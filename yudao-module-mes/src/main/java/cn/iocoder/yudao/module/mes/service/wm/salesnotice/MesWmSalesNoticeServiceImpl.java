@@ -37,7 +37,6 @@ public class MesWmSalesNoticeServiceImpl implements MesWmSalesNoticeService {
 
     @Resource
     private MesWmSalesNoticeLineService salesNoticeLineService;
-
     @Resource
     private MesMdClientService clientService;
 
@@ -112,14 +111,7 @@ public class MesWmSalesNoticeServiceImpl implements MesWmSalesNoticeService {
     }
 
     @Override
-    public List<MesWmSalesNoticeDO> getSalesNoticeListByStatus(Integer status) {
-        if (status == null) {
-            return salesNoticeMapper.selectList();
-        }
-        return salesNoticeMapper.selectListByStatus(status);
-    }
-
-    private MesWmSalesNoticeDO validateSalesNoticeExists(Long id) {
+    public MesWmSalesNoticeDO validateSalesNoticeExists(Long id) {
         MesWmSalesNoticeDO notice = salesNoticeMapper.selectById(id);
         if (notice == null) {
             throw exception(WM_SALES_NOTICE_NOT_EXISTS);
@@ -140,15 +132,15 @@ public class MesWmSalesNoticeServiceImpl implements MesWmSalesNoticeService {
 
     private void validateSalesNoticeSave(MesWmSalesNoticeSaveReqVO saveReqVO) {
         // 校验编码唯一
-        validateNoticeCodeUnique(saveReqVO.getId(), saveReqVO.getNoticeCode());
+        validateNoticeCodeUnique(saveReqVO.getId(), saveReqVO.getCode());
         // 校验客户存在
         if (saveReqVO.getClientId() != null) {
-            clientService.validateClientExists(saveReqVO.getClientId());
+            clientService.validateClientExistsAndEnable(saveReqVO.getClientId());
         }
     }
 
-    private void validateNoticeCodeUnique(Long id, String noticeCode) {
-        MesWmSalesNoticeDO notice = salesNoticeMapper.selectByNoticeCode(noticeCode);
+    private void validateNoticeCodeUnique(Long id, String code) {
+        MesWmSalesNoticeDO notice = salesNoticeMapper.selectByCode(code);
         if (notice == null) {
             return;
         }

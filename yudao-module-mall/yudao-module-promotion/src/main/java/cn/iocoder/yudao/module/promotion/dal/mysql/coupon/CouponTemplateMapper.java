@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.mybatis.core.util.MyBatisUtils;
 import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.template.CouponTemplatePageReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponTemplateDO;
 import cn.iocoder.yudao.module.promotion.enums.coupon.CouponTemplateValidityTypeEnum;
@@ -34,7 +35,7 @@ public interface CouponTemplateMapper extends BaseMapperX<CouponTemplateDO> {
                 .eqIfPresent(CouponTemplateDO::getDiscountType, reqVO.getDiscountType())
                 .betweenIfPresent(CouponTemplateDO::getCreateTime, reqVO.getCreateTime())
                 .eqIfPresent(CouponTemplateDO::getProductScope, reqVO.getProductScope())
-                .and(reqVO.getProductScopeValue() != null, w -> w.apply("FIND_IN_SET({0}, product_scope_values)",
+                .and(reqVO.getProductScopeValue() != null, w -> w.apply(MyBatisUtils.findInSet("product_scope_values"),
                         reqVO.getProductScopeValue()))
                 .and(canTakeConsumer != null, canTakeConsumer)
                 .orderByDesc(CouponTemplateDO::getId));
@@ -61,7 +62,7 @@ public interface CouponTemplateMapper extends BaseMapperX<CouponTemplateDO> {
         Consumer<LambdaQueryWrapper<CouponTemplateDO>> canTakeConsumer = buildCanTakeQueryConsumer(canTakeTypes);
         return selectList(new LambdaQueryWrapperX<CouponTemplateDO>()
                 .eqIfPresent(CouponTemplateDO::getProductScope, productScope)
-                .and(productScopeValue != null, w -> w.apply("FIND_IN_SET({0}, product_scope_values)",
+                .and(productScopeValue != null, w -> w.apply(MyBatisUtils.findInSet("product_scope_values"),
                         productScopeValue))
                 .and(canTakeConsumer != null, canTakeConsumer)
                 .last(" LIMIT " + count)

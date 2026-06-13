@@ -26,7 +26,7 @@ public class MesDvMachinerySaveReqVO {
     private String brand;
 
     @Schema(description = "规格型号", example = "S7-300")
-    private String spec;
+    private String specification;
 
     @Schema(description = "设备类型编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
     @NotNull(message = "设备类型不能为空")

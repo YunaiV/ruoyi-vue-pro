@@ -4,10 +4,10 @@ import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
+import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleConditionOperatorEnum;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleTriggerTypeEnum;
 import cn.iocoder.yudao.module.iot.service.rule.scene.matcher.IotBaseConditionMatcherTest;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -23,7 +23,6 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author HUIHUI
  */
-@Disabled // TODO @puhui999：单测有报错，先屏蔽
 public class IotDeviceServiceInvokeTriggerMatcherTest extends IotBaseConditionMatcherTest {
 
     private IotDeviceServiceInvokeTriggerMatcher matcher;
@@ -487,7 +486,7 @@ public class IotDeviceServiceInvokeTriggerMatcherTest extends IotBaseConditionMa
         IotSceneRuleDO.Trigger trigger = new IotSceneRuleDO.Trigger();
         trigger.setType(IotSceneRuleTriggerTypeEnum.DEVICE_SERVICE_INVOKE.getType());
         trigger.setIdentifier(serviceIdentifier);
-        trigger.setOperator("=="); // 等于操作符
+        trigger.setOperator(IotSceneRuleConditionOperatorEnum.EQUALS.getOperator()); // 等于操作符
         trigger.setValue("auto");
 
         // 调用

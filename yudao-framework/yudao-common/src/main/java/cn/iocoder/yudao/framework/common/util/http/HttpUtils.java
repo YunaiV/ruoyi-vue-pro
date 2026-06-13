@@ -1,9 +1,7 @@
 package cn.iocoder.yudao.framework.common.util.http;
 
 import cn.hutool.core.codec.Base64;
-import cn.hutool.core.map.TableMap;
 import cn.hutool.core.net.url.UrlBuilder;
-import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
@@ -11,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.util.UriUtils;
 
 import java.net.URI;
 import java.net.URLDecoder;
@@ -57,19 +56,65 @@ public class HttpUtils {
      * @return 解码后的路径
      */
     public static String decodeUrlPath(String path) {
+        if (StrUtil.isEmpty(path)) {
+            return path;
+        }
         // 先将 + 替换为 %2B，避免被 URLDecoder 解码为空格
         String encoded = path.replace("+", "%2B");
         return URLDecoder.decode(encoded, StandardCharsets.UTF_8);
     }
 
-    @SuppressWarnings("unchecked")
+    /**
+     * 编码 URL 路径，按路径段编码，保留 / 分隔符
+     *
+     * @param path URL 路径，例如 20250602/xxx.pdf
+     * @return 编码后的路径
+     */
+    public static String encodeUrlPath(String path) {
+        if (StrUtil.isEmpty(path)) {
+            return path;
+        }
+        String[] segments = path.split(StrUtil.SLASH, -1);
+        StringBuilder result = new StringBuilder(path.length());
+        for (int i = 0; i < segments.length; i++) {
+            if (i > 0) {
+                result.append(StrUtil.SLASH);
+            }
+            result.append(encodeUrlPathSegment(segments[i]));
+        }
+        return result.toString();
+    }
+
+    /**
+     * 编码 URL 路径段
+     *
+     * @param segment URL 路径段
+     * @return 编码后的路径段
+     */
+    public static String encodeUrlPathSegment(String segment) {
+        return UriUtils.encodePathSegment(segment, StandardCharsets.UTF_8);
+    }
+
+    public static String removeUrlPathQueryAndFragment(String path) {
+        if (StrUtil.isEmpty(path)) {
+            return path;
+        }
+        int endIndex = path.length();
+        int queryIndex = path.indexOf('?');
+        if (queryIndex >= 0) {
+            endIndex = queryIndex;
+        }
+        int fragmentIndex = path.indexOf('#');
+        if (fragmentIndex >= 0 && fragmentIndex < endIndex) {
+            endIndex = fragmentIndex;
+        }
+        return path.substring(0, endIndex);
+    }
+
     public static String replaceUrlQuery(String url, String key, String value) {
         UrlBuilder builder = UrlBuilder.of(url, Charset.defaultCharset());
-        // 先移除
-        TableMap<CharSequence, CharSequence> query = (TableMap<CharSequence, CharSequence>)
-                ReflectUtil.getFieldValue(builder.getQuery(), "query");
-        query.remove(key);
-        // 后添加
+        // 先移除；再添加
+        builder.getQuery().remove(key);
         builder.addQuery(key, value);
         return builder.build();
     }

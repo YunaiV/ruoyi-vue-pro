@@ -14,6 +14,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import cn.iocoder.yudao.module.mes.enums.DictTypeConstants;
 
 /**
  * MES 生产工单 DO
@@ -51,12 +52,14 @@ public class MesProWorkOrderDO extends BaseDO {
     /**
      * 工单类型
      *
+     * 字典 {@link DictTypeConstants#MES_PRO_WORK_ORDER_TYPE}
      * 枚举 {@link MesProWorkOrderTypeEnum}
      */
     private Integer type;
     /**
      * 来源类型
      *
+     * 字典 {@link DictTypeConstants#MES_PRO_WORK_ORDER_SOURCE_TYPE}
      * 枚举 {@link MesProWorkOrderSourceTypeEnum}
      */
     private Integer orderSourceType;
@@ -123,6 +126,7 @@ public class MesProWorkOrderDO extends BaseDO {
     /**
      * 工单状态
      *
+     * 字典 {@link DictTypeConstants#MES_PRO_WORK_ORDER_STATUS}
      * 枚举 {@link MesProWorkOrderStatusEnum}
      */
     private Integer status;

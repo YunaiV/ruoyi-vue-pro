@@ -88,4 +88,19 @@ public interface OAuth2TokenService {
      */
     PageResult<OAuth2AccessTokenDO> getAccessTokenPage(OAuth2AccessTokenPageReqVO reqVO);
 
+    /**
+     * 清理过期 exceedDay 天的刷新令牌
+     *
+     * @param exceedDay   过期多少天就进行清理
+     * @param deleteLimit 清理的间隔条数
+     */
+    Integer cleanRefreshToken(Integer exceedDay, Integer deleteLimit);
+
+    /**
+     * 清理过期 exceedDay 天的访问令牌
+     *
+     * @param exceedDay   过期多少天就进行清理
+     * @param deleteLimit 清理的间隔条数
+     */
+    Integer cleanAccessToken(Integer exceedDay, Integer deleteLimit);
 }

@@ -89,4 +89,9 @@ public class MesMdWorkstationToolServiceImpl implements MesMdWorkstationToolServ
         workstationToolMapper.deleteByWorkstationId(workstationId);
     }
 
+    @Override
+    public Long getWorkstationToolCountByToolTypeId(Long toolTypeId) {
+        return workstationToolMapper.selectCountByToolTypeId(toolTypeId);
+    }
+
 }

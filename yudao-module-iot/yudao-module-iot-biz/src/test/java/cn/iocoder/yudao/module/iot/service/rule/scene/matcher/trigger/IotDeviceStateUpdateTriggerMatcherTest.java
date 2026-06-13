@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.service.rule.scene.matcher.trigger;
 
+import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.enums.device.IotDeviceStateEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
@@ -8,7 +9,6 @@ import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleConditionOperatorEnum;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleTriggerTypeEnum;
 import cn.iocoder.yudao.module.iot.service.rule.scene.matcher.IotBaseConditionMatcherTest;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
@@ -19,7 +19,6 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author HUIHUI
  */
-@Disabled // TODO @puhui999：单测有报错，先屏蔽
 public class IotDeviceStateUpdateTriggerMatcherTest extends IotBaseConditionMatcherTest {
 
     private IotDeviceStateUpdateTriggerMatcher matcher;
@@ -250,7 +249,7 @@ public class IotDeviceStateUpdateTriggerMatcherTest extends IotBaseConditionMatc
         IotDeviceMessage message = new IotDeviceMessage();
         message.setDeviceId(randomLongId());
         message.setMethod(IotDeviceMessageMethodEnum.STATE_UPDATE.getMethod());
-        message.setParams(state);
+        message.setParams(MapUtil.of("state", state));
         return message;
     }
 

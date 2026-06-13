@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import cn.iocoder.yudao.module.mes.enums.DictTypeConstants;
 
 /**
  * MES 盘点方案 DO
@@ -44,6 +45,7 @@ public class MesWmStockTakingPlanDO extends BaseDO {
     /**
      * 盘点类型
      *
+     * 字典 {@link DictTypeConstants#MES_WM_STOCK_TAKING_TYPE}
      * 枚举 {@link MesWmStockTakingTypeEnum}
      */
     private Integer type;

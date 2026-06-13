@@ -9,8 +9,65 @@ import jakarta.validation.Validation;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 @SuppressWarnings("resource")
 public class S3FileClientTest {
+
+    @Test
+    public void testPresignGetUrl_publicAccess_encodeUrlPath() {
+        // 准备参数
+        S3FileClientConfig config = new S3FileClientConfig();
+        config.setDomain("https://static.iocoder.cn");
+        config.setEnablePublicAccess(true);
+        S3FileClient client = new S3FileClient(0L, config);
+
+        // 调用
+        String result = client.presignGetUrl("avatar/中文 100%+文件.jpg", 300);
+
+        // 断言
+        assertEquals("https://static.iocoder.cn/avatar/%E4%B8%AD%E6%96%87%20100%25+%E6%96%87%E4%BB%B6.jpg", result);
+    }
+
+    @Test
+    public void testPresignGetUrl_publicAccess_decodeDomainUrl() {
+        // 准备参数
+        S3FileClientConfig config = new S3FileClientConfig();
+        config.setDomain("https://static.iocoder.cn");
+        config.setEnablePublicAccess(true);
+        S3FileClient client = new S3FileClient(0L, config);
+
+        // 调用
+        String result = client.presignGetUrl("https://static.iocoder.cn/avatar/%E4%B8%AD%E6%96%87%20100%25+%E6%96%87%E4%BB%B6.jpg?token=1", 300);
+
+        // 断言
+        assertEquals("https://static.iocoder.cn/avatar/%E4%B8%AD%E6%96%87%20100%25+%E6%96%87%E4%BB%B6.jpg", result);
+    }
+
+    @Test
+    public void testPresignGetUrl_privateAccess_rawPath() {
+        // 准备参数
+        S3FileClientConfig config = new S3FileClientConfig();
+        config.setAccessKey("admin");
+        config.setAccessSecret("password");
+        config.setBucket("yudao");
+        config.setDomain("http://127.0.0.1:9000/yudao");
+        config.setEndpoint("http://127.0.0.1:9000");
+        config.setEnablePathStyleAccess(true);
+        config.setEnablePublicAccess(false);
+        S3FileClient client = new S3FileClient(0L, config);
+        client.init();
+
+        // 调用
+        String result = client.presignGetUrl("avatar/中文 100%+文件.jpg", 300);
+
+        // 断言
+        assertTrue(result.contains("/yudao/avatar/%E4%B8%AD%E6%96%87%20100%25"));
+        assertTrue(result.contains("%E6%96%87%E4%BB%B6.jpg"));
+        assertFalse(result.contains("%25E4%25B8%25AD"));
+    }
 
     @Test
     @Disabled // MinIO，如果要集成测试，可以注释本行

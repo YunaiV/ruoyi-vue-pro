@@ -14,20 +14,19 @@ public class MesWmReturnVendorDetailSaveReqVO {
     @Schema(description = "编号", example = "1024")
     private Long id;
 
+    @Schema(description = "退货单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @NotNull(message = "退货单编号不能为空")
+    private Long returnId;
     @Schema(description = "退货单行编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "退货单行编号不能为空")
     private Long lineId;
 
-    @Schema(description = "退货单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    @NotNull(message = "退货单编号不能为空")
-    private Long returnId;
+    @Schema(description = "库存记录编号", example = "1")
+    private Long materialStockId;
 
     @Schema(description = "物料编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "物料编号不能为空")
     private Long itemId;
-
-    @Schema(description = "库存记录编号", example = "1")
-    private Long materialStockId;
 
     @Schema(description = "退货数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "300.00")
     @NotNull(message = "退货数量不能为空")

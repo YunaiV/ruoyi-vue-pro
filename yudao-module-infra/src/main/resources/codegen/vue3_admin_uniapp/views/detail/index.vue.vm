@@ -62,6 +62,7 @@
   #end
 #end
 import type { ${simpleClassName} } from '@/api/${table.moduleName}/${table.businessName}'
+import { onUnload } from '@dcloudio/uni-app'
 import { onMounted, ref } from 'vue'
 import { useToast } from 'wot-design-uni'
 import { delete${simpleClassName}, get${simpleClassName} } from '@/api/${table.moduleName}/${table.businessName}'
@@ -87,8 +88,8 @@ definePage({
 
 const { hasAccessByCodes } = useAccess()
 const toast = useToast()
-const formData = ref<${simpleClassName}>()
-const deleting = ref(false)
+const formData = ref<${simpleClassName}>() // 详情数据
+const deleting = ref(false) // 删除状态
 
 /** 返回上一页 */
 function handleBack() {
@@ -97,7 +98,7 @@ function handleBack() {
 
 /** 加载${table.classComment}详情 */
 async function getDetail() {
-  if (!props.id) {
+  if (!props.id || deleting.value) {
     return
   }
   try {
@@ -131,6 +132,7 @@ function handleDelete() {
       try {
         await delete${simpleClassName}(props.id)
         toast.success('删除成功')
+        uni.$emit('${table.moduleName}:${table.businessName}:reload')
         setTimeout(() => {
           handleBack()
         }, 500)
@@ -143,7 +145,13 @@ function handleDelete() {
 
 /** 初始化 */
 onMounted(() => {
+  uni.$on('${table.moduleName}:${table.businessName}:reload', getDetail)
   getDetail()
+})
+
+/** 卸载 */
+onUnload(() => {
+  uni.$off('${table.moduleName}:${table.businessName}:reload', getDetail)
 })
 </script>
 

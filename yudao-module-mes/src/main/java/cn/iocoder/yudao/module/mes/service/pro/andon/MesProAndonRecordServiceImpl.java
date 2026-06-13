@@ -34,13 +34,10 @@ public class MesProAndonRecordServiceImpl implements MesProAndonRecordService {
 
     @Resource
     private MesMdWorkstationService workstationService;
-
     @Resource
     private MesProWorkOrderService workOrderService;
-
     @Resource
     private MesProProcessService processService;
-
     @Resource
     private MesProAndonConfigService andonConfigService;
 
@@ -50,10 +47,10 @@ public class MesProAndonRecordServiceImpl implements MesProAndonRecordService {
         MesProAndonConfigDO config = andonConfigService.validateAndonConfigExists(createReqVO.getConfigId());
         workstationService.validateWorkstationExists(createReqVO.getWorkstationId());
         if (createReqVO.getWorkOrderId() != null) {
-            workOrderService.validateWorkOrderExists(createReqVO.getWorkOrderId());
+            workOrderService.validateWorkOrderConfirmed(createReqVO.getWorkOrderId());
         }
         if (createReqVO.getProcessId() != null) {
-            processService.validateProcessExists(createReqVO.getProcessId());
+            processService.validateProcessExistsAndEnable(createReqVO.getProcessId());
         }
 
         // 2. 插入记录

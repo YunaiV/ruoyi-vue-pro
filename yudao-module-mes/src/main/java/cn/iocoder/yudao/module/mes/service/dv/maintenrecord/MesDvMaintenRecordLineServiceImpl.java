@@ -73,7 +73,7 @@ public class MesDvMaintenRecordLineServiceImpl implements MesDvMaintenRecordLine
         // 校验保养记录为草稿状态
         maintenRecordService.validateMaintenRecordDraft(reqVO.getRecordId());
         // 校验保养项目是否存在
-        subjectService.validateSubjectExists(reqVO.getSubjectId());
+        subjectService.validateSubjectExistsAndEnable(reqVO.getSubjectId());
     }
 
     private MesDvMaintenRecordLineDO validateMaintenRecordLineExists(Long id) {

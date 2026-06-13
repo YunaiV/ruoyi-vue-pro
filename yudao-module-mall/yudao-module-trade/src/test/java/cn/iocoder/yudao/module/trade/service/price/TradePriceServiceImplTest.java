@@ -6,12 +6,10 @@ import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
 import cn.iocoder.yudao.module.product.api.spu.ProductSpuApi;
 import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
-import cn.iocoder.yudao.module.product.enums.spu.ProductSpuStatusEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
 import cn.iocoder.yudao.module.trade.service.price.calculator.TradePriceCalculator;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -30,7 +28,6 @@ import static org.mockito.Mockito.when;
  *
  * @author 芋道源码
  */
-@Disabled // TODO 芋艿：后续 fix 补充的单测
 public class TradePriceServiceImplTest extends BaseMockitoUnitTest {
 
     @InjectMocks
@@ -67,9 +64,8 @@ public class TradePriceServiceImplTest extends BaseMockitoUnitTest {
                                 .setValueId(4L).setValueName("黑色")))
         );
         when(productSkuApi.getSkuList(Mockito.eq(asSet(100L, 200L, 300L)))).thenReturn(skuList);
-        when(productSpuApi.getSpuList(Mockito.eq(asSet(1001L))))
-                .thenReturn(singletonList(new ProductSpuRespDTO().setId(1001L).setName("小菜").setCategoryId(666L)
-                        .setStatus(ProductSpuStatusEnum.ENABLE.getStatus())));
+        when(productSpuApi.validateSpuList(Mockito.eq(asSet(1001L))))
+                .thenReturn(singletonList(new ProductSpuRespDTO().setId(1001L).setName("小菜").setCategoryId(666L)));
 
         // 调用
         TradePriceCalculateRespBO calculateRespBO = tradePriceService.calculateOrderPrice(calculateReqBO);

@@ -39,10 +39,8 @@ public class MesProRouteProductBomController {
 
     @Resource
     private MesProRouteProductBomService routeProductBomService;
-
     @Resource
     private MesMdItemService itemService;
-
     @Resource
     private MesMdUnitMeasureService unitMeasureService;
 

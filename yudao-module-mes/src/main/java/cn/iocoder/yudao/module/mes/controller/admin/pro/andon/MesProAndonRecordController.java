@@ -50,13 +50,10 @@ public class MesProAndonRecordController {
 
     @Resource
     private MesProAndonRecordService andonRecordService;
-
     @Resource
     private MesMdWorkstationService workstationService;
-
     @Resource
     private MesProWorkOrderService workOrderService;
-
     @Resource
     private MesProProcessService processService;
 

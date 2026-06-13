@@ -19,12 +19,15 @@ public class MesProWorkOrderItemRespVO {
     private String itemName;
 
     @Schema(description = "规格型号", example = "0603")
-    private String itemSpec;
+    private String itemSpecification;
 
     @Schema(description = "单位名称", example = "个")
     private String unitMeasureName;
 
     @Schema(description = "需求数量", example = "1000.00")
     private BigDecimal quantity;
+
+    @Schema(description = "物料/产品标识", example = "ITEM")
+    private String itemOrProduct;
 
 }

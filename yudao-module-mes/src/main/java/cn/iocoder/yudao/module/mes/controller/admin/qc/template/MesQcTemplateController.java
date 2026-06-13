@@ -77,13 +77,6 @@ public class MesQcTemplateController {
         return success(BeanUtils.toBean(pageResult, MesQcTemplateRespVO.class));
     }
 
-    @GetMapping("/simple-list")
-    @Operation(summary = "获得质检方案精简列表", description = "主要用于前端的下拉选项")
-    public CommonResult<List<MesQcTemplateRespVO>> getTemplateSimpleList() {
-        List<MesQcTemplateDO> list = templateService.getTemplateList();
-        return success(BeanUtils.toBean(list, MesQcTemplateRespVO.class));
-    }
-
     @GetMapping("/export-excel")
     @Operation(summary = "导出质检方案 Excel")
     @PreAuthorize("@ss.hasPermission('mes:qc-template:export')")

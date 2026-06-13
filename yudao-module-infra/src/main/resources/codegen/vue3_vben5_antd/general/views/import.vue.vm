@@ -1,0 +1,71 @@
+<script lang="ts" setup>
+import type { FileType } from 'ant-design-vue/es/upload/interface';
+
+import { ref } from 'vue';
+
+import { useVbenModal } from '@vben/common-ui';
+import { downloadFileFromBlobPart } from '@vben/utils';
+
+import { Button, message, Upload } from 'ant-design-vue';
+
+import { import${simpleClassName}, import${simpleClassName}Template } from '#/api/${table.moduleName}/${table.businessName}';
+
+defineOptions({ name: '${simpleClassName}Import' });
+
+const emit = defineEmits(['success']);
+const fileRef = ref<File | null>(null);
+
+const [Modal, modalApi] = useVbenModal({
+  async onConfirm() {
+    if (!fileRef.value) {
+      message.error('请上传文件');
+      return;
+    }
+    modalApi.lock();
+    try {
+      const formData = new FormData();
+      formData.append('file', fileRef.value);
+      const response: any = await import${simpleClassName}(formData);
+      const data = response?.data ?? response ?? {};
+      let text = '导入成功数量：' + (data.successCount || 0) + '；导入失败数量：' + (data.failureCount || 0) + '；';
+      if (data.failureRows) {
+        Object.keys(data.failureRows).forEach((rowNo) => {
+          text += '< 第' + rowNo + '行: ' + data.failureRows[rowNo] + ' >';
+        });
+      }
+      message.info(text);
+      await modalApi.close();
+      emit('success');
+    } finally {
+      modalApi.unlock();
+    }
+  },
+});
+
+/** 上传前：拦截 antd Upload 的自动上传，文件存到 ref */
+function beforeUpload(file: FileType) {
+  fileRef.value = file as unknown as File;
+  return false;
+}
+
+/** 下载导入模板 */
+async function handleDownload() {
+  const data = await import${simpleClassName}Template();
+  downloadFileFromBlobPart({ fileName: '${table.classComment}导入模板.xls', source: data });
+}
+</script>
+
+<template>
+  <Modal title="导入${table.classComment}" class="w-1/3">
+    <div class="mx-4">
+      <Upload :max-count="1" accept=".xls,.xlsx" :before-upload="beforeUpload">
+        <Button type="primary"> 选择 Excel 文件 </Button>
+      </Upload>
+    </div>
+    <template #prepend-footer>
+      <div class="flex flex-auto items-center">
+        <Button @click="handleDownload"> 下载导入模板 </Button>
+      </div>
+    </template>
+  </Modal>
+</template>

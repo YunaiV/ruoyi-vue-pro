@@ -84,4 +84,19 @@ public class CodegenBuilderTest extends BaseMockitoUnitTest {
         assertEquals("input", column.getHtmlType());
     }
 
+    @Test
+    public void testSanitizeComment() {
+        // 1. null / 空字符串：原样返回
+        assertNull(codegenBuilder.sanitizeComment(null));
+        assertEquals("", codegenBuilder.sanitizeComment(""));
+        // 2. 无英文引号：原样返回
+        assertEquals("无引号注释", codegenBuilder.sanitizeComment("无引号注释"));
+        // 3. 含英文双引号：替换为中文左双引号
+        assertEquals("含“双“引号", codegenBuilder.sanitizeComment("含\"双\"引号"));
+        // 4. 含英文单引号：替换为中文左单引号
+        assertEquals("含‘单‘引号", codegenBuilder.sanitizeComment("含'单'引号"));
+        // 5. 双 / 单引号混合
+        assertEquals("“混‘搭“‘", codegenBuilder.sanitizeComment("\"混'搭\"'"));
+    }
+
 }

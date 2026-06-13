@@ -41,6 +41,7 @@ public class MesWmTransactionServiceImpl implements MesWmTransactionService {
 
     @Resource
     private MesWmTransactionMapper transactionMapper;
+
     @Resource
     private MesWmMaterialStockService materialStockService;
     @Resource

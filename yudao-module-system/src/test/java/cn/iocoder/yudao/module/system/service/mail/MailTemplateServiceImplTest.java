@@ -157,6 +157,23 @@ public class MailTemplateServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
+    public void testGetMailTemplateListByStatus() {
+        // mock 数据
+        MailTemplateDO dbMailTemplate = randomPojo(MailTemplateDO.class,
+                o -> o.setStatus(CommonStatusEnum.ENABLE.getStatus()));
+        mailTemplateMapper.insert(dbMailTemplate);
+        mailTemplateMapper.insert(cloneIgnoreId(dbMailTemplate,
+                o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
+
+        // 调用
+        List<MailTemplateDO> list = mailTemplateService.getMailTemplateListByStatus(
+                CommonStatusEnum.ENABLE.getStatus());
+        // 断言
+        assertEquals(1, list.size());
+        assertPojoEquals(dbMailTemplate, list.get(0));
+    }
+
+    @Test
     public void testGetMailTemplate() {
         // mock 数据
         MailTemplateDO dbMailTemplate = randomPojo(MailTemplateDO.class);

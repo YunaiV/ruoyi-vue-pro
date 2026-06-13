@@ -31,10 +31,8 @@ public class MesWmProductReceiptLineServiceImpl implements MesWmProductReceiptLi
     @Resource
     @Lazy
     private MesWmProductReceiptService productReceiptService;
-
     @Resource
     private MesWmProductReceiptDetailService productReceiptDetailService;
-
     @Resource
     private MesMdItemService itemService;
 
@@ -111,7 +109,7 @@ public class MesWmProductReceiptLineServiceImpl implements MesWmProductReceiptLi
         // 校验父单据存在且为可编辑状态
         productReceiptService.validateProductReceiptEditable(reqVO.getReceiptId());
         // 校验物料存在
-        itemService.validateItemExists(reqVO.getItemId());
+        itemService.validateItemExistsAndEnable(reqVO.getItemId());
     }
 
 }

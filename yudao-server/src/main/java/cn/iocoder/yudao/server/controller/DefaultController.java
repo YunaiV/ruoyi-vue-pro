@@ -46,10 +46,28 @@ public class DefaultController {
                 "[ERP 模块 yudao-module-erp - 已禁用][参考 https://doc.iocoder.cn/erp/build/ 开启]");
     }
 
+    @RequestMapping(value = { "/admin-api/wms/**"})
+    public CommonResult<Boolean> wms404() {
+        return CommonResult.error(NOT_IMPLEMENTED.getCode(),
+                "[WMS 仓库管理系统 yudao-module-wms - 已禁用][参考 https://doc.iocoder.cn/wms/build/ 开启]");
+    }
+
     @RequestMapping("/admin-api/crm/**")
     public CommonResult<Boolean> crm404() {
         return CommonResult.error(NOT_IMPLEMENTED.getCode(),
                 "[CRM 模块 yudao-module-crm - 已禁用][参考 https://doc.iocoder.cn/crm/build/ 开启]");
+    }
+
+    @RequestMapping(value = { "/admin-api/mes/**"})
+    public CommonResult<Boolean> mes404() {
+        return CommonResult.error(NOT_IMPLEMENTED.getCode(),
+                "[MES 系统 yudao-module-mes - 已禁用][参考 https://doc.iocoder.cn/mes/build/ 开启]");
+    }
+
+    @RequestMapping(value = { "/admin-api/im/**"})
+    public CommonResult<Boolean> im404() {
+        return CommonResult.error(NOT_IMPLEMENTED.getCode(),
+                "[IM 即时通讯 yudao-module-im - 已禁用][参考 https://doc.iocoder.cn/im/build/ 开启]");
     }
 
     @RequestMapping(value = { "/admin-api/report/**"})

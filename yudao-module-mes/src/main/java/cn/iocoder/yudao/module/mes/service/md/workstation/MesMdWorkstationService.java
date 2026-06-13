@@ -50,6 +50,14 @@ public interface MesMdWorkstationService {
     MesMdWorkstationDO validateWorkstationExists(Long id);
 
     /**
+     * 校验工作站存在且启用
+     *
+     * @param id 编号
+     * @return 工作站
+     */
+    MesMdWorkstationDO validateWorkstationExistsAndEnable(Long id);
+
+    /**
      * 获得工作站
      *
      * @param id 编号
@@ -96,6 +104,14 @@ public interface MesMdWorkstationService {
      * @return 工作站数量
      */
     Long getWorkstationCountByAreaId(Long areaId);
+
+    /**
+     * 获得指定车间下的工作站数量
+     *
+     * @param workshopId 车间编号
+     * @return 工作站数量
+     */
+    Long getWorkstationCountByWorkshopId(Long workshopId);
 
     /**
      * 获得工作站列表

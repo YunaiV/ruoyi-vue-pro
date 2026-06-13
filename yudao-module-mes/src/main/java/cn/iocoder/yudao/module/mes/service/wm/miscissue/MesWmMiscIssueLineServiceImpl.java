@@ -32,14 +32,11 @@ public class MesWmMiscIssueLineServiceImpl implements MesWmMiscIssueLineService 
     @Resource
     @Lazy
     private MesWmMiscIssueService miscIssueService;
-
     @Resource
     @Lazy
     private MesWmMiscIssueDetailService miscIssueDetailService;
-
     @Resource
     private MesMdItemService itemService;
-
     @Resource
     private MesWmWarehouseAreaService warehouseAreaService;
 
@@ -132,7 +129,7 @@ public class MesWmMiscIssueLineServiceImpl implements MesWmMiscIssueLineService 
         // 校验父单据存在且为可编辑状态
         miscIssueService.validateMiscIssueEditable(issueId);
         // 校验物料存在
-        itemService.validateItemExists(reqVO.getItemId());
+        itemService.validateItemExistsAndEnable(reqVO.getItemId());
         // 校验仓库、库区、库位的父子关系
         warehouseAreaService.validateWarehouseAreaExists(reqVO.getWarehouseId(),
                 reqVO.getLocationId(), reqVO.getAreaId());

@@ -38,14 +38,14 @@ public class MesMdAutoCodeRecordDO extends BaseDO {
      */
     private String result;
     /**
-     * 传入的参数
-     */
-    private String inputChar;
-    /**
      * 生成的流水号
      *
      * 当规则组成中包含流水号分段（{@link MesMdAutoCodePartTypeEnum#SERIAL_NUMBER}）时记录，方便追溯和调试
      */
     private Long serialNo;
+    /**
+     * 传入的参数
+     */
+    private String inputChar;
 
 }

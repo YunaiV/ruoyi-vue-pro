@@ -259,10 +259,10 @@ public class MesWmOutsourceIssueServiceImpl implements MesWmOutsourceIssueServic
         validateCodeUnique(saveReqVO.getId(), saveReqVO.getCode());
         // 校验供应商存在
         if (saveReqVO.getVendorId() != null) {
-            vendorService.validateVendorExists(saveReqVO.getVendorId());
+            vendorService.validateVendorExistsAndEnable(saveReqVO.getVendorId());
         }
         // 校验工单存在且类型为外协（代工）
-        MesProWorkOrderDO workOrder = workOrderService.validateWorkOrderExists(saveReqVO.getWorkOrderId());
+        MesProWorkOrderDO workOrder = workOrderService.validateWorkOrderConfirmed(saveReqVO.getWorkOrderId());
         if (ObjUtil.notEqual(workOrder.getType(), MesProWorkOrderTypeEnum.OUTSOURCE.getType())) {
             throw exception(WM_OUTSOURCE_ISSUE_WORK_ORDER_TYPE_INVALID);
         }
@@ -279,6 +279,11 @@ public class MesWmOutsourceIssueServiceImpl implements MesWmOutsourceIssueServic
         if (ObjUtil.notEqual(id, issue.getId())) {
             throw exception(WM_OUTSOURCE_ISSUE_CODE_DUPLICATE);
         }
+    }
+
+    @Override
+    public Long getOutsourceIssueCountByVendorId(Long vendorId) {
+        return outsourceIssueMapper.selectCountByVendorId(vendorId);
     }
 
 }

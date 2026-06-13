@@ -92,6 +92,16 @@
         >
           <Icon icon="ep:plus" class="mr-5px" /> 新增
         </el-button>
+#if ($importEnable)
+        <el-button
+          type="warning"
+          plain
+          @click="handleImport"
+          v-hasPermi="['${permissionPrefix}:import']"
+        >
+          <Icon icon="ep:upload" class="mr-5px" /> 导入
+        </el-button>
+#end
         <el-button
           type="success"
           plain
@@ -237,6 +247,11 @@
       @pagination="getList"
     />
   </ContentWrap>
+#if ($importEnable)
+
+  <!-- 导入弹窗 -->
+  <${simpleClassName}ImportForm ref="importRef" @success="getList" />
+#end
 
   <!-- 表单弹窗：添加/修改 -->
   <${simpleClassName}Form ref="formRef" @success="getList" />
@@ -263,6 +278,9 @@
 import { getIntDictOptions, getStrDictOptions, getBoolDictOptions, DICT_TYPE } from '@/utils/dict'
 import { isEmpty } from '@/utils/is'
 import { dateFormatter } from '@/utils/formatTime'
+#if ($importEnable)
+import ${simpleClassName}ImportForm from './${simpleClassName}ImportForm.vue'
+#end
 ## 特殊：树表专属逻辑
 #if ( $table.templateType == 2 )
 import { handleTree } from '@/utils/tree'
@@ -308,6 +326,9 @@ const queryParams = reactive({
 })
 const queryFormRef = ref() // 搜索的表单
 const exportLoading = ref(false) // 导出的加载中
+#if ($importEnable)
+const importRef = ref() // ${table.classComment} 导入组件的 Ref
+#end
 
 /** 查询列表 */
 const getList = async () => {
@@ -344,6 +365,13 @@ const formRef = ref()
 const openForm = (type: string, id?: number) => {
   formRef.value.open(type, id)
 }
+#if ($importEnable)
+
+/** 导入按钮操作 */
+const handleImport = () => {
+  importRef.value.open()
+}
+#end
 
 /** 删除按钮操作 */
 const handleDelete = async (id: number) => {

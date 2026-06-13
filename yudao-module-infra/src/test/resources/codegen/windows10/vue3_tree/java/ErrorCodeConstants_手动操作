@@ -1,8 +1,0 @@
-// TODO 待办：请将下面的错误码复制到 yudao-module-infra-api 模块的 ErrorCodeConstants 类中。注意，请给“TODO 补充编号”设置一个错误码编号！！！
-// ========== 分类 TODO 补充编号 ==========
-ErrorCode CATEGORY_NOT_EXISTS = new ErrorCode(TODO 补充编号, "分类不存在");
-ErrorCode CATEGORY_EXITS_CHILDREN = new ErrorCode(TODO 补充编号, "存在存在子分类，无法删除");
-ErrorCode CATEGORY_PARENT_NOT_EXITS = new ErrorCode(TODO 补充编号,"父级分类不存在");
-ErrorCode CATEGORY_PARENT_ERROR = new ErrorCode(TODO 补充编号, "不能设置自己为父分类");
-ErrorCode CATEGORY_NAME_DUPLICATE = new ErrorCode(TODO 补充编号, "已经存在该名字的分类");
-ErrorCode CATEGORY_PARENT_IS_CHILD = new ErrorCode(TODO 补充编号, "不能设置自己的子InfraCategory为父InfraCategory");

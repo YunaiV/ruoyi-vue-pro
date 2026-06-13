@@ -42,7 +42,6 @@ public class MesWmArrivalNoticeController {
 
     @Resource
     private MesWmArrivalNoticeService arrivalNoticeService;
-
     @Resource
     private MesMdVendorService vendorService;
 
@@ -110,15 +109,6 @@ public class MesWmArrivalNoticeController {
     public CommonResult<Boolean> submitArrivalNotice(@RequestParam("id") Long id) {
         arrivalNoticeService.submitArrivalNotice(id);
         return success(true);
-    }
-
-    @GetMapping("/simple-list")
-    @Operation(summary = "获得到货通知单精简列表")
-    @Parameter(name = "status", description = "状态", example = "2")
-    public CommonResult<List<MesWmArrivalNoticeRespVO>> getArrivalNoticeSimpleList(
-            @RequestParam(value = "status", required = false) Integer status) {
-        List<MesWmArrivalNoticeDO> list = arrivalNoticeService.getArrivalNoticeListByStatus(status);
-        return success(buildRespVOList(list));
     }
 
     // ==================== 拼接 VO ====================

@@ -7,7 +7,6 @@ import cn.iocoder.yudao.module.mes.controller.admin.wm.stocktaking.plan.vo.MesWm
 import cn.iocoder.yudao.module.mes.dal.dataobject.wm.stocktaking.plan.MesWmStockTakingPlanDO;
 import org.apache.ibatis.annotations.Mapper;
 
-import java.util.List;
 
 /**
  * MES 盘点方案 Mapper
@@ -26,12 +25,7 @@ public interface MesWmStockTakingPlanMapper extends BaseMapperX<MesWmStockTaking
                 .likeIfPresent(MesWmStockTakingPlanDO::getCode, reqVO.getCode())
                 .likeIfPresent(MesWmStockTakingPlanDO::getName, reqVO.getName())
                 .eqIfPresent(MesWmStockTakingPlanDO::getType, reqVO.getType())
-                .orderByDesc(MesWmStockTakingPlanDO::getId));
-    }
-
-    default List<MesWmStockTakingPlanDO> selectListByStatus(Integer status) {
-        return selectList(new LambdaQueryWrapperX<MesWmStockTakingPlanDO>()
-                .eqIfPresent(MesWmStockTakingPlanDO::getStatus, status)
+                .eqIfPresent(MesWmStockTakingPlanDO::getStatus, reqVO.getStatus())
                 .orderByDesc(MesWmStockTakingPlanDO::getId));
     }
 

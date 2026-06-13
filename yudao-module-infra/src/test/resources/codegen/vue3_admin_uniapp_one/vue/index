@@ -1,0 +1,169 @@
+<template>
+  <view class="yd-page-container yd-page-container-paging">
+    <!-- 顶部导航栏 -->
+    <wd-navbar
+      title="学生管理"
+      left-arrow placeholder safe-area-inset-top fixed
+      @click-left="handleBack"
+    />
+
+    <!-- 搜索组件 -->
+    <SearchForm @search="handleQuery" @reset="handleReset" />
+
+    <!-- 学生列表 -->
+    <z-paging
+      ref="pagingRef"
+      v-model="list"
+      :fixed="false"
+      class="min-h-0 flex-1"
+      :default-page-size="10"
+      :refresher-enabled="true"
+      :inside-more="true"
+      :loading-more-default-as-loading="true"
+      empty-view-text="暂无学生数据"
+      @query="queryList"
+    >
+      <view class="p-24rpx">
+        <view
+          v-for="item in list"
+          :key="item.id"
+          class="mb-24rpx overflow-hidden rounded-12rpx bg-white shadow-sm"
+          @click="handleDetail(item)"
+        >
+          <view class="p-24rpx">
+            <view class="mb-16rpx flex items-center justify-between">
+              <view class="text-32rpx text-[#333] font-semibold">
+                {{ item.name }}
+              </view>
+              <dict-tag :type="DICT_TYPE.SYSTEM_USER_SEX" :value="item.sex" />
+            </view>
+            <view class="mb-12rpx flex items-center text-28rpx text-[#666]">
+              <text class="mr-8rpx text-[#999]">简介：</text>
+              <text class="line-clamp-1">{{ item.description }}</text>
+            </view>
+            <view class="mb-12rpx flex items-center text-28rpx text-[#666]">
+              <text class="mr-8rpx text-[#999]">出生日期：</text>
+              <text class="line-clamp-1">{{ formatDateTime(item.birthday) || '-' }}</text>
+            </view>
+            <view class="mb-12rpx flex items-center text-28rpx text-[#666]">
+              <text class="mr-8rpx text-[#999]">是否有效：</text>
+              <dict-tag :type="DICT_TYPE.INFRA_BOOLEAN_STRING" :value="item.enabled" />
+            </view>
+            <view class="mb-12rpx flex items-center text-28rpx text-[#666]">
+              <text class="mr-8rpx text-[#999]">头像：</text>
+              <text class="line-clamp-1">{{ item.avatar }}</text>
+            </view>
+            <view class="mb-12rpx flex items-center text-28rpx text-[#666]">
+              <text class="mr-8rpx text-[#999]">附件：</text>
+              <text class="line-clamp-1">{{ item.video }}</text>
+            </view>
+            <view class="mb-12rpx flex items-center text-28rpx text-[#666]">
+              <text class="mr-8rpx text-[#999]">备注：</text>
+              <text class="line-clamp-1">{{ item.memo }}</text>
+            </view>
+            <view class="mb-12rpx flex items-center text-28rpx text-[#666]">
+              <text class="mr-8rpx text-[#999]">创建时间：</text>
+              <text class="line-clamp-1">{{ formatDateTime(item.createTime) || '-' }}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </z-paging>
+
+    <!-- 新增按钮 -->
+    <wd-fab
+      v-if="hasAccessByCodes(['infra:student:create'])"
+      position="right-bottom"
+      type="primary"
+      :expandable="false"
+      @click="handleAdd"
+    />
+  </view>
+</template>
+
+<script lang="ts" setup>
+import type { Student } from '@/api/infra/demo'
+import { onUnload } from '@dcloudio/uni-app'
+import { onMounted, ref } from 'vue'
+import { getStudentPage } from '@/api/infra/demo'
+import { useAccess } from '@/hooks/useAccess'
+import { navigateBackPlus } from '@/utils'
+import { DICT_TYPE } from '@/utils/constants'
+import { formatDateTime } from '@/utils/date'
+import SearchForm from './components/search-form.vue'
+
+definePage({
+  style: {
+    navigationBarTitleText: '',
+    navigationStyle: 'custom',
+  },
+})
+
+const { hasAccessByCodes } = useAccess()
+const list = ref<Student[]>([]) // 列表数据
+const pagingRef = ref<any>() // 分页组件引用
+const queryParams = ref<Record<string, any>>({}) // 查询参数
+
+/** 返回上一页 */
+function handleBack() {
+  navigateBackPlus()
+}
+
+/** 查询学生列表 */
+async function queryList(pageNo: number, pageSize: number) {
+  try {
+    const params = {
+      ...queryParams.value,
+      pageNo,
+      pageSize,
+    }
+    const data = await getStudentPage(params)
+    pagingRef.value?.completeByTotal(data.list, data.total)
+  } catch {
+    pagingRef.value?.complete(false)
+  }
+}
+
+/** 搜索按钮操作 */
+function handleQuery(data?: Record<string, any>) {
+  queryParams.value = { ...data }
+  reload()
+}
+
+/** 重置按钮操作 */
+function handleReset() {
+  handleQuery()
+}
+
+/** 重新加载 */
+function reload() {
+  pagingRef.value?.reload()
+}
+
+/** 新增学生 */
+function handleAdd() {
+  uni.navigateTo({
+    url: '/pages-infra/demo/form/index',
+  })
+}
+
+/** 查看详情 */
+function handleDetail(item: Student) {
+  uni.navigateTo({
+    url: `/pages-infra/demo/detail/index?id=${item.id}`,
+  })
+}
+
+/** 初始化 */
+onMounted(() => {
+  uni.$on('infra:demo:reload', reload)
+})
+
+/** 卸载 */
+onUnload(() => {
+  uni.$off('infra:demo:reload', reload)
+})
+</script>
+
+<style lang="scss" scoped>
+</style>

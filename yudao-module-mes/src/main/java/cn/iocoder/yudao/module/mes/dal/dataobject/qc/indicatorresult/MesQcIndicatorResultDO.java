@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
+import cn.iocoder.yudao.module.mes.enums.DictTypeConstants;
 
 /**
  * MES 检验结果记录 DO
@@ -48,6 +49,7 @@ public class MesQcIndicatorResultDO extends BaseDO {
     /**
      * 质检类型
      *
+     * 字典 {@link DictTypeConstants#MES_QC_TYPE}
      * 枚举 {@link MesQcTypeEnum}
      */
     private Integer qcType;

@@ -40,10 +40,8 @@ public class MesProCardProcessController {
 
     @Resource
     private MesProCardProcessService cardProcessService;
-
     @Resource
     private MesProProcessService processService;
-
     @Resource
     private MesMdWorkstationService workstationService;
 

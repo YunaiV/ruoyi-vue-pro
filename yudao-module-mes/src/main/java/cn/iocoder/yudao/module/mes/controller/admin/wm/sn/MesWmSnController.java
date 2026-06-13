@@ -13,7 +13,9 @@ import cn.iocoder.yudao.module.mes.controller.admin.wm.sn.vo.MesWmSnGroupRespVO;
 import cn.iocoder.yudao.module.mes.controller.admin.wm.sn.vo.MesWmSnPageReqVO;
 import cn.iocoder.yudao.module.mes.controller.admin.wm.sn.vo.MesWmSnRespVO;
 import cn.iocoder.yudao.module.mes.dal.dataobject.md.item.MesMdItemDO;
+import cn.iocoder.yudao.module.mes.dal.dataobject.md.unitmeasure.MesMdUnitMeasureDO;
 import cn.iocoder.yudao.module.mes.service.md.item.MesMdItemService;
+import cn.iocoder.yudao.module.mes.service.md.unitmeasure.MesMdUnitMeasureService;
 import cn.iocoder.yudao.module.mes.service.wm.sn.MesWmSnService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -44,6 +46,8 @@ public class MesWmSnController {
     private MesWmSnService snService;
     @Resource
     private MesMdItemService itemService;
+    @Resource
+    private MesMdUnitMeasureService unitMeasureService;
 
     @PostMapping("/generate")
     @Operation(summary = "生成 SN 码")
@@ -61,8 +65,19 @@ public class MesWmSnController {
         if (CollUtil.isEmpty(pageResult.getList())) {
             return success(PageResult.empty(pageResult.getTotal()));
         }
-        buildGroupItemInfo(pageResult.getList());
+        buildSnGroupItemVO(pageResult.getList());
         return success(pageResult);
+    }
+
+    @GetMapping("/list-by-uuid")
+    @Operation(summary = "获得批次 SN 码明细列表")
+    @Parameter(name = "uuid", description = "批次 UUID", required = true)
+    @PreAuthorize("@ss.hasPermission('mes:wm-sn:query')")
+    public CommonResult<List<MesWmSnRespVO>> getSnListByUuid(
+            @RequestParam("uuid") @NotBlank(message = "批次 UUID 不能为空") String uuid) {
+        List<MesWmSnRespVO> list = BeanUtils.toBean(snService.getSnListByUuid(uuid), MesWmSnRespVO.class);
+        buildSnItemVO(list);
+        return success(list);
     }
 
     @DeleteMapping("/delete-batch")
@@ -81,7 +96,7 @@ public class MesWmSnController {
     public void exportSnGroupExcel(@Valid MesWmSnPageReqVO reqVO, HttpServletResponse response) throws IOException {
         reqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<MesWmSnGroupRespVO> list = snService.getSnGroupPage(reqVO).getList();
-        buildGroupItemInfo(list);
+        buildSnGroupItemVO(list);
         ExcelUtils.write(response, "SN码分组.xls", "数据", MesWmSnGroupRespVO.class, list);
     }
 
@@ -92,28 +107,36 @@ public class MesWmSnController {
     @ApiAccessLog(operateType = EXPORT)
     public void exportSnExcel(@RequestParam("uuid") String uuid, HttpServletResponse response) throws IOException {
         List<MesWmSnRespVO> list = BeanUtils.toBean(snService.getSnListByUuid(uuid), MesWmSnRespVO.class);
-        buildItemInfo(list);
+        buildSnItemVO(list);
         ExcelUtils.write(response, "SN码明细.xls", "数据", MesWmSnRespVO.class, list);
     }
 
     // ==================== 拼接 VO ====================
 
-    private void buildGroupItemInfo(List<MesWmSnGroupRespVO> list) {
+    private void buildSnGroupItemVO(List<MesWmSnGroupRespVO> list) {
         if (CollUtil.isEmpty(list)) {
             return;
         }
         Map<Long, MesMdItemDO> itemMap = itemService.getItemMap(convertSet(list, MesWmSnGroupRespVO::getItemId));
-        list.forEach(vo -> MapUtils.findAndThen(itemMap, vo.getItemId(), item ->
-                vo.setItemCode(item.getCode()).setItemName(item.getName()).setSpecification(item.getSpecification())));
+        Map<Long, MesMdUnitMeasureDO> unitMap = unitMeasureService.getUnitMeasureMap(
+                convertSet(itemMap.values(), MesMdItemDO::getUnitMeasureId));
+        list.forEach(vo -> MapUtils.findAndThen(itemMap, vo.getItemId(), item -> {
+            vo.setItemCode(item.getCode()).setItemName(item.getName()).setSpecification(item.getSpecification());
+            MapUtils.findAndThen(unitMap, item.getUnitMeasureId(), unit -> vo.setUnitName(unit.getName()));
+        }));
     }
 
-    private void buildItemInfo(List<MesWmSnRespVO> list) {
+    private void buildSnItemVO(List<MesWmSnRespVO> list) {
         if (CollUtil.isEmpty(list)) {
             return;
         }
         Map<Long, MesMdItemDO> itemMap = itemService.getItemMap(convertSet(list, MesWmSnRespVO::getItemId));
-        list.forEach(vo -> MapUtils.findAndThen(itemMap, vo.getItemId(), item ->
-                vo.setItemCode(item.getCode()).setItemName(item.getName()).setSpecification(item.getSpecification())));
+        Map<Long, MesMdUnitMeasureDO> unitMap = unitMeasureService.getUnitMeasureMap(
+                convertSet(itemMap.values(), MesMdItemDO::getUnitMeasureId));
+        list.forEach(vo -> MapUtils.findAndThen(itemMap, vo.getItemId(), item -> {
+            vo.setItemCode(item.getCode()).setItemName(item.getName()).setSpecification(item.getSpecification());
+            MapUtils.findAndThen(unitMap, item.getUnitMeasureId(), unit -> vo.setUnitName(unit.getName()));
+        }));
     }
 
 }

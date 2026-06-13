@@ -58,13 +58,10 @@ public class MesDvCheckRecordLineServiceImpl implements MesDvCheckRecordLineServ
     @Override
     public void deleteCheckRecordLine(Long id) {
         // 1. 校验存在
-        // TODO @AI：复用 validateCheckRecordLineExists 方法；
-        MesDvCheckRecordLineDO line = checkRecordLineMapper.selectById(id);
-        if (line == null) {
-            throw exception(DV_CHECK_RECORD_LINE_NOT_EXISTS);
-        }
+        validateCheckRecordLineExists(id);
 
         // 2. 校验父记录为草稿状态
+        MesDvCheckRecordLineDO line = checkRecordLineMapper.selectById(id);
         checkRecordService.validateCheckRecordDraft(line.getRecordId());
         // 3. 删除
         checkRecordLineMapper.deleteById(id);

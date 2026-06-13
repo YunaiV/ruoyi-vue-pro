@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.ai.util;
 
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.module.ai.enums.model.AiPlatformEnum;
@@ -33,6 +35,28 @@ public class AiUtils {
     public static final String TOOL_CONTEXT_LOGIN_USER = "LOGIN_USER";
     public static final String TOOL_CONTEXT_TENANT_ID = "TENANT_ID";
 
+    /**
+     * 通义千问支持多模态的模型
+     *
+     * @see <a href="https://bailian.console.aliyun.com/cn-beijing/?tab=model#/model-market/all?providers=qwen&capabilities=VU">模型广场</a>
+     * @see <a href="https://help.aliyun.com/zh/model-studio/error-code#error-url">必须开启 withMultiModel 参数</a>
+     */
+    public static final Set<String> TONG_YI_MULTI_MODELS = SetUtils.asSet(
+            // qwen3.5 / 3.6 系列（统一多模态主干）
+            "qwen3.6-plus", "qwen3.6-flash",
+            "qwen3.5-plus", "qwen3.5-flash",
+            // qwen-vl 视觉理解
+            "qwen3-vl-plus", "qwen3-vl-flash",
+            "qwen-vl-max", "qwen-vl-plus",
+            "qwen2.5-vl-72b-instruct", "qwen2.5-vl-32b-instruct",
+            "qwen2.5-vl-7b-instruct", "qwen2.5-vl-3b-instruct",
+            // qvq 视觉推理
+            "qvq-max", "qvq-plus",
+            // qwen-omni 全模态
+            "qwen3.5-omni-plus", "qwen3.5-omni-flash",
+            "qwen3-omni-flash", "qwen-omni-turbo"
+    );
+
     public static ChatOptions buildChatOptions(AiPlatformEnum platform, String model, Double temperature, Integer maxTokens) {
         return buildChatOptions(platform, model, temperature, maxTokens, null, null);
     }
@@ -44,9 +68,10 @@ public class AiUtils {
         // noinspection EnhancedSwitchMigration
         switch (platform) {
             case TONG_YI:
-                return DashScopeChatOptions.builder().withModel(model).withTemperature(temperature).withMaxToken(maxTokens)
-                        .withEnableThinking(true) // TODO 芋艿：默认都开启 thinking 模式，后续可以让用户配置
-                        .withToolCallbacks(toolCallbacks).withToolContext(toolContext).build();
+                return DashScopeChatOptions.builder().model(model).temperature(temperature).maxToken(maxTokens)
+                        .enableThinking(true) // TODO 芋艿：默认都开启 thinking 模式，后续可以让用户配置
+                        .multiModel(TONG_YI_MULTI_MODELS.contains(model)) // 是否多模态模型
+                        .toolCallbacks(toolCallbacks).toolContext(toolContext).build();
             case YI_YAN:
                 return QianFanChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens).build();
             case DEEP_SEEK:
@@ -125,10 +150,13 @@ public class AiUtils {
                 || response.getResult().getOutput() == null) {
             return null;
         }
-        if (response.getResult().getOutput() instanceof DeepSeekAssistantMessage) {
-            return ((DeepSeekAssistantMessage) (response.getResult().getOutput())).getReasoningContent();
+        AssistantMessage output = response.getResult().getOutput();
+        // DeepSeek 通过专属 AssistantMessage 暴露 reasoningContent
+        if (output instanceof DeepSeekAssistantMessage) {
+            return ((DeepSeekAssistantMessage) output).getReasoningContent();
         }
-        return null;
+        // 通义千问等通过 metadata 透传 reasoningContent
+        return MapUtil.getStr(output.getMetadata(), "reasoningContent");
     }
 
 }

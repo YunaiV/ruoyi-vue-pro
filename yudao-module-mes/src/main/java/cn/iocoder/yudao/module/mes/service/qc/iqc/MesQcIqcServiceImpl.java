@@ -18,11 +18,13 @@ import cn.iocoder.yudao.module.mes.enums.qc.MesQcTypeEnum;
 import cn.iocoder.yudao.module.mes.service.md.item.MesMdItemService;
 import cn.iocoder.yudao.module.mes.service.md.vendor.MesMdVendorService;
 import cn.iocoder.yudao.module.mes.service.qc.defectrecord.MesQcDefectRecordService;
+import cn.iocoder.yudao.module.mes.service.qc.indicatorresult.MesQcIndicatorResultService;
 import cn.iocoder.yudao.module.mes.service.qc.template.MesQcTemplateItemService;
 import cn.iocoder.yudao.module.mes.service.wm.arrivalnotice.MesWmArrivalNoticeService;
 import cn.iocoder.yudao.module.mes.service.wm.outsourcereceipt.MesWmOutsourceReceiptService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import jakarta.annotation.Resource;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -62,6 +64,9 @@ public class MesQcIqcServiceImpl implements MesQcIqcService {
     private MesMdVendorService vendorService;
     @Resource
     private MesMdItemService itemService;
+    @Resource
+    @Lazy
+    private MesQcIndicatorResultService indicatorResultService;
 
     @Resource
     private AdminUserApi adminUserApi;
@@ -125,6 +130,8 @@ public class MesQcIqcServiceImpl implements MesQcIqcService {
         if (iqc.getCheckResult() == null) {
             throw exception(QC_IQC_CHECK_RESULT_EMPTY);
         }
+        // 1.2 校验至少存在一条检测结果
+        indicatorResultService.validateIndicatorResultExistsByQcIdAndType(id, MesQcTypeEnum.IQC.getType());
 
         // 2. 更新状态为已完成
         MesQcIqcDO updateObj = new MesQcIqcDO()
@@ -294,6 +301,11 @@ public class MesQcIqcServiceImpl implements MesQcIqcService {
         }
         List<MesQcIqcDO> list = iqcMapper.selectByIds(ids);
         return convertMap(list, MesQcIqcDO::getId);
+    }
+
+    @Override
+    public Long getIqcCountByVendorId(Long vendorId) {
+        return iqcMapper.selectCountByVendorId(vendorId);
     }
 
 }

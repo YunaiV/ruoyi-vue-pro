@@ -19,6 +19,14 @@ public interface MesWmProductProduceLineService {
     void createProductProduceLine(MesWmProductProduceLineDO line);
 
     /**
+     * 校验生产入库单行存在
+     *
+     * @param id 行 ID
+     * @return 行数据
+     */
+    MesWmProductProduceLineDO validateProductProduceLineExists(Long id);
+
+    /**
      * 更新生产入库单行（内部使用）
      *
      * @param line 行数据

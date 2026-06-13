@@ -5,6 +5,8 @@ import cn.iocoder.yudao.module.iot.controller.admin.alert.vo.recrod.IotAlertReco
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.alert.IotAlertConfigDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.alert.IotAlertRecordDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.Collection;
@@ -58,8 +60,11 @@ public interface IotAlertRecordService {
      * @param config 告警配置
      * @param sceneRuleId 场景规则编号
      * @param deviceMessage 设备消息，可为空
+     * @param device 设备信息，可为空；用于回填产品编号、设备编号
      * @return 告警记录编号
      */
-    Long createAlertRecord(IotAlertConfigDO config, Long sceneRuleId, IotDeviceMessage deviceMessage);
+    @SuppressWarnings("UnusedReturnValue")
+    Long createAlertRecord(IotAlertConfigDO config, Long sceneRuleId,
+                           @Nullable IotDeviceMessage deviceMessage, @Nullable IotDeviceDO device);
 
 }

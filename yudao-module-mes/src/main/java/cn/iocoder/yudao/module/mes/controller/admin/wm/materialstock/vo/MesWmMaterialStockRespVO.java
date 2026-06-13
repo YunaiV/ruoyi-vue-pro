@@ -49,6 +49,9 @@ public class MesWmMaterialStockRespVO {
     @Schema(description = "仓库编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long warehouseId;
 
+    @Schema(description = "仓库编码", example = "WH001")
+    private String warehouseCode;
+
     @Schema(description = "仓库名称", example = "原料仓")
     @ExcelProperty("仓库")
     private String warehouseName;

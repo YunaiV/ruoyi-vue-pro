@@ -7,9 +7,7 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.mes.controller.admin.md.workstation.vo.workshop.MesMdWorkshopPageReqVO;
 import cn.iocoder.yudao.module.mes.controller.admin.md.workstation.vo.workshop.MesMdWorkshopSaveReqVO;
 import cn.iocoder.yudao.module.mes.dal.dataobject.md.workstation.MesMdWorkshopDO;
-import cn.iocoder.yudao.module.mes.dal.dataobject.md.workstation.MesMdWorkstationDO;
 import cn.iocoder.yudao.module.mes.dal.mysql.md.workstation.MesMdWorkshopMapper;
-import cn.iocoder.yudao.module.mes.dal.mysql.md.workstation.MesMdWorkstationMapper;
 import cn.iocoder.yudao.module.mes.enums.wm.BarcodeBizTypeEnum;
 import cn.iocoder.yudao.module.mes.service.wm.barcode.MesWmBarcodeService;
 import jakarta.annotation.Resource;
@@ -38,8 +36,7 @@ public class MesMdWorkshopServiceImpl implements MesMdWorkshopService {
 
     @Resource
     @Lazy
-    private MesMdWorkstationMapper workstationMapper;
-
+    private MesMdWorkstationService workstationService;
     @Resource
     private MesWmBarcodeService barcodeService;
 
@@ -79,7 +76,7 @@ public class MesMdWorkshopServiceImpl implements MesMdWorkshopService {
         // 校验存在
         validateWorkshopExists(id);
         // 校验车间下是否存在工作站
-        Long count = workstationMapper.selectCount(MesMdWorkstationDO::getWorkshopId, id);
+        Long count = workstationService.getWorkstationCountByWorkshopId(id);
         if (count > 0) {
             throw exception(MD_WORKSHOP_HAS_WORKSTATION);
         }

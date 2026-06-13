@@ -64,7 +64,7 @@ public class MesDvCheckRecordRespVO {
 
     @Schema(description = "规格型号", example = "X-100")
     @ExcelProperty("规格型号")
-    private String machinerySpec;
+    private String machinerySpecification;
 
     @Schema(description = "点检时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("点检时间")

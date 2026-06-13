@@ -15,6 +15,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import cn.iocoder.yudao.module.mes.enums.DictTypeConstants;
 
 /**
  * MES 过程检验单（IPQC, In-Process Quality Control） DO
@@ -62,6 +63,7 @@ public class MesQcIpqcDO extends BaseDO {
     /**
      * 来源单据类型
      *
+     * 字典 {@link DictTypeConstants#MES_QC_SOURCE_DOC_TYPE}
      * 枚举 {@link MesQcSourceDocTypeEnum}
      */
     private Integer sourceDocType;
@@ -179,6 +181,7 @@ public class MesQcIpqcDO extends BaseDO {
     /**
      * 检测结果
      *
+     * 字典 {@link DictTypeConstants#MES_QC_CHECK_RESULT}
      * 枚举 {@link cn.iocoder.yudao.module.mes.enums.qc.MesQcCheckResultEnum}
      */
     private Integer checkResult;
@@ -195,6 +198,7 @@ public class MesQcIpqcDO extends BaseDO {
     /**
      * 状态
      *
+     * 字典 {@link DictTypeConstants#MES_ORDER_STATUS}
      * 枚举 {@link MesQcStatusEnum}
      */
     private Integer status;

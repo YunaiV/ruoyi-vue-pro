@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.im.service.group;
 
+import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
@@ -116,10 +117,10 @@ public class ImGroupMemberServiceImplTest extends BaseMockitoUnitTest {
         ImGroupMemberDO exist4 = ImGroupMemberDO.builder().id(40L).groupId(10L).userId(4L)
                 .status(CommonStatusEnum.ENABLE.getStatus()).build();
         when(groupMemberMapper.selectListByGroupIdAndUserIds(eq(10L), anyCollection()))
-                .thenReturn(List.of(exist3, exist4));
+                .thenReturn(ListUtil.of(exist3, exist4));
 
         // 调用
-        groupMemberService.addGroupMembers(10L, List.of(2L, 3L, 4L));
+        groupMemberService.addGroupMembers(10L, ListUtil.of(2L, 3L, 4L));
 
         // 断言：updates 只有用户 3；inserts 只有用户 2
         verify(groupMemberMapper).updateRejoinFields(eq(30L), eq(CommonStatusEnum.ENABLE.getStatus()),
@@ -131,7 +132,7 @@ public class ImGroupMemberServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testAddGroupMembers_allExisting_onlyUpdates() {
         // 准备：传入的 3 个用户都已有记录（全部 DISABLE） → 只做 update，不做 insert
-        List<ImGroupMemberDO> existing = List.of(
+        List<ImGroupMemberDO> existing = ListUtil.of(
                 ImGroupMemberDO.builder().id(1L).groupId(10L).userId(2L)
                         .status(CommonStatusEnum.DISABLE.getStatus()).build(),
                 ImGroupMemberDO.builder().id(2L).groupId(10L).userId(3L)
@@ -140,7 +141,7 @@ public class ImGroupMemberServiceImplTest extends BaseMockitoUnitTest {
         when(groupMemberMapper.selectListByGroupIdAndUserIds(eq(10L), anyCollection()))
                 .thenReturn(existing);
 
-        groupMemberService.addGroupMembers(10L, List.of(2L, 3L));
+        groupMemberService.addGroupMembers(10L, ListUtil.of(2L, 3L));
 
         verify(groupMemberMapper, times(2)).updateRejoinFields(anyLong(), eq(CommonStatusEnum.ENABLE.getStatus()),
                 any(), eq(ImGroupMemberRoleEnum.NORMAL.getRole()), isNull(), isNull());
@@ -151,9 +152,9 @@ public class ImGroupMemberServiceImplTest extends BaseMockitoUnitTest {
     public void testAddGroupMembers_allNew_onlyInserts() {
         // 准备：都不存在 → 只做 insert
         when(groupMemberMapper.selectListByGroupIdAndUserIds(eq(10L), anyCollection()))
-                .thenReturn(List.of());
+                .thenReturn(ListUtil.of());
 
-        groupMemberService.addGroupMembers(10L, List.of(2L, 3L));
+        groupMemberService.addGroupMembers(10L, ListUtil.of(2L, 3L));
 
         verify(groupMemberMapper, never()).updateRejoinFields(anyLong(), anyInt(), any(), anyInt(), any(), any());
         verify(groupMemberMapper).insertBatch(anyList());
@@ -162,14 +163,14 @@ public class ImGroupMemberServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testAddGroupMembers_allExistingEnabled_nothingHappens() {
         // 准备：都已存在且 ENABLE → 既不 update 也不 insert
-        List<ImGroupMemberDO> existing = List.of(
+        List<ImGroupMemberDO> existing = ListUtil.of(
                 ImGroupMemberDO.builder().id(1L).groupId(10L).userId(2L)
                         .status(CommonStatusEnum.ENABLE.getStatus()).build()
         );
         when(groupMemberMapper.selectListByGroupIdAndUserIds(eq(10L), anyCollection()))
                 .thenReturn(existing);
 
-        groupMemberService.addGroupMembers(10L, List.of(2L));
+        groupMemberService.addGroupMembers(10L, ListUtil.of(2L));
 
         verify(groupMemberMapper, never()).updateRejoinFields(anyLong(), anyInt(), any(), anyInt(), any(), any());
         verify(groupMemberMapper, never()).insertBatch(anyList());
@@ -179,14 +180,14 @@ public class ImGroupMemberServiceImplTest extends BaseMockitoUnitTest {
     public void testAddGroupMembers_batchInsertDuplicateFallback() {
         // 准备：两个新增成员，批量插入失败时降级为逐个 addGroupMember
         when(groupMemberMapper.selectListByGroupIdAndUserIds(eq(10L), anyCollection()))
-                .thenReturn(List.of());
+                .thenReturn(ListUtil.of());
         doThrow(new DuplicateKeyException("concurrent batch insert"))
                 .when(groupMemberMapper).insertBatch(anyList());
         // addGroupMember 单条兜底逻辑
         when(groupMemberMapper.selectByGroupIdAndUserId(eq(10L), anyLong())).thenReturn(null);
 
         // 调用
-        groupMemberService.addGroupMembers(10L, List.of(2L, 3L));
+        groupMemberService.addGroupMembers(10L, ListUtil.of(2L, 3L));
 
         // 断言：降级为逐条调用 insert
         verify(groupMemberMapper, times(2)).insert(any(ImGroupMemberDO.class));
@@ -244,7 +245,7 @@ public class ImGroupMemberServiceImplTest extends BaseMockitoUnitTest {
         // 公开字段昵称变化 → 全员广播 GROUP_MEMBER_NICKNAME_UPDATE
         verify(groupMessageService).sendGroupMessage(eq(1L), any(cn.iocoder.yudao.module.im.service.message.dto.ImGroupMessageSendDTO.class));
         // 个人字段 silent 变化 → 仅自己多端同步 GROUP_MEMBER_SETTING_UPDATE
-        verify(groupMessageService).sendGroupMessage(eq(1L), eq(java.util.List.of(1L)),
+        verify(groupMessageService).sendGroupMessage(eq(1L), eq(ListUtil.of(1L)),
                 any(cn.iocoder.yudao.module.im.service.message.dto.ImGroupMessageSendDTO.class));
     }
 
@@ -278,7 +279,7 @@ public class ImGroupMemberServiceImplTest extends BaseMockitoUnitTest {
 
     @Test
     public void testRemoveGroupMembers_batch() {
-        groupMemberService.removeGroupMembers(10L, List.of(2L, 3L));
+        groupMemberService.removeGroupMembers(10L, ListUtil.of(2L, 3L));
 
         ArgumentCaptor<ImGroupMemberDO> captor = ArgumentCaptor.forClass(ImGroupMemberDO.class);
         verify(groupMemberMapper).updateByGroupIdAndUserIdsAndStatus(eq(10L), anyCollection(),
@@ -303,7 +304,7 @@ public class ImGroupMemberServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testGetActiveGroupMemberUserIdsByGroupId_extractsUserIds() {
         // 准备：3 个 ENABLE 成员
-        List<ImGroupMemberDO> members = List.of(
+        List<ImGroupMemberDO> members = ListUtil.of(
                 ImGroupMemberDO.builder().groupId(10L).userId(1L)
                         .status(CommonStatusEnum.ENABLE.getStatus()).build(),
                 ImGroupMemberDO.builder().groupId(10L).userId(2L)
@@ -318,13 +319,13 @@ public class ImGroupMemberServiceImplTest extends BaseMockitoUnitTest {
         List<Long> userIds = groupMemberService.getActiveGroupMemberUserIdsByGroupId(10L);
 
         // 断言：只返回 userId、顺序保留
-        assertEquals(List.of(1L, 2L, 3L), userIds);
+        assertEquals(ListUtil.of(1L, 2L, 3L), userIds);
     }
 
     @Test
     public void testGetActiveGroupMemberUserIdsByGroupId_emptyList() {
         when(groupMemberMapper.selectListByGroupIdAndStatus(
-                10L, CommonStatusEnum.ENABLE.getStatus())).thenReturn(List.of());
+                10L, CommonStatusEnum.ENABLE.getStatus())).thenReturn(ListUtil.of());
 
         List<Long> userIds = groupMemberService.getActiveGroupMemberUserIdsByGroupId(10L);
 
@@ -333,8 +334,8 @@ public class ImGroupMemberServiceImplTest extends BaseMockitoUnitTest {
 
     @Test
     public void testGetGroupMemberListByOwnerAndAdmin_passesRoles() {
-        List<Integer> roles = List.of(ImGroupMemberRoleEnum.OWNER.getRole(), ImGroupMemberRoleEnum.ADMIN.getRole());
-        List<ImGroupMemberDO> members = List.of(ImGroupMemberDO.builder().groupId(10L).userId(1L).build());
+        List<Integer> roles = ListUtil.of(ImGroupMemberRoleEnum.OWNER.getRole(), ImGroupMemberRoleEnum.ADMIN.getRole());
+        List<ImGroupMemberDO> members = ListUtil.of(ImGroupMemberDO.builder().groupId(10L).userId(1L).build());
         when(groupMemberMapper.selectListByGroupIdAndStatusAndRoles(10L, CommonStatusEnum.ENABLE.getStatus(), roles))
                 .thenReturn(members);
 

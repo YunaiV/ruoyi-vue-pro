@@ -38,10 +38,8 @@ public class MesProRouteProductController {
 
     @Resource
     private MesProRouteProductService routeProductService;
-
     @Resource
     private MesMdItemService itemService;
-
     @Resource
     private MesMdUnitMeasureService unitMeasureService;
 

@@ -42,19 +42,14 @@ public class MesWmProductSalesDetailController {
 
     @Resource
     private MesWmProductSalesDetailService productSalesDetailService;
-
     @Resource
     private MesMdItemService itemService;
-
     @Resource
     private MesMdUnitMeasureService unitMeasureService;
-
     @Resource
     private MesWmWarehouseService warehouseService;
-
     @Resource
     private MesWmWarehouseLocationService locationService;
-
     @Resource
     private MesWmWarehouseAreaService areaService;
 

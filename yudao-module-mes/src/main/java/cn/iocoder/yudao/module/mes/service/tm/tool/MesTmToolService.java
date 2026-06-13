@@ -65,6 +65,14 @@ public interface MesTmToolService {
     List<MesTmToolDO> getToolList();
 
     /**
+     * 获得指定工具类型下的工具数量
+     *
+     * @param toolTypeId 工具类型编号
+     * @return 工具数量
+     */
+    Long getToolCountByToolTypeId(Long toolTypeId);
+
+    /**
      * 获得工具列表
      *
      * @param ids 编号列表

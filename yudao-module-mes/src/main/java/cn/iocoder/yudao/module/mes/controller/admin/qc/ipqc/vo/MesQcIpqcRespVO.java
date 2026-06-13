@@ -34,11 +34,11 @@ public class MesQcIpqcRespVO {
 
     // ========== 来源单据 ==========
 
-    @Schema(description = "来源单据 ID", example = "200")
-    private Long sourceDocId;
-
     @Schema(description = "来源单据类型", example = "304")
     private Integer sourceDocType;
+
+    @Schema(description = "来源单据 ID", example = "200")
+    private Long sourceDocId;
 
     @Schema(description = "来源单据行 ID", example = "300")
     private Long sourceLineId;

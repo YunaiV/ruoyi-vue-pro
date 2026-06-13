@@ -24,5 +24,4 @@ public class MesProCardPageReqVO extends PageParam {
     @Schema(description = "批次号", example = "BATCH-001")
     private String batchCode;
 
-
 }

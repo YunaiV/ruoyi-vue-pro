@@ -12,6 +12,7 @@ import cn.binarywang.wx.miniapp.constant.WxMaConstants;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.DesensitizedUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ReflectUtil;
@@ -103,13 +104,9 @@ public class SocialClientServiceImpl implements SocialClientService {
     public String miniprogramState;
 
     /**
-     * 上传发货信息重试次数
+     * 上传发货信息重试间隔（毫秒），数组长度即重试次数；总等待最坏 1 + 2 + 4 = 7 秒，覆盖微信支付回调的常见延迟
      */
-    private static final int UPLOAD_SHIPPING_INFO_MAX_RETRIES = 5;
-    /**
-     * 上传发货信息重试间隔
-     */
-    private static final Duration UPLOAD_SHIPPING_INFO_RETRY_INTERVAL = Duration.ofMillis(500L);
+    private static final long[] UPLOAD_SHIPPING_INFO_RETRY_BACKOFF_MILLIS = {1000, 2000, 4000};
     /**
      * 微信错误码：支付单不存在
      */
@@ -383,31 +380,23 @@ public class SocialClientServiceImpl implements SocialClientService {
                 .build();
         // 重试机制：解决支付回调与订单信息上传之间的时间差导致的 10060001 错误
         // 对应 ISSUE：https://gitee.com/zhijiantianya/yudao-cloud/pulls/230
-        for (int attempt = 1; attempt <= UPLOAD_SHIPPING_INFO_MAX_RETRIES; attempt++) {
+        // 注意：wx-java 的 upload 内部对 errCode != 0 直接抛 WxErrorException，所以重试判断必须基于异常的 errorCode
+        int maxAttempts = UPLOAD_SHIPPING_INFO_RETRY_BACKOFF_MILLIS.length + 1;
+        for (int attempt = 1; attempt <= maxAttempts; attempt++) {
             try {
                 WxMaOrderShippingInfoBaseResponse response = service.getWxMaOrderShippingService().upload(request);
-                // 成功，直接返回
-                if (response.getErrCode() == 0) {
-                    log.info("[uploadWxaOrderShippingInfo][上传微信小程序发货信息成功：request({}) response({})]", request, response);
-                    return;
-                }
-                // 如果是 10060001 错误（支付单不存在）且还有重试次数，则等待后重试
-                if (response.getErrCode() == WX_ERR_CODE_PAY_ORDER_NOT_EXIST && attempt < UPLOAD_SHIPPING_INFO_MAX_RETRIES) {
-                    log.warn("[uploadWxaOrderShippingInfo][第 {} 次尝试失败，支付单不存在，{} 后重试：request({}) response({})]",
-                            attempt, UPLOAD_SHIPPING_INFO_RETRY_INTERVAL, request, response);
-                    Thread.sleep(UPLOAD_SHIPPING_INFO_RETRY_INTERVAL.toMillis());
+                log.info("[uploadWxaOrderShippingInfo][上传微信小程序发货信息成功：request({}) response({})]", request, response);
+                return;
+            } catch (WxErrorException ex) {
+                if (ex.getError().getErrorCode() == WX_ERR_CODE_PAY_ORDER_NOT_EXIST && attempt < maxAttempts) {
+                    long delayMillis = UPLOAD_SHIPPING_INFO_RETRY_BACKOFF_MILLIS[attempt - 1];
+                    log.warn("[uploadWxaOrderShippingInfo][第 {} 次尝试失败，支付单不存在，{} ms 后重试：request({})]",
+                            attempt, delayMillis, request, ex);
+                    ThreadUtil.sleep(delayMillis);
                     continue;
                 }
-                // 其他错误或重试次数用尽，抛出异常
-                log.error("[uploadWxaOrderShippingInfo][上传微信小程序发货信息失败：request({}) response({})]", request, response);
-                throw exception(SOCIAL_CLIENT_WEIXIN_MINI_APP_ORDER_UPLOAD_SHIPPING_INFO_ERROR, response.getErrMsg());
-            } catch (WxErrorException ex) {
                 log.error("[uploadWxaOrderShippingInfo][上传微信小程序发货信息失败：request({})]", request, ex);
                 throw exception(SOCIAL_CLIENT_WEIXIN_MINI_APP_ORDER_UPLOAD_SHIPPING_INFO_ERROR, ex.getError().getErrorMsg());
-            } catch (InterruptedException ex) {
-                Thread.currentThread().interrupt();
-                log.error("[uploadWxaOrderShippingInfo][重试等待被中断：request({})]", request, ex);
-                throw exception(SOCIAL_CLIENT_WEIXIN_MINI_APP_ORDER_UPLOAD_SHIPPING_INFO_ERROR, "重试等待被中断");
             }
         }
     }

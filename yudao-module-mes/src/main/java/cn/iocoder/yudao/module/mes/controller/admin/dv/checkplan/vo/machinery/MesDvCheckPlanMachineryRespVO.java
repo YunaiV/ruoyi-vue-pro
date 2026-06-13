@@ -28,7 +28,7 @@ public class MesDvCheckPlanMachineryRespVO {
     private String machineryBrand;
 
     @Schema(description = "规格型号", example = "HTF120")
-    private String machinerySpec;
+    private String machinerySpecification;
 
     @Schema(description = "备注")
     private String remark;

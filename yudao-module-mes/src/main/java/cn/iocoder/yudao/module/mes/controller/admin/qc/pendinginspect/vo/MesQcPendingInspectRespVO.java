@@ -10,17 +10,16 @@ import java.time.LocalDateTime;
 @Data
 public class MesQcPendingInspectRespVO {
 
-    @Schema(description = "来源单据 ID", example = "100")
-    private Long sourceDocId;
-
     @Schema(description = "来源单据类型（MesBizTypeConstants）", example = "100")
     private Integer sourceDocType;
 
-    @Schema(description = "来源单据编号", example = "AN2025001")
-    private String sourceDocCode;
+    @Schema(description = "来源单据 ID", example = "100")
+    private Long sourceDocId;
 
     @Schema(description = "来源单据行 ID", example = "200")
     private Long sourceLineId;
+    @Schema(description = "来源单据编号", example = "AN2025001")
+    private String sourceDocCode;
 
     @Schema(description = "检验类型（MesQcTypeEnum）", example = "1")
     private Integer qcType;

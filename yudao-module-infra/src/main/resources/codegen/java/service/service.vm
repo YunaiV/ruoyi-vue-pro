@@ -25,6 +25,16 @@ public interface ${table.className}Service {
      * @return 编号
      */
     ${primaryColumn.javaType} create${simpleClassName}(@Valid ${saveReqVOClass} ${saveReqVOVar});
+#if ($importEnable)
+
+    /**
+     * 导入${table.classComment}
+     *
+     * @param importList 导入信息
+     * @return 导入结果
+     */
+    ${sceneEnum.prefixClass}${table.className}ImportRespVO import${simpleClassName}List(List<${sceneEnum.prefixClass}${table.className}ImportExcelVO> importList);
+#end
 
     /**
      * 更新${table.classComment}

@@ -19,7 +19,7 @@ import java.util.List;
 public enum MesCalShiftTypeEnum implements ArrayValuable<Integer> {
 
     SINGLE(1, "单白班", ListUtil.of(
-            Pair.of("白班", new String[]{"08:00", "17:00"})
+            Pair.of("白班", new String[]{"08:00", "18:00"})
     )),
     TWO(2, "两班倒", ListUtil.of(
             Pair.of("白班", new String[]{"08:00", "20:00"}),
@@ -45,7 +45,7 @@ public enum MesCalShiftTypeEnum implements ArrayValuable<Integer> {
      * 班次配置列表
      *
      * key: 班次名称（如 "白班", "夜班", "中班"）
-     * value: [startTime, endTime]（如 ["08:00", "17:00"]）
+     * value: [startTime, endTime]（如 ["08:00", "18:00"]）
      */
     private final List<Pair<String, String[]>> shifts;
 

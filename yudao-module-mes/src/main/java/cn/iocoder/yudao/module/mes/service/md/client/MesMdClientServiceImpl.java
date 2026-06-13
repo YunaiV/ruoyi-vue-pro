@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.mes.controller.admin.md.client.vo.MesMdClientImpo
 import cn.iocoder.yudao.module.mes.controller.admin.md.client.vo.MesMdClientImportRespVO;
 import cn.iocoder.yudao.module.mes.controller.admin.md.client.vo.MesMdClientPageReqVO;
 import cn.iocoder.yudao.module.mes.controller.admin.md.client.vo.MesMdClientSaveReqVO;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.module.mes.dal.dataobject.md.client.MesMdClientDO;
 import cn.iocoder.yudao.module.mes.dal.mysql.md.client.MesMdClientMapper;
 import cn.iocoder.yudao.module.mes.enums.wm.BarcodeBizTypeEnum;
@@ -92,6 +93,17 @@ public class MesMdClientServiceImpl implements MesMdClientService {
     public void validateClientExists(Long id) {
         if (clientMapper.selectById(id) == null) {
             throw exception(MD_CLIENT_NOT_EXISTS);
+        }
+    }
+
+    @Override
+    public void validateClientExistsAndEnable(Long id) {
+        MesMdClientDO client = clientMapper.selectById(id);
+        if (client == null) {
+            throw exception(MD_CLIENT_NOT_EXISTS);
+        }
+        if (ObjUtil.notEqual(CommonStatusEnum.ENABLE.getStatus(), client.getStatus())) {
+            throw exception(MD_CLIENT_IS_DISABLE);
         }
     }
 

@@ -34,7 +34,6 @@ public class MesMdWorkstationToolController {
 
     @Resource
     private MesMdWorkstationToolService workstationToolService;
-
     @Resource
     private MesTmToolTypeService toolTypeService;
 

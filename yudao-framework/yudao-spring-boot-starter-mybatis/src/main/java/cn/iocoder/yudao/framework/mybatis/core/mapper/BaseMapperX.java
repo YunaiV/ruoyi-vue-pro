@@ -120,6 +120,31 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
     }
 
     /**
+     * 获得满足条件的一条记录，并使用 FOR UPDATE 锁定。
+     *
+     * 注意：需要在事务中调用，否则锁会立即释放。
+     *
+     * @param queryWrapper 查询条件
+     * @return 实体
+     */
+    default T selectOneForUpdate(LambdaQueryWrapper<T> queryWrapper) {
+        return selectOne(queryWrapper.last("FOR UPDATE"));
+    }
+
+    default T selectOneForUpdate(SFunction<T, ?> field, Object value) {
+        return selectOneForUpdate(new LambdaQueryWrapper<T>().eq(field, value));
+    }
+
+    default T selectOneForUpdate(SFunction<T, ?> field1, Object value1, SFunction<T, ?> field2, Object value2) {
+        return selectOneForUpdate(new LambdaQueryWrapper<T>().eq(field1, value1).eq(field2, value2));
+    }
+
+    default T selectOneForUpdate(SFunction<T, ?> field1, Object value1, SFunction<T, ?> field2, Object value2,
+                                 SFunction<T, ?> field3, Object value3) {
+        return selectOneForUpdate(new LambdaQueryWrapper<T>().eq(field1, value1).eq(field2, value2).eq(field3, value3));
+    }
+
+    /**
      * 获取满足条件的第 1 条记录
      *
      * 目的：解决并发场景下，插入多条记录后，使用 selectOne 会报错的问题

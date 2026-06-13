@@ -87,4 +87,12 @@ public interface MesWmOutsourceIssueService {
      */
     Boolean checkOutsourceIssueQuantity(Long id);
 
+    /**
+     * 根据供应商 ID 统计外协发料单数量
+     *
+     * @param vendorId 供应商 ID
+     * @return 数量
+     */
+    Long getOutsourceIssueCountByVendorId(Long vendorId);
+
 }

@@ -27,8 +27,8 @@ public class MesQcRqcLineRespVO {
     @Schema(description = "检测指标名称", example = "外观")
     private String indicatorName;
 
-    @Schema(description = "检测指标类型", example = "QUANTITATIVE")
-    private String indicatorType;
+    @Schema(description = "检测指标类型", example = "1")
+    private Integer indicatorType;
 
     @Schema(description = "检测工具", example = "卡尺")
     private String tool;

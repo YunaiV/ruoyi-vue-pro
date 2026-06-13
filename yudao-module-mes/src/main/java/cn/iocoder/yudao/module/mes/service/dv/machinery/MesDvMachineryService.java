@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.mes.controller.admin.dv.machinery.vo.MesDvMachine
 import cn.iocoder.yudao.module.mes.dal.dataobject.dv.machinery.MesDvMachineryDO;
 import jakarta.validation.Valid;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -98,6 +99,22 @@ public interface MesDvMachineryService {
     default Map<Long, MesDvMachineryDO> getMachineryMap(Collection<Long> ids) {
         return convertMap(getMachineryList(ids), MesDvMachineryDO::getId);
     }
+
+    /**
+     * 更新设备的最近点检时间
+     *
+     * @param machineryId 设备编号
+     * @param lastCheckTime 最近点检时间
+     */
+    void updateMachineryLastCheckTime(Long machineryId, LocalDateTime lastCheckTime);
+
+    /**
+     * 更新设备的最近保养时间
+     *
+     * @param machineryId 设备编号
+     * @param lastMaintenTime 最近保养时间
+     */
+    void updateMachineryLastMaintenTime(Long machineryId, LocalDateTime lastMaintenTime);
 
     /**
      * 导入设备列表

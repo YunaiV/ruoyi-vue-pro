@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
+import cn.iocoder.yudao.module.mes.enums.DictTypeConstants;
 
 /**
  * MES 盘点方案参数 DO
@@ -37,6 +38,7 @@ public class MesWmStockTakingPlanParamDO extends BaseDO {
     /**
      * 参数值类型
      *
+     * 字典 {@link DictTypeConstants#MES_WM_STOCK_TAKING_PLAN_PARAM_TYPE}
      * 枚举 {@link MesWmStockTakingPlanParamTypeEnum}
      */
     private Integer type;

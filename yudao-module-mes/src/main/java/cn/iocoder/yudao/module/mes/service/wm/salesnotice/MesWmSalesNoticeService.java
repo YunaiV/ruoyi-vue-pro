@@ -40,6 +40,14 @@ public interface MesWmSalesNoticeService {
     void deleteSalesNotice(Long id);
 
     /**
+     * 校验发货通知单存在
+     *
+     * @param id 编号
+     * @return 发货通知单
+     */
+    MesWmSalesNoticeDO validateSalesNoticeExists(Long id);
+
+    /**
      * 获得发货通知单
      *
      * @param id 编号
@@ -79,13 +87,5 @@ public interface MesWmSalesNoticeService {
     default Map<Long, MesWmSalesNoticeDO> getSalesNoticeMap(Collection<Long> ids) {
         return convertMap(getSalesNoticeList(ids), MesWmSalesNoticeDO::getId);
     }
-
-    /**
-     * 按状态获得发货通知单列表
-     *
-     * @param status 状态
-     * @return 发货通知单列表
-     */
-    List<MesWmSalesNoticeDO> getSalesNoticeListByStatus(Integer status);
 
 }

@@ -9,9 +9,9 @@ import cn.iocoder.yudao.module.mes.dal.dataobject.qc.indicator.MesQcIndicatorDO;
 import cn.iocoder.yudao.module.mes.dal.dataobject.qc.rqc.MesQcRqcLineDO;
 import cn.iocoder.yudao.module.mes.dal.dataobject.qc.template.MesQcTemplateIndicatorDO;
 import cn.iocoder.yudao.module.mes.dal.mysql.qc.rqc.MesQcRqcLineMapper;
-import cn.iocoder.yudao.module.mes.dal.mysql.qc.template.MesQcTemplateIndicatorMapper;
 import cn.iocoder.yudao.module.mes.enums.qc.MesQcDefectLevelEnum;
 import cn.iocoder.yudao.module.mes.service.qc.indicator.MesQcIndicatorService;
+import cn.iocoder.yudao.module.mes.service.qc.template.MesQcTemplateIndicatorService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -37,11 +37,11 @@ public class MesQcRqcLineServiceImpl implements MesQcRqcLineService {
 
     @Resource
     private MesQcRqcLineMapper rqcLineMapper;
-    @Resource
-    private MesQcTemplateIndicatorMapper templateIndicatorMapper;
 
     @Resource
     private MesQcIndicatorService indicatorService;
+    @Resource
+    private MesQcTemplateIndicatorService templateIndicatorService;
 
     @Override
     public MesQcRqcLineDO validateRqcLineExists(Long id) {
@@ -64,7 +64,7 @@ public class MesQcRqcLineServiceImpl implements MesQcRqcLineService {
 
     @Override
     public void createLinesFromTemplate(Long rqcId, Long templateId) {
-        List<MesQcTemplateIndicatorDO> templateIndicators = templateIndicatorMapper.selectListByTemplateId(templateId);
+        List<MesQcTemplateIndicatorDO> templateIndicators = templateIndicatorService.getTemplateIndicatorListByTemplateId(templateId);
         if (CollUtil.isEmpty(templateIndicators)) {
             return;
         }
@@ -123,6 +123,11 @@ public class MesQcRqcLineServiceImpl implements MesQcRqcLineService {
     @Override
     public void deleteByRqcId(Long rqcId) {
         rqcLineMapper.deleteByRqcId(rqcId);
+    }
+
+    @Override
+    public Long getRqcLineCountByUnitMeasureId(Long unitMeasureId) {
+        return rqcLineMapper.selectCountByUnitMeasureId(unitMeasureId);
     }
 
 }

@@ -5,9 +5,9 @@ import cn.iocoder.yudao.module.mes.controller.admin.md.workstation.vo.machine.Me
 import cn.iocoder.yudao.module.mes.dal.dataobject.md.workstation.MesMdWorkstationDO;
 import cn.iocoder.yudao.module.mes.dal.dataobject.md.workstation.MesMdWorkstationMachineDO;
 import cn.iocoder.yudao.module.mes.dal.mysql.md.workstation.MesMdWorkstationMachineMapper;
-import cn.iocoder.yudao.module.mes.dal.mysql.md.workstation.MesMdWorkstationMapper;
 import cn.iocoder.yudao.module.mes.service.dv.machinery.MesDvMachineryService;
 import jakarta.annotation.Resource;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -29,8 +29,8 @@ public class MesMdWorkstationMachineServiceImpl implements MesMdWorkstationMachi
     private MesMdWorkstationMachineMapper workstationMachineMapper;
 
     @Resource
-    private MesMdWorkstationMapper workstationMapper;
-
+    @Lazy
+    private MesMdWorkstationService workstationService;
     @Resource
     private MesDvMachineryService machineryService;
 
@@ -51,7 +51,7 @@ public class MesMdWorkstationMachineServiceImpl implements MesMdWorkstationMachi
         // 校验该设备是否已分配到其他工作站（一台设备只能分配到一个工作站）
         MesMdWorkstationMachineDO existing = workstationMachineMapper.selectByMachineryId(reqVO.getMachineryId());
         if (existing != null) {
-            MesMdWorkstationDO workstation = workstationMapper.selectById(existing.getWorkstationId());
+            MesMdWorkstationDO workstation = workstationService.getWorkstation(existing.getWorkstationId());
             throw exception(MD_WORKSTATION_MACHINE_EXISTS,
                     workstation != null ? workstation.getName() : String.valueOf(existing.getWorkstationId()));
         }

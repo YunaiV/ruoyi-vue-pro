@@ -69,4 +69,12 @@ public interface MesQcIpqcLineService {
      */
     void deleteListByIpqcId(Long ipqcId);
 
+    /**
+     * 统计使用指定计量单位的过程检验行数量
+     *
+     * @param unitMeasureId 计量单位编号
+     * @return 引用数量
+     */
+    Long getIpqcLineCountByUnitMeasureId(Long unitMeasureId);
+
 }

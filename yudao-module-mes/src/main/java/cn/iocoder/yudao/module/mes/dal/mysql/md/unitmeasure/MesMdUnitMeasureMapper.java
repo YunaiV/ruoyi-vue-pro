@@ -33,4 +33,8 @@ public interface MesMdUnitMeasureMapper extends BaseMapperX<MesMdUnitMeasureDO> 
         return selectList(MesMdUnitMeasureDO::getStatus, status);
     }
 
+    default Long selectCountByPrimaryId(Long primaryId) {
+        return selectCount(MesMdUnitMeasureDO::getPrimaryId, primaryId);
+    }
+
 }

@@ -117,7 +117,7 @@ public class MesWmReturnIssueLineServiceImpl implements MesWmReturnIssueLineServ
         // 校验父数据存在 + 草稿状态
         MesWmReturnIssueDO issue = issueService.validateReturnIssueExistsAndPrepare(reqVO.getIssueId());
         // 校验物料存在
-        itemService.validateItemExists(reqVO.getItemId());
+        itemService.validateItemExistsAndEnable(reqVO.getItemId());
         return issue;
     }
 

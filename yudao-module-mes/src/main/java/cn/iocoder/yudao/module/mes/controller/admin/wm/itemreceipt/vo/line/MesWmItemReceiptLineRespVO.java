@@ -16,6 +16,12 @@ public class MesWmItemReceiptLineRespVO {
     @Schema(description = "入库单编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long receiptId;
 
+    @Schema(description = "入库单编码", example = "IR2026020001")
+    private String receiptCode;
+
+    @Schema(description = "采购订单号", example = "PO20260201")
+    private String purchaseOrderCode;
+
     @Schema(description = "到货通知单行编号", example = "1")
     private Long arrivalNoticeLineId;
 

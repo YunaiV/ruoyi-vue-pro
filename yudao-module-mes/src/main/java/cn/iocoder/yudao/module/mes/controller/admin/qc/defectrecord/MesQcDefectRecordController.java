@@ -46,10 +46,19 @@ public class MesQcDefectRecordController {
     @DeleteMapping("/delete")
     @Operation(summary = "删除质检缺陷记录")
     @Parameter(name = "id", description = "编号", required = true)
-    @PreAuthorize("@ss.hasPermission('mes:qc-defect:update')")
+    @PreAuthorize("@ss.hasPermission('mes:qc-defect:delete')")
     public CommonResult<Boolean> deleteDefectRecord(@RequestParam("id") Long id) {
         defectRecordService.deleteDefectRecord(id);
         return success(true);
+    }
+
+    @GetMapping("/get")
+    @Operation(summary = "获得质检缺陷记录")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @PreAuthorize("@ss.hasPermission('mes:qc-defect:query')")
+    public CommonResult<MesQcDefectRecordRespVO> getDefectRecord(@RequestParam("id") Long id) {
+        MesQcDefectRecordDO record = defectRecordService.getDefectRecord(id);
+        return success(BeanUtils.toBean(record, MesQcDefectRecordRespVO.class));
     }
 
     @GetMapping("/page")

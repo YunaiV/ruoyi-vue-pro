@@ -245,4 +245,9 @@ public class MesProWorkOrderServiceImpl implements MesProWorkOrderService {
         workOrderMapper.updateProducedQuantity(id, incrQuantityProduced);
     }
 
+    @Override
+    public Long getWorkOrderCountByVendorId(Long vendorId) {
+        return workOrderMapper.selectCountByVendorId(vendorId);
+    }
+
 }

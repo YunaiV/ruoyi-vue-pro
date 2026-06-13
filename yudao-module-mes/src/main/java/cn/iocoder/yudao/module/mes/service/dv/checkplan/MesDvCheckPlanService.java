@@ -63,6 +63,15 @@ public interface MesDvCheckPlanService {
     void validateCheckPlanExists(Long id);
 
     /**
+     * 校验点检保养方案存在、类型匹配，且方案已启用
+     *
+     * @param id   方案编号
+     * @param type 期望的方案类型
+     * @return 方案
+     */
+    MesDvCheckPlanDO validateCheckPlanExistsAndType(Long id, Integer type);
+
+    /**
      * 校验点检保养方案为草稿状态
      *
      * @param planId 方案编号

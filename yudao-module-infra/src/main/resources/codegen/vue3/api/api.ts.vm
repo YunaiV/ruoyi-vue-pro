@@ -98,6 +98,18 @@ export const ${simpleClassName}Api = {
   export${simpleClassName}: async (params) => {
     return await request.download({ url: `${baseURL}/export-excel`, params })
   },
+#if ($importEnable)
+
+  // 下载${table.classComment}导入模板
+  import${simpleClassName}Template: async () => {
+    return await request.download({ url: `${baseURL}/get-import-template` })
+  },
+
+  // 导入${table.classComment}
+  import${simpleClassName}: async (data: FormData) => {
+    return await request.upload({ url: `${baseURL}/import`, data })
+  },
+#end
 ## 特殊：主子表专属逻辑
 #foreach ($subTable in $subTables)
 #set ($index = $foreach.count - 1)

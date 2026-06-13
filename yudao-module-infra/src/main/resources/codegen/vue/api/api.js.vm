@@ -73,6 +73,26 @@ export function export${simpleClassName}Excel(params) {
     responseType: 'blob'
   })
 }
+#if ($importEnable)
+
+// 下载${table.classComment}导入模板
+export function import${simpleClassName}Template() {
+  return request({
+    url: '${baseURL}/get-import-template',
+    method: 'get',
+    responseType: 'blob'
+  })
+}
+
+// 导入${table.classComment}
+export function import${simpleClassName}(data) {
+  return request({
+    url: '${baseURL}/import',
+    method: 'post',
+    data
+  })
+}
+#end
 ## 特殊：主子表专属逻辑
 #foreach ($subTable in $subTables)
   #set ($index = $foreach.count - 1)

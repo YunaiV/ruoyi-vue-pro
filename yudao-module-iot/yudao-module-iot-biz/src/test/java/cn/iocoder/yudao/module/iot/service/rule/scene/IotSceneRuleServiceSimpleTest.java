@@ -5,11 +5,12 @@ import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.scene.IotSceneRuleSaveReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.rule.IotSceneRuleMapper;
-import cn.iocoder.yudao.module.iot.framework.job.core.IotSchedulerManager;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import cn.iocoder.yudao.module.iot.service.rule.scene.action.IotSceneRuleAction;
-import org.junit.jupiter.api.Disabled;
+import cn.iocoder.yudao.module.iot.service.rule.scene.matcher.IotSceneRuleMatcherManager;
+import cn.iocoder.yudao.module.iot.service.rule.scene.timer.IotSceneRuleTimerHandler;
+import cn.iocoder.yudao.module.iot.service.rule.scene.timer.IotTimerConditionEvaluator;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -30,7 +31,6 @@ import static org.mockito.Mockito.*;
  *
  * @author 芋道源码
  */
-@Disabled // TODO @puhui999：单测有报错，先屏蔽
 public class IotSceneRuleServiceSimpleTest extends BaseMockitoUnitTest {
 
     @InjectMocks
@@ -43,7 +43,13 @@ public class IotSceneRuleServiceSimpleTest extends BaseMockitoUnitTest {
     private List<IotSceneRuleAction> sceneRuleActions;
 
     @Mock
-    private IotSchedulerManager schedulerManager;
+    private IotSceneRuleTimerHandler timerHandler;
+
+    @Mock
+    private IotTimerConditionEvaluator timerConditionEvaluator;
+
+    @Mock
+    private IotSceneRuleMatcherManager sceneRuleMatcherManager;
 
     @Mock
     private IotProductService productService;
@@ -52,7 +58,7 @@ public class IotSceneRuleServiceSimpleTest extends BaseMockitoUnitTest {
     private IotDeviceService deviceService;
 
     @Test
-    public void testCreateScene_Rule_success() {
+    public void testCreateScene_rule_success() {
         // 准备参数
         IotSceneRuleSaveReqVO createReqVO = randomPojo(IotSceneRuleSaveReqVO.class, o -> {
             o.setId(null);
@@ -78,7 +84,7 @@ public class IotSceneRuleServiceSimpleTest extends BaseMockitoUnitTest {
     }
 
     @Test
-    public void testUpdateScene_Rule_success() {
+    public void testUpdateScene_rule_success() {
         // 准备参数
         Long id = randomLongId();
         IotSceneRuleSaveReqVO updateReqVO = randomPojo(IotSceneRuleSaveReqVO.class, o -> {

@@ -168,7 +168,7 @@ public class MesWmReturnIssueServiceImpl implements MesWmReturnIssueService {
                         MesWmReturnIssueDetailDO::getQuantity, BigDecimal::add, BigDecimal.ZERO);
                 // 对比行数量与明细总数量，不满足直接抛出
                 if (line.getQuantity().compareTo(totalDetailQuantity) > 0) {
-                    MesMdItemDO item = itemService.validateItemExists(line.getItemId());
+                    MesMdItemDO item = itemService.validateItemExistsAndEnable(line.getItemId());
                     throw exception(WM_RETURN_ISSUE_DETAIL_QUANTITY_MISMATCH,
                             item.getCode() + " " + item.getName() + " 未完成上架");
                 }
@@ -289,9 +289,9 @@ public class MesWmReturnIssueServiceImpl implements MesWmReturnIssueService {
      */
     private void validateReturnIssueSaveData(MesWmReturnIssueSaveReqVO reqVO) {
         validateCodeUnique(reqVO.getId(), reqVO.getCode());
-        workOrderService.validateWorkOrderExists(reqVO.getWorkOrderId());
+        workOrderService.validateWorkOrderConfirmed(reqVO.getWorkOrderId());
         if (reqVO.getWorkstationId() != null) {
-            workstationService.validateWorkstationExists(reqVO.getWorkstationId());
+            workstationService.validateWorkstationExistsAndEnable(reqVO.getWorkstationId());
         }
     }
 

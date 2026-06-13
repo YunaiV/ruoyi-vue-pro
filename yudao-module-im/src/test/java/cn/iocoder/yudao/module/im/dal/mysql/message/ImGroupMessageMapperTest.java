@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.im.dal.mysql.message;
 
+import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImGroupMessageDO;
 import cn.iocoder.yudao.module.im.enums.message.ImGroupMessageReceiptStatusEnum;
@@ -35,7 +36,7 @@ public class ImGroupMessageMapperTest extends BaseDbUnitTest {
         mapper.insert(msg20);
 
         // 调用：只查群 10
-        List<ImGroupMessageDO> result = mapper.selectListByMinId(List.of(10L), 0L, FAR_PAST, 100);
+        List<ImGroupMessageDO> result = mapper.selectListByMinId(ListUtil.of(10L), 0L, FAR_PAST, 100);
 
         // 断言：只有 msg10
         assertEquals(1, result.size());
@@ -50,7 +51,7 @@ public class ImGroupMessageMapperTest extends BaseDbUnitTest {
         ImGroupMessageDO recalled = buildMessage(10L, 1L, ImMessageStatusEnum.RECALL);
         mapper.insert(recalled);
 
-        List<ImGroupMessageDO> result = mapper.selectListByMinId(List.of(10L), 0L, FAR_PAST, 100);
+        List<ImGroupMessageDO> result = mapper.selectListByMinId(ListUtil.of(10L), 0L, FAR_PAST, 100);
 
         // 断言：撤回消息一并返回，由客户端按 status 切换渲染
         assertEquals(2, result.size());
@@ -66,7 +67,7 @@ public class ImGroupMessageMapperTest extends BaseDbUnitTest {
         outWindow.setSendTime(LocalDateTime.now().minusDays(40));
         mapper.insert(outWindow);
 
-        List<ImGroupMessageDO> result = mapper.selectListByMinId(List.of(10L), 0L,
+        List<ImGroupMessageDO> result = mapper.selectListByMinId(ListUtil.of(10L), 0L,
                 LocalDateTime.now().minusDays(30), 100);
 
         assertEquals(1, result.size());
@@ -84,7 +85,7 @@ public class ImGroupMessageMapperTest extends BaseDbUnitTest {
         mapper.insert(m3);
 
         // 调用：size=2，返回 id 最小的 2 条
-        List<ImGroupMessageDO> result = mapper.selectListByMinId(List.of(10L), 0L, FAR_PAST, 2);
+        List<ImGroupMessageDO> result = mapper.selectListByMinId(ListUtil.of(10L), 0L, FAR_PAST, 2);
 
         assertEquals(2, result.size());
         assertTrue(result.get(0).getId() < result.get(1).getId());

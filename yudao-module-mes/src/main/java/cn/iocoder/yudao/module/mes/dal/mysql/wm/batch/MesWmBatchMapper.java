@@ -24,6 +24,10 @@ public interface MesWmBatchMapper extends BaseMapperX<MesWmBatchDO> {
         return selectOne(MesWmBatchDO:: getCode, code);
     }
 
+    default Long selectCountByToolId(Long toolId) {
+        return selectCount(MesWmBatchDO::getToolId, toolId);
+    }
+
     default PageResult<MesWmBatchDO> selectPage(MesWmBatchPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<MesWmBatchDO>()
                 .likeIfPresent(MesWmBatchDO::getCode, reqVO.getCode())

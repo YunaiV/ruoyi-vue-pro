@@ -1,6 +1,9 @@
 package ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePackage}.${table.businessName};
 
 import org.springframework.web.bind.annotation.*;
+#if ($importEnable)
+import org.springframework.web.multipart.MultipartFile;
+#end
 import ${jakartaPackage}.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 #if ($sceneEnum.scene == 1)import org.springframework.security.access.prepost.PreAuthorize;#end
@@ -157,6 +160,29 @@ public class ${sceneEnum.prefixClass}${table.className}Controller {
         // 导出 Excel
         ExcelUtils.write(response, "${table.classComment}.xls", "数据", ${table.className}RespVO.class,
                         BeanUtils.toBean(list, ${table.className}RespVO.class));
+    }
+#end
+#if ($importEnable)
+
+    @GetMapping("/get-import-template")
+    @Operation(summary = "获得导入${table.classComment}模板")
+#if ($sceneEnum.scene == 1)
+    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:import')")
+#end
+    public void importTemplate(HttpServletResponse response) throws IOException {
+        ExcelUtils.write(response, "${table.classComment}导入模板.xls", "数据",
+                ${sceneEnum.prefixClass}${table.className}ImportExcelVO.class, Collections.emptyList());
+    }
+
+    @PostMapping("/import")
+    @Operation(summary = "导入${table.classComment}")
+    @Parameter(name = "file", description = "Excel 文件", required = true)
+#if ($sceneEnum.scene == 1)
+    @PreAuthorize("@ss.hasPermission('${permissionPrefix}:import')")
+#end
+    public CommonResult<${sceneEnum.prefixClass}${table.className}ImportRespVO> importExcel(@RequestParam("file") MultipartFile file) throws Exception {
+        List<${sceneEnum.prefixClass}${table.className}ImportExcelVO> list = ExcelUtils.read(file, ${sceneEnum.prefixClass}${table.className}ImportExcelVO.class);
+        return success(${classNameVar}Service.import${simpleClassName}List(list));
     }
 #end
 

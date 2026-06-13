@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
+import cn.iocoder.yudao.module.mes.enums.DictTypeConstants;
 
 /**
  * MES 物料产品分类 DO
@@ -43,6 +44,7 @@ public class MesMdItemTypeDO extends BaseDO {
     /**
      * 物料/产品标识
      *
+     * 字典 {@link DictTypeConstants#MES_MD_ITEM_OR_PRODUCT}
      * 枚举 {@link cn.iocoder.yudao.module.mes.enums.md.MesMdItemTypeEnum}
      */
     private String itemOrProduct;

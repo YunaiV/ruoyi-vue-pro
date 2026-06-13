@@ -21,7 +21,7 @@ public interface MesTmToolMapper extends BaseMapperX<MesTmToolDO> {
                 .likeIfPresent(MesTmToolDO::getName, reqVO.getName())
                 .eqIfPresent(MesTmToolDO::getToolTypeId, reqVO.getToolTypeId())
                 .likeIfPresent(MesTmToolDO::getBrand, reqVO.getBrand())
-                .likeIfPresent(MesTmToolDO::getSpec, reqVO.getSpec())
+                .likeIfPresent(MesTmToolDO::getSpecification, reqVO.getSpecification())
                 .eqIfPresent(MesTmToolDO::getStatus, reqVO.getStatus())
                 .orderByDesc(MesTmToolDO::getId));
     }

@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.trade.service.price.calculator;
 
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
+import cn.iocoder.yudao.module.member.api.level.MemberLevelApi;
+import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.promotion.api.discount.DiscountActivityApi;
 import cn.iocoder.yudao.module.promotion.api.discount.dto.DiscountProductRespDTO;
 import cn.iocoder.yudao.module.promotion.enums.common.PromotionDiscountTypeEnum;
@@ -8,7 +10,6 @@ import cn.iocoder.yudao.module.promotion.enums.common.PromotionTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -27,7 +28,6 @@ import static org.mockito.Mockito.when;
  *
  * @author 芋道源码
  */
-@Disabled // TODO 芋艿：后续修复
 public class TradeDiscountActivityPriceCalculatorTest extends BaseMockitoUnitTest {
 
     @InjectMocks
@@ -35,6 +35,10 @@ public class TradeDiscountActivityPriceCalculatorTest extends BaseMockitoUnitTes
 
     @Mock
     private DiscountActivityApi discountActivityApi;
+    @Mock
+    private MemberLevelApi memberLevelApi;
+    @Mock
+    private MemberUserApi memberUserApi;
 
     @Test
     public void testCalculate() {
@@ -92,16 +96,16 @@ public class TradeDiscountActivityPriceCalculatorTest extends BaseMockitoUnitTes
         assertEquals(orderItem01.getCouponPrice(), 0);
         assertEquals(orderItem01.getPointPrice(), 0);
         assertEquals(orderItem01.getPayPrice(), 120);
-        // 断言：SKU 2
+        // 断言：SKU 2 未选中，不参与计算
         TradePriceCalculateRespBO.OrderItem orderItem02 = result.getItems().get(1);
         assertEquals(orderItem02.getSkuId(), 20L);
         assertEquals(orderItem02.getCount(), 3);
         assertEquals(orderItem02.getPrice(), 50);
-        assertEquals(orderItem02.getDiscountPrice(), 60);
+        assertEquals(orderItem02.getDiscountPrice(), 0);
         assertEquals(orderItem02.getDeliveryPrice(), 0);
         assertEquals(orderItem02.getCouponPrice(), 0);
         assertEquals(orderItem02.getPointPrice(), 0);
-        assertEquals(orderItem02.getPayPrice(), 90);
+        assertEquals(orderItem02.getPayPrice(), 150);
         // 断言：Promotion 部分
         assertEquals(result.getPromotions().size(), 1);
         TradePriceCalculateRespBO.Promotion promotion01 = result.getPromotions().get(0);

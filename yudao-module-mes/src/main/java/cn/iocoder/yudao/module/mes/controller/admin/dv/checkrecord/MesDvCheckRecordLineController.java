@@ -36,7 +36,6 @@ public class MesDvCheckRecordLineController {
 
     @Resource
     private MesDvCheckRecordLineService checkRecordLineService;
-
     @Resource
     private MesDvSubjectService subjectService;
 

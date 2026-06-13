@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import cn.iocoder.yudao.module.mes.enums.DictTypeConstants;
 
 /**
  * MES 设备点检记录 DO
@@ -56,6 +57,7 @@ public class MesDvCheckRecordDO extends BaseDO {
     /**
      * 状态
      *
+     * 字典 {@link DictTypeConstants#MES_DV_CHECK_RECORD_STATUS}
      * 枚举 {@link MesDvCheckRecordStatusEnum}
      */
     private Integer status;

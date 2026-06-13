@@ -1,18 +1,31 @@
 <script lang="ts" setup>
 import ${simpleClassName}Modal from './${simpleClassName}Modal.vue'
 import { columns, searchFormSchema } from './${classNameVar}.data'
+import { ref } from 'vue'
 import { useI18n } from '@/hooks/web/useI18n'
 import { useMessage } from '@/hooks/web/useMessage'
 import { useModal } from '@/components/Modal'
 import { IconEnum } from '@/enums/appEnum'
 import { BasicTable, TableAction, useTable } from '@/components/Table'
-import { delete${simpleClassName}, export${simpleClassName}, get${simpleClassName}Page } from '@/api/${table.moduleName}/${table.businessName}'
+import {
+  delete${simpleClassName},
+  export${simpleClassName},
+  get${simpleClassName}Page,
+#if ($importEnable)
+  import${simpleClassName},
+  import${simpleClassName}Template,
+#end
+} from '@/api/${table.moduleName}/${table.businessName}'
 
 defineOptions({ name: '${table.className}' })
 
 const { t } = useI18n()
 const { createConfirm, createMessage } = useMessage()
 const [registerModal, { openModal }] = useModal()
+#if ($importEnable)
+const importFileRef = ref<HTMLInputElement>()
+const importLoading = ref(false)
+#end
 
 const [registerTable, { getForm, reload }] = useTable({
   title: '${table.classComment}列表',
@@ -48,6 +61,44 @@ async function handleExport() {
     },
   })
 }
+#if ($importEnable)
+
+function handleImport() {
+  importFileRef.value?.click()
+}
+
+async function handleImportTemplateDownload() {
+  await import${simpleClassName}Template()
+  createMessage.success('模板下载已开始')
+}
+
+async function handleImportFileChange(event: Event) {
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0]
+  if (!file) {
+    return
+  }
+  importLoading.value = true
+  try {
+    const formData = new FormData()
+    formData.append('file', file)
+    const response: any = await import${simpleClassName}(formData)
+    const data = response?.data ?? response
+    let text =
+      '导入成功数量：' + (data?.successCount || 0) + '；导入失败数量：' + (data?.failureCount || 0) + '；'
+    if (data?.failureRows) {
+      Object.keys(data.failureRows).forEach((rowNo) => {
+        text += '< 第' + rowNo + '行: ' + data.failureRows[rowNo] + ' >'
+      })
+    }
+    createMessage.success(text)
+    await reload()
+  } finally {
+    target.value = ''
+    importLoading.value = false
+  }
+}
+#end
 
 async function handleDelete(record: Recordable) {
   await delete${simpleClassName}(record.id)
@@ -62,6 +113,14 @@ async function handleDelete(record: Recordable) {
         <a-button type="primary" v-auth="['${permissionPrefix}:create']" :preIcon="IconEnum.ADD" @click="handleCreate">
           {{ t('action.create') }}
         </a-button>
+#if ($importEnable)
+        <a-button v-auth="['${permissionPrefix}:import']" :loading="importLoading" @click="handleImport">
+          导入
+        </a-button>
+        <a-button v-auth="['${permissionPrefix}:import']" @click="handleImportTemplateDownload">
+          导入模板
+        </a-button>
+#end
         <a-button v-auth="['${permissionPrefix}:export']" :preIcon="IconEnum.EXPORT" @click="handleExport">
           {{ t('action.export') }}
         </a-button>
@@ -87,6 +146,9 @@ async function handleDelete(record: Recordable) {
         </template>
       </template>
     </BasicTable>
+#if ($importEnable)
+    <input ref="importFileRef" type="file" accept=".xls,.xlsx" class="hidden" @change="handleImportFileChange" />
+#end
     <${simpleClassName}Modal @register="registerModal" @success="reload()" />
   </div>
 </template>

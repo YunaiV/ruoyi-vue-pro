@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS "member_user"
     "avatar"      varchar(255) NOT NULL DEFAULT '' COMMENT '头像',
     "status"      tinyint      NOT NULL COMMENT '状态',
     "mobile"      varchar(11)  NOT NULL COMMENT '手机号',
+    "email"       varchar(50)  NULL COMMENT '邮箱',
     "password"    varchar(100) NOT NULL DEFAULT '' COMMENT '密码',
     "register_ip" varchar(32)  NOT NULL COMMENT '注册 IP',
     "login_ip"    varchar(50)  NULL     DEFAULT '' COMMENT '最后登录IP',

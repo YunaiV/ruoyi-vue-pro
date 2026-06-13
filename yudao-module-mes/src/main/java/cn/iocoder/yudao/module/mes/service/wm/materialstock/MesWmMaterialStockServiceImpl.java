@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.mes.service.wm.materialstock;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
@@ -11,11 +12,14 @@ import cn.iocoder.yudao.module.mes.dal.dataobject.md.item.MesMdItemDO;
 import cn.iocoder.yudao.module.mes.dal.dataobject.md.item.MesMdItemTypeDO;
 import cn.iocoder.yudao.module.mes.dal.dataobject.wm.materialstock.MesWmMaterialStockDO;
 import cn.iocoder.yudao.module.mes.dal.dataobject.wm.warehouse.MesWmWarehouseAreaDO;
+import cn.iocoder.yudao.module.mes.dal.dataobject.wm.warehouse.MesWmWarehouseDO;
 import cn.iocoder.yudao.module.mes.dal.mysql.wm.materialstock.MesWmMaterialStockMapper;
 import cn.iocoder.yudao.module.mes.service.md.item.MesMdItemService;
 import cn.iocoder.yudao.module.mes.service.md.item.MesMdItemTypeService;
 import cn.iocoder.yudao.module.mes.service.wm.warehouse.MesWmWarehouseAreaService;
+import cn.iocoder.yudao.module.mes.service.wm.warehouse.MesWmWarehouseService;
 import jakarta.annotation.Resource;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -43,6 +47,9 @@ public class MesWmMaterialStockServiceImpl implements MesWmMaterialStockService 
     private MesMdItemTypeService itemTypeService;
     @Resource
     private MesWmWarehouseAreaService areaService;
+    @Resource
+    @Lazy
+    private MesWmWarehouseService warehouseService;
 
     @Override
     public MesWmMaterialStockDO getMaterialStock(Long id) {
@@ -77,9 +84,19 @@ public class MesWmMaterialStockServiceImpl implements MesWmMaterialStockService 
         if (pageReqVO.getItemId() != null) {
             itemIds = SetUtils.asSet(pageReqVO.getItemId());
         }
+        // 1.3 解析 virtualFilter：转换为虚拟仓 warehouseId
+        Long virtualWarehouseId = null;
+        String virtualFilter = pageReqVO.getVirtualFilter();
+        if (MesWmMaterialStockPageReqVO.VIRTUAL_FILTER_EXCLUDE.equals(virtualFilter)
+                || MesWmMaterialStockPageReqVO.VIRTUAL_FILTER_ONLY.equals(virtualFilter)) {
+            MesWmWarehouseDO virtualWarehouse = warehouseService.getWarehouseByCode(
+                    MesWmWarehouseDO.WIP_VIRTUAL_WAREHOUSE);
+            Assert.notNull(virtualWarehouse, "虚拟仓库（WIP_VIRTUAL_WAREHOUSE）不存在");
+            virtualWarehouseId = virtualWarehouse.getId();
+        }
 
         // 2. 分页查询
-        return materialStockMapper.selectPage(pageReqVO, itemTypeIds, itemIds);
+        return materialStockMapper.selectPage(pageReqVO, itemTypeIds, itemIds, virtualWarehouseId);
     }
 
     @Override
@@ -183,6 +200,36 @@ public class MesWmMaterialStockServiceImpl implements MesWmMaterialStockService 
                 throw exception(WM_MATERIAL_STOCK_AREA_BATCH_MIXING_NOT_ALLOWED, area.getName());
             }
         }
+    }
+
+    @Override
+    public MesWmMaterialStockDO validateSelectedStock(Long materialStockId,
+                                                      Long itemId,
+                                                      Long batchId,
+                                                      String batchCode,
+                                                      Long warehouseId,
+                                                      Long locationId,
+                                                      Long areaId,
+                                                      BigDecimal quantity) {
+        // 1. 校验库存记录必须存在
+        if (materialStockId == null) {
+            throw exception(WM_MATERIAL_STOCK_REQUIRED);
+        }
+        MesWmMaterialStockDO stock = validateMaterialStockExists(materialStockId);
+        // 2. 校验库存记录的物料、批次、仓库、库区、库位等信息与前端选择的一致，避免串单或越权提交
+        if (ObjUtil.notEqual(stock.getItemId(), itemId)
+                || ObjUtil.notEqual(stock.getBatchId(), batchId)
+                || (batchCode != null && ObjUtil.notEqual(stock.getBatchCode(), batchCode))
+                || ObjUtil.notEqual(stock.getWarehouseId(), warehouseId)
+                || ObjUtil.notEqual(stock.getLocationId(), locationId)
+                || ObjUtil.notEqual(stock.getAreaId(), areaId)) {
+            throw exception(WM_MATERIAL_STOCK_SELECTION_MISMATCH);
+        }
+        // 3. 校验库存数量充足（如果前端传了 quantity，则必须保证库存数量 >= quantity）
+        if (quantity != null && stock.getQuantity() != null && stock.getQuantity().compareTo(quantity) < 0) {
+            throw exception(WM_MATERIAL_STOCK_INSUFFICIENT);
+        }
+        return stock;
     }
 
 }

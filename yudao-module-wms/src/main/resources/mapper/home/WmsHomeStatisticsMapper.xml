@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.iocoder.yudao.module.wms.dal.mysql.home.WmsHomeStatisticsMapper">
+
+    <!-- 按单据类型和状态统计单据数量 -->
+    <select id="selectOrderCountGroupByTypeAndStatus" resultType="java.util.Map">
+        SELECT orderType, status, SUM(count) AS count
+        FROM (
+            SELECT ${@cn.iocoder.yudao.module.wms.enums.order.WmsOrderTypeEnum@RECEIPT.type} AS orderType,
+                   status,
+                   COUNT(*) AS count
+            FROM wms_receipt_order
+            WHERE deleted = 0
+              <if test="warehouseId != null">
+                  AND warehouse_id = #{warehouseId}
+              </if>
+            GROUP BY status
+            UNION ALL
+            SELECT ${@cn.iocoder.yudao.module.wms.enums.order.WmsOrderTypeEnum@SHIPMENT.type} AS orderType,
+                   status,
+                   COUNT(*) AS count
+            FROM wms_shipment_order
+            WHERE deleted = 0
+              <if test="warehouseId != null">
+                  AND warehouse_id = #{warehouseId}
+              </if>
+            GROUP BY status
+            UNION ALL
+            SELECT ${@cn.iocoder.yudao.module.wms.enums.order.WmsOrderTypeEnum@MOVEMENT.type} AS orderType,
+                   status,
+                   COUNT(*) AS count
+            FROM wms_movement_order
+            WHERE deleted = 0
+              <if test="warehouseId != null">
+                  AND (source_warehouse_id = #{warehouseId} OR target_warehouse_id = #{warehouseId})
+              </if>
+            GROUP BY status
+            UNION ALL
+            SELECT ${@cn.iocoder.yudao.module.wms.enums.order.WmsOrderTypeEnum@CHECK.type} AS orderType,
+                   status,
+                   COUNT(*) AS count
+            FROM wms_check_order
+            WHERE deleted = 0
+              <if test="warehouseId != null">
+                  AND warehouse_id = #{warehouseId}
+              </if>
+            GROUP BY status
+        ) t
+        GROUP BY orderType, status
+        ORDER BY orderType, status
+    </select>
+
+    <!-- 按天聚合单据数量 -->
+    <select id="selectDailyOrderTrend" resultType="java.util.Map">
+        SELECT date, orderType, SUM(count) AS count
+        FROM (
+            SELECT DATE_FORMAT(order_time, '%Y-%m-%d') AS date,
+                   ${@cn.iocoder.yudao.module.wms.enums.order.WmsOrderTypeEnum@RECEIPT.type} AS orderType,
+                   COUNT(*) AS count
+            FROM wms_receipt_order
+            WHERE deleted = 0
+              AND order_time &gt;= #{beginTime}
+              AND order_time &lt; #{endTime}
+              <if test="warehouseId != null">
+                  AND warehouse_id = #{warehouseId}
+              </if>
+            GROUP BY DATE_FORMAT(order_time, '%Y-%m-%d')
+            UNION ALL
+            SELECT DATE_FORMAT(order_time, '%Y-%m-%d') AS date,
+                   ${@cn.iocoder.yudao.module.wms.enums.order.WmsOrderTypeEnum@SHIPMENT.type} AS orderType,
+                   COUNT(*) AS count
+            FROM wms_shipment_order
+            WHERE deleted = 0
+              AND order_time &gt;= #{beginTime}
+              AND order_time &lt; #{endTime}
+              <if test="warehouseId != null">
+                  AND warehouse_id = #{warehouseId}
+              </if>
+            GROUP BY DATE_FORMAT(order_time, '%Y-%m-%d')
+            UNION ALL
+            SELECT DATE_FORMAT(order_time, '%Y-%m-%d') AS date,
+                   ${@cn.iocoder.yudao.module.wms.enums.order.WmsOrderTypeEnum@MOVEMENT.type} AS orderType,
+                   COUNT(*) AS count
+            FROM wms_movement_order
+            WHERE deleted = 0
+              AND order_time &gt;= #{beginTime}
+              AND order_time &lt; #{endTime}
+              <if test="warehouseId != null">
+                  AND (source_warehouse_id = #{warehouseId} OR target_warehouse_id = #{warehouseId})
+              </if>
+            GROUP BY DATE_FORMAT(order_time, '%Y-%m-%d')
+            UNION ALL
+            SELECT DATE_FORMAT(order_time, '%Y-%m-%d') AS date,
+                   ${@cn.iocoder.yudao.module.wms.enums.order.WmsOrderTypeEnum@CHECK.type} AS orderType,
+                   COUNT(*) AS count
+            FROM wms_check_order
+            WHERE deleted = 0
+              AND order_time &gt;= #{beginTime}
+              AND order_time &lt; #{endTime}
+              <if test="warehouseId != null">
+                  AND warehouse_id = #{warehouseId}
+              </if>
+            GROUP BY DATE_FORMAT(order_time, '%Y-%m-%d')
+        ) t
+        GROUP BY date, orderType
+        ORDER BY date, orderType
+    </select>
+
+    <!-- 统计库存总数量 -->
+    <select id="selectInventoryTotalQuantity" resultType="java.math.BigDecimal">
+        SELECT IFNULL(SUM(quantity), 0)
+        FROM wms_inventory
+        WHERE deleted = 0
+          <if test="warehouseId != null">
+              AND warehouse_id = #{warehouseId}
+          </if>
+    </select>
+
+    <!-- 按商品统计库存数量排行 -->
+    <select id="selectInventoryItemRank" resultType="java.util.Map">
+        SELECT item.id AS id,
+               item.name AS name,
+               IFNULL(SUM(inventory.quantity), 0) AS quantity
+        FROM wms_inventory inventory
+                 INNER JOIN wms_item_sku sku ON sku.id = inventory.sku_id AND sku.deleted = 0
+                 INNER JOIN wms_item item ON item.id = sku.item_id AND item.deleted = 0
+        WHERE inventory.deleted = 0
+          AND inventory.quantity &gt; 0
+          <if test="warehouseId != null">
+              AND inventory.warehouse_id = #{warehouseId}
+          </if>
+        GROUP BY item.id, item.name
+        ORDER BY quantity DESC, item.id ASC
+        LIMIT #{limit}
+    </select>
+
+    <!-- 按仓库统计库存数量排行 -->
+    <select id="selectInventoryWarehouseRank" resultType="java.util.Map">
+        SELECT warehouse.id AS id,
+               warehouse.name AS name,
+               IFNULL(SUM(inventory.quantity), 0) AS quantity
+        FROM wms_inventory inventory
+                 INNER JOIN wms_warehouse warehouse ON warehouse.id = inventory.warehouse_id AND warehouse.deleted = 0
+        WHERE inventory.deleted = 0
+          AND inventory.quantity &gt; 0
+          <if test="warehouseId != null">
+              AND inventory.warehouse_id = #{warehouseId}
+          </if>
+        GROUP BY warehouse.id, warehouse.name
+        ORDER BY quantity DESC, warehouse.id ASC
+        LIMIT #{limit}
+    </select>
+
+</mapper>

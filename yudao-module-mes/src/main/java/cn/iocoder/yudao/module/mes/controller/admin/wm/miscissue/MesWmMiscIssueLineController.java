@@ -44,19 +44,14 @@ public class MesWmMiscIssueLineController {
 
     @Resource
     private MesWmMiscIssueLineService miscIssueLineService;
-
     @Resource
     private MesMdItemService itemService;
-
     @Resource
     private MesMdUnitMeasureService unitMeasureService;
-
     @Resource
     private MesWmWarehouseService warehouseService;
-
     @Resource
     private MesWmWarehouseLocationService warehouseLocationService;
-
     @Resource
     private MesWmWarehouseAreaService warehouseAreaService;
 

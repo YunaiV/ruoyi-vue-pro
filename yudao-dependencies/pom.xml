@@ -14,32 +14,32 @@
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
     <properties>
-        <revision>2026.01-SNAPSHOT</revision>
+        <revision>2026.05-SNAPSHOT</revision>
         <flatten-maven-plugin.version>1.7.2</flatten-maven-plugin.version>
         <!-- 统一依赖管理 -->
-        <spring.boot.version>3.5.9</spring.boot.version>
+        <spring.boot.version>3.5.14</spring.boot.version>
         <!-- Web 相关 -->
-        <springdoc.version>2.8.14</springdoc.version>
+        <springdoc.version>2.8.17</springdoc.version>
         <knife4j.version>4.5.0</knife4j.version>
         <!-- DB 相关 -->
-        <druid.version>1.2.27</druid.version>
+        <druid.version>1.2.28</druid.version>
         <mybatis.version>3.5.19</mybatis.version>
-        <mybatis-plus.version>3.5.15</mybatis-plus.version>
-        <mybatis-plus-join.version>1.5.5</mybatis-plus-join.version>
+        <mybatis-plus.version>3.5.16</mybatis-plus.version>
+        <mybatis-plus-join.version>1.5.7</mybatis-plus-join.version>
         <dynamic-datasource.version>4.5.0</dynamic-datasource.version>
         <easy-trans.version>3.0.6</easy-trans.version>
-        <redisson.version>3.52.0</redisson.version>
+        <redisson.version>4.4.0</redisson.version>
         <dm8.jdbc.version>8.1.3.140</dm8.jdbc.version>
-        <kingbase.jdbc.version>8.6.0</kingbase.jdbc.version>
-        <opengauss.jdbc.version>5.1.0</opengauss.jdbc.version>
-        <taos.version>3.7.9</taos.version>
+        <kingbase.jdbc.version>9.0.1.jre7</kingbase.jdbc.version>
+        <opengauss.jdbc.version>7.0.0-RC3-og</opengauss.jdbc.version>
+        <taos.version>3.8.3</taos.version>
         <!-- 消息队列 -->
         <rocketmq-spring.version>2.3.5</rocketmq-spring.version>
         <!-- 服务保障相关 -->
         <lock4j.version>2.2.7</lock4j.version>
         <!-- 监控相关 -->
-        <skywalking.version>9.5.0</skywalking.version>
-        <spring-boot-admin.version>3.5.6</spring-boot-admin.version>
+        <skywalking.version>9.6.0</skywalking.version>
+        <spring-boot-admin.version>3.5.8</spring-boot-admin.version>
         <opentracing.version>0.33.0</opentracing.version>
         <!-- Test 测试相关 -->
         <podam.version>8.0.2.RELEASE</podam.version>
@@ -49,38 +49,40 @@
         <flowable.version>7.2.0</flowable.version>
         <!-- 工具类相关 -->
         <anji-plus-captcha.version>1.4.0</anji-plus-captcha.version>
-        <jsoup.version>1.21.2</jsoup.version>
+        <jsoup.version>1.22.2</jsoup.version>
         <sensitive-word.version>0.29.5</sensitive-word.version>
         <pinyin4j.version>2.5.1</pinyin4j.version>
-        <lombok.version>1.18.42</lombok.version>
+        <lombok.version>1.18.46</lombok.version>
         <mapstruct.version>1.6.3</mapstruct.version>
-        <hutool-5.version>5.8.42</hutool-5.version>
+        <hutool-5.version>5.8.44</hutool-5.version>
         <hutool-6.version>6.0.0-M22</hutool-6.version>
         <fastexcel.version>1.3.0</fastexcel.version>
         <velocity.version>2.4.1</velocity.version>
         <fastjson.version>1.2.83</fastjson.version>
-        <guava.version>33.5.0-jre</guava.version>
+        <fastjson2.version>2.0.61</fastjson2.version>
+        <guava.version>33.6.0-jre</guava.version>
         <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
-        <commons-net.version>3.12.0</commons-net.version>
+        <commons-net.version>3.13.0</commons-net.version>
         <commons-lang3.version>3.20.0</commons-lang3.version>
-        <jsch.version>2.27.7</jsch.version>
-        <tika-core.version>3.2.3</tika-core.version>
+        <jsch.version>2.28.2</jsch.version>
+        <tika-core.version>3.3.0</tika-core.version>
         <ip2region.version>2.7.0</ip2region.version>
         <bizlog-sdk.version>3.0.6</bizlog-sdk.version>
-        <netty.version>4.2.9.Final</netty.version>
+        <netty.version>4.2.14.Final</netty.version>
         <mqtt.version>1.2.5</mqtt.version>
-        <vertx.version>4.5.22</vertx.version>
+        <vertx.version>4.5.26</vertx.version>
         <okhttp.version>4.12.0</okhttp.version>
-        <californium.version>3.12.0</californium.version>
-        <j2mod.version>3.2.1</j2mod.version>
+        <californium.version>3.14.0</californium.version>
+        <j2mod.version>3.3.0</j2mod.version>
         <!-- 三方云服务相关 -->
-        <awssdk.version>2.40.15</awssdk.version>
+        <awssdk.version>2.44.0</awssdk.version>
         <justauth.version>1.16.7</justauth.version>
         <justauth-starter.version>1.4.0</justauth-starter.version>
-        <jimureport.version>2.1.3</jimureport.version>
-        <jimubi.version>2.3.0</jimubi.version>
-        <weixin-java.version>4.7.9-20251224.161447</weixin-java.version>
-        <alipay-sdk-java.version>4.40.607.ALL</alipay-sdk-java.version>
+        <jimureport.version>2.3.4</jimureport.version>
+        <jimubi.version>2.3.2</jimubi.version>
+        <weixin-java.version>4.8.2-20260501.180637</weixin-java.version>
+        <bouncycastle.version>1.80</bouncycastle.version>
+        <alipay-sdk-java.version>4.40.806.ALL</alipay-sdk-java.version>
     </properties>
 
     <dependencyManagement>
@@ -512,6 +514,11 @@
                 <artifactId>fastjson</artifactId>
                 <version>${fastjson.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.alibaba.fastjson2</groupId>
+                <artifactId>fastjson2</artifactId>
+                <version>${fastjson2.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>com.google.guava</groupId>
@@ -660,6 +667,24 @@
                 </exclusions>
             </dependency>
 
+            <!-- 锁定 weixin-java 传递依赖，避免 Maven 版本范围自动升级到 1.80.2 后 Fat Jar 启动失败。
+                 反馈：https://t.zsxq.com/pCVBo -->
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk18on</artifactId>
+                <version>${bouncycastle.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcutil-jdk18on</artifactId>
+                <version>${bouncycastle.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcpkix-jdk18on</artifactId>
+                <version>${bouncycastle.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>com.github.binarywang</groupId>
                 <artifactId>weixin-java-pay</artifactId>
@@ -679,7 +704,7 @@
             <!-- 积木报表-->
             <dependency>
                 <groupId>org.jeecgframework.jimureport</groupId>
-                <artifactId>jimureport-spring-boot3-starter-fastjson2</artifactId>
+                <artifactId>jimureport-spring-boot3-starter</artifactId>
                 <version>${jimureport.version}</version>
             </dependency>
             <dependency>

@@ -22,6 +22,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import java.util.Collections;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -36,6 +37,7 @@ import java.util.Map;
 import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
 @Tag(name = "管理后台 - 用户")
 @RestController
@@ -112,6 +114,20 @@ public class UserController {
                 convertList(pageResult.getList(), AdminUserDO::getDeptId));
         return success(new PageResult<>(UserConvert.INSTANCE.convertList(pageResult.getList(), deptMap),
                 pageResult.getTotal()));
+    }
+
+    @GetMapping("/list")
+    @Operation(summary = "获得用户详情列表")
+    @Parameter(name = "ids", description = "编号列表", required = true, example = "[1024]")
+    @PreAuthorize("@ss.hasPermission('system:user:query')")
+    public CommonResult<List<UserRespVO>> getUserList(@RequestParam("ids") List<Long> ids) {
+        List<AdminUserDO> list = userService.getUserList(ids);
+        if (CollUtil.isEmpty(list)) {
+            return success(Collections.emptyList());
+        }
+        // 拼接数据
+        Map<Long, DeptDO> deptMap = deptService.getDeptMap(convertSet(list, AdminUserDO::getDeptId));
+        return success(UserConvert.INSTANCE.convertList(list, deptMap));
     }
 
     @GetMapping({"/list-all-simple", "/simple-list"})

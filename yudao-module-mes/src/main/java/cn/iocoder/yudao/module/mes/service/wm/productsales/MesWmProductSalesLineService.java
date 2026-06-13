@@ -69,6 +69,14 @@ public interface MesWmProductSalesLineService {
     PageResult<MesWmProductSalesLineDO> getProductSalesLinePage(MesWmProductSalesLinePageReqVO pageReqVO);
 
     /**
+     * 校验销售出库单行存在
+     *
+     * @param id 编号
+     * @return 销售出库单行
+     */
+    MesWmProductSalesLineDO validateProductSalesLineExists(Long id);
+
+    /**
      * OQC 检验完成后，更新销售出库单行的 OQC 质检状态
      *
      * @param id 行 ID

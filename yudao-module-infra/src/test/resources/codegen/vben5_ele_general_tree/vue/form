@@ -1,0 +1,127 @@
+<script lang="ts" setup>
+import type { CategoryApi } from '#/api/infra/category';
+import type { FormRules } from 'element-plus';
+
+import { useVbenModal } from '@vben/common-ui';
+import { getDictOptions } from '@vben/hooks';
+import { Tinymce as RichTextarea } from '#/components/tinymce';
+import { ImageUpload, FileUpload } from "#/components/upload";
+import { ElMessage, ElTabs, ElTabPane, ElForm, ElFormItem, ElInput, ElSelect, ElOption, ElRadioGroup, ElRadio, ElCheckboxGroup, ElCheckbox, ElDatePicker, ElTreeSelect } from 'element-plus';
+import { getCategoryList } from '#/api/infra/category';
+import { handleTree } from '@vben/utils'
+
+import { computed, ref, reactive } from 'vue';
+import { $t } from '#/locales';
+import { getCategory, createCategory, updateCategory } from '#/api/infra/category';
+
+const emit = defineEmits(['success']);
+
+const formRef = ref();
+const formData = ref<Partial<CategoryApi.Category>>({
+        id: undefined,
+        name: undefined,
+        parentId: undefined,
+});
+const rules = reactive<FormRules>({
+        name: [{ required: true, message: '名字不能为空', trigger: 'blur' }],
+        parentId: [{ required: true, message: '父编号不能为空', trigger: 'blur' }],
+});
+const categoryTree = ref<any[]>([]) // 树形结构
+const getTitle = computed(() => {
+  return formData.value?.id
+    ? $t('ui.actionTitle.edit', ['分类'])
+    : $t('ui.actionTitle.create', ['分类']);
+});
+
+
+/** 重置表单 */
+const resetForm = () => {
+  formData.value = {
+            id: undefined,
+            name: undefined,
+            parentId: undefined,
+  };
+  formRef.value?.resetFields();
+}
+
+/** 获得分类树 */
+const getCategoryTree = async () => {
+  categoryTree.value = []
+  const data = await getCategoryList({});
+  data.unshift({
+    id: 0,
+    name: '顶级分类',
+  });
+    categoryTree.value = handleTree(data);
+}
+
+const [Modal, modalApi] = useVbenModal({
+  async onConfirm() {
+    await formRef.value?.validate();
+        modalApi.lock();
+    // 提交表单
+    const data = formData.value as CategoryApi.Category;
+        try {
+      await (formData.value?.id ? updateCategory(data) : createCategory(data));
+      // 关闭并提示
+      await modalApi.close();
+      emit('success');
+      ElMessage.success($t('ui.actionMessage.operationSuccess'));
+    } finally {
+      modalApi.unlock();
+    }
+  },
+  async onOpenChange(isOpen: boolean) {
+    if (!isOpen) {
+      resetForm()
+      return;
+    }
+    // 加载数据
+    let data = modalApi.getData<CategoryApi.Category>();
+    if (!data) {
+      return;
+    }
+    if (data.id) {
+      modalApi.lock();
+      try {
+        data = await getCategory(data.id);
+      } finally {
+        modalApi.unlock();
+      }
+    }
+    formData.value = data;
+    // 加载树数据
+    await getCategoryTree()
+  },
+});
+</script>
+
+<template>
+  <Modal :title="getTitle">
+    <el-form
+      ref="formRef"
+      :model="formData"
+      :rules="rules"
+      label-width="120px"
+      label-position="right"
+    >
+            <el-form-item label="名字" prop="name">
+              <el-input v-model="formData.name" placeholder="请输入名字" />
+            </el-form-item>
+            <el-form-item label="父编号" prop="parentId">
+              <el-tree-select
+                      v-model="formData.parentId"
+                      :data="categoryTree"
+                      :props="{
+            label: 'name',
+            value: 'id',
+            children: 'children',
+          }"
+                      check-strictly
+                      default-expand-all
+                      placeholder="请选择父编号"
+              />
+            </el-form-item>
+    </el-form>
+      </Modal>
+</template>

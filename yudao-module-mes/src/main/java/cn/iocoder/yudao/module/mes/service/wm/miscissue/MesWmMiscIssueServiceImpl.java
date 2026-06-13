@@ -132,6 +132,7 @@ public class MesWmMiscIssueServiceImpl implements MesWmMiscIssueService {
         wmTransactionService.createTransactionList(convertList(lines, line -> new MesWmTransactionSaveReqDTO()
                 .setType(MesWmTransactionTypeEnum.OUT.getType()).setItemId(line.getItemId())
                 .setQuantity(line.getQuantity().negate()) // 出库数量为负数
+                .setBatchId(line.getBatchId()).setBatchCode(line.getBatchCode())
                 .setWarehouseId(line.getWarehouseId()).setLocationId(line.getLocationId()).setAreaId(line.getAreaId())
                 .setBizType(MesBizTypeConstants.WM_MISC_ISSUE).setBizId(issue.getId()).setBizCode(issue.getCode()).setBizLineId(line.getId())));
     }

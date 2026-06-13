@@ -1,0 +1,118 @@
+<script lang="ts" setup>
+import type { StudentApi } from '#/api/infra/demo';
+
+import { computed, ref, h, onMounted, watch, nextTick } from 'vue';
+
+import { DICT_TYPE } from '@vben/constants';
+import { getDictOptions } from '@vben/hooks';
+
+import { message, Tabs, Form, Input, Textarea, Button, Select, RadioGroup, Radio, CheckboxGroup, Checkbox, DatePicker } from 'ant-design-vue';
+import { $t } from '#/locales';
+
+import type { Rule } from 'ant-design-vue/es/form';
+import { Tinymce as RichTextarea } from '#/components/tinymce';
+import { ImageUpload, FileUpload } from "#/components/upload";
+import { getStudentTeacherByStudentId } from '#/api/infra/demo';
+
+const props = defineProps<{
+   studentId?: number // 学生编号（主表的关联字段）
+}>()
+
+const formRef = ref();
+const formData = ref<Partial<StudentApi.StudentTeacher>>({
+                    id: undefined,
+                    studentId: undefined,
+                    name: undefined,
+                    description: undefined,
+                    birthday: undefined,
+                    sex: undefined,
+                    enabled: undefined,
+                    avatar: undefined,
+                    video: undefined,
+                    memo: undefined,
+});
+const rules: Record<string, Rule[]> = {
+                studentId: [{ required: true, message: '学生编号不能为空', trigger: 'blur' }],
+                name: [{ required: true, message: '名字不能为空', trigger: 'blur' }],
+                description: [{ required: true, message: '简介不能为空', trigger: 'blur' }],
+                birthday: [{ required: true, message: '出生日期不能为空', trigger: 'blur' }],
+                sex: [{ required: true, message: '性别不能为空', trigger: 'change' }],
+                enabled: [{ required: true, message: '是否有效不能为空', trigger: 'blur' }],
+                avatar: [{ required: true, message: '头像不能为空', trigger: 'blur' }],
+                memo: [{ required: true, message: '备注不能为空', trigger: 'blur' }],
+};
+/** 暴露出表单校验方法和表单值获取方法 */
+defineExpose({
+  validate: async () => await formRef.value?.validate(),
+  getValues: ()=> formData.value,
+});
+
+/** 监听主表的关联字段的变化，加载对应的子表数据 */
+watch(
+    () => props.studentId,
+    async (val) => {
+      if (!val) {
+        return;
+      }
+      await nextTick();
+      formData.value = await getStudentTeacherByStudentId(props.studentId!);
+    },
+    { immediate: true },
+);
+</script>
+
+<template>
+  <Form
+      ref="formRef"
+      class="mx-4"
+      :model="formData"
+      :rules="rules"
+      :label-col="{ span: 5 }"
+      :wrapper-col="{ span: 18 }"
+  >
+                <Form.Item label="名字" name="name">
+                  <Input v-model:value="formData.name" placeholder="请输入名字" />
+                </Form.Item>
+                <Form.Item label="简介" name="description">
+                  <Textarea v-model:value="formData.description" placeholder="请输入简介" />
+                </Form.Item>
+                <Form.Item label="出生日期" name="birthday">
+                  <DatePicker
+                      v-model:value="formData.birthday"
+                      valueFormat="x"
+                      placeholder="选择出生日期"
+                  />
+                </Form.Item>
+                <Form.Item label="性别" name="sex">
+                  <Select v-model:value="formData.sex" placeholder="请选择性别">
+                        <Select.Option
+                            v-for="dict in getDictOptions(DICT_TYPE.SYSTEM_USER_SEX, 'number')"
+                            :key="dict.value"
+                            :value="dict.value"
+                        >
+                          {{ dict.label }}
+                        </Select.Option>
+                  </Select>
+                </Form.Item>
+                <Form.Item label="是否有效" name="enabled">
+                  <RadioGroup v-model:value="formData.enabled">
+                        <Radio
+                            v-for="dict in getDictOptions(DICT_TYPE.INFRA_BOOLEAN_STRING, 'boolean')"
+                            :key="dict.value"
+                            :value="dict.value"
+                        >
+                          {{ dict.label }}
+                        </Radio>
+                  </RadioGroup>
+                </Form.Item>
+                <Form.Item label="头像" name="avatar">
+                  <ImageUpload v-model:value="formData.avatar" />
+                </Form.Item>
+                <Form.Item label="附件" name="video">
+                  <FileUpload v-model:value="formData.video" />
+                </Form.Item>
+                <Form.Item label="备注" name="memo">
+                  <RichTextarea v-model="formData.memo" height="500px" />
+                </Form.Item>
+  </Form>
+</template>

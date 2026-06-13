@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
+import cn.iocoder.yudao.module.mes.enums.DictTypeConstants;
 
 /**
  * MES 质检指标 DO
@@ -39,7 +40,7 @@ public class MesQcIndicatorDO extends BaseDO {
      *
      * 枚举 {@link cn.iocoder.yudao.module.mes.enums.DictTypeConstants#MES_INDICATOR_TYPE}
      */
-    private String type;
+    private Integer type;
     /**
      * 检测工具
      */
@@ -47,6 +48,7 @@ public class MesQcIndicatorDO extends BaseDO {
     /**
      * 结果值类型
      *
+     * 字典 {@link DictTypeConstants#MES_QC_RESULT_TYPE}
      * 枚举 {@link cn.iocoder.yudao.module.mes.enums.qc.MesQcResultValueTypeEnum}
      */
     private Integer resultType;

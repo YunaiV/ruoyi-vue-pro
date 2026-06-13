@@ -63,9 +63,9 @@ public class MesQcTemplateIndicatorRespVO {
     @ExcelProperty("检测项名称")
     private String indicatorName;
 
-    @Schema(description = "检测项类型（字典 mes_index_type）", example = "SIZE")
+    @Schema(description = "检测项类型", example = "1")
     @ExcelProperty("检测项类型")
-    private String indicatorType;
+    private Integer indicatorType;
 
     @Schema(description = "检测工具", example = "卡尺")
     @ExcelProperty("检测工具")

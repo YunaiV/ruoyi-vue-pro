@@ -138,6 +138,11 @@ public class MesWmProductIssueServiceImpl implements MesWmProductIssueService {
         if (ObjUtil.notEqual(MesWmProductIssueStatusEnum.APPROVING.getStatus(), issue.getStatus())) {
             throw exception(WM_PRODUCT_ISSUE_STATUS_INVALID);
         }
+        // 校验拣货明细闭环：行数量 = 明细数量
+        if (!checkProductIssueQuantity(id)) {
+            throw exception(WM_PRODUCT_ISSUE_DETAIL_QUANTITY_MISMATCH);
+        }
+
         // 执行拣货（待拣货 → 待执行领出）
         issueMapper.updateById(new MesWmProductIssueDO()
                 .setId(id).setStatus(MesWmProductIssueStatusEnum.APPROVED.getStatus()));
@@ -150,6 +155,15 @@ public class MesWmProductIssueServiceImpl implements MesWmProductIssueService {
         MesWmProductIssueDO issue = validateProductIssueExists(id);
         if (ObjUtil.notEqual(MesWmProductIssueStatusEnum.APPROVED.getStatus(), issue.getStatus())) {
             throw exception(WM_PRODUCT_ISSUE_STATUS_INVALID);
+        }
+        // 校验至少有一条明细
+        List<MesWmProductIssueDetailDO> details = issueDetailService.getProductIssueDetailListByIssueId(id);
+        if (CollUtil.isEmpty(details)) {
+            throw exception(WM_PRODUCT_ISSUE_NO_DETAIL);
+        }
+        // 校验行数量 = 明细数量
+        if (!checkProductIssueQuantity(id)) {
+            throw exception(WM_PRODUCT_ISSUE_DETAIL_QUANTITY_MISMATCH);
         }
 
         // 2. 遍历所有明细，创建库存事务（扣减库存 + 记录流水）
@@ -260,9 +274,9 @@ public class MesWmProductIssueServiceImpl implements MesWmProductIssueService {
      */
     private void validateProductIssueSaveData(MesWmProductIssueSaveReqVO reqVO) {
         validateCodeUnique(reqVO.getId(), reqVO.getCode());
-        workOrderService.validateWorkOrderExists(reqVO.getWorkOrderId());
+        workOrderService.validateWorkOrderConfirmed(reqVO.getWorkOrderId());
         if (reqVO.getWorkstationId() != null) {
-            workstationService.validateWorkstationExists(reqVO.getWorkstationId());
+            workstationService.validateWorkstationExistsAndEnable(reqVO.getWorkstationId());
         }
     }
 

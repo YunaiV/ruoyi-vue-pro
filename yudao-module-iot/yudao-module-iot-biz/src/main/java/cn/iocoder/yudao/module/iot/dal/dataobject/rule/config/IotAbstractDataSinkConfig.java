@@ -20,6 +20,7 @@ import lombok.Data;
         @JsonSubTypes.Type(value = IotDataSinkTcpConfig.class, name = "2"),
         @JsonSubTypes.Type(value = IotDataSinkWebSocketConfig.class, name = "3"),
         @JsonSubTypes.Type(value = IotDataSinkMqttConfig.class, name = "10"),
+        @JsonSubTypes.Type(value = IotDataSinkDatabaseConfig.class, name = "20"),
         @JsonSubTypes.Type(value = IotDataSinkRedisConfig.class, name = "21"),
         @JsonSubTypes.Type(value = IotDataSinkRocketMQConfig.class, name = "30"),
         @JsonSubTypes.Type(value = IotDataSinkRabbitMQConfig.class, name = "31"),

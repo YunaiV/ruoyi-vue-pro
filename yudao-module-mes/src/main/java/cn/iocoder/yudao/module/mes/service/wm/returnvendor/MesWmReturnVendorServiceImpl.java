@@ -217,7 +217,7 @@ public class MesWmReturnVendorServiceImpl implements MesWmReturnVendorService {
             validateReturnVendorExistsAndPrepare(reqVO.getId());
         }
         // 校验供应商存在
-        vendorService.validateVendorExists(reqVO.getVendorId());
+        vendorService.validateVendorExistsAndEnable(reqVO.getVendorId());
         // 校验编码唯一
         validateCodeUnique(reqVO.getId(), reqVO.getCode());
     }

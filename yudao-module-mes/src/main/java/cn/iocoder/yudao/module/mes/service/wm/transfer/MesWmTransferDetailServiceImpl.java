@@ -37,7 +37,6 @@ public class MesWmTransferDetailServiceImpl implements MesWmTransferDetailServic
     @Resource
     @Lazy
     private MesWmTransferLineService transferLineService;
-
     @Resource
     private MesWmWarehouseAreaService warehouseAreaService;
 

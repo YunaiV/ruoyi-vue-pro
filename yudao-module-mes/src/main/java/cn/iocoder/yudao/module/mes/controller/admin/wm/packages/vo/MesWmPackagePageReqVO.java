@@ -32,4 +32,7 @@ public class MesWmPackagePageReqVO extends PageParam {
     @Schema(description = "检查员用户 ID", example = "1")
     private Long inspectorUserId;
 
+    @Schema(description = "单据状态", example = "1")
+    private Integer status;
+
 }

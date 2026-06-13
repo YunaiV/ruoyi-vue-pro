@@ -36,10 +36,10 @@ public class MesWmPackageLineSaveReqVO {
     @DecimalMin(value = "0.01", message = "装箱数量必须大于 0")
     private BigDecimal quantity;
 
-    @Schema(description = "生产工单 ID", example = "1")
+    @Schema(description = "生产工单 ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @NotNull(message = "生产工单不能为空")
     private Long workOrderId;
 
-    // DONE @AI：时间都是 LocalDateTIme；
     @Schema(description = "有效期")
     private LocalDateTime expireDate;
 

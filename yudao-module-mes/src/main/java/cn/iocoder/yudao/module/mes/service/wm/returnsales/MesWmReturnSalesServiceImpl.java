@@ -170,7 +170,7 @@ public class MesWmReturnSalesServiceImpl implements MesWmReturnSalesService {
                         MesWmReturnSalesDetailDO::getQuantity, BigDecimal::add, BigDecimal.ZERO);
                 // 对比行数量与明细总数量，不满足直接抛出
                 if (line.getQuantity().compareTo(totalDetailQuantity) > 0) {
-                    MesMdItemDO item = itemService.validateItemExists(line.getItemId());
+                    MesMdItemDO item = itemService.validateItemExistsAndEnable(line.getItemId());
                     throw exception(WM_RETURN_SALES_DETAIL_QUANTITY_MISMATCH,
                             item.getCode() + " " + item.getName() + " 未完成上架");
                 }
@@ -190,7 +190,7 @@ public class MesWmReturnSalesServiceImpl implements MesWmReturnSalesService {
         wmTransactionService.createTransactionList(convertList(details, detail -> new MesWmTransactionSaveReqDTO()
                 .setType(MesWmTransactionTypeEnum.IN.getType()).setItemId(detail.getItemId())
                 .setQuantity(detail.getQuantity()) // 入库数量为正数
-                .setBatchId(detail.getBatchId())
+                .setBatchId(detail.getBatchId()).setBatchCode(detail.getBatchCode())
                 .setWarehouseId(detail.getWarehouseId()).setLocationId(detail.getLocationId()).setAreaId(detail.getAreaId())
                 .setBizType(MesBizTypeConstants.WM_RETURN_SALES).setBizId(returnSales.getId())
                 .setBizCode(returnSales.getCode()).setBizLineId(detail.getLineId())));
@@ -272,7 +272,7 @@ public class MesWmReturnSalesServiceImpl implements MesWmReturnSalesService {
      */
     private void validateSaveData(MesWmReturnSalesSaveReqVO reqVO) {
         validateCodeUnique(reqVO.getId(), reqVO.getCode());
-        clientService.validateClientExists(reqVO.getClientId());
+        clientService.validateClientExistsAndEnable(reqVO.getClientId());
     }
 
 }

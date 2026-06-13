@@ -82,4 +82,12 @@ public interface MesQcIndicatorService {
         return convertMap(getIndicatorList(ids), MesQcIndicatorDO::getId);
     }
 
+    /**
+     * 批量校验质检指标是否都存在
+     *
+     * @param ids 编号数组
+     * @return 质检指标 Map
+     */
+    Map<Long, MesQcIndicatorDO> validateIndicatorListExists(Collection<Long> ids);
+
 }

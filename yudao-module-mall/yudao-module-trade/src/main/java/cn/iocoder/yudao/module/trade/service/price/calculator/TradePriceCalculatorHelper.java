@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.trade.service.price.calculator;
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
@@ -61,7 +62,7 @@ public class TradePriceCalculatorHelper {
             // spu 信息
             orderItem.setSpuName(spu.getName()).setCategoryId(spu.getCategoryId())
                     .setDeliveryTypes(spu.getDeliveryTypes()).setDeliveryTemplateId(spu.getDeliveryTemplateId())
-                    .setGivePoint(spu.getGiveIntegral()).setUsePoint(0);
+                    .setGivePoint(ObjectUtil.defaultIfNull(spu.getGiveIntegral(), 0)).setUsePoint(0);
             if (StrUtil.isBlank(orderItem.getPicUrl())) {
                 orderItem.setPicUrl(spu.getPicUrl());
             }

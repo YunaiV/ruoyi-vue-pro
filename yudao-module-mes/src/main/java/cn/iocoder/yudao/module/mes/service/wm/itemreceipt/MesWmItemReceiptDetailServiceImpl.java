@@ -32,11 +32,9 @@ public class MesWmItemReceiptDetailServiceImpl implements MesWmItemReceiptDetail
     @Resource
     @Lazy
     private MesWmItemReceiptService itemReceiptService;
-
     @Resource
     @Lazy
     private MesWmItemReceiptLineService itemReceiptLineService;
-
     @Resource
     private MesWmWarehouseAreaService warehouseAreaService;
     @Resource

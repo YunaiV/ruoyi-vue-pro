@@ -25,7 +25,7 @@ public class MesTmToolPageReqVO extends PageParam {
     private String brand;
 
     @Schema(description = "型号规格", example = "M5-100")
-    private String spec;
+    private String specification;
 
     @Schema(description = "状态", example = "1")
     private Integer status;

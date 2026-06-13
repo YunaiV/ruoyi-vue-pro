@@ -82,6 +82,13 @@ public interface MesProProcessService {
     void validateProcessExists(Long id);
 
     /**
+     * 校验工序存在且启用
+     *
+     * @param id 编号
+     */
+    void validateProcessExistsAndEnable(Long id);
+
+    /**
      * 获得工序 Map
      *
      * @param ids 编号列表

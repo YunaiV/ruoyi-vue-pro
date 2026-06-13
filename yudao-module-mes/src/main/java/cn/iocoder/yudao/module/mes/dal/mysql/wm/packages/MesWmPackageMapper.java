@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.mes.controller.admin.wm.packages.vo.MesWmPackagePageReqVO;
 import cn.iocoder.yudao.module.mes.dal.dataobject.wm.packages.MesWmPackageDO;
-import cn.iocoder.yudao.module.mes.enums.wm.MesWmPackageStatusEnum;
+
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.Collection;
@@ -26,6 +26,7 @@ public interface MesWmPackageMapper extends BaseMapperX<MesWmPackageDO> {
                 .eqIfPresent(MesWmPackageDO::getClientId, reqVO.getClientId())
                 .eqIfPresent(MesWmPackageDO::getParentId, reqVO.getParentId())
                 .eqIfPresent(MesWmPackageDO::getInspectorUserId, reqVO.getInspectorUserId())
+                .eqIfPresent(MesWmPackageDO::getStatus, reqVO.getStatus())
                 .orderByDesc(MesWmPackageDO::getId));
     }
 
@@ -42,11 +43,5 @@ public interface MesWmPackageMapper extends BaseMapperX<MesWmPackageDO> {
                 .in(MesWmPackageDO::getParentId, parentIds));
     }
 
-    default List<MesWmPackageDO> selectChildableList() {
-        return selectList(new LambdaQueryWrapperX<MesWmPackageDO>()
-                .eq(MesWmPackageDO::getParentId, MesWmPackageDO.PARENT_ID_ROOT)
-                .eq(MesWmPackageDO::getStatus, MesWmPackageStatusEnum.FINISHED.getStatus())
-                .orderByDesc(MesWmPackageDO::getId));
-    }
 
 }

@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.im.service.group;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -77,7 +78,7 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
     @Override
     public List<ImGroupMemberDO> getGroupMemberListByOwnerAndAdmin(Long groupId) {
         return groupMemberMapper.selectListByGroupIdAndStatusAndRoles(groupId, CommonStatusEnum.ENABLE.getStatus(),
-                List.of(ImGroupMemberRoleEnum.OWNER.getRole(), ImGroupMemberRoleEnum.ADMIN.getRole()));
+                ListUtil.of(ImGroupMemberRoleEnum.OWNER.getRole(), ImGroupMemberRoleEnum.ADMIN.getRole()));
     }
 
     /**
@@ -269,7 +270,7 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
         boolean groupRemarkChanged = updateReqVO.getGroupRemark() != null
                 && ObjUtil.notEqual(updateReqVO.getGroupRemark(), member.getGroupRemark());
         if (silentChanged || groupRemarkChanged) {
-            groupMessageService.sendGroupMessage(userId, List.of(userId), ImGroupMessageSendDTO.ofGroupMemberSettingUpdate(
+            groupMessageService.sendGroupMessage(userId, ListUtil.of(userId), ImGroupMessageSendDTO.ofGroupMemberSettingUpdate(
                     groupId, userId, updateReqVO.getSilent(), updateReqVO.getGroupRemark()));
         }
     }

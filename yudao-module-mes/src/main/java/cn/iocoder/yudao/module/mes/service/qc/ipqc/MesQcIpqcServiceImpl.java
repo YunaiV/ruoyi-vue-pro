@@ -3,11 +3,14 @@ package cn.iocoder.yudao.module.mes.service.qc.ipqc;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.mes.dal.dataobject.wm.productproduce.MesWmProductProduceLineDO;
+import cn.iocoder.yudao.module.mes.enums.wm.MesWmQualityStatusEnum;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.mes.controller.admin.qc.ipqc.vo.MesQcIpqcPageReqVO;
 import cn.iocoder.yudao.module.mes.controller.admin.qc.ipqc.vo.MesQcIpqcSaveReqVO;
 import cn.iocoder.yudao.module.mes.dal.dataobject.md.workstation.MesMdWorkstationDO;
 import cn.iocoder.yudao.module.mes.dal.dataobject.pro.route.MesProRouteProductDO;
+import cn.iocoder.yudao.module.mes.dal.dataobject.pro.task.MesProTaskDO;
 import cn.iocoder.yudao.module.mes.dal.dataobject.pro.workorder.MesProWorkOrderDO;
 import cn.iocoder.yudao.module.mes.dal.dataobject.pro.feedback.MesProFeedbackDO;
 import cn.iocoder.yudao.module.mes.dal.dataobject.qc.defectrecord.MesQcDefectRecordDO;
@@ -23,9 +26,12 @@ import cn.iocoder.yudao.module.mes.service.md.workstation.MesMdWorkstationServic
 import cn.iocoder.yudao.module.mes.service.pro.feedback.MesProFeedbackService;
 import cn.iocoder.yudao.module.mes.service.pro.route.MesProRouteProcessService;
 import cn.iocoder.yudao.module.mes.service.pro.route.MesProRouteProductService;
+import cn.iocoder.yudao.module.mes.service.pro.task.MesProTaskService;
 import cn.iocoder.yudao.module.mes.service.pro.workorder.MesProWorkOrderService;
 import cn.iocoder.yudao.module.mes.service.qc.defectrecord.MesQcDefectRecordService;
+import cn.iocoder.yudao.module.mes.service.qc.indicatorresult.MesQcIndicatorResultService;
 import cn.iocoder.yudao.module.mes.service.qc.template.MesQcTemplateItemService;
+import cn.iocoder.yudao.module.mes.service.wm.productproduce.MesWmProductProduceLineService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
@@ -76,12 +82,21 @@ public class MesQcIpqcServiceImpl implements MesQcIpqcService {
     @Resource
     @Lazy
     private MesProRouteProcessService routeProcessService;
-
     @Resource
-    private AdminUserApi adminUserApi;
+    @Lazy
+    private MesProTaskService taskService;
     @Resource
     @Lazy
     private MesProFeedbackService feedbackService;
+    @Resource
+    @Lazy
+    private MesQcIndicatorResultService indicatorResultService;
+    @Resource
+    @Lazy
+    private MesWmProductProduceLineService productProduceLineService;
+
+    @Resource
+    private AdminUserApi adminUserApi;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -96,7 +111,7 @@ public class MesQcIpqcServiceImpl implements MesQcIpqcService {
         Long templateId = templateItem.getTemplateId();
         // 1.4 获取来源单据编号
         String sourceDocCode = validateAndGetSourceDocCode(
-                createReqVO.getSourceDocType(), createReqVO.getSourceDocId());
+                createReqVO.getSourceDocType(), createReqVO.getSourceDocId(), createReqVO.getSourceLineId());
 
         // 2. 插入主表
         MesQcIpqcDO ipqc = BeanUtils.toBean(createReqVO, MesQcIpqcDO.class)
@@ -136,7 +151,37 @@ public class MesQcIpqcServiceImpl implements MesQcIpqcService {
         // 校验工位、检测人员存在
         MesMdWorkstationDO workstation = workstationService.validateWorkstationExists(reqVO.getWorkstationId());
         adminUserApi.validateUser(reqVO.getInspectorUserId());
+        // 校验工单存在
+        MesProWorkOrderDO workOrder = workOrderService.validateWorkOrderConfirmed(reqVO.getWorkOrderId());
+        if (reqVO.getItemId() != null && ObjUtil.notEqual(reqVO.getItemId(), workOrder.getProductId())) {
+            throw exception(PRO_WORK_ORDER_PRODUCT_MISMATCH);
+        }
+        if (reqVO.getProcessId() != null && ObjUtil.notEqual(workstation.getProcessId(), reqVO.getProcessId())) {
+            throw exception(PRO_WORKSTATION_PROCESS_MISMATCH);
+        }
+        // 校验任务关系（如果指定了任务）
+        if (reqVO.getTaskId() != null) {
+            MesProTaskDO task = taskService.validateTaskNotFinished(reqVO.getTaskId());
+            validateTaskRelation(task, workstation, workOrder, reqVO);
+        }
         return workstation;
+    }
+
+    private void validateTaskRelation(MesProTaskDO task, MesMdWorkstationDO workstation,
+                                      MesProWorkOrderDO workOrder, MesQcIpqcSaveReqVO reqVO) {
+        if (ObjUtil.notEqual(task.getWorkOrderId(), workOrder.getId())) {
+            throw exception(PRO_TASK_WORK_ORDER_MISMATCH);
+        }
+        if (ObjUtil.notEqual(task.getWorkstationId(), workstation.getId())) {
+            throw exception(PRO_TASK_WORKSTATION_MISMATCH);
+        }
+        Long expectedProcessId = reqVO.getProcessId() != null ? reqVO.getProcessId() : workstation.getProcessId();
+        if (expectedProcessId != null && ObjUtil.notEqual(task.getProcessId(), expectedProcessId)) {
+            throw exception(PRO_TASK_ROUTE_PROCESS_MISMATCH);
+        }
+        if (ObjUtil.notEqual(task.getItemId(), workOrder.getProductId())) {
+            throw exception(PRO_TASK_ITEM_MISMATCH);
+        }
     }
 
     @Override
@@ -148,6 +193,8 @@ public class MesQcIpqcServiceImpl implements MesQcIpqcService {
         if (ipqc.getCheckResult() == null) {
             throw exception(QC_IPQC_CHECK_RESULT_EMPTY);
         }
+        // 1.3 校验至少存在一条检测结果
+        indicatorResultService.validateIndicatorResultExistsByQcIdAndType(id, MesQcTypeEnum.IPQC.getType());
 
         // 2. 更新状态为已完成
         ipqcMapper.updateById(new MesQcIpqcDO()
@@ -174,7 +221,7 @@ public class MesQcIpqcServiceImpl implements MesQcIpqcService {
         }
 
         if (Objects.equals(ipqc.getSourceDocType(), MesBizTypeConstants.PRO_FEEDBACK)) {
-            feedbackService.updateProFeedbackWhenIpqcFinish(ipqc.getSourceDocId(),
+            feedbackService.updateProFeedbackWhenIpqcFinish(ipqc.getSourceDocId(), ipqc.getSourceLineId(),
                     ObjectUtil.defaultIfNull(ipqc.getQualifiedQuantity(), BigDecimal.ZERO),
                     ObjectUtil.defaultIfNull(ipqc.getUnqualifiedQuantity(), BigDecimal.ZERO),
                     ObjectUtil.defaultIfNull(ipqc.getLaborScrapQuantity(), BigDecimal.ZERO),
@@ -233,15 +280,30 @@ public class MesQcIpqcServiceImpl implements MesQcIpqcService {
         }
     }
 
-    private String validateAndGetSourceDocCode(Integer sourceDocType, Long sourceDocId) {
+    private String validateAndGetSourceDocCode(Integer sourceDocType, Long sourceDocId, Long sourceLineId) {
         if (sourceDocType == null || sourceDocId == null) {
             return null;
         }
         if (Objects.equals(sourceDocType, MesBizTypeConstants.PRO_FEEDBACK)) {
-            MesProFeedbackDO feedback = feedbackService.getFeedback(sourceDocId);
-            return feedback != null ? feedback.getCode() : null;
+            MesProFeedbackDO feedback = feedbackService.validateFeedbackExists(sourceDocId);
+            // 校验 sourceLineId 必填
+            if (sourceLineId == null) {
+                throw exception(QC_IPQC_SOURCE_LINE_REQUIRED);
+            }
+            // 校验 sourceLineId 存在，且属于该报工的产出行
+            MesWmProductProduceLineDO targetLine = productProduceLineService
+                    .validateProductProduceLineExists(sourceLineId);
+            if (ObjUtil.notEqual(targetLine.getFeedbackId(), sourceDocId)) {
+                throw exception(QC_IPQC_SOURCE_LINE_NOT_BELONG);
+            }
+            // 校验该产出行为待检验状态
+            if (ObjUtil.notEqual(targetLine.getQualityStatus(), MesWmQualityStatusEnum.PENDING.getStatus())) {
+                throw exception(QC_IPQC_SOURCE_LINE_NOT_PENDING);
+            }
+            return feedback.getCode();
         }
-        return null;
+        // 未知来源类型应报错，而不是静默忽略
+        throw exception(QC_IPQC_SOURCE_DOC_TYPE_UNKNOWN);
     }
 
     /**

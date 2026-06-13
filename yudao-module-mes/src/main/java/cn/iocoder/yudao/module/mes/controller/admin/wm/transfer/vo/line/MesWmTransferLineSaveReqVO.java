@@ -18,7 +18,8 @@ public class MesWmTransferLineSaveReqVO {
     @NotNull(message = "转移单编号不能为空")
     private Long transferId;
 
-    @Schema(description = "库存记录编号", example = "1")
+    @Schema(description = "库存记录编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @NotNull(message = "库存记录编号不能为空")
     private Long materialStockId;
 
     @Schema(description = "物料编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")

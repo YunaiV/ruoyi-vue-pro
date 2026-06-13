@@ -34,6 +34,7 @@ public class MesWmPackageServiceImpl implements MesWmPackageService {
 
     @Resource
     private MesWmPackageMapper packageMapper;
+
     @Resource
     private MesWmPackageLineService packageLineService;
     @Resource
@@ -135,16 +136,6 @@ public class MesWmPackageServiceImpl implements MesWmPackageService {
 
         // 清除 parentId
         packageMapper.updateById(new MesWmPackageDO().setId(childId).setParentId(MesWmPackageDO.PARENT_ID_ROOT));
-    }
-
-    @Override
-    public List<MesWmPackageDO> getChildablePackageList() {
-        return packageMapper.selectChildableList();
-    }
-
-    @Override
-    public List<MesWmPackageDO> getPackageSimpleList() {
-        return packageMapper.selectList();
     }
 
     @Override

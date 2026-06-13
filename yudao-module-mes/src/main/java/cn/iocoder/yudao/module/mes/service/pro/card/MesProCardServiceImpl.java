@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.module.mes.controller.admin.pro.card.vo.MesProCardPageReqVO;
 import cn.iocoder.yudao.module.mes.controller.admin.pro.card.vo.MesProCardSaveReqVO;
 import cn.iocoder.yudao.module.mes.dal.dataobject.pro.card.MesProCardDO;
+import cn.iocoder.yudao.module.mes.dal.dataobject.pro.workorder.MesProWorkOrderDO;
 import cn.iocoder.yudao.module.mes.dal.mysql.pro.card.MesProCardMapper;
 import cn.iocoder.yudao.module.mes.enums.pro.MesProWorkOrderStatusEnum;
 import cn.iocoder.yudao.module.mes.enums.wm.BarcodeBizTypeEnum;
@@ -18,8 +19,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
-
-import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.mes.enums.ErrorCodeConstants.*;
@@ -36,11 +35,9 @@ public class MesProCardServiceImpl implements MesProCardService {
     @Resource
     private MesProCardMapper cardMapper;
 
-    // DONE @AI：会用对应的 service
     @Resource
     @Lazy
     private MesProCardProcessService cardProcessService;
-
     @Resource
     private MesProWorkOrderService workOrderService;
     @Resource
@@ -66,8 +63,8 @@ public class MesProCardServiceImpl implements MesProCardService {
 
     @Override
     public void updateCard(MesProCardSaveReqVO updateReqVO) {
-        // 1.1 校验存在
-        validateCardExists(updateReqVO.getId());
+        // 1.1 校验存在 + 草稿状态
+        validateCardExistsAndPrepare(updateReqVO.getId());
         // 1.2 校验关联数据
         validateCardSaveData(updateReqVO);
 
@@ -79,8 +76,8 @@ public class MesProCardServiceImpl implements MesProCardService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteCard(Long id) {
-        // 1. 校验存在
-        validateCardExists(id);
+        // 1. 校验存在 + 草稿状态
+        validateCardExistsAndPrepare(id);
 
         // 2. 删除流转卡 + 级联删除工序记录
         cardMapper.deleteById(id);
@@ -95,11 +92,6 @@ public class MesProCardServiceImpl implements MesProCardService {
     @Override
     public PageResult<MesProCardDO> getCardPage(MesProCardPageReqVO pageReqVO) {
         return cardMapper.selectPage(pageReqVO);
-    }
-
-    @Override
-    public List<MesProCardDO> getCardSimpleList() {
-        return cardMapper.selectList();
     }
 
     @Override
@@ -145,6 +137,14 @@ public class MesProCardServiceImpl implements MesProCardService {
         validateCardExistsInternal(id);
     }
 
+    @Override
+    public void validateCardExistsAndPrepare(Long id) {
+        MesProCardDO card = validateCardExistsInternal(id);
+        if (ObjUtil.notEqual(MesProWorkOrderStatusEnum.PREPARE.getStatus(), card.getStatus())) {
+            throw exception(PRO_CARD_NOT_PREPARE);
+        }
+    }
+
     private MesProCardDO validateCardExistsInternal(Long id) {
         MesProCardDO card = cardMapper.selectById(id);
         if (card == null) {
@@ -178,9 +178,12 @@ public class MesProCardServiceImpl implements MesProCardService {
         // 校验编码唯一
         validateCardCodeUnique(reqVO.getId(), reqVO.getCode());
         // 校验工单存在
-        workOrderService.validateWorkOrderExists(reqVO.getWorkOrderId());
+        MesProWorkOrderDO workOrder = workOrderService.validateWorkOrderConfirmed(reqVO.getWorkOrderId());
         // 校验物料存在
         itemService.validateItemExists(reqVO.getItemId());
+        if (ObjUtil.notEqual(workOrder.getProductId(), reqVO.getItemId())) {
+            throw exception(PRO_WORK_ORDER_PRODUCT_MISMATCH);
+        }
     }
 
 }

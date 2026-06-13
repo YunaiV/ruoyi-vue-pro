@@ -22,20 +22,20 @@ public class MesProTaskIssueRespVO {
     @Schema(description = "工作站编号", example = "1")
     private Long workstationId;
 
+    @Schema(description = "来源单据类型", example = "MATERIAL_ISSUE")
+    private String sourceDocType;
+
     @Schema(description = "来源单据编号", example = "1")
     private Long sourceDocId;
+
+    @Schema(description = "来源单据行编号", example = "1")
+    private Long sourceLineId;
 
     @Schema(description = "来源单据编码", example = "DOC-001")
     private String sourceDocCode;
 
-    @Schema(description = "来源单据类型", example = "MATERIAL_ISSUE")
-    private String sourceDocType;
-
     @Schema(description = "投料批次", example = "BATCH-001")
     private String batchCode;
-
-    @Schema(description = "来源单据行编号", example = "1")
-    private Long sourceLineId;
 
     @Schema(description = "产品物料编号", example = "100")
     private Long itemId;
@@ -47,7 +47,7 @@ public class MesProTaskIssueRespVO {
     private String itemName;
 
     @Schema(description = "规格型号", example = "100x200mm")
-    private String itemSpec;
+    private String itemSpecification;
 
     @Schema(description = "单位编号", example = "1")
     private Long unitMeasureId;

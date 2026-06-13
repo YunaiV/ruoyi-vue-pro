@@ -71,12 +71,12 @@ public class IotDeviceApiImpl implements IotDeviceCommonApi {
 
     @Override
     public CommonResult<IotDeviceRegisterRespDTO> registerDevice(IotDeviceRegisterReqDTO reqDTO) {
-        return doPost("/register", reqDTO, new ParameterizedTypeReference<>() { });
+        return doPost("/rpc-api/iot/device/register", reqDTO, new ParameterizedTypeReference<>() { });
     }
 
     @Override
     public CommonResult<List<IotSubDeviceRegisterRespDTO>> registerSubDevices(IotSubDeviceRegisterFullReqDTO reqDTO) {
-        return doPost("/register-sub", reqDTO, new ParameterizedTypeReference<>() { });
+        return doPost("/rpc-api/iot/device/register-sub", reqDTO, new ParameterizedTypeReference<>() { });
     }
 
     private <T, R> CommonResult<R> doPost(String url, T body,

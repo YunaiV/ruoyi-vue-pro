@@ -1,15 +1,18 @@
 package cn.iocoder.yudao.module.iot.core.util;
 
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.system.SystemUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * IoT 设备【消息】的工具类
@@ -54,20 +57,61 @@ public class IotDeviceMessageUtils {
      * @param message 消息
      * @return 标识符
      */
-    @SuppressWarnings("unchecked")
     public static String getIdentifier(IotDeviceMessage message) {
-        if (message.getParams() == null) {
+        if (message == null || message.getParams() == null) {
             return null;
         }
+        Object params = message.getParams();
         if (StrUtil.equalsAny(message.getMethod(), IotDeviceMessageMethodEnum.EVENT_POST.getMethod(),
                 IotDeviceMessageMethodEnum.SERVICE_INVOKE.getMethod())) {
-            Map<String, Object> params = (Map<String, Object>) message.getParams();
-            return MapUtil.getStr(params, "identifier");
-        }  else if (StrUtil.equalsAny(message.getMethod(), IotDeviceMessageMethodEnum.STATE_UPDATE.getMethod())) {
-            Map<String, Object> params = (Map<String, Object>) message.getParams();
-            return MapUtil.getStr(params, "state");
+            return StrUtil.toStringOrNull(readField(params, "identifier"));
+        } else if (StrUtil.equalsAny(message.getMethod(), IotDeviceMessageMethodEnum.STATE_UPDATE.getMethod())) {
+            return StrUtil.toStringOrNull(readField(params, "state"));
         }
         return null;
+    }
+
+    /**
+     * 从 params 中读取字段值，兼容 Map 和 POJO（DTO）两种形态
+     *
+     * Why：MQ 消息经 JSON 反序列化后 params 是 Map，但本地总线场景 producer 可能直接传 DTO 对象（如 IotDeviceEventPostReqDTO），
+     * matcher 必须同时支持两种形态，避免事件触发器在同 JVM 内部消息总线下匹配失败
+     */
+    private static Object readField(Object params, String fieldName) {
+        if (params == null) {
+            return null;
+        }
+        if (params instanceof Map) {
+            return ((Map<?, ?>) params).get(fieldName);
+        }
+        // 跳过 JDK 内置类型，避免反射读取到内部字段（例如 JDK8 下 String#value 会返回 char[]）
+        if (ClassUtil.isJdkClass(params.getClass())) {
+            return null;
+        }
+        try {
+            return ReflectUtil.getFieldValue(params, fieldName);
+        } catch (Exception ignored) {
+            return null;
+        }
+    }
+
+    /**
+     * 获取属性上报消息中包含的所有属性标识符
+     *
+     * 仅支持扁平结构：{ temperature: 25.5, humidity: 60 }，顶层 key 即属性标识符
+     *
+     * @param message 设备消息
+     * @return 属性标识符集合，不为 null
+     */
+    public static Set<String> getPropertyIdentifiers(IotDeviceMessage message) {
+        if (message == null) {
+            return new LinkedHashSet<>();
+        }
+        Map<String, Object> params = parseParamsToMap(message.getParams());
+        if (params == null) {
+            return new LinkedHashSet<>();
+        }
+        return new LinkedHashSet<>(params.keySet());
     }
 
     /**
@@ -82,8 +126,9 @@ public class IotDeviceMessageUtils {
      * @param identifier 要检查的标识符
      * @return 是否包含
      */
+    @SuppressWarnings("unchecked")
     public static boolean containsIdentifier(IotDeviceMessage message, String identifier) {
-        if (message.getParams() == null || StrUtil.isBlank(identifier)) {
+        if (message == null || message.getParams() == null || StrUtil.isBlank(identifier)) {
             return false;
         }
         // EVENT_POST / SERVICE_INVOKE / STATE_UPDATE：使用原有逻辑
@@ -91,10 +136,17 @@ public class IotDeviceMessageUtils {
         if (messageIdentifier != null) {
             return identifier.equals(messageIdentifier);
         }
-        // PROPERTY_POST：检查 params 中是否包含该属性 key
+        // PROPERTY_POST：检查 params 中是否包含该属性 key（支持扁平和嵌套 properties 结构）
         if (StrUtil.equals(message.getMethod(), IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod())) {
             Map<String, Object> params = parseParamsToMap(message.getParams());
-            return params != null && params.containsKey(identifier);
+            if (params == null) {
+                return false;
+            }
+            if (params.containsKey(identifier)) {
+                return true;
+            }
+            Object properties = params.get("properties");
+            return properties instanceof Map && ((Map<String, Object>) properties).containsKey(identifier);
         }
         return false;
     }
@@ -132,9 +184,6 @@ public class IotDeviceMessageUtils {
 
     /**
      * 从设备消息中提取指定标识符的属性值
-     * - 支持多种消息格式和属性值提取策略
-     * - 兼容现有的消息结构
-     * - 提供统一的属性值提取接口
      * <p>
      * 支持的提取策略（按优先级顺序）：
      * 1. 直接值：如果 params 不是 Map，直接返回该值（适用于简单消息）
@@ -150,7 +199,7 @@ public class IotDeviceMessageUtils {
      */
     @SuppressWarnings("unchecked")
     public static Object extractPropertyValue(IotDeviceMessage message, String identifier) {
-        Object params = message.getParams();
+        Object params = message != null ? message.getParams() : null;
         if (params == null) {
             return null;
         }
@@ -207,6 +256,19 @@ public class IotDeviceMessageUtils {
     }
 
     /**
+     * 从设备事件上报消息中提取事件值
+     * <p>
+     * 事件上报的 params 结构为：{"identifier": "xxx", "value": ...}，事件值即 value 字段。
+     * value 可能是标量（字符串/数字/布尔），也可能是结构体（如告警事件 {level, message}）
+     *
+     * @param message 设备消息
+     * @return 事件值，如果未找到则返回 null
+     */
+    public static Object extractEventValue(IotDeviceMessage message) {
+        return readField(message != null ? message.getParams() : null, "value");
+    }
+
+    /**
      * 从服务调用消息中提取输入参数
      * <p>
      * 服务调用消息的 params 结构通常为：
@@ -220,23 +282,16 @@ public class IotDeviceMessageUtils {
      */
     @SuppressWarnings("unchecked")
     public static Map<String, Object> extractServiceInputParams(IotDeviceMessage message) {
-        // 1. 参数校验
+        if (message == null || message.getParams() == null) {
+            return null;
+        }
         Object params = message.getParams();
-        if (params == null) {
-            return null;
-        }
-        if (!(params instanceof Map)) {
-            return null;
-        }
-        Map<String, Object> paramsMap = (Map<String, Object>) params;
-
-        // 尝试从 inputData 字段获取
-        Object inputData = paramsMap.get("inputData");
+        // 兼容 Map 和 POJO（如 IotDeviceServiceInvokeReqDTO）两种 params 形态
+        Object inputData = readField(params, "inputData");
         if (inputData instanceof Map) {
             return (Map<String, Object>) inputData;
         }
-        // 尝试从 inputParams 字段获取
-        Object inputParams = paramsMap.get("inputParams");
+        Object inputParams = readField(params, "inputParams");
         if (inputParams instanceof Map) {
             return (Map<String, Object>) inputParams;
         }

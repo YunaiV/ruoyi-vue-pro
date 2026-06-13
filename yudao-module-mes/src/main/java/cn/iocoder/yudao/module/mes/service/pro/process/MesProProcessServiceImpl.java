@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.mes.service.pro.process;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjUtil;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.mes.controller.admin.pro.process.vo.MesProProcessPageReqVO;
@@ -35,7 +37,6 @@ public class MesProProcessServiceImpl implements MesProProcessService {
 
     @Resource
     private MesProProcessContentService processContentService;
-
     @Resource
     @Lazy
     private MesProRouteProcessService routeProcessService;
@@ -83,6 +84,17 @@ public class MesProProcessServiceImpl implements MesProProcessService {
     public void validateProcessExists(Long id) {
         if (processMapper.selectById(id) == null) {
             throw exception(PRO_PROCESS_NOT_EXISTS);
+        }
+    }
+
+    @Override
+    public void validateProcessExistsAndEnable(Long id) {
+        MesProProcessDO process = processMapper.selectById(id);
+        if (process == null) {
+            throw exception(PRO_PROCESS_NOT_EXISTS);
+        }
+        if (ObjUtil.notEqual(CommonStatusEnum.ENABLE.getStatus(), process.getStatus())) {
+            throw exception(PRO_PROCESS_IS_DISABLE);
         }
     }
 

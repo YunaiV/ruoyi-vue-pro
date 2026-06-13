@@ -9,7 +9,7 @@ import lombok.*;
 import java.math.BigDecimal;
 
 /**
- * MES 产品BOM DO
+ * MES 产品 BOM DO
  *
  * @author 芋道源码
  */

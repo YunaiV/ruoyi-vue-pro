@@ -27,6 +27,10 @@ public interface MesProTaskIssueMapper extends BaseMapperX<MesProTaskIssueDO> {
                 .orderByDesc(MesProTaskIssueDO::getId));
     }
 
+    default Long selectCountByUnitMeasureId(Long unitMeasureId) {
+        return selectCount(MesProTaskIssueDO::getUnitMeasureId, unitMeasureId);
+    }
+
     default List<MesProTaskIssueDO> selectListByTaskId(Long taskId) {
         return selectList(new LambdaQueryWrapperX<MesProTaskIssueDO>()
                 .eq(MesProTaskIssueDO::getTaskId, taskId)

@@ -1,0 +1,149 @@
+<template>
+  <div class="app-container">
+    <!-- 对话框(添加 / 修改) -->
+    <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="45%" v-dialogDrag append-to-body>
+      <el-form ref="formRef" :model="formData" :rules="formRules" v-loading="formLoading" label-width="100px">
+                    <el-form-item label="名字" prop="name">
+                      <el-input v-model="formData.name" placeholder="请输入名字" />
+                    </el-form-item>
+                    <el-form-item label="简介" prop="description">
+                      <el-input v-model="formData.description" type="textarea" placeholder="请输入内容" />
+                    </el-form-item>
+                    <el-form-item label="出生日期" prop="birthday">
+                      <el-date-picker clearable v-model="formData.birthday" type="date" value-format="timestamp" placeholder="选择出生日期" />
+                    </el-form-item>
+                    <el-form-item label="性别" prop="sex">
+                      <el-select v-model="formData.sex" placeholder="请选择性别">
+                            <el-option v-for="dict in this.getDictDatas(DICT_TYPE.SYSTEM_USER_SEX)"
+                                       :key="dict.value" :label="dict.label" :value="parseInt(dict.value)" />
+                      </el-select>
+                    </el-form-item>
+                    <el-form-item label="是否有效" prop="enabled">
+                      <el-radio-group v-model="formData.enabled">
+                            <el-radio v-for="dict in this.getDictDatas(DICT_TYPE.INFRA_BOOLEAN_STRING)"
+                                      :key="dict.value" :label="dict.value">{{dict.label}}</el-radio>
+                      </el-radio-group>
+                    </el-form-item>
+                    <el-form-item label="头像">
+                      <ImageUpload v-model="formData.avatar"/>
+                    </el-form-item>
+                    <el-form-item label="附件">
+                      <FileUpload v-model="formData.video"/>
+                    </el-form-item>
+                    <el-form-item label="备注">
+                      <Editor v-model="formData.memo" :min-height="192"/>
+                    </el-form-item>
+      </el-form>
+              <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitForm" :disabled="formLoading">确 定</el-button>
+        <el-button @click="dialogVisible = false">取 消</el-button>
+      </div>
+    </el-dialog>
+  </div>
+</template>
+
+<script>
+  import * as StudentApi from '@/api/infra/demo';
+  import ImageUpload from '@/components/ImageUpload';
+  import FileUpload from '@/components/FileUpload';
+  import Editor from '@/components/Editor';
+      export default {
+    name: "StudentForm",
+    components: {
+          ImageUpload,
+          FileUpload,
+          Editor,
+                    },
+    data() {
+      return {
+        // 弹出层标题
+        dialogTitle: "",
+        // 是否显示弹出层
+        dialogVisible: false,
+        // 表单的加载中：1）修改时的数据加载；2）提交的按钮禁用
+        formLoading: false,
+        // 表单参数
+        formData: {
+                            id: undefined,
+                            name: undefined,
+                            description: undefined,
+                            birthday: undefined,
+                            sex: undefined,
+                            enabled: undefined,
+                            avatar: undefined,
+                            video: undefined,
+                            memo: undefined,
+        },
+        // 表单校验
+        formRules: {
+                        name: [{ required: true, message: '名字不能为空', trigger: 'blur' }],
+                        description: [{ required: true, message: '简介不能为空', trigger: 'blur' }],
+                        birthday: [{ required: true, message: '出生日期不能为空', trigger: 'blur' }],
+                        sex: [{ required: true, message: '性别不能为空', trigger: 'change' }],
+                        enabled: [{ required: true, message: '是否有效不能为空', trigger: 'blur' }],
+                        avatar: [{ required: true, message: '头像不能为空', trigger: 'blur' }],
+                        video: [{ required: true, message: '附件不能为空', trigger: 'blur' }],
+                        memo: [{ required: true, message: '备注不能为空', trigger: 'blur' }],
+        },
+                        };
+    },
+    methods: {
+      /** 打开弹窗 */
+     async open(id) {
+        this.dialogVisible = true;
+        this.reset();
+        // 修改时，设置数据
+        if (id) {
+          this.formLoading = true;
+          try {
+            const res = await StudentApi.getStudent(id);
+            this.formData = res.data;
+            this.title = "修改学生";
+          } finally {
+            this.formLoading = false;
+          }
+        }
+        this.title = "新增学生";
+              },
+      /** 提交按钮 */
+      async submitForm() {
+        // 校验主表
+        await this.$refs["formRef"].validate();
+                  this.formLoading = true;
+        try {
+          const data = this.formData;
+                  // 修改的提交
+          if (data.id) {
+            await StudentApi.updateStudent(data);
+            this.$modal.msgSuccess("修改成功");
+            this.dialogVisible = false;
+            this.$emit('success');
+            return;
+          }
+          // 添加的提交
+          await StudentApi.createStudent(data);
+          this.$modal.msgSuccess("新增成功");
+          this.dialogVisible = false;
+          this.$emit('success');
+        } finally {
+          this.formLoading = false;
+        }
+      },
+                      /** 表单重置 */
+      reset() {
+        this.formData = {
+                            id: undefined,
+                            name: undefined,
+                            description: undefined,
+                            birthday: undefined,
+                            sex: undefined,
+                            enabled: undefined,
+                            avatar: undefined,
+                            video: undefined,
+                            memo: undefined,
+        };
+        this.resetForm("formRef");
+      }
+    }
+  };
+</script>

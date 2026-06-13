@@ -8,3 +8,4 @@ DELETE FROM "iot_alert_record";
 DELETE FROM "iot_ota_firmware";
 DELETE FROM "iot_ota_task";
 DELETE FROM "iot_ota_record";
+DELETE FROM "iot_data_rule";

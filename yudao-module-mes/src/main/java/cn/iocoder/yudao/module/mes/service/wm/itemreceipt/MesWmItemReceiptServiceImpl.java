@@ -8,6 +8,7 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.module.mes.controller.admin.wm.itemreceipt.vo.MesWmItemReceiptPageReqVO;
 import cn.iocoder.yudao.module.mes.controller.admin.wm.itemreceipt.vo.MesWmItemReceiptSaveReqVO;
+import cn.iocoder.yudao.module.mes.dal.dataobject.wm.arrivalnotice.MesWmArrivalNoticeDO;
 import cn.iocoder.yudao.module.mes.dal.dataobject.wm.itemreceipt.MesWmItemReceiptDO;
 import cn.iocoder.yudao.module.mes.dal.dataobject.wm.itemreceipt.MesWmItemReceiptDetailDO;
 import cn.iocoder.yudao.module.mes.dal.dataobject.wm.itemreceipt.MesWmItemReceiptLineDO;
@@ -27,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -55,7 +57,6 @@ public class MesWmItemReceiptServiceImpl implements MesWmItemReceiptService {
     @Resource
     @Lazy
     private MesQcIqcService iqcService;
-
     @Resource
     private MesWmTransactionService wmTransactionService;
 
@@ -87,10 +88,13 @@ public class MesWmItemReceiptServiceImpl implements MesWmItemReceiptService {
         // 校验编码唯一
         validateCodeUnique(reqVO.getId(), reqVO.getCode());
         // 校验供应商存在
-        vendorService.validateVendorExists(reqVO.getVendorId());
+        vendorService.validateVendorExistsAndEnable(reqVO.getVendorId());
         // 校验到货通知单存在
         if (reqVO.getNoticeId() != null) {
-            arrivalNoticeService.validateArrivalNoticeExists(reqVO.getNoticeId());
+            MesWmArrivalNoticeDO notice = arrivalNoticeService.validateArrivalNoticeReadyForReceipt(reqVO.getNoticeId());
+            if (ObjUtil.notEqual(notice.getVendorId(), reqVO.getVendorId())) {
+                throw exception(WM_ARRIVAL_NOTICE_VENDOR_MISMATCH);
+            }
         }
         // 校验来料检验单存在
         if (reqVO.getIqcId() != null) {
@@ -261,6 +265,11 @@ public class MesWmItemReceiptServiceImpl implements MesWmItemReceiptService {
     @Override
     public List<MesWmItemReceiptDO> getItemReceiptListByVendorId(Long vendorId) {
         return itemReceiptMapper.selectListByVendorId(vendorId);
+    }
+
+    @Override
+    public List<MesWmItemReceiptDO> getItemReceiptList(Collection<Long> ids) {
+        return itemReceiptMapper.selectByIds(ids);
     }
 
 }

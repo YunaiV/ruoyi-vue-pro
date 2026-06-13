@@ -66,7 +66,7 @@ public class MesWmArrivalNoticeLineServiceImpl implements MesWmArrivalNoticeLine
         // 校验父单据存在且为草稿状态
         arrivalNoticeService.validateArrivalNoticeExistsAndDraft(reqVO.getNoticeId());
         // 校验物料存在
-        itemService.validateItemExists(reqVO.getItemId());
+        itemService.validateItemExistsAndEnable(reqVO.getItemId());
     }
 
     /**

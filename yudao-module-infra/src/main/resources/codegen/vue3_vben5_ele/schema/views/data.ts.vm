@@ -137,6 +137,21 @@ export function useFormSchema(): VbenFormSchema[] {
   ];
 }
 
+#if ($importEnable)
+/** 导入的表单 */
+export function useImportFormSchema(): VbenFormSchema[] {
+  return [
+    {
+      fieldName: 'file',
+      label: '${table.classComment}数据',
+      component: 'Upload',
+      rules: 'required',
+      help: '仅允许导入 xls、xlsx 格式文件',
+    },
+  ];
+}
+
+#end
 /** 列表的搜索表单 */
 export function useGridFormSchema(): VbenFormSchema[] {
   return [

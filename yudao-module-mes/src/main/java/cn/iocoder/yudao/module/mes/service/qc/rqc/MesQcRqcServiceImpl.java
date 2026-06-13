@@ -15,6 +15,7 @@ import cn.iocoder.yudao.module.mes.enums.qc.MesQcTypeEnum;
 import cn.iocoder.yudao.module.mes.enums.MesBizTypeConstants;
 import cn.iocoder.yudao.module.mes.service.md.item.MesMdItemService;
 import cn.iocoder.yudao.module.mes.service.qc.defectrecord.MesQcDefectRecordService;
+import cn.iocoder.yudao.module.mes.service.qc.indicatorresult.MesQcIndicatorResultService;
 import cn.iocoder.yudao.module.mes.service.wm.returnissue.MesWmReturnIssueService;
 import cn.iocoder.yudao.module.mes.service.wm.returnsales.MesWmReturnSalesService;
 import cn.iocoder.yudao.module.mes.service.qc.template.MesQcTemplateItemService;
@@ -46,6 +47,7 @@ public class MesQcRqcServiceImpl implements MesQcRqcService {
 
     @Resource
     private MesQcRqcMapper rqcMapper;
+
     @Resource
     private MesQcTemplateItemService templateItemService;
     @Resource
@@ -68,6 +70,9 @@ public class MesQcRqcServiceImpl implements MesQcRqcService {
     @Resource
     @Lazy
     private MesWmReturnSalesService returnSalesService;
+    @Resource
+    @Lazy
+    private MesQcIndicatorResultService indicatorResultService;
 
     @Resource
     private AdminUserApi adminUserApi;
@@ -137,6 +142,8 @@ public class MesQcRqcServiceImpl implements MesQcRqcService {
                 throw exception(QC_RQC_QUANTITY_MISMATCH);
             }
         }
+        // 1.4 校验至少存在一条检测结果
+        indicatorResultService.validateIndicatorResultExistsByQcIdAndType(id, MesQcTypeEnum.RQC.getType());
 
         // 2. 更新状态为已完成
         MesQcRqcDO updateObj = new MesQcRqcDO().setId(id).setStatus(MesQcStatusEnum.FINISHED.getStatus());

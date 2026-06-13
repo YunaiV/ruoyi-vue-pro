@@ -1,11 +1,11 @@
 package cn.iocoder.yudao.module.iot.service.rule.data.action;
 
+import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.config.IotDataSinkTcpConfig;
 import cn.iocoder.yudao.module.iot.service.rule.data.action.tcp.IotTcpClient;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -18,7 +18,6 @@ import static org.mockito.Mockito.*;
  *
  * @author HUIHUI
  */
-@Disabled // TODO @puhui999：单测有报错，先屏蔽
 class IotTcpDataRuleActionTest {
 
     private IotTcpDataRuleAction tcpDataRuleAction;
@@ -44,9 +43,8 @@ class IotTcpDataRuleActionTest {
         assertEquals(expectedType, actualType);
     }
 
-    // TODO @puhui999：_ 后面是小写哈，单测的命名规则。
     @Test
-    public void testInitProducer_Success() throws Exception {
+    public void testInitProducer_success() throws Exception {
         // 准备参数
         IotDataSinkTcpConfig config = new IotDataSinkTcpConfig();
         config.setHost("localhost");
@@ -62,7 +60,7 @@ class IotTcpDataRuleActionTest {
     }
 
     @Test
-    public void testInitProducer_InvalidHost() {
+    public void testInitProducer_invalidHost() {
         // 准备参数
         IotDataSinkTcpConfig config = new IotDataSinkTcpConfig();
         config.setHost("");
@@ -80,7 +78,7 @@ class IotTcpDataRuleActionTest {
     }
 
     @Test
-    public void testInitProducer_InvalidPort() {
+    public void testInitProducer_invalidPort() {
         // 准备参数
         IotDataSinkTcpConfig config = new IotDataSinkTcpConfig();
         config.setHost("localhost");
@@ -107,7 +105,7 @@ class IotTcpDataRuleActionTest {
     }
 
     @Test
-    public void testExecute_WithValidConfig() {
+    public void testExecute_withValidConfig() {
         // 准备参数
         IotDeviceMessage message = IotDeviceMessage.requestOf("thing.property.report",
                 "{\"temperature\": 25.5, \"humidity\": 60}");
@@ -127,7 +125,7 @@ class IotTcpDataRuleActionTest {
     }
 
     @Test
-    public void testConfig_DefaultValues() {
+    public void testConfig_defaultValues() {
         // 准备参数
         IotDataSinkTcpConfig config = new IotDataSinkTcpConfig();
 
@@ -148,7 +146,7 @@ class IotTcpDataRuleActionTest {
         IotDeviceMessage message = IotDeviceMessage.builder()
                 .deviceId(123L)
                 .method("thing.property.report")
-                .params("{\"temperature\": 25.5}")
+                .params(MapUtil.of("temperature", 25.5))
                 .build();
 
         // 调用方法

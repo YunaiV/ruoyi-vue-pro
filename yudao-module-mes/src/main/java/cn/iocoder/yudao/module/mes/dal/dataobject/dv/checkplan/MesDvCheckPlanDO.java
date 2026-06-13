@@ -65,6 +65,7 @@ public class MesDvCheckPlanDO extends BaseDO {
     /**
      * 状态
      *
+     * 字典 {@link DictTypeConstants#MES_DV_CHECK_PLAN_STATUS}
      * 枚举 {@link MesDvCheckPlanStatusEnum}
      */
     private Integer status;

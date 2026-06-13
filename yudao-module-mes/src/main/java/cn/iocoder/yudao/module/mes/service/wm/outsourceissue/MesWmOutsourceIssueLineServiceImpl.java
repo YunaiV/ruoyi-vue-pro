@@ -121,7 +121,7 @@ public class MesWmOutsourceIssueLineServiceImpl implements MesWmOutsourceIssueLi
             throw exception(WM_OUTSOURCE_ISSUE_NOT_EXISTS);
         }
         // 校验关联的物料存在
-        itemService.validateItemExists(saveReqVO.getItemId());
+        itemService.validateItemExistsAndEnable(saveReqVO.getItemId());
         // 校验物料是否在工单 BOM 中
         validateItemInWorkOrderBom(issue.getWorkOrderId(), saveReqVO.getItemId());
     }

@@ -39,6 +39,7 @@ public class MesCalTeamShiftServiceImpl implements MesCalTeamShiftService {
 
     @Resource
     private MesCalTeamShiftMapper teamShiftMapper;
+
     @Resource
     @Lazy
     private MesCalPlanService planService;

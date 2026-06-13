@@ -35,6 +35,9 @@ public class MesProWorkOrderPageReqVO extends PageParam {
     @Schema(description = "客户编号", example = "300")
     private Long clientId;
 
+    @Schema(description = "工单状态", example = "1")
+    private Integer status;
+
     @Schema(description = "需求日期")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] requestDate;

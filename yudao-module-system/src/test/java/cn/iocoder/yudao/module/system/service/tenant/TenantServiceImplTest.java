@@ -22,7 +22,6 @@ import cn.iocoder.yudao.module.system.service.tenant.handler.TenantMenuHandler;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -334,7 +333,6 @@ public class TenantServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
-    @Disabled // H2 不支持 find_in_set 函数
     public void testGetTenantByWebsite() {
         // mock 数据
         TenantDO dbTenant = randomPojo(TenantDO.class, o -> o.setWebsites(singletonList("https://www.iocoder.cn")));

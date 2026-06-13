@@ -46,6 +46,14 @@ public interface MesProFeedbackService {
     MesProFeedbackDO getFeedback(Long id);
 
     /**
+     * 校验生产报工存在
+     *
+     * @param id 编号
+     * @return 生产报工
+     */
+    MesProFeedbackDO validateFeedbackExists(Long id);
+
+    /**
      * 获得生产报工分页
      *
      * @param pageReqVO 分页查询
@@ -83,11 +91,10 @@ public interface MesProFeedbackService {
      *   </li>
      * </ol>
      *
-     * @param id     报工单编号
-     * @param userId 当前操作用户编号（审核人）
+     * @param id 报工单编号
      * @return true=已完成, false=待检验（需等质检回调）
      */
-    boolean approveFeedback(Long id, Long userId);
+    boolean approveFeedback(Long id);
 
     /**
      * IPQC 完成后回调：完成报工单并更新任务/工单进度
@@ -96,13 +103,15 @@ public interface MesProFeedbackService {
      * 并根据检验结果回写合格/不合格/废品数量，同时更新任务/工单的已生产数量。
      *
      * @param feedbackId          报工记录 ID
+     * @param sourceLineId        来源产出行 ID（用于直接定位待检行）
      * @param qualifiedQty        合格品数量
      * @param unqualifiedQty      不合格品数量
      * @param laborScrapQty       工废数量
      * @param materialScrapQty    料废数量
      * @param otherScrapQty       其他废品数量
      */
-    void updateProFeedbackWhenIpqcFinish(Long feedbackId, BigDecimal qualifiedQty, BigDecimal unqualifiedQty,
+    void updateProFeedbackWhenIpqcFinish(Long feedbackId, Long sourceLineId,
+                                         BigDecimal qualifiedQty, BigDecimal unqualifiedQty,
                                          BigDecimal laborScrapQty, BigDecimal materialScrapQty, BigDecimal otherScrapQty);
 
 }

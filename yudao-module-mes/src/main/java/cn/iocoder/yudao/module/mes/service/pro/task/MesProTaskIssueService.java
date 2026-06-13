@@ -61,4 +61,12 @@ public interface MesProTaskIssueService {
      */
     List<MesProTaskIssueDO> getTaskIssueListByTaskId(Long taskId);
 
+    /**
+     * 获取指定计量单位的投料记录数量
+     *
+     * @param unitMeasureId 计量单位编号
+     * @return 投料记录数量
+     */
+    Long getTaskIssueCountByUnitMeasureId(Long unitMeasureId);
+
 }

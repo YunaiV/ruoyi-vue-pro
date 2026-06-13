@@ -9,6 +9,7 @@ import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
 
 import java.lang.reflect.Type;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Date;
@@ -52,6 +53,10 @@ public class RandomUtils {
             }
             return RandomUtil.randomInt();
         });
+        // BigDecimal：限制精度在 DECIMAL(10,2) 范围内，避免 H2 等数据库溢出
+        PODAM_FACTORY.getStrategy().addOrReplaceTypeManufacturer(BigDecimal.class,
+                (dataProviderStrategy, attributeMetadata, map) ->
+                        BigDecimal.valueOf(RandomUtil.randomInt(0, 10000000), 2));
         // LocalDateTime
         PODAM_FACTORY.getStrategy().addOrReplaceTypeManufacturer(LocalDateTime.class,
                 (dataProviderStrategy, attributeMetadata, map) -> randomLocalDateTime());

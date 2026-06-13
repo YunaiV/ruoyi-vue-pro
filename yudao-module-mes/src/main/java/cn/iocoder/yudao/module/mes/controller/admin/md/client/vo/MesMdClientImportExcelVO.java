@@ -37,6 +37,39 @@ public class MesMdClientImportExcelVO {
     @ExcelProperty("客户邮箱地址")
     private String email;
 
+    @ExcelProperty("客户英文名称")
+    private String englishName;
+
+    @ExcelProperty("客户简介")
+    private String description;
+
+    @ExcelProperty("客户地址")
+    private String address;
+
+    @ExcelProperty("客户官网地址")
+    private String website;
+
+    @ExcelProperty("联系人1")
+    private String contact1Name;
+
+    @ExcelProperty("联系人1-电话")
+    private String contact1Telephone;
+
+    @ExcelProperty("联系人1-邮箱")
+    private String contact1Email;
+
+    @ExcelProperty("联系人2")
+    private String contact2Name;
+
+    @ExcelProperty("联系人2-电话")
+    private String contact2Telephone;
+
+    @ExcelProperty("联系人2-邮箱")
+    private String contact2Email;
+
+    @ExcelProperty("统一社会信用代码")
+    private String creditCode;
+
     @ExcelProperty(value = "状态", converter = DictConvert.class)
     @DictFormat(cn.iocoder.yudao.module.system.enums.DictTypeConstants.COMMON_STATUS)
     private Integer status;

@@ -7,10 +7,10 @@ import org.springframework.stereotype.Component;
 /**
  * 根据流程变量 variable 的类型，转换参数的值
  *
- * 目前用于 ConditionNodeConvert 的 buildConditionExpression 方法中
- *
+ * @deprecated 已无调用方
  * @author jason
  */
+@Deprecated // TODO @芋艿：兼容老版本，预计 27 年删除；
 @Component
 public class VariableConvertByTypeExpressionFunction extends AbstractFlowableVariableExpressionFunction {
 

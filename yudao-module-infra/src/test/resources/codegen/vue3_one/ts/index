@@ -1,0 +1,53 @@
+import request from '@/config/axios'
+import type { Dayjs } from 'dayjs';
+
+/** 学生信息 */
+export interface Student {
+          id: number; // 编号
+          name?: string; // 名字
+          description?: string; // 简介
+          birthday?: string | Dayjs; // 出生日期
+          sex?: number; // 性别
+          enabled?: boolean; // 是否有效
+          avatar?: string; // 头像
+          video?: string; // 附件
+          memo?: string; // 备注
+  }
+
+// 学生 API
+export const StudentApi = {
+  // 查询学生分页
+  getStudentPage: async (params: any) => {
+    return await request.get({ url: `/infra/student/page`, params })
+  },
+
+  // 查询学生详情
+  getStudent: async (id: number) => {
+    return await request.get({ url: `/infra/student/get?id=` + id })
+  },
+
+  // 新增学生
+  createStudent: async (data: Student) => {
+    return await request.post({ url: `/infra/student/create`, data })
+  },
+
+  // 修改学生
+  updateStudent: async (data: Student) => {
+    return await request.put({ url: `/infra/student/update`, data })
+  },
+
+  // 删除学生
+  deleteStudent: async (id: number) => {
+    return await request.delete({ url: `/infra/student/delete?id=` + id })
+  },
+
+  /** 批量删除学生 */
+  deleteStudentList: async (ids: number[]) => {
+    return await request.delete({ url: `/infra/student/delete-list?ids=${ids.join(',')}` })
+  },
+
+  // 导出学生 Excel
+  exportStudent: async (params) => {
+    return await request.download({ url: `/infra/student/export-excel`, params })
+  }
+}

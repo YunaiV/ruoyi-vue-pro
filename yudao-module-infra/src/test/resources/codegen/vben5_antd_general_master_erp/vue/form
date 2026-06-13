@@ -1,0 +1,161 @@
+<script lang="ts" setup>
+import type { Rule } from 'ant-design-vue/es/form';
+import type { StudentApi } from '#/api/infra/demo';
+
+import { computed, ref } from 'vue';
+
+import { useVbenModal } from '@vben/common-ui';
+import { DICT_TYPE } from '@vben/constants';
+import { getDictOptions } from '@vben/hooks';
+import { Tinymce as RichTextarea } from '#/components/tinymce';
+import { ImageUpload, FileUpload } from "#/components/upload";
+import { message, Tabs, Form, Input, Textarea, Select, RadioGroup, Radio, CheckboxGroup, Checkbox, DatePicker, TreeSelect } from 'ant-design-vue';
+
+import { $t } from '#/locales';
+import { getStudent, createStudent, updateStudent } from '#/api/infra/demo';
+
+const emit = defineEmits(['success']);
+
+const formRef = ref();
+const formData = ref<Partial<StudentApi.Student>>({
+        id: undefined,
+        name: undefined,
+        description: undefined,
+        birthday: undefined,
+        sex: undefined,
+        enabled: undefined,
+        avatar: undefined,
+        video: undefined,
+        memo: undefined,
+});
+const rules: Record<string, Rule[]> = {
+        name: [{ required: true, message: '名字不能为空', trigger: 'blur' }],
+        description: [{ required: true, message: '简介不能为空', trigger: 'blur' }],
+        birthday: [{ required: true, message: '出生日期不能为空', trigger: 'blur' }],
+        sex: [{ required: true, message: '性别不能为空', trigger: 'change' }],
+        enabled: [{ required: true, message: '是否有效不能为空', trigger: 'blur' }],
+        avatar: [{ required: true, message: '头像不能为空', trigger: 'blur' }],
+        video: [{ required: true, message: '附件不能为空', trigger: 'blur' }],
+        memo: [{ required: true, message: '备注不能为空', trigger: 'blur' }],
+};
+const getTitle = computed(() => {
+  return formData.value?.id
+    ? $t('ui.actionTitle.edit', ['学生'])
+    : $t('ui.actionTitle.create', ['学生']);
+});
+
+
+/** 重置表单 */
+function resetForm() {
+  formData.value = {
+            id: undefined,
+            name: undefined,
+            description: undefined,
+            birthday: undefined,
+            sex: undefined,
+            enabled: undefined,
+            avatar: undefined,
+            video: undefined,
+            memo: undefined,
+  };
+  formRef.value?.resetFields();
+}
+
+
+const [Modal, modalApi] = useVbenModal({
+  async onConfirm() {
+    await formRef.value?.validate();
+        modalApi.lock();
+    // 提交表单
+    const data = formData.value as StudentApi.Student;
+        try {
+      await (formData.value?.id ? updateStudent(data) : createStudent(data));
+      // 关闭并提示
+      await modalApi.close();
+      emit('success');
+      message.success({
+        content: $t('ui.actionMessage.operationSuccess'),
+      });
+    } finally {
+      modalApi.unlock();
+    }
+  },
+  async onOpenChange(isOpen: boolean) {
+    if (!isOpen) {
+      resetForm()
+      return;
+    }
+    // 加载数据
+    let data = modalApi.getData<StudentApi.Student>();
+    if (!data) {
+      return;
+    }
+    if (data.id) {
+      modalApi.lock();
+      try {
+        data = await getStudent(data.id);
+      } finally {
+        modalApi.unlock();
+      }
+    }
+    formData.value = data;
+  },
+});
+</script>
+
+<template>
+  <Modal :title="getTitle">
+    <Form
+      ref="formRef"
+      :model="formData"
+      :rules="rules"
+      :label-col="{ span: 5 }"
+      :wrapper-col="{ span: 18 }"
+    >
+            <Form.Item label="名字" name="name">
+              <Input v-model:value="formData.name" placeholder="请输入名字" />
+            </Form.Item>
+            <Form.Item label="简介" name="description">
+              <Textarea v-model:value="formData.description" placeholder="请输入简介" />
+            </Form.Item>
+            <Form.Item label="出生日期" name="birthday">
+              <DatePicker
+                      v-model:value="formData.birthday"
+                      valueFormat="x"
+                      placeholder="选择出生日期"
+              />
+            </Form.Item>
+            <Form.Item label="性别" name="sex">
+              <Select v-model:value="formData.sex" placeholder="请选择性别">
+                  <Select.Option
+                          v-for="dict in getDictOptions(DICT_TYPE.SYSTEM_USER_SEX, 'number')"
+                          :key="dict.value"
+                          :value="dict.value"
+                  >
+                    {{ dict.label }}
+                  </Select.Option>
+              </Select>
+            </Form.Item>
+            <Form.Item label="是否有效" name="enabled">
+              <RadioGroup v-model:value="formData.enabled">
+                  <Radio
+                          v-for="dict in getDictOptions(DICT_TYPE.INFRA_BOOLEAN_STRING, 'boolean')"
+                          :key="dict.value"
+                          :value="dict.value"
+                  >
+                    {{ dict.label }}
+                  </Radio>
+              </RadioGroup>
+            </Form.Item>
+            <Form.Item label="头像" name="avatar">
+              <ImageUpload v-model:value="formData.avatar" />
+            </Form.Item>
+            <Form.Item label="附件" name="video">
+              <FileUpload v-model:value="formData.video" />
+            </Form.Item>
+            <Form.Item label="备注" name="memo">
+              <RichTextarea v-model="formData.memo" height="500px" />
+            </Form.Item>
+    </Form>
+      </Modal>
+</template>

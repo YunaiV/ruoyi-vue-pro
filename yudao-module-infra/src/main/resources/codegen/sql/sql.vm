@@ -1,6 +1,11 @@
 ## 通用变量定义
+#if ($importEnable)
+#set ($functionNames = ['查询', '创建', '更新', '删除', '导出', '导入'])
+#set ($functionOps = ['query', 'create', 'update', 'delete', 'export', 'import'])
+#else
 #set ($functionNames = ['查询', '创建', '更新', '删除', '导出'])
 #set ($functionOps = ['query', 'create', 'update', 'delete', 'export'])
+#end
 ##
 ## 宏定义：生成按钮 SQL（通用部分）
 #macro(insertButtonSql $parentIdVar)

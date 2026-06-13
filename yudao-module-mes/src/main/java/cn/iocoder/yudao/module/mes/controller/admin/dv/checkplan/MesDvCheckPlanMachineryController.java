@@ -75,7 +75,7 @@ public class MesDvCheckPlanMachineryController {
         return BeanUtils.toBean(list, MesDvCheckPlanMachineryRespVO.class, vo ->
             MapUtils.findAndThen(machineryMap, vo.getMachineryId(), machinery ->
                 vo.setMachineryCode(machinery.getCode()).setMachineryName(machinery.getName())
-                  .setMachineryBrand(machinery.getBrand()).setMachinerySpec(machinery.getSpec())
+                  .setMachineryBrand(machinery.getBrand()).setMachinerySpecification(machinery.getSpecification())
             )
         );
     }

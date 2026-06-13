@@ -6,8 +6,6 @@ import cn.iocoder.yudao.module.mes.dal.dataobject.wm.outsourcereceipt.MesWmOutso
 import cn.iocoder.yudao.module.mes.dal.mysql.wm.outsourcereceipt.MesWmOutsourceReceiptDetailMapper;
 import cn.iocoder.yudao.module.mes.service.md.item.MesMdItemService;
 import cn.iocoder.yudao.module.mes.service.wm.warehouse.MesWmWarehouseAreaService;
-import cn.iocoder.yudao.module.mes.service.wm.warehouse.MesWmWarehouseLocationService;
-import cn.iocoder.yudao.module.mes.service.wm.warehouse.MesWmWarehouseService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -29,30 +27,13 @@ public class MesWmOutsourceReceiptDetailServiceImpl implements MesWmOutsourceRec
 
     @Resource
     private MesMdItemService itemService;
-
-    @Resource
-    private MesWmWarehouseService warehouseService;
-
-    @Resource
-    private MesWmWarehouseLocationService locationService;
-
     @Resource
     private MesWmWarehouseAreaService areaService;
 
     @Override
     public Long createOutsourceReceiptDetail(MesWmOutsourceReceiptDetailSaveReqVO createReqVO) {
-        // 校验物料存在
-        itemService.validateItemExists(createReqVO.getItemId());
-        // 校验仓库、库区、库位存在
-        if (createReqVO.getWarehouseId() != null) {
-            warehouseService.validateWarehouseExists(createReqVO.getWarehouseId());
-        }
-        if (createReqVO.getLocationId() != null) {
-            locationService.validateWarehouseLocationExists(createReqVO.getLocationId());
-        }
-        if (createReqVO.getAreaId() != null) {
-            areaService.validateWarehouseAreaExists(createReqVO.getAreaId());
-        }
+        // 校验数据
+        validateDetailSaveData(createReqVO);
 
         // 插入
         MesWmOutsourceReceiptDetailDO detail = BeanUtils.toBean(createReqVO, MesWmOutsourceReceiptDetailDO.class);
@@ -64,18 +45,8 @@ public class MesWmOutsourceReceiptDetailServiceImpl implements MesWmOutsourceRec
     public void updateOutsourceReceiptDetail(MesWmOutsourceReceiptDetailSaveReqVO updateReqVO) {
         // 校验存在
         validateOutsourceReceiptDetailExists(updateReqVO.getId());
-        // 校验物料存在
-        itemService.validateItemExists(updateReqVO.getItemId());
-        // 校验仓库、库区、库位存在
-        if (updateReqVO.getWarehouseId() != null) {
-            warehouseService.validateWarehouseExists(updateReqVO.getWarehouseId());
-        }
-        if (updateReqVO.getLocationId() != null) {
-            locationService.validateWarehouseLocationExists(updateReqVO.getLocationId());
-        }
-        if (updateReqVO.getAreaId() != null) {
-            areaService.validateWarehouseAreaExists(updateReqVO.getAreaId());
-        }
+        // 校验数据
+        validateDetailSaveData(updateReqVO);
 
         // 更新
         MesWmOutsourceReceiptDetailDO updateObj = BeanUtils.toBean(updateReqVO, MesWmOutsourceReceiptDetailDO.class);
@@ -113,6 +84,16 @@ public class MesWmOutsourceReceiptDetailServiceImpl implements MesWmOutsourceRec
     @Override
     public void deleteOutsourceReceiptDetailByLineId(Long lineId) {
         detailMapper.deleteByLineId(lineId);
+    }
+
+    /**
+     * 校验保存时的关联数据
+     */
+    private void validateDetailSaveData(MesWmOutsourceReceiptDetailSaveReqVO reqVO) {
+        // 校验物料存在
+        itemService.validateItemExistsAndEnable(reqVO.getItemId());
+        // 校验仓库、库区、库位的层级关系
+        areaService.validateWarehouseAreaExists(reqVO.getWarehouseId(), reqVO.getLocationId(), reqVO.getAreaId());
     }
 
     private void validateOutsourceReceiptDetailExists(Long id) {

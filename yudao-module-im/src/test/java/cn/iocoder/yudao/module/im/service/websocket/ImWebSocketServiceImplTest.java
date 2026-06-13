@@ -1,11 +1,12 @@
 package cn.iocoder.yudao.module.im.service.websocket;
 
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
-import cn.iocoder.yudao.framework.websocket.core.sender.WebSocketMessageSender;
 import cn.iocoder.yudao.module.im.service.websocket.dto.ImGroupMessageDTO;
 import cn.iocoder.yudao.module.im.service.websocket.dto.ImPrivateMessageDTO;
+import cn.iocoder.yudao.module.infra.api.websocket.WebSocketSenderApi;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -33,7 +34,7 @@ public class ImWebSocketServiceImplTest extends BaseMockitoUnitTest {
     private ImWebSocketServiceImpl imWebSocketService;
 
     @Mock
-    private WebSocketMessageSender webSocketMessageSender;
+    private WebSocketSenderApi webSocketSenderApi;
 
     @AfterEach
     public void tearDown() {
@@ -58,7 +59,7 @@ public class ImWebSocketServiceImplTest extends BaseMockitoUnitTest {
             imWebSocketService.sendPrivateMessageAsync(2L, dto);
 
             // 断言
-            verify(webSocketMessageSender).sendObject(
+            verify(webSocketSenderApi).sendObject(
                     eq(UserTypeEnum.ADMIN.getValue()), eq(2L), eq(ImPrivateMessageDTO.TYPE), eq(dto));
         }
     }
@@ -78,7 +79,7 @@ public class ImWebSocketServiceImplTest extends BaseMockitoUnitTest {
                 imWebSocketService.sendPrivateMessageAsync(2L, dto);
 
                 // 断言：事务未提交，未推送
-                verify(webSocketMessageSender, never()).sendObject(anyInt(), anyLong(), anyString(), any());
+                verify(webSocketSenderApi, never()).sendObject(anyInt(), anyLong(), anyString(), any());
 
                 // 模拟事务提交
                 List<TransactionSynchronization> syncs =
@@ -87,7 +88,7 @@ public class ImWebSocketServiceImplTest extends BaseMockitoUnitTest {
                 syncs.forEach(TransactionSynchronization::afterCommit);
 
                 // 断言：提交后推送
-                verify(webSocketMessageSender).sendObject(
+                verify(webSocketSenderApi).sendObject(
                         eq(UserTypeEnum.ADMIN.getValue()), eq(2L), eq(ImPrivateMessageDTO.TYPE), eq(dto));
             } finally {
                 TransactionSynchronizationManager.clear();
@@ -107,13 +108,13 @@ public class ImWebSocketServiceImplTest extends BaseMockitoUnitTest {
             dto.setGroupId(10L);
             dto.setSenderId(1L);
 
-            imWebSocketService.sendGroupMessageAsync(List.of(1L, 2L, 3L), dto);
+            imWebSocketService.sendGroupMessageAsync(ListUtil.of(1L, 2L, 3L), dto);
 
-            verify(webSocketMessageSender).sendObject(
+            verify(webSocketSenderApi).sendObject(
                     eq(UserTypeEnum.ADMIN.getValue()), eq(1L), eq(ImGroupMessageDTO.TYPE), eq(dto));
-            verify(webSocketMessageSender).sendObject(
+            verify(webSocketSenderApi).sendObject(
                     eq(UserTypeEnum.ADMIN.getValue()), eq(2L), eq(ImGroupMessageDTO.TYPE), eq(dto));
-            verify(webSocketMessageSender).sendObject(
+            verify(webSocketSenderApi).sendObject(
                     eq(UserTypeEnum.ADMIN.getValue()), eq(3L), eq(ImGroupMessageDTO.TYPE), eq(dto));
         }
     }
@@ -128,13 +129,13 @@ public class ImWebSocketServiceImplTest extends BaseMockitoUnitTest {
             dto.setGroupId(10L);
             // 给 1 号用户推送时抛异常，不能影响 2/3 号
             doThrow(new RuntimeException("user offline"))
-                    .when(webSocketMessageSender).sendObject(anyInt(), eq(1L), anyString(), any());
+                    .when(webSocketSenderApi).sendObject(anyInt(), eq(1L), anyString(), any());
 
-            imWebSocketService.sendGroupMessageAsync(List.of(1L, 2L, 3L), dto);
+            imWebSocketService.sendGroupMessageAsync(ListUtil.of(1L, 2L, 3L), dto);
 
             // 2L 和 3L 也都被推送
-            verify(webSocketMessageSender).sendObject(anyInt(), eq(2L), anyString(), any());
-            verify(webSocketMessageSender).sendObject(anyInt(), eq(3L), anyString(), any());
+            verify(webSocketSenderApi).sendObject(anyInt(), eq(2L), anyString(), any());
+            verify(webSocketSenderApi).sendObject(anyInt(), eq(3L), anyString(), any());
         }
     }
 
@@ -145,7 +146,7 @@ public class ImWebSocketServiceImplTest extends BaseMockitoUnitTest {
         imWebSocketService.doSendGroupMessage(Collections.emptyList(), dto);
         imWebSocketService.doSendGroupMessage(null, dto);
 
-        verifyNoInteractions(webSocketMessageSender);
+        verifyNoInteractions(webSocketSenderApi);
     }
 
     @Test
@@ -154,11 +155,11 @@ public class ImWebSocketServiceImplTest extends BaseMockitoUnitTest {
 
         imWebSocketService.doSendGroupMessage(Arrays.asList(1L, 2L, 1L, null), dto);
 
-        verify(webSocketMessageSender).sendObject(
+        verify(webSocketSenderApi).sendObject(
                 eq(UserTypeEnum.ADMIN.getValue()), eq(1L), eq(ImGroupMessageDTO.TYPE), eq(dto));
-        verify(webSocketMessageSender).sendObject(
+        verify(webSocketSenderApi).sendObject(
                 eq(UserTypeEnum.ADMIN.getValue()), eq(2L), eq(ImGroupMessageDTO.TYPE), eq(dto));
-        verifyNoMoreInteractions(webSocketMessageSender);
+        verifyNoMoreInteractions(webSocketSenderApi);
     }
 
     @Test
@@ -170,12 +171,12 @@ public class ImWebSocketServiceImplTest extends BaseMockitoUnitTest {
             // 准备：sender 抛异常
             ImPrivateMessageDTO dto = new ImPrivateMessageDTO().setSenderId(1L).setReceiverId(2L);
             doThrow(new RuntimeException("user offline"))
-                    .when(webSocketMessageSender).sendObject(anyInt(), anyLong(), anyString(), any());
+                    .when(webSocketSenderApi).sendObject(anyInt(), anyLong(), anyString(), any());
 
             // 调用：异常应被吞掉，不向上抛
             imWebSocketService.sendPrivateMessageAsync(2L, dto);
 
-            verify(webSocketMessageSender).sendObject(anyInt(), eq(2L), anyString(), any());
+            verify(webSocketSenderApi).sendObject(anyInt(), eq(2L), anyString(), any());
         }
     }
 
@@ -190,7 +191,7 @@ public class ImWebSocketServiceImplTest extends BaseMockitoUnitTest {
 
             imWebSocketService.sendGroupMessageAsync(42L, dto);
 
-            verify(webSocketMessageSender).sendObject(
+            verify(webSocketSenderApi).sendObject(
                     eq(UserTypeEnum.ADMIN.getValue()), eq(42L), eq(ImGroupMessageDTO.TYPE), eq(dto));
         }
     }

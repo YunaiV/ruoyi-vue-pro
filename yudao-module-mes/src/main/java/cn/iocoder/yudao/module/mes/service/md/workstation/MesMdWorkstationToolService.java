@@ -50,4 +50,12 @@ public interface MesMdWorkstationToolService {
      */
     void deleteWorkstationToolByWorkstationId(Long workstationId);
 
+    /**
+     * 获得指定工具类型的工装夹具资源数量
+     *
+     * @param toolTypeId 工具类型编号
+     * @return 数量
+     */
+    Long getWorkstationToolCountByToolTypeId(Long toolTypeId);
+
 }

@@ -1,3 +1,7 @@
+DELETE FROM "mes_cal_team_shift";
+DELETE FROM "mes_cal_plan_team";
+DELETE FROM "mes_cal_plan_shift";
+DELETE FROM "mes_cal_plan";
 DELETE FROM "mes_md_auto_code_rule";
 DELETE FROM "mes_md_auto_code_part";
 DELETE FROM "mes_md_auto_code_record";
@@ -13,3 +17,7 @@ DELETE FROM "mes_wm_item_receipt";
 DELETE FROM "mes_wm_item_receipt_line";
 DELETE FROM "mes_wm_item_receipt_detail";
 DELETE FROM "mes_wm_batch";
+DELETE FROM "mes_wm_material_stock";
+DELETE FROM "mes_pro_task";
+DELETE FROM "mes_pro_route_process";
+DELETE FROM "mes_qc_indicator_result";

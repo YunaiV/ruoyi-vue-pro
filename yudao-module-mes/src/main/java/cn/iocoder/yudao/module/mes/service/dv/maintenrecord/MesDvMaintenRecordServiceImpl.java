@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.mes.dal.dataobject.dv.maintenrecord.MesDvMaintenR
 import cn.iocoder.yudao.module.mes.dal.dataobject.dv.maintenrecord.MesDvMaintenRecordLineDO;
 import cn.iocoder.yudao.module.mes.dal.mysql.dv.maintenrecord.MesDvMaintenRecordMapper;
 import cn.iocoder.yudao.module.mes.enums.dv.MesDvMaintenRecordStatusEnum;
+import cn.iocoder.yudao.module.mes.enums.dv.MesDvCheckPlanTypeEnum;
 import cn.iocoder.yudao.module.mes.service.dv.checkplan.MesDvCheckPlanService;
 import cn.iocoder.yudao.module.mes.service.dv.machinery.MesDvMachineryService;
 import jakarta.annotation.Resource;
@@ -34,6 +35,7 @@ public class MesDvMaintenRecordServiceImpl implements MesDvMaintenRecordService 
 
     @Resource
     private MesDvMaintenRecordMapper maintenRecordMapper;
+
     @Resource
     @Lazy
     private MesDvMaintenRecordLineService maintenRecordLineService;
@@ -67,6 +69,7 @@ public class MesDvMaintenRecordServiceImpl implements MesDvMaintenRecordService 
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void submitMaintenRecord(Long id) {
         // 1.1 校验状态为草稿
         validateMaintenRecordDraft(id);
@@ -77,10 +80,16 @@ public class MesDvMaintenRecordServiceImpl implements MesDvMaintenRecordService 
         }
 
         // 2. 状态改为已提交
+        MesDvMaintenRecordDO record = maintenRecordMapper.selectById(id);
         MesDvMaintenRecordDO updateObj = new MesDvMaintenRecordDO();
         updateObj.setId(id);
         updateObj.setStatus(MesDvMaintenRecordStatusEnum.SUBMITTED.getStatus());
         maintenRecordMapper.updateById(updateObj);
+
+        // 3. 回写设备台账的【最近保养时间】
+        if (record.getMaintenTime() != null) {
+            machineryService.updateMachineryLastMaintenTime(record.getMachineryId(), record.getMaintenTime());
+        }
     }
 
     @Override
@@ -100,7 +109,7 @@ public class MesDvMaintenRecordServiceImpl implements MesDvMaintenRecordService 
         machineryService.validateMachineryExists(reqVO.getMachineryId());
         // 校验保养计划是否存在
         if (reqVO.getPlanId() != null) {
-            checkPlanService.validateCheckPlanExists(reqVO.getPlanId());
+            checkPlanService.validateCheckPlanExistsAndType(reqVO.getPlanId(), MesDvCheckPlanTypeEnum.MAINTENANCE.getType());
         }
     }
 

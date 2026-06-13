@@ -26,6 +26,7 @@ public class MesDvCheckPlanSubjectServiceImpl implements MesDvCheckPlanSubjectSe
 
     @Resource
     private MesDvCheckPlanSubjectMapper checkPlanSubjectMapper;
+
     @Resource
     @Lazy
     private MesDvCheckPlanService checkPlanService;
@@ -37,7 +38,7 @@ public class MesDvCheckPlanSubjectServiceImpl implements MesDvCheckPlanSubjectSe
         // 1.1 校验方案草稿状态
         checkPlanService.validateCheckPlanPrepare(createReqVO.getPlanId());
         // 1.2 校验项目存在
-        subjectService.validateSubjectExists(createReqVO.getSubjectId());
+        subjectService.validateSubjectExistsAndEnable(createReqVO.getSubjectId());
         // 1.3 校验同一方案下项目不重复
         if (checkPlanSubjectMapper.selectByPlanIdAndSubjectId(createReqVO.getPlanId(), createReqVO.getSubjectId()) != null) {
             throw exception(DV_CHECK_PLAN_SUBJECT_DUPLICATE);

@@ -30,13 +30,12 @@ public class MesProCardProcessServiceImpl implements MesProCardProcessService {
     @Resource
     @Lazy
     private MesProCardService cardService;
-
     @Resource
     private MesProProcessService processService;
 
     @Override
     public Long createCardProcess(MesProCardProcessSaveReqVO createReqVO) {
-        // 1. 校验关联数据
+        // 1. 校验关联数据（含流转卡草稿状态校验）
         validateCardProcessSaveData(createReqVO);
 
         // 2. 插入
@@ -49,7 +48,7 @@ public class MesProCardProcessServiceImpl implements MesProCardProcessService {
     public void updateCardProcess(MesProCardProcessSaveReqVO updateReqVO) {
         // 1.1 校验存在
         validateCardProcessExists(updateReqVO.getId());
-        // 1.2 校验关联数据
+        // 1.2 校验关联数据（含流转卡草稿状态校验）
         validateCardProcessSaveData(updateReqVO);
 
         // 2. 更新
@@ -60,9 +59,14 @@ public class MesProCardProcessServiceImpl implements MesProCardProcessService {
     @Override
     public void deleteCardProcess(Long id) {
         // 1. 校验存在
-        validateCardProcessExists(id);
+        MesProCardProcessDO cardProcess = cardProcessMapper.selectById(id);
+        if (cardProcess == null) {
+            throw exception(PRO_CARD_PROCESS_NOT_EXISTS);
+        }
+        // 2. 校验流转卡为草稿状态
+        cardService.validateCardExistsAndPrepare(cardProcess.getCardId());
 
-        // 2. 删除
+        // 3. 删除
         cardProcessMapper.deleteById(id);
     }
 
@@ -85,11 +89,11 @@ public class MesProCardProcessServiceImpl implements MesProCardProcessService {
     }
 
     private void validateCardProcessSaveData(MesProCardProcessSaveReqVO reqVO) {
-        // 校验流转卡存在
-        cardService.validateCardExists(reqVO.getCardId());
+        // 校验流转卡存在 + 草稿状态
+        cardService.validateCardExistsAndPrepare(reqVO.getCardId());
         // 校验工序存在
         if (reqVO.getProcessId() != null) {
-            processService.validateProcessExists(reqVO.getProcessId());
+            processService.validateProcessExistsAndEnable(reqVO.getProcessId());
         }
     }
 

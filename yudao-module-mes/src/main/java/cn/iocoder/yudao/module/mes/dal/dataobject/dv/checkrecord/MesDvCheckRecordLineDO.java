@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
+import cn.iocoder.yudao.module.mes.enums.DictTypeConstants;
 
 /**
  * MES 设备点检记录明细 DO
@@ -43,6 +44,7 @@ public class MesDvCheckRecordLineDO extends BaseDO {
     /**
      * 点检结果
      *
+     * 字典 {@link DictTypeConstants#MES_DV_CHECK_RESULT}
      * 枚举 {@link MesDvCheckResultEnum}
      */
     private Integer checkStatus;

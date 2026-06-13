@@ -1,12 +1,16 @@
 package cn.iocoder.yudao.module.mes.service.wm.productsales;
 
+import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.mes.controller.admin.wm.productsales.vo.detail.MesWmProductSalesDetailSaveReqVO;
 import cn.iocoder.yudao.module.mes.dal.dataobject.wm.productsales.MesWmProductSalesDetailDO;
+import cn.iocoder.yudao.module.mes.dal.dataobject.wm.productsales.MesWmProductSalesLineDO;
 import cn.iocoder.yudao.module.mes.dal.mysql.wm.productsales.MesWmProductSalesDetailMapper;
 import cn.iocoder.yudao.module.mes.service.md.item.MesMdItemService;
+import cn.iocoder.yudao.module.mes.service.wm.materialstock.MesWmMaterialStockService;
 import cn.iocoder.yudao.module.mes.service.wm.warehouse.MesWmWarehouseAreaService;
 import jakarta.annotation.Resource;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -29,17 +33,18 @@ public class MesWmProductSalesDetailServiceImpl implements MesWmProductSalesDeta
 
     @Resource
     private MesMdItemService itemService;
-
+    @Resource
+    @Lazy
+    private MesWmProductSalesLineService productSalesLineService;
+    @Resource
+    private MesWmMaterialStockService materialStockService;
     @Resource
     private MesWmWarehouseAreaService warehouseAreaService;
 
     @Override
     public Long createProductSalesDetail(MesWmProductSalesDetailSaveReqVO createReqVO) {
-        // 校验物料存在
-        itemService.validateItemExists(createReqVO.getItemId());
-        // 校验库区关系
-        warehouseAreaService.validateWarehouseAreaExists(
-                createReqVO.getWarehouseId(), createReqVO.getLocationId(), createReqVO.getAreaId());
+        // 校验数据
+        validateProductSalesDetailSaveData(createReqVO);
 
         // 插入
         MesWmProductSalesDetailDO detail = BeanUtils.toBean(createReqVO, MesWmProductSalesDetailDO.class);
@@ -51,11 +56,8 @@ public class MesWmProductSalesDetailServiceImpl implements MesWmProductSalesDeta
     public void updateProductSalesDetail(MesWmProductSalesDetailSaveReqVO updateReqVO) {
         // 校验存在
         validateProductSalesDetailExists(updateReqVO.getId());
-        // 校验物料存在
-        itemService.validateItemExists(updateReqVO.getItemId());
-        // 校验库区关系
-        warehouseAreaService.validateWarehouseAreaExists(
-                updateReqVO.getWarehouseId(), updateReqVO.getLocationId(), updateReqVO.getAreaId());
+        // 校验数据
+        validateProductSalesDetailSaveData(updateReqVO);
 
         // 更新
         MesWmProductSalesDetailDO updateObj = BeanUtils.toBean(updateReqVO, MesWmProductSalesDetailDO.class);
@@ -101,6 +103,29 @@ public class MesWmProductSalesDetailServiceImpl implements MesWmProductSalesDeta
             throw exception(WM_PRODUCT_SALES_DETAIL_NOT_EXISTS);
         }
         return detail;
+    }
+
+    private void validateProductSalesDetailSaveData(MesWmProductSalesDetailSaveReqVO reqVO) {
+        // 校验父数据（行）存在
+        MesWmProductSalesLineDO line = productSalesLineService.getProductSalesLine(reqVO.getLineId());
+        if (line == null) {
+            throw exception(WM_PRODUCT_SALES_LINE_NOT_EXISTS);
+        }
+        if (ObjUtil.notEqual(line.getSalesId(), reqVO.getSalesId())) {
+            throw exception(WM_PRODUCT_SALES_DETAIL_LINE_NOT_MATCH);
+        }
+        // 校验物料存在
+        itemService.validateItemExistsAndEnable(reqVO.getItemId());
+        if (ObjUtil.notEqual(line.getItemId(), reqVO.getItemId())) {
+            throw exception(WM_PRODUCT_SALES_DETAIL_ITEM_MISMATCH);
+        }
+        // 校验库位存在
+        warehouseAreaService.validateWarehouseAreaExists(
+                reqVO.getWarehouseId(), reqVO.getLocationId(), reqVO.getAreaId());
+        // 校验库存记录存在且物料一致
+        materialStockService.validateSelectedStock(
+                reqVO.getMaterialStockId(), reqVO.getItemId(), reqVO.getBatchId(), reqVO.getBatchCode(),
+                reqVO.getWarehouseId(), reqVO.getLocationId(), reqVO.getAreaId(), reqVO.getQuantity());
     }
 
 }

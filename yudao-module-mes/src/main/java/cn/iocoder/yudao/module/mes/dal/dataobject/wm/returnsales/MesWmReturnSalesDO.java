@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import cn.iocoder.yudao.module.mes.enums.DictTypeConstants;
 
 /**
  * MES 销售退货单 DO
@@ -59,6 +60,7 @@ public class MesWmReturnSalesDO extends BaseDO {
     /**
      * 状态
      *
+     * 字典 {@link DictTypeConstants#MES_WM_RETURN_SALES_STATUS}
      * 枚举 {@link MesWmReturnSalesStatusEnum}
      */
     private Integer status;

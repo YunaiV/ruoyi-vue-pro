@@ -1,10 +1,14 @@
 package cn.iocoder.yudao.module.mes.service.wm.outsourceissue;
 
+import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.mes.controller.admin.wm.outsourceissue.vo.detail.MesWmOutsourceIssueDetailSaveReqVO;
 import cn.iocoder.yudao.module.mes.dal.dataobject.wm.outsourceissue.MesWmOutsourceIssueDetailDO;
+import cn.iocoder.yudao.module.mes.dal.dataobject.wm.outsourceissue.MesWmOutsourceIssueLineDO;
 import cn.iocoder.yudao.module.mes.dal.mysql.wm.outsourceissue.MesWmOutsourceIssueDetailMapper;
 import cn.iocoder.yudao.module.mes.service.md.item.MesMdItemService;
+import cn.iocoder.yudao.module.mes.service.wm.materialstock.MesWmMaterialStockService;
+import cn.iocoder.yudao.module.mes.service.wm.warehouse.MesWmWarehouseAreaService;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -13,7 +17,7 @@ import org.springframework.validation.annotation.Validated;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.mes.enums.ErrorCodeConstants.WM_OUTSOURCE_ISSUE_DETAIL_NOT_EXISTS;
+import static cn.iocoder.yudao.module.mes.enums.ErrorCodeConstants.*;
 
 /**
  * MES 外协发料单明细 Service 实现类
@@ -26,11 +30,16 @@ public class MesWmOutsourceIssueDetailServiceImpl implements MesWmOutsourceIssue
 
     @Resource
     private MesWmOutsourceIssueDetailMapper outsourceIssueDetailMapper;
+
     @Resource
     @Lazy
-    private MesWmOutsourceIssueService outsourceIssueService;
+    private MesWmOutsourceIssueLineService outsourceIssueLineService;
     @Resource
     private MesMdItemService itemService;
+    @Resource
+    private MesWmWarehouseAreaService warehouseAreaService;
+    @Resource
+    private MesWmMaterialStockService materialStockService;
 
     @Override
     public Long createOutsourceIssueDetail(MesWmOutsourceIssueDetailSaveReqVO createReqVO) {
@@ -95,10 +104,26 @@ public class MesWmOutsourceIssueDetailServiceImpl implements MesWmOutsourceIssue
     }
 
     private void validateOutsourceIssueDetailSaveData(MesWmOutsourceIssueDetailSaveReqVO saveReqVO) {
-        // 校验关联的发料单存在
-        outsourceIssueService.getOutsourceIssue(saveReqVO.getIssueId());
-        // 校验关联的物料存在
-        itemService.validateItemExists(saveReqVO.getItemId());
+        // 校验父数据（行）存在
+        MesWmOutsourceIssueLineDO line = outsourceIssueLineService.getOutsourceIssueLine(saveReqVO.getLineId());
+        if (line == null) {
+            throw exception(WM_OUTSOURCE_ISSUE_LINE_NOT_EXISTS);
+        }
+        if (ObjUtil.notEqual(line.getIssueId(), saveReqVO.getIssueId())) {
+            throw exception(WM_OUTSOURCE_ISSUE_DETAIL_LINE_NOT_MATCH);
+        }
+        // 校验物料存在
+        itemService.validateItemExistsAndEnable(saveReqVO.getItemId());
+        if (ObjUtil.notEqual(line.getItemId(), saveReqVO.getItemId())) {
+            throw exception(WM_OUTSOURCE_ISSUE_DETAIL_ITEM_MISMATCH);
+        }
+        // 校验仓库、库区、库位的关联关系
+        warehouseAreaService.validateWarehouseAreaExists(
+                saveReqVO.getWarehouseId(), saveReqVO.getLocationId(), saveReqVO.getAreaId());
+        // 校验库存记录存在且物料一致
+        materialStockService.validateSelectedStock(
+                saveReqVO.getMaterialStockId(), saveReqVO.getItemId(), saveReqVO.getBatchId(), null,
+                saveReqVO.getWarehouseId(), saveReqVO.getLocationId(), saveReqVO.getAreaId(), saveReqVO.getQuantity());
     }
 
 }

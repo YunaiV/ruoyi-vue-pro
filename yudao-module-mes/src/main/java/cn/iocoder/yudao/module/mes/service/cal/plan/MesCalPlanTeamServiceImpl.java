@@ -26,6 +26,7 @@ public class MesCalPlanTeamServiceImpl implements MesCalPlanTeamService {
 
     @Resource
     private MesCalPlanTeamMapper planTeamMapper;
+
     @Resource
     @Lazy
     private MesCalPlanService planService;

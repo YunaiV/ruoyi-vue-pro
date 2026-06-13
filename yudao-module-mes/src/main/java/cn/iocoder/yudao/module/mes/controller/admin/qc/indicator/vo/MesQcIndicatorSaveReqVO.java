@@ -20,9 +20,9 @@ public class MesQcIndicatorSaveReqVO {
     @NotEmpty(message = "检测项名称不能为空")
     private String name;
 
-    @Schema(description = "检测项类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "SIZE")
-    @NotEmpty(message = "检测项类型不能为空")
-    private String type;
+    @Schema(description = "检测项类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @NotNull(message = "检测项类型不能为空")
+    private Integer type;
 
     @Schema(description = "检测工具", example = "卡尺")
     private String tool;

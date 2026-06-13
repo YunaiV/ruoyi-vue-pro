@@ -47,13 +47,10 @@ public class MesProCardController {
 
     @Resource
     private MesProCardService cardService;
-
     @Resource
     private MesProWorkOrderService workOrderService;
-
     @Resource
     private MesMdItemService itemService;
-
     @Resource
     private MesMdUnitMeasureService unitMeasureService;
 
@@ -128,12 +125,6 @@ public class MesProCardController {
         return success(new PageResult<>(buildCardRespVOList(pageResult.getList()), pageResult.getTotal()));
     }
 
-    @GetMapping("/simple-list")
-    @Operation(summary = "获得生产流转卡精简列表", description = "主要用于前端的下拉选项")
-    public CommonResult<List<MesProCardRespVO>> getCardSimpleList() {
-        List<MesProCardDO> list = cardService.getCardSimpleList();
-        return success(buildCardRespVOList(list));
-    }
 
     @GetMapping("/export-excel")
     @Operation(summary = "导出生产流转卡 Excel")

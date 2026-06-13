@@ -303,7 +303,7 @@ public class PermissionServiceImpl implements PermissionService {
                 CollUtil.addAll(result.getDeptIds(), role.getDataScopeDeptIds());
                 // 自定义可见部门时，保证可以看到自己所在的部门。否则，一些场景下可能会有问题。
                 // 例如说，登录时，基于 t_user 的 username 查询会可能被 dept_id 过滤掉
-                CollUtil.addAll(result.getDeptIds(), userDeptId.get());
+                CollectionUtils.addIfNotNull(result.getDeptIds(), userDeptId.get());
                 continue;
             }
             // 情况三，DEPT_ONLY
@@ -313,9 +313,14 @@ public class PermissionServiceImpl implements PermissionService {
             }
             // 情况四，DEPT_DEPT_AND_CHILD
             if (Objects.equals(role.getDataScope(), DataScopeEnum.DEPT_AND_CHILD.getScope())) {
-                CollUtil.addAll(result.getDeptIds(), deptService.getChildDeptIdListFromCache(userDeptId.get()));
+                Long deptId = userDeptId.get();
+                // 用户未设置部门，直接跳过；否则 getChildDeptIdListFromCache 走缓存注解会因 null key 报错
+                if (deptId == null) {
+                    continue;
+                }
+                CollUtil.addAll(result.getDeptIds(), deptService.getChildDeptIdListFromCache(deptId));
                 // 添加本身部门编号
-                CollUtil.addAll(result.getDeptIds(), userDeptId.get());
+                result.getDeptIds().add(deptId);
                 continue;
             }
             // 情况五，SELF

@@ -5,8 +5,11 @@ import cn.iocoder.yudao.module.mes.controller.admin.wm.itemreceipt.vo.MesWmItemR
 import cn.iocoder.yudao.module.mes.controller.admin.wm.itemreceipt.vo.MesWmItemReceiptSaveReqVO;
 import cn.iocoder.yudao.module.mes.dal.dataobject.wm.itemreceipt.MesWmItemReceiptDO;
 import jakarta.validation.Valid;
-
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
  * MES 采购入库单 Service 接口
@@ -102,5 +105,23 @@ public interface MesWmItemReceiptService {
      * @return 入库单列表
      */
     List<MesWmItemReceiptDO> getItemReceiptListByVendorId(Long vendorId);
+
+    /**
+     * 批量获得采购入库单列表
+     *
+     * @param ids 编号数组
+     * @return 入库单列表
+     */
+    List<MesWmItemReceiptDO> getItemReceiptList(Collection<Long> ids);
+
+    /**
+     * 批量获得采购入库单 Map
+     *
+     * @param ids 编号数组
+     * @return 入库单 Map
+     */
+    default Map<Long, MesWmItemReceiptDO> getItemReceiptMap(Collection<Long> ids) {
+        return convertMap(getItemReceiptList(ids), MesWmItemReceiptDO::getId);
+    }
 
 }

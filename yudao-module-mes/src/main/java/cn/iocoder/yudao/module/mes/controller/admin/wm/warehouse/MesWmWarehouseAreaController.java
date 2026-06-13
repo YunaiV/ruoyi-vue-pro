@@ -38,10 +38,8 @@ public class MesWmWarehouseAreaController {
 
     @Resource
     private MesWmWarehouseAreaService areaService;
-
     @Resource
     private MesWmWarehouseLocationService locationService;
-
     @Resource
     private MesWmWarehouseService warehouseService;
 

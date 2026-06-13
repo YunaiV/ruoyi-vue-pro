@@ -99,4 +99,12 @@ public interface MesWmOutsourceReceiptService {
      */
     void validateOutsourceReceiptAndLineExists(Long receiptId, Long lineId);
 
+    /**
+     * 根据供应商 ID 统计外协入库单数量
+     *
+     * @param vendorId 供应商 ID
+     * @return 数量
+     */
+    Long getOutsourceReceiptCountByVendorId(Long vendorId);
+
 }

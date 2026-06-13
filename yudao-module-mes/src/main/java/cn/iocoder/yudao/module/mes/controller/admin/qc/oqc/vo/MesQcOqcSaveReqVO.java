@@ -26,11 +26,11 @@ public class MesQcOqcSaveReqVO {
 
     // ========== 来源单据 ==========
 
-    @Schema(description = "来源单据 ID", example = "200")
-    private Long sourceDocId;
-
     @Schema(description = "来源单据类型", example = "118")
     private Integer sourceDocType;
+
+    @Schema(description = "来源单据 ID", example = "200")
+    private Long sourceDocId;
 
     @Schema(description = "来源单据行 ID", example = "300")
     private Long sourceLineId;
@@ -41,10 +41,10 @@ public class MesQcOqcSaveReqVO {
     @NotNull(message = "客户不能为空")
     private Long clientId;
 
+    // ========== 物料 ==========
+
     @Schema(description = "批次号", example = "BC20250101")
     private String batchCode;
-
-    // ========== 物料 ==========
 
     @Schema(description = "产品物料 ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "20")
     @NotNull(message = "产品物料不能为空")
@@ -74,9 +74,8 @@ public class MesQcOqcSaveReqVO {
 
     // ========== 检验 ==========
 
-    @Schema(description = "检测人员用户 ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    @NotNull(message = "检测人员不能为空")
-    private Long inspectorUserId;
+    @Schema(description = "检测结果", example = "1")
+    private Integer checkResult;
 
     @Schema(description = "出货日期", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "出货日期不能为空")
@@ -86,8 +85,9 @@ public class MesQcOqcSaveReqVO {
     @NotNull(message = "检测日期不能为空")
     private LocalDateTime inspectDate;
 
-    @Schema(description = "检测结果", example = "1")
-    private Integer checkResult;
+    @Schema(description = "检测人员用户 ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @NotNull(message = "检测人员不能为空")
+    private Long inspectorUserId;
 
     @Schema(description = "备注", example = "备注")
     private String remark;

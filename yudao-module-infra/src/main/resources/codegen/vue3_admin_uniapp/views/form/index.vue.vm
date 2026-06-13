@@ -175,7 +175,7 @@ definePage({
 
 const toast = useToast()
 const getTitle = computed(() => props.id ? '编辑${table.classComment}' : '新增${table.classComment}')
-const formLoading = ref(false)
+const formLoading = ref(false) // 表单提交状态
 const formData = ref<${simpleClassName}>({
 #foreach($column in $columns)
   #if (($column.createOperation || $column.updateOperation) || $column.primaryKey)
@@ -195,7 +195,7 @@ const formData = ref<${simpleClassName}>({
     #end
   #end
 #end
-})
+}) // 表单数据
 const formRules = {
 #foreach($column in $columns)
   #set ($javaFieldLower = $column.javaField.toLowerCase())
@@ -204,8 +204,8 @@ const formRules = {
   ${column.javaField}: [{ required: true, message: '${column.columnComment}不能为空' }],
   #end
 #end
-}
-const formRef = ref<FormInstance>()
+} // 表单校验规则
+const formRef = ref<FormInstance>() // 表单组件引用
 
 /** 返回上一页 */
 function handleBack() {
@@ -236,6 +236,7 @@ async function handleSubmit() {
       await create${simpleClassName}(formData.value)
       toast.success('新增成功')
     }
+    uni.$emit('${table.moduleName}:${table.businessName}:reload')
     setTimeout(() => {
       handleBack()
     }, 500)

@@ -62,4 +62,21 @@ public interface MesQcIndicatorResultService {
      */
     List<MesQcIndicatorResultDetailDO> getIndicatorResultDetailListByResultId(Long resultId);
 
+    /**
+     * 获取指定质检单下的检验结果数量
+     *
+     * @param qcId   质检单 ID
+     * @param qcType 质检类型
+     * @return 结果数量
+     */
+    Long getIndicatorResultCountByQcIdAndType(Long qcId, Integer qcType);
+
+    /**
+     * 校验指定质检单下至少存在一条检验结果
+     *
+     * @param qcId   质检单 ID
+     * @param qcType 质检类型
+     */
+    void validateIndicatorResultExistsByQcIdAndType(Long qcId, Integer qcType);
+
 }

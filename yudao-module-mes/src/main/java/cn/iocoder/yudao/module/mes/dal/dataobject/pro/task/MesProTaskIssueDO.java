@@ -51,25 +51,25 @@ public class MesProTaskIssueDO extends BaseDO {
      */
     private Long workstationId;
     /**
+     * 来源单据类型
+     */
+    private String sourceDocType;
+    /**
      * 来源单据编号
      */
     private Long sourceDocId;
+    /**
+     * 来源单据行编号
+     */
+    private Long sourceLineId;
     /**
      * 来源单据编码
      */
     private String sourceDocCode;
     /**
-     * 来源单据类型
-     */
-    private String sourceDocType;
-    /**
      * 投料批次
      */
     private String batchCode;
-    /**
-     * 来源单据行编号
-     */
-    private Long sourceLineId;
     /**
      * 产品物料编号
      *

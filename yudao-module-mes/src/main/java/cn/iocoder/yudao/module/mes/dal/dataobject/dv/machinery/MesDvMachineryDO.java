@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import cn.iocoder.yudao.module.mes.enums.DictTypeConstants;
 
 /**
  * MES 设备台账 DO
@@ -43,7 +44,7 @@ public class MesDvMachineryDO extends BaseDO {
     /**
      * 规格型号
      */
-    private String spec;
+    private String specification;
     /**
      * 设备类型编号
      *
@@ -59,6 +60,7 @@ public class MesDvMachineryDO extends BaseDO {
     /**
      * 设备状态
      *
+     * 字典 {@link DictTypeConstants#MES_DV_MACHINERY_STATUS}
      * 枚举 {@link cn.iocoder.yudao.module.mes.enums.dv.MesDvMachineryStatusEnum}
      */
     private Integer status;

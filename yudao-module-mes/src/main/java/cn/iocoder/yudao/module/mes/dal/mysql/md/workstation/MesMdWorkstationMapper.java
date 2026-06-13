@@ -39,6 +39,10 @@ public interface MesMdWorkstationMapper extends BaseMapperX<MesMdWorkstationDO> 
         return selectList(MesMdWorkstationDO::getStatus, status);
     }
 
+    default Long selectCountByWorkshopId(Long workshopId) {
+        return selectCount(MesMdWorkstationDO::getWorkshopId, workshopId);
+    }
+
     default Long selectCountByWarehouseId(Long warehouseId) {
         return selectCount(MesMdWorkstationDO::getWarehouseId, warehouseId);
     }

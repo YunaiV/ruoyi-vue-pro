@@ -160,8 +160,8 @@ public class MailLogServiceImplTest extends BaseDbUnitTest {
        mailLogMapper.insert(cloneIgnoreId(dbMailLog, o -> o.setUserId(2L)));
        // 测试 userType 不匹配
        mailLogMapper.insert(cloneIgnoreId(dbMailLog, o -> o.setUserType(UserTypeEnum.MEMBER.getValue())));
-       // 测试 toMails 不匹配（特殊：find_in_set 无法单测）
-//       mailLogMapper.insert(cloneIgnoreId(dbMailLog, o -> o.setToMails(Lists.newArrayList("788@qq.com"))));
+       // 测试 toMails 不匹配
+       mailLogMapper.insert(cloneIgnoreId(dbMailLog, o -> o.setToMails(Lists.newArrayList("788@qq.com"))));
        // 测试 accountId 不匹配
        mailLogMapper.insert(cloneIgnoreId(dbMailLog, o -> o.setAccountId(11L)));
        // 测试 templateId 不匹配
@@ -174,7 +174,7 @@ public class MailLogServiceImplTest extends BaseDbUnitTest {
        MailLogPageReqVO reqVO = new MailLogPageReqVO();
        reqVO.setUserId(1L);
        reqVO.setUserType(UserTypeEnum.ADMIN.getValue());
-//       reqVO.setToMail("768@qq.com");
+       reqVO.setToMail("768@qq.com");
        reqVO.setAccountId(10L);
        reqVO.setTemplateId(100L);
        reqVO.setSendStatus(MailSendStatusEnum.INIT.getStatus());

@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.infra.enums.codegen.CodegenColumnListConditionEnu
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenTemplateTypeEnum;
 import com.baomidou.mybatisplus.generator.config.po.TableField;
 import com.baomidou.mybatisplus.generator.config.po.TableInfo;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Sets;
 import org.springframework.stereotype.Component;
 
@@ -117,8 +118,8 @@ public class CodegenBuilder {
         table.setBusinessName(toCamelCase(subAfter(tableName, '_', false)).toLowerCase());
         // 驼峰 + 首字母大写；第一步，第一个 _ 前缀的后面，作为 class 名字；第二步，驼峰命名
         table.setClassName(upperFirst(toCamelCase(subAfter(tableName, '_', false))));
-        // 去除结尾的表，作为类描述
-        table.setClassComment(StrUtil.removeSuffixIgnoreCase(table.getTableComment(), "表"));
+        // 去除结尾的表，作为类描述；注释中的英文引号替换为中文引号，避免破坏生成代码中的字符串字面量
+        table.setClassComment(StrUtil.removeSuffixIgnoreCase(sanitizeComment(table.getTableComment()), "表"));
         table.setTemplateType(CodegenTemplateTypeEnum.ONE.getType());
     }
 
@@ -128,6 +129,7 @@ public class CodegenBuilder {
         for (CodegenColumnDO column : columns) {
             column.setTableId(tableId);
             column.setOrdinalPosition(index++);
+            column.setColumnComment(sanitizeComment(column.getColumnComment()));
             // 特殊处理：Byte => Integer
             if (Byte.class.getSimpleName().equals(column.getJavaType())) {
                 column.setJavaType(Integer.class.getSimpleName());
@@ -215,6 +217,20 @@ public class CodegenBuilder {
         if (StrUtil.endWithAnyIgnoreCase(column.getColumnName(), "description", "memo", "remark")) {
             column.setExample(randomEle(new String[]{"你猜", "随便", "你说的对"}));
         }
+    }
+
+    /**
+     * 将注释中的英文引号替换为中文引号，避免破坏生成代码中的字符串字面量
+     *
+     * @param comment 原始注释
+     * @return 清理后的注释
+     */
+    @VisibleForTesting
+    String sanitizeComment(String comment) {
+        if (StrUtil.isEmpty(comment)) {
+            return comment;
+        }
+        return comment.replace('"', '“').replace('\'', '‘');
     }
 
 }

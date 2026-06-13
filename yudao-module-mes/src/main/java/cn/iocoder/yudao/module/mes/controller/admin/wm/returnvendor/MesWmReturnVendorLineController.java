@@ -38,10 +38,8 @@ public class MesWmReturnVendorLineController {
 
     @Resource
     private MesWmReturnVendorLineService returnVendorLineService;
-
     @Resource
     private MesMdItemService itemService;
-
     @Resource
     private MesMdUnitMeasureService unitMeasureService;
 

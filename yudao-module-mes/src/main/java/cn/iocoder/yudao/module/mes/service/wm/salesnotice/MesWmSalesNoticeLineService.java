@@ -66,4 +66,21 @@ public interface MesWmSalesNoticeLineService {
      */
     void deleteSalesNoticeLineByNoticeId(Long noticeId);
 
+    /**
+     * 校验发货通知单行存在
+     *
+     * @param id 行编号
+     * @return 发货通知单行
+     */
+    MesWmSalesNoticeLineDO validateSalesNoticeLineExists(Long id);
+
+    /**
+     * 校验发货通知单行存在，并且属于指定的通知单
+     *
+     * @param lineId   行编号
+     * @param noticeId 通知单编号
+     * @return 发货通知单行
+     */
+    MesWmSalesNoticeLineDO validateSalesNoticeLineExists(Long lineId, Long noticeId);
+
 }

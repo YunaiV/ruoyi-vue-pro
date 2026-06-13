@@ -83,6 +83,15 @@ public class AiKnowledgeSegmentController {
         return success(true);
     }
 
+    @DeleteMapping("/delete")
+    @Operation(summary = "删除段落")
+    @Parameter(name = "id", description = "段落编号", required = true, example = "1024")
+    @PreAuthorize("@ss.hasPermission('ai:knowledge:delete')")
+    public CommonResult<Boolean> deleteKnowledgeSegment(@RequestParam("id") Long id) {
+        segmentService.deleteKnowledgeSegment(id);
+        return success(true);
+    }
+
     @GetMapping("/split")
     @Operation(summary = "切片内容")
     @Parameters({

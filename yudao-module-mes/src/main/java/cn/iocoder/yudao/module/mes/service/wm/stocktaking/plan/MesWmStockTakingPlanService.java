@@ -107,12 +107,4 @@ public interface MesWmStockTakingPlanService {
      */
     PageResult<MesWmStockTakingPlanDO> getStockTakingPlanPage(MesWmStockTakingPlanPageReqVO pageReqVO);
 
-    /**
-     * 根据状态获得盘点方案列表。
-     *
-     * @param status 状态
-     * @return 盘点方案列表
-     */
-    List<MesWmStockTakingPlanDO> getStockTakingPlanListByStatus(Integer status);
-
 }

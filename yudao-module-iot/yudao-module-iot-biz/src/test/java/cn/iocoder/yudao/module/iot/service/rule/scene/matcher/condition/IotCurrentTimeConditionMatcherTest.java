@@ -6,7 +6,6 @@ import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleConditionOperatorEnum;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleConditionTypeEnum;
 import cn.iocoder.yudao.module.iot.service.rule.scene.matcher.IotBaseConditionMatcherTest;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -21,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author HUIHUI
  */
-@Disabled // TODO @puhui999：单测有报错，先屏蔽
 public class IotCurrentTimeConditionMatcherTest extends IotBaseConditionMatcherTest {
 
     private IotCurrentTimeConditionMatcher matcher;
@@ -61,7 +59,7 @@ public class IotCurrentTimeConditionMatcherTest extends IotBaseConditionMatcherT
     // ========== 时间戳条件测试 ==========
 
     @Test
-    public void testMatches_DateTimeGreaterThan_success() {
+    public void testMatches_dateTimeGreaterThan_success() {
         // 准备参数
         IotDeviceMessage message = createDeviceMessage();
         long pastTimestamp = LocalDateTime.now().minusHours(1).toEpochSecond(ZoneOffset.of("+8"));
@@ -78,7 +76,7 @@ public class IotCurrentTimeConditionMatcherTest extends IotBaseConditionMatcherT
     }
 
     @Test
-    public void testMatches_DateTimeGreaterThan_fail() {
+    public void testMatches_dateTimeGreaterThan_fail() {
         // 准备参数
         IotDeviceMessage message = createDeviceMessage();
         long futureTimestamp = LocalDateTime.now().plusHours(1).toEpochSecond(ZoneOffset.of("+8"));
@@ -95,7 +93,7 @@ public class IotCurrentTimeConditionMatcherTest extends IotBaseConditionMatcherT
     }
 
     @Test
-    public void testMatches_DateTimeLessThan_success() {
+    public void testMatches_dateTimeLessThan_success() {
         // 准备参数
         IotDeviceMessage message = createDeviceMessage();
         long futureTimestamp = LocalDateTime.now().plusHours(1).toEpochSecond(ZoneOffset.of("+8"));
@@ -112,7 +110,7 @@ public class IotCurrentTimeConditionMatcherTest extends IotBaseConditionMatcherT
     }
 
     @Test
-    public void testMatches_DateTimeBetween_success() {
+    public void testMatches_dateTimeBetween_success() {
         // 准备参数
         IotDeviceMessage message = createDeviceMessage();
         long startTimestamp = LocalDateTime.now().minusHours(1).toEpochSecond(ZoneOffset.of("+8"));
@@ -130,7 +128,7 @@ public class IotCurrentTimeConditionMatcherTest extends IotBaseConditionMatcherT
     }
 
     @Test
-    public void testMatches_DateTimeBetween_fail() {
+    public void testMatches_dateTimeBetween_fail() {
         // 准备参数
         IotDeviceMessage message = createDeviceMessage();
         long startTimestamp = LocalDateTime.now().plusHours(1).toEpochSecond(ZoneOffset.of("+8"));
@@ -150,7 +148,7 @@ public class IotCurrentTimeConditionMatcherTest extends IotBaseConditionMatcherT
     // ========== 当日时间条件测试 ==========
 
     @Test
-    public void testMatches_TimeGreaterThan_earlyMorning() {
+    public void testMatches_timeGreaterThan_earlyMorning() {
         // 准备参数
         IotDeviceMessage message = createDeviceMessage();
         IotSceneRuleDO.TriggerCondition condition = createTimeCondition(
@@ -167,7 +165,7 @@ public class IotCurrentTimeConditionMatcherTest extends IotBaseConditionMatcherT
     }
 
     @Test
-    public void testMatches_TimeLessThan_lateNight() {
+    public void testMatches_timeLessThan_lateNight() {
         // 准备参数
         IotDeviceMessage message = createDeviceMessage();
         IotSceneRuleDO.TriggerCondition condition = createTimeCondition(
@@ -184,7 +182,7 @@ public class IotCurrentTimeConditionMatcherTest extends IotBaseConditionMatcherT
     }
 
     @Test
-    public void testMatches_TimeBetween_allDay() {
+    public void testMatches_timeBetween_allDay() {
         // 准备参数
         IotDeviceMessage message = createDeviceMessage();
         IotSceneRuleDO.TriggerCondition condition = createTimeCondition(
@@ -200,7 +198,7 @@ public class IotCurrentTimeConditionMatcherTest extends IotBaseConditionMatcherT
     }
 
     @Test
-    public void testMatches_TimeBetween_workingHours() {
+    public void testMatches_timeBetween_workingHours() {
         // 准备参数
         IotDeviceMessage message = createDeviceMessage();
         IotSceneRuleDO.TriggerCondition condition = createTimeCondition(

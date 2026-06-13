@@ -9,7 +9,6 @@ import cn.iocoder.yudao.module.promotion.enums.common.PromotionTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -22,13 +21,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
-// TODO 芋艿：晚点 review
 /**
  * {@link TradePointUsePriceCalculator } 的单元测试类
  *
  * @author owen
  */
-@Disabled // TODO 芋艿：后续修复
 public class TradePointUsePriceCalculatorTest extends BaseMockitoUnitTest {
 
     @InjectMocks
@@ -244,6 +241,10 @@ public class TradePointUsePriceCalculatorTest extends BaseMockitoUnitTest {
         // 保证价格被初始化上
         TradePriceCalculatorHelper.recountPayPrice(result.getItems());
         TradePriceCalculatorHelper.recountAllPrice(result);
+
+        // mock 方法（会员 信息）：不使用积分仍需获取用户初始化 totalPoint
+        MemberUserRespDTO user = randomPojo(MemberUserRespDTO.class, o -> o.setId(param.getUserId()).setPoint(100));
+        when(memberUserApi.getUser(user.getId())).thenReturn(user);
 
         // 调用
         tradePointUsePriceCalculator.calculate(param, result);

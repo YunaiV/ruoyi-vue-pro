@@ -44,4 +44,12 @@ public class IotAlertConfigSaveReqVO {
     @NotEmpty(message = "接收的类型数组不能为空")
     private List<Integer> receiveTypes;
 
+    @Schema(description = "短信模板编号", example = "iot_alert_sms")
+    private String smsTemplateCode;
+
+    @Schema(description = "邮件模板编号", example = "iot_alert_mail")
+    private String mailTemplateCode;
+
+    @Schema(description = "站内信模板编号", example = "iot_alert_notify")
+    private String notifyTemplateCode;
 }

@@ -5,7 +5,9 @@ import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleTriggerTypeEnum;
+import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.service.rule.scene.matcher.IotSceneRuleMatcherHelper;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
 
 /**
@@ -15,6 +17,9 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class IotDeviceStateUpdateTriggerMatcher implements IotSceneRuleTriggerMatcher {
+
+    @Resource
+    private IotDeviceService iotDeviceService;
 
     @Override
     public IotSceneRuleTriggerTypeEnum getSupportedTriggerType() {
@@ -36,7 +41,13 @@ public class IotDeviceStateUpdateTriggerMatcher implements IotSceneRuleTriggerMa
             return false;
         }
 
-        // 1.3 检查操作符和值是否有效
+        // 1.3 修复触发器中忽略了产品和设备的一致性验证，2025.05.25 by panda
+        if (IotSceneRuleMatcherHelper.productAndDeviceNotMatched(message, trigger.getProductId(),trigger.getDeviceId())){
+            IotSceneRuleMatcherHelper.logTriggerMatchFailure(message,trigger,"触发器中产品或设备不匹配");
+            return false;
+        }
+
+        // 1.4 检查操作符和值是否有效
         if (!IotSceneRuleMatcherHelper.isTriggerOperatorAndValueValid(trigger)) {
             IotSceneRuleMatcherHelper.logTriggerMatchFailure(message, trigger, "操作符或值无效");
             return false;

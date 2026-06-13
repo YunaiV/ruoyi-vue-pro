@@ -18,8 +18,10 @@ import org.springframework.validation.annotation.Validated;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.module.mes.enums.ErrorCodeConstants.*;
 
 /**
@@ -130,6 +132,15 @@ public class MesQcIndicatorServiceImpl implements MesQcIndicatorService {
             return Collections.emptyList();
         }
         return indicatorMapper.selectByIds(ids);
+    }
+
+    @Override
+    public Map<Long, MesQcIndicatorDO> validateIndicatorListExists(Collection<Long> ids) {
+        List<MesQcIndicatorDO> indicators = getIndicatorList(ids);
+        if (indicators.size() != ids.size()) {
+            throw exception(QC_INDICATOR_NOT_EXISTS);
+        }
+        return convertMap(indicators, MesQcIndicatorDO::getId);
     }
 
 }

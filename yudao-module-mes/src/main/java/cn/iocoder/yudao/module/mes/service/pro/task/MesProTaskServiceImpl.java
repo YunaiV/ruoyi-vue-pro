@@ -69,7 +69,7 @@ public class MesProTaskServiceImpl implements MesProTaskService {
         MesProWorkOrderDO workOrder = workOrderService.validateWorkOrderExists(createReqVO.getWorkOrderId());
         workstationService.validateWorkstationExists(createReqVO.getWorkstationId());
         routeService.validateRouteExists(createReqVO.getRouteId());
-        processService.validateProcessExists(createReqVO.getProcessId());
+        processService.validateProcessExistsAndEnable(createReqVO.getProcessId());
         MesMdItemDO item = itemService.validateItemExists(createReqVO.getItemId());
 
         // 2.1 构建任务 DO：自动填充客户信息
@@ -100,7 +100,7 @@ public class MesProTaskServiceImpl implements MesProTaskService {
             routeService.validateRouteExists(updateReqVO.getRouteId());
         }
         if (updateReqVO.getProcessId() != null) {
-            processService.validateProcessExists(updateReqVO.getProcessId());
+            processService.validateProcessExistsAndEnable(updateReqVO.getProcessId());
         }
         MesMdItemDO item;
         if (updateReqVO.getItemId() != null) {
@@ -147,11 +147,6 @@ public class MesProTaskServiceImpl implements MesProTaskService {
     @Override
     public PageResult<MesProTaskDO> getTaskPage(MesProTaskPageReqVO pageReqVO) {
         return taskMapper.selectPage(pageReqVO);
-    }
-
-    @Override
-    public List<MesProTaskDO> getTaskListByWorkOrderId(Long workOrderId) {
-        return taskMapper.selectListByWorkOrderId(workOrderId);
     }
 
     @Override

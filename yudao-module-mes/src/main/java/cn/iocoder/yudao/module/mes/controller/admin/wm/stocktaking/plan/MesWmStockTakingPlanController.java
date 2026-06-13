@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.mes.controller.admin.wm.stocktaking.plan;
 
 import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -24,7 +23,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.List;
 
 import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -102,15 +100,6 @@ public class MesWmStockTakingPlanController {
         PageResult<MesWmStockTakingPlanDO> pageResult = stockTakingPlanService.getStockTakingPlanPage(pageReqVO);
         ExcelUtils.write(response, "盘点方案.xls", "数据", MesWmStockTakingPlanRespVO.class,
                 BeanUtils.toBean(pageResult.getList(), MesWmStockTakingPlanRespVO.class));
-    }
-
-    @GetMapping("/simple-list")
-    @Operation(summary = "获得已启用的盘点方案精简列表")
-    @PreAuthorize("@ss.hasPermission('mes:wm-stock-taking-task:query')")
-    public CommonResult<List<MesWmStockTakingPlanRespVO>> getEnabledStockTakingPlanSimpleList() {
-        List<MesWmStockTakingPlanDO> list = stockTakingPlanService.getStockTakingPlanListByStatus(
-                CommonStatusEnum.ENABLE.getStatus());
-        return success(BeanUtils.toBean(list, MesWmStockTakingPlanRespVO.class));
     }
 
 }

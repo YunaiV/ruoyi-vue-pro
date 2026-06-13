@@ -79,7 +79,7 @@ public class MesDvRepairLineServiceImpl implements MesDvRepairLineService {
         repairService.validateRepairExists(reqVO.getRepairId());
         // 校验点检保养项目是否存在（可选）
         if (reqVO.getSubjectId() != null) {
-            subjectService.validateSubjectExists(reqVO.getSubjectId());
+            subjectService.validateSubjectExistsAndEnable(reqVO.getSubjectId());
         }
     }
 

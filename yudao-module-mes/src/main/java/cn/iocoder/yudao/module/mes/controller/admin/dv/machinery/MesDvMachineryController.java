@@ -48,10 +48,8 @@ public class MesDvMachineryController {
 
     @Resource
     private MesDvMachineryService machineryService;
-
     @Resource
     private MesDvMachineryTypeService machineryTypeService;
-
     @Resource
     private MesMdWorkshopService workshopService;
 
@@ -126,7 +124,7 @@ public class MesDvMachineryController {
         // 手动创建导出 demo
         List<MesDvMachineryImportExcelVO> list = Collections.singletonList(
                 MesDvMachineryImportExcelVO.builder().code("EQ-001").name("示例设备")
-                        .brand("示例品牌").spec("型号A").machineryTypeCode("MT-001")
+                        .brand("示例品牌").specification("型号A").machineryTypeCode("MT-001")
                         .workshopCode("WS-001").status(0).build()
         );
         // 输出

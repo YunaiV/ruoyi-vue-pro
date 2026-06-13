@@ -30,3 +30,15 @@ export function delete${simpleClassName}(id: number) {
 export function export${simpleClassName}(params) {
   return defHttp.download({ url: '${baseURL}/export-excel', params }, '${table.classComment}.xls')
 }
+#if ($importEnable)
+
+// 下载${table.classComment}导入模板
+export function import${simpleClassName}Template() {
+  return defHttp.download({ url: '${baseURL}/get-import-template' }, '${table.classComment}导入模板.xls')
+}
+
+// 导入${table.classComment}
+export function import${simpleClassName}(data: FormData) {
+  return defHttp.post({ url: '${baseURL}/import', data })
+}
+#end

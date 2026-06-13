@@ -2,13 +2,17 @@ package cn.iocoder.yudao.module.iot.service.rule.scene.matcher;
 
 import cn.hutool.core.text.CharPool;
 import cn.hutool.core.util.NumberUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.common.util.spring.SpringExpressionUtils;
+import cn.iocoder.yudao.framework.common.util.spring.SpringUtils;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
+import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleConditionOperatorEnum;
+import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
@@ -142,6 +146,7 @@ public final class IotSceneRuleMatcherHelper {
      * @param trigger 触发器配置
      * @return 是否有效
      */
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean isBasicTriggerValid(IotSceneRuleDO.Trigger trigger) {
         return trigger != null && trigger.getType() != null;
     }
@@ -152,6 +157,7 @@ public final class IotSceneRuleMatcherHelper {
      * @param trigger 触发器配置
      * @return 是否有效
      */
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean isTriggerOperatorAndValueValid(IotSceneRuleDO.Trigger trigger) {
         return StrUtil.isNotBlank(trigger.getOperator()) && StrUtil.isNotBlank(trigger.getValue());
     }
@@ -163,7 +169,9 @@ public final class IotSceneRuleMatcherHelper {
      * @param trigger     触发器配置
      */
     public static void logTriggerMatchSuccess(IotDeviceMessage message, IotSceneRuleDO.Trigger trigger) {
-        log.debug("[isMatched][message({}) trigger({}) 匹配触发器成功]", message.getRequestId(), trigger.getType());
+        log.debug("[isMatched][message({}) trigger({}) 匹配触发器成功]",
+                message != null ? message.getRequestId() : null,
+                trigger != null ? trigger.getType() : null);
     }
 
     /**
@@ -174,7 +182,10 @@ public final class IotSceneRuleMatcherHelper {
      * @param reason      失败原因
      */
     public static void logTriggerMatchFailure(IotDeviceMessage message, IotSceneRuleDO.Trigger trigger, String reason) {
-        log.debug("[isMatched][message({}) trigger({}) reason({}) 匹配触发器失败]", message.getRequestId(), trigger.getType(), reason);
+        log.debug("[isMatched][message({}) trigger({}) reason({}) 匹配触发器失败]",
+                message != null ? message.getRequestId() : null,
+                trigger != null ? trigger.getType() : null,
+                reason);
     }
 
     // ========== 【条件】相关工具方法 ==========
@@ -185,6 +196,7 @@ public final class IotSceneRuleMatcherHelper {
      * @param condition 触发条件
      * @return 是否有效
      */
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean isBasicConditionValid(IotSceneRuleDO.TriggerCondition condition) {
         return condition != null && condition.getType() != null;
     }
@@ -195,6 +207,7 @@ public final class IotSceneRuleMatcherHelper {
      * @param condition 触发条件
      * @return 是否有效
      */
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean isConditionOperatorAndParamValid(IotSceneRuleDO.TriggerCondition condition) {
         return StrUtil.isNotBlank(condition.getOperator()) && StrUtil.isNotBlank(condition.getParam());
     }
@@ -206,7 +219,9 @@ public final class IotSceneRuleMatcherHelper {
      * @param condition   触发条件
      */
     public static void logConditionMatchSuccess(IotDeviceMessage message, IotSceneRuleDO.TriggerCondition condition) {
-        log.debug("[isMatched][message({}) condition({}) 匹配条件成功]", message.getRequestId(), condition.getType());
+        log.debug("[isMatched][message({}) condition({}) 匹配条件成功]",
+                message != null ? message.getRequestId() : null,
+                condition != null ? condition.getType() : null);
     }
 
     /**
@@ -217,7 +232,10 @@ public final class IotSceneRuleMatcherHelper {
      * @param reason      失败原因
      */
     public static void logConditionMatchFailure(IotDeviceMessage message, IotSceneRuleDO.TriggerCondition condition, String reason) {
-        log.debug("[isMatched][message({}) condition({}) reason({}) 匹配条件失败]", message.getRequestId(), condition.getType(), reason);
+        log.debug("[isMatched][message({}) condition({}) reason({}) 匹配条件失败]",
+                message != null ? message.getRequestId() : null,
+                condition != null ? condition.getType() : null,
+                reason);
     }
 
     // ========== 【通用】工具方法 ==========
@@ -229,8 +247,31 @@ public final class IotSceneRuleMatcherHelper {
      * @param actualIdentifier   实际的标识符
      * @return 是否匹配
      */
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean isIdentifierMatched(String expectedIdentifier, String actualIdentifier) {
         return StrUtil.isNotBlank(expectedIdentifier) && expectedIdentifier.equals(actualIdentifier);
+    }
+
+    /**
+     * 校验匹配器中的产品和设备是否一致
+     *
+     * @param message 消息
+     * @param productId 产品编号
+     * @param deviceId 设备编号
+     * @return 校验结果
+     */
+    public static boolean productAndDeviceNotMatched(IotDeviceMessage message, Long productId, Long deviceId) {
+        if (message == null || message.getDeviceId() == null) {
+            return false;
+        }
+        if (deviceId != null && !IotDeviceDO.DEVICE_ID_ALL.equals(deviceId)) {
+            return ObjectUtil.notEqual(message.getDeviceId(), deviceId);
+        }
+        if (productId == null) {
+            return false;
+        }
+        IotDeviceDO device = SpringUtils.getBean(IotDeviceService.class).getDeviceFromCache(message.getDeviceId());
+        return device == null || ObjectUtil.notEqual(device.getProductId(), productId);
     }
 
 }

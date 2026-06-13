@@ -117,12 +117,13 @@ public interface MesWmArrivalNoticeService {
     void validateArrivalNoticeAndLineExists(Long noticeId, Long lineId);
 
     /**
-     * 按状态获得到货通知单列表
+     * 校验到货通知单已就绪可被采购入库引用
+     * <p>校验状态为待入库 + 所有需检行都已完成 IQC</p>
      *
-     * @param status 状态
-     * @return 到货通知单列表
+     * @param id 到货通知单编号
+     * @return 到货通知单
      */
-    List<MesWmArrivalNoticeDO> getArrivalNoticeListByStatus(Integer status);
+    MesWmArrivalNoticeDO validateArrivalNoticeReadyForReceipt(Long id);
 
     /**
      * 查询指定供应商的到货通知单数量

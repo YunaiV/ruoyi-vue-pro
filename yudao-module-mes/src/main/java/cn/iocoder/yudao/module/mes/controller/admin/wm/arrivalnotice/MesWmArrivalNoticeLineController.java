@@ -40,13 +40,10 @@ public class MesWmArrivalNoticeLineController {
 
     @Resource
     private MesWmArrivalNoticeLineService arrivalNoticeLineService;
-
     @Resource
     private MesMdItemService itemService;
-
     @Resource
     private MesMdUnitMeasureService unitMeasureService;
-
     @Resource
     private MesQcIqcService iqcService;
 
@@ -93,16 +90,6 @@ public class MesWmArrivalNoticeLineController {
             @Valid MesWmArrivalNoticeLinePageReqVO pageReqVO) {
         PageResult<MesWmArrivalNoticeLineDO> pageResult = arrivalNoticeLineService.getArrivalNoticeLinePage(pageReqVO);
         return success(new PageResult<>(buildRespVOList(pageResult.getList()), pageResult.getTotal()));
-    }
-
-    @GetMapping("/list-by-notice-id")
-    @Operation(summary = "获得到货通知单行列表")
-    @Parameter(name = "noticeId", description = "到货通知单编号", required = true, example = "1024")
-    @PreAuthorize("@ss.hasPermission('mes:wm-arrival-notice:query')")
-    public CommonResult<List<MesWmArrivalNoticeLineRespVO>> getArrivalNoticeLineListByNoticeId(
-            @RequestParam("noticeId") Long noticeId) {
-        List<MesWmArrivalNoticeLineDO> list = arrivalNoticeLineService.getArrivalNoticeLineListByNoticeId(noticeId);
-        return success(buildRespVOList(list));
     }
 
     // ==================== 拼接 VO ====================

@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.mes.enums.dv;
 
 import cn.iocoder.yudao.framework.common.core.ArrayValuable;
+import cn.iocoder.yudao.module.mes.enums.MesOrderStatusConstants;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -20,13 +21,13 @@ public enum MesDvMaintenRecordStatusEnum implements ArrayValuable<Integer> {
      *
      * 对应 MesDvMaintenRecordService#createMaintenRecord 方法
      */
-    PREPARE(1, "草稿"),
+    PREPARE(MesOrderStatusConstants.PREPARE, "草稿"),
     /**
      * 已提交
      *
      * 对应 MesDvMaintenRecordService#submitMaintenRecord 方法
      */
-    SUBMITTED(2, "已提交");
+    SUBMITTED(MesOrderStatusConstants.FINISHED, "已提交");
 
     public static final Integer[] ARRAYS = Arrays.stream(values()).map(MesDvMaintenRecordStatusEnum::getStatus)
             .toArray(Integer[]::new);

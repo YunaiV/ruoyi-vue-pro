@@ -116,4 +116,13 @@ public interface MesWmProductSalesService {
      */
     List<MesWmProductSalesDO> getProductSalesListByClientId(Long clientId);
 
+    /**
+     * 校验销售出库单存在且为草稿状态
+     *
+     * @param id 编号
+     * @return 销售出库单
+     */
+    MesWmProductSalesDO validateProductSalesExistsAndDraft(Long id);
+
 }
+

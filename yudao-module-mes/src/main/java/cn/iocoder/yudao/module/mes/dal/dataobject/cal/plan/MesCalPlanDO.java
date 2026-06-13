@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import cn.iocoder.yudao.module.mes.enums.DictTypeConstants;
 
 /**
  * MES 排班计划 DO
@@ -54,12 +55,14 @@ public class MesCalPlanDO extends BaseDO {
     /**
      * 轮班方式
      *
+     * 字典 {@link DictTypeConstants#MES_CAL_SHIFT_TYPE}
      * 枚举 {@link MesCalShiftTypeEnum}
      */
     private Integer shiftType;
     /**
      * 倒班方式
      *
+     * 字典 {@link DictTypeConstants#MES_CAL_SHIFT_METHOD}
      * 枚举 {@link MesCalShiftMethodEnum}
      */
     private Integer shiftMethod;
@@ -70,6 +73,7 @@ public class MesCalPlanDO extends BaseDO {
     /**
      * 状态
      *
+     * 字典 {@link DictTypeConstants#MES_CAL_PLAN_STATUS}
      * 枚举 {@link MesCalPlanStatusEnum}
      */
     private Integer status;

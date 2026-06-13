@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.mes.service.wm.returnissue;
 
+import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.mes.controller.admin.wm.returnissue.vo.detail.MesWmReturnIssueDetailSaveReqVO;
@@ -17,8 +18,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.mes.enums.ErrorCodeConstants.WM_RETURN_ISSUE_DETAIL_NOT_EXISTS;
-import static cn.iocoder.yudao.module.mes.enums.ErrorCodeConstants.WM_RETURN_ISSUE_DETAIL_QUANTITY_EXCEED;
+import static cn.iocoder.yudao.module.mes.enums.ErrorCodeConstants.*;
 
 /**
  * MES 生产退料明细 Service 实现类
@@ -105,11 +105,21 @@ public class MesWmReturnIssueDetailServiceImpl implements MesWmReturnIssueDetail
     private void validateReturnIssueDetailSaveData(MesWmReturnIssueDetailSaveReqVO reqVO) {
         // 校验父数据存在
         MesWmReturnIssueLineDO line = issueLineService.validateReturnIssueLineExists(reqVO.getLineId());
+        if (ObjUtil.notEqual(line.getIssueId(), reqVO.getIssueId())) {
+            throw exception(WM_RETURN_ISSUE_DETAIL_LINE_NOT_MATCH);
+        }
+        if (ObjUtil.notEqual(line.getItemId(), reqVO.getItemId())) {
+            throw exception(WM_RETURN_ISSUE_DETAIL_ITEM_MISMATCH);
+        }
         // 校验仓库、库区、库位的关联关系
         warehouseAreaService.validateWarehouseAreaExists(
                 reqVO.getWarehouseId(), reqVO.getLocationId(), reqVO.getAreaId());
         // 校验库位物料/批次混放规则
         materialStockService.checkAreaMixingRule(reqVO.getAreaId(), reqVO.getItemId(), reqVO.getBatchId());
+        // 校验库存记录
+        materialStockService.validateSelectedStock(
+                reqVO.getMaterialStockId(), reqVO.getItemId(), reqVO.getBatchId(), reqVO.getBatchCode(),
+                reqVO.getWarehouseId(), reqVO.getLocationId(), reqVO.getAreaId(), reqVO.getQuantity());
         // 校验明细总数量不超过行数量（排除自身）
         validateDetailQuantityNotExceed(reqVO.getLineId(), reqVO.getQuantity(), reqVO.getId(), line);
     }

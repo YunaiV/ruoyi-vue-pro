@@ -45,21 +45,18 @@ public class MesQcDefectRecordServiceImpl implements MesQcDefectRecordService {
     @Resource
     @Lazy
     private MesQcIqcLineService iqcLineService;
-
     @Resource
     @Lazy
     private MesQcIpqcService ipqcService;
     @Resource
     @Lazy
     private MesQcIpqcLineService ipqcLineService;
-
     @Resource
     @Lazy
     private MesQcOqcService oqcService;
     @Resource
     @Lazy
     private MesQcOqcLineService oqcLineService;
-
     @Resource
     @Lazy
     private MesQcRqcService rqcService;
@@ -107,6 +104,11 @@ public class MesQcDefectRecordServiceImpl implements MesQcDefectRecordService {
 
         // 3. 重新计算缺陷统计
         recalculateDefectStats(record.getQcType(), record.getQcId());
+    }
+
+    @Override
+    public MesQcDefectRecordDO getDefectRecord(Long id) {
+        return defectRecordMapper.selectById(id);
     }
 
     @Override

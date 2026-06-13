@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.framework.test.core.util.AssertUtils;
+import cn.iocoder.yudao.module.infra.controller.admin.file.vo.file.FileCreateReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.file.vo.file.FilePageReqVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.file.FileDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.file.FileMapper;
@@ -22,6 +23,7 @@ import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.bui
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
 import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.FILE_NOT_EXISTS;
+import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.FILE_PATH_INVALID;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.*;
@@ -42,6 +44,7 @@ public class FileServiceImplTest extends BaseDbUnitTest {
     public void setUp() {
         FileServiceImpl.PATH_PREFIX_DATE_ENABLE = true;
         FileServiceImpl.PATH_SUFFIX_TIMESTAMP_ENABLE = true;
+        FileServiceImpl.PATH_SUFFIX_AS_DIRECTORY = true;
     }
 
     @Test
@@ -93,7 +96,7 @@ public class FileServiceImplTest extends BaseDbUnitTest {
         String url = randomString();
         AtomicReference<String> pathRef = new AtomicReference<>();
         when(client.upload(same(content), argThat(path -> {
-            assertTrue(path.matches(directory + "/\\d{8}/" + name + "_\\d+.jpg"));
+            assertTrue(path.matches(directory + "/\\d{8}/\\d+/" + name + ".jpg"));
             pathRef.set(path);
             return true;
         }), eq(type))).thenReturn(url);
@@ -125,7 +128,7 @@ public class FileServiceImplTest extends BaseDbUnitTest {
         String url = randomString();
         AtomicReference<String> pathRef = new AtomicReference<>();
         when(client.upload(same(content), argThat(path -> {
-            assertTrue(path.matches("\\d{8}/6318848e882d8a7e7e82789d87608f684ee52d41966bfc8cad3ce15aad2b970e_\\d+\\.jpg"));
+            assertTrue(path.matches("\\d{8}/\\d+/6318848e882d8a7e7e82789d87608f684ee52d41966bfc8cad3ce15aad2b970e\\.jpg"));
             pathRef.set(path);
             return true;
         }), eq(type))).thenReturn(url);
@@ -172,6 +175,16 @@ public class FileServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
+    public void testDeleteFile_pathInvalid() {
+        // mock 数据
+        FileDO dbFile = randomPojo(FileDO.class, o -> o.setConfigId(10L).setPath("../tudou.jpg"));
+        fileMapper.insert(dbFile);
+
+        // 调用，并断言异常
+        assertServiceException(() -> fileService.deleteFile(dbFile.getId()), FILE_PATH_INVALID);
+    }
+
+    @Test
     public void testGetFileContent() throws Exception {
         // 准备参数
         Long configId = 10L;
@@ -189,6 +202,76 @@ public class FileServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
+    public void testGetFileContent_pathInvalid() {
+        // 准备参数
+        Long configId = 10L;
+        String path = "../tudou.jpg";
+
+        // 调用，并断言异常
+        assertServiceException(() -> fileService.getFileContent(configId, path), FILE_PATH_INVALID);
+    }
+
+    @Test
+    public void testGetFileByConfigIdAndPath() {
+        // mock 数据
+        FileDO dbFile = randomPojo(FileDO.class, o -> o.setConfigId(10L).setPath("avatar/中文 100%+文件.jpg"));
+        fileMapper.insert(dbFile);
+        FileDO latestFile = ObjectUtils.cloneIgnoreId(dbFile, o -> o.setName("最新文件名.jpg"));
+        fileMapper.insert(latestFile);
+        fileMapper.insert(ObjectUtils.cloneIgnoreId(dbFile, o -> o.setPath("avatar/other.jpg")));
+        fileMapper.insert(ObjectUtils.cloneIgnoreId(dbFile, o -> o.setConfigId(20L)));
+
+        // 调用
+        FileDO result = fileService.getFileByConfigIdAndPath(10L, "avatar/中文 100%+文件.jpg");
+
+        // 断言
+        AssertUtils.assertPojoEquals(latestFile, result);
+    }
+
+    @Test
+    public void testCreateFileByPresignedPath_success() {
+        // 准备参数
+        FileCreateReqVO reqVO = randomPojo(FileCreateReqVO.class, o -> {
+            o.setPath("avatar/test.jpg");
+            o.setName("test.jpg");
+            o.setUrl("https://www.iocoder.cn/test.jpg?token=123");
+        });
+
+        // 调用
+        Long fileId = fileService.createFile(reqVO);
+
+        // 断言
+        FileDO file = fileMapper.selectById(fileId);
+        assertEquals("avatar/test.jpg", file.getPath());
+        assertEquals("test.jpg", file.getName());
+        assertEquals("https://www.iocoder.cn/test.jpg", file.getUrl());
+    }
+
+    @Test
+    public void testCreateFileByPresignedPath_nameInvalid() {
+        // 准备参数
+        FileCreateReqVO reqVO = randomPojo(FileCreateReqVO.class, o -> {
+            o.setPath("avatar/test.jpg");
+            o.setName("../test.jpg");
+        });
+
+        // 调用，并断言异常
+        assertServiceException(() -> fileService.createFile(reqVO), FILE_PATH_INVALID);
+    }
+
+    @Test
+    public void testCreateFileByPresignedPath_pathInvalid() {
+        // 准备参数
+        FileCreateReqVO reqVO = randomPojo(FileCreateReqVO.class, o -> {
+            o.setPath("../test.jpg");
+            o.setName("test.jpg");
+        });
+
+        // 调用，并断言异常
+        assertServiceException(() -> fileService.createFile(reqVO), FILE_PATH_INVALID);
+    }
+
+    @Test
     public void testGenerateUploadPath_AllEnabled() {
         // 准备参数
         String name = "test.jpg";
@@ -200,10 +283,10 @@ public class FileServiceImplTest extends BaseDbUnitTest {
         String path = fileService.generateUploadPath(name, directory);
 
         // 断言
-        // 格式为：avatar/yyyyMMdd/test_timestamp.jpg
+        // 格式为：avatar/yyyyMMdd/{时间戳+随机数}/test.jpg
         assertTrue(path.startsWith(directory + "/"));
         // 包含日期格式：8 位数字，如 20240517
-        assertTrue(path.matches(directory + "/\\d{8}/test_\\d+\\.jpg"));
+        assertTrue(path.matches(directory + "/\\d{8}/\\d+/test\\.jpg"));
     }
 
     @Test
@@ -236,9 +319,9 @@ public class FileServiceImplTest extends BaseDbUnitTest {
         String path = fileService.generateUploadPath(name, directory);
 
         // 断言
-        // 格式为：avatar/test_timestamp.jpg
+        // 格式为：avatar/{时间戳+随机数}/test.jpg
         assertTrue(path.startsWith(directory + "/"));
-        assertTrue(path.matches(directory + "/test_\\d+\\.jpg"));
+        assertTrue(path.matches(directory + "/\\d+/test\\.jpg"));
     }
 
     @Test
@@ -269,9 +352,9 @@ public class FileServiceImplTest extends BaseDbUnitTest {
         String path = fileService.generateUploadPath(name, directory);
 
         // 断言
-        // 格式为：avatar/yyyyMMdd/test_timestamp
+        // 格式为：avatar/yyyyMMdd/{时间戳+随机数}/test
         assertTrue(path.startsWith(directory + "/"));
-        assertTrue(path.matches(directory + "/\\d{8}/test_\\d+"));
+        assertTrue(path.matches(directory + "/\\d{8}/\\d+/test"));
     }
 
     @Test
@@ -286,8 +369,81 @@ public class FileServiceImplTest extends BaseDbUnitTest {
         String path = fileService.generateUploadPath(name, directory);
 
         // 断言
-        // 格式为：yyyyMMdd/test_timestamp.jpg
-        assertTrue(path.matches("\\d{8}/test_\\d+\\.jpg"));
+        // 格式为：yyyyMMdd/{时间戳+随机数}/test.jpg
+        assertTrue(path.matches("\\d{8}/\\d+/test\\.jpg"));
+    }
+
+    @Test
+    public void testGenerateUploadPath_SuffixAsName_AllEnabled() {
+        // 准备参数
+        String name = "test.jpg";
+        String directory = "avatar";
+        FileServiceImpl.PATH_PREFIX_DATE_ENABLE = true;
+        FileServiceImpl.PATH_SUFFIX_TIMESTAMP_ENABLE = true;
+        FileServiceImpl.PATH_SUFFIX_AS_DIRECTORY = false;
+
+        // 调用
+        String path = fileService.generateUploadPath(name, directory);
+
+        // 断言
+        // 格式为：avatar/yyyyMMdd/test_{时间戳+随机数}.jpg
+        assertTrue(path.matches(directory + "/\\d{8}/test_\\d+\\.jpg"));
+    }
+
+    @Test
+    public void testGenerateUploadPath_SuffixAsName_PrefixDisabled() {
+        // 准备参数
+        String name = "test.jpg";
+        String directory = "avatar";
+        FileServiceImpl.PATH_PREFIX_DATE_ENABLE = false;
+        FileServiceImpl.PATH_SUFFIX_TIMESTAMP_ENABLE = true;
+        FileServiceImpl.PATH_SUFFIX_AS_DIRECTORY = false;
+
+        // 调用
+        String path = fileService.generateUploadPath(name, directory);
+
+        // 断言
+        // 格式为：avatar/test_{时间戳+随机数}.jpg
+        assertTrue(path.matches(directory + "/test_\\d+\\.jpg"));
+    }
+
+    @Test
+    public void testGenerateUploadPath_SuffixAsName_NoExtension() {
+        // 准备参数
+        String name = "test";
+        String directory = "avatar";
+        FileServiceImpl.PATH_PREFIX_DATE_ENABLE = true;
+        FileServiceImpl.PATH_SUFFIX_TIMESTAMP_ENABLE = true;
+        FileServiceImpl.PATH_SUFFIX_AS_DIRECTORY = false;
+
+        // 调用
+        String path = fileService.generateUploadPath(name, directory);
+
+        // 断言
+        // 格式为：avatar/yyyyMMdd/test_{时间戳+随机数}
+        assertTrue(path.matches(directory + "/\\d{8}/test_\\d+"));
+    }
+
+    @Test
+    public void testGenerateUploadPath_FileNameInvalid() {
+        // 准备参数
+        String name = "../test.jpg";
+        String directory = "avatar";
+        FileServiceImpl.PATH_PREFIX_DATE_ENABLE = false;
+        FileServiceImpl.PATH_SUFFIX_TIMESTAMP_ENABLE = false;
+
+        // 调用，并断言异常
+        assertServiceException(() -> fileService.generateUploadPath(name, directory), FILE_PATH_INVALID);
+    }
+
+    @Test
+    public void testGenerateUploadPath_DirectoryInvalid() {
+        // 准备参数
+        String name = "test.jpg";
+        String directory = "../avatar";
+
+        // 调用，并断言异常
+        assertServiceException(() -> fileService.generateUploadPath(name, directory), FILE_PATH_INVALID);
     }
 
     @Test
@@ -302,8 +458,8 @@ public class FileServiceImplTest extends BaseDbUnitTest {
         String path = fileService.generateUploadPath(name, directory);
 
         // 断言
-        // 格式为：yyyyMMdd/test_timestamp.jpg
-        assertTrue(path.matches("\\d{8}/test_\\d+\\.jpg"));
+        // 格式为：yyyyMMdd/{时间戳+随机数}/test.jpg
+        assertTrue(path.matches("\\d{8}/\\d+/test\\.jpg"));
     }
 
 }

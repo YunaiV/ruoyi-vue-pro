@@ -129,4 +129,12 @@ public interface MesProWorkOrderService {
      */
     void updateProducedQuantity(Long id, BigDecimal incrQuantityProduced);
 
+    /**
+     * 根据供应商 ID 统计工单数量
+     *
+     * @param vendorId 供应商 ID
+     * @return 数量
+     */
+    Long getWorkOrderCountByVendorId(Long vendorId);
+
 }

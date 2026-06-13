@@ -1,13 +1,17 @@
 package cn.iocoder.yudao.module.system.service.social;
 
+import cn.binarywang.wx.miniapp.api.WxMaOrderShippingService;
 import cn.binarywang.wx.miniapp.api.WxMaService;
 import cn.binarywang.wx.miniapp.api.WxMaUserService;
 import cn.binarywang.wx.miniapp.bean.WxMaPhoneNumberInfo;
+import cn.binarywang.wx.miniapp.bean.shop.request.shipping.WxMaOrderShippingInfoUploadRequest;
+import cn.binarywang.wx.miniapp.bean.shop.response.WxMaOrderShippingInfoBaseResponse;
 import cn.hutool.core.util.ReflectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
+import cn.iocoder.yudao.module.system.api.social.dto.SocialWxaOrderUploadShippingInfoReqDTO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialClientDO;
@@ -18,6 +22,7 @@ import com.binarywang.spring.starter.wxjava.miniapp.properties.WxMaProperties;
 import com.binarywang.spring.starter.wxjava.mp.properties.WxMpProperties;
 import jakarta.annotation.Resource;
 import me.chanjar.weixin.common.bean.WxJsapiSignature;
+import me.chanjar.weixin.common.error.WxError;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.zhyd.oauth.config.AuthConfig;
@@ -26,6 +31,7 @@ import me.zhyd.oauth.model.AuthUser;
 import me.zhyd.oauth.request.AuthDefaultRequest;
 import me.zhyd.oauth.request.AuthRequest;
 import me.zhyd.oauth.utils.AuthStateUtils;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.springframework.context.annotation.Import;
@@ -466,6 +472,102 @@ public class SocialClientServiceImplTest extends BaseDbUnitTest {
         assertEquals(1, pageResult.getTotal());
         assertEquals(1, pageResult.getList().size());
         assertPojoEquals(dbSocialClient, pageResult.getList().get(0));
+    }
+
+    // =================== 微信小程序订单发货 ===================
+
+    @BeforeAll
+    public static void setUpUploadShippingBackoff() {
+        // 测试场景下把退避数组的每一项改为 1ms，避免拖慢用例（数组引用是 final 但元素可改）
+        long[] backoff = (long[]) ReflectUtil.getFieldValue(SocialClientServiceImpl.class,
+                "UPLOAD_SHIPPING_INFO_RETRY_BACKOFF_MILLIS");
+        for (int i = 0; i < backoff.length; i++) {
+            backoff[i] = 1L;
+        }
+    }
+
+    @Test
+    public void testUploadWxaOrderShippingInfo_success() throws WxErrorException {
+        // 准备参数
+        Integer userType = randomPojo(UserTypeEnum.class).getValue();
+        SocialWxaOrderUploadShippingInfoReqDTO reqDTO = randomUploadShippingReqDTO();
+        // mock 方法：首次调用就成功
+        WxMaOrderShippingService shippingService = mockWxMaOrderShippingService();
+        when(shippingService.upload(any(WxMaOrderShippingInfoUploadRequest.class)))
+                .thenReturn(new WxMaOrderShippingInfoBaseResponse());
+
+        // 调用
+        socialClientService.uploadWxaOrderShippingInfo(userType, reqDTO);
+        // 断言：仅调用 1 次，无重试
+        verify(shippingService, times(1)).upload(any(WxMaOrderShippingInfoUploadRequest.class));
+    }
+
+    @Test
+    public void testUploadWxaOrderShippingInfo_retryThenSuccess() throws WxErrorException {
+        // 准备参数
+        Integer userType = randomPojo(UserTypeEnum.class).getValue();
+        SocialWxaOrderUploadShippingInfoReqDTO reqDTO = randomUploadShippingReqDTO();
+        // mock 方法：首次抛 10060001，第二次成功
+        WxMaOrderShippingService shippingService = mockWxMaOrderShippingService();
+        when(shippingService.upload(any(WxMaOrderShippingInfoUploadRequest.class)))
+                .thenThrow(buildWxErrorException(10060001))
+                .thenReturn(new WxMaOrderShippingInfoBaseResponse());
+
+        // 调用
+        socialClientService.uploadWxaOrderShippingInfo(userType, reqDTO);
+        // 断言：上传调用了 2 次，触发了 1 次重试
+        verify(shippingService, times(2)).upload(any(WxMaOrderShippingInfoUploadRequest.class));
+    }
+
+    @Test
+    public void testUploadWxaOrderShippingInfo_retryExhausted() throws WxErrorException {
+        // 准备参数
+        Integer userType = randomPojo(UserTypeEnum.class).getValue();
+        SocialWxaOrderUploadShippingInfoReqDTO reqDTO = randomUploadShippingReqDTO();
+        // mock 方法：始终抛 10060001
+        WxMaOrderShippingService shippingService = mockWxMaOrderShippingService();
+        when(shippingService.upload(any(WxMaOrderShippingInfoUploadRequest.class)))
+                .thenThrow(buildWxErrorException(10060001));
+
+        // 调用并断言：重试用尽抛业务异常
+        assertServiceException(() -> socialClientService.uploadWxaOrderShippingInfo(userType, reqDTO),
+                SOCIAL_CLIENT_WEIXIN_MINI_APP_ORDER_UPLOAD_SHIPPING_INFO_ERROR);
+        // 断言：共 4 次尝试（1 次首发 + 3 次重试）
+        verify(shippingService, times(4)).upload(any(WxMaOrderShippingInfoUploadRequest.class));
+    }
+
+    @Test
+    public void testUploadWxaOrderShippingInfo_otherErrorNoRetry() throws WxErrorException {
+        // 准备参数
+        Integer userType = randomPojo(UserTypeEnum.class).getValue();
+        SocialWxaOrderUploadShippingInfoReqDTO reqDTO = randomUploadShippingReqDTO();
+        // mock 方法：抛非 10060001 错误（如 access_token 失效）
+        WxMaOrderShippingService shippingService = mockWxMaOrderShippingService();
+        when(shippingService.upload(any(WxMaOrderShippingInfoUploadRequest.class)))
+                .thenThrow(buildWxErrorException(40001));
+
+        // 调用并断言：立即抛业务异常，无重试
+        assertServiceException(() -> socialClientService.uploadWxaOrderShippingInfo(userType, reqDTO),
+                SOCIAL_CLIENT_WEIXIN_MINI_APP_ORDER_UPLOAD_SHIPPING_INFO_ERROR);
+        verify(shippingService, times(1)).upload(any(WxMaOrderShippingInfoUploadRequest.class));
+    }
+
+    /** 构造一个发货上传请求 */
+    private SocialWxaOrderUploadShippingInfoReqDTO randomUploadShippingReqDTO() {
+        return randomPojo(SocialWxaOrderUploadShippingInfoReqDTO.class,
+                o -> o.setLogisticsType(SocialWxaOrderUploadShippingInfoReqDTO.LOGISTICS_TYPE_EXPRESS));
+    }
+
+    /** mock 出 wxMaService.getWxMaOrderShippingService() 的返回值并返回该 mock */
+    private WxMaOrderShippingService mockWxMaOrderShippingService() {
+        WxMaOrderShippingService shippingService = mock(WxMaOrderShippingService.class);
+        when(wxMaService.getWxMaOrderShippingService()).thenReturn(shippingService);
+        return shippingService;
+    }
+
+    /** 构造指定 errorCode 的 WxErrorException */
+    private WxErrorException buildWxErrorException(int errorCode) {
+        return new WxErrorException(WxError.builder().errorCode(errorCode).errorMsg("mock error").build());
     }
 
 }

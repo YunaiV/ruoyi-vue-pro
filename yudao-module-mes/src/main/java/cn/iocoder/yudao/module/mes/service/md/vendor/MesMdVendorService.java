@@ -60,6 +60,14 @@ public interface MesMdVendorService {
     MesMdVendorDO validateVendorExists(Long id);
 
     /**
+     * 校验供应商存在且启用
+     *
+     * @param id 供应商 ID
+     * @return 供应商
+     */
+    MesMdVendorDO validateVendorExistsAndEnable(Long id);
+
+    /**
      * 获得供应商分页
      *
      * @param pageReqVO 分页查询

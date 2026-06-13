@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
+import cn.iocoder.yudao.module.mes.enums.DictTypeConstants;
 
 /**
  * MES 上下工记录流水 DO
@@ -43,6 +44,7 @@ public class MesProWorkRecordLogDO extends BaseDO {
     /**
      * 操作类型
      *
+     * 字典 {@link DictTypeConstants#MES_PRO_WORK_RECORD_TYPE}
      * 枚举 {@link MesProWorkRecordTypeEnum}
      */
     private Integer type;

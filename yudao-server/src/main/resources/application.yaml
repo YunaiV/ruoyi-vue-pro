@@ -307,6 +307,7 @@ yudao:
     vo-type: 10 # VO 的类型，参见 CodegenVOTypeEnum 枚举类
     delete-batch-enable: true # 是否生成批量删除接口
     unit-test-enable: false # 是否生成单元测试
+    import-enable: false # 是否生成 Excel 导入接口
   tenant: # 多租户相关配置项
     enable: true
     ignore-urls:

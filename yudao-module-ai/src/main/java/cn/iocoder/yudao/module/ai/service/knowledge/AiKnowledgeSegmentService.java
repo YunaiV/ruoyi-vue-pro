@@ -99,6 +99,13 @@ public interface AiKnowledgeSegmentService {
     void updateKnowledgeSegmentStatus(AiKnowledgeSegmentUpdateStatusReqVO reqVO);
 
     /**
+     * 删除知识库段落
+     *
+     * @param id 段落编号
+     */
+    void deleteKnowledgeSegment(Long id);
+
+    /**
      * 重新索引知识库下的所有文档段落
      *
      * @param knowledgeId 知识库编号

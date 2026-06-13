@@ -84,6 +84,13 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- MQTT -->
+        <dependency>
+            <groupId>org.eclipse.paho</groupId>
+            <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
+            <optional>true</optional>
+        </dependency>
+
         <!-- 消息队列相关 -->
         <!-- TODO @芋艿：临时打开 -->
         <dependency>

@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import cn.iocoder.yudao.module.mes.enums.DictTypeConstants;
 
 /**
  * MES 转移单 DO
@@ -41,6 +42,7 @@ public class MesWmTransferDO extends BaseDO {
     /**
      * 转移单类型
      *
+     * 字典 {@link DictTypeConstants#MES_WM_TRANSFER_TYPE}
      * 枚举 {@link MesWmTransferTypeEnum}
      */
     private Integer type;
@@ -82,6 +84,7 @@ public class MesWmTransferDO extends BaseDO {
     /**
      * 状态
      *
+     * 字典 {@link DictTypeConstants#MES_WM_TRANSFER_STATUS}
      * 枚举 {@link MesWmTransferStatusEnum}
      */
     private Integer status;

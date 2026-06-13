@@ -34,23 +34,6 @@ public class MesWmMaterialStockDO extends BaseDO {
      */
     @TableId
     private Long id;
-
-    /**
-     * 在库数量
-     */
-    private BigDecimal quantity;
-    /**
-     * 入库时间
-     */
-    private LocalDateTime receiptTime;
-
-    /**
-     * 供应商编号
-     *
-     * 关联 {@link MesMdVendorDO#getId()}
-     */
-    private Long vendorId;
-
     // ==================== 物料维度 ====================
 
     /**
@@ -98,6 +81,23 @@ public class MesWmMaterialStockDO extends BaseDO {
      * 关联 {@link MesWmWarehouseAreaDO#getId()}
      */
     private Long areaId;
+
+    // ==================== 供应商 & 数量 ====================
+
+    /**
+     * 供应商编号
+     *
+     * 关联 {@link MesMdVendorDO#getId()}
+     */
+    private Long vendorId;
+    /**
+     * 在库数量
+     */
+    private BigDecimal quantity;
+    /**
+     * 入库时间
+     */
+    private LocalDateTime receiptTime;
 
     // ==================== 状态 ====================
 

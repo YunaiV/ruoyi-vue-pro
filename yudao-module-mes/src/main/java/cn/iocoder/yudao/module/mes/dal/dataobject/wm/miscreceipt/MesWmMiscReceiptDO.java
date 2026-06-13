@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.mes.dal.dataobject.wm.miscreceipt;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.mes.enums.DictTypeConstants;
 import cn.iocoder.yudao.module.mes.enums.wm.MesWmMiscReceiptStatusEnum;
-import cn.iocoder.yudao.module.mes.enums.wm.MesWmMiscReceiptTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -41,9 +41,13 @@ public class MesWmMiscReceiptDO extends BaseDO {
     /**
      * 杂项类型
      *
-     * 枚举 {@link MesWmMiscReceiptTypeEnum}
+     * 字典 {@link DictTypeConstants#MES_WM_MISC_RECEIPT_TYPE}
      */
     private Integer type;
+    /**
+     * 来源单据类型
+     */
+    private String sourceDocType;
     /**
      * 来源单据 ID
      */
@@ -53,16 +57,13 @@ public class MesWmMiscReceiptDO extends BaseDO {
      */
     private String sourceDocCode;
     /**
-     * 来源单据类型
-     */
-    private String sourceDocType;
-    /**
      * 入库日期
      */
     private LocalDateTime receiptDate;
     /**
      * 状态
      *
+     * 字典 {@link DictTypeConstants#MES_WM_MISC_RECEIPT_STATUS}
      * 枚举 {@link MesWmMiscReceiptStatusEnum}
      */
     private Integer status;

@@ -36,13 +36,11 @@ public enum IotSceneRuleConditionOperatorEnum implements ArrayValuable<String> {
 
     // ========== 特殊：不放在字典里 ==========
 
-    // TODO @puhui999：@芋艿：需要测试下
     DATE_TIME_GREATER_THAN("date_time_>", "#source > #value"), // 在时间之后：时间戳
     DATE_TIME_LESS_THAN("date_time_<", "#source < #value"), // 在时间之前：时间戳
     DATE_TIME_BETWEEN("date_time_between", // 在时间之间：时间戳
             "(#source >= #values.get(0)) && (#source <= #values.get(1))"),
 
-    // TODO @puhui999：@芋艿：需要测试下
     TIME_GREATER_THAN("time_>", "#source.isAfter(#value)"), // 在当日时间之后：HH:mm:ss
     TIME_LESS_THAN("time_<", "#source.isBefore(#value)"), // 在当日时间之前：HH:mm:ss
     TIME_BETWEEN("time_between", // 在当日时间之间：HH:mm:ss

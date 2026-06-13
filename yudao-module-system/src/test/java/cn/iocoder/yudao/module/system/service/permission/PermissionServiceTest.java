@@ -441,6 +441,34 @@ public class PermissionServiceTest extends BaseDbUnitTest {
     }
 
     @Test
+    public void testGetDeptDataPermission_DeptCustom_userDeptIdNull() {
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(PermissionServiceImpl.class)))
+                    .thenReturn(permissionService);
+
+            // 准备参数
+            Long userId = 1L;
+            // mock 用户的角色编号
+            userRoleMapper.insert(randomPojo(UserRoleDO.class).setUserId(userId).setRoleId(2L));
+            // mock 获得用户的角色
+            RoleDO roleDO = randomPojo(RoleDO.class, o -> o.setDataScope(DataScopeEnum.DEPT_CUSTOM.getScope())
+                    .setStatus(CommonStatusEnum.ENABLE.getStatus()));
+            when(roleService.getRoleListFromCache(eq(singleton(2L)))).thenReturn(toList(roleDO));
+            // mock 部门的返回：用户未设置部门
+            when(userService.getUser(eq(1L))).thenReturn(new AdminUserDO()); // deptId 为 null
+
+            // 调用
+            DeptDataPermissionRespDTO result = permissionService.getDeptDataPermission(userId);
+            // 断言：角色配置的可见部门仍正常加入，但 null 不进集合
+            assertFalse(result.getAll());
+            assertFalse(result.getSelf());
+            assertEquals(roleDO.getDataScopeDeptIds().size(), result.getDeptIds().size());
+            assertTrue(CollUtil.containsAll(result.getDeptIds(), roleDO.getDataScopeDeptIds()));
+            assertFalse(result.getDeptIds().contains(null));
+        }
+    }
+
+    @Test
     public void testGetDeptDataPermission_DeptOnly() {
         try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
             springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(PermissionServiceImpl.class)))
@@ -497,6 +525,33 @@ public class PermissionServiceTest extends BaseDbUnitTest {
             assertEquals(2, result.getDeptIds().size());
             assertTrue(CollUtil.contains(result.getDeptIds(), deptDO.getId()));
             assertTrue(CollUtil.contains(result.getDeptIds(), 3L));
+        }
+    }
+
+    @Test
+    public void testGetDeptDataPermission_DeptAndChild_userDeptIdNull() {
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(PermissionServiceImpl.class)))
+                    .thenReturn(permissionService);
+
+            // 准备参数
+            Long userId = 1L;
+            // mock 用户的角色编号
+            userRoleMapper.insert(randomPojo(UserRoleDO.class).setUserId(userId).setRoleId(2L));
+            // mock 获得用户的角色
+            RoleDO roleDO = randomPojo(RoleDO.class, o -> o.setDataScope(DataScopeEnum.DEPT_AND_CHILD.getScope())
+                    .setStatus(CommonStatusEnum.ENABLE.getStatus()));
+            when(roleService.getRoleListFromCache(eq(singleton(2L)))).thenReturn(toList(roleDO));
+            // mock 部门的返回：用户未设置部门
+            when(userService.getUser(eq(1L))).thenReturn(new AdminUserDO()); // deptId 为 null
+
+            // 调用
+            DeptDataPermissionRespDTO result = permissionService.getDeptDataPermission(userId);
+            // 断言：deptId 为 null，整段跳过；deptIds 为空，子部门查询不被触发
+            assertFalse(result.getAll());
+            assertFalse(result.getSelf());
+            assertTrue(CollUtil.isEmpty(result.getDeptIds()));
+            verify(deptService, never()).getChildDeptIdListFromCache(any());
         }
     }
 

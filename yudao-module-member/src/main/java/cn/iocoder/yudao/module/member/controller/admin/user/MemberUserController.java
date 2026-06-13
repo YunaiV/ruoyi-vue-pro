@@ -87,7 +87,7 @@ public class MemberUserController {
         }
         MemberUserRespVO userVO = MemberUserConvert.INSTANCE.convert03(user);
         if (user.getLevelId() != null) {
-            MemberLevelDO level = memberLevelService.getLevel(userVO.getId());
+            MemberLevelDO level = memberLevelService.getLevel(userVO.getLevelId());
             if (level != null) {
                 userVO.setLevelName(level.getName());
             }

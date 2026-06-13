@@ -44,10 +44,8 @@ public class MesWmOutsourceReceiptController {
 
     @Resource
     private MesWmOutsourceReceiptService outsourceReceiptService;
-
     @Resource
     private MesMdVendorService vendorService;
-
     @Resource
     private MesProWorkOrderService workOrderService;
 

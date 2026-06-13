@@ -1,0 +1,131 @@
+<script lang="ts" setup>
+  import type { InfraStudentApi } from '#/api/infra/demo';
+
+  import { computed, ref, h, onMounted,watch,nextTick } from 'vue';
+
+  import { $t } from '#/locales';
+
+ import { Plus } from "@vben/icons";
+import { ElButton, ElTabs, ElTabPane, ElCheckbox, ElInput, ElSelect, ElOption, ElRadioGroup, ElCheckboxGroup, ElDatePicker } from 'element-plus';
+import { ImageUpload, FileUpload } from "#/components/upload";
+import type { OnActionClickParams } from '#/adapter/vxe-table';
+import { useVbenVxeGrid } from '#/adapter/vxe-table';
+import { useStudentContactGridEditColumns } from '../data';
+import { getStudentContactListByStudentId } from '#/api/infra/demo';
+
+const props = defineProps<{
+   studentId?: number // 学生编号（主表的关联字段）
+}>()
+
+ /** 表格操作按钮的回调函数 */
+function onActionClick({
+ code,
+ row,
+}: OnActionClickParams<InfraStudentApi.StudentContact>) {
+  switch (code) {
+    case 'delete': {
+      onDelete(row);
+      break;
+    }
+  }
+}
+
+const [Grid, gridApi] = useVbenVxeGrid({
+gridOptions: {
+  columns: useStudentContactGridEditColumns(onActionClick),
+  border: true,
+  showOverflow: true,
+  autoResize: true,
+  keepSource: true,
+  rowConfig: {
+    keyField: 'id',
+  },
+  pagerConfig: {
+    enabled: false,
+  },
+  toolbarConfig: {
+    enabled: false,
+  },
+},
+});
+
+/** 添加学生联系人 */
+const onAdd = async () => {
+  await gridApi.grid.insertAt({} as StudentApi.StudentContact, -1);
+}
+
+/** 删除学生联系人 */
+const onDelete =  async (row: InfraStudentApi.StudentContact) => {
+  await gridApi.grid.remove(row);
+}
+
+/** 提供获取表格数据的方法供父组件调用 */
+defineExpose({
+  getData: (): InfraStudentApi.StudentContact[] => {
+    const data = gridApi.grid.getData() as InfraStudentApi.StudentContact[];
+    const removeRecords = gridApi.grid.getRemoveRecords() as InfraStudentApi.StudentContact[];
+    const insertRecords = gridApi.grid.getInsertRecords() as InfraStudentApi.StudentContact[];
+    return data
+        .filter((row) => !removeRecords.some((removed) => removed.id === row.id))
+        .concat(insertRecords.map((row: any) => ({ ...row, id: undefined })));
+  },
+});
+
+/** 监听主表的关联字段的变化，加载对应的子表数据 */
+watch(
+    () => props.studentId,
+    async (val) => {
+      if (!val) {
+        return;
+      }
+      await nextTick();
+      await gridApi.grid.loadData(await getStudentContactListByStudentId(props.studentId!));
+    },
+    { immediate: true },
+);
+</script>
+
+<template>
+   <Grid class="mx-4">
+                 <template #name="{ row }">
+                  <el-input v-model="row.name" />
+                </template>
+                <template #description="{ row }">
+                  <el-input v-model="row.description" type="textarea" />
+                </template>
+                <template #birthday="{ row }">
+                  <el-date-picker
+                      v-model="row.birthday"
+                      type="datetime"
+                      value-format="x"
+                      format="YYYY-MM-DD HH:mm:ss"
+                  />
+                </template>
+                <template #sex="{ row, column }">
+                  <el-select v-model="row.sex" class="w-full">
+                    <el-option v-for="option in column.params.options" :key="option.value" :value="option.value" :label="option.label" />
+                  </el-select>
+                </template>
+                <template #enabled="{ row, column }">
+                  <el-radio-group v-model="row.enabled">
+                    <el-radio v-for="option in column.params.options" :key="option.value" :label="option.value">
+                      {{ option.label }}
+                    </el-radio>
+                  </el-radio-group>
+                </template>
+                <template #avatar="{ row }">
+                  <ImageUpload v-model="row.avatar" />
+                </template>
+                <template #video="{ row }">
+                  <FileUpload v-model="row.video" />
+                </template>
+                <template #memo="{ row }">
+                  <el-input v-model="row.memo" type="textarea" />
+                </template>
+  </Grid>
+  <div class="flex justify-center -mt-4">
+    <el-button :icon="Plus" type="primary" plain @click="onAdd" v-access:code="['infra:student:create']">
+      {{ $t('ui.actionTitle.create', ['学生联系人']) }}
+    </el-button>
+  </div>
+</template>

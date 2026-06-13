@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.mes.controller.admin.pro.workorder.vo.bom.MesProW
 import cn.iocoder.yudao.module.mes.dal.dataobject.md.item.MesMdItemDO;
 import cn.iocoder.yudao.module.mes.dal.dataobject.md.item.MesMdProductBomDO;
 import cn.iocoder.yudao.module.mes.dal.dataobject.pro.workorder.MesProWorkOrderBomDO;
+import cn.iocoder.yudao.module.mes.dal.dataobject.pro.workorder.MesProWorkOrderDO;
 import cn.iocoder.yudao.module.mes.dal.mysql.pro.workorder.MesProWorkOrderBomMapper;
 import cn.iocoder.yudao.module.mes.service.md.item.MesMdItemService;
 import cn.iocoder.yudao.module.mes.service.md.item.MesMdProductBomService;
@@ -25,6 +26,7 @@ import java.util.Set;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.module.mes.enums.ErrorCodeConstants.MD_ITEM_NOT_EXISTS;
+import static cn.iocoder.yudao.module.mes.enums.ErrorCodeConstants.MD_PRODUCT_BOM_ITEM_INVALID;
 import static cn.iocoder.yudao.module.mes.enums.ErrorCodeConstants.PRO_WORK_ORDER_BOM_NOT_EXISTS;
 
 /**
@@ -49,8 +51,8 @@ public class MesProWorkOrderBomServiceImpl implements MesProWorkOrderBomService 
 
     @Override
     public Long createWorkOrderBom(MesProWorkOrderBomSaveReqVO createReqVO) {
-        // 校验工单存在
-        workOrderService.validateWorkOrderExists(createReqVO.getWorkOrderId());
+        // 校验数据
+        validateWorkOrderBomSaveData(createReqVO);
 
         // 插入数据
         MesProWorkOrderBomDO workOrderBom = BeanUtils.toBean(createReqVO, MesProWorkOrderBomDO.class);
@@ -62,6 +64,8 @@ public class MesProWorkOrderBomServiceImpl implements MesProWorkOrderBomService 
     public void updateWorkOrderBom(MesProWorkOrderBomSaveReqVO updateReqVO) {
         // 校验存在
         validateWorkOrderBomExists(updateReqVO.getId());
+        // 校验数据
+        validateWorkOrderBomSaveData(updateReqVO);
 
         // 更新数据
         MesProWorkOrderBomDO updateObj = BeanUtils.toBean(updateReqVO, MesProWorkOrderBomDO.class);
@@ -80,6 +84,19 @@ public class MesProWorkOrderBomServiceImpl implements MesProWorkOrderBomService 
     private void validateWorkOrderBomExists(Long id) {
         if (workOrderBomMapper.selectById(id) == null) {
             throw exception(PRO_WORK_ORDER_BOM_NOT_EXISTS);
+        }
+    }
+
+    private void validateWorkOrderBomSaveData(MesProWorkOrderBomSaveReqVO reqVO) {
+        // 校验工单存在
+        MesProWorkOrderDO workOrder = workOrderService.validateWorkOrderExists(reqVO.getWorkOrderId());
+        // DONE @AI：增加注释
+        // 校验物料存在
+        itemService.validateItemExists(reqVO.getItemId());
+        // 校验物料属于产品 BOM
+        if (!CollUtil.anyMatch(productBomService.getProductBomListByItemId(workOrder.getProductId()),
+                productBom -> productBom.getBomItemId().equals(reqVO.getItemId()))) {
+            throw exception(MD_PRODUCT_BOM_ITEM_INVALID);
         }
     }
 

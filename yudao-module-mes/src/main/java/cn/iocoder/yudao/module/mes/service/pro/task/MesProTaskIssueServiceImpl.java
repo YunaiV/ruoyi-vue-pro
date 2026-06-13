@@ -30,7 +30,6 @@ public class MesProTaskIssueServiceImpl implements MesProTaskIssueService {
 
     @Resource
     private MesProTaskService taskService;
-
     @Resource
     private MesMdItemService itemService;
 
@@ -82,6 +81,11 @@ public class MesProTaskIssueServiceImpl implements MesProTaskIssueService {
     @Override
     public List<MesProTaskIssueDO> getTaskIssueListByTaskId(Long taskId) {
         return taskIssueMapper.selectListByTaskId(taskId);
+    }
+
+    @Override
+    public Long getTaskIssueCountByUnitMeasureId(Long unitMeasureId) {
+        return taskIssueMapper.selectCountByUnitMeasureId(unitMeasureId);
     }
 
     private void validateTaskIssueExists(Long id) {

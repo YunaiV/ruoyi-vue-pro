@@ -222,7 +222,8 @@ public class MesWmProductProduceServiceImpl implements MesWmProductProduceServic
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void splitPendingAndFinishProduce(Long feedbackId, BigDecimal qualifiedQty, BigDecimal unqualifiedQty) {
+    public void splitPendingAndFinishProduce(Long feedbackId, Long sourceLineId,
+                                              BigDecimal qualifiedQty, BigDecimal unqualifiedQty) {
         // 1.1 查询产出单
         MesWmProductProduceDO produce = productProduceMapper.selectByFeedbackId(feedbackId);
         if (produce == null) {
@@ -233,13 +234,8 @@ public class MesWmProductProduceServiceImpl implements MesWmProductProduceServic
         MesWmWarehouseLocationDO virtualLocation = locationService.getWarehouseLocationByCode(MesWmWarehouseLocationDO.WIP_VIRTUAL_LOCATION);
         MesWmWarehouseAreaDO virtualArea = areaService.getWarehouseAreaByCode(MesWmWarehouseAreaDO.WIP_VIRTUAL_AREA);
 
-        // 2. 查找待检验行（checkFlag=true 时只有一行 PENDING）
-        List<MesWmProductProduceLineDO> lines = productProduceLineService.getProductProduceLineListByProduceId(produce.getId());
-        MesWmProductProduceLineDO pendingLine = CollUtil.findOne(lines,
-                l -> ObjUtil.equal(l.getQualityStatus(), MesWmQualityStatusEnum.PENDING.getStatus()));
-        if (pendingLine == null) {
-            throw exception(WM_PRODUCT_PRODUCE_LINE_NOT_EXISTS);
-        }
+        // 2. 通过 sourceLineId 直接定位待检验行
+        MesWmProductProduceLineDO pendingLine = productProduceLineService.validateProductProduceLineExists(sourceLineId);
 
         // 3A. 情况一：存在不合格品数量，需要拆分行
         if (unqualifiedQty != null && unqualifiedQty.compareTo(BigDecimal.ZERO) > 0) {

@@ -64,14 +64,8 @@ public class MesWmOutsourceReceiptServiceImpl implements MesWmOutsourceReceiptSe
 
     @Override
     public Long createOutsourceReceipt(MesWmOutsourceReceiptSaveReqVO createReqVO) {
-        // 校验编码唯一
-        validateCodeUnique(null, createReqVO.getCode());
-        // 校验供应商存在
-        vendorService.validateVendorExists(createReqVO.getVendorId());
-        // 校验外协工单存在
-        if (createReqVO.getWorkOrderId() != null) {
-            workOrderService.validateWorkOrderExists(createReqVO.getWorkOrderId());
-        }
+        // 校验数据
+        validateOutsourceReceiptSaveData(null, createReqVO);
 
         // 插入
         MesWmOutsourceReceiptDO receipt = BeanUtils.toBean(createReqVO, MesWmOutsourceReceiptDO.class);
@@ -84,14 +78,8 @@ public class MesWmOutsourceReceiptServiceImpl implements MesWmOutsourceReceiptSe
     public void updateOutsourceReceipt(MesWmOutsourceReceiptSaveReqVO updateReqVO) {
         // 校验存在 + 草稿状态
         validateOutsourceReceiptExistsAndDraft(updateReqVO.getId());
-        // 校验编码唯一
-        validateCodeUnique(updateReqVO.getId(), updateReqVO.getCode());
-        // 校验供应商存在
-        vendorService.validateVendorExists(updateReqVO.getVendorId());
-        // 校验外协工单存在
-        if (updateReqVO.getWorkOrderId() != null) {
-            workOrderService.validateWorkOrderExists(updateReqVO.getWorkOrderId());
-        }
+        // 校验数据
+        validateOutsourceReceiptSaveData(updateReqVO.getId(), updateReqVO);
 
         // 更新
         MesWmOutsourceReceiptDO updateObj = BeanUtils.toBean(updateReqVO, MesWmOutsourceReceiptDO.class);
@@ -172,7 +160,7 @@ public class MesWmOutsourceReceiptServiceImpl implements MesWmOutsourceReceiptSe
                         MesWmOutsourceReceiptDetailDO::getQuantity, BigDecimal::add, BigDecimal.ZERO);
                 // 对比行数量与明细总数量，不满足直接抛出
                 if (line.getQuantity().compareTo(totalDetailQuantity) > 0) {
-                    MesMdItemDO item = itemService.validateItemExists(line.getItemId());
+                    MesMdItemDO item = itemService.validateItemExistsAndEnable(line.getItemId());
                     throw exception(WM_OUTSOURCE_RECEIPT_DETAIL_QUANTITY_MISMATCH,
                             item.getCode() + " " + item.getName() + " 未完成上架");
                 }
@@ -317,6 +305,17 @@ public class MesWmOutsourceReceiptServiceImpl implements MesWmOutsourceReceiptSe
         return receipt;
     }
 
+    private void validateOutsourceReceiptSaveData(Long id, MesWmOutsourceReceiptSaveReqVO reqVO) {
+        // 校验编码唯一
+        validateCodeUnique(id, reqVO.getCode());
+        // 校验供应商存在
+        vendorService.validateVendorExistsAndEnable(reqVO.getVendorId());
+        // 校验外协工单存在
+        if (reqVO.getWorkOrderId() != null) {
+            workOrderService.validateWorkOrderConfirmed(reqVO.getWorkOrderId());
+        }
+    }
+
     private void validateCodeUnique(Long id, String code) {
         MesWmOutsourceReceiptDO receipt = outsourceReceiptMapper.selectByCode(code);
         if (receipt == null) {
@@ -325,6 +324,11 @@ public class MesWmOutsourceReceiptServiceImpl implements MesWmOutsourceReceiptSe
         if (ObjUtil.notEqual(id, receipt.getId())) {
             throw exception(WM_OUTSOURCE_RECEIPT_CODE_DUPLICATE);
         }
+    }
+
+    @Override
+    public Long getOutsourceReceiptCountByVendorId(Long vendorId) {
+        return outsourceReceiptMapper.selectCountByVendorId(vendorId);
     }
 
 }

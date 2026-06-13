@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import cn.iocoder.yudao.module.mes.enums.DictTypeConstants;
 
 /**
  * MES 到货通知单 DO
@@ -61,6 +62,7 @@ public class MesWmArrivalNoticeDO extends BaseDO {
     /**
      * 状态
      *
+     * 字典 {@link DictTypeConstants#MES_WM_ARRIVAL_NOTICE_STATUS}
      * 枚举 {@link MesWmArrivalNoticeStatusEnum}
      */
     private Integer status;

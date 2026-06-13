@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.mes.dal.dataobject.dv.checkplan.MesDvCheckPlanSub
 import cn.iocoder.yudao.module.mes.dal.dataobject.dv.checkrecord.MesDvCheckRecordDO;
 import cn.iocoder.yudao.module.mes.dal.dataobject.dv.checkrecord.MesDvCheckRecordLineDO;
 import cn.iocoder.yudao.module.mes.enums.dv.MesDvCheckRecordStatusEnum;
+import cn.iocoder.yudao.module.mes.enums.dv.MesDvCheckPlanTypeEnum;
 import cn.iocoder.yudao.module.mes.enums.dv.MesDvCheckResultEnum;
 import cn.iocoder.yudao.module.mes.dal.mysql.dv.checkrecord.MesDvCheckRecordMapper;
 import cn.iocoder.yudao.module.mes.service.dv.checkplan.MesDvCheckPlanService;
@@ -37,8 +38,10 @@ import static cn.iocoder.yudao.module.mes.enums.ErrorCodeConstants.*;
 @Validated
 public class MesDvCheckRecordServiceImpl implements MesDvCheckRecordService {
 
+
     @Resource
     private MesDvCheckRecordMapper checkRecordMapper;
+
     @Resource
     @Lazy
     private MesDvCheckRecordLineService checkRecordLineService;
@@ -48,6 +51,7 @@ public class MesDvCheckRecordServiceImpl implements MesDvCheckRecordService {
     private MesDvCheckPlanService checkPlanService;
     @Resource
     private MesDvCheckPlanSubjectService checkPlanSubjectService;
+
     @Resource
     private AdminUserApi adminUserApi;
 
@@ -95,6 +99,7 @@ public class MesDvCheckRecordServiceImpl implements MesDvCheckRecordService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void submitCheckRecord(Long id) {
         // 1.1 校验状态为草稿
         validateCheckRecordDraft(id);
@@ -105,9 +110,15 @@ public class MesDvCheckRecordServiceImpl implements MesDvCheckRecordService {
         }
 
         // 2. 状态改为已完成
+        MesDvCheckRecordDO record = checkRecordMapper.selectById(id);
         MesDvCheckRecordDO updateObj = new MesDvCheckRecordDO()
                 .setId(id).setStatus(MesDvCheckRecordStatusEnum.FINISHED.getStatus());
         checkRecordMapper.updateById(updateObj);
+
+        // 3. 回写设备台账的【最近点检时间】
+        if (record.getCheckTime() != null) {
+            machineryService.updateMachineryLastCheckTime(record.getMachineryId(), record.getCheckTime());
+        }
     }
 
     @Override
@@ -162,7 +173,7 @@ public class MesDvCheckRecordServiceImpl implements MesDvCheckRecordService {
         machineryService.validateMachineryExists(reqVO.getMachineryId());
         // 校验点检计划是否存在
         if (reqVO.getPlanId() != null) {
-            checkPlanService.validateCheckPlanExists(reqVO.getPlanId());
+            checkPlanService.validateCheckPlanExistsAndType(reqVO.getPlanId(), MesDvCheckPlanTypeEnum.CHECK.getType());
         }
         // 校验点检人是否存在
         if (reqVO.getUserId() != null) {

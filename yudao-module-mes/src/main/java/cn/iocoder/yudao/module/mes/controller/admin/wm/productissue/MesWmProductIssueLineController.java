@@ -38,10 +38,8 @@ public class MesWmProductIssueLineController {
 
     @Resource
     private MesWmProductIssueLineService issueLineService;
-
     @Resource
     private MesMdItemService itemService;
-
     @Resource
     private MesMdUnitMeasureService unitMeasureService;
 

@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
+import cn.iocoder.yudao.module.mes.enums.DictTypeConstants;
 
 /**
  * MES 条码清单 DO
@@ -35,12 +36,14 @@ public class MesWmBarcodeDO extends BaseDO {
     /**
      * 条码格式
      *
+     * 字典 {@link DictTypeConstants#MES_BARCODE_FORMAT}
      * 枚举 {@link cn.iocoder.yudao.module.mes.enums.wm.BarcodeFormatEnum}
      */
     private Integer format;
     /**
      * 业务类型
      *
+     * 字典 {@link DictTypeConstants#MES_BARCODE_BIZ_TYPE}
      * 枚举 {@link cn.iocoder.yudao.module.mes.enums.wm.BarcodeBizTypeEnum}
      */
     private Integer bizType;

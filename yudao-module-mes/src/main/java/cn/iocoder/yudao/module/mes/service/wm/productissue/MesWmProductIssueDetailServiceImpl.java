@@ -9,6 +9,8 @@ import cn.iocoder.yudao.module.mes.dal.dataobject.wm.productissue.MesWmProductIs
 import cn.iocoder.yudao.module.mes.dal.dataobject.wm.productissue.MesWmProductIssueLineDO;
 import cn.iocoder.yudao.module.mes.dal.mysql.wm.productissue.MesWmProductIssueDetailMapper;
 import cn.iocoder.yudao.module.mes.enums.wm.MesWmProductIssueStatusEnum;
+import cn.iocoder.yudao.module.mes.service.wm.materialstock.MesWmMaterialStockService;
+import cn.iocoder.yudao.module.mes.service.wm.warehouse.MesWmWarehouseAreaService;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -35,6 +37,10 @@ public class MesWmProductIssueDetailServiceImpl implements MesWmProductIssueDeta
     @Resource
     @Lazy
     private MesWmProductIssueLineService issueLineService;
+    @Resource
+    private MesWmWarehouseAreaService warehouseAreaService;
+    @Resource
+    private MesWmMaterialStockService materialStockService;
 
     @Override
     public Long createProductIssueDetail(MesWmProductIssueDetailSaveReqVO createReqVO) {
@@ -116,8 +122,23 @@ public class MesWmProductIssueDetailServiceImpl implements MesWmProductIssueDeta
     private void validateProductIssueDetailSaveData(MesWmProductIssueDetailSaveReqVO reqVO) {
         // 校验父数据存在
         MesWmProductIssueLineDO line = issueLineService.validateProductIssueLineExists(reqVO.getLineId());
+        if (ObjUtil.notEqual(line.getIssueId(), reqVO.getIssueId())) {
+            throw exception(WM_PRODUCT_ISSUE_DETAIL_LINE_NOT_MATCH);
+        }
+        // 校验主单状态为待拣货（只有 APPROVING 状态才允许新增/修改明细）
+        MesWmProductIssueDO issue = issueService.validateProductIssueExists(line.getIssueId());
+        if (ObjUtil.notEqual(MesWmProductIssueStatusEnum.APPROVING.getStatus(), issue.getStatus())) {
+            throw exception(WM_PRODUCT_ISSUE_STATUS_INVALID);
+        }
         // 校验物料匹配（明细 itemId 必须与行 itemId 一致）
         validateDetailItemMatch(reqVO.getItemId(), line.getItemId());
+        // 校验仓库、库区、库位的关联关系
+        warehouseAreaService.validateWarehouseAreaExists(
+                reqVO.getWarehouseId(), reqVO.getLocationId(), reqVO.getAreaId());
+        // 校验库存记录
+        materialStockService.validateSelectedStock(
+                reqVO.getMaterialStockId(), reqVO.getItemId(), reqVO.getBatchId(), reqVO.getBatchCode(),
+                reqVO.getWarehouseId(), reqVO.getLocationId(), reqVO.getAreaId(), reqVO.getQuantity());
     }
 
     /**
@@ -130,4 +151,3 @@ public class MesWmProductIssueDetailServiceImpl implements MesWmProductIssueDeta
     }
 
 }
-

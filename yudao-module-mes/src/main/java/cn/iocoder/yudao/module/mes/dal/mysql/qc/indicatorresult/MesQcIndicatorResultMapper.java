@@ -24,4 +24,10 @@ public interface MesQcIndicatorResultMapper extends BaseMapperX<MesQcIndicatorRe
                 .orderByDesc(MesQcIndicatorResultDO::getId));
     }
 
+    default Long selectCountByQcIdAndType(Long qcId, Integer qcType) {
+        return selectCount(new LambdaQueryWrapperX<MesQcIndicatorResultDO>()
+                .eq(MesQcIndicatorResultDO::getQcId, qcId)
+                .eq(MesQcIndicatorResultDO::getQcType, qcType));
+    }
+
 }

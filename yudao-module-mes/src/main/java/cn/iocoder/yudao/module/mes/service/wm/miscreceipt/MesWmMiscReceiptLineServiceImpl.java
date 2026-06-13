@@ -125,7 +125,7 @@ public class MesWmMiscReceiptLineServiceImpl implements MesWmMiscReceiptLineServ
         // 校验父单据存在且为可编辑状态
         miscReceiptService.validateMiscReceiptEditable(reqVO.getReceiptId());
         // 校验物料存在
-        itemService.validateItemExists(reqVO.getItemId());
+        itemService.validateItemExistsAndEnable(reqVO.getItemId());
         // 校验仓库层级关系（仓库 - 库位 - 库区）
         warehouseAreaService.validateWarehouseAreaExists(reqVO.getWarehouseId(),
                 reqVO.getLocationId(), reqVO.getAreaId());

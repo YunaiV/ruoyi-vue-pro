@@ -69,4 +69,12 @@ public interface MesQcOqcLineService {
      */
     void recalculateLineDefectStats(Long oqcId, List<MesQcDefectRecordDO> records);
 
+    /**
+     * 统计使用指定计量单位的出货检验行数量
+     *
+     * @param unitMeasureId 计量单位编号
+     * @return 引用数量
+     */
+    Long getOqcLineCountByUnitMeasureId(Long unitMeasureId);
+
 }

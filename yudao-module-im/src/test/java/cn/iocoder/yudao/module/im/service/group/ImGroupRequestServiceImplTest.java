@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.im.service.group;
 
+import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
@@ -93,7 +95,7 @@ public class ImGroupRequestServiceImplTest extends BaseMockitoUnitTest {
                 .status(CommonStatusEnum.ENABLE.getStatus()).build();
         when(groupService.validateGroupExists(10L)).thenReturn(group);
         // 群里有 owner + 一个 admin，作为 1503 推送目标
-        when(groupMemberService.getGroupMemberListByOwnerAndAdmin(10L)).thenReturn(List.of(
+        when(groupMemberService.getGroupMemberListByOwnerAndAdmin(10L)).thenReturn(ListUtil.of(
                 ImGroupMemberDO.builder().groupId(10L).userId(99L)
                         .role(ImGroupMemberRoleEnum.OWNER.getRole())
                         .status(CommonStatusEnum.ENABLE.getStatus()).build(),
@@ -125,7 +127,7 @@ public class ImGroupRequestServiceImplTest extends BaseMockitoUnitTest {
                 .joinApproval(true)
                 .status(CommonStatusEnum.ENABLE.getStatus()).build();
         when(groupService.validateGroupExists(10L)).thenReturn(group);
-        when(groupMemberService.getGroupMemberListByOwnerAndAdmin(10L)).thenReturn(List.of(
+        when(groupMemberService.getGroupMemberListByOwnerAndAdmin(10L)).thenReturn(ListUtil.of(
                 ImGroupMemberDO.builder().groupId(10L).userId(99L)
                         .role(ImGroupMemberRoleEnum.OWNER.getRole())
                         .status(CommonStatusEnum.ENABLE.getStatus()).build()));
@@ -190,7 +192,7 @@ public class ImGroupRequestServiceImplTest extends BaseMockitoUnitTest {
         ImGroupDO group = ImGroupDO.builder().id(10L).ownerUserId(99L)
                 .status(CommonStatusEnum.ENABLE.getStatus()).build();
         when(groupService.getGroup(10L)).thenReturn(group);
-        when(groupMemberService.getGroupMemberListByOwnerAndAdmin(10L)).thenReturn(List.of(
+        when(groupMemberService.getGroupMemberListByOwnerAndAdmin(10L)).thenReturn(ListUtil.of(
                 ImGroupMemberDO.builder().groupId(10L).userId(99L)
                         .role(ImGroupMemberRoleEnum.OWNER.getRole())
                         .status(CommonStatusEnum.ENABLE.getStatus()).build()));
@@ -268,7 +270,7 @@ public class ImGroupRequestServiceImplTest extends BaseMockitoUnitTest {
         ImGroupDO group = ImGroupDO.builder().id(10L).ownerUserId(1L)
                 .status(CommonStatusEnum.ENABLE.getStatus()).build();
         when(groupService.getGroup(10L)).thenReturn(group);
-        when(groupMemberService.getGroupMemberListByOwnerAndAdmin(10L)).thenReturn(List.of(
+        when(groupMemberService.getGroupMemberListByOwnerAndAdmin(10L)).thenReturn(ListUtil.of(
                 ImGroupMemberDO.builder().groupId(10L).userId(1L)
                         .role(ImGroupMemberRoleEnum.OWNER.getRole())
                         .status(CommonStatusEnum.ENABLE.getStatus()).build()));
@@ -289,16 +291,17 @@ public class ImGroupRequestServiceImplTest extends BaseMockitoUnitTest {
                 .status(CommonStatusEnum.ENABLE.getStatus()).build();
         when(groupService.validateGroupExists(10L)).thenReturn(group);
         when(groupRequestMapper.selectByGroupIdAndUserId(eq(10L), anyLong())).thenReturn(null);
-        when(groupMemberService.getGroupMemberListByOwnerAndAdmin(10L)).thenReturn(List.of(
+        when(groupMemberService.getGroupMemberListByOwnerAndAdmin(10L)).thenReturn(ListUtil.of(
                 ImGroupMemberDO.builder().groupId(10L).userId(99L)
                         .role(ImGroupMemberRoleEnum.OWNER.getRole())
                         .status(CommonStatusEnum.ENABLE.getStatus()).build()));
-        when(adminUserApi.getUserMap(anyCollection())).thenReturn(java.util.Map.of(
-                2L, buildUser(2L, "用户A"),
-                3L, buildUser(3L, "用户B")));
+        when(adminUserApi.getUserMap(anyCollection())).thenReturn(MapUtil.<Long, AdminUserRespDTO>builder()
+                .put(2L, buildUser(2L, "用户A"))
+                .put(3L, buildUser(3L, "用户B"))
+                .build());
 
         // 调用：邀请人 1L 邀请 2L、3L（都没有旧记录）
-        groupRequestService.createInviteRequestList(10L, 1L, List.of(2L, 3L));
+        groupRequestService.createInviteRequestList(10L, 1L, ListUtil.of(2L, 3L));
 
         // 断言：插入 2 条 + 推 1503 给 owner（每条 1 帧）共 2 帧
         ArgumentCaptor<ImGroupRequestDO> captor = ArgumentCaptor.forClass(ImGroupRequestDO.class);
@@ -323,14 +326,14 @@ public class ImGroupRequestServiceImplTest extends BaseMockitoUnitTest {
                 .setHandleResult(ImGroupRequestHandleResultEnum.REFUSED.getResult());
         when(groupRequestMapper.selectByGroupIdAndUserId(10L, 2L)).thenReturn(null, old);
         when(groupRequestMapper.insert(any(ImGroupRequestDO.class))).thenThrow(new DuplicateKeyException("dup"));
-        when(groupMemberService.getGroupMemberListByOwnerAndAdmin(10L)).thenReturn(List.of(
+        when(groupMemberService.getGroupMemberListByOwnerAndAdmin(10L)).thenReturn(ListUtil.of(
                 ImGroupMemberDO.builder().groupId(10L).userId(99L)
                         .role(ImGroupMemberRoleEnum.OWNER.getRole())
                         .status(CommonStatusEnum.ENABLE.getStatus()).build()));
-        when(adminUserApi.getUserMap(anyCollection())).thenReturn(java.util.Map.of(2L, buildUser(2L, "用户A")));
+        when(adminUserApi.getUserMap(anyCollection())).thenReturn(MapUtil.of(2L, buildUser(2L, "用户A")));
 
         // 调用
-        groupRequestService.createInviteRequestList(10L, 1L, List.of(2L));
+        groupRequestService.createInviteRequestList(10L, 1L, ListUtil.of(2L));
 
         // 断言：复用并重置旧邀请申请
         verify(groupRequestMapper).updateInviteByIdReset(eq(50L), eq(1L),

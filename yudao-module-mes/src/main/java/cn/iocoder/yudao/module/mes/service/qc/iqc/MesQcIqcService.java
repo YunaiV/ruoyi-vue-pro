@@ -87,4 +87,12 @@ public interface MesQcIqcService {
      */
     Map<Long, MesQcIqcDO> getIqcMap(Collection<Long> ids);
 
+    /**
+     * 根据供应商 ID 统计来料检验单数量
+     *
+     * @param vendorId 供应商 ID
+     * @return 数量
+     */
+    Long getIqcCountByVendorId(Long vendorId);
+
 }

@@ -34,7 +34,6 @@ public class MesMdWorkstationMachineController {
 
     @Resource
     private MesMdWorkstationMachineService workstationMachineService;
-
     @Resource
     private MesDvMachineryService machineryService;
 

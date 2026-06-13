@@ -46,10 +46,8 @@ public class MesDvCheckRecordController {
 
     @Resource
     private MesDvCheckRecordService checkRecordService;
-
     @Resource
     private MesDvCheckPlanService checkPlanService;
-
     @Resource
     private MesDvMachineryService machineryService;
 
@@ -143,7 +141,7 @@ public class MesDvCheckRecordController {
                             .setPlanCycleType(plan.getCycleType()).setPlanCycleCount(plan.getCycleCount()));
             MapUtils.findAndThen(machineryMap, vo.getMachineryId(), machinery -> vo
                     .setMachineryCode(machinery.getCode()).setMachineryName(machinery.getName())
-                    .setMachineryBrand(machinery.getBrand()).setMachinerySpec(machinery.getSpec()));
+                    .setMachineryBrand(machinery.getBrand()).setMachinerySpecification(machinery.getSpecification()));
             MapUtils.findAndThen(userMap, vo.getUserId(),
                     user -> vo.setNickname(user.getNickname()));
         });

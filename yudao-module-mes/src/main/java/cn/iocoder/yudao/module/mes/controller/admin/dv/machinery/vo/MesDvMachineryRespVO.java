@@ -33,7 +33,7 @@ public class MesDvMachineryRespVO {
 
     @Schema(description = "规格型号", example = "S7-300")
     @ExcelProperty("规格型号")
-    private String spec;
+    private String specification;
 
     @Schema(description = "设备类型编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
     private Long machineryTypeId;

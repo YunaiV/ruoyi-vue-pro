@@ -48,6 +48,7 @@ public class MesWmItemConsumeServiceImpl implements MesWmItemConsumeService {
 
     @Resource
     private MesWmItemConsumeMapper itemConsumeMapper;
+
     @Resource
     private MesWmItemConsumeLineService itemConsumeLineService;
     @Resource

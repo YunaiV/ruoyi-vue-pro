@@ -1,0 +1,130 @@
+<script lang="ts" setup>
+import type { Rule } from 'ant-design-vue/es/form';
+import type { CategoryApi } from '#/api/infra/demo';
+
+import { computed, ref } from 'vue';
+
+import { useVbenModal } from '@vben/common-ui';
+import { getDictOptions } from '@vben/hooks';
+import { Tinymce as RichTextarea } from '#/components/tinymce';
+import { ImageUpload, FileUpload } from "#/components/upload";
+import { message, Tabs, Form, Input, Textarea, Select, RadioGroup, Radio, CheckboxGroup, Checkbox, DatePicker, TreeSelect } from 'ant-design-vue';
+import { getCategoryList } from '#/api/infra/demo';
+import { handleTree } from '@vben/utils'
+
+import { $t } from '#/locales';
+import { getCategory, createCategory, updateCategory } from '#/api/infra/demo';
+
+const emit = defineEmits(['success']);
+
+const formRef = ref();
+const formData = ref<Partial<CategoryApi.Category>>({
+        id: undefined,
+        name: undefined,
+        parentId: undefined,
+});
+const rules: Record<string, Rule[]> = {
+        name: [{ required: true, message: '名字不能为空', trigger: 'blur' }],
+        parentId: [{ required: true, message: '父编号不能为空', trigger: 'blur' }],
+};
+const categoryTree = ref<any[]>([]) // 树形结构
+const getTitle = computed(() => {
+  return formData.value?.id
+    ? $t('ui.actionTitle.edit', ['分类'])
+    : $t('ui.actionTitle.create', ['分类']);
+});
+
+
+/** 重置表单 */
+function resetForm() {
+  formData.value = {
+            id: undefined,
+            name: undefined,
+            parentId: undefined,
+  };
+  formRef.value?.resetFields();
+}
+
+/** 获得分类树 */
+async function getCategoryTree() {
+  categoryTree.value = []
+  const data = await getCategoryList({});
+  data.unshift({
+    id: 0,
+    name: '顶级分类',
+  });
+    categoryTree.value = handleTree(data);
+}
+
+const [Modal, modalApi] = useVbenModal({
+  async onConfirm() {
+    await formRef.value?.validate();
+        modalApi.lock();
+    // 提交表单
+    const data = formData.value as CategoryApi.Category;
+        try {
+      await (formData.value?.id ? updateCategory(data) : createCategory(data));
+      // 关闭并提示
+      await modalApi.close();
+      emit('success');
+      message.success({
+        content: $t('ui.actionMessage.operationSuccess'),
+      });
+    } finally {
+      modalApi.unlock();
+    }
+  },
+  async onOpenChange(isOpen: boolean) {
+    if (!isOpen) {
+      resetForm()
+      return;
+    }
+    // 加载数据
+    let data = modalApi.getData<CategoryApi.Category>();
+    if (!data) {
+      return;
+    }
+    if (data.id) {
+      modalApi.lock();
+      try {
+        data = await getCategory(data.id);
+      } finally {
+        modalApi.unlock();
+      }
+    }
+    formData.value = data;
+    // 加载树数据
+    await getCategoryTree()
+  },
+});
+</script>
+
+<template>
+  <Modal :title="getTitle">
+    <Form
+      ref="formRef"
+      :model="formData"
+      :rules="rules"
+      :label-col="{ span: 5 }"
+      :wrapper-col="{ span: 18 }"
+    >
+            <Form.Item label="名字" name="name">
+              <Input v-model:value="formData.name" placeholder="请输入名字" />
+            </Form.Item>
+            <Form.Item label="父编号" name="parentId">
+              <TreeSelect
+                      v-model:value="formData.parentId"
+                      :treeData="categoryTree"
+                      :fieldNames="{
+            label: 'name',
+            value: 'id',
+            children: 'children',
+          }"
+                      checkable
+                      treeDefaultExpandAll
+                      placeholder="请选择父编号"
+              />
+            </Form.Item>
+    </Form>
+      </Modal>
+</template>

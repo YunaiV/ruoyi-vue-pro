@@ -457,6 +457,54 @@ public class BpmnModelUtils {
     }
 
     /**
+     * 根据节点，递归获取上游 source 为 UserTask 的入口连线
+     *
+     * 1. 如果当前节点的直接入口连线 source 就是 UserTask，则直接返回该连线
+     * 2. 如果当前节点的直接入口连线 source 不是 UserTask，则继续向上递归查找
+     * 3. 如果递归过程中遇到 StartEvent 或 SubProcess，则停止该分支继续向上查找
+     *
+     * @param source 起始节点
+     * @return 上游连接 UserTask 的入口连线列表
+     */
+    public static List<SequenceFlow> getElementIncomingUserTaskFlows(FlowElement source) {
+        List<SequenceFlow> result = new ArrayList<>();
+        collectElementIncomingUserTaskFlows(source, new HashSet<>(), new HashSet<>(), result);
+        return result;
+    }
+
+    private static void collectElementIncomingUserTaskFlows(FlowElement source, Set<String> visitedSequenceFlowIds,
+                                                            Set<String> resultSequenceFlowIds, List<SequenceFlow> result) {
+        // 如果是开始节点或子流程，则停止该分支向上查找
+        if (source == null || source instanceof StartEvent || source instanceof SubProcess) {
+            return;
+        }
+        // 获取入口连线
+        List<SequenceFlow> incomingFlows = getElementIncomingFlows(source);
+        if (CollUtil.isEmpty(incomingFlows)) {
+            return;
+        }
+
+        // 循环找到目标元素
+        for (SequenceFlow incomingFlow : incomingFlows) {
+            // 如果发现连线重复，说明连线已经走过。跳过
+            if (incomingFlow == null || !visitedSequenceFlowIds.add(incomingFlow.getId())) {
+                continue;
+            }
+            // 如果 source 是 UserTask，则添加到结果中
+            FlowElement sourceFlowElement = incomingFlow.getSourceFlowElement();
+            if (sourceFlowElement instanceof UserTask) {
+                if (resultSequenceFlowIds.add(incomingFlow.getId())) {
+                    result.add(incomingFlow);
+                }
+                continue;
+            }
+            // 递归向上查找 UserTask
+            collectElementIncomingUserTaskFlows(sourceFlowElement, visitedSequenceFlowIds,
+                    resultSequenceFlowIds, result);
+        }
+    }
+
+    /**
      * 根据节点，获取出口连线
      *
      * @param source 起始节点

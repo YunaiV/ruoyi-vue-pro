@@ -46,13 +46,10 @@ public class MesWmItemReceiptController {
 
     @Resource
     private MesWmItemReceiptService itemReceiptService;
-
     @Resource
     private MesMdVendorService vendorService;
-
     @Resource
     private MesQcIqcService iqcService;
-
     @Resource
     private MesWmArrivalNoticeService arrivalNoticeService;
 

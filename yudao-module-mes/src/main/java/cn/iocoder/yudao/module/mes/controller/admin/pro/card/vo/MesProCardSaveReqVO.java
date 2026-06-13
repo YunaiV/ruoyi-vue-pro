@@ -22,12 +22,12 @@ public class MesProCardSaveReqVO {
     @NotNull(message = "生产工单不能为空")
     private Long workOrderId;
 
-    @Schema(description = "批次号", example = "BATCH-001")
-    private String batchCode;
-
     @Schema(description = "产品物料编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "200")
     @NotNull(message = "产品物料不能为空")
     private Long itemId;
+
+    @Schema(description = "批次号", example = "BATCH-001")
+    private String batchCode;
 
     @Schema(description = "流转数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "100.00")
     @NotNull(message = "流转数量不能为空")

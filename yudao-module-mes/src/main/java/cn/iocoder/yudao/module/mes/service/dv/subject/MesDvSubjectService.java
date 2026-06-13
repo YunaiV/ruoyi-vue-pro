@@ -65,6 +65,13 @@ public interface MesDvSubjectService {
     void validateSubjectExists(Long id);
 
     /**
+     * 校验点检保养项目存在且启用
+     *
+     * @param id 编号
+     */
+    void validateSubjectExistsAndEnable(Long id);
+
+    /**
      * 获得点检保养项目列表
      *
      * @return 项目列表

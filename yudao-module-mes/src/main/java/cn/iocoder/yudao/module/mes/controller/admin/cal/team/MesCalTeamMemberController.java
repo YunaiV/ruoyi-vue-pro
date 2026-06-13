@@ -37,6 +37,7 @@ public class MesCalTeamMemberController {
 
     @Resource
     private MesCalTeamMemberService teamMemberService;
+
     @Resource
     private AdminUserApi adminUserApi;
 

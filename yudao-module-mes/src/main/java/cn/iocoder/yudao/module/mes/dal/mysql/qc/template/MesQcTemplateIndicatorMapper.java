@@ -27,6 +27,10 @@ public interface MesQcTemplateIndicatorMapper extends BaseMapperX<MesQcTemplateI
         return selectList(MesQcTemplateIndicatorDO::getTemplateId, templateId);
     }
 
+    default Long selectCountByUnitMeasureId(Long unitMeasureId) {
+        return selectCount(MesQcTemplateIndicatorDO::getUnitMeasureId, unitMeasureId);
+    }
+
     default void deleteByTemplateId(Long templateId) {
         delete(new LambdaQueryWrapperX<MesQcTemplateIndicatorDO>()
                 .eq(MesQcTemplateIndicatorDO::getTemplateId, templateId));

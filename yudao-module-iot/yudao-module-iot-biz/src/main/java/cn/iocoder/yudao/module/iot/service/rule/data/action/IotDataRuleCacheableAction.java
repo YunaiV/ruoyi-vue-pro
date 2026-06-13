@@ -12,9 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
 
-// TODO @芋艿：数据库
-// TODO @芋艿：mqtt
-
 /**
  * 可缓存的 {@link IotDataRuleAction} 抽象实现
  *
@@ -75,6 +72,18 @@ public abstract class IotDataRuleCacheableAction<Config, Producer> implements Io
      */
     protected Producer getProducer(Config config) throws Exception {
         return PRODUCER_CACHE.get(config);
+    }
+
+    /**
+     * 使指定配置的 Producer 缓存失效
+     *
+     * 当子类检测到 Producer 不可用时（如连接断开），可调用此方法踢出缓存，
+     * 下次 {@link #getProducer(Object)} 调用将触发 {@link #initProducer(Object)} 重新创建。
+     *
+     * @param config 配置信息
+     */
+    protected void invalidateProducer(Config config) {
+        PRODUCER_CACHE.invalidate(config);
     }
 
     /**

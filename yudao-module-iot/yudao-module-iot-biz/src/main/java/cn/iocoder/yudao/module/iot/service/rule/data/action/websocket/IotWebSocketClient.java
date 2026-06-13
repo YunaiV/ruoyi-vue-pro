@@ -33,6 +33,13 @@ public class IotWebSocketClient {
     private volatile WebSocket webSocket;
     private final AtomicBoolean connected = new AtomicBoolean(false);
 
+    /**
+     * WebSocket 正常关闭状态码
+     *
+     * @see <a href="https://tools.ietf.org/html/rfc6455#section-7.4.1">RFC 6455 - 定义的状态码</a>
+     */
+    private static final int NORMAL_CLOSURE_STATUS = 1000;
+
     public IotWebSocketClient(String serverUrl, Integer connectTimeoutMs, Integer sendTimeoutMs, String dataFormat) {
         this.serverUrl = serverUrl;
         this.connectTimeoutMs = connectTimeoutMs != null ? connectTimeoutMs : IotDataSinkWebSocketConfig.DEFAULT_CONNECT_TIMEOUT_MS;
@@ -123,9 +130,8 @@ public class IotWebSocketClient {
     public void close() {
         try {
             if (webSocket != null) {
-                // 发送正常关闭帧，状态码 1000 表示正常关闭
-                // TODO @puhui999：有没 1000 的枚举哈？在 okhttp 里
-                webSocket.close(1000, "客户端主动关闭");
+                // 发送正常关闭帧
+                webSocket.close(NORMAL_CLOSURE_STATUS, "客户端主动关闭");
                 webSocket = null;
             }
             if (okHttpClient != null) {

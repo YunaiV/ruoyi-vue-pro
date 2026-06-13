@@ -34,6 +34,7 @@ public class MesWmStockTakingPlanServiceImpl implements MesWmStockTakingPlanServ
 
     @Resource
     private MesWmStockTakingPlanMapper stockTakingPlanMapper;
+
     @Resource
     private MesWmStockTakingPlanParamService stockTakingPlanParamService;
 
@@ -119,11 +120,6 @@ public class MesWmStockTakingPlanServiceImpl implements MesWmStockTakingPlanServ
     @Override
     public PageResult<MesWmStockTakingPlanDO> getStockTakingPlanPage(MesWmStockTakingPlanPageReqVO pageReqVO) {
         return stockTakingPlanMapper.selectPage(pageReqVO);
-    }
-
-    @Override
-    public List<MesWmStockTakingPlanDO> getStockTakingPlanListByStatus(Integer status) {
-        return stockTakingPlanMapper.selectListByStatus(status);
     }
 
     private void validatePlanCodeUnique(Long id, String code) {

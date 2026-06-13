@@ -7,8 +7,6 @@ import cn.iocoder.yudao.module.mes.controller.admin.wm.arrivalnotice.vo.MesWmArr
 import cn.iocoder.yudao.module.mes.dal.dataobject.wm.arrivalnotice.MesWmArrivalNoticeDO;
 import org.apache.ibatis.annotations.Mapper;
 
-import java.util.List;
-
 /**
  * MES 到货通知单 Mapper
  */
@@ -28,10 +26,6 @@ public interface MesWmArrivalNoticeMapper extends BaseMapperX<MesWmArrivalNotice
 
     default MesWmArrivalNoticeDO selectByCode(String code) {
         return selectOne(MesWmArrivalNoticeDO::getCode, code);
-    }
-
-    default List<MesWmArrivalNoticeDO> selectListByStatus(Integer status) {
-        return selectList(MesWmArrivalNoticeDO::getStatus, status);
     }
 
     default Long selectCountByVendorId(Long vendorId) {

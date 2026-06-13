@@ -1,12 +1,24 @@
 package ${basePackage}.module.${table.moduleName}.service.${table.businessName};
 
 import cn.hutool.core.collection.CollUtil;
+#set ($hasSubJoinMany = false)
+#foreach ($subTable in $subTables)
+#if ( $subTable.subJoinMany )
+#set ($hasSubJoinMany = true)
+#end
+#end
+#if ( $subTables && $subTables.size() > 0 && $table.templateType != 11 && $hasSubJoinMany )
+import cn.hutool.core.util.ObjectUtil;
+#end
 import org.springframework.stereotype.Service;
 import ${jakartaPackage}.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+#if ($importEnable)
+import java.util.concurrent.atomic.AtomicInteger;
+#end
 import ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePackage}.${table.businessName}.vo.*;
 import ${basePackage}.module.${table.moduleName}.dal.dataobject.${table.businessName}.${table.className}DO;
 ## 特殊：主子表专属逻辑
@@ -91,6 +103,32 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
         // 返回
         return ${classNameVar}.getId();
     }
+#if ($importEnable)
+
+    @Override
+    @Transactional(rollbackFor = Exception.class) // 添加事务，异常则回滚所有导入
+    public ${sceneEnum.prefixClass}${table.className}ImportRespVO import${simpleClassName}List(List<${sceneEnum.prefixClass}${table.className}ImportExcelVO> importList) {
+        if (CollUtil.isEmpty(importList)) {
+            return ${sceneEnum.prefixClass}${table.className}ImportRespVO.builder()
+                    .successCount(0).failureCount(0).failureRows(new LinkedHashMap<>()).build();
+        }
+        // 遍历，逐个创建
+        ${sceneEnum.prefixClass}${table.className}ImportRespVO respVO = ${sceneEnum.prefixClass}${table.className}ImportRespVO.builder()
+                .successCount(0).failureCount(0).failureRows(new LinkedHashMap<>()).build();
+        AtomicInteger index = new AtomicInteger(1);
+        importList.forEach(importItem -> {
+            int currentIndex = index.getAndIncrement();
+            try {
+                create${simpleClassName}(BeanUtils.toBean(importItem, ${saveReqVOClass}.class));
+                respVO.setSuccessCount(respVO.getSuccessCount() + 1);
+            } catch (Exception ex) {
+                respVO.getFailureRows().put(currentIndex, ex.getMessage());
+            }
+        });
+        respVO.setFailureCount(respVO.getFailureRows().size());
+        return respVO;
+    }
+#end
 
     @Override
 ## 特殊：主子表专属逻辑（非 ERP 模式）
@@ -359,6 +397,9 @@ public class ${table.className}ServiceImpl implements ${table.className}Service 
 #else
     #if ( $subTable.subJoinMany)
     private void create${subSimpleClassName}List(${primaryColumn.javaType} ${subJoinColumn.javaField}, List<${subTable.className}DO> list) {
+        if (CollUtil.isEmpty(list)) {
+            return;
+        }
         list.forEach(o -> o.set${SubJoinColumnName}(${subJoinColumn.javaField}).clean());
         ${subClassNameVars.get($index)}Mapper.insertBatch(list);
     }

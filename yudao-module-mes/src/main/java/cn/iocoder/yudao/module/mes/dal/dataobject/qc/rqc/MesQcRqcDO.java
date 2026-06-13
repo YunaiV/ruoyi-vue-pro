@@ -11,6 +11,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import cn.iocoder.yudao.module.mes.enums.DictTypeConstants;
 
 /**
  * MES 退货检验单（RQC, Return Quality Control） DO
@@ -50,15 +51,15 @@ public class MesQcRqcDO extends BaseDO {
     // ========== 来源单据 ==========
 
     /**
-     * 来源单据 ID
-     */
-    private Long sourceDocId;
-    /**
      * 来源单据类型
      *
      * 关联 {@link cn.iocoder.yudao.module.mes.enums.MesBizTypeConstants}
      */
     private Integer sourceDocType;
+    /**
+     * 来源单据 ID
+     */
+    private Long sourceDocId;
     /**
      * 来源单据行 ID
      */
@@ -105,11 +106,39 @@ public class MesQcRqcDO extends BaseDO {
      */
     private BigDecimal unqualifiedQuantity;
 
+    // ========== 缺陷统计 ==========
+
+    /**
+     * 致命缺陷率（%）
+     */
+    private BigDecimal criticalRate;
+    /**
+     * 严重缺陷率（%）
+     */
+    private BigDecimal majorRate;
+    /**
+     * 轻微缺陷率（%）
+     */
+    private BigDecimal minorRate;
+    /**
+     * 致命缺陷数量
+     */
+    private Integer criticalQuantity;
+    /**
+     * 严重缺陷数量
+     */
+    private Integer majorQuantity;
+    /**
+     * 轻微缺陷数量
+     */
+    private Integer minorQuantity;
+
     // ========== 检验 ==========
 
     /**
      * 检测结果
      *
+     * 字典 {@link DictTypeConstants#MES_QC_CHECK_RESULT}
      * 枚举 {@link cn.iocoder.yudao.module.mes.enums.qc.MesQcCheckResultEnum}
      */
     private Integer checkResult;
@@ -126,6 +155,7 @@ public class MesQcRqcDO extends BaseDO {
     /**
      * 状态
      *
+     * 字典 {@link DictTypeConstants#MES_ORDER_STATUS}
      * 枚举 {@link MesQcStatusEnum}
      */
     private Integer status;
@@ -133,32 +163,5 @@ public class MesQcRqcDO extends BaseDO {
      * 备注
      */
     private String remark;
-
-    // ========== 缺陷统计 ==========
-
-    /**
-     * 致命缺陷数量
-     */
-    private Integer criticalQuantity;
-    /**
-     * 严重缺陷数量
-     */
-    private Integer majorQuantity;
-    /**
-     * 轻微缺陷数量
-     */
-    private Integer minorQuantity;
-    /**
-     * 致命缺陷率（%）
-     */
-    private BigDecimal criticalRate;
-    /**
-     * 严重缺陷率（%）
-     */
-    private BigDecimal majorRate;
-    /**
-     * 轻微缺陷率（%）
-     */
-    private BigDecimal minorRate;
 
 }

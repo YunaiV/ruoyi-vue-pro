@@ -5,40 +5,39 @@
 
  Target Server Type    : DM8
 
- Date: 2025-05-22 21:49:51
+ Date: 2026-05-03 09:41:52
 */
 
 
 -- ----------------------------
 -- Table structure for infra_api_access_log
 -- ----------------------------
-CREATE TABLE infra_api_access_log
-(
-    id               bigint                                 NOT NULL PRIMARY KEY IDENTITY,
-    trace_id         varchar(64)  DEFAULT ''                NULL,
-    user_id          bigint       DEFAULT 0                 NOT NULL,
-    user_type        smallint     DEFAULT 0                 NOT NULL,
-    application_name varchar(50)                            NOT NULL,
-    request_method   varchar(16)  DEFAULT ''                NULL,
-    request_url      varchar(255) DEFAULT ''                NULL,
-    request_params   text                                   NULL,
-    response_body    text                                   NULL,
-    user_ip          varchar(50)                            NOT NULL,
-    user_agent       varchar(512)                           NOT NULL,
-    operate_module   varchar(50)  DEFAULT NULL              NULL,
-    operate_name     varchar(50)  DEFAULT NULL              NULL,
-    operate_type     smallint     DEFAULT 0                 NULL,
-    begin_time       datetime                               NOT NULL,
-    end_time         datetime                               NOT NULL,
-    duration         int                                    NOT NULL,
-    result_code      int          DEFAULT 0                 NOT NULL,
-    result_msg       varchar(512) DEFAULT ''                NULL,
-    creator          varchar(64)  DEFAULT ''                NULL,
-    create_time      datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater          varchar(64)  DEFAULT ''                NULL,
-    update_time      datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted          bit          DEFAULT '0'               NOT NULL,
-    tenant_id        bigint       DEFAULT 0                 NOT NULL
+CREATE TABLE infra_api_access_log (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    trace_id varchar(64) DEFAULT '' NULL,
+    user_id bigint DEFAULT 0 NOT NULL,
+    user_type smallint DEFAULT 0 NOT NULL,
+    application_name varchar(50)  NOT NULL,
+    request_method varchar(16) DEFAULT '' NULL,
+    request_url varchar(255) DEFAULT '' NULL,
+    request_params text  NULL,
+    response_body text  NULL,
+    user_ip varchar(50)  NOT NULL,
+    user_agent varchar(512)  NOT NULL,
+    operate_module varchar(50) DEFAULT NULL NULL,
+    operate_name varchar(50) DEFAULT NULL NULL,
+    operate_type smallint DEFAULT 0 NULL,
+    begin_time datetime  NOT NULL,
+    end_time datetime  NOT NULL,
+    duration int  NOT NULL,
+    result_code int DEFAULT 0 NOT NULL,
+    result_msg varchar(512) DEFAULT '' NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT '0' NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 );
 
 CREATE INDEX idx_infra_api_access_log_01 ON infra_api_access_log (create_time);
@@ -73,37 +72,38 @@ COMMENT ON TABLE infra_api_access_log IS 'API 访问日志表';
 -- ----------------------------
 -- Table structure for infra_api_error_log
 -- ----------------------------
-CREATE TABLE infra_api_error_log
-(
-    id                           bigint                                 NOT NULL PRIMARY KEY IDENTITY,
-    trace_id                     varchar(64)                            NOT NULL,
-    user_id                      bigint       DEFAULT 0                 NOT NULL,
-    user_type                    smallint     DEFAULT 0                 NOT NULL,
-    application_name             varchar(50)                            NOT NULL,
-    request_method               varchar(16)                            NOT NULL,
-    request_url                  varchar(255)                           NOT NULL,
-    request_params               varchar(8000)                          NOT NULL,
-    user_ip                      varchar(50)                            NOT NULL,
-    user_agent                   varchar(512)                           NOT NULL,
-    exception_time               datetime                               NOT NULL,
-    exception_name               varchar(128) DEFAULT ''                NULL,
-    exception_message            text                                   NOT NULL,
-    exception_root_cause_message text                                   NOT NULL,
-    exception_stack_trace        text                                   NOT NULL,
-    exception_class_name         varchar(512)                           NOT NULL,
-    exception_file_name          varchar(512)                           NOT NULL,
-    exception_method_name        varchar(512)                           NOT NULL,
-    exception_line_number        int                                    NOT NULL,
-    process_status               smallint                               NOT NULL,
-    process_time                 datetime     DEFAULT NULL              NULL,
-    process_user_id              int          DEFAULT 0                 NULL,
-    creator                      varchar(64)  DEFAULT ''                NULL,
-    create_time                  datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater                      varchar(64)  DEFAULT ''                NULL,
-    update_time                  datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted                      bit          DEFAULT '0'               NOT NULL,
-    tenant_id                    bigint       DEFAULT 0                 NOT NULL
+CREATE TABLE infra_api_error_log (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    trace_id varchar(64)  NOT NULL,
+    user_id bigint DEFAULT 0 NOT NULL,
+    user_type smallint DEFAULT 0 NOT NULL,
+    application_name varchar(50)  NOT NULL,
+    request_method varchar(16)  NOT NULL,
+    request_url varchar(255)  NOT NULL,
+    request_params varchar(8000)  NOT NULL,
+    user_ip varchar(50)  NOT NULL,
+    user_agent varchar(512)  NOT NULL,
+    exception_time datetime  NOT NULL,
+    exception_name varchar(128) DEFAULT '' NULL,
+    exception_message text  NOT NULL,
+    exception_root_cause_message text  NOT NULL,
+    exception_stack_trace text  NOT NULL,
+    exception_class_name varchar(512)  NOT NULL,
+    exception_file_name varchar(512)  NOT NULL,
+    exception_method_name varchar(512)  NOT NULL,
+    exception_line_number int  NOT NULL,
+    process_status smallint  NOT NULL,
+    process_time datetime DEFAULT NULL NULL,
+    process_user_id int DEFAULT 0 NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT '0' NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 );
+
+CREATE INDEX idx_infra_api_error_log_01 ON infra_api_error_log (create_time);
 
 COMMENT ON COLUMN infra_api_error_log.id IS '编号';
 COMMENT ON COLUMN infra_api_error_log.trace_id IS '链路追踪编号';
@@ -138,32 +138,33 @@ COMMENT ON TABLE infra_api_error_log IS '系统异常日志';
 -- ----------------------------
 -- Table structure for infra_codegen_column
 -- ----------------------------
-CREATE TABLE infra_codegen_column
-(
-    id                       bigint                                 NOT NULL PRIMARY KEY IDENTITY,
-    table_id                 bigint                                 NOT NULL,
-    column_name              varchar(200)                           NOT NULL,
-    data_type                varchar(100)                           NOT NULL,
-    column_comment           varchar(500)                           NOT NULL,
-    nullable                 bit                                    NOT NULL,
-    primary_key              bit                                    NOT NULL,
-    ordinal_position         int                                    NOT NULL,
-    java_type                varchar(32)                            NOT NULL,
-    java_field               varchar(64)                            NOT NULL,
-    dict_type                varchar(200) DEFAULT ''                NULL,
-    example                  varchar(64)  DEFAULT NULL              NULL,
-    create_operation         bit                                    NOT NULL,
-    update_operation         bit                                    NOT NULL,
-    list_operation           bit                                    NOT NULL,
-    list_operation_condition varchar(32)  DEFAULT '='               NOT NULL,
-    list_operation_result    bit                                    NOT NULL,
-    html_type                varchar(32)                            NOT NULL,
-    creator                  varchar(64)  DEFAULT ''                NULL,
-    create_time              datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater                  varchar(64)  DEFAULT ''                NULL,
-    update_time              datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted                  bit          DEFAULT '0'               NOT NULL
+CREATE TABLE infra_codegen_column (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    table_id bigint  NOT NULL,
+    column_name varchar(200)  NOT NULL,
+    data_type varchar(100)  NOT NULL,
+    column_comment varchar(500)  NOT NULL,
+    nullable bit  NOT NULL,
+    primary_key bit  NOT NULL,
+    ordinal_position int  NOT NULL,
+    java_type varchar(32)  NOT NULL,
+    java_field varchar(64)  NOT NULL,
+    dict_type varchar(200) DEFAULT '' NULL,
+    example varchar(64) DEFAULT NULL NULL,
+    create_operation bit  NOT NULL,
+    update_operation bit  NOT NULL,
+    list_operation bit  NOT NULL,
+    list_operation_condition varchar(32) DEFAULT '=' NOT NULL,
+    list_operation_result bit  NOT NULL,
+    html_type varchar(32)  NOT NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT '0' NOT NULL
 );
+
+CREATE INDEX idx_infra_codegen_column_01 ON infra_codegen_column (table_id);
 
 COMMENT ON COLUMN infra_codegen_column.id IS '编号';
 COMMENT ON COLUMN infra_codegen_column.table_id IS '表编号';
@@ -193,32 +194,31 @@ COMMENT ON TABLE infra_codegen_column IS '代码生成表字段定义';
 -- ----------------------------
 -- Table structure for infra_codegen_table
 -- ----------------------------
-CREATE TABLE infra_codegen_table
-(
-    id                    bigint                                 NOT NULL PRIMARY KEY IDENTITY,
-    data_source_config_id bigint                                 NOT NULL,
-    scene                 smallint     DEFAULT 1                 NOT NULL,
-    table_name            varchar(200) DEFAULT ''                NULL,
-    table_comment         varchar(500) DEFAULT ''                NULL,
-    remark                varchar(500) DEFAULT NULL              NULL,
-    module_name           varchar(30)                            NOT NULL,
-    business_name         varchar(30)                            NOT NULL,
-    class_name            varchar(100) DEFAULT ''                NULL,
-    class_comment         varchar(50)                            NOT NULL,
-    author                varchar(50)                            NOT NULL,
-    template_type         smallint     DEFAULT 1                 NOT NULL,
-    front_type            smallint                               NOT NULL,
-    parent_menu_id        bigint       DEFAULT NULL              NULL,
-    master_table_id       bigint       DEFAULT NULL              NULL,
-    sub_join_column_id    bigint       DEFAULT NULL              NULL,
-    sub_join_many         bit          DEFAULT NULL              NULL,
-    tree_parent_column_id bigint       DEFAULT NULL              NULL,
-    tree_name_column_id   bigint       DEFAULT NULL              NULL,
-    creator               varchar(64)  DEFAULT ''                NULL,
-    create_time           datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater               varchar(64)  DEFAULT ''                NULL,
-    update_time           datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted               bit          DEFAULT '0'               NOT NULL
+CREATE TABLE infra_codegen_table (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    data_source_config_id bigint  NOT NULL,
+    scene smallint DEFAULT 1 NOT NULL,
+    table_name varchar(200) DEFAULT '' NULL,
+    table_comment varchar(500) DEFAULT '' NULL,
+    remark varchar(500) DEFAULT NULL NULL,
+    module_name varchar(30)  NOT NULL,
+    business_name varchar(30)  NOT NULL,
+    class_name varchar(100) DEFAULT '' NULL,
+    class_comment varchar(50)  NOT NULL,
+    author varchar(50)  NOT NULL,
+    template_type smallint DEFAULT 1 NOT NULL,
+    front_type smallint  NOT NULL,
+    parent_menu_id bigint DEFAULT NULL NULL,
+    master_table_id bigint DEFAULT NULL NULL,
+    sub_join_column_id bigint DEFAULT NULL NULL,
+    sub_join_many bit DEFAULT NULL NULL,
+    tree_parent_column_id bigint DEFAULT NULL NULL,
+    tree_name_column_id bigint DEFAULT NULL NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT '0' NOT NULL
 );
 
 COMMENT ON COLUMN infra_codegen_table.id IS '编号';
@@ -250,22 +250,23 @@ COMMENT ON TABLE infra_codegen_table IS '代码生成表定义';
 -- ----------------------------
 -- Table structure for infra_config
 -- ----------------------------
-CREATE TABLE infra_config
-(
-    id          bigint                                 NOT NULL PRIMARY KEY IDENTITY,
-    category    varchar(50)                            NOT NULL,
-    type        smallint                               NOT NULL,
-    name        varchar(100) DEFAULT ''                NULL,
-    config_key  varchar(100) DEFAULT ''                NULL,
-    value       varchar(500) DEFAULT ''                NULL,
-    visible     bit                                    NOT NULL,
-    remark      varchar(500) DEFAULT NULL              NULL,
-    creator     varchar(64)  DEFAULT ''                NULL,
-    create_time datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater     varchar(64)  DEFAULT ''                NULL,
-    update_time datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted     bit          DEFAULT '0'               NOT NULL
+CREATE TABLE infra_config (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    category varchar(50)  NOT NULL,
+    type smallint  NOT NULL,
+    name varchar(100) DEFAULT '' NULL,
+    config_key varchar(100) DEFAULT '' NULL,
+    value varchar(500) DEFAULT '' NULL,
+    visible bit  NOT NULL,
+    remark varchar(500) DEFAULT NULL NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT '0' NOT NULL
 );
+
+CREATE INDEX idx_infra_config_01 ON infra_config (config_key);
 
 COMMENT ON COLUMN infra_config.id IS '参数主键';
 COMMENT ON COLUMN infra_config.category IS '参数分组';
@@ -292,7 +293,6 @@ INSERT INTO infra_config (id, category, type, name, config_key, value, visible, 
 INSERT INTO infra_config (id, category, type, name, config_key, value, visible, remark, creator, create_time, updater, update_time, deleted) VALUES (8, 'url', 2, 'SkyWalking 监控的地址', 'url.skywalking', '', '1', '', '1', '2023-04-07 13:41:16', '1', '2023-04-07 14:57:03', '0');
 INSERT INTO infra_config (id, category, type, name, config_key, value, visible, remark, creator, create_time, updater, update_time, deleted) VALUES (9, 'url', 2, 'Spring Boot Admin 监控的地址', 'url.spring-boot-admin', '', '1', '', '1', '2023-04-07 13:41:16', '1', '2023-04-07 14:52:07', '0');
 INSERT INTO infra_config (id, category, type, name, config_key, value, visible, remark, creator, create_time, updater, update_time, deleted) VALUES (10, 'url', 2, 'Swagger 接口文档的地址', 'url.swagger', '', '1', '', '1', '2023-04-07 13:41:16', '1', '2023-04-07 14:59:00', '0');
-INSERT INTO infra_config (id, category, type, name, config_key, value, visible, remark, creator, create_time, updater, update_time, deleted) VALUES (11, 'ui', 2, '腾讯地图 key', 'tencent.lbs.key', 'TVDBZ-TDILD-4ON4B-PFDZA-RNLKH-VVF6E', '1', '腾讯地图 key', '1', '2023-06-03 19:16:27', '1', '2023-06-03 19:16:27', '0');
 INSERT INTO infra_config (id, category, type, name, config_key, value, visible, remark, creator, create_time, updater, update_time, deleted) VALUES (12, 'test2', 2, 'test3', 'test4', 'test5', '1', 'test6', '1', '2023-12-03 09:55:16', '1', '2025-04-06 21:00:09', '0');
 INSERT INTO infra_config (id, category, type, name, config_key, value, visible, remark, creator, create_time, updater, update_time, deleted) VALUES (13, '用户管理-账号初始密码', 2, '用户管理-注册开关', 'system.user.register-enabled', 'true', '0', '', '1', '2025-04-26 17:23:41', '1', '2025-04-26 17:23:41', '0');
 COMMIT;
@@ -302,18 +302,17 @@ SET IDENTITY_INSERT infra_config OFF;
 -- ----------------------------
 -- Table structure for infra_data_source_config
 -- ----------------------------
-CREATE TABLE infra_data_source_config
-(
-    id          bigint                                 NOT NULL PRIMARY KEY IDENTITY,
-    name        varchar(100) DEFAULT ''                NULL,
-    url         varchar(1024)                          NOT NULL,
-    username    varchar(255)                           NOT NULL,
-    password    varchar(255) DEFAULT ''                NULL,
-    creator     varchar(64)  DEFAULT ''                NULL,
-    create_time datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater     varchar(64)  DEFAULT ''                NULL,
-    update_time datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted     bit          DEFAULT '0'               NOT NULL
+CREATE TABLE infra_data_source_config (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    name varchar(100) DEFAULT '' NULL,
+    url varchar(1024)  NOT NULL,
+    username varchar(255)  NOT NULL,
+    password varchar(255) DEFAULT '' NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT '0' NOT NULL
 );
 
 COMMENT ON COLUMN infra_data_source_config.id IS '主键编号';
@@ -331,20 +330,19 @@ COMMENT ON TABLE infra_data_source_config IS '数据源配置表';
 -- ----------------------------
 -- Table structure for infra_file
 -- ----------------------------
-CREATE TABLE infra_file
-(
-    id          bigint                                 NOT NULL PRIMARY KEY IDENTITY,
-    config_id   bigint       DEFAULT NULL              NULL,
-    name        varchar(256) DEFAULT NULL              NULL,
-    path        varchar(512)                           NOT NULL,
-    url         varchar(1024)                          NOT NULL,
-    type        varchar(128) DEFAULT NULL              NULL,
-    size        int                                    NOT NULL,
-    creator     varchar(64)  DEFAULT ''                NULL,
-    create_time datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater     varchar(64)  DEFAULT ''                NULL,
-    update_time datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted     bit          DEFAULT '0'               NOT NULL
+CREATE TABLE infra_file (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    config_id bigint DEFAULT NULL NULL,
+    name varchar(256) DEFAULT NULL NULL,
+    path varchar(512)  NOT NULL,
+    url varchar(1024)  NOT NULL,
+    type varchar(128) DEFAULT NULL NULL,
+    size int  NOT NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT '0' NOT NULL
 );
 
 COMMENT ON COLUMN infra_file.id IS '文件编号';
@@ -364,19 +362,18 @@ COMMENT ON TABLE infra_file IS '文件表';
 -- ----------------------------
 -- Table structure for infra_file_config
 -- ----------------------------
-CREATE TABLE infra_file_config
-(
-    id          bigint                                 NOT NULL PRIMARY KEY IDENTITY,
-    name        varchar(63)                            NOT NULL,
-    storage     smallint                               NOT NULL,
-    remark      varchar(255) DEFAULT NULL              NULL,
-    master      bit                                    NOT NULL,
-    config      varchar(4096)                          NOT NULL,
-    creator     varchar(64)  DEFAULT ''                NULL,
-    create_time datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater     varchar(64)  DEFAULT ''                NULL,
-    update_time datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted     bit          DEFAULT '0'               NOT NULL
+CREATE TABLE infra_file_config (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    name varchar(63)  NOT NULL,
+    storage smallint  NOT NULL,
+    remark varchar(255) DEFAULT NULL NULL,
+    master bit  NOT NULL,
+    config varchar(4096)  NOT NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT '0' NOT NULL
 );
 
 COMMENT ON COLUMN infra_file_config.id IS '编号';
@@ -397,15 +394,17 @@ COMMENT ON TABLE infra_file_config IS '文件配置表';
 -- ----------------------------
 -- @formatter:off
 SET IDENTITY_INSERT infra_file_config ON;
-INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (4, '数据库（示例）', 1, '我是数据库', '0', '{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.db.DBFileClientConfig","domain":"http://127.0.0.1:48080"}', '1', '2022-03-15 23:56:24', '1', '2025-05-02 18:30:28', '0');
-INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (22, '七牛存储器（示例）', 20, '请换成你自己的密钥！！！', '1', '{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig","endpoint":"s3.cn-south-1.qiniucs.com","domain":"http://test.yudao.iocoder.cn","bucket":"ruoyi-vue-pro","accessKey":"3TvrJ70gl2Gt6IBe7_IZT1F6i_k0iMuRtyEv4EyS","accessSecret":"wd0tbVBYlp0S-ihA8Qg2hPLncoP83wyrIq24OZuY","enablePathStyleAccess":false}', '1', '2024-01-13 22:11:12', '1', '2025-05-02 18:30:28', '0');
-INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (24, '腾讯云存储（示例）', 20, '请换成你的密钥！！！', '0', '{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig","endpoint":"https://cos.ap-shanghai.myqcloud.com","domain":"http://tengxun-oss.iocoder.cn","bucket":"aoteman-1255880240","accessKey":"AKIDAF6WSh1uiIjwqtrOsGSN3WryqTM6cTMt","accessSecret":"X"}', '1', '2024-11-09 16:03:22', '1', '2025-05-02 18:30:28', '0');
-INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (25, '阿里云存储（示例）', 20, '', '0', '{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig","endpoint":"oss-cn-beijing.aliyuncs.com","domain":"http://ali-oss.iocoder.cn","bucket":"yunai-aoteman","accessKey":"LTAI5tEQLgnDyjh3WpNcdMKA","accessSecret":"X","enablePathStyleAccess":false}', '1', '2024-11-09 16:47:08', '1', '2025-05-02 18:30:28', '0');
-INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (26, '火山云存储（示例）', 20, '', '0', '{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig","endpoint":"tos-s3-cn-beijing.volces.com","domain":null,"bucket":"yunai","accessKey":"AKLTZjc3Zjc4MzZmMjU3NDk0ZTgxYmIyMmFkNTIwMDI1ZGE","accessSecret":"X==","enablePathStyleAccess":false}', '1', '2024-11-09 16:56:42', '1', '2025-05-02 18:30:28', '0');
-INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (27, '华为云存储（示例）', 20, '', '0', '{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig","endpoint":"obs.cn-east-3.myhuaweicloud.com","domain":"","bucket":"yudao","accessKey":"PVDONDEIOTW88LF8DC4U","accessSecret":"X","enablePathStyleAccess":false}', '1', '2024-11-09 17:18:41', '1', '2025-05-02 18:30:28', '0');
-INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (28, 'MinIO 存储（示例）', 20, '', '0', '{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig","endpoint":"http://127.0.0.1:9000","domain":"http://127.0.0.1:9000/yudao","bucket":"yudao","accessKey":"admin","accessSecret":"password","enablePathStyleAccess":false}', '1', '2024-11-09 17:43:10', '1', '2025-05-02 18:30:28', '0');
-INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (29, '本地存储（示例）', 10, '仅适合 mac 或 windows', '0', '{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.local.LocalFileClientConfig","basePath":"/Users/yunai/tmp/file","domain":"http://127.0.0.1:48080"}', '1', '2025-05-02 11:25:45', '1', '2025-05-02 18:30:28', '0');
-INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (30, 'SFTP 存储（示例）', 12, '', '0', '{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.sftp.SftpFileClientConfig","basePath":"/upload","domain":"http://127.0.0.1:48080","host":"127.0.0.1","port":2222,"username":"foo","password":"pass"}', '1', '2025-05-02 16:34:10', '1', '2025-05-02 18:30:28', '0');
+INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (4, '数据库（示例）', 1, '我是数据库', '0', '{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.db.DBFileClientConfig","domain":"http://127.0.0.1:48080"}', '1', '2022-03-15 23:56:24', '1', '2025-11-24 20:57:14', '0');
+INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (22, '七牛存储器（示例）', 20, '请换成你自己的密钥！！！', '1', '{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig","endpoint":"s3.cn-south-1.qiniucs.com","domain":"http://test.yudao.iocoder.cn","bucket":"ruoyi-vue-pro","accessKey":"3TvrJ70gl2Gt6IBe7_IZT1F6i_k0iMuRtyEv4EyS","accessSecret":"wd0tbVBYlp0S-ihA8Qg2hPLncoP83wyrIq24OZuY","enablePathStyleAccess":false,"enablePublicAccess":true}', '1', '2024-01-13 22:11:12', '1', '2025-11-24 20:57:14', '0');
+INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (24, '腾讯云存储（示例）', 20, '请换成你的密钥！！！', '0', '{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig","endpoint":"https://cos.ap-shanghai.myqcloud.com","domain":"http://tengxun-oss.iocoder.cn","bucket":"aoteman-1255880240","accessKey":"AKIDAF6WSh1uiIjwqtrOsGSN3WryqTM6cTMt","accessSecret":"X","enablePathStyleAccess":false,"enablePublicAccess":true}', '1', '2024-11-09 16:03:22', '1', '2025-11-24 20:57:14', '0');
+INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (25, '阿里云存储（示例）', 20, '', '0', '{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig","endpoint":"oss-cn-beijing.aliyuncs.com","domain":"http://ali-oss.iocoder.cn","bucket":"yunai-aoteman","accessKey":"LTAI5tEQLgnDyjh3WpNcdMKA","accessSecret":"X","enablePathStyleAccess":false,"enablePublicAccess":true}', '1', '2024-11-09 16:47:08', '1', '2025-11-24 20:57:14', '0');
+INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (26, '火山云存储（示例）', 20, '', '0', '{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig","endpoint":"tos-s3-cn-beijing.volces.com","domain":null,"bucket":"yunai","accessKey":"AKLTZjc3Zjc4MzZmMjU3NDk0ZTgxYmIyMmFkNTIwMDI1ZGE","accessSecret":"X==","enablePathStyleAccess":false,"enablePublicAccess":true}', '1', '2024-11-09 16:56:42', '1', '2025-11-24 20:57:14', '0');
+INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (27, '华为云存储（示例）', 20, '', '0', '{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig","endpoint":"obs.cn-east-3.myhuaweicloud.com","domain":"","bucket":"yudao","accessKey":"PVDONDEIOTW88LF8DC4U","accessSecret":"X","enablePathStyleAccess":false,"enablePublicAccess":true}', '1', '2024-11-09 17:18:41', '1', '2025-11-24 20:57:14', '0');
+INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (28, 'MinIO 存储（示例）', 20, '', '0', '{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig","endpoint":"http://127.0.0.1:9000","domain":"http://127.0.0.1:9000/yudao","bucket":"yudao","accessKey":"admin","accessSecret":"password","enablePathStyleAccess":false,"enablePublicAccess":true}', '1', '2024-11-09 17:43:10', '1', '2025-11-24 20:57:14', '0');
+INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (29, '本地存储（示例）', 10, 'mac/linux 使用 /，windows 使用 \\', '0', '{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.local.LocalFileClientConfig","basePath":"/Users/yunai/tmp/file","domain":"http://127.0.0.1:48080"}', '1', '2025-05-02 11:25:45', '1', '2025-11-24 20:57:14', '0');
+INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (30, 'SFTP 存储（示例）', 12, '', '0', '{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.sftp.SftpFileClientConfig","basePath":"/upload","domain":"http://127.0.0.1:48080","host":"127.0.0.1","port":2222,"username":"foo","password":"pass"}', '1', '2025-05-02 16:34:10', '1', '2025-11-24 20:57:14', '0');
+INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (34, '七牛云存储【私有】（示例）', 20, '请换成你自己的密钥！！！', '0', '{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig","endpoint":"s3.cn-south-1.qiniucs.com","domain":"http://t151glocd.hn-bkt.clouddn.com","bucket":"ruoyi-vue-pro-private","accessKey":"3TvrJ70gl2Gt6IBe7_IZT1F6i_k0iMuRtyEv4EyS","accessSecret":"wd0tbVBYlp0S-ihA8Qg2hPLncoP83wyrIq24OZuY","enablePathStyleAccess":false,"enablePublicAccess":false}', '1', '2025-08-17 21:22:00', '1', '2025-11-24 20:57:14', '0');
+INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (35, '1', 20, '1', '0', '{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig","endpoint":"http://www.baidu.com","domain":"http://www.xxx.com","bucket":"1","accessKey":"2","accessSecret":"3","enablePathStyleAccess":false,"enablePublicAccess":false,"region":"1"}', '1', '2025-10-02 14:32:12', '1', '2025-11-29 15:59:39', '0');
 COMMIT;
 SET IDENTITY_INSERT infra_file_config OFF;
 -- @formatter:on
@@ -413,18 +412,19 @@ SET IDENTITY_INSERT infra_file_config OFF;
 -- ----------------------------
 -- Table structure for infra_file_content
 -- ----------------------------
-CREATE TABLE infra_file_content
-(
-    id          bigint                                NOT NULL PRIMARY KEY IDENTITY,
-    config_id   bigint                                NOT NULL,
-    path        varchar(512)                          NOT NULL,
-    content     blob                                  NOT NULL,
-    creator     varchar(64) DEFAULT ''                NULL,
-    create_time datetime    DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater     varchar(64) DEFAULT ''                NULL,
-    update_time datetime    DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted     bit         DEFAULT '0'               NOT NULL
+CREATE TABLE infra_file_content (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    config_id bigint  NOT NULL,
+    path varchar(512)  NOT NULL,
+    content blob  NOT NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT '0' NOT NULL
 );
+
+CREATE INDEX idx_infra_file_content_01 ON infra_file_content (config_id, path);
 
 COMMENT ON COLUMN infra_file_content.id IS '编号';
 COMMENT ON COLUMN infra_file_content.config_id IS '配置编号';
@@ -440,22 +440,21 @@ COMMENT ON TABLE infra_file_content IS '文件表';
 -- ----------------------------
 -- Table structure for infra_job
 -- ----------------------------
-CREATE TABLE infra_job
-(
-    id              bigint                                 NOT NULL PRIMARY KEY IDENTITY,
-    name            varchar(32)                            NOT NULL,
-    status          smallint                               NOT NULL,
-    handler_name    varchar(64)                            NOT NULL,
-    handler_param   varchar(255) DEFAULT NULL              NULL,
-    cron_expression varchar(32)                            NOT NULL,
-    retry_count     int          DEFAULT 0                 NOT NULL,
-    retry_interval  int          DEFAULT 0                 NOT NULL,
-    monitor_timeout int          DEFAULT 0                 NOT NULL,
-    creator         varchar(64)  DEFAULT ''                NULL,
-    create_time     datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater         varchar(64)  DEFAULT ''                NULL,
-    update_time     datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted         bit          DEFAULT '0'               NOT NULL
+CREATE TABLE infra_job (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    name varchar(32)  NOT NULL,
+    status smallint  NOT NULL,
+    handler_name varchar(64)  NOT NULL,
+    handler_param varchar(255) DEFAULT NULL NULL,
+    cron_expression varchar(32)  NOT NULL,
+    retry_count int DEFAULT 0 NOT NULL,
+    retry_interval int DEFAULT 0 NOT NULL,
+    monitor_timeout int DEFAULT 0 NOT NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT '0' NOT NULL
 );
 
 COMMENT ON COLUMN infra_job.id IS '任务编号';
@@ -483,15 +482,20 @@ INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expre
 INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expression, retry_count, retry_interval, monitor_timeout, creator, create_time, updater, update_time, deleted) VALUES (17, '支付订单同步 Job', 2, 'payOrderSyncJob', NULL, '0 0/1 * * * ?', 0, 0, 0, '1', '2023-07-22 14:36:26', '1', '2023-07-22 15:39:08', '0');
 INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expression, retry_count, retry_interval, monitor_timeout, creator, create_time, updater, update_time, deleted) VALUES (18, '支付订单过期 Job', 2, 'payOrderExpireJob', NULL, '0 0/1 * * * ?', 0, 0, 0, '1', '2023-07-22 15:36:23', '1', '2023-07-22 15:39:54', '0');
 INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expression, retry_count, retry_interval, monitor_timeout, creator, create_time, updater, update_time, deleted) VALUES (19, '退款订单的同步 Job', 2, 'payRefundSyncJob', NULL, '0 0/1 * * * ?', 0, 0, 0, '1', '2023-07-23 21:03:44', '1', '2023-07-23 21:09:00', '0');
-INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expression, retry_count, retry_interval, monitor_timeout, creator, create_time, updater, update_time, deleted) VALUES (21, '交易订单的自动过期 Job', 2, 'tradeOrderAutoCancelJob', '', '0 * * * * ?', 3, 0, 0, '1', '2023-09-25 23:43:26', '1', '2023-09-26 19:23:30', '0');
-INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expression, retry_count, retry_interval, monitor_timeout, creator, create_time, updater, update_time, deleted) VALUES (22, '交易订单的自动收货 Job', 2, 'tradeOrderAutoReceiveJob', '', '0 * * * * ?', 3, 0, 0, '1', '2023-09-26 19:23:53', '1', '2023-09-26 23:38:08', '0');
-INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expression, retry_count, retry_interval, monitor_timeout, creator, create_time, updater, update_time, deleted) VALUES (23, '交易订单的自动评论 Job', 2, 'tradeOrderAutoCommentJob', '', '0 * * * * ?', 3, 0, 0, '1', '2023-09-26 23:38:29', '1', '2023-09-27 11:03:10', '0');
-INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expression, retry_count, retry_interval, monitor_timeout, creator, create_time, updater, update_time, deleted) VALUES (24, '佣金解冻 Job', 2, 'brokerageRecordUnfreezeJob', '', '0 * * * * ?', 3, 0, 0, '1', '2023-09-28 22:01:46', '1', '2023-09-28 22:01:56', '0');
+INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expression, retry_count, retry_interval, monitor_timeout, creator, create_time, updater, update_time, deleted) VALUES (21, 'Mall 交易订单的自动过期 Job', 2, 'tradeOrderAutoCancelJob', '', '0 * * * * ?', 3, 0, 0, '1', '2023-09-25 23:43:26', '1', '2025-10-02 11:08:34', '0');
+INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expression, retry_count, retry_interval, monitor_timeout, creator, create_time, updater, update_time, deleted) VALUES (22, 'Mall 交易订单的自动收货 Job', 2, 'tradeOrderAutoReceiveJob', '', '0 * * * * ?', 3, 0, 0, '1', '2023-09-26 19:23:53', '1', '2025-10-02 11:08:36', '0');
+INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expression, retry_count, retry_interval, monitor_timeout, creator, create_time, updater, update_time, deleted) VALUES (23, 'Mall 交易订单的自动评论 Job', 2, 'tradeOrderAutoCommentJob', '', '0 * * * * ?', 3, 0, 0, '1', '2023-09-26 23:38:29', '1', '2025-10-02 11:08:38', '0');
+INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expression, retry_count, retry_interval, monitor_timeout, creator, create_time, updater, update_time, deleted) VALUES (24, 'Mall 佣金解冻 Job', 2, 'brokerageRecordUnfreezeJob', '', '0 * * * * ?', 3, 0, 0, '1', '2023-09-28 22:01:46', '1', '2025-10-02 11:08:04', '0');
 INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expression, retry_count, retry_interval, monitor_timeout, creator, create_time, updater, update_time, deleted) VALUES (25, '访问日志清理 Job', 2, 'accessLogCleanJob', '', '0 0 0 * * ?', 3, 0, 0, '1', '2023-10-03 10:59:41', '1', '2023-10-03 11:01:10', '0');
 INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expression, retry_count, retry_interval, monitor_timeout, creator, create_time, updater, update_time, deleted) VALUES (26, '错误日志清理 Job', 2, 'errorLogCleanJob', '', '0 0 0 * * ?', 3, 0, 0, '1', '2023-10-03 11:00:43', '1', '2023-10-03 11:01:12', '0');
 INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expression, retry_count, retry_interval, monitor_timeout, creator, create_time, updater, update_time, deleted) VALUES (27, '任务日志清理 Job', 2, 'jobLogCleanJob', '', '0 0 0 * * ?', 3, 0, 0, '1', '2023-10-03 11:01:33', '1', '2024-09-12 13:40:34', '0');
 INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expression, retry_count, retry_interval, monitor_timeout, creator, create_time, updater, update_time, deleted) VALUES (33, 'demoJob', 2, 'demoJob', '', '0 * * * * ?', 1, 1, 0, '1', '2024-10-27 19:38:46', '1', '2025-05-10 18:13:54', '0');
 INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expression, retry_count, retry_interval, monitor_timeout, creator, create_time, updater, update_time, deleted) VALUES (35, '转账订单的同步 Job', 2, 'payTransferSyncJob', '', '0 * * * * ?', 0, 0, 0, '1', '2025-05-10 17:35:54', '1', '2025-05-10 18:13:52', '0');
+INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expression, retry_count, retry_interval, monitor_timeout, creator, create_time, updater, update_time, deleted) VALUES (36, 'IoT 设备离线检查 Job', 2, 'iotDeviceOfflineCheckJob', '', '0 * * * * ?', 0, 0, 0, '1', '2025-07-03 23:48:44', '"1"', '2025-07-03 23:48:47', '0');
+INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expression, retry_count, retry_interval, monitor_timeout, creator, create_time, updater, update_time, deleted) VALUES (37, 'IoT OTA 升级推送 Job', 2, 'iotOtaUpgradeJob', '', '0 * * * * ?', 0, 0, 0, '1', '2025-07-03 23:49:07', '"1"', '2025-07-03 23:49:13', '0');
+INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expression, retry_count, retry_interval, monitor_timeout, creator, create_time, updater, update_time, deleted) VALUES (38, 'Mall 拼团过期 Job', 2, 'combinationRecordExpireJob', '', '0 * * * * ?', 0, 0, 0, '1', '2025-10-02 11:07:11', '1', '2025-10-02 11:07:14', '0');
+INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expression, retry_count, retry_interval, monitor_timeout, creator, create_time, updater, update_time, deleted) VALUES (39, 'Mall 优惠券过期 Job', 2, 'couponExpireJob', '', '0 * * * * ?', 0, 0, 0, '1', '2025-10-02 11:07:34', '1', '2025-10-02 11:07:37', '0');
+INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expression, retry_count, retry_interval, monitor_timeout, creator, create_time, updater, update_time, deleted) VALUES (40, 'Mall 商品统计 Job', 2, 'productStatisticsJob', '', '0 0 0 * * ?', 0, 0, 0, '1', '2025-11-22 18:51:25', '1', '2025-11-22 18:56:21', '0');
 COMMIT;
 SET IDENTITY_INSERT infra_job OFF;
 -- @formatter:on
@@ -499,24 +503,26 @@ SET IDENTITY_INSERT infra_job OFF;
 -- ----------------------------
 -- Table structure for infra_job_log
 -- ----------------------------
-CREATE TABLE infra_job_log
-(
-    id            bigint                                  NOT NULL PRIMARY KEY IDENTITY,
-    job_id        bigint                                  NOT NULL,
-    handler_name  varchar(64)                             NOT NULL,
-    handler_param varchar(255)  DEFAULT NULL              NULL,
-    execute_index smallint      DEFAULT 1                 NOT NULL,
-    begin_time    datetime                                NOT NULL,
-    end_time      datetime      DEFAULT NULL              NULL,
-    duration      int           DEFAULT NULL              NULL,
-    status        smallint                                NOT NULL,
-    result        varchar(4000) DEFAULT ''                NULL,
-    creator       varchar(64)   DEFAULT ''                NULL,
-    create_time   datetime      DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater       varchar(64)   DEFAULT ''                NULL,
-    update_time   datetime      DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted       bit           DEFAULT '0'               NOT NULL
+CREATE TABLE infra_job_log (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    job_id bigint  NOT NULL,
+    handler_name varchar(64)  NOT NULL,
+    handler_param varchar(255) DEFAULT NULL NULL,
+    execute_index smallint DEFAULT 1 NOT NULL,
+    begin_time datetime  NOT NULL,
+    end_time datetime DEFAULT NULL NULL,
+    duration int DEFAULT NULL NULL,
+    status smallint  NOT NULL,
+    result varchar(4000) DEFAULT '' NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT '0' NOT NULL
 );
+
+CREATE INDEX idx_infra_job_log_01 ON infra_job_log (job_id);
+CREATE INDEX idx_infra_job_log_02 ON infra_job_log (create_time);
 
 COMMENT ON COLUMN infra_job_log.id IS '日志编号';
 COMMENT ON COLUMN infra_job_log.job_id IS '任务编号';
@@ -538,22 +544,21 @@ COMMENT ON TABLE infra_job_log IS '定时任务日志表';
 -- ----------------------------
 -- Table structure for system_dept
 -- ----------------------------
-CREATE TABLE system_dept
-(
-    id             bigint                                NOT NULL PRIMARY KEY IDENTITY,
-    name           varchar(30) DEFAULT ''                NULL,
-    parent_id      bigint      DEFAULT 0                 NOT NULL,
-    sort           int         DEFAULT 0                 NOT NULL,
-    leader_user_id bigint      DEFAULT NULL              NULL,
-    phone          varchar(11) DEFAULT NULL              NULL,
-    email          varchar(50) DEFAULT NULL              NULL,
-    status         smallint                              NOT NULL,
-    creator        varchar(64) DEFAULT ''                NULL,
-    create_time    datetime    DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater        varchar(64) DEFAULT ''                NULL,
-    update_time    datetime    DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted        bit         DEFAULT '0'               NOT NULL,
-    tenant_id      bigint      DEFAULT 0                 NOT NULL
+CREATE TABLE system_dept (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    name varchar(30) DEFAULT '' NULL,
+    parent_id bigint DEFAULT 0 NOT NULL,
+    sort int DEFAULT 0 NOT NULL,
+    leader_user_id bigint DEFAULT NULL NULL,
+    phone varchar(11) DEFAULT NULL NULL,
+    email varchar(50) DEFAULT NULL NULL,
+    status smallint  NOT NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT '0' NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 );
 
 COMMENT ON COLUMN system_dept.id IS '部门id';
@@ -577,10 +582,10 @@ COMMENT ON TABLE system_dept IS '部门表';
 -- ----------------------------
 -- @formatter:off
 SET IDENTITY_INSERT system_dept ON;
-INSERT INTO system_dept (id, name, parent_id, sort, leader_user_id, phone, email, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (100, '芋道源码', 0, 0, 1, '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '1', '2025-03-29 15:47:53', '0', 1);
+INSERT INTO system_dept (id, name, parent_id, sort, leader_user_id, phone, email, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (100, '芋道源码', 0, 0, 1, '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '1', '2026-01-04 18:01:12', '0', 1);
 INSERT INTO system_dept (id, name, parent_id, sort, leader_user_id, phone, email, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (101, '深圳总公司', 100, 1, 104, '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '1', '2025-03-29 15:49:55', '0', 1);
 INSERT INTO system_dept (id, name, parent_id, sort, leader_user_id, phone, email, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (102, '长沙分公司', 100, 2, NULL, '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-12-15 05:01:40', '0', 1);
-INSERT INTO system_dept (id, name, parent_id, sort, leader_user_id, phone, email, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (103, '研发部门', 101, 1, 1, '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '1', '2024-10-02 10:22:03', '0', 1);
+INSERT INTO system_dept (id, name, parent_id, sort, leader_user_id, phone, email, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (103, '研发部门', 101, 1, 104, '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '1', '2026-01-04 18:01:24', '0', 1);
 INSERT INTO system_dept (id, name, parent_id, sort, leader_user_id, phone, email, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (104, '市场部门', 101, 2, NULL, '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-12-15 05:01:38', '0', 1);
 INSERT INTO system_dept (id, name, parent_id, sort, leader_user_id, phone, email, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (105, '测试部门', 101, 3, NULL, '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '1', '2022-05-16 20:25:15', '0', 1);
 INSERT INTO system_dept (id, name, parent_id, sort, leader_user_id, phone, email, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (106, '财务部门', 101, 4, 103, '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '103', '2022-01-15 21:32:22', '0', 1);
@@ -591,6 +596,8 @@ INSERT INTO system_dept (id, name, parent_id, sort, leader_user_id, phone, email
 INSERT INTO system_dept (id, name, parent_id, sort, leader_user_id, phone, email, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (111, '顶级部门', 0, 1, NULL, NULL, NULL, 0, '113', '2022-03-07 21:44:50', '113', '2022-03-07 21:44:50', '0', 122);
 INSERT INTO system_dept (id, name, parent_id, sort, leader_user_id, phone, email, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (112, '产品部门', 101, 100, 1, NULL, NULL, 1, '1', '2023-12-02 09:45:13', '1', '2023-12-02 09:45:31', '0', 1);
 INSERT INTO system_dept (id, name, parent_id, sort, leader_user_id, phone, email, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (113, '支持部门', 102, 3, 104, NULL, NULL, 1, '1', '2023-12-02 09:47:38', '1', '2025-03-29 15:00:56', '0', 1);
+INSERT INTO system_dept (id, name, parent_id, sort, leader_user_id, phone, email, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (116, '某个子部门', 0, 1, NULL, NULL, NULL, 0, '1', '2025-12-08 14:51:12', '1', '2025-12-08 14:51:12', '0', 1);
+INSERT INTO system_dept (id, name, parent_id, sort, leader_user_id, phone, email, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (117, '某个子部门 2', 0, 2, NULL, NULL, NULL, 0, '1', '2025-12-08 14:51:25', '1', '2025-12-08 14:51:25', '0', 1);
 COMMIT;
 SET IDENTITY_INSERT system_dept OFF;
 -- @formatter:on
@@ -598,22 +605,21 @@ SET IDENTITY_INSERT system_dept OFF;
 -- ----------------------------
 -- Table structure for system_dict_data
 -- ----------------------------
-CREATE TABLE system_dict_data
-(
-    id          bigint                                 NOT NULL PRIMARY KEY IDENTITY,
-    sort        int          DEFAULT 0                 NOT NULL,
-    label       varchar(100) DEFAULT ''                NULL,
-    value       varchar(100) DEFAULT ''                NULL,
-    dict_type   varchar(100) DEFAULT ''                NULL,
-    status      smallint     DEFAULT 0                 NOT NULL,
-    color_type  varchar(100) DEFAULT ''                NULL,
-    css_class   varchar(100) DEFAULT ''                NULL,
-    remark      varchar(500) DEFAULT NULL              NULL,
-    creator     varchar(64)  DEFAULT ''                NULL,
-    create_time datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater     varchar(64)  DEFAULT ''                NULL,
-    update_time datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted     bit          DEFAULT '0'               NOT NULL
+CREATE TABLE system_dict_data (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    sort int DEFAULT 0 NOT NULL,
+    label varchar(100) DEFAULT '' NULL,
+    value varchar(100) DEFAULT '' NULL,
+    dict_type varchar(100) DEFAULT '' NULL,
+    status smallint DEFAULT 0 NOT NULL,
+    color_type varchar(100) DEFAULT '' NULL,
+    css_class varchar(100) DEFAULT '' NULL,
+    remark varchar(500) DEFAULT NULL NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT '0' NOT NULL
 );
 
 COMMENT ON COLUMN system_dict_data.id IS '字典编码';
@@ -637,7 +643,7 @@ COMMENT ON TABLE system_dict_data IS '字典数据表';
 -- ----------------------------
 -- @formatter:off
 SET IDENTITY_INSERT system_dict_data ON;
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1, 1, '男', '1', 'system_user_sex', 0, 'default', 'A', '性别男', 'admin', '2021-01-05 17:03:48', '1', '2022-03-29 00:14:39', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1, 1, '男', '1', 'system_user_sex', 0, 'primary', 'A', '性别男', 'admin', '2021-01-05 17:03:48', '1', '2025-12-10 13:19:26', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2, 2, '女', '2', 'system_user_sex', 0, 'success', '', '性别女', 'admin', '2021-01-05 17:03:48', '1', '2023-11-15 23:30:37', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (8, 1, '正常', '1', 'infra_job_status', 0, 'success', '', '正常状态', 'admin', '2021-01-05 17:03:48', '1', '2022-02-16 19:33:38', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (9, 2, '暂停', '2', 'infra_job_status', 0, 'danger', '', '停用状态', 'admin', '2021-01-05 17:03:48', '1', '2022-02-16 19:33:45', '0');
@@ -822,7 +828,7 @@ INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_t
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1230, 13, '支付宝条码支付', 'alipay_bar', 'pay_channel_code', 0, 'primary', '', '支付宝条码支付', '1', '2023-02-18 23:32:24', '1', '2023-07-19 20:09:23', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1231, 10, 'Vue2 Element UI 标准模版', '10', 'infra_codegen_front_type', 0, '', '', '', '1', '2023-04-13 00:03:55', '1', '2023-04-13 00:03:55', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1232, 20, 'Vue3 Element Plus 标准模版', '20', 'infra_codegen_front_type', 0, '', '', '', '1', '2023-04-13 00:04:08', '1', '2023-04-13 00:04:08', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1234, 30, 'Vben2.0 Ant Design Schema 模版', '30', 'infra_codegen_front_type', 0, '', '', '', '1', '2023-04-13 00:04:26', '1', '2025-04-23 21:27:34', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1234, 30, 'Vben2.0 Ant Design Schema 模版', '30', 'infra_codegen_front_type', 1, '', '', '', '1', '2023-04-13 00:04:26', '1', '2025-07-27 10:55:14', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1244, 0, '按件', '1', 'trade_delivery_express_charge_mode', 0, '', '', '', '1', '2023-05-21 22:46:40', '1', '2023-05-21 22:46:40', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1245, 1, '按重量', '2', 'trade_delivery_express_charge_mode', 0, '', '', '', '1', '2023-05-21 22:46:58', '1', '2023-05-21 22:46:58', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1246, 2, '按体积', '3', 'trade_delivery_express_charge_mode', 0, '', '', '', '1', '2023-05-21 22:47:18', '1', '2023-05-21 22:47:18', '0');
@@ -1029,7 +1035,6 @@ INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_t
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1566, 6, '诙谐', '6', 'ai_write_tone', 0, '', '', '', '1', '2024-07-07 15:52:15', '1', '2024-07-07 15:52:15', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1567, 7, '有趣', '7', 'ai_write_tone', 0, '', '', '', '1', '2024-07-07 15:52:24', '1', '2024-07-07 15:52:24', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1568, 8, '正式', '8', 'ai_write_tone', 0, '', '', '', '1', '2024-07-07 15:54:33', '1', '2024-07-07 15:54:33', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1569, 5, '段落', '5', 'ai_write_format', 0, '', '', '', '1', '2024-07-07 15:49:54', '1', '2024-07-07 15:49:54', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1570, 1, '自动', '1', 'ai_write_format', 0, '', '', '', '1', '2024-07-07 15:19:34', '1', '2024-07-07 15:19:34', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1571, 2, '电子邮件', '2', 'ai_write_format', 0, '', '', '', '1', '2024-07-07 15:19:50', '1', '2024-07-07 15:49:30', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1572, 3, '消息', '3', 'ai_write_format', 0, '', '', '', '1', '2024-07-07 15:20:01', '1', '2024-07-07 15:49:38', '0');
@@ -1042,7 +1047,6 @@ INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_t
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1579, 1, '自动', '1', 'ai_write_length', 0, '', '', '', '1', '2024-07-07 15:48:34', '1', '2024-07-07 15:48:34', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1580, 2, '短', '2', 'ai_write_length', 0, '', '', '', '1', '2024-07-07 15:48:44', '1', '2024-07-07 15:48:44', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1581, 3, '中等', '3', 'ai_write_length', 0, '', '', '', '1', '2024-07-07 15:48:52', '1', '2024-07-07 15:48:52', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1582, 4, '长', '4', 'ai_write_length', 0, '', '', '', '1', '2024-07-07 15:49:03', '1', '2024-07-07 15:49:03', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1584, 1, '撰写', '1', 'ai_write_type', 0, '', '', '', '1', '2024-07-10 21:26:00', '1', '2024-07-10 21:26:00', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1585, 2, '回复', '2', 'ai_write_type', 0, '', '', '', '1', '2024-07-10 21:26:06', '1', '2024-07-10 21:26:06', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1586, 2, '腾讯云', 'TENCENT', 'system_sms_channel_code', 0, '', '', '', '1', '2024-07-22 22:23:16', '1', '2024-07-22 22:23:16', '0');
@@ -1063,37 +1067,22 @@ INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_t
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1690, 5, '向量', '5', 'ai_model_type', 0, '', '', '', '1', '2025-03-03 12:28:15', '1', '2025-03-03 12:28:15', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1691, 6, '重排', '6', 'ai_model_type', 0, '', '', '', '1', '2025-03-03 12:28:26', '1', '2025-03-03 12:28:26', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1692, 14, 'MiniMax', 'MiniMax', 'ai_platform', 0, '', '', '', '1', '2025-03-11 20:04:51', '1', '2025-03-11 20:04:51', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1693, 15, '月之暗面', 'Moonshot', 'ai_platform', 0, '', '', '', '1', '2025-03-11 20:05:08', '1', '2025-03-11 20:05:08', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2000, 0, '标准数据格式（JSON）', '0', 'iot_data_format', 0, 'default', '', '', '1', '2024-08-10 11:53:26', '1', '2025-03-17 09:28:16', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2001, 1, '透传/自定义', '1', 'iot_data_format', 0, 'default', '', '', '1', '2024-08-10 11:53:37', '1', '2025-03-17 09:28:19', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1693, 15, '月之暗面', 'Moonshot', 'ai_platform', 0, '', '', '', '1', '2025-03-11 20:05:08', '1', '2025-11-24 07:17:39', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2002, 0, '直连设备', '0', 'iot_product_device_type', 0, 'default', '', '', '1', '2024-08-10 11:54:58', '1', '2025-03-17 09:28:22', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2003, 2, '网关设备', '2', 'iot_product_device_type', 0, 'default', '', '', '1', '2024-08-10 11:55:08', '1', '2025-03-17 09:28:28', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2004, 1, '网关子设备', '1', 'iot_product_device_type', 0, 'default', '', '', '1', '2024-08-10 11:55:20', '1', '2025-03-17 09:28:31', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2005, 1, '已发布', '1', 'iot_product_status', 0, 'success', '', '', '1', '2024-08-10 12:10:33', '1', '2025-03-17 09:28:34', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2006, 0, '开发中', '0', 'iot_product_status', 0, 'default', '', '', '1', '2024-08-10 14:19:18', '1', '2025-03-17 09:28:39', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2007, 0, '弱校验', '0', 'iot_validate_type', 0, '', '', '', '1', '2024-09-06 20:05:48', '1', '2025-03-17 09:28:41', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2008, 1, '免校验', '1', 'iot_validate_type', 0, '', '', '', '1', '2024-09-06 20:06:03', '1', '2025-03-17 09:28:44', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2009, 0, 'Wi-Fi', '0', 'iot_net_type', 0, '', '', '', '1', '2024-09-06 22:04:47', '1', '2025-03-17 09:28:47', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2010, 1, '蜂窝（2G / 3G / 4G / 5G）', '1', 'iot_net_type', 0, '', '', '', '1', '2024-09-06 22:05:14', '1', '2025-03-17 09:28:49', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2010, 1, '移动网络', '1', 'iot_net_type', 0, '', '', '', '1', '2024-09-06 22:05:14', '1', '2025-06-12 23:27:19', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2011, 2, '以太网', '2', 'iot_net_type', 0, '', '', '', '1', '2024-09-06 22:05:35', '1', '2025-03-17 09:28:51', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2012, 3, '其他', '3', 'iot_net_type', 0, '', '', '', '1', '2024-09-06 22:05:52', '1', '2025-03-17 09:28:54', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2013, 0, '自定义', '0', 'iot_protocol_type', 0, '', '', '', '1', '2024-09-06 22:26:10', '1', '2025-03-17 09:28:56', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2014, 1, 'Modbus', '1', 'iot_protocol_type', 0, '', '', '', '1', '2024-09-06 22:26:21', '1', '2025-03-17 09:28:58', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2015, 2, 'OPC UA', '2', 'iot_protocol_type', 0, '', '', '', '1', '2024-09-06 22:26:31', '1', '2025-03-17 09:29:00', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2016, 3, 'ZigBee', '3', 'iot_protocol_type', 0, '', '', '', '1', '2024-09-06 22:26:39', '1', '2025-03-17 09:29:04', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2017, 4, 'BLE', '4', 'iot_protocol_type', 0, '', '', '', '1', '2024-09-06 22:26:48', '1', '2025-03-17 09:29:06', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2018, 0, '未激活', '0', 'iot_device_state', 0, '', '', '', '1', '2024-09-21 08:13:34', '1', '2025-03-17 09:29:09', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2019, 1, '在线', '1', 'iot_device_state', 0, '', '', '', '1', '2024-09-21 08:13:48', '1', '2025-03-17 09:29:12', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2020, 2, '离线', '2', 'iot_device_state', 0, '', '', '', '1', '2024-09-21 08:13:59', '1', '2025-03-17 09:29:14', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2021, 1, '属性', '1', 'iot_thing_model_type', 0, '', '', '', '1', '2024-09-29 20:03:01', '1', '2025-03-17 09:29:24', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2022, 2, '服务', '2', 'iot_thing_model_type', 0, '', '', '', '1', '2024-09-29 20:03:11', '1', '2025-03-17 09:29:27', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2023, 3, '事件', '3', 'iot_thing_model_type', 0, '', '', '', '1', '2024-09-29 20:03:20', '1', '2025-03-17 09:29:29', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2024, 1, 'JAR 部署', '0', 'iot_plugin_deploy_type', 0, '', '', '', '1', '2024-12-13 10:55:32', '1', '2025-03-17 09:29:32', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2025, 2, '独立部署', '1', 'iot_plugin_deploy_type', 0, '', '', '', '1', '2024-12-13 10:55:43', '1', '2025-03-17 09:29:34', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2026, 0, '停止', '0', 'iot_plugin_status', 0, 'danger', '', '', '1', '2024-12-13 11:07:37', '1', '2025-03-17 09:29:37', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2027, 1, '运行', '1', 'iot_plugin_status', 0, '', '', '', '1', '2024-12-13 11:07:45', '1', '2025-03-17 09:34:17', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2028, 0, '普通插件', '0', 'iot_plugin_type', 0, '', '', '', '1', '2024-12-13 11:08:32', '1', '2025-03-17 09:34:19', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2029, 1, '设备插件', '1', 'iot_plugin_type', 0, '', '', '', '1', '2024-12-13 11:08:41', '1', '2025-03-17 09:34:22', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2030, 1, '升每分钟', 'L/min', 'iot_thing_model_unit', 0, '', '', '', '1', '2024-12-13 11:08:41', '1', '2025-03-17 09:34:24', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2031, 2, '毫克每千克', 'mg/kg', 'iot_thing_model_unit', 0, '', '', '', '1', '2024-12-13 11:08:41', '1', '2025-03-17 09:34:27', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2032, 3, '浊度', 'NTU', 'iot_thing_model_unit', 0, '', '', '', '1', '2024-12-13 11:08:41', '1', '2025-03-17 09:34:31', '0');
@@ -1108,7 +1097,7 @@ INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_t
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2041, 12, '厘斯', 'cst', 'iot_thing_model_unit', 0, '', '', '', '1', '2024-12-13 11:08:41', '1', '2025-03-17 09:37:22', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2042, 13, '巴', 'bar', 'iot_thing_model_unit', 0, '', '', '', '1', '2024-12-13 11:08:41', '1', '2025-03-17 09:37:24', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2043, 14, '纳克每升', 'ppt', 'iot_thing_model_unit', 0, '', '', '', '1', '2024-12-13 11:08:41', '1', '2025-03-17 09:37:27', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2044, 15, '微克每升', 'ppb', 'iot_thing_model_unit', 0, '', '', '', '1', '2024-12-13 11:08:41', '1', '2025-03-17 09:37:31', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2044, 15, '十亿分之一', 'ppb', 'iot_thing_model_unit', 0, '', '', '', '1', '2024-12-13 11:08:41', '1', '2026-04-05 15:53:29', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2045, 16, '微西每厘米', 'uS/cm', 'iot_thing_model_unit', 0, '', '', '', '1', '2024-12-13 11:08:41', '1', '2025-03-17 09:37:34', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2046, 17, '牛顿每库仑', 'N/C', 'iot_thing_model_unit', 0, '', '', '', '1', '2024-12-13 11:08:41', '1', '2025-03-17 09:37:38', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2047, 18, '伏特每米', 'V/m', 'iot_thing_model_unit', 0, '', '', '', '1', '2024-12-13 11:08:41', '1', '2025-03-17 09:37:43', '0');
@@ -1116,7 +1105,7 @@ INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_t
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2049, 20, '毫米汞柱', 'mmHg', 'iot_thing_model_unit', 0, '', '', '', '1', '2024-12-13 11:08:41', '1', '2025-03-17 09:37:48', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2050, 21, '血糖', 'mmol/L', 'iot_thing_model_unit', 0, '', '', '', '1', '2024-12-13 11:08:41', '1', '2025-03-17 09:37:54', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2051, 22, '毫米每秒', 'mm/s', 'iot_thing_model_unit', 0, '', '', '', '1', '2024-12-13 11:08:41', '1', '2025-03-17 09:38:02', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2052, 23, '转每分钟', 'turn/m', 'iot_thing_model_unit', 0, '', '', '', '1', '2024-12-13 11:08:41', '1', '2025-03-17 09:38:07', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2052, 23, '转每米', 'turn/m', 'iot_thing_model_unit', 0, '', '', '', '1', '2024-12-13 11:08:41', '1', '2026-04-05 15:53:29', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2053, 24, '次', 'count', 'iot_thing_model_unit', 0, '', '', '', '1', '2024-12-13 11:08:41', '1', '2025-03-17 09:38:09', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2054, 25, '档', 'gear', 'iot_thing_model_unit', 0, '', '', '', '1', '2024-12-13 11:08:41', '1', '2025-03-17 09:38:11', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2055, 26, '步', 'stepCount', 'iot_thing_model_unit', 0, '', '', '', '1', '2024-12-13 11:08:41', '1', '2025-03-17 09:38:13', '0');
@@ -1133,7 +1122,7 @@ INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_t
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2067, 37, '吨每小时', 't/h', 'iot_thing_model_unit', 0, '', '', '', '1', '2024-12-13 11:08:41', '1', '2025-03-17 09:40:46', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2068, 38, '千卡每小时', 'KCL/h', 'iot_thing_model_unit', 0, '', '', '', '1', '2024-12-13 11:08:41', '1', '2025-03-17 09:40:46', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2069, 39, '升每秒', 'L/s', 'iot_thing_model_unit', 0, '', '', '', '1', '2024-12-13 11:08:41', '1', '2025-03-17 09:40:46', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2070, 40, '兆帕', 'Mpa', 'iot_thing_model_unit', 0, '', '', '', '1', '2024-12-13 11:08:41', '1', '2025-03-17 09:40:46', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2070, 40, '兆帕', 'MPa', 'iot_thing_model_unit', 0, '', '', '', '1', '2024-12-13 11:08:41', '1', '2026-04-05 15:53:29', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2071, 41, '立方米每小时', 'm³/h', 'iot_thing_model_unit', 0, '', '', '', '1', '2024-12-13 11:08:41', '1', '2025-03-17 09:40:46', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2072, 42, '千乏时', 'kvarh', 'iot_thing_model_unit', 0, '', '', '', '1', '2024-12-13 11:08:41', '1', '2025-03-17 09:40:46', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2073, 43, '微克每升', 'μg/L', 'iot_thing_model_unit', 0, '', '', '', '1', '2024-12-13 11:08:41', '1', '2025-03-17 09:40:46', '0');
@@ -1181,7 +1170,7 @@ INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_t
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2115, 85, '节', 'kn', 'iot_thing_model_unit', 0, '', '', '', '1', '2024-12-13 11:08:41', '1', '2025-03-17 09:40:46', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2116, 86, '千米每小时', 'km/h', 'iot_thing_model_unit', 0, '', '', '', '1', '2024-12-13 11:08:41', '1', '2025-03-17 09:40:46', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2117, 87, '米每秒', 'm/s', 'iot_thing_model_unit', 0, '', '', '', '1', '2024-12-13 11:08:41', '1', '2025-03-17 09:40:46', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2118, 88, '秒', '″', 'iot_thing_model_unit', 0, '', '', '', '1', '2024-12-13 11:08:41', '1', '2025-03-17 09:40:46', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2118, 88, '角秒', '″', 'iot_thing_model_unit', 0, '', '', '', '1', '2024-12-13 11:08:41', '1', '2026-04-05 15:53:29', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2119, 89, '分', '′', 'iot_thing_model_unit', 0, '', '', '', '1', '2024-12-13 11:08:41', '1', '2025-03-17 09:40:46', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2120, 90, '度', '°', 'iot_thing_model_unit', 0, '', '', '', '1', '2024-12-13 11:08:41', '1', '2025-03-17 09:40:46', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2121, 91, '弧度', 'rad', 'iot_thing_model_unit', 0, '', '', '', '1', '2024-12-13 11:08:41', '1', '2025-03-17 09:40:46', '0');
@@ -1200,7 +1189,7 @@ INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_t
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2134, 104, '开尔文', 'K', 'iot_thing_model_unit', 0, '', '', '', '1', '2024-12-13 11:08:41', '1', '2025-03-17 09:40:46', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2135, 105, '吨', 't', 'iot_thing_model_unit', 0, '', '', '', '1', '2024-12-13 11:08:41', '1', '2025-03-17 09:40:46', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2136, 106, '摄氏度', '°C', 'iot_thing_model_unit', 0, '', '', '', '1', '2024-12-13 11:08:41', '1', '2025-03-17 09:40:46', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2137, 107, '毫帕', 'mPa', 'iot_thing_model_unit', 0, '', '', '', '1', '2024-12-13 11:08:41', '1', '2025-03-17 09:40:46', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2137, 107, '毫帕', '1e-3Pa', 'iot_thing_model_unit', 0, '', '', '', '1', '2024-12-13 11:08:41', '1', '2026-04-05 15:53:29', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2138, 108, '百帕', 'hPa', 'iot_thing_model_unit', 0, '', '', '', '1', '2024-12-13 11:08:41', '1', '2025-03-17 09:40:46', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2139, 109, '千帕', 'kPa', 'iot_thing_model_unit', 0, '', '', '', '1', '2024-12-13 11:08:41', '1', '2025-03-17 09:40:46', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2140, 110, '帕斯卡', 'Pa', 'iot_thing_model_unit', 0, '', '', '', '1', '2024-12-13 11:08:41', '1', '2025-03-17 09:40:46', '0');
@@ -1226,21 +1215,346 @@ INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_t
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2160, 130, '分米', 'dm', 'iot_thing_model_unit', 0, '', '', '', '1', '2024-12-13 11:08:41', '1', '2025-03-17 09:40:46', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2161, 131, '千米', 'km', 'iot_thing_model_unit', 0, '', '', '', '1', '2024-12-13 11:08:41', '1', '2025-03-17 09:40:46', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2162, 132, '米', 'm', 'iot_thing_model_unit', 0, '', '', '', '1', '2024-12-13 11:08:41', '1', '2025-03-17 09:40:46', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2163, 1, '输入', '1', 'iot_data_bridge_direction_enum', 0, 'primary', '', '', '1', '2025-03-09 12:38:24', '1', '2025-03-17 09:40:46', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2164, 2, '输出', '2', 'iot_data_bridge_direction_enum', 0, 'primary', '', '', '1', '2025-03-09 12:38:36', '1', '2025-03-17 09:40:46', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2165, 1, 'HTTP', '1', 'iot_data_bridge_type_enum', 0, 'primary', '', '', '1', '2025-03-09 12:39:54', '1', '2025-03-17 09:40:46', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2166, 2, 'TCP', '2', 'iot_data_bridge_type_enum', 0, 'primary', '', '', '1', '2025-03-09 12:40:06', '1', '2025-03-17 09:40:46', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2167, 3, 'WEBSOCKET', '3', 'iot_data_bridge_type_enum', 0, 'primary', '', '', '1', '2025-03-09 12:40:24', '1', '2025-03-17 09:40:46', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2168, 10, 'MQTT', '10', 'iot_data_bridge_type_enum', 0, 'primary', '', '', '1', '2025-03-09 12:40:37', '1', '2025-03-17 09:40:46', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2169, 20, 'DATABASE', '20', 'iot_data_bridge_type_enum', 0, 'primary', '', '', '1', '2025-03-09 12:41:05', '1', '2025-03-17 09:40:46', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2170, 21, 'REDIS_STREAM', '21', 'iot_data_bridge_type_enum', 0, 'primary', '', '', '1', '2025-03-09 12:41:18', '1', '2025-03-17 09:40:46', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2171, 30, 'ROCKETMQ', '30', 'iot_data_bridge_type_enum', 0, 'primary', '', '', '1', '2025-03-09 12:41:30', '1', '2025-03-17 09:40:46', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2172, 31, 'RABBITMQ', '31', 'iot_data_bridge_type_enum', 0, 'primary', '', '', '1', '2025-03-09 12:41:47', '1', '2025-03-17 09:40:46', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2173, 32, 'KAFKA', '32', 'iot_data_bridge_type_enum', 0, 'primary', '', '', '1', '2025-03-09 12:41:59', '1', '2025-03-17 09:40:46', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2165, 1, 'HTTP', '1', 'iot_data_sink_type_enum', 0, 'default', '', '', '1', '2025-03-09 12:39:54', '1', '2025-06-24 12:44:47', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2166, 2, 'TCP', '2', 'iot_data_sink_type_enum', 0, 'default', '', '', '1', '2025-03-09 12:40:06', '1', '2025-06-24 12:44:46', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2167, 3, 'WebSocket', '3', 'iot_data_sink_type_enum', 0, 'default', '', '', '1', '2025-03-09 12:40:24', '1', '2025-06-24 12:44:45', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2168, 10, 'MQTT', '10', 'iot_data_sink_type_enum', 0, 'default', '', '', '1', '2025-03-09 12:40:37', '1', '2025-06-24 12:44:44', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2169, 20, 'Database', '20', 'iot_data_sink_type_enum', 0, 'default', '', '', '1', '2025-03-09 12:41:05', '1', '2025-06-24 12:44:44', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2170, 21, 'Redis Stream', '21', 'iot_data_sink_type_enum', 0, 'default', '', '', '1', '2025-03-09 12:41:18', '1', '2025-06-24 12:44:43', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2171, 30, 'RocketMQ', '30', 'iot_data_sink_type_enum', 0, 'default', '', '', '1', '2025-03-09 12:41:30', '1', '2025-06-24 12:44:42', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2172, 31, 'RabbitMQ', '31', 'iot_data_sink_type_enum', 0, 'default', '', '', '1', '2025-03-09 12:41:47', '1', '2025-06-24 12:44:41', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2173, 32, 'Kafka', '32', 'iot_data_sink_type_enum', 0, 'default', '', '', '1', '2025-03-09 12:41:59', '1', '2025-06-24 12:44:39', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2174, 1, '设备上下线变更', '1', 'iot_rule_scene_trigger_type_enum', 0, 'primary', '', '', '1', '2025-03-20 15:00:01', '"1"', '2025-07-06 10:28:16', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2175, 2, '物模型属性上报', '2', 'iot_rule_scene_trigger_type_enum', 0, 'primary', '', '', '1', '2025-03-20 15:00:09', '"1"', '2025-07-06 10:28:22', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2176, 1, '设备状态', 'state', 'iot_device_message_type_enum', 0, 'primary', '', '', '1', '2025-03-20 15:24:58', '1', '2025-03-20 15:24:58', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2177, 2, '设备属性', 'property', 'iot_device_message_type_enum', 0, 'primary', '', '', '1', '2025-03-20 15:25:09', '1', '2025-03-20 15:25:09', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2178, 3, '设备事件', 'event', 'iot_device_message_type_enum', 0, 'primary', '', '', '1', '2025-03-20 15:25:23', '1', '2025-03-20 15:25:23', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2179, 4, '设备服务', 'service', 'iot_device_message_type_enum', 0, 'primary', '', '', '1', '2025-03-20 15:25:39', '1', '2025-03-20 15:25:39', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2180, 5, '设备配置', 'config', 'iot_device_message_type_enum', 0, 'primary', '', '', '1', '2025-03-20 15:25:51', '1', '2025-03-20 15:25:57', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2181, 6, '设备 OTA', 'ota', 'iot_device_message_type_enum', 0, 'primary', '', '', '1', '2025-03-20 15:26:17', '1', '2025-03-20 15:26:17', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2182, 7, '设备注册', 'register', 'iot_device_message_type_enum', 0, 'primary', '', '', '1', '2025-03-20 15:26:35', '1', '2025-03-20 15:26:35', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2183, 8, '设备拓扑', 'topology', 'iot_device_message_type_enum', 0, 'primary', '', '', '1', '2025-03-20 15:26:46', '1', '2025-03-20 15:26:46', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2184, 1, '设备属性设置', '1', 'iot_rule_scene_action_type_enum', 0, 'primary', '', '', '1', '2025-03-28 15:27:12', '"1"', '2025-07-06 10:37:33', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2185, 2, '设备服务调用', '2', 'iot_rule_scene_action_type_enum', 0, 'primary', '', '', '1', '2025-03-28 15:27:25', '"1"', '2025-07-06 10:37:41', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2186, 100, '告警触发', '100', 'iot_rule_scene_action_type_enum', 0, 'primary', '', '', '1', '2025-03-28 15:27:35', '"1"', '2025-07-06 10:37:50', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3000, 16, '百川智能', 'BaiChuan', 'ai_platform', 0, '', '', '', '1', '2025-03-23 12:15:46', '1', '2025-03-23 12:15:46', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3001, 50, 'Vben5.0 Ant Design Schema 模版', '40', 'infra_codegen_front_type', 0, '', '', NULL, '1', '2025-04-23 21:47:47', '1', '2025-05-02 12:01:15', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3001, 40, 'Vben5.0 Ant Design Schema 模版', '40', 'infra_codegen_front_type', 0, '', '', NULL, '1', '2025-04-23 21:47:47', '1', '2025-09-04 23:25:12', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3002, 6, '支付宝余额', '6', 'brokerage_withdraw_type', 0, '', '', 'API 打款', '1', '2025-05-10 08:24:49', '1', '2025-05-10 08:24:49', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3004, 3, 'WARN', '3', 'iot_alert_level', 0, 'warning', '', '', '1', '2025-06-27 20:32:22', '1', '2025-06-27 20:34:31', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3005, 1, 'INFO', '1', 'iot_alert_level', 0, 'primary', '', '', '1', '2025-06-27 20:33:28', '1', '2025-06-27 20:34:35', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3006, 5, 'ERROR', '5', 'iot_alert_level', 0, 'danger', '', '', '1', '2025-06-27 20:33:50', '1', '2025-06-27 20:33:50', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3007, 1, '短信', '1', 'iot_alert_receive_type', 0, '', '', '', '1', '2025-06-27 22:49:30', '1', '2025-06-27 22:49:30', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3008, 2, '邮箱', '2', 'iot_alert_receive_type', 0, '', '', '', '1', '2025-06-27 22:49:39', '1', '2025-06-27 22:50:07', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3009, 3, '站内信', '3', 'iot_alert_receive_type', 0, '', '', '', '1', '2025-06-27 22:50:20', '1', '2025-06-27 22:50:20', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3010, 1, '全部设备', '1', 'iot_ota_task_device_scope', 0, '', '', '', '1', '2025-07-02 09:43:09', '1', '2025-07-02 09:43:09', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3011, 2, '指定设备', '2', 'iot_ota_task_device_scope', 0, '', '', '', '1', '2025-07-02 09:43:15', '1', '2025-07-02 09:43:15', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3012, 10, '进行中', '10', 'iot_ota_task_status', 0, 'primary', '', '', '1', '2025-07-02 09:44:01', '"1"', '2025-07-02 09:44:21', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3013, 20, '已结束', '20', 'iot_ota_task_status', 0, 'success', '', '', '1', '2025-07-02 09:44:14', '"1"', '2025-07-02 23:56:12', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3014, 30, '已取消', '30', 'iot_ota_task_status', 0, 'danger', '', '', '1', '2025-07-02 09:44:36', '1', '2025-07-02 09:44:36', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3015, 0, '待推送', '0', 'iot_ota_task_record_status', 0, '', '', '', '1', '2025-07-02 09:45:16', '1', '2025-07-02 09:45:16', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3016, 10, '已推送', '10', 'iot_ota_task_record_status', 0, '', '', '', '1', '2025-07-02 09:45:25', '1', '2025-07-02 09:45:25', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3017, 20, '升级中', '20', 'iot_ota_task_record_status', 0, 'primary', '', '', '1', '2025-07-02 09:45:37', '1', '2025-07-02 09:45:37', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3018, 30, '升级成功', '30', 'iot_ota_task_record_status', 0, 'success', '', '', '1', '2025-07-02 09:45:47', '1', '2025-07-02 09:45:47', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3019, 40, '升级失败', '40', 'iot_ota_task_record_status', 0, 'danger', '', '', '1', '2025-07-02 09:46:02', '1', '2025-07-02 09:46:02', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3020, 50, '升级取消', '50', 'iot_ota_task_record_status', 0, 'warning', '', '', '1', '2025-07-02 09:46:09', '"1"', '2025-07-02 09:46:27', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3024, 3, '设备事件上报', '3', 'iot_rule_scene_trigger_type_enum', 0, '', '', '', '1', '2025-07-06 10:28:29', '1', '2025-07-06 10:28:29', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3025, 4, '设备服务调用', '4', 'iot_rule_scene_trigger_type_enum', 0, '', '', '', '1', '2025-07-06 10:28:35', '1', '2025-07-06 10:28:35', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3026, 100, '定时触发', '100', 'iot_rule_scene_trigger_type_enum', 0, '', '', '', '1', '2025-07-06 10:28:48', '1', '2025-07-06 10:28:48', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3027, 101, '告警恢复', '101', 'iot_rule_scene_action_type_enum', 0, '', '', '', '1', '2025-07-06 10:37:57', '1', '2025-07-06 10:37:57', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3028, 2, 'Anthropic', 'Anthropic', 'ai_platform', 0, '', '', '', '1', '2025-08-21 22:54:24', '1', '2025-08-21 22:57:58', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3029, 2, '谷歌 Gemini', 'Gemini', 'ai_platform', 0, '', '', '', '1', '2025-08-22 22:39:35', '1', '2025-08-22 22:44:49', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3030, 1, '文件系统', 'filesystem', 'ai_mcp_client_name', 0, '', '', '', '1', '2025-08-28 13:58:43', '1', '2025-08-28 21:19:42', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3031, 41, 'Vben5.0 Ant Design 标准模版', '41', 'infra_codegen_front_type', 0, '', '', '', '1', '2025-09-04 23:26:07', '1', '2025-09-04 23:26:07', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3032, 50, 'Vben5.0 Element Plus Schema 模版', '50', 'infra_codegen_front_type', 0, '', '', '', '1', '2025-09-04 23:26:38', '1', '2025-09-04 23:26:38', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3033, 51, 'Vben5.0 Element Plus 标准模版', '51', 'infra_codegen_front_type', 0, '', '', '', '1', '2025-09-04 23:26:49', '1', '2025-09-04 23:26:49', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3034, 1, 'ttt', 'tt', 'iot_ota_task_record_status', 0, 'success', '', NULL, '1', '2025-09-06 00:02:21', '1', '2025-09-06 00:02:31', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3035, 40, '支付宝小程序', '40', 'system_social_type', 0, '', '', '', '1', '2023-11-04 13:05:38', '1', '2023-11-04 13:07:16', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3036, 60, 'Admin Uniapp 移动端', '60', 'infra_codegen_front_type', 0, '', '', NULL, '1', '2025-12-16 19:25:51', '1', '2025-12-17 09:46:15', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3040, 1, 'UDP', 'udp', 'iot_protocol_type', 0, '', '', 'UDP 协议', '1', '2026-02-04 00:32:47', '1', '2026-02-04 00:32:47', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3041, 2, 'WebSocket', 'websocket', 'iot_protocol_type', 0, '', '', 'WebSocket 协议', '1', '2026-02-04 00:32:55', '1', '2026-02-04 00:32:55', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3042, 3, 'HTTP', 'http', 'iot_protocol_type', 0, '', '', 'HTTP 协议', '1', '2026-02-04 00:32:55', '1', '2026-02-04 00:32:55', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3043, 4, 'MQTT', 'mqtt', 'iot_protocol_type', 0, 'success', '', 'MQTT 协议', '1', '2026-02-04 00:32:55', '1', '2026-02-04 00:32:55', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3044, 5, 'EMQX', 'emqx', 'iot_protocol_type', 0, 'success', '', 'EMQX 协议', '1', '2026-02-04 00:32:55', '1', '2026-02-04 00:32:55', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3045, 6, 'CoAP', 'coap', 'iot_protocol_type', 0, '', '', 'CoAP 协议', '1', '2026-02-04 00:32:55', '1', '2026-02-04 00:32:55', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3046, 7, 'Modbus TCP Server', 'modbus_tcp_server', 'iot_protocol_type', 0, '', '', 'Modbus TCP Server 协议', '1', '2026-02-04 00:32:55', '1', '2026-02-12 15:16:45', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3047, 0, 'JSON', 'json', 'iot_serialize_type', 0, 'success', '', 'JSON 格式', '1', '2026-02-04 00:33:19', '1', '2026-02-04 00:33:19', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3048, 1, '二进制', 'binary', 'iot_serialize_type', 0, 'warning', '', '二进制格式', '1', '2026-02-04 00:33:19', '1', '2026-02-04 00:33:19', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3049, 8, 'Modbus TCP Client', 'modbus_tcp_client', 'iot_protocol_type', 0, '', '', 'Modbus TCP Client 协议', '1', '2026-02-08 18:29:46', '1', '2026-02-12 15:16:32', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3050, 2, '边缘采集', '2', 'iot_modbus_mode', 0, 'success', '', '设备主动上报数据，无需轮询', '1', '2025-06-12 22:56:06', '1', '2026-02-09 13:03:23', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3051, 1, 'Modbus TCP', '1', 'iot_modbus_frame_format', 0, 'default', '', 'MBAP 头部格式', '1', '2025-06-12 22:56:06', '1', '2025-06-12 22:56:06', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3052, 2, 'Modbus RTU', '2', 'iot_modbus_frame_format', 0, 'warning', '', 'CRC16 校验格式', '1', '2025-06-12 22:56:06', '1', '2025-06-12 22:56:06', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3053, 1, '云端轮询', '1', 'iot_modbus_mode', 0, 'primary', '', '网关主动轮询读取设备寄存器', '1', '2025-06-12 22:56:06', '1', '2025-06-12 22:56:06', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3054, 1, '企业客户', '1', 'mes_client_type', 0, 'primary', '', '', '1', '2026-02-15 14:38:25', '1', '2026-02-15 14:38:25', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3055, 2, '个人', '2', 'mes_client_type', 0, 'success', '', '', '1', '2026-02-15 14:38:25', '1', '2026-02-15 14:38:25', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3056, 1, '优质供应商', 'A', 'mes_vendor_level', 0, 'success', '', '', '1', '2026-02-15 15:59:15', '1', '2026-02-15 15:59:15', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3057, 2, '正常', 'B', 'mes_vendor_level', 0, 'primary', '', '', '1', '2026-02-15 15:59:15', '1', '2026-02-15 15:59:15', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3058, 3, '重点关注', 'C', 'mes_vendor_level', 0, 'warning', '', '', '1', '2026-02-15 15:59:15', '1', '2026-02-15 15:59:15', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3059, 4, '劣质供应商', 'D', 'mes_vendor_level', 0, 'danger', '', '', '1', '2026-02-15 15:59:15', '1', '2026-02-15 15:59:15', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3060, 5, '黑名单', 'E', 'mes_vendor_level', 0, 'info', '', '', '1', '2026-02-15 15:59:15', '1', '2026-02-15 15:59:15', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3061, 1, '假期', '2', 'mes_cal_holiday_type', 0, 'success', '', '', '1', '2026-02-16 07:35:58', '1', '2026-02-16 11:20:42', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3062, 2, '工作日', '1', 'mes_cal_holiday_type', 0, 'primary', '', '', '1', '2026-02-16 07:35:58', '1', '2026-02-16 11:20:40', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3063, 1, '在库', '1', 'mes_tm_tool_status', 0, 'success', '', '', '1', '2026-02-16 11:10:55', '1', '2026-02-16 11:10:55', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3064, 2, '领用中', '2', 'mes_tm_tool_status', 0, 'primary', '', '', '1', '2026-02-16 11:10:55', '1', '2026-02-16 11:10:55', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3065, 3, '维修中', '3', 'mes_tm_tool_status', 0, 'warning', '', '', '1', '2026-02-16 11:10:55', '1', '2026-02-16 11:10:55', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3066, 4, '报废', '4', 'mes_tm_tool_status', 0, 'danger', '', '', '1', '2026-02-16 11:10:55', '1', '2026-02-16 11:10:55', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3067, 1, '定期维护', '1', 'mes_tm_mainten_type', 0, 'primary', '', '', '1', '2026-02-16 11:10:55', '1', '2026-02-16 11:10:55', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3068, 2, '按使用次数维护', '2', 'mes_tm_mainten_type', 0, 'success', '', '', '1', '2026-02-16 11:10:55', '1', '2026-02-16 11:10:55', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3069, 1, '停机', '1', 'mes_dv_machinery_status', 0, 'success', '', '', '1', '2026-02-17 01:00:06', '1', '2026-02-17 03:28:27', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3070, 2, '生产中', '2', 'mes_dv_machinery_status', 0, 'info', '', '', '1', '2026-02-17 01:00:06', '1', '2026-02-17 03:28:33', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3071, 3, '维护中', '3', 'mes_dv_machinery_status', 0, 'danger', '', '', '1', '2026-02-17 01:00:06', '1', '2026-02-17 03:28:41', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3072, 1, '尺寸', '1', 'mes_indicator_type', 0, '', '', '', '1', '2026-02-17 02:18:18', '1', '2026-04-09 14:38:53', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3073, 2, '外观', '2', 'mes_indicator_type', 0, '', '', '', '1', '2026-02-17 02:18:18', '1', '2026-04-09 14:38:53', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3074, 3, '重量', '3', 'mes_indicator_type', 0, '', '', '', '1', '2026-02-17 02:18:18', '1', '2026-04-09 14:38:53', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3075, 4, '性能', '4', 'mes_indicator_type', 0, '', '', '', '1', '2026-02-17 02:18:18', '1', '2026-04-09 14:38:53', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3076, 5, '成分', '5', 'mes_indicator_type', 0, '', '', '', '1', '2026-02-17 02:18:18', '1', '2026-04-09 14:38:53', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3077, 1, '致命缺陷', '1', 'mes_defect_level', 0, 'danger', '', '', '1', '2026-02-17 02:18:18', '1', '2026-02-21 12:21:12', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3078, 2, '严重缺陷', '2', 'mes_defect_level', 0, 'warning', '', '', '1', '2026-02-17 02:18:18', '1', '2026-02-21 12:21:15', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3079, 3, '轻微缺陷', '3', 'mes_defect_level', 0, 'info', '', '', '1', '2026-02-17 02:18:18', '1', '2026-02-21 12:21:19', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3080, 1, '单白班', '1', 'mes_cal_shift_type', 0, 'primary', '', '', '1', '2026-02-17 03:40:09', '1', '2026-02-17 03:40:09', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3081, 2, '两班倒', '2', 'mes_cal_shift_type', 0, 'success', '', '', '1', '2026-02-17 03:40:09', '1', '2026-02-17 03:40:09', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3082, 3, '三班倒', '3', 'mes_cal_shift_type', 0, 'warning', '', '', '1', '2026-02-17 03:40:09', '1', '2026-02-17 03:40:09', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3083, 1, '按季度', '1', 'mes_cal_shift_method', 0, '', '', '', '1', '2026-02-17 03:40:09', '1', '2026-02-17 03:40:09', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3084, 2, '按月', '2', 'mes_cal_shift_method', 0, '', '', '', '1', '2026-02-17 03:40:09', '1', '2026-02-17 03:40:09', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3085, 3, '按周', '3', 'mes_cal_shift_method', 0, '', '', '', '1', '2026-02-17 03:40:09', '1', '2026-02-17 03:40:09', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3086, 4, '按天', '4', 'mes_cal_shift_method', 0, '', '', '', '1', '2026-02-17 03:40:09', '1', '2026-02-17 03:40:09', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3089, 0, '草稿', '0', 'mes_cal_plan_status', 0, 'info', '', '', '1', '2026-02-17 03:40:09', '1', '2026-02-17 03:40:09', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3090, 1, '已确认', '1', 'mes_cal_plan_status', 0, 'success', '', '', '1', '2026-02-17 03:40:09', '1', '2026-02-17 03:40:09', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3100, 0, '草稿', '0', 'mes_pro_work_order_status', 0, 'info', '', '', '1', '2026-02-17 11:43:47', '1', '2026-02-17 11:43:47', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3101, 1, '已确认', '1', 'mes_pro_work_order_status', 0, 'primary', '', '', '1', '2026-02-17 11:43:47', '1', '2026-02-17 11:43:47', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3102, 2, '已完成', '2', 'mes_pro_work_order_status', 0, 'success', '', '', '1', '2026-02-17 11:43:47', '1', '2026-02-17 11:43:47', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3103, 3, '已取消', '3', 'mes_pro_work_order_status', 0, 'warning', '', '', '1', '2026-02-17 11:43:47', '1', '2026-02-17 11:43:47', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3104, 1, '客户订单', '1', 'mes_pro_work_order_source_type', 0, 'primary', '', '', '1', '2026-02-17 11:43:47', '1', '2026-02-17 11:43:47', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3105, 2, '库存备货', '2', 'mes_pro_work_order_source_type', 0, 'success', '', '', '1', '2026-02-17 11:43:47', '1', '2026-02-17 11:43:47', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3106, 1, '自行生产', '1', 'mes_pro_work_order_type', 0, 'primary', '', '', '1', '2026-02-17 11:43:47', '1', '2026-02-17 11:43:47', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3107, 2, '代工', '2', 'mes_pro_work_order_type', 0, 'warning', '', '', '1', '2026-02-17 11:43:47', '1', '2026-02-17 11:43:47', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3108, 3, '采购', '3', 'mes_pro_work_order_type', 0, 'info', '', '', '1', '2026-02-17 11:43:47', '1', '2026-02-17 11:43:47', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3121, 1, 'IQC（来料检验）', '1', 'mes_qc_type', 0, 'primary', '', '来料质量检验', '1', '2026-02-18 14:12:05', '1', '2026-02-18 14:12:05', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3122, 2, 'IPQC（过程检验）', '2', 'mes_qc_type', 0, 'warning', '', '生产制程质量检验', '1', '2026-02-18 14:12:05', '1', '2026-03-24 15:21:34', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3123, 3, 'OQC（出货检验）', '3', 'mes_qc_type', 0, 'success', '', '出货质量检验', '1', '2026-02-18 14:12:05', '1', '2026-02-18 14:12:05', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3124, 4, 'RQC（退料检验）', '4', 'mes_qc_type', 0, 'danger', '', '退货质量检验', '1', '2026-02-18 14:12:05', '1', '2026-03-24 15:22:00', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3125, 0, '开始-开始(SS)', '0', 'mes_pro_link_type', 0, 'default', '', '前序开始后，后序可以开始', '1', '2026-02-19 04:24:53', '1', '2026-02-19 04:24:53', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3126, 1, '结束-结束(FF)', '1', 'mes_pro_link_type', 0, 'default', '', '前序结束后，后序才能结束', '1', '2026-02-19 04:24:53', '1', '2026-02-19 04:24:53', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3127, 2, '开始-结束(SF)', '2', 'mes_pro_link_type', 0, 'default', '', '前序开始后，后序才能结束', '1', '2026-02-19 04:24:53', '1', '2026-02-19 04:24:53', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3128, 3, '结束-开始(FS)', '3', 'mes_pro_link_type', 0, 'default', '', '前序结束后，后序才能开始', '1', '2026-02-19 04:24:53', '1', '2026-02-19 04:24:53', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3129, 1, '分钟', 'MINUTE', 'mes_time_unit_type', 0, 'default', '', '', '1', '2026-02-19 04:24:53', '1', '2026-02-19 04:24:53', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3130, 2, '小时', 'HOUR', 'mes_time_unit_type', 0, 'default', '', '', '1', '2026-02-19 04:24:53', '1', '2026-02-19 04:24:53', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3131, 3, '天', 'DAY', 'mes_time_unit_type', 0, 'default', '', '', '1', '2026-02-19 04:24:53', '1', '2026-02-19 04:24:53', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3137, 1, '设备点检', '1', 'mes_dv_subject_type', 0, 'info', '', '', '1', '2026-02-20 01:42:58', '1', '2026-02-20 01:42:58', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3138, 2, '设备保养', '2', 'mes_dv_subject_type', 0, 'success', '', '', '1', '2026-02-20 01:42:58', '1', '2026-02-20 01:42:58', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3139, 1, '待保养', '0', 'mes_mainten_record_status', 0, 'info', '', NULL, 'admin', '2026-02-20 02:59:55', '1', '2026-04-16 05:32:37', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3140, 2, '已完成', '4', 'mes_mainten_record_status', 0, 'success', '', NULL, 'admin', '2026-02-20 02:59:55', '1', '2026-04-16 05:32:37', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3141, 1, '正常', '1', 'mes_mainten_status', 0, 'success', '', NULL, 'admin', '2026-02-20 02:59:55', 'admin', '2026-02-20 02:59:55', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3142, 2, '异常', '0', 'mes_mainten_status', 0, 'danger', '', NULL, 'admin', '2026-02-20 02:59:55', 'admin', '2026-02-20 02:59:55', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3143, 1, '天', '1', 'mes_dv_cycle_type', 0, 'default', '', '', '1', '2026-02-20 07:11:43', '1', '2026-02-20 07:11:43', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3144, 2, '周', '2', 'mes_dv_cycle_type', 0, 'default', '', '', '1', '2026-02-20 07:11:43', '1', '2026-02-20 07:11:43', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3145, 3, '月', '3', 'mes_dv_cycle_type', 0, 'default', '', '', '1', '2026-02-20 07:11:43', '1', '2026-02-20 07:11:43', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3146, 4, '年', '4', 'mes_dv_cycle_type', 0, 'default', '', '', '1', '2026-02-20 07:11:43', '1', '2026-02-20 07:11:43', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3147, 0, '草稿', '0', 'mes_dv_check_plan_status', 0, 'info', '', '', '1', '2026-02-20 07:11:43', '1', '2026-02-20 07:11:43', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3148, 1, '已启用', '1', 'mes_dv_check_plan_status', 0, 'success', '', '', '1', '2026-02-20 07:11:43', '1', '2026-02-20 07:11:43', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3149, 1, '待点检', '10', 'mes_dv_check_record_status', 0, 'info', '', NULL, 'admin', '2026-02-20 09:46:19', 'admin', '2026-02-20 09:46:19', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3150, 2, '已完成', '20', 'mes_dv_check_record_status', 0, 'success', '', NULL, 'admin', '2026-02-20 09:46:19', 'admin', '2026-02-20 09:46:19', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3151, 1, '正常', '1', 'mes_dv_check_result', 0, 'success', '', NULL, 'admin', '2026-02-20 09:46:19', 'admin', '2026-02-20 09:46:19', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3152, 2, '异常', '2', 'mes_dv_check_result', 0, 'danger', '', NULL, 'admin', '2026-02-20 09:46:19', 'admin', '2026-02-20 09:46:19', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3157, 1, '修复成功', '1', 'mes_dv_repair_result', 0, 'success', '', '', '1', '2026-02-20 10:56:24', '1', '2026-02-20 10:56:24', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3158, 2, '报废', '2', 'mes_dv_repair_result', 0, 'danger', '', '', '1', '2026-02-20 10:56:24', '1', '2026-02-20 10:56:24', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3161, 1, '校验通过', '1', 'mes_qc_check_result', 0, 'success', '', '', '1', '2026-02-20 11:23:35', '1', '2026-02-20 16:15:54', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3162, 2, '校验不通过', '2', 'mes_qc_check_result', 0, 'danger', '', '', '1', '2026-02-20 11:23:35', '1', '2026-02-20 16:15:52', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3166, 0, '未处置', '0', 'mes_pro_andon_status', 0, 'danger', '', '', '1', '2026-02-21 00:08:38', '1', '2026-02-21 00:08:38', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3167, 1, '已处置', '1', 'mes_pro_andon_status', 0, 'success', '', '', '1', '2026-02-21 00:08:38', '1', '2026-02-21 00:08:38', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3168, 1, '一级', '1', 'mes_pro_andon_level', 0, 'danger', '', '', '1', '2026-02-21 00:08:38', '1', '2026-02-21 00:08:38', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3169, 2, '二级', '2', 'mes_pro_andon_level', 0, 'warning', '', '', '1', '2026-02-21 00:08:38', '1', '2026-02-21 00:08:38', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3170, 3, '三级', '3', 'mes_pro_andon_level', 0, 'info', '', '', '1', '2026-02-21 00:08:38', '1', '2026-02-21 00:08:38', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3171, 0, '草稿', '0', 'mes_pro_feedback_status', 0, 'info', '', '', '1', '2026-02-21 00:50:32', '1', '2026-02-21 00:50:32', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3172, 2, '审批中', '2', 'mes_pro_feedback_status', 0, 'primary', '', '', '1', '2026-02-21 00:50:32', '1', '2026-03-19 00:51:54', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3173, 3, '待检验', '3', 'mes_pro_feedback_status', 0, 'warning', '', '', '1', '2026-02-21 00:50:32', '1', '2026-03-19 00:51:54', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3174, 4, '已完成', '4', 'mes_pro_feedback_status', 0, 'success', '', '', '1', '2026-02-21 00:50:32', '1', '2026-03-19 00:51:54', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3176, 1, '自行报工', '1', 'mes_pro_feedback_type', 0, 'primary', '', '', '1', '2026-02-21 00:50:32', '1', '2026-02-21 00:50:32', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3177, 2, '统一报工', '2', 'mes_pro_feedback_type', 0, 'success', '', '', '1', '2026-02-21 00:50:32', '1', '2026-02-21 00:50:32', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3178, 1, 'PC', 'PC', 'mes_pro_feedback_channel', 0, 'primary', '', '', '1', '2026-02-21 00:50:32', '1', '2026-02-21 00:50:32', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3179, 2, 'APP', 'APP', 'mes_pro_feedback_channel', 0, 'success', '', '', '1', '2026-02-21 00:50:32', '1', '2026-02-21 00:50:32', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3180, 3, 'PDA', 'PDA', 'mes_pro_feedback_channel', 0, 'info', '', '', '1', '2026-02-21 00:50:32', '1', '2026-02-21 00:50:32', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3181, 1, '浮点', '1', 'mes_qc_result_type', 0, 'primary', '', '', '1', '2026-02-21 13:37:17', '1', '2026-02-21 13:37:17', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3182, 2, '整数', '2', 'mes_qc_result_type', 0, 'success', '', '', '1', '2026-02-21 13:37:17', '1', '2026-02-21 13:37:17', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3183, 3, '文本', '3', 'mes_qc_result_type', 0, 'info', '', '', '1', '2026-02-21 13:37:17', '1', '2026-02-21 13:37:17', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3184, 4, '字典', '4', 'mes_qc_result_type', 0, 'warning', '', '', '1', '2026-02-21 13:37:17', '1', '2026-02-21 13:37:17', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3185, 5, '文件', '5', 'mes_qc_result_type', 0, 'danger', '', '', '1', '2026-02-21 13:37:17', '1', '2026-02-21 13:37:17', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3186, 1, '生产退料', '1', 'mes_rqc_type', 0, 'default', '', '生产退料检验', '1', '2026-02-22 06:44:09', '1', '2026-02-22 06:44:09', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3187, 2, '销售退货', '2', 'mes_rqc_type', 0, 'default', '', '销售退货检验', '1', '2026-02-22 06:44:09', '1', '2026-02-22 06:44:09', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3188, 1, '自制工序检验', '1', 'mes_ipqc_type', 0, 'primary', '', '', '1', '2026-02-22 07:01:04', '1', '2026-02-22 07:01:04', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3189, 2, '首检', '2', 'mes_ipqc_type', 0, 'success', '', '', '1', '2026-02-22 07:01:04', '1', '2026-02-22 07:01:04', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3190, 3, '巡检', '3', 'mes_ipqc_type', 0, 'warning', '', '', '1', '2026-02-22 07:01:04', '1', '2026-02-22 07:01:04', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3191, 4, '自检', '4', 'mes_ipqc_type', 0, 'info', '', '', '1', '2026-02-22 07:01:04', '1', '2026-02-22 07:01:04', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3192, 5, '成品检验', '5', 'mes_ipqc_type', 0, 'danger', '', '', '1', '2026-02-22 07:01:04', '1', '2026-02-22 07:01:04', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3205, 0, '草稿', '0', 'mes_wm_arrival_notice_status', 0, 'info', '', '', '1', '2026-02-22 14:53:18', '1', '2026-02-22 14:53:18', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3206, 2, '待质检', '2', 'mes_wm_arrival_notice_status', 0, 'warning', '', '', '1', '2026-02-22 14:53:18', '1', '2026-02-26 05:24:40', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3207, 3, '待入库', '3', 'mes_wm_arrival_notice_status', 0, 'success', '', '', '1', '2026-02-22 14:53:18', '1', '2026-02-26 05:24:47', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3208, 4, '已完成', '4', 'mes_wm_arrival_notice_status', 0, 'primary', '', '', '1', '2026-02-22 14:53:18', '1', '2026-02-26 05:24:52', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3209, 0, '草稿', '0', 'mes_wm_item_receipt_status', 0, 'info', '', '', '1', '2026-02-22 14:54:05', '1', '2026-02-22 14:54:05', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3210, 1, '待上架', '2', 'mes_wm_item_receipt_status', 0, 'warning', '', '', '1', '2026-02-22 14:54:05', '1', '2026-02-26 08:03:35', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3211, 2, '待执行入库', '3', 'mes_wm_item_receipt_status', 0, 'success', '', '', '1', '2026-02-22 14:54:05', '1', '2026-02-26 08:03:31', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3212, 3, '已完成', '4', 'mes_wm_item_receipt_status', 0, 'primary', '', '', '1', '2026-02-22 14:54:05', '1', '2026-02-26 08:03:20', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3213, 4, '已取消', '5', 'mes_wm_item_receipt_status', 0, 'danger', '', '', '1', '2026-02-22 14:54:05', '1', '2026-02-26 08:03:24', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3214, 1, '草稿', '0', 'mes_order_status', 0, 'info', '', '', '1', '2026-02-23 21:16:03', '1', '2026-02-23 21:16:03', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3215, 2, '已确认', '1', 'mes_order_status', 0, 'primary', '', '', '1', '2026-02-23 21:16:03', '1', '2026-02-23 21:16:03', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3216, 3, '审批中', '2', 'mes_order_status', 0, 'warning', '', '', '1', '2026-02-23 21:16:03', '1', '2026-02-23 21:16:03', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3217, 4, '已审批', '3', 'mes_order_status', 0, 'success', '', '', '1', '2026-02-23 21:16:03', '1', '2026-02-23 21:16:03', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3218, 5, '已完成', '4', 'mes_order_status', 0, 'success', '', '', '1', '2026-02-23 21:16:03', '1', '2026-02-23 21:16:03', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3219, 6, '已取消', '5', 'mes_order_status', 0, 'danger', '', '', '1', '2026-02-23 21:16:03', '1', '2026-02-23 21:16:03', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3220, 1, '草稿', '0', 'mes_wm_issue_status', 0, 'info', '', '草稿状态，未完成', '1', '2026-02-26 15:54:25', '1', '2026-02-26 15:54:25', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3221, 2, '已完成', '4', 'mes_wm_issue_status', 0, 'success', '', '已完成出库', '1', '2026-02-26 15:54:25', '1', '2026-02-26 15:54:25', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3222, 1, '草稿', '0', 'mes_wm_product_issue_status', 0, 'info', '', '草稿状态，可编辑', '1', '2026-02-26 16:39:12', '1', '2026-03-23 13:18:02', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3223, 2, '待拣货', '2', 'mes_wm_product_issue_status', 0, 'warning', '', '审批中，可执行拣货', '1', '2026-02-26 16:39:12', '1', '2026-03-23 13:18:02', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3224, 3, '待执行领出', '3', 'mes_wm_product_issue_status', 0, 'primary', '', '已审批，拣货完成', '1', '2026-02-26 16:39:12', '1', '2026-03-23 13:18:02', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3225, 4, '已完成', '4', 'mes_wm_product_issue_status', 0, 'success', '', '已完成出库', '1', '2026-02-26 16:39:12', '1', '2026-03-23 13:18:02', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3226, 5, '已取消', '5', 'mes_wm_product_issue_status', 0, 'success', '', '已完成出库', '1', '2026-02-26 16:39:12', '1', '2026-03-23 13:18:02', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3232, 1, '草稿', '0', 'mes_wm_return_issue_status', 0, 'info', '', '草稿状态，可编辑', '1', '2026-02-28 14:11:12', '1', '2026-02-28 14:28:24', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3233, 2, '待检验', '1', 'mes_wm_return_issue_status', 0, 'default', '', '已确认，等待质检', '1', '2026-02-28 14:11:12', '1', '2026-02-28 14:28:28', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3234, 3, '待上架', '2', 'mes_wm_return_issue_status', 0, 'warning', '', '检验完成，等待仓库上架', '1', '2026-02-28 14:11:12', '1', '2026-02-28 14:28:31', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3235, 4, '待执行退料', '3', 'mes_wm_return_issue_status', 0, 'primary', '', '上架完成，等待执行退料操作', '1', '2026-02-28 14:11:12', '1', '2026-02-28 14:28:34', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3236, 5, '已完成', '4', 'mes_wm_return_issue_status', 0, 'success', '', '退料执行完成，库存已更新', '1', '2026-02-28 14:11:12', '1', '2026-02-28 14:28:37', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3237, 6, '已取消', '5', 'mes_wm_return_issue_status', 0, 'danger', '', '已取消', '1', '2026-02-28 14:11:12', '1', '2026-02-28 14:28:40', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3238, 1, '余料退料', '1', 'mes_wm_return_issue_type', 0, 'success', '', '余料退回，直接合格', '1', '2026-02-28 14:11:12', '1', '2026-02-28 14:27:47', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3239, 2, '不良退料', '2', 'mes_wm_return_issue_type', 0, 'danger', '', '不良品退回', '1', '2026-02-28 14:11:12', '1', '2026-02-28 14:27:49', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3240, 3, '其他退料', '3', 'mes_wm_return_issue_type', 0, 'info', '', '其他原因退料', '1', '2026-02-28 14:11:12', '1', '2026-02-28 14:27:55', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3241, 1, '待检', '0', 'mes_wm_quality_status', 0, 'warning', '', '待检状态', '1', '2026-02-28 15:00:53', '1', '2026-02-28 15:00:53', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3242, 2, '合格', '1', 'mes_wm_quality_status', 0, 'success', '', '合格状态', '1', '2026-02-28 15:00:53', '1', '2026-02-28 15:00:53', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3243, 3, '不合格', '2', 'mes_wm_quality_status', 0, 'danger', '', '不合格状态', '1', '2026-02-28 15:00:53', '1', '2026-02-28 15:00:53', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3244, 1, '草稿', '0', 'mes_wm_product_receipt_status', 0, 'info', '', '草稿状态', '1', '2026-03-01 06:03:07', '1', '2026-03-01 06:03:07', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3245, 2, '待上架', '2', 'mes_wm_product_receipt_status', 0, 'primary', '', '待上架', '1', '2026-03-01 06:03:07', '1', '2026-03-01 06:03:07', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3246, 3, '待执行入库', '3', 'mes_wm_product_receipt_status', 0, 'warning', '', '待执行入库', '1', '2026-03-01 06:03:07', '1', '2026-03-01 06:03:07', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3247, 4, '已完成', '4', 'mes_wm_product_receipt_status', 0, 'success', '', '已完成', '1', '2026-03-01 06:03:07', '1', '2026-03-01 06:03:07', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3248, 5, '已取消', '5', 'mes_wm_product_receipt_status', 0, 'danger', '', '已取消', '1', '2026-03-01 06:03:07', '1', '2026-03-01 06:03:07', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3252, 1, '草稿', '0', 'mes_wm_product_sales_status', 0, 'info', '', '草稿状态', '1', '2026-03-02 08:55:11', '1', '2026-03-02 08:55:11', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3253, 3, '待拣货', '2', 'mes_wm_product_sales_status', 0, 'warning', '', '待拣货状态', '1', '2026-03-02 08:55:11', '1', '2026-03-27 11:44:48', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3254, 4, '待出库', '3', 'mes_wm_product_sales_status', 0, 'primary', '', '待出库状态', '1', '2026-03-02 08:55:11', '1', '2026-03-27 11:44:48', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3255, 5, '已完成', '4', 'mes_wm_product_sales_status', 0, 'success', '', '已完成状态', '1', '2026-03-02 08:55:11', '1', '2026-03-27 11:44:48', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3256, 6, '已取消', '5', 'mes_wm_product_sales_status', 0, 'danger', '', '已取消状态', '1', '2026-03-02 08:55:11', '1', '2026-03-27 11:44:48', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3272, 1, '草稿', '0', 'mes_wm_misc_receipt_status', 0, 'info', '', '草稿状态', '1', '2026-03-03 07:33:41', '1', '2026-03-03 07:33:41', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3273, 2, '待执行入库', '3', 'mes_wm_misc_receipt_status', 0, 'primary', '', '待执行入库状态', '1', '2026-03-03 07:33:41', '1', '2026-03-03 07:37:34', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3274, 3, '已完成', '4', 'mes_wm_misc_receipt_status', 0, 'success', '', '已完成状态', '1', '2026-03-03 07:33:41', '1', '2026-03-03 07:33:41', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3275, 4, '已取消', '5', 'mes_wm_misc_receipt_status', 0, 'danger', '', '已取消状态', '1', '2026-03-03 07:33:41', '1', '2026-03-03 07:33:41', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3277, 1, '库存调整', '1', 'mes_wm_misc_receipt_type', 0, 'primary', '', '库存调整入库', '1', '2026-03-03 07:34:33', '1', '2026-03-03 07:34:33', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3278, 1, '库存调整', '1', 'mes_wm_misc_issue_type', 0, 'primary', '', '库存调整出库', '1', '2026-03-03 07:34:33', '1', '2026-03-03 07:34:33', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3279, 2, '报废出库', '2', 'mes_wm_misc_issue_type', 0, 'danger', '', '报废出库', '1', '2026-03-03 07:36:13', '1', '2026-03-03 07:36:13', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3280, 1, '草稿', '0', 'mes_wm_outsource_receipt_status', 0, 'info', '', '草稿状态', '1', '2026-03-03 14:03:57', '1', '2026-03-03 14:03:57', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3281, 2, '待检验', '1', 'mes_wm_outsource_receipt_status', 0, 'warning', '', '已确认，等待质检', '1', '2026-03-03 14:03:57', '1', '2026-03-03 14:03:57', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3282, 3, '待上架', '2', 'mes_wm_outsource_receipt_status', 0, 'primary', '', '检验完成，等待仓库上架', '1', '2026-03-03 14:03:57', '1', '2026-03-03 14:03:57', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3283, 4, '待执行入库', '3', 'mes_wm_outsource_receipt_status', 0, 'warning', '', '上架完成，等待执行入库操作', '1', '2026-03-03 14:03:57', '1', '2026-03-03 14:03:57', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3284, 5, '已完成', '4', 'mes_wm_outsource_receipt_status', 0, 'success', '', '入库执行完成，库存已更新', '1', '2026-03-03 14:03:57', '1', '2026-03-03 14:03:57', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3285, 6, '已取消', '5', 'mes_wm_outsource_receipt_status', 0, 'danger', '', '已取消', '1', '2026-03-03 14:03:57', '1', '2026-03-03 14:03:57', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3286, 1, '草稿', '0', 'mes_wm_outsource_issue_status', 0, 'info', '', '草稿状态，可编辑、删除、执行出库', '1', '2026-03-03 16:31:00', '1', '2026-03-03 16:31:00', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3287, 2, '待拣货', '2', 'mes_wm_outsource_issue_status', 0, 'warning', '', '待拣货状态', '1', '2026-03-03 16:31:00', '1', '2026-03-03 16:31:00', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3288, 3, '待执行出库', '3', 'mes_wm_outsource_issue_status', 0, 'primary', '', '待执行出库状态', '1', '2026-03-03 16:31:00', '1', '2026-03-03 16:31:00', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3289, 4, '已完成', '4', 'mes_wm_outsource_issue_status', 0, 'success', '', '已完成，库存已扣减', '1', '2026-03-03 16:31:00', '1', '2026-03-03 16:31:00', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3290, 5, '已取消', '5', 'mes_wm_outsource_issue_status', 0, 'danger', '', '已取消状态', '1', '2026-03-03 16:31:00', '1', '2026-03-03 16:31:00', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3301, 1, '输入字符', '1', 'mes_md_auto_code_part_type', 0, 'default', '', '输入字符', '1', '2026-03-04 14:46:22', '1', '2026-03-04 15:24:40', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3302, 2, '当前日期', '2', 'mes_md_auto_code_part_type', 0, 'primary', '', '当前日期时间', '1', '2026-03-04 14:46:22', '1', '2026-03-04 15:24:40', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3303, 3, '固定字符', '3', 'mes_md_auto_code_part_type', 0, 'success', '', '固定字符', '1', '2026-03-04 14:46:22', '1', '2026-03-04 15:24:40', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3304, 4, '流水号', '4', 'mes_md_auto_code_part_type', 0, 'warning', '', '流水号', '1', '2026-03-04 14:46:22', '1', '2026-03-04 15:24:40', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3305, 1, '左补齐', '1', 'mes_md_auto_code_padded_method', 0, 'primary', '', '左补齐', '1', '2026-03-04 14:46:22', '1', '2026-03-04 15:24:40', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3306, 2, '右补齐', '2', 'mes_md_auto_code_padded_method', 0, 'success', '', '右补齐', '1', '2026-03-04 14:46:22', '1', '2026-03-04 15:24:40', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3307, 1, '按年', '1', 'mes_md_auto_code_cycle_method', 0, 'default', '', '按年循环', '1', '2026-03-04 14:46:22', '1', '2026-03-04 15:24:40', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3308, 2, '按月', '2', 'mes_md_auto_code_cycle_method', 0, 'primary', '', '按月循环', '1', '2026-03-04 14:46:22', '1', '2026-03-04 15:24:40', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3309, 3, '按天', '3', 'mes_md_auto_code_cycle_method', 0, 'success', '', '按天循环', '1', '2026-03-04 14:46:22', '1', '2026-03-04 15:24:40', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3310, 4, '按小时', '4', 'mes_md_auto_code_cycle_method', 0, 'warning', '', '按小时循环', '1', '2026-03-04 14:46:22', '1', '2026-03-04 15:24:40', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3311, 5, '按分钟', '5', 'mes_md_auto_code_cycle_method', 0, 'danger', '', '按分钟循环', '1', '2026-03-04 14:46:22', '1', '2026-03-04 15:24:40', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3312, 10, '按传入字符', '10', 'mes_md_auto_code_cycle_method', 0, 'info', '', '按传入字符循环', '1', '2026-03-04 14:46:22', '1', '2026-03-04 15:24:40', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3313, 1, '二维码', '1', 'mes_wm_barcode_format', 0, 'primary', '', 'QR_CODE', '1', '2026-03-05 14:37:20', '1', '2026-03-06 13:18:21', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3314, 2, 'EAN13 商品条码', '2', 'mes_wm_barcode_format', 0, 'success', '', 'EAN13', '1', '2026-03-05 14:37:20', '1', '2026-03-06 13:18:23', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3315, 3, 'CODE39 工业条码', '3', 'mes_wm_barcode_format', 0, 'info', '', 'CODE39', '1', '2026-03-05 14:37:20', '1', '2026-03-06 13:18:25', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3316, 4, 'UPC-A 美国商品码', '4', 'mes_wm_barcode_format', 0, 'warning', '', 'UPC_A', '1', '2026-03-05 14:37:20', '1', '2026-03-06 13:18:28', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3318, 3, '库位', '104', 'mes_wm_barcode_biz_type', 0, 'default', '', 'AREA', '1', '2026-03-05 14:37:20', '1', '2026-03-07 06:25:19', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3319, 4, '装箱单', '105', 'mes_wm_barcode_biz_type', 0, 'default', '', 'PACKAGE', '1', '2026-03-05 14:37:20', '1', '2026-03-07 06:25:19', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3320, 5, '库存', '106', 'mes_wm_barcode_biz_type', 0, 'default', '', 'STOCK', '1', '2026-03-05 14:37:20', '1', '2026-03-07 06:25:19', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3321, 6, '批次', '107', 'mes_wm_barcode_biz_type', 0, 'default', '', 'BATCH', '1', '2026-03-05 14:37:20', '1', '2026-03-07 06:25:19', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3322, 7, '流转卡', '300', 'mes_wm_barcode_biz_type', 0, 'primary', '', 'PROCARD', '1', '2026-03-05 14:37:20', '1', '2026-03-07 06:25:19', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3323, 8, '工单', '301', 'mes_wm_barcode_biz_type', 0, 'primary', '', 'WORKORDER', '1', '2026-03-05 14:37:20', '1', '2026-03-07 06:25:19', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3324, 9, '流转单', '302', 'mes_wm_barcode_biz_type', 0, 'primary', '', 'TRANSORDER', '1', '2026-03-05 14:37:20', '1', '2026-03-07 06:25:19', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3325, 10, '设备', '400', 'mes_wm_barcode_biz_type', 0, 'success', '', 'MACHINERY', '1', '2026-03-05 14:37:20', '1', '2026-03-07 06:25:19', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3327, 12, '产品物料', '600', 'mes_wm_barcode_biz_type', 0, 'info', '', 'ITEM', '1', '2026-03-05 14:37:20', '1', '2026-03-07 06:25:19', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3328, 13, '供应商', '601', 'mes_wm_barcode_biz_type', 0, 'info', '', 'VENDOR', '1', '2026-03-05 14:37:20', '1', '2026-03-07 06:25:19', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3329, 14, '工作站', '602', 'mes_wm_barcode_biz_type', 0, 'info', '', 'WORKSTATION', '1', '2026-03-05 14:37:20', '1', '2026-03-07 06:25:19', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3330, 15, '车间', '603', 'mes_wm_barcode_biz_type', 0, 'info', '', 'WORKSHOP', '1', '2026-03-05 14:37:20', '1', '2026-03-07 06:25:19', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3331, 16, '人员', '604', 'mes_wm_barcode_biz_type', 0, 'info', '', 'USER', '1', '2026-03-05 14:37:20', '1', '2026-03-07 06:25:19', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3351, 1, '仓库', '102', 'mes_wm_barcode_biz_type', 0, '', '', NULL, '', '2026-03-07 06:22:27', '', '2026-03-07 06:25:19', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3352, 2, '库区', '103', 'mes_wm_barcode_biz_type', 0, '', '', NULL, '', '2026-03-07 06:22:27', '', '2026-03-07 06:25:19', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3353, 11, '工具', '500', 'mes_wm_barcode_biz_type', 0, '', '', NULL, '', '2026-03-07 06:22:27', '', '2026-03-07 06:22:27', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3354, 17, '客户', '605', 'mes_wm_barcode_biz_type', 0, '', '', NULL, '', '2026-03-07 06:22:27', '', '2026-03-07 06:25:19', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3355, 1, '草稿', '0', 'mes_wm_package_status', 0, 'info', '', '草稿状态，可编辑', '1', '2026-03-08 02:05:46', '1', '2026-03-08 02:05:46', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3356, 2, '已完成', '4', 'mes_wm_package_status', 0, 'success', '', '装箱已完成', '1', '2026-03-08 02:05:46', '1', '2026-03-08 02:05:46', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3357, 1, '草稿', '0', 'mes_wm_transfer_status', 0, 'info', '', '草稿状态，可编辑', '1', '2026-03-08 11:55:25', '1', '2026-03-08 11:55:25', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3358, 2, '待确认', '1', 'mes_wm_transfer_status', 0, 'warning', '', '外部调拨待确认到货', '1', '2026-03-08 11:55:25', '1', '2026-03-08 11:55:25', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3359, 3, '待上架', '2', 'mes_wm_transfer_status', 0, 'primary', '', '待维护目标库位明细', '1', '2026-03-08 11:55:25', '1', '2026-03-08 11:55:25', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3360, 4, '待执行', '3', 'mes_wm_transfer_status', 0, 'success', '', '目标库位已分配，待执行调拨', '1', '2026-03-08 11:55:25', '1', '2026-03-08 11:55:25', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3361, 5, '已完成', '4', 'mes_wm_transfer_status', 0, 'success', '', '调拨已完成', '1', '2026-03-08 11:55:25', '1', '2026-03-08 11:55:25', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3362, 6, '已取消', '5', 'mes_wm_transfer_status', 0, 'danger', '', '调拨已取消', '1', '2026-03-08 11:55:25', '1', '2026-03-08 11:55:25', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3363, 1, '内部调拨', '1', 'mes_wm_transfer_type', 0, 'success', '', '内部仓储调拨', '1', '2026-03-08 11:55:25', '1', '2026-03-08 11:55:25', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3364, 2, '外部调拨', '2', 'mes_wm_transfer_type', 0, 'warning', '', '外部配送/外部收货调拨', '1', '2026-03-08 11:55:25', '1', '2026-03-08 11:55:25', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3365, 1, '静态盘点', '1', 'mes_wm_stock_taking_type', 0, 'primary', '', '静态盘点', '1', '2026-03-09 00:00:00', '1', '2026-04-05 15:02:18', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3366, 2, '动态盘点', '2', 'mes_wm_stock_taking_type', 0, 'success', '', '动态盘点', '1', '2026-03-09 00:00:00', '1', '2026-04-05 15:02:18', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3367, 1, '仓库', '102', 'mes_wm_stock_taking_plan_param_type', 0, 'primary', '', '按仓库盘点', '1', '2026-03-09 00:00:00', '1', '2026-03-09 00:00:00', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3368, 2, '库区', '103', 'mes_wm_stock_taking_plan_param_type', 0, 'success', '', '按库区盘点', '1', '2026-03-09 00:00:00', '1', '2026-03-09 00:00:00', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3369, 3, '库位', '104', 'mes_wm_stock_taking_plan_param_type', 0, 'info', '', '按库位盘点', '1', '2026-03-09 00:00:00', '1', '2026-03-09 00:00:00', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3370, 4, '物料', '600', 'mes_wm_stock_taking_plan_param_type', 0, 'warning', '', '按物料盘点', '1', '2026-03-09 00:00:00', '1', '2026-03-09 00:00:00', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3371, 5, '批次', '107', 'mes_wm_stock_taking_plan_param_type', 0, 'danger', '', '按批次盘点', '1', '2026-03-09 00:00:00', '1', '2026-03-09 00:00:00', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3372, 1, '草稿', '0', 'mes_wm_stock_taking_task_status', 0, 'info', '', '草稿', '1', '2026-03-09 00:00:00', '1', '2026-04-05 15:02:18', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3373, 2, '审批中', '2', 'mes_wm_stock_taking_task_status', 0, 'primary', '', '盘点任务审批中', '1', '2026-03-09 00:00:00', '1', '2026-03-09 00:00:00', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3374, 3, '已完成', '4', 'mes_wm_stock_taking_task_status', 0, 'success', '', '已完成', '1', '2026-03-09 00:00:00', '1', '2026-04-05 15:02:18', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3375, 4, '已取消', '5', 'mes_wm_stock_taking_task_status', 0, 'danger', '', '已取消', '1', '2026-03-09 00:00:00', '1', '2026-04-05 15:02:18', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3377, 1, '正常', '1', 'mes_wm_stock_taking_task_line_status', 0, 'success', '', '正常', '1', '2026-03-09 00:00:00', '1', '2026-04-05 15:02:18', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3378, 2, '盘盈', '2', 'mes_wm_stock_taking_task_line_status', 0, 'primary', '', '盘盈', '1', '2026-03-09 00:00:00', '1', '2026-04-05 15:02:18', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3379, 3, '盘亏', '3', 'mes_wm_stock_taking_task_line_status', 0, 'danger', '', '盘亏', '1', '2026-03-09 00:00:00', '1', '2026-04-05 15:02:18', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3380, 6, '质量状态', '900', 'mes_wm_stock_taking_plan_param_type', 0, 'default', '', '按质量状态盘点', '1', '2026-03-09 00:00:00', '1', '2026-03-09 00:00:00', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3381, 1, '物料', 'ITEM', 'mes_md_item_or_product', 0, 'info', '', '', '1', '2026-03-15 01:55:06', '1', '2026-03-15 01:55:06', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3382, 2, '产品', 'PRODUCT', 'mes_md_item_or_product', 0, 'success', '', '', '1', '2026-03-15 01:55:06', '1', '2026-03-15 01:55:06', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3383, 1, '草稿', '0', 'mes_wm_item_consume_status', 0, 'info', '', '草稿状态', '1', '2026-03-19 15:06:23', '1', '2026-03-19 15:06:23', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3384, 2, '已完成', '4', 'mes_wm_item_consume_status', 0, 'success', '', '已完成', '1', '2026-03-19 15:06:23', '1', '2026-03-19 15:06:23', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3385, 1, '到货通知单', '100', 'mes_qc_source_doc_type', 0, 'primary', '', 'IQC', '1', '2026-03-26 13:01:09', '1', '2026-03-26 13:01:09', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3386, 2, '外协入库单', '121', 'mes_qc_source_doc_type', 0, 'warning', '', 'IQC', '1', '2026-03-26 13:01:09', '1', '2026-03-26 13:01:09', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3387, 3, '生产报工', '304', 'mes_qc_source_doc_type', 0, 'success', '', 'IPQC', '1', '2026-03-26 13:01:09', '1', '2026-03-26 13:01:09', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3388, 4, '销售出库单', '118', 'mes_qc_source_doc_type', 0, 'info', '', 'OQC', '1', '2026-03-26 13:01:09', '1', '2026-03-26 13:01:09', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3389, 5, '生产退料单', '116', 'mes_qc_source_doc_type', 0, 'danger', '', 'RQC', '1', '2026-03-26 13:01:09', '1', '2026-03-26 13:01:09', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3390, 6, '销售退货单', '119', 'mes_qc_source_doc_type', 0, 'default', '', 'RQC', '1', '2026-03-26 13:01:09', '1', '2026-03-26 13:01:09', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3397, 2, '待检测', '1', 'mes_wm_product_sales_status', 0, 'warning', '', 'OQC 检验中', '1', '2026-03-27 11:44:48', '1', '2026-03-27 11:44:48', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3398, 0, '草稿', '0', 'mes_wm_return_vendor_status', 0, 'info', '', NULL, '', '2026-03-29 13:49:57', '', '2026-04-05 15:53:46', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3399, 1, '待拣货', '2', 'mes_wm_return_vendor_status', 0, 'primary', '', NULL, '', '2026-03-29 13:49:57', '', '2026-04-05 15:53:46', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3400, 2, '待执行退货', '3', 'mes_wm_return_vendor_status', 0, 'warning', '', NULL, '', '2026-03-29 13:49:57', '', '2026-04-05 15:53:46', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3401, 3, '已完成', '4', 'mes_wm_return_vendor_status', 0, 'success', '', NULL, '', '2026-03-29 13:49:57', '', '2026-04-05 15:53:46', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3402, 4, '已取消', '5', 'mes_wm_return_vendor_status', 0, 'danger', '', NULL, '', '2026-03-29 13:49:57', '', '2026-04-05 15:53:46', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3403, 1, '草稿', '0', 'mes_wm_sales_notice_status', 0, 'info', '', '草稿状态，可以修改和删除', '1', '2026-03-30 08:54:30', '1', '2026-04-05 15:53:46', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3404, 2, '待出库', '3', 'mes_wm_sales_notice_status', 0, 'success', '', '已提交状态，不可修改和删除', '1', '2026-03-30 08:54:30', '1', '2026-04-05 15:53:46', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3405, 3, '已完成', '4', 'mes_wm_sales_notice_status', 0, '', '', NULL, '1', '2026-03-30 10:02:10', '1', '2026-04-05 15:53:46', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3406, 1, '草稿', '0', 'mes_wm_misc_issue_status', 0, 'info', '', '草稿状态', '1', '2026-03-30 15:00:18', '1', '2026-03-30 15:00:18', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3407, 2, '待出库', '3', 'mes_wm_misc_issue_status', 0, 'warning', '', '待出库状态', '1', '2026-03-30 15:00:18', '1', '2026-03-30 15:00:18', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3408, 3, '已完成', '4', 'mes_wm_misc_issue_status', 0, 'success', '', '执行出库后的状态', '1', '2026-03-30 15:00:18', '1', '2026-03-30 15:00:18', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3409, 4, '已取消', '5', 'mes_wm_misc_issue_status', 0, 'danger', '', '已取消状态', '1', '2026-03-30 15:00:18', '1', '2026-03-30 15:00:18', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3415, 1, '注塑', '1', 'mes_cal_calendar_type', 0, 'primary', '', '', '1', '2026-04-01 15:23:14', '1', '2026-04-01 16:08:31', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3416, 2, '机加工', '2', 'mes_cal_calendar_type', 0, 'success', '', '', '1', '2026-04-01 15:23:14', '1', '2026-04-01 16:08:32', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3417, 3, '组装', '3', 'mes_cal_calendar_type', 0, 'warning', '', '', '1', '2026-04-01 15:23:14', '1', '2026-04-01 16:08:33', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3418, 4, '仓库', '4', 'mes_cal_calendar_type', 0, 'danger', '', '', '1', '2026-04-01 15:23:14', '1', '2026-04-01 16:08:34', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3419, 0, '草稿', '0', 'mes_dv_repair_status', 0, 'info', '', '', '1', '2026-04-03 17:20:23', '1', '2026-04-03 17:20:23', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3420, 1, '维修中', '1', 'mes_dv_repair_status', 0, 'primary', '', '', '1', '2026-04-03 17:20:23', '1', '2026-04-03 17:20:23', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3421, 2, '待验收', '2', 'mes_dv_repair_status', 0, 'warning', '', '', '1', '2026-04-03 17:20:23', '1', '2026-04-03 17:20:23', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3422, 3, '已确认', '4', 'mes_dv_repair_status', 0, 'success', '', '', '1', '2026-04-03 17:20:23', '1', '2026-04-03 17:20:23', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3423, 0, '草稿', '0', 'mes_wm_return_sales_status', 0, 'info', '', '', '1', '2026-04-03 17:20:25', '1', '2026-04-03 17:20:25', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3424, 1, '待检验', '1', 'mes_wm_return_sales_status', 0, 'warning', '', '', '1', '2026-04-03 17:20:25', '1', '2026-04-03 17:20:25', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3425, 2, '待执行', '2', 'mes_wm_return_sales_status', 0, 'warning', '', '', '1', '2026-04-03 17:20:25', '1', '2026-04-03 17:20:25', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3426, 3, '待上架', '3', 'mes_wm_return_sales_status', 0, 'primary', '', '', '1', '2026-04-03 17:20:25', '1', '2026-04-03 17:20:25', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3427, 4, '已完成', '4', 'mes_wm_return_sales_status', 0, 'success', '', '', '1', '2026-04-03 17:20:25', '1', '2026-04-03 17:20:25', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3428, 5, '已取消', '5', 'mes_wm_return_sales_status', 0, 'danger', '', '', '1', '2026-04-03 17:20:25', '1', '2026-04-03 17:20:25', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3429, 1, '尺寸', '1', 'mes_defect_type', 0, '', '', '', '1', '2026-04-04 12:49:51', '1', '2026-04-09 15:03:20', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3430, 2, '外观', '2', 'mes_defect_type', 0, '', '', '', '1', '2026-04-04 12:49:51', '1', '2026-04-09 15:03:20', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3431, 3, '重量', '3', 'mes_defect_type', 0, '', '', '', '1', '2026-04-04 12:49:51', '1', '2026-04-09 15:03:20', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3432, 4, '性能', '4', 'mes_defect_type', 0, '', '', '', '1', '2026-04-04 12:49:51', '1', '2026-04-09 15:03:20', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3433, 5, '成分', '5', 'mes_defect_type', 0, '', '', '', '1', '2026-04-04 12:49:51', '1', '2026-04-09 15:03:20', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3436, 1, '上工', '1', 'mes_pro_work_record_type', 0, 'success', '', '', '1', '2026-04-05 14:07:27', '1', '2026-04-05 14:07:27', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3437, 2, '下工', '2', 'mes_pro_work_record_type', 0, 'danger', '', '', '1', '2026-04-05 14:07:27', '1', '2026-04-05 14:07:27', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3443, 1, '草稿', '0', 'mes_wm_product_produce_status', 0, 'info', '', '草稿状态', '1', '2026-04-05 15:53:46', '1', '2026-04-05 15:53:46', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3444, 2, '已完成', '4', 'mes_wm_product_produce_status', 0, 'success', '', '已完成状态', '1', '2026-04-05 15:53:46', '1', '2026-04-05 15:53:46', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3445, 3, '已取消', '5', 'mes_wm_product_produce_status', 0, 'danger', '', '已取消状态', '1', '2026-04-05 15:53:46', '1', '2026-04-05 15:53:46', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3446, 0, '草稿', '0', 'mes_pro_task_status', 0, '', '', NULL, '1', '2026-04-16 09:47:00', '1', '2026-04-16 09:47:00', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3447, 1, '已完成', '4', 'mes_pro_task_status', 0, '', '', NULL, '1', '2026-04-16 09:47:00', '1', '2026-04-16 09:47:00', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3448, 2, '已取消', '5', 'mes_pro_task_status', 0, '', '', NULL, '1', '2026-04-16 09:47:00', '1', '2026-04-16 09:47:00', '0');
 COMMIT;
 SET IDENTITY_INSERT system_dict_data OFF;
 -- @formatter:on
@@ -1248,19 +1562,18 @@ SET IDENTITY_INSERT system_dict_data OFF;
 -- ----------------------------
 -- Table structure for system_dict_type
 -- ----------------------------
-CREATE TABLE system_dict_type
-(
-    id           bigint                                 NOT NULL PRIMARY KEY IDENTITY,
-    name         varchar(100) DEFAULT ''                NULL,
-    type         varchar(100) DEFAULT ''                NULL,
-    status       smallint     DEFAULT 0                 NOT NULL,
-    remark       varchar(500) DEFAULT NULL              NULL,
-    creator      varchar(64)  DEFAULT ''                NULL,
-    create_time  datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater      varchar(64)  DEFAULT ''                NULL,
-    update_time  datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted      bit          DEFAULT '0'               NOT NULL,
-    deleted_time datetime     DEFAULT NULL              NULL
+CREATE TABLE system_dict_type (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    name varchar(100) DEFAULT '' NULL,
+    type varchar(100) DEFAULT '' NULL,
+    status smallint DEFAULT 0 NOT NULL,
+    remark varchar(500) DEFAULT NULL NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT '0' NOT NULL,
+    deleted_time datetime DEFAULT NULL NULL
 );
 
 COMMENT ON COLUMN system_dict_type.id IS '字典主键';
@@ -1374,20 +1687,99 @@ INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_ti
 INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (628, 'AI 写作类型', 'ai_write_type', 0, '', '1', '2024-07-10 21:25:29', '1', '2024-07-10 21:25:29', '0', '1970-01-01 00:00:00');
 INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (629, 'BPM 流程模型类型', 'bpm_model_type', 0, '', '1', '2024-08-26 15:21:43', '1', '2024-08-26 15:21:43', '0', '1970-01-01 00:00:00');
 INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (640, 'AI 模型类型', 'ai_model_type', 0, '', '1', '2025-03-03 12:24:07', '1', '2025-03-03 12:24:07', '0', '1970-01-01 00:00:00');
-INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1000, 'IoT 数据格式', 'iot_data_format', 0, '', '1', '2024-08-10 11:52:58', '1', '2025-03-17 09:25:06', '0', '1970-01-01 00:00:00');
 INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1001, 'IoT 产品设备类型', 'iot_product_device_type', 0, '', '1', '2024-08-10 11:54:30', '1', '2025-03-17 09:25:08', '0', '1970-01-01 00:00:00');
 INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1002, 'IoT 产品状态', 'iot_product_status', 0, '', '1', '2024-08-10 12:06:09', '1', '2025-03-17 09:25:10', '0', '1970-01-01 00:00:00');
-INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1003, 'IoT 数据校验级别', 'iot_validate_type', 0, '', '1', '2024-09-06 20:05:13', '1', '2025-03-17 09:25:12', '0', '1970-01-01 00:00:00');
 INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1004, 'IoT 联网方式', 'iot_net_type', 0, '', '1', '2024-09-06 22:04:13', '1', '2025-03-17 09:25:14', '0', '1970-01-01 00:00:00');
-INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1005, 'IoT 接入网关协议', 'iot_protocol_type', 0, '', '1', '2024-09-06 22:20:17', '1', '2025-03-17 09:25:16', '0', '1970-01-01 00:00:00');
 INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1006, 'IoT 设备状态', 'iot_device_state', 0, '', '1', '2024-09-21 08:12:55', '1', '2025-03-17 09:25:19', '0', '1970-01-01 00:00:00');
 INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1007, 'IoT 物模型功能类型', 'iot_thing_model_type', 0, '', '1', '2024-09-29 20:02:36', '1', '2025-03-17 09:25:24', '0', '1970-01-01 00:00:00');
-INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1008, 'IoT 插件部署方式', 'iot_plugin_deploy_type', 0, '', '1', '2024-12-13 10:55:13', '1', '2025-03-17 09:25:27', '0', '1970-01-01 00:00:00');
-INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1009, 'IoT 插件状态', 'iot_plugin_status', 0, '', '1', '2024-12-13 11:05:34', '1', '2025-03-17 09:25:30', '0', '1970-01-01 00:00:00');
-INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1010, 'IoT 插件类型', 'iot_plugin_type', 0, '', '1', '2024-12-13 11:08:19', '1', '2025-03-17 09:25:32', '0', '1970-01-01 00:00:00');
 INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1011, 'IoT 物模型单位', 'iot_thing_model_unit', 0, '', '1', '2024-12-25 17:36:46', '1', '2025-03-17 09:25:35', '0', '1970-01-01 00:00:00');
-INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1012, 'IoT 数据桥接的方向枚举', 'iot_data_bridge_direction_enum', 0, '', '1', '2025-03-09 12:37:40', '1', '2025-03-17 09:25:39', '0', '1970-01-01 00:00:00');
-INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1013, 'IoT 数据桥梁的类型枚举', 'iot_data_bridge_type_enum', 0, '', '1', '2025-03-09 12:39:36', '1', '2025-04-06 17:09:46', '0', '1970-01-01 00:00:00');
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1013, 'IoT 数据流转目的的类型枚举', 'iot_data_sink_type_enum', 0, '', '1', '2025-03-09 12:39:36', '1', '2025-06-24 12:45:24', '0', '1970-01-01 00:00:00');
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1014, 'IoT 场景流转的触发类型枚举', 'iot_rule_scene_trigger_type_enum', 0, '', '1', '2025-03-20 14:59:44', '1', '2025-03-20 14:59:44', '0', '1970-01-01 00:00:00');
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1015, 'IoT 设备消息类型枚举', 'iot_device_message_type_enum', 0, '', '1', '2025-03-20 15:01:15', '1', '2025-03-20 15:01:15', '0', '1970-01-01 00:00:00');
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1016, 'IoT 规则场景的触发类型枚举', 'iot_rule_scene_action_type_enum', 0, '', '1', '2025-03-28 15:26:54', '1', '2025-03-28 15:29:13', '0', '1970-01-01 00:00:00');
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1017, 'MES 物料消耗记录状态', 'mes_wm_item_consume_status', 0, 'MES 物料消耗记录状态', '1', '2026-03-19 15:06:23', '1', '2026-03-19 15:06:23', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2001, 'IoT 告警级别', 'iot_alert_level', 0, '', '1', '2025-06-27 20:30:57', '1', '2025-06-27 20:30:57', '0', '1970-01-01 00:00:00');
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2002, 'IoT 告警', 'iot_alert_receive_type', 0, '', '1', '2025-06-27 22:49:19', '1', '2025-06-27 22:49:19', '0', '1970-01-01 00:00:00');
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2003, 'IoT 固件设备范围', 'iot_ota_task_device_scope', 0, '', '1', '2025-07-02 09:42:49', '1', '2025-07-02 09:42:49', '0', '1970-01-01 00:00:00');
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2004, 'IoT 固件升级任务状态', 'iot_ota_task_status', 0, '', '1', '2025-07-02 09:43:43', '1', '2025-07-02 09:43:43', '0', '1970-01-01 00:00:00');
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2005, 'IoT 固件升级记录状态', 'iot_ota_task_record_status', 0, '', '1', '2025-07-02 09:45:02', '1', '2025-07-02 09:45:02', '0', '1970-01-01 00:00:00');
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2007, 'AI MCP 客户端名字', 'ai_mcp_client_name', 0, '', '1', '2025-08-28 13:57:40', '1', '2025-08-28 13:57:40', '0', '1970-01-01 00:00:00');
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2008, 'IoT 协议类型', 'iot_protocol_type', 0, 'IoT 设备接入协议类型', '1', '2026-02-04 00:31:33', '1', '2026-02-04 00:31:33', '0', '1970-01-01 00:00:00');
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2009, 'IoT 序列化类型', 'iot_serialize_type', 0, 'IoT 设备消息序列化类型', '1', '2026-02-04 00:33:16', '1', '2026-02-04 00:33:16', '0', '1970-01-01 00:00:00');
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2010, 'IoT Modbus 工作模式', 'iot_modbus_mode', 0, 'Modbus 设备数据采集模式', '1', '2025-06-12 22:55:46', '1', '2025-06-12 22:55:46', '0', '1970-01-01 00:00:00');
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2011, 'IoT Modbus 帧格式', 'iot_modbus_frame_format', 0, 'Modbus 数据帧协议格式', '1', '2025-06-12 22:55:46', '1', '2025-06-12 22:55:46', '0', '1970-01-01 00:00:00');
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2012, 'MES 客户类型', 'mes_client_type', 0, '', '1', '2026-02-15 14:38:25', '1', '2026-02-15 14:38:25', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2013, 'MES 供应商级别', 'mes_vendor_level', 0, '', '1', '2026-02-15 15:59:15', '1', '2026-02-15 15:59:15', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2014, 'MES 假期类型', 'mes_cal_holiday_type', 0, 'MES 日历排班 - 假期类型（HOLIDAY=假期，WORKDAY=工作日）', '1', '2026-02-16 07:35:58', '1', '2026-02-16 07:35:58', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2015, 'MES 工具状态', 'mes_tm_tool_status', 0, 'MES 工具管理 - 工具状态（1=在库，2=领用中，3=维修中，4=报废）', '1', '2026-02-16 11:10:55', '1', '2026-02-16 11:10:55', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2016, 'MES 保养维护类型', 'mes_tm_mainten_type', 0, 'MES 工具管理 - 保养维护类型（1=定期维护，2=按使用次数维护）', '1', '2026-02-16 11:10:55', '1', '2026-02-16 11:10:55', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2017, 'MES 设备状态', 'mes_dv_machinery_status', 0, 'MES 设备管理 - 设备状态（1=运行中，2=停机，3=故障）', '1', '2026-02-17 01:00:06', '1', '2026-02-17 01:00:06', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2018, 'MES 检测项类型', 'mes_indicator_type', 0, '', '1', '2026-02-17 02:16:22', '1', '2026-02-21 15:25:04', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2019, 'MES 缺陷等级', 'mes_defect_level', 0, '', '1', '2026-02-17 02:16:22', '1', '2026-02-17 02:16:22', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2020, 'MES 轮班方式', 'mes_cal_shift_type', 0, 'MES 日历排班 - 轮班方式', '1', '2026-02-17 03:40:09', '1', '2026-02-17 03:40:09', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2021, 'MES 倒班方式', 'mes_cal_shift_method', 0, 'MES 日历排班 - 倒班方式', '1', '2026-02-17 03:40:09', '1', '2026-02-17 03:40:09', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2022, 'MES 班组类型', 'mes_cal_calendar_type', 0, 'MES 日历排班 - 班组类型', '1', '2026-02-17 03:40:09', '1', '2026-02-17 03:40:09', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2023, 'MES 排班计划状态', 'mes_cal_plan_status', 0, 'MES 日历排班 - 排班计划状态', '1', '2026-02-17 03:40:09', '1', '2026-02-17 03:40:09', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2026, 'MES 检测种类', 'mes_qc_type', 0, 'IQC/IPQC/OQC/RQC', '1', '2026-02-17 08:34:40', '1', '2026-02-17 08:34:40', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2027, 'MES 生产工单状态', 'mes_pro_work_order_status', 0, 'MES 生产管理 - 工单状态（0=草稿，1=已确认，2=已完成，3=已取消）', '1', '2026-02-17 11:43:47', '1', '2026-02-17 11:43:47', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2028, 'MES 工单来源类型', 'mes_pro_work_order_source_type', 0, 'MES 生产管理 - 工单来源类型（1=客户订单，2=库存备货）', '1', '2026-02-17 11:43:47', '1', '2026-02-17 11:43:47', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2029, 'MES 工单类型', 'mes_pro_work_order_type', 0, 'MES 生产管理 - 工单类型（1=自行生产，2=代工，3=采购）', '1', '2026-02-17 11:43:47', '1', '2026-02-17 11:43:47', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2036, 'MES 工序关系类型', 'mes_pro_link_type', 0, '工艺路线中工序之间的关系类型', '1', '2026-02-19 04:24:53', '1', '2026-04-05 15:05:07', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2037, 'MES 时间单位', 'mes_time_unit_type', 0, '生产时间的计量单位', '1', '2026-02-19 04:24:53', '1', '2026-04-05 15:04:57', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2038, 'MES 生产任务状态', 'mes_pro_task_status', 0, 'MES 生产管理 - 任务状态（0=草稿，1=进行中，2=暂停，3=已完成，4=已取消）', '1', '2026-02-19 15:25:27', '1', '2026-02-19 15:25:27', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2039, 'MES 点检保养项目类型', 'mes_dv_subject_type', 0, 'MES 设备管理 - 点检保养项目类型（1=设备点检，2=设备保养）', '1', '2026-02-20 01:42:58', '1', '2026-02-20 01:42:58', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2040, 'MES 保养记录状态', 'mes_mainten_record_status', 0, NULL, 'admin', '2026-02-20 02:59:55', 'admin', '2026-02-20 02:59:55', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2041, 'MES 保养结果', 'mes_mainten_status', 0, NULL, 'admin', '2026-02-20 02:59:55', 'admin', '2026-02-20 02:59:55', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2042, 'MES 点检保养周期类型', 'mes_dv_cycle_type', 0, 'MES 设备管理 - 点检保养周期类型（1=天，2=周，3=月，4=年）', '1', '2026-02-20 07:11:43', '1', '2026-02-20 07:11:43', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2043, 'MES 点检保养方案状态', 'mes_dv_check_plan_status', 0, 'MES 设备管理 - 点检保养方案状态（0=草稿，1=已启用）', '1', '2026-02-20 07:11:43', '1', '2026-02-20 07:11:43', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2044, 'MES 点检记录状态', 'mes_dv_check_record_status', 0, NULL, 'admin', '2026-02-20 09:46:19', 'admin', '2026-02-20 09:46:19', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2045, 'MES 点检结果', 'mes_dv_check_result', 0, NULL, 'admin', '2026-02-20 09:46:19', 'admin', '2026-02-20 09:46:19', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2046, 'MES 维修工单状态', 'mes_dv_repair_status', 0, 'MES 设备管理 - 维修工单状态（10=待维修，20=维修中，30=已完成，40=已验收）', '1', '2026-02-20 10:56:24', '1', '2026-02-20 10:56:24', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2047, 'MES 维修结果', 'mes_dv_repair_result', 0, 'MES 设备管理 - 维修结果（1=修复成功，2=报废）', '1', '2026-02-20 10:56:24', '1', '2026-02-20 10:56:24', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2049, 'MES 检测结果', 'mes_qc_check_result', 0, '来料检验的最终结果判定', '1', '2026-02-20 11:23:35', '1', '2026-02-20 11:23:35', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2050, 'MES 来源单据类型', 'mes_qc_source_doc_type', 0, 'IQC 来料检验的来源单据类型', '1', '2026-02-20 11:23:35', '1', '2026-02-20 11:23:35', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2051, 'MES 安灯处置状态', 'mes_pro_andon_status', 0, 'MES 生产管理 - 安灯处置状态（0=未处置，1=已处置）', '1', '2026-02-21 00:08:38', '1', '2026-02-21 00:08:38', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2052, 'MES 安灯级别', 'mes_pro_andon_level', 0, 'MES 生产管理 - 安灯级别（1=一级，2=二级，3=三级）', '1', '2026-02-21 00:08:38', '1', '2026-02-21 00:08:38', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2053, 'MES 生产报工状态', 'mes_pro_feedback_status', 0, 'MES 生产管理 - 报工状态（0=草稿，1=审批中，2=待检验，3=已完成，4=已取消）', '1', '2026-02-21 00:50:32', '1', '2026-02-21 00:50:32', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2054, 'MES 生产报工类型', 'mes_pro_feedback_type', 0, 'MES 生产管理 - 报工类型（1=自行报工，2=统一报工）', '1', '2026-02-21 00:50:32', '1', '2026-02-21 00:50:32', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2055, 'MES 生产报工途径', 'mes_pro_feedback_channel', 0, 'MES 生产管理 - 报工途径（PC/APP/PDA）', '1', '2026-02-21 00:50:32', '1', '2026-02-21 00:50:32', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2056, 'MES 质检值类型', 'mes_qc_result_type', 0, '检验结果明细的值类型：浮点/整数/文本/字典/文件', '1', '2026-02-21 13:37:17', '1', '2026-02-21 13:37:17', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2057, 'MES 退货检验类型', 'mes_rqc_type', 0, 'MES 退货检验类型', '1', '2026-02-22 06:43:18', '1', '2026-02-22 06:43:18', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2062, 'MES IPQC 检验类型', 'mes_ipqc_type', 0, 'IPQC 过程检验的检验类型', '1', '2026-02-22 07:01:04', '1', '2026-02-22 07:01:04', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2066, 'MES 到货通知单状态', 'mes_wm_arrival_notice_status', 0, 'MES 到货通知单状态', '1', '2026-02-22 14:53:18', '1', '2026-02-22 14:53:18', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2067, 'MES 采购入库单状态', 'mes_wm_item_receipt_status', 0, 'MES 采购入库单状态', '1', '2026-02-22 14:54:05', '1', '2026-02-22 14:54:05', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2068, 'MES 单据状态', 'mes_order_status', 0, '', '1', '2026-02-23 21:16:03', '1', '2026-02-23 21:17:37', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2069, 'MES 领料出库单状态', 'mes_wm_product_issue_status', 0, 'MES 领料出库单状态', '1', '2026-02-26 16:39:44', '1', '2026-04-05 15:05:11', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2073, 'MES 生产退料单状态', 'mes_wm_return_issue_status', 0, 'MES 生产退料单状态', '1', '2026-02-28 14:11:09', '1', '2026-04-05 15:05:14', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2074, 'MES 生产退料类型', 'mes_wm_return_issue_type', 0, 'MES 生产退料类型', '1', '2026-02-28 14:11:09', '1', '2026-04-05 15:05:16', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2075, 'MES 质量状态', 'mes_wm_quality_status', 0, 'MES 质量状态（待检/合格/不合格）', '1', '2026-02-28 15:00:53', '1', '2026-02-28 15:00:53', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2100, 'MES 产品入库单状态', 'mes_wm_product_receipt_status', 0, 'MES 产品入库单状态', '1', '2026-03-01 06:03:04', '1', '2026-04-05 15:05:49', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2102, 'MES 销售出库单状态', 'mes_wm_product_sales_status', 0, 'MES 销售出库单状态', '1', '2026-03-02 08:55:11', '1', '2026-04-05 15:05:18', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2105, 'MES 杂项入库类型', 'mes_wm_misc_receipt_type', 0, '杂项入库类型', '1', '2026-03-03 07:18:12', '1', '2026-04-05 15:05:23', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2106, 'MES 杂项入库状态', 'mes_wm_misc_receipt_status', 0, '杂项入库状态', '1', '2026-03-03 07:18:12', '1', '2026-04-05 15:05:25', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2109, 'MES 杂项出库类型', 'mes_wm_misc_issue_type', 0, 'MES 杂项出库类型', '1', '2026-03-03 07:34:33', '1', '2026-03-03 07:34:33', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2110, 'MES 外协入库单状态', 'mes_wm_outsource_receipt_status', 0, 'MES 外协入库单状态', '1', '2026-03-03 14:03:20', '1', '2026-03-03 14:03:20', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2112, 'MES 外协发料单状态', 'mes_wm_outsource_issue_status', 0, 'MES 外协发料单状态', '1', '2026-03-03 16:30:56', '1', '2026-04-05 15:05:47', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2113, 'MES 编码规则分段类型', 'mes_md_auto_code_part_type', 0, 'MES 编码规则分段类型', '1', '2026-03-04 14:45:46', '1', '2026-03-04 15:24:40', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2115, 'MES 编码规则补齐方式', 'mes_md_auto_code_padded_method', 0, 'MES 编码规则补齐方式', '1', '2026-03-04 14:46:22', '1', '2026-03-04 15:24:40', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2116, 'MES 编码规则循环方式', 'mes_md_auto_code_cycle_method', 0, 'MES 编码规则循环方式', '1', '2026-03-04 14:46:22', '1', '2026-03-04 15:24:40', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2117, 'MES 条码格式', 'mes_wm_barcode_format', 0, 'MES 条码格式', '1', '2026-03-05 14:37:20', '1', '2026-04-05 15:05:27', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2118, 'MES 条码业务类型', 'mes_wm_barcode_biz_type', 0, 'MES 条码业务类型', '1', '2026-03-05 14:37:20', '1', '2026-04-05 15:05:29', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2121, 'MES 装箱单状态', 'mes_wm_package_status', 0, 'MES 装箱单状态', '1', '2026-03-08 02:05:46', '1', '2026-04-05 15:05:35', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2122, 'MES 调拨单状态', 'mes_wm_transfer_status', 0, 'MES 调拨单状态', '1', '2026-03-08 11:55:25', '1', '2026-03-08 11:55:25', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2123, 'MES 调拨类型', 'mes_wm_transfer_type', 0, 'MES 调拨类型', '1', '2026-03-08 11:55:25', '1', '2026-03-08 11:55:25', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2124, 'MES 盘点类型', 'mes_wm_stock_taking_type', 0, 'MES 盘点类型', '1', '2026-03-09 00:00:00', '1', '2026-03-09 00:00:00', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2125, 'MES 盘点方案参数类型', 'mes_wm_stock_taking_plan_param_type', 0, 'MES 盘点方案参数类型', '1', '2026-03-09 00:00:00', '1', '2026-03-09 00:00:00', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2126, 'MES 盘点任务状态', 'mes_wm_stock_taking_task_status', 0, 'MES 盘点任务状态', '1', '2026-03-09 00:00:00', '1', '2026-03-09 00:00:00', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2127, 'MES 盘点任务行状态', 'mes_wm_stock_taking_task_line_status', 0, 'MES 盘点任务行状态', '1', '2026-03-09 00:00:00', '1', '2026-04-05 15:02:18', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2129, 'MES 物料产品标识', 'mes_md_item_or_product', 0, '物料分类：物料(ITEM) / 产品(PRODUCT)', '1', '2026-03-15 01:55:06', '1', '2026-03-15 01:55:06', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2130, 'MES 供应商退货单状态', 'mes_wm_return_vendor_status', 0, '采购退货单状态', '', '2026-03-29 13:49:57', '', '2026-04-05 15:53:46', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2131, 'MES 发货通知单状态', 'mes_wm_sales_notice_status', 0, 'MES 发货通知单状态', '1', '2026-03-30 08:54:30', '1', '2026-04-05 15:53:46', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2132, 'MES 杂项出库单状态', 'mes_wm_misc_issue_status', 0, '杂项出库单状态', '1', '2026-03-30 15:00:18', '1', '2026-04-05 15:05:41', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2133, 'MES 销售退货单状态', 'mes_wm_return_sales_status', 0, 'MES 销售退货单状态枚举', '1', '2026-04-03 17:20:25', '1', '2026-04-05 15:05:39', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2134, 'MES 缺陷检测项类型', 'mes_defect_type', 0, '缺陷模块的检测项类型字典', '1', '2026-04-04 12:49:51', '1', '2026-04-04 12:49:51', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2135, 'MES 上下工状态类型', 'mes_pro_work_record_type', 0, 'MES 上下工状态类型', '1', '2026-04-05 14:07:27', '1', '2026-04-05 14:07:27', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2138, 'MES 生产入库单状态', 'mes_wm_product_produce_status', 0, 'MES 生产入库单状态', '1', '2026-04-05 15:53:46', '1', '2026-04-05 15:53:46', '0', '1970-01-01 00:00:00');
 COMMIT;
 SET IDENTITY_INSERT system_dict_type OFF;
 -- @formatter:on
@@ -1395,24 +1787,26 @@ SET IDENTITY_INSERT system_dict_type OFF;
 -- ----------------------------
 -- Table structure for system_login_log
 -- ----------------------------
-CREATE TABLE system_login_log
-(
-    id          bigint                                NOT NULL PRIMARY KEY IDENTITY,
-    log_type    bigint                                NOT NULL,
-    trace_id    varchar(64) DEFAULT ''                NULL,
-    user_id     bigint      DEFAULT 0                 NOT NULL,
-    user_type   smallint    DEFAULT 0                 NOT NULL,
-    username    varchar(50) DEFAULT ''                NULL,
-    result      smallint                              NOT NULL,
-    user_ip     varchar(50)                           NOT NULL,
-    user_agent  varchar(512)                          NOT NULL,
-    creator     varchar(64) DEFAULT ''                NULL,
-    create_time datetime    DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater     varchar(64) DEFAULT ''                NULL,
-    update_time datetime    DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted     bit         DEFAULT '0'               NOT NULL,
-    tenant_id   bigint      DEFAULT 0                 NOT NULL
+CREATE TABLE system_login_log (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    log_type bigint  NOT NULL,
+    trace_id varchar(64) DEFAULT '' NULL,
+    user_id bigint DEFAULT 0 NOT NULL,
+    user_type smallint DEFAULT 0 NOT NULL,
+    username varchar(50) DEFAULT '' NULL,
+    result smallint  NOT NULL,
+    user_ip varchar(50)  NOT NULL,
+    user_agent varchar(512)  NOT NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT '0' NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 );
+
+CREATE INDEX idx_system_login_log_01 ON system_login_log (username);
+CREATE INDEX idx_system_login_log_02 ON system_login_log (create_time);
 
 COMMENT ON COLUMN system_login_log.id IS '访问ID';
 COMMENT ON COLUMN system_login_log.log_type IS '日志类型';
@@ -1434,21 +1828,20 @@ COMMENT ON TABLE system_login_log IS '系统访问记录';
 -- ----------------------------
 -- Table structure for system_mail_account
 -- ----------------------------
-CREATE TABLE system_mail_account
-(
-    id              bigint                                NOT NULL PRIMARY KEY IDENTITY,
-    mail            varchar(255)                          NOT NULL,
-    username        varchar(255)                          NOT NULL,
-    password        varchar(255)                          NOT NULL,
-    host            varchar(255)                          NOT NULL,
-    port            int                                   NOT NULL,
-    ssl_enable      bit         DEFAULT '0'               NOT NULL,
-    starttls_enable bit         DEFAULT '0'               NOT NULL,
-    creator         varchar(64) DEFAULT ''                NULL,
-    create_time     datetime    DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater         varchar(64) DEFAULT ''                NULL,
-    update_time     datetime    DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted         bit         DEFAULT '0'               NOT NULL
+CREATE TABLE system_mail_account (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    mail varchar(255)  NOT NULL,
+    username varchar(255)  NOT NULL,
+    password varchar(255)  NOT NULL,
+    host varchar(255)  NOT NULL,
+    port int  NOT NULL,
+    ssl_enable bit DEFAULT '0' NOT NULL,
+    starttls_enable bit DEFAULT '0' NOT NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT '0' NOT NULL
 );
 
 COMMENT ON COLUMN system_mail_account.id IS '主键';
@@ -1472,7 +1865,7 @@ COMMENT ON TABLE system_mail_account IS '邮箱账号表';
 -- @formatter:off
 SET IDENTITY_INSERT system_mail_account ON;
 INSERT INTO system_mail_account (id, mail, username, password, host, port, ssl_enable, starttls_enable, creator, create_time, updater, update_time, deleted) VALUES (1, '7684413@qq.com', '7684413@qq.com', '1234576', '127.0.0.1', 8080, '0', '0', '1', '2023-01-25 17:39:52', '1', '2025-04-04 16:34:40', '0');
-INSERT INTO system_mail_account (id, mail, username, password, host, port, ssl_enable, starttls_enable, creator, create_time, updater, update_time, deleted) VALUES (2, 'ydym_test@163.com', 'ydym_test@163.com', 'WBZTEINMIFVRYSOE', 'smtp.163.com', 465, '1', '0', '1', '2023-01-26 01:26:03', '1', '2023-04-12 22:39:38', '0');
+INSERT INTO system_mail_account (id, mail, username, password, host, port, ssl_enable, starttls_enable, creator, create_time, updater, update_time, deleted) VALUES (2, 'ydym_test@163.com', 'ydym_test@163.com', 'WBZTEINMIFVRYSOE', 'smtp.163.com', 465, '1', '0', '1', '2023-01-26 01:26:03', '1', '2025-12-20 18:09:32', '0');
 INSERT INTO system_mail_account (id, mail, username, password, host, port, ssl_enable, starttls_enable, creator, create_time, updater, update_time, deleted) VALUES (3, '76854114@qq.com', '3335', '11234', 'yunai1.cn', 466, '0', '0', '1', '2023-01-27 15:06:38', '1', '2023-01-27 07:08:36', '1');
 INSERT INTO system_mail_account (id, mail, username, password, host, port, ssl_enable, starttls_enable, creator, create_time, updater, update_time, deleted) VALUES (4, '7685413x@qq.com', '2', '3', '4', 5, '1', '0', '1', '2023-04-12 23:05:06', '1', '2023-04-12 15:05:11', '1');
 COMMIT;
@@ -1482,35 +1875,38 @@ SET IDENTITY_INSERT system_mail_account OFF;
 -- ----------------------------
 -- Table structure for system_mail_log
 -- ----------------------------
-CREATE TABLE system_mail_log
-(
-    id                bigint                                  NOT NULL PRIMARY KEY IDENTITY,
-    user_id           bigint        DEFAULT NULL              NULL,
-    user_type         smallint      DEFAULT NULL              NULL,
-    to_mail           varchar(255)                            NOT NULL,
-    account_id        bigint                                  NOT NULL,
-    from_mail         varchar(255)                            NOT NULL,
-    template_id       bigint                                  NOT NULL,
-    template_code     varchar(63)                             NOT NULL,
-    template_nickname varchar(255)  DEFAULT NULL              NULL,
-    template_title    varchar(255)                            NOT NULL,
-    template_content  varchar(10240)                          NOT NULL,
-    template_params   varchar(255)                            NOT NULL,
-    send_status       smallint      DEFAULT 0                 NOT NULL,
-    send_time         datetime      DEFAULT NULL              NULL,
-    send_message_id   varchar(255)  DEFAULT NULL              NULL,
-    send_exception    varchar(4096) DEFAULT NULL              NULL,
-    creator           varchar(64)   DEFAULT ''                NULL,
-    create_time       datetime      DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater           varchar(64)   DEFAULT ''                NULL,
-    update_time       datetime      DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted           bit           DEFAULT '0'               NOT NULL
+CREATE TABLE system_mail_log (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    user_id bigint DEFAULT NULL NULL,
+    user_type smallint DEFAULT NULL NULL,
+    to_mails varchar(1024)  NOT NULL,
+    cc_mails varchar(1024) DEFAULT NULL NULL,
+    bcc_mails varchar(1024) DEFAULT NULL NULL,
+    account_id bigint  NOT NULL,
+    from_mail varchar(255)  NOT NULL,
+    template_id bigint  NOT NULL,
+    template_code varchar(63)  NOT NULL,
+    template_nickname varchar(255) DEFAULT NULL NULL,
+    template_title varchar(255)  NOT NULL,
+    template_content text  NOT NULL,
+    template_params varchar(255)  NOT NULL,
+    send_status smallint DEFAULT 0 NOT NULL,
+    send_time datetime DEFAULT NULL NULL,
+    send_message_id varchar(255) DEFAULT NULL NULL,
+    send_exception varchar(4096) DEFAULT NULL NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT '0' NOT NULL
 );
 
 COMMENT ON COLUMN system_mail_log.id IS '编号';
 COMMENT ON COLUMN system_mail_log.user_id IS '用户编号';
 COMMENT ON COLUMN system_mail_log.user_type IS '用户类型';
-COMMENT ON COLUMN system_mail_log.to_mail IS '接收邮箱地址';
+COMMENT ON COLUMN system_mail_log.to_mails IS '接收邮箱地址';
+COMMENT ON COLUMN system_mail_log.cc_mails IS '抄送邮箱地址';
+COMMENT ON COLUMN system_mail_log.bcc_mails IS '密送邮箱地址';
 COMMENT ON COLUMN system_mail_log.account_id IS '邮箱账号编号';
 COMMENT ON COLUMN system_mail_log.from_mail IS '发送邮箱地址';
 COMMENT ON COLUMN system_mail_log.template_id IS '模板编号';
@@ -1533,23 +1929,22 @@ COMMENT ON TABLE system_mail_log IS '邮件日志表';
 -- ----------------------------
 -- Table structure for system_mail_template
 -- ----------------------------
-CREATE TABLE system_mail_template
-(
-    id          bigint                                 NOT NULL PRIMARY KEY IDENTITY,
-    name        varchar(63)                            NOT NULL,
-    code        varchar(63)                            NOT NULL,
-    account_id  bigint                                 NOT NULL,
-    nickname    varchar(255) DEFAULT NULL              NULL,
-    title       varchar(255)                           NOT NULL,
-    content     varchar(10240)                         NOT NULL,
-    params      varchar(255)                           NOT NULL,
-    status      smallint                               NOT NULL,
-    remark      varchar(255) DEFAULT NULL              NULL,
-    creator     varchar(64)  DEFAULT ''                NULL,
-    create_time datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater     varchar(64)  DEFAULT ''                NULL,
-    update_time datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted     bit          DEFAULT '0'               NOT NULL
+CREATE TABLE system_mail_template (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    name varchar(63)  NOT NULL,
+    code varchar(63)  NOT NULL,
+    account_id bigint  NOT NULL,
+    nickname varchar(255) DEFAULT NULL NULL,
+    title varchar(255)  NOT NULL,
+    content varchar(10240)  NOT NULL,
+    params varchar(255)  NOT NULL,
+    status smallint  NOT NULL,
+    remark varchar(255) DEFAULT NULL NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT '0' NOT NULL
 );
 
 COMMENT ON COLUMN system_mail_template.id IS '编号';
@@ -1575,8 +1970,8 @@ COMMENT ON TABLE system_mail_template IS '邮件模版表';
 -- @formatter:off
 SET IDENTITY_INSERT system_mail_template ON;
 INSERT INTO system_mail_template (id, name, code, account_id, nickname, title, content, params, status, remark, creator, create_time, updater, update_time, deleted) VALUES (13, '后台用户短信登录', 'admin-sms-login', 1, '奥特曼', '你猜我猜', '<p>您的验证码是{code}，名字是{name}</p>', '["code","name"]', 0, '3', '1', '2021-10-11 08:10:00', '1', '2023-12-02 19:51:14', '0');
-INSERT INTO system_mail_template (id, name, code, account_id, nickname, title, content, params, status, remark, creator, create_time, updater, update_time, deleted) VALUES (14, '测试模版', 'test_01', 2, '芋艿', '一个标题', '<p>你是 {key01} 吗？</p><p><br></p><p>是的话，赶紧 {key02} 一下！</p>', '["key01","key02"]', 0, NULL, '1', '2023-01-26 01:27:40', '1', '2023-01-27 10:32:16', '0');
-INSERT INTO system_mail_template (id, name, code, account_id, nickname, title, content, params, status, remark, creator, create_time, updater, update_time, deleted) VALUES (15, '3', '2', 2, '7', '4', '<p>45</p>', '[]', 1, '80', '1', '2023-01-27 15:50:35', '1', '2023-01-27 16:34:49', '0');
+INSERT INTO system_mail_template (id, name, code, account_id, nickname, title, content, params, status, remark, creator, create_time, updater, update_time, deleted) VALUES (14, '测试模版', 'test_01', 2, '芋艿', '一个标题', '<p>你是 {key01} 吗？</p><p><br></p><p>是的话，赶紧 {key02} 一下！</p>', '["key01","key02"]', 0, NULL, '1', '2023-01-26 01:27:40', '1', '2025-07-26 21:48:45', '0');
+INSERT INTO system_mail_template (id, name, code, account_id, nickname, title, content, params, status, remark, creator, create_time, updater, update_time, deleted) VALUES (15, '3', '2', 2, '7', '4', '<p>45</p>', '[]', 1, '80', '1', '2023-01-27 15:50:35', '1', '2025-07-26 21:47:49', '1');
 COMMIT;
 SET IDENTITY_INSERT system_mail_template OFF;
 -- @formatter:on
@@ -1584,27 +1979,26 @@ SET IDENTITY_INSERT system_mail_template OFF;
 -- ----------------------------
 -- Table structure for system_menu
 -- ----------------------------
-CREATE TABLE system_menu
-(
-    id             bigint                                 NOT NULL PRIMARY KEY IDENTITY,
-    name           varchar(50)                            NOT NULL,
-    permission     varchar(100) DEFAULT ''                NULL,
-    type           smallint                               NOT NULL,
-    sort           int          DEFAULT 0                 NOT NULL,
-    parent_id      bigint       DEFAULT 0                 NOT NULL,
-    path           varchar(200) DEFAULT ''                NULL,
-    icon           varchar(100) DEFAULT '#'               NULL,
-    component      varchar(255) DEFAULT NULL              NULL,
-    component_name varchar(255) DEFAULT NULL              NULL,
-    status         smallint     DEFAULT 0                 NOT NULL,
-    visible        bit          DEFAULT '1'               NOT NULL,
-    keep_alive     bit          DEFAULT '1'               NOT NULL,
-    always_show    bit          DEFAULT '1'               NOT NULL,
-    creator        varchar(64)  DEFAULT ''                NULL,
-    create_time    datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater        varchar(64)  DEFAULT ''                NULL,
-    update_time    datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted        bit          DEFAULT '0'               NOT NULL
+CREATE TABLE system_menu (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    name varchar(50)  NOT NULL,
+    permission varchar(100) DEFAULT '' NULL,
+    type smallint  NOT NULL,
+    sort int DEFAULT 0 NOT NULL,
+    parent_id bigint DEFAULT 0 NOT NULL,
+    path varchar(200) DEFAULT '' NULL,
+    icon varchar(100) DEFAULT '#' NULL,
+    component varchar(255) DEFAULT NULL NULL,
+    component_name varchar(255) DEFAULT NULL NULL,
+    status smallint DEFAULT 0 NOT NULL,
+    visible bit DEFAULT '1' NOT NULL,
+    keep_alive bit DEFAULT '1' NOT NULL,
+    always_show bit DEFAULT '1' NOT NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT '0' NOT NULL
 );
 
 COMMENT ON COLUMN system_menu.id IS '菜单ID';
@@ -1636,8 +2030,8 @@ SET IDENTITY_INSERT system_menu ON;
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (1, '系统管理', '', 1, 10, 0, '/system', 'ep:tools', NULL, NULL, 0, '1', '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2025-03-15 21:30:27', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (2, '基础设施', '', 1, 20, 0, '/infra', 'ep:monitor', NULL, NULL, 0, '1', '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2024-03-01 08:28:40', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5, 'OA 示例', '', 1, 40, 1185, 'oa', 'fa:road', NULL, NULL, 0, '1', '1', '1', 'admin', '2021-09-20 16:26:19', '1', '2024-02-29 12:38:13', '0');
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (100, '用户管理', 'system:user:list', 2, 1, 1, 'user', 'ep:avatar', 'system/user/index', 'SystemUser', 0, '1', '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2025-03-15 21:30:41', '0');
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (101, '角色管理', '', 2, 2, 1, 'role', 'ep:user', 'system/role/index', 'SystemRole', 0, '1', '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2024-05-01 18:35:29', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (100, '用户管理', 'system:user:list', 2, 1, 1, 'user', 'ep:avatar', 'system/user/index', 'SystemUser', 0, '1', '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2026-01-01 18:43:01', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (101, '角色管理', '', 2, 2, 1, 'role', 'ep:user', 'system/role/index', 'SystemRole', 0, '1', '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2026-01-05 19:30:33', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (102, '菜单管理', '', 2, 3, 1, 'menu', 'ep:menu', 'system/menu/index', 'SystemMenu', 0, '1', '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2024-02-29 01:03:50', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (103, '部门管理', '', 2, 4, 1, 'dept', 'fa:address-card', 'system/dept/index', 'SystemDept', 0, '1', '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2024-02-29 01:06:28', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (104, '岗位管理', '', 2, 5, 1, 'post', 'fa:address-book-o', 'system/post/index', 'SystemPost', 0, '1', '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2024-02-29 01:06:39', '0');
@@ -1845,7 +2239,7 @@ INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (2010, '品牌创建', 'product:brand:create', 3, 2, 2008, '', '', '', NULL, 0, '1', '1', '1', '', '2022-07-30 13:52:44', '', '2022-07-30 13:52:44', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (2011, '品牌更新', 'product:brand:update', 3, 3, 2008, '', '', '', NULL, 0, '1', '1', '1', '', '2022-07-30 13:52:44', '', '2022-07-30 13:52:44', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (2012, '品牌删除', 'product:brand:delete', 3, 4, 2008, '', '', '', NULL, 0, '1', '1', '1', '', '2022-07-30 13:52:44', '', '2022-07-30 13:52:44', '0');
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (2014, '商品列表', '', 2, 1, 2000, 'spu', 'ep:apple', 'mall/product/spu/index', 'ProductSpu', 0, '1', '1', '1', '', '2022-07-30 14:22:58', '1', '2023-08-21 10:27:01', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (2014, '商品列表', '', 2, 1, 2000, 'spu', 'ep:apple', 'mall/product/spu/index', 'ProductSpu', 0, '1', '1', '1', '', '2022-07-30 14:22:58', '1', '2025-10-08 10:36:52', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (2015, '商品查询', 'product:spu:query', 3, 1, 2014, '', '', '', NULL, 0, '1', '1', '1', '', '2022-07-30 14:22:58', '', '2022-07-30 14:22:58', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (2016, '商品创建', 'product:spu:create', 3, 2, 2014, '', '', '', NULL, 0, '1', '1', '1', '', '2022-07-30 14:22:58', '', '2022-07-30 14:22:58', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (2017, '商品更新', 'product:spu:update', 3, 3, 2014, '', '', '', NULL, 0, '1', '1', '1', '', '2022-07-30 14:22:58', '', '2022-07-30 14:22:58', '0');
@@ -1972,7 +2366,7 @@ INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (2156, '查询项目', 'report:go-view-project:query', 3, 0, 2153, '', '', '', NULL, 0, '1', '1', '1', '1', '2023-02-07 19:25:53', '1', '2023-02-07 19:25:53', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (2157, '使用 SQL 查询数据', 'report:go-view-data:get-by-sql', 3, 3, 2153, '', '', '', NULL, 0, '1', '1', '1', '1', '2023-02-07 19:26:15', '1', '2023-02-07 19:26:15', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (2158, '使用 HTTP 查询数据', 'report:go-view-data:get-by-http', 3, 4, 2153, '', '', '', NULL, 0, '1', '1', '1', '1', '2023-02-07 19:26:35', '1', '2023-02-07 19:26:35', '0');
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (2159, 'Boot 开发文档', '', 1, 1, 0, 'https://doc.iocoder.cn/', 'ep:document', NULL, NULL, 0, '1', '1', '1', '1', '2023-02-10 22:46:28', '1', '2024-07-28 11:36:48', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (2159, 'Boot 开发文档', '', 1, 1, 0, 'https://doc.iocoder.cn/', 'ep:document', NULL, NULL, 0, '1', '1', '1', '1', '2023-02-10 22:46:28', '1', '2026-01-05 19:31:07', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (2160, 'Cloud 开发文档', '', 1, 2, 0, 'https://cloud.iocoder.cn', 'ep:document-copy', NULL, NULL, 0, '1', '1', '1', '1', '2023-02-10 22:47:07', '1', '2023-12-02 21:32:29', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (2161, '接入示例', '', 1, 99, 1117, 'demo', 'fa-solid:dragon', 'pay/demo/index', NULL, 0, '1', '1', '1', '', '2023-02-11 14:21:42', '1', '2024-01-18 23:50:00', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (2162, '商品导出', 'product:spu:export', 3, 5, 2014, '', '', '', NULL, 0, '1', '1', '1', '', '2022-07-30 14:22:58', '', '2022-07-30 14:22:58', '0');
@@ -2383,7 +2777,7 @@ INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (2722, '流程实例的查询（管理员）', 'bpm:process-instance:manager-query', 3, 1, 2721, '', '', '', '', 0, '1', '1', '1', '1', '2024-03-22 08:18:27', '1', '2024-03-22 08:19:05', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (2723, '流程实例的取消（管理员）', 'bpm:process-instance:cancel-by-admin', 3, 2, 2721, '', '', '', '', 0, '1', '1', '1', '1', '2024-03-22 08:19:25', '1', '2024-03-22 08:19:25', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (2724, '流程任务', '', 2, 11, 1186, 'process-tasnk', 'ep:collection-tag', 'bpm/task/manager/index', 'BpmManagerTask', 0, '1', '1', '1', '1', '2024-03-22 08:43:22', '1', '2024-03-22 08:43:27', '0');
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (2725, '流程任务的查询（管理员）', 'bpm:task:mananger-query', 3, 1, 2724, '', '', '', '', 0, '1', '1', '1', '1', '2024-03-22 08:43:49', '1', '2024-03-22 08:43:49', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (2725, '流程任务的查询（管理员）', 'bpm:task:manager-query', 3, 1, 2724, '', '', '', '', 0, '1', '1', '1', '1', '2024-03-22 08:43:49', '1', '2025-12-23 23:04:44', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (2726, '流程监听器', '', 2, 5, 1186, 'process-listener', 'fa:assistive-listening-systems', 'bpm/processListener/index', 'BpmProcessListener', 0, '1', '1', '1', '', '2024-03-09 16:05:34', '1', '2024-03-23 13:13:38', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (2727, '流程监听器查询', 'bpm:process-listener:query', 3, 1, 2726, '', '', '', NULL, 0, '1', '1', '1', '', '2024-03-09 16:05:34', '', '2024-03-09 16:05:34', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (2728, '流程监听器创建', 'bpm:process-listener:create', 3, 2, 2726, '', '', '', NULL, 0, '1', '1', '1', '', '2024-03-09 16:05:34', '', '2024-03-09 16:05:34', '0');
@@ -2485,55 +2879,47 @@ INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (2924, '工具删除', 'ai:tool:delete', 3, 4, 2920, '', '', '', NULL, 0, '1', '1', '1', '', '2025-03-14 11:19:29', '', '2025-03-14 11:19:29', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4000, 'IoT 物联网', '', 1, 500, 0, '/iot', 'fa-solid:hdd', '', '', 0, '1', '1', '1', '1', '2024-08-10 09:55:28', '1', '2024-12-07 15:58:34', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4001, '设备接入', '', 1, 2, 4000, 'device', 'ep:platform', '', '', 0, '1', '1', '1', '1', '2024-08-10 09:57:56', '1', '2025-02-27 08:39:49', '0');
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4002, '产品管理', '', 2, 2, 4001, 'product', 'fa-solid:tools', 'iot/product/product/index', 'IoTProduct', 0, '1', '1', '1', '', '2024-08-10 02:38:02', '1', '2024-12-07 18:47:53', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4002, '产品管理', '', 2, 1, 4001, 'product', 'fa-solid:tools', 'iot/product/product/index', 'IoTProduct', 0, '1', '1', '1', '', '2024-08-10 02:38:02', '1', '2025-06-15 20:56:06', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4003, '产品查询', 'iot:product:query', 3, 1, 4002, '', '', '', NULL, 0, '1', '1', '1', '', '2024-08-10 02:38:02', '', '2024-12-07 15:55:00', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4004, '产品创建', 'iot:product:create', 3, 2, 4002, '', '', '', NULL, 0, '1', '1', '1', '', '2024-08-10 02:38:02', '', '2024-12-07 15:55:03', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4005, '产品更新', 'iot:product:update', 3, 3, 4002, '', '', '', NULL, 0, '1', '1', '1', '', '2024-08-10 02:38:02', '', '2024-12-07 15:55:05', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4006, '产品删除', 'iot:product:delete', 3, 4, 4002, '', '', '', NULL, 0, '1', '1', '1', '', '2024-08-10 02:38:02', '', '2024-12-07 15:55:06', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4007, '产品导出', 'iot:product:export', 3, 5, 4002, '', '', '', NULL, 0, '1', '1', '1', '', '2024-08-10 02:38:02', '', '2024-12-07 15:55:13', '0');
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4008, '设备管理', '', 2, 4, 4001, 'device', 'fa:mobile', 'iot/device/device/index', 'IoTDevice', 0, '1', '1', '1', '', '2024-09-16 18:48:19', '1', '2024-12-14 11:39:30', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4008, '设备管理', '', 2, 2, 4001, 'device', 'fa:mobile', 'iot/device/device/index', 'IoTDevice', 0, '1', '1', '1', '', '2024-09-16 18:48:19', '1', '2025-06-15 20:56:10', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4009, '设备查询', 'iot:device:query', 3, 1, 4008, '', '', '', '', 0, '1', '1', '1', '', '2024-09-16 18:48:19', '1', '2024-12-07 15:55:40', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4010, '设备创建', 'iot:device:create', 3, 2, 4008, '', '', '', '', 0, '1', '1', '1', '', '2024-09-16 18:48:19', '1', '2024-12-07 15:55:41', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4011, '设备更新', 'iot:device:update', 3, 3, 4008, '', '', '', '', 0, '1', '1', '1', '', '2024-09-16 18:48:19', '1', '2024-12-07 15:55:42', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4012, '设备删除', 'iot:device:delete', 3, 4, 4008, '', '', '', '', 0, '1', '1', '1', '', '2024-09-16 18:48:19', '1', '2024-12-07 15:55:43', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4013, '设备导出', 'iot:device:export', 3, 5, 4008, '', '', '', '', 0, '1', '1', '1', '', '2024-09-16 18:48:19', '1', '2024-12-07 15:55:44', '0');
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4014, '产品分类', '', 2, 1, 4001, 'product-category', 'ep:notebook', 'iot/product/category/index', 'IotProductCategory', 0, '1', '1', '1', '', '2024-12-07 16:01:35', '1', '2024-12-07 16:31:52', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4014, '产品分类', '', 2, 3, 4001, 'product-category', 'ep:notebook', 'iot/product/category/index', 'IotProductCategory', 0, '1', '1', '1', '', '2024-12-07 16:01:35', '1', '2025-06-15 20:56:39', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4015, '产品分类查询', 'iot:product-category:query', 3, 1, 4014, '', '', '', NULL, 0, '1', '1', '1', '', '2024-12-07 16:01:35', '', '2024-12-07 16:01:35', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4016, '产品分类创建', 'iot:product-category:create', 3, 2, 4014, '', '', '', NULL, 0, '1', '1', '1', '', '2024-12-07 16:01:35', '', '2024-12-07 16:01:35', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4017, '产品分类更新', 'iot:product-category:update', 3, 3, 4014, '', '', '', NULL, 0, '1', '1', '1', '', '2024-12-07 16:01:35', '', '2024-12-07 16:01:35', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4018, '产品分类删除', 'iot:product-category:delete', 3, 4, 4014, '', '', '', NULL, 0, '1', '1', '1', '', '2024-12-07 16:01:35', '', '2024-12-07 16:01:35', '0');
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4025, '插件管理', '', 2, 5, 4047, 'plugin-config', 'ep:folder-opened', 'iot/plugin/index', 'IoTPlugin', 0, '1', '1', '1', '', '2024-12-09 21:25:06', '1', '2025-02-05 22:23:12', '0');
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4026, '插件查询', 'iot:plugin-config:query', 3, 1, 4025, '', '', '', NULL, 0, '1', '1', '1', '', '2024-12-09 21:25:06', '', '2025-02-05 21:23:20', '0');
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4027, '插件创建', 'iot:plugin-config:create', 3, 2, 4025, '', '', '', NULL, 0, '1', '1', '1', '', '2024-12-09 21:25:06', '', '2025-02-05 21:23:16', '0');
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4028, '插件更新', 'iot:plugin-config:update', 3, 3, 4025, '', '', '', NULL, 0, '1', '1', '1', '', '2024-12-09 21:25:06', '', '2025-02-05 21:23:12', '0');
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4029, '插件删除', 'iot:plugin-config:delete', 3, 4, 4025, '', '', '', NULL, 0, '1', '1', '1', '', '2024-12-09 21:25:06', '', '2025-02-05 21:23:09', '0');
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4030, '插件导出', 'iot:plugin-config:export', 3, 5, 4025, '', '', '', NULL, 0, '1', '1', '1', '', '2024-12-09 21:25:06', '', '2025-02-05 21:23:06', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4031, '设备分组', '', 2, 3, 4001, 'device-group', 'fa-solid:layer-group', 'iot/device/group/index', 'IotDeviceGroup', 0, '1', '1', '1', '', '2024-12-14 17:08:29', '1', '2024-12-14 17:09:17', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4032, '设备分组查询', 'iot:device-group:query', 3, 1, 4031, '', '', '', NULL, 0, '1', '1', '1', '', '2024-12-14 17:08:29', '', '2024-12-14 17:08:29', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4033, '设备分组创建', 'iot:device-group:create', 3, 2, 4031, '', '', '', NULL, 0, '1', '1', '1', '', '2024-12-14 17:08:29', '', '2024-12-14 17:08:29', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4034, '设备分组更新', 'iot:device-group:update', 3, 3, 4031, '', '', '', NULL, 0, '1', '1', '1', '', '2024-12-14 17:08:29', '', '2024-12-14 17:08:29', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4035, '设备分组删除', 'iot:device-group:delete', 3, 4, 4031, '', '', '', NULL, 0, '1', '1', '1', '', '2024-12-14 17:08:29', '', '2024-12-14 17:08:29', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4036, '设备导入', 'iot:device:import', 3, 6, 4008, '', '', '', '', 0, '1', '1', '1', '1', '2024-12-15 10:35:47', '1', '2024-12-15 10:35:47', '0');
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4037, '产品物模型', '', 2, 2, 4001, 'thing-model', 'ep:mostly-cloudy', 'iot/thingmodel/index', 'IoTThingModel', 0, '0', '0', '0', '', '2024-12-16 17:17:50', '1', '2024-12-27 11:03:37', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4037, '产品物模型', '', 2, 99, 4001, 'thing-model', 'ep:mostly-cloudy', 'iot/thingmodel/index', 'IoTThingModel', 0, '0', '0', '0', '', '2024-12-16 17:17:50', '1', '2025-06-15 20:56:19', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4038, '产品物模型功能查询', 'iot:thing-model:query', 3, 1, 4037, '', '', '', NULL, 0, '1', '1', '1', '', '2024-12-16 17:17:51', '', '2025-03-17 09:14:54', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4039, '产品物模型功能创建', 'iot:thing-model:create', 3, 2, 4037, '', '', '', NULL, 0, '1', '1', '1', '', '2024-12-16 17:17:52', '', '2025-03-17 09:14:58', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4040, '产品物模型功能更新', 'iot:thing-model:update', 3, 3, 4037, '', '', '', NULL, 0, '1', '1', '1', '', '2024-12-16 17:17:52', '', '2025-03-17 09:15:03', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4041, '产品物模型功能删除', 'iot:thing-model:delete', 3, 4, 4037, '', '', '', NULL, 0, '1', '1', '1', '', '2024-12-16 17:17:52', '', '2025-03-17 09:15:06', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4042, '产品物模型功能导出', 'iot:thing-model:export', 3, 5, 4037, '', '', '', NULL, 0, '1', '1', '1', '', '2024-12-16 17:17:53', '', '2025-03-17 09:15:09', '0');
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4043, '设备上行', 'iot:device:upstream', 3, 7, 4008, '', '', '', '', 0, '1', '1', '1', '1', '2025-01-28 04:40:16', '1', '2025-01-31 22:45:53', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4043, '设备消息发送', 'iot:device:message-send', 3, 12, 4008, '', '', '', '', 0, '1', '1', '1', '1', '2025-01-28 04:40:16', '1', '2025-06-14 14:09:26', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4044, '设备属性查询', 'iot:device:property-query', 3, 10, 4008, '', '', '', '', 0, '1', '1', '1', '1', '2025-01-28 11:52:54', '1', '2025-01-28 11:52:54', '0');
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4045, '设备日志查询', 'iot:device:log-query', 3, 11, 4008, '', '', '', '', 0, '1', '1', '1', '1', '2025-01-28 11:53:22', '1', '2025-01-28 11:53:22', '0');
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4046, '设备下行', 'iot:device:downstream', 3, 8, 4008, '', '', '', '', 0, '1', '1', '1', '1', '2025-01-31 22:46:11', '1', '2025-01-31 22:46:11', '0');
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4047, '运维管理', '', 1, 2, 4000, 'operations', 'fa:cog', '', '', 0, '1', '1', '1', '1', '2025-02-05 22:21:37', '1', '2025-02-05 22:22:53', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4045, '设备消息查询', 'iot:device:message-query', 3, 11, 4008, '', '', '', '', 0, '1', '1', '1', '1', '2025-01-28 11:53:22', '1', '2025-06-14 11:11:20', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4047, '运维管理', '', 1, 4, 4000, 'operation', 'fa:align-center', '', '', 0, '1', '1', '1', '1', '2025-02-05 22:21:37', '"1"', '2025-06-30 20:12:48', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4048, '规则引擎', '', 1, 3, 4000, 'rule', 'fa-solid:cogs', '', '', 0, '1', '1', '1', '1', '2025-02-11 14:10:54', '1', '2025-02-11 14:10:54', '0');
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4049, '场景联动', '', 2, 1, 4048, 'scene', 'ep:link', 'iot/rule/scene/index', 'Scene', 0, '1', '1', '1', '1', '2025-02-11 14:12:44', '1', '2025-02-12 10:15:36', '0');
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4050, 'IoT首页', '', 2, 1, 4000, 'home', 'ep:home-filled', 'iot/home/index', 'IotHome', 0, '1', '1', '1', '1', '2025-02-27 08:39:35', '1', '2025-02-27 08:40:28', '0');
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4051, '数据桥梁', '', 2, 0, 4048, 'data-bridge', 'ep:guide', 'iot/rule/databridge/index', 'IotDataBridge', 0, '1', '1', '1', '', '2025-03-09 13:47:11', '1', '2025-03-09 13:47:51', '0');
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4052, 'IoT 数据桥梁查询', 'iot:data-bridge:query', 3, 1, 4051, '', '', '', NULL, 0, '1', '1', '1', '', '2025-03-09 13:47:11', '', '2025-03-09 13:47:11', '0');
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4053, 'IoT 数据桥梁创建', 'iot:data-bridge:create', 3, 2, 4051, '', '', '', NULL, 0, '1', '1', '1', '', '2025-03-09 13:47:11', '', '2025-03-09 13:47:11', '0');
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4054, 'IoT 数据桥梁更新', 'iot:data-bridge:update', 3, 3, 4051, '', '', '', NULL, 0, '1', '1', '1', '', '2025-03-09 13:47:11', '', '2025-03-09 13:47:11', '0');
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4055, 'IoT 数据桥梁删除', 'iot:data-bridge:delete', 3, 4, 4051, '', '', '', NULL, 0, '1', '1', '1', '', '2025-03-09 13:47:12', '', '2025-03-09 13:47:12', '0');
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4056, 'IoT 数据桥梁导出', 'iot:data-bridge:export', 3, 5, 4051, '', '', '', NULL, 0, '1', '1', '1', '', '2025-03-09 13:47:12', '', '2025-03-09 13:47:12', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4049, '场景联动', '', 2, 1, 4048, 'scene', 'ep:link', 'iot/rule/scene/index', 'IoTSceneRule', 0, '1', '1', '1', '1', '2025-02-11 14:12:44', '"1"', '2025-08-09 15:38:32', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4050, 'IoT 首页', '', 2, 1, 4000, 'home', 'ep:home-filled', 'iot/home/index', 'IotHome', 0, '1', '1', '1', '1', '2025-02-27 08:39:35', '1', '2025-06-24 14:22:50', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4051, '数据流转', '', 2, 2, 4048, 'data-rule', 'ep:guide', 'iot/rule/data/index', 'IoTDataRule', 0, '1', '1', '1', '', '2025-03-09 13:47:11', '"1"', '2025-08-09 15:38:37', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4052, '数据流转规则查询', 'iot:data-rule:query', 3, 1, 4051, '', '', '', '', 0, '1', '1', '1', '', '2025-03-09 13:47:11', '1', '2025-06-24 20:48:04', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4053, '数据流转规则创建', 'iot:data-rule:create', 3, 2, 4051, '', '', '', '', 0, '1', '1', '1', '', '2025-03-09 13:47:11', '1', '2025-06-24 20:48:08', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4054, '数据流转规则更新', 'iot:data-rule:update', 3, 3, 4051, '', '', '', '', 0, '1', '1', '1', '', '2025-03-09 13:47:11', '1', '2025-06-24 20:48:11', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4055, '数据流转规则删除', 'iot:data-rule:delete', 3, 4, 4051, '', '', '', '', 0, '1', '1', '1', '', '2025-03-09 13:47:12', '1', '2025-06-24 20:48:15', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5000, 'AI 工作流', '', 2, 5, 2758, 'workflow', 'fa:hand-grab-o', 'ai/workflow/index.vue', 'AiWorkflow', 0, '1', '1', '1', '1', '2025-03-25 09:50:27', '1', '2025-05-03 18:55:12', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5001, 'AI 工作流查询', 'ai:workflow:query', 3, 1, 5000, '', '', '', '', 0, '1', '1', '1', '1', '2025-03-25 09:51:11', '1', '2025-03-25 09:51:11', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5002, 'AI 工作流创建', 'ai:workflow:create', 3, 2, 5000, '', '', '', '', 0, '1', '1', '1', '1', '2025-03-25 09:51:28', '1', '2025-03-25 09:51:28', '0');
@@ -2544,6 +2930,424 @@ INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5010, '租户切换', 'system:tenant:visit', 3, 999, 1138, '', '', '', '', 0, '1', '1', '1', '1', '2025-05-05 15:25:32', '1', '2025-05-05 15:25:32', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5011, '转账订单查询', 'pay:transfer:query', 3, 1, 2559, '', '', '', '', 0, '1', '1', '1', '1', '2025-05-08 12:46:53', '1', '2025-05-08 12:46:53', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5012, '转账订单导出', 'pay:transfer:export', 3, 2, 2559, '', '', '', '', 0, '1', '1', '1', '1', '2025-05-10 17:00:28', '1', '2025-05-10 17:00:28', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5013, '场景联动查询', 'iot:rule-scene:query', 3, 1, 4049, '', '', '', '', 0, '1', '1', '1', '1', '2025-06-20 16:53:01', '1', '2025-06-20 16:53:01', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5014, '场景联动创建', 'iot:rule-scene:create', 3, 2, 4049, '', '', '', '', 0, '1', '1', '1', '1', '2025-06-20 16:54:31', '1', '2025-06-20 16:54:31', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5015, '场景联动更新', 'iot:rule-scene:update', 3, 3, 4049, '', '', '', '', 0, '1', '1', '1', '1', '2025-06-20 16:54:47', '1', '2025-06-20 16:54:47', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5016, '场景联动删除', 'iot:rule-scene:delete', 3, 4, 4049, '', '', '', '', 0, '1', '1', '1', '1', '2025-06-20 16:55:04', '1', '2025-06-20 16:55:27', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5017, '场景联动导出', 'iot:rule-scene:export', 3, 5, 4049, '', '', '', '', 0, '1', '1', '1', '1', '2025-06-20 16:57:56', '1', '2025-06-20 16:57:56', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5018, '数据流转目的查询', 'iot:data-sink:query', 3, 11, 4051, '', '', '', '', 0, '1', '1', '1', '1', '2025-06-24 20:48:40', '1', '2025-06-24 20:48:40', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5019, '数据流转目的创建', 'iot:data-sink:create', 3, 12, 4051, '', '', '', '', 0, '1', '1', '1', '1', '2025-06-24 20:48:57', '1', '2025-06-24 20:48:57', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5020, '数据流转目的更新', 'iot:data-sink:update', 3, 13, 4051, '', '', '', '', 0, '1', '1', '1', '1', '2025-06-24 20:49:10', '1', '2025-06-24 20:49:10', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5021, '数据流转目的删除', 'iot:data-sink:delete', 3, 14, 4051, '', '', '', '', 0, '1', '1', '1', '1', '2025-06-24 20:49:23', '1', '2025-06-24 20:49:23', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5022, '告警配置', '', 2, 1, 5028, 'config', 'fa:connectdevelop', 'iot/alert/config/index', 'IotAlertConfig', 0, '1', '1', '1', '', '2025-06-27 14:28:59', '1', '2025-06-27 22:31:19', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5023, '告警配置查询', 'iot:alert-config:query', 3, 1, 5022, '', '', '', '', 0, '1', '1', '1', '', '2025-06-27 14:28:59', '1', '2025-06-28 16:00:31', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5024, '告警配置创建', 'iot:alert-config:create', 3, 2, 5022, '', '', '', '', 0, '1', '1', '1', '', '2025-06-27 14:28:59', '1', '2025-06-28 16:00:35', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5025, '告警配置更新', 'iot:alert-config:update', 3, 3, 5022, '', '', '', '', 0, '1', '1', '1', '', '2025-06-27 14:28:59', '1', '2025-06-28 16:00:43', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5026, '告警配置删除', 'iot:alert-config:delete', 3, 4, 5022, '', '', '', '', 0, '1', '1', '1', '', '2025-06-27 14:29:00', '1', '2025-06-28 16:00:39', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5028, '告警中心', '', 1, 3, 4000, 'alert', 'fa:soundcloud', '', '', 0, '1', '1', '1', '1', '2025-06-27 22:30:04', '1', '2025-06-27 22:30:19', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5029, '告警记录', '', 2, 2, 5028, 'record', 'fa-solid:record-vinyl', 'iot/alert/record/index', 'IotAlertRecord', 0, '1', '1', '1', '', '2025-06-28 07:59:32', '1', '2025-06-28 16:01:48', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5030, '告警记录查询', 'iot:alert-record:query', 3, 1, 5029, '', '', '', '', 0, '1', '1', '1', '', '2025-06-28 07:59:32', '1', '2025-06-28 16:00:53', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5031, '告警记录处理', 'iot:alert-record:process', 3, 2, 5029, '', '', '', '', 0, '1', '1', '1', '', '2025-06-28 07:59:32', '1', '2025-06-28 16:01:04', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5032, 'OTA 固件', '', 2, 1, 4047, 'ota/firmware', 'fa-solid:award', 'iot/ota/firmware/index', 'IoTOtaFirmware', 0, '1', '1', '1', '', '2025-06-30 07:50:29', '"1"', '2025-06-30 20:13:28', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5033, 'OTA 固件查询', 'iot:ota-firmware:query', 3, 1, 5032, '', '', '', '', 0, '1', '1', '1', '', '2025-06-30 07:50:29', '"1"', '2025-06-30 17:38:12', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5034, 'OTA 固件创建', 'iot:ota-firmware:create', 3, 2, 5032, '', '', '', '', 0, '1', '1', '1', '', '2025-06-30 07:50:29', '"1"', '2025-06-30 17:38:21', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5035, 'OTA 固件更新', 'iot:ota-firmware:update', 3, 3, 5032, '', '', '', '', 0, '1', '1', '1', '', '2025-06-30 07:50:29', '"1"', '2025-06-30 17:38:29', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5036, 'OTA 固件删除', 'iot:ota-firmware:delete', 3, 4, 5032, '', '', '', '', 0, '1', '1', '1', '', '2025-06-30 07:50:29', '"1"', '2025-06-30 17:38:37', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5037, 'OTA 升级任务查询', 'iot:ota-task:create', 3, 11, 5032, '', '', '', '', 0, '1', '1', '1', '1', '2025-07-02 23:56:56', '1', '2025-07-02 23:56:56', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5038, 'OTA 升级任务取消', 'iot:ota-task:cancel', 3, 13, 5032, '', '', '', '', 0, '1', '1', '1', '1', '2025-07-02 23:57:26', '1', '2025-07-02 23:57:26', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5039, 'OTA 升级任务创建', 'iot:ota-task:create', 3, 12, 5032, '', '', '', '', 0, '1', '1', '1', '1', '2025-07-02 23:57:52', '1', '2025-07-02 23:57:52', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5040, 'OTA 升级记录查询', 'iot:ota-task-record:query', 3, 21, 5032, '', '', '', '', 0, '1', '1', '1', '1', '2025-07-02 23:58:30', '1', '2025-07-02 23:58:30', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5041, 'OTA 升级记录取消', 'iot:ota-task-record:cancel', 3, 23, 5032, '', '', '', '', 0, '1', '1', '1', '1', '2025-07-02 23:59:18', '1', '2025-07-02 23:59:18', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5042, '模版消息', '', 2, 5, 2084, 'message-template', 'ep:notebook', 'mp/messageTemplate/index', 'MpMessageTemplate', 0, '1', '1', '1', '1', '2025-11-26 16:45:35', '1', '2025-11-26 18:44:52', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5043, '查询模版消息', 'mp:message-template:query', 3, 1, 5042, '', '', '', '', 0, '1', '1', '1', '1', '2025-11-26 17:00:15', '1', '2025-11-26 18:45:00', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5044, '删除模版消息', 'mp:message-template:delete', 3, 2, 5042, '', '', '', '', 0, '1', '1', '1', '1', '2025-11-26 17:00:31', '1', '2025-11-26 18:45:05', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5045, '同步公众号模板', 'mp:message-template:sync', 3, 3, 5042, '', '', '', '', 0, '1', '1', '1', '1', '2025-11-26 17:00:55', '1', '2025-11-26 17:00:55', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5046, '给粉丝发送模版消息', 'mp:message-template:send', 3, 4, 5042, '', '', '', '', 0, '1', '1', '1', '1', '2025-11-26 17:01:11', '1', '2025-11-26 17:01:11', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5100, 'MES 系统', '', 1, 500, 0, '/mes', 'ep:cpu', '', '', 0, '1', '1', '1', '1', '2026-02-15 00:39:57', '1', '2026-04-05 23:22:56', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5101, '基础数据', '', 1, 10, 5100, 'md', 'ep:data-analysis', '', '', 0, '1', '1', '1', '1', '2026-02-15 00:40:13', '1', '2026-02-15 00:40:13', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5110, '物料产品分类', '', 2, 2, 5101, 'item-type', 'ep:files', 'mes/md/item/type/index', 'MesMdItemType', 0, '1', '1', '1', '1', '2026-02-15 00:40:13', '1', '2026-02-15 13:58:29', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5111, '分类查询', 'mes:md-item-type:query', 3, 1, 5110, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-15 00:40:13', '1', '2026-02-15 00:40:13', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5112, '分类创建', 'mes:md-item-type:create', 3, 2, 5110, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-15 00:40:13', '1', '2026-02-15 00:40:13', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5113, '分类更新', 'mes:md-item-type:update', 3, 3, 5110, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-15 00:40:13', '1', '2026-02-15 00:40:13', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5114, '分类删除', 'mes:md-item-type:delete', 3, 4, 5110, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-15 00:40:13', '1', '2026-02-15 00:40:13', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5120, '物料产品管理', '', 2, 1, 5101, 'item', 'ep:box', 'mes/md/item/index', 'MesMdItem', 0, '1', '1', '1', '1', '2026-02-15 00:40:13', '1', '2026-02-15 13:58:24', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5121, '物料查询', 'mes:md-item:query', 3, 1, 5120, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-15 00:40:13', '1', '2026-02-15 00:40:13', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5122, '物料创建', 'mes:md-item:create', 3, 2, 5120, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-15 00:40:13', '1', '2026-02-15 00:40:13', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5123, '物料更新', 'mes:md-item:update', 3, 3, 5120, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-15 00:40:13', '1', '2026-02-15 00:40:13', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5124, '物料删除', 'mes:md-item:delete', 3, 4, 5120, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-15 00:40:13', '1', '2026-02-15 00:40:13', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5125, '物料导出', 'mes:md-item:export', 3, 5, 5120, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-15 00:40:13', '1', '2026-02-15 00:40:13', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5126, '物料导入', 'mes:md-item:import', 3, 6, 5120, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-15 14:13:01', '1', '2026-02-15 14:13:01', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5130, '计量单位', '', 2, 3, 5101, 'unit-measure', 'ep:scale-to-original', 'mes/md/unitmeasure/index', 'MesMdUnitMeasure', 0, '1', '1', '1', '1', '2026-02-15 13:55:01', '1', '2026-02-15 13:55:01', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5131, '单位查询', 'mes:md-unit-measure:query', 3, 1, 5130, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-15 13:55:16', '1', '2026-02-15 13:55:16', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5132, '单位创建', 'mes:md-unit-measure:create', 3, 2, 5130, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-15 13:55:16', '1', '2026-02-15 13:55:16', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5133, '单位更新', 'mes:md-unit-measure:update', 3, 3, 5130, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-15 13:55:16', '1', '2026-02-15 13:55:16', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5134, '单位删除', 'mes:md-unit-measure:delete', 3, 4, 5130, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-15 13:55:16', '1', '2026-02-15 13:55:16', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5135, '单位导出', 'mes:md-unit-measure:export', 3, 5, 5130, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-15 13:55:16', '1', '2026-02-15 13:55:16', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5140, '客户管理', '', 2, 4, 5101, 'client', 'ep:user', 'mes/md/client/index', 'MesMdClient', 0, '1', '1', '1', '1', '2026-02-15 15:06:41', '1', '2026-02-15 15:06:41', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5141, '客户查询', 'mes:md-client:query', 3, 1, 5140, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-15 15:06:41', '1', '2026-02-15 15:06:41', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5142, '客户创建', 'mes:md-client:create', 3, 2, 5140, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-15 15:06:41', '1', '2026-02-15 15:06:41', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5143, '客户更新', 'mes:md-client:update', 3, 3, 5140, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-15 15:06:41', '1', '2026-02-15 15:06:41', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5144, '客户删除', 'mes:md-client:delete', 3, 4, 5140, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-15 15:06:41', '1', '2026-02-15 15:06:41', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5145, '客户导出', 'mes:md-client:export', 3, 5, 5140, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-15 15:06:41', '1', '2026-02-15 15:06:41', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5146, '客户导入', 'mes:md-client:import', 3, 6, 5140, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-15 15:06:41', '1', '2026-02-15 15:06:41', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5150, '供应商管理', '', 2, 5, 5101, 'vendor', 'ep:goods', 'mes/md/vendor/index', 'MesMdVendor', 0, '1', '1', '1', '1', '2026-02-15 16:01:11', '1', '2026-02-15 16:01:11', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5151, '供应商查询', 'mes:md-vendor:query', 3, 1, 5150, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-15 16:01:11', '1', '2026-02-15 16:01:11', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5152, '供应商创建', 'mes:md-vendor:create', 3, 2, 5150, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-15 16:01:11', '1', '2026-02-15 16:01:11', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5153, '供应商更新', 'mes:md-vendor:update', 3, 3, 5150, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-15 16:01:11', '1', '2026-02-15 16:01:11', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5154, '供应商删除', 'mes:md-vendor:delete', 3, 4, 5150, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-15 16:01:11', '1', '2026-02-15 16:01:11', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5155, '供应商导出', 'mes:md-vendor:export', 3, 5, 5150, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-15 16:01:11', '1', '2026-02-15 16:01:11', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5156, '供应商导入', 'mes:md-vendor:import', 3, 6, 5150, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-15 16:01:11', '1', '2026-02-15 16:01:11', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5160, '车间设置', '', 2, 6, 5101, 'workstation/workshop', 'ep:office-building', 'mes/md/workstation/workshop/index', 'MesMdWorkshop', 0, '1', '1', '1', '1', '2026-02-15 16:47:47', '1', '2026-02-16 11:17:35', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5161, '车间查询', 'mes:md-workshop:query', 3, 1, 5160, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-15 16:47:47', '1', '2026-02-15 16:47:47', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5162, '车间创建', 'mes:md-workshop:create', 3, 2, 5160, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-15 16:47:47', '1', '2026-02-15 16:47:47', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5163, '车间更新', 'mes:md-workshop:update', 3, 3, 5160, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-15 16:47:47', '1', '2026-02-15 16:47:47', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5164, '车间删除', 'mes:md-workshop:delete', 3, 4, 5160, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-15 16:47:47', '1', '2026-02-15 16:47:47', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5170, '工作站设置', '', 2, 7, 5101, 'workstation', 'ep:place', 'mes/md/workstation/index', 'MesMdWorkstation', 0, '1', '1', '1', '1', '2026-02-15 16:47:47', '1', '2026-02-16 11:18:34', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5171, '工位查询', 'mes:md-workstation:query', 3, 1, 5170, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-15 16:47:47', '1', '2026-02-15 16:47:47', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5172, '工位创建', 'mes:md-workstation:create', 3, 2, 5170, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-15 16:47:47', '1', '2026-02-15 16:47:47', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5173, '工位更新', 'mes:md-workstation:update', 3, 3, 5170, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-15 16:47:47', '1', '2026-02-15 16:47:47', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5174, '工位删除', 'mes:md-workstation:delete', 3, 4, 5170, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-15 16:47:47', '1', '2026-02-15 16:47:47', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5175, '工位导出', 'mes:md-workstation:export', 3, 5, 5170, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-15 16:47:47', '1', '2026-02-15 16:47:47', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5190, '编码规则', '', 2, 10, 5101, 'auto-code', 'ep:document', 'mes/md/autocode/index', 'MesAutoCode', 0, '1', '1', '1', '1', '2026-03-04 05:26:04', '1', '2026-04-03 08:31:25', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5191, '编码规则查询', 'mes:auto-code-rule:query', 3, 1, 5190, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-04 05:26:04', '1', '2026-03-04 05:26:04', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5192, '编码规则创建', 'mes:auto-code-rule:create', 3, 2, 5190, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-04 05:26:04', '1', '2026-03-04 05:26:04', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5193, '编码规则更新', 'mes:auto-code-rule:update', 3, 3, 5190, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-04 05:26:04', '1', '2026-03-04 05:26:04', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5194, '编码规则删除', 'mes:auto-code-rule:delete', 3, 4, 5190, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-04 05:26:04', '1', '2026-03-04 05:26:04', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5195, '编码规则导出', 'mes:auto-code-rule:export', 3, 5, 5190, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-04 05:26:04', '1', '2026-03-04 05:26:04', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5200, '排班管理', '', 1, 70, 5100, 'cal', 'ep:calendar', '', '', 0, '1', '1', '1', '1', '2026-02-16 07:35:50', '1', '2026-02-16 15:37:53', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5220, '班组设置', '', 2, 1, 5200, 'team', 'ep:user', 'mes/cal/team/index', 'MesCalTeam', 0, '1', '1', '1', '1', '2026-02-18 01:16:03', '1', '2026-02-18 11:14:31', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5221, '班组查询', 'mes:cal-team:query', 3, 1, 5220, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-18 01:16:03', '1', '2026-02-18 01:16:03', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5222, '班组创建', 'mes:cal-team:create', 3, 2, 5220, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-18 01:16:03', '1', '2026-02-18 01:16:03', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5223, '班组更新', 'mes:cal-team:update', 3, 3, 5220, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-18 01:16:03', '1', '2026-02-18 01:16:03', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5224, '班组删除', 'mes:cal-team:delete', 3, 4, 5220, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-18 01:16:03', '1', '2026-02-18 01:16:03', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5225, '班组导出', 'mes:cal-team:export', 3, 5, 5220, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-18 01:16:03', '1', '2026-02-18 01:16:03', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5230, '排班计划', '', 2, 3, 5200, 'plan', 'ep:memo', 'mes/cal/plan/index', 'MesCalPlan', 0, '1', '1', '1', '1', '2026-02-17 03:40:09', '1', '2026-02-17 03:40:09', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5231, '排班计划查询', 'mes:cal-plan:query', 3, 1, 5230, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-17 03:40:09', '1', '2026-02-17 03:40:09', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5232, '排班计划创建', 'mes:cal-plan:create', 3, 2, 5230, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-17 03:40:09', '1', '2026-02-17 03:40:09', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5233, '排班计划更新', 'mes:cal-plan:update', 3, 3, 5230, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-17 03:40:09', '1', '2026-02-17 03:40:09', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5234, '排班计划删除', 'mes:cal-plan:delete', 3, 4, 5230, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-17 03:40:09', '1', '2026-02-17 03:40:09', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5235, '排班计划导出', 'mes:cal-plan:export', 3, 5, 5230, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-17 03:40:09', '1', '2026-02-17 03:40:09', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5250, '节假日设置', '', 2, 3, 5200, 'holiday', 'ep:sunny', 'mes/cal/holiday/index', 'MesCalHoliday', 0, '1', '1', '1', '1', '2026-02-16 07:35:50', '1', '2026-02-16 15:38:25', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5251, '假期查询', 'mes:cal-holiday:query', 3, 1, 5250, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-16 07:35:50', '1', '2026-02-16 07:35:50', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5252, '假期创建', 'mes:cal-holiday:create', 3, 2, 5250, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-16 07:35:50', '1', '2026-02-16 07:35:50', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5253, '假期更新', 'mes:cal-holiday:update', 3, 3, 5250, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-16 07:35:50', '1', '2026-02-16 07:35:50', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5254, '假期删除', 'mes:cal-holiday:delete', 3, 4, 5250, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-16 07:35:50', '1', '2026-02-16 07:35:50', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5255, '假期导出', 'mes:cal-holiday:export', 3, 5, 5250, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-16 07:35:50', '1', '2026-02-16 07:35:50', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5260, '排班日历', '', 2, 3, 5200, 'calendar', 'ep:calendar', 'mes/cal/calendar/index', 'MesCalCalendar', 0, '1', '1', '1', '1', '2026-02-19 04:19:33', '1', '2026-02-19 04:19:33', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5261, '排班日历查询', 'mes:cal-team-shift:query', 3, 1, 5260, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-19 04:19:33', '1', '2026-02-19 04:19:33', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5300, '设备管理', '', 1, 30, 5100, 'dv', 'ep:cpu', '', '', 0, '1', '1', '1', '1', '2026-02-17 00:59:58', '1', '2026-02-17 09:01:18', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5310, '设备类型', '', 2, 1, 5300, 'machinery/type', 'ep:files', 'mes/dv/machinery/type/index', 'MesDvMachineryType', 0, '1', '1', '1', '1', '2026-02-17 00:59:58', '1', '2026-02-17 09:02:05', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5311, '类型查询', 'mes:dv-machinery-type:query', 3, 1, 5310, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-17 00:59:58', '1', '2026-02-17 00:59:58', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5312, '类型创建', 'mes:dv-machinery-type:create', 3, 2, 5310, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-17 00:59:58', '1', '2026-02-17 00:59:58', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5313, '类型更新', 'mes:dv-machinery-type:update', 3, 3, 5310, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-17 00:59:58', '1', '2026-02-17 00:59:58', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5314, '类型删除', 'mes:dv-machinery-type:delete', 3, 4, 5310, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-17 00:59:58', '1', '2026-02-17 00:59:58', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5315, '类型导出', 'mes:dv-machinery-type:export', 3, 5, 5310, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-17 00:59:58', '1', '2026-02-17 00:59:58', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5320, '设备台账', '', 2, 2, 5300, 'machinery', 'ep:monitor', 'mes/dv/machinery/index', 'MesDvMachinery', 0, '1', '1', '1', '1', '2026-02-17 00:59:58', '1', '2026-02-17 00:59:58', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5321, '设备查询', 'mes:dv-machinery:query', 3, 1, 5320, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-17 00:59:58', '1', '2026-02-17 00:59:58', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5322, '设备创建', 'mes:dv-machinery:create', 3, 2, 5320, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-17 00:59:58', '1', '2026-02-17 00:59:58', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5323, '设备更新', 'mes:dv-machinery:update', 3, 3, 5320, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-17 00:59:58', '1', '2026-02-17 00:59:58', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5324, '设备删除', 'mes:dv-machinery:delete', 3, 4, 5320, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-17 00:59:58', '1', '2026-02-17 00:59:58', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5325, '设备导出', 'mes:dv-machinery:export', 3, 5, 5320, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-17 00:59:58', '1', '2026-02-17 00:59:58', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5326, '设备导入', 'mes:dv-machinery:import', 3, 6, 5320, '', '', '', '', 0, '1', '1', '1', '1', '2026-04-02 15:40:42', '1', '2026-04-02 15:40:42', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5330, '点检保养项目', '', 2, 3, 5300, 'subject', 'ep:document-checked', 'mes/dv/subject/index', 'MesDvSubject', 0, '1', '1', '1', '1', '2026-02-20 01:42:58', '1', '2026-02-20 01:42:58', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5331, '项目查询', 'mes:dv-subject:query', 3, 1, 5330, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-20 01:42:58', '1', '2026-02-20 01:42:58', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5332, '项目创建', 'mes:dv-subject:create', 3, 2, 5330, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-20 01:42:58', '1', '2026-02-20 01:42:58', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5333, '项目更新', 'mes:dv-subject:update', 3, 3, 5330, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-20 01:42:58', '1', '2026-02-20 01:42:58', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5334, '项目删除', 'mes:dv-subject:delete', 3, 4, 5330, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-20 01:42:58', '1', '2026-02-20 01:42:58', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5335, '项目导出', 'mes:dv-subject:export', 3, 5, 5330, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-20 01:42:58', '1', '2026-02-20 01:42:58', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5340, '保养记录', '', 2, 6, 5300, 'mainten-record', 'ep:setting', 'mes/dv/maintenrecord/index', 'MesDvMaintenRecord', 0, '1', '1', '1', '', '2026-02-20 02:59:55', '1', '2026-03-02 11:45:39', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5341, '保养记录查询', 'mes:dv-mainten-record:query', 3, 1, 5340, '', '', '', '', 0, '1', '1', '1', '', '2026-02-20 02:59:55', '', '2026-02-20 02:59:55', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5342, '保养记录创建', 'mes:dv-mainten-record:create', 3, 2, 5340, '', '', '', '', 0, '1', '1', '1', '', '2026-02-20 02:59:55', '', '2026-02-20 02:59:55', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5343, '保养记录更新', 'mes:dv-mainten-record:update', 3, 3, 5340, '', '', '', '', 0, '1', '1', '1', '', '2026-02-20 02:59:55', '', '2026-02-20 02:59:55', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5344, '保养记录删除', 'mes:dv-mainten-record:delete', 3, 4, 5340, '', '', '', '', 0, '1', '1', '1', '', '2026-02-20 02:59:55', '', '2026-02-20 02:59:55', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5345, '保养记录导出', 'mes:dv-mainten-record:export', 3, 5, 5340, '', '', '', '', 0, '1', '1', '1', '', '2026-02-20 02:59:55', '', '2026-02-20 02:59:55', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5350, '点检保养方案', '', 2, 4, 5300, 'checkplan', 'ep:calendar', 'mes/dv/checkplan/index', 'MesDvCheckPlan', 0, '1', '1', '1', '1', '2026-02-20 07:13:08', '1', '2026-02-20 07:13:08', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5351, '方案查询', 'mes:dv-check-plan:query', 3, 1, 5350, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-20 07:13:08', '1', '2026-02-20 07:13:08', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5352, '方案创建', 'mes:dv-check-plan:create', 3, 2, 5350, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-20 07:13:08', '1', '2026-02-20 07:13:08', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5353, '方案更新', 'mes:dv-check-plan:update', 3, 3, 5350, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-20 07:13:08', '1', '2026-02-20 07:13:08', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5354, '方案删除', 'mes:dv-check-plan:delete', 3, 4, 5350, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-20 07:13:08', '1', '2026-02-20 07:13:08', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5355, '方案导出', 'mes:dv-check-plan:export', 3, 5, 5350, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-20 07:13:08', '1', '2026-02-20 07:13:08', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5360, '点检记录', '', 2, 5, 5300, 'check-record', 'ep:document-checked', 'mes/dv/checkrecord/index', 'MesDvCheckRecord', 0, '1', '1', '1', '', '2026-02-20 09:46:19', '', '2026-03-02 11:45:39', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5361, '点检记录查询', 'mes:dv-check-record:query', 3, 1, 5360, '', '', '', '', 0, '1', '1', '1', '', '2026-02-20 09:46:19', '', '2026-02-20 09:46:19', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5362, '点检记录创建', 'mes:dv-check-record:create', 3, 2, 5360, '', '', '', '', 0, '1', '1', '1', '', '2026-02-20 09:46:19', '', '2026-02-20 09:46:19', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5363, '点检记录更新', 'mes:dv-check-record:update', 3, 3, 5360, '', '', '', '', 0, '1', '1', '1', '', '2026-02-20 09:46:19', '', '2026-02-20 09:46:19', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5364, '点检记录删除', 'mes:dv-check-record:delete', 3, 4, 5360, '', '', '', '', 0, '1', '1', '1', '', '2026-02-20 09:46:19', '', '2026-02-20 09:46:19', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5365, '点检记录导出', 'mes:dv-check-record:export', 3, 5, 5360, '', '', '', '', 0, '1', '1', '1', '', '2026-02-20 09:46:19', '', '2026-02-20 09:46:19', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5366, '工单导出', 'mes:dv-repair:export', 3, 5, 5360, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-20 11:07:06', '1', '2026-02-20 11:07:06', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5370, '维修单', '', 2, 7, 5300, 'repair', 'ep:tools', 'mes/dv/repair/index', 'MesDvRepair', 0, '1', '1', '1', '1', '2026-02-20 11:06:28', '1', '2026-02-20 19:10:18', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5371, '工单查询', 'mes:dv-repair:query', 3, 1, 5370, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-20 11:06:28', '1', '2026-02-20 11:06:28', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5372, '工单创建', 'mes:dv-repair:create', 3, 2, 5370, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-20 11:06:28', '1', '2026-02-20 11:06:28', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5373, '工单更新', 'mes:dv-repair:update', 3, 3, 5370, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-20 11:54:20', '1', '2026-02-20 11:54:20', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5374, '工单删除', 'mes:dv-repair:delete', 3, 4, 5370, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-20 11:54:15', '1', '2026-02-20 11:54:15', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5375, '工单导出', 'mes:dv-repair:export', 3, 5, 5370, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-20 11:54:04', '1', '2026-02-20 11:54:04', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5400, '工具管理', '', 1, 40, 5100, 'tm', 'ep:scissor', '', '', 0, '1', '1', '1', '1', '2026-02-16 11:10:55', '1', '2026-03-21 14:20:41', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5410, '工具类型设置', '', 2, 1, 5400, 'tool/type', 'ep:files', 'mes/tm/tool/type/index', 'MesTmToolType', 0, '1', '1', '1', '1', '2026-02-16 11:10:55', '1', '2026-02-16 21:28:41', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5411, '类型查询', 'mes:tm-tool-type:query', 3, 1, 5410, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-16 11:10:55', '1', '2026-02-16 11:10:55', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5412, '类型创建', 'mes:tm-tool-type:create', 3, 2, 5410, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-16 11:10:55', '1', '2026-02-16 11:10:55', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5413, '类型更新', 'mes:tm-tool-type:update', 3, 3, 5410, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-16 11:10:55', '1', '2026-02-16 11:10:55', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5414, '类型删除', 'mes:tm-tool-type:delete', 3, 4, 5410, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-16 11:10:55', '1', '2026-02-16 11:10:55', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5415, '类型导出', 'mes:tm-tool-type:export', 3, 5, 5410, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-16 11:10:55', '1', '2026-02-16 11:10:55', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5420, '工装夹具台账', '', 2, 2, 5400, 'tool', 'ep:box', 'mes/tm/tool/index', 'MesTmTool', 0, '1', '1', '1', '1', '2026-02-16 11:10:55', '1', '2026-02-16 21:29:23', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5421, '工具查询', 'mes:tm-tool:query', 3, 1, 5420, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-16 11:10:55', '1', '2026-02-16 11:10:55', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5422, '工具创建', 'mes:tm-tool:create', 3, 2, 5420, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-16 11:10:55', '1', '2026-02-16 11:10:55', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5423, '工具更新', 'mes:tm-tool:update', 3, 3, 5420, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-16 11:10:55', '1', '2026-02-16 11:10:55', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5424, '工具删除', 'mes:tm-tool:delete', 3, 4, 5420, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-16 11:10:55', '1', '2026-02-16 11:10:55', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5425, '工具导出', 'mes:tm-tool:export', 3, 5, 5420, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-16 11:10:55', '1', '2026-02-16 11:10:55', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5500, '质量管理', '', 1, 60, 5100, 'qc', 'ep:check', '', '', 0, '1', '1', '1', '1', '2026-02-17 02:18:18', '1', '2026-02-17 14:36:15', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5510, '常见缺陷', '', 2, 1, 5500, 'defect', 'ep:warning', 'mes/qc/defect/index', 'MesQcDefect', 0, '1', '1', '1', '1', '2026-02-17 02:18:18', '1', '2026-03-04 04:29:46', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5511, '缺陷类型查询', 'mes:qc-defect:query', 3, 1, 5510, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-17 02:18:18', '1', '2026-02-17 02:18:18', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5512, '缺陷类型创建', 'mes:qc-defect:create', 3, 2, 5510, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-17 02:18:18', '1', '2026-02-17 02:18:18', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5513, '缺陷类型更新', 'mes:qc-defect:update', 3, 3, 5510, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-17 02:18:18', '1', '2026-02-17 02:18:18', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5514, '缺陷类型删除', 'mes:qc-defect:delete', 3, 4, 5510, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-17 02:18:18', '1', '2026-02-17 02:18:18', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5515, '缺陷类型导出', 'mes:qc-defect:export', 3, 5, 5510, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-17 02:18:18', '1', '2026-02-17 02:18:18', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5530, '生产工单', '', 2, 1, 5700, 'work-order', 'ep:document-copy', 'mes/pro/workorder/index', 'MesProWorkOrder', 0, '1', '1', '1', '1', '2026-02-17 11:51:44', '1', '2026-02-17 19:54:36', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5531, '工单查询', 'mes:pro-work-order:query', 3, 1, 5530, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-17 11:51:44', '1', '2026-02-17 11:51:44', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5532, '工单创建', 'mes:pro-work-order:create', 3, 2, 5530, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-17 11:51:44', '1', '2026-02-17 11:51:44', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5533, '工单更新', 'mes:pro-work-order:update', 3, 3, 5530, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-17 11:51:44', '1', '2026-02-17 11:51:44', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5534, '工单删除', 'mes:pro-work-order:delete', 3, 4, 5530, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-17 11:51:44', '1', '2026-02-17 11:51:44', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5535, '工单导出', 'mes:pro-work-order:export', 3, 5, 5530, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-17 11:51:44', '1', '2026-02-17 11:51:44', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5540, '生产排产', '', 2, 4, 5700, 'task', 'ep:calendar', 'mes/pro/task/index', 'MesProTask', 0, '1', '1', '1', '1', '2026-02-19 15:25:27', '1', '2026-02-20 08:30:27', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5541, '排产查询', 'mes:pro-task:query', 3, 1, 5540, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-19 15:25:27', '1', '2026-02-19 15:25:27', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5542, '排产创建', 'mes:pro-task:create', 3, 2, 5540, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-19 15:25:27', '1', '2026-02-19 15:25:27', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5543, '排产更新', 'mes:pro-task:update', 3, 3, 5540, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-19 15:25:27', '1', '2026-02-19 15:25:27', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5544, '排产删除', 'mes:pro-task:delete', 3, 4, 5540, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-19 15:25:27', '1', '2026-02-19 15:25:27', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5545, '排产导出', 'mes:pro-task:export', 3, 5, 5540, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-19 15:25:27', '1', '2026-02-19 15:25:27', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5550, '生产报工', '', 2, 5, 5700, 'feedback', 'ep:finished', 'mes/pro/feedback/index', 'MesProFeedback', 0, '1', '1', '1', '1', '2026-02-21 00:50:22', '1', '2026-02-21 08:55:14', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5551, '报工查询', 'mes:pro-feedback:query', 3, 1, 5550, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-21 00:50:22', '1', '2026-02-21 00:50:22', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5552, '报工创建', 'mes:pro-feedback:create', 3, 2, 5550, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-21 00:50:22', '1', '2026-02-21 00:50:22', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5553, '报工更新', 'mes:pro-feedback:update', 3, 3, 5550, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-21 00:50:22', '1', '2026-02-21 00:50:22', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5554, '报工删除', 'mes:pro-feedback:delete', 3, 4, 5550, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-21 00:50:22', '1', '2026-02-21 00:50:22', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5555, '报工导出', 'mes:pro-feedback:export', 3, 5, 5550, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-21 00:50:22', '1', '2026-02-21 00:50:22', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5560, '工序流转', '', 2, 6, 5700, 'card', 'ep:postcard', 'mes/pro/card/index', 'MesProCard', 0, '1', '1', '1', '1', '2026-02-21 03:16:35', '1', '2026-02-21 11:18:42', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5561, '流转卡查询', 'mes:pro-card:query', 3, 1, 5560, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-21 03:16:35', '1', '2026-02-21 03:16:35', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5562, '流转卡创建', 'mes:pro-card:create', 3, 2, 5560, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-21 03:16:35', '1', '2026-02-21 03:16:35', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5563, '流转卡更新', 'mes:pro-card:update', 3, 3, 5560, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-21 03:16:35', '1', '2026-02-21 03:16:35', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5564, '流转卡删除', 'mes:pro-card:delete', 3, 4, 5560, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-21 03:16:35', '1', '2026-02-21 03:16:35', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5565, '流转卡导出', 'mes:pro-card:export', 3, 5, 5560, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-21 03:16:35', '1', '2026-02-21 03:16:35', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5566, '流转卡完成', 'mes:pro-card:finish', 3, 6, 5560, '', '', '', '', 0, '1', '1', '1', '1', '2026-04-04 12:18:15', '1', '2026-04-04 12:18:15', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5610, '检测项设置', '', 2, 2, 5500, 'indicator', 'ep:data-analysis', 'mes/qc/indicator/index', 'MesQcIndicator', 0, '1', '1', '1', '1', '2026-02-17 08:11:31', '1', '2026-02-17 16:16:07', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5611, '质检指标查询', 'mes:qc-indicator:query', 3, 1, 5610, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-17 08:11:31', '1', '2026-02-17 08:11:31', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5612, '质检指标创建', 'mes:qc-indicator:create', 3, 2, 5610, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-17 08:11:31', '1', '2026-02-17 08:11:31', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5613, '质检指标更新', 'mes:qc-indicator:update', 3, 3, 5610, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-17 08:11:31', '1', '2026-02-17 08:11:31', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5614, '质检指标删除', 'mes:qc-indicator:delete', 3, 4, 5610, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-17 08:11:31', '1', '2026-02-17 08:11:31', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5615, '质检指标导出', 'mes:qc-indicator:export', 3, 5, 5610, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-17 08:11:31', '1', '2026-02-17 08:11:31', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5630, '质检方案', '', 2, 3, 5500, 'template', 'ep:document-copy', 'mes/qc/template/index', 'MesQcTemplate', 0, '1', '1', '1', '1', '2026-02-17 08:34:40', '1', '2026-03-04 04:29:46', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5631, '质检方案查询', 'mes:qc-template:query', 3, 1, 5630, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-17 08:34:40', '1', '2026-02-18 14:12:05', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5632, '质检方案创建', 'mes:qc-template:create', 3, 2, 5630, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-17 08:34:40', '1', '2026-02-18 14:12:05', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5633, '质检方案更新', 'mes:qc-template:update', 3, 3, 5630, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-17 08:34:40', '1', '2026-02-18 14:12:05', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5634, '质检方案删除', 'mes:qc-template:delete', 3, 4, 5630, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-17 08:34:40', '1', '2026-02-18 14:12:05', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5635, '质检方案导出', 'mes:qc-template:export', 3, 5, 5630, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-17 08:34:40', '1', '2026-02-18 14:12:05', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5640, '来料检验', '', 2, 5, 5500, 'iqc', 'ep:finished', 'mes/qc/iqc/index', 'MesQcIqc', 0, '1', '1', '1', '1', '2026-02-20 11:23:45', '1', '2026-02-24 05:24:01', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5641, '来料检验查询', 'mes:qc-iqc:query', 3, 1, 5640, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-20 11:23:45', '1', '2026-02-20 11:23:45', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5642, '来料检验创建', 'mes:qc-iqc:create', 3, 2, 5640, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-20 11:23:45', '1', '2026-02-20 11:23:45', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5643, '来料检验更新', 'mes:qc-iqc:update', 3, 3, 5640, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-20 11:23:45', '1', '2026-02-20 11:23:45', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5644, '来料检验删除', 'mes:qc-iqc:delete', 3, 4, 5640, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-20 11:23:45', '1', '2026-02-20 11:23:45', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5645, '来料检验导出', 'mes:qc-iqc:export', 3, 5, 5640, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-20 11:23:45', '1', '2026-02-20 11:23:45', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5650, '过程检验', '', 2, 6, 5500, 'ipqc', 'ep:checked', 'mes/qc/ipqc/index', 'MesQcIpqc', 0, '1', '1', '1', '1', '2026-02-22 07:01:08', '1', '2026-02-22 15:02:42', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5651, '过程检验查询', 'mes:qc-ipqc:query', 3, 1, 5650, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-22 07:01:08', '1', '2026-02-22 07:01:08', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5652, '过程检验创建', 'mes:qc-ipqc:create', 3, 2, 5650, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-22 07:01:08', '1', '2026-02-22 07:01:08', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5653, '过程检验更新', 'mes:qc-ipqc:update', 3, 3, 5650, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-22 07:01:08', '1', '2026-02-22 07:01:08', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5654, '过程检验删除', 'mes:qc-ipqc:delete', 3, 4, 5650, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-22 07:01:08', '1', '2026-02-22 07:01:08', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5655, '过程检验导出', 'mes:qc-ipqc:export', 3, 5, 5650, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-22 07:01:08', '1', '2026-02-22 07:01:08', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5660, '出货检验', '', 2, 8, 5500, 'oqc', 'ep:sell', 'mes/qc/oqc/index', 'MesQcOqc', 0, '1', '1', '1', '1', '2026-02-22 06:55:53', '1', '2026-02-22 14:58:31', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5661, '出货检验查询', 'mes:qc-oqc:query', 3, 1, 5660, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-22 06:55:53', '1', '2026-02-22 06:55:53', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5662, '出货检验创建', 'mes:qc-oqc:create', 3, 2, 5660, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-22 06:55:53', '1', '2026-02-22 06:55:53', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5663, '出货检验更新', 'mes:qc-oqc:update', 3, 3, 5660, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-22 06:55:53', '1', '2026-02-22 06:55:53', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5664, '出货检验删除', 'mes:qc-oqc:delete', 3, 4, 5660, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-22 06:55:53', '1', '2026-02-22 06:55:53', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5665, '出货检验导出', 'mes:qc-oqc:export', 3, 5, 5660, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-22 06:55:53', '1', '2026-02-22 06:55:53', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5670, '退料检验', '', 2, 7, 5500, 'rqc', 'ep:warning-filled', 'mes/qc/rqc/index', 'MesQcRqc', 0, '1', '1', '1', '1', '2026-02-22 06:43:25', '1', '2026-02-22 14:46:41', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5671, '退货检验查询', 'mes:qc-rqc:query', 3, 1, 5670, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-22 06:43:25', '1', '2026-02-22 06:43:25', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5672, '退货检验创建', 'mes:qc-rqc:create', 3, 2, 5670, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-22 06:43:25', '1', '2026-02-22 06:43:25', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5673, '退货检验更新', 'mes:qc-rqc:update', 3, 3, 5670, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-22 06:43:25', '1', '2026-02-22 06:43:25', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5674, '退货检验删除', 'mes:qc-rqc:delete', 3, 4, 5670, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-22 06:43:25', '1', '2026-02-22 06:43:25', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5675, '退货检验导出', 'mes:qc-rqc:export', 3, 5, 5670, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-22 06:43:25', '1', '2026-02-22 06:43:25', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5680, '待检任务', '', 2, 4, 5500, 'pending-inspect', 'ep:clock', 'mes/qc/pendinginspect/index', 'MesQcPendingInspect', 0, '1', '1', '1', '1', '2026-02-23 07:15:41', '1', '2026-02-24 05:24:04', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5681, '待检任务查询', 'mes:qc-pending-inspect:query', 3, 1, 5680, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-23 07:15:41', '1', '2026-02-23 07:15:41', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5700, '生产管理', '', 1, 50, 5100, 'pro', 'ep:management', '', '', 0, '1', '1', '1', '1', '2026-02-17 11:39:58', '1', '2026-02-17 19:53:35', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5710, '工序设置', '', 2, 2, 5700, 'process', 'ep:operation', 'mes/pro/process/index', 'MesProProcess', 0, '1', '1', '1', '1', '2026-02-17 11:39:58', '1', '2026-02-19 16:23:45', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5711, '工序查询', 'mes:pro-process:query', 3, 1, 5710, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-17 11:39:58', '1', '2026-02-17 11:39:58', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5712, '工序创建', 'mes:pro-process:create', 3, 2, 5710, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-17 11:39:58', '1', '2026-02-17 11:39:58', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5713, '工序更新', 'mes:pro-process:update', 3, 3, 5710, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-17 11:39:58', '1', '2026-02-17 11:39:58', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5714, '工序删除', 'mes:pro-process:delete', 3, 4, 5710, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-17 11:39:58', '1', '2026-02-17 11:39:58', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5715, '工序导出', 'mes:pro-process:export', 3, 5, 5710, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-17 11:39:58', '1', '2026-02-17 11:39:58', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5720, '工艺流程', '', 2, 3, 5700, 'route', 'ep:guide', 'mes/pro/route/index', 'MesProRoute', 0, '1', '1', '1', '1', '2026-02-19 04:24:53', '1', '2026-02-19 16:24:23', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5721, '工艺路线查询', 'mes:pro-route:query', 3, 1, 5720, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-19 04:24:53', '1', '2026-02-19 04:24:53', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5722, '工艺路线创建', 'mes:pro-route:create', 3, 2, 5720, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-19 04:24:53', '1', '2026-02-19 04:24:53', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5723, '工艺路线更新', 'mes:pro-route:update', 3, 3, 5720, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-19 04:24:53', '1', '2026-02-19 04:24:53', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5724, '工艺路线删除', 'mes:pro-route:delete', 3, 4, 5720, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-19 04:24:53', '1', '2026-02-19 04:24:53', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5725, '工艺路线导出', 'mes:pro-route:export', 3, 5, 5720, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-19 04:24:53', '1', '2026-02-19 04:24:53', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5750, '安灯呼叫', '', 2, 7, 5700, 'andon', 'ep:bell', 'mes/pro/andon/record/index', 'MesProAndonRecord', 0, '1', '1', '1', '1', '2026-02-21 00:24:18', '1', '2026-02-21 11:35:45', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5751, '安灯记录查询', 'mes:pro-andon-record:query', 3, 1, 5750, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-21 00:24:18', '1', '2026-02-21 00:24:18', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5752, '安灯记录创建', 'mes:pro-andon-record:create', 3, 2, 5750, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-21 00:24:18', '1', '2026-02-21 00:24:18', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5753, '安灯记录更新', 'mes:pro-andon-record:update', 3, 3, 5750, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-21 00:24:18', '1', '2026-02-21 00:24:18', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5754, '安灯记录删除', 'mes:pro-andon-record:delete', 3, 4, 5750, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-21 00:24:18', '1', '2026-02-21 00:24:18', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5755, '安灯记录导出', 'mes:pro-andon-record:export', 3, 5, 5750, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-21 00:24:18', '1', '2026-02-21 00:24:18', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5756, '安灯配置查询', 'mes:pro-andon-config:query', 3, 6, 5750, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-21 00:24:18', '1', '2026-02-21 00:24:18', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5757, '安灯配置创建', 'mes:pro-andon-config:create', 3, 7, 5750, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-21 00:24:18', '1', '2026-02-21 00:24:18', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5758, '安灯配置更新', 'mes:pro-andon-config:update', 3, 8, 5750, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-21 00:24:18', '1', '2026-02-21 00:24:18', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5759, '安灯配置删除', 'mes:pro-andon-config:delete', 3, 9, 5750, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-21 00:24:18', '1', '2026-02-21 00:24:18', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5780, '仓库管理', '', 1, 20, 5100, 'wm', 'ep:box', '', '', 0, '1', '1', '1', '1', '2026-02-17 15:37:58', '1', '2026-02-17 23:38:18', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5781, '仓库设置', '', 2, 1, 5780, 'warehouse', 'ep:office-building', 'mes/wm/warehouse/index', 'MesWmWarehouse', 0, '1', '1', '1', '1', '2026-02-17 15:37:58', '1', '2026-02-17 15:37:58', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5782, '仓库查询', 'mes:wm-warehouse:query', 3, 1, 5781, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-17 15:37:58', '1', '2026-02-17 15:37:58', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5783, '仓库创建', 'mes:wm-warehouse:create', 3, 2, 5781, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-17 15:37:58', '1', '2026-02-17 15:37:58', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5784, '仓库更新', 'mes:wm-warehouse:update', 3, 3, 5781, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-17 15:37:58', '1', '2026-02-17 15:37:58', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5785, '仓库删除', 'mes:wm-warehouse:delete', 3, 4, 5781, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-17 15:37:58', '1', '2026-02-17 15:37:58', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5786, '库存现有量', '', 2, 2, 5780, 'material-stock', 'ep:document', 'mes/wm/materialstock/index', 'MesWmMaterialStock', 0, '1', '1', '1', '1', '2026-02-20 01:02:36', '1', '2026-02-20 09:03:40', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5787, '库存台账查询', 'mes:wm-material-stock:query', 3, 1, 5786, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-20 01:02:36', '1', '2026-02-20 01:02:36', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5788, '库存台账创建', 'mes:wm-material-stock:create', 3, 2, 5786, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-20 01:02:37', '1', '2026-02-20 01:02:37', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5789, '库存台账更新', 'mes:wm-material-stock:update', 3, 3, 5786, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-20 01:02:37', '1', '2026-02-20 01:02:37', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5790, '库存台账删除', 'mes:wm-material-stock:delete', 3, 4, 5786, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-20 01:02:37', '1', '2026-02-20 01:02:37', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5791, '库存台账导出', 'mes:wm-material-stock:export', 3, 5, 5786, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-20 01:02:37', '1', '2026-02-20 01:02:37', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5792, '到货通知', '', 2, 4, 5780, 'arrival-notice', 'ep:document-checked', 'mes/wm/arrivalnotice/index', 'MesWmArrivalNotice', 0, '1', '1', '1', '1', '2026-02-22 09:11:05', '1', '2026-02-22 17:13:15', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5793, '到货通知单查询', 'mes:wm-arrival-notice:query', 3, 1, 5792, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-22 09:11:05', '1', '2026-02-22 09:11:05', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5794, '到货通知单创建', 'mes:wm-arrival-notice:create', 3, 2, 5792, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-22 09:11:05', '1', '2026-02-22 09:11:05', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5795, '到货通知单更新', 'mes:wm-arrival-notice:update', 3, 3, 5792, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-22 09:11:05', '1', '2026-02-22 09:11:05', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5796, '到货通知单删除', 'mes:wm-arrival-notice:delete', 3, 4, 5792, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-22 09:11:05', '1', '2026-02-22 09:11:05', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5797, '到货通知单导出', 'mes:wm-arrival-notice:export', 3, 5, 5792, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-22 09:11:05', '1', '2026-02-22 09:11:05', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5798, '采购入库', '', 2, 3, 5780, 'item-receipt', 'ep:goods', 'mes/wm/itemreceipt/index', 'MesWmItemReceipt', 0, '1', '1', '1', '1', '2026-02-22 10:23:22', '1', '2026-02-22 18:35:01', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5799, '采购入库单查询', 'mes:wm-item-receipt:query', 3, 1, 5798, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-22 10:23:22', '1', '2026-02-22 10:23:22', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5800, '采购入库单创建', 'mes:wm-item-receipt:create', 3, 2, 5798, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-22 10:23:22', '1', '2026-02-22 10:23:22', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5801, '采购入库单更新', 'mes:wm-item-receipt:update', 3, 3, 5798, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-22 10:23:22', '1', '2026-02-22 10:23:22', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5802, '采购入库单删除', 'mes:wm-item-receipt:delete', 3, 4, 5798, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-22 10:23:22', '1', '2026-02-22 10:23:22', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5803, '采购入库单导出', 'mes:wm-item-receipt:export', 3, 5, 5798, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-22 10:23:22', '1', '2026-02-22 10:23:22', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5804, '采购入库单完成', 'mes:wm-item-receipt:finish', 3, 6, 5798, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-22 10:23:22', '1', '2026-03-02 11:24:29', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5805, '生产领料', '', 2, 6, 5780, 'product-issue', 'ep:sell', 'mes/wm/productissue/index', 'MesWmProductIssue', 0, '1', '1', '1', '1', '2026-02-26 15:53:24', '1', '2026-03-23 12:21:59', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5806, '领料出库单查询', 'mes:wm-product-issue:query', 3, 1, 5805, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-02-26 15:53:24', '1', '2026-03-23 12:21:59', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5807, '领料出库单新增', 'mes:wm-product-issue:create', 3, 2, 5805, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-02-26 15:53:24', '1', '2026-03-23 12:21:59', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5808, '领料出库单修改', 'mes:wm-product-issue:update', 3, 3, 5805, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-02-26 15:53:24', '1', '2026-03-23 12:21:59', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5809, '领料出库单删除', 'mes:wm-product-issue:delete', 3, 4, 5805, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-02-26 15:53:24', '1', '2026-03-23 12:21:59', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5810, '领料出库单导出', 'mes:wm-product-issue:export', 3, 5, 5805, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-02-26 15:53:24', '1', '2026-03-23 12:21:59', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5811, '领料出库单完成', 'mes:wm-product-issue:finish', 3, 6, 5805, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-02-26 15:53:24', '1', '2026-03-30 03:06:32', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5819, '产品入库', '', 2, 8, 5780, 'product-receipt', 'ep:box', 'mes/wm/productreceipt/index', 'MesWmProductReceipt', 0, '1', '1', '1', '1', '2026-03-01 04:03:25', '1', '2026-03-04 04:29:46', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5820, '产品入库单查询', 'mes:wm-product-receipt:query', 3, 1, 5819, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-01 04:03:25', '1', '2026-03-01 06:03:44', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5821, '产品入库单新增', 'mes:wm-product-receipt:create', 3, 2, 5819, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-01 04:03:25', '1', '2026-03-01 06:03:44', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5822, '产品入库单修改', 'mes:wm-product-receipt:update', 3, 3, 5819, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-01 04:03:25', '1', '2026-03-01 06:03:44', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5823, '产品入库单删除', 'mes:wm-product-receipt:delete', 3, 4, 5819, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-01 04:03:25', '1', '2026-03-01 06:03:44', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5824, '产品入库单导出', 'mes:wm-product-receipt:export', 3, 5, 5819, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-01 04:03:25', '1', '2026-03-01 06:03:44', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5825, '产品入库单完成', 'mes:wm-product-receipt:finish', 3, 6, 5819, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-01 04:03:25', '1', '2026-03-02 11:24:29', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5830, '采购退货', '', 2, 5, 5780, 'return-vendor', 'ep:box', 'mes/wm/returnvendor/index', 'MesWmReturnVendor', 0, '1', '1', '1', '1', '2026-02-28 09:47:48', '1', '2026-03-29 20:22:49', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5831, '供应商退货单查询', 'mes:wm-return-vendor:query', 3, 1, 5830, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-02-28 09:47:48', '1', '2026-02-28 09:47:48', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5832, '供应商退货单新增', 'mes:wm-return-vendor:create', 3, 2, 5830, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-02-28 09:47:48', '1', '2026-02-28 09:47:48', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5833, '供应商退货单修改', 'mes:wm-return-vendor:update', 3, 3, 5830, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-02-28 09:47:48', '1', '2026-02-28 09:47:48', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5834, '供应商退货单删除', 'mes:wm-return-vendor:delete', 3, 4, 5830, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-02-28 09:47:48', '1', '2026-02-28 09:47:48', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5835, '供应商退货单导出', 'mes:wm-return-vendor:export', 3, 5, 5830, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-02-28 09:47:48', '1', '2026-02-28 09:47:48', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5836, '供应商退货单状态变更', 'mes:wm-return-vendor:update-status', 3, 6, 5830, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-02-28 09:47:48', '1', '2026-02-28 09:47:48', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5840, '生产退料', '', 2, 7, 5780, 'return-issue', 'ep:refresh-left', 'mes/wm/returnissue/index', 'MesWmReturnIssue', 0, '1', '1', '1', '1', '2026-02-28 14:11:04', '1', '2026-03-04 04:29:46', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5841, '生产退料单查询', 'mes:wm-return-issue:query', 3, 1, 5840, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-02-28 14:11:04', '1', '2026-02-28 14:11:04', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5842, '生产退料单新增', 'mes:wm-return-issue:create', 3, 2, 5840, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-02-28 14:11:04', '1', '2026-02-28 14:11:04', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5843, '生产退料单修改', 'mes:wm-return-issue:update', 3, 3, 5840, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-02-28 14:11:04', '1', '2026-02-28 14:11:04', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5844, '生产退料单删除', 'mes:wm-return-issue:delete', 3, 4, 5840, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-02-28 14:11:04', '1', '2026-02-28 14:11:04', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5845, '生产退料单导出', 'mes:wm-return-issue:export', 3, 5, 5840, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-02-28 14:11:04', '1', '2026-02-28 14:11:04', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5846, '生产退料单执行', 'mes:wm-return-issue:finish', 3, 6, 5840, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-28 14:11:04', '1', '2026-03-02 11:24:30', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5847, '销售退货', '', 2, 11, 5780, 'return-sales', 'ep:refresh-left', 'mes/wm/returnsales/index', 'MesWmReturnSales', 0, '1', '1', '1', '1', '2026-03-01 10:31:35', '1', '2026-03-04 04:29:46', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5848, '销售退货单查询', 'mes:wm-return-sales:query', 3, 1, 5847, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-01 10:31:35', '1', '2026-03-01 10:31:35', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5849, '销售退货单新增', 'mes:wm-return-sales:create', 3, 2, 5847, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-01 10:31:35', '1', '2026-03-01 10:31:35', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5850, '销售退货单修改', 'mes:wm-return-sales:update', 3, 3, 5847, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-01 10:31:35', '1', '2026-03-01 10:31:35', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5851, '销售退货单删除', 'mes:wm-return-sales:delete', 3, 4, 5847, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-01 10:31:35', '1', '2026-03-01 10:31:35', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5852, '销售退货单导出', 'mes:wm-return-sales:export', 3, 5, 5847, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-01 10:31:35', '1', '2026-03-01 10:31:35', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5853, '销售退货单提交', 'mes:wm-return-sales:submit', 3, 6, 5847, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-01 10:31:35', '1', '2026-03-01 10:31:35', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5854, '销售退货单完成退货', 'mes:wm-return-sales:finish', 3, 7, 5847, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-01 10:31:35', '1', '2026-03-02 11:24:29', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5855, '销售退货单执行上架', 'mes:wm-return-sales:stock', 3, 8, 5847, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-01 10:31:35', '1', '2026-03-01 10:31:35', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5856, '销售退货单取消', 'mes:wm-return-sales:cancel', 3, 9, 5847, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-01 10:31:35', '1', '2026-03-01 10:31:35', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5857, '杂项出库', '', 2, 20, 5780, 'misc-issue', 'ep:sell', 'mes/wm/miscissue/index', NULL, 0, '1', '1', '1', '1', '2026-03-02 14:33:34', '1', '2026-03-03 09:12:16', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5858, '杂项出库查询', 'mes:wm-misc-issue:query', 3, 1, 5857, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-02 14:33:34', '1', '2026-03-02 14:33:34', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5859, '杂项出库新增', 'mes:wm-misc-issue:create', 3, 2, 5857, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-02 14:33:34', '1', '2026-03-02 14:33:34', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5860, '杂项出库修改', 'mes:wm-misc-issue:update', 3, 3, 5857, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-02 14:33:34', '1', '2026-03-02 14:33:34', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5861, '杂项出库删除', 'mes:wm-misc-issue:delete', 3, 4, 5857, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-02 14:33:34', '1', '2026-03-02 14:33:34', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5862, '杂项出库导出', 'mes:wm-misc-issue:export', 3, 5, 5857, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-02 14:33:34', '1', '2026-03-02 14:33:34', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5863, '杂项出库执行', 'mes:wm-misc-issue:finish', 3, 6, 5857, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-02 14:33:34', '1', '2026-03-02 14:33:34', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5867, '发货通知', '', 2, 9, 5780, 'sales-notice', 'fa-solid:notes-medical', 'mes/wm/salesnotice/index', 'MesWmSalesNotice', 0, '1', '1', '1', '1', '2026-03-30 08:54:30', '1', '2026-03-30 17:09:27', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5868, '查询发货通知', 'mes:wm-sales-notice:query', 3, 1, 5867, '', '', '', '', 0, '1', '1', '1', '1', '2026-03-30 08:54:30', '1', '2026-03-30 16:57:31', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5869, '创建发货通知', 'mes:wm-sales-notice:create', 3, 2, 5867, '', '', '', '', 0, '1', '1', '1', '1', '2026-03-30 08:54:30', '1', '2026-03-30 16:57:37', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5870, '更新发货通知', 'mes:wm-sales-notice:update', 3, 3, 5867, '', '', '', '', 0, '1', '1', '1', '1', '2026-03-30 08:54:30', '1', '2026-03-30 16:57:49', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5871, '删除发货通知', 'mes:wm-sales-notice:delete', 3, 4, 5867, '', '', '', '', 0, '1', '1', '1', '1', '2026-03-30 08:54:30', '1', '2026-03-30 16:57:57', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5872, '导出发货通知', 'mes:wm-sales-notice:export', 3, 5, 5867, '', '', '', '', 0, '1', '1', '1', '1', '2026-03-30 08:54:30', '1', '2026-03-30 16:58:03', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5873, '外协入库', '', 2, 18, 5780, 'outsource-receipt', 'fa-solid:truck', 'mes/wm/outsourcereceipt/index', 'MesWmOutsourceReceipt', 0, '1', '1', '1', '1', '2026-03-31 15:36:37', '1', '2026-04-01 00:04:11', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5874, '外协入库单查询', 'mes:wm-outsource-receipt:query', 3, 1, 5873, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-31 15:36:37', '1', '2026-03-31 15:36:37', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5875, '外协入库单新增', 'mes:wm-outsource-receipt:create', 3, 2, 5873, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-31 15:36:37', '1', '2026-03-31 15:36:37', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5876, '外协入库单修改', 'mes:wm-outsource-receipt:update', 3, 3, 5873, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-31 15:36:37', '1', '2026-03-31 15:36:37', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5877, '外协入库单删除', 'mes:wm-outsource-receipt:delete', 3, 4, 5873, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-31 15:36:37', '1', '2026-03-31 15:36:37', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5878, '外协入库单导出', 'mes:wm-outsource-receipt:export', 3, 5, 5873, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-31 15:36:37', '1', '2026-03-31 15:36:37', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5879, '外协入库单完成', 'mes:wm-outsource-receipt:finish', 3, 6, 5873, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-31 15:36:37', '1', '2026-03-31 15:36:37', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5881, '外协发料', '', 2, 17, 5780, 'outsource-issue', 'ep:sell', 'mes/wm/outsourceissue/index', 'MesWmOutsourceIssue', 0, '1', '1', '1', '1', '2026-03-02 14:36:04', '1', '2026-03-03 19:59:38', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5882, '外协发料单查询', 'mes:wm-outsource-issue:query', 3, 1, 5881, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-02 14:36:04', '1', '2026-03-02 14:36:04', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5883, '外协发料单新增', 'mes:wm-outsource-issue:create', 3, 2, 5881, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-02 14:36:04', '1', '2026-03-02 14:36:04', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5884, '外协发料单修改', 'mes:wm-outsource-issue:update', 3, 3, 5881, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-02 14:36:04', '1', '2026-03-02 14:36:04', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5885, '外协发料单删除', 'mes:wm-outsource-issue:delete', 3, 4, 5881, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-02 14:36:04', '1', '2026-03-02 14:36:04', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5886, '外协发料单导出', 'mes:wm-outsource-issue:export', 3, 5, 5881, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-02 14:36:04', '1', '2026-03-02 14:36:04', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5887, '外协发料单执行出库', 'mes:wm-outsource-issue:execute', 3, 6, 5881, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-02 14:36:04', '1', '2026-03-02 14:36:04', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5888, '杂项入库', '', 2, 19, 5780, 'misc-receipt', 'ep:bottom', 'mes/wm/miscreceipt/index', NULL, 0, '1', '1', '1', '1', '2026-03-03 07:17:50', '1', '2026-03-03 07:46:53', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5889, '杂项入库查询', 'mes:wm:misc-receipt:query', 3, 1, 5888, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-03 07:17:50', '1', '2026-03-03 07:17:50', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5890, '杂项入库创建', 'mes:wm:misc-receipt:create', 3, 2, 5888, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-03 07:17:50', '1', '2026-03-03 07:17:50', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5891, '杂项入库更新', 'mes:wm:misc-receipt:update', 3, 3, 5888, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-03 07:17:50', '1', '2026-03-03 07:17:50', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5892, '杂项入库删除', 'mes:wm:misc-receipt:delete', 3, 4, 5888, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-03 07:17:50', '1', '2026-03-03 07:17:50', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5893, '杂项入库提交', 'mes:wm:misc-receipt:submit', 3, 5, 5888, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-03 07:17:50', '1', '2026-03-03 07:17:50', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5894, '杂项入库执行', 'mes:wm:misc-receipt:finish', 3, 6, 5888, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-03 07:17:50', '1', '2026-03-03 07:17:50', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5895, '杂项入库取消', 'mes:wm:misc-receipt:cancel', 3, 7, 5888, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-03 07:17:50', '1', '2026-03-03 07:17:50', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5896, '杂项入库导出', 'mes:wm:misc-receipt:export', 3, 8, 5888, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-03 07:17:50', '1', '2026-03-03 07:17:50', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5897, 'SN 码', '', 2, 16, 5780, 'sn', 'ep:document', 'mes/wm/sn/index', 'MesWmSn', 0, '1', '1', '1', '1', '2026-03-05 01:30:21', '1', '2026-03-05 13:37:30', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5898, 'SN 码查询', 'mes:wm-sn:query', 3, 1, 5897, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-05 01:30:21', '1', '2026-03-05 01:30:21', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5899, 'SN 码生成', 'mes:wm-sn:create', 3, 2, 5897, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-05 01:30:21', '1', '2026-03-05 01:30:21', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5900, 'SN 码删除', 'mes:wm-sn:delete', 3, 4, 5897, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-05 01:30:21', '1', '2026-03-05 01:30:21', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5901, 'SN 码导出', 'mes:wm-sn:export', 3, 5, 5897, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-05 01:30:21', '1', '2026-03-05 01:30:21', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5906, '条码配置', '', 2, 15, 5780, 'barcode/config', 'fa:barcode', 'mes/wm/barcode/config/index', 'MesWmBarcodeConfig', 0, '0', '1', '1', '1', '2026-03-05 14:37:20', '1', '2026-03-06 21:05:20', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5907, '条码配置查询', 'mes:wm-barcode-config:query', 3, 1, 5906, '', '', '', '', 0, '1', '1', '1', '1', '2026-03-05 14:37:20', '1', '2026-03-06 21:09:11', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5908, '条码配置创建', 'mes:wm-barcode-config:create', 3, 2, 5906, '', '', '', '', 0, '1', '1', '1', '1', '2026-03-05 14:37:20', '1', '2026-03-06 21:09:16', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5909, '条码配置更新', 'mes:wm-barcode-config:update', 3, 3, 5906, '', '', '', '', 0, '1', '1', '1', '1', '2026-03-05 14:37:20', '1', '2026-03-06 21:09:21', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5910, '条码配置删除', 'mes:wm-barcode-config:delete', 3, 4, 5906, '', '', '', '', 0, '1', '1', '1', '1', '2026-03-05 14:37:20', '1', '2026-03-06 21:09:26', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5911, '赋能管理', '', 2, 15, 5780, 'barcode', 'fa:qrcode', 'mes/wm/barcode/index', 'MesWmBarcode', 0, '1', '1', '1', '1', '2026-03-05 14:37:20', '1', '2026-03-06 10:01:03', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5912, '条码清单查询', 'mes:wm-barcode:query', 3, 1, 5911, '', '', '', '', 0, '1', '1', '1', '1', '2026-03-05 14:37:20', '1', '2026-03-06 09:58:59', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5913, '条码清单创建', 'mes:wm-barcode:create', 3, 2, 5911, '', '', '', '', 0, '1', '1', '1', '1', '2026-03-05 14:37:20', '1', '2026-03-06 09:59:03', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5914, '条码清单更新', 'mes:wm-barcode:update', 3, 3, 5911, '', '', '', '', 0, '1', '1', '1', '1', '2026-03-05 14:37:20', '1', '2026-03-06 09:59:08', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5915, '条码清单删除', 'mes:wm-barcode:delete', 3, 4, 5911, '', '', '', '', 0, '1', '1', '1', '1', '2026-03-05 14:37:20', '1', '2026-03-06 09:59:12', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5916, '条码清单导出', 'mes:wm-barcode:export', 3, 5, 5911, '', '', '', '', 0, '1', '1', '1', '1', '2026-03-07 02:08:17', '1', '2026-03-07 02:08:17', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5917, '装箱管理', '', 2, 14, 5780, 'packages', 'ep:box', 'mes/wm/packages/index', 'MesWmPackages', 0, '1', '1', '1', '1', '2026-03-08 02:05:46', '1', '2026-03-08 19:16:27', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5918, '装箱管理查询', 'mes:wm-package:query', 3, 1, 5917, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-08 02:05:46', '1', '2026-03-08 02:05:46', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5919, '装箱管理新增', 'mes:wm-package:create', 3, 2, 5917, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-08 02:05:46', '1', '2026-03-08 02:05:46', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5920, '装箱管理修改', 'mes:wm-package:update', 3, 3, 5917, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-08 02:05:46', '1', '2026-03-08 02:05:46', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5921, '装箱管理删除', 'mes:wm-package:delete', 3, 4, 5917, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-08 02:05:46', '1', '2026-03-08 02:05:46', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5922, '转移调拨', '', 2, 12, 5780, 'transfer', 'ep:sort', 'mes/wm/transfer/index', 'MesWmTransfer', 0, '1', '1', '1', '1', '2026-03-08 11:55:25', '1', '2026-03-22 15:22:57', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5923, '调拨单查询', 'mes:wm-transfer:query', 3, 1, 5922, '', '', '', '', 0, '1', '1', '1', '1', '2026-03-08 11:55:25', '1', '2026-03-08 11:55:25', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5924, '调拨单新增', 'mes:wm-transfer:create', 3, 2, 5922, '', '', '', '', 0, '1', '1', '1', '1', '2026-03-08 11:55:25', '1', '2026-03-08 11:55:25', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5925, '调拨单修改', 'mes:wm-transfer:update', 3, 3, 5922, '', '', '', '', 0, '1', '1', '1', '1', '2026-03-08 11:55:25', '1', '2026-03-08 11:55:25', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5926, '调拨单删除', 'mes:wm-transfer:delete', 3, 4, 5922, '', '', '', '', 0, '1', '1', '1', '1', '2026-03-08 11:55:25', '1', '2026-03-08 11:55:25', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5927, '调拨单导出', 'mes:wm-transfer:export', 3, 5, 5922, '', '', '', '', 0, '1', '1', '1', '1', '2026-03-08 11:55:25', '1', '2026-03-08 11:55:25', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5928, '调拨单提交', 'mes:wm-transfer:submit', 3, 6, 5922, '', '', '', '', 0, '1', '1', '1', '1', '2026-03-08 11:55:25', '1', '2026-03-08 11:55:25', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5929, '调拨单确认', 'mes:wm-transfer:confirm', 3, 7, 5922, '', '', '', '', 0, '1', '1', '1', '1', '2026-03-08 11:55:25', '1', '2026-03-08 11:55:25', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5930, '调拨单完成', 'mes:wm-transfer:finish', 3, 8, 5922, '', '', '', '', 0, '1', '1', '1', '1', '2026-03-08 11:55:25', '1', '2026-03-08 11:55:25', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5931, '调拨单取消', 'mes:wm-transfer:cancel', 3, 9, 5922, '', '', '', '', 0, '1', '1', '1', '1', '2026-03-08 11:55:25', '1', '2026-03-08 11:55:25', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5950, '库存盘点', '', 1, 13, 5780, 'stock-taking', 'ep:circle-check-filled', '', '', 0, '1', '1', '1', '1', '2026-03-09 00:00:00', '1', '2026-03-09 21:19:09', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5951, '盘点方案', '', 2, 1, 5950, 'plan', 'ep:document', 'mes/wm/stocktaking/plan/index', 'MesWmStockTakingPlan', 0, '1', '1', '1', '1', '2026-03-09 00:00:00', '1', '2026-03-09 13:19:52', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5952, '盘点方案查询', 'mes:wm-stock-taking-plan:query', 3, 1, 5951, '', '', '', '', 0, '1', '1', '1', '1', '2026-03-09 00:00:00', '1', '2026-03-09 13:35:06', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5953, '盘点方案创建', 'mes:wm-stock-taking-plan:create', 3, 2, 5951, '', '', '', '', 0, '1', '1', '1', '1', '2026-03-09 00:00:00', '1', '2026-03-09 13:35:07', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5954, '盘点方案更新', 'mes:wm-stock-taking-plan:update', 3, 3, 5951, '', '', '', '', 0, '1', '1', '1', '1', '2026-03-09 00:00:00', '1', '2026-03-09 13:35:09', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5955, '盘点方案删除', 'mes:wm-stock-taking-plan:delete', 3, 4, 5951, '', '', '', '', 0, '1', '1', '1', '1', '2026-03-09 00:00:00', '1', '2026-03-09 13:35:11', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5956, '盘点方案导出', 'mes:wm-stock-taking-plan:export', 3, 5, 5951, '', '', '', '', 0, '1', '1', '1', '1', '2026-03-09 00:00:00', '1', '2026-03-09 13:35:13', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5957, '盘点任务', '', 2, 2, 5950, 'task', 'ep:list', 'mes/wm/stocktaking/task/index', 'MesWmStockTakingTask', 0, '1', '1', '1', '1', '2026-03-09 00:00:00', '1', '2026-03-09 23:00:02', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5958, '盘点任务查询', 'mes:wm-stock-taking-task:query', 3, 1, 5957, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-09 00:00:00', '1', '2026-03-09 00:00:00', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5959, '盘点任务创建', 'mes:wm-stock-taking-task:create', 3, 2, 5957, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-09 00:00:00', '1', '2026-03-09 00:00:00', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5960, '盘点任务更新', 'mes:wm-stock-taking-task:update', 3, 3, 5957, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-09 00:00:00', '1', '2026-03-09 00:00:00', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5961, '盘点任务删除', 'mes:wm-stock-taking-task:delete', 3, 4, 5957, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-09 00:00:00', '1', '2026-03-09 00:00:00', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5962, '盘点任务导出', 'mes:wm-stock-taking-task:export', 3, 5, 5957, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-09 00:00:00', '1', '2026-03-09 00:00:00', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5966, '批次追溯', '', 2, 9, 5500, 'batch-trace', 'ep:aim', 'mes/qc/batchtrace/index', 'BatchTrace', 0, '1', '1', '1', '1', '2026-03-14 06:59:25', '1', '2026-04-05 09:39:54', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5967, '批次追溯查询', 'mes:wm-batch:query', 3, 1, 5966, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-03-14 06:59:25', '1', '2026-03-14 06:59:25', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5969, '报告审批', 'mes:pro-feedback:approve', 3, 6, 5550, '', '', '', '', 0, '1', '1', '1', '1', '2026-03-19 08:51:16', '1', '2026-03-19 08:51:16', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5970, '销售出库', '', 2, 10, 5780, 'product-sales', 'ep:sell', 'mes/wm/productsales/index', 'MesWmProductSales', 0, '1', '1', '1', '', '2026-03-30 10:37:08', '', '2026-03-30 10:37:08', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5971, '查询销售出库', 'mes:wm-product-sales:query', 3, 1, 5970, '', '', '', '', 0, '1', '1', '1', '', '2026-03-30 10:37:08', '', '2026-03-30 10:37:08', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5972, '创建销售出库', 'mes:wm-product-sales:create', 3, 2, 5970, '', '', '', '', 0, '1', '1', '1', '', '2026-03-30 10:37:08', '', '2026-03-30 10:37:08', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5973, '更新销售出库', 'mes:wm-product-sales:update', 3, 3, 5970, '', '', '', '', 0, '1', '1', '1', '', '2026-03-30 10:37:08', '', '2026-03-30 10:37:08', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5974, '删除销售出库', 'mes:wm-product-sales:delete', 3, 4, 5970, '', '', '', '', 0, '1', '1', '1', '', '2026-03-30 10:37:08', '', '2026-03-30 10:37:08', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5975, '导出销售出库', 'mes:wm-product-sales:export', 3, 5, 5970, '', '', '', '', 0, '1', '1', '1', '', '2026-03-30 10:37:08', '', '2026-03-30 10:37:08', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5976, '提交销售出库', 'mes:wm-product-sales:submit', 3, 6, 5970, '', '', '', '', 0, '1', '1', '1', '', '2026-03-30 10:37:08', '', '2026-03-30 10:37:08', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5977, '执行拣货', 'mes:wm-product-sales:stock', 3, 7, 5970, '', '', '', '', 0, '1', '1', '1', '', '2026-03-30 10:37:08', '', '2026-03-30 10:37:08', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5978, '填写运单', 'mes:wm-product-sales:shipping', 3, 8, 5970, '', '', '', '', 0, '1', '1', '1', '', '2026-03-30 10:37:08', '', '2026-03-30 10:37:08', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5979, '执行出库', 'mes:wm-product-sales:finish', 3, 9, 5970, '', '', '', '', 0, '1', '1', '1', '', '2026-03-30 10:37:08', '', '2026-03-30 10:37:08', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5980, '取消销售出库', 'mes:wm-product-sales:cancel', 3, 10, 5970, '', '', '', '', 0, '1', '1', '1', '', '2026-03-30 10:37:08', '', '2026-03-30 10:37:08', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5981, '工作记录', '', 2, 99, 5700, 'workrecord', 'ep:timer', 'mes/pro/workrecord/index', 'MesProWorkRecordLog', 0, '1', '1', '1', '1', '2026-04-05 14:08:44', '1', '2026-04-05 14:08:44', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5982, '工作记录查询', 'mes:pro-workrecord:query', 3, 1, 5981, '', '', '', '', 0, '1', '1', '1', '1', '2026-04-05 14:08:44', '1', '2026-04-05 14:08:44', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5983, '工作记录导出', 'mes:pro-workrecord:export', 3, 2, 5981, '', '', '', '', 0, '1', '1', '1', '1', '2026-04-05 14:08:44', '1', '2026-04-05 14:08:44', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5984, '上工下工', 'mes:pro-workrecord:clock', 3, 3, 5981, '', '', '', '', 0, '1', '1', '1', '1', '2026-04-05 14:08:44', '1', '2026-04-05 14:08:44', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5985, 'MES 首页', 'mes:home:query', 2, 0, 5100, 'mes/home/index', 'ep:home-filled', 'mes/home/index', 'MesHome', 0, '1', '1', '1', '1', '2026-04-05 23:24:03', '1', '2026-04-06 01:20:52', '0');
 COMMIT;
 SET IDENTITY_INSERT system_menu OFF;
 -- @formatter:on
@@ -2551,19 +3355,18 @@ SET IDENTITY_INSERT system_menu OFF;
 -- ----------------------------
 -- Table structure for system_notice
 -- ----------------------------
-CREATE TABLE system_notice
-(
-    id          bigint                                NOT NULL PRIMARY KEY IDENTITY,
-    title       varchar(50)                           NOT NULL,
-    content     text                                  NOT NULL,
-    type        smallint                              NOT NULL,
-    status      smallint    DEFAULT 0                 NOT NULL,
-    creator     varchar(64) DEFAULT ''                NULL,
-    create_time datetime    DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater     varchar(64) DEFAULT ''                NULL,
-    update_time datetime    DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted     bit         DEFAULT '0'               NOT NULL,
-    tenant_id   bigint      DEFAULT 0                 NOT NULL
+CREATE TABLE system_notice (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    title varchar(50)  NOT NULL,
+    content text  NOT NULL,
+    type smallint  NOT NULL,
+    status smallint DEFAULT 0 NOT NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT '0' NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 );
 
 COMMENT ON COLUMN system_notice.id IS '公告ID';
@@ -2584,7 +3387,7 @@ COMMENT ON TABLE system_notice IS '通知公告表';
 -- ----------------------------
 -- @formatter:off
 SET IDENTITY_INSERT system_notice ON;
-INSERT INTO system_notice (id, title, content, type, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1, '芋道的公众', '<p>新版本内容133</p>', 1, 0, 'admin', '2021-01-05 17:03:48', '1', '2022-05-04 21:00:20', '0', 1);
+INSERT INTO system_notice (id, title, content, type, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1, '芋道的公众', '<p>新版本内容133222</p>', 1, 0, 'admin', '2021-01-05 17:03:48', '"1"', '2025-08-31 09:38:22', '0', 1);
 INSERT INTO system_notice (id, title, content, type, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2, '维护通知：2018-07-01 系统凌晨维护', '<p><img src="http://test.yudao.iocoder.cn/b7cb3cf49b4b3258bf7309a09dd2f4e5.jpg" alt="" data-href="">11112222<img src="http://test.yudao.iocoder.cn/fe44fc7bdb82ca421184b2eebbaee9e2148d4a1827479a4eb4521e11d2a062ba.png" alt="image" data-href="http://test.yudao.iocoder.cn/fe44fc7bdb82ca421184b2eebbaee9e2148d4a1827479a4eb4521e11d2a062ba.png">3333</p>', 2, 1, 'admin', '2021-01-05 17:03:48', '1', '2025-04-18 23:56:40', '0', 1);
 INSERT INTO system_notice (id, title, content, type, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4, '我是测试标题', '<p>哈哈哈哈123</p>', 1, 0, '110', '2022-02-22 01:01:25', '110', '2022-02-22 01:01:46', '0', 121);
 COMMIT;
@@ -2594,26 +3397,27 @@ SET IDENTITY_INSERT system_notice OFF;
 -- ----------------------------
 -- Table structure for system_notify_message
 -- ----------------------------
-CREATE TABLE system_notify_message
-(
-    id                bigint                                NOT NULL PRIMARY KEY IDENTITY,
-    user_id           bigint                                NOT NULL,
-    user_type         smallint                              NOT NULL,
-    template_id       bigint                                NOT NULL,
-    template_code     varchar(64)                           NOT NULL,
-    template_nickname varchar(63)                           NOT NULL,
-    template_content  varchar(1024)                         NOT NULL,
-    template_type     int                                   NOT NULL,
-    template_params   varchar(255)                          NOT NULL,
-    read_status       bit                                   NOT NULL,
-    read_time         datetime    DEFAULT NULL              NULL,
-    creator           varchar(64) DEFAULT ''                NULL,
-    create_time       datetime    DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater           varchar(64) DEFAULT ''                NULL,
-    update_time       datetime    DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted           bit         DEFAULT '0'               NOT NULL,
-    tenant_id         bigint      DEFAULT 0                 NOT NULL
+CREATE TABLE system_notify_message (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    user_id bigint  NOT NULL,
+    user_type smallint  NOT NULL,
+    template_id bigint  NOT NULL,
+    template_code varchar(64)  NOT NULL,
+    template_nickname varchar(63)  NOT NULL,
+    template_content varchar(1024)  NOT NULL,
+    template_type int  NOT NULL,
+    template_params varchar(255)  NOT NULL,
+    read_status bit  NOT NULL,
+    read_time datetime DEFAULT NULL NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT '0' NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 );
+
+CREATE INDEX idx_system_notify_message_01 ON system_notify_message (user_id, user_type, read_status);
 
 COMMENT ON COLUMN system_notify_message.id IS '用户ID';
 COMMENT ON COLUMN system_notify_message.user_id IS '用户id';
@@ -2639,13 +3443,13 @@ COMMENT ON TABLE system_notify_message IS '站内信消息表';
 -- ----------------------------
 -- @formatter:off
 SET IDENTITY_INSERT system_notify_message ON;
-INSERT INTO system_notify_message (id, user_id, user_type, template_id, template_code, template_nickname, template_content, template_type, template_params, read_status, read_time, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2, 1, 2, 1, 'test', '123', '我是 1，我开始 2 了', 1, '{"name":"1","what":"2"}', '1', '2025-04-21 14:59:37', '1', '2023-01-28 11:44:08', '1', '2025-04-21 14:59:37', '0', 1);
-INSERT INTO system_notify_message (id, user_id, user_type, template_id, template_code, template_nickname, template_content, template_type, template_params, read_status, read_time, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3, 1, 2, 1, 'test', '123', '我是 1，我开始 2 了', 1, '{"name":"1","what":"2"}', '1', '2025-04-21 14:59:37', '1', '2023-01-28 11:45:04', '1', '2025-04-21 14:59:37', '0', 1);
+INSERT INTO system_notify_message (id, user_id, user_type, template_id, template_code, template_nickname, template_content, template_type, template_params, read_status, read_time, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2, 1, 2, 1, 'test', '123', '我是 1，我开始 2 了', 1, '{"name":"1","what":"2"}', '1', '2025-12-15 21:24:36', '1', '2023-01-28 11:44:08', '1', '2025-12-15 21:24:36', '0', 1);
+INSERT INTO system_notify_message (id, user_id, user_type, template_id, template_code, template_nickname, template_content, template_type, template_params, read_status, read_time, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3, 1, 2, 1, 'test', '123', '我是 1，我开始 2 了', 1, '{"name":"1","what":"2"}', '1', '2025-12-15 21:24:36', '1', '2023-01-28 11:45:04', '1', '2025-12-15 21:24:36', '0', 1);
 INSERT INTO system_notify_message (id, user_id, user_type, template_id, template_code, template_nickname, template_content, template_type, template_params, read_status, read_time, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4, 103, 2, 2, 'register', '系统消息', '你好，欢迎 哈哈 加入大家庭！', 2, '{"name":"哈哈"}', '0', NULL, '1', '2023-01-28 21:02:20', '1', '2023-01-28 21:02:20', '0', 1);
-INSERT INTO system_notify_message (id, user_id, user_type, template_id, template_code, template_nickname, template_content, template_type, template_params, read_status, read_time, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (5, 1, 2, 1, 'test', '123', '我是 芋艿，我开始 写代码 了', 1, '{"name":"芋艿","what":"写代码"}', '1', '2025-04-21 14:59:37', '1', '2023-01-28 22:21:42', '1', '2025-04-21 14:59:37', '0', 1);
-INSERT INTO system_notify_message (id, user_id, user_type, template_id, template_code, template_nickname, template_content, template_type, template_params, read_status, read_time, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6, 1, 2, 1, 'test', '123', '我是 芋艿，我开始 写代码 了', 1, '{"name":"芋艿","what":"写代码"}', '1', '2025-04-21 14:59:36', '1', '2023-01-28 22:22:07', '1', '2025-04-21 14:59:36', '0', 1);
-INSERT INTO system_notify_message (id, user_id, user_type, template_id, template_code, template_nickname, template_content, template_type, template_params, read_status, read_time, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (7, 1, 2, 1, 'test', '123', '我是 2，我开始 3 了', 1, '{"name":"2","what":"3"}', '1', '2025-04-21 14:59:35', '1', '2023-01-28 23:45:21', '1', '2025-04-21 14:59:35', '0', 1);
-INSERT INTO system_notify_message (id, user_id, user_type, template_id, template_code, template_nickname, template_content, template_type, template_params, read_status, read_time, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (8, 1, 2, 2, 'register', '系统消息', '你好，欢迎 123 加入大家庭！', 2, '{"name":"123"}', '1', '2025-04-21 14:59:35', '1', '2023-01-28 23:50:21', '1', '2025-04-21 14:59:35', '0', 1);
+INSERT INTO system_notify_message (id, user_id, user_type, template_id, template_code, template_nickname, template_content, template_type, template_params, read_status, read_time, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (5, 1, 2, 1, 'test', '123', '我是 芋艿，我开始 写代码 了', 1, '{"name":"芋艿","what":"写代码"}', '1', '2025-12-08 17:25:28', '1', '2023-01-28 22:21:42', '1', '2025-12-08 17:25:28', '0', 1);
+INSERT INTO system_notify_message (id, user_id, user_type, template_id, template_code, template_nickname, template_content, template_type, template_params, read_status, read_time, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6, 1, 2, 1, 'test', '123', '我是 芋艿，我开始 写代码 了', 1, '{"name":"芋艿","what":"写代码"}', '1', '2025-12-08 17:25:30', '1', '2023-01-28 22:22:07', '1', '2025-12-08 17:25:30', '0', 1);
+INSERT INTO system_notify_message (id, user_id, user_type, template_id, template_code, template_nickname, template_content, template_type, template_params, read_status, read_time, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (7, 1, 2, 1, 'test', '123', '我是 2，我开始 3 了', 1, '{"name":"2","what":"3"}', '1', '2025-12-08 17:25:22', '1', '2023-01-28 23:45:21', '1', '2025-12-08 17:25:22', '0', 1);
+INSERT INTO system_notify_message (id, user_id, user_type, template_id, template_code, template_nickname, template_content, template_type, template_params, read_status, read_time, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (8, 1, 2, 2, 'register', '系统消息', '你好，欢迎 123 加入大家庭！', 2, '{"name":"123"}', '1', '2025-12-08 16:46:01', '1', '2023-01-28 23:50:21', '1', '2025-12-08 16:46:01', '0', 1);
 INSERT INTO system_notify_message (id, user_id, user_type, template_id, template_code, template_nickname, template_content, template_type, template_params, read_status, read_time, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (9, 247, 1, 4, 'brokerage_withdraw_audit_approve', 'system', '您在2023-09-28 08:35:46提现￥0.09元的申请已通过审核', 2, '{"reason":null,"createTime":"2023-09-28 08:35:46","price":"0.09"}', '0', NULL, '1', '2023-09-28 16:36:22', '1', '2023-09-28 16:36:22', '0', 1);
 INSERT INTO system_notify_message (id, user_id, user_type, template_id, template_code, template_nickname, template_content, template_type, template_params, read_status, read_time, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (10, 247, 1, 4, 'brokerage_withdraw_audit_approve', 'system', '您在2023-09-30 20:59:40提现￥1.00元的申请已通过审核', 2, '{"reason":null,"createTime":"2023-09-30 20:59:40","price":"1.00"}', '0', NULL, '1', '2023-10-03 12:11:34', '1', '2023-10-03 12:11:34', '0', 1);
 COMMIT;
@@ -2655,22 +3459,21 @@ SET IDENTITY_INSERT system_notify_message OFF;
 -- ----------------------------
 -- Table structure for system_notify_template
 -- ----------------------------
-CREATE TABLE system_notify_template
-(
-    id          bigint                                 NOT NULL PRIMARY KEY IDENTITY,
-    name        varchar(63)                            NOT NULL,
-    code        varchar(64)                            NOT NULL,
-    nickname    varchar(255)                           NOT NULL,
-    content     varchar(1024)                          NOT NULL,
-    type        smallint                               NOT NULL,
-    params      varchar(255) DEFAULT NULL              NULL,
-    status      smallint                               NOT NULL,
-    remark      varchar(255) DEFAULT NULL              NULL,
-    creator     varchar(64)  DEFAULT ''                NULL,
-    create_time datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater     varchar(64)  DEFAULT ''                NULL,
-    update_time datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted     bit          DEFAULT '0'               NOT NULL
+CREATE TABLE system_notify_template (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    name varchar(63)  NOT NULL,
+    code varchar(64)  NOT NULL,
+    nickname varchar(255)  NOT NULL,
+    content varchar(1024)  NOT NULL,
+    type smallint  NOT NULL,
+    params varchar(255) DEFAULT NULL NULL,
+    status smallint  NOT NULL,
+    remark varchar(255) DEFAULT NULL NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT '0' NOT NULL
 );
 
 COMMENT ON COLUMN system_notify_template.id IS '主键';
@@ -2692,23 +3495,22 @@ COMMENT ON TABLE system_notify_template IS '站内信模板表';
 -- ----------------------------
 -- Table structure for system_oauth2_access_token
 -- ----------------------------
-CREATE TABLE system_oauth2_access_token
-(
-    id            bigint                                 NOT NULL PRIMARY KEY IDENTITY,
-    user_id       bigint                                 NOT NULL,
-    user_type     smallint                               NOT NULL,
-    user_info     varchar(512)                           NOT NULL,
-    access_token  varchar(255)                           NOT NULL,
-    refresh_token varchar(32)                            NOT NULL,
-    client_id     varchar(255)                           NOT NULL,
-    scopes        varchar(255) DEFAULT NULL              NULL,
-    expires_time  datetime                               NOT NULL,
-    creator       varchar(64)  DEFAULT ''                NULL,
-    create_time   datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater       varchar(64)  DEFAULT ''                NULL,
-    update_time   datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted       bit          DEFAULT '0'               NOT NULL,
-    tenant_id     bigint       DEFAULT 0                 NOT NULL
+CREATE TABLE system_oauth2_access_token (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    user_id bigint  NOT NULL,
+    user_type smallint  NOT NULL,
+    user_info varchar(512)  NOT NULL,
+    access_token varchar(255)  NOT NULL,
+    refresh_token varchar(32)  NOT NULL,
+    client_id varchar(255)  NOT NULL,
+    scopes varchar(255) DEFAULT NULL NULL,
+    expires_time datetime  NOT NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT '0' NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 );
 
 CREATE INDEX idx_system_oauth2_access_token_01 ON system_oauth2_access_token (access_token);
@@ -2734,22 +3536,23 @@ COMMENT ON TABLE system_oauth2_access_token IS 'OAuth2 访问令牌';
 -- ----------------------------
 -- Table structure for system_oauth2_approve
 -- ----------------------------
-CREATE TABLE system_oauth2_approve
-(
-    id           bigint                                 NOT NULL PRIMARY KEY IDENTITY,
-    user_id      bigint                                 NOT NULL,
-    user_type    smallint                               NOT NULL,
-    client_id    varchar(255)                           NOT NULL,
-    scope        varchar(255) DEFAULT ''                NULL,
-    approved     bit          DEFAULT '0'               NOT NULL,
-    expires_time datetime                               NOT NULL,
-    creator      varchar(64)  DEFAULT ''                NULL,
-    create_time  datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater      varchar(64)  DEFAULT ''                NULL,
-    update_time  datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted      bit          DEFAULT '0'               NOT NULL,
-    tenant_id    bigint       DEFAULT 0                 NOT NULL
+CREATE TABLE system_oauth2_approve (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    user_id bigint  NOT NULL,
+    user_type smallint  NOT NULL,
+    client_id varchar(255)  NOT NULL,
+    scope varchar(255) DEFAULT '' NULL,
+    approved bit DEFAULT '0' NOT NULL,
+    expires_time datetime  NOT NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT '0' NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 );
+
+CREATE INDEX idx_system_oauth2_approve_01 ON system_oauth2_approve (user_id, user_type, client_id);
 
 COMMENT ON COLUMN system_oauth2_approve.id IS '编号';
 COMMENT ON COLUMN system_oauth2_approve.user_id IS '用户编号';
@@ -2769,30 +3572,31 @@ COMMENT ON TABLE system_oauth2_approve IS 'OAuth2 批准表';
 -- ----------------------------
 -- Table structure for system_oauth2_client
 -- ----------------------------
-CREATE TABLE system_oauth2_client
-(
-    id                             bigint                                  NOT NULL PRIMARY KEY IDENTITY,
-    client_id                      varchar(255)                            NOT NULL,
-    secret                         varchar(255)                            NOT NULL,
-    name                           varchar(255)                            NOT NULL,
-    logo                           varchar(255)                            NOT NULL,
-    description                    varchar(255)  DEFAULT NULL              NULL,
-    status                         smallint                                NOT NULL,
-    access_token_validity_seconds  int                                     NOT NULL,
-    refresh_token_validity_seconds int                                     NOT NULL,
-    redirect_uris                  varchar(255)                            NOT NULL,
-    authorized_grant_types         varchar(255)                            NOT NULL,
-    scopes                         varchar(255)  DEFAULT NULL              NULL,
-    auto_approve_scopes            varchar(255)  DEFAULT NULL              NULL,
-    authorities                    varchar(255)  DEFAULT NULL              NULL,
-    resource_ids                   varchar(255)  DEFAULT NULL              NULL,
-    additional_information         varchar(4096) DEFAULT NULL              NULL,
-    creator                        varchar(64)   DEFAULT ''                NULL,
-    create_time                    datetime      DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater                        varchar(64)   DEFAULT ''                NULL,
-    update_time                    datetime      DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted                        bit           DEFAULT '0'               NOT NULL
+CREATE TABLE system_oauth2_client (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    client_id varchar(255)  NOT NULL,
+    secret varchar(255)  NOT NULL,
+    name varchar(255)  NOT NULL,
+    logo varchar(255)  NOT NULL,
+    description varchar(255) DEFAULT NULL NULL,
+    status smallint  NOT NULL,
+    access_token_validity_seconds int  NOT NULL,
+    refresh_token_validity_seconds int  NOT NULL,
+    redirect_uris varchar(255)  NOT NULL,
+    authorized_grant_types varchar(255)  NOT NULL,
+    scopes varchar(255) DEFAULT NULL NULL,
+    auto_approve_scopes varchar(255) DEFAULT NULL NULL,
+    authorities varchar(255) DEFAULT NULL NULL,
+    resource_ids varchar(255) DEFAULT NULL NULL,
+    additional_information varchar(4096) DEFAULT NULL NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT '0' NOT NULL
 );
+
+CREATE INDEX idx_system_oauth2_client_01 ON system_oauth2_client (client_id);
 
 COMMENT ON COLUMN system_oauth2_client.id IS '编号';
 COMMENT ON COLUMN system_oauth2_client.client_id IS '客户端编号';
@@ -2822,10 +3626,10 @@ COMMENT ON TABLE system_oauth2_client IS 'OAuth2 客户端表';
 -- ----------------------------
 -- @formatter:off
 SET IDENTITY_INSERT system_oauth2_client ON;
-INSERT INTO system_oauth2_client (id, client_id, secret, name, logo, description, status, access_token_validity_seconds, refresh_token_validity_seconds, redirect_uris, authorized_grant_types, scopes, auto_approve_scopes, authorities, resource_ids, additional_information, creator, create_time, updater, update_time, deleted) VALUES (1, 'default', 'admin123', '芋道源码', 'http://test.yudao.iocoder.cn/20250502/sort2_1746189740718.png', '我是描述', 0, 1800, 2592000, '["https://www.iocoder.cn","https://doc.iocoder.cn"]', '["password","authorization_code","implicit","refresh_token"]', '["user.read","user.write"]', '[]', '["user.read","user.write"]', '[]', '{}', '1', '2022-05-11 21:47:12', '1', '2025-05-02 20:42:22', '0');
-INSERT INTO system_oauth2_client (id, client_id, secret, name, logo, description, status, access_token_validity_seconds, refresh_token_validity_seconds, redirect_uris, authorized_grant_types, scopes, auto_approve_scopes, authorities, resource_ids, additional_information, creator, create_time, updater, update_time, deleted) VALUES (40, 'test', 'test2', 'biubiu', 'http://test.yudao.iocoder.cn/xx/20250502/ed07110a37464b5299f8bd7c67ad65c7_1746187077009.jpg', '啦啦啦啦', 0, 1800, 43200, '["https://www.iocoder.cn"]', '["password","authorization_code","implicit"]', '["user_info","projects"]', '["user_info"]', '[]', '[]', '{}', '1', '2022-05-12 00:28:20', '1', '2025-05-02 19:58:08', '0');
+INSERT INTO system_oauth2_client (id, client_id, secret, name, logo, description, status, access_token_validity_seconds, refresh_token_validity_seconds, redirect_uris, authorized_grant_types, scopes, auto_approve_scopes, authorities, resource_ids, additional_information, creator, create_time, updater, update_time, deleted) VALUES (1, 'default', 'admin123', '芋道源码', 'http://test.yudao.iocoder.cn/20250502/sort2_1746189740718.png', '我是描述', 0, 1800, 2592000, '["https://www.iocoder.cn","https://doc.iocoder.cn"]', '["password","authorization_code","implicit","refresh_token","client_credentials"]', '["user.read","user.write"]', '[]', '["user.read","user.write"]', '[]', '{}', '1', '2022-05-11 21:47:12', '1', '2025-12-07 20:07:09', '0');
+INSERT INTO system_oauth2_client (id, client_id, secret, name, logo, description, status, access_token_validity_seconds, refresh_token_validity_seconds, redirect_uris, authorized_grant_types, scopes, auto_approve_scopes, authorities, resource_ids, additional_information, creator, create_time, updater, update_time, deleted) VALUES (40, 'test', 'test2', 'biubiu', 'http://test.yudao.iocoder.cn/20251227/javayuanma_1766829882970.jpg', '啦啦啦啦', 0, 1800, 43200, '["https://www.iocoder.cn"]', '["password","authorization_code","implicit"]', '["user_info","projects"]', '["user_info"]', '[]', '[]', '{}', '1', '2022-05-12 00:28:20', '1', '2025-12-27 18:04:44', '0');
 INSERT INTO system_oauth2_client (id, client_id, secret, name, logo, description, status, access_token_validity_seconds, refresh_token_validity_seconds, redirect_uris, authorized_grant_types, scopes, auto_approve_scopes, authorities, resource_ids, additional_information, creator, create_time, updater, update_time, deleted) VALUES (41, 'yudao-sso-demo-by-code', 'test', '基于授权码模式，如何实现 SSO 单点登录？', 'http://test.yudao.iocoder.cn/it/20250502/sign_1746181948685.png', NULL, 0, 1800, 43200, '["http://127.0.0.1:18080"]', '["authorization_code","refresh_token"]', '["user.read","user.write"]', '[]', '[]', '[]', NULL, '1', '2022-09-29 13:28:31', '1', '2025-05-02 18:32:30', '0');
-INSERT INTO system_oauth2_client (id, client_id, secret, name, logo, description, status, access_token_validity_seconds, refresh_token_validity_seconds, redirect_uris, authorized_grant_types, scopes, auto_approve_scopes, authorities, resource_ids, additional_information, creator, create_time, updater, update_time, deleted) VALUES (42, 'yudao-sso-demo-by-password', 'test', '基于密码模式，如何实现 SSO 单点登录？', 'http://test.yudao.iocoder.cn/604bdc695e13b3b22745be704d1f2aa8ee05c5f26f9fead6d1ca49005afbc857.jpeg', NULL, 0, 1800, 43200, '["http://127.0.0.1:18080"]', '["password","refresh_token"]', '["user.read","user.write"]', '[]', '[]', '[]', NULL, '1', '2022-10-04 17:40:16', '1', '2025-05-04 16:00:46', '0');
+INSERT INTO system_oauth2_client (id, client_id, secret, name, logo, description, status, access_token_validity_seconds, refresh_token_validity_seconds, redirect_uris, authorized_grant_types, scopes, auto_approve_scopes, authorities, resource_ids, additional_information, creator, create_time, updater, update_time, deleted) VALUES (42, 'yudao-sso-demo-by-password', 'test', '基于密码模式，如何实现 SSO 单点登录？', 'http://test.yudao.iocoder.cn/20251025/images (3)_1761360515810.jpeg', NULL, 0, 1800, 43200, '["http://127.0.0.1:18080"]', '["password","refresh_token"]', '["user.read","user.write"]', '[]', '[]', '[]', NULL, '1', '2022-10-04 17:40:16', '1', '2025-10-25 10:49:40', '0');
 COMMIT;
 SET IDENTITY_INSERT system_oauth2_client OFF;
 -- @formatter:on
@@ -2833,24 +3637,25 @@ SET IDENTITY_INSERT system_oauth2_client OFF;
 -- ----------------------------
 -- Table structure for system_oauth2_code
 -- ----------------------------
-CREATE TABLE system_oauth2_code
-(
-    id           bigint                                 NOT NULL PRIMARY KEY IDENTITY,
-    user_id      bigint                                 NOT NULL,
-    user_type    smallint                               NOT NULL,
-    code         varchar(32)                            NOT NULL,
-    client_id    varchar(255)                           NOT NULL,
-    scopes       varchar(255) DEFAULT ''                NULL,
-    expires_time datetime                               NOT NULL,
-    redirect_uri varchar(255) DEFAULT NULL              NULL,
-    state        varchar(255) DEFAULT ''                NULL,
-    creator      varchar(64)  DEFAULT ''                NULL,
-    create_time  datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater      varchar(64)  DEFAULT ''                NULL,
-    update_time  datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted      bit          DEFAULT '0'               NOT NULL,
-    tenant_id    bigint       DEFAULT 0                 NOT NULL
+CREATE TABLE system_oauth2_code (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    user_id bigint  NOT NULL,
+    user_type smallint  NOT NULL,
+    code varchar(32)  NOT NULL,
+    client_id varchar(255)  NOT NULL,
+    scopes varchar(255) DEFAULT '' NULL,
+    expires_time datetime  NOT NULL,
+    redirect_uri varchar(255) DEFAULT NULL NULL,
+    state varchar(255) DEFAULT '' NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT '0' NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 );
+
+CREATE INDEX idx_system_oauth2_code_01 ON system_oauth2_code (code);
 
 COMMENT ON COLUMN system_oauth2_code.id IS '编号';
 COMMENT ON COLUMN system_oauth2_code.user_id IS '用户编号';
@@ -2872,22 +3677,23 @@ COMMENT ON TABLE system_oauth2_code IS 'OAuth2 授权码表';
 -- ----------------------------
 -- Table structure for system_oauth2_refresh_token
 -- ----------------------------
-CREATE TABLE system_oauth2_refresh_token
-(
-    id            bigint                                 NOT NULL PRIMARY KEY IDENTITY,
-    user_id       bigint                                 NOT NULL,
-    refresh_token varchar(32)                            NOT NULL,
-    user_type     smallint                               NOT NULL,
-    client_id     varchar(255)                           NOT NULL,
-    scopes        varchar(255) DEFAULT NULL              NULL,
-    expires_time  datetime                               NOT NULL,
-    creator       varchar(64)  DEFAULT ''                NULL,
-    create_time   datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater       varchar(64)  DEFAULT ''                NULL,
-    update_time   datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted       bit          DEFAULT '0'               NOT NULL,
-    tenant_id     bigint       DEFAULT 0                 NOT NULL
+CREATE TABLE system_oauth2_refresh_token (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    user_id bigint  NOT NULL,
+    refresh_token varchar(32)  NOT NULL,
+    user_type smallint  NOT NULL,
+    client_id varchar(255)  NOT NULL,
+    scopes varchar(255) DEFAULT NULL NULL,
+    expires_time datetime  NOT NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT '0' NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 );
+
+CREATE INDEX idx_system_oauth2_refresh_token_01 ON system_oauth2_refresh_token (refresh_token);
 
 COMMENT ON COLUMN system_oauth2_refresh_token.id IS '编号';
 COMMENT ON COLUMN system_oauth2_refresh_token.user_id IS '用户编号';
@@ -2907,29 +3713,31 @@ COMMENT ON TABLE system_oauth2_refresh_token IS 'OAuth2 刷新令牌';
 -- ----------------------------
 -- Table structure for system_operate_log
 -- ----------------------------
-CREATE TABLE system_operate_log
-(
-    id             bigint                                  NOT NULL PRIMARY KEY IDENTITY,
-    trace_id       varchar(64)   DEFAULT ''                NULL,
-    user_id        bigint                                  NOT NULL,
-    user_type      smallint      DEFAULT 0                 NOT NULL,
-    type           varchar(50)                             NOT NULL,
-    sub_type       varchar(50)                             NOT NULL,
-    biz_id         bigint                                  NOT NULL,
-    action         varchar(2000) DEFAULT ''                NULL,
-    success        bit           DEFAULT '1'               NOT NULL,
-    extra          varchar(2000) DEFAULT ''                NULL,
-    request_method varchar(16)   DEFAULT ''                NULL,
-    request_url    varchar(255)  DEFAULT ''                NULL,
-    user_ip        varchar(50)   DEFAULT NULL              NULL,
-    user_agent     varchar(512)  DEFAULT NULL              NULL,
-    creator        varchar(64)   DEFAULT ''                NULL,
-    create_time    datetime      DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater        varchar(64)   DEFAULT ''                NULL,
-    update_time    datetime      DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted        bit           DEFAULT '0'               NOT NULL,
-    tenant_id      bigint        DEFAULT 0                 NOT NULL
+CREATE TABLE system_operate_log (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    trace_id varchar(64) DEFAULT '' NULL,
+    user_id bigint  NOT NULL,
+    user_type smallint DEFAULT 0 NOT NULL,
+    type varchar(50)  NOT NULL,
+    sub_type varchar(50)  NOT NULL,
+    biz_id bigint  NOT NULL,
+    action varchar(2000) DEFAULT '' NULL,
+    success bit DEFAULT '1' NOT NULL,
+    extra varchar(2000) DEFAULT '' NULL,
+    request_method varchar(16) DEFAULT '' NULL,
+    request_url varchar(255) DEFAULT '' NULL,
+    user_ip varchar(50) DEFAULT NULL NULL,
+    user_agent varchar(512) DEFAULT NULL NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT '0' NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 );
+
+CREATE INDEX idx_system_operate_log_01 ON system_operate_log (user_id);
+CREATE INDEX idx_system_operate_log_02 ON system_operate_log (create_time);
 
 COMMENT ON COLUMN system_operate_log.id IS '日志主键';
 COMMENT ON COLUMN system_operate_log.trace_id IS '链路追踪编号';
@@ -2956,20 +3764,19 @@ COMMENT ON TABLE system_operate_log IS '操作日志记录 V2 版本';
 -- ----------------------------
 -- Table structure for system_post
 -- ----------------------------
-CREATE TABLE system_post
-(
-    id          bigint                                 NOT NULL PRIMARY KEY IDENTITY,
-    code        varchar(64)                            NOT NULL,
-    name        varchar(50)                            NOT NULL,
-    sort        int                                    NOT NULL,
-    status      smallint                               NOT NULL,
-    remark      varchar(500) DEFAULT NULL              NULL,
-    creator     varchar(64)  DEFAULT ''                NULL,
-    create_time datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater     varchar(64)  DEFAULT ''                NULL,
-    update_time datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted     bit          DEFAULT '0'               NOT NULL,
-    tenant_id   bigint       DEFAULT 0                 NOT NULL
+CREATE TABLE system_post (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    code varchar(64)  NOT NULL,
+    name varchar(50)  NOT NULL,
+    sort int  NOT NULL,
+    status smallint  NOT NULL,
+    remark varchar(500) DEFAULT NULL NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT '0' NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 );
 
 COMMENT ON COLUMN system_post.id IS '岗位ID';
@@ -2991,10 +3798,10 @@ COMMENT ON TABLE system_post IS '岗位信息表';
 -- ----------------------------
 -- @formatter:off
 SET IDENTITY_INSERT system_post ON;
-INSERT INTO system_post (id, code, name, sort, status, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1, 'ceo', '董事长', 1, 0, '', 'admin', '2021-01-06 17:03:48', '1', '2023-02-11 15:19:04', '0', 1);
-INSERT INTO system_post (id, code, name, sort, status, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2, 'se', '项目经理', 2, 0, '', 'admin', '2021-01-05 17:03:48', '1', '2023-11-15 09:18:20', '0', 1);
+INSERT INTO system_post (id, code, name, sort, status, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2, 'se', '项目经理', 2, 0, '', 'admin', '2021-01-05 17:03:48', '1', '2025-12-15 22:38:43', '0', 1);
 INSERT INTO system_post (id, code, name, sort, status, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4, 'user', '普通员工', 4, 0, '111222', 'admin', '2021-01-05 17:03:48', '1', '2025-03-24 21:32:40', '0', 1);
 INSERT INTO system_post (id, code, name, sort, status, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (5, 'HR', '人力资源', 5, 0, '`', '1', '2024-03-24 20:45:40', '1', '2025-03-29 19:08:10', '0', 1);
+INSERT INTO system_post (id, code, name, sort, status, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (7, 'test', '测试', 10, 0, NULL, '1', '2025-09-02 08:45:57', '1', '2025-09-02 08:45:57', '0', 1);
 COMMIT;
 SET IDENTITY_INSERT system_post OFF;
 -- @formatter:on
@@ -3002,23 +3809,22 @@ SET IDENTITY_INSERT system_post OFF;
 -- ----------------------------
 -- Table structure for system_role
 -- ----------------------------
-CREATE TABLE system_role
-(
-    id                  bigint                                 NOT NULL PRIMARY KEY IDENTITY,
-    name                varchar(30)                            NOT NULL,
-    code                varchar(100)                           NOT NULL,
-    sort                int                                    NOT NULL,
-    data_scope          smallint     DEFAULT 1                 NOT NULL,
-    data_scope_dept_ids varchar(500) DEFAULT ''                NULL,
-    status              smallint                               NOT NULL,
-    type                smallint                               NOT NULL,
-    remark              varchar(500) DEFAULT NULL              NULL,
-    creator             varchar(64)  DEFAULT ''                NULL,
-    create_time         datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater             varchar(64)  DEFAULT ''                NULL,
-    update_time         datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted             bit          DEFAULT '0'               NOT NULL,
-    tenant_id           bigint       DEFAULT 0                 NOT NULL
+CREATE TABLE system_role (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    name varchar(30)  NOT NULL,
+    code varchar(100)  NOT NULL,
+    sort int  NOT NULL,
+    data_scope smallint DEFAULT 1 NOT NULL,
+    data_scope_dept_ids varchar(500) DEFAULT '' NULL,
+    status smallint  NOT NULL,
+    type smallint  NOT NULL,
+    remark varchar(500) DEFAULT NULL NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT '0' NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 );
 
 COMMENT ON COLUMN system_role.id IS '角色ID';
@@ -3026,7 +3832,7 @@ COMMENT ON COLUMN system_role.name IS '角色名称';
 COMMENT ON COLUMN system_role.code IS '角色权限字符串';
 COMMENT ON COLUMN system_role.sort IS '显示顺序';
 COMMENT ON COLUMN system_role.data_scope IS '数据范围（1：全部数据权限 2：自定数据权限 3：本部门数据权限 4：本部门及以下数据权限）';
-COMMENT ON COLUMN system_role.data_scope_dept_ids IS '数据范围 ( 指定部门数组)';
+COMMENT ON COLUMN system_role.data_scope_dept_ids IS '数据范围(指定部门数组)';
 COMMENT ON COLUMN system_role.status IS '角色状态（0正常 1停用）';
 COMMENT ON COLUMN system_role.type IS '角色类型';
 COMMENT ON COLUMN system_role.remark IS '备注';
@@ -3046,11 +3852,9 @@ SET IDENTITY_INSERT system_role ON;
 INSERT INTO system_role (id, name, code, sort, data_scope, data_scope_dept_ids, status, type, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1, '超级管理员', 'super_admin', 1, 1, '', 0, 1, '超级管理员', 'admin', '2021-01-05 17:03:48', '', '2022-02-22 05:08:21', '0', 1);
 INSERT INTO system_role (id, name, code, sort, data_scope, data_scope_dept_ids, status, type, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2, '普通角色', 'common', 2, 2, '', 0, 1, '普通角色', 'admin', '2021-01-05 17:03:48', '', '2022-02-22 05:08:20', '0', 1);
 INSERT INTO system_role (id, name, code, sort, data_scope, data_scope_dept_ids, status, type, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3, 'CRM 管理员', 'crm_admin', 2, 1, '', 0, 1, 'CRM 专属角色', '1', '2024-02-24 10:51:13', '1', '2024-02-24 02:51:32', '0', 1);
-INSERT INTO system_role (id, name, code, sort, data_scope, data_scope_dept_ids, status, type, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (101, '测试账号', 'test', 0, 1, '[]', 0, 2, '123', '', '2021-01-06 13:49:35', '1', '2025-04-30 17:38:28', '0', 1);
 INSERT INTO system_role (id, name, code, sort, data_scope, data_scope_dept_ids, status, type, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (109, '租户管理员', 'tenant_admin', 0, 1, '', 0, 1, '系统自动生成', '1', '2022-02-22 00:56:14', '1', '2022-02-22 00:56:14', '0', 121);
 INSERT INTO system_role (id, name, code, sort, data_scope, data_scope_dept_ids, status, type, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (111, '租户管理员', 'tenant_admin', 0, 1, '', 0, 1, '系统自动生成', '1', '2022-03-07 21:37:58', '1', '2022-03-07 21:37:58', '0', 122);
-INSERT INTO system_role (id, name, code, sort, data_scope, data_scope_dept_ids, status, type, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (155, '测试数据权限', 'test-dp', 3, 2, '[100,102,103,104,105,108]', 0, 2, '', '1', '2025-03-31 14:58:06', '1', '2025-04-17 23:07:44', '0', 1);
-INSERT INTO system_role (id, name, code, sort, data_scope, data_scope_dept_ids, status, type, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (158, '2', '3', 4, 1, '', 0, 2, NULL, '1', '2025-04-17 20:08:08', '1', '2025-04-17 23:05:31', '0', 1);
+INSERT INTO system_role (id, name, code, sort, data_scope, data_scope_dept_ids, status, type, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (155, '测试数据权限1', 'test-dp', 4, 2, '[112,100,102,103,104,105,107,108]', 0, 2, '1111', '1', '2025-03-31 14:58:06', '1', '2025-12-04 23:29:40', '0', 1);
 COMMIT;
 SET IDENTITY_INSERT system_role OFF;
 -- @formatter:on
@@ -3058,18 +3862,19 @@ SET IDENTITY_INSERT system_role OFF;
 -- ----------------------------
 -- Table structure for system_role_menu
 -- ----------------------------
-CREATE TABLE system_role_menu
-(
-    id          bigint                                NOT NULL PRIMARY KEY IDENTITY,
-    role_id     bigint                                NOT NULL,
-    menu_id     bigint                                NOT NULL,
-    creator     varchar(64) DEFAULT ''                NULL,
-    create_time datetime    DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater     varchar(64) DEFAULT ''                NULL,
-    update_time datetime    DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted     bit         DEFAULT '0'               NOT NULL,
-    tenant_id   bigint      DEFAULT 0                 NOT NULL
+CREATE TABLE system_role_menu (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    role_id bigint  NOT NULL,
+    menu_id bigint  NOT NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT '0' NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 );
+
+CREATE INDEX idx_system_role_menu_01 ON system_role_menu (role_id);
 
 COMMENT ON COLUMN system_role_menu.id IS '自增编号';
 COMMENT ON COLUMN system_role_menu.role_id IS '角色ID';
@@ -3122,87 +3927,6 @@ INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, update
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (707, 2, 113, '1', '2022-02-22 13:16:57', '1', '2022-02-22 13:16:57', '0', 1);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1296, 110, 1, '110', '2022-02-23 00:23:55', '110', '2022-02-23 00:23:55', '0', 121);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1578, 111, 1, '1', '2022-03-07 21:37:58', '1', '2022-03-07 21:37:58', '0', 122);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1604, 101, 1216, '1', '2022-03-19 21:45:52', '1', '2022-03-19 21:45:52', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1605, 101, 1217, '1', '2022-03-19 21:45:52', '1', '2022-03-19 21:45:52', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1606, 101, 1218, '1', '2022-03-19 21:45:52', '1', '2022-03-19 21:45:52', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1607, 101, 1219, '1', '2022-03-19 21:45:52', '1', '2022-03-19 21:45:52', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1608, 101, 1220, '1', '2022-03-19 21:45:52', '1', '2022-03-19 21:45:52', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1609, 101, 1221, '1', '2022-03-19 21:45:52', '1', '2022-03-19 21:45:52', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1610, 101, 5, '1', '2022-03-19 21:45:52', '1', '2022-03-19 21:45:52', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1611, 101, 1222, '1', '2022-03-19 21:45:52', '1', '2022-03-19 21:45:52', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1612, 101, 1118, '1', '2022-03-19 21:45:52', '1', '2022-03-19 21:45:52', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1613, 101, 1119, '1', '2022-03-19 21:45:52', '1', '2022-03-19 21:45:52', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1614, 101, 1120, '1', '2022-03-19 21:45:52', '1', '2022-03-19 21:45:52', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1615, 101, 1185, '1', '2022-03-19 21:45:52', '1', '2022-03-19 21:45:52', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1616, 101, 1186, '1', '2022-03-19 21:45:52', '1', '2022-03-19 21:45:52', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1617, 101, 1187, '1', '2022-03-19 21:45:52', '1', '2022-03-19 21:45:52', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1618, 101, 1188, '1', '2022-03-19 21:45:52', '1', '2022-03-19 21:45:52', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1619, 101, 1189, '1', '2022-03-19 21:45:52', '1', '2022-03-19 21:45:52', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1620, 101, 1190, '1', '2022-03-19 21:45:52', '1', '2022-03-19 21:45:52', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1621, 101, 1191, '1', '2022-03-19 21:45:52', '1', '2022-03-19 21:45:52', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1622, 101, 1192, '1', '2022-03-19 21:45:52', '1', '2022-03-19 21:45:52', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1623, 101, 1193, '1', '2022-03-19 21:45:52', '1', '2022-03-19 21:45:52', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1624, 101, 1194, '1', '2022-03-19 21:45:52', '1', '2022-03-19 21:45:52', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1625, 101, 1195, '1', '2022-03-19 21:45:52', '1', '2022-03-19 21:45:52', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1627, 101, 1197, '1', '2022-03-19 21:45:52', '1', '2022-03-19 21:45:52', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1628, 101, 1198, '1', '2022-03-19 21:45:52', '1', '2022-03-19 21:45:52', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1629, 101, 1199, '1', '2022-03-19 21:45:52', '1', '2022-03-19 21:45:52', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1630, 101, 1200, '1', '2022-03-19 21:45:52', '1', '2022-03-19 21:45:52', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1631, 101, 1201, '1', '2022-03-19 21:45:52', '1', '2022-03-19 21:45:52', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1632, 101, 1202, '1', '2022-03-19 21:45:52', '1', '2022-03-19 21:45:52', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1633, 101, 1207, '1', '2022-03-19 21:45:52', '1', '2022-03-19 21:45:52', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1634, 101, 1208, '1', '2022-03-19 21:45:52', '1', '2022-03-19 21:45:52', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1635, 101, 1209, '1', '2022-03-19 21:45:52', '1', '2022-03-19 21:45:52', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1636, 101, 1210, '1', '2022-03-19 21:45:52', '1', '2022-03-19 21:45:52', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1637, 101, 1211, '1', '2022-03-19 21:45:52', '1', '2022-03-19 21:45:52', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1638, 101, 1212, '1', '2022-03-19 21:45:52', '1', '2022-03-19 21:45:52', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1639, 101, 1213, '1', '2022-03-19 21:45:52', '1', '2022-03-19 21:45:52', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1640, 101, 1215, '1', '2022-03-19 21:45:52', '1', '2022-03-19 21:45:52', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1641, 101, 2, '1', '2022-04-01 22:21:24', '1', '2022-04-01 22:21:24', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1642, 101, 1031, '1', '2022-04-01 22:21:37', '1', '2022-04-01 22:21:37', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1643, 101, 1032, '1', '2022-04-01 22:21:37', '1', '2022-04-01 22:21:37', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1644, 101, 1033, '1', '2022-04-01 22:21:37', '1', '2022-04-01 22:21:37', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1645, 101, 1034, '1', '2022-04-01 22:21:37', '1', '2022-04-01 22:21:37', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1646, 101, 1035, '1', '2022-04-01 22:21:37', '1', '2022-04-01 22:21:37', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1647, 101, 1050, '1', '2022-04-01 22:21:37', '1', '2022-04-01 22:21:37', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1648, 101, 1051, '1', '2022-04-01 22:21:37', '1', '2022-04-01 22:21:37', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1649, 101, 1052, '1', '2022-04-01 22:21:37', '1', '2022-04-01 22:21:37', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1650, 101, 1053, '1', '2022-04-01 22:21:37', '1', '2022-04-01 22:21:37', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1651, 101, 1054, '1', '2022-04-01 22:21:37', '1', '2022-04-01 22:21:37', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1652, 101, 1056, '1', '2022-04-01 22:21:37', '1', '2022-04-01 22:21:37', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1653, 101, 1057, '1', '2022-04-01 22:21:37', '1', '2022-04-01 22:21:37', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1654, 101, 1058, '1', '2022-04-01 22:21:37', '1', '2022-04-01 22:21:37', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1655, 101, 1059, '1', '2022-04-01 22:21:37', '1', '2022-04-01 22:21:37', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1656, 101, 1060, '1', '2022-04-01 22:21:37', '1', '2022-04-01 22:21:37', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1657, 101, 1066, '1', '2022-04-01 22:21:37', '1', '2022-04-01 22:21:37', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1658, 101, 1067, '1', '2022-04-01 22:21:37', '1', '2022-04-01 22:21:37', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1659, 101, 1070, '1', '2022-04-01 22:21:37', '1', '2022-04-01 22:21:37', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1664, 101, 1075, '1', '2022-04-01 22:21:37', '1', '2022-04-01 22:21:37', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1666, 101, 1077, '1', '2022-04-01 22:21:37', '1', '2022-04-01 22:21:37', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1667, 101, 1078, '1', '2022-04-01 22:21:37', '1', '2022-04-01 22:21:37', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1668, 101, 1082, '1', '2022-04-01 22:21:37', '1', '2022-04-01 22:21:37', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1669, 101, 1083, '1', '2022-04-01 22:21:37', '1', '2022-04-01 22:21:37', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1670, 101, 1084, '1', '2022-04-01 22:21:37', '1', '2022-04-01 22:21:37', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1671, 101, 1085, '1', '2022-04-01 22:21:37', '1', '2022-04-01 22:21:37', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1672, 101, 1086, '1', '2022-04-01 22:21:37', '1', '2022-04-01 22:21:37', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1673, 101, 1087, '1', '2022-04-01 22:21:37', '1', '2022-04-01 22:21:37', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1674, 101, 1088, '1', '2022-04-01 22:21:37', '1', '2022-04-01 22:21:37', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1675, 101, 1089, '1', '2022-04-01 22:21:37', '1', '2022-04-01 22:21:37', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1679, 101, 1237, '1', '2022-04-01 22:21:37', '1', '2022-04-01 22:21:37', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1680, 101, 1238, '1', '2022-04-01 22:21:37', '1', '2022-04-01 22:21:37', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1681, 101, 1239, '1', '2022-04-01 22:21:37', '1', '2022-04-01 22:21:37', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1682, 101, 1240, '1', '2022-04-01 22:21:37', '1', '2022-04-01 22:21:37', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1683, 101, 1241, '1', '2022-04-01 22:21:37', '1', '2022-04-01 22:21:37', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1684, 101, 1242, '1', '2022-04-01 22:21:37', '1', '2022-04-01 22:21:37', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1685, 101, 1243, '1', '2022-04-01 22:21:37', '1', '2022-04-01 22:21:37', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1687, 101, 106, '1', '2022-04-01 22:21:37', '1', '2022-04-01 22:21:37', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1688, 101, 110, '1', '2022-04-01 22:21:37', '1', '2022-04-01 22:21:37', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1689, 101, 111, '1', '2022-04-01 22:21:37', '1', '2022-04-01 22:21:37', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1690, 101, 112, '1', '2022-04-01 22:21:37', '1', '2022-04-01 22:21:37', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1691, 101, 113, '1', '2022-04-01 22:21:37', '1', '2022-04-01 22:21:37', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1692, 101, 114, '1', '2022-04-01 22:21:37', '1', '2022-04-01 22:21:37', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1693, 101, 115, '1', '2022-04-01 22:21:37', '1', '2022-04-01 22:21:37', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1694, 101, 116, '1', '2022-04-01 22:21:37', '1', '2022-04-01 22:21:37', '0', 1);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1729, 109, 100, '1', '2022-09-21 22:08:51', '1', '2022-09-21 22:08:51', '0', 121);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1730, 109, 101, '1', '2022-09-21 22:08:51', '1', '2022-09-21 22:08:51', '0', 121);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1731, 109, 1063, '1', '2022-09-21 22:08:51', '1', '2022-09-21 22:08:51', '0', 121);
@@ -3482,119 +4206,6 @@ INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, update
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2182, 2, 2016, '1', '2023-01-25 08:43:12', '1', '2023-01-25 08:43:12', '0', 1);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2183, 2, 2017, '1', '2023-01-25 08:43:12', '1', '2023-01-25 08:43:12', '0', 1);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2184, 2, 2018, '1', '2023-01-25 08:43:12', '1', '2023-01-25 08:43:12', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2188, 101, 1024, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2189, 101, 1, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2190, 101, 1025, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2191, 101, 1026, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2192, 101, 1027, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2193, 101, 1028, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2194, 101, 1029, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2195, 101, 1030, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2196, 101, 1036, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2197, 101, 1037, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2198, 101, 1038, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2199, 101, 1039, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2200, 101, 1040, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2201, 101, 1042, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2202, 101, 1043, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2203, 101, 1045, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2204, 101, 1046, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2205, 101, 1048, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2206, 101, 2083, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2207, 101, 1063, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2208, 101, 1064, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2209, 101, 1065, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2210, 101, 1093, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2211, 101, 1094, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2212, 101, 1095, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2213, 101, 1096, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2214, 101, 1097, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2215, 101, 1098, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2216, 101, 1100, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2217, 101, 1101, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2218, 101, 1102, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2219, 101, 1103, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2220, 101, 1104, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2221, 101, 1105, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2222, 101, 1106, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2223, 101, 2130, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2224, 101, 1107, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2225, 101, 2131, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2226, 101, 1108, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2227, 101, 2132, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2228, 101, 1109, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2229, 101, 2133, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2230, 101, 2134, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2232, 101, 2135, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2234, 101, 2136, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2236, 101, 2137, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2238, 101, 2138, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2240, 101, 2139, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2242, 101, 2140, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2243, 101, 2141, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2244, 101, 2142, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2245, 101, 2143, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2246, 101, 2144, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2247, 101, 2145, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2248, 101, 2146, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2249, 101, 2147, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2250, 101, 100, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2251, 101, 2148, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2252, 101, 101, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2253, 101, 2149, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2254, 101, 102, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2255, 101, 2150, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2256, 101, 103, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2257, 101, 2151, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2258, 101, 104, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2259, 101, 2152, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2260, 101, 105, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2261, 101, 107, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2262, 101, 108, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2263, 101, 109, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2264, 101, 1138, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2265, 101, 1139, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2266, 101, 1140, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2267, 101, 1141, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2268, 101, 1142, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2269, 101, 1143, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2270, 101, 1224, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2271, 101, 1225, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2272, 101, 1226, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2273, 101, 1227, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2274, 101, 1228, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2275, 101, 1229, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2282, 101, 1261, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2283, 101, 1263, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2284, 101, 1264, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2285, 101, 1265, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2286, 101, 1266, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2287, 101, 1267, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2288, 101, 1001, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2289, 101, 1002, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2290, 101, 1003, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2291, 101, 1004, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2292, 101, 1005, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2293, 101, 1006, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2294, 101, 1007, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2295, 101, 1008, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2296, 101, 1009, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2297, 101, 1010, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2298, 101, 1011, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2299, 101, 1012, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2300, 101, 500, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2301, 101, 1013, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2302, 101, 501, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2303, 101, 1014, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2304, 101, 1015, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2305, 101, 1016, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2306, 101, 1017, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2307, 101, 1018, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2308, 101, 1019, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2309, 101, 1020, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2310, 101, 1021, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2311, 101, 1022, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2312, 101, 1023, '1', '2023-02-09 23:49:46', '1', '2023-02-09 23:49:46', '0', 1);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2929, 109, 1224, '1', '2023-12-02 23:19:40', '1', '2023-12-02 23:19:40', '0', 121);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2930, 109, 1225, '1', '2023-12-02 23:19:40', '1', '2023-12-02 23:19:40', '0', 121);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2931, 109, 1226, '1', '2023-12-02 23:19:40', '1', '2023-12-02 23:19:40', '0', 121);
@@ -3812,7 +4423,6 @@ INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, update
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4193, 109, 2730, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', '0', 121);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4194, 109, 1195, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', '0', 121);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4195, 109, 2731, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', '0', 121);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4196, 109, 1196, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', '0', 121);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4197, 109, 2732, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', '0', 121);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4198, 109, 1197, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', '0', 121);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4199, 109, 2733, '1', '2024-03-30 17:53:17', '1', '2024-03-30 17:53:17', '0', 121);
@@ -3871,7 +4481,6 @@ INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, update
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4252, 111, 2730, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', '0', 122);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4253, 111, 1195, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', '0', 122);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4254, 111, 2731, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', '0', 122);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4255, 111, 1196, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', '0', 122);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4256, 111, 2732, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', '0', 122);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4257, 111, 1197, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', '0', 122);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4258, 111, 2733, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', '0', 122);
@@ -3897,8 +4506,6 @@ INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, update
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4278, 111, 1220, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', '0', 122);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4279, 111, 1221, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', '0', 122);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4280, 111, 1222, '1', '2024-03-30 17:53:18', '1', '2024-03-30 17:53:18', '0', 122);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (5777, 101, 2739, '1', '2024-04-30 09:38:37', '1', '2024-04-30 09:38:37', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (5778, 101, 2740, '1', '2024-04-30 09:38:37', '1', '2024-04-30 09:38:37', '0', 1);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (5779, 2, 2739, '1', '2024-07-07 20:39:38', '1', '2024-07-07 20:39:38', '0', 1);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (5780, 2, 2740, '1', '2024-07-07 20:39:38', '1', '2024-07-07 20:39:38', '0', 1);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (5781, 2, 2758, '1', '2024-07-07 20:39:38', '1', '2024-07-07 20:39:38', '0', 1);
@@ -3906,9 +4513,6 @@ INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, update
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (5783, 2, 2362, '1', '2024-07-07 20:39:38', '1', '2024-07-07 20:39:38', '0', 1);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (5784, 2, 2387, '1', '2024-07-07 20:39:38', '1', '2024-07-07 20:39:38', '0', 1);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (5785, 2, 2030, '1', '2024-07-07 20:39:38', '1', '2024-07-07 20:39:38', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (5786, 101, 2758, '1', '2024-07-07 20:39:55', '1', '2024-07-07 20:39:55', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (5787, 101, 2759, '1', '2024-07-07 20:39:55', '1', '2024-07-07 20:39:55', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (5788, 101, 2783, '1', '2024-07-07 20:39:55', '1', '2024-07-07 20:39:55', '0', 1);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (5789, 109, 2739, '1', '2024-07-13 22:37:24', '1', '2024-07-13 22:37:24', '0', 121);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (5790, 109, 2740, '1', '2024-07-13 22:37:24', '1', '2024-07-13 22:37:24', '0', 121);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (5791, 111, 2739, '1', '2024-07-13 22:37:24', '1', '2024-07-13 22:37:24', '0', 122);
@@ -3929,7 +4533,6 @@ INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, update
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6115, 155, 4043, '1', '2025-04-01 13:49:30', '1', '2025-04-01 13:49:30', '0', 1);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6116, 155, 4044, '1', '2025-04-01 13:49:30', '1', '2025-04-01 13:49:30', '0', 1);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6117, 155, 4045, '1', '2025-04-01 13:49:30', '1', '2025-04-01 13:49:30', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6118, 155, 4046, '1', '2025-04-01 13:49:30', '1', '2025-04-01 13:49:30', '0', 1);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6119, 155, 4001, '1', '2025-04-01 13:49:30', '1', '2025-04-01 13:49:30', '0', 1);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6120, 155, 4002, '1', '2025-04-01 13:49:30', '1', '2025-04-01 13:49:30', '0', 1);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6121, 155, 4003, '1', '2025-04-01 13:49:30', '1', '2025-04-01 13:49:30', '0', 1);
@@ -3949,7 +4552,232 @@ INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, update
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6135, 155, 4017, '1', '2025-04-01 13:49:30', '1', '2025-04-01 13:49:30', '0', 1);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6136, 155, 4018, '1', '2025-04-01 13:49:30', '1', '2025-04-01 13:49:30', '0', 1);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6137, 155, 4031, '1', '2025-04-01 13:49:30', '1', '2025-04-01 13:49:30', '0', 1);
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6138, 101, 5010, '1', '2025-05-05 17:49:17', '1', '2025-05-05 17:49:17', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6139, 109, 1117, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6140, 109, 1126, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6141, 109, 1127, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6142, 109, 1128, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6143, 109, 1129, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6144, 109, 1130, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6145, 109, 1132, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6146, 109, 1133, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6147, 109, 1134, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6148, 109, 1135, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6149, 109, 1136, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6150, 109, 1137, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6151, 109, 2161, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6152, 109, 1150, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6153, 109, 1161, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6154, 109, 1162, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6155, 109, 1166, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6156, 109, 1173, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6157, 109, 1174, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6158, 109, 1178, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6159, 109, 2745, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6160, 109, 2746, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6161, 109, 2747, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6162, 109, 2748, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6163, 109, 2301, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6164, 109, 2302, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6165, 109, 5011, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6166, 109, 5012, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6167, 109, 2549, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6168, 109, 2550, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6169, 109, 2551, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6170, 109, 2552, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6171, 109, 2553, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6172, 109, 2554, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6173, 109, 2555, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6174, 109, 2556, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6175, 109, 2557, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6176, 109, 2558, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6177, 109, 2559, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6178, 111, 1117, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6179, 111, 1126, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6180, 111, 1127, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6181, 111, 1128, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6182, 111, 1129, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6183, 111, 1130, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6184, 111, 1132, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6185, 111, 1133, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6186, 111, 1134, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6187, 111, 1135, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6188, 111, 1136, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6189, 111, 1137, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6190, 111, 2161, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6191, 111, 1150, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6192, 111, 1161, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6193, 111, 1162, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6194, 111, 1166, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6195, 111, 1173, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6196, 111, 1174, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6197, 111, 1178, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6198, 111, 2745, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6199, 111, 2746, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6200, 111, 2747, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6201, 111, 2748, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6202, 111, 2301, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6203, 111, 2302, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6204, 111, 5011, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6205, 111, 5012, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6206, 111, 2549, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6207, 111, 2550, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6208, 111, 2551, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6209, 111, 2552, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6210, 111, 2553, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6211, 111, 2554, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6212, 111, 2555, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6213, 111, 2556, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6214, 111, 2557, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6215, 111, 2558, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6216, 111, 2559, '1', '2025-09-06 20:52:12', '1', '2025-09-06 20:52:12', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6217, 109, 2756, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6218, 109, 2757, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6219, 109, 2262, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6220, 109, 2275, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6221, 109, 2276, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6222, 109, 2277, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6223, 109, 2281, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6224, 109, 2282, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6225, 109, 2283, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6226, 109, 2284, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6227, 109, 2285, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6228, 109, 2287, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6229, 109, 2288, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6230, 109, 2293, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6231, 109, 2294, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6232, 109, 2297, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6233, 109, 2300, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6234, 109, 2317, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6235, 109, 2318, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6236, 109, 2319, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6237, 109, 2320, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6238, 109, 2321, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6239, 109, 2322, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6240, 109, 2323, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6241, 109, 2324, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6242, 109, 2325, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6243, 109, 2326, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6244, 109, 2327, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6245, 109, 2328, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6246, 109, 2329, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6247, 109, 2330, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6248, 109, 2331, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6249, 109, 2332, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6250, 109, 2333, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6251, 109, 2334, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6252, 109, 2335, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6253, 109, 2363, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6254, 109, 2364, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6255, 111, 2756, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6256, 111, 2757, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6257, 111, 2262, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6258, 111, 2275, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6259, 111, 2276, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6260, 111, 2277, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6261, 111, 2281, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6262, 111, 2282, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6263, 111, 2283, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6264, 111, 2284, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6265, 111, 2285, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6266, 111, 2287, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6267, 111, 2288, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6268, 111, 2293, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6269, 111, 2294, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6270, 111, 2297, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6271, 111, 2300, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6272, 111, 2317, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6273, 111, 2318, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6274, 111, 2319, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6275, 111, 2320, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6276, 111, 2321, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6277, 111, 2322, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6278, 111, 2323, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6279, 111, 2324, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6280, 111, 2325, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6281, 111, 2326, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6282, 111, 2327, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6283, 111, 2328, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6284, 111, 2329, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6285, 111, 2330, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6286, 111, 2331, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6287, 111, 2332, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6288, 111, 2333, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6289, 111, 2334, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6290, 111, 2335, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6291, 111, 2363, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6292, 111, 2364, '1', '2025-09-06 20:52:25', '1', '2025-09-06 20:52:25', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6293, 2, 5, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6294, 2, 1118, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6295, 2, 1119, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6296, 2, 1120, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6297, 2, 2713, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6298, 2, 2714, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6299, 2, 2715, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6300, 2, 2716, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6301, 2, 2717, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6302, 2, 2718, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6303, 2, 2720, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6304, 2, 1185, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6305, 2, 2721, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6306, 2, 1186, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6307, 2, 2722, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6308, 2, 1187, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6309, 2, 2723, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6310, 2, 1188, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6311, 2, 2724, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6312, 2, 1189, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6313, 2, 2725, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6314, 2, 1190, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6315, 2, 2726, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6316, 2, 1191, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6317, 2, 2727, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6318, 2, 1192, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6319, 2, 2728, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6320, 2, 1193, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6321, 2, 2729, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6322, 2, 1194, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6323, 2, 2730, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6324, 2, 1195, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6325, 2, 2731, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6326, 2, 2732, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6327, 2, 1197, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6328, 2, 2733, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6329, 2, 1198, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6330, 2, 2734, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6331, 2, 1199, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6332, 2, 2735, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6333, 2, 1200, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6334, 2, 1201, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6335, 2, 1202, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6336, 2, 1207, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6337, 2, 1208, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6338, 2, 1209, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6339, 2, 1210, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6340, 2, 1211, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6341, 2, 1212, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6342, 2, 1213, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6343, 2, 1215, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6344, 2, 1216, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6345, 2, 1217, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6346, 2, 1218, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6347, 2, 1219, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6348, 2, 1220, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6349, 2, 1221, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6350, 2, 1222, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6351, 2, 2913, '1', '2026-01-04 18:09:41', '1', '2026-01-04 18:09:41', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6352, 1, 5720, '1', '2026-02-19 04:24:53', '1', '2026-02-19 04:24:53', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6353, 1, 5721, '1', '2026-02-19 04:24:53', '1', '2026-02-19 04:24:53', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6354, 1, 5722, '1', '2026-02-19 04:24:53', '1', '2026-02-19 04:24:53', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6355, 1, 5723, '1', '2026-02-19 04:24:53', '1', '2026-02-19 04:24:53', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6356, 1, 5724, '1', '2026-02-19 04:24:53', '1', '2026-02-19 04:24:53', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6357, 1, 5725, '1', '2026-02-19 04:24:53', '1', '2026-02-19 04:24:53', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6358, 1, 5811, '', '2026-03-30 03:11:59', '', '2026-03-30 03:11:59', '0', 0);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6359, 1, 5811, '', '2026-03-30 03:13:05', '', '2026-03-30 03:13:05', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6360, 2, 5811, '', '2026-03-30 03:13:05', '', '2026-03-30 03:13:05', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6361, 3, 5811, '', '2026-03-30 03:13:05', '', '2026-03-30 03:13:05', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6362, 109, 5811, '', '2026-03-30 03:13:05', '', '2026-03-30 03:13:05', '0', 121);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6363, 111, 5811, '', '2026-03-30 03:13:05', '', '2026-03-30 03:13:05', '0', 122);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6364, 155, 5811, '', '2026-03-30 03:13:05', '', '2026-03-30 03:13:05', '0', 1);
 COMMIT;
 SET IDENTITY_INSERT system_role_menu OFF;
 -- @formatter:on
@@ -3957,21 +4785,20 @@ SET IDENTITY_INSERT system_role_menu OFF;
 -- ----------------------------
 -- Table structure for system_sms_channel
 -- ----------------------------
-CREATE TABLE system_sms_channel
-(
-    id           bigint                                 NOT NULL PRIMARY KEY IDENTITY,
-    signature    varchar(12)                            NOT NULL,
-    code         varchar(63)                            NOT NULL,
-    status       smallint                               NOT NULL,
-    remark       varchar(255) DEFAULT NULL              NULL,
-    api_key      varchar(128)                           NOT NULL,
-    api_secret   varchar(128) DEFAULT NULL              NULL,
-    callback_url varchar(255) DEFAULT NULL              NULL,
-    creator      varchar(64)  DEFAULT ''                NULL,
-    create_time  datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater      varchar(64)  DEFAULT ''                NULL,
-    update_time  datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted      bit          DEFAULT '0'               NOT NULL
+CREATE TABLE system_sms_channel (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    signature varchar(12)  NOT NULL,
+    code varchar(63)  NOT NULL,
+    status smallint  NOT NULL,
+    remark varchar(255) DEFAULT NULL NULL,
+    api_key varchar(128)  NOT NULL,
+    api_secret varchar(128) DEFAULT NULL NULL,
+    callback_url varchar(255) DEFAULT NULL NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT '0' NOT NULL
 );
 
 COMMENT ON COLUMN system_sms_channel.id IS '编号';
@@ -3996,7 +4823,7 @@ COMMENT ON TABLE system_sms_channel IS '短信渠道';
 SET IDENTITY_INSERT system_sms_channel ON;
 INSERT INTO system_sms_channel (id, signature, code, status, remark, api_key, api_secret, callback_url, creator, create_time, updater, update_time, deleted) VALUES (2, 'Ballcat', 'ALIYUN', 0, '你要改哦，只有我可以用！！！！', 'LTAI5tCnKso2uG3kJ5gRav88', 'fGJ5SNXL7P1NHNRmJ7DJaMJGPyE55C', NULL, '', '2021-03-31 11:53:10', '1', '2024-08-04 08:53:26', '0');
 INSERT INTO system_sms_channel (id, signature, code, status, remark, api_key, api_secret, callback_url, creator, create_time, updater, update_time, deleted) VALUES (4, '测试渠道', 'DEBUG_DING_TALK', 0, '123', '696b5d8ead48071237e4aa5861ff08dbadb2b4ded1c688a7b7c9afc615579859', 'SEC5c4e5ff888bc8a9923ae47f59e7ccd30af1f14d93c55b4e2c9cb094e35aeed67', NULL, '1', '2021-04-13 00:23:14', '1', '2022-03-27 20:29:49', '0');
-INSERT INTO system_sms_channel (id, signature, code, status, remark, api_key, api_secret, callback_url, creator, create_time, updater, update_time, deleted) VALUES (7, 'mock腾讯云', 'TENCENT', 0, '', '1 2', '2 3', '', '1', '2024-09-30 08:53:45', '1', '2024-09-30 08:55:01', '0');
+INSERT INTO system_sms_channel (id, signature, code, status, remark, api_key, api_secret, callback_url, creator, create_time, updater, update_time, deleted) VALUES (7, 'mock腾讯云', 'TENCENT', 0, '123', '1 2', '2 3', '', '1', '2024-09-30 08:53:45', '1', '2025-12-20 11:30:18', '0');
 COMMIT;
 SET IDENTITY_INSERT system_sms_channel OFF;
 -- @formatter:on
@@ -4004,23 +4831,22 @@ SET IDENTITY_INSERT system_sms_channel OFF;
 -- ----------------------------
 -- Table structure for system_sms_code
 -- ----------------------------
-CREATE TABLE system_sms_code
-(
-    id          bigint                                 NOT NULL PRIMARY KEY IDENTITY,
-    mobile      varchar(11)                            NOT NULL,
-    code        varchar(6)                             NOT NULL,
-    create_ip   varchar(15)                            NOT NULL,
-    scene       smallint                               NOT NULL,
-    today_index smallint                               NOT NULL,
-    used        smallint                               NOT NULL,
-    used_time   datetime     DEFAULT NULL              NULL,
-    used_ip     varchar(255) DEFAULT NULL              NULL,
-    creator     varchar(64)  DEFAULT ''                NULL,
-    create_time datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater     varchar(64)  DEFAULT ''                NULL,
-    update_time datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted     bit          DEFAULT '0'               NOT NULL,
-    tenant_id   bigint       DEFAULT 0                 NOT NULL
+CREATE TABLE system_sms_code (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    mobile varchar(11)  NOT NULL,
+    code varchar(6)  NOT NULL,
+    create_ip varchar(15)  NOT NULL,
+    scene smallint  NOT NULL,
+    today_index smallint  NOT NULL,
+    used smallint  NOT NULL,
+    used_time datetime DEFAULT NULL NULL,
+    used_ip varchar(255) DEFAULT NULL NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT '0' NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 );
 
 CREATE INDEX idx_system_sms_code_01 ON system_sms_code (mobile);
@@ -4045,35 +4871,34 @@ COMMENT ON TABLE system_sms_code IS '手机验证码';
 -- ----------------------------
 -- Table structure for system_sms_log
 -- ----------------------------
-CREATE TABLE system_sms_log
-(
-    id               bigint                                 NOT NULL PRIMARY KEY IDENTITY,
-    channel_id       bigint                                 NOT NULL,
-    channel_code     varchar(63)                            NOT NULL,
-    template_id      bigint                                 NOT NULL,
-    template_code    varchar(63)                            NOT NULL,
-    template_type    smallint                               NOT NULL,
-    template_content varchar(255)                           NOT NULL,
-    template_params  varchar(255)                           NOT NULL,
-    api_template_id  varchar(63)                            NOT NULL,
-    mobile           varchar(11)                            NOT NULL,
-    user_id          bigint       DEFAULT NULL              NULL,
-    user_type        smallint     DEFAULT NULL              NULL,
-    send_status      smallint     DEFAULT 0                 NOT NULL,
-    send_time        datetime     DEFAULT NULL              NULL,
-    api_send_code    varchar(63)  DEFAULT NULL              NULL,
-    api_send_msg     varchar(255) DEFAULT NULL              NULL,
-    api_request_id   varchar(255) DEFAULT NULL              NULL,
-    api_serial_no    varchar(255) DEFAULT NULL              NULL,
-    receive_status   smallint     DEFAULT 0                 NOT NULL,
-    receive_time     datetime     DEFAULT NULL              NULL,
-    api_receive_code varchar(63)  DEFAULT NULL              NULL,
-    api_receive_msg  varchar(255) DEFAULT NULL              NULL,
-    creator          varchar(64)  DEFAULT ''                NULL,
-    create_time      datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater          varchar(64)  DEFAULT ''                NULL,
-    update_time      datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted          bit          DEFAULT '0'               NOT NULL
+CREATE TABLE system_sms_log (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    channel_id bigint  NOT NULL,
+    channel_code varchar(63)  NOT NULL,
+    template_id bigint  NOT NULL,
+    template_code varchar(63)  NOT NULL,
+    template_type smallint  NOT NULL,
+    template_content varchar(255)  NOT NULL,
+    template_params varchar(255)  NOT NULL,
+    api_template_id varchar(63)  NOT NULL,
+    mobile varchar(11)  NOT NULL,
+    user_id bigint DEFAULT NULL NULL,
+    user_type smallint DEFAULT NULL NULL,
+    send_status smallint DEFAULT 0 NOT NULL,
+    send_time datetime DEFAULT NULL NULL,
+    api_send_code varchar(63) DEFAULT NULL NULL,
+    api_send_msg varchar(255) DEFAULT NULL NULL,
+    api_request_id varchar(255) DEFAULT NULL NULL,
+    api_serial_no varchar(255) DEFAULT NULL NULL,
+    receive_status smallint DEFAULT 0 NOT NULL,
+    receive_time datetime DEFAULT NULL NULL,
+    api_receive_code varchar(63) DEFAULT NULL NULL,
+    api_receive_msg varchar(255) DEFAULT NULL NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT '0' NOT NULL
 );
 
 COMMENT ON COLUMN system_sms_log.id IS '编号';
@@ -4108,24 +4933,23 @@ COMMENT ON TABLE system_sms_log IS '短信日志';
 -- ----------------------------
 -- Table structure for system_sms_template
 -- ----------------------------
-CREATE TABLE system_sms_template
-(
-    id              bigint                                 NOT NULL PRIMARY KEY IDENTITY,
-    type            smallint                               NOT NULL,
-    status          smallint                               NOT NULL,
-    code            varchar(63)                            NOT NULL,
-    name            varchar(63)                            NOT NULL,
-    content         varchar(255)                           NOT NULL,
-    params          varchar(255)                           NOT NULL,
-    remark          varchar(255) DEFAULT NULL              NULL,
-    api_template_id varchar(63)                            NOT NULL,
-    channel_id      bigint                                 NOT NULL,
-    channel_code    varchar(63)                            NOT NULL,
-    creator         varchar(64)  DEFAULT ''                NULL,
-    create_time     datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater         varchar(64)  DEFAULT ''                NULL,
-    update_time     datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted         bit          DEFAULT '0'               NOT NULL
+CREATE TABLE system_sms_template (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    type smallint  NOT NULL,
+    status smallint  NOT NULL,
+    code varchar(63)  NOT NULL,
+    name varchar(63)  NOT NULL,
+    content varchar(255)  NOT NULL,
+    params varchar(255)  NOT NULL,
+    remark varchar(255) DEFAULT NULL NULL,
+    api_template_id varchar(63)  NOT NULL,
+    channel_id bigint  NOT NULL,
+    channel_code varchar(63)  NOT NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT '0' NOT NULL
 );
 
 COMMENT ON COLUMN system_sms_template.id IS '编号';
@@ -4173,23 +4997,22 @@ SET IDENTITY_INSERT system_sms_template OFF;
 -- ----------------------------
 -- Table structure for system_social_client
 -- ----------------------------
-CREATE TABLE system_social_client
-(
-    id            bigint                                 NOT NULL PRIMARY KEY IDENTITY,
-    name          varchar(255)                           NOT NULL,
-    social_type   smallint                               NOT NULL,
-    user_type     smallint                               NOT NULL,
-    client_id     varchar(255)                           NOT NULL,
-    client_secret varchar(2048)                           NOT NULL,
-    public_key    varchar(2048) DEFAULT NULL              NULL,
-    agent_id      varchar(255) DEFAULT NULL              NULL,
-    status        smallint                               NOT NULL,
-    creator       varchar(64)  DEFAULT ''                NULL,
-    create_time   datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater       varchar(64)  DEFAULT ''                NULL,
-    update_time   datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted       bit          DEFAULT '0'               NOT NULL,
-    tenant_id     bigint       DEFAULT 0                 NOT NULL
+CREATE TABLE system_social_client (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    name varchar(255)  NOT NULL,
+    social_type smallint  NOT NULL,
+    user_type smallint  NOT NULL,
+    client_id varchar(255)  NOT NULL,
+    client_secret varchar(255)  NOT NULL,
+    agent_id varchar(255) DEFAULT NULL NULL,
+    public_key varchar(2048) DEFAULT NULL NULL,
+    status smallint  NOT NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT '0' NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 );
 
 COMMENT ON COLUMN system_social_client.id IS '编号';
@@ -4197,9 +5020,9 @@ COMMENT ON COLUMN system_social_client.name IS '应用名';
 COMMENT ON COLUMN system_social_client.social_type IS '社交平台的类型';
 COMMENT ON COLUMN system_social_client.user_type IS '用户类型';
 COMMENT ON COLUMN system_social_client.client_id IS '客户端编号';
-COMMENT ON COLUMN system_social_client.public_key IS 'publicKey公钥';
 COMMENT ON COLUMN system_social_client.client_secret IS '客户端密钥';
 COMMENT ON COLUMN system_social_client.agent_id IS '代理编号';
+COMMENT ON COLUMN system_social_client.public_key IS 'publicKey 公钥';
 COMMENT ON COLUMN system_social_client.status IS '状态';
 COMMENT ON COLUMN system_social_client.creator IS '创建者';
 COMMENT ON COLUMN system_social_client.create_time IS '创建时间';
@@ -4214,11 +5037,14 @@ COMMENT ON TABLE system_social_client IS '社交客户端表';
 -- ----------------------------
 -- @formatter:off
 SET IDENTITY_INSERT system_social_client ON;
-INSERT INTO system_social_client (id, name, social_type, user_type, client_id, client_secret, agent_id, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1, '钉钉', 20, 2, 'dingvrnreaje3yqvzhxg', 'i8E6iZyDvZj51JIb0tYsYfVQYOks9Cq1lgryEjFRqC79P3iJcrxEwT6Qk2QvLrLI', NULL, 0, '', '2023-10-18 11:21:18', '1', '2023-12-20 21:28:26', '1', 1);
-INSERT INTO system_social_client (id, name, social_type, user_type, client_id, client_secret, agent_id, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2, '钉钉（王土豆）', 20, 2, 'dingtsu9hpepjkbmthhw', 'FP_bnSq_HAHKCSncmJjw5hxhnzs6vaVDSZZn3egj6rdqTQ_hu5tQVJyLMpgCakdP', NULL, 0, '', '2023-10-18 11:21:18', '', '2023-12-20 21:28:26', '1', 121);
-INSERT INTO system_social_client (id, name, social_type, user_type, client_id, client_secret, agent_id, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3, '微信公众号', 31, 1, 'wx5b23ba7a5589ecbb', '2a7b3b20c537e52e74afd395eb85f61f', NULL, 0, '', '2023-10-18 16:07:46', '1', '2023-12-20 21:28:23', '1', 1);
-INSERT INTO system_social_client (id, name, social_type, user_type, client_id, client_secret, agent_id, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (43, '微信小程序', 34, 1, 'wx63c280fe3248a3e7', '6f270509224a7ae1296bbf1c8cb97aed', NULL, 0, '', '2023-10-19 13:37:41', '1', '2023-12-20 21:28:25', '1', 1);
-INSERT INTO system_social_client (id, name, social_type, user_type, client_id, client_secret, agent_id, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (44, '1', 10, 1, '2', '3', NULL, 0, '1', '2025-04-06 20:36:28', '1', '2025-04-06 20:43:12', '1', 1);
+INSERT INTO system_social_client (id, name, social_type, user_type, client_id, client_secret, agent_id, public_key, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1, '钉钉', 20, 2, 'dingvrnreaje3yqvzhxg', 'i8E6iZyDvZj51JIb0tYsYfVQYOks9Cq1lgryEjFRqC79P3iJcrxEwT6Qk2QvLrLI', NULL, NULL, 0, '', '2023-10-18 11:21:18', '1', '2023-12-20 21:28:26', '1', 1);
+INSERT INTO system_social_client (id, name, social_type, user_type, client_id, client_secret, agent_id, public_key, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2, '钉钉（王土豆）', 20, 2, 'dingtsu9hpepjkbmthhw', 'FP_bnSq_HAHKCSncmJjw5hxhnzs6vaVDSZZn3egj6rdqTQ_hu5tQVJyLMpgCakdP', NULL, NULL, 0, '', '2023-10-18 11:21:18', '', '2023-12-20 21:28:26', '1', 121);
+INSERT INTO system_social_client (id, name, social_type, user_type, client_id, client_secret, agent_id, public_key, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3, '微信公众号', 31, 1, 'wx5b23ba7a5589ecbb', '2a7b3b20c537e52e74afd395eb85f61f', NULL, NULL, 0, '', '2023-10-18 16:07:46', '1', '2023-12-20 21:28:23', '1', 1);
+INSERT INTO system_social_client (id, name, social_type, user_type, client_id, client_secret, agent_id, public_key, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (43, '微信小程序', 34, 1, 'wx63c280fe3248a3e7', '6f270509224a7ae1296bbf1c8cb97aed', NULL, NULL, 0, '', '2023-10-19 13:37:41', '1', '2023-12-20 21:28:25', '1', 1);
+INSERT INTO system_social_client (id, name, social_type, user_type, client_id, client_secret, agent_id, public_key, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (44, '1', 10, 1, '2', '3', NULL, NULL, 0, '1', '2025-04-06 20:36:28', '1', '2025-04-06 20:43:12', '1', 1);
+INSERT INTO system_social_client (id, name, social_type, user_type, client_id, client_secret, agent_id, public_key, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (45, '1', 10, 1, '2', '3', NULL, NULL, 1, '1', '2025-09-06 20:26:15', '1', '2025-09-06 20:27:55', '1', 1);
+INSERT INTO system_social_client (id, name, social_type, user_type, client_id, client_secret, agent_id, public_key, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (46, '1', 10, 1, '2', '3', NULL, NULL, 0, '1', '2025-11-29 16:04:23', '1', '2025-11-29 16:04:26', '1', 1);
+INSERT INTO system_social_client (id, name, social_type, user_type, client_id, client_secret, agent_id, public_key, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (47, '123', 10, 1, '1', '2', '3', NULL, 0, '1', '2025-12-21 10:27:02', '1', '2025-12-21 10:27:20', '1', 1);
 COMMIT;
 SET IDENTITY_INSERT system_social_client OFF;
 -- @formatter:on
@@ -4226,27 +5052,29 @@ SET IDENTITY_INSERT system_social_client OFF;
 -- ----------------------------
 -- Table structure for system_social_user
 -- ----------------------------
-CREATE TABLE system_social_user
-(
-    id             bigint                                 NOT NULL PRIMARY KEY IDENTITY,
-    type           smallint                               NOT NULL,
-    openid         varchar(32)                            NOT NULL,
-    token          varchar(256) DEFAULT NULL              NULL,
-    raw_token_info varchar(1024)                          NOT NULL,
-    nickname       varchar(32)                            NOT NULL,
-    avatar         varchar(255) DEFAULT NULL              NULL,
-    raw_user_info  varchar(1024)                          NOT NULL,
-    code           varchar(256)                           NOT NULL,
-    state          varchar(256) DEFAULT NULL              NULL,
-    creator        varchar(64)  DEFAULT ''                NULL,
-    create_time    datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater        varchar(64)  DEFAULT ''                NULL,
-    update_time    datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted        bit          DEFAULT '0'               NOT NULL,
-    tenant_id      bigint       DEFAULT 0                 NOT NULL
+CREATE TABLE system_social_user (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    type smallint  NOT NULL,
+    openid varchar(32)  NOT NULL,
+    token varchar(256) DEFAULT NULL NULL,
+    raw_token_info varchar(1024)  NOT NULL,
+    nickname varchar(32)  NOT NULL,
+    avatar varchar(255) DEFAULT NULL NULL,
+    raw_user_info varchar(1024)  NOT NULL,
+    code varchar(256)  NOT NULL,
+    state varchar(256) DEFAULT NULL NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT '0' NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 );
 
-COMMENT ON COLUMN system_social_user.id IS '主键 ( 自增策略)';
+CREATE INDEX idx_system_social_user_01 ON system_social_user (type, openid);
+CREATE INDEX idx_system_social_user_02 ON system_social_user (type, code, state);
+
+COMMENT ON COLUMN system_social_user.id IS '主键(自增策略)';
 COMMENT ON COLUMN system_social_user.type IS '社交平台的类型';
 COMMENT ON COLUMN system_social_user.openid IS '社交 openid';
 COMMENT ON COLUMN system_social_user.token IS '社交 token';
@@ -4267,22 +5095,23 @@ COMMENT ON TABLE system_social_user IS '社交用户表';
 -- ----------------------------
 -- Table structure for system_social_user_bind
 -- ----------------------------
-CREATE TABLE system_social_user_bind
-(
-    id             bigint                                NOT NULL PRIMARY KEY IDENTITY,
-    user_id        bigint                                NOT NULL,
-    user_type      smallint                              NOT NULL,
-    social_type    smallint                              NOT NULL,
-    social_user_id bigint                                NOT NULL,
-    creator        varchar(64) DEFAULT ''                NULL,
-    create_time    datetime    DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater        varchar(64) DEFAULT ''                NULL,
-    update_time    datetime    DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted        bit         DEFAULT '0'               NOT NULL,
-    tenant_id      bigint      DEFAULT 0                 NOT NULL
+CREATE TABLE system_social_user_bind (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    user_id bigint  NOT NULL,
+    user_type smallint  NOT NULL,
+    social_type smallint  NOT NULL,
+    social_user_id bigint  NOT NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT '0' NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 );
 
-COMMENT ON COLUMN system_social_user_bind.id IS '主键 ( 自增策略)';
+CREATE INDEX idx_system_social_user_bind_01 ON system_social_user_bind (user_type, social_user_id);
+
+COMMENT ON COLUMN system_social_user_bind.id IS '主键(自增策略)';
 COMMENT ON COLUMN system_social_user_bind.user_id IS '用户编号';
 COMMENT ON COLUMN system_social_user_bind.user_type IS '用户类型';
 COMMENT ON COLUMN system_social_user_bind.social_type IS '社交平台的类型';
@@ -4298,23 +5127,22 @@ COMMENT ON TABLE system_social_user_bind IS '社交绑定表';
 -- ----------------------------
 -- Table structure for system_tenant
 -- ----------------------------
-CREATE TABLE system_tenant
-(
-    id              bigint                                 NOT NULL PRIMARY KEY IDENTITY,
-    name            varchar(30)                            NOT NULL,
-    contact_user_id bigint       DEFAULT NULL              NULL,
-    contact_name    varchar(30)                            NOT NULL,
-    contact_mobile  varchar(500) DEFAULT NULL              NULL,
-    status          smallint     DEFAULT 0                 NOT NULL,
-    websites        varchar(256) DEFAULT ''                NULL,
-    package_id      bigint                                 NOT NULL,
-    expire_time     datetime                               NOT NULL,
-    account_count   int                                    NOT NULL,
-    creator         varchar(64)  DEFAULT ''                NULL,
-    create_time     datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater         varchar(64)  DEFAULT ''                NULL,
-    update_time     datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted         bit          DEFAULT '0'               NOT NULL
+CREATE TABLE system_tenant (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    name varchar(30)  NOT NULL,
+    contact_user_id bigint DEFAULT NULL NULL,
+    contact_name varchar(30)  NOT NULL,
+    contact_mobile varchar(500) DEFAULT NULL NULL,
+    status smallint DEFAULT 0 NOT NULL,
+    websites varchar(1024) DEFAULT '' NULL,
+    package_id bigint  NOT NULL,
+    expire_time datetime  NOT NULL,
+    account_count int  NOT NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT '0' NOT NULL
 );
 
 COMMENT ON COLUMN system_tenant.id IS '租户编号';
@@ -4322,7 +5150,7 @@ COMMENT ON COLUMN system_tenant.name IS '租户名';
 COMMENT ON COLUMN system_tenant.contact_user_id IS '联系人的用户编号';
 COMMENT ON COLUMN system_tenant.contact_name IS '联系人';
 COMMENT ON COLUMN system_tenant.contact_mobile IS '联系手机';
-COMMENT ON COLUMN system_tenant.status IS '租户状态（0正常 1停用）';
+COMMENT ON COLUMN system_tenant.status IS '租户状态';
 COMMENT ON COLUMN system_tenant.websites IS '绑定域名数组';
 COMMENT ON COLUMN system_tenant.package_id IS '租户套餐编号';
 COMMENT ON COLUMN system_tenant.expire_time IS '过期时间';
@@ -4339,9 +5167,9 @@ COMMENT ON TABLE system_tenant IS '租户表';
 -- ----------------------------
 -- @formatter:off
 SET IDENTITY_INSERT system_tenant ON;
-INSERT INTO system_tenant (id, name, contact_user_id, contact_name, contact_mobile, status, websites, package_id, expire_time, account_count, creator, create_time, updater, update_time, deleted) VALUES (1, '芋道源码', NULL, '芋艿', '17321315478', 0, 'www.iocoder.cn', 0, '2099-02-19 17:14:16', 9999, '1', '2021-01-05 17:03:47', '1', '2023-11-06 11:41:41', '0');
-INSERT INTO system_tenant (id, name, contact_user_id, contact_name, contact_mobile, status, websites, package_id, expire_time, account_count, creator, create_time, updater, update_time, deleted) VALUES (121, '小租户', 110, '小王2', '15601691300', 0, 'zsxq.iocoder.cn', 111, '2026-07-10 00:00:00', 30, '1', '2022-02-22 00:56:14', '1', '2025-04-03 21:33:01', '0');
-INSERT INTO system_tenant (id, name, contact_user_id, contact_name, contact_mobile, status, websites, package_id, expire_time, account_count, creator, create_time, updater, update_time, deleted) VALUES (122, '测试租户', 113, '芋道', '15601691300', 0, 'test.iocoder.cn', 111, '2022-04-29 00:00:00', 50, '1', '2022-03-07 21:37:58', '1', '2024-09-22 12:10:50', '0');
+INSERT INTO system_tenant (id, name, contact_user_id, contact_name, contact_mobile, status, websites, package_id, expire_time, account_count, creator, create_time, updater, update_time, deleted) VALUES (1, '芋道源码', NULL, '芋艿', '17321315478', 0, 'www.iocoder.cn,127.0.0.1:3000,wxc4598c446f8a9cb3', 0, '2099-02-19 17:14:16', 9999, '1', '2021-01-05 17:03:47', '1', '2025-08-19 05:18:41', '0');
+INSERT INTO system_tenant (id, name, contact_user_id, contact_name, contact_mobile, status, websites, package_id, expire_time, account_count, creator, create_time, updater, update_time, deleted) VALUES (121, '小租户', 110, '小王2', '15601691300', 0, 'zsxq.iocoder.cn,123321', 111, '2026-07-10 00:00:00', 30, '1', '2022-02-22 00:56:14', '1', '2025-08-19 21:19:29', '0');
+INSERT INTO system_tenant (id, name, contact_user_id, contact_name, contact_mobile, status, websites, package_id, expire_time, account_count, creator, create_time, updater, update_time, deleted) VALUES (122, '测试租户', 113, '芋道', '15601691300', 0, 'test.iocoder.cn,222,333', 111, '2023-04-29 00:00:00', 50, '1', '2022-03-07 21:37:58', '1', '2025-12-21 09:50:00', '0');
 COMMIT;
 SET IDENTITY_INSERT system_tenant OFF;
 -- @formatter:on
@@ -4349,18 +5177,17 @@ SET IDENTITY_INSERT system_tenant OFF;
 -- ----------------------------
 -- Table structure for system_tenant_package
 -- ----------------------------
-CREATE TABLE system_tenant_package
-(
-    id          bigint                                 NOT NULL PRIMARY KEY IDENTITY,
-    name        varchar(30)                            NOT NULL,
-    status      smallint     DEFAULT 0                 NOT NULL,
-    remark      varchar(256) DEFAULT ''                NULL,
-    menu_ids    varchar(4096)                          NOT NULL,
-    creator     varchar(64)  DEFAULT ''                NULL,
-    create_time datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater     varchar(64)  DEFAULT ''                NULL,
-    update_time datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted     bit          DEFAULT '0'               NOT NULL
+CREATE TABLE system_tenant_package (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    name varchar(30)  NOT NULL,
+    status smallint DEFAULT 0 NOT NULL,
+    remark varchar(256) DEFAULT '' NULL,
+    menu_ids varchar(4096)  NOT NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT '0' NOT NULL
 );
 
 COMMENT ON COLUMN system_tenant_package.id IS '套餐编号';
@@ -4380,8 +5207,7 @@ COMMENT ON TABLE system_tenant_package IS '租户套餐表';
 -- ----------------------------
 -- @formatter:off
 SET IDENTITY_INSERT system_tenant_package ON;
-INSERT INTO system_tenant_package (id, name, status, remark, menu_ids, creator, create_time, updater, update_time, deleted) VALUES (111, '普通套餐', 0, '小功能', '[1,2,5,1031,1032,1033,1034,1035,1036,1037,1038,1039,1050,1051,1052,1053,1054,1056,1057,1058,1059,1060,1063,1064,1065,1066,1067,1070,1075,1077,1078,1082,1083,1084,1085,1086,1087,1088,1089,1090,1091,1092,1118,1119,1120,100,101,102,103,106,107,110,111,112,113,1138,114,1139,115,1140,116,1141,1142,1143,2713,2714,2715,2716,2717,2718,2720,1185,2721,1186,2722,1187,2723,1188,2724,1189,2725,1190,2726,1191,2727,2472,1192,2728,1193,2729,1194,2730,1195,2731,1196,2732,1197,2733,2478,1198,2734,2479,1199,2735,2480,1200,2481,1201,2482,1202,2483,2739,2484,2740,2485,2486,2487,1207,2488,1208,2489,1209,2490,1210,2491,1211,2492,1212,2493,1213,2494,2495,1215,1216,2497,1217,1218,1219,1220,1221,1222,1224,1225,1226,1227,1228,1229,1237,1238,1239,1240,1241,1242,1243,2525,1255,1256,1001,1257,1002,1258,1003,1259,1004,1260,1005,1006,1007,1008,1009,1010,1011,1012,1013,1014,1015,1016,1017,1018,1019,1020]', '1', '2022-02-22 00:54:00', '1', '2024-07-13 22:37:24', '0');
-INSERT INTO system_tenant_package (id, name, status, remark, menu_ids, creator, create_time, updater, update_time, deleted) VALUES (112, '再来一个套餐', 0, '1234', '[1024,1,1025,1026,2,1027,1028,1029,1030,1031,1032,1033,1034,1035,1036,1037,1038,1039,1040,1042,1043,1045,1046,1048,1050,1051,1052,1053,1054,1056,1057,1058,2083,1059,1060,1063,1064,1065,1066,1067,1070,1075,1077,1078,1082,1083,1084,1085,1086,1087,1088,1089,1090,1091,1092,1093,1094,1095,1096,1097,1098,1100,1101,1102,1103,1104,1105,1106,2130,1107,2131,1108,2132,1109,2133,2134,2135,2136,2137,2138,2139,2140,2141,2142,2143,2144,2145,2146,2147,100,2148,101,2149,102,2150,103,2151,104,2152,105,106,107,108,109,110,111,112,113,1138,114,1139,115,1140,116,1141,1142,1143,2739,2740,1224,1225,1226,1227,1228,1229,1237,1238,1239,1240,1241,1242,1243,1255,1256,1257,1258,1259,1260,1261,1263,1264,1265,1266,1267,2447,2448,2449,2450,2451,2452,2453,2472,2478,2479,2480,2481,2482,2483,2484,2485,2486,2487,2488,2489,2490,2491,2492,2493,2494,2495,2497,2525,1001,1002,1003,1004,1005,1006,1007,1008,1009,1010,1011,1012,500,1013,501,1014,1015,1016,1017,1018,1019,1020,1021,1022,1023]', '1', '2025-04-04 08:15:02', '1', '2025-04-04 08:15:21', '0');
+INSERT INTO system_tenant_package (id, name, status, remark, menu_ids, creator, create_time, updater, update_time, deleted) VALUES (111, '普通套餐', 0, '小功能', '[1,2,5,1031,1032,1033,1034,1035,1036,1037,1038,1039,1050,1051,1052,1053,1054,1056,1057,1058,1059,1060,1063,1064,1065,1066,1067,1070,1075,1077,1078,1082,1083,1084,1085,1086,1087,1088,1089,1090,1091,1092,1117,1118,1119,1120,100,101,102,1126,103,1127,1128,1129,106,1130,107,1132,1133,110,1134,111,1135,112,1136,113,1137,2161,114,1138,1139,115,1140,116,1141,1142,1143,1150,1161,1162,1166,1173,1174,2713,2714,1178,2715,2716,2717,2718,2720,2721,1185,2722,1186,1187,2723,1188,2724,1189,2725,1190,2726,1191,2727,1192,2728,2729,1193,1194,2730,1195,2731,2732,1197,2733,1198,2734,1199,2735,1200,1201,1202,2739,2740,1207,1208,1209,2745,1210,2746,1211,2747,1212,2748,1213,1215,1216,1217,1218,1219,1220,2756,1221,2757,1222,1224,1225,1226,1227,1228,1229,1237,1238,2262,1239,1240,1241,1242,1243,2275,2276,2277,1255,1256,1257,2281,1258,2282,1259,2283,1260,2284,2285,2287,2288,2293,2294,2297,2300,2301,2302,2317,2318,2319,2320,2321,2322,2323,2324,2325,2326,2327,2328,2329,2330,2331,2332,2333,2334,2335,2363,2364,5011,5012,2472,2478,2479,2480,2481,2482,2483,2484,2485,2486,2487,2488,2489,2490,2491,2492,2493,2494,2495,2497,2525,1001,1002,1003,1004,1005,1006,1007,1008,1009,1010,1011,1012,1013,2549,1014,2550,1015,2551,1016,2552,1017,2553,1018,2554,1019,2555,1020,2556,2557,2558,2559]', '1', '2022-02-22 00:54:00', '1', '2025-09-06 20:52:25', '0');
 COMMIT;
 SET IDENTITY_INSERT system_tenant_package OFF;
 -- @formatter:on
@@ -4389,17 +5215,16 @@ SET IDENTITY_INSERT system_tenant_package OFF;
 -- ----------------------------
 -- Table structure for system_user_post
 -- ----------------------------
-CREATE TABLE system_user_post
-(
-    id          bigint                                NOT NULL PRIMARY KEY IDENTITY,
-    user_id     bigint      DEFAULT 0                 NOT NULL,
-    post_id     bigint      DEFAULT 0                 NOT NULL,
-    creator     varchar(64) DEFAULT ''                NULL,
-    create_time datetime    DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater     varchar(64) DEFAULT ''                NULL,
-    update_time datetime    DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted     bit         DEFAULT '0'               NOT NULL,
-    tenant_id   bigint      DEFAULT 0                 NOT NULL
+CREATE TABLE system_user_post (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    user_id bigint DEFAULT 0 NOT NULL,
+    post_id bigint DEFAULT 0 NOT NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT '0' NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 );
 
 COMMENT ON COLUMN system_user_post.id IS 'id';
@@ -4427,6 +5252,8 @@ INSERT INTO system_user_post (id, user_id, post_id, creator, create_time, update
 INSERT INTO system_user_post (id, user_id, post_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (123, 115, 1, '1', '2024-04-04 09:37:14', '1', '2024-04-04 09:37:14', '0', 1);
 INSERT INTO system_user_post (id, user_id, post_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (124, 115, 2, '1', '2024-04-04 09:37:14', '1', '2024-04-04 09:37:14', '0', 1);
 INSERT INTO system_user_post (id, user_id, post_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (125, 1, 2, '1', '2024-07-13 22:31:39', '1', '2024-07-13 22:31:39', '0', 1);
+INSERT INTO system_user_post (id, user_id, post_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (128, 139, 2, '1', '2025-12-05 21:43:27', '1', '2025-12-05 21:43:27', '0', 1);
+INSERT INTO system_user_post (id, user_id, post_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (129, 139, 4, '1', '2025-12-05 21:43:27', '1', '2025-12-05 21:43:27', '0', 1);
 COMMIT;
 SET IDENTITY_INSERT system_user_post OFF;
 -- @formatter:on
@@ -4434,18 +5261,19 @@ SET IDENTITY_INSERT system_user_post OFF;
 -- ----------------------------
 -- Table structure for system_user_role
 -- ----------------------------
-CREATE TABLE system_user_role
-(
-    id          bigint                                NOT NULL PRIMARY KEY IDENTITY,
-    user_id     bigint                                NOT NULL,
-    role_id     bigint                                NOT NULL,
-    creator     varchar(64) DEFAULT ''                NULL,
-    create_time datetime    DEFAULT CURRENT_TIMESTAMP NULL,
-    updater     varchar(64) DEFAULT ''                NULL,
-    update_time datetime    DEFAULT CURRENT_TIMESTAMP NULL,
-    deleted     bit         DEFAULT '0'               NULL,
-    tenant_id   bigint      DEFAULT 0                 NOT NULL
+CREATE TABLE system_user_role (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    user_id bigint  NOT NULL,
+    role_id bigint  NOT NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NULL,
+    deleted bit DEFAULT '0' NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 );
+
+CREATE INDEX idx_system_user_role_01 ON system_user_role (user_id);
 
 COMMENT ON COLUMN system_user_role.id IS '自增编号';
 COMMENT ON COLUMN system_user_role.user_id IS '用户ID';
@@ -4465,7 +5293,6 @@ COMMENT ON TABLE system_user_role IS '用户和角色关联表';
 SET IDENTITY_INSERT system_user_role ON;
 INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1, 1, 1, '', '2022-01-11 13:19:45', '', '2022-05-12 12:35:17', '0', 1);
 INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2, 2, 2, '', '2022-01-11 13:19:45', '', '2022-05-12 12:35:13', '0', 1);
-INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4, 100, 101, '', '2022-01-11 13:19:45', '', '2022-05-12 12:35:13', '0', 1);
 INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (5, 100, 1, '', '2022-01-11 13:19:45', '', '2022-05-12 12:35:12', '0', 1);
 INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6, 100, 2, '', '2022-01-11 13:19:45', '', '2022-05-12 12:35:11', '0', 1);
 INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (10, 103, 1, '1', '2022-01-11 13:19:45', '1', '2022-01-11 13:19:45', '0', 1);
@@ -4476,10 +5303,15 @@ INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, update
 INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (22, 115, 2, '1', '2022-07-21 22:08:30', '1', '2022-07-21 22:08:30', '0', 1);
 INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (35, 112, 1, '1', '2024-03-15 20:00:24', '1', '2024-03-15 20:00:24', '0', 1);
 INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (36, 118, 1, '1', '2024-03-17 09:12:08', '1', '2024-03-17 09:12:08', '0', 1);
-INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (38, 114, 101, '1', '2024-03-24 22:23:03', '1', '2024-03-24 22:23:03', '0', 1);
 INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (46, 117, 1, '1', '2024-10-02 10:16:11', '1', '2024-10-02 10:16:11', '0', 1);
 INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (47, 104, 2, '1', '2025-01-04 10:40:33', '1', '2025-01-04 10:40:33', '0', 1);
 INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (48, 100, 155, '1', '2025-04-04 10:41:14', '1', '2025-04-04 10:41:14', '0', 1);
+INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (49, 142, 1, '1', '2025-07-23 09:11:42', '1', '2025-07-23 09:11:42', '0', 1);
+INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (50, 142, 2, '1', '2025-10-07 20:50:37', '1', '2025-10-07 20:50:37', '0', 1);
+INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (51, 139, 1, '1', '2025-12-05 22:36:57', '1', '2025-12-05 22:36:57', '0', 1);
+INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (52, 139, 2, '1', '2025-12-05 22:37:00', '1', '2025-12-05 22:37:00', '0', 1);
+INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (53, 114, 2, '1', '2026-01-04 18:15:40', '1', '2026-01-04 18:15:40', '0', 1);
+INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (54, 114, 3, '1', '2026-01-04 18:16:19', '1', '2026-01-04 18:16:19', '0', 1);
 COMMIT;
 SET IDENTITY_INSERT system_user_role OFF;
 -- @formatter:on
@@ -4487,29 +5319,33 @@ SET IDENTITY_INSERT system_user_role OFF;
 -- ----------------------------
 -- Table structure for system_users
 -- ----------------------------
-CREATE TABLE system_users
-(
-    id          bigint                                 NOT NULL PRIMARY KEY IDENTITY,
-    username    varchar(30)                            NOT NULL,
-    password    varchar(100) DEFAULT ''                NULL,
-    nickname    varchar(30)                            NOT NULL,
-    remark      varchar(500) DEFAULT NULL              NULL,
-    dept_id     bigint       DEFAULT NULL              NULL,
-    post_ids    varchar(255) DEFAULT NULL              NULL,
-    email       varchar(50)  DEFAULT ''                NULL,
-    mobile      varchar(11)  DEFAULT ''                NULL,
-    sex         smallint     DEFAULT 0                 NULL,
-    avatar      varchar(512) DEFAULT ''                NULL,
-    status      smallint     DEFAULT 0                 NOT NULL,
-    login_ip    varchar(50)  DEFAULT ''                NULL,
-    login_date  datetime     DEFAULT NULL              NULL,
-    creator     varchar(64)  DEFAULT ''                NULL,
-    create_time datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater     varchar(64)  DEFAULT ''                NULL,
-    update_time datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted     bit          DEFAULT '0'               NOT NULL,
-    tenant_id   bigint       DEFAULT 0                 NOT NULL
+CREATE TABLE system_users (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    username varchar(30)  NOT NULL,
+    password varchar(100) DEFAULT '' NULL,
+    nickname varchar(30)  NOT NULL,
+    remark varchar(500) DEFAULT NULL NULL,
+    dept_id bigint DEFAULT NULL NULL,
+    post_ids varchar(255) DEFAULT NULL NULL,
+    email varchar(50) DEFAULT '' NULL,
+    mobile varchar(11) DEFAULT '' NULL,
+    sex smallint DEFAULT 0 NULL,
+    avatar varchar(512) DEFAULT '' NULL,
+    status smallint DEFAULT 0 NOT NULL,
+    login_ip varchar(50) DEFAULT '' NULL,
+    login_date datetime DEFAULT NULL NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT '0' NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 );
+
+CREATE INDEX idx_system_users_01 ON system_users (username);
+CREATE INDEX idx_system_users_02 ON system_users (mobile);
+CREATE INDEX idx_system_users_03 ON system_users (email);
+CREATE INDEX idx_system_users_04 ON system_users (dept_id);
 
 COMMENT ON COLUMN system_users.id IS '用户ID';
 COMMENT ON COLUMN system_users.username IS '用户账号';
@@ -4538,10 +5374,10 @@ COMMENT ON TABLE system_users IS '用户信息表';
 -- ----------------------------
 -- @formatter:off
 SET IDENTITY_INSERT system_users ON;
-INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1, 'admin', '$2a$04$KljJDa/LK7QfDm0lF5OhuePhlPfjRH3tB2Wu351Uidz.oQGJXevPi', '芋道源码', '管理员', 103, '[1,2]', '11aoteman@126.com', '18818260277', 2, 'http://test.yudao.iocoder.cn/test/20250502/avatar_1746154660449.png', 0, '0:0:0:0:0:0:0:1', '2025-05-10 18:03:15', 'admin', '2021-01-05 17:03:47', NULL, '2025-05-10 18:03:15', '0', 1);
-INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (100, 'yudao', '$2a$04$h.aaPKgO.odHepnk5PCsWeEwKdojFWdTItxGKfx1r0e1CSeBzsTJ6', '芋道', '不要吓我', 104, '[1]', 'yudao@iocoder.cn', '15601691300', 1, NULL, 0, '0:0:0:0:0:0:0:1', '2025-04-08 09:36:40', '', '2021-01-07 09:07:17', NULL, '2025-04-21 14:23:08', '0', 1);
-INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (103, 'yuanma', '$2a$04$fUBSmjKCPYAUmnMzOb6qE.eZCGPhHi1JmAKclODbfS/O7fHOl2bH6', '源码', NULL, 106, NULL, 'yuanma@iocoder.cn', '15601701300', 0, NULL, 0, '0:0:0:0:0:0:0:1', '2024-08-11 17:48:12', '', '2021-01-13 23:50:35', NULL, '2025-04-21 14:23:08', '0', 1);
-INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (104, 'test', '$2a$04$BrwaYn303hjA/6TnXqdGoOLhyHOAA0bVrAFu6.1dJKycqKUnIoRz2', '测试号', NULL, 107, '[1,2]', '111@qq.com', '15601691200', 1, NULL, 0, '0:0:0:0:0:0:0:1', '2025-03-28 20:01:16', '', '2021-01-21 02:13:53', NULL, '2025-04-21 14:23:08', '0', 1);
+INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1, 'admin', '$2a$04$.vd8nPeLwxt6hnSzmAoAyul8BOLX7Cib6QhcxRe30rfvrIPQHH1OG', '芋道源码', '管理员', 103, '[1,2]', '13aoteman@126.com', '18818260272', 1, 'http://test.yudao.iocoder.cn/user/avatar/20251220/blob_1766215463801.jpg', 0, '0:0:0:0:0:0:0:1', '2026-04-17 08:47:40', 'admin', '2021-01-05 17:03:47', NULL, '2026-04-17 08:47:40', '0', 1);
+INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (100, 'yudao', '$2a$04$h.aaPKgO.odHepnk5PCsWeEwKdojFWdTItxGKfx1r0e1CSeBzsTJ6', '芋道', '不要吓我', 104, '[1]', 'yudao@iocoder.cn', '15601691300', 1, NULL, 0, '0:0:0:0:0:0:0:1', '2025-12-15 21:47:26', '', '2021-01-07 09:07:17', NULL, '2025-12-15 21:47:26', '0', 1);
+INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (103, 'yuanma', '$2a$04$fUBSmjKCPYAUmnMzOb6qE.eZCGPhHi1JmAKclODbfS/O7fHOl2bH6', '源码', NULL, 106, NULL, 'yuanma@iocoder.cn', '15601701300', 0, NULL, 0, '0:0:0:0:0:0:0:1', '2024-08-11 17:48:12', '', '2021-01-13 23:50:35', '1', '2025-07-09 23:41:58', '0', 1);
+INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (104, 'test', '$2a$04$BrwaYn303hjA/6TnXqdGoOLhyHOAA0bVrAFu6.1dJKycqKUnIoRz2', '测试号', NULL, 107, '[1,2]', '111@qq.com', '15601691200', 1, NULL, 0, '0:0:0:0:0:0:0:1', '2026-01-04 18:09:54', '', '2021-01-21 02:13:53', NULL, '2026-01-04 18:09:54', '0', 1);
 INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (107, 'admin107', '$2a$10$dYOOBKMO93v/.ReCqzyFg.o67Tqk.bbc2bhrpyBGkIw9aypCtr2pm', '芋艿', NULL, NULL, NULL, '', '15601691300', 0, NULL, 0, '', NULL, '1', '2022-02-20 22:59:33', '1', '2025-04-21 14:23:08', '0', 118);
 INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (108, 'admin108', '$2a$10$y6mfvKoNYL1GXWak8nYwVOH.kCWqjactkzdoIDgiKl93WN3Ejg.Lu', '芋艿', NULL, NULL, NULL, '', '15601691300', 0, NULL, 0, '', NULL, '1', '2022-02-20 23:00:50', '1', '2025-04-21 14:23:08', '0', 119);
 INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (109, 'admin109', '$2a$10$JAqvH0tEc0I7dfDVBI7zyuB4E3j.uH6daIjV53.vUS6PknFkDJkuK', '芋艿', NULL, NULL, NULL, '', '15601691300', 0, NULL, 0, '', NULL, '1', '2022-02-20 23:11:50', '1', '2025-04-21 14:23:08', '0', 120);
@@ -4549,13 +5385,15 @@ INSERT INTO system_users (id, username, password, nickname, remark, dept_id, pos
 INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (111, 'test', '$2a$10$mRMIYLDtRHlf6.9ipiqH1.Z.bh/R9dO9d5iHiGYPigi6r5KOoR2Wm', '测试用户', NULL, NULL, '[]', '', '', 0, NULL, 0, '0:0:0:0:0:0:0:1', '2023-12-30 11:42:17', '110', '2022-02-23 13:14:33', NULL, '2025-04-21 14:23:08', '0', 121);
 INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (112, 'newobject', '$2a$04$dB0z8Q819fJWz0hbaLe6B.VfHCjYgWx6LFfET5lyz3JwcqlyCkQ4C', '新对象', NULL, 100, '[]', '', '15601691235', 1, NULL, 0, '0:0:0:0:0:0:0:1', '2024-03-16 23:11:38', '1', '2022-02-23 19:08:03', NULL, '2025-04-21 14:23:08', '0', 1);
 INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (113, 'aoteman', '$2a$10$0acJOIk2D25/oC87nyclE..0lzeu9DtQ/n3geP4fkun/zIVRhHJIO', '芋道1', NULL, NULL, NULL, '', '15601691300', 0, NULL, 0, '127.0.0.1', '2022-03-19 18:38:51', '1', '2022-03-07 21:37:58', '1', '2025-05-05 15:30:53', '0', 122);
-INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (114, 'hrmgr', '$2a$10$TR4eybBioGRhBmDBWkqWLO6NIh3mzYa8KBKDDB5woiGYFVlRAi.fu', 'hr 小姐姐', NULL, NULL, '[5]', '', '15601691236', 1, NULL, 0, '0:0:0:0:0:0:0:1', '2024-03-24 22:21:05', '1', '2022-03-19 21:50:58', NULL, '2025-04-21 14:23:08', '0', 1);
+INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (114, 'hrmgr', '$2a$10$TR4eybBioGRhBmDBWkqWLO6NIh3mzYa8KBKDDB5woiGYFVlRAi.fu', 'hr 小姐姐', NULL, NULL, '[5]', '', '15601691236', 1, NULL, 0, '0:0:0:0:0:0:0:1', '2026-01-04 18:16:01', '1', '2022-03-19 21:50:58', NULL, '2026-01-04 18:16:01', '0', 1);
 INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (115, 'aotemane', '$2a$04$GcyP0Vyzb2F2Yni5PuIK9ueGxM0tkZGMtDwVRwrNbtMvorzbpNsV2', '阿呆', '11222', 102, '[1,2]', '7648@qq.com', '15601691229', 2, NULL, 0, '', NULL, '1', '2022-04-30 02:55:43', '1', '2025-04-21 14:23:08', '0', 1);
-INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (117, 'admin123', '$2a$04$sEtimsHu9YCkYY4/oqElHem2Ijc9ld20eYO6lN.g/21NfLUTDLB9W', '测试号02', '1111', 100, '[2]', '', '15601691234', 1, NULL, 0, '0:0:0:0:0:0:0:1', '2024-10-02 10:16:20', '1', '2022-07-09 17:40:26', NULL, '2025-04-21 14:23:08', '0', 1);
-INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (118, 'goudan', '$2a$04$jth0yOj8cSJq84D6vrzusOHDwW/LpBfgBnQ6bfFlD8zNZfM632Ta2', '狗蛋', NULL, 103, '[1]', '', '15601691239', 1, NULL, 0, '0:0:0:0:0:0:0:1', '2024-03-17 09:10:27', '1', '2022-07-09 17:44:43', '1', '2025-04-21 14:23:08', '0', 1);
-INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (131, 'hh', '$2a$04$jyH9h6.gaw8mpOjPfHIpx.8as2Rzfcmdlj5rlJFwgCw4rsv/MTb2K', '呵呵', NULL, 100, '[]', '777@qq.com', '15601882312', 1, NULL, 0, '', NULL, '1', '2024-04-27 08:45:56', '1', '2025-04-21 14:23:08', '0', 1);
-INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (139, 'wwbwwb', '$2a$04$aOHoFbQU6zfBk/1Z9raF/ugTdhjNdx7culC1HhO0zvoczAnahCiMq', '小秃头', NULL, NULL, NULL, '', '', 0, NULL, 0, '0:0:0:0:0:0:0:1', '2024-09-10 21:03:58', NULL, '2024-09-10 21:03:58', NULL, '2025-04-21 14:23:08', '0', 1);
-INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (141, 'admin1', '$2a$04$oj6F6d7HrZ70kYVD3TNzEu.m3TPUzajOVuC66zdKna8KRerK1FmVa', '新用户', NULL, NULL, NULL, '', '', 0, '', 0, '0:0:0:0:0:0:0:1', '2025-04-08 13:09:07', '1', '2025-04-08 13:09:07', '1', '2025-04-08 13:09:07', '0', 1);
+INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (117, 'admin123', '$2a$04$sEtimsHu9YCkYY4/oqElHem2Ijc9ld20eYO6lN.g/21NfLUTDLB9W', '测试号02', '1111', 100, '[2]', '', '15601691234', 1, NULL, 0, '0:0:0:0:0:0:0:1', '2024-10-02 10:16:20', '1', '2022-07-09 17:40:26', '1', '2025-05-14 09:56:04', '0', 1);
+INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (118, 'goudan', '$2a$04$3suGZjnA6rM5bErf38u1felbgqbsPHGdRG3l9NkxPCEt2ah9Y6aJi', '狗蛋', NULL, 103, '[1]', '', '15601691239', 1, NULL, 0, '0:0:0:0:0:0:0:1', '2025-11-23 15:28:25', '1', '2022-07-09 17:44:43', NULL, '2025-11-23 15:28:25', '0', 1);
+INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (139, 'wwbwwb', '$2a$04$FJLIyg8lbPytP29pbZaiU.LesJvCsYfEaHqQfB0pGQhK3e9BeZmLy', '小秃头', '123', 108, '[2,4]', '', '', 1, NULL, 0, '0:0:0:0:0:0:0:1', '2024-09-10 21:03:58', NULL, '2024-09-10 21:03:58', '1', '2025-12-15 22:38:15', '0', 1);
+INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (141, 'admin1', '$2a$04$oj6F6d7HrZ70kYVD3TNzEu.m3TPUzajOVuC66zdKna8KRerK1FmVa', '新用户', NULL, NULL, NULL, '', '', 0, '', 0, '0:0:0:0:0:0:0:1', '2025-04-08 13:09:07', '1', '2025-04-08 13:09:07', '1', '2025-05-14 19:11:48', '0', 1);
+INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (142, 'test01', '$2a$04$4bCYWZkjxxOC4QE0LY2M9uEEKWeJbLfs489NFtQoyidL5I0FndRaO', 'test01', '', NULL, '[]', '', '19021719925', 1, '', 0, '0:0:0:0:0:0:0:1', '2025-07-29 19:47:17', '1', '2025-07-09 21:07:10', NULL, '2025-12-02 13:23:11', '0', 1);
+INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (143, 'a00001', '$2a$04$GhVHFviOw/SsTmiQtifHJesDYFlHMeGK7OWh7aGCCjGGVCmbHVAwa', 'a00001', NULL, 104, NULL, '', '', 0, '', 0, '0:0:0:0:0:0:0:1', '2025-12-01 16:10:13', NULL, '2025-12-01 16:10:13', '1', '2025-12-05 21:34:05', '0', 1);
+INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (144, 'aoteman001', '$2a$04$omQOmhz8OyUFBKw77nr8KOtMp6xdvoQ1gWStjk9r8.OYT3Bv6oEYe', 'aoteman001', NULL, 116, NULL, '', '', 0, '', 1, '0:0:0:0:0:0:0:1', '2025-12-01 17:05:27', '1', '2025-12-01 17:05:27', '1', '2025-12-15 15:55:54', '0', 1);
 COMMIT;
 SET IDENTITY_INSERT system_users OFF;
 -- @formatter:on
@@ -4563,20 +5401,19 @@ SET IDENTITY_INSERT system_users OFF;
 -- ----------------------------
 -- Table structure for yudao_demo01_contact
 -- ----------------------------
-CREATE TABLE yudao_demo01_contact
-(
-    id          bigint                                 NOT NULL PRIMARY KEY IDENTITY,
-    name        varchar(100) DEFAULT ''                NULL,
-    sex         smallint                               NOT NULL,
-    birthday    datetime                               NOT NULL,
-    description varchar(255)                           NOT NULL,
-    avatar      varchar(512) DEFAULT NULL              NULL,
-    creator     varchar(64)  DEFAULT ''                NULL,
-    create_time datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater     varchar(64)  DEFAULT ''                NULL,
-    update_time datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted     bit          DEFAULT '0'               NOT NULL,
-    tenant_id   bigint       DEFAULT 0                 NOT NULL
+CREATE TABLE yudao_demo01_contact (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    name varchar(100) DEFAULT '' NULL,
+    sex smallint  NOT NULL,
+    birthday datetime  NOT NULL,
+    description varchar(255)  NOT NULL,
+    avatar varchar(512) DEFAULT NULL NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT '0' NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 );
 
 COMMENT ON COLUMN yudao_demo01_contact.id IS '编号';
@@ -4606,17 +5443,16 @@ SET IDENTITY_INSERT yudao_demo01_contact OFF;
 -- ----------------------------
 -- Table structure for yudao_demo02_category
 -- ----------------------------
-CREATE TABLE yudao_demo02_category
-(
-    id          bigint                                 NOT NULL PRIMARY KEY IDENTITY,
-    name        varchar(100) DEFAULT ''                NULL,
-    parent_id   bigint                                 NOT NULL,
-    creator     varchar(64)  DEFAULT ''                NULL,
-    create_time datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater     varchar(64)  DEFAULT ''                NULL,
-    update_time datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted     bit          DEFAULT '0'               NOT NULL,
-    tenant_id   bigint       DEFAULT 0                 NOT NULL
+CREATE TABLE yudao_demo02_category (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    name varchar(100) DEFAULT '' NULL,
+    parent_id bigint  NOT NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT '0' NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 );
 
 COMMENT ON COLUMN yudao_demo02_category.id IS '编号';
@@ -4641,6 +5477,7 @@ INSERT INTO yudao_demo02_category (id, name, parent_id, creator, create_time, up
 INSERT INTO yudao_demo02_category (id, name, parent_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4, '小番茄', 2, '1', '2023-11-16 20:24:39', '1', '2023-11-16 20:24:39', '0', 1);
 INSERT INTO yudao_demo02_category (id, name, parent_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (5, '大番茄', 2, '1', '2023-11-16 20:24:46', '1', '2023-11-16 20:24:46', '0', 1);
 INSERT INTO yudao_demo02_category (id, name, parent_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6, '11', 3, '1', '2023-11-24 19:29:34', '1', '2023-11-24 19:29:34', '0', 1);
+INSERT INTO yudao_demo02_category (id, name, parent_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (7, '1', 0, '1', '2025-10-01 09:19:20', '1', '2025-10-01 09:19:20', '0', 1);
 COMMIT;
 SET IDENTITY_INSERT yudao_demo02_category OFF;
 -- @formatter:on
@@ -4648,18 +5485,17 @@ SET IDENTITY_INSERT yudao_demo02_category OFF;
 -- ----------------------------
 -- Table structure for yudao_demo03_course
 -- ----------------------------
-CREATE TABLE yudao_demo03_course
-(
-    id          bigint                                 NOT NULL PRIMARY KEY IDENTITY,
-    student_id  bigint                                 NOT NULL,
-    name        varchar(100) DEFAULT ''                NULL,
-    score       smallint                               NOT NULL,
-    creator     varchar(64)  DEFAULT ''                NULL,
-    create_time datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater     varchar(64)  DEFAULT ''                NULL,
-    update_time datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted     bit          DEFAULT '0'               NOT NULL,
-    tenant_id   bigint       DEFAULT 0                 NOT NULL
+CREATE TABLE yudao_demo03_course (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    student_id bigint  NOT NULL,
+    name varchar(100) DEFAULT '' NULL,
+    score smallint  NOT NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT '0' NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 );
 
 COMMENT ON COLUMN yudao_demo03_course.id IS '编号';
@@ -4703,18 +5539,17 @@ SET IDENTITY_INSERT yudao_demo03_course OFF;
 -- ----------------------------
 -- Table structure for yudao_demo03_grade
 -- ----------------------------
-CREATE TABLE yudao_demo03_grade
-(
-    id          bigint                                 NOT NULL PRIMARY KEY IDENTITY,
-    student_id  bigint                                 NOT NULL,
-    name        varchar(100) DEFAULT ''                NULL,
-    teacher     varchar(255)                           NOT NULL,
-    creator     varchar(64)  DEFAULT ''                NULL,
-    create_time datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater     varchar(64)  DEFAULT ''                NULL,
-    update_time datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted     bit          DEFAULT '0'               NOT NULL,
-    tenant_id   bigint       DEFAULT 0                 NOT NULL
+CREATE TABLE yudao_demo03_grade (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    student_id bigint  NOT NULL,
+    name varchar(100) DEFAULT '' NULL,
+    teacher varchar(255)  NOT NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT '0' NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 );
 
 COMMENT ON COLUMN yudao_demo03_grade.id IS '编号';
@@ -4744,19 +5579,18 @@ SET IDENTITY_INSERT yudao_demo03_grade OFF;
 -- ----------------------------
 -- Table structure for yudao_demo03_student
 -- ----------------------------
-CREATE TABLE yudao_demo03_student
-(
-    id          bigint                                 NOT NULL PRIMARY KEY IDENTITY,
-    name        varchar(100) DEFAULT ''                NULL,
-    sex         smallint                               NOT NULL,
-    birthday    datetime                               NOT NULL,
-    description varchar(255)                           NOT NULL,
-    creator     varchar(64)  DEFAULT ''                NULL,
-    create_time datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater     varchar(64)  DEFAULT ''                NULL,
-    update_time datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted     bit          DEFAULT '0'               NOT NULL,
-    tenant_id   bigint       DEFAULT 0                 NOT NULL
+CREATE TABLE yudao_demo03_student (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    name varchar(100) DEFAULT '' NULL,
+    sex smallint  NOT NULL,
+    birthday datetime  NOT NULL,
+    description varchar(255)  NOT NULL,
+    creator varchar(64) DEFAULT '' NULL,
+    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater varchar(64) DEFAULT '' NULL,
+    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT '0' NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 );
 
 COMMENT ON COLUMN yudao_demo03_student.id IS '编号';
@@ -4783,4 +5617,3 @@ INSERT INTO yudao_demo03_student (id, name, sex, birthday, description, creator,
 COMMIT;
 SET IDENTITY_INSERT yudao_demo03_student OFF;
 -- @formatter:on
-

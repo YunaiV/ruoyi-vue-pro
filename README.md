@@ -28,8 +28,8 @@
 | 【完整版】[ruoyi-vue-pro](https://gitee.com/zhijiantianya/ruoyi-vue-pro) | [`master`](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/master/) 分支 | [`master-jdk17`](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/master-jdk17/) 分支 |
 | 【精简版】[yudao-boot-mini](https://gitee.com/yudaocode/yudao-boot-mini) | [`master`](https://gitee.com/yudaocode/yudao-boot-mini/tree/master/) 分支   | [`master-jdk17`](https://gitee.com/yudaocode/yudao-boot-mini/tree/master-jdk17/) 分支   |
 
-* 【完整版】：包括系统功能、基础设施、会员中心、数据报表、工作流程、商城系统、微信公众号、CRM、ERP 等功能
-* 【精简版】：只包括系统功能、基础设施功能，不包括会员中心、数据报表、工作流程、商城系统、微信公众号、CRM、ERP 等功能
+* 【完整版】：包括系统功能、基础设施、会员中心、数据报表、工作流程、商城系统、微信公众号、CRM、ERP、WMS、MES、IM 即时通讯、AI 大模型、IoT 物联网等功能
+* 【精简版】：只包括系统功能、基础设施功能，不包括会员中心、数据报表、工作流程、商城系统、微信公众号、CRM、ERP、WMS、MES、IM 即时通讯、AI 大模型、IoT 物联网等功能
 
 可参考 [《迁移文档》](https://doc.iocoder.cn/migrate-module/) ，只需要 5-10 分钟，即可将【完整版】按需迁移到【精简版】
 
@@ -102,7 +102,7 @@
 
 团队包含专业的项目经理、架构师、前端工程师、后端工程师、测试工程师、运维工程师，可以提供全流程的外包服务。
 
-项目可以是商城、SCRM 系统、OA 系统、物流系统、ERP 系统、CMS 系统、HIS 系统、支付系统、IM 聊天、微信公众号、微信小程序等等。
+项目可以是商城、SCRM 系统、OA 系统、物流系统、ERP 系统、CMS 系统、HIS 系统、支付系统、IM 即时通讯、微信公众号、微信小程序等等。
 
 ## 🐼 内置功能
 
@@ -112,7 +112,7 @@
 
 * 通用模块（必选）：系统功能、基础设施
 * 通用模块（可选）：工作流程、支付系统、数据报表、会员中心
-* 业务系统（按需）：ERP 系统、CRM 系统、商城系统、微信公众号、AI 大模型
+* 业务系统（按需）：Mall 电子商城、OA 办公自动化、ERP 企业资源计划系统、WMS 仓库管理系统、CRM 客户关系管理、CMS 内容管理系统、MES 执行制造系统、AI 大模型平台、IoT 物联网系统、IM 即时通讯系统、Mobile 手机移动端、Report 数据大屏
 
 > 友情提示：本项目基于 RuoYi-Vue 修改，**重构优化**后端的代码，**美化**前端的界面。
 >
@@ -270,11 +270,27 @@
 
 ![功能图](/.image/common/erp-feature.png)
 
+### WMS 系统
+
+演示地址：<https://doc.iocoder.cn/wms-preview/>
+
+![功能图](/.image/common/wms-feature.png)
+
+![功能图](/.image/common/wms-preview.png)
+
 ### CRM 系统
 
 演示地址：<https://doc.iocoder.cn/crm-preview/>
 
 ![功能图](/.image/common/crm-feature.png)
+
+### MES 系统
+
+演示地址：<https://doc.iocoder.cn/mes-preview/>
+
+![功能图](/.image/common/mes-feature.png)
+
+![功能图](/.image/common/mes-preview.png)
 
 ### AI 大模型
 
@@ -283,6 +299,27 @@
 ![功能图](/.image/common/ai-feature.png)
 
 ![功能图](/.image/common/ai-preview.gif)
+
+### IoT 物联网
+
+演示地址：<https://doc.iocoder.cn/iot/build>
+
+![功能图](/.image/common/iot-feature.png)
+
+![预览图](/.image/common/iot-preview.png)
+
+### IM 即时通讯
+
+演示地址（Boot）：<https://doc.iocoder.cn/im-preview/>
+
+演示地址（Vue3 + Element Plus）：<http://dashboard-vue3.yudao.iocoder.cn>
+
+
+![功能图](/.image/common/im-feature.png)
+
+| 聊天界面 | 聊天管理 |
+| --- | --- |
+| ![聊天界面](/.image/common/im-preview-home.png) | ![聊天管理](/.image/common/im-preview-manager.png) |
 
 ## 🐨 技术栈
 
@@ -301,7 +338,11 @@
 | `yudao-module-mall`   | 商城系统的 Module 模块    |
 | `yudao-module-erp`    | ERP 系统的 Module 模块  |
 | `yudao-module-crm`    | CRM 系统的 Module 模块  |
+| `yudao-module-mes`    | MES 系统的 Module 模块  |
+| `yudao-module-wms`    | WMS 系统的 Module 模块  |
+| `yudao-module-im`     | IM 即时通讯的 Module 模块 |
 | `yudao-module-ai`     | AI 大模型的 Module 模块  |
+| `yudao-module-iot`    | IoT 物联网的 Module 模块 |
 | `yudao-module-mp`     | 微信公众号的 Module 模块   |
 | `yudao-module-report` | 大屏报表 Module 模块     |
 

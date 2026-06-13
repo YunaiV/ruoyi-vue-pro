@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.infra.service.file;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -14,6 +15,7 @@ import cn.iocoder.yudao.module.infra.controller.admin.file.vo.file.FilePresigned
 import cn.iocoder.yudao.module.infra.dal.dataobject.file.FileDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.file.FileMapper;
 import cn.iocoder.yudao.module.infra.framework.file.core.client.FileClient;
+import cn.iocoder.yudao.module.infra.framework.file.core.utils.FilePathUtils;
 import cn.iocoder.yudao.module.infra.framework.file.core.utils.FileTypeUtils;
 import com.google.common.annotations.VisibleForTesting;
 import jakarta.annotation.Resource;
@@ -41,12 +43,19 @@ public class FileServiceImpl implements FileService {
      */
     static boolean PATH_PREFIX_DATE_ENABLE = true;
     /**
-     * 上传文件的后缀，是否包含时间戳
+     * 上传文件的后缀，是否启用
      *
-     * 目的：保证文件的唯一性，避免覆盖
+     * 算法：当前时间戳（毫秒）+ 5 位随机数；目的是保证文件的唯一性，避免覆盖
      * 定制：可按需调整成 UUID、或者其他方式
      */
-    static boolean PATH_SUFFIX_TIMESTAMP_ENABLE = true;
+    static boolean PATH_SUFFIX_TIMESTAMP_ENABLE = false;
+    /**
+     * 后缀是否作为上级目录
+     *
+     * true：{@code yyyyMMdd/<后缀>/原文件名.ext}；保留原文件名
+     * false：{@code yyyyMMdd/原文件名_<后缀>.ext}；后缀拼到文件名
+     */
+    static boolean PATH_SUFFIX_AS_DIRECTORY = true;
 
     @Resource
     private FileConfigService fileConfigService;
@@ -62,11 +71,14 @@ public class FileServiceImpl implements FileService {
     @Override
     @SneakyThrows
     public String createFile(byte[] content, String name, String directory, String type) {
-        // 1.1 处理 type 为空的情况
+        // 1.1 处理 name 的合法性，禁止携带目录路径
+        name = FilePathUtils.validateFileName(name);
+
+        // 1.2.1 处理 type 为空的情况
         if (StrUtil.isEmpty(type)) {
             type = FileTypeUtils.getMineType(content, name);
         }
-        // 1.2 处理 name 为空的情况
+        // 1.2.2 处理 name 为空的情况
         if (StrUtil.isEmpty(name)) {
             name = DigestUtil.sha256Hex(content);
         }
@@ -94,23 +106,32 @@ public class FileServiceImpl implements FileService {
 
     @VisibleForTesting
     String generateUploadPath(String name, String directory) {
-        // 1. 生成前缀、后缀
+        // 1.1 处理 name 和 directory 的合法性
+        name = FilePathUtils.validateFileName(name);
+        FilePathUtils.validatePath(name);
+        FilePathUtils.validateDirectory(directory);
+        // 1.2 生成前缀、后缀
         String prefix = null;
         if (PATH_PREFIX_DATE_ENABLE) {
             prefix = LocalDateTimeUtil.format(LocalDateTimeUtil.now(), PURE_DATE_PATTERN);
         }
         String suffix = null;
         if (PATH_SUFFIX_TIMESTAMP_ENABLE) {
-            suffix = String.valueOf(System.currentTimeMillis());
+            // 5 位随机数，避免同一毫秒内的重复
+            suffix = String.valueOf(System.currentTimeMillis()) + RandomUtil.randomInt(10000, 100000);
         }
 
         // 2.1 先拼接 suffix 后缀
         if (StrUtil.isNotEmpty(suffix)) {
-            String ext = FileUtil.extName(name);
-            if (StrUtil.isNotEmpty(ext)) {
-                name = FileUtil.mainName(name) + StrUtil.C_UNDERLINE + suffix + StrUtil.DOT + ext;
+            if (PATH_SUFFIX_AS_DIRECTORY) {
+                name = suffix + StrUtil.SLASH + name;
             } else {
-                name = name + StrUtil.C_UNDERLINE + suffix;
+                String ext = FileUtil.extName(name);
+                if (StrUtil.isNotEmpty(ext)) {
+                    name = FileUtil.mainName(name) + StrUtil.C_UNDERLINE + suffix + StrUtil.DOT + ext;
+                } else {
+                    name = name + StrUtil.C_UNDERLINE + suffix;
+                }
             }
         }
         // 2.2 再拼接 prefix 前缀
@@ -146,7 +167,13 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public Long createFile(FileCreateReqVO createReqVO) {
+        // 1.1 校验参数的合法性
+        FilePathUtils.validatePath(createReqVO.getPath());
+        createReqVO.setName(FilePathUtils.validateFileName(createReqVO.getName()));
+        // 1.2 处理 URL 的合法性，移除 URL 中的查询参数（例如签名参数），保证 URL 的唯一性
         createReqVO.setUrl(HttpUtils.removeUrlQuery(createReqVO.getUrl())); // 目的：移除私有桶情况下，URL 的签名参数
+
+        // 2. 保存到数据库
         FileDO file = BeanUtils.toBean(createReqVO, FileDO.class);
         fileMapper.insert(file);
         return file.getId();
@@ -159,15 +186,17 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public void deleteFile(Long id) throws Exception {
-        // 校验存在
+        // 1.1 校验存在
         FileDO file = validateFileExists(id);
+        // 1.2 校验路径合法性，避免误删文件存储器中的其他文件
+        FilePathUtils.validatePath(file.getPath());
 
-        // 从文件存储器中删除
+        // 2.1 从文件存储器中删除
         FileClient client = fileConfigService.getFileClient(file.getConfigId());
         Assert.notNull(client, "客户端({}) 不能为空", file.getConfigId());
         client.delete(file.getPath());
 
-        // 删除记录
+        // 2.2 删除记录
         fileMapper.deleteById(id);
     }
 
@@ -177,6 +206,7 @@ public class FileServiceImpl implements FileService {
         // 删除文件
         List<FileDO> files = fileMapper.selectByIds(ids);
         for (FileDO file : files) {
+            FilePathUtils.validatePath(file.getPath());
             // 获取客户端
             FileClient client = fileConfigService.getFileClient(file.getConfigId());
             Assert.notNull(client, "客户端({}) 不能为空", file.getPath());
@@ -198,9 +228,19 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public byte[] getFileContent(Long configId, String path) throws Exception {
+        // 1. 校验路径合法性
+        FilePathUtils.validatePath(path);
+
+        // 2.1 获取客户端
         FileClient client = fileConfigService.getFileClient(configId);
         Assert.notNull(client, "客户端({}) 不能为空", configId);
+        // 2.2 获取文件内容
         return client.getContent(path);
+    }
+
+    @Override
+    public FileDO getFileByConfigIdAndPath(Long configId, String path) {
+        return fileMapper.selectLatestByConfigIdAndPath(configId, path);
     }
 
 }

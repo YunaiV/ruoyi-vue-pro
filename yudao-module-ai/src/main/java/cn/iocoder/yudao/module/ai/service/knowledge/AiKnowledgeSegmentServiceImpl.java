@@ -142,6 +142,19 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
     }
 
     @Override
+    public void deleteKnowledgeSegment(Long id) {
+        // 1. 校验段落存在
+        AiKnowledgeSegmentDO segment = validateKnowledgeSegmentExists(id);
+
+        // 2. 删除向量
+        VectorStore vectorStore = getVectorStoreById(segment.getKnowledgeId());
+        deleteVectorStore(vectorStore, segment);
+
+        // 3. 删除段落记录
+        segmentMapper.deleteById(id);
+    }
+
+    @Override
     public void deleteKnowledgeSegmentByDocumentId(Long documentId) {
         // 1. 查询需要删除的段落
         List<AiKnowledgeSegmentDO> segments = segmentMapper.selectListByDocumentId(documentId);

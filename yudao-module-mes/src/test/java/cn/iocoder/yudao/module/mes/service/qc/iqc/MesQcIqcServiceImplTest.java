@@ -11,6 +11,7 @@ import cn.iocoder.yudao.module.mes.service.qc.defectrecord.MesQcDefectRecordServ
 import cn.iocoder.yudao.module.mes.service.qc.template.MesQcTemplateItemService;
 import cn.iocoder.yudao.module.mes.service.wm.arrivalnotice.MesWmArrivalNoticeService;
 import cn.iocoder.yudao.module.mes.service.wm.outsourcereceipt.MesWmOutsourceReceiptService;
+import cn.iocoder.yudao.module.mes.service.qc.indicatorresult.MesQcIndicatorResultService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
@@ -55,6 +56,8 @@ public class MesQcIqcServiceImplTest extends BaseDbUnitTest {
     private MesQcTemplateItemService templateItemService;
     @MockitoBean
     private AdminUserApi adminUserApi;
+    @MockitoBean
+    private MesQcIndicatorResultService indicatorResultService;
 
     @Test
     public void testFinishIqc_writeBack_arrivalNotice() {

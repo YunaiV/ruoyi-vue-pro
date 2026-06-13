@@ -10,10 +10,12 @@ import cn.iocoder.yudao.module.mes.controller.admin.wm.itemreceipt.vo.line.MesWm
 import cn.iocoder.yudao.module.mes.controller.admin.wm.itemreceipt.vo.line.MesWmItemReceiptLineSaveReqVO;
 import cn.iocoder.yudao.module.mes.dal.dataobject.md.item.MesMdItemDO;
 import cn.iocoder.yudao.module.mes.dal.dataobject.md.unitmeasure.MesMdUnitMeasureDO;
+import cn.iocoder.yudao.module.mes.dal.dataobject.wm.itemreceipt.MesWmItemReceiptDO;
 import cn.iocoder.yudao.module.mes.dal.dataobject.wm.itemreceipt.MesWmItemReceiptLineDO;
 import cn.iocoder.yudao.module.mes.service.md.item.MesMdItemService;
 import cn.iocoder.yudao.module.mes.service.md.unitmeasure.MesMdUnitMeasureService;
 import cn.iocoder.yudao.module.mes.service.wm.itemreceipt.MesWmItemReceiptLineService;
+import cn.iocoder.yudao.module.mes.service.wm.itemreceipt.MesWmItemReceiptService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -38,12 +40,12 @@ public class MesWmItemReceiptLineController {
 
     @Resource
     private MesWmItemReceiptLineService itemReceiptLineService;
-
     @Resource
     private MesMdItemService itemService;
-
     @Resource
     private MesMdUnitMeasureService unitMeasureService;
+    @Resource
+    private MesWmItemReceiptService itemReceiptService;
 
     @PostMapping("/create")
     @Operation(summary = "创建采购入库单行")
@@ -101,6 +103,8 @@ public class MesWmItemReceiptLineController {
                 convertSet(list, MesWmItemReceiptLineDO::getItemId));
         Map<Long, MesMdUnitMeasureDO> unitMeasureMap = unitMeasureService.getUnitMeasureMap(
                 convertSet(itemMap.values(), MesMdItemDO::getUnitMeasureId));
+        Map<Long, MesWmItemReceiptDO> receiptMap = itemReceiptService.getItemReceiptMap(
+                convertSet(list, MesWmItemReceiptLineDO::getReceiptId));
         // 2. 构建结果
         return BeanUtils.toBean(list, MesWmItemReceiptLineRespVO.class, vo -> {
             MapUtils.findAndThen(itemMap, vo.getItemId(), item -> {
@@ -108,6 +112,8 @@ public class MesWmItemReceiptLineController {
                 MapUtils.findAndThen(unitMeasureMap, item.getUnitMeasureId(),
                         unitMeasure -> vo.setUnitMeasureName(unitMeasure.getName()));
             });
+            MapUtils.findAndThen(receiptMap, vo.getReceiptId(), receipt ->
+                    vo.setReceiptCode(receipt.getCode()).setPurchaseOrderCode(receipt.getPurchaseOrderCode()));
         });
     }
 

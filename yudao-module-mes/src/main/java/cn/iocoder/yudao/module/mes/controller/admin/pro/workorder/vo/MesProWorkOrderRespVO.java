@@ -55,7 +55,7 @@ public class MesProWorkOrderRespVO {
 
     @Schema(description = "规格型号", example = "100x200mm")
     @ExcelProperty("规格型号")
-    private String productSpec;
+    private String productSpecification;
 
     @Schema(description = "单位名称", example = "个")
     @ExcelProperty("单位")

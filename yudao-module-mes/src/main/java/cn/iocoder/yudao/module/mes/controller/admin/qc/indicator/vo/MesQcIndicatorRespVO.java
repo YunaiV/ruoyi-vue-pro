@@ -27,10 +27,10 @@ public class MesQcIndicatorRespVO {
     @ExcelProperty("检测项名称")
     private String name;
 
-    @Schema(description = "检测项类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "SIZE")
+    @Schema(description = "检测项类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @ExcelProperty(value = "检测项类型", converter = DictConvert.class)
     @DictFormat(DictTypeConstants.MES_INDICATOR_TYPE)
-    private String type;
+    private Integer type;
 
     @Schema(description = "检测工具", example = "卡尺")
     @ExcelProperty("检测工具")

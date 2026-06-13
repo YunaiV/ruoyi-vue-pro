@@ -113,6 +113,18 @@ export function delete${simpleClassName}List(ids: number[]) {
 export function export${simpleClassName}(params: any) {
   return requestClient.download('${baseURL}/export-excel', { params });
 }
+#if ($importEnable)
+
+/** 下载${table.classComment}导入模板 */
+export function import${simpleClassName}Template() {
+  return requestClient.download('${baseURL}/get-import-template');
+}
+
+/** 导入${table.classComment} */
+export function import${simpleClassName}(file: File) {
+  return requestClient.upload('${baseURL}/import', { file });
+}
+#end
 
 ## 特殊：主子表专属逻辑
 #foreach ($subTable in $subTables)

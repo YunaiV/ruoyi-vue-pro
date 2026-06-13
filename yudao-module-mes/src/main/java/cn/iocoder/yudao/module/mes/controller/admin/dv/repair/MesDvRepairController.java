@@ -48,7 +48,6 @@ public class MesDvRepairController {
 
     @Resource
     private MesDvRepairService repairService;
-
     @Resource
     private MesDvMachineryService machineryService;
 
@@ -160,7 +159,7 @@ public class MesDvRepairController {
         return BeanUtils.toBean(list, MesDvRepairRespVO.class, vo -> {
             MapUtils.findAndThen(machineryMap, vo.getMachineryId(), machinery -> vo
                     .setMachineryCode(machinery.getCode()).setMachineryName(machinery.getName())
-                    .setMachineryBrand(machinery.getBrand()).setMachinerySpec(machinery.getSpec()));
+                    .setMachineryBrand(machinery.getBrand()).setMachinerySpecification(machinery.getSpecification()));
             MapUtils.findAndThen(userMap, vo.getAcceptedUserId(),
                     user -> vo.setAcceptedUserNickname(user.getNickname()));
             MapUtils.findAndThen(userMap, vo.getConfirmUserId(),

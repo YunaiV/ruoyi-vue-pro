@@ -30,11 +30,11 @@ public class MesQcOqcRespVO {
 
     // ========== 来源单据 ==========
 
-    @Schema(description = "来源单据 ID", example = "200")
-    private Long sourceDocId;
-
     @Schema(description = "来源单据类型", example = "118")
     private Integer sourceDocType;
+
+    @Schema(description = "来源单据 ID", example = "200")
+    private Long sourceDocId;
 
     @Schema(description = "来源单据行 ID", example = "300")
     private Long sourceLineId;
@@ -51,11 +51,11 @@ public class MesQcOqcRespVO {
     @ExcelProperty("客户简称")
     private String clientNickname;
 
+    // ========== 物料 ==========
+
     @Schema(description = "批次号", example = "BC20250101")
     @ExcelProperty("批次号")
     private String batchCode;
-
-    // ========== 物料 ==========
 
     @Schema(description = "产品物料 ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "20")
     private Long itemId;

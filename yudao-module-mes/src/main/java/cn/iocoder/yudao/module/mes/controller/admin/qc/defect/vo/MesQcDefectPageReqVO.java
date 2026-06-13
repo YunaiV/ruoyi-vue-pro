@@ -18,8 +18,8 @@ public class MesQcDefectPageReqVO extends PageParam {
     @Schema(description = "缺陷描述", example = "外观缺陷")
     private String name;
 
-    @Schema(description = "检测项类型", example = "APPEARANCE")
-    private String type;
+    @Schema(description = "检测项类型", example = "2")
+    private Integer type;
 
     @Schema(description = "缺陷等级", example = "1")
     private Integer level;

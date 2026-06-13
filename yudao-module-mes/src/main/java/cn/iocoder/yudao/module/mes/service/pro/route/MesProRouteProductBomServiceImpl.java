@@ -1,10 +1,13 @@
 package cn.iocoder.yudao.module.mes.service.pro.route;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.mes.controller.admin.pro.route.vo.productbom.MesProRouteProductBomSaveReqVO;
 import cn.iocoder.yudao.module.mes.dal.dataobject.pro.route.MesProRouteProductBomDO;
 import cn.iocoder.yudao.module.mes.dal.mysql.pro.route.MesProRouteProductBomMapper;
+import cn.iocoder.yudao.module.mes.service.md.item.MesMdItemService;
+import cn.iocoder.yudao.module.mes.service.md.item.MesMdProductBomService;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -30,13 +33,16 @@ public class MesProRouteProductBomServiceImpl implements MesProRouteProductBomSe
     @Resource
     @Lazy
     private MesProRouteService routeService;
+    @Resource
+    private MesMdItemService itemService;
+    @Resource
+    private MesMdProductBomService productBomService;
 
     @Override
     public Long createRouteProductBom(MesProRouteProductBomSaveReqVO createReqVO) {
-        // 1.0 已启用的工艺路线，不允许操作
-        routeService.validateRouteNotEnable(createReqVO.getRouteId());
-        // 1.1 校验唯一性
-        validateBomUnique(null, createReqVO.getItemId(), createReqVO.getProcessId(), createReqVO.getProductId());
+        // 1. 校验数据
+        validateRouteProductBomSaveData(null, createReqVO);
+
         // 2. 插入
         MesProRouteProductBomDO routeProductBom = BeanUtils.toBean(createReqVO, MesProRouteProductBomDO.class);
         routeProductBomMapper.insert(routeProductBom);
@@ -45,13 +51,11 @@ public class MesProRouteProductBomServiceImpl implements MesProRouteProductBomSe
 
     @Override
     public void updateRouteProductBom(MesProRouteProductBomSaveReqVO updateReqVO) {
-        // 1.0 已启用的工艺路线，不允许操作
-        routeService.validateRouteNotEnable(updateReqVO.getRouteId());
-        // 1.1 校验存在
+        // 1. 校验存在 + 校验数据
         validateRouteProductBomExists(updateReqVO.getId());
-        // 1.2 校验唯一性
-        validateBomUnique(updateReqVO.getId(), updateReqVO.getItemId(), updateReqVO.getProcessId(), updateReqVO.getProductId());
-        // 3. 更新
+        validateRouteProductBomSaveData(updateReqVO.getId(), updateReqVO);
+
+        // 2. 更新
         MesProRouteProductBomDO updateObj = BeanUtils.toBean(updateReqVO, MesProRouteProductBomDO.class);
         routeProductBomMapper.updateById(updateObj);
     }
@@ -75,6 +79,21 @@ public class MesProRouteProductBomServiceImpl implements MesProRouteProductBomSe
         }
     }
 
+    /**
+     * 校验保存时的关联数据
+     *
+     * @param id    记录编号（新增时为 null）
+     * @param reqVO 保存请求
+     */
+    private void validateRouteProductBomSaveData(Long id, MesProRouteProductBomSaveReqVO reqVO) {
+        // 校验已启用的工艺路线，不允许操作
+        routeService.validateRouteNotEnable(reqVO.getRouteId());
+        // 校验唯一性
+        validateBomUnique(id, reqVO.getItemId(), reqVO.getProcessId(), reqVO.getProductId());
+        // 校验物料属于产品 BOM
+        validateBomItemBelongsToProduct(reqVO.getProductId(), reqVO.getItemId());
+    }
+
     private void validateBomUnique(Long id, Long itemId, Long processId, Long productId) {
         MesProRouteProductBomDO existing = routeProductBomMapper.selectByUnique(itemId, processId, productId);
         if (existing == null) {
@@ -82,6 +101,14 @@ public class MesProRouteProductBomServiceImpl implements MesProRouteProductBomSe
         }
         if (ObjUtil.notEqual(existing.getId(), id)) {
             throw exception(PRO_ROUTE_PRODUCT_BOM_DUPLICATE);
+        }
+    }
+
+    private void validateBomItemBelongsToProduct(Long productId, Long itemId) {
+        itemService.validateItemExists(itemId);
+        if (!CollUtil.anyMatch(productBomService.getProductBomListByItemId(productId),
+                productBom -> ObjUtil.equal(productBom.getBomItemId(), itemId))) {
+            throw exception(MD_PRODUCT_BOM_ITEM_INVALID);
         }
     }
 

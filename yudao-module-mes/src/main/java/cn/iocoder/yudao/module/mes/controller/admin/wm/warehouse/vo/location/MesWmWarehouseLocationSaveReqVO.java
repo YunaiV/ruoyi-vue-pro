@@ -29,10 +29,6 @@ public class MesWmWarehouseLocationSaveReqVO {
     @Schema(description = "面积", example = "500.00")
     private BigDecimal area;
 
-    @Schema(description = "库位管理状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
-    @NotNull(message = "库位管理状态不能为空")
-    private Integer areaStatus;
-
     @Schema(description = "是否冻结", requiredMode = Schema.RequiredMode.REQUIRED, example = "false")
     @NotNull(message = "是否冻结不能为空")
     private Boolean frozen;

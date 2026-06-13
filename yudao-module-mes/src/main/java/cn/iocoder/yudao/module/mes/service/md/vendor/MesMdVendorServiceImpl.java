@@ -10,12 +10,17 @@ import cn.iocoder.yudao.module.mes.controller.admin.md.vendor.vo.MesMdVendorImpo
 import cn.iocoder.yudao.module.mes.controller.admin.md.vendor.vo.MesMdVendorImportRespVO;
 import cn.iocoder.yudao.module.mes.controller.admin.md.vendor.vo.MesMdVendorPageReqVO;
 import cn.iocoder.yudao.module.mes.controller.admin.md.vendor.vo.MesMdVendorSaveReqVO;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.module.mes.dal.dataobject.md.vendor.MesMdVendorDO;
 import cn.iocoder.yudao.module.mes.dal.mysql.md.vendor.MesMdVendorMapper;
 import cn.iocoder.yudao.module.mes.enums.wm.BarcodeBizTypeEnum;
+import cn.iocoder.yudao.module.mes.service.pro.workorder.MesProWorkOrderService;
+import cn.iocoder.yudao.module.mes.service.qc.iqc.MesQcIqcService;
 import cn.iocoder.yudao.module.mes.service.wm.arrivalnotice.MesWmArrivalNoticeService;
 import cn.iocoder.yudao.module.mes.service.wm.barcode.MesWmBarcodeService;
 import cn.iocoder.yudao.module.mes.service.wm.itemreceipt.MesWmItemReceiptService;
+import cn.iocoder.yudao.module.mes.service.wm.outsourceissue.MesWmOutsourceIssueService;
+import cn.iocoder.yudao.module.mes.service.wm.outsourcereceipt.MesWmOutsourceReceiptService;
 import cn.iocoder.yudao.module.mes.service.wm.returnvendor.MesWmReturnVendorService;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
@@ -56,6 +61,18 @@ public class MesMdVendorServiceImpl implements MesMdVendorService {
     @Resource
     @Lazy
     private MesWmReturnVendorService returnVendorService;
+    @Resource
+    @Lazy
+    private MesQcIqcService iqcService;
+    @Resource
+    @Lazy
+    private MesProWorkOrderService workOrderService;
+    @Resource
+    @Lazy
+    private MesWmOutsourceIssueService outsourceIssueService;
+    @Resource
+    @Lazy
+    private MesWmOutsourceReceiptService outsourceReceiptService;
 
     @Override
     public Long createVendor(MesMdVendorSaveReqVO createReqVO) {
@@ -99,6 +116,15 @@ public class MesMdVendorServiceImpl implements MesMdVendorService {
         MesMdVendorDO vendor = vendorMapper.selectById(id);
         if (vendor == null) {
             throw exception(MD_VENDOR_NOT_EXISTS);
+        }
+        return vendor;
+    }
+
+    @Override
+    public MesMdVendorDO validateVendorExistsAndEnable(Long id) {
+        MesMdVendorDO vendor = validateVendorExists(id);
+        if (ObjUtil.notEqual(CommonStatusEnum.ENABLE.getStatus(), vendor.getStatus())) {
+            throw exception(MD_VENDOR_IS_DISABLE);
         }
         return vendor;
     }
@@ -148,7 +174,11 @@ public class MesMdVendorServiceImpl implements MesMdVendorService {
     private void validateVendorNotReferenced(Long id) {
         if (itemReceiptService.getItemReceiptCountByVendorId(id) > 0
                 || arrivalNoticeService.getArrivalNoticeCountByVendorId(id) > 0
-                || returnVendorService.getReturnVendorCountByVendorId(id) > 0) {
+                || returnVendorService.getReturnVendorCountByVendorId(id) > 0
+                || iqcService.getIqcCountByVendorId(id) > 0
+                || workOrderService.getWorkOrderCountByVendorId(id) > 0
+                || outsourceIssueService.getOutsourceIssueCountByVendorId(id) > 0
+                || outsourceReceiptService.getOutsourceReceiptCountByVendorId(id) > 0) {
             throw exception(MD_VENDOR_HAS_REFERENCE);
         }
     }

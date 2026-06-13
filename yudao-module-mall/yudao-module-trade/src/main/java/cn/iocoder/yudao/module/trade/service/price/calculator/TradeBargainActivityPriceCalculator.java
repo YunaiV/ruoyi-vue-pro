@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 
 import jakarta.annotation.Resource;
 
-// TODO huihui：单测需要补充
 /**
  * 砍价活动的 {@link TradePriceCalculator} 实现类
  *
@@ -29,12 +28,12 @@ public class TradeBargainActivityPriceCalculator implements TradePriceCalculator
 
     @Override
     public void calculate(TradePriceCalculateReqBO param, TradePriceCalculateRespBO result) {
-        // 1. 判断订单类型和是否具有拼团记录编号
+        // 1. 判断订单类型和是否具有砍价记录编号
         if (ObjectUtil.notEqual(result.getType(), TradeOrderTypeEnum.BARGAIN.getType())) {
             return;
         }
         Assert.isTrue(param.getItems().size() == 1, "砍价时，只允许选择一个商品");
-        Assert.isTrue(param.getItems().get(0).getCount() == 1, "砍价时，只允许选择一个商品");
+        Assert.isTrue(param.getItems().get(0).getCount() == 1, "砍价时，商品数量只允许为 1");
         // 2. 校验是否可以参与砍价
         TradePriceCalculateRespBO.OrderItem orderItem = result.getItems().get(0);
         BargainValidateJoinRespDTO bargainActivity = bargainRecordApi.validateJoinBargain(
@@ -44,7 +43,7 @@ public class TradeBargainActivityPriceCalculator implements TradePriceCalculator
         Integer discountPrice = orderItem.getPayPrice() - bargainActivity.getBargainPrice() * orderItem.getCount();
         // TODO 芋艿：极端情况，优惠金额为负数，需要处理
         TradePriceCalculatorHelper.addPromotion(result, orderItem,
-                param.getSeckillActivityId(), bargainActivity.getName(), PromotionTypeEnum.BARGAIN_ACTIVITY.getType(),
+                bargainActivity.getActivityId(), bargainActivity.getName(), PromotionTypeEnum.BARGAIN_ACTIVITY.getType(),
                 StrUtil.format("砍价活动：省 {} 元", TradePriceCalculatorHelper.formatPrice(discountPrice)),
                 discountPrice);
         // 3.2 更新 SKU 优惠金额

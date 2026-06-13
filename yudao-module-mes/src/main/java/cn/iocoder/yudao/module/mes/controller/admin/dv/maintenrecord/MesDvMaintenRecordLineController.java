@@ -42,7 +42,6 @@ public class MesDvMaintenRecordLineController {
 
     @Resource
     private MesDvMaintenRecordLineService maintenRecordLineService;
-
     @Resource
     private MesDvSubjectService subjectService;
 

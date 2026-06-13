@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.bpm.framework.flowable.core.util;
 
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
@@ -11,6 +12,7 @@ import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.form.BpmFormFi
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionInfoDO;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelFormTypeEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants;
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.SneakyThrows;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.variable.VariableContainer;
@@ -26,6 +28,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.TaskInfo;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -244,12 +247,10 @@ public class FlowableUtils {
         }
 
         // 解析表单配置
-        Map<String, BpmFormFieldVO> formFieldsMap = new HashMap<>();
+        Map<String, BpmFormFieldVO> formFieldsMap = new LinkedHashMap<>();
         processDefinitionInfo.getFormFields().forEach(formFieldStr -> {
-            BpmFormFieldVO formField = JsonUtils.parseObject(formFieldStr, BpmFormFieldVO.class);
-            if (formField != null) {
-                formFieldsMap.put(formField.getField(), formField);
-            }
+            JsonNode formFieldNode = JsonUtils.parseObject(formFieldStr, JsonNode.class);
+            parseFormField(formFieldNode, formFieldsMap);
         });
 
         // 情况一：当自定义了摘要
@@ -271,6 +272,40 @@ public class FlowableUtils {
                 .map(entry -> new KeyValue<>(entry.getValue().getTitle(),
                         MapUtil.getStr(processVariables, entry.getValue().getField(), "")))
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * 递归解析表单字段
+     */
+    private static void parseFormField(JsonNode formFieldNode, Map<String, BpmFormFieldVO> formFieldsMap) {
+        if (formFieldNode == null || !formFieldNode.isObject()) {
+            return;
+        }
+
+        // 如果 children 里存在对象节点，说明是布局组件；字符串节点是分割线、标签、文字等展示组件内容，直接跳过。
+        JsonNode children = formFieldNode.get("children");
+        if (children != null && children.isArray() && children.size() > 0) {
+            boolean hasObjectChild = false;
+            for (JsonNode child : children) {
+                if (!child.isObject()) {
+                    continue;
+                }
+                hasObjectChild = true;
+                parseFormField(child, formFieldsMap);
+            }
+            if (hasObjectChild) {
+                return;
+            }
+        }
+
+        // 真实字段才加入 map
+        BpmFormFieldVO formField = new BpmFormFieldVO()
+                .setType(JsonUtils.getText(formFieldNode, "type"))
+                .setField(JsonUtils.getText(formFieldNode, "field"))
+                .setTitle(JsonUtils.getText(formFieldNode, "title"));
+        if (StrUtil.isNotBlank(formField.getField())) {
+            formFieldsMap.put(formField.getField(), formField);
+        }
     }
 
     // ========== Task 相关的工具方法 ==========

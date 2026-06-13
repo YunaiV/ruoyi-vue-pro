@@ -18,11 +18,11 @@ public class MesWmSalesNoticeRespVO {
 
     @Schema(description = "通知单编码", requiredMode = Schema.RequiredMode.REQUIRED, example = "SN202603010001")
     @ExcelProperty("通知单编码")
-    private String noticeCode;
+    private String code;
 
     @Schema(description = "通知单名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "测试发货通知")
     @ExcelProperty("通知单名称")
-    private String noticeName;
+    private String name;
 
     @Schema(description = "销售订单编号", example = "SO202603010001")
     @ExcelProperty("销售订单编号")

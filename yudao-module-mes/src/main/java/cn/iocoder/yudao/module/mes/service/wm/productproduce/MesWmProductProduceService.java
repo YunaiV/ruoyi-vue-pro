@@ -41,9 +41,11 @@ public interface MesWmProductProduceService {
      * 待检产出（{@code checkFlag=true}）按检验结果拆分行，并执行入库。
      *
      * @param feedbackId      报工记录 ID
+     * @param sourceLineId    来源产出行 ID（直接定位待检行）
      * @param qualifiedQty    合格品数量
      * @param unqualifiedQty  不合格品数量
      */
-    void splitPendingAndFinishProduce(Long feedbackId, BigDecimal qualifiedQty, BigDecimal unqualifiedQty);
+    void splitPendingAndFinishProduce(Long feedbackId, Long sourceLineId,
+                                      BigDecimal qualifiedQty, BigDecimal unqualifiedQty);
 
 }

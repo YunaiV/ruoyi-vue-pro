@@ -62,6 +62,10 @@ def load_and_clean(sql_file: str) -> str:
     content = open(sql_file, encoding="utf-8").read()
     for replace_pair in REPLACE_PAIR_LIST:
         content = content.replace(*replace_pair)
+    # 移除所有 CHARACTER SET / COLLATE 变体 (utf8mb3、utf8 等)
+    content = re.sub(r" CHARACTER SET \w+ COLLATE \w+", "", content)
+    content = re.sub(r" CHARACTER SET \w+", "", content)
+    content = re.sub(r" COLLATE \w+", "", content)
     # 移除索引字段的前缀长度定义，例如: `name`(32) -> `name`
     # 移除索引定义上的 USING BTREE COMMENT 部分
     # 相关 issue：https://t.zsxq.com/96IFc 、https://t.zsxq.com/rC3A3
@@ -73,11 +77,18 @@ def load_and_clean(sql_file: str) -> str:
 
 
 class Convertor(ABC):
+    # 不同数据库的关键字不完全一致；子类按需声明需要转义的列名。
+    reserved_column_names = set()
+
     def __init__(self, src: str, db_type) -> None:
         self.src = src
         self.db_type = db_type
         self.content = load_and_clean(self.src)
-        self.table_script_list = re.findall(r"CREATE TABLE [^;]*;", self.content)
+        # original_content 保留原始 COMMENT 信息，用于注释提取
+        self.original_content = open(src, encoding="utf-8").read()
+        # 剥离列级 COMMENT 以避免 COMMENT 值内的分号截断 CREATE TABLE 正则
+        content_no_comment = re.sub(r" COMMENT '(?:[^'\\]|\\.)*'", "", self.content)
+        self.table_script_list = re.findall(r"CREATE TABLE [^;]*;", content_no_comment)
 
     @abstractmethod
     def translate_type(self, type: str, size: Optional[Union[int, Tuple[int]]]) -> str:
@@ -171,6 +182,31 @@ class Convertor(ABC):
         """
         return ""
 
+    def escape_column_name(self, name: str) -> str:
+        """转义目标库保留字列名，例如 Oracle / Kingbase 的 level。"""
+
+        column_name = name.lower()
+        if column_name in self.reserved_column_names:
+            return f'"{column_name}"'
+        return column_name
+
+    def escape_insert_columns(self, insert_script: str) -> str:
+        """INSERT 显式列清单需要和 CREATE / COMMENT 使用同一套列名转义。"""
+
+        match = re.match(
+            r"(INSERT INTO\s+\S+\s*\()([^)]+)(\)\s+VALUES\s+[\s\S]*)",
+            insert_script,
+            flags=re.IGNORECASE,
+        )
+        if not match:
+            return insert_script
+
+        columns = [
+            self.escape_column_name(column.strip())
+            for column in match.group(2).split(",")
+        ]
+        return f"{match.group(1)}{', '.join(columns)}{match.group(3)}"
+
     @staticmethod
     def inserts(table_name: str, script_content: str) -> Generator:
         PREFIX = f"INSERT INTO `{table_name}`"
@@ -182,7 +218,8 @@ class Convertor(ABC):
                 head = head.strip().replace("`", "").lower()
                 tail = tail.strip().replace(r"\"", '"')
                 # tail = tail.replace("b'0'", "'0'").replace("b'1'", "'1'")
-                yield f"INSERT INTO {table_name.lower()} {head} VALUES {tail}"
+                col_part = f" {head}" if head else ""
+                yield f"INSERT INTO {table_name.lower()}{col_part} VALUES {tail}"
 
     @staticmethod
     def index(ddl: Dict) -> Generator:
@@ -195,17 +232,54 @@ class Convertor(ABC):
             Generator[str]: create index 语句
         """
 
-        def generate_columns(columns):
-            keys = [
-                f"{col['name'].lower()}{' ' + col['order'].lower() if col['order'] != 'ASC' else ''}"
-                for col in columns[0]
-            ]
-            return ", ".join(keys)
-
-        for no, index in enumerate(ddl["index"], 1):
-            columns = generate_columns(index["columns"])
+        for no, index in enumerate(ddl.get("index", []), 1):
+            columns = ", ".join(Convertor.index_columns(index.get("columns", [])))
+            if not columns:
+                continue
             table_name = ddl["table_name"].lower()
             yield f"CREATE INDEX idx_{table_name}_{no:02d} ON {table_name} ({columns})"
+
+    @staticmethod
+    def index_columns(columns) -> list:
+        """兼容 simple-ddl-parser 不同版本的索引列结构。"""
+
+        keys = []
+
+        def append(name, order="ASC"):
+            if not name:
+                return
+            column_name = str(name).strip("`").lower()
+            column_order = str(order or "ASC").upper()
+            if column_order == "DESC":
+                keys.append(f"{column_name} desc")
+            else:
+                keys.append(column_name)
+
+        def visit(value):
+            # 普通索引常见结构：[[{'name': 'user_id', 'order': 'ASC'}]]
+            if isinstance(value, (list, tuple)):
+                for item in value:
+                    visit(item)
+                return
+            if isinstance(value, dict):
+                name = value.get("name")
+                if isinstance(name, (dict, list, tuple)):
+                    visit(name)
+                    return
+                append(name, value.get("order", "ASC"))
+                return
+            # 唯一索引在部分版本中会被解析成 ['mobile', 'ASC', 'tenant_id', 'ASC']。
+            if isinstance(value, str):
+                token = value.strip("`")
+                order = token.upper()
+                if order in ("ASC", "DESC"):
+                    if order == "DESC" and keys and not keys[-1].endswith(" desc"):
+                        keys[-1] = f"{keys[-1]} desc"
+                    return
+                append(token)
+
+        visit(columns)
+        return keys
 
     @staticmethod
     def unique_index(ddl: Dict) -> Generator:
@@ -214,7 +288,9 @@ class Convertor(ABC):
             for uk in uk_list:
                 table_name = ddl["table_name"]
                 uk_name = uk["constraint_name"]
-                uk_columns = uk["columns"]
+                uk_columns = Convertor.index_columns(uk["columns"])
+                if not uk_columns:
+                    continue
                 yield table_name, uk_name, uk_columns
 
     @staticmethod
@@ -227,7 +303,8 @@ class Convertor(ABC):
                 yield field, comment_string
 
     def table_comment(self, table_sql: str) -> str:
-        match = re.search(r"COMMENT \='([^']+)';", table_sql)
+        # 兼容 COMMENT='xxx' / COMMENT = 'xxx' 等等号两侧空格变体；允许 COMMENT 内含转义单引号
+        match = re.search(r"COMMENT\s*=\s*'((?:[^'\\]|\\.)*)'", table_sql)
         return match.group(1) if match else None
 
     def print(self):
@@ -251,7 +328,9 @@ class Convertor(ABC):
 
         error_scripts = []
         for table_sql in self.table_script_list:
-            ddl = DDLParser(table_sql.replace("`", "")).run()
+            # 剥离 COMMENT 子句避免 DDLParser 无法处理中文等特殊字符
+            table_sql_for_parse = re.sub(r"\s+COMMENT\s+'[^']*'", "", table_sql)
+            ddl = DDLParser(table_sql_for_parse.replace("`", "")).run()
 
             # 如果parse失败, 需要跟进
             if len(ddl) == 0:
@@ -266,17 +345,23 @@ class Convertor(ABC):
                 continue
 
             # 解析注释
+            # 从原始 SQL 提取注释（支持中文等 DDLParser 不能处理的内容）
+            # 按表名定位完整建表段（以「换行 + )」起始的 ENGINE 行作为终止），避免被列 COMMENT 内的分号截断
+            orig_match = re.search(
+                rf"CREATE TABLE\s+`{re.escape(table_name)}`[\s\S]*?\n\)[^;]*;",
+                self.original_content,
+                flags=re.IGNORECASE,
+            )
+            orig_table_sql = orig_match.group() if orig_match else table_sql
+            comments_dict = dict(Convertor.filed_comments(orig_table_sql))
             for column in table_ddl["columns"]:
-                column["comment"] = bytes(column["comment"], "utf-8").decode(
-                    r"unicode_escape"
-                )[1:-1]
-            table_ddl["comment"] = bytes(table_ddl["comment"], "utf-8").decode(
-                r"unicode_escape"
-            )[1:-1]
+                column["comment"] = comments_dict.get(column["name"], "")
+            table_ddl["comment"] = self.table_comment(orig_table_sql) or ""
 
             # 为每个表生成个6个基本部分
             create = self.gen_create(table_ddl)
-            pk = self.gen_pk(table_name)
+            has_id = any(col["name"].lower() == "id" for col in table_ddl["columns"])
+            pk = self.gen_pk(table_name) if has_id else ""
             uk = self.gen_uk(table_ddl)
             index = self.gen_index(table_ddl)
             comment = self.gen_comment(table_ddl)
@@ -320,25 +405,31 @@ class PostgreSQLConvertor(Convertor):
 
         if type == "varchar":
             return f"varchar({size})"
-        if type in ("int", "int unsigned"):
+        if type in ("int", "int unsigned", "int unsigned zerofill"):
             return "int4"
         if type in ("bigint", "bigint unsigned"):
             return "int8"
-        if type == "datetime":
+        if type in ("tinyint", "smallint", "tinyint unsigned"):
+            return "int2"
+        if type in ("datetime", "timestamp null"):
             return "timestamp"
+        if type == "date":
+            return "date"
+        if type == "json":
+            return "jsonb"
+        if type == "double":
+            return "double precision"
         if type == "timestamp":
-            return f"timestamp({size})"
+            return f"timestamp({size})" if size else "timestamp"
         if type == "bit":
             return "bool"
-        if type in ("tinyint", "smallint"):
-            return "int2"
         if type in ("text", "longtext"):
             return "text"
-        if type in ("blob", "mediumblob"):
+        if type in ("blob", "mediumblob", "longblob"):
             return "bytea"
         if type == "decimal":
             return (
-                f"numeric({','.join(str(s) for s in size)})" if len(size) else "numeric"
+                f"numeric({','.join(str(s) for s in size)})" if size and len(size) else "numeric"
             )
 
     def gen_create(self, ddl: Dict) -> str:
@@ -351,9 +442,13 @@ class PostgreSQLConvertor(Convertor):
 
             type = col["type"].lower()
             full_type = self.translate_type(type, col["size"])
+            if full_type is None:
+                raise NotImplementedError(
+                    f"未支持的类型: '{col['type']}' (列: {name}, 表: {ddl['table_name']})"
+                )
             nullable = "NULL" if col["nullable"] else "NOT NULL"
             default = f"DEFAULT {col['default']}" if col["default"] is not None else ""
-            return f"{name} {full_type} {nullable} {default}"
+            return f"{self.escape_column_name(name)} {full_type} {nullable} {default}"
 
         table_name = ddl["table_name"].lower()
         columns = [f"{_generate_column(col).strip()}" for col in ddl["columns"]]
@@ -378,7 +473,7 @@ CREATE TABLE {table_name} (
         for column in table_ddl["columns"]:
             table_comment = column["comment"]
             script += (
-                f"COMMENT ON COLUMN {table_ddl['table_name']}.{column['name']} IS '{table_comment}';"
+                f"COMMENT ON COLUMN {table_ddl['table_name']}.{self.escape_column_name(column['name'])} IS '{table_comment}';"
                 + "\n"
             )
 
@@ -407,6 +502,9 @@ CREATE TABLE {table_name} (
         """生成 insert 语句，以及根据最后的 insert id+1 生成 Sequence"""
 
         inserts = list(Convertor.inserts(table_name, self.content))
+        inserts = [self.escape_insert_columns(s) for s in inserts]
+        # 转换 MySQL 字符串转义为 PostgreSQL 格式：\\ -> \，\' -> ''
+        inserts = [re.sub(r"\\\\|\\'", lambda m: "\\" if m.group() == "\\\\" else "''", s) for s in inserts]
         ## 生成 insert 脚本
         script = ""
         last_id = 0
@@ -452,6 +550,8 @@ INSERT INTO dual VALUES (1);
 
 
 class OracleConvertor(Convertor):
+    reserved_column_names = {"level", "size"}
+
     def __init__(self, src):
         super().__init__(src, "Oracle")
 
@@ -496,10 +596,8 @@ class OracleConvertor(Convertor):
             # Oracle的 INSERT '' 不能通过NOT NULL校验，因此对文字类型字段覆写为 NULL
             nullable = "NULL" if type in ("varchar", "text", "longtext") else nullable
             default = f"DEFAULT {col['default']}" if col["default"] is not None else ""
-            # Oracle 中 size 不能作为字段名
-            field_name = '"size"' if name == "size" else name
             # Oracle DEFAULT 定义在 NULLABLE 之前
-            return f"{field_name} {full_type} {default} {nullable}"
+            return f"{self.escape_column_name(name)} {full_type} {default} {nullable}"
 
         table_name = ddl["table_name"].lower()
         columns = [f"{generate_column(col).strip()}" for col in ddl["columns"]]
@@ -524,7 +622,7 @@ CREATE TABLE {table_name} (
         for column in table_ddl["columns"]:
             table_comment = column["comment"]
             script += (
-                f"COMMENT ON COLUMN {table_ddl['table_name']}.{column['name']} IS '{table_comment}';"
+                f"COMMENT ON COLUMN {table_ddl['table_name']}.{self.escape_column_name(column['name'])} IS '{table_comment}';"
                 + "\n"
             )
 
@@ -556,6 +654,7 @@ CREATE TABLE {table_name} (
         """拷贝 INSERT 语句"""
         inserts = []
         for insert_script in Convertor.inserts(table_name, self.content):
+            insert_script = self.escape_insert_columns(insert_script)
             # 对日期数据添加 TO_DATE 转换
             insert_script = re.sub(
                 r"('\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}')",
@@ -877,6 +976,8 @@ SET IDENTITY_INSERT {table_name.lower()} OFF;
 
 
 class KingbaseConvertor(PostgreSQLConvertor):
+    reserved_column_names = {"level"}
+
     def __init__(self, src):
         super().__init__(src)
         self.db_type = "Kingbase"
@@ -895,7 +996,7 @@ class KingbaseConvertor(PostgreSQLConvertor):
             if full_type == "text":
                 nullable = "NULL"
             default = f"DEFAULT {col['default']}" if col["default"] is not None else ""
-            return f"{name} {full_type} {nullable} {default}"
+            return f"{self.escape_column_name(name)} {full_type} {nullable} {default}"
 
         table_name = ddl["table_name"].lower()
         columns = [f"{_generate_column(col).strip()}" for col in ddl["columns"]]
@@ -915,6 +1016,8 @@ CREATE TABLE {table_name} (
 
 
 class OpengaussConvertor(KingbaseConvertor):
+    reserved_column_names = set()
+
     def __init__(self, src):
         super().__init__(src)
         self.db_type = "OpenGauss"

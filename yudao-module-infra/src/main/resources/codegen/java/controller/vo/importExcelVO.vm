@@ -1,0 +1,38 @@
+package ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePackage}.${table.businessName}.vo;
+
+import cn.idev.excel.annotation.ExcelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+#foreach ($column in $columns)
+#if (${column.createOperation} && "$!column.dictType" != "")
+import ${DictFormatClassName};
+import ${DictConvertClassName};
+#break
+#end
+#end
+
+/**
+ * ${table.classComment} Excel 导入 VO
+ */
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class ${sceneEnum.prefixClass}${table.className}ImportExcelVO {
+
+## 逐个处理字段
+#foreach ($column in $columns)
+#if (${column.createOperation})
+#if ("$!column.dictType" != "")
+    @ExcelProperty(value = "${column.columnComment}", converter = DictConvert.class)
+    @DictFormat("${column.dictType}") // TODO 代码优化：建议设置到对应的 DictTypeConstants 枚举类中
+#else
+    @ExcelProperty("${column.columnComment}")
+#end
+    private ${column.javaType} ${column.javaField};
+
+#end
+#end
+}

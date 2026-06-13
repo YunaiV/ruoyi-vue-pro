@@ -16,8 +16,8 @@
             identifier NCHAR(100),
             request_id NCHAR(50),
             method NCHAR(100),
-            params NCHAR(2048),
-            data NCHAR(2048),
+            params VARCHAR(8192),
+            data VARCHAR(8192),
             code INT,
             msg NCHAR(256)
         ) TAGS (
@@ -38,7 +38,7 @@
         USING device_message
         TAGS (#{deviceId})
         VALUES (
-            NOW, #{id}, #{reportTime}, #{tenantId},  #{serverId},
+            #{ts}, #{id}, #{reportTime}, #{tenantId},  #{serverId},
             #{upstream}, #{reply}, #{identifier}, #{requestId}, #{method}, 
             #{params}, #{data}, #{code}, #{msg}
         )

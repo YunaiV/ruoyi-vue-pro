@@ -36,10 +36,8 @@ public class MesWmSalesNoticeLineServiceImpl implements MesWmSalesNoticeLineServ
     @Resource
     @Lazy
     private MesWmSalesNoticeService salesNoticeService;
-
     @Resource
     private MesWmBatchService batchService;
-
     @Resource
     private MesMdItemService itemService;
 
@@ -100,10 +98,21 @@ public class MesWmSalesNoticeLineServiceImpl implements MesWmSalesNoticeLineServ
         salesNoticeLineMapper.deleteByNoticeId(noticeId);
     }
 
-    private MesWmSalesNoticeLineDO validateSalesNoticeLineExists(Long id) {
+    @Override
+    public MesWmSalesNoticeLineDO validateSalesNoticeLineExists(Long id) {
         MesWmSalesNoticeLineDO line = salesNoticeLineMapper.selectById(id);
         if (line == null) {
             throw exception(WM_SALES_NOTICE_LINE_NOT_EXISTS);
+        }
+        return line;
+    }
+
+    @Override
+    public MesWmSalesNoticeLineDO validateSalesNoticeLineExists(Long lineId, Long noticeId) {
+        MesWmSalesNoticeLineDO line = validateSalesNoticeLineExists(lineId);
+        // 进一步校验行的 noticeId 与传入的 noticeId 是否匹配
+        if (noticeId != null && ObjUtil.notEqual(line.getNoticeId(), noticeId)) {
+            throw exception(WM_SALES_NOTICE_LINE_NOT_MATCH);
         }
         return line;
     }
@@ -113,7 +122,7 @@ public class MesWmSalesNoticeLineServiceImpl implements MesWmSalesNoticeLineServ
         validateNoticeStatusDraft(reqVO.getNoticeId());
         // 校验物料存在
         if (reqVO.getItemId() != null) {
-            itemService.validateItemExists(reqVO.getItemId());
+            itemService.validateItemExistsAndEnable(reqVO.getItemId());
         }
     }
 

@@ -6,9 +6,10 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.mes.controller.admin.tm.tool.vo.type.MesTmToolTypePageReqVO;
 import cn.iocoder.yudao.module.mes.controller.admin.tm.tool.vo.type.MesTmToolTypeSaveReqVO;
 import cn.iocoder.yudao.module.mes.dal.dataobject.tm.tool.MesTmToolTypeDO;
-import cn.iocoder.yudao.module.mes.dal.mysql.tm.tool.MesTmToolMapper;
 import cn.iocoder.yudao.module.mes.dal.mysql.tm.tool.MesTmToolTypeMapper;
+import cn.iocoder.yudao.module.mes.service.md.workstation.MesMdWorkstationToolService;
 import jakarta.annotation.Resource;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -34,7 +35,11 @@ public class MesTmToolTypeServiceImpl implements MesTmToolTypeService {
     private MesTmToolTypeMapper toolTypeMapper;
 
     @Resource
-    private MesTmToolMapper toolMapper;
+    @Lazy
+    private MesTmToolService toolService;
+    @Resource
+    @Lazy
+    private MesMdWorkstationToolService workstationToolService;
 
     @Override
     public Long createToolType(MesTmToolTypeSaveReqVO createReqVO) {
@@ -71,8 +76,12 @@ public class MesTmToolTypeServiceImpl implements MesTmToolTypeService {
         // 校验存在
         validateToolTypeExists(id);
         // 校验是否被工具引用
-        if (toolMapper.selectCountByToolTypeId(id) > 0) {
+        if (toolService.getToolCountByToolTypeId(id) > 0) {
             throw exception(TM_TOOL_TYPE_HAS_TOOL);
+        }
+        // 校验是否被工作站工装资源引用
+        if (workstationToolService.getWorkstationToolCountByToolTypeId(id) > 0) {
+            throw exception(TM_TOOL_TYPE_HAS_WORKSTATION_TOOL);
         }
 
         // 删除

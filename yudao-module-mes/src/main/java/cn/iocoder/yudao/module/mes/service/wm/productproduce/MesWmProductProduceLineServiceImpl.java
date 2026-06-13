@@ -10,6 +10,9 @@ import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.mes.enums.ErrorCodeConstants.*;
+
 /**
  * MES 生产入库单行 Service 实现类
  */
@@ -23,6 +26,15 @@ public class MesWmProductProduceLineServiceImpl implements MesWmProductProduceLi
     @Override
     public void createProductProduceLine(MesWmProductProduceLineDO line) {
         productProduceLineMapper.insert(line);
+    }
+
+    @Override
+    public MesWmProductProduceLineDO validateProductProduceLineExists(Long id) {
+        MesWmProductProduceLineDO line = productProduceLineMapper.selectById(id);
+        if (line == null) {
+            throw exception(WM_PRODUCT_PRODUCE_LINE_NOT_EXISTS);
+        }
+        return line;
     }
 
     @Override

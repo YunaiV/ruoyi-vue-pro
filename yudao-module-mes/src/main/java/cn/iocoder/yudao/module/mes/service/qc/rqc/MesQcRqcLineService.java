@@ -69,4 +69,12 @@ public interface MesQcRqcLineService {
      */
     void deleteByRqcId(Long rqcId);
 
+    /**
+     * 统计使用指定计量单位的退货检验行数量
+     *
+     * @param unitMeasureId 计量单位编号
+     * @return 引用数量
+     */
+    Long getRqcLineCountByUnitMeasureId(Long unitMeasureId);
+
 }

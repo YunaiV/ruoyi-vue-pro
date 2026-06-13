@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import cn.iocoder.yudao.module.mes.enums.DictTypeConstants;
 
 /**
  * MES 采购入库单 DO
@@ -69,6 +70,7 @@ public class MesWmItemReceiptDO extends BaseDO {
     /**
      * 状态
      *
+     * 字典 {@link DictTypeConstants#MES_WM_ITEM_RECEIPT_STATUS}
      * 枚举 {@link MesWmItemReceiptStatusEnum}
      */
     private Integer status;

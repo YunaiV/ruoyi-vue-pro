@@ -32,12 +32,12 @@ public class MesProCardRespVO {
     @ExcelProperty("工单名称")
     private String workOrderName;
 
+    @Schema(description = "产品物料编号", example = "200")
+    private Long itemId;
+
     @Schema(description = "批次号", example = "BATCH-001")
     @ExcelProperty("批次号")
     private String batchCode;
-
-    @Schema(description = "产品物料编号", example = "200")
-    private Long itemId;
 
     @Schema(description = "产品编码", example = "P-001")
     @ExcelProperty("产品编码")

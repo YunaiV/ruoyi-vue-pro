@@ -50,12 +50,6 @@ public class MesWmWarehouseLocationDO extends BaseDO {
      */
     private BigDecimal area;
     /**
-     * 库位管理状态
-     *
-     * 枚举 {@link cn.iocoder.yudao.framework.common.enums.CommonStatusEnum}
-     */
-    private Integer areaStatus;
-    /**
      * 是否冻结
      */
     private Boolean frozen;

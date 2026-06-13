@@ -19,4 +19,7 @@ public class MesWmStockTakingPlanPageReqVO extends PageParam {
     @Schema(description = "盘点类型", example = "1")
     private Integer type;
 
+    @Schema(description = "状态", example = "0")
+    private Integer status;
+
 }

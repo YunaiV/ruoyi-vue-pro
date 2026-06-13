@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import cn.iocoder.yudao.module.mes.enums.DictTypeConstants;
 
 /**
  * MES 外协发料单 DO
@@ -58,6 +59,7 @@ public class MesWmOutsourceIssueDO extends BaseDO {
     /**
      * 单据状态
      *
+     * 字典 {@link DictTypeConstants#MES_WM_OUTSOURCE_ISSUE_STATUS}
      * 枚举 {@link MesWmOutsourceIssueStatusEnum}
      */
     private Integer status;

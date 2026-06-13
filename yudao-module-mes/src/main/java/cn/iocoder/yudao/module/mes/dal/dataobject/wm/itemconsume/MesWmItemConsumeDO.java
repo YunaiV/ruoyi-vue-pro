@@ -12,6 +12,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import cn.iocoder.yudao.module.mes.enums.DictTypeConstants;
 
 /**
  * MES 物料消耗记录 DO
@@ -71,6 +72,7 @@ public class MesWmItemConsumeDO extends BaseDO {
     /**
      * 状态
      *
+     * 字典 {@link DictTypeConstants#MES_WM_ITEM_CONSUME_STATUS}
      * 枚举 {@link cn.iocoder.yudao.module.mes.enums.wm.MesWmItemConsumeStatusEnum}
      */
     private Integer status;

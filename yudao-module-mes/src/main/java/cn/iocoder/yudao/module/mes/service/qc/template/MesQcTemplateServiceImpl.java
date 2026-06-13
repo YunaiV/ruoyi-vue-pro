@@ -32,6 +32,7 @@ public class MesQcTemplateServiceImpl implements MesQcTemplateService {
 
     @Resource
     private MesQcTemplateMapper templateMapper;
+
     @Resource
     @Lazy
     private MesQcTemplateIndicatorService templateIndicatorService;

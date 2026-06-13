@@ -10,6 +10,7 @@ import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.common.util.spring.SpringUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.data.rule.IotDataRulePageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.data.rule.IotDataRuleSaveReqVO;
+import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
@@ -212,34 +213,76 @@ public class IotDataRuleServiceImpl implements IotDataRuleService {
     @Override
     public void executeDataRule(IotDeviceMessage message) {
         try {
-            // 1. 获取匹配的数据流转规则
             Long deviceId = message.getDeviceId();
             String method = message.getMethod();
-            String identifier = IotDeviceMessageUtils.getIdentifier(message);
-            List<IotDataRuleDO> rules = getSelf().getDataRuleListByConditionFromCache(deviceId, method, identifier);
-            if (CollUtil.isEmpty(rules)) {
+            // 1. 匹配命中的规则
+            List<IotDataRuleDO> matchedRules;
+            Object identifierForLog;
+            if (IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod().equals(method)) {
+                // 属性上报：params 含多个属性 key，每个 key 都可能命中规则
+                Set<String> identifiers = IotDeviceMessageUtils.getPropertyIdentifiers(message);
+                matchedRules = matchPropertyPostDataRules(deviceId, method, identifiers);
+                identifierForLog = identifiers;
+            } else {
+                // 其他消息（事件 / 服务调用 / 状态）：单一 identifier
+                String identifier = IotDeviceMessageUtils.getIdentifier(message);
+                matchedRules = getSelf().getDataRuleListByConditionFromCache(deviceId, method, identifier);
+                identifierForLog = identifier;
+            }
+            if (CollUtil.isEmpty(matchedRules)) {
                 log.debug("[executeDataRule][设备({}) 方法({}) 标识符({}) 没有匹配的数据流转规则]",
-                        deviceId, method, identifier);
+                        deviceId, method, identifierForLog);
                 return;
             }
             log.info("[executeDataRule][设备({}) 方法({}) 标识符({}) 匹配到 {} 条数据流转规则]",
-                    deviceId, method, identifier, rules.size());
+                    deviceId, method, identifierForLog, matchedRules.size());
 
-            // 2. 遍历规则，执行数据流转
-            rules.forEach(rule -> executeDataRule(message, rule));
+            // 2. 跨规则去重 sink，避免多条规则命中同一数据目的时重复推送
+            Set<Long> processedSinkIds = new HashSet<>();
+            matchedRules.forEach(rule -> executeDataRule(message, rule, processedSinkIds));
         } catch (Exception e) {
             log.error("[executeDataRule][消息({}) 执行数据流转规则异常]", message, e);
         }
     }
 
     /**
+     * 匹配属性上报场景下命中的数据流转规则
+     *
+     * 同一规则可能同时匹配「任意属性」与具体 identifier，按 ruleId 去重后返回
+     *
+     * @param deviceId    设备编号
+     * @param method      消息方法
+     * @param identifiers 上报消息中包含的属性标识符集合
+     * @return 命中的数据流转规则列表
+     */
+    private List<IotDataRuleDO> matchPropertyPostDataRules(Long deviceId, String method, Set<String> identifiers) {
+        LinkedHashMap<Long, IotDataRuleDO> matchedRuleMap = new LinkedHashMap<>();
+        // 情况一：先匹配未填 identifier 的「任意属性」规则，默认就匹配
+        collectMatchedRules(matchedRuleMap, deviceId, method, null);
+        // 情况二：再针对每个上报的属性标识符匹配限定具体 identifier 的规则
+        identifiers.forEach(identifier -> collectMatchedRules(matchedRuleMap, deviceId, method, identifier));
+        return new ArrayList<>(matchedRuleMap.values());
+    }
+
+    private void collectMatchedRules(Map<Long, IotDataRuleDO> matchedRuleMap,
+                                     Long deviceId, String method, String identifier) {
+        getSelf().getDataRuleListByConditionFromCache(deviceId, method, identifier)
+                .forEach(rule -> matchedRuleMap.putIfAbsent(rule.getId(), rule));
+    }
+
+    /**
      * 为指定规则的所有数据目的执行数据流转
      *
-     * @param message 设备消息
-     * @param rule    数据流转规则
+     * @param message          设备消息
+     * @param rule             数据流转规则
+     * @param processedSinkIds 已处理的数据目的编号集合，跨规则去重，避免同一数据目的被重复推送
      */
-    private void executeDataRule(IotDeviceMessage message, IotDataRuleDO rule) {
+    private void executeDataRule(IotDeviceMessage message, IotDataRuleDO rule, Set<Long> processedSinkIds) {
         rule.getSinkIds().forEach(sinkId -> {
+            // 同一消息下，多条规则命中同一数据目的时只推送一次
+            if (!processedSinkIds.add(sinkId)) {
+                return;
+            }
             try {
                 // 获取数据目的配置
                 IotDataSinkDO dataSink = dataSinkService.getDataSinkFromCache(sinkId);

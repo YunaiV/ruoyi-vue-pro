@@ -5,7 +5,7 @@
 
  Target Server Type    : Microsoft SQL Server
 
- Date: 2025-05-22 21:03:59
+ Date: 2026-05-03 09:41:52
 */
 
 
@@ -16,14 +16,14 @@ DROP TABLE IF EXISTS dual
 GO
 CREATE TABLE dual
 (
-    id int
+  id int
 )
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'数据库连接的表',
-     'SCHEMA', N'dbo',
-     'TABLE', N'dual'
+    'MS_Description', N'数据库连接的表',
+    'SCHEMA', N'dbo',
+    'TABLE', N'dual'
 GO
 
 -- ----------------------------
@@ -39,33 +39,32 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS infra_api_access_log
 GO
-CREATE TABLE infra_api_access_log
-(
-    id               bigint                                  NOT NULL PRIMARY KEY IDENTITY,
-    trace_id         nvarchar(64)  DEFAULT ''                NOT NULL,
-    user_id          bigint        DEFAULT 0                 NOT NULL,
-    user_type        tinyint       DEFAULT 0                 NOT NULL,
-    application_name nvarchar(50)                            NOT NULL,
-    request_method   nvarchar(16)  DEFAULT ''                NOT NULL,
-    request_url      nvarchar(255) DEFAULT ''                NOT NULL,
-    request_params   nvarchar(max)                           NULL,
-    response_body    nvarchar(max)                           NULL,
-    user_ip          nvarchar(50)                            NOT NULL,
-    user_agent       nvarchar(512)                           NOT NULL,
-    operate_module   nvarchar(50)  DEFAULT NULL              NULL,
-    operate_name     nvarchar(50)  DEFAULT NULL              NULL,
-    operate_type     tinyint       DEFAULT 0                 NULL,
-    begin_time       datetime2                               NOT NULL,
-    end_time         datetime2                               NOT NULL,
-    duration         int                                     NOT NULL,
-    result_code      int           DEFAULT 0                 NOT NULL,
-    result_msg       nvarchar(512) DEFAULT ''                NULL,
-    creator          nvarchar(64)  DEFAULT ''                NULL,
-    create_time      datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater          nvarchar(64)  DEFAULT ''                NULL,
-    update_time      datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted          bit           DEFAULT 0                 NOT NULL,
-    tenant_id        bigint        DEFAULT 0                 NOT NULL
+CREATE TABLE infra_api_access_log (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    trace_id nvarchar(64) DEFAULT '' NOT NULL,
+    user_id bigint DEFAULT 0 NOT NULL,
+    user_type tinyint DEFAULT 0 NOT NULL,
+    application_name nvarchar(50)  NOT NULL,
+    request_method nvarchar(16) DEFAULT '' NOT NULL,
+    request_url nvarchar(255) DEFAULT '' NOT NULL,
+    request_params nvarchar(max)  NULL,
+    response_body nvarchar(max)  NULL,
+    user_ip nvarchar(50)  NOT NULL,
+    user_agent nvarchar(512)  NOT NULL,
+    operate_module nvarchar(50) DEFAULT NULL NULL,
+    operate_name nvarchar(50) DEFAULT NULL NULL,
+    operate_type tinyint DEFAULT 0 NULL,
+    begin_time datetime2  NOT NULL,
+    end_time datetime2  NOT NULL,
+    duration int  NOT NULL,
+    result_code int DEFAULT 0 NOT NULL,
+    result_msg nvarchar(512) DEFAULT '' NULL,
+    creator nvarchar(64) DEFAULT '' NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT 0 NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 )
 GO
 
@@ -73,184 +72,184 @@ CREATE INDEX idx_infra_api_access_log_01 ON infra_api_access_log (create_time)
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'日志主键',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_access_log',
-     'COLUMN', N'id'
+    'MS_Description', N'日志主键',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_access_log',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'链路追踪编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_access_log',
-     'COLUMN', N'trace_id'
+    'MS_Description', N'链路追踪编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_access_log',
+    'COLUMN', N'trace_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'用户编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_access_log',
-     'COLUMN', N'user_id'
+    'MS_Description', N'用户编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_access_log',
+    'COLUMN', N'user_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'用户类型',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_access_log',
-     'COLUMN', N'user_type'
+    'MS_Description', N'用户类型',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_access_log',
+    'COLUMN', N'user_type'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'应用名',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_access_log',
-     'COLUMN', N'application_name'
+    'MS_Description', N'应用名',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_access_log',
+    'COLUMN', N'application_name'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'请求方法名',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_access_log',
-     'COLUMN', N'request_method'
+    'MS_Description', N'请求方法名',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_access_log',
+    'COLUMN', N'request_method'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'请求地址',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_access_log',
-     'COLUMN', N'request_url'
+    'MS_Description', N'请求地址',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_access_log',
+    'COLUMN', N'request_url'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'请求参数',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_access_log',
-     'COLUMN', N'request_params'
+    'MS_Description', N'请求参数',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_access_log',
+    'COLUMN', N'request_params'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'响应结果',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_access_log',
-     'COLUMN', N'response_body'
+    'MS_Description', N'响应结果',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_access_log',
+    'COLUMN', N'response_body'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'用户 IP',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_access_log',
-     'COLUMN', N'user_ip'
+    'MS_Description', N'用户 IP',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_access_log',
+    'COLUMN', N'user_ip'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'浏览器 UA',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_access_log',
-     'COLUMN', N'user_agent'
+    'MS_Description', N'浏览器 UA',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_access_log',
+    'COLUMN', N'user_agent'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'操作模块',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_access_log',
-     'COLUMN', N'operate_module'
+    'MS_Description', N'操作模块',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_access_log',
+    'COLUMN', N'operate_module'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'操作名',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_access_log',
-     'COLUMN', N'operate_name'
+    'MS_Description', N'操作名',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_access_log',
+    'COLUMN', N'operate_name'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'操作分类',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_access_log',
-     'COLUMN', N'operate_type'
+    'MS_Description', N'操作分类',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_access_log',
+    'COLUMN', N'operate_type'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'开始请求时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_access_log',
-     'COLUMN', N'begin_time'
+    'MS_Description', N'开始请求时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_access_log',
+    'COLUMN', N'begin_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'结束请求时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_access_log',
-     'COLUMN', N'end_time'
+    'MS_Description', N'结束请求时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_access_log',
+    'COLUMN', N'end_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'执行时长',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_access_log',
-     'COLUMN', N'duration'
+    'MS_Description', N'执行时长',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_access_log',
+    'COLUMN', N'duration'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'结果码',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_access_log',
-     'COLUMN', N'result_code'
+    'MS_Description', N'结果码',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_access_log',
+    'COLUMN', N'result_code'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'结果提示',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_access_log',
-     'COLUMN', N'result_msg'
+    'MS_Description', N'结果提示',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_access_log',
+    'COLUMN', N'result_msg'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_access_log',
-     'COLUMN', N'creator'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_access_log',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_access_log',
-     'COLUMN', N'create_time'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_access_log',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_access_log',
-     'COLUMN', N'updater'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_access_log',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_access_log',
-     'COLUMN', N'update_time'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_access_log',
+    'COLUMN', N'update_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_access_log',
-     'COLUMN', N'deleted'
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_access_log',
+    'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'租户编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_access_log',
-     'COLUMN', N'tenant_id'
+    'MS_Description', N'租户编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_access_log',
+    'COLUMN', N'tenant_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'API 访问日志表',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_access_log'
+    'MS_Description', N'API 访问日志表',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_access_log'
 GO
 
 -- ----------------------------
@@ -258,239 +257,241 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS infra_api_error_log
 GO
-CREATE TABLE infra_api_error_log
-(
-    id                           bigint                                  NOT NULL PRIMARY KEY IDENTITY,
-    trace_id                     nvarchar(64)                            NOT NULL,
-    user_id                      bigint        DEFAULT 0                 NOT NULL,
-    user_type                    tinyint       DEFAULT 0                 NOT NULL,
-    application_name             nvarchar(50)                            NOT NULL,
-    request_method               nvarchar(16)                            NOT NULL,
-    request_url                  nvarchar(255)                           NOT NULL,
-    request_params               nvarchar(4000)                          NOT NULL,
-    user_ip                      nvarchar(50)                            NOT NULL,
-    user_agent                   nvarchar(512)                           NOT NULL,
-    exception_time               datetime2                               NOT NULL,
-    exception_name               nvarchar(128) DEFAULT ''                NOT NULL,
-    exception_message            nvarchar(max)                           NOT NULL,
-    exception_root_cause_message nvarchar(max)                           NOT NULL,
-    exception_stack_trace        nvarchar(max)                           NOT NULL,
-    exception_class_name         nvarchar(512)                           NOT NULL,
-    exception_file_name          nvarchar(512)                           NOT NULL,
-    exception_method_name        nvarchar(512)                           NOT NULL,
-    exception_line_number        int                                     NOT NULL,
-    process_status               tinyint                                 NOT NULL,
-    process_time                 datetime2     DEFAULT NULL              NULL,
-    process_user_id              int           DEFAULT 0                 NULL,
-    creator                      nvarchar(64)  DEFAULT ''                NULL,
-    create_time                  datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater                      nvarchar(64)  DEFAULT ''                NULL,
-    update_time                  datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted                      bit           DEFAULT 0                 NOT NULL,
-    tenant_id                    bigint        DEFAULT 0                 NOT NULL
+CREATE TABLE infra_api_error_log (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    trace_id nvarchar(64)  NOT NULL,
+    user_id bigint DEFAULT 0 NOT NULL,
+    user_type tinyint DEFAULT 0 NOT NULL,
+    application_name nvarchar(50)  NOT NULL,
+    request_method nvarchar(16)  NOT NULL,
+    request_url nvarchar(255)  NOT NULL,
+    request_params nvarchar(4000)  NOT NULL,
+    user_ip nvarchar(50)  NOT NULL,
+    user_agent nvarchar(512)  NOT NULL,
+    exception_time datetime2  NOT NULL,
+    exception_name nvarchar(128) DEFAULT '' NOT NULL,
+    exception_message nvarchar(max)  NOT NULL,
+    exception_root_cause_message nvarchar(max)  NOT NULL,
+    exception_stack_trace nvarchar(max)  NOT NULL,
+    exception_class_name nvarchar(512)  NOT NULL,
+    exception_file_name nvarchar(512)  NOT NULL,
+    exception_method_name nvarchar(512)  NOT NULL,
+    exception_line_number int  NOT NULL,
+    process_status tinyint  NOT NULL,
+    process_time datetime2 DEFAULT NULL NULL,
+    process_user_id int DEFAULT 0 NULL,
+    creator nvarchar(64) DEFAULT '' NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT 0 NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 )
 GO
 
-EXEC sp_addextendedproperty
-     'MS_Description', N'编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_error_log',
-     'COLUMN', N'id'
+CREATE INDEX idx_infra_api_error_log_01 ON infra_api_error_log (create_time)
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'链路追踪编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_error_log',
-     'COLUMN', N'trace_id'
+    'MS_Description', N'编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_error_log',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'用户编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_error_log',
-     'COLUMN', N'user_id'
+    'MS_Description', N'链路追踪编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_error_log',
+    'COLUMN', N'trace_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'用户类型',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_error_log',
-     'COLUMN', N'user_type'
+    'MS_Description', N'用户编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_error_log',
+    'COLUMN', N'user_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'应用名',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_error_log',
-     'COLUMN', N'application_name'
+    'MS_Description', N'用户类型',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_error_log',
+    'COLUMN', N'user_type'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'请求方法名',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_error_log',
-     'COLUMN', N'request_method'
+    'MS_Description', N'应用名',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_error_log',
+    'COLUMN', N'application_name'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'请求地址',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_error_log',
-     'COLUMN', N'request_url'
+    'MS_Description', N'请求方法名',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_error_log',
+    'COLUMN', N'request_method'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'请求参数',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_error_log',
-     'COLUMN', N'request_params'
+    'MS_Description', N'请求地址',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_error_log',
+    'COLUMN', N'request_url'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'用户 IP',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_error_log',
-     'COLUMN', N'user_ip'
+    'MS_Description', N'请求参数',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_error_log',
+    'COLUMN', N'request_params'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'浏览器 UA',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_error_log',
-     'COLUMN', N'user_agent'
+    'MS_Description', N'用户 IP',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_error_log',
+    'COLUMN', N'user_ip'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'异常发生时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_error_log',
-     'COLUMN', N'exception_time'
+    'MS_Description', N'浏览器 UA',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_error_log',
+    'COLUMN', N'user_agent'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'异常名',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_error_log',
-     'COLUMN', N'exception_name'
+    'MS_Description', N'异常发生时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_error_log',
+    'COLUMN', N'exception_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'异常导致的消息',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_error_log',
-     'COLUMN', N'exception_message'
+    'MS_Description', N'异常名',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_error_log',
+    'COLUMN', N'exception_name'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'异常导致的根消息',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_error_log',
-     'COLUMN', N'exception_root_cause_message'
+    'MS_Description', N'异常导致的消息',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_error_log',
+    'COLUMN', N'exception_message'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'异常的栈轨迹',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_error_log',
-     'COLUMN', N'exception_stack_trace'
+    'MS_Description', N'异常导致的根消息',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_error_log',
+    'COLUMN', N'exception_root_cause_message'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'异常发生的类全名',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_error_log',
-     'COLUMN', N'exception_class_name'
+    'MS_Description', N'异常的栈轨迹',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_error_log',
+    'COLUMN', N'exception_stack_trace'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'异常发生的类文件',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_error_log',
-     'COLUMN', N'exception_file_name'
+    'MS_Description', N'异常发生的类全名',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_error_log',
+    'COLUMN', N'exception_class_name'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'异常发生的方法名',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_error_log',
-     'COLUMN', N'exception_method_name'
+    'MS_Description', N'异常发生的类文件',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_error_log',
+    'COLUMN', N'exception_file_name'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'异常发生的方法所在行',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_error_log',
-     'COLUMN', N'exception_line_number'
+    'MS_Description', N'异常发生的方法名',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_error_log',
+    'COLUMN', N'exception_method_name'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'处理状态',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_error_log',
-     'COLUMN', N'process_status'
+    'MS_Description', N'异常发生的方法所在行',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_error_log',
+    'COLUMN', N'exception_line_number'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'处理时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_error_log',
-     'COLUMN', N'process_time'
+    'MS_Description', N'处理状态',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_error_log',
+    'COLUMN', N'process_status'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'处理用户编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_error_log',
-     'COLUMN', N'process_user_id'
+    'MS_Description', N'处理时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_error_log',
+    'COLUMN', N'process_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_error_log',
-     'COLUMN', N'creator'
+    'MS_Description', N'处理用户编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_error_log',
+    'COLUMN', N'process_user_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_error_log',
-     'COLUMN', N'create_time'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_error_log',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_error_log',
-     'COLUMN', N'updater'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_error_log',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_error_log',
-     'COLUMN', N'update_time'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_error_log',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_error_log',
-     'COLUMN', N'deleted'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_error_log',
+    'COLUMN', N'update_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'租户编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_error_log',
-     'COLUMN', N'tenant_id'
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_error_log',
+    'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'系统异常日志',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_api_error_log'
+    'MS_Description', N'租户编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_error_log',
+    'COLUMN', N'tenant_id'
+GO
+
+EXEC sp_addextendedproperty
+    'MS_Description', N'系统异常日志',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_api_error_log'
 GO
 
 -- ----------------------------
@@ -498,199 +499,201 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS infra_codegen_column
 GO
-CREATE TABLE infra_codegen_column
-(
-    id                       bigint                                  NOT NULL PRIMARY KEY IDENTITY,
-    table_id                 bigint                                  NOT NULL,
-    column_name              nvarchar(200)                           NOT NULL,
-    data_type                nvarchar(100)                           NOT NULL,
-    column_comment           nvarchar(500)                           NOT NULL,
-    nullable                 varchar(1)                              NOT NULL,
-    primary_key              varchar(1)                              NOT NULL,
-    ordinal_position         int                                     NOT NULL,
-    java_type                nvarchar(32)                            NOT NULL,
-    java_field               nvarchar(64)                            NOT NULL,
-    dict_type                nvarchar(200) DEFAULT ''                NULL,
-    example                  nvarchar(64)  DEFAULT NULL              NULL,
-    create_operation         varchar(1)                              NOT NULL,
-    update_operation         varchar(1)                              NOT NULL,
-    list_operation           varchar(1)                              NOT NULL,
-    list_operation_condition nvarchar(32)  DEFAULT '='               NOT NULL,
-    list_operation_result    varchar(1)                              NOT NULL,
-    html_type                nvarchar(32)                            NOT NULL,
-    creator                  nvarchar(64)  DEFAULT ''                NULL,
-    create_time              datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater                  nvarchar(64)  DEFAULT ''                NULL,
-    update_time              datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted                  bit           DEFAULT 0                 NOT NULL
+CREATE TABLE infra_codegen_column (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    table_id bigint  NOT NULL,
+    column_name nvarchar(200)  NOT NULL,
+    data_type nvarchar(100)  NOT NULL,
+    column_comment nvarchar(500)  NOT NULL,
+    nullable varchar(1)  NOT NULL,
+    primary_key varchar(1)  NOT NULL,
+    ordinal_position int  NOT NULL,
+    java_type nvarchar(32)  NOT NULL,
+    java_field nvarchar(64)  NOT NULL,
+    dict_type nvarchar(200) DEFAULT '' NULL,
+    example nvarchar(64) DEFAULT NULL NULL,
+    create_operation varchar(1)  NOT NULL,
+    update_operation varchar(1)  NOT NULL,
+    list_operation varchar(1)  NOT NULL,
+    list_operation_condition nvarchar(32) DEFAULT '=' NOT NULL,
+    list_operation_result varchar(1)  NOT NULL,
+    html_type nvarchar(32)  NOT NULL,
+    creator nvarchar(64) DEFAULT '' NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT 0 NOT NULL
 )
 GO
 
-EXEC sp_addextendedproperty
-     'MS_Description', N'编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_column',
-     'COLUMN', N'id'
+CREATE INDEX idx_infra_codegen_column_01 ON infra_codegen_column (table_id)
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'表编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_column',
-     'COLUMN', N'table_id'
+    'MS_Description', N'编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_column',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'字段名',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_column',
-     'COLUMN', N'column_name'
+    'MS_Description', N'表编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_column',
+    'COLUMN', N'table_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'字段类型',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_column',
-     'COLUMN', N'data_type'
+    'MS_Description', N'字段名',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_column',
+    'COLUMN', N'column_name'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'字段描述',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_column',
-     'COLUMN', N'column_comment'
+    'MS_Description', N'字段类型',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_column',
+    'COLUMN', N'data_type'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否允许为空',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_column',
-     'COLUMN', N'nullable'
+    'MS_Description', N'字段描述',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_column',
+    'COLUMN', N'column_comment'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否主键',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_column',
-     'COLUMN', N'primary_key'
+    'MS_Description', N'是否允许为空',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_column',
+    'COLUMN', N'nullable'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'排序',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_column',
-     'COLUMN', N'ordinal_position'
+    'MS_Description', N'是否主键',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_column',
+    'COLUMN', N'primary_key'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'Java 属性类型',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_column',
-     'COLUMN', N'java_type'
+    'MS_Description', N'排序',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_column',
+    'COLUMN', N'ordinal_position'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'Java 属性名',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_column',
-     'COLUMN', N'java_field'
+    'MS_Description', N'Java 属性类型',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_column',
+    'COLUMN', N'java_type'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'字典类型',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_column',
-     'COLUMN', N'dict_type'
+    'MS_Description', N'Java 属性名',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_column',
+    'COLUMN', N'java_field'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'数据示例',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_column',
-     'COLUMN', N'example'
+    'MS_Description', N'字典类型',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_column',
+    'COLUMN', N'dict_type'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否为 Create 创建操作的字段',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_column',
-     'COLUMN', N'create_operation'
+    'MS_Description', N'数据示例',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_column',
+    'COLUMN', N'example'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否为 Update 更新操作的字段',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_column',
-     'COLUMN', N'update_operation'
+    'MS_Description', N'是否为 Create 创建操作的字段',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_column',
+    'COLUMN', N'create_operation'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否为 List 查询操作的字段',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_column',
-     'COLUMN', N'list_operation'
+    'MS_Description', N'是否为 Update 更新操作的字段',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_column',
+    'COLUMN', N'update_operation'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'List 查询操作的条件类型',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_column',
-     'COLUMN', N'list_operation_condition'
+    'MS_Description', N'是否为 List 查询操作的字段',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_column',
+    'COLUMN', N'list_operation'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否为 List 查询操作的返回字段',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_column',
-     'COLUMN', N'list_operation_result'
+    'MS_Description', N'List 查询操作的条件类型',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_column',
+    'COLUMN', N'list_operation_condition'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'显示类型',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_column',
-     'COLUMN', N'html_type'
+    'MS_Description', N'是否为 List 查询操作的返回字段',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_column',
+    'COLUMN', N'list_operation_result'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_column',
-     'COLUMN', N'creator'
+    'MS_Description', N'显示类型',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_column',
+    'COLUMN', N'html_type'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_column',
-     'COLUMN', N'create_time'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_column',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_column',
-     'COLUMN', N'updater'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_column',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_column',
-     'COLUMN', N'update_time'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_column',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_column',
-     'COLUMN', N'deleted'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_column',
+    'COLUMN', N'update_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'代码生成表字段定义',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_column'
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_column',
+    'COLUMN', N'deleted'
+GO
+
+EXEC sp_addextendedproperty
+    'MS_Description', N'代码生成表字段定义',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_column'
 GO
 
 -- ----------------------------
@@ -698,207 +701,206 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS infra_codegen_table
 GO
-CREATE TABLE infra_codegen_table
-(
-    id                    bigint                                  NOT NULL PRIMARY KEY IDENTITY,
-    data_source_config_id bigint                                  NOT NULL,
-    scene                 tinyint       DEFAULT 1                 NOT NULL,
-    table_name            nvarchar(200) DEFAULT ''                NOT NULL,
-    table_comment         nvarchar(500) DEFAULT ''                NOT NULL,
-    remark                nvarchar(500) DEFAULT NULL              NULL,
-    module_name           nvarchar(30)                            NOT NULL,
-    business_name         nvarchar(30)                            NOT NULL,
-    class_name            nvarchar(100) DEFAULT ''                NOT NULL,
-    class_comment         nvarchar(50)                            NOT NULL,
-    author                nvarchar(50)                            NOT NULL,
-    template_type         tinyint       DEFAULT 1                 NOT NULL,
-    front_type            tinyint                                 NOT NULL,
-    parent_menu_id        bigint        DEFAULT NULL              NULL,
-    master_table_id       bigint        DEFAULT NULL              NULL,
-    sub_join_column_id    bigint        DEFAULT NULL              NULL,
-    sub_join_many         varchar(1)    DEFAULT NULL              NULL,
-    tree_parent_column_id bigint        DEFAULT NULL              NULL,
-    tree_name_column_id   bigint        DEFAULT NULL              NULL,
-    creator               nvarchar(64)  DEFAULT ''                NULL,
-    create_time           datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater               nvarchar(64)  DEFAULT ''                NULL,
-    update_time           datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted               bit           DEFAULT 0                 NOT NULL
+CREATE TABLE infra_codegen_table (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    data_source_config_id bigint  NOT NULL,
+    scene tinyint DEFAULT 1 NOT NULL,
+    table_name nvarchar(200) DEFAULT '' NOT NULL,
+    table_comment nvarchar(500) DEFAULT '' NOT NULL,
+    remark nvarchar(500) DEFAULT NULL NULL,
+    module_name nvarchar(30)  NOT NULL,
+    business_name nvarchar(30)  NOT NULL,
+    class_name nvarchar(100) DEFAULT '' NOT NULL,
+    class_comment nvarchar(50)  NOT NULL,
+    author nvarchar(50)  NOT NULL,
+    template_type tinyint DEFAULT 1 NOT NULL,
+    front_type tinyint  NOT NULL,
+    parent_menu_id bigint DEFAULT NULL NULL,
+    master_table_id bigint DEFAULT NULL NULL,
+    sub_join_column_id bigint DEFAULT NULL NULL,
+    sub_join_many varchar(1) DEFAULT NULL NULL,
+    tree_parent_column_id bigint DEFAULT NULL NULL,
+    tree_name_column_id bigint DEFAULT NULL NULL,
+    creator nvarchar(64) DEFAULT '' NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT 0 NOT NULL
 )
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_table',
-     'COLUMN', N'id'
+    'MS_Description', N'编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_table',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'数据源配置的编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_table',
-     'COLUMN', N'data_source_config_id'
+    'MS_Description', N'数据源配置的编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_table',
+    'COLUMN', N'data_source_config_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'生成场景',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_table',
-     'COLUMN', N'scene'
+    'MS_Description', N'生成场景',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_table',
+    'COLUMN', N'scene'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'表名称',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_table',
-     'COLUMN', N'table_name'
+    'MS_Description', N'表名称',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_table',
+    'COLUMN', N'table_name'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'表描述',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_table',
-     'COLUMN', N'table_comment'
+    'MS_Description', N'表描述',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_table',
+    'COLUMN', N'table_comment'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'备注',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_table',
-     'COLUMN', N'remark'
+    'MS_Description', N'备注',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_table',
+    'COLUMN', N'remark'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'模块名',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_table',
-     'COLUMN', N'module_name'
+    'MS_Description', N'模块名',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_table',
+    'COLUMN', N'module_name'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'业务名',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_table',
-     'COLUMN', N'business_name'
+    'MS_Description', N'业务名',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_table',
+    'COLUMN', N'business_name'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'类名称',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_table',
-     'COLUMN', N'class_name'
+    'MS_Description', N'类名称',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_table',
+    'COLUMN', N'class_name'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'类描述',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_table',
-     'COLUMN', N'class_comment'
+    'MS_Description', N'类描述',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_table',
+    'COLUMN', N'class_comment'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'作者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_table',
-     'COLUMN', N'author'
+    'MS_Description', N'作者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_table',
+    'COLUMN', N'author'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'模板类型',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_table',
-     'COLUMN', N'template_type'
+    'MS_Description', N'模板类型',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_table',
+    'COLUMN', N'template_type'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'前端类型',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_table',
-     'COLUMN', N'front_type'
+    'MS_Description', N'前端类型',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_table',
+    'COLUMN', N'front_type'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'父菜单编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_table',
-     'COLUMN', N'parent_menu_id'
+    'MS_Description', N'父菜单编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_table',
+    'COLUMN', N'parent_menu_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'主表的编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_table',
-     'COLUMN', N'master_table_id'
+    'MS_Description', N'主表的编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_table',
+    'COLUMN', N'master_table_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'子表关联主表的字段编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_table',
-     'COLUMN', N'sub_join_column_id'
+    'MS_Description', N'子表关联主表的字段编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_table',
+    'COLUMN', N'sub_join_column_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'主表与子表是否一对多',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_table',
-     'COLUMN', N'sub_join_many'
+    'MS_Description', N'主表与子表是否一对多',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_table',
+    'COLUMN', N'sub_join_many'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'树表的父字段编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_table',
-     'COLUMN', N'tree_parent_column_id'
+    'MS_Description', N'树表的父字段编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_table',
+    'COLUMN', N'tree_parent_column_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'树表的名字字段编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_table',
-     'COLUMN', N'tree_name_column_id'
+    'MS_Description', N'树表的名字字段编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_table',
+    'COLUMN', N'tree_name_column_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_table',
-     'COLUMN', N'creator'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_table',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_table',
-     'COLUMN', N'create_time'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_table',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_table',
-     'COLUMN', N'updater'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_table',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_table',
-     'COLUMN', N'update_time'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_table',
+    'COLUMN', N'update_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_table',
-     'COLUMN', N'deleted'
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_table',
+    'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'代码生成表定义',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_codegen_table'
+    'MS_Description', N'代码生成表定义',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_codegen_table'
 GO
 
 -- ----------------------------
@@ -906,119 +908,121 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS infra_config
 GO
-CREATE TABLE infra_config
-(
-    id          bigint                                  NOT NULL PRIMARY KEY IDENTITY,
-    category    nvarchar(50)                            NOT NULL,
-    type        tinyint                                 NOT NULL,
-    name        nvarchar(100) DEFAULT ''                NOT NULL,
-    config_key  nvarchar(100) DEFAULT ''                NOT NULL,
-    value       nvarchar(500) DEFAULT ''                NOT NULL,
-    visible     varchar(1)                              NOT NULL,
-    remark      nvarchar(500) DEFAULT NULL              NULL,
-    creator     nvarchar(64)  DEFAULT ''                NULL,
-    create_time datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater     nvarchar(64)  DEFAULT ''                NULL,
-    update_time datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted     bit           DEFAULT 0                 NOT NULL
+CREATE TABLE infra_config (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    category nvarchar(50)  NOT NULL,
+    type tinyint  NOT NULL,
+    name nvarchar(100) DEFAULT '' NOT NULL,
+    config_key nvarchar(100) DEFAULT '' NOT NULL,
+    value nvarchar(500) DEFAULT '' NOT NULL,
+    visible varchar(1)  NOT NULL,
+    remark nvarchar(500) DEFAULT NULL NULL,
+    creator nvarchar(64) DEFAULT '' NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT 0 NOT NULL
 )
 GO
 
-EXEC sp_addextendedproperty
-     'MS_Description', N'参数主键',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_config',
-     'COLUMN', N'id'
+CREATE INDEX idx_infra_config_01 ON infra_config (config_key)
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'参数分组',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_config',
-     'COLUMN', N'category'
+    'MS_Description', N'参数主键',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_config',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'参数类型',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_config',
-     'COLUMN', N'type'
+    'MS_Description', N'参数分组',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_config',
+    'COLUMN', N'category'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'参数名称',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_config',
-     'COLUMN', N'name'
+    'MS_Description', N'参数类型',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_config',
+    'COLUMN', N'type'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'参数键名',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_config',
-     'COLUMN', N'config_key'
+    'MS_Description', N'参数名称',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_config',
+    'COLUMN', N'name'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'参数键值',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_config',
-     'COLUMN', N'value'
+    'MS_Description', N'参数键名',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_config',
+    'COLUMN', N'config_key'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否可见',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_config',
-     'COLUMN', N'visible'
+    'MS_Description', N'参数键值',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_config',
+    'COLUMN', N'value'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'备注',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_config',
-     'COLUMN', N'remark'
+    'MS_Description', N'是否可见',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_config',
+    'COLUMN', N'visible'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_config',
-     'COLUMN', N'creator'
+    'MS_Description', N'备注',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_config',
+    'COLUMN', N'remark'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_config',
-     'COLUMN', N'create_time'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_config',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_config',
-     'COLUMN', N'updater'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_config',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_config',
-     'COLUMN', N'update_time'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_config',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_config',
-     'COLUMN', N'deleted'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_config',
+    'COLUMN', N'update_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'参数配置表',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_config'
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_config',
+    'COLUMN', N'deleted'
+GO
+
+EXEC sp_addextendedproperty
+    'MS_Description', N'参数配置表',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_config'
 GO
 
 -- ----------------------------
@@ -1039,8 +1043,6 @@ INSERT INTO infra_config (id, category, type, name, config_key, value, visible, 
 GO
 INSERT INTO infra_config (id, category, type, name, config_key, value, visible, remark, creator, create_time, updater, update_time, deleted) VALUES (10, N'url', 2, N'Swagger 接口文档的地址', N'url.swagger', N'', N'1', N'', N'1', N'2023-04-07 13:41:16', N'1', N'2023-04-07 14:59:00', N'0')
 GO
-INSERT INTO infra_config (id, category, type, name, config_key, value, visible, remark, creator, create_time, updater, update_time, deleted) VALUES (11, N'ui', 2, N'腾讯地图 key', N'tencent.lbs.key', N'TVDBZ-TDILD-4ON4B-PFDZA-RNLKH-VVF6E', N'1', N'腾讯地图 key', N'1', N'2023-06-03 19:16:27', N'1', N'2023-06-03 19:16:27', N'0')
-GO
 INSERT INTO infra_config (id, category, type, name, config_key, value, visible, remark, creator, create_time, updater, update_time, deleted) VALUES (12, N'test2', 2, N'test3', N'test4', N'test5', N'1', N'test6', N'1', N'2023-12-03 09:55:16', N'1', N'2025-04-06 21:00:09', N'0')
 GO
 INSERT INTO infra_config (id, category, type, name, config_key, value, visible, remark, creator, create_time, updater, update_time, deleted) VALUES (13, N'用户管理-账号初始密码', 2, N'用户管理-注册开关', N'system.user.register-enabled', N'true', N'0', N'', N'1', N'2025-04-26 17:23:41', N'1', N'2025-04-26 17:23:41', N'0')
@@ -1056,95 +1058,94 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS infra_data_source_config
 GO
-CREATE TABLE infra_data_source_config
-(
-    id          bigint                                  NOT NULL PRIMARY KEY IDENTITY,
-    name        nvarchar(100) DEFAULT ''                NOT NULL,
-    url         nvarchar(1024)                          NOT NULL,
-    username    nvarchar(255)                           NOT NULL,
-    password    nvarchar(255) DEFAULT ''                NOT NULL,
-    creator     nvarchar(64)  DEFAULT ''                NULL,
-    create_time datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater     nvarchar(64)  DEFAULT ''                NULL,
-    update_time datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted     bit           DEFAULT 0                 NOT NULL
+CREATE TABLE infra_data_source_config (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    name nvarchar(100) DEFAULT '' NOT NULL,
+    url nvarchar(1024)  NOT NULL,
+    username nvarchar(255)  NOT NULL,
+    password nvarchar(255) DEFAULT '' NOT NULL,
+    creator nvarchar(64) DEFAULT '' NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT 0 NOT NULL
 )
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'主键编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_data_source_config',
-     'COLUMN', N'id'
+    'MS_Description', N'主键编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_data_source_config',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'参数名称',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_data_source_config',
-     'COLUMN', N'name'
+    'MS_Description', N'参数名称',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_data_source_config',
+    'COLUMN', N'name'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'数据源连接',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_data_source_config',
-     'COLUMN', N'url'
+    'MS_Description', N'数据源连接',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_data_source_config',
+    'COLUMN', N'url'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'用户名',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_data_source_config',
-     'COLUMN', N'username'
+    'MS_Description', N'用户名',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_data_source_config',
+    'COLUMN', N'username'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'密码',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_data_source_config',
-     'COLUMN', N'password'
+    'MS_Description', N'密码',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_data_source_config',
+    'COLUMN', N'password'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_data_source_config',
-     'COLUMN', N'creator'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_data_source_config',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_data_source_config',
-     'COLUMN', N'create_time'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_data_source_config',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_data_source_config',
-     'COLUMN', N'updater'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_data_source_config',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_data_source_config',
-     'COLUMN', N'update_time'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_data_source_config',
+    'COLUMN', N'update_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_data_source_config',
-     'COLUMN', N'deleted'
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_data_source_config',
+    'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'数据源配置表',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_data_source_config'
+    'MS_Description', N'数据源配置表',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_data_source_config'
 GO
 
 -- ----------------------------
@@ -1152,111 +1153,110 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS infra_file
 GO
-CREATE TABLE infra_file
-(
-    id          bigint                                  NOT NULL PRIMARY KEY IDENTITY,
-    config_id   bigint        DEFAULT NULL              NULL,
-    name        nvarchar(256) DEFAULT NULL              NULL,
-    path        nvarchar(512)                           NOT NULL,
-    url         nvarchar(1024)                          NOT NULL,
-    type        nvarchar(128) DEFAULT NULL              NULL,
-    size        int                                     NOT NULL,
-    creator     nvarchar(64)  DEFAULT ''                NULL,
-    create_time datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater     nvarchar(64)  DEFAULT ''                NULL,
-    update_time datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted     bit           DEFAULT 0                 NOT NULL
+CREATE TABLE infra_file (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    config_id bigint DEFAULT NULL NULL,
+    name nvarchar(256) DEFAULT NULL NULL,
+    path nvarchar(512)  NOT NULL,
+    url nvarchar(1024)  NOT NULL,
+    type nvarchar(128) DEFAULT NULL NULL,
+    size int  NOT NULL,
+    creator nvarchar(64) DEFAULT '' NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT 0 NOT NULL
 )
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'文件编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_file',
-     'COLUMN', N'id'
+    'MS_Description', N'文件编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_file',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'配置编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_file',
-     'COLUMN', N'config_id'
+    'MS_Description', N'配置编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_file',
+    'COLUMN', N'config_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'文件名',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_file',
-     'COLUMN', N'name'
+    'MS_Description', N'文件名',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_file',
+    'COLUMN', N'name'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'文件路径',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_file',
-     'COLUMN', N'path'
+    'MS_Description', N'文件路径',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_file',
+    'COLUMN', N'path'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'文件 URL',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_file',
-     'COLUMN', N'url'
+    'MS_Description', N'文件 URL',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_file',
+    'COLUMN', N'url'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'文件类型',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_file',
-     'COLUMN', N'type'
+    'MS_Description', N'文件类型',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_file',
+    'COLUMN', N'type'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'文件大小',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_file',
-     'COLUMN', N'size'
+    'MS_Description', N'文件大小',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_file',
+    'COLUMN', N'size'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_file',
-     'COLUMN', N'creator'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_file',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_file',
-     'COLUMN', N'create_time'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_file',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_file',
-     'COLUMN', N'updater'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_file',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_file',
-     'COLUMN', N'update_time'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_file',
+    'COLUMN', N'update_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_file',
-     'COLUMN', N'deleted'
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_file',
+    'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'文件表',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_file'
+    'MS_Description', N'文件表',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_file'
 GO
 
 -- ----------------------------
@@ -1264,103 +1264,102 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS infra_file_config
 GO
-CREATE TABLE infra_file_config
-(
-    id          bigint                                  NOT NULL PRIMARY KEY IDENTITY,
-    name        nvarchar(63)                            NOT NULL,
-    storage     tinyint                                 NOT NULL,
-    remark      nvarchar(255) DEFAULT NULL              NULL,
-    master      varchar(1)                              NOT NULL,
-    config      nvarchar(4000)                          NOT NULL,
-    creator     nvarchar(64)  DEFAULT ''                NULL,
-    create_time datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater     nvarchar(64)  DEFAULT ''                NULL,
-    update_time datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted     bit           DEFAULT 0                 NOT NULL
+CREATE TABLE infra_file_config (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    name nvarchar(63)  NOT NULL,
+    storage tinyint  NOT NULL,
+    remark nvarchar(255) DEFAULT NULL NULL,
+    master varchar(1)  NOT NULL,
+    config nvarchar(4000)  NOT NULL,
+    creator nvarchar(64) DEFAULT '' NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT 0 NOT NULL
 )
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_file_config',
-     'COLUMN', N'id'
+    'MS_Description', N'编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_file_config',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'配置名',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_file_config',
-     'COLUMN', N'name'
+    'MS_Description', N'配置名',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_file_config',
+    'COLUMN', N'name'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'存储器',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_file_config',
-     'COLUMN', N'storage'
+    'MS_Description', N'存储器',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_file_config',
+    'COLUMN', N'storage'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'备注',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_file_config',
-     'COLUMN', N'remark'
+    'MS_Description', N'备注',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_file_config',
+    'COLUMN', N'remark'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否为主配置',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_file_config',
-     'COLUMN', N'master'
+    'MS_Description', N'是否为主配置',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_file_config',
+    'COLUMN', N'master'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'存储配置',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_file_config',
-     'COLUMN', N'config'
+    'MS_Description', N'存储配置',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_file_config',
+    'COLUMN', N'config'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_file_config',
-     'COLUMN', N'creator'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_file_config',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_file_config',
-     'COLUMN', N'create_time'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_file_config',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_file_config',
-     'COLUMN', N'updater'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_file_config',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_file_config',
-     'COLUMN', N'update_time'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_file_config',
+    'COLUMN', N'update_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_file_config',
-     'COLUMN', N'deleted'
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_file_config',
+    'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'文件配置表',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_file_config'
+    'MS_Description', N'文件配置表',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_file_config'
 GO
 
 -- ----------------------------
@@ -1371,23 +1370,27 @@ BEGIN TRANSACTION
 GO
 SET IDENTITY_INSERT infra_file_config ON
 GO
-INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (4, N'数据库（示例）', 1, N'我是数据库', N'0', N'{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.db.DBFileClientConfig","domain":"http://127.0.0.1:48080"}', N'1', N'2022-03-15 23:56:24', N'1', N'2025-05-02 18:30:28', N'0')
+INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (4, N'数据库（示例）', 1, N'我是数据库', N'0', N'{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.db.DBFileClientConfig","domain":"http://127.0.0.1:48080"}', N'1', N'2022-03-15 23:56:24', N'1', N'2025-11-24 20:57:14', N'0')
 GO
-INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (22, N'七牛存储器（示例）', 20, N'请换成你自己的密钥！！！', N'1', N'{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig","endpoint":"s3.cn-south-1.qiniucs.com","domain":"http://test.yudao.iocoder.cn","bucket":"ruoyi-vue-pro","accessKey":"3TvrJ70gl2Gt6IBe7_IZT1F6i_k0iMuRtyEv4EyS","accessSecret":"wd0tbVBYlp0S-ihA8Qg2hPLncoP83wyrIq24OZuY","enablePathStyleAccess":false}', N'1', N'2024-01-13 22:11:12', N'1', N'2025-05-02 18:30:28', N'0')
+INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (22, N'七牛存储器（示例）', 20, N'请换成你自己的密钥！！！', N'1', N'{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig","endpoint":"s3.cn-south-1.qiniucs.com","domain":"http://test.yudao.iocoder.cn","bucket":"ruoyi-vue-pro","accessKey":"3TvrJ70gl2Gt6IBe7_IZT1F6i_k0iMuRtyEv4EyS","accessSecret":"wd0tbVBYlp0S-ihA8Qg2hPLncoP83wyrIq24OZuY","enablePathStyleAccess":false,"enablePublicAccess":true}', N'1', N'2024-01-13 22:11:12', N'1', N'2025-11-24 20:57:14', N'0')
 GO
-INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (24, N'腾讯云存储（示例）', 20, N'请换成你的密钥！！！', N'0', N'{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig","endpoint":"https://cos.ap-shanghai.myqcloud.com","domain":"http://tengxun-oss.iocoder.cn","bucket":"aoteman-1255880240","accessKey":"AKIDAF6WSh1uiIjwqtrOsGSN3WryqTM6cTMt","accessSecret":"X"}', N'1', N'2024-11-09 16:03:22', N'1', N'2025-05-02 18:30:28', N'0')
+INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (24, N'腾讯云存储（示例）', 20, N'请换成你的密钥！！！', N'0', N'{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig","endpoint":"https://cos.ap-shanghai.myqcloud.com","domain":"http://tengxun-oss.iocoder.cn","bucket":"aoteman-1255880240","accessKey":"AKIDAF6WSh1uiIjwqtrOsGSN3WryqTM6cTMt","accessSecret":"X","enablePathStyleAccess":false,"enablePublicAccess":true}', N'1', N'2024-11-09 16:03:22', N'1', N'2025-11-24 20:57:14', N'0')
 GO
-INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (25, N'阿里云存储（示例）', 20, N'', N'0', N'{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig","endpoint":"oss-cn-beijing.aliyuncs.com","domain":"http://ali-oss.iocoder.cn","bucket":"yunai-aoteman","accessKey":"LTAI5tEQLgnDyjh3WpNcdMKA","accessSecret":"X","enablePathStyleAccess":false}', N'1', N'2024-11-09 16:47:08', N'1', N'2025-05-02 18:30:28', N'0')
+INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (25, N'阿里云存储（示例）', 20, N'', N'0', N'{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig","endpoint":"oss-cn-beijing.aliyuncs.com","domain":"http://ali-oss.iocoder.cn","bucket":"yunai-aoteman","accessKey":"LTAI5tEQLgnDyjh3WpNcdMKA","accessSecret":"X","enablePathStyleAccess":false,"enablePublicAccess":true}', N'1', N'2024-11-09 16:47:08', N'1', N'2025-11-24 20:57:14', N'0')
 GO
-INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (26, N'火山云存储（示例）', 20, N'', N'0', N'{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig","endpoint":"tos-s3-cn-beijing.volces.com","domain":null,"bucket":"yunai","accessKey":"AKLTZjc3Zjc4MzZmMjU3NDk0ZTgxYmIyMmFkNTIwMDI1ZGE","accessSecret":"X==","enablePathStyleAccess":false}', N'1', N'2024-11-09 16:56:42', N'1', N'2025-05-02 18:30:28', N'0')
+INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (26, N'火山云存储（示例）', 20, N'', N'0', N'{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig","endpoint":"tos-s3-cn-beijing.volces.com","domain":null,"bucket":"yunai","accessKey":"AKLTZjc3Zjc4MzZmMjU3NDk0ZTgxYmIyMmFkNTIwMDI1ZGE","accessSecret":"X==","enablePathStyleAccess":false,"enablePublicAccess":true}', N'1', N'2024-11-09 16:56:42', N'1', N'2025-11-24 20:57:14', N'0')
 GO
-INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (27, N'华为云存储（示例）', 20, N'', N'0', N'{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig","endpoint":"obs.cn-east-3.myhuaweicloud.com","domain":"","bucket":"yudao","accessKey":"PVDONDEIOTW88LF8DC4U","accessSecret":"X","enablePathStyleAccess":false}', N'1', N'2024-11-09 17:18:41', N'1', N'2025-05-02 18:30:28', N'0')
+INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (27, N'华为云存储（示例）', 20, N'', N'0', N'{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig","endpoint":"obs.cn-east-3.myhuaweicloud.com","domain":"","bucket":"yudao","accessKey":"PVDONDEIOTW88LF8DC4U","accessSecret":"X","enablePathStyleAccess":false,"enablePublicAccess":true}', N'1', N'2024-11-09 17:18:41', N'1', N'2025-11-24 20:57:14', N'0')
 GO
-INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (28, N'MinIO 存储（示例）', 20, N'', N'0', N'{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig","endpoint":"http://127.0.0.1:9000","domain":"http://127.0.0.1:9000/yudao","bucket":"yudao","accessKey":"admin","accessSecret":"password","enablePathStyleAccess":false}', N'1', N'2024-11-09 17:43:10', N'1', N'2025-05-02 18:30:28', N'0')
+INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (28, N'MinIO 存储（示例）', 20, N'', N'0', N'{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig","endpoint":"http://127.0.0.1:9000","domain":"http://127.0.0.1:9000/yudao","bucket":"yudao","accessKey":"admin","accessSecret":"password","enablePathStyleAccess":false,"enablePublicAccess":true}', N'1', N'2024-11-09 17:43:10', N'1', N'2025-11-24 20:57:14', N'0')
 GO
-INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (29, N'本地存储（示例）', 10, N'仅适合 mac 或 windows', N'0', N'{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.local.LocalFileClientConfig","basePath":"/Users/yunai/tmp/file","domain":"http://127.0.0.1:48080"}', N'1', N'2025-05-02 11:25:45', N'1', N'2025-05-02 18:30:28', N'0')
+INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (29, N'本地存储（示例）', 10, N'mac/linux 使用 /，windows 使用 \\', N'0', N'{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.local.LocalFileClientConfig","basePath":"/Users/yunai/tmp/file","domain":"http://127.0.0.1:48080"}', N'1', N'2025-05-02 11:25:45', N'1', N'2025-11-24 20:57:14', N'0')
 GO
-INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (30, N'SFTP 存储（示例）', 12, N'', N'0', N'{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.sftp.SftpFileClientConfig","basePath":"/upload","domain":"http://127.0.0.1:48080","host":"127.0.0.1","port":2222,"username":"foo","password":"pass"}', N'1', N'2025-05-02 16:34:10', N'1', N'2025-05-02 18:30:28', N'0')
+INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (30, N'SFTP 存储（示例）', 12, N'', N'0', N'{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.sftp.SftpFileClientConfig","basePath":"/upload","domain":"http://127.0.0.1:48080","host":"127.0.0.1","port":2222,"username":"foo","password":"pass"}', N'1', N'2025-05-02 16:34:10', N'1', N'2025-11-24 20:57:14', N'0')
+GO
+INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (34, N'七牛云存储【私有】（示例）', 20, N'请换成你自己的密钥！！！', N'0', N'{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig","endpoint":"s3.cn-south-1.qiniucs.com","domain":"http://t151glocd.hn-bkt.clouddn.com","bucket":"ruoyi-vue-pro-private","accessKey":"3TvrJ70gl2Gt6IBe7_IZT1F6i_k0iMuRtyEv4EyS","accessSecret":"wd0tbVBYlp0S-ihA8Qg2hPLncoP83wyrIq24OZuY","enablePathStyleAccess":false,"enablePublicAccess":false}', N'1', N'2025-08-17 21:22:00', N'1', N'2025-11-24 20:57:14', N'0')
+GO
+INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (35, N'1', 20, N'1', N'0', N'{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig","endpoint":"http://www.baidu.com","domain":"http://www.xxx.com","bucket":"1","accessKey":"2","accessSecret":"3","enablePathStyleAccess":false,"enablePublicAccess":false,"region":"1"}', N'1', N'2025-10-02 14:32:12', N'1', N'2025-11-29 15:59:39', N'0')
 GO
 SET IDENTITY_INSERT infra_file_config OFF
 GO
@@ -1400,87 +1403,89 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS infra_file_content
 GO
-CREATE TABLE infra_file_content
-(
-    id          bigint                                 NOT NULL PRIMARY KEY IDENTITY,
-    config_id   bigint                                 NOT NULL,
-    path        nvarchar(512)                          NOT NULL,
-    content     varbinary(max)                         NOT NULL,
-    creator     nvarchar(64) DEFAULT ''                NULL,
-    create_time datetime2    DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater     nvarchar(64) DEFAULT ''                NULL,
-    update_time datetime2    DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted     bit          DEFAULT 0                 NOT NULL
+CREATE TABLE infra_file_content (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    config_id bigint  NOT NULL,
+    path nvarchar(512)  NOT NULL,
+    content varbinary(max)  NOT NULL,
+    creator nvarchar(64) DEFAULT '' NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT 0 NOT NULL
 )
 GO
 
-EXEC sp_addextendedproperty
-     'MS_Description', N'编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_file_content',
-     'COLUMN', N'id'
+CREATE INDEX idx_infra_file_content_01 ON infra_file_content (config_id, path)
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'配置编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_file_content',
-     'COLUMN', N'config_id'
+    'MS_Description', N'编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_file_content',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'文件路径',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_file_content',
-     'COLUMN', N'path'
+    'MS_Description', N'配置编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_file_content',
+    'COLUMN', N'config_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'文件内容',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_file_content',
-     'COLUMN', N'content'
+    'MS_Description', N'文件路径',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_file_content',
+    'COLUMN', N'path'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_file_content',
-     'COLUMN', N'creator'
+    'MS_Description', N'文件内容',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_file_content',
+    'COLUMN', N'content'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_file_content',
-     'COLUMN', N'create_time'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_file_content',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_file_content',
-     'COLUMN', N'updater'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_file_content',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_file_content',
-     'COLUMN', N'update_time'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_file_content',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_file_content',
-     'COLUMN', N'deleted'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_file_content',
+    'COLUMN', N'update_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'文件表',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_file_content'
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_file_content',
+    'COLUMN', N'deleted'
+GO
+
+EXEC sp_addextendedproperty
+    'MS_Description', N'文件表',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_file_content'
 GO
 
 -- ----------------------------
@@ -1488,127 +1493,126 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS infra_job
 GO
-CREATE TABLE infra_job
-(
-    id              bigint                                  NOT NULL PRIMARY KEY IDENTITY,
-    name            nvarchar(32)                            NOT NULL,
-    status          tinyint                                 NOT NULL,
-    handler_name    nvarchar(64)                            NOT NULL,
-    handler_param   nvarchar(255) DEFAULT NULL              NULL,
-    cron_expression nvarchar(32)                            NOT NULL,
-    retry_count     int           DEFAULT 0                 NOT NULL,
-    retry_interval  int           DEFAULT 0                 NOT NULL,
-    monitor_timeout int           DEFAULT 0                 NOT NULL,
-    creator         nvarchar(64)  DEFAULT ''                NULL,
-    create_time     datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater         nvarchar(64)  DEFAULT ''                NULL,
-    update_time     datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted         bit           DEFAULT 0                 NOT NULL
+CREATE TABLE infra_job (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    name nvarchar(32)  NOT NULL,
+    status tinyint  NOT NULL,
+    handler_name nvarchar(64)  NOT NULL,
+    handler_param nvarchar(255) DEFAULT NULL NULL,
+    cron_expression nvarchar(32)  NOT NULL,
+    retry_count int DEFAULT 0 NOT NULL,
+    retry_interval int DEFAULT 0 NOT NULL,
+    monitor_timeout int DEFAULT 0 NOT NULL,
+    creator nvarchar(64) DEFAULT '' NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT 0 NOT NULL
 )
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'任务编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_job',
-     'COLUMN', N'id'
+    'MS_Description', N'任务编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_job',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'任务名称',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_job',
-     'COLUMN', N'name'
+    'MS_Description', N'任务名称',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_job',
+    'COLUMN', N'name'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'任务状态',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_job',
-     'COLUMN', N'status'
+    'MS_Description', N'任务状态',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_job',
+    'COLUMN', N'status'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'处理器的名字',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_job',
-     'COLUMN', N'handler_name'
+    'MS_Description', N'处理器的名字',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_job',
+    'COLUMN', N'handler_name'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'处理器的参数',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_job',
-     'COLUMN', N'handler_param'
+    'MS_Description', N'处理器的参数',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_job',
+    'COLUMN', N'handler_param'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'CRON 表达式',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_job',
-     'COLUMN', N'cron_expression'
+    'MS_Description', N'CRON 表达式',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_job',
+    'COLUMN', N'cron_expression'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'重试次数',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_job',
-     'COLUMN', N'retry_count'
+    'MS_Description', N'重试次数',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_job',
+    'COLUMN', N'retry_count'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'重试间隔',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_job',
-     'COLUMN', N'retry_interval'
+    'MS_Description', N'重试间隔',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_job',
+    'COLUMN', N'retry_interval'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'监控超时时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_job',
-     'COLUMN', N'monitor_timeout'
+    'MS_Description', N'监控超时时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_job',
+    'COLUMN', N'monitor_timeout'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_job',
-     'COLUMN', N'creator'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_job',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_job',
-     'COLUMN', N'create_time'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_job',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_job',
-     'COLUMN', N'updater'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_job',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_job',
-     'COLUMN', N'update_time'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_job',
+    'COLUMN', N'update_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_job',
-     'COLUMN', N'deleted'
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_job',
+    'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'定时任务表',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_job'
+    'MS_Description', N'定时任务表',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_job'
 GO
 
 -- ----------------------------
@@ -1627,13 +1631,13 @@ INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expre
 GO
 INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expression, retry_count, retry_interval, monitor_timeout, creator, create_time, updater, update_time, deleted) VALUES (19, N'退款订单的同步 Job', 2, N'payRefundSyncJob', NULL, N'0 0/1 * * * ?', 0, 0, 0, N'1', N'2023-07-23 21:03:44', N'1', N'2023-07-23 21:09:00', N'0')
 GO
-INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expression, retry_count, retry_interval, monitor_timeout, creator, create_time, updater, update_time, deleted) VALUES (21, N'交易订单的自动过期 Job', 2, N'tradeOrderAutoCancelJob', N'', N'0 * * * * ?', 3, 0, 0, N'1', N'2023-09-25 23:43:26', N'1', N'2023-09-26 19:23:30', N'0')
+INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expression, retry_count, retry_interval, monitor_timeout, creator, create_time, updater, update_time, deleted) VALUES (21, N'Mall 交易订单的自动过期 Job', 2, N'tradeOrderAutoCancelJob', N'', N'0 * * * * ?', 3, 0, 0, N'1', N'2023-09-25 23:43:26', N'1', N'2025-10-02 11:08:34', N'0')
 GO
-INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expression, retry_count, retry_interval, monitor_timeout, creator, create_time, updater, update_time, deleted) VALUES (22, N'交易订单的自动收货 Job', 2, N'tradeOrderAutoReceiveJob', N'', N'0 * * * * ?', 3, 0, 0, N'1', N'2023-09-26 19:23:53', N'1', N'2023-09-26 23:38:08', N'0')
+INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expression, retry_count, retry_interval, monitor_timeout, creator, create_time, updater, update_time, deleted) VALUES (22, N'Mall 交易订单的自动收货 Job', 2, N'tradeOrderAutoReceiveJob', N'', N'0 * * * * ?', 3, 0, 0, N'1', N'2023-09-26 19:23:53', N'1', N'2025-10-02 11:08:36', N'0')
 GO
-INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expression, retry_count, retry_interval, monitor_timeout, creator, create_time, updater, update_time, deleted) VALUES (23, N'交易订单的自动评论 Job', 2, N'tradeOrderAutoCommentJob', N'', N'0 * * * * ?', 3, 0, 0, N'1', N'2023-09-26 23:38:29', N'1', N'2023-09-27 11:03:10', N'0')
+INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expression, retry_count, retry_interval, monitor_timeout, creator, create_time, updater, update_time, deleted) VALUES (23, N'Mall 交易订单的自动评论 Job', 2, N'tradeOrderAutoCommentJob', N'', N'0 * * * * ?', 3, 0, 0, N'1', N'2023-09-26 23:38:29', N'1', N'2025-10-02 11:08:38', N'0')
 GO
-INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expression, retry_count, retry_interval, monitor_timeout, creator, create_time, updater, update_time, deleted) VALUES (24, N'佣金解冻 Job', 2, N'brokerageRecordUnfreezeJob', N'', N'0 * * * * ?', 3, 0, 0, N'1', N'2023-09-28 22:01:46', N'1', N'2023-09-28 22:01:56', N'0')
+INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expression, retry_count, retry_interval, monitor_timeout, creator, create_time, updater, update_time, deleted) VALUES (24, N'Mall 佣金解冻 Job', 2, N'brokerageRecordUnfreezeJob', N'', N'0 * * * * ?', 3, 0, 0, N'1', N'2023-09-28 22:01:46', N'1', N'2025-10-02 11:08:04', N'0')
 GO
 INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expression, retry_count, retry_interval, monitor_timeout, creator, create_time, updater, update_time, deleted) VALUES (25, N'访问日志清理 Job', 2, N'accessLogCleanJob', N'', N'0 0 0 * * ?', 3, 0, 0, N'1', N'2023-10-03 10:59:41', N'1', N'2023-10-03 11:01:10', N'0')
 GO
@@ -1644,6 +1648,16 @@ GO
 INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expression, retry_count, retry_interval, monitor_timeout, creator, create_time, updater, update_time, deleted) VALUES (33, N'demoJob', 2, N'demoJob', N'', N'0 * * * * ?', 1, 1, 0, N'1', N'2024-10-27 19:38:46', N'1', N'2025-05-10 18:13:54', N'0')
 GO
 INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expression, retry_count, retry_interval, monitor_timeout, creator, create_time, updater, update_time, deleted) VALUES (35, N'转账订单的同步 Job', 2, N'payTransferSyncJob', N'', N'0 * * * * ?', 0, 0, 0, N'1', N'2025-05-10 17:35:54', N'1', N'2025-05-10 18:13:52', N'0')
+GO
+INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expression, retry_count, retry_interval, monitor_timeout, creator, create_time, updater, update_time, deleted) VALUES (36, N'IoT 设备离线检查 Job', 2, N'iotDeviceOfflineCheckJob', N'', N'0 * * * * ?', 0, 0, 0, N'1', N'2025-07-03 23:48:44', N'"1"', N'2025-07-03 23:48:47', N'0')
+GO
+INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expression, retry_count, retry_interval, monitor_timeout, creator, create_time, updater, update_time, deleted) VALUES (37, N'IoT OTA 升级推送 Job', 2, N'iotOtaUpgradeJob', N'', N'0 * * * * ?', 0, 0, 0, N'1', N'2025-07-03 23:49:07', N'"1"', N'2025-07-03 23:49:13', N'0')
+GO
+INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expression, retry_count, retry_interval, monitor_timeout, creator, create_time, updater, update_time, deleted) VALUES (38, N'Mall 拼团过期 Job', 2, N'combinationRecordExpireJob', N'', N'0 * * * * ?', 0, 0, 0, N'1', N'2025-10-02 11:07:11', N'1', N'2025-10-02 11:07:14', N'0')
+GO
+INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expression, retry_count, retry_interval, monitor_timeout, creator, create_time, updater, update_time, deleted) VALUES (39, N'Mall 优惠券过期 Job', 2, N'couponExpireJob', N'', N'0 * * * * ?', 0, 0, 0, N'1', N'2025-10-02 11:07:34', N'1', N'2025-10-02 11:07:37', N'0')
+GO
+INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expression, retry_count, retry_interval, monitor_timeout, creator, create_time, updater, update_time, deleted) VALUES (40, N'Mall 商品统计 Job', 2, N'productStatisticsJob', N'', N'0 0 0 * * ?', 0, 0, 0, N'1', N'2025-11-22 18:51:25', N'1', N'2025-11-22 18:56:21', N'0')
 GO
 SET IDENTITY_INSERT infra_job OFF
 GO
@@ -1656,135 +1670,139 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS infra_job_log
 GO
-CREATE TABLE infra_job_log
-(
-    id            bigint                                   NOT NULL PRIMARY KEY IDENTITY,
-    job_id        bigint                                   NOT NULL,
-    handler_name  nvarchar(64)                             NOT NULL,
-    handler_param nvarchar(255)  DEFAULT NULL              NULL,
-    execute_index tinyint        DEFAULT 1                 NOT NULL,
-    begin_time    datetime2                                NOT NULL,
-    end_time      datetime2      DEFAULT NULL              NULL,
-    duration      int            DEFAULT NULL              NULL,
-    status        tinyint                                  NOT NULL,
-    result        nvarchar(4000) DEFAULT ''                NULL,
-    creator       nvarchar(64)   DEFAULT ''                NULL,
-    create_time   datetime2      DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater       nvarchar(64)   DEFAULT ''                NULL,
-    update_time   datetime2      DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted       bit            DEFAULT 0                 NOT NULL
+CREATE TABLE infra_job_log (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    job_id bigint  NOT NULL,
+    handler_name nvarchar(64)  NOT NULL,
+    handler_param nvarchar(255) DEFAULT NULL NULL,
+    execute_index tinyint DEFAULT 1 NOT NULL,
+    begin_time datetime2  NOT NULL,
+    end_time datetime2 DEFAULT NULL NULL,
+    duration int DEFAULT NULL NULL,
+    status tinyint  NOT NULL,
+    result nvarchar(4000) DEFAULT '' NULL,
+    creator nvarchar(64) DEFAULT '' NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT 0 NOT NULL
 )
 GO
 
-EXEC sp_addextendedproperty
-     'MS_Description', N'日志编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_job_log',
-     'COLUMN', N'id'
+CREATE INDEX idx_infra_job_log_01 ON infra_job_log (job_id)
+GO
+CREATE INDEX idx_infra_job_log_02 ON infra_job_log (create_time)
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'任务编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_job_log',
-     'COLUMN', N'job_id'
+    'MS_Description', N'日志编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_job_log',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'处理器的名字',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_job_log',
-     'COLUMN', N'handler_name'
+    'MS_Description', N'任务编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_job_log',
+    'COLUMN', N'job_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'处理器的参数',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_job_log',
-     'COLUMN', N'handler_param'
+    'MS_Description', N'处理器的名字',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_job_log',
+    'COLUMN', N'handler_name'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'第几次执行',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_job_log',
-     'COLUMN', N'execute_index'
+    'MS_Description', N'处理器的参数',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_job_log',
+    'COLUMN', N'handler_param'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'开始执行时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_job_log',
-     'COLUMN', N'begin_time'
+    'MS_Description', N'第几次执行',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_job_log',
+    'COLUMN', N'execute_index'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'结束执行时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_job_log',
-     'COLUMN', N'end_time'
+    'MS_Description', N'开始执行时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_job_log',
+    'COLUMN', N'begin_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'执行时长',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_job_log',
-     'COLUMN', N'duration'
+    'MS_Description', N'结束执行时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_job_log',
+    'COLUMN', N'end_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'任务状态',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_job_log',
-     'COLUMN', N'status'
+    'MS_Description', N'执行时长',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_job_log',
+    'COLUMN', N'duration'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'结果数据',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_job_log',
-     'COLUMN', N'result'
+    'MS_Description', N'任务状态',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_job_log',
+    'COLUMN', N'status'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_job_log',
-     'COLUMN', N'creator'
+    'MS_Description', N'结果数据',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_job_log',
+    'COLUMN', N'result'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_job_log',
-     'COLUMN', N'create_time'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_job_log',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_job_log',
-     'COLUMN', N'updater'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_job_log',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_job_log',
-     'COLUMN', N'update_time'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_job_log',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_job_log',
-     'COLUMN', N'deleted'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_job_log',
+    'COLUMN', N'update_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'定时任务日志表',
-     'SCHEMA', N'dbo',
-     'TABLE', N'infra_job_log'
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_job_log',
+    'COLUMN', N'deleted'
+GO
+
+EXEC sp_addextendedproperty
+    'MS_Description', N'定时任务日志表',
+    'SCHEMA', N'dbo',
+    'TABLE', N'infra_job_log'
 GO
 
 -- ----------------------------
@@ -1792,127 +1810,126 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS system_dept
 GO
-CREATE TABLE system_dept
-(
-    id             bigint                                 NOT NULL PRIMARY KEY IDENTITY,
-    name           nvarchar(30) DEFAULT ''                NOT NULL,
-    parent_id      bigint       DEFAULT 0                 NOT NULL,
-    sort           int          DEFAULT 0                 NOT NULL,
-    leader_user_id bigint       DEFAULT NULL              NULL,
-    phone          nvarchar(11) DEFAULT NULL              NULL,
-    email          nvarchar(50) DEFAULT NULL              NULL,
-    status         tinyint                                NOT NULL,
-    creator        nvarchar(64) DEFAULT ''                NULL,
-    create_time    datetime2    DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater        nvarchar(64) DEFAULT ''                NULL,
-    update_time    datetime2    DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted        bit          DEFAULT 0                 NOT NULL,
-    tenant_id      bigint       DEFAULT 0                 NOT NULL
+CREATE TABLE system_dept (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    name nvarchar(30) DEFAULT '' NOT NULL,
+    parent_id bigint DEFAULT 0 NOT NULL,
+    sort int DEFAULT 0 NOT NULL,
+    leader_user_id bigint DEFAULT NULL NULL,
+    phone nvarchar(11) DEFAULT NULL NULL,
+    email nvarchar(50) DEFAULT NULL NULL,
+    status tinyint  NOT NULL,
+    creator nvarchar(64) DEFAULT '' NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT 0 NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 )
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'部门id',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_dept',
-     'COLUMN', N'id'
+    'MS_Description', N'部门id',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dept',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'部门名称',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_dept',
-     'COLUMN', N'name'
+    'MS_Description', N'部门名称',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dept',
+    'COLUMN', N'name'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'父部门id',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_dept',
-     'COLUMN', N'parent_id'
+    'MS_Description', N'父部门id',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dept',
+    'COLUMN', N'parent_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'显示顺序',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_dept',
-     'COLUMN', N'sort'
+    'MS_Description', N'显示顺序',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dept',
+    'COLUMN', N'sort'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'负责人',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_dept',
-     'COLUMN', N'leader_user_id'
+    'MS_Description', N'负责人',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dept',
+    'COLUMN', N'leader_user_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'联系电话',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_dept',
-     'COLUMN', N'phone'
+    'MS_Description', N'联系电话',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dept',
+    'COLUMN', N'phone'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'邮箱',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_dept',
-     'COLUMN', N'email'
+    'MS_Description', N'邮箱',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dept',
+    'COLUMN', N'email'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'部门状态（0正常 1停用）',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_dept',
-     'COLUMN', N'status'
+    'MS_Description', N'部门状态（0正常 1停用）',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dept',
+    'COLUMN', N'status'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_dept',
-     'COLUMN', N'creator'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dept',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_dept',
-     'COLUMN', N'create_time'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dept',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_dept',
-     'COLUMN', N'updater'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dept',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_dept',
-     'COLUMN', N'update_time'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dept',
+    'COLUMN', N'update_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_dept',
-     'COLUMN', N'deleted'
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dept',
+    'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'租户编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_dept',
-     'COLUMN', N'tenant_id'
+    'MS_Description', N'租户编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dept',
+    'COLUMN', N'tenant_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'部门表',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_dept'
+    'MS_Description', N'部门表',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dept'
 GO
 
 -- ----------------------------
@@ -1923,13 +1940,13 @@ BEGIN TRANSACTION
 GO
 SET IDENTITY_INSERT system_dept ON
 GO
-INSERT INTO system_dept (id, name, parent_id, sort, leader_user_id, phone, email, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (100, N'芋道源码', 0, 0, 1, N'15888888888', N'ry@qq.com', 0, N'admin', N'2021-01-05 17:03:47', N'1', N'2025-03-29 15:47:53', N'0', 1)
+INSERT INTO system_dept (id, name, parent_id, sort, leader_user_id, phone, email, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (100, N'芋道源码', 0, 0, 1, N'15888888888', N'ry@qq.com', 0, N'admin', N'2021-01-05 17:03:47', N'1', N'2026-01-04 18:01:12', N'0', 1)
 GO
 INSERT INTO system_dept (id, name, parent_id, sort, leader_user_id, phone, email, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (101, N'深圳总公司', 100, 1, 104, N'15888888888', N'ry@qq.com', 0, N'admin', N'2021-01-05 17:03:47', N'1', N'2025-03-29 15:49:55', N'0', 1)
 GO
 INSERT INTO system_dept (id, name, parent_id, sort, leader_user_id, phone, email, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (102, N'长沙分公司', 100, 2, NULL, N'15888888888', N'ry@qq.com', 0, N'admin', N'2021-01-05 17:03:47', N'', N'2021-12-15 05:01:40', N'0', 1)
 GO
-INSERT INTO system_dept (id, name, parent_id, sort, leader_user_id, phone, email, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (103, N'研发部门', 101, 1, 1, N'15888888888', N'ry@qq.com', 0, N'admin', N'2021-01-05 17:03:47', N'1', N'2024-10-02 10:22:03', N'0', 1)
+INSERT INTO system_dept (id, name, parent_id, sort, leader_user_id, phone, email, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (103, N'研发部门', 101, 1, 104, N'15888888888', N'ry@qq.com', 0, N'admin', N'2021-01-05 17:03:47', N'1', N'2026-01-04 18:01:24', N'0', 1)
 GO
 INSERT INTO system_dept (id, name, parent_id, sort, leader_user_id, phone, email, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (104, N'市场部门', 101, 2, NULL, N'15888888888', N'ry@qq.com', 0, N'admin', N'2021-01-05 17:03:47', N'', N'2021-12-15 05:01:38', N'0', 1)
 GO
@@ -1951,6 +1968,10 @@ INSERT INTO system_dept (id, name, parent_id, sort, leader_user_id, phone, email
 GO
 INSERT INTO system_dept (id, name, parent_id, sort, leader_user_id, phone, email, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (113, N'支持部门', 102, 3, 104, NULL, NULL, 1, N'1', N'2023-12-02 09:47:38', N'1', N'2025-03-29 15:00:56', N'0', 1)
 GO
+INSERT INTO system_dept (id, name, parent_id, sort, leader_user_id, phone, email, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (116, N'某个子部门', 0, 1, NULL, NULL, NULL, 0, N'1', N'2025-12-08 14:51:12', N'1', N'2025-12-08 14:51:12', N'0', 1)
+GO
+INSERT INTO system_dept (id, name, parent_id, sort, leader_user_id, phone, email, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (117, N'某个子部门 2', 0, 2, NULL, NULL, NULL, 0, N'1', N'2025-12-08 14:51:25', N'1', N'2025-12-08 14:51:25', N'0', 1)
+GO
 SET IDENTITY_INSERT system_dept OFF
 GO
 COMMIT
@@ -1962,127 +1983,126 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS system_dict_data
 GO
-CREATE TABLE system_dict_data
-(
-    id          bigint                                  NOT NULL PRIMARY KEY IDENTITY,
-    sort        int           DEFAULT 0                 NOT NULL,
-    label       nvarchar(100) DEFAULT ''                NOT NULL,
-    value       nvarchar(100) DEFAULT ''                NOT NULL,
-    dict_type   nvarchar(100) DEFAULT ''                NOT NULL,
-    status      tinyint       DEFAULT 0                 NOT NULL,
-    color_type  nvarchar(100) DEFAULT ''                NULL,
-    css_class   nvarchar(100) DEFAULT ''                NULL,
-    remark      nvarchar(500) DEFAULT NULL              NULL,
-    creator     nvarchar(64)  DEFAULT ''                NULL,
-    create_time datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater     nvarchar(64)  DEFAULT ''                NULL,
-    update_time datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted     bit           DEFAULT 0                 NOT NULL
+CREATE TABLE system_dict_data (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    sort int DEFAULT 0 NOT NULL,
+    label nvarchar(100) DEFAULT '' NOT NULL,
+    value nvarchar(100) DEFAULT '' NOT NULL,
+    dict_type nvarchar(100) DEFAULT '' NOT NULL,
+    status tinyint DEFAULT 0 NOT NULL,
+    color_type nvarchar(100) DEFAULT '' NULL,
+    css_class nvarchar(100) DEFAULT '' NULL,
+    remark nvarchar(500) DEFAULT NULL NULL,
+    creator nvarchar(64) DEFAULT '' NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT 0 NOT NULL
 )
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'字典编码',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_dict_data',
-     'COLUMN', N'id'
+    'MS_Description', N'字典编码',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dict_data',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'字典排序',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_dict_data',
-     'COLUMN', N'sort'
+    'MS_Description', N'字典排序',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dict_data',
+    'COLUMN', N'sort'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'字典标签',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_dict_data',
-     'COLUMN', N'label'
+    'MS_Description', N'字典标签',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dict_data',
+    'COLUMN', N'label'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'字典键值',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_dict_data',
-     'COLUMN', N'value'
+    'MS_Description', N'字典键值',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dict_data',
+    'COLUMN', N'value'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'字典类型',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_dict_data',
-     'COLUMN', N'dict_type'
+    'MS_Description', N'字典类型',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dict_data',
+    'COLUMN', N'dict_type'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'状态（0正常 1停用）',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_dict_data',
-     'COLUMN', N'status'
+    'MS_Description', N'状态（0正常 1停用）',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dict_data',
+    'COLUMN', N'status'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'颜色类型',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_dict_data',
-     'COLUMN', N'color_type'
+    'MS_Description', N'颜色类型',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dict_data',
+    'COLUMN', N'color_type'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'css 样式',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_dict_data',
-     'COLUMN', N'css_class'
+    'MS_Description', N'css 样式',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dict_data',
+    'COLUMN', N'css_class'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'备注',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_dict_data',
-     'COLUMN', N'remark'
+    'MS_Description', N'备注',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dict_data',
+    'COLUMN', N'remark'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_dict_data',
-     'COLUMN', N'creator'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dict_data',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_dict_data',
-     'COLUMN', N'create_time'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dict_data',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_dict_data',
-     'COLUMN', N'updater'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dict_data',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_dict_data',
-     'COLUMN', N'update_time'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dict_data',
+    'COLUMN', N'update_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_dict_data',
-     'COLUMN', N'deleted'
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dict_data',
+    'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'字典数据表',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_dict_data'
+    'MS_Description', N'字典数据表',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dict_data'
 GO
 
 -- ----------------------------
@@ -2093,7 +2113,7 @@ BEGIN TRANSACTION
 GO
 SET IDENTITY_INSERT system_dict_data ON
 GO
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1, 1, N'男', N'1', N'system_user_sex', 0, N'default', N'A', N'性别男', N'admin', N'2021-01-05 17:03:48', N'1', N'2022-03-29 00:14:39', N'0')
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1, 1, N'男', N'1', N'system_user_sex', 0, N'primary', N'A', N'性别男', N'admin', N'2021-01-05 17:03:48', N'1', N'2025-12-10 13:19:26', N'0')
 GO
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2, 2, N'女', N'2', N'system_user_sex', 0, N'success', N'', N'性别女', N'admin', N'2021-01-05 17:03:48', N'1', N'2023-11-15 23:30:37', N'0')
 GO
@@ -2463,7 +2483,7 @@ INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_t
 GO
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1232, 20, N'Vue3 Element Plus 标准模版', N'20', N'infra_codegen_front_type', 0, N'', N'', N'', N'1', N'2023-04-13 00:04:08', N'1', N'2023-04-13 00:04:08', N'0')
 GO
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1234, 30, N'Vben2.0 Ant Design Schema 模版', N'30', N'infra_codegen_front_type', 0, N'', N'', N'', N'1', N'2023-04-13 00:04:26', N'1', N'2025-04-23 21:27:34', N'0')
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1234, 30, N'Vben2.0 Ant Design Schema 模版', N'30', N'infra_codegen_front_type', 1, N'', N'', N'', N'1', N'2023-04-13 00:04:26', N'1', N'2025-07-27 10:55:14', N'0')
 GO
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1244, 0, N'按件', N'1', N'trade_delivery_express_charge_mode', 0, N'', N'', N'', N'1', N'2023-05-21 22:46:40', N'1', N'2023-05-21 22:46:40', N'0')
 GO
@@ -2877,8 +2897,6 @@ INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_t
 GO
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1568, 8, N'正式', N'8', N'ai_write_tone', 0, N'', N'', N'', N'1', N'2024-07-07 15:54:33', N'1', N'2024-07-07 15:54:33', N'0')
 GO
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1569, 5, N'段落', N'5', N'ai_write_format', 0, N'', N'', N'', N'1', N'2024-07-07 15:49:54', N'1', N'2024-07-07 15:49:54', N'0')
-GO
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1570, 1, N'自动', N'1', N'ai_write_format', 0, N'', N'', N'', N'1', N'2024-07-07 15:19:34', N'1', N'2024-07-07 15:19:34', N'0')
 GO
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1571, 2, N'电子邮件', N'2', N'ai_write_format', 0, N'', N'', N'', N'1', N'2024-07-07 15:19:50', N'1', N'2024-07-07 15:49:30', N'0')
@@ -2902,8 +2920,6 @@ GO
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1580, 2, N'短', N'2', N'ai_write_length', 0, N'', N'', N'', N'1', N'2024-07-07 15:48:44', N'1', N'2024-07-07 15:48:44', N'0')
 GO
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1581, 3, N'中等', N'3', N'ai_write_length', 0, N'', N'', N'', N'1', N'2024-07-07 15:48:52', N'1', N'2024-07-07 15:48:52', N'0')
-GO
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1582, 4, N'长', N'4', N'ai_write_length', 0, N'', N'', N'', N'1', N'2024-07-07 15:49:03', N'1', N'2024-07-07 15:49:03', N'0')
 GO
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1584, 1, N'撰写', N'1', N'ai_write_type', 0, N'', N'', N'', N'1', N'2024-07-10 21:26:00', N'1', N'2024-07-10 21:26:00', N'0')
 GO
@@ -2945,11 +2961,7 @@ INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_t
 GO
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1692, 14, N'MiniMax', N'MiniMax', N'ai_platform', 0, N'', N'', N'', N'1', N'2025-03-11 20:04:51', N'1', N'2025-03-11 20:04:51', N'0')
 GO
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1693, 15, N'月之暗面', N'Moonshot', N'ai_platform', 0, N'', N'', N'', N'1', N'2025-03-11 20:05:08', N'1', N'2025-03-11 20:05:08', N'0')
-GO
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2000, 0, N'标准数据格式（JSON）', N'0', N'iot_data_format', 0, N'default', N'', N'', N'1', N'2024-08-10 11:53:26', N'1', N'2025-03-17 09:28:16', N'0')
-GO
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2001, 1, N'透传/自定义', N'1', N'iot_data_format', 0, N'default', N'', N'', N'1', N'2024-08-10 11:53:37', N'1', N'2025-03-17 09:28:19', N'0')
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1693, 15, N'月之暗面', N'Moonshot', N'ai_platform', 0, N'', N'', N'', N'1', N'2025-03-11 20:05:08', N'1', N'2025-11-24 07:17:39', N'0')
 GO
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2002, 0, N'直连设备', N'0', N'iot_product_device_type', 0, N'default', N'', N'', N'1', N'2024-08-10 11:54:58', N'1', N'2025-03-17 09:28:22', N'0')
 GO
@@ -2961,27 +2973,13 @@ INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_t
 GO
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2006, 0, N'开发中', N'0', N'iot_product_status', 0, N'default', N'', N'', N'1', N'2024-08-10 14:19:18', N'1', N'2025-03-17 09:28:39', N'0')
 GO
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2007, 0, N'弱校验', N'0', N'iot_validate_type', 0, N'', N'', N'', N'1', N'2024-09-06 20:05:48', N'1', N'2025-03-17 09:28:41', N'0')
-GO
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2008, 1, N'免校验', N'1', N'iot_validate_type', 0, N'', N'', N'', N'1', N'2024-09-06 20:06:03', N'1', N'2025-03-17 09:28:44', N'0')
-GO
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2009, 0, N'Wi-Fi', N'0', N'iot_net_type', 0, N'', N'', N'', N'1', N'2024-09-06 22:04:47', N'1', N'2025-03-17 09:28:47', N'0')
 GO
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2010, 1, N'蜂窝（2G / 3G / 4G / 5G）', N'1', N'iot_net_type', 0, N'', N'', N'', N'1', N'2024-09-06 22:05:14', N'1', N'2025-03-17 09:28:49', N'0')
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2010, 1, N'移动网络', N'1', N'iot_net_type', 0, N'', N'', N'', N'1', N'2024-09-06 22:05:14', N'1', N'2025-06-12 23:27:19', N'0')
 GO
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2011, 2, N'以太网', N'2', N'iot_net_type', 0, N'', N'', N'', N'1', N'2024-09-06 22:05:35', N'1', N'2025-03-17 09:28:51', N'0')
 GO
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2012, 3, N'其他', N'3', N'iot_net_type', 0, N'', N'', N'', N'1', N'2024-09-06 22:05:52', N'1', N'2025-03-17 09:28:54', N'0')
-GO
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2013, 0, N'自定义', N'0', N'iot_protocol_type', 0, N'', N'', N'', N'1', N'2024-09-06 22:26:10', N'1', N'2025-03-17 09:28:56', N'0')
-GO
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2014, 1, N'Modbus', N'1', N'iot_protocol_type', 0, N'', N'', N'', N'1', N'2024-09-06 22:26:21', N'1', N'2025-03-17 09:28:58', N'0')
-GO
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2015, 2, N'OPC UA', N'2', N'iot_protocol_type', 0, N'', N'', N'', N'1', N'2024-09-06 22:26:31', N'1', N'2025-03-17 09:29:00', N'0')
-GO
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2016, 3, N'ZigBee', N'3', N'iot_protocol_type', 0, N'', N'', N'', N'1', N'2024-09-06 22:26:39', N'1', N'2025-03-17 09:29:04', N'0')
-GO
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2017, 4, N'BLE', N'4', N'iot_protocol_type', 0, N'', N'', N'', N'1', N'2024-09-06 22:26:48', N'1', N'2025-03-17 09:29:06', N'0')
 GO
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2018, 0, N'未激活', N'0', N'iot_device_state', 0, N'', N'', N'', N'1', N'2024-09-21 08:13:34', N'1', N'2025-03-17 09:29:09', N'0')
 GO
@@ -2994,18 +2992,6 @@ GO
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2022, 2, N'服务', N'2', N'iot_thing_model_type', 0, N'', N'', N'', N'1', N'2024-09-29 20:03:11', N'1', N'2025-03-17 09:29:27', N'0')
 GO
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2023, 3, N'事件', N'3', N'iot_thing_model_type', 0, N'', N'', N'', N'1', N'2024-09-29 20:03:20', N'1', N'2025-03-17 09:29:29', N'0')
-GO
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2024, 1, N'JAR 部署', N'0', N'iot_plugin_deploy_type', 0, N'', N'', N'', N'1', N'2024-12-13 10:55:32', N'1', N'2025-03-17 09:29:32', N'0')
-GO
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2025, 2, N'独立部署', N'1', N'iot_plugin_deploy_type', 0, N'', N'', N'', N'1', N'2024-12-13 10:55:43', N'1', N'2025-03-17 09:29:34', N'0')
-GO
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2026, 0, N'停止', N'0', N'iot_plugin_status', 0, N'danger', N'', N'', N'1', N'2024-12-13 11:07:37', N'1', N'2025-03-17 09:29:37', N'0')
-GO
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2027, 1, N'运行', N'1', N'iot_plugin_status', 0, N'', N'', N'', N'1', N'2024-12-13 11:07:45', N'1', N'2025-03-17 09:34:17', N'0')
-GO
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2028, 0, N'普通插件', N'0', N'iot_plugin_type', 0, N'', N'', N'', N'1', N'2024-12-13 11:08:32', N'1', N'2025-03-17 09:34:19', N'0')
-GO
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2029, 1, N'设备插件', N'1', N'iot_plugin_type', 0, N'', N'', N'', N'1', N'2024-12-13 11:08:41', N'1', N'2025-03-17 09:34:22', N'0')
 GO
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2030, 1, N'升每分钟', N'L/min', N'iot_thing_model_unit', 0, N'', N'', N'', N'1', N'2024-12-13 11:08:41', N'1', N'2025-03-17 09:34:24', N'0')
 GO
@@ -3035,7 +3021,7 @@ INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_t
 GO
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2043, 14, N'纳克每升', N'ppt', N'iot_thing_model_unit', 0, N'', N'', N'', N'1', N'2024-12-13 11:08:41', N'1', N'2025-03-17 09:37:27', N'0')
 GO
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2044, 15, N'微克每升', N'ppb', N'iot_thing_model_unit', 0, N'', N'', N'', N'1', N'2024-12-13 11:08:41', N'1', N'2025-03-17 09:37:31', N'0')
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2044, 15, N'十亿分之一', N'ppb', N'iot_thing_model_unit', 0, N'', N'', N'', N'1', N'2024-12-13 11:08:41', N'1', N'2026-04-05 15:53:29', N'0')
 GO
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2045, 16, N'微西每厘米', N'uS/cm', N'iot_thing_model_unit', 0, N'', N'', N'', N'1', N'2024-12-13 11:08:41', N'1', N'2025-03-17 09:37:34', N'0')
 GO
@@ -3051,7 +3037,7 @@ INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_t
 GO
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2051, 22, N'毫米每秒', N'mm/s', N'iot_thing_model_unit', 0, N'', N'', N'', N'1', N'2024-12-13 11:08:41', N'1', N'2025-03-17 09:38:02', N'0')
 GO
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2052, 23, N'转每分钟', N'turn/m', N'iot_thing_model_unit', 0, N'', N'', N'', N'1', N'2024-12-13 11:08:41', N'1', N'2025-03-17 09:38:07', N'0')
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2052, 23, N'转每米', N'turn/m', N'iot_thing_model_unit', 0, N'', N'', N'', N'1', N'2024-12-13 11:08:41', N'1', N'2026-04-05 15:53:29', N'0')
 GO
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2053, 24, N'次', N'count', N'iot_thing_model_unit', 0, N'', N'', N'', N'1', N'2024-12-13 11:08:41', N'1', N'2025-03-17 09:38:09', N'0')
 GO
@@ -3085,7 +3071,7 @@ INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_t
 GO
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2069, 39, N'升每秒', N'L/s', N'iot_thing_model_unit', 0, N'', N'', N'', N'1', N'2024-12-13 11:08:41', N'1', N'2025-03-17 09:40:46', N'0')
 GO
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2070, 40, N'兆帕', N'Mpa', N'iot_thing_model_unit', 0, N'', N'', N'', N'1', N'2024-12-13 11:08:41', N'1', N'2025-03-17 09:40:46', N'0')
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2070, 40, N'兆帕', N'MPa', N'iot_thing_model_unit', 0, N'', N'', N'', N'1', N'2024-12-13 11:08:41', N'1', N'2026-04-05 15:53:29', N'0')
 GO
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2071, 41, N'立方米每小时', N'm³/h', N'iot_thing_model_unit', 0, N'', N'', N'', N'1', N'2024-12-13 11:08:41', N'1', N'2025-03-17 09:40:46', N'0')
 GO
@@ -3181,7 +3167,7 @@ INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_t
 GO
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2117, 87, N'米每秒', N'm/s', N'iot_thing_model_unit', 0, N'', N'', N'', N'1', N'2024-12-13 11:08:41', N'1', N'2025-03-17 09:40:46', N'0')
 GO
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2118, 88, N'秒', N'″', N'iot_thing_model_unit', 0, N'', N'', N'', N'1', N'2024-12-13 11:08:41', N'1', N'2025-03-17 09:40:46', N'0')
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2118, 88, N'角秒', N'″', N'iot_thing_model_unit', 0, N'', N'', N'', N'1', N'2024-12-13 11:08:41', N'1', N'2026-04-05 15:53:29', N'0')
 GO
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2119, 89, N'分', N'′', N'iot_thing_model_unit', 0, N'', N'', N'', N'1', N'2024-12-13 11:08:41', N'1', N'2025-03-17 09:40:46', N'0')
 GO
@@ -3219,7 +3205,7 @@ INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_t
 GO
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2136, 106, N'摄氏度', N'°C', N'iot_thing_model_unit', 0, N'', N'', N'', N'1', N'2024-12-13 11:08:41', N'1', N'2025-03-17 09:40:46', N'0')
 GO
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2137, 107, N'毫帕', N'mPa', N'iot_thing_model_unit', 0, N'', N'', N'', N'1', N'2024-12-13 11:08:41', N'1', N'2025-03-17 09:40:46', N'0')
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2137, 107, N'毫帕', N'1e-3Pa', N'iot_thing_model_unit', 0, N'', N'', N'', N'1', N'2024-12-13 11:08:41', N'1', N'2026-04-05 15:53:29', N'0')
 GO
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2138, 108, N'百帕', N'hPa', N'iot_thing_model_unit', 0, N'', N'', N'', N'1', N'2024-12-13 11:08:41', N'1', N'2025-03-17 09:40:46', N'0')
 GO
@@ -3271,35 +3257,685 @@ INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_t
 GO
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2162, 132, N'米', N'm', N'iot_thing_model_unit', 0, N'', N'', N'', N'1', N'2024-12-13 11:08:41', N'1', N'2025-03-17 09:40:46', N'0')
 GO
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2163, 1, N'输入', N'1', N'iot_data_bridge_direction_enum', 0, N'primary', N'', N'', N'1', N'2025-03-09 12:38:24', N'1', N'2025-03-17 09:40:46', N'0')
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2165, 1, N'HTTP', N'1', N'iot_data_sink_type_enum', 0, N'default', N'', N'', N'1', N'2025-03-09 12:39:54', N'1', N'2025-06-24 12:44:47', N'0')
 GO
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2164, 2, N'输出', N'2', N'iot_data_bridge_direction_enum', 0, N'primary', N'', N'', N'1', N'2025-03-09 12:38:36', N'1', N'2025-03-17 09:40:46', N'0')
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2166, 2, N'TCP', N'2', N'iot_data_sink_type_enum', 0, N'default', N'', N'', N'1', N'2025-03-09 12:40:06', N'1', N'2025-06-24 12:44:46', N'0')
 GO
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2165, 1, N'HTTP', N'1', N'iot_data_bridge_type_enum', 0, N'primary', N'', N'', N'1', N'2025-03-09 12:39:54', N'1', N'2025-03-17 09:40:46', N'0')
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2167, 3, N'WebSocket', N'3', N'iot_data_sink_type_enum', 0, N'default', N'', N'', N'1', N'2025-03-09 12:40:24', N'1', N'2025-06-24 12:44:45', N'0')
 GO
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2166, 2, N'TCP', N'2', N'iot_data_bridge_type_enum', 0, N'primary', N'', N'', N'1', N'2025-03-09 12:40:06', N'1', N'2025-03-17 09:40:46', N'0')
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2168, 10, N'MQTT', N'10', N'iot_data_sink_type_enum', 0, N'default', N'', N'', N'1', N'2025-03-09 12:40:37', N'1', N'2025-06-24 12:44:44', N'0')
 GO
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2167, 3, N'WEBSOCKET', N'3', N'iot_data_bridge_type_enum', 0, N'primary', N'', N'', N'1', N'2025-03-09 12:40:24', N'1', N'2025-03-17 09:40:46', N'0')
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2169, 20, N'Database', N'20', N'iot_data_sink_type_enum', 0, N'default', N'', N'', N'1', N'2025-03-09 12:41:05', N'1', N'2025-06-24 12:44:44', N'0')
 GO
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2168, 10, N'MQTT', N'10', N'iot_data_bridge_type_enum', 0, N'primary', N'', N'', N'1', N'2025-03-09 12:40:37', N'1', N'2025-03-17 09:40:46', N'0')
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2170, 21, N'Redis Stream', N'21', N'iot_data_sink_type_enum', 0, N'default', N'', N'', N'1', N'2025-03-09 12:41:18', N'1', N'2025-06-24 12:44:43', N'0')
 GO
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2169, 20, N'DATABASE', N'20', N'iot_data_bridge_type_enum', 0, N'primary', N'', N'', N'1', N'2025-03-09 12:41:05', N'1', N'2025-03-17 09:40:46', N'0')
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2171, 30, N'RocketMQ', N'30', N'iot_data_sink_type_enum', 0, N'default', N'', N'', N'1', N'2025-03-09 12:41:30', N'1', N'2025-06-24 12:44:42', N'0')
 GO
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2170, 21, N'REDIS_STREAM', N'21', N'iot_data_bridge_type_enum', 0, N'primary', N'', N'', N'1', N'2025-03-09 12:41:18', N'1', N'2025-03-17 09:40:46', N'0')
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2172, 31, N'RabbitMQ', N'31', N'iot_data_sink_type_enum', 0, N'default', N'', N'', N'1', N'2025-03-09 12:41:47', N'1', N'2025-06-24 12:44:41', N'0')
 GO
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2171, 30, N'ROCKETMQ', N'30', N'iot_data_bridge_type_enum', 0, N'primary', N'', N'', N'1', N'2025-03-09 12:41:30', N'1', N'2025-03-17 09:40:46', N'0')
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2173, 32, N'Kafka', N'32', N'iot_data_sink_type_enum', 0, N'default', N'', N'', N'1', N'2025-03-09 12:41:59', N'1', N'2025-06-24 12:44:39', N'0')
 GO
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2172, 31, N'RABBITMQ', N'31', N'iot_data_bridge_type_enum', 0, N'primary', N'', N'', N'1', N'2025-03-09 12:41:47', N'1', N'2025-03-17 09:40:46', N'0')
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2174, 1, N'设备上下线变更', N'1', N'iot_rule_scene_trigger_type_enum', 0, N'primary', N'', N'', N'1', N'2025-03-20 15:00:01', N'"1"', N'2025-07-06 10:28:16', N'0')
 GO
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2173, 32, N'KAFKA', N'32', N'iot_data_bridge_type_enum', 0, N'primary', N'', N'', N'1', N'2025-03-09 12:41:59', N'1', N'2025-03-17 09:40:46', N'0')
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2175, 2, N'物模型属性上报', N'2', N'iot_rule_scene_trigger_type_enum', 0, N'primary', N'', N'', N'1', N'2025-03-20 15:00:09', N'"1"', N'2025-07-06 10:28:22', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2176, 1, N'设备状态', N'state', N'iot_device_message_type_enum', 0, N'primary', N'', N'', N'1', N'2025-03-20 15:24:58', N'1', N'2025-03-20 15:24:58', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2177, 2, N'设备属性', N'property', N'iot_device_message_type_enum', 0, N'primary', N'', N'', N'1', N'2025-03-20 15:25:09', N'1', N'2025-03-20 15:25:09', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2178, 3, N'设备事件', N'event', N'iot_device_message_type_enum', 0, N'primary', N'', N'', N'1', N'2025-03-20 15:25:23', N'1', N'2025-03-20 15:25:23', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2179, 4, N'设备服务', N'service', N'iot_device_message_type_enum', 0, N'primary', N'', N'', N'1', N'2025-03-20 15:25:39', N'1', N'2025-03-20 15:25:39', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2180, 5, N'设备配置', N'config', N'iot_device_message_type_enum', 0, N'primary', N'', N'', N'1', N'2025-03-20 15:25:51', N'1', N'2025-03-20 15:25:57', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2181, 6, N'设备 OTA', N'ota', N'iot_device_message_type_enum', 0, N'primary', N'', N'', N'1', N'2025-03-20 15:26:17', N'1', N'2025-03-20 15:26:17', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2182, 7, N'设备注册', N'register', N'iot_device_message_type_enum', 0, N'primary', N'', N'', N'1', N'2025-03-20 15:26:35', N'1', N'2025-03-20 15:26:35', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2183, 8, N'设备拓扑', N'topology', N'iot_device_message_type_enum', 0, N'primary', N'', N'', N'1', N'2025-03-20 15:26:46', N'1', N'2025-03-20 15:26:46', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2184, 1, N'设备属性设置', N'1', N'iot_rule_scene_action_type_enum', 0, N'primary', N'', N'', N'1', N'2025-03-28 15:27:12', N'"1"', N'2025-07-06 10:37:33', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2185, 2, N'设备服务调用', N'2', N'iot_rule_scene_action_type_enum', 0, N'primary', N'', N'', N'1', N'2025-03-28 15:27:25', N'"1"', N'2025-07-06 10:37:41', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2186, 100, N'告警触发', N'100', N'iot_rule_scene_action_type_enum', 0, N'primary', N'', N'', N'1', N'2025-03-28 15:27:35', N'"1"', N'2025-07-06 10:37:50', N'0')
 GO
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3000, 16, N'百川智能', N'BaiChuan', N'ai_platform', 0, N'', N'', N'', N'1', N'2025-03-23 12:15:46', N'1', N'2025-03-23 12:15:46', N'0')
 GO
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3001, 50, N'Vben5.0 Ant Design Schema 模版', N'40', N'infra_codegen_front_type', 0, N'', N'', NULL, N'1', N'2025-04-23 21:47:47', N'1', N'2025-05-02 12:01:15', N'0')
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3001, 40, N'Vben5.0 Ant Design Schema 模版', N'40', N'infra_codegen_front_type', 0, N'', N'', NULL, N'1', N'2025-04-23 21:47:47', N'1', N'2025-09-04 23:25:12', N'0')
 GO
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3002, 6, N'支付宝余额', N'6', N'brokerage_withdraw_type', 0, N'', N'', N'API 打款', N'1', N'2025-05-10 08:24:49', N'1', N'2025-05-10 08:24:49', N'0')
 GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3004, 3, N'WARN', N'3', N'iot_alert_level', 0, N'warning', N'', N'', N'1', N'2025-06-27 20:32:22', N'1', N'2025-06-27 20:34:31', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3005, 1, N'INFO', N'1', N'iot_alert_level', 0, N'primary', N'', N'', N'1', N'2025-06-27 20:33:28', N'1', N'2025-06-27 20:34:35', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3006, 5, N'ERROR', N'5', N'iot_alert_level', 0, N'danger', N'', N'', N'1', N'2025-06-27 20:33:50', N'1', N'2025-06-27 20:33:50', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3007, 1, N'短信', N'1', N'iot_alert_receive_type', 0, N'', N'', N'', N'1', N'2025-06-27 22:49:30', N'1', N'2025-06-27 22:49:30', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3008, 2, N'邮箱', N'2', N'iot_alert_receive_type', 0, N'', N'', N'', N'1', N'2025-06-27 22:49:39', N'1', N'2025-06-27 22:50:07', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3009, 3, N'站内信', N'3', N'iot_alert_receive_type', 0, N'', N'', N'', N'1', N'2025-06-27 22:50:20', N'1', N'2025-06-27 22:50:20', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3010, 1, N'全部设备', N'1', N'iot_ota_task_device_scope', 0, N'', N'', N'', N'1', N'2025-07-02 09:43:09', N'1', N'2025-07-02 09:43:09', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3011, 2, N'指定设备', N'2', N'iot_ota_task_device_scope', 0, N'', N'', N'', N'1', N'2025-07-02 09:43:15', N'1', N'2025-07-02 09:43:15', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3012, 10, N'进行中', N'10', N'iot_ota_task_status', 0, N'primary', N'', N'', N'1', N'2025-07-02 09:44:01', N'"1"', N'2025-07-02 09:44:21', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3013, 20, N'已结束', N'20', N'iot_ota_task_status', 0, N'success', N'', N'', N'1', N'2025-07-02 09:44:14', N'"1"', N'2025-07-02 23:56:12', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3014, 30, N'已取消', N'30', N'iot_ota_task_status', 0, N'danger', N'', N'', N'1', N'2025-07-02 09:44:36', N'1', N'2025-07-02 09:44:36', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3015, 0, N'待推送', N'0', N'iot_ota_task_record_status', 0, N'', N'', N'', N'1', N'2025-07-02 09:45:16', N'1', N'2025-07-02 09:45:16', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3016, 10, N'已推送', N'10', N'iot_ota_task_record_status', 0, N'', N'', N'', N'1', N'2025-07-02 09:45:25', N'1', N'2025-07-02 09:45:25', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3017, 20, N'升级中', N'20', N'iot_ota_task_record_status', 0, N'primary', N'', N'', N'1', N'2025-07-02 09:45:37', N'1', N'2025-07-02 09:45:37', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3018, 30, N'升级成功', N'30', N'iot_ota_task_record_status', 0, N'success', N'', N'', N'1', N'2025-07-02 09:45:47', N'1', N'2025-07-02 09:45:47', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3019, 40, N'升级失败', N'40', N'iot_ota_task_record_status', 0, N'danger', N'', N'', N'1', N'2025-07-02 09:46:02', N'1', N'2025-07-02 09:46:02', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3020, 50, N'升级取消', N'50', N'iot_ota_task_record_status', 0, N'warning', N'', N'', N'1', N'2025-07-02 09:46:09', N'"1"', N'2025-07-02 09:46:27', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3024, 3, N'设备事件上报', N'3', N'iot_rule_scene_trigger_type_enum', 0, N'', N'', N'', N'1', N'2025-07-06 10:28:29', N'1', N'2025-07-06 10:28:29', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3025, 4, N'设备服务调用', N'4', N'iot_rule_scene_trigger_type_enum', 0, N'', N'', N'', N'1', N'2025-07-06 10:28:35', N'1', N'2025-07-06 10:28:35', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3026, 100, N'定时触发', N'100', N'iot_rule_scene_trigger_type_enum', 0, N'', N'', N'', N'1', N'2025-07-06 10:28:48', N'1', N'2025-07-06 10:28:48', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3027, 101, N'告警恢复', N'101', N'iot_rule_scene_action_type_enum', 0, N'', N'', N'', N'1', N'2025-07-06 10:37:57', N'1', N'2025-07-06 10:37:57', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3028, 2, N'Anthropic', N'Anthropic', N'ai_platform', 0, N'', N'', N'', N'1', N'2025-08-21 22:54:24', N'1', N'2025-08-21 22:57:58', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3029, 2, N'谷歌 Gemini', N'Gemini', N'ai_platform', 0, N'', N'', N'', N'1', N'2025-08-22 22:39:35', N'1', N'2025-08-22 22:44:49', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3030, 1, N'文件系统', N'filesystem', N'ai_mcp_client_name', 0, N'', N'', N'', N'1', N'2025-08-28 13:58:43', N'1', N'2025-08-28 21:19:42', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3031, 41, N'Vben5.0 Ant Design 标准模版', N'41', N'infra_codegen_front_type', 0, N'', N'', N'', N'1', N'2025-09-04 23:26:07', N'1', N'2025-09-04 23:26:07', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3032, 50, N'Vben5.0 Element Plus Schema 模版', N'50', N'infra_codegen_front_type', 0, N'', N'', N'', N'1', N'2025-09-04 23:26:38', N'1', N'2025-09-04 23:26:38', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3033, 51, N'Vben5.0 Element Plus 标准模版', N'51', N'infra_codegen_front_type', 0, N'', N'', N'', N'1', N'2025-09-04 23:26:49', N'1', N'2025-09-04 23:26:49', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3034, 1, N'ttt', N'tt', N'iot_ota_task_record_status', 0, N'success', N'', NULL, N'1', N'2025-09-06 00:02:21', N'1', N'2025-09-06 00:02:31', N'0')
+GO
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3035, 40, N'支付宝小程序', N'40', N'system_social_type', 0, N'', N'', N'', N'1', N'2023-11-04 13:05:38', N'1', N'2023-11-04 13:07:16', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3036, 60, N'Admin Uniapp 移动端', N'60', N'infra_codegen_front_type', 0, N'', N'', NULL, N'1', N'2025-12-16 19:25:51', N'1', N'2025-12-17 09:46:15', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3040, 1, N'UDP', N'udp', N'iot_protocol_type', 0, N'', N'', N'UDP 协议', N'1', N'2026-02-04 00:32:47', N'1', N'2026-02-04 00:32:47', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3041, 2, N'WebSocket', N'websocket', N'iot_protocol_type', 0, N'', N'', N'WebSocket 协议', N'1', N'2026-02-04 00:32:55', N'1', N'2026-02-04 00:32:55', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3042, 3, N'HTTP', N'http', N'iot_protocol_type', 0, N'', N'', N'HTTP 协议', N'1', N'2026-02-04 00:32:55', N'1', N'2026-02-04 00:32:55', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3043, 4, N'MQTT', N'mqtt', N'iot_protocol_type', 0, N'success', N'', N'MQTT 协议', N'1', N'2026-02-04 00:32:55', N'1', N'2026-02-04 00:32:55', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3044, 5, N'EMQX', N'emqx', N'iot_protocol_type', 0, N'success', N'', N'EMQX 协议', N'1', N'2026-02-04 00:32:55', N'1', N'2026-02-04 00:32:55', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3045, 6, N'CoAP', N'coap', N'iot_protocol_type', 0, N'', N'', N'CoAP 协议', N'1', N'2026-02-04 00:32:55', N'1', N'2026-02-04 00:32:55', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3046, 7, N'Modbus TCP Server', N'modbus_tcp_server', N'iot_protocol_type', 0, N'', N'', N'Modbus TCP Server 协议', N'1', N'2026-02-04 00:32:55', N'1', N'2026-02-12 15:16:45', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3047, 0, N'JSON', N'json', N'iot_serialize_type', 0, N'success', N'', N'JSON 格式', N'1', N'2026-02-04 00:33:19', N'1', N'2026-02-04 00:33:19', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3048, 1, N'二进制', N'binary', N'iot_serialize_type', 0, N'warning', N'', N'二进制格式', N'1', N'2026-02-04 00:33:19', N'1', N'2026-02-04 00:33:19', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3049, 8, N'Modbus TCP Client', N'modbus_tcp_client', N'iot_protocol_type', 0, N'', N'', N'Modbus TCP Client 协议', N'1', N'2026-02-08 18:29:46', N'1', N'2026-02-12 15:16:32', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3050, 2, N'边缘采集', N'2', N'iot_modbus_mode', 0, N'success', N'', N'设备主动上报数据，无需轮询', N'1', N'2025-06-12 22:56:06', N'1', N'2026-02-09 13:03:23', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3051, 1, N'Modbus TCP', N'1', N'iot_modbus_frame_format', 0, N'default', N'', N'MBAP 头部格式', N'1', N'2025-06-12 22:56:06', N'1', N'2025-06-12 22:56:06', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3052, 2, N'Modbus RTU', N'2', N'iot_modbus_frame_format', 0, N'warning', N'', N'CRC16 校验格式', N'1', N'2025-06-12 22:56:06', N'1', N'2025-06-12 22:56:06', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3053, 1, N'云端轮询', N'1', N'iot_modbus_mode', 0, N'primary', N'', N'网关主动轮询读取设备寄存器', N'1', N'2025-06-12 22:56:06', N'1', N'2025-06-12 22:56:06', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3054, 1, N'企业客户', N'1', N'mes_client_type', 0, N'primary', N'', N'', N'1', N'2026-02-15 14:38:25', N'1', N'2026-02-15 14:38:25', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3055, 2, N'个人', N'2', N'mes_client_type', 0, N'success', N'', N'', N'1', N'2026-02-15 14:38:25', N'1', N'2026-02-15 14:38:25', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3056, 1, N'优质供应商', N'A', N'mes_vendor_level', 0, N'success', N'', N'', N'1', N'2026-02-15 15:59:15', N'1', N'2026-02-15 15:59:15', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3057, 2, N'正常', N'B', N'mes_vendor_level', 0, N'primary', N'', N'', N'1', N'2026-02-15 15:59:15', N'1', N'2026-02-15 15:59:15', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3058, 3, N'重点关注', N'C', N'mes_vendor_level', 0, N'warning', N'', N'', N'1', N'2026-02-15 15:59:15', N'1', N'2026-02-15 15:59:15', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3059, 4, N'劣质供应商', N'D', N'mes_vendor_level', 0, N'danger', N'', N'', N'1', N'2026-02-15 15:59:15', N'1', N'2026-02-15 15:59:15', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3060, 5, N'黑名单', N'E', N'mes_vendor_level', 0, N'info', N'', N'', N'1', N'2026-02-15 15:59:15', N'1', N'2026-02-15 15:59:15', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3061, 1, N'假期', N'2', N'mes_cal_holiday_type', 0, N'success', N'', N'', N'1', N'2026-02-16 07:35:58', N'1', N'2026-02-16 11:20:42', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3062, 2, N'工作日', N'1', N'mes_cal_holiday_type', 0, N'primary', N'', N'', N'1', N'2026-02-16 07:35:58', N'1', N'2026-02-16 11:20:40', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3063, 1, N'在库', N'1', N'mes_tm_tool_status', 0, N'success', N'', N'', N'1', N'2026-02-16 11:10:55', N'1', N'2026-02-16 11:10:55', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3064, 2, N'领用中', N'2', N'mes_tm_tool_status', 0, N'primary', N'', N'', N'1', N'2026-02-16 11:10:55', N'1', N'2026-02-16 11:10:55', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3065, 3, N'维修中', N'3', N'mes_tm_tool_status', 0, N'warning', N'', N'', N'1', N'2026-02-16 11:10:55', N'1', N'2026-02-16 11:10:55', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3066, 4, N'报废', N'4', N'mes_tm_tool_status', 0, N'danger', N'', N'', N'1', N'2026-02-16 11:10:55', N'1', N'2026-02-16 11:10:55', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3067, 1, N'定期维护', N'1', N'mes_tm_mainten_type', 0, N'primary', N'', N'', N'1', N'2026-02-16 11:10:55', N'1', N'2026-02-16 11:10:55', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3068, 2, N'按使用次数维护', N'2', N'mes_tm_mainten_type', 0, N'success', N'', N'', N'1', N'2026-02-16 11:10:55', N'1', N'2026-02-16 11:10:55', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3069, 1, N'停机', N'1', N'mes_dv_machinery_status', 0, N'success', N'', N'', N'1', N'2026-02-17 01:00:06', N'1', N'2026-02-17 03:28:27', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3070, 2, N'生产中', N'2', N'mes_dv_machinery_status', 0, N'info', N'', N'', N'1', N'2026-02-17 01:00:06', N'1', N'2026-02-17 03:28:33', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3071, 3, N'维护中', N'3', N'mes_dv_machinery_status', 0, N'danger', N'', N'', N'1', N'2026-02-17 01:00:06', N'1', N'2026-02-17 03:28:41', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3072, 1, N'尺寸', N'1', N'mes_indicator_type', 0, N'', N'', N'', N'1', N'2026-02-17 02:18:18', N'1', N'2026-04-09 14:38:53', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3073, 2, N'外观', N'2', N'mes_indicator_type', 0, N'', N'', N'', N'1', N'2026-02-17 02:18:18', N'1', N'2026-04-09 14:38:53', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3074, 3, N'重量', N'3', N'mes_indicator_type', 0, N'', N'', N'', N'1', N'2026-02-17 02:18:18', N'1', N'2026-04-09 14:38:53', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3075, 4, N'性能', N'4', N'mes_indicator_type', 0, N'', N'', N'', N'1', N'2026-02-17 02:18:18', N'1', N'2026-04-09 14:38:53', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3076, 5, N'成分', N'5', N'mes_indicator_type', 0, N'', N'', N'', N'1', N'2026-02-17 02:18:18', N'1', N'2026-04-09 14:38:53', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3077, 1, N'致命缺陷', N'1', N'mes_defect_level', 0, N'danger', N'', N'', N'1', N'2026-02-17 02:18:18', N'1', N'2026-02-21 12:21:12', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3078, 2, N'严重缺陷', N'2', N'mes_defect_level', 0, N'warning', N'', N'', N'1', N'2026-02-17 02:18:18', N'1', N'2026-02-21 12:21:15', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3079, 3, N'轻微缺陷', N'3', N'mes_defect_level', 0, N'info', N'', N'', N'1', N'2026-02-17 02:18:18', N'1', N'2026-02-21 12:21:19', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3080, 1, N'单白班', N'1', N'mes_cal_shift_type', 0, N'primary', N'', N'', N'1', N'2026-02-17 03:40:09', N'1', N'2026-02-17 03:40:09', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3081, 2, N'两班倒', N'2', N'mes_cal_shift_type', 0, N'success', N'', N'', N'1', N'2026-02-17 03:40:09', N'1', N'2026-02-17 03:40:09', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3082, 3, N'三班倒', N'3', N'mes_cal_shift_type', 0, N'warning', N'', N'', N'1', N'2026-02-17 03:40:09', N'1', N'2026-02-17 03:40:09', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3083, 1, N'按季度', N'1', N'mes_cal_shift_method', 0, N'', N'', N'', N'1', N'2026-02-17 03:40:09', N'1', N'2026-02-17 03:40:09', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3084, 2, N'按月', N'2', N'mes_cal_shift_method', 0, N'', N'', N'', N'1', N'2026-02-17 03:40:09', N'1', N'2026-02-17 03:40:09', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3085, 3, N'按周', N'3', N'mes_cal_shift_method', 0, N'', N'', N'', N'1', N'2026-02-17 03:40:09', N'1', N'2026-02-17 03:40:09', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3086, 4, N'按天', N'4', N'mes_cal_shift_method', 0, N'', N'', N'', N'1', N'2026-02-17 03:40:09', N'1', N'2026-02-17 03:40:09', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3089, 0, N'草稿', N'0', N'mes_cal_plan_status', 0, N'info', N'', N'', N'1', N'2026-02-17 03:40:09', N'1', N'2026-02-17 03:40:09', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3090, 1, N'已确认', N'1', N'mes_cal_plan_status', 0, N'success', N'', N'', N'1', N'2026-02-17 03:40:09', N'1', N'2026-02-17 03:40:09', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3100, 0, N'草稿', N'0', N'mes_pro_work_order_status', 0, N'info', N'', N'', N'1', N'2026-02-17 11:43:47', N'1', N'2026-02-17 11:43:47', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3101, 1, N'已确认', N'1', N'mes_pro_work_order_status', 0, N'primary', N'', N'', N'1', N'2026-02-17 11:43:47', N'1', N'2026-02-17 11:43:47', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3102, 2, N'已完成', N'2', N'mes_pro_work_order_status', 0, N'success', N'', N'', N'1', N'2026-02-17 11:43:47', N'1', N'2026-02-17 11:43:47', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3103, 3, N'已取消', N'3', N'mes_pro_work_order_status', 0, N'warning', N'', N'', N'1', N'2026-02-17 11:43:47', N'1', N'2026-02-17 11:43:47', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3104, 1, N'客户订单', N'1', N'mes_pro_work_order_source_type', 0, N'primary', N'', N'', N'1', N'2026-02-17 11:43:47', N'1', N'2026-02-17 11:43:47', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3105, 2, N'库存备货', N'2', N'mes_pro_work_order_source_type', 0, N'success', N'', N'', N'1', N'2026-02-17 11:43:47', N'1', N'2026-02-17 11:43:47', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3106, 1, N'自行生产', N'1', N'mes_pro_work_order_type', 0, N'primary', N'', N'', N'1', N'2026-02-17 11:43:47', N'1', N'2026-02-17 11:43:47', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3107, 2, N'代工', N'2', N'mes_pro_work_order_type', 0, N'warning', N'', N'', N'1', N'2026-02-17 11:43:47', N'1', N'2026-02-17 11:43:47', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3108, 3, N'采购', N'3', N'mes_pro_work_order_type', 0, N'info', N'', N'', N'1', N'2026-02-17 11:43:47', N'1', N'2026-02-17 11:43:47', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3121, 1, N'IQC（来料检验）', N'1', N'mes_qc_type', 0, N'primary', N'', N'来料质量检验', N'1', N'2026-02-18 14:12:05', N'1', N'2026-02-18 14:12:05', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3122, 2, N'IPQC（过程检验）', N'2', N'mes_qc_type', 0, N'warning', N'', N'生产制程质量检验', N'1', N'2026-02-18 14:12:05', N'1', N'2026-03-24 15:21:34', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3123, 3, N'OQC（出货检验）', N'3', N'mes_qc_type', 0, N'success', N'', N'出货质量检验', N'1', N'2026-02-18 14:12:05', N'1', N'2026-02-18 14:12:05', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3124, 4, N'RQC（退料检验）', N'4', N'mes_qc_type', 0, N'danger', N'', N'退货质量检验', N'1', N'2026-02-18 14:12:05', N'1', N'2026-03-24 15:22:00', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3125, 0, N'开始-开始(SS)', N'0', N'mes_pro_link_type', 0, N'default', N'', N'前序开始后，后序可以开始', N'1', N'2026-02-19 04:24:53', N'1', N'2026-02-19 04:24:53', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3126, 1, N'结束-结束(FF)', N'1', N'mes_pro_link_type', 0, N'default', N'', N'前序结束后，后序才能结束', N'1', N'2026-02-19 04:24:53', N'1', N'2026-02-19 04:24:53', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3127, 2, N'开始-结束(SF)', N'2', N'mes_pro_link_type', 0, N'default', N'', N'前序开始后，后序才能结束', N'1', N'2026-02-19 04:24:53', N'1', N'2026-02-19 04:24:53', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3128, 3, N'结束-开始(FS)', N'3', N'mes_pro_link_type', 0, N'default', N'', N'前序结束后，后序才能开始', N'1', N'2026-02-19 04:24:53', N'1', N'2026-02-19 04:24:53', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3129, 1, N'分钟', N'MINUTE', N'mes_time_unit_type', 0, N'default', N'', N'', N'1', N'2026-02-19 04:24:53', N'1', N'2026-02-19 04:24:53', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3130, 2, N'小时', N'HOUR', N'mes_time_unit_type', 0, N'default', N'', N'', N'1', N'2026-02-19 04:24:53', N'1', N'2026-02-19 04:24:53', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3131, 3, N'天', N'DAY', N'mes_time_unit_type', 0, N'default', N'', N'', N'1', N'2026-02-19 04:24:53', N'1', N'2026-02-19 04:24:53', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3137, 1, N'设备点检', N'1', N'mes_dv_subject_type', 0, N'info', N'', N'', N'1', N'2026-02-20 01:42:58', N'1', N'2026-02-20 01:42:58', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3138, 2, N'设备保养', N'2', N'mes_dv_subject_type', 0, N'success', N'', N'', N'1', N'2026-02-20 01:42:58', N'1', N'2026-02-20 01:42:58', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3139, 1, N'待保养', N'0', N'mes_mainten_record_status', 0, N'info', N'', NULL, N'admin', N'2026-02-20 02:59:55', N'1', N'2026-04-16 05:32:37', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3140, 2, N'已完成', N'4', N'mes_mainten_record_status', 0, N'success', N'', NULL, N'admin', N'2026-02-20 02:59:55', N'1', N'2026-04-16 05:32:37', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3141, 1, N'正常', N'1', N'mes_mainten_status', 0, N'success', N'', NULL, N'admin', N'2026-02-20 02:59:55', N'admin', N'2026-02-20 02:59:55', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3142, 2, N'异常', N'0', N'mes_mainten_status', 0, N'danger', N'', NULL, N'admin', N'2026-02-20 02:59:55', N'admin', N'2026-02-20 02:59:55', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3143, 1, N'天', N'1', N'mes_dv_cycle_type', 0, N'default', N'', N'', N'1', N'2026-02-20 07:11:43', N'1', N'2026-02-20 07:11:43', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3144, 2, N'周', N'2', N'mes_dv_cycle_type', 0, N'default', N'', N'', N'1', N'2026-02-20 07:11:43', N'1', N'2026-02-20 07:11:43', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3145, 3, N'月', N'3', N'mes_dv_cycle_type', 0, N'default', N'', N'', N'1', N'2026-02-20 07:11:43', N'1', N'2026-02-20 07:11:43', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3146, 4, N'年', N'4', N'mes_dv_cycle_type', 0, N'default', N'', N'', N'1', N'2026-02-20 07:11:43', N'1', N'2026-02-20 07:11:43', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3147, 0, N'草稿', N'0', N'mes_dv_check_plan_status', 0, N'info', N'', N'', N'1', N'2026-02-20 07:11:43', N'1', N'2026-02-20 07:11:43', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3148, 1, N'已启用', N'1', N'mes_dv_check_plan_status', 0, N'success', N'', N'', N'1', N'2026-02-20 07:11:43', N'1', N'2026-02-20 07:11:43', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3149, 1, N'待点检', N'10', N'mes_dv_check_record_status', 0, N'info', N'', NULL, N'admin', N'2026-02-20 09:46:19', N'admin', N'2026-02-20 09:46:19', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3150, 2, N'已完成', N'20', N'mes_dv_check_record_status', 0, N'success', N'', NULL, N'admin', N'2026-02-20 09:46:19', N'admin', N'2026-02-20 09:46:19', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3151, 1, N'正常', N'1', N'mes_dv_check_result', 0, N'success', N'', NULL, N'admin', N'2026-02-20 09:46:19', N'admin', N'2026-02-20 09:46:19', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3152, 2, N'异常', N'2', N'mes_dv_check_result', 0, N'danger', N'', NULL, N'admin', N'2026-02-20 09:46:19', N'admin', N'2026-02-20 09:46:19', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3157, 1, N'修复成功', N'1', N'mes_dv_repair_result', 0, N'success', N'', N'', N'1', N'2026-02-20 10:56:24', N'1', N'2026-02-20 10:56:24', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3158, 2, N'报废', N'2', N'mes_dv_repair_result', 0, N'danger', N'', N'', N'1', N'2026-02-20 10:56:24', N'1', N'2026-02-20 10:56:24', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3161, 1, N'校验通过', N'1', N'mes_qc_check_result', 0, N'success', N'', N'', N'1', N'2026-02-20 11:23:35', N'1', N'2026-02-20 16:15:54', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3162, 2, N'校验不通过', N'2', N'mes_qc_check_result', 0, N'danger', N'', N'', N'1', N'2026-02-20 11:23:35', N'1', N'2026-02-20 16:15:52', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3166, 0, N'未处置', N'0', N'mes_pro_andon_status', 0, N'danger', N'', N'', N'1', N'2026-02-21 00:08:38', N'1', N'2026-02-21 00:08:38', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3167, 1, N'已处置', N'1', N'mes_pro_andon_status', 0, N'success', N'', N'', N'1', N'2026-02-21 00:08:38', N'1', N'2026-02-21 00:08:38', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3168, 1, N'一级', N'1', N'mes_pro_andon_level', 0, N'danger', N'', N'', N'1', N'2026-02-21 00:08:38', N'1', N'2026-02-21 00:08:38', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3169, 2, N'二级', N'2', N'mes_pro_andon_level', 0, N'warning', N'', N'', N'1', N'2026-02-21 00:08:38', N'1', N'2026-02-21 00:08:38', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3170, 3, N'三级', N'3', N'mes_pro_andon_level', 0, N'info', N'', N'', N'1', N'2026-02-21 00:08:38', N'1', N'2026-02-21 00:08:38', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3171, 0, N'草稿', N'0', N'mes_pro_feedback_status', 0, N'info', N'', N'', N'1', N'2026-02-21 00:50:32', N'1', N'2026-02-21 00:50:32', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3172, 2, N'审批中', N'2', N'mes_pro_feedback_status', 0, N'primary', N'', N'', N'1', N'2026-02-21 00:50:32', N'1', N'2026-03-19 00:51:54', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3173, 3, N'待检验', N'3', N'mes_pro_feedback_status', 0, N'warning', N'', N'', N'1', N'2026-02-21 00:50:32', N'1', N'2026-03-19 00:51:54', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3174, 4, N'已完成', N'4', N'mes_pro_feedback_status', 0, N'success', N'', N'', N'1', N'2026-02-21 00:50:32', N'1', N'2026-03-19 00:51:54', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3176, 1, N'自行报工', N'1', N'mes_pro_feedback_type', 0, N'primary', N'', N'', N'1', N'2026-02-21 00:50:32', N'1', N'2026-02-21 00:50:32', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3177, 2, N'统一报工', N'2', N'mes_pro_feedback_type', 0, N'success', N'', N'', N'1', N'2026-02-21 00:50:32', N'1', N'2026-02-21 00:50:32', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3178, 1, N'PC', N'PC', N'mes_pro_feedback_channel', 0, N'primary', N'', N'', N'1', N'2026-02-21 00:50:32', N'1', N'2026-02-21 00:50:32', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3179, 2, N'APP', N'APP', N'mes_pro_feedback_channel', 0, N'success', N'', N'', N'1', N'2026-02-21 00:50:32', N'1', N'2026-02-21 00:50:32', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3180, 3, N'PDA', N'PDA', N'mes_pro_feedback_channel', 0, N'info', N'', N'', N'1', N'2026-02-21 00:50:32', N'1', N'2026-02-21 00:50:32', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3181, 1, N'浮点', N'1', N'mes_qc_result_type', 0, N'primary', N'', N'', N'1', N'2026-02-21 13:37:17', N'1', N'2026-02-21 13:37:17', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3182, 2, N'整数', N'2', N'mes_qc_result_type', 0, N'success', N'', N'', N'1', N'2026-02-21 13:37:17', N'1', N'2026-02-21 13:37:17', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3183, 3, N'文本', N'3', N'mes_qc_result_type', 0, N'info', N'', N'', N'1', N'2026-02-21 13:37:17', N'1', N'2026-02-21 13:37:17', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3184, 4, N'字典', N'4', N'mes_qc_result_type', 0, N'warning', N'', N'', N'1', N'2026-02-21 13:37:17', N'1', N'2026-02-21 13:37:17', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3185, 5, N'文件', N'5', N'mes_qc_result_type', 0, N'danger', N'', N'', N'1', N'2026-02-21 13:37:17', N'1', N'2026-02-21 13:37:17', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3186, 1, N'生产退料', N'1', N'mes_rqc_type', 0, N'default', N'', N'生产退料检验', N'1', N'2026-02-22 06:44:09', N'1', N'2026-02-22 06:44:09', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3187, 2, N'销售退货', N'2', N'mes_rqc_type', 0, N'default', N'', N'销售退货检验', N'1', N'2026-02-22 06:44:09', N'1', N'2026-02-22 06:44:09', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3188, 1, N'自制工序检验', N'1', N'mes_ipqc_type', 0, N'primary', N'', N'', N'1', N'2026-02-22 07:01:04', N'1', N'2026-02-22 07:01:04', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3189, 2, N'首检', N'2', N'mes_ipqc_type', 0, N'success', N'', N'', N'1', N'2026-02-22 07:01:04', N'1', N'2026-02-22 07:01:04', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3190, 3, N'巡检', N'3', N'mes_ipqc_type', 0, N'warning', N'', N'', N'1', N'2026-02-22 07:01:04', N'1', N'2026-02-22 07:01:04', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3191, 4, N'自检', N'4', N'mes_ipqc_type', 0, N'info', N'', N'', N'1', N'2026-02-22 07:01:04', N'1', N'2026-02-22 07:01:04', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3192, 5, N'成品检验', N'5', N'mes_ipqc_type', 0, N'danger', N'', N'', N'1', N'2026-02-22 07:01:04', N'1', N'2026-02-22 07:01:04', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3205, 0, N'草稿', N'0', N'mes_wm_arrival_notice_status', 0, N'info', N'', N'', N'1', N'2026-02-22 14:53:18', N'1', N'2026-02-22 14:53:18', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3206, 2, N'待质检', N'2', N'mes_wm_arrival_notice_status', 0, N'warning', N'', N'', N'1', N'2026-02-22 14:53:18', N'1', N'2026-02-26 05:24:40', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3207, 3, N'待入库', N'3', N'mes_wm_arrival_notice_status', 0, N'success', N'', N'', N'1', N'2026-02-22 14:53:18', N'1', N'2026-02-26 05:24:47', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3208, 4, N'已完成', N'4', N'mes_wm_arrival_notice_status', 0, N'primary', N'', N'', N'1', N'2026-02-22 14:53:18', N'1', N'2026-02-26 05:24:52', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3209, 0, N'草稿', N'0', N'mes_wm_item_receipt_status', 0, N'info', N'', N'', N'1', N'2026-02-22 14:54:05', N'1', N'2026-02-22 14:54:05', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3210, 1, N'待上架', N'2', N'mes_wm_item_receipt_status', 0, N'warning', N'', N'', N'1', N'2026-02-22 14:54:05', N'1', N'2026-02-26 08:03:35', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3211, 2, N'待执行入库', N'3', N'mes_wm_item_receipt_status', 0, N'success', N'', N'', N'1', N'2026-02-22 14:54:05', N'1', N'2026-02-26 08:03:31', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3212, 3, N'已完成', N'4', N'mes_wm_item_receipt_status', 0, N'primary', N'', N'', N'1', N'2026-02-22 14:54:05', N'1', N'2026-02-26 08:03:20', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3213, 4, N'已取消', N'5', N'mes_wm_item_receipt_status', 0, N'danger', N'', N'', N'1', N'2026-02-22 14:54:05', N'1', N'2026-02-26 08:03:24', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3214, 1, N'草稿', N'0', N'mes_order_status', 0, N'info', N'', N'', N'1', N'2026-02-23 21:16:03', N'1', N'2026-02-23 21:16:03', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3215, 2, N'已确认', N'1', N'mes_order_status', 0, N'primary', N'', N'', N'1', N'2026-02-23 21:16:03', N'1', N'2026-02-23 21:16:03', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3216, 3, N'审批中', N'2', N'mes_order_status', 0, N'warning', N'', N'', N'1', N'2026-02-23 21:16:03', N'1', N'2026-02-23 21:16:03', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3217, 4, N'已审批', N'3', N'mes_order_status', 0, N'success', N'', N'', N'1', N'2026-02-23 21:16:03', N'1', N'2026-02-23 21:16:03', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3218, 5, N'已完成', N'4', N'mes_order_status', 0, N'success', N'', N'', N'1', N'2026-02-23 21:16:03', N'1', N'2026-02-23 21:16:03', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3219, 6, N'已取消', N'5', N'mes_order_status', 0, N'danger', N'', N'', N'1', N'2026-02-23 21:16:03', N'1', N'2026-02-23 21:16:03', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3220, 1, N'草稿', N'0', N'mes_wm_issue_status', 0, N'info', N'', N'草稿状态，未完成', N'1', N'2026-02-26 15:54:25', N'1', N'2026-02-26 15:54:25', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3221, 2, N'已完成', N'4', N'mes_wm_issue_status', 0, N'success', N'', N'已完成出库', N'1', N'2026-02-26 15:54:25', N'1', N'2026-02-26 15:54:25', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3222, 1, N'草稿', N'0', N'mes_wm_product_issue_status', 0, N'info', N'', N'草稿状态，可编辑', N'1', N'2026-02-26 16:39:12', N'1', N'2026-03-23 13:18:02', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3223, 2, N'待拣货', N'2', N'mes_wm_product_issue_status', 0, N'warning', N'', N'审批中，可执行拣货', N'1', N'2026-02-26 16:39:12', N'1', N'2026-03-23 13:18:02', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3224, 3, N'待执行领出', N'3', N'mes_wm_product_issue_status', 0, N'primary', N'', N'已审批，拣货完成', N'1', N'2026-02-26 16:39:12', N'1', N'2026-03-23 13:18:02', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3225, 4, N'已完成', N'4', N'mes_wm_product_issue_status', 0, N'success', N'', N'已完成出库', N'1', N'2026-02-26 16:39:12', N'1', N'2026-03-23 13:18:02', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3226, 5, N'已取消', N'5', N'mes_wm_product_issue_status', 0, N'success', N'', N'已完成出库', N'1', N'2026-02-26 16:39:12', N'1', N'2026-03-23 13:18:02', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3232, 1, N'草稿', N'0', N'mes_wm_return_issue_status', 0, N'info', N'', N'草稿状态，可编辑', N'1', N'2026-02-28 14:11:12', N'1', N'2026-02-28 14:28:24', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3233, 2, N'待检验', N'1', N'mes_wm_return_issue_status', 0, N'default', N'', N'已确认，等待质检', N'1', N'2026-02-28 14:11:12', N'1', N'2026-02-28 14:28:28', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3234, 3, N'待上架', N'2', N'mes_wm_return_issue_status', 0, N'warning', N'', N'检验完成，等待仓库上架', N'1', N'2026-02-28 14:11:12', N'1', N'2026-02-28 14:28:31', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3235, 4, N'待执行退料', N'3', N'mes_wm_return_issue_status', 0, N'primary', N'', N'上架完成，等待执行退料操作', N'1', N'2026-02-28 14:11:12', N'1', N'2026-02-28 14:28:34', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3236, 5, N'已完成', N'4', N'mes_wm_return_issue_status', 0, N'success', N'', N'退料执行完成，库存已更新', N'1', N'2026-02-28 14:11:12', N'1', N'2026-02-28 14:28:37', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3237, 6, N'已取消', N'5', N'mes_wm_return_issue_status', 0, N'danger', N'', N'已取消', N'1', N'2026-02-28 14:11:12', N'1', N'2026-02-28 14:28:40', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3238, 1, N'余料退料', N'1', N'mes_wm_return_issue_type', 0, N'success', N'', N'余料退回，直接合格', N'1', N'2026-02-28 14:11:12', N'1', N'2026-02-28 14:27:47', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3239, 2, N'不良退料', N'2', N'mes_wm_return_issue_type', 0, N'danger', N'', N'不良品退回', N'1', N'2026-02-28 14:11:12', N'1', N'2026-02-28 14:27:49', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3240, 3, N'其他退料', N'3', N'mes_wm_return_issue_type', 0, N'info', N'', N'其他原因退料', N'1', N'2026-02-28 14:11:12', N'1', N'2026-02-28 14:27:55', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3241, 1, N'待检', N'0', N'mes_wm_quality_status', 0, N'warning', N'', N'待检状态', N'1', N'2026-02-28 15:00:53', N'1', N'2026-02-28 15:00:53', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3242, 2, N'合格', N'1', N'mes_wm_quality_status', 0, N'success', N'', N'合格状态', N'1', N'2026-02-28 15:00:53', N'1', N'2026-02-28 15:00:53', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3243, 3, N'不合格', N'2', N'mes_wm_quality_status', 0, N'danger', N'', N'不合格状态', N'1', N'2026-02-28 15:00:53', N'1', N'2026-02-28 15:00:53', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3244, 1, N'草稿', N'0', N'mes_wm_product_receipt_status', 0, N'info', N'', N'草稿状态', N'1', N'2026-03-01 06:03:07', N'1', N'2026-03-01 06:03:07', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3245, 2, N'待上架', N'2', N'mes_wm_product_receipt_status', 0, N'primary', N'', N'待上架', N'1', N'2026-03-01 06:03:07', N'1', N'2026-03-01 06:03:07', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3246, 3, N'待执行入库', N'3', N'mes_wm_product_receipt_status', 0, N'warning', N'', N'待执行入库', N'1', N'2026-03-01 06:03:07', N'1', N'2026-03-01 06:03:07', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3247, 4, N'已完成', N'4', N'mes_wm_product_receipt_status', 0, N'success', N'', N'已完成', N'1', N'2026-03-01 06:03:07', N'1', N'2026-03-01 06:03:07', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3248, 5, N'已取消', N'5', N'mes_wm_product_receipt_status', 0, N'danger', N'', N'已取消', N'1', N'2026-03-01 06:03:07', N'1', N'2026-03-01 06:03:07', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3252, 1, N'草稿', N'0', N'mes_wm_product_sales_status', 0, N'info', N'', N'草稿状态', N'1', N'2026-03-02 08:55:11', N'1', N'2026-03-02 08:55:11', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3253, 3, N'待拣货', N'2', N'mes_wm_product_sales_status', 0, N'warning', N'', N'待拣货状态', N'1', N'2026-03-02 08:55:11', N'1', N'2026-03-27 11:44:48', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3254, 4, N'待出库', N'3', N'mes_wm_product_sales_status', 0, N'primary', N'', N'待出库状态', N'1', N'2026-03-02 08:55:11', N'1', N'2026-03-27 11:44:48', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3255, 5, N'已完成', N'4', N'mes_wm_product_sales_status', 0, N'success', N'', N'已完成状态', N'1', N'2026-03-02 08:55:11', N'1', N'2026-03-27 11:44:48', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3256, 6, N'已取消', N'5', N'mes_wm_product_sales_status', 0, N'danger', N'', N'已取消状态', N'1', N'2026-03-02 08:55:11', N'1', N'2026-03-27 11:44:48', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3272, 1, N'草稿', N'0', N'mes_wm_misc_receipt_status', 0, N'info', N'', N'草稿状态', N'1', N'2026-03-03 07:33:41', N'1', N'2026-03-03 07:33:41', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3273, 2, N'待执行入库', N'3', N'mes_wm_misc_receipt_status', 0, N'primary', N'', N'待执行入库状态', N'1', N'2026-03-03 07:33:41', N'1', N'2026-03-03 07:37:34', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3274, 3, N'已完成', N'4', N'mes_wm_misc_receipt_status', 0, N'success', N'', N'已完成状态', N'1', N'2026-03-03 07:33:41', N'1', N'2026-03-03 07:33:41', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3275, 4, N'已取消', N'5', N'mes_wm_misc_receipt_status', 0, N'danger', N'', N'已取消状态', N'1', N'2026-03-03 07:33:41', N'1', N'2026-03-03 07:33:41', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3277, 1, N'库存调整', N'1', N'mes_wm_misc_receipt_type', 0, N'primary', N'', N'库存调整入库', N'1', N'2026-03-03 07:34:33', N'1', N'2026-03-03 07:34:33', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3278, 1, N'库存调整', N'1', N'mes_wm_misc_issue_type', 0, N'primary', N'', N'库存调整出库', N'1', N'2026-03-03 07:34:33', N'1', N'2026-03-03 07:34:33', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3279, 2, N'报废出库', N'2', N'mes_wm_misc_issue_type', 0, N'danger', N'', N'报废出库', N'1', N'2026-03-03 07:36:13', N'1', N'2026-03-03 07:36:13', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3280, 1, N'草稿', N'0', N'mes_wm_outsource_receipt_status', 0, N'info', N'', N'草稿状态', N'1', N'2026-03-03 14:03:57', N'1', N'2026-03-03 14:03:57', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3281, 2, N'待检验', N'1', N'mes_wm_outsource_receipt_status', 0, N'warning', N'', N'已确认，等待质检', N'1', N'2026-03-03 14:03:57', N'1', N'2026-03-03 14:03:57', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3282, 3, N'待上架', N'2', N'mes_wm_outsource_receipt_status', 0, N'primary', N'', N'检验完成，等待仓库上架', N'1', N'2026-03-03 14:03:57', N'1', N'2026-03-03 14:03:57', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3283, 4, N'待执行入库', N'3', N'mes_wm_outsource_receipt_status', 0, N'warning', N'', N'上架完成，等待执行入库操作', N'1', N'2026-03-03 14:03:57', N'1', N'2026-03-03 14:03:57', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3284, 5, N'已完成', N'4', N'mes_wm_outsource_receipt_status', 0, N'success', N'', N'入库执行完成，库存已更新', N'1', N'2026-03-03 14:03:57', N'1', N'2026-03-03 14:03:57', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3285, 6, N'已取消', N'5', N'mes_wm_outsource_receipt_status', 0, N'danger', N'', N'已取消', N'1', N'2026-03-03 14:03:57', N'1', N'2026-03-03 14:03:57', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3286, 1, N'草稿', N'0', N'mes_wm_outsource_issue_status', 0, N'info', N'', N'草稿状态，可编辑、删除、执行出库', N'1', N'2026-03-03 16:31:00', N'1', N'2026-03-03 16:31:00', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3287, 2, N'待拣货', N'2', N'mes_wm_outsource_issue_status', 0, N'warning', N'', N'待拣货状态', N'1', N'2026-03-03 16:31:00', N'1', N'2026-03-03 16:31:00', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3288, 3, N'待执行出库', N'3', N'mes_wm_outsource_issue_status', 0, N'primary', N'', N'待执行出库状态', N'1', N'2026-03-03 16:31:00', N'1', N'2026-03-03 16:31:00', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3289, 4, N'已完成', N'4', N'mes_wm_outsource_issue_status', 0, N'success', N'', N'已完成，库存已扣减', N'1', N'2026-03-03 16:31:00', N'1', N'2026-03-03 16:31:00', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3290, 5, N'已取消', N'5', N'mes_wm_outsource_issue_status', 0, N'danger', N'', N'已取消状态', N'1', N'2026-03-03 16:31:00', N'1', N'2026-03-03 16:31:00', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3301, 1, N'输入字符', N'1', N'mes_md_auto_code_part_type', 0, N'default', N'', N'输入字符', N'1', N'2026-03-04 14:46:22', N'1', N'2026-03-04 15:24:40', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3302, 2, N'当前日期', N'2', N'mes_md_auto_code_part_type', 0, N'primary', N'', N'当前日期时间', N'1', N'2026-03-04 14:46:22', N'1', N'2026-03-04 15:24:40', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3303, 3, N'固定字符', N'3', N'mes_md_auto_code_part_type', 0, N'success', N'', N'固定字符', N'1', N'2026-03-04 14:46:22', N'1', N'2026-03-04 15:24:40', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3304, 4, N'流水号', N'4', N'mes_md_auto_code_part_type', 0, N'warning', N'', N'流水号', N'1', N'2026-03-04 14:46:22', N'1', N'2026-03-04 15:24:40', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3305, 1, N'左补齐', N'1', N'mes_md_auto_code_padded_method', 0, N'primary', N'', N'左补齐', N'1', N'2026-03-04 14:46:22', N'1', N'2026-03-04 15:24:40', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3306, 2, N'右补齐', N'2', N'mes_md_auto_code_padded_method', 0, N'success', N'', N'右补齐', N'1', N'2026-03-04 14:46:22', N'1', N'2026-03-04 15:24:40', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3307, 1, N'按年', N'1', N'mes_md_auto_code_cycle_method', 0, N'default', N'', N'按年循环', N'1', N'2026-03-04 14:46:22', N'1', N'2026-03-04 15:24:40', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3308, 2, N'按月', N'2', N'mes_md_auto_code_cycle_method', 0, N'primary', N'', N'按月循环', N'1', N'2026-03-04 14:46:22', N'1', N'2026-03-04 15:24:40', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3309, 3, N'按天', N'3', N'mes_md_auto_code_cycle_method', 0, N'success', N'', N'按天循环', N'1', N'2026-03-04 14:46:22', N'1', N'2026-03-04 15:24:40', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3310, 4, N'按小时', N'4', N'mes_md_auto_code_cycle_method', 0, N'warning', N'', N'按小时循环', N'1', N'2026-03-04 14:46:22', N'1', N'2026-03-04 15:24:40', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3311, 5, N'按分钟', N'5', N'mes_md_auto_code_cycle_method', 0, N'danger', N'', N'按分钟循环', N'1', N'2026-03-04 14:46:22', N'1', N'2026-03-04 15:24:40', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3312, 10, N'按传入字符', N'10', N'mes_md_auto_code_cycle_method', 0, N'info', N'', N'按传入字符循环', N'1', N'2026-03-04 14:46:22', N'1', N'2026-03-04 15:24:40', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3313, 1, N'二维码', N'1', N'mes_wm_barcode_format', 0, N'primary', N'', N'QR_CODE', N'1', N'2026-03-05 14:37:20', N'1', N'2026-03-06 13:18:21', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3314, 2, N'EAN13 商品条码', N'2', N'mes_wm_barcode_format', 0, N'success', N'', N'EAN13', N'1', N'2026-03-05 14:37:20', N'1', N'2026-03-06 13:18:23', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3315, 3, N'CODE39 工业条码', N'3', N'mes_wm_barcode_format', 0, N'info', N'', N'CODE39', N'1', N'2026-03-05 14:37:20', N'1', N'2026-03-06 13:18:25', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3316, 4, N'UPC-A 美国商品码', N'4', N'mes_wm_barcode_format', 0, N'warning', N'', N'UPC_A', N'1', N'2026-03-05 14:37:20', N'1', N'2026-03-06 13:18:28', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3318, 3, N'库位', N'104', N'mes_wm_barcode_biz_type', 0, N'default', N'', N'AREA', N'1', N'2026-03-05 14:37:20', N'1', N'2026-03-07 06:25:19', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3319, 4, N'装箱单', N'105', N'mes_wm_barcode_biz_type', 0, N'default', N'', N'PACKAGE', N'1', N'2026-03-05 14:37:20', N'1', N'2026-03-07 06:25:19', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3320, 5, N'库存', N'106', N'mes_wm_barcode_biz_type', 0, N'default', N'', N'STOCK', N'1', N'2026-03-05 14:37:20', N'1', N'2026-03-07 06:25:19', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3321, 6, N'批次', N'107', N'mes_wm_barcode_biz_type', 0, N'default', N'', N'BATCH', N'1', N'2026-03-05 14:37:20', N'1', N'2026-03-07 06:25:19', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3322, 7, N'流转卡', N'300', N'mes_wm_barcode_biz_type', 0, N'primary', N'', N'PROCARD', N'1', N'2026-03-05 14:37:20', N'1', N'2026-03-07 06:25:19', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3323, 8, N'工单', N'301', N'mes_wm_barcode_biz_type', 0, N'primary', N'', N'WORKORDER', N'1', N'2026-03-05 14:37:20', N'1', N'2026-03-07 06:25:19', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3324, 9, N'流转单', N'302', N'mes_wm_barcode_biz_type', 0, N'primary', N'', N'TRANSORDER', N'1', N'2026-03-05 14:37:20', N'1', N'2026-03-07 06:25:19', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3325, 10, N'设备', N'400', N'mes_wm_barcode_biz_type', 0, N'success', N'', N'MACHINERY', N'1', N'2026-03-05 14:37:20', N'1', N'2026-03-07 06:25:19', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3327, 12, N'产品物料', N'600', N'mes_wm_barcode_biz_type', 0, N'info', N'', N'ITEM', N'1', N'2026-03-05 14:37:20', N'1', N'2026-03-07 06:25:19', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3328, 13, N'供应商', N'601', N'mes_wm_barcode_biz_type', 0, N'info', N'', N'VENDOR', N'1', N'2026-03-05 14:37:20', N'1', N'2026-03-07 06:25:19', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3329, 14, N'工作站', N'602', N'mes_wm_barcode_biz_type', 0, N'info', N'', N'WORKSTATION', N'1', N'2026-03-05 14:37:20', N'1', N'2026-03-07 06:25:19', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3330, 15, N'车间', N'603', N'mes_wm_barcode_biz_type', 0, N'info', N'', N'WORKSHOP', N'1', N'2026-03-05 14:37:20', N'1', N'2026-03-07 06:25:19', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3331, 16, N'人员', N'604', N'mes_wm_barcode_biz_type', 0, N'info', N'', N'USER', N'1', N'2026-03-05 14:37:20', N'1', N'2026-03-07 06:25:19', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3351, 1, N'仓库', N'102', N'mes_wm_barcode_biz_type', 0, N'', N'', NULL, N'', N'2026-03-07 06:22:27', N'', N'2026-03-07 06:25:19', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3352, 2, N'库区', N'103', N'mes_wm_barcode_biz_type', 0, N'', N'', NULL, N'', N'2026-03-07 06:22:27', N'', N'2026-03-07 06:25:19', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3353, 11, N'工具', N'500', N'mes_wm_barcode_biz_type', 0, N'', N'', NULL, N'', N'2026-03-07 06:22:27', N'', N'2026-03-07 06:22:27', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3354, 17, N'客户', N'605', N'mes_wm_barcode_biz_type', 0, N'', N'', NULL, N'', N'2026-03-07 06:22:27', N'', N'2026-03-07 06:25:19', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3355, 1, N'草稿', N'0', N'mes_wm_package_status', 0, N'info', N'', N'草稿状态，可编辑', N'1', N'2026-03-08 02:05:46', N'1', N'2026-03-08 02:05:46', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3356, 2, N'已完成', N'4', N'mes_wm_package_status', 0, N'success', N'', N'装箱已完成', N'1', N'2026-03-08 02:05:46', N'1', N'2026-03-08 02:05:46', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3357, 1, N'草稿', N'0', N'mes_wm_transfer_status', 0, N'info', N'', N'草稿状态，可编辑', N'1', N'2026-03-08 11:55:25', N'1', N'2026-03-08 11:55:25', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3358, 2, N'待确认', N'1', N'mes_wm_transfer_status', 0, N'warning', N'', N'外部调拨待确认到货', N'1', N'2026-03-08 11:55:25', N'1', N'2026-03-08 11:55:25', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3359, 3, N'待上架', N'2', N'mes_wm_transfer_status', 0, N'primary', N'', N'待维护目标库位明细', N'1', N'2026-03-08 11:55:25', N'1', N'2026-03-08 11:55:25', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3360, 4, N'待执行', N'3', N'mes_wm_transfer_status', 0, N'success', N'', N'目标库位已分配，待执行调拨', N'1', N'2026-03-08 11:55:25', N'1', N'2026-03-08 11:55:25', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3361, 5, N'已完成', N'4', N'mes_wm_transfer_status', 0, N'success', N'', N'调拨已完成', N'1', N'2026-03-08 11:55:25', N'1', N'2026-03-08 11:55:25', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3362, 6, N'已取消', N'5', N'mes_wm_transfer_status', 0, N'danger', N'', N'调拨已取消', N'1', N'2026-03-08 11:55:25', N'1', N'2026-03-08 11:55:25', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3363, 1, N'内部调拨', N'1', N'mes_wm_transfer_type', 0, N'success', N'', N'内部仓储调拨', N'1', N'2026-03-08 11:55:25', N'1', N'2026-03-08 11:55:25', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3364, 2, N'外部调拨', N'2', N'mes_wm_transfer_type', 0, N'warning', N'', N'外部配送/外部收货调拨', N'1', N'2026-03-08 11:55:25', N'1', N'2026-03-08 11:55:25', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3365, 1, N'静态盘点', N'1', N'mes_wm_stock_taking_type', 0, N'primary', N'', N'静态盘点', N'1', N'2026-03-09 00:00:00', N'1', N'2026-04-05 15:02:18', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3366, 2, N'动态盘点', N'2', N'mes_wm_stock_taking_type', 0, N'success', N'', N'动态盘点', N'1', N'2026-03-09 00:00:00', N'1', N'2026-04-05 15:02:18', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3367, 1, N'仓库', N'102', N'mes_wm_stock_taking_plan_param_type', 0, N'primary', N'', N'按仓库盘点', N'1', N'2026-03-09 00:00:00', N'1', N'2026-03-09 00:00:00', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3368, 2, N'库区', N'103', N'mes_wm_stock_taking_plan_param_type', 0, N'success', N'', N'按库区盘点', N'1', N'2026-03-09 00:00:00', N'1', N'2026-03-09 00:00:00', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3369, 3, N'库位', N'104', N'mes_wm_stock_taking_plan_param_type', 0, N'info', N'', N'按库位盘点', N'1', N'2026-03-09 00:00:00', N'1', N'2026-03-09 00:00:00', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3370, 4, N'物料', N'600', N'mes_wm_stock_taking_plan_param_type', 0, N'warning', N'', N'按物料盘点', N'1', N'2026-03-09 00:00:00', N'1', N'2026-03-09 00:00:00', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3371, 5, N'批次', N'107', N'mes_wm_stock_taking_plan_param_type', 0, N'danger', N'', N'按批次盘点', N'1', N'2026-03-09 00:00:00', N'1', N'2026-03-09 00:00:00', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3372, 1, N'草稿', N'0', N'mes_wm_stock_taking_task_status', 0, N'info', N'', N'草稿', N'1', N'2026-03-09 00:00:00', N'1', N'2026-04-05 15:02:18', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3373, 2, N'审批中', N'2', N'mes_wm_stock_taking_task_status', 0, N'primary', N'', N'盘点任务审批中', N'1', N'2026-03-09 00:00:00', N'1', N'2026-03-09 00:00:00', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3374, 3, N'已完成', N'4', N'mes_wm_stock_taking_task_status', 0, N'success', N'', N'已完成', N'1', N'2026-03-09 00:00:00', N'1', N'2026-04-05 15:02:18', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3375, 4, N'已取消', N'5', N'mes_wm_stock_taking_task_status', 0, N'danger', N'', N'已取消', N'1', N'2026-03-09 00:00:00', N'1', N'2026-04-05 15:02:18', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3377, 1, N'正常', N'1', N'mes_wm_stock_taking_task_line_status', 0, N'success', N'', N'正常', N'1', N'2026-03-09 00:00:00', N'1', N'2026-04-05 15:02:18', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3378, 2, N'盘盈', N'2', N'mes_wm_stock_taking_task_line_status', 0, N'primary', N'', N'盘盈', N'1', N'2026-03-09 00:00:00', N'1', N'2026-04-05 15:02:18', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3379, 3, N'盘亏', N'3', N'mes_wm_stock_taking_task_line_status', 0, N'danger', N'', N'盘亏', N'1', N'2026-03-09 00:00:00', N'1', N'2026-04-05 15:02:18', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3380, 6, N'质量状态', N'900', N'mes_wm_stock_taking_plan_param_type', 0, N'default', N'', N'按质量状态盘点', N'1', N'2026-03-09 00:00:00', N'1', N'2026-03-09 00:00:00', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3381, 1, N'物料', N'ITEM', N'mes_md_item_or_product', 0, N'info', N'', N'', N'1', N'2026-03-15 01:55:06', N'1', N'2026-03-15 01:55:06', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3382, 2, N'产品', N'PRODUCT', N'mes_md_item_or_product', 0, N'success', N'', N'', N'1', N'2026-03-15 01:55:06', N'1', N'2026-03-15 01:55:06', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3383, 1, N'草稿', N'0', N'mes_wm_item_consume_status', 0, N'info', N'', N'草稿状态', N'1', N'2026-03-19 15:06:23', N'1', N'2026-03-19 15:06:23', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3384, 2, N'已完成', N'4', N'mes_wm_item_consume_status', 0, N'success', N'', N'已完成', N'1', N'2026-03-19 15:06:23', N'1', N'2026-03-19 15:06:23', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3385, 1, N'到货通知单', N'100', N'mes_qc_source_doc_type', 0, N'primary', N'', N'IQC', N'1', N'2026-03-26 13:01:09', N'1', N'2026-03-26 13:01:09', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3386, 2, N'外协入库单', N'121', N'mes_qc_source_doc_type', 0, N'warning', N'', N'IQC', N'1', N'2026-03-26 13:01:09', N'1', N'2026-03-26 13:01:09', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3387, 3, N'生产报工', N'304', N'mes_qc_source_doc_type', 0, N'success', N'', N'IPQC', N'1', N'2026-03-26 13:01:09', N'1', N'2026-03-26 13:01:09', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3388, 4, N'销售出库单', N'118', N'mes_qc_source_doc_type', 0, N'info', N'', N'OQC', N'1', N'2026-03-26 13:01:09', N'1', N'2026-03-26 13:01:09', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3389, 5, N'生产退料单', N'116', N'mes_qc_source_doc_type', 0, N'danger', N'', N'RQC', N'1', N'2026-03-26 13:01:09', N'1', N'2026-03-26 13:01:09', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3390, 6, N'销售退货单', N'119', N'mes_qc_source_doc_type', 0, N'default', N'', N'RQC', N'1', N'2026-03-26 13:01:09', N'1', N'2026-03-26 13:01:09', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3397, 2, N'待检测', N'1', N'mes_wm_product_sales_status', 0, N'warning', N'', N'OQC 检验中', N'1', N'2026-03-27 11:44:48', N'1', N'2026-03-27 11:44:48', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3398, 0, N'草稿', N'0', N'mes_wm_return_vendor_status', 0, N'info', N'', NULL, N'', N'2026-03-29 13:49:57', N'', N'2026-04-05 15:53:46', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3399, 1, N'待拣货', N'2', N'mes_wm_return_vendor_status', 0, N'primary', N'', NULL, N'', N'2026-03-29 13:49:57', N'', N'2026-04-05 15:53:46', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3400, 2, N'待执行退货', N'3', N'mes_wm_return_vendor_status', 0, N'warning', N'', NULL, N'', N'2026-03-29 13:49:57', N'', N'2026-04-05 15:53:46', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3401, 3, N'已完成', N'4', N'mes_wm_return_vendor_status', 0, N'success', N'', NULL, N'', N'2026-03-29 13:49:57', N'', N'2026-04-05 15:53:46', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3402, 4, N'已取消', N'5', N'mes_wm_return_vendor_status', 0, N'danger', N'', NULL, N'', N'2026-03-29 13:49:57', N'', N'2026-04-05 15:53:46', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3403, 1, N'草稿', N'0', N'mes_wm_sales_notice_status', 0, N'info', N'', N'草稿状态，可以修改和删除', N'1', N'2026-03-30 08:54:30', N'1', N'2026-04-05 15:53:46', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3404, 2, N'待出库', N'3', N'mes_wm_sales_notice_status', 0, N'success', N'', N'已提交状态，不可修改和删除', N'1', N'2026-03-30 08:54:30', N'1', N'2026-04-05 15:53:46', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3405, 3, N'已完成', N'4', N'mes_wm_sales_notice_status', 0, N'', N'', NULL, N'1', N'2026-03-30 10:02:10', N'1', N'2026-04-05 15:53:46', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3406, 1, N'草稿', N'0', N'mes_wm_misc_issue_status', 0, N'info', N'', N'草稿状态', N'1', N'2026-03-30 15:00:18', N'1', N'2026-03-30 15:00:18', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3407, 2, N'待出库', N'3', N'mes_wm_misc_issue_status', 0, N'warning', N'', N'待出库状态', N'1', N'2026-03-30 15:00:18', N'1', N'2026-03-30 15:00:18', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3408, 3, N'已完成', N'4', N'mes_wm_misc_issue_status', 0, N'success', N'', N'执行出库后的状态', N'1', N'2026-03-30 15:00:18', N'1', N'2026-03-30 15:00:18', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3409, 4, N'已取消', N'5', N'mes_wm_misc_issue_status', 0, N'danger', N'', N'已取消状态', N'1', N'2026-03-30 15:00:18', N'1', N'2026-03-30 15:00:18', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3415, 1, N'注塑', N'1', N'mes_cal_calendar_type', 0, N'primary', N'', N'', N'1', N'2026-04-01 15:23:14', N'1', N'2026-04-01 16:08:31', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3416, 2, N'机加工', N'2', N'mes_cal_calendar_type', 0, N'success', N'', N'', N'1', N'2026-04-01 15:23:14', N'1', N'2026-04-01 16:08:32', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3417, 3, N'组装', N'3', N'mes_cal_calendar_type', 0, N'warning', N'', N'', N'1', N'2026-04-01 15:23:14', N'1', N'2026-04-01 16:08:33', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3418, 4, N'仓库', N'4', N'mes_cal_calendar_type', 0, N'danger', N'', N'', N'1', N'2026-04-01 15:23:14', N'1', N'2026-04-01 16:08:34', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3419, 0, N'草稿', N'0', N'mes_dv_repair_status', 0, N'info', N'', N'', N'1', N'2026-04-03 17:20:23', N'1', N'2026-04-03 17:20:23', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3420, 1, N'维修中', N'1', N'mes_dv_repair_status', 0, N'primary', N'', N'', N'1', N'2026-04-03 17:20:23', N'1', N'2026-04-03 17:20:23', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3421, 2, N'待验收', N'2', N'mes_dv_repair_status', 0, N'warning', N'', N'', N'1', N'2026-04-03 17:20:23', N'1', N'2026-04-03 17:20:23', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3422, 3, N'已确认', N'4', N'mes_dv_repair_status', 0, N'success', N'', N'', N'1', N'2026-04-03 17:20:23', N'1', N'2026-04-03 17:20:23', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3423, 0, N'草稿', N'0', N'mes_wm_return_sales_status', 0, N'info', N'', N'', N'1', N'2026-04-03 17:20:25', N'1', N'2026-04-03 17:20:25', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3424, 1, N'待检验', N'1', N'mes_wm_return_sales_status', 0, N'warning', N'', N'', N'1', N'2026-04-03 17:20:25', N'1', N'2026-04-03 17:20:25', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3425, 2, N'待执行', N'2', N'mes_wm_return_sales_status', 0, N'warning', N'', N'', N'1', N'2026-04-03 17:20:25', N'1', N'2026-04-03 17:20:25', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3426, 3, N'待上架', N'3', N'mes_wm_return_sales_status', 0, N'primary', N'', N'', N'1', N'2026-04-03 17:20:25', N'1', N'2026-04-03 17:20:25', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3427, 4, N'已完成', N'4', N'mes_wm_return_sales_status', 0, N'success', N'', N'', N'1', N'2026-04-03 17:20:25', N'1', N'2026-04-03 17:20:25', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3428, 5, N'已取消', N'5', N'mes_wm_return_sales_status', 0, N'danger', N'', N'', N'1', N'2026-04-03 17:20:25', N'1', N'2026-04-03 17:20:25', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3429, 1, N'尺寸', N'1', N'mes_defect_type', 0, N'', N'', N'', N'1', N'2026-04-04 12:49:51', N'1', N'2026-04-09 15:03:20', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3430, 2, N'外观', N'2', N'mes_defect_type', 0, N'', N'', N'', N'1', N'2026-04-04 12:49:51', N'1', N'2026-04-09 15:03:20', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3431, 3, N'重量', N'3', N'mes_defect_type', 0, N'', N'', N'', N'1', N'2026-04-04 12:49:51', N'1', N'2026-04-09 15:03:20', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3432, 4, N'性能', N'4', N'mes_defect_type', 0, N'', N'', N'', N'1', N'2026-04-04 12:49:51', N'1', N'2026-04-09 15:03:20', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3433, 5, N'成分', N'5', N'mes_defect_type', 0, N'', N'', N'', N'1', N'2026-04-04 12:49:51', N'1', N'2026-04-09 15:03:20', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3436, 1, N'上工', N'1', N'mes_pro_work_record_type', 0, N'success', N'', N'', N'1', N'2026-04-05 14:07:27', N'1', N'2026-04-05 14:07:27', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3437, 2, N'下工', N'2', N'mes_pro_work_record_type', 0, N'danger', N'', N'', N'1', N'2026-04-05 14:07:27', N'1', N'2026-04-05 14:07:27', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3443, 1, N'草稿', N'0', N'mes_wm_product_produce_status', 0, N'info', N'', N'草稿状态', N'1', N'2026-04-05 15:53:46', N'1', N'2026-04-05 15:53:46', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3444, 2, N'已完成', N'4', N'mes_wm_product_produce_status', 0, N'success', N'', N'已完成状态', N'1', N'2026-04-05 15:53:46', N'1', N'2026-04-05 15:53:46', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3445, 3, N'已取消', N'5', N'mes_wm_product_produce_status', 0, N'danger', N'', N'已取消状态', N'1', N'2026-04-05 15:53:46', N'1', N'2026-04-05 15:53:46', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3446, 0, N'草稿', N'0', N'mes_pro_task_status', 0, N'', N'', NULL, N'1', N'2026-04-16 09:47:00', N'1', N'2026-04-16 09:47:00', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3447, 1, N'已完成', N'4', N'mes_pro_task_status', 0, N'', N'', NULL, N'1', N'2026-04-16 09:47:00', N'1', N'2026-04-16 09:47:00', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3448, 2, N'已取消', N'5', N'mes_pro_task_status', 0, N'', N'', NULL, N'1', N'2026-04-16 09:47:00', N'1', N'2026-04-16 09:47:00', N'0')
 GO
 SET IDENTITY_INSERT system_dict_data OFF
 GO
@@ -3312,103 +3948,102 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS system_dict_type
 GO
-CREATE TABLE system_dict_type
-(
-    id           bigint                                  NOT NULL PRIMARY KEY IDENTITY,
-    name         nvarchar(100) DEFAULT ''                NOT NULL,
-    type         nvarchar(100) DEFAULT ''                NOT NULL,
-    status       tinyint       DEFAULT 0                 NOT NULL,
-    remark       nvarchar(500) DEFAULT NULL              NULL,
-    creator      nvarchar(64)  DEFAULT ''                NULL,
-    create_time  datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater      nvarchar(64)  DEFAULT ''                NULL,
-    update_time  datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted      bit           DEFAULT 0                 NOT NULL,
-    deleted_time datetime2     DEFAULT NULL              NULL
+CREATE TABLE system_dict_type (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    name nvarchar(100) DEFAULT '' NOT NULL,
+    type nvarchar(100) DEFAULT '' NOT NULL,
+    status tinyint DEFAULT 0 NOT NULL,
+    remark nvarchar(500) DEFAULT NULL NULL,
+    creator nvarchar(64) DEFAULT '' NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT 0 NOT NULL,
+    deleted_time datetime2 DEFAULT NULL NULL
 )
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'字典主键',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_dict_type',
-     'COLUMN', N'id'
+    'MS_Description', N'字典主键',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dict_type',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'字典名称',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_dict_type',
-     'COLUMN', N'name'
+    'MS_Description', N'字典名称',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dict_type',
+    'COLUMN', N'name'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'字典类型',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_dict_type',
-     'COLUMN', N'type'
+    'MS_Description', N'字典类型',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dict_type',
+    'COLUMN', N'type'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'状态（0正常 1停用）',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_dict_type',
-     'COLUMN', N'status'
+    'MS_Description', N'状态（0正常 1停用）',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dict_type',
+    'COLUMN', N'status'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'备注',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_dict_type',
-     'COLUMN', N'remark'
+    'MS_Description', N'备注',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dict_type',
+    'COLUMN', N'remark'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_dict_type',
-     'COLUMN', N'creator'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dict_type',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_dict_type',
-     'COLUMN', N'create_time'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dict_type',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_dict_type',
-     'COLUMN', N'updater'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dict_type',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_dict_type',
-     'COLUMN', N'update_time'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dict_type',
+    'COLUMN', N'update_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_dict_type',
-     'COLUMN', N'deleted'
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dict_type',
+    'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'删除时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_dict_type',
-     'COLUMN', N'deleted_time'
+    'MS_Description', N'删除时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dict_type',
+    'COLUMN', N'deleted_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'字典类型表',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_dict_type'
+    'MS_Description', N'字典类型表',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_dict_type'
 GO
 
 -- ----------------------------
@@ -3605,33 +4240,191 @@ INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_ti
 GO
 INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (640, N'AI 模型类型', N'ai_model_type', 0, N'', N'1', N'2025-03-03 12:24:07', N'1', N'2025-03-03 12:24:07', N'0', N'1970-01-01 00:00:00')
 GO
-INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1000, N'IoT 数据格式', N'iot_data_format', 0, N'', N'1', N'2024-08-10 11:52:58', N'1', N'2025-03-17 09:25:06', N'0', N'1970-01-01 00:00:00')
-GO
 INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1001, N'IoT 产品设备类型', N'iot_product_device_type', 0, N'', N'1', N'2024-08-10 11:54:30', N'1', N'2025-03-17 09:25:08', N'0', N'1970-01-01 00:00:00')
 GO
 INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1002, N'IoT 产品状态', N'iot_product_status', 0, N'', N'1', N'2024-08-10 12:06:09', N'1', N'2025-03-17 09:25:10', N'0', N'1970-01-01 00:00:00')
 GO
-INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1003, N'IoT 数据校验级别', N'iot_validate_type', 0, N'', N'1', N'2024-09-06 20:05:13', N'1', N'2025-03-17 09:25:12', N'0', N'1970-01-01 00:00:00')
-GO
 INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1004, N'IoT 联网方式', N'iot_net_type', 0, N'', N'1', N'2024-09-06 22:04:13', N'1', N'2025-03-17 09:25:14', N'0', N'1970-01-01 00:00:00')
-GO
-INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1005, N'IoT 接入网关协议', N'iot_protocol_type', 0, N'', N'1', N'2024-09-06 22:20:17', N'1', N'2025-03-17 09:25:16', N'0', N'1970-01-01 00:00:00')
 GO
 INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1006, N'IoT 设备状态', N'iot_device_state', 0, N'', N'1', N'2024-09-21 08:12:55', N'1', N'2025-03-17 09:25:19', N'0', N'1970-01-01 00:00:00')
 GO
 INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1007, N'IoT 物模型功能类型', N'iot_thing_model_type', 0, N'', N'1', N'2024-09-29 20:02:36', N'1', N'2025-03-17 09:25:24', N'0', N'1970-01-01 00:00:00')
 GO
-INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1008, N'IoT 插件部署方式', N'iot_plugin_deploy_type', 0, N'', N'1', N'2024-12-13 10:55:13', N'1', N'2025-03-17 09:25:27', N'0', N'1970-01-01 00:00:00')
-GO
-INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1009, N'IoT 插件状态', N'iot_plugin_status', 0, N'', N'1', N'2024-12-13 11:05:34', N'1', N'2025-03-17 09:25:30', N'0', N'1970-01-01 00:00:00')
-GO
-INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1010, N'IoT 插件类型', N'iot_plugin_type', 0, N'', N'1', N'2024-12-13 11:08:19', N'1', N'2025-03-17 09:25:32', N'0', N'1970-01-01 00:00:00')
-GO
 INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1011, N'IoT 物模型单位', N'iot_thing_model_unit', 0, N'', N'1', N'2024-12-25 17:36:46', N'1', N'2025-03-17 09:25:35', N'0', N'1970-01-01 00:00:00')
 GO
-INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1012, N'IoT 数据桥接的方向枚举', N'iot_data_bridge_direction_enum', 0, N'', N'1', N'2025-03-09 12:37:40', N'1', N'2025-03-17 09:25:39', N'0', N'1970-01-01 00:00:00')
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1013, N'IoT 数据流转目的的类型枚举', N'iot_data_sink_type_enum', 0, N'', N'1', N'2025-03-09 12:39:36', N'1', N'2025-06-24 12:45:24', N'0', N'1970-01-01 00:00:00')
 GO
-INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1013, N'IoT 数据桥梁的类型枚举', N'iot_data_bridge_type_enum', 0, N'', N'1', N'2025-03-09 12:39:36', N'1', N'2025-04-06 17:09:46', N'0', N'1970-01-01 00:00:00')
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1014, N'IoT 场景流转的触发类型枚举', N'iot_rule_scene_trigger_type_enum', 0, N'', N'1', N'2025-03-20 14:59:44', N'1', N'2025-03-20 14:59:44', N'0', N'1970-01-01 00:00:00')
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1015, N'IoT 设备消息类型枚举', N'iot_device_message_type_enum', 0, N'', N'1', N'2025-03-20 15:01:15', N'1', N'2025-03-20 15:01:15', N'0', N'1970-01-01 00:00:00')
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1016, N'IoT 规则场景的触发类型枚举', N'iot_rule_scene_action_type_enum', 0, N'', N'1', N'2025-03-28 15:26:54', N'1', N'2025-03-28 15:29:13', N'0', N'1970-01-01 00:00:00')
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1017, N'MES 物料消耗记录状态', N'mes_wm_item_consume_status', 0, N'MES 物料消耗记录状态', N'1', N'2026-03-19 15:06:23', N'1', N'2026-03-19 15:06:23', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2001, N'IoT 告警级别', N'iot_alert_level', 0, N'', N'1', N'2025-06-27 20:30:57', N'1', N'2025-06-27 20:30:57', N'0', N'1970-01-01 00:00:00')
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2002, N'IoT 告警', N'iot_alert_receive_type', 0, N'', N'1', N'2025-06-27 22:49:19', N'1', N'2025-06-27 22:49:19', N'0', N'1970-01-01 00:00:00')
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2003, N'IoT 固件设备范围', N'iot_ota_task_device_scope', 0, N'', N'1', N'2025-07-02 09:42:49', N'1', N'2025-07-02 09:42:49', N'0', N'1970-01-01 00:00:00')
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2004, N'IoT 固件升级任务状态', N'iot_ota_task_status', 0, N'', N'1', N'2025-07-02 09:43:43', N'1', N'2025-07-02 09:43:43', N'0', N'1970-01-01 00:00:00')
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2005, N'IoT 固件升级记录状态', N'iot_ota_task_record_status', 0, N'', N'1', N'2025-07-02 09:45:02', N'1', N'2025-07-02 09:45:02', N'0', N'1970-01-01 00:00:00')
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2007, N'AI MCP 客户端名字', N'ai_mcp_client_name', 0, N'', N'1', N'2025-08-28 13:57:40', N'1', N'2025-08-28 13:57:40', N'0', N'1970-01-01 00:00:00')
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2008, N'IoT 协议类型', N'iot_protocol_type', 0, N'IoT 设备接入协议类型', N'1', N'2026-02-04 00:31:33', N'1', N'2026-02-04 00:31:33', N'0', N'1970-01-01 00:00:00')
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2009, N'IoT 序列化类型', N'iot_serialize_type', 0, N'IoT 设备消息序列化类型', N'1', N'2026-02-04 00:33:16', N'1', N'2026-02-04 00:33:16', N'0', N'1970-01-01 00:00:00')
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2010, N'IoT Modbus 工作模式', N'iot_modbus_mode', 0, N'Modbus 设备数据采集模式', N'1', N'2025-06-12 22:55:46', N'1', N'2025-06-12 22:55:46', N'0', N'1970-01-01 00:00:00')
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2011, N'IoT Modbus 帧格式', N'iot_modbus_frame_format', 0, N'Modbus 数据帧协议格式', N'1', N'2025-06-12 22:55:46', N'1', N'2025-06-12 22:55:46', N'0', N'1970-01-01 00:00:00')
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2012, N'MES 客户类型', N'mes_client_type', 0, N'', N'1', N'2026-02-15 14:38:25', N'1', N'2026-02-15 14:38:25', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2013, N'MES 供应商级别', N'mes_vendor_level', 0, N'', N'1', N'2026-02-15 15:59:15', N'1', N'2026-02-15 15:59:15', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2014, N'MES 假期类型', N'mes_cal_holiday_type', 0, N'MES 日历排班 - 假期类型（HOLIDAY=假期，WORKDAY=工作日）', N'1', N'2026-02-16 07:35:58', N'1', N'2026-02-16 07:35:58', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2015, N'MES 工具状态', N'mes_tm_tool_status', 0, N'MES 工具管理 - 工具状态（1=在库，2=领用中，3=维修中，4=报废）', N'1', N'2026-02-16 11:10:55', N'1', N'2026-02-16 11:10:55', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2016, N'MES 保养维护类型', N'mes_tm_mainten_type', 0, N'MES 工具管理 - 保养维护类型（1=定期维护，2=按使用次数维护）', N'1', N'2026-02-16 11:10:55', N'1', N'2026-02-16 11:10:55', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2017, N'MES 设备状态', N'mes_dv_machinery_status', 0, N'MES 设备管理 - 设备状态（1=运行中，2=停机，3=故障）', N'1', N'2026-02-17 01:00:06', N'1', N'2026-02-17 01:00:06', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2018, N'MES 检测项类型', N'mes_indicator_type', 0, N'', N'1', N'2026-02-17 02:16:22', N'1', N'2026-02-21 15:25:04', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2019, N'MES 缺陷等级', N'mes_defect_level', 0, N'', N'1', N'2026-02-17 02:16:22', N'1', N'2026-02-17 02:16:22', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2020, N'MES 轮班方式', N'mes_cal_shift_type', 0, N'MES 日历排班 - 轮班方式', N'1', N'2026-02-17 03:40:09', N'1', N'2026-02-17 03:40:09', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2021, N'MES 倒班方式', N'mes_cal_shift_method', 0, N'MES 日历排班 - 倒班方式', N'1', N'2026-02-17 03:40:09', N'1', N'2026-02-17 03:40:09', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2022, N'MES 班组类型', N'mes_cal_calendar_type', 0, N'MES 日历排班 - 班组类型', N'1', N'2026-02-17 03:40:09', N'1', N'2026-02-17 03:40:09', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2023, N'MES 排班计划状态', N'mes_cal_plan_status', 0, N'MES 日历排班 - 排班计划状态', N'1', N'2026-02-17 03:40:09', N'1', N'2026-02-17 03:40:09', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2026, N'MES 检测种类', N'mes_qc_type', 0, N'IQC/IPQC/OQC/RQC', N'1', N'2026-02-17 08:34:40', N'1', N'2026-02-17 08:34:40', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2027, N'MES 生产工单状态', N'mes_pro_work_order_status', 0, N'MES 生产管理 - 工单状态（0=草稿，1=已确认，2=已完成，3=已取消）', N'1', N'2026-02-17 11:43:47', N'1', N'2026-02-17 11:43:47', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2028, N'MES 工单来源类型', N'mes_pro_work_order_source_type', 0, N'MES 生产管理 - 工单来源类型（1=客户订单，2=库存备货）', N'1', N'2026-02-17 11:43:47', N'1', N'2026-02-17 11:43:47', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2029, N'MES 工单类型', N'mes_pro_work_order_type', 0, N'MES 生产管理 - 工单类型（1=自行生产，2=代工，3=采购）', N'1', N'2026-02-17 11:43:47', N'1', N'2026-02-17 11:43:47', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2036, N'MES 工序关系类型', N'mes_pro_link_type', 0, N'工艺路线中工序之间的关系类型', N'1', N'2026-02-19 04:24:53', N'1', N'2026-04-05 15:05:07', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2037, N'MES 时间单位', N'mes_time_unit_type', 0, N'生产时间的计量单位', N'1', N'2026-02-19 04:24:53', N'1', N'2026-04-05 15:04:57', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2038, N'MES 生产任务状态', N'mes_pro_task_status', 0, N'MES 生产管理 - 任务状态（0=草稿，1=进行中，2=暂停，3=已完成，4=已取消）', N'1', N'2026-02-19 15:25:27', N'1', N'2026-02-19 15:25:27', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2039, N'MES 点检保养项目类型', N'mes_dv_subject_type', 0, N'MES 设备管理 - 点检保养项目类型（1=设备点检，2=设备保养）', N'1', N'2026-02-20 01:42:58', N'1', N'2026-02-20 01:42:58', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2040, N'MES 保养记录状态', N'mes_mainten_record_status', 0, NULL, N'admin', N'2026-02-20 02:59:55', N'admin', N'2026-02-20 02:59:55', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2041, N'MES 保养结果', N'mes_mainten_status', 0, NULL, N'admin', N'2026-02-20 02:59:55', N'admin', N'2026-02-20 02:59:55', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2042, N'MES 点检保养周期类型', N'mes_dv_cycle_type', 0, N'MES 设备管理 - 点检保养周期类型（1=天，2=周，3=月，4=年）', N'1', N'2026-02-20 07:11:43', N'1', N'2026-02-20 07:11:43', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2043, N'MES 点检保养方案状态', N'mes_dv_check_plan_status', 0, N'MES 设备管理 - 点检保养方案状态（0=草稿，1=已启用）', N'1', N'2026-02-20 07:11:43', N'1', N'2026-02-20 07:11:43', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2044, N'MES 点检记录状态', N'mes_dv_check_record_status', 0, NULL, N'admin', N'2026-02-20 09:46:19', N'admin', N'2026-02-20 09:46:19', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2045, N'MES 点检结果', N'mes_dv_check_result', 0, NULL, N'admin', N'2026-02-20 09:46:19', N'admin', N'2026-02-20 09:46:19', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2046, N'MES 维修工单状态', N'mes_dv_repair_status', 0, N'MES 设备管理 - 维修工单状态（10=待维修，20=维修中，30=已完成，40=已验收）', N'1', N'2026-02-20 10:56:24', N'1', N'2026-02-20 10:56:24', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2047, N'MES 维修结果', N'mes_dv_repair_result', 0, N'MES 设备管理 - 维修结果（1=修复成功，2=报废）', N'1', N'2026-02-20 10:56:24', N'1', N'2026-02-20 10:56:24', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2049, N'MES 检测结果', N'mes_qc_check_result', 0, N'来料检验的最终结果判定', N'1', N'2026-02-20 11:23:35', N'1', N'2026-02-20 11:23:35', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2050, N'MES 来源单据类型', N'mes_qc_source_doc_type', 0, N'IQC 来料检验的来源单据类型', N'1', N'2026-02-20 11:23:35', N'1', N'2026-02-20 11:23:35', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2051, N'MES 安灯处置状态', N'mes_pro_andon_status', 0, N'MES 生产管理 - 安灯处置状态（0=未处置，1=已处置）', N'1', N'2026-02-21 00:08:38', N'1', N'2026-02-21 00:08:38', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2052, N'MES 安灯级别', N'mes_pro_andon_level', 0, N'MES 生产管理 - 安灯级别（1=一级，2=二级，3=三级）', N'1', N'2026-02-21 00:08:38', N'1', N'2026-02-21 00:08:38', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2053, N'MES 生产报工状态', N'mes_pro_feedback_status', 0, N'MES 生产管理 - 报工状态（0=草稿，1=审批中，2=待检验，3=已完成，4=已取消）', N'1', N'2026-02-21 00:50:32', N'1', N'2026-02-21 00:50:32', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2054, N'MES 生产报工类型', N'mes_pro_feedback_type', 0, N'MES 生产管理 - 报工类型（1=自行报工，2=统一报工）', N'1', N'2026-02-21 00:50:32', N'1', N'2026-02-21 00:50:32', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2055, N'MES 生产报工途径', N'mes_pro_feedback_channel', 0, N'MES 生产管理 - 报工途径（PC/APP/PDA）', N'1', N'2026-02-21 00:50:32', N'1', N'2026-02-21 00:50:32', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2056, N'MES 质检值类型', N'mes_qc_result_type', 0, N'检验结果明细的值类型：浮点/整数/文本/字典/文件', N'1', N'2026-02-21 13:37:17', N'1', N'2026-02-21 13:37:17', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2057, N'MES 退货检验类型', N'mes_rqc_type', 0, N'MES 退货检验类型', N'1', N'2026-02-22 06:43:18', N'1', N'2026-02-22 06:43:18', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2062, N'MES IPQC 检验类型', N'mes_ipqc_type', 0, N'IPQC 过程检验的检验类型', N'1', N'2026-02-22 07:01:04', N'1', N'2026-02-22 07:01:04', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2066, N'MES 到货通知单状态', N'mes_wm_arrival_notice_status', 0, N'MES 到货通知单状态', N'1', N'2026-02-22 14:53:18', N'1', N'2026-02-22 14:53:18', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2067, N'MES 采购入库单状态', N'mes_wm_item_receipt_status', 0, N'MES 采购入库单状态', N'1', N'2026-02-22 14:54:05', N'1', N'2026-02-22 14:54:05', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2068, N'MES 单据状态', N'mes_order_status', 0, N'', N'1', N'2026-02-23 21:16:03', N'1', N'2026-02-23 21:17:37', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2069, N'MES 领料出库单状态', N'mes_wm_product_issue_status', 0, N'MES 领料出库单状态', N'1', N'2026-02-26 16:39:44', N'1', N'2026-04-05 15:05:11', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2073, N'MES 生产退料单状态', N'mes_wm_return_issue_status', 0, N'MES 生产退料单状态', N'1', N'2026-02-28 14:11:09', N'1', N'2026-04-05 15:05:14', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2074, N'MES 生产退料类型', N'mes_wm_return_issue_type', 0, N'MES 生产退料类型', N'1', N'2026-02-28 14:11:09', N'1', N'2026-04-05 15:05:16', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2075, N'MES 质量状态', N'mes_wm_quality_status', 0, N'MES 质量状态（待检/合格/不合格）', N'1', N'2026-02-28 15:00:53', N'1', N'2026-02-28 15:00:53', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2100, N'MES 产品入库单状态', N'mes_wm_product_receipt_status', 0, N'MES 产品入库单状态', N'1', N'2026-03-01 06:03:04', N'1', N'2026-04-05 15:05:49', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2102, N'MES 销售出库单状态', N'mes_wm_product_sales_status', 0, N'MES 销售出库单状态', N'1', N'2026-03-02 08:55:11', N'1', N'2026-04-05 15:05:18', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2105, N'MES 杂项入库类型', N'mes_wm_misc_receipt_type', 0, N'杂项入库类型', N'1', N'2026-03-03 07:18:12', N'1', N'2026-04-05 15:05:23', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2106, N'MES 杂项入库状态', N'mes_wm_misc_receipt_status', 0, N'杂项入库状态', N'1', N'2026-03-03 07:18:12', N'1', N'2026-04-05 15:05:25', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2109, N'MES 杂项出库类型', N'mes_wm_misc_issue_type', 0, N'MES 杂项出库类型', N'1', N'2026-03-03 07:34:33', N'1', N'2026-03-03 07:34:33', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2110, N'MES 外协入库单状态', N'mes_wm_outsource_receipt_status', 0, N'MES 外协入库单状态', N'1', N'2026-03-03 14:03:20', N'1', N'2026-03-03 14:03:20', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2112, N'MES 外协发料单状态', N'mes_wm_outsource_issue_status', 0, N'MES 外协发料单状态', N'1', N'2026-03-03 16:30:56', N'1', N'2026-04-05 15:05:47', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2113, N'MES 编码规则分段类型', N'mes_md_auto_code_part_type', 0, N'MES 编码规则分段类型', N'1', N'2026-03-04 14:45:46', N'1', N'2026-03-04 15:24:40', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2115, N'MES 编码规则补齐方式', N'mes_md_auto_code_padded_method', 0, N'MES 编码规则补齐方式', N'1', N'2026-03-04 14:46:22', N'1', N'2026-03-04 15:24:40', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2116, N'MES 编码规则循环方式', N'mes_md_auto_code_cycle_method', 0, N'MES 编码规则循环方式', N'1', N'2026-03-04 14:46:22', N'1', N'2026-03-04 15:24:40', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2117, N'MES 条码格式', N'mes_wm_barcode_format', 0, N'MES 条码格式', N'1', N'2026-03-05 14:37:20', N'1', N'2026-04-05 15:05:27', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2118, N'MES 条码业务类型', N'mes_wm_barcode_biz_type', 0, N'MES 条码业务类型', N'1', N'2026-03-05 14:37:20', N'1', N'2026-04-05 15:05:29', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2121, N'MES 装箱单状态', N'mes_wm_package_status', 0, N'MES 装箱单状态', N'1', N'2026-03-08 02:05:46', N'1', N'2026-04-05 15:05:35', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2122, N'MES 调拨单状态', N'mes_wm_transfer_status', 0, N'MES 调拨单状态', N'1', N'2026-03-08 11:55:25', N'1', N'2026-03-08 11:55:25', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2123, N'MES 调拨类型', N'mes_wm_transfer_type', 0, N'MES 调拨类型', N'1', N'2026-03-08 11:55:25', N'1', N'2026-03-08 11:55:25', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2124, N'MES 盘点类型', N'mes_wm_stock_taking_type', 0, N'MES 盘点类型', N'1', N'2026-03-09 00:00:00', N'1', N'2026-03-09 00:00:00', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2125, N'MES 盘点方案参数类型', N'mes_wm_stock_taking_plan_param_type', 0, N'MES 盘点方案参数类型', N'1', N'2026-03-09 00:00:00', N'1', N'2026-03-09 00:00:00', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2126, N'MES 盘点任务状态', N'mes_wm_stock_taking_task_status', 0, N'MES 盘点任务状态', N'1', N'2026-03-09 00:00:00', N'1', N'2026-03-09 00:00:00', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2127, N'MES 盘点任务行状态', N'mes_wm_stock_taking_task_line_status', 0, N'MES 盘点任务行状态', N'1', N'2026-03-09 00:00:00', N'1', N'2026-04-05 15:02:18', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2129, N'MES 物料产品标识', N'mes_md_item_or_product', 0, N'物料分类：物料(ITEM) / 产品(PRODUCT)', N'1', N'2026-03-15 01:55:06', N'1', N'2026-03-15 01:55:06', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2130, N'MES 供应商退货单状态', N'mes_wm_return_vendor_status', 0, N'采购退货单状态', N'', N'2026-03-29 13:49:57', N'', N'2026-04-05 15:53:46', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2131, N'MES 发货通知单状态', N'mes_wm_sales_notice_status', 0, N'MES 发货通知单状态', N'1', N'2026-03-30 08:54:30', N'1', N'2026-04-05 15:53:46', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2132, N'MES 杂项出库单状态', N'mes_wm_misc_issue_status', 0, N'杂项出库单状态', N'1', N'2026-03-30 15:00:18', N'1', N'2026-04-05 15:05:41', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2133, N'MES 销售退货单状态', N'mes_wm_return_sales_status', 0, N'MES 销售退货单状态枚举', N'1', N'2026-04-03 17:20:25', N'1', N'2026-04-05 15:05:39', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2134, N'MES 缺陷检测项类型', N'mes_defect_type', 0, N'缺陷模块的检测项类型字典', N'1', N'2026-04-04 12:49:51', N'1', N'2026-04-04 12:49:51', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2135, N'MES 上下工状态类型', N'mes_pro_work_record_type', 0, N'MES 上下工状态类型', N'1', N'2026-04-05 14:07:27', N'1', N'2026-04-05 14:07:27', N'0', NULL)
+GO
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2138, N'MES 生产入库单状态', N'mes_wm_product_produce_status', 0, N'MES 生产入库单状态', N'1', N'2026-04-05 15:53:46', N'1', N'2026-04-05 15:53:46', N'0', N'1970-01-01 00:00:00')
 GO
 SET IDENTITY_INSERT system_dict_type OFF
 GO
@@ -3644,135 +4437,139 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS system_login_log
 GO
-CREATE TABLE system_login_log
-(
-    id          bigint                                 NOT NULL PRIMARY KEY IDENTITY,
-    log_type    bigint                                 NOT NULL,
-    trace_id    nvarchar(64) DEFAULT ''                NOT NULL,
-    user_id     bigint       DEFAULT 0                 NOT NULL,
-    user_type   tinyint      DEFAULT 0                 NOT NULL,
-    username    nvarchar(50) DEFAULT ''                NOT NULL,
-    result      tinyint                                NOT NULL,
-    user_ip     nvarchar(50)                           NOT NULL,
-    user_agent  nvarchar(512)                          NOT NULL,
-    creator     nvarchar(64) DEFAULT ''                NULL,
-    create_time datetime2    DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater     nvarchar(64) DEFAULT ''                NULL,
-    update_time datetime2    DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted     bit          DEFAULT 0                 NOT NULL,
-    tenant_id   bigint       DEFAULT 0                 NOT NULL
+CREATE TABLE system_login_log (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    log_type bigint  NOT NULL,
+    trace_id nvarchar(64) DEFAULT '' NOT NULL,
+    user_id bigint DEFAULT 0 NOT NULL,
+    user_type tinyint DEFAULT 0 NOT NULL,
+    username nvarchar(50) DEFAULT '' NOT NULL,
+    result tinyint  NOT NULL,
+    user_ip nvarchar(50)  NOT NULL,
+    user_agent nvarchar(512)  NOT NULL,
+    creator nvarchar(64) DEFAULT '' NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT 0 NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 )
 GO
 
-EXEC sp_addextendedproperty
-     'MS_Description', N'访问ID',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_login_log',
-     'COLUMN', N'id'
+CREATE INDEX idx_system_login_log_01 ON system_login_log (username)
+GO
+CREATE INDEX idx_system_login_log_02 ON system_login_log (create_time)
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'日志类型',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_login_log',
-     'COLUMN', N'log_type'
+    'MS_Description', N'访问ID',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_login_log',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'链路追踪编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_login_log',
-     'COLUMN', N'trace_id'
+    'MS_Description', N'日志类型',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_login_log',
+    'COLUMN', N'log_type'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'用户编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_login_log',
-     'COLUMN', N'user_id'
+    'MS_Description', N'链路追踪编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_login_log',
+    'COLUMN', N'trace_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'用户类型',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_login_log',
-     'COLUMN', N'user_type'
+    'MS_Description', N'用户编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_login_log',
+    'COLUMN', N'user_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'用户账号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_login_log',
-     'COLUMN', N'username'
+    'MS_Description', N'用户类型',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_login_log',
+    'COLUMN', N'user_type'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'登陆结果',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_login_log',
-     'COLUMN', N'result'
+    'MS_Description', N'用户账号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_login_log',
+    'COLUMN', N'username'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'用户 IP',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_login_log',
-     'COLUMN', N'user_ip'
+    'MS_Description', N'登陆结果',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_login_log',
+    'COLUMN', N'result'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'浏览器 UA',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_login_log',
-     'COLUMN', N'user_agent'
+    'MS_Description', N'用户 IP',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_login_log',
+    'COLUMN', N'user_ip'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_login_log',
-     'COLUMN', N'creator'
+    'MS_Description', N'浏览器 UA',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_login_log',
+    'COLUMN', N'user_agent'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_login_log',
-     'COLUMN', N'create_time'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_login_log',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_login_log',
-     'COLUMN', N'updater'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_login_log',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_login_log',
-     'COLUMN', N'update_time'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_login_log',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_login_log',
-     'COLUMN', N'deleted'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_login_log',
+    'COLUMN', N'update_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'租户编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_login_log',
-     'COLUMN', N'tenant_id'
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_login_log',
+    'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'系统访问记录',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_login_log'
+    'MS_Description', N'租户编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_login_log',
+    'COLUMN', N'tenant_id'
+GO
+
+EXEC sp_addextendedproperty
+    'MS_Description', N'系统访问记录',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_login_log'
 GO
 
 -- ----------------------------
@@ -3780,119 +4577,118 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS system_mail_account
 GO
-CREATE TABLE system_mail_account
-(
-    id              bigint                                 NOT NULL PRIMARY KEY IDENTITY,
-    mail            nvarchar(255)                          NOT NULL,
-    username        nvarchar(255)                          NOT NULL,
-    password        nvarchar(255)                          NOT NULL,
-    host            nvarchar(255)                          NOT NULL,
-    port            int                                    NOT NULL,
-    ssl_enable      varchar(1)   DEFAULT '0'               NOT NULL,
-    starttls_enable varchar(1)   DEFAULT '0'               NOT NULL,
-    creator         nvarchar(64) DEFAULT ''                NULL,
-    create_time     datetime2    DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater         nvarchar(64) DEFAULT ''                NULL,
-    update_time     datetime2    DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted         bit          DEFAULT 0                 NOT NULL
+CREATE TABLE system_mail_account (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    mail nvarchar(255)  NOT NULL,
+    username nvarchar(255)  NOT NULL,
+    password nvarchar(255)  NOT NULL,
+    host nvarchar(255)  NOT NULL,
+    port int  NOT NULL,
+    ssl_enable varchar(1) DEFAULT '0' NOT NULL,
+    starttls_enable varchar(1) DEFAULT '0' NOT NULL,
+    creator nvarchar(64) DEFAULT '' NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT 0 NOT NULL
 )
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'主键',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_account',
-     'COLUMN', N'id'
+    'MS_Description', N'主键',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_account',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'邮箱',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_account',
-     'COLUMN', N'mail'
+    'MS_Description', N'邮箱',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_account',
+    'COLUMN', N'mail'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'用户名',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_account',
-     'COLUMN', N'username'
+    'MS_Description', N'用户名',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_account',
+    'COLUMN', N'username'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'密码',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_account',
-     'COLUMN', N'password'
+    'MS_Description', N'密码',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_account',
+    'COLUMN', N'password'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'SMTP 服务器域名',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_account',
-     'COLUMN', N'host'
+    'MS_Description', N'SMTP 服务器域名',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_account',
+    'COLUMN', N'host'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'SMTP 服务器端口',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_account',
-     'COLUMN', N'port'
+    'MS_Description', N'SMTP 服务器端口',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_account',
+    'COLUMN', N'port'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否开启 SSL',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_account',
-     'COLUMN', N'ssl_enable'
+    'MS_Description', N'是否开启 SSL',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_account',
+    'COLUMN', N'ssl_enable'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否开启 STARTTLS',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_account',
-     'COLUMN', N'starttls_enable'
+    'MS_Description', N'是否开启 STARTTLS',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_account',
+    'COLUMN', N'starttls_enable'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_account',
-     'COLUMN', N'creator'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_account',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_account',
-     'COLUMN', N'create_time'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_account',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_account',
-     'COLUMN', N'updater'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_account',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_account',
-     'COLUMN', N'update_time'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_account',
+    'COLUMN', N'update_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_account',
-     'COLUMN', N'deleted'
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_account',
+    'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'邮箱账号表',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_account'
+    'MS_Description', N'邮箱账号表',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_account'
 GO
 
 -- ----------------------------
@@ -3905,7 +4701,7 @@ SET IDENTITY_INSERT system_mail_account ON
 GO
 INSERT INTO system_mail_account (id, mail, username, password, host, port, ssl_enable, starttls_enable, creator, create_time, updater, update_time, deleted) VALUES (1, N'7684413@qq.com', N'7684413@qq.com', N'1234576', N'127.0.0.1', 8080, N'0', N'0', N'1', N'2023-01-25 17:39:52', N'1', N'2025-04-04 16:34:40', N'0')
 GO
-INSERT INTO system_mail_account (id, mail, username, password, host, port, ssl_enable, starttls_enable, creator, create_time, updater, update_time, deleted) VALUES (2, N'ydym_test@163.com', N'ydym_test@163.com', N'WBZTEINMIFVRYSOE', N'smtp.163.com', 465, N'1', N'0', N'1', N'2023-01-26 01:26:03', N'1', N'2023-04-12 22:39:38', N'0')
+INSERT INTO system_mail_account (id, mail, username, password, host, port, ssl_enable, starttls_enable, creator, create_time, updater, update_time, deleted) VALUES (2, N'ydym_test@163.com', N'ydym_test@163.com', N'WBZTEINMIFVRYSOE', N'smtp.163.com', 465, N'1', N'0', N'1', N'2023-01-26 01:26:03', N'1', N'2025-12-20 18:09:32', N'0')
 GO
 INSERT INTO system_mail_account (id, mail, username, password, host, port, ssl_enable, starttls_enable, creator, create_time, updater, update_time, deleted) VALUES (3, N'76854114@qq.com', N'3335', N'11234', N'yunai1.cn', 466, N'0', N'0', N'1', N'2023-01-27 15:06:38', N'1', N'2023-01-27 07:08:36', N'1')
 GO
@@ -3922,183 +4718,198 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS system_mail_log
 GO
-CREATE TABLE system_mail_log
-(
-    id                bigint                                   NOT NULL PRIMARY KEY IDENTITY,
-    user_id           bigint         DEFAULT NULL              NULL,
-    user_type         tinyint        DEFAULT NULL              NULL,
-    to_mail           nvarchar(255)                            NOT NULL,
-    account_id        bigint                                   NOT NULL,
-    from_mail         nvarchar(255)                            NOT NULL,
-    template_id       bigint                                   NOT NULL,
-    template_code     nvarchar(63)                             NOT NULL,
-    template_nickname nvarchar(255)  DEFAULT NULL              NULL,
-    template_title    nvarchar(255)                            NOT NULL,
-    template_content  nvarchar(4000)                           NOT NULL,
-    template_params   nvarchar(255)                            NOT NULL,
-    send_status       tinyint        DEFAULT 0                 NOT NULL,
-    send_time         datetime2      DEFAULT NULL              NULL,
-    send_message_id   nvarchar(255)  DEFAULT NULL              NULL,
-    send_exception    nvarchar(4000) DEFAULT NULL              NULL,
-    creator           nvarchar(64)   DEFAULT ''                NULL,
-    create_time       datetime2      DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater           nvarchar(64)   DEFAULT ''                NULL,
-    update_time       datetime2      DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted           bit            DEFAULT 0                 NOT NULL
+CREATE TABLE system_mail_log (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    user_id bigint DEFAULT NULL NULL,
+    user_type tinyint DEFAULT NULL NULL,
+    to_mails nvarchar(1024)  NOT NULL,
+    cc_mails nvarchar(1024) DEFAULT NULL NULL,
+    bcc_mails nvarchar(1024) DEFAULT NULL NULL,
+    account_id bigint  NOT NULL,
+    from_mail nvarchar(255)  NOT NULL,
+    template_id bigint  NOT NULL,
+    template_code nvarchar(63)  NOT NULL,
+    template_nickname nvarchar(255) DEFAULT NULL NULL,
+    template_title nvarchar(255)  NOT NULL,
+    template_content nvarchar(max)  NOT NULL,
+    template_params nvarchar(255)  NOT NULL,
+    send_status tinyint DEFAULT 0 NOT NULL,
+    send_time datetime2 DEFAULT NULL NULL,
+    send_message_id nvarchar(255) DEFAULT NULL NULL,
+    send_exception nvarchar(4000) DEFAULT NULL NULL,
+    creator nvarchar(64) DEFAULT '' NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT 0 NOT NULL
 )
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_log',
-     'COLUMN', N'id'
+    'MS_Description', N'编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_log',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'用户编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_log',
-     'COLUMN', N'user_id'
+    'MS_Description', N'用户编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_log',
+    'COLUMN', N'user_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'用户类型',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_log',
-     'COLUMN', N'user_type'
+    'MS_Description', N'用户类型',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_log',
+    'COLUMN', N'user_type'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'接收邮箱地址',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_log',
-     'COLUMN', N'to_mail'
+    'MS_Description', N'接收邮箱地址',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_log',
+    'COLUMN', N'to_mails'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'邮箱账号编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_log',
-     'COLUMN', N'account_id'
+    'MS_Description', N'抄送邮箱地址',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_log',
+    'COLUMN', N'cc_mails'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'发送邮箱地址',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_log',
-     'COLUMN', N'from_mail'
+    'MS_Description', N'密送邮箱地址',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_log',
+    'COLUMN', N'bcc_mails'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'模板编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_log',
-     'COLUMN', N'template_id'
+    'MS_Description', N'邮箱账号编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_log',
+    'COLUMN', N'account_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'模板编码',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_log',
-     'COLUMN', N'template_code'
+    'MS_Description', N'发送邮箱地址',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_log',
+    'COLUMN', N'from_mail'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'模版发送人名称',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_log',
-     'COLUMN', N'template_nickname'
+    'MS_Description', N'模板编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_log',
+    'COLUMN', N'template_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'邮件标题',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_log',
-     'COLUMN', N'template_title'
+    'MS_Description', N'模板编码',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_log',
+    'COLUMN', N'template_code'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'邮件内容',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_log',
-     'COLUMN', N'template_content'
+    'MS_Description', N'模版发送人名称',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_log',
+    'COLUMN', N'template_nickname'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'邮件参数',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_log',
-     'COLUMN', N'template_params'
+    'MS_Description', N'邮件标题',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_log',
+    'COLUMN', N'template_title'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'发送状态',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_log',
-     'COLUMN', N'send_status'
+    'MS_Description', N'邮件内容',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_log',
+    'COLUMN', N'template_content'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'发送时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_log',
-     'COLUMN', N'send_time'
+    'MS_Description', N'邮件参数',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_log',
+    'COLUMN', N'template_params'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'发送返回的消息 ID',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_log',
-     'COLUMN', N'send_message_id'
+    'MS_Description', N'发送状态',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_log',
+    'COLUMN', N'send_status'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'发送异常',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_log',
-     'COLUMN', N'send_exception'
+    'MS_Description', N'发送时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_log',
+    'COLUMN', N'send_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_log',
-     'COLUMN', N'creator'
+    'MS_Description', N'发送返回的消息 ID',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_log',
+    'COLUMN', N'send_message_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_log',
-     'COLUMN', N'create_time'
+    'MS_Description', N'发送异常',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_log',
+    'COLUMN', N'send_exception'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_log',
-     'COLUMN', N'updater'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_log',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_log',
-     'COLUMN', N'update_time'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_log',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_log',
-     'COLUMN', N'deleted'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_log',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'邮件日志表',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_log'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_log',
+    'COLUMN', N'update_time'
+GO
+
+EXEC sp_addextendedproperty
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_log',
+    'COLUMN', N'deleted'
+GO
+
+EXEC sp_addextendedproperty
+    'MS_Description', N'邮件日志表',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_log'
 GO
 
 -- ----------------------------
@@ -4106,135 +4917,134 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS system_mail_template
 GO
-CREATE TABLE system_mail_template
-(
-    id          bigint                                  NOT NULL PRIMARY KEY IDENTITY,
-    name        nvarchar(63)                            NOT NULL,
-    code        nvarchar(63)                            NOT NULL,
-    account_id  bigint                                  NOT NULL,
-    nickname    nvarchar(255) DEFAULT NULL              NULL,
-    title       nvarchar(255)                           NOT NULL,
-    content     nvarchar(4000)                          NOT NULL,
-    params      nvarchar(255)                           NOT NULL,
-    status      tinyint                                 NOT NULL,
-    remark      nvarchar(255) DEFAULT NULL              NULL,
-    creator     nvarchar(64)  DEFAULT ''                NULL,
-    create_time datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater     nvarchar(64)  DEFAULT ''                NULL,
-    update_time datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted     bit           DEFAULT 0                 NOT NULL
+CREATE TABLE system_mail_template (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    name nvarchar(63)  NOT NULL,
+    code nvarchar(63)  NOT NULL,
+    account_id bigint  NOT NULL,
+    nickname nvarchar(255) DEFAULT NULL NULL,
+    title nvarchar(255)  NOT NULL,
+    content nvarchar(4000)  NOT NULL,
+    params nvarchar(255)  NOT NULL,
+    status tinyint  NOT NULL,
+    remark nvarchar(255) DEFAULT NULL NULL,
+    creator nvarchar(64) DEFAULT '' NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT 0 NOT NULL
 )
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_template',
-     'COLUMN', N'id'
+    'MS_Description', N'编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_template',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'模板名称',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_template',
-     'COLUMN', N'name'
+    'MS_Description', N'模板名称',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_template',
+    'COLUMN', N'name'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'模板编码',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_template',
-     'COLUMN', N'code'
+    'MS_Description', N'模板编码',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_template',
+    'COLUMN', N'code'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'发送的邮箱账号编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_template',
-     'COLUMN', N'account_id'
+    'MS_Description', N'发送的邮箱账号编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_template',
+    'COLUMN', N'account_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'发送人名称',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_template',
-     'COLUMN', N'nickname'
+    'MS_Description', N'发送人名称',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_template',
+    'COLUMN', N'nickname'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'模板标题',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_template',
-     'COLUMN', N'title'
+    'MS_Description', N'模板标题',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_template',
+    'COLUMN', N'title'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'模板内容',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_template',
-     'COLUMN', N'content'
+    'MS_Description', N'模板内容',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_template',
+    'COLUMN', N'content'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'参数数组',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_template',
-     'COLUMN', N'params'
+    'MS_Description', N'参数数组',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_template',
+    'COLUMN', N'params'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'开启状态',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_template',
-     'COLUMN', N'status'
+    'MS_Description', N'开启状态',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_template',
+    'COLUMN', N'status'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'备注',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_template',
-     'COLUMN', N'remark'
+    'MS_Description', N'备注',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_template',
+    'COLUMN', N'remark'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_template',
-     'COLUMN', N'creator'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_template',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_template',
-     'COLUMN', N'create_time'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_template',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_template',
-     'COLUMN', N'updater'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_template',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_template',
-     'COLUMN', N'update_time'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_template',
+    'COLUMN', N'update_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_template',
-     'COLUMN', N'deleted'
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_template',
+    'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'邮件模版表',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_mail_template'
+    'MS_Description', N'邮件模版表',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_mail_template'
 GO
 
 -- ----------------------------
@@ -4247,9 +5057,9 @@ SET IDENTITY_INSERT system_mail_template ON
 GO
 INSERT INTO system_mail_template (id, name, code, account_id, nickname, title, content, params, status, remark, creator, create_time, updater, update_time, deleted) VALUES (13, N'后台用户短信登录', N'admin-sms-login', 1, N'奥特曼', N'你猜我猜', N'<p>您的验证码是{code}，名字是{name}</p>', N'["code","name"]', 0, N'3', N'1', N'2021-10-11 08:10:00', N'1', N'2023-12-02 19:51:14', N'0')
 GO
-INSERT INTO system_mail_template (id, name, code, account_id, nickname, title, content, params, status, remark, creator, create_time, updater, update_time, deleted) VALUES (14, N'测试模版', N'test_01', 2, N'芋艿', N'一个标题', N'<p>你是 {key01} 吗？</p><p><br></p><p>是的话，赶紧 {key02} 一下！</p>', N'["key01","key02"]', 0, NULL, N'1', N'2023-01-26 01:27:40', N'1', N'2023-01-27 10:32:16', N'0')
+INSERT INTO system_mail_template (id, name, code, account_id, nickname, title, content, params, status, remark, creator, create_time, updater, update_time, deleted) VALUES (14, N'测试模版', N'test_01', 2, N'芋艿', N'一个标题', N'<p>你是 {key01} 吗？</p><p><br></p><p>是的话，赶紧 {key02} 一下！</p>', N'["key01","key02"]', 0, NULL, N'1', N'2023-01-26 01:27:40', N'1', N'2025-07-26 21:48:45', N'0')
 GO
-INSERT INTO system_mail_template (id, name, code, account_id, nickname, title, content, params, status, remark, creator, create_time, updater, update_time, deleted) VALUES (15, N'3', N'2', 2, N'7', N'4', N'<p>45</p>', N'[]', 1, N'80', N'1', N'2023-01-27 15:50:35', N'1', N'2023-01-27 16:34:49', N'0')
+INSERT INTO system_mail_template (id, name, code, account_id, nickname, title, content, params, status, remark, creator, create_time, updater, update_time, deleted) VALUES (15, N'3', N'2', 2, N'7', N'4', N'<p>45</p>', N'[]', 1, N'80', N'1', N'2023-01-27 15:50:35', N'1', N'2025-07-26 21:47:49', N'1')
 GO
 SET IDENTITY_INSERT system_mail_template OFF
 GO
@@ -4262,167 +5072,166 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS system_menu
 GO
-CREATE TABLE system_menu
-(
-    id             bigint                                  NOT NULL PRIMARY KEY IDENTITY,
-    name           nvarchar(50)                            NOT NULL,
-    permission     nvarchar(100) DEFAULT ''                NOT NULL,
-    type           tinyint                                 NOT NULL,
-    sort           int           DEFAULT 0                 NOT NULL,
-    parent_id      bigint        DEFAULT 0                 NOT NULL,
-    path           nvarchar(200) DEFAULT ''                NULL,
-    icon           nvarchar(100) DEFAULT '#'               NULL,
-    component      nvarchar(255) DEFAULT NULL              NULL,
-    component_name nvarchar(255) DEFAULT NULL              NULL,
-    status         tinyint       DEFAULT 0                 NOT NULL,
-    visible        varchar(1)    DEFAULT '1'               NOT NULL,
-    keep_alive     varchar(1)    DEFAULT '1'               NOT NULL,
-    always_show    varchar(1)    DEFAULT '1'               NOT NULL,
-    creator        nvarchar(64)  DEFAULT ''                NULL,
-    create_time    datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater        nvarchar(64)  DEFAULT ''                NULL,
-    update_time    datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted        bit           DEFAULT 0                 NOT NULL
+CREATE TABLE system_menu (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    name nvarchar(50)  NOT NULL,
+    permission nvarchar(100) DEFAULT '' NOT NULL,
+    type tinyint  NOT NULL,
+    sort int DEFAULT 0 NOT NULL,
+    parent_id bigint DEFAULT 0 NOT NULL,
+    path nvarchar(200) DEFAULT '' NULL,
+    icon nvarchar(100) DEFAULT '#' NULL,
+    component nvarchar(255) DEFAULT NULL NULL,
+    component_name nvarchar(255) DEFAULT NULL NULL,
+    status tinyint DEFAULT 0 NOT NULL,
+    visible varchar(1) DEFAULT '1' NOT NULL,
+    keep_alive varchar(1) DEFAULT '1' NOT NULL,
+    always_show varchar(1) DEFAULT '1' NOT NULL,
+    creator nvarchar(64) DEFAULT '' NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT 0 NOT NULL
 )
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'菜单ID',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_menu',
-     'COLUMN', N'id'
+    'MS_Description', N'菜单ID',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_menu',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'菜单名称',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_menu',
-     'COLUMN', N'name'
+    'MS_Description', N'菜单名称',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_menu',
+    'COLUMN', N'name'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'权限标识',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_menu',
-     'COLUMN', N'permission'
+    'MS_Description', N'权限标识',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_menu',
+    'COLUMN', N'permission'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'菜单类型',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_menu',
-     'COLUMN', N'type'
+    'MS_Description', N'菜单类型',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_menu',
+    'COLUMN', N'type'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'显示顺序',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_menu',
-     'COLUMN', N'sort'
+    'MS_Description', N'显示顺序',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_menu',
+    'COLUMN', N'sort'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'父菜单ID',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_menu',
-     'COLUMN', N'parent_id'
+    'MS_Description', N'父菜单ID',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_menu',
+    'COLUMN', N'parent_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'路由地址',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_menu',
-     'COLUMN', N'path'
+    'MS_Description', N'路由地址',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_menu',
+    'COLUMN', N'path'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'菜单图标',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_menu',
-     'COLUMN', N'icon'
+    'MS_Description', N'菜单图标',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_menu',
+    'COLUMN', N'icon'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'组件路径',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_menu',
-     'COLUMN', N'component'
+    'MS_Description', N'组件路径',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_menu',
+    'COLUMN', N'component'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'组件名',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_menu',
-     'COLUMN', N'component_name'
+    'MS_Description', N'组件名',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_menu',
+    'COLUMN', N'component_name'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'菜单状态',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_menu',
-     'COLUMN', N'status'
+    'MS_Description', N'菜单状态',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_menu',
+    'COLUMN', N'status'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否可见',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_menu',
-     'COLUMN', N'visible'
+    'MS_Description', N'是否可见',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_menu',
+    'COLUMN', N'visible'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否缓存',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_menu',
-     'COLUMN', N'keep_alive'
+    'MS_Description', N'是否缓存',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_menu',
+    'COLUMN', N'keep_alive'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否总是显示',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_menu',
-     'COLUMN', N'always_show'
+    'MS_Description', N'是否总是显示',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_menu',
+    'COLUMN', N'always_show'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_menu',
-     'COLUMN', N'creator'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_menu',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_menu',
-     'COLUMN', N'create_time'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_menu',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_menu',
-     'COLUMN', N'updater'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_menu',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_menu',
-     'COLUMN', N'update_time'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_menu',
+    'COLUMN', N'update_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_menu',
-     'COLUMN', N'deleted'
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_menu',
+    'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'菜单权限表',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_menu'
+    'MS_Description', N'菜单权限表',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_menu'
 GO
 
 -- ----------------------------
@@ -4439,9 +5248,9 @@ INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon
 GO
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5, N'OA 示例', N'', 1, 40, 1185, N'oa', N'fa:road', NULL, NULL, 0, N'1', N'1', N'1', N'admin', N'2021-09-20 16:26:19', N'1', N'2024-02-29 12:38:13', N'0')
 GO
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (100, N'用户管理', N'system:user:list', 2, 1, 1, N'user', N'ep:avatar', N'system/user/index', N'SystemUser', 0, N'1', N'1', N'1', N'admin', N'2021-01-05 17:03:48', N'1', N'2025-03-15 21:30:41', N'0')
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (100, N'用户管理', N'system:user:list', 2, 1, 1, N'user', N'ep:avatar', N'system/user/index', N'SystemUser', 0, N'1', N'1', N'1', N'admin', N'2021-01-05 17:03:48', N'1', N'2026-01-01 18:43:01', N'0')
 GO
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (101, N'角色管理', N'', 2, 2, 1, N'role', N'ep:user', N'system/role/index', N'SystemRole', 0, N'1', N'1', N'1', N'admin', N'2021-01-05 17:03:48', N'1', N'2024-05-01 18:35:29', N'0')
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (101, N'角色管理', N'', 2, 2, 1, N'role', N'ep:user', N'system/role/index', N'SystemRole', 0, N'1', N'1', N'1', N'admin', N'2021-01-05 17:03:48', N'1', N'2026-01-05 19:30:33', N'0')
 GO
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (102, N'菜单管理', N'', 2, 3, 1, N'menu', N'ep:menu', N'system/menu/index', N'SystemMenu', 0, N'1', N'1', N'1', N'admin', N'2021-01-05 17:03:48', N'1', N'2024-02-29 01:03:50', N'0')
 GO
@@ -4857,7 +5666,7 @@ INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon
 GO
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (2012, N'品牌删除', N'product:brand:delete', 3, 4, 2008, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'', N'2022-07-30 13:52:44', N'', N'2022-07-30 13:52:44', N'0')
 GO
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (2014, N'商品列表', N'', 2, 1, 2000, N'spu', N'ep:apple', N'mall/product/spu/index', N'ProductSpu', 0, N'1', N'1', N'1', N'', N'2022-07-30 14:22:58', N'1', N'2023-08-21 10:27:01', N'0')
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (2014, N'商品列表', N'', 2, 1, 2000, N'spu', N'ep:apple', N'mall/product/spu/index', N'ProductSpu', 0, N'1', N'1', N'1', N'', N'2022-07-30 14:22:58', N'1', N'2025-10-08 10:36:52', N'0')
 GO
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (2015, N'商品查询', N'product:spu:query', 3, 1, 2014, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'', N'2022-07-30 14:22:58', N'', N'2022-07-30 14:22:58', N'0')
 GO
@@ -5111,7 +5920,7 @@ INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon
 GO
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (2158, N'使用 HTTP 查询数据', N'report:go-view-data:get-by-http', 3, 4, 2153, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2023-02-07 19:26:35', N'1', N'2023-02-07 19:26:35', N'0')
 GO
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (2159, N'Boot 开发文档', N'', 1, 1, 0, N'https://doc.iocoder.cn/', N'ep:document', NULL, NULL, 0, N'1', N'1', N'1', N'1', N'2023-02-10 22:46:28', N'1', N'2024-07-28 11:36:48', N'0')
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (2159, N'Boot 开发文档', N'', 1, 1, 0, N'https://doc.iocoder.cn/', N'ep:document', NULL, NULL, 0, N'1', N'1', N'1', N'1', N'2023-02-10 22:46:28', N'1', N'2026-01-05 19:31:07', N'0')
 GO
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (2160, N'Cloud 开发文档', N'', 1, 2, 0, N'https://cloud.iocoder.cn', N'ep:document-copy', NULL, NULL, 0, N'1', N'1', N'1', N'1', N'2023-02-10 22:47:07', N'1', N'2023-12-02 21:32:29', N'0')
 GO
@@ -5933,7 +6742,7 @@ INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon
 GO
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (2724, N'流程任务', N'', 2, 11, 1186, N'process-tasnk', N'ep:collection-tag', N'bpm/task/manager/index', N'BpmManagerTask', 0, N'1', N'1', N'1', N'1', N'2024-03-22 08:43:22', N'1', N'2024-03-22 08:43:27', N'0')
 GO
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (2725, N'流程任务的查询（管理员）', N'bpm:task:mananger-query', 3, 1, 2724, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2024-03-22 08:43:49', N'1', N'2024-03-22 08:43:49', N'0')
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (2725, N'流程任务的查询（管理员）', N'bpm:task:manager-query', 3, 1, 2724, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2024-03-22 08:43:49', N'1', N'2025-12-23 23:04:44', N'0')
 GO
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (2726, N'流程监听器', N'', 2, 5, 1186, N'process-listener', N'fa:assistive-listening-systems', N'bpm/processListener/index', N'BpmProcessListener', 0, N'1', N'1', N'1', N'', N'2024-03-09 16:05:34', N'1', N'2024-03-23 13:13:38', N'0')
 GO
@@ -6137,7 +6946,7 @@ INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon
 GO
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4001, N'设备接入', N'', 1, 2, 4000, N'device', N'ep:platform', N'', N'', 0, N'1', N'1', N'1', N'1', N'2024-08-10 09:57:56', N'1', N'2025-02-27 08:39:49', N'0')
 GO
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4002, N'产品管理', N'', 2, 2, 4001, N'product', N'fa-solid:tools', N'iot/product/product/index', N'IoTProduct', 0, N'1', N'1', N'1', N'', N'2024-08-10 02:38:02', N'1', N'2024-12-07 18:47:53', N'0')
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4002, N'产品管理', N'', 2, 1, 4001, N'product', N'fa-solid:tools', N'iot/product/product/index', N'IoTProduct', 0, N'1', N'1', N'1', N'', N'2024-08-10 02:38:02', N'1', N'2025-06-15 20:56:06', N'0')
 GO
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4003, N'产品查询', N'iot:product:query', 3, 1, 4002, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'', N'2024-08-10 02:38:02', N'', N'2024-12-07 15:55:00', N'0')
 GO
@@ -6149,7 +6958,7 @@ INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon
 GO
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4007, N'产品导出', N'iot:product:export', 3, 5, 4002, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'', N'2024-08-10 02:38:02', N'', N'2024-12-07 15:55:13', N'0')
 GO
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4008, N'设备管理', N'', 2, 4, 4001, N'device', N'fa:mobile', N'iot/device/device/index', N'IoTDevice', 0, N'1', N'1', N'1', N'', N'2024-09-16 18:48:19', N'1', N'2024-12-14 11:39:30', N'0')
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4008, N'设备管理', N'', 2, 2, 4001, N'device', N'fa:mobile', N'iot/device/device/index', N'IoTDevice', 0, N'1', N'1', N'1', N'', N'2024-09-16 18:48:19', N'1', N'2025-06-15 20:56:10', N'0')
 GO
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4009, N'设备查询', N'iot:device:query', 3, 1, 4008, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'', N'2024-09-16 18:48:19', N'1', N'2024-12-07 15:55:40', N'0')
 GO
@@ -6161,7 +6970,7 @@ INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon
 GO
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4013, N'设备导出', N'iot:device:export', 3, 5, 4008, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'', N'2024-09-16 18:48:19', N'1', N'2024-12-07 15:55:44', N'0')
 GO
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4014, N'产品分类', N'', 2, 1, 4001, N'product-category', N'ep:notebook', N'iot/product/category/index', N'IotProductCategory', 0, N'1', N'1', N'1', N'', N'2024-12-07 16:01:35', N'1', N'2024-12-07 16:31:52', N'0')
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4014, N'产品分类', N'', 2, 3, 4001, N'product-category', N'ep:notebook', N'iot/product/category/index', N'IotProductCategory', 0, N'1', N'1', N'1', N'', N'2024-12-07 16:01:35', N'1', N'2025-06-15 20:56:39', N'0')
 GO
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4015, N'产品分类查询', N'iot:product-category:query', 3, 1, 4014, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'', N'2024-12-07 16:01:35', N'', N'2024-12-07 16:01:35', N'0')
 GO
@@ -6170,18 +6979,6 @@ GO
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4017, N'产品分类更新', N'iot:product-category:update', 3, 3, 4014, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'', N'2024-12-07 16:01:35', N'', N'2024-12-07 16:01:35', N'0')
 GO
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4018, N'产品分类删除', N'iot:product-category:delete', 3, 4, 4014, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'', N'2024-12-07 16:01:35', N'', N'2024-12-07 16:01:35', N'0')
-GO
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4025, N'插件管理', N'', 2, 5, 4047, N'plugin-config', N'ep:folder-opened', N'iot/plugin/index', N'IoTPlugin', 0, N'1', N'1', N'1', N'', N'2024-12-09 21:25:06', N'1', N'2025-02-05 22:23:12', N'0')
-GO
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4026, N'插件查询', N'iot:plugin-config:query', 3, 1, 4025, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'', N'2024-12-09 21:25:06', N'', N'2025-02-05 21:23:20', N'0')
-GO
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4027, N'插件创建', N'iot:plugin-config:create', 3, 2, 4025, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'', N'2024-12-09 21:25:06', N'', N'2025-02-05 21:23:16', N'0')
-GO
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4028, N'插件更新', N'iot:plugin-config:update', 3, 3, 4025, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'', N'2024-12-09 21:25:06', N'', N'2025-02-05 21:23:12', N'0')
-GO
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4029, N'插件删除', N'iot:plugin-config:delete', 3, 4, 4025, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'', N'2024-12-09 21:25:06', N'', N'2025-02-05 21:23:09', N'0')
-GO
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4030, N'插件导出', N'iot:plugin-config:export', 3, 5, 4025, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'', N'2024-12-09 21:25:06', N'', N'2025-02-05 21:23:06', N'0')
 GO
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4031, N'设备分组', N'', 2, 3, 4001, N'device-group', N'fa-solid:layer-group', N'iot/device/group/index', N'IotDeviceGroup', 0, N'1', N'1', N'1', N'', N'2024-12-14 17:08:29', N'1', N'2024-12-14 17:09:17', N'0')
 GO
@@ -6195,7 +6992,7 @@ INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon
 GO
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4036, N'设备导入', N'iot:device:import', 3, 6, 4008, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2024-12-15 10:35:47', N'1', N'2024-12-15 10:35:47', N'0')
 GO
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4037, N'产品物模型', N'', 2, 2, 4001, N'thing-model', N'ep:mostly-cloudy', N'iot/thingmodel/index', N'IoTThingModel', 0, N'0', N'0', N'0', N'', N'2024-12-16 17:17:50', N'1', N'2024-12-27 11:03:37', N'0')
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4037, N'产品物模型', N'', 2, 99, 4001, N'thing-model', N'ep:mostly-cloudy', N'iot/thingmodel/index', N'IoTThingModel', 0, N'0', N'0', N'0', N'', N'2024-12-16 17:17:50', N'1', N'2025-06-15 20:56:19', N'0')
 GO
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4038, N'产品物模型功能查询', N'iot:thing-model:query', 3, 1, 4037, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'', N'2024-12-16 17:17:51', N'', N'2025-03-17 09:14:54', N'0')
 GO
@@ -6207,33 +7004,29 @@ INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon
 GO
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4042, N'产品物模型功能导出', N'iot:thing-model:export', 3, 5, 4037, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'', N'2024-12-16 17:17:53', N'', N'2025-03-17 09:15:09', N'0')
 GO
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4043, N'设备上行', N'iot:device:upstream', 3, 7, 4008, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2025-01-28 04:40:16', N'1', N'2025-01-31 22:45:53', N'0')
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4043, N'设备消息发送', N'iot:device:message-send', 3, 12, 4008, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2025-01-28 04:40:16', N'1', N'2025-06-14 14:09:26', N'0')
 GO
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4044, N'设备属性查询', N'iot:device:property-query', 3, 10, 4008, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2025-01-28 11:52:54', N'1', N'2025-01-28 11:52:54', N'0')
 GO
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4045, N'设备日志查询', N'iot:device:log-query', 3, 11, 4008, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2025-01-28 11:53:22', N'1', N'2025-01-28 11:53:22', N'0')
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4045, N'设备消息查询', N'iot:device:message-query', 3, 11, 4008, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2025-01-28 11:53:22', N'1', N'2025-06-14 11:11:20', N'0')
 GO
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4046, N'设备下行', N'iot:device:downstream', 3, 8, 4008, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2025-01-31 22:46:11', N'1', N'2025-01-31 22:46:11', N'0')
-GO
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4047, N'运维管理', N'', 1, 2, 4000, N'operations', N'fa:cog', N'', N'', 0, N'1', N'1', N'1', N'1', N'2025-02-05 22:21:37', N'1', N'2025-02-05 22:22:53', N'0')
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4047, N'运维管理', N'', 1, 4, 4000, N'operation', N'fa:align-center', N'', N'', 0, N'1', N'1', N'1', N'1', N'2025-02-05 22:21:37', N'"1"', N'2025-06-30 20:12:48', N'0')
 GO
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4048, N'规则引擎', N'', 1, 3, 4000, N'rule', N'fa-solid:cogs', N'', N'', 0, N'1', N'1', N'1', N'1', N'2025-02-11 14:10:54', N'1', N'2025-02-11 14:10:54', N'0')
 GO
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4049, N'场景联动', N'', 2, 1, 4048, N'scene', N'ep:link', N'iot/rule/scene/index', N'Scene', 0, N'1', N'1', N'1', N'1', N'2025-02-11 14:12:44', N'1', N'2025-02-12 10:15:36', N'0')
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4049, N'场景联动', N'', 2, 1, 4048, N'scene', N'ep:link', N'iot/rule/scene/index', N'IoTSceneRule', 0, N'1', N'1', N'1', N'1', N'2025-02-11 14:12:44', N'"1"', N'2025-08-09 15:38:32', N'0')
 GO
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4050, N'IoT首页', N'', 2, 1, 4000, N'home', N'ep:home-filled', N'iot/home/index', N'IotHome', 0, N'1', N'1', N'1', N'1', N'2025-02-27 08:39:35', N'1', N'2025-02-27 08:40:28', N'0')
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4050, N'IoT 首页', N'', 2, 1, 4000, N'home', N'ep:home-filled', N'iot/home/index', N'IotHome', 0, N'1', N'1', N'1', N'1', N'2025-02-27 08:39:35', N'1', N'2025-06-24 14:22:50', N'0')
 GO
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4051, N'数据桥梁', N'', 2, 0, 4048, N'data-bridge', N'ep:guide', N'iot/rule/databridge/index', N'IotDataBridge', 0, N'1', N'1', N'1', N'', N'2025-03-09 13:47:11', N'1', N'2025-03-09 13:47:51', N'0')
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4051, N'数据流转', N'', 2, 2, 4048, N'data-rule', N'ep:guide', N'iot/rule/data/index', N'IoTDataRule', 0, N'1', N'1', N'1', N'', N'2025-03-09 13:47:11', N'"1"', N'2025-08-09 15:38:37', N'0')
 GO
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4052, N'IoT 数据桥梁查询', N'iot:data-bridge:query', 3, 1, 4051, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'', N'2025-03-09 13:47:11', N'', N'2025-03-09 13:47:11', N'0')
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4052, N'数据流转规则查询', N'iot:data-rule:query', 3, 1, 4051, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'', N'2025-03-09 13:47:11', N'1', N'2025-06-24 20:48:04', N'0')
 GO
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4053, N'IoT 数据桥梁创建', N'iot:data-bridge:create', 3, 2, 4051, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'', N'2025-03-09 13:47:11', N'', N'2025-03-09 13:47:11', N'0')
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4053, N'数据流转规则创建', N'iot:data-rule:create', 3, 2, 4051, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'', N'2025-03-09 13:47:11', N'1', N'2025-06-24 20:48:08', N'0')
 GO
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4054, N'IoT 数据桥梁更新', N'iot:data-bridge:update', 3, 3, 4051, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'', N'2025-03-09 13:47:11', N'', N'2025-03-09 13:47:11', N'0')
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4054, N'数据流转规则更新', N'iot:data-rule:update', 3, 3, 4051, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'', N'2025-03-09 13:47:11', N'1', N'2025-06-24 20:48:11', N'0')
 GO
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4055, N'IoT 数据桥梁删除', N'iot:data-bridge:delete', 3, 4, 4051, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'', N'2025-03-09 13:47:12', N'', N'2025-03-09 13:47:12', N'0')
-GO
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4056, N'IoT 数据桥梁导出', N'iot:data-bridge:export', 3, 5, 4051, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'', N'2025-03-09 13:47:12', N'', N'2025-03-09 13:47:12', N'0')
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (4055, N'数据流转规则删除', N'iot:data-rule:delete', 3, 4, 4051, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'', N'2025-03-09 13:47:12', N'1', N'2025-06-24 20:48:15', N'0')
 GO
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5000, N'AI 工作流', N'', 2, 5, 2758, N'workflow', N'fa:hand-grab-o', N'ai/workflow/index.vue', N'AiWorkflow', 0, N'1', N'1', N'1', N'1', N'2025-03-25 09:50:27', N'1', N'2025-05-03 18:55:12', N'0')
 GO
@@ -6255,6 +7048,842 @@ INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon
 GO
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5012, N'转账订单导出', N'pay:transfer:export', 3, 2, 2559, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2025-05-10 17:00:28', N'1', N'2025-05-10 17:00:28', N'0')
 GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5013, N'场景联动查询', N'iot:rule-scene:query', 3, 1, 4049, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2025-06-20 16:53:01', N'1', N'2025-06-20 16:53:01', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5014, N'场景联动创建', N'iot:rule-scene:create', 3, 2, 4049, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2025-06-20 16:54:31', N'1', N'2025-06-20 16:54:31', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5015, N'场景联动更新', N'iot:rule-scene:update', 3, 3, 4049, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2025-06-20 16:54:47', N'1', N'2025-06-20 16:54:47', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5016, N'场景联动删除', N'iot:rule-scene:delete', 3, 4, 4049, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2025-06-20 16:55:04', N'1', N'2025-06-20 16:55:27', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5017, N'场景联动导出', N'iot:rule-scene:export', 3, 5, 4049, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2025-06-20 16:57:56', N'1', N'2025-06-20 16:57:56', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5018, N'数据流转目的查询', N'iot:data-sink:query', 3, 11, 4051, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2025-06-24 20:48:40', N'1', N'2025-06-24 20:48:40', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5019, N'数据流转目的创建', N'iot:data-sink:create', 3, 12, 4051, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2025-06-24 20:48:57', N'1', N'2025-06-24 20:48:57', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5020, N'数据流转目的更新', N'iot:data-sink:update', 3, 13, 4051, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2025-06-24 20:49:10', N'1', N'2025-06-24 20:49:10', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5021, N'数据流转目的删除', N'iot:data-sink:delete', 3, 14, 4051, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2025-06-24 20:49:23', N'1', N'2025-06-24 20:49:23', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5022, N'告警配置', N'', 2, 1, 5028, N'config', N'fa:connectdevelop', N'iot/alert/config/index', N'IotAlertConfig', 0, N'1', N'1', N'1', N'', N'2025-06-27 14:28:59', N'1', N'2025-06-27 22:31:19', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5023, N'告警配置查询', N'iot:alert-config:query', 3, 1, 5022, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'', N'2025-06-27 14:28:59', N'1', N'2025-06-28 16:00:31', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5024, N'告警配置创建', N'iot:alert-config:create', 3, 2, 5022, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'', N'2025-06-27 14:28:59', N'1', N'2025-06-28 16:00:35', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5025, N'告警配置更新', N'iot:alert-config:update', 3, 3, 5022, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'', N'2025-06-27 14:28:59', N'1', N'2025-06-28 16:00:43', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5026, N'告警配置删除', N'iot:alert-config:delete', 3, 4, 5022, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'', N'2025-06-27 14:29:00', N'1', N'2025-06-28 16:00:39', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5028, N'告警中心', N'', 1, 3, 4000, N'alert', N'fa:soundcloud', N'', N'', 0, N'1', N'1', N'1', N'1', N'2025-06-27 22:30:04', N'1', N'2025-06-27 22:30:19', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5029, N'告警记录', N'', 2, 2, 5028, N'record', N'fa-solid:record-vinyl', N'iot/alert/record/index', N'IotAlertRecord', 0, N'1', N'1', N'1', N'', N'2025-06-28 07:59:32', N'1', N'2025-06-28 16:01:48', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5030, N'告警记录查询', N'iot:alert-record:query', 3, 1, 5029, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'', N'2025-06-28 07:59:32', N'1', N'2025-06-28 16:00:53', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5031, N'告警记录处理', N'iot:alert-record:process', 3, 2, 5029, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'', N'2025-06-28 07:59:32', N'1', N'2025-06-28 16:01:04', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5032, N'OTA 固件', N'', 2, 1, 4047, N'ota/firmware', N'fa-solid:award', N'iot/ota/firmware/index', N'IoTOtaFirmware', 0, N'1', N'1', N'1', N'', N'2025-06-30 07:50:29', N'"1"', N'2025-06-30 20:13:28', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5033, N'OTA 固件查询', N'iot:ota-firmware:query', 3, 1, 5032, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'', N'2025-06-30 07:50:29', N'"1"', N'2025-06-30 17:38:12', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5034, N'OTA 固件创建', N'iot:ota-firmware:create', 3, 2, 5032, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'', N'2025-06-30 07:50:29', N'"1"', N'2025-06-30 17:38:21', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5035, N'OTA 固件更新', N'iot:ota-firmware:update', 3, 3, 5032, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'', N'2025-06-30 07:50:29', N'"1"', N'2025-06-30 17:38:29', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5036, N'OTA 固件删除', N'iot:ota-firmware:delete', 3, 4, 5032, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'', N'2025-06-30 07:50:29', N'"1"', N'2025-06-30 17:38:37', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5037, N'OTA 升级任务查询', N'iot:ota-task:create', 3, 11, 5032, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2025-07-02 23:56:56', N'1', N'2025-07-02 23:56:56', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5038, N'OTA 升级任务取消', N'iot:ota-task:cancel', 3, 13, 5032, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2025-07-02 23:57:26', N'1', N'2025-07-02 23:57:26', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5039, N'OTA 升级任务创建', N'iot:ota-task:create', 3, 12, 5032, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2025-07-02 23:57:52', N'1', N'2025-07-02 23:57:52', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5040, N'OTA 升级记录查询', N'iot:ota-task-record:query', 3, 21, 5032, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2025-07-02 23:58:30', N'1', N'2025-07-02 23:58:30', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5041, N'OTA 升级记录取消', N'iot:ota-task-record:cancel', 3, 23, 5032, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2025-07-02 23:59:18', N'1', N'2025-07-02 23:59:18', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5042, N'模版消息', N'', 2, 5, 2084, N'message-template', N'ep:notebook', N'mp/messageTemplate/index', N'MpMessageTemplate', 0, N'1', N'1', N'1', N'1', N'2025-11-26 16:45:35', N'1', N'2025-11-26 18:44:52', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5043, N'查询模版消息', N'mp:message-template:query', 3, 1, 5042, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2025-11-26 17:00:15', N'1', N'2025-11-26 18:45:00', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5044, N'删除模版消息', N'mp:message-template:delete', 3, 2, 5042, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2025-11-26 17:00:31', N'1', N'2025-11-26 18:45:05', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5045, N'同步公众号模板', N'mp:message-template:sync', 3, 3, 5042, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2025-11-26 17:00:55', N'1', N'2025-11-26 17:00:55', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5046, N'给粉丝发送模版消息', N'mp:message-template:send', 3, 4, 5042, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2025-11-26 17:01:11', N'1', N'2025-11-26 17:01:11', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5100, N'MES 系统', N'', 1, 500, 0, N'/mes', N'ep:cpu', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-15 00:39:57', N'1', N'2026-04-05 23:22:56', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5101, N'基础数据', N'', 1, 10, 5100, N'md', N'ep:data-analysis', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-15 00:40:13', N'1', N'2026-02-15 00:40:13', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5110, N'物料产品分类', N'', 2, 2, 5101, N'item-type', N'ep:files', N'mes/md/item/type/index', N'MesMdItemType', 0, N'1', N'1', N'1', N'1', N'2026-02-15 00:40:13', N'1', N'2026-02-15 13:58:29', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5111, N'分类查询', N'mes:md-item-type:query', 3, 1, 5110, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-15 00:40:13', N'1', N'2026-02-15 00:40:13', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5112, N'分类创建', N'mes:md-item-type:create', 3, 2, 5110, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-15 00:40:13', N'1', N'2026-02-15 00:40:13', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5113, N'分类更新', N'mes:md-item-type:update', 3, 3, 5110, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-15 00:40:13', N'1', N'2026-02-15 00:40:13', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5114, N'分类删除', N'mes:md-item-type:delete', 3, 4, 5110, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-15 00:40:13', N'1', N'2026-02-15 00:40:13', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5120, N'物料产品管理', N'', 2, 1, 5101, N'item', N'ep:box', N'mes/md/item/index', N'MesMdItem', 0, N'1', N'1', N'1', N'1', N'2026-02-15 00:40:13', N'1', N'2026-02-15 13:58:24', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5121, N'物料查询', N'mes:md-item:query', 3, 1, 5120, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-15 00:40:13', N'1', N'2026-02-15 00:40:13', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5122, N'物料创建', N'mes:md-item:create', 3, 2, 5120, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-15 00:40:13', N'1', N'2026-02-15 00:40:13', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5123, N'物料更新', N'mes:md-item:update', 3, 3, 5120, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-15 00:40:13', N'1', N'2026-02-15 00:40:13', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5124, N'物料删除', N'mes:md-item:delete', 3, 4, 5120, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-15 00:40:13', N'1', N'2026-02-15 00:40:13', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5125, N'物料导出', N'mes:md-item:export', 3, 5, 5120, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-15 00:40:13', N'1', N'2026-02-15 00:40:13', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5126, N'物料导入', N'mes:md-item:import', 3, 6, 5120, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-15 14:13:01', N'1', N'2026-02-15 14:13:01', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5130, N'计量单位', N'', 2, 3, 5101, N'unit-measure', N'ep:scale-to-original', N'mes/md/unitmeasure/index', N'MesMdUnitMeasure', 0, N'1', N'1', N'1', N'1', N'2026-02-15 13:55:01', N'1', N'2026-02-15 13:55:01', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5131, N'单位查询', N'mes:md-unit-measure:query', 3, 1, 5130, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-15 13:55:16', N'1', N'2026-02-15 13:55:16', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5132, N'单位创建', N'mes:md-unit-measure:create', 3, 2, 5130, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-15 13:55:16', N'1', N'2026-02-15 13:55:16', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5133, N'单位更新', N'mes:md-unit-measure:update', 3, 3, 5130, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-15 13:55:16', N'1', N'2026-02-15 13:55:16', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5134, N'单位删除', N'mes:md-unit-measure:delete', 3, 4, 5130, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-15 13:55:16', N'1', N'2026-02-15 13:55:16', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5135, N'单位导出', N'mes:md-unit-measure:export', 3, 5, 5130, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-15 13:55:16', N'1', N'2026-02-15 13:55:16', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5140, N'客户管理', N'', 2, 4, 5101, N'client', N'ep:user', N'mes/md/client/index', N'MesMdClient', 0, N'1', N'1', N'1', N'1', N'2026-02-15 15:06:41', N'1', N'2026-02-15 15:06:41', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5141, N'客户查询', N'mes:md-client:query', 3, 1, 5140, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-15 15:06:41', N'1', N'2026-02-15 15:06:41', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5142, N'客户创建', N'mes:md-client:create', 3, 2, 5140, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-15 15:06:41', N'1', N'2026-02-15 15:06:41', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5143, N'客户更新', N'mes:md-client:update', 3, 3, 5140, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-15 15:06:41', N'1', N'2026-02-15 15:06:41', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5144, N'客户删除', N'mes:md-client:delete', 3, 4, 5140, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-15 15:06:41', N'1', N'2026-02-15 15:06:41', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5145, N'客户导出', N'mes:md-client:export', 3, 5, 5140, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-15 15:06:41', N'1', N'2026-02-15 15:06:41', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5146, N'客户导入', N'mes:md-client:import', 3, 6, 5140, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-15 15:06:41', N'1', N'2026-02-15 15:06:41', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5150, N'供应商管理', N'', 2, 5, 5101, N'vendor', N'ep:goods', N'mes/md/vendor/index', N'MesMdVendor', 0, N'1', N'1', N'1', N'1', N'2026-02-15 16:01:11', N'1', N'2026-02-15 16:01:11', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5151, N'供应商查询', N'mes:md-vendor:query', 3, 1, 5150, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-15 16:01:11', N'1', N'2026-02-15 16:01:11', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5152, N'供应商创建', N'mes:md-vendor:create', 3, 2, 5150, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-15 16:01:11', N'1', N'2026-02-15 16:01:11', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5153, N'供应商更新', N'mes:md-vendor:update', 3, 3, 5150, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-15 16:01:11', N'1', N'2026-02-15 16:01:11', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5154, N'供应商删除', N'mes:md-vendor:delete', 3, 4, 5150, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-15 16:01:11', N'1', N'2026-02-15 16:01:11', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5155, N'供应商导出', N'mes:md-vendor:export', 3, 5, 5150, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-15 16:01:11', N'1', N'2026-02-15 16:01:11', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5156, N'供应商导入', N'mes:md-vendor:import', 3, 6, 5150, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-15 16:01:11', N'1', N'2026-02-15 16:01:11', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5160, N'车间设置', N'', 2, 6, 5101, N'workstation/workshop', N'ep:office-building', N'mes/md/workstation/workshop/index', N'MesMdWorkshop', 0, N'1', N'1', N'1', N'1', N'2026-02-15 16:47:47', N'1', N'2026-02-16 11:17:35', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5161, N'车间查询', N'mes:md-workshop:query', 3, 1, 5160, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-15 16:47:47', N'1', N'2026-02-15 16:47:47', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5162, N'车间创建', N'mes:md-workshop:create', 3, 2, 5160, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-15 16:47:47', N'1', N'2026-02-15 16:47:47', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5163, N'车间更新', N'mes:md-workshop:update', 3, 3, 5160, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-15 16:47:47', N'1', N'2026-02-15 16:47:47', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5164, N'车间删除', N'mes:md-workshop:delete', 3, 4, 5160, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-15 16:47:47', N'1', N'2026-02-15 16:47:47', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5170, N'工作站设置', N'', 2, 7, 5101, N'workstation', N'ep:place', N'mes/md/workstation/index', N'MesMdWorkstation', 0, N'1', N'1', N'1', N'1', N'2026-02-15 16:47:47', N'1', N'2026-02-16 11:18:34', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5171, N'工位查询', N'mes:md-workstation:query', 3, 1, 5170, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-15 16:47:47', N'1', N'2026-02-15 16:47:47', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5172, N'工位创建', N'mes:md-workstation:create', 3, 2, 5170, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-15 16:47:47', N'1', N'2026-02-15 16:47:47', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5173, N'工位更新', N'mes:md-workstation:update', 3, 3, 5170, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-15 16:47:47', N'1', N'2026-02-15 16:47:47', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5174, N'工位删除', N'mes:md-workstation:delete', 3, 4, 5170, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-15 16:47:47', N'1', N'2026-02-15 16:47:47', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5175, N'工位导出', N'mes:md-workstation:export', 3, 5, 5170, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-15 16:47:47', N'1', N'2026-02-15 16:47:47', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5190, N'编码规则', N'', 2, 10, 5101, N'auto-code', N'ep:document', N'mes/md/autocode/index', N'MesAutoCode', 0, N'1', N'1', N'1', N'1', N'2026-03-04 05:26:04', N'1', N'2026-04-03 08:31:25', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5191, N'编码规则查询', N'mes:auto-code-rule:query', 3, 1, 5190, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-04 05:26:04', N'1', N'2026-03-04 05:26:04', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5192, N'编码规则创建', N'mes:auto-code-rule:create', 3, 2, 5190, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-04 05:26:04', N'1', N'2026-03-04 05:26:04', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5193, N'编码规则更新', N'mes:auto-code-rule:update', 3, 3, 5190, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-04 05:26:04', N'1', N'2026-03-04 05:26:04', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5194, N'编码规则删除', N'mes:auto-code-rule:delete', 3, 4, 5190, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-04 05:26:04', N'1', N'2026-03-04 05:26:04', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5195, N'编码规则导出', N'mes:auto-code-rule:export', 3, 5, 5190, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-04 05:26:04', N'1', N'2026-03-04 05:26:04', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5200, N'排班管理', N'', 1, 70, 5100, N'cal', N'ep:calendar', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-16 07:35:50', N'1', N'2026-02-16 15:37:53', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5220, N'班组设置', N'', 2, 1, 5200, N'team', N'ep:user', N'mes/cal/team/index', N'MesCalTeam', 0, N'1', N'1', N'1', N'1', N'2026-02-18 01:16:03', N'1', N'2026-02-18 11:14:31', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5221, N'班组查询', N'mes:cal-team:query', 3, 1, 5220, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-18 01:16:03', N'1', N'2026-02-18 01:16:03', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5222, N'班组创建', N'mes:cal-team:create', 3, 2, 5220, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-18 01:16:03', N'1', N'2026-02-18 01:16:03', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5223, N'班组更新', N'mes:cal-team:update', 3, 3, 5220, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-18 01:16:03', N'1', N'2026-02-18 01:16:03', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5224, N'班组删除', N'mes:cal-team:delete', 3, 4, 5220, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-18 01:16:03', N'1', N'2026-02-18 01:16:03', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5225, N'班组导出', N'mes:cal-team:export', 3, 5, 5220, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-18 01:16:03', N'1', N'2026-02-18 01:16:03', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5230, N'排班计划', N'', 2, 3, 5200, N'plan', N'ep:memo', N'mes/cal/plan/index', N'MesCalPlan', 0, N'1', N'1', N'1', N'1', N'2026-02-17 03:40:09', N'1', N'2026-02-17 03:40:09', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5231, N'排班计划查询', N'mes:cal-plan:query', 3, 1, 5230, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 03:40:09', N'1', N'2026-02-17 03:40:09', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5232, N'排班计划创建', N'mes:cal-plan:create', 3, 2, 5230, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 03:40:09', N'1', N'2026-02-17 03:40:09', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5233, N'排班计划更新', N'mes:cal-plan:update', 3, 3, 5230, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 03:40:09', N'1', N'2026-02-17 03:40:09', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5234, N'排班计划删除', N'mes:cal-plan:delete', 3, 4, 5230, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 03:40:09', N'1', N'2026-02-17 03:40:09', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5235, N'排班计划导出', N'mes:cal-plan:export', 3, 5, 5230, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 03:40:09', N'1', N'2026-02-17 03:40:09', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5250, N'节假日设置', N'', 2, 3, 5200, N'holiday', N'ep:sunny', N'mes/cal/holiday/index', N'MesCalHoliday', 0, N'1', N'1', N'1', N'1', N'2026-02-16 07:35:50', N'1', N'2026-02-16 15:38:25', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5251, N'假期查询', N'mes:cal-holiday:query', 3, 1, 5250, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-16 07:35:50', N'1', N'2026-02-16 07:35:50', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5252, N'假期创建', N'mes:cal-holiday:create', 3, 2, 5250, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-16 07:35:50', N'1', N'2026-02-16 07:35:50', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5253, N'假期更新', N'mes:cal-holiday:update', 3, 3, 5250, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-16 07:35:50', N'1', N'2026-02-16 07:35:50', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5254, N'假期删除', N'mes:cal-holiday:delete', 3, 4, 5250, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-16 07:35:50', N'1', N'2026-02-16 07:35:50', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5255, N'假期导出', N'mes:cal-holiday:export', 3, 5, 5250, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-16 07:35:50', N'1', N'2026-02-16 07:35:50', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5260, N'排班日历', N'', 2, 3, 5200, N'calendar', N'ep:calendar', N'mes/cal/calendar/index', N'MesCalCalendar', 0, N'1', N'1', N'1', N'1', N'2026-02-19 04:19:33', N'1', N'2026-02-19 04:19:33', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5261, N'排班日历查询', N'mes:cal-team-shift:query', 3, 1, 5260, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-19 04:19:33', N'1', N'2026-02-19 04:19:33', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5300, N'设备管理', N'', 1, 30, 5100, N'dv', N'ep:cpu', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 00:59:58', N'1', N'2026-02-17 09:01:18', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5310, N'设备类型', N'', 2, 1, 5300, N'machinery/type', N'ep:files', N'mes/dv/machinery/type/index', N'MesDvMachineryType', 0, N'1', N'1', N'1', N'1', N'2026-02-17 00:59:58', N'1', N'2026-02-17 09:02:05', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5311, N'类型查询', N'mes:dv-machinery-type:query', 3, 1, 5310, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 00:59:58', N'1', N'2026-02-17 00:59:58', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5312, N'类型创建', N'mes:dv-machinery-type:create', 3, 2, 5310, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 00:59:58', N'1', N'2026-02-17 00:59:58', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5313, N'类型更新', N'mes:dv-machinery-type:update', 3, 3, 5310, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 00:59:58', N'1', N'2026-02-17 00:59:58', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5314, N'类型删除', N'mes:dv-machinery-type:delete', 3, 4, 5310, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 00:59:58', N'1', N'2026-02-17 00:59:58', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5315, N'类型导出', N'mes:dv-machinery-type:export', 3, 5, 5310, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 00:59:58', N'1', N'2026-02-17 00:59:58', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5320, N'设备台账', N'', 2, 2, 5300, N'machinery', N'ep:monitor', N'mes/dv/machinery/index', N'MesDvMachinery', 0, N'1', N'1', N'1', N'1', N'2026-02-17 00:59:58', N'1', N'2026-02-17 00:59:58', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5321, N'设备查询', N'mes:dv-machinery:query', 3, 1, 5320, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 00:59:58', N'1', N'2026-02-17 00:59:58', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5322, N'设备创建', N'mes:dv-machinery:create', 3, 2, 5320, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 00:59:58', N'1', N'2026-02-17 00:59:58', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5323, N'设备更新', N'mes:dv-machinery:update', 3, 3, 5320, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 00:59:58', N'1', N'2026-02-17 00:59:58', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5324, N'设备删除', N'mes:dv-machinery:delete', 3, 4, 5320, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 00:59:58', N'1', N'2026-02-17 00:59:58', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5325, N'设备导出', N'mes:dv-machinery:export', 3, 5, 5320, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 00:59:58', N'1', N'2026-02-17 00:59:58', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5326, N'设备导入', N'mes:dv-machinery:import', 3, 6, 5320, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-04-02 15:40:42', N'1', N'2026-04-02 15:40:42', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5330, N'点检保养项目', N'', 2, 3, 5300, N'subject', N'ep:document-checked', N'mes/dv/subject/index', N'MesDvSubject', 0, N'1', N'1', N'1', N'1', N'2026-02-20 01:42:58', N'1', N'2026-02-20 01:42:58', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5331, N'项目查询', N'mes:dv-subject:query', 3, 1, 5330, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-20 01:42:58', N'1', N'2026-02-20 01:42:58', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5332, N'项目创建', N'mes:dv-subject:create', 3, 2, 5330, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-20 01:42:58', N'1', N'2026-02-20 01:42:58', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5333, N'项目更新', N'mes:dv-subject:update', 3, 3, 5330, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-20 01:42:58', N'1', N'2026-02-20 01:42:58', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5334, N'项目删除', N'mes:dv-subject:delete', 3, 4, 5330, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-20 01:42:58', N'1', N'2026-02-20 01:42:58', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5335, N'项目导出', N'mes:dv-subject:export', 3, 5, 5330, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-20 01:42:58', N'1', N'2026-02-20 01:42:58', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5340, N'保养记录', N'', 2, 6, 5300, N'mainten-record', N'ep:setting', N'mes/dv/maintenrecord/index', N'MesDvMaintenRecord', 0, N'1', N'1', N'1', N'', N'2026-02-20 02:59:55', N'1', N'2026-03-02 11:45:39', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5341, N'保养记录查询', N'mes:dv-mainten-record:query', 3, 1, 5340, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'', N'2026-02-20 02:59:55', N'', N'2026-02-20 02:59:55', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5342, N'保养记录创建', N'mes:dv-mainten-record:create', 3, 2, 5340, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'', N'2026-02-20 02:59:55', N'', N'2026-02-20 02:59:55', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5343, N'保养记录更新', N'mes:dv-mainten-record:update', 3, 3, 5340, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'', N'2026-02-20 02:59:55', N'', N'2026-02-20 02:59:55', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5344, N'保养记录删除', N'mes:dv-mainten-record:delete', 3, 4, 5340, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'', N'2026-02-20 02:59:55', N'', N'2026-02-20 02:59:55', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5345, N'保养记录导出', N'mes:dv-mainten-record:export', 3, 5, 5340, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'', N'2026-02-20 02:59:55', N'', N'2026-02-20 02:59:55', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5350, N'点检保养方案', N'', 2, 4, 5300, N'checkplan', N'ep:calendar', N'mes/dv/checkplan/index', N'MesDvCheckPlan', 0, N'1', N'1', N'1', N'1', N'2026-02-20 07:13:08', N'1', N'2026-02-20 07:13:08', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5351, N'方案查询', N'mes:dv-check-plan:query', 3, 1, 5350, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-20 07:13:08', N'1', N'2026-02-20 07:13:08', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5352, N'方案创建', N'mes:dv-check-plan:create', 3, 2, 5350, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-20 07:13:08', N'1', N'2026-02-20 07:13:08', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5353, N'方案更新', N'mes:dv-check-plan:update', 3, 3, 5350, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-20 07:13:08', N'1', N'2026-02-20 07:13:08', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5354, N'方案删除', N'mes:dv-check-plan:delete', 3, 4, 5350, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-20 07:13:08', N'1', N'2026-02-20 07:13:08', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5355, N'方案导出', N'mes:dv-check-plan:export', 3, 5, 5350, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-20 07:13:08', N'1', N'2026-02-20 07:13:08', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5360, N'点检记录', N'', 2, 5, 5300, N'check-record', N'ep:document-checked', N'mes/dv/checkrecord/index', N'MesDvCheckRecord', 0, N'1', N'1', N'1', N'', N'2026-02-20 09:46:19', N'', N'2026-03-02 11:45:39', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5361, N'点检记录查询', N'mes:dv-check-record:query', 3, 1, 5360, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'', N'2026-02-20 09:46:19', N'', N'2026-02-20 09:46:19', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5362, N'点检记录创建', N'mes:dv-check-record:create', 3, 2, 5360, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'', N'2026-02-20 09:46:19', N'', N'2026-02-20 09:46:19', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5363, N'点检记录更新', N'mes:dv-check-record:update', 3, 3, 5360, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'', N'2026-02-20 09:46:19', N'', N'2026-02-20 09:46:19', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5364, N'点检记录删除', N'mes:dv-check-record:delete', 3, 4, 5360, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'', N'2026-02-20 09:46:19', N'', N'2026-02-20 09:46:19', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5365, N'点检记录导出', N'mes:dv-check-record:export', 3, 5, 5360, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'', N'2026-02-20 09:46:19', N'', N'2026-02-20 09:46:19', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5366, N'工单导出', N'mes:dv-repair:export', 3, 5, 5360, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-20 11:07:06', N'1', N'2026-02-20 11:07:06', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5370, N'维修单', N'', 2, 7, 5300, N'repair', N'ep:tools', N'mes/dv/repair/index', N'MesDvRepair', 0, N'1', N'1', N'1', N'1', N'2026-02-20 11:06:28', N'1', N'2026-02-20 19:10:18', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5371, N'工单查询', N'mes:dv-repair:query', 3, 1, 5370, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-20 11:06:28', N'1', N'2026-02-20 11:06:28', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5372, N'工单创建', N'mes:dv-repair:create', 3, 2, 5370, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-20 11:06:28', N'1', N'2026-02-20 11:06:28', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5373, N'工单更新', N'mes:dv-repair:update', 3, 3, 5370, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-20 11:54:20', N'1', N'2026-02-20 11:54:20', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5374, N'工单删除', N'mes:dv-repair:delete', 3, 4, 5370, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-20 11:54:15', N'1', N'2026-02-20 11:54:15', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5375, N'工单导出', N'mes:dv-repair:export', 3, 5, 5370, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-20 11:54:04', N'1', N'2026-02-20 11:54:04', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5400, N'工具管理', N'', 1, 40, 5100, N'tm', N'ep:scissor', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-16 11:10:55', N'1', N'2026-03-21 14:20:41', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5410, N'工具类型设置', N'', 2, 1, 5400, N'tool/type', N'ep:files', N'mes/tm/tool/type/index', N'MesTmToolType', 0, N'1', N'1', N'1', N'1', N'2026-02-16 11:10:55', N'1', N'2026-02-16 21:28:41', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5411, N'类型查询', N'mes:tm-tool-type:query', 3, 1, 5410, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-16 11:10:55', N'1', N'2026-02-16 11:10:55', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5412, N'类型创建', N'mes:tm-tool-type:create', 3, 2, 5410, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-16 11:10:55', N'1', N'2026-02-16 11:10:55', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5413, N'类型更新', N'mes:tm-tool-type:update', 3, 3, 5410, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-16 11:10:55', N'1', N'2026-02-16 11:10:55', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5414, N'类型删除', N'mes:tm-tool-type:delete', 3, 4, 5410, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-16 11:10:55', N'1', N'2026-02-16 11:10:55', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5415, N'类型导出', N'mes:tm-tool-type:export', 3, 5, 5410, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-16 11:10:55', N'1', N'2026-02-16 11:10:55', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5420, N'工装夹具台账', N'', 2, 2, 5400, N'tool', N'ep:box', N'mes/tm/tool/index', N'MesTmTool', 0, N'1', N'1', N'1', N'1', N'2026-02-16 11:10:55', N'1', N'2026-02-16 21:29:23', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5421, N'工具查询', N'mes:tm-tool:query', 3, 1, 5420, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-16 11:10:55', N'1', N'2026-02-16 11:10:55', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5422, N'工具创建', N'mes:tm-tool:create', 3, 2, 5420, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-16 11:10:55', N'1', N'2026-02-16 11:10:55', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5423, N'工具更新', N'mes:tm-tool:update', 3, 3, 5420, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-16 11:10:55', N'1', N'2026-02-16 11:10:55', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5424, N'工具删除', N'mes:tm-tool:delete', 3, 4, 5420, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-16 11:10:55', N'1', N'2026-02-16 11:10:55', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5425, N'工具导出', N'mes:tm-tool:export', 3, 5, 5420, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-16 11:10:55', N'1', N'2026-02-16 11:10:55', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5500, N'质量管理', N'', 1, 60, 5100, N'qc', N'ep:check', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 02:18:18', N'1', N'2026-02-17 14:36:15', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5510, N'常见缺陷', N'', 2, 1, 5500, N'defect', N'ep:warning', N'mes/qc/defect/index', N'MesQcDefect', 0, N'1', N'1', N'1', N'1', N'2026-02-17 02:18:18', N'1', N'2026-03-04 04:29:46', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5511, N'缺陷类型查询', N'mes:qc-defect:query', 3, 1, 5510, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 02:18:18', N'1', N'2026-02-17 02:18:18', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5512, N'缺陷类型创建', N'mes:qc-defect:create', 3, 2, 5510, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 02:18:18', N'1', N'2026-02-17 02:18:18', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5513, N'缺陷类型更新', N'mes:qc-defect:update', 3, 3, 5510, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 02:18:18', N'1', N'2026-02-17 02:18:18', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5514, N'缺陷类型删除', N'mes:qc-defect:delete', 3, 4, 5510, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 02:18:18', N'1', N'2026-02-17 02:18:18', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5515, N'缺陷类型导出', N'mes:qc-defect:export', 3, 5, 5510, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 02:18:18', N'1', N'2026-02-17 02:18:18', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5530, N'生产工单', N'', 2, 1, 5700, N'work-order', N'ep:document-copy', N'mes/pro/workorder/index', N'MesProWorkOrder', 0, N'1', N'1', N'1', N'1', N'2026-02-17 11:51:44', N'1', N'2026-02-17 19:54:36', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5531, N'工单查询', N'mes:pro-work-order:query', 3, 1, 5530, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 11:51:44', N'1', N'2026-02-17 11:51:44', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5532, N'工单创建', N'mes:pro-work-order:create', 3, 2, 5530, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 11:51:44', N'1', N'2026-02-17 11:51:44', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5533, N'工单更新', N'mes:pro-work-order:update', 3, 3, 5530, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 11:51:44', N'1', N'2026-02-17 11:51:44', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5534, N'工单删除', N'mes:pro-work-order:delete', 3, 4, 5530, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 11:51:44', N'1', N'2026-02-17 11:51:44', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5535, N'工单导出', N'mes:pro-work-order:export', 3, 5, 5530, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 11:51:44', N'1', N'2026-02-17 11:51:44', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5540, N'生产排产', N'', 2, 4, 5700, N'task', N'ep:calendar', N'mes/pro/task/index', N'MesProTask', 0, N'1', N'1', N'1', N'1', N'2026-02-19 15:25:27', N'1', N'2026-02-20 08:30:27', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5541, N'排产查询', N'mes:pro-task:query', 3, 1, 5540, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-19 15:25:27', N'1', N'2026-02-19 15:25:27', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5542, N'排产创建', N'mes:pro-task:create', 3, 2, 5540, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-19 15:25:27', N'1', N'2026-02-19 15:25:27', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5543, N'排产更新', N'mes:pro-task:update', 3, 3, 5540, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-19 15:25:27', N'1', N'2026-02-19 15:25:27', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5544, N'排产删除', N'mes:pro-task:delete', 3, 4, 5540, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-19 15:25:27', N'1', N'2026-02-19 15:25:27', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5545, N'排产导出', N'mes:pro-task:export', 3, 5, 5540, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-19 15:25:27', N'1', N'2026-02-19 15:25:27', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5550, N'生产报工', N'', 2, 5, 5700, N'feedback', N'ep:finished', N'mes/pro/feedback/index', N'MesProFeedback', 0, N'1', N'1', N'1', N'1', N'2026-02-21 00:50:22', N'1', N'2026-02-21 08:55:14', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5551, N'报工查询', N'mes:pro-feedback:query', 3, 1, 5550, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-21 00:50:22', N'1', N'2026-02-21 00:50:22', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5552, N'报工创建', N'mes:pro-feedback:create', 3, 2, 5550, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-21 00:50:22', N'1', N'2026-02-21 00:50:22', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5553, N'报工更新', N'mes:pro-feedback:update', 3, 3, 5550, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-21 00:50:22', N'1', N'2026-02-21 00:50:22', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5554, N'报工删除', N'mes:pro-feedback:delete', 3, 4, 5550, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-21 00:50:22', N'1', N'2026-02-21 00:50:22', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5555, N'报工导出', N'mes:pro-feedback:export', 3, 5, 5550, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-21 00:50:22', N'1', N'2026-02-21 00:50:22', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5560, N'工序流转', N'', 2, 6, 5700, N'card', N'ep:postcard', N'mes/pro/card/index', N'MesProCard', 0, N'1', N'1', N'1', N'1', N'2026-02-21 03:16:35', N'1', N'2026-02-21 11:18:42', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5561, N'流转卡查询', N'mes:pro-card:query', 3, 1, 5560, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-21 03:16:35', N'1', N'2026-02-21 03:16:35', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5562, N'流转卡创建', N'mes:pro-card:create', 3, 2, 5560, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-21 03:16:35', N'1', N'2026-02-21 03:16:35', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5563, N'流转卡更新', N'mes:pro-card:update', 3, 3, 5560, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-21 03:16:35', N'1', N'2026-02-21 03:16:35', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5564, N'流转卡删除', N'mes:pro-card:delete', 3, 4, 5560, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-21 03:16:35', N'1', N'2026-02-21 03:16:35', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5565, N'流转卡导出', N'mes:pro-card:export', 3, 5, 5560, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-21 03:16:35', N'1', N'2026-02-21 03:16:35', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5566, N'流转卡完成', N'mes:pro-card:finish', 3, 6, 5560, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-04-04 12:18:15', N'1', N'2026-04-04 12:18:15', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5610, N'检测项设置', N'', 2, 2, 5500, N'indicator', N'ep:data-analysis', N'mes/qc/indicator/index', N'MesQcIndicator', 0, N'1', N'1', N'1', N'1', N'2026-02-17 08:11:31', N'1', N'2026-02-17 16:16:07', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5611, N'质检指标查询', N'mes:qc-indicator:query', 3, 1, 5610, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 08:11:31', N'1', N'2026-02-17 08:11:31', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5612, N'质检指标创建', N'mes:qc-indicator:create', 3, 2, 5610, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 08:11:31', N'1', N'2026-02-17 08:11:31', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5613, N'质检指标更新', N'mes:qc-indicator:update', 3, 3, 5610, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 08:11:31', N'1', N'2026-02-17 08:11:31', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5614, N'质检指标删除', N'mes:qc-indicator:delete', 3, 4, 5610, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 08:11:31', N'1', N'2026-02-17 08:11:31', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5615, N'质检指标导出', N'mes:qc-indicator:export', 3, 5, 5610, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 08:11:31', N'1', N'2026-02-17 08:11:31', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5630, N'质检方案', N'', 2, 3, 5500, N'template', N'ep:document-copy', N'mes/qc/template/index', N'MesQcTemplate', 0, N'1', N'1', N'1', N'1', N'2026-02-17 08:34:40', N'1', N'2026-03-04 04:29:46', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5631, N'质检方案查询', N'mes:qc-template:query', 3, 1, 5630, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 08:34:40', N'1', N'2026-02-18 14:12:05', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5632, N'质检方案创建', N'mes:qc-template:create', 3, 2, 5630, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 08:34:40', N'1', N'2026-02-18 14:12:05', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5633, N'质检方案更新', N'mes:qc-template:update', 3, 3, 5630, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 08:34:40', N'1', N'2026-02-18 14:12:05', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5634, N'质检方案删除', N'mes:qc-template:delete', 3, 4, 5630, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 08:34:40', N'1', N'2026-02-18 14:12:05', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5635, N'质检方案导出', N'mes:qc-template:export', 3, 5, 5630, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 08:34:40', N'1', N'2026-02-18 14:12:05', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5640, N'来料检验', N'', 2, 5, 5500, N'iqc', N'ep:finished', N'mes/qc/iqc/index', N'MesQcIqc', 0, N'1', N'1', N'1', N'1', N'2026-02-20 11:23:45', N'1', N'2026-02-24 05:24:01', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5641, N'来料检验查询', N'mes:qc-iqc:query', 3, 1, 5640, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-20 11:23:45', N'1', N'2026-02-20 11:23:45', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5642, N'来料检验创建', N'mes:qc-iqc:create', 3, 2, 5640, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-20 11:23:45', N'1', N'2026-02-20 11:23:45', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5643, N'来料检验更新', N'mes:qc-iqc:update', 3, 3, 5640, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-20 11:23:45', N'1', N'2026-02-20 11:23:45', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5644, N'来料检验删除', N'mes:qc-iqc:delete', 3, 4, 5640, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-20 11:23:45', N'1', N'2026-02-20 11:23:45', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5645, N'来料检验导出', N'mes:qc-iqc:export', 3, 5, 5640, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-20 11:23:45', N'1', N'2026-02-20 11:23:45', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5650, N'过程检验', N'', 2, 6, 5500, N'ipqc', N'ep:checked', N'mes/qc/ipqc/index', N'MesQcIpqc', 0, N'1', N'1', N'1', N'1', N'2026-02-22 07:01:08', N'1', N'2026-02-22 15:02:42', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5651, N'过程检验查询', N'mes:qc-ipqc:query', 3, 1, 5650, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-22 07:01:08', N'1', N'2026-02-22 07:01:08', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5652, N'过程检验创建', N'mes:qc-ipqc:create', 3, 2, 5650, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-22 07:01:08', N'1', N'2026-02-22 07:01:08', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5653, N'过程检验更新', N'mes:qc-ipqc:update', 3, 3, 5650, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-22 07:01:08', N'1', N'2026-02-22 07:01:08', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5654, N'过程检验删除', N'mes:qc-ipqc:delete', 3, 4, 5650, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-22 07:01:08', N'1', N'2026-02-22 07:01:08', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5655, N'过程检验导出', N'mes:qc-ipqc:export', 3, 5, 5650, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-22 07:01:08', N'1', N'2026-02-22 07:01:08', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5660, N'出货检验', N'', 2, 8, 5500, N'oqc', N'ep:sell', N'mes/qc/oqc/index', N'MesQcOqc', 0, N'1', N'1', N'1', N'1', N'2026-02-22 06:55:53', N'1', N'2026-02-22 14:58:31', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5661, N'出货检验查询', N'mes:qc-oqc:query', 3, 1, 5660, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-22 06:55:53', N'1', N'2026-02-22 06:55:53', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5662, N'出货检验创建', N'mes:qc-oqc:create', 3, 2, 5660, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-22 06:55:53', N'1', N'2026-02-22 06:55:53', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5663, N'出货检验更新', N'mes:qc-oqc:update', 3, 3, 5660, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-22 06:55:53', N'1', N'2026-02-22 06:55:53', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5664, N'出货检验删除', N'mes:qc-oqc:delete', 3, 4, 5660, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-22 06:55:53', N'1', N'2026-02-22 06:55:53', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5665, N'出货检验导出', N'mes:qc-oqc:export', 3, 5, 5660, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-22 06:55:53', N'1', N'2026-02-22 06:55:53', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5670, N'退料检验', N'', 2, 7, 5500, N'rqc', N'ep:warning-filled', N'mes/qc/rqc/index', N'MesQcRqc', 0, N'1', N'1', N'1', N'1', N'2026-02-22 06:43:25', N'1', N'2026-02-22 14:46:41', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5671, N'退货检验查询', N'mes:qc-rqc:query', 3, 1, 5670, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-22 06:43:25', N'1', N'2026-02-22 06:43:25', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5672, N'退货检验创建', N'mes:qc-rqc:create', 3, 2, 5670, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-22 06:43:25', N'1', N'2026-02-22 06:43:25', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5673, N'退货检验更新', N'mes:qc-rqc:update', 3, 3, 5670, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-22 06:43:25', N'1', N'2026-02-22 06:43:25', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5674, N'退货检验删除', N'mes:qc-rqc:delete', 3, 4, 5670, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-22 06:43:25', N'1', N'2026-02-22 06:43:25', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5675, N'退货检验导出', N'mes:qc-rqc:export', 3, 5, 5670, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-22 06:43:25', N'1', N'2026-02-22 06:43:25', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5680, N'待检任务', N'', 2, 4, 5500, N'pending-inspect', N'ep:clock', N'mes/qc/pendinginspect/index', N'MesQcPendingInspect', 0, N'1', N'1', N'1', N'1', N'2026-02-23 07:15:41', N'1', N'2026-02-24 05:24:04', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5681, N'待检任务查询', N'mes:qc-pending-inspect:query', 3, 1, 5680, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-23 07:15:41', N'1', N'2026-02-23 07:15:41', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5700, N'生产管理', N'', 1, 50, 5100, N'pro', N'ep:management', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 11:39:58', N'1', N'2026-02-17 19:53:35', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5710, N'工序设置', N'', 2, 2, 5700, N'process', N'ep:operation', N'mes/pro/process/index', N'MesProProcess', 0, N'1', N'1', N'1', N'1', N'2026-02-17 11:39:58', N'1', N'2026-02-19 16:23:45', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5711, N'工序查询', N'mes:pro-process:query', 3, 1, 5710, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 11:39:58', N'1', N'2026-02-17 11:39:58', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5712, N'工序创建', N'mes:pro-process:create', 3, 2, 5710, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 11:39:58', N'1', N'2026-02-17 11:39:58', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5713, N'工序更新', N'mes:pro-process:update', 3, 3, 5710, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 11:39:58', N'1', N'2026-02-17 11:39:58', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5714, N'工序删除', N'mes:pro-process:delete', 3, 4, 5710, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 11:39:58', N'1', N'2026-02-17 11:39:58', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5715, N'工序导出', N'mes:pro-process:export', 3, 5, 5710, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 11:39:58', N'1', N'2026-02-17 11:39:58', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5720, N'工艺流程', N'', 2, 3, 5700, N'route', N'ep:guide', N'mes/pro/route/index', N'MesProRoute', 0, N'1', N'1', N'1', N'1', N'2026-02-19 04:24:53', N'1', N'2026-02-19 16:24:23', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5721, N'工艺路线查询', N'mes:pro-route:query', 3, 1, 5720, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-19 04:24:53', N'1', N'2026-02-19 04:24:53', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5722, N'工艺路线创建', N'mes:pro-route:create', 3, 2, 5720, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-19 04:24:53', N'1', N'2026-02-19 04:24:53', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5723, N'工艺路线更新', N'mes:pro-route:update', 3, 3, 5720, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-19 04:24:53', N'1', N'2026-02-19 04:24:53', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5724, N'工艺路线删除', N'mes:pro-route:delete', 3, 4, 5720, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-19 04:24:53', N'1', N'2026-02-19 04:24:53', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5725, N'工艺路线导出', N'mes:pro-route:export', 3, 5, 5720, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-19 04:24:53', N'1', N'2026-02-19 04:24:53', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5750, N'安灯呼叫', N'', 2, 7, 5700, N'andon', N'ep:bell', N'mes/pro/andon/record/index', N'MesProAndonRecord', 0, N'1', N'1', N'1', N'1', N'2026-02-21 00:24:18', N'1', N'2026-02-21 11:35:45', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5751, N'安灯记录查询', N'mes:pro-andon-record:query', 3, 1, 5750, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-21 00:24:18', N'1', N'2026-02-21 00:24:18', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5752, N'安灯记录创建', N'mes:pro-andon-record:create', 3, 2, 5750, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-21 00:24:18', N'1', N'2026-02-21 00:24:18', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5753, N'安灯记录更新', N'mes:pro-andon-record:update', 3, 3, 5750, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-21 00:24:18', N'1', N'2026-02-21 00:24:18', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5754, N'安灯记录删除', N'mes:pro-andon-record:delete', 3, 4, 5750, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-21 00:24:18', N'1', N'2026-02-21 00:24:18', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5755, N'安灯记录导出', N'mes:pro-andon-record:export', 3, 5, 5750, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-21 00:24:18', N'1', N'2026-02-21 00:24:18', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5756, N'安灯配置查询', N'mes:pro-andon-config:query', 3, 6, 5750, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-21 00:24:18', N'1', N'2026-02-21 00:24:18', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5757, N'安灯配置创建', N'mes:pro-andon-config:create', 3, 7, 5750, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-21 00:24:18', N'1', N'2026-02-21 00:24:18', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5758, N'安灯配置更新', N'mes:pro-andon-config:update', 3, 8, 5750, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-21 00:24:18', N'1', N'2026-02-21 00:24:18', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5759, N'安灯配置删除', N'mes:pro-andon-config:delete', 3, 9, 5750, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-21 00:24:18', N'1', N'2026-02-21 00:24:18', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5780, N'仓库管理', N'', 1, 20, 5100, N'wm', N'ep:box', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 15:37:58', N'1', N'2026-02-17 23:38:18', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5781, N'仓库设置', N'', 2, 1, 5780, N'warehouse', N'ep:office-building', N'mes/wm/warehouse/index', N'MesWmWarehouse', 0, N'1', N'1', N'1', N'1', N'2026-02-17 15:37:58', N'1', N'2026-02-17 15:37:58', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5782, N'仓库查询', N'mes:wm-warehouse:query', 3, 1, 5781, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 15:37:58', N'1', N'2026-02-17 15:37:58', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5783, N'仓库创建', N'mes:wm-warehouse:create', 3, 2, 5781, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 15:37:58', N'1', N'2026-02-17 15:37:58', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5784, N'仓库更新', N'mes:wm-warehouse:update', 3, 3, 5781, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 15:37:58', N'1', N'2026-02-17 15:37:58', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5785, N'仓库删除', N'mes:wm-warehouse:delete', 3, 4, 5781, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-17 15:37:58', N'1', N'2026-02-17 15:37:58', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5786, N'库存现有量', N'', 2, 2, 5780, N'material-stock', N'ep:document', N'mes/wm/materialstock/index', N'MesWmMaterialStock', 0, N'1', N'1', N'1', N'1', N'2026-02-20 01:02:36', N'1', N'2026-02-20 09:03:40', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5787, N'库存台账查询', N'mes:wm-material-stock:query', 3, 1, 5786, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-20 01:02:36', N'1', N'2026-02-20 01:02:36', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5788, N'库存台账创建', N'mes:wm-material-stock:create', 3, 2, 5786, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-20 01:02:37', N'1', N'2026-02-20 01:02:37', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5789, N'库存台账更新', N'mes:wm-material-stock:update', 3, 3, 5786, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-20 01:02:37', N'1', N'2026-02-20 01:02:37', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5790, N'库存台账删除', N'mes:wm-material-stock:delete', 3, 4, 5786, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-20 01:02:37', N'1', N'2026-02-20 01:02:37', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5791, N'库存台账导出', N'mes:wm-material-stock:export', 3, 5, 5786, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-20 01:02:37', N'1', N'2026-02-20 01:02:37', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5792, N'到货通知', N'', 2, 4, 5780, N'arrival-notice', N'ep:document-checked', N'mes/wm/arrivalnotice/index', N'MesWmArrivalNotice', 0, N'1', N'1', N'1', N'1', N'2026-02-22 09:11:05', N'1', N'2026-02-22 17:13:15', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5793, N'到货通知单查询', N'mes:wm-arrival-notice:query', 3, 1, 5792, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-22 09:11:05', N'1', N'2026-02-22 09:11:05', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5794, N'到货通知单创建', N'mes:wm-arrival-notice:create', 3, 2, 5792, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-22 09:11:05', N'1', N'2026-02-22 09:11:05', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5795, N'到货通知单更新', N'mes:wm-arrival-notice:update', 3, 3, 5792, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-22 09:11:05', N'1', N'2026-02-22 09:11:05', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5796, N'到货通知单删除', N'mes:wm-arrival-notice:delete', 3, 4, 5792, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-22 09:11:05', N'1', N'2026-02-22 09:11:05', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5797, N'到货通知单导出', N'mes:wm-arrival-notice:export', 3, 5, 5792, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-22 09:11:05', N'1', N'2026-02-22 09:11:05', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5798, N'采购入库', N'', 2, 3, 5780, N'item-receipt', N'ep:goods', N'mes/wm/itemreceipt/index', N'MesWmItemReceipt', 0, N'1', N'1', N'1', N'1', N'2026-02-22 10:23:22', N'1', N'2026-02-22 18:35:01', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5799, N'采购入库单查询', N'mes:wm-item-receipt:query', 3, 1, 5798, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-22 10:23:22', N'1', N'2026-02-22 10:23:22', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5800, N'采购入库单创建', N'mes:wm-item-receipt:create', 3, 2, 5798, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-22 10:23:22', N'1', N'2026-02-22 10:23:22', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5801, N'采购入库单更新', N'mes:wm-item-receipt:update', 3, 3, 5798, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-22 10:23:22', N'1', N'2026-02-22 10:23:22', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5802, N'采购入库单删除', N'mes:wm-item-receipt:delete', 3, 4, 5798, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-22 10:23:22', N'1', N'2026-02-22 10:23:22', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5803, N'采购入库单导出', N'mes:wm-item-receipt:export', 3, 5, 5798, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-22 10:23:22', N'1', N'2026-02-22 10:23:22', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5804, N'采购入库单完成', N'mes:wm-item-receipt:finish', 3, 6, 5798, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-22 10:23:22', N'1', N'2026-03-02 11:24:29', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5805, N'生产领料', N'', 2, 6, 5780, N'product-issue', N'ep:sell', N'mes/wm/productissue/index', N'MesWmProductIssue', 0, N'1', N'1', N'1', N'1', N'2026-02-26 15:53:24', N'1', N'2026-03-23 12:21:59', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5806, N'领料出库单查询', N'mes:wm-product-issue:query', 3, 1, 5805, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-02-26 15:53:24', N'1', N'2026-03-23 12:21:59', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5807, N'领料出库单新增', N'mes:wm-product-issue:create', 3, 2, 5805, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-02-26 15:53:24', N'1', N'2026-03-23 12:21:59', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5808, N'领料出库单修改', N'mes:wm-product-issue:update', 3, 3, 5805, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-02-26 15:53:24', N'1', N'2026-03-23 12:21:59', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5809, N'领料出库单删除', N'mes:wm-product-issue:delete', 3, 4, 5805, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-02-26 15:53:24', N'1', N'2026-03-23 12:21:59', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5810, N'领料出库单导出', N'mes:wm-product-issue:export', 3, 5, 5805, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-02-26 15:53:24', N'1', N'2026-03-23 12:21:59', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5811, N'领料出库单完成', N'mes:wm-product-issue:finish', 3, 6, 5805, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-02-26 15:53:24', N'1', N'2026-03-30 03:06:32', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5819, N'产品入库', N'', 2, 8, 5780, N'product-receipt', N'ep:box', N'mes/wm/productreceipt/index', N'MesWmProductReceipt', 0, N'1', N'1', N'1', N'1', N'2026-03-01 04:03:25', N'1', N'2026-03-04 04:29:46', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5820, N'产品入库单查询', N'mes:wm-product-receipt:query', 3, 1, 5819, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-01 04:03:25', N'1', N'2026-03-01 06:03:44', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5821, N'产品入库单新增', N'mes:wm-product-receipt:create', 3, 2, 5819, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-01 04:03:25', N'1', N'2026-03-01 06:03:44', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5822, N'产品入库单修改', N'mes:wm-product-receipt:update', 3, 3, 5819, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-01 04:03:25', N'1', N'2026-03-01 06:03:44', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5823, N'产品入库单删除', N'mes:wm-product-receipt:delete', 3, 4, 5819, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-01 04:03:25', N'1', N'2026-03-01 06:03:44', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5824, N'产品入库单导出', N'mes:wm-product-receipt:export', 3, 5, 5819, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-01 04:03:25', N'1', N'2026-03-01 06:03:44', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5825, N'产品入库单完成', N'mes:wm-product-receipt:finish', 3, 6, 5819, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-01 04:03:25', N'1', N'2026-03-02 11:24:29', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5830, N'采购退货', N'', 2, 5, 5780, N'return-vendor', N'ep:box', N'mes/wm/returnvendor/index', N'MesWmReturnVendor', 0, N'1', N'1', N'1', N'1', N'2026-02-28 09:47:48', N'1', N'2026-03-29 20:22:49', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5831, N'供应商退货单查询', N'mes:wm-return-vendor:query', 3, 1, 5830, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-02-28 09:47:48', N'1', N'2026-02-28 09:47:48', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5832, N'供应商退货单新增', N'mes:wm-return-vendor:create', 3, 2, 5830, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-02-28 09:47:48', N'1', N'2026-02-28 09:47:48', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5833, N'供应商退货单修改', N'mes:wm-return-vendor:update', 3, 3, 5830, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-02-28 09:47:48', N'1', N'2026-02-28 09:47:48', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5834, N'供应商退货单删除', N'mes:wm-return-vendor:delete', 3, 4, 5830, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-02-28 09:47:48', N'1', N'2026-02-28 09:47:48', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5835, N'供应商退货单导出', N'mes:wm-return-vendor:export', 3, 5, 5830, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-02-28 09:47:48', N'1', N'2026-02-28 09:47:48', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5836, N'供应商退货单状态变更', N'mes:wm-return-vendor:update-status', 3, 6, 5830, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-02-28 09:47:48', N'1', N'2026-02-28 09:47:48', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5840, N'生产退料', N'', 2, 7, 5780, N'return-issue', N'ep:refresh-left', N'mes/wm/returnissue/index', N'MesWmReturnIssue', 0, N'1', N'1', N'1', N'1', N'2026-02-28 14:11:04', N'1', N'2026-03-04 04:29:46', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5841, N'生产退料单查询', N'mes:wm-return-issue:query', 3, 1, 5840, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-02-28 14:11:04', N'1', N'2026-02-28 14:11:04', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5842, N'生产退料单新增', N'mes:wm-return-issue:create', 3, 2, 5840, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-02-28 14:11:04', N'1', N'2026-02-28 14:11:04', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5843, N'生产退料单修改', N'mes:wm-return-issue:update', 3, 3, 5840, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-02-28 14:11:04', N'1', N'2026-02-28 14:11:04', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5844, N'生产退料单删除', N'mes:wm-return-issue:delete', 3, 4, 5840, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-02-28 14:11:04', N'1', N'2026-02-28 14:11:04', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5845, N'生产退料单导出', N'mes:wm-return-issue:export', 3, 5, 5840, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-02-28 14:11:04', N'1', N'2026-02-28 14:11:04', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5846, N'生产退料单执行', N'mes:wm-return-issue:finish', 3, 6, 5840, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-02-28 14:11:04', N'1', N'2026-03-02 11:24:30', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5847, N'销售退货', N'', 2, 11, 5780, N'return-sales', N'ep:refresh-left', N'mes/wm/returnsales/index', N'MesWmReturnSales', 0, N'1', N'1', N'1', N'1', N'2026-03-01 10:31:35', N'1', N'2026-03-04 04:29:46', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5848, N'销售退货单查询', N'mes:wm-return-sales:query', 3, 1, 5847, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-01 10:31:35', N'1', N'2026-03-01 10:31:35', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5849, N'销售退货单新增', N'mes:wm-return-sales:create', 3, 2, 5847, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-01 10:31:35', N'1', N'2026-03-01 10:31:35', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5850, N'销售退货单修改', N'mes:wm-return-sales:update', 3, 3, 5847, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-01 10:31:35', N'1', N'2026-03-01 10:31:35', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5851, N'销售退货单删除', N'mes:wm-return-sales:delete', 3, 4, 5847, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-01 10:31:35', N'1', N'2026-03-01 10:31:35', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5852, N'销售退货单导出', N'mes:wm-return-sales:export', 3, 5, 5847, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-01 10:31:35', N'1', N'2026-03-01 10:31:35', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5853, N'销售退货单提交', N'mes:wm-return-sales:submit', 3, 6, 5847, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-01 10:31:35', N'1', N'2026-03-01 10:31:35', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5854, N'销售退货单完成退货', N'mes:wm-return-sales:finish', 3, 7, 5847, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-01 10:31:35', N'1', N'2026-03-02 11:24:29', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5855, N'销售退货单执行上架', N'mes:wm-return-sales:stock', 3, 8, 5847, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-01 10:31:35', N'1', N'2026-03-01 10:31:35', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5856, N'销售退货单取消', N'mes:wm-return-sales:cancel', 3, 9, 5847, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-01 10:31:35', N'1', N'2026-03-01 10:31:35', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5857, N'杂项出库', N'', 2, 20, 5780, N'misc-issue', N'ep:sell', N'mes/wm/miscissue/index', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-02 14:33:34', N'1', N'2026-03-03 09:12:16', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5858, N'杂项出库查询', N'mes:wm-misc-issue:query', 3, 1, 5857, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-02 14:33:34', N'1', N'2026-03-02 14:33:34', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5859, N'杂项出库新增', N'mes:wm-misc-issue:create', 3, 2, 5857, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-02 14:33:34', N'1', N'2026-03-02 14:33:34', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5860, N'杂项出库修改', N'mes:wm-misc-issue:update', 3, 3, 5857, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-02 14:33:34', N'1', N'2026-03-02 14:33:34', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5861, N'杂项出库删除', N'mes:wm-misc-issue:delete', 3, 4, 5857, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-02 14:33:34', N'1', N'2026-03-02 14:33:34', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5862, N'杂项出库导出', N'mes:wm-misc-issue:export', 3, 5, 5857, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-02 14:33:34', N'1', N'2026-03-02 14:33:34', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5863, N'杂项出库执行', N'mes:wm-misc-issue:finish', 3, 6, 5857, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-02 14:33:34', N'1', N'2026-03-02 14:33:34', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5867, N'发货通知', N'', 2, 9, 5780, N'sales-notice', N'fa-solid:notes-medical', N'mes/wm/salesnotice/index', N'MesWmSalesNotice', 0, N'1', N'1', N'1', N'1', N'2026-03-30 08:54:30', N'1', N'2026-03-30 17:09:27', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5868, N'查询发货通知', N'mes:wm-sales-notice:query', 3, 1, 5867, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-03-30 08:54:30', N'1', N'2026-03-30 16:57:31', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5869, N'创建发货通知', N'mes:wm-sales-notice:create', 3, 2, 5867, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-03-30 08:54:30', N'1', N'2026-03-30 16:57:37', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5870, N'更新发货通知', N'mes:wm-sales-notice:update', 3, 3, 5867, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-03-30 08:54:30', N'1', N'2026-03-30 16:57:49', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5871, N'删除发货通知', N'mes:wm-sales-notice:delete', 3, 4, 5867, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-03-30 08:54:30', N'1', N'2026-03-30 16:57:57', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5872, N'导出发货通知', N'mes:wm-sales-notice:export', 3, 5, 5867, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-03-30 08:54:30', N'1', N'2026-03-30 16:58:03', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5873, N'外协入库', N'', 2, 18, 5780, N'outsource-receipt', N'fa-solid:truck', N'mes/wm/outsourcereceipt/index', N'MesWmOutsourceReceipt', 0, N'1', N'1', N'1', N'1', N'2026-03-31 15:36:37', N'1', N'2026-04-01 00:04:11', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5874, N'外协入库单查询', N'mes:wm-outsource-receipt:query', 3, 1, 5873, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-31 15:36:37', N'1', N'2026-03-31 15:36:37', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5875, N'外协入库单新增', N'mes:wm-outsource-receipt:create', 3, 2, 5873, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-31 15:36:37', N'1', N'2026-03-31 15:36:37', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5876, N'外协入库单修改', N'mes:wm-outsource-receipt:update', 3, 3, 5873, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-31 15:36:37', N'1', N'2026-03-31 15:36:37', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5877, N'外协入库单删除', N'mes:wm-outsource-receipt:delete', 3, 4, 5873, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-31 15:36:37', N'1', N'2026-03-31 15:36:37', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5878, N'外协入库单导出', N'mes:wm-outsource-receipt:export', 3, 5, 5873, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-31 15:36:37', N'1', N'2026-03-31 15:36:37', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5879, N'外协入库单完成', N'mes:wm-outsource-receipt:finish', 3, 6, 5873, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-31 15:36:37', N'1', N'2026-03-31 15:36:37', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5881, N'外协发料', N'', 2, 17, 5780, N'outsource-issue', N'ep:sell', N'mes/wm/outsourceissue/index', N'MesWmOutsourceIssue', 0, N'1', N'1', N'1', N'1', N'2026-03-02 14:36:04', N'1', N'2026-03-03 19:59:38', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5882, N'外协发料单查询', N'mes:wm-outsource-issue:query', 3, 1, 5881, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-02 14:36:04', N'1', N'2026-03-02 14:36:04', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5883, N'外协发料单新增', N'mes:wm-outsource-issue:create', 3, 2, 5881, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-02 14:36:04', N'1', N'2026-03-02 14:36:04', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5884, N'外协发料单修改', N'mes:wm-outsource-issue:update', 3, 3, 5881, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-02 14:36:04', N'1', N'2026-03-02 14:36:04', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5885, N'外协发料单删除', N'mes:wm-outsource-issue:delete', 3, 4, 5881, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-02 14:36:04', N'1', N'2026-03-02 14:36:04', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5886, N'外协发料单导出', N'mes:wm-outsource-issue:export', 3, 5, 5881, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-02 14:36:04', N'1', N'2026-03-02 14:36:04', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5887, N'外协发料单执行出库', N'mes:wm-outsource-issue:execute', 3, 6, 5881, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-02 14:36:04', N'1', N'2026-03-02 14:36:04', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5888, N'杂项入库', N'', 2, 19, 5780, N'misc-receipt', N'ep:bottom', N'mes/wm/miscreceipt/index', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-03 07:17:50', N'1', N'2026-03-03 07:46:53', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5889, N'杂项入库查询', N'mes:wm:misc-receipt:query', 3, 1, 5888, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-03 07:17:50', N'1', N'2026-03-03 07:17:50', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5890, N'杂项入库创建', N'mes:wm:misc-receipt:create', 3, 2, 5888, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-03 07:17:50', N'1', N'2026-03-03 07:17:50', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5891, N'杂项入库更新', N'mes:wm:misc-receipt:update', 3, 3, 5888, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-03 07:17:50', N'1', N'2026-03-03 07:17:50', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5892, N'杂项入库删除', N'mes:wm:misc-receipt:delete', 3, 4, 5888, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-03 07:17:50', N'1', N'2026-03-03 07:17:50', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5893, N'杂项入库提交', N'mes:wm:misc-receipt:submit', 3, 5, 5888, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-03 07:17:50', N'1', N'2026-03-03 07:17:50', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5894, N'杂项入库执行', N'mes:wm:misc-receipt:finish', 3, 6, 5888, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-03 07:17:50', N'1', N'2026-03-03 07:17:50', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5895, N'杂项入库取消', N'mes:wm:misc-receipt:cancel', 3, 7, 5888, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-03 07:17:50', N'1', N'2026-03-03 07:17:50', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5896, N'杂项入库导出', N'mes:wm:misc-receipt:export', 3, 8, 5888, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-03 07:17:50', N'1', N'2026-03-03 07:17:50', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5897, N'SN 码', N'', 2, 16, 5780, N'sn', N'ep:document', N'mes/wm/sn/index', N'MesWmSn', 0, N'1', N'1', N'1', N'1', N'2026-03-05 01:30:21', N'1', N'2026-03-05 13:37:30', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5898, N'SN 码查询', N'mes:wm-sn:query', 3, 1, 5897, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-05 01:30:21', N'1', N'2026-03-05 01:30:21', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5899, N'SN 码生成', N'mes:wm-sn:create', 3, 2, 5897, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-05 01:30:21', N'1', N'2026-03-05 01:30:21', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5900, N'SN 码删除', N'mes:wm-sn:delete', 3, 4, 5897, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-05 01:30:21', N'1', N'2026-03-05 01:30:21', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5901, N'SN 码导出', N'mes:wm-sn:export', 3, 5, 5897, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-05 01:30:21', N'1', N'2026-03-05 01:30:21', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5906, N'条码配置', N'', 2, 15, 5780, N'barcode/config', N'fa:barcode', N'mes/wm/barcode/config/index', N'MesWmBarcodeConfig', 0, N'0', N'1', N'1', N'1', N'2026-03-05 14:37:20', N'1', N'2026-03-06 21:05:20', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5907, N'条码配置查询', N'mes:wm-barcode-config:query', 3, 1, 5906, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-03-05 14:37:20', N'1', N'2026-03-06 21:09:11', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5908, N'条码配置创建', N'mes:wm-barcode-config:create', 3, 2, 5906, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-03-05 14:37:20', N'1', N'2026-03-06 21:09:16', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5909, N'条码配置更新', N'mes:wm-barcode-config:update', 3, 3, 5906, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-03-05 14:37:20', N'1', N'2026-03-06 21:09:21', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5910, N'条码配置删除', N'mes:wm-barcode-config:delete', 3, 4, 5906, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-03-05 14:37:20', N'1', N'2026-03-06 21:09:26', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5911, N'赋能管理', N'', 2, 15, 5780, N'barcode', N'fa:qrcode', N'mes/wm/barcode/index', N'MesWmBarcode', 0, N'1', N'1', N'1', N'1', N'2026-03-05 14:37:20', N'1', N'2026-03-06 10:01:03', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5912, N'条码清单查询', N'mes:wm-barcode:query', 3, 1, 5911, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-03-05 14:37:20', N'1', N'2026-03-06 09:58:59', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5913, N'条码清单创建', N'mes:wm-barcode:create', 3, 2, 5911, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-03-05 14:37:20', N'1', N'2026-03-06 09:59:03', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5914, N'条码清单更新', N'mes:wm-barcode:update', 3, 3, 5911, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-03-05 14:37:20', N'1', N'2026-03-06 09:59:08', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5915, N'条码清单删除', N'mes:wm-barcode:delete', 3, 4, 5911, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-03-05 14:37:20', N'1', N'2026-03-06 09:59:12', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5916, N'条码清单导出', N'mes:wm-barcode:export', 3, 5, 5911, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-03-07 02:08:17', N'1', N'2026-03-07 02:08:17', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5917, N'装箱管理', N'', 2, 14, 5780, N'packages', N'ep:box', N'mes/wm/packages/index', N'MesWmPackages', 0, N'1', N'1', N'1', N'1', N'2026-03-08 02:05:46', N'1', N'2026-03-08 19:16:27', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5918, N'装箱管理查询', N'mes:wm-package:query', 3, 1, 5917, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-08 02:05:46', N'1', N'2026-03-08 02:05:46', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5919, N'装箱管理新增', N'mes:wm-package:create', 3, 2, 5917, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-08 02:05:46', N'1', N'2026-03-08 02:05:46', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5920, N'装箱管理修改', N'mes:wm-package:update', 3, 3, 5917, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-08 02:05:46', N'1', N'2026-03-08 02:05:46', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5921, N'装箱管理删除', N'mes:wm-package:delete', 3, 4, 5917, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-08 02:05:46', N'1', N'2026-03-08 02:05:46', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5922, N'转移调拨', N'', 2, 12, 5780, N'transfer', N'ep:sort', N'mes/wm/transfer/index', N'MesWmTransfer', 0, N'1', N'1', N'1', N'1', N'2026-03-08 11:55:25', N'1', N'2026-03-22 15:22:57', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5923, N'调拨单查询', N'mes:wm-transfer:query', 3, 1, 5922, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-03-08 11:55:25', N'1', N'2026-03-08 11:55:25', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5924, N'调拨单新增', N'mes:wm-transfer:create', 3, 2, 5922, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-03-08 11:55:25', N'1', N'2026-03-08 11:55:25', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5925, N'调拨单修改', N'mes:wm-transfer:update', 3, 3, 5922, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-03-08 11:55:25', N'1', N'2026-03-08 11:55:25', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5926, N'调拨单删除', N'mes:wm-transfer:delete', 3, 4, 5922, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-03-08 11:55:25', N'1', N'2026-03-08 11:55:25', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5927, N'调拨单导出', N'mes:wm-transfer:export', 3, 5, 5922, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-03-08 11:55:25', N'1', N'2026-03-08 11:55:25', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5928, N'调拨单提交', N'mes:wm-transfer:submit', 3, 6, 5922, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-03-08 11:55:25', N'1', N'2026-03-08 11:55:25', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5929, N'调拨单确认', N'mes:wm-transfer:confirm', 3, 7, 5922, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-03-08 11:55:25', N'1', N'2026-03-08 11:55:25', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5930, N'调拨单完成', N'mes:wm-transfer:finish', 3, 8, 5922, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-03-08 11:55:25', N'1', N'2026-03-08 11:55:25', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5931, N'调拨单取消', N'mes:wm-transfer:cancel', 3, 9, 5922, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-03-08 11:55:25', N'1', N'2026-03-08 11:55:25', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5950, N'库存盘点', N'', 1, 13, 5780, N'stock-taking', N'ep:circle-check-filled', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-03-09 00:00:00', N'1', N'2026-03-09 21:19:09', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5951, N'盘点方案', N'', 2, 1, 5950, N'plan', N'ep:document', N'mes/wm/stocktaking/plan/index', N'MesWmStockTakingPlan', 0, N'1', N'1', N'1', N'1', N'2026-03-09 00:00:00', N'1', N'2026-03-09 13:19:52', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5952, N'盘点方案查询', N'mes:wm-stock-taking-plan:query', 3, 1, 5951, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-03-09 00:00:00', N'1', N'2026-03-09 13:35:06', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5953, N'盘点方案创建', N'mes:wm-stock-taking-plan:create', 3, 2, 5951, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-03-09 00:00:00', N'1', N'2026-03-09 13:35:07', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5954, N'盘点方案更新', N'mes:wm-stock-taking-plan:update', 3, 3, 5951, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-03-09 00:00:00', N'1', N'2026-03-09 13:35:09', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5955, N'盘点方案删除', N'mes:wm-stock-taking-plan:delete', 3, 4, 5951, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-03-09 00:00:00', N'1', N'2026-03-09 13:35:11', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5956, N'盘点方案导出', N'mes:wm-stock-taking-plan:export', 3, 5, 5951, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-03-09 00:00:00', N'1', N'2026-03-09 13:35:13', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5957, N'盘点任务', N'', 2, 2, 5950, N'task', N'ep:list', N'mes/wm/stocktaking/task/index', N'MesWmStockTakingTask', 0, N'1', N'1', N'1', N'1', N'2026-03-09 00:00:00', N'1', N'2026-03-09 23:00:02', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5958, N'盘点任务查询', N'mes:wm-stock-taking-task:query', 3, 1, 5957, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-09 00:00:00', N'1', N'2026-03-09 00:00:00', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5959, N'盘点任务创建', N'mes:wm-stock-taking-task:create', 3, 2, 5957, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-09 00:00:00', N'1', N'2026-03-09 00:00:00', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5960, N'盘点任务更新', N'mes:wm-stock-taking-task:update', 3, 3, 5957, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-09 00:00:00', N'1', N'2026-03-09 00:00:00', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5961, N'盘点任务删除', N'mes:wm-stock-taking-task:delete', 3, 4, 5957, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-09 00:00:00', N'1', N'2026-03-09 00:00:00', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5962, N'盘点任务导出', N'mes:wm-stock-taking-task:export', 3, 5, 5957, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-09 00:00:00', N'1', N'2026-03-09 00:00:00', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5966, N'批次追溯', N'', 2, 9, 5500, N'batch-trace', N'ep:aim', N'mes/qc/batchtrace/index', N'BatchTrace', 0, N'1', N'1', N'1', N'1', N'2026-03-14 06:59:25', N'1', N'2026-04-05 09:39:54', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5967, N'批次追溯查询', N'mes:wm-batch:query', 3, 1, 5966, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'1', N'2026-03-14 06:59:25', N'1', N'2026-03-14 06:59:25', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5969, N'报告审批', N'mes:pro-feedback:approve', 3, 6, 5550, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-03-19 08:51:16', N'1', N'2026-03-19 08:51:16', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5970, N'销售出库', N'', 2, 10, 5780, N'product-sales', N'ep:sell', N'mes/wm/productsales/index', N'MesWmProductSales', 0, N'1', N'1', N'1', N'', N'2026-03-30 10:37:08', N'', N'2026-03-30 10:37:08', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5971, N'查询销售出库', N'mes:wm-product-sales:query', 3, 1, 5970, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'', N'2026-03-30 10:37:08', N'', N'2026-03-30 10:37:08', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5972, N'创建销售出库', N'mes:wm-product-sales:create', 3, 2, 5970, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'', N'2026-03-30 10:37:08', N'', N'2026-03-30 10:37:08', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5973, N'更新销售出库', N'mes:wm-product-sales:update', 3, 3, 5970, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'', N'2026-03-30 10:37:08', N'', N'2026-03-30 10:37:08', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5974, N'删除销售出库', N'mes:wm-product-sales:delete', 3, 4, 5970, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'', N'2026-03-30 10:37:08', N'', N'2026-03-30 10:37:08', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5975, N'导出销售出库', N'mes:wm-product-sales:export', 3, 5, 5970, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'', N'2026-03-30 10:37:08', N'', N'2026-03-30 10:37:08', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5976, N'提交销售出库', N'mes:wm-product-sales:submit', 3, 6, 5970, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'', N'2026-03-30 10:37:08', N'', N'2026-03-30 10:37:08', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5977, N'执行拣货', N'mes:wm-product-sales:stock', 3, 7, 5970, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'', N'2026-03-30 10:37:08', N'', N'2026-03-30 10:37:08', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5978, N'填写运单', N'mes:wm-product-sales:shipping', 3, 8, 5970, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'', N'2026-03-30 10:37:08', N'', N'2026-03-30 10:37:08', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5979, N'执行出库', N'mes:wm-product-sales:finish', 3, 9, 5970, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'', N'2026-03-30 10:37:08', N'', N'2026-03-30 10:37:08', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5980, N'取消销售出库', N'mes:wm-product-sales:cancel', 3, 10, 5970, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'', N'2026-03-30 10:37:08', N'', N'2026-03-30 10:37:08', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5981, N'工作记录', N'', 2, 99, 5700, N'workrecord', N'ep:timer', N'mes/pro/workrecord/index', N'MesProWorkRecordLog', 0, N'1', N'1', N'1', N'1', N'2026-04-05 14:08:44', N'1', N'2026-04-05 14:08:44', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5982, N'工作记录查询', N'mes:pro-workrecord:query', 3, 1, 5981, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-04-05 14:08:44', N'1', N'2026-04-05 14:08:44', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5983, N'工作记录导出', N'mes:pro-workrecord:export', 3, 2, 5981, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-04-05 14:08:44', N'1', N'2026-04-05 14:08:44', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5984, N'上工下工', N'mes:pro-workrecord:clock', 3, 3, 5981, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2026-04-05 14:08:44', N'1', N'2026-04-05 14:08:44', N'0')
+GO
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5985, N'MES 首页', N'mes:home:query', 2, 0, 5100, N'mes/home/index', N'ep:home-filled', N'mes/home/index', N'MesHome', 0, N'1', N'1', N'1', N'1', N'2026-04-05 23:24:03', N'1', N'2026-04-06 01:20:52', N'0')
+GO
 SET IDENTITY_INSERT system_menu OFF
 GO
 COMMIT
@@ -6266,103 +7895,102 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS system_notice
 GO
-CREATE TABLE system_notice
-(
-    id          bigint                                 NOT NULL PRIMARY KEY IDENTITY,
-    title       nvarchar(50)                           NOT NULL,
-    content     nvarchar(max)                          NOT NULL,
-    type        tinyint                                NOT NULL,
-    status      tinyint      DEFAULT 0                 NOT NULL,
-    creator     nvarchar(64) DEFAULT ''                NULL,
-    create_time datetime2    DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater     nvarchar(64) DEFAULT ''                NULL,
-    update_time datetime2    DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted     bit          DEFAULT 0                 NOT NULL,
-    tenant_id   bigint       DEFAULT 0                 NOT NULL
+CREATE TABLE system_notice (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    title nvarchar(50)  NOT NULL,
+    content nvarchar(max)  NOT NULL,
+    type tinyint  NOT NULL,
+    status tinyint DEFAULT 0 NOT NULL,
+    creator nvarchar(64) DEFAULT '' NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT 0 NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 )
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'公告ID',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_notice',
-     'COLUMN', N'id'
+    'MS_Description', N'公告ID',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_notice',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'公告标题',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_notice',
-     'COLUMN', N'title'
+    'MS_Description', N'公告标题',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_notice',
+    'COLUMN', N'title'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'公告内容',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_notice',
-     'COLUMN', N'content'
+    'MS_Description', N'公告内容',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_notice',
+    'COLUMN', N'content'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'公告类型（1通知 2公告）',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_notice',
-     'COLUMN', N'type'
+    'MS_Description', N'公告类型（1通知 2公告）',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_notice',
+    'COLUMN', N'type'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'公告状态（0正常 1关闭）',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_notice',
-     'COLUMN', N'status'
+    'MS_Description', N'公告状态（0正常 1关闭）',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_notice',
+    'COLUMN', N'status'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_notice',
-     'COLUMN', N'creator'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_notice',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_notice',
-     'COLUMN', N'create_time'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_notice',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_notice',
-     'COLUMN', N'updater'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_notice',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_notice',
-     'COLUMN', N'update_time'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_notice',
+    'COLUMN', N'update_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_notice',
-     'COLUMN', N'deleted'
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_notice',
+    'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'租户编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_notice',
-     'COLUMN', N'tenant_id'
+    'MS_Description', N'租户编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_notice',
+    'COLUMN', N'tenant_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'通知公告表',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_notice'
+    'MS_Description', N'通知公告表',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_notice'
 GO
 
 -- ----------------------------
@@ -6373,7 +8001,7 @@ BEGIN TRANSACTION
 GO
 SET IDENTITY_INSERT system_notice ON
 GO
-INSERT INTO system_notice (id, title, content, type, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1, N'芋道的公众', N'<p>新版本内容133</p>', 1, 0, N'admin', N'2021-01-05 17:03:48', N'1', N'2022-05-04 21:00:20', N'0', 1)
+INSERT INTO system_notice (id, title, content, type, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1, N'芋道的公众', N'<p>新版本内容133222</p>', 1, 0, N'admin', N'2021-01-05 17:03:48', N'"1"', N'2025-08-31 09:38:22', N'0', 1)
 GO
 INSERT INTO system_notice (id, title, content, type, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2, N'维护通知：2018-07-01 系统凌晨维护', N'<p><img src="http://test.yudao.iocoder.cn/b7cb3cf49b4b3258bf7309a09dd2f4e5.jpg" alt="" data-href="">11112222<img src="http://test.yudao.iocoder.cn/fe44fc7bdb82ca421184b2eebbaee9e2148d4a1827479a4eb4521e11d2a062ba.png" alt="image" data-href="http://test.yudao.iocoder.cn/fe44fc7bdb82ca421184b2eebbaee9e2148d4a1827479a4eb4521e11d2a062ba.png">3333</p>', 2, 1, N'admin', N'2021-01-05 17:03:48', N'1', N'2025-04-18 23:56:40', N'0', 1)
 GO
@@ -6390,151 +8018,153 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS system_notify_message
 GO
-CREATE TABLE system_notify_message
-(
-    id                bigint                                 NOT NULL PRIMARY KEY IDENTITY,
-    user_id           bigint                                 NOT NULL,
-    user_type         tinyint                                NOT NULL,
-    template_id       bigint                                 NOT NULL,
-    template_code     nvarchar(64)                           NOT NULL,
-    template_nickname nvarchar(63)                           NOT NULL,
-    template_content  nvarchar(1024)                         NOT NULL,
-    template_type     int                                    NOT NULL,
-    template_params   nvarchar(255)                          NOT NULL,
-    read_status       varchar(1)                             NOT NULL,
-    read_time         datetime2    DEFAULT NULL              NULL,
-    creator           nvarchar(64) DEFAULT ''                NULL,
-    create_time       datetime2    DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater           nvarchar(64) DEFAULT ''                NULL,
-    update_time       datetime2    DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted           bit          DEFAULT 0                 NOT NULL,
-    tenant_id         bigint       DEFAULT 0                 NOT NULL
+CREATE TABLE system_notify_message (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    user_id bigint  NOT NULL,
+    user_type tinyint  NOT NULL,
+    template_id bigint  NOT NULL,
+    template_code nvarchar(64)  NOT NULL,
+    template_nickname nvarchar(63)  NOT NULL,
+    template_content nvarchar(1024)  NOT NULL,
+    template_type int  NOT NULL,
+    template_params nvarchar(255)  NOT NULL,
+    read_status varchar(1)  NOT NULL,
+    read_time datetime2 DEFAULT NULL NULL,
+    creator nvarchar(64) DEFAULT '' NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT 0 NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 )
 GO
 
-EXEC sp_addextendedproperty
-     'MS_Description', N'用户ID',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_notify_message',
-     'COLUMN', N'id'
+CREATE INDEX idx_system_notify_message_01 ON system_notify_message (user_id, user_type, read_status)
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'用户id',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_notify_message',
-     'COLUMN', N'user_id'
+    'MS_Description', N'用户ID',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_notify_message',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'用户类型',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_notify_message',
-     'COLUMN', N'user_type'
+    'MS_Description', N'用户id',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_notify_message',
+    'COLUMN', N'user_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'模版编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_notify_message',
-     'COLUMN', N'template_id'
+    'MS_Description', N'用户类型',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_notify_message',
+    'COLUMN', N'user_type'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'模板编码',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_notify_message',
-     'COLUMN', N'template_code'
+    'MS_Description', N'模版编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_notify_message',
+    'COLUMN', N'template_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'模版发送人名称',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_notify_message',
-     'COLUMN', N'template_nickname'
+    'MS_Description', N'模板编码',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_notify_message',
+    'COLUMN', N'template_code'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'模版内容',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_notify_message',
-     'COLUMN', N'template_content'
+    'MS_Description', N'模版发送人名称',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_notify_message',
+    'COLUMN', N'template_nickname'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'模版类型',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_notify_message',
-     'COLUMN', N'template_type'
+    'MS_Description', N'模版内容',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_notify_message',
+    'COLUMN', N'template_content'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'模版参数',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_notify_message',
-     'COLUMN', N'template_params'
+    'MS_Description', N'模版类型',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_notify_message',
+    'COLUMN', N'template_type'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否已读',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_notify_message',
-     'COLUMN', N'read_status'
+    'MS_Description', N'模版参数',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_notify_message',
+    'COLUMN', N'template_params'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'阅读时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_notify_message',
-     'COLUMN', N'read_time'
+    'MS_Description', N'是否已读',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_notify_message',
+    'COLUMN', N'read_status'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_notify_message',
-     'COLUMN', N'creator'
+    'MS_Description', N'阅读时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_notify_message',
+    'COLUMN', N'read_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_notify_message',
-     'COLUMN', N'create_time'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_notify_message',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_notify_message',
-     'COLUMN', N'updater'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_notify_message',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_notify_message',
-     'COLUMN', N'update_time'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_notify_message',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_notify_message',
-     'COLUMN', N'deleted'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_notify_message',
+    'COLUMN', N'update_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'租户编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_notify_message',
-     'COLUMN', N'tenant_id'
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_notify_message',
+    'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'站内信消息表',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_notify_message'
+    'MS_Description', N'租户编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_notify_message',
+    'COLUMN', N'tenant_id'
+GO
+
+EXEC sp_addextendedproperty
+    'MS_Description', N'站内信消息表',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_notify_message'
 GO
 
 -- ----------------------------
@@ -6545,19 +8175,19 @@ BEGIN TRANSACTION
 GO
 SET IDENTITY_INSERT system_notify_message ON
 GO
-INSERT INTO system_notify_message (id, user_id, user_type, template_id, template_code, template_nickname, template_content, template_type, template_params, read_status, read_time, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2, 1, 2, 1, N'test', N'123', N'我是 1，我开始 2 了', 1, N'{"name":"1","what":"2"}', N'1', N'2025-04-21 14:59:37', N'1', N'2023-01-28 11:44:08', N'1', N'2025-04-21 14:59:37', N'0', 1)
+INSERT INTO system_notify_message (id, user_id, user_type, template_id, template_code, template_nickname, template_content, template_type, template_params, read_status, read_time, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2, 1, 2, 1, N'test', N'123', N'我是 1，我开始 2 了', 1, N'{"name":"1","what":"2"}', N'1', N'2025-12-15 21:24:36', N'1', N'2023-01-28 11:44:08', N'1', N'2025-12-15 21:24:36', N'0', 1)
 GO
-INSERT INTO system_notify_message (id, user_id, user_type, template_id, template_code, template_nickname, template_content, template_type, template_params, read_status, read_time, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3, 1, 2, 1, N'test', N'123', N'我是 1，我开始 2 了', 1, N'{"name":"1","what":"2"}', N'1', N'2025-04-21 14:59:37', N'1', N'2023-01-28 11:45:04', N'1', N'2025-04-21 14:59:37', N'0', 1)
+INSERT INTO system_notify_message (id, user_id, user_type, template_id, template_code, template_nickname, template_content, template_type, template_params, read_status, read_time, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3, 1, 2, 1, N'test', N'123', N'我是 1，我开始 2 了', 1, N'{"name":"1","what":"2"}', N'1', N'2025-12-15 21:24:36', N'1', N'2023-01-28 11:45:04', N'1', N'2025-12-15 21:24:36', N'0', 1)
 GO
 INSERT INTO system_notify_message (id, user_id, user_type, template_id, template_code, template_nickname, template_content, template_type, template_params, read_status, read_time, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4, 103, 2, 2, N'register', N'系统消息', N'你好，欢迎 哈哈 加入大家庭！', 2, N'{"name":"哈哈"}', N'0', NULL, N'1', N'2023-01-28 21:02:20', N'1', N'2023-01-28 21:02:20', N'0', 1)
 GO
-INSERT INTO system_notify_message (id, user_id, user_type, template_id, template_code, template_nickname, template_content, template_type, template_params, read_status, read_time, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (5, 1, 2, 1, N'test', N'123', N'我是 芋艿，我开始 写代码 了', 1, N'{"name":"芋艿","what":"写代码"}', N'1', N'2025-04-21 14:59:37', N'1', N'2023-01-28 22:21:42', N'1', N'2025-04-21 14:59:37', N'0', 1)
+INSERT INTO system_notify_message (id, user_id, user_type, template_id, template_code, template_nickname, template_content, template_type, template_params, read_status, read_time, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (5, 1, 2, 1, N'test', N'123', N'我是 芋艿，我开始 写代码 了', 1, N'{"name":"芋艿","what":"写代码"}', N'1', N'2025-12-08 17:25:28', N'1', N'2023-01-28 22:21:42', N'1', N'2025-12-08 17:25:28', N'0', 1)
 GO
-INSERT INTO system_notify_message (id, user_id, user_type, template_id, template_code, template_nickname, template_content, template_type, template_params, read_status, read_time, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6, 1, 2, 1, N'test', N'123', N'我是 芋艿，我开始 写代码 了', 1, N'{"name":"芋艿","what":"写代码"}', N'1', N'2025-04-21 14:59:36', N'1', N'2023-01-28 22:22:07', N'1', N'2025-04-21 14:59:36', N'0', 1)
+INSERT INTO system_notify_message (id, user_id, user_type, template_id, template_code, template_nickname, template_content, template_type, template_params, read_status, read_time, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6, 1, 2, 1, N'test', N'123', N'我是 芋艿，我开始 写代码 了', 1, N'{"name":"芋艿","what":"写代码"}', N'1', N'2025-12-08 17:25:30', N'1', N'2023-01-28 22:22:07', N'1', N'2025-12-08 17:25:30', N'0', 1)
 GO
-INSERT INTO system_notify_message (id, user_id, user_type, template_id, template_code, template_nickname, template_content, template_type, template_params, read_status, read_time, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (7, 1, 2, 1, N'test', N'123', N'我是 2，我开始 3 了', 1, N'{"name":"2","what":"3"}', N'1', N'2025-04-21 14:59:35', N'1', N'2023-01-28 23:45:21', N'1', N'2025-04-21 14:59:35', N'0', 1)
+INSERT INTO system_notify_message (id, user_id, user_type, template_id, template_code, template_nickname, template_content, template_type, template_params, read_status, read_time, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (7, 1, 2, 1, N'test', N'123', N'我是 2，我开始 3 了', 1, N'{"name":"2","what":"3"}', N'1', N'2025-12-08 17:25:22', N'1', N'2023-01-28 23:45:21', N'1', N'2025-12-08 17:25:22', N'0', 1)
 GO
-INSERT INTO system_notify_message (id, user_id, user_type, template_id, template_code, template_nickname, template_content, template_type, template_params, read_status, read_time, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (8, 1, 2, 2, N'register', N'系统消息', N'你好，欢迎 123 加入大家庭！', 2, N'{"name":"123"}', N'1', N'2025-04-21 14:59:35', N'1', N'2023-01-28 23:50:21', N'1', N'2025-04-21 14:59:35', N'0', 1)
+INSERT INTO system_notify_message (id, user_id, user_type, template_id, template_code, template_nickname, template_content, template_type, template_params, read_status, read_time, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (8, 1, 2, 2, N'register', N'系统消息', N'你好，欢迎 123 加入大家庭！', 2, N'{"name":"123"}', N'1', N'2025-12-08 16:46:01', N'1', N'2023-01-28 23:50:21', N'1', N'2025-12-08 16:46:01', N'0', 1)
 GO
 INSERT INTO system_notify_message (id, user_id, user_type, template_id, template_code, template_nickname, template_content, template_type, template_params, read_status, read_time, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (9, 247, 1, 4, N'brokerage_withdraw_audit_approve', N'system', N'您在2023-09-28 08:35:46提现￥0.09元的申请已通过审核', 2, N'{"reason":null,"createTime":"2023-09-28 08:35:46","price":"0.09"}', N'0', NULL, N'1', N'2023-09-28 16:36:22', N'1', N'2023-09-28 16:36:22', N'0', 1)
 GO
@@ -6574,127 +8204,126 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS system_notify_template
 GO
-CREATE TABLE system_notify_template
-(
-    id          bigint                                  NOT NULL PRIMARY KEY IDENTITY,
-    name        nvarchar(63)                            NOT NULL,
-    code        nvarchar(64)                            NOT NULL,
-    nickname    nvarchar(255)                           NOT NULL,
-    content     nvarchar(1024)                          NOT NULL,
-    type        tinyint                                 NOT NULL,
-    params      nvarchar(255) DEFAULT NULL              NULL,
-    status      tinyint                                 NOT NULL,
-    remark      nvarchar(255) DEFAULT NULL              NULL,
-    creator     nvarchar(64)  DEFAULT ''                NULL,
-    create_time datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater     nvarchar(64)  DEFAULT ''                NULL,
-    update_time datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted     bit           DEFAULT 0                 NOT NULL
+CREATE TABLE system_notify_template (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    name nvarchar(63)  NOT NULL,
+    code nvarchar(64)  NOT NULL,
+    nickname nvarchar(255)  NOT NULL,
+    content nvarchar(1024)  NOT NULL,
+    type tinyint  NOT NULL,
+    params nvarchar(255) DEFAULT NULL NULL,
+    status tinyint  NOT NULL,
+    remark nvarchar(255) DEFAULT NULL NULL,
+    creator nvarchar(64) DEFAULT '' NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT 0 NOT NULL
 )
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'主键',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_notify_template',
-     'COLUMN', N'id'
+    'MS_Description', N'主键',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_notify_template',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'模板名称',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_notify_template',
-     'COLUMN', N'name'
+    'MS_Description', N'模板名称',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_notify_template',
+    'COLUMN', N'name'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'模版编码',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_notify_template',
-     'COLUMN', N'code'
+    'MS_Description', N'模版编码',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_notify_template',
+    'COLUMN', N'code'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'发送人名称',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_notify_template',
-     'COLUMN', N'nickname'
+    'MS_Description', N'发送人名称',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_notify_template',
+    'COLUMN', N'nickname'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'模版内容',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_notify_template',
-     'COLUMN', N'content'
+    'MS_Description', N'模版内容',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_notify_template',
+    'COLUMN', N'content'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'类型',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_notify_template',
-     'COLUMN', N'type'
+    'MS_Description', N'类型',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_notify_template',
+    'COLUMN', N'type'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'参数数组',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_notify_template',
-     'COLUMN', N'params'
+    'MS_Description', N'参数数组',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_notify_template',
+    'COLUMN', N'params'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'状态',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_notify_template',
-     'COLUMN', N'status'
+    'MS_Description', N'状态',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_notify_template',
+    'COLUMN', N'status'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'备注',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_notify_template',
-     'COLUMN', N'remark'
+    'MS_Description', N'备注',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_notify_template',
+    'COLUMN', N'remark'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_notify_template',
-     'COLUMN', N'creator'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_notify_template',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_notify_template',
-     'COLUMN', N'create_time'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_notify_template',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_notify_template',
-     'COLUMN', N'updater'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_notify_template',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_notify_template',
-     'COLUMN', N'update_time'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_notify_template',
+    'COLUMN', N'update_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_notify_template',
-     'COLUMN', N'deleted'
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_notify_template',
+    'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'站内信模板表',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_notify_template'
+    'MS_Description', N'站内信模板表',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_notify_template'
 GO
 
 -- ----------------------------
@@ -6702,23 +8331,22 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS system_oauth2_access_token
 GO
-CREATE TABLE system_oauth2_access_token
-(
-    id            bigint                                  NOT NULL PRIMARY KEY IDENTITY,
-    user_id       bigint                                  NOT NULL,
-    user_type     tinyint                                 NOT NULL,
-    user_info     nvarchar(512)                           NOT NULL,
-    access_token  nvarchar(255)                           NOT NULL,
-    refresh_token nvarchar(32)                            NOT NULL,
-    client_id     nvarchar(255)                           NOT NULL,
-    scopes        nvarchar(255) DEFAULT NULL              NULL,
-    expires_time  datetime2                               NOT NULL,
-    creator       nvarchar(64)  DEFAULT ''                NULL,
-    create_time   datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater       nvarchar(64)  DEFAULT ''                NULL,
-    update_time   datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted       bit           DEFAULT 0                 NOT NULL,
-    tenant_id     bigint        DEFAULT 0                 NOT NULL
+CREATE TABLE system_oauth2_access_token (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    user_id bigint  NOT NULL,
+    user_type tinyint  NOT NULL,
+    user_info nvarchar(512)  NOT NULL,
+    access_token nvarchar(255)  NOT NULL,
+    refresh_token nvarchar(32)  NOT NULL,
+    client_id nvarchar(255)  NOT NULL,
+    scopes nvarchar(255) DEFAULT NULL NULL,
+    expires_time datetime2  NOT NULL,
+    creator nvarchar(64) DEFAULT '' NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT 0 NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 )
 GO
 
@@ -6728,114 +8356,114 @@ CREATE INDEX idx_system_oauth2_access_token_02 ON system_oauth2_access_token (re
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_access_token',
-     'COLUMN', N'id'
+    'MS_Description', N'编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_access_token',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'用户编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_access_token',
-     'COLUMN', N'user_id'
+    'MS_Description', N'用户编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_access_token',
+    'COLUMN', N'user_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'用户类型',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_access_token',
-     'COLUMN', N'user_type'
+    'MS_Description', N'用户类型',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_access_token',
+    'COLUMN', N'user_type'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'用户信息',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_access_token',
-     'COLUMN', N'user_info'
+    'MS_Description', N'用户信息',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_access_token',
+    'COLUMN', N'user_info'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'访问令牌',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_access_token',
-     'COLUMN', N'access_token'
+    'MS_Description', N'访问令牌',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_access_token',
+    'COLUMN', N'access_token'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'刷新令牌',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_access_token',
-     'COLUMN', N'refresh_token'
+    'MS_Description', N'刷新令牌',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_access_token',
+    'COLUMN', N'refresh_token'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'客户端编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_access_token',
-     'COLUMN', N'client_id'
+    'MS_Description', N'客户端编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_access_token',
+    'COLUMN', N'client_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'授权范围',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_access_token',
-     'COLUMN', N'scopes'
+    'MS_Description', N'授权范围',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_access_token',
+    'COLUMN', N'scopes'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'过期时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_access_token',
-     'COLUMN', N'expires_time'
+    'MS_Description', N'过期时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_access_token',
+    'COLUMN', N'expires_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_access_token',
-     'COLUMN', N'creator'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_access_token',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_access_token',
-     'COLUMN', N'create_time'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_access_token',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_access_token',
-     'COLUMN', N'updater'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_access_token',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_access_token',
-     'COLUMN', N'update_time'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_access_token',
+    'COLUMN', N'update_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_access_token',
-     'COLUMN', N'deleted'
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_access_token',
+    'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'租户编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_access_token',
-     'COLUMN', N'tenant_id'
+    'MS_Description', N'租户编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_access_token',
+    'COLUMN', N'tenant_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'OAuth2 访问令牌',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_access_token'
+    'MS_Description', N'OAuth2 访问令牌',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_access_token'
 GO
 
 -- ----------------------------
@@ -6843,119 +8471,121 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS system_oauth2_approve
 GO
-CREATE TABLE system_oauth2_approve
-(
-    id           bigint                                  NOT NULL PRIMARY KEY IDENTITY,
-    user_id      bigint                                  NOT NULL,
-    user_type    tinyint                                 NOT NULL,
-    client_id    nvarchar(255)                           NOT NULL,
-    scope        nvarchar(255) DEFAULT ''                NOT NULL,
-    approved     varchar(1)    DEFAULT '0'               NOT NULL,
-    expires_time datetime2                               NOT NULL,
-    creator      nvarchar(64)  DEFAULT ''                NULL,
-    create_time  datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater      nvarchar(64)  DEFAULT ''                NULL,
-    update_time  datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted      bit           DEFAULT 0                 NOT NULL,
-    tenant_id    bigint        DEFAULT 0                 NOT NULL
+CREATE TABLE system_oauth2_approve (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    user_id bigint  NOT NULL,
+    user_type tinyint  NOT NULL,
+    client_id nvarchar(255)  NOT NULL,
+    scope nvarchar(255) DEFAULT '' NOT NULL,
+    approved varchar(1) DEFAULT '0' NOT NULL,
+    expires_time datetime2  NOT NULL,
+    creator nvarchar(64) DEFAULT '' NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT 0 NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 )
 GO
 
-EXEC sp_addextendedproperty
-     'MS_Description', N'编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_approve',
-     'COLUMN', N'id'
+CREATE INDEX idx_system_oauth2_approve_01 ON system_oauth2_approve (user_id, user_type, client_id)
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'用户编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_approve',
-     'COLUMN', N'user_id'
+    'MS_Description', N'编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_approve',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'用户类型',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_approve',
-     'COLUMN', N'user_type'
+    'MS_Description', N'用户编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_approve',
+    'COLUMN', N'user_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'客户端编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_approve',
-     'COLUMN', N'client_id'
+    'MS_Description', N'用户类型',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_approve',
+    'COLUMN', N'user_type'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'授权范围',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_approve',
-     'COLUMN', N'scope'
+    'MS_Description', N'客户端编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_approve',
+    'COLUMN', N'client_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否接受',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_approve',
-     'COLUMN', N'approved'
+    'MS_Description', N'授权范围',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_approve',
+    'COLUMN', N'scope'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'过期时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_approve',
-     'COLUMN', N'expires_time'
+    'MS_Description', N'是否接受',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_approve',
+    'COLUMN', N'approved'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_approve',
-     'COLUMN', N'creator'
+    'MS_Description', N'过期时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_approve',
+    'COLUMN', N'expires_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_approve',
-     'COLUMN', N'create_time'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_approve',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_approve',
-     'COLUMN', N'updater'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_approve',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_approve',
-     'COLUMN', N'update_time'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_approve',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_approve',
-     'COLUMN', N'deleted'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_approve',
+    'COLUMN', N'update_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'租户编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_approve',
-     'COLUMN', N'tenant_id'
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_approve',
+    'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'OAuth2 批准表',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_approve'
+    'MS_Description', N'租户编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_approve',
+    'COLUMN', N'tenant_id'
+GO
+
+EXEC sp_addextendedproperty
+    'MS_Description', N'OAuth2 批准表',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_approve'
 GO
 
 -- ----------------------------
@@ -6963,183 +8593,185 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS system_oauth2_client
 GO
-CREATE TABLE system_oauth2_client
-(
-    id                             bigint                                   NOT NULL PRIMARY KEY IDENTITY,
-    client_id                      nvarchar(255)                            NOT NULL,
-    secret                         nvarchar(255)                            NOT NULL,
-    name                           nvarchar(255)                            NOT NULL,
-    logo                           nvarchar(255)                            NOT NULL,
-    description                    nvarchar(255)  DEFAULT NULL              NULL,
-    status                         tinyint                                  NOT NULL,
-    access_token_validity_seconds  int                                      NOT NULL,
-    refresh_token_validity_seconds int                                      NOT NULL,
-    redirect_uris                  nvarchar(255)                            NOT NULL,
-    authorized_grant_types         nvarchar(255)                            NOT NULL,
-    scopes                         nvarchar(255)  DEFAULT NULL              NULL,
-    auto_approve_scopes            nvarchar(255)  DEFAULT NULL              NULL,
-    authorities                    nvarchar(255)  DEFAULT NULL              NULL,
-    resource_ids                   nvarchar(255)  DEFAULT NULL              NULL,
-    additional_information         nvarchar(4000) DEFAULT NULL              NULL,
-    creator                        nvarchar(64)   DEFAULT ''                NULL,
-    create_time                    datetime2      DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater                        nvarchar(64)   DEFAULT ''                NULL,
-    update_time                    datetime2      DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted                        bit            DEFAULT 0                 NOT NULL
+CREATE TABLE system_oauth2_client (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    client_id nvarchar(255)  NOT NULL,
+    secret nvarchar(255)  NOT NULL,
+    name nvarchar(255)  NOT NULL,
+    logo nvarchar(255)  NOT NULL,
+    description nvarchar(255) DEFAULT NULL NULL,
+    status tinyint  NOT NULL,
+    access_token_validity_seconds int  NOT NULL,
+    refresh_token_validity_seconds int  NOT NULL,
+    redirect_uris nvarchar(255)  NOT NULL,
+    authorized_grant_types nvarchar(255)  NOT NULL,
+    scopes nvarchar(255) DEFAULT NULL NULL,
+    auto_approve_scopes nvarchar(255) DEFAULT NULL NULL,
+    authorities nvarchar(255) DEFAULT NULL NULL,
+    resource_ids nvarchar(255) DEFAULT NULL NULL,
+    additional_information nvarchar(4000) DEFAULT NULL NULL,
+    creator nvarchar(64) DEFAULT '' NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT 0 NOT NULL
 )
 GO
 
-EXEC sp_addextendedproperty
-     'MS_Description', N'编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_client',
-     'COLUMN', N'id'
+CREATE INDEX idx_system_oauth2_client_01 ON system_oauth2_client (client_id)
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'客户端编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_client',
-     'COLUMN', N'client_id'
+    'MS_Description', N'编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_client',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'客户端密钥',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_client',
-     'COLUMN', N'secret'
+    'MS_Description', N'客户端编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_client',
+    'COLUMN', N'client_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'应用名',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_client',
-     'COLUMN', N'name'
+    'MS_Description', N'客户端密钥',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_client',
+    'COLUMN', N'secret'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'应用图标',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_client',
-     'COLUMN', N'logo'
+    'MS_Description', N'应用名',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_client',
+    'COLUMN', N'name'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'应用描述',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_client',
-     'COLUMN', N'description'
+    'MS_Description', N'应用图标',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_client',
+    'COLUMN', N'logo'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'状态',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_client',
-     'COLUMN', N'status'
+    'MS_Description', N'应用描述',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_client',
+    'COLUMN', N'description'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'访问令牌的有效期',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_client',
-     'COLUMN', N'access_token_validity_seconds'
+    'MS_Description', N'状态',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_client',
+    'COLUMN', N'status'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'刷新令牌的有效期',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_client',
-     'COLUMN', N'refresh_token_validity_seconds'
+    'MS_Description', N'访问令牌的有效期',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_client',
+    'COLUMN', N'access_token_validity_seconds'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'可重定向的 URI 地址',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_client',
-     'COLUMN', N'redirect_uris'
+    'MS_Description', N'刷新令牌的有效期',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_client',
+    'COLUMN', N'refresh_token_validity_seconds'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'授权类型',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_client',
-     'COLUMN', N'authorized_grant_types'
+    'MS_Description', N'可重定向的 URI 地址',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_client',
+    'COLUMN', N'redirect_uris'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'授权范围',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_client',
-     'COLUMN', N'scopes'
+    'MS_Description', N'授权类型',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_client',
+    'COLUMN', N'authorized_grant_types'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'自动通过的授权范围',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_client',
-     'COLUMN', N'auto_approve_scopes'
+    'MS_Description', N'授权范围',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_client',
+    'COLUMN', N'scopes'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'权限',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_client',
-     'COLUMN', N'authorities'
+    'MS_Description', N'自动通过的授权范围',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_client',
+    'COLUMN', N'auto_approve_scopes'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'资源',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_client',
-     'COLUMN', N'resource_ids'
+    'MS_Description', N'权限',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_client',
+    'COLUMN', N'authorities'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'附加信息',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_client',
-     'COLUMN', N'additional_information'
+    'MS_Description', N'资源',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_client',
+    'COLUMN', N'resource_ids'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_client',
-     'COLUMN', N'creator'
+    'MS_Description', N'附加信息',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_client',
+    'COLUMN', N'additional_information'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_client',
-     'COLUMN', N'create_time'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_client',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_client',
-     'COLUMN', N'updater'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_client',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_client',
-     'COLUMN', N'update_time'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_client',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_client',
-     'COLUMN', N'deleted'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_client',
+    'COLUMN', N'update_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'OAuth2 客户端表',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_client'
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_client',
+    'COLUMN', N'deleted'
+GO
+
+EXEC sp_addextendedproperty
+    'MS_Description', N'OAuth2 客户端表',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_client'
 GO
 
 -- ----------------------------
@@ -7150,13 +8782,13 @@ BEGIN TRANSACTION
 GO
 SET IDENTITY_INSERT system_oauth2_client ON
 GO
-INSERT INTO system_oauth2_client (id, client_id, secret, name, logo, description, status, access_token_validity_seconds, refresh_token_validity_seconds, redirect_uris, authorized_grant_types, scopes, auto_approve_scopes, authorities, resource_ids, additional_information, creator, create_time, updater, update_time, deleted) VALUES (1, N'default', N'admin123', N'芋道源码', N'http://test.yudao.iocoder.cn/20250502/sort2_1746189740718.png', N'我是描述', 0, 1800, 2592000, N'["https://www.iocoder.cn","https://doc.iocoder.cn"]', N'["password","authorization_code","implicit","refresh_token"]', N'["user.read","user.write"]', N'[]', N'["user.read","user.write"]', N'[]', N'{}', N'1', N'2022-05-11 21:47:12', N'1', N'2025-05-02 20:42:22', N'0')
+INSERT INTO system_oauth2_client (id, client_id, secret, name, logo, description, status, access_token_validity_seconds, refresh_token_validity_seconds, redirect_uris, authorized_grant_types, scopes, auto_approve_scopes, authorities, resource_ids, additional_information, creator, create_time, updater, update_time, deleted) VALUES (1, N'default', N'admin123', N'芋道源码', N'http://test.yudao.iocoder.cn/20250502/sort2_1746189740718.png', N'我是描述', 0, 1800, 2592000, N'["https://www.iocoder.cn","https://doc.iocoder.cn"]', N'["password","authorization_code","implicit","refresh_token","client_credentials"]', N'["user.read","user.write"]', N'[]', N'["user.read","user.write"]', N'[]', N'{}', N'1', N'2022-05-11 21:47:12', N'1', N'2025-12-07 20:07:09', N'0')
 GO
-INSERT INTO system_oauth2_client (id, client_id, secret, name, logo, description, status, access_token_validity_seconds, refresh_token_validity_seconds, redirect_uris, authorized_grant_types, scopes, auto_approve_scopes, authorities, resource_ids, additional_information, creator, create_time, updater, update_time, deleted) VALUES (40, N'test', N'test2', N'biubiu', N'http://test.yudao.iocoder.cn/xx/20250502/ed07110a37464b5299f8bd7c67ad65c7_1746187077009.jpg', N'啦啦啦啦', 0, 1800, 43200, N'["https://www.iocoder.cn"]', N'["password","authorization_code","implicit"]', N'["user_info","projects"]', N'["user_info"]', N'[]', N'[]', N'{}', N'1', N'2022-05-12 00:28:20', N'1', N'2025-05-02 19:58:08', N'0')
+INSERT INTO system_oauth2_client (id, client_id, secret, name, logo, description, status, access_token_validity_seconds, refresh_token_validity_seconds, redirect_uris, authorized_grant_types, scopes, auto_approve_scopes, authorities, resource_ids, additional_information, creator, create_time, updater, update_time, deleted) VALUES (40, N'test', N'test2', N'biubiu', N'http://test.yudao.iocoder.cn/20251227/javayuanma_1766829882970.jpg', N'啦啦啦啦', 0, 1800, 43200, N'["https://www.iocoder.cn"]', N'["password","authorization_code","implicit"]', N'["user_info","projects"]', N'["user_info"]', N'[]', N'[]', N'{}', N'1', N'2022-05-12 00:28:20', N'1', N'2025-12-27 18:04:44', N'0')
 GO
 INSERT INTO system_oauth2_client (id, client_id, secret, name, logo, description, status, access_token_validity_seconds, refresh_token_validity_seconds, redirect_uris, authorized_grant_types, scopes, auto_approve_scopes, authorities, resource_ids, additional_information, creator, create_time, updater, update_time, deleted) VALUES (41, N'yudao-sso-demo-by-code', N'test', N'基于授权码模式，如何实现 SSO 单点登录？', N'http://test.yudao.iocoder.cn/it/20250502/sign_1746181948685.png', NULL, 0, 1800, 43200, N'["http://127.0.0.1:18080"]', N'["authorization_code","refresh_token"]', N'["user.read","user.write"]', N'[]', N'[]', N'[]', NULL, N'1', N'2022-09-29 13:28:31', N'1', N'2025-05-02 18:32:30', N'0')
 GO
-INSERT INTO system_oauth2_client (id, client_id, secret, name, logo, description, status, access_token_validity_seconds, refresh_token_validity_seconds, redirect_uris, authorized_grant_types, scopes, auto_approve_scopes, authorities, resource_ids, additional_information, creator, create_time, updater, update_time, deleted) VALUES (42, N'yudao-sso-demo-by-password', N'test', N'基于密码模式，如何实现 SSO 单点登录？', N'http://test.yudao.iocoder.cn/604bdc695e13b3b22745be704d1f2aa8ee05c5f26f9fead6d1ca49005afbc857.jpeg', NULL, 0, 1800, 43200, N'["http://127.0.0.1:18080"]', N'["password","refresh_token"]', N'["user.read","user.write"]', N'[]', N'[]', N'[]', NULL, N'1', N'2022-10-04 17:40:16', N'1', N'2025-05-04 16:00:46', N'0')
+INSERT INTO system_oauth2_client (id, client_id, secret, name, logo, description, status, access_token_validity_seconds, refresh_token_validity_seconds, redirect_uris, authorized_grant_types, scopes, auto_approve_scopes, authorities, resource_ids, additional_information, creator, create_time, updater, update_time, deleted) VALUES (42, N'yudao-sso-demo-by-password', N'test', N'基于密码模式，如何实现 SSO 单点登录？', N'http://test.yudao.iocoder.cn/20251025/images (3)_1761360515810.jpeg', NULL, 0, 1800, 43200, N'["http://127.0.0.1:18080"]', N'["password","refresh_token"]', N'["user.read","user.write"]', N'[]', N'[]', N'[]', NULL, N'1', N'2022-10-04 17:40:16', N'1', N'2025-10-25 10:49:40', N'0')
 GO
 SET IDENTITY_INSERT system_oauth2_client OFF
 GO
@@ -7169,135 +8801,137 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS system_oauth2_code
 GO
-CREATE TABLE system_oauth2_code
-(
-    id           bigint                                  NOT NULL PRIMARY KEY IDENTITY,
-    user_id      bigint                                  NOT NULL,
-    user_type    tinyint                                 NOT NULL,
-    code         nvarchar(32)                            NOT NULL,
-    client_id    nvarchar(255)                           NOT NULL,
-    scopes       nvarchar(255) DEFAULT ''                NULL,
-    expires_time datetime2                               NOT NULL,
-    redirect_uri nvarchar(255) DEFAULT NULL              NULL,
-    state        nvarchar(255) DEFAULT ''                NOT NULL,
-    creator      nvarchar(64)  DEFAULT ''                NULL,
-    create_time  datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater      nvarchar(64)  DEFAULT ''                NULL,
-    update_time  datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted      bit           DEFAULT 0                 NOT NULL,
-    tenant_id    bigint        DEFAULT 0                 NOT NULL
+CREATE TABLE system_oauth2_code (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    user_id bigint  NOT NULL,
+    user_type tinyint  NOT NULL,
+    code nvarchar(32)  NOT NULL,
+    client_id nvarchar(255)  NOT NULL,
+    scopes nvarchar(255) DEFAULT '' NULL,
+    expires_time datetime2  NOT NULL,
+    redirect_uri nvarchar(255) DEFAULT NULL NULL,
+    state nvarchar(255) DEFAULT '' NOT NULL,
+    creator nvarchar(64) DEFAULT '' NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT 0 NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 )
 GO
 
-EXEC sp_addextendedproperty
-     'MS_Description', N'编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_code',
-     'COLUMN', N'id'
+CREATE INDEX idx_system_oauth2_code_01 ON system_oauth2_code (code)
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'用户编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_code',
-     'COLUMN', N'user_id'
+    'MS_Description', N'编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_code',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'用户类型',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_code',
-     'COLUMN', N'user_type'
+    'MS_Description', N'用户编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_code',
+    'COLUMN', N'user_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'授权码',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_code',
-     'COLUMN', N'code'
+    'MS_Description', N'用户类型',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_code',
+    'COLUMN', N'user_type'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'客户端编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_code',
-     'COLUMN', N'client_id'
+    'MS_Description', N'授权码',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_code',
+    'COLUMN', N'code'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'授权范围',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_code',
-     'COLUMN', N'scopes'
+    'MS_Description', N'客户端编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_code',
+    'COLUMN', N'client_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'过期时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_code',
-     'COLUMN', N'expires_time'
+    'MS_Description', N'授权范围',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_code',
+    'COLUMN', N'scopes'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'可重定向的 URI 地址',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_code',
-     'COLUMN', N'redirect_uri'
+    'MS_Description', N'过期时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_code',
+    'COLUMN', N'expires_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'状态',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_code',
-     'COLUMN', N'state'
+    'MS_Description', N'可重定向的 URI 地址',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_code',
+    'COLUMN', N'redirect_uri'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_code',
-     'COLUMN', N'creator'
+    'MS_Description', N'状态',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_code',
+    'COLUMN', N'state'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_code',
-     'COLUMN', N'create_time'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_code',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_code',
-     'COLUMN', N'updater'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_code',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_code',
-     'COLUMN', N'update_time'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_code',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_code',
-     'COLUMN', N'deleted'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_code',
+    'COLUMN', N'update_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'租户编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_code',
-     'COLUMN', N'tenant_id'
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_code',
+    'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'OAuth2 授权码表',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_code'
+    'MS_Description', N'租户编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_code',
+    'COLUMN', N'tenant_id'
+GO
+
+EXEC sp_addextendedproperty
+    'MS_Description', N'OAuth2 授权码表',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_code'
 GO
 
 -- ----------------------------
@@ -7305,119 +8939,121 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS system_oauth2_refresh_token
 GO
-CREATE TABLE system_oauth2_refresh_token
-(
-    id            bigint                                  NOT NULL PRIMARY KEY IDENTITY,
-    user_id       bigint                                  NOT NULL,
-    refresh_token nvarchar(32)                            NOT NULL,
-    user_type     tinyint                                 NOT NULL,
-    client_id     nvarchar(255)                           NOT NULL,
-    scopes        nvarchar(255) DEFAULT NULL              NULL,
-    expires_time  datetime2                               NOT NULL,
-    creator       nvarchar(64)  DEFAULT ''                NULL,
-    create_time   datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater       nvarchar(64)  DEFAULT ''                NULL,
-    update_time   datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted       bit           DEFAULT 0                 NOT NULL,
-    tenant_id     bigint        DEFAULT 0                 NOT NULL
+CREATE TABLE system_oauth2_refresh_token (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    user_id bigint  NOT NULL,
+    refresh_token nvarchar(32)  NOT NULL,
+    user_type tinyint  NOT NULL,
+    client_id nvarchar(255)  NOT NULL,
+    scopes nvarchar(255) DEFAULT NULL NULL,
+    expires_time datetime2  NOT NULL,
+    creator nvarchar(64) DEFAULT '' NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT 0 NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 )
 GO
 
-EXEC sp_addextendedproperty
-     'MS_Description', N'编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_refresh_token',
-     'COLUMN', N'id'
+CREATE INDEX idx_system_oauth2_refresh_token_01 ON system_oauth2_refresh_token (refresh_token)
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'用户编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_refresh_token',
-     'COLUMN', N'user_id'
+    'MS_Description', N'编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_refresh_token',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'刷新令牌',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_refresh_token',
-     'COLUMN', N'refresh_token'
+    'MS_Description', N'用户编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_refresh_token',
+    'COLUMN', N'user_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'用户类型',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_refresh_token',
-     'COLUMN', N'user_type'
+    'MS_Description', N'刷新令牌',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_refresh_token',
+    'COLUMN', N'refresh_token'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'客户端编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_refresh_token',
-     'COLUMN', N'client_id'
+    'MS_Description', N'用户类型',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_refresh_token',
+    'COLUMN', N'user_type'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'授权范围',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_refresh_token',
-     'COLUMN', N'scopes'
+    'MS_Description', N'客户端编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_refresh_token',
+    'COLUMN', N'client_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'过期时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_refresh_token',
-     'COLUMN', N'expires_time'
+    'MS_Description', N'授权范围',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_refresh_token',
+    'COLUMN', N'scopes'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_refresh_token',
-     'COLUMN', N'creator'
+    'MS_Description', N'过期时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_refresh_token',
+    'COLUMN', N'expires_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_refresh_token',
-     'COLUMN', N'create_time'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_refresh_token',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_refresh_token',
-     'COLUMN', N'updater'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_refresh_token',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_refresh_token',
-     'COLUMN', N'update_time'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_refresh_token',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_refresh_token',
-     'COLUMN', N'deleted'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_refresh_token',
+    'COLUMN', N'update_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'租户编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_refresh_token',
-     'COLUMN', N'tenant_id'
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_refresh_token',
+    'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'OAuth2 刷新令牌',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_oauth2_refresh_token'
+    'MS_Description', N'租户编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_refresh_token',
+    'COLUMN', N'tenant_id'
+GO
+
+EXEC sp_addextendedproperty
+    'MS_Description', N'OAuth2 刷新令牌',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_oauth2_refresh_token'
 GO
 
 -- ----------------------------
@@ -7425,175 +9061,179 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS system_operate_log
 GO
-CREATE TABLE system_operate_log
-(
-    id             bigint                                   NOT NULL PRIMARY KEY IDENTITY,
-    trace_id       nvarchar(64)   DEFAULT ''                NOT NULL,
-    user_id        bigint                                   NOT NULL,
-    user_type      tinyint        DEFAULT 0                 NOT NULL,
-    type           nvarchar(50)                             NOT NULL,
-    sub_type       nvarchar(50)                             NOT NULL,
-    biz_id         bigint                                   NOT NULL,
-    action         nvarchar(2000) DEFAULT ''                NOT NULL,
-    success        varchar(1)     DEFAULT '1'               NOT NULL,
-    extra          nvarchar(2000) DEFAULT ''                NOT NULL,
-    request_method nvarchar(16)   DEFAULT ''                NULL,
-    request_url    nvarchar(255)  DEFAULT ''                NULL,
-    user_ip        nvarchar(50)   DEFAULT NULL              NULL,
-    user_agent     nvarchar(512)  DEFAULT NULL              NULL,
-    creator        nvarchar(64)   DEFAULT ''                NULL,
-    create_time    datetime2      DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater        nvarchar(64)   DEFAULT ''                NULL,
-    update_time    datetime2      DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted        bit            DEFAULT 0                 NOT NULL,
-    tenant_id      bigint         DEFAULT 0                 NOT NULL
+CREATE TABLE system_operate_log (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    trace_id nvarchar(64) DEFAULT '' NOT NULL,
+    user_id bigint  NOT NULL,
+    user_type tinyint DEFAULT 0 NOT NULL,
+    type nvarchar(50)  NOT NULL,
+    sub_type nvarchar(50)  NOT NULL,
+    biz_id bigint  NOT NULL,
+    action nvarchar(2000) DEFAULT '' NOT NULL,
+    success varchar(1) DEFAULT '1' NOT NULL,
+    extra nvarchar(2000) DEFAULT '' NOT NULL,
+    request_method nvarchar(16) DEFAULT '' NULL,
+    request_url nvarchar(255) DEFAULT '' NULL,
+    user_ip nvarchar(50) DEFAULT NULL NULL,
+    user_agent nvarchar(512) DEFAULT NULL NULL,
+    creator nvarchar(64) DEFAULT '' NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT 0 NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 )
 GO
 
-EXEC sp_addextendedproperty
-     'MS_Description', N'日志主键',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_operate_log',
-     'COLUMN', N'id'
+CREATE INDEX idx_system_operate_log_01 ON system_operate_log (user_id)
+GO
+CREATE INDEX idx_system_operate_log_02 ON system_operate_log (create_time)
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'链路追踪编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_operate_log',
-     'COLUMN', N'trace_id'
+    'MS_Description', N'日志主键',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_operate_log',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'用户编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_operate_log',
-     'COLUMN', N'user_id'
+    'MS_Description', N'链路追踪编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_operate_log',
+    'COLUMN', N'trace_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'用户类型',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_operate_log',
-     'COLUMN', N'user_type'
+    'MS_Description', N'用户编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_operate_log',
+    'COLUMN', N'user_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'操作模块类型',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_operate_log',
-     'COLUMN', N'type'
+    'MS_Description', N'用户类型',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_operate_log',
+    'COLUMN', N'user_type'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'操作名',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_operate_log',
-     'COLUMN', N'sub_type'
+    'MS_Description', N'操作模块类型',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_operate_log',
+    'COLUMN', N'type'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'操作数据模块编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_operate_log',
-     'COLUMN', N'biz_id'
+    'MS_Description', N'操作名',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_operate_log',
+    'COLUMN', N'sub_type'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'操作内容',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_operate_log',
-     'COLUMN', N'action'
+    'MS_Description', N'操作数据模块编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_operate_log',
+    'COLUMN', N'biz_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'操作结果',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_operate_log',
-     'COLUMN', N'success'
+    'MS_Description', N'操作内容',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_operate_log',
+    'COLUMN', N'action'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'拓展字段',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_operate_log',
-     'COLUMN', N'extra'
+    'MS_Description', N'操作结果',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_operate_log',
+    'COLUMN', N'success'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'请求方法名',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_operate_log',
-     'COLUMN', N'request_method'
+    'MS_Description', N'拓展字段',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_operate_log',
+    'COLUMN', N'extra'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'请求地址',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_operate_log',
-     'COLUMN', N'request_url'
+    'MS_Description', N'请求方法名',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_operate_log',
+    'COLUMN', N'request_method'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'用户 IP',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_operate_log',
-     'COLUMN', N'user_ip'
+    'MS_Description', N'请求地址',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_operate_log',
+    'COLUMN', N'request_url'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'浏览器 UA',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_operate_log',
-     'COLUMN', N'user_agent'
+    'MS_Description', N'用户 IP',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_operate_log',
+    'COLUMN', N'user_ip'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_operate_log',
-     'COLUMN', N'creator'
+    'MS_Description', N'浏览器 UA',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_operate_log',
+    'COLUMN', N'user_agent'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_operate_log',
-     'COLUMN', N'create_time'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_operate_log',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_operate_log',
-     'COLUMN', N'updater'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_operate_log',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_operate_log',
-     'COLUMN', N'update_time'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_operate_log',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_operate_log',
-     'COLUMN', N'deleted'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_operate_log',
+    'COLUMN', N'update_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'租户编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_operate_log',
-     'COLUMN', N'tenant_id'
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_operate_log',
+    'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'操作日志记录 V2 版本',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_operate_log'
+    'MS_Description', N'租户编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_operate_log',
+    'COLUMN', N'tenant_id'
+GO
+
+EXEC sp_addextendedproperty
+    'MS_Description', N'操作日志记录 V2 版本',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_operate_log'
 GO
 
 -- ----------------------------
@@ -7601,111 +9241,110 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS system_post
 GO
-CREATE TABLE system_post
-(
-    id          bigint                                  NOT NULL PRIMARY KEY IDENTITY,
-    code        nvarchar(64)                            NOT NULL,
-    name        nvarchar(50)                            NOT NULL,
-    sort        int                                     NOT NULL,
-    status      tinyint                                 NOT NULL,
-    remark      nvarchar(500) DEFAULT NULL              NULL,
-    creator     nvarchar(64)  DEFAULT ''                NULL,
-    create_time datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater     nvarchar(64)  DEFAULT ''                NULL,
-    update_time datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted     bit           DEFAULT 0                 NOT NULL,
-    tenant_id   bigint        DEFAULT 0                 NOT NULL
+CREATE TABLE system_post (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    code nvarchar(64)  NOT NULL,
+    name nvarchar(50)  NOT NULL,
+    sort int  NOT NULL,
+    status tinyint  NOT NULL,
+    remark nvarchar(500) DEFAULT NULL NULL,
+    creator nvarchar(64) DEFAULT '' NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT 0 NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 )
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'岗位ID',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_post',
-     'COLUMN', N'id'
+    'MS_Description', N'岗位ID',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_post',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'岗位编码',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_post',
-     'COLUMN', N'code'
+    'MS_Description', N'岗位编码',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_post',
+    'COLUMN', N'code'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'岗位名称',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_post',
-     'COLUMN', N'name'
+    'MS_Description', N'岗位名称',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_post',
+    'COLUMN', N'name'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'显示顺序',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_post',
-     'COLUMN', N'sort'
+    'MS_Description', N'显示顺序',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_post',
+    'COLUMN', N'sort'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'状态（0正常 1停用）',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_post',
-     'COLUMN', N'status'
+    'MS_Description', N'状态（0正常 1停用）',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_post',
+    'COLUMN', N'status'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'备注',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_post',
-     'COLUMN', N'remark'
+    'MS_Description', N'备注',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_post',
+    'COLUMN', N'remark'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_post',
-     'COLUMN', N'creator'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_post',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_post',
-     'COLUMN', N'create_time'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_post',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_post',
-     'COLUMN', N'updater'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_post',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_post',
-     'COLUMN', N'update_time'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_post',
+    'COLUMN', N'update_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_post',
-     'COLUMN', N'deleted'
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_post',
+    'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'租户编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_post',
-     'COLUMN', N'tenant_id'
+    'MS_Description', N'租户编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_post',
+    'COLUMN', N'tenant_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'岗位信息表',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_post'
+    'MS_Description', N'岗位信息表',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_post'
 GO
 
 -- ----------------------------
@@ -7716,13 +9355,13 @@ BEGIN TRANSACTION
 GO
 SET IDENTITY_INSERT system_post ON
 GO
-INSERT INTO system_post (id, code, name, sort, status, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1, N'ceo', N'董事长', 1, 0, N'', N'admin', N'2021-01-06 17:03:48', N'1', N'2023-02-11 15:19:04', N'0', 1)
-GO
-INSERT INTO system_post (id, code, name, sort, status, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2, N'se', N'项目经理', 2, 0, N'', N'admin', N'2021-01-05 17:03:48', N'1', N'2023-11-15 09:18:20', N'0', 1)
+INSERT INTO system_post (id, code, name, sort, status, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2, N'se', N'项目经理', 2, 0, N'', N'admin', N'2021-01-05 17:03:48', N'1', N'2025-12-15 22:38:43', N'0', 1)
 GO
 INSERT INTO system_post (id, code, name, sort, status, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4, N'user', N'普通员工', 4, 0, N'111222', N'admin', N'2021-01-05 17:03:48', N'1', N'2025-03-24 21:32:40', N'0', 1)
 GO
 INSERT INTO system_post (id, code, name, sort, status, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (5, N'HR', N'人力资源', 5, 0, N'`', N'1', N'2024-03-24 20:45:40', N'1', N'2025-03-29 19:08:10', N'0', 1)
+GO
+INSERT INTO system_post (id, code, name, sort, status, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (7, N'test', N'测试', 10, 0, NULL, N'1', N'2025-09-02 08:45:57', N'1', N'2025-09-02 08:45:57', N'0', 1)
 GO
 SET IDENTITY_INSERT system_post OFF
 GO
@@ -7735,135 +9374,134 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS system_role
 GO
-CREATE TABLE system_role
-(
-    id                  bigint                                  NOT NULL PRIMARY KEY IDENTITY,
-    name                nvarchar(30)                            NOT NULL,
-    code                nvarchar(100)                           NOT NULL,
-    sort                int                                     NOT NULL,
-    data_scope          tinyint       DEFAULT 1                 NOT NULL,
-    data_scope_dept_ids nvarchar(500) DEFAULT ''                NOT NULL,
-    status              tinyint                                 NOT NULL,
-    type                tinyint                                 NOT NULL,
-    remark              nvarchar(500) DEFAULT NULL              NULL,
-    creator             nvarchar(64)  DEFAULT ''                NULL,
-    create_time         datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater             nvarchar(64)  DEFAULT ''                NULL,
-    update_time         datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted             bit           DEFAULT 0                 NOT NULL,
-    tenant_id           bigint        DEFAULT 0                 NOT NULL
+CREATE TABLE system_role (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    name nvarchar(30)  NOT NULL,
+    code nvarchar(100)  NOT NULL,
+    sort int  NOT NULL,
+    data_scope tinyint DEFAULT 1 NOT NULL,
+    data_scope_dept_ids nvarchar(500) DEFAULT '' NOT NULL,
+    status tinyint  NOT NULL,
+    type tinyint  NOT NULL,
+    remark nvarchar(500) DEFAULT NULL NULL,
+    creator nvarchar(64) DEFAULT '' NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT 0 NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 )
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'角色ID',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_role',
-     'COLUMN', N'id'
+    'MS_Description', N'角色ID',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_role',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'角色名称',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_role',
-     'COLUMN', N'name'
+    'MS_Description', N'角色名称',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_role',
+    'COLUMN', N'name'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'角色权限字符串',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_role',
-     'COLUMN', N'code'
+    'MS_Description', N'角色权限字符串',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_role',
+    'COLUMN', N'code'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'显示顺序',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_role',
-     'COLUMN', N'sort'
+    'MS_Description', N'显示顺序',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_role',
+    'COLUMN', N'sort'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'数据范围（1：全部数据权限 2：自定数据权限 3：本部门数据权限 4：本部门及以下数据权限）',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_role',
-     'COLUMN', N'data_scope'
+    'MS_Description', N'数据范围（1：全部数据权限 2：自定数据权限 3：本部门数据权限 4：本部门及以下数据权限）',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_role',
+    'COLUMN', N'data_scope'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'数据范围 ( 指定部门数组)',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_role',
-     'COLUMN', N'data_scope_dept_ids'
+    'MS_Description', N'数据范围(指定部门数组)',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_role',
+    'COLUMN', N'data_scope_dept_ids'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'角色状态（0正常 1停用）',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_role',
-     'COLUMN', N'status'
+    'MS_Description', N'角色状态（0正常 1停用）',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_role',
+    'COLUMN', N'status'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'角色类型',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_role',
-     'COLUMN', N'type'
+    'MS_Description', N'角色类型',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_role',
+    'COLUMN', N'type'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'备注',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_role',
-     'COLUMN', N'remark'
+    'MS_Description', N'备注',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_role',
+    'COLUMN', N'remark'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_role',
-     'COLUMN', N'creator'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_role',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_role',
-     'COLUMN', N'create_time'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_role',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_role',
-     'COLUMN', N'updater'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_role',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_role',
-     'COLUMN', N'update_time'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_role',
+    'COLUMN', N'update_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_role',
-     'COLUMN', N'deleted'
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_role',
+    'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'租户编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_role',
-     'COLUMN', N'tenant_id'
+    'MS_Description', N'租户编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_role',
+    'COLUMN', N'tenant_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'角色信息表',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_role'
+    'MS_Description', N'角色信息表',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_role'
 GO
 
 -- ----------------------------
@@ -7880,15 +9518,11 @@ INSERT INTO system_role (id, name, code, sort, data_scope, data_scope_dept_ids, 
 GO
 INSERT INTO system_role (id, name, code, sort, data_scope, data_scope_dept_ids, status, type, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3, N'CRM 管理员', N'crm_admin', 2, 1, N'', 0, 1, N'CRM 专属角色', N'1', N'2024-02-24 10:51:13', N'1', N'2024-02-24 02:51:32', N'0', 1)
 GO
-INSERT INTO system_role (id, name, code, sort, data_scope, data_scope_dept_ids, status, type, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (101, N'测试账号', N'test', 0, 1, N'[]', 0, 2, N'123', N'', N'2021-01-06 13:49:35', N'1', N'2025-04-30 17:38:28', N'0', 1)
-GO
 INSERT INTO system_role (id, name, code, sort, data_scope, data_scope_dept_ids, status, type, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (109, N'租户管理员', N'tenant_admin', 0, 1, N'', 0, 1, N'系统自动生成', N'1', N'2022-02-22 00:56:14', N'1', N'2022-02-22 00:56:14', N'0', 121)
 GO
 INSERT INTO system_role (id, name, code, sort, data_scope, data_scope_dept_ids, status, type, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (111, N'租户管理员', N'tenant_admin', 0, 1, N'', 0, 1, N'系统自动生成', N'1', N'2022-03-07 21:37:58', N'1', N'2022-03-07 21:37:58', N'0', 122)
 GO
-INSERT INTO system_role (id, name, code, sort, data_scope, data_scope_dept_ids, status, type, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (155, N'测试数据权限', N'test-dp', 3, 2, N'[100,102,103,104,105,108]', 0, 2, N'', N'1', N'2025-03-31 14:58:06', N'1', N'2025-04-17 23:07:44', N'0', 1)
-GO
-INSERT INTO system_role (id, name, code, sort, data_scope, data_scope_dept_ids, status, type, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (158, N'2', N'3', 4, 1, N'', 0, 2, NULL, N'1', N'2025-04-17 20:08:08', N'1', N'2025-04-17 23:05:31', N'0', 1)
+INSERT INTO system_role (id, name, code, sort, data_scope, data_scope_dept_ids, status, type, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (155, N'测试数据权限1', N'test-dp', 4, 2, N'[112,100,102,103,104,105,107,108]', 0, 2, N'1111', N'1', N'2025-03-31 14:58:06', N'1', N'2025-12-04 23:29:40', N'0', 1)
 GO
 SET IDENTITY_INSERT system_role OFF
 GO
@@ -7901,87 +9535,89 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS system_role_menu
 GO
-CREATE TABLE system_role_menu
-(
-    id          bigint                                 NOT NULL PRIMARY KEY IDENTITY,
-    role_id     bigint                                 NOT NULL,
-    menu_id     bigint                                 NOT NULL,
-    creator     nvarchar(64) DEFAULT ''                NULL,
-    create_time datetime2    DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater     nvarchar(64) DEFAULT ''                NULL,
-    update_time datetime2    DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted     bit          DEFAULT 0                 NOT NULL,
-    tenant_id   bigint       DEFAULT 0                 NOT NULL
+CREATE TABLE system_role_menu (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    role_id bigint  NOT NULL,
+    menu_id bigint  NOT NULL,
+    creator nvarchar(64) DEFAULT '' NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT 0 NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 )
 GO
 
-EXEC sp_addextendedproperty
-     'MS_Description', N'自增编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_role_menu',
-     'COLUMN', N'id'
+CREATE INDEX idx_system_role_menu_01 ON system_role_menu (role_id)
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'角色ID',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_role_menu',
-     'COLUMN', N'role_id'
+    'MS_Description', N'自增编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_role_menu',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'菜单ID',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_role_menu',
-     'COLUMN', N'menu_id'
+    'MS_Description', N'角色ID',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_role_menu',
+    'COLUMN', N'role_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_role_menu',
-     'COLUMN', N'creator'
+    'MS_Description', N'菜单ID',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_role_menu',
+    'COLUMN', N'menu_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_role_menu',
-     'COLUMN', N'create_time'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_role_menu',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_role_menu',
-     'COLUMN', N'updater'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_role_menu',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_role_menu',
-     'COLUMN', N'update_time'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_role_menu',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_role_menu',
-     'COLUMN', N'deleted'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_role_menu',
+    'COLUMN', N'update_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'租户编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_role_menu',
-     'COLUMN', N'tenant_id'
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_role_menu',
+    'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'角色和菜单关联表',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_role_menu'
+    'MS_Description', N'租户编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_role_menu',
+    'COLUMN', N'tenant_id'
+GO
+
+EXEC sp_addextendedproperty
+    'MS_Description', N'角色和菜单关联表',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_role_menu'
 GO
 
 -- ----------------------------
@@ -8061,168 +9697,6 @@ GO
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1296, 110, 1, N'110', N'2022-02-23 00:23:55', N'110', N'2022-02-23 00:23:55', N'0', 121)
 GO
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1578, 111, 1, N'1', N'2022-03-07 21:37:58', N'1', N'2022-03-07 21:37:58', N'0', 122)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1604, 101, 1216, N'1', N'2022-03-19 21:45:52', N'1', N'2022-03-19 21:45:52', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1605, 101, 1217, N'1', N'2022-03-19 21:45:52', N'1', N'2022-03-19 21:45:52', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1606, 101, 1218, N'1', N'2022-03-19 21:45:52', N'1', N'2022-03-19 21:45:52', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1607, 101, 1219, N'1', N'2022-03-19 21:45:52', N'1', N'2022-03-19 21:45:52', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1608, 101, 1220, N'1', N'2022-03-19 21:45:52', N'1', N'2022-03-19 21:45:52', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1609, 101, 1221, N'1', N'2022-03-19 21:45:52', N'1', N'2022-03-19 21:45:52', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1610, 101, 5, N'1', N'2022-03-19 21:45:52', N'1', N'2022-03-19 21:45:52', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1611, 101, 1222, N'1', N'2022-03-19 21:45:52', N'1', N'2022-03-19 21:45:52', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1612, 101, 1118, N'1', N'2022-03-19 21:45:52', N'1', N'2022-03-19 21:45:52', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1613, 101, 1119, N'1', N'2022-03-19 21:45:52', N'1', N'2022-03-19 21:45:52', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1614, 101, 1120, N'1', N'2022-03-19 21:45:52', N'1', N'2022-03-19 21:45:52', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1615, 101, 1185, N'1', N'2022-03-19 21:45:52', N'1', N'2022-03-19 21:45:52', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1616, 101, 1186, N'1', N'2022-03-19 21:45:52', N'1', N'2022-03-19 21:45:52', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1617, 101, 1187, N'1', N'2022-03-19 21:45:52', N'1', N'2022-03-19 21:45:52', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1618, 101, 1188, N'1', N'2022-03-19 21:45:52', N'1', N'2022-03-19 21:45:52', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1619, 101, 1189, N'1', N'2022-03-19 21:45:52', N'1', N'2022-03-19 21:45:52', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1620, 101, 1190, N'1', N'2022-03-19 21:45:52', N'1', N'2022-03-19 21:45:52', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1621, 101, 1191, N'1', N'2022-03-19 21:45:52', N'1', N'2022-03-19 21:45:52', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1622, 101, 1192, N'1', N'2022-03-19 21:45:52', N'1', N'2022-03-19 21:45:52', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1623, 101, 1193, N'1', N'2022-03-19 21:45:52', N'1', N'2022-03-19 21:45:52', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1624, 101, 1194, N'1', N'2022-03-19 21:45:52', N'1', N'2022-03-19 21:45:52', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1625, 101, 1195, N'1', N'2022-03-19 21:45:52', N'1', N'2022-03-19 21:45:52', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1627, 101, 1197, N'1', N'2022-03-19 21:45:52', N'1', N'2022-03-19 21:45:52', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1628, 101, 1198, N'1', N'2022-03-19 21:45:52', N'1', N'2022-03-19 21:45:52', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1629, 101, 1199, N'1', N'2022-03-19 21:45:52', N'1', N'2022-03-19 21:45:52', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1630, 101, 1200, N'1', N'2022-03-19 21:45:52', N'1', N'2022-03-19 21:45:52', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1631, 101, 1201, N'1', N'2022-03-19 21:45:52', N'1', N'2022-03-19 21:45:52', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1632, 101, 1202, N'1', N'2022-03-19 21:45:52', N'1', N'2022-03-19 21:45:52', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1633, 101, 1207, N'1', N'2022-03-19 21:45:52', N'1', N'2022-03-19 21:45:52', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1634, 101, 1208, N'1', N'2022-03-19 21:45:52', N'1', N'2022-03-19 21:45:52', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1635, 101, 1209, N'1', N'2022-03-19 21:45:52', N'1', N'2022-03-19 21:45:52', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1636, 101, 1210, N'1', N'2022-03-19 21:45:52', N'1', N'2022-03-19 21:45:52', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1637, 101, 1211, N'1', N'2022-03-19 21:45:52', N'1', N'2022-03-19 21:45:52', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1638, 101, 1212, N'1', N'2022-03-19 21:45:52', N'1', N'2022-03-19 21:45:52', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1639, 101, 1213, N'1', N'2022-03-19 21:45:52', N'1', N'2022-03-19 21:45:52', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1640, 101, 1215, N'1', N'2022-03-19 21:45:52', N'1', N'2022-03-19 21:45:52', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1641, 101, 2, N'1', N'2022-04-01 22:21:24', N'1', N'2022-04-01 22:21:24', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1642, 101, 1031, N'1', N'2022-04-01 22:21:37', N'1', N'2022-04-01 22:21:37', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1643, 101, 1032, N'1', N'2022-04-01 22:21:37', N'1', N'2022-04-01 22:21:37', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1644, 101, 1033, N'1', N'2022-04-01 22:21:37', N'1', N'2022-04-01 22:21:37', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1645, 101, 1034, N'1', N'2022-04-01 22:21:37', N'1', N'2022-04-01 22:21:37', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1646, 101, 1035, N'1', N'2022-04-01 22:21:37', N'1', N'2022-04-01 22:21:37', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1647, 101, 1050, N'1', N'2022-04-01 22:21:37', N'1', N'2022-04-01 22:21:37', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1648, 101, 1051, N'1', N'2022-04-01 22:21:37', N'1', N'2022-04-01 22:21:37', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1649, 101, 1052, N'1', N'2022-04-01 22:21:37', N'1', N'2022-04-01 22:21:37', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1650, 101, 1053, N'1', N'2022-04-01 22:21:37', N'1', N'2022-04-01 22:21:37', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1651, 101, 1054, N'1', N'2022-04-01 22:21:37', N'1', N'2022-04-01 22:21:37', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1652, 101, 1056, N'1', N'2022-04-01 22:21:37', N'1', N'2022-04-01 22:21:37', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1653, 101, 1057, N'1', N'2022-04-01 22:21:37', N'1', N'2022-04-01 22:21:37', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1654, 101, 1058, N'1', N'2022-04-01 22:21:37', N'1', N'2022-04-01 22:21:37', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1655, 101, 1059, N'1', N'2022-04-01 22:21:37', N'1', N'2022-04-01 22:21:37', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1656, 101, 1060, N'1', N'2022-04-01 22:21:37', N'1', N'2022-04-01 22:21:37', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1657, 101, 1066, N'1', N'2022-04-01 22:21:37', N'1', N'2022-04-01 22:21:37', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1658, 101, 1067, N'1', N'2022-04-01 22:21:37', N'1', N'2022-04-01 22:21:37', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1659, 101, 1070, N'1', N'2022-04-01 22:21:37', N'1', N'2022-04-01 22:21:37', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1664, 101, 1075, N'1', N'2022-04-01 22:21:37', N'1', N'2022-04-01 22:21:37', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1666, 101, 1077, N'1', N'2022-04-01 22:21:37', N'1', N'2022-04-01 22:21:37', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1667, 101, 1078, N'1', N'2022-04-01 22:21:37', N'1', N'2022-04-01 22:21:37', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1668, 101, 1082, N'1', N'2022-04-01 22:21:37', N'1', N'2022-04-01 22:21:37', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1669, 101, 1083, N'1', N'2022-04-01 22:21:37', N'1', N'2022-04-01 22:21:37', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1670, 101, 1084, N'1', N'2022-04-01 22:21:37', N'1', N'2022-04-01 22:21:37', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1671, 101, 1085, N'1', N'2022-04-01 22:21:37', N'1', N'2022-04-01 22:21:37', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1672, 101, 1086, N'1', N'2022-04-01 22:21:37', N'1', N'2022-04-01 22:21:37', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1673, 101, 1087, N'1', N'2022-04-01 22:21:37', N'1', N'2022-04-01 22:21:37', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1674, 101, 1088, N'1', N'2022-04-01 22:21:37', N'1', N'2022-04-01 22:21:37', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1675, 101, 1089, N'1', N'2022-04-01 22:21:37', N'1', N'2022-04-01 22:21:37', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1679, 101, 1237, N'1', N'2022-04-01 22:21:37', N'1', N'2022-04-01 22:21:37', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1680, 101, 1238, N'1', N'2022-04-01 22:21:37', N'1', N'2022-04-01 22:21:37', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1681, 101, 1239, N'1', N'2022-04-01 22:21:37', N'1', N'2022-04-01 22:21:37', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1682, 101, 1240, N'1', N'2022-04-01 22:21:37', N'1', N'2022-04-01 22:21:37', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1683, 101, 1241, N'1', N'2022-04-01 22:21:37', N'1', N'2022-04-01 22:21:37', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1684, 101, 1242, N'1', N'2022-04-01 22:21:37', N'1', N'2022-04-01 22:21:37', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1685, 101, 1243, N'1', N'2022-04-01 22:21:37', N'1', N'2022-04-01 22:21:37', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1687, 101, 106, N'1', N'2022-04-01 22:21:37', N'1', N'2022-04-01 22:21:37', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1688, 101, 110, N'1', N'2022-04-01 22:21:37', N'1', N'2022-04-01 22:21:37', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1689, 101, 111, N'1', N'2022-04-01 22:21:37', N'1', N'2022-04-01 22:21:37', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1690, 101, 112, N'1', N'2022-04-01 22:21:37', N'1', N'2022-04-01 22:21:37', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1691, 101, 113, N'1', N'2022-04-01 22:21:37', N'1', N'2022-04-01 22:21:37', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1692, 101, 114, N'1', N'2022-04-01 22:21:37', N'1', N'2022-04-01 22:21:37', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1693, 101, 115, N'1', N'2022-04-01 22:21:37', N'1', N'2022-04-01 22:21:37', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1694, 101, 116, N'1', N'2022-04-01 22:21:37', N'1', N'2022-04-01 22:21:37', N'0', 1)
 GO
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1729, 109, 100, N'1', N'2022-09-21 22:08:51', N'1', N'2022-09-21 22:08:51', N'0', 121)
 GO
@@ -8782,232 +10256,6 @@ INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, update
 GO
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2184, 2, 2018, N'1', N'2023-01-25 08:43:12', N'1', N'2023-01-25 08:43:12', N'0', 1)
 GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2188, 101, 1024, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2189, 101, 1, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2190, 101, 1025, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2191, 101, 1026, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2192, 101, 1027, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2193, 101, 1028, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2194, 101, 1029, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2195, 101, 1030, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2196, 101, 1036, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2197, 101, 1037, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2198, 101, 1038, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2199, 101, 1039, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2200, 101, 1040, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2201, 101, 1042, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2202, 101, 1043, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2203, 101, 1045, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2204, 101, 1046, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2205, 101, 1048, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2206, 101, 2083, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2207, 101, 1063, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2208, 101, 1064, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2209, 101, 1065, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2210, 101, 1093, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2211, 101, 1094, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2212, 101, 1095, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2213, 101, 1096, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2214, 101, 1097, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2215, 101, 1098, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2216, 101, 1100, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2217, 101, 1101, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2218, 101, 1102, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2219, 101, 1103, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2220, 101, 1104, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2221, 101, 1105, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2222, 101, 1106, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2223, 101, 2130, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2224, 101, 1107, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2225, 101, 2131, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2226, 101, 1108, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2227, 101, 2132, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2228, 101, 1109, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2229, 101, 2133, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2230, 101, 2134, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2232, 101, 2135, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2234, 101, 2136, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2236, 101, 2137, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2238, 101, 2138, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2240, 101, 2139, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2242, 101, 2140, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2243, 101, 2141, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2244, 101, 2142, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2245, 101, 2143, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2246, 101, 2144, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2247, 101, 2145, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2248, 101, 2146, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2249, 101, 2147, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2250, 101, 100, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2251, 101, 2148, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2252, 101, 101, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2253, 101, 2149, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2254, 101, 102, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2255, 101, 2150, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2256, 101, 103, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2257, 101, 2151, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2258, 101, 104, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2259, 101, 2152, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2260, 101, 105, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2261, 101, 107, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2262, 101, 108, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2263, 101, 109, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2264, 101, 1138, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2265, 101, 1139, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2266, 101, 1140, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2267, 101, 1141, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2268, 101, 1142, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2269, 101, 1143, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2270, 101, 1224, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2271, 101, 1225, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2272, 101, 1226, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2273, 101, 1227, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2274, 101, 1228, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2275, 101, 1229, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2282, 101, 1261, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2283, 101, 1263, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2284, 101, 1264, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2285, 101, 1265, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2286, 101, 1266, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2287, 101, 1267, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2288, 101, 1001, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2289, 101, 1002, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2290, 101, 1003, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2291, 101, 1004, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2292, 101, 1005, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2293, 101, 1006, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2294, 101, 1007, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2295, 101, 1008, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2296, 101, 1009, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2297, 101, 1010, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2298, 101, 1011, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2299, 101, 1012, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2300, 101, 500, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2301, 101, 1013, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2302, 101, 501, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2303, 101, 1014, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2304, 101, 1015, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2305, 101, 1016, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2306, 101, 1017, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2307, 101, 1018, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2308, 101, 1019, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2309, 101, 1020, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2310, 101, 1021, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2311, 101, 1022, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2312, 101, 1023, N'1', N'2023-02-09 23:49:46', N'1', N'2023-02-09 23:49:46', N'0', 1)
-GO
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2929, 109, 1224, N'1', N'2023-12-02 23:19:40', N'1', N'2023-12-02 23:19:40', N'0', 121)
 GO
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2930, 109, 1225, N'1', N'2023-12-02 23:19:40', N'1', N'2023-12-02 23:19:40', N'0', 121)
@@ -9442,8 +10690,6 @@ INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, update
 GO
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4195, 109, 2731, N'1', N'2024-03-30 17:53:17', N'1', N'2024-03-30 17:53:17', N'0', 121)
 GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4196, 109, 1196, N'1', N'2024-03-30 17:53:17', N'1', N'2024-03-30 17:53:17', N'0', 121)
-GO
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4197, 109, 2732, N'1', N'2024-03-30 17:53:17', N'1', N'2024-03-30 17:53:17', N'0', 121)
 GO
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4198, 109, 1197, N'1', N'2024-03-30 17:53:17', N'1', N'2024-03-30 17:53:17', N'0', 121)
@@ -9560,8 +10806,6 @@ INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, update
 GO
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4254, 111, 2731, N'1', N'2024-03-30 17:53:18', N'1', N'2024-03-30 17:53:18', N'0', 122)
 GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4255, 111, 1196, N'1', N'2024-03-30 17:53:18', N'1', N'2024-03-30 17:53:18', N'0', 122)
-GO
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4256, 111, 2732, N'1', N'2024-03-30 17:53:18', N'1', N'2024-03-30 17:53:18', N'0', 122)
 GO
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4257, 111, 1197, N'1', N'2024-03-30 17:53:18', N'1', N'2024-03-30 17:53:18', N'0', 122)
@@ -9612,10 +10856,6 @@ INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, update
 GO
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4280, 111, 1222, N'1', N'2024-03-30 17:53:18', N'1', N'2024-03-30 17:53:18', N'0', 122)
 GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (5777, 101, 2739, N'1', N'2024-04-30 09:38:37', N'1', N'2024-04-30 09:38:37', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (5778, 101, 2740, N'1', N'2024-04-30 09:38:37', N'1', N'2024-04-30 09:38:37', N'0', 1)
-GO
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (5779, 2, 2739, N'1', N'2024-07-07 20:39:38', N'1', N'2024-07-07 20:39:38', N'0', 1)
 GO
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (5780, 2, 2740, N'1', N'2024-07-07 20:39:38', N'1', N'2024-07-07 20:39:38', N'0', 1)
@@ -9629,12 +10869,6 @@ GO
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (5784, 2, 2387, N'1', N'2024-07-07 20:39:38', N'1', N'2024-07-07 20:39:38', N'0', 1)
 GO
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (5785, 2, 2030, N'1', N'2024-07-07 20:39:38', N'1', N'2024-07-07 20:39:38', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (5786, 101, 2758, N'1', N'2024-07-07 20:39:55', N'1', N'2024-07-07 20:39:55', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (5787, 101, 2759, N'1', N'2024-07-07 20:39:55', N'1', N'2024-07-07 20:39:55', N'0', 1)
-GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (5788, 101, 2783, N'1', N'2024-07-07 20:39:55', N'1', N'2024-07-07 20:39:55', N'0', 1)
 GO
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (5789, 109, 2739, N'1', N'2024-07-13 22:37:24', N'1', N'2024-07-13 22:37:24', N'0', 121)
 GO
@@ -9676,8 +10910,6 @@ INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, update
 GO
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6117, 155, 4045, N'1', N'2025-04-01 13:49:30', N'1', N'2025-04-01 13:49:30', N'0', 1)
 GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6118, 155, 4046, N'1', N'2025-04-01 13:49:30', N'1', N'2025-04-01 13:49:30', N'0', 1)
-GO
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6119, 155, 4001, N'1', N'2025-04-01 13:49:30', N'1', N'2025-04-01 13:49:30', N'0', 1)
 GO
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6120, 155, 4002, N'1', N'2025-04-01 13:49:30', N'1', N'2025-04-01 13:49:30', N'0', 1)
@@ -9716,7 +10948,457 @@ INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, update
 GO
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6137, 155, 4031, N'1', N'2025-04-01 13:49:30', N'1', N'2025-04-01 13:49:30', N'0', 1)
 GO
-INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6138, 101, 5010, N'1', N'2025-05-05 17:49:17', N'1', N'2025-05-05 17:49:17', N'0', 1)
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6139, 109, 1117, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6140, 109, 1126, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6141, 109, 1127, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6142, 109, 1128, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6143, 109, 1129, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6144, 109, 1130, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6145, 109, 1132, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6146, 109, 1133, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6147, 109, 1134, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6148, 109, 1135, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6149, 109, 1136, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6150, 109, 1137, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6151, 109, 2161, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6152, 109, 1150, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6153, 109, 1161, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6154, 109, 1162, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6155, 109, 1166, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6156, 109, 1173, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6157, 109, 1174, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6158, 109, 1178, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6159, 109, 2745, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6160, 109, 2746, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6161, 109, 2747, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6162, 109, 2748, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6163, 109, 2301, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6164, 109, 2302, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6165, 109, 5011, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6166, 109, 5012, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6167, 109, 2549, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6168, 109, 2550, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6169, 109, 2551, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6170, 109, 2552, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6171, 109, 2553, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6172, 109, 2554, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6173, 109, 2555, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6174, 109, 2556, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6175, 109, 2557, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6176, 109, 2558, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6177, 109, 2559, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6178, 111, 1117, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6179, 111, 1126, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6180, 111, 1127, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6181, 111, 1128, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6182, 111, 1129, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6183, 111, 1130, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6184, 111, 1132, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6185, 111, 1133, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6186, 111, 1134, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6187, 111, 1135, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6188, 111, 1136, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6189, 111, 1137, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6190, 111, 2161, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6191, 111, 1150, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6192, 111, 1161, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6193, 111, 1162, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6194, 111, 1166, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6195, 111, 1173, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6196, 111, 1174, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6197, 111, 1178, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6198, 111, 2745, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6199, 111, 2746, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6200, 111, 2747, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6201, 111, 2748, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6202, 111, 2301, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6203, 111, 2302, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6204, 111, 5011, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6205, 111, 5012, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6206, 111, 2549, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6207, 111, 2550, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6208, 111, 2551, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6209, 111, 2552, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6210, 111, 2553, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6211, 111, 2554, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6212, 111, 2555, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6213, 111, 2556, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6214, 111, 2557, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6215, 111, 2558, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6216, 111, 2559, N'1', N'2025-09-06 20:52:12', N'1', N'2025-09-06 20:52:12', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6217, 109, 2756, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6218, 109, 2757, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6219, 109, 2262, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6220, 109, 2275, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6221, 109, 2276, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6222, 109, 2277, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6223, 109, 2281, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6224, 109, 2282, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6225, 109, 2283, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6226, 109, 2284, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6227, 109, 2285, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6228, 109, 2287, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6229, 109, 2288, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6230, 109, 2293, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6231, 109, 2294, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6232, 109, 2297, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6233, 109, 2300, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6234, 109, 2317, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6235, 109, 2318, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6236, 109, 2319, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6237, 109, 2320, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6238, 109, 2321, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6239, 109, 2322, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6240, 109, 2323, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6241, 109, 2324, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6242, 109, 2325, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6243, 109, 2326, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6244, 109, 2327, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6245, 109, 2328, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6246, 109, 2329, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6247, 109, 2330, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6248, 109, 2331, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6249, 109, 2332, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6250, 109, 2333, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6251, 109, 2334, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6252, 109, 2335, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6253, 109, 2363, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6254, 109, 2364, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6255, 111, 2756, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6256, 111, 2757, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6257, 111, 2262, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6258, 111, 2275, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6259, 111, 2276, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6260, 111, 2277, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6261, 111, 2281, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6262, 111, 2282, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6263, 111, 2283, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6264, 111, 2284, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6265, 111, 2285, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6266, 111, 2287, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6267, 111, 2288, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6268, 111, 2293, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6269, 111, 2294, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6270, 111, 2297, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6271, 111, 2300, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6272, 111, 2317, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6273, 111, 2318, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6274, 111, 2319, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6275, 111, 2320, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6276, 111, 2321, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6277, 111, 2322, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6278, 111, 2323, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6279, 111, 2324, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6280, 111, 2325, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6281, 111, 2326, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6282, 111, 2327, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6283, 111, 2328, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6284, 111, 2329, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6285, 111, 2330, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6286, 111, 2331, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6287, 111, 2332, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6288, 111, 2333, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6289, 111, 2334, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6290, 111, 2335, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6291, 111, 2363, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6292, 111, 2364, N'1', N'2025-09-06 20:52:25', N'1', N'2025-09-06 20:52:25', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6293, 2, 5, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6294, 2, 1118, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6295, 2, 1119, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6296, 2, 1120, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6297, 2, 2713, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6298, 2, 2714, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6299, 2, 2715, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6300, 2, 2716, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6301, 2, 2717, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6302, 2, 2718, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6303, 2, 2720, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6304, 2, 1185, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6305, 2, 2721, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6306, 2, 1186, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6307, 2, 2722, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6308, 2, 1187, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6309, 2, 2723, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6310, 2, 1188, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6311, 2, 2724, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6312, 2, 1189, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6313, 2, 2725, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6314, 2, 1190, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6315, 2, 2726, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6316, 2, 1191, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6317, 2, 2727, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6318, 2, 1192, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6319, 2, 2728, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6320, 2, 1193, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6321, 2, 2729, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6322, 2, 1194, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6323, 2, 2730, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6324, 2, 1195, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6325, 2, 2731, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6326, 2, 2732, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6327, 2, 1197, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6328, 2, 2733, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6329, 2, 1198, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6330, 2, 2734, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6331, 2, 1199, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6332, 2, 2735, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6333, 2, 1200, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6334, 2, 1201, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6335, 2, 1202, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6336, 2, 1207, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6337, 2, 1208, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6338, 2, 1209, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6339, 2, 1210, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6340, 2, 1211, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6341, 2, 1212, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6342, 2, 1213, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6343, 2, 1215, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6344, 2, 1216, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6345, 2, 1217, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6346, 2, 1218, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6347, 2, 1219, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6348, 2, 1220, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6349, 2, 1221, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6350, 2, 1222, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6351, 2, 2913, N'1', N'2026-01-04 18:09:41', N'1', N'2026-01-04 18:09:41', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6352, 1, 5720, N'1', N'2026-02-19 04:24:53', N'1', N'2026-02-19 04:24:53', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6353, 1, 5721, N'1', N'2026-02-19 04:24:53', N'1', N'2026-02-19 04:24:53', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6354, 1, 5722, N'1', N'2026-02-19 04:24:53', N'1', N'2026-02-19 04:24:53', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6355, 1, 5723, N'1', N'2026-02-19 04:24:53', N'1', N'2026-02-19 04:24:53', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6356, 1, 5724, N'1', N'2026-02-19 04:24:53', N'1', N'2026-02-19 04:24:53', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6357, 1, 5725, N'1', N'2026-02-19 04:24:53', N'1', N'2026-02-19 04:24:53', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6358, 1, 5811, N'', N'2026-03-30 03:11:59', N'', N'2026-03-30 03:11:59', N'0', 0)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6359, 1, 5811, N'', N'2026-03-30 03:13:05', N'', N'2026-03-30 03:13:05', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6360, 2, 5811, N'', N'2026-03-30 03:13:05', N'', N'2026-03-30 03:13:05', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6361, 3, 5811, N'', N'2026-03-30 03:13:05', N'', N'2026-03-30 03:13:05', N'0', 1)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6362, 109, 5811, N'', N'2026-03-30 03:13:05', N'', N'2026-03-30 03:13:05', N'0', 121)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6363, 111, 5811, N'', N'2026-03-30 03:13:05', N'', N'2026-03-30 03:13:05', N'0', 122)
+GO
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6364, 155, 5811, N'', N'2026-03-30 03:13:05', N'', N'2026-03-30 03:13:05', N'0', 1)
 GO
 SET IDENTITY_INSERT system_role_menu OFF
 GO
@@ -9729,119 +11411,118 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS system_sms_channel
 GO
-CREATE TABLE system_sms_channel
-(
-    id           bigint                                  NOT NULL PRIMARY KEY IDENTITY,
-    signature    nvarchar(12)                            NOT NULL,
-    code         nvarchar(63)                            NOT NULL,
-    status       tinyint                                 NOT NULL,
-    remark       nvarchar(255) DEFAULT NULL              NULL,
-    api_key      nvarchar(128)                           NOT NULL,
-    api_secret   nvarchar(128) DEFAULT NULL              NULL,
-    callback_url nvarchar(255) DEFAULT NULL              NULL,
-    creator      nvarchar(64)  DEFAULT ''                NULL,
-    create_time  datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater      nvarchar(64)  DEFAULT ''                NULL,
-    update_time  datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted      bit           DEFAULT 0                 NOT NULL
+CREATE TABLE system_sms_channel (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    signature nvarchar(12)  NOT NULL,
+    code nvarchar(63)  NOT NULL,
+    status tinyint  NOT NULL,
+    remark nvarchar(255) DEFAULT NULL NULL,
+    api_key nvarchar(128)  NOT NULL,
+    api_secret nvarchar(128) DEFAULT NULL NULL,
+    callback_url nvarchar(255) DEFAULT NULL NULL,
+    creator nvarchar(64) DEFAULT '' NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT 0 NOT NULL
 )
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_channel',
-     'COLUMN', N'id'
+    'MS_Description', N'编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_channel',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'短信签名',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_channel',
-     'COLUMN', N'signature'
+    'MS_Description', N'短信签名',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_channel',
+    'COLUMN', N'signature'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'渠道编码',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_channel',
-     'COLUMN', N'code'
+    'MS_Description', N'渠道编码',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_channel',
+    'COLUMN', N'code'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'开启状态',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_channel',
-     'COLUMN', N'status'
+    'MS_Description', N'开启状态',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_channel',
+    'COLUMN', N'status'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'备注',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_channel',
-     'COLUMN', N'remark'
+    'MS_Description', N'备注',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_channel',
+    'COLUMN', N'remark'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'短信 API 的账号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_channel',
-     'COLUMN', N'api_key'
+    'MS_Description', N'短信 API 的账号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_channel',
+    'COLUMN', N'api_key'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'短信 API 的秘钥',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_channel',
-     'COLUMN', N'api_secret'
+    'MS_Description', N'短信 API 的秘钥',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_channel',
+    'COLUMN', N'api_secret'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'短信发送回调 URL',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_channel',
-     'COLUMN', N'callback_url'
+    'MS_Description', N'短信发送回调 URL',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_channel',
+    'COLUMN', N'callback_url'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_channel',
-     'COLUMN', N'creator'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_channel',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_channel',
-     'COLUMN', N'create_time'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_channel',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_channel',
-     'COLUMN', N'updater'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_channel',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_channel',
-     'COLUMN', N'update_time'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_channel',
+    'COLUMN', N'update_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_channel',
-     'COLUMN', N'deleted'
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_channel',
+    'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'短信渠道',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_channel'
+    'MS_Description', N'短信渠道',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_channel'
 GO
 
 -- ----------------------------
@@ -9856,7 +11537,7 @@ INSERT INTO system_sms_channel (id, signature, code, status, remark, api_key, ap
 GO
 INSERT INTO system_sms_channel (id, signature, code, status, remark, api_key, api_secret, callback_url, creator, create_time, updater, update_time, deleted) VALUES (4, N'测试渠道', N'DEBUG_DING_TALK', 0, N'123', N'696b5d8ead48071237e4aa5861ff08dbadb2b4ded1c688a7b7c9afc615579859', N'SEC5c4e5ff888bc8a9923ae47f59e7ccd30af1f14d93c55b4e2c9cb094e35aeed67', NULL, N'1', N'2021-04-13 00:23:14', N'1', N'2022-03-27 20:29:49', N'0')
 GO
-INSERT INTO system_sms_channel (id, signature, code, status, remark, api_key, api_secret, callback_url, creator, create_time, updater, update_time, deleted) VALUES (7, N'mock腾讯云', N'TENCENT', 0, N'', N'1 2', N'2 3', N'', N'1', N'2024-09-30 08:53:45', N'1', N'2024-09-30 08:55:01', N'0')
+INSERT INTO system_sms_channel (id, signature, code, status, remark, api_key, api_secret, callback_url, creator, create_time, updater, update_time, deleted) VALUES (7, N'mock腾讯云', N'TENCENT', 0, N'123', N'1 2', N'2 3', N'', N'1', N'2024-09-30 08:53:45', N'1', N'2025-12-20 11:30:18', N'0')
 GO
 SET IDENTITY_INSERT system_sms_channel OFF
 GO
@@ -9869,23 +11550,22 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS system_sms_code
 GO
-CREATE TABLE system_sms_code
-(
-    id          bigint                                  NOT NULL PRIMARY KEY IDENTITY,
-    mobile      nvarchar(11)                            NOT NULL,
-    code        nvarchar(6)                             NOT NULL,
-    create_ip   nvarchar(15)                            NOT NULL,
-    scene       tinyint                                 NOT NULL,
-    today_index tinyint                                 NOT NULL,
-    used        tinyint                                 NOT NULL,
-    used_time   datetime2     DEFAULT NULL              NULL,
-    used_ip     nvarchar(255) DEFAULT NULL              NULL,
-    creator     nvarchar(64)  DEFAULT ''                NULL,
-    create_time datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater     nvarchar(64)  DEFAULT ''                NULL,
-    update_time datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted     bit           DEFAULT 0                 NOT NULL,
-    tenant_id   bigint        DEFAULT 0                 NOT NULL
+CREATE TABLE system_sms_code (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    mobile nvarchar(11)  NOT NULL,
+    code nvarchar(6)  NOT NULL,
+    create_ip nvarchar(15)  NOT NULL,
+    scene tinyint  NOT NULL,
+    today_index tinyint  NOT NULL,
+    used tinyint  NOT NULL,
+    used_time datetime2 DEFAULT NULL NULL,
+    used_ip nvarchar(255) DEFAULT NULL NULL,
+    creator nvarchar(64) DEFAULT '' NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT 0 NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 )
 GO
 
@@ -9893,114 +11573,114 @@ CREATE INDEX idx_system_sms_code_01 ON system_sms_code (mobile)
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_code',
-     'COLUMN', N'id'
+    'MS_Description', N'编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_code',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'手机号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_code',
-     'COLUMN', N'mobile'
+    'MS_Description', N'手机号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_code',
+    'COLUMN', N'mobile'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'验证码',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_code',
-     'COLUMN', N'code'
+    'MS_Description', N'验证码',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_code',
+    'COLUMN', N'code'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建 IP',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_code',
-     'COLUMN', N'create_ip'
+    'MS_Description', N'创建 IP',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_code',
+    'COLUMN', N'create_ip'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'发送场景',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_code',
-     'COLUMN', N'scene'
+    'MS_Description', N'发送场景',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_code',
+    'COLUMN', N'scene'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'今日发送的第几条',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_code',
-     'COLUMN', N'today_index'
+    'MS_Description', N'今日发送的第几条',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_code',
+    'COLUMN', N'today_index'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否使用',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_code',
-     'COLUMN', N'used'
+    'MS_Description', N'是否使用',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_code',
+    'COLUMN', N'used'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'使用时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_code',
-     'COLUMN', N'used_time'
+    'MS_Description', N'使用时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_code',
+    'COLUMN', N'used_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'使用 IP',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_code',
-     'COLUMN', N'used_ip'
+    'MS_Description', N'使用 IP',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_code',
+    'COLUMN', N'used_ip'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_code',
-     'COLUMN', N'creator'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_code',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_code',
-     'COLUMN', N'create_time'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_code',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_code',
-     'COLUMN', N'updater'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_code',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_code',
-     'COLUMN', N'update_time'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_code',
+    'COLUMN', N'update_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_code',
-     'COLUMN', N'deleted'
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_code',
+    'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'租户编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_code',
-     'COLUMN', N'tenant_id'
+    'MS_Description', N'租户编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_code',
+    'COLUMN', N'tenant_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'手机验证码',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_code'
+    'MS_Description', N'手机验证码',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_code'
 GO
 
 -- ----------------------------
@@ -10008,231 +11688,230 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS system_sms_log
 GO
-CREATE TABLE system_sms_log
-(
-    id               bigint                                  NOT NULL PRIMARY KEY IDENTITY,
-    channel_id       bigint                                  NOT NULL,
-    channel_code     nvarchar(63)                            NOT NULL,
-    template_id      bigint                                  NOT NULL,
-    template_code    nvarchar(63)                            NOT NULL,
-    template_type    tinyint                                 NOT NULL,
-    template_content nvarchar(255)                           NOT NULL,
-    template_params  nvarchar(255)                           NOT NULL,
-    api_template_id  nvarchar(63)                            NOT NULL,
-    mobile           nvarchar(11)                            NOT NULL,
-    user_id          bigint        DEFAULT NULL              NULL,
-    user_type        tinyint       DEFAULT NULL              NULL,
-    send_status      tinyint       DEFAULT 0                 NOT NULL,
-    send_time        datetime2     DEFAULT NULL              NULL,
-    api_send_code    nvarchar(63)  DEFAULT NULL              NULL,
-    api_send_msg     nvarchar(255) DEFAULT NULL              NULL,
-    api_request_id   nvarchar(255) DEFAULT NULL              NULL,
-    api_serial_no    nvarchar(255) DEFAULT NULL              NULL,
-    receive_status   tinyint       DEFAULT 0                 NOT NULL,
-    receive_time     datetime2     DEFAULT NULL              NULL,
-    api_receive_code nvarchar(63)  DEFAULT NULL              NULL,
-    api_receive_msg  nvarchar(255) DEFAULT NULL              NULL,
-    creator          nvarchar(64)  DEFAULT ''                NULL,
-    create_time      datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater          nvarchar(64)  DEFAULT ''                NULL,
-    update_time      datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted          bit           DEFAULT 0                 NOT NULL
+CREATE TABLE system_sms_log (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    channel_id bigint  NOT NULL,
+    channel_code nvarchar(63)  NOT NULL,
+    template_id bigint  NOT NULL,
+    template_code nvarchar(63)  NOT NULL,
+    template_type tinyint  NOT NULL,
+    template_content nvarchar(255)  NOT NULL,
+    template_params nvarchar(255)  NOT NULL,
+    api_template_id nvarchar(63)  NOT NULL,
+    mobile nvarchar(11)  NOT NULL,
+    user_id bigint DEFAULT NULL NULL,
+    user_type tinyint DEFAULT NULL NULL,
+    send_status tinyint DEFAULT 0 NOT NULL,
+    send_time datetime2 DEFAULT NULL NULL,
+    api_send_code nvarchar(63) DEFAULT NULL NULL,
+    api_send_msg nvarchar(255) DEFAULT NULL NULL,
+    api_request_id nvarchar(255) DEFAULT NULL NULL,
+    api_serial_no nvarchar(255) DEFAULT NULL NULL,
+    receive_status tinyint DEFAULT 0 NOT NULL,
+    receive_time datetime2 DEFAULT NULL NULL,
+    api_receive_code nvarchar(63) DEFAULT NULL NULL,
+    api_receive_msg nvarchar(255) DEFAULT NULL NULL,
+    creator nvarchar(64) DEFAULT '' NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT 0 NOT NULL
 )
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_log',
-     'COLUMN', N'id'
+    'MS_Description', N'编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_log',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'短信渠道编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_log',
-     'COLUMN', N'channel_id'
+    'MS_Description', N'短信渠道编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_log',
+    'COLUMN', N'channel_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'短信渠道编码',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_log',
-     'COLUMN', N'channel_code'
+    'MS_Description', N'短信渠道编码',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_log',
+    'COLUMN', N'channel_code'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'模板编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_log',
-     'COLUMN', N'template_id'
+    'MS_Description', N'模板编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_log',
+    'COLUMN', N'template_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'模板编码',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_log',
-     'COLUMN', N'template_code'
+    'MS_Description', N'模板编码',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_log',
+    'COLUMN', N'template_code'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'短信类型',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_log',
-     'COLUMN', N'template_type'
+    'MS_Description', N'短信类型',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_log',
+    'COLUMN', N'template_type'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'短信内容',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_log',
-     'COLUMN', N'template_content'
+    'MS_Description', N'短信内容',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_log',
+    'COLUMN', N'template_content'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'短信参数',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_log',
-     'COLUMN', N'template_params'
+    'MS_Description', N'短信参数',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_log',
+    'COLUMN', N'template_params'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'短信 API 的模板编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_log',
-     'COLUMN', N'api_template_id'
+    'MS_Description', N'短信 API 的模板编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_log',
+    'COLUMN', N'api_template_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'手机号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_log',
-     'COLUMN', N'mobile'
+    'MS_Description', N'手机号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_log',
+    'COLUMN', N'mobile'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'用户编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_log',
-     'COLUMN', N'user_id'
+    'MS_Description', N'用户编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_log',
+    'COLUMN', N'user_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'用户类型',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_log',
-     'COLUMN', N'user_type'
+    'MS_Description', N'用户类型',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_log',
+    'COLUMN', N'user_type'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'发送状态',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_log',
-     'COLUMN', N'send_status'
+    'MS_Description', N'发送状态',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_log',
+    'COLUMN', N'send_status'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'发送时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_log',
-     'COLUMN', N'send_time'
+    'MS_Description', N'发送时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_log',
+    'COLUMN', N'send_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'短信 API 发送结果的编码',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_log',
-     'COLUMN', N'api_send_code'
+    'MS_Description', N'短信 API 发送结果的编码',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_log',
+    'COLUMN', N'api_send_code'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'短信 API 发送失败的提示',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_log',
-     'COLUMN', N'api_send_msg'
+    'MS_Description', N'短信 API 发送失败的提示',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_log',
+    'COLUMN', N'api_send_msg'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'短信 API 发送返回的唯一请求 ID',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_log',
-     'COLUMN', N'api_request_id'
+    'MS_Description', N'短信 API 发送返回的唯一请求 ID',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_log',
+    'COLUMN', N'api_request_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'短信 API 发送返回的序号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_log',
-     'COLUMN', N'api_serial_no'
+    'MS_Description', N'短信 API 发送返回的序号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_log',
+    'COLUMN', N'api_serial_no'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'接收状态',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_log',
-     'COLUMN', N'receive_status'
+    'MS_Description', N'接收状态',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_log',
+    'COLUMN', N'receive_status'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'接收时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_log',
-     'COLUMN', N'receive_time'
+    'MS_Description', N'接收时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_log',
+    'COLUMN', N'receive_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'API 接收结果的编码',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_log',
-     'COLUMN', N'api_receive_code'
+    'MS_Description', N'API 接收结果的编码',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_log',
+    'COLUMN', N'api_receive_code'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'API 接收结果的说明',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_log',
-     'COLUMN', N'api_receive_msg'
+    'MS_Description', N'API 接收结果的说明',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_log',
+    'COLUMN', N'api_receive_msg'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_log',
-     'COLUMN', N'creator'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_log',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_log',
-     'COLUMN', N'create_time'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_log',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_log',
-     'COLUMN', N'updater'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_log',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_log',
-     'COLUMN', N'update_time'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_log',
+    'COLUMN', N'update_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_log',
-     'COLUMN', N'deleted'
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_log',
+    'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'短信日志',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_log'
+    'MS_Description', N'短信日志',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_log'
 GO
 
 -- ----------------------------
@@ -10240,143 +11919,142 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS system_sms_template
 GO
-CREATE TABLE system_sms_template
-(
-    id              bigint                                  NOT NULL PRIMARY KEY IDENTITY,
-    type            tinyint                                 NOT NULL,
-    status          tinyint                                 NOT NULL,
-    code            nvarchar(63)                            NOT NULL,
-    name            nvarchar(63)                            NOT NULL,
-    content         nvarchar(255)                           NOT NULL,
-    params          nvarchar(255)                           NOT NULL,
-    remark          nvarchar(255) DEFAULT NULL              NULL,
-    api_template_id nvarchar(63)                            NOT NULL,
-    channel_id      bigint                                  NOT NULL,
-    channel_code    nvarchar(63)                            NOT NULL,
-    creator         nvarchar(64)  DEFAULT ''                NULL,
-    create_time     datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater         nvarchar(64)  DEFAULT ''                NULL,
-    update_time     datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted         bit           DEFAULT 0                 NOT NULL
+CREATE TABLE system_sms_template (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    type tinyint  NOT NULL,
+    status tinyint  NOT NULL,
+    code nvarchar(63)  NOT NULL,
+    name nvarchar(63)  NOT NULL,
+    content nvarchar(255)  NOT NULL,
+    params nvarchar(255)  NOT NULL,
+    remark nvarchar(255) DEFAULT NULL NULL,
+    api_template_id nvarchar(63)  NOT NULL,
+    channel_id bigint  NOT NULL,
+    channel_code nvarchar(63)  NOT NULL,
+    creator nvarchar(64) DEFAULT '' NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT 0 NOT NULL
 )
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_template',
-     'COLUMN', N'id'
+    'MS_Description', N'编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_template',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'模板类型',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_template',
-     'COLUMN', N'type'
+    'MS_Description', N'模板类型',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_template',
+    'COLUMN', N'type'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'开启状态',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_template',
-     'COLUMN', N'status'
+    'MS_Description', N'开启状态',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_template',
+    'COLUMN', N'status'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'模板编码',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_template',
-     'COLUMN', N'code'
+    'MS_Description', N'模板编码',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_template',
+    'COLUMN', N'code'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'模板名称',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_template',
-     'COLUMN', N'name'
+    'MS_Description', N'模板名称',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_template',
+    'COLUMN', N'name'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'模板内容',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_template',
-     'COLUMN', N'content'
+    'MS_Description', N'模板内容',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_template',
+    'COLUMN', N'content'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'参数数组',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_template',
-     'COLUMN', N'params'
+    'MS_Description', N'参数数组',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_template',
+    'COLUMN', N'params'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'备注',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_template',
-     'COLUMN', N'remark'
+    'MS_Description', N'备注',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_template',
+    'COLUMN', N'remark'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'短信 API 的模板编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_template',
-     'COLUMN', N'api_template_id'
+    'MS_Description', N'短信 API 的模板编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_template',
+    'COLUMN', N'api_template_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'短信渠道编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_template',
-     'COLUMN', N'channel_id'
+    'MS_Description', N'短信渠道编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_template',
+    'COLUMN', N'channel_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'短信渠道编码',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_template',
-     'COLUMN', N'channel_code'
+    'MS_Description', N'短信渠道编码',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_template',
+    'COLUMN', N'channel_code'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_template',
-     'COLUMN', N'creator'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_template',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_template',
-     'COLUMN', N'create_time'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_template',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_template',
-     'COLUMN', N'updater'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_template',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_template',
-     'COLUMN', N'update_time'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_template',
+    'COLUMN', N'update_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_template',
-     'COLUMN', N'deleted'
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_template',
+    'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'短信模板',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_sms_template'
+    'MS_Description', N'短信模板',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_sms_template'
 GO
 
 -- ----------------------------
@@ -10428,135 +12106,134 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS system_social_client
 GO
-CREATE TABLE system_social_client
-(
-    id            bigint                                  NOT NULL PRIMARY KEY IDENTITY,
-    name          nvarchar(255)                           NOT NULL,
-    social_type   tinyint                                 NOT NULL,
-    user_type     tinyint                                 NOT NULL,
-    client_id     nvarchar(255)                           NOT NULL,
-    client_secret nvarchar(2048)                           NOT NULL,
-    public_key    nvarchar(2048) DEFAULT NULL              NULL,
-    agent_id      nvarchar(255) DEFAULT NULL              NULL,
-    status        tinyint                                 NOT NULL,
-    creator       nvarchar(64)  DEFAULT ''                NULL,
-    create_time   datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater       nvarchar(64)  DEFAULT ''                NULL,
-    update_time   datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted       bit           DEFAULT 0                 NOT NULL,
-    tenant_id     bigint        DEFAULT 0                 NOT NULL
+CREATE TABLE system_social_client (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    name nvarchar(255)  NOT NULL,
+    social_type tinyint  NOT NULL,
+    user_type tinyint  NOT NULL,
+    client_id nvarchar(255)  NOT NULL,
+    client_secret nvarchar(255)  NOT NULL,
+    agent_id nvarchar(255) DEFAULT NULL NULL,
+    public_key nvarchar(2048) DEFAULT NULL NULL,
+    status tinyint  NOT NULL,
+    creator nvarchar(64) DEFAULT '' NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT 0 NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 )
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_social_client',
-     'COLUMN', N'id'
+    'MS_Description', N'编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_social_client',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'应用名',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_social_client',
-     'COLUMN', N'name'
+    'MS_Description', N'应用名',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_social_client',
+    'COLUMN', N'name'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'社交平台的类型',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_social_client',
-     'COLUMN', N'social_type'
+    'MS_Description', N'社交平台的类型',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_social_client',
+    'COLUMN', N'social_type'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'用户类型',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_social_client',
-     'COLUMN', N'user_type'
+    'MS_Description', N'用户类型',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_social_client',
+    'COLUMN', N'user_type'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'客户端编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_social_client',
-     'COLUMN', N'client_id'
+    'MS_Description', N'客户端编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_social_client',
+    'COLUMN', N'client_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'客户端密钥',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_social_client',
-     'COLUMN', N'client_secret'
+    'MS_Description', N'客户端密钥',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_social_client',
+    'COLUMN', N'client_secret'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'publicKey公钥',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_social_client',
-     'COLUMN', N'public_key'
+    'MS_Description', N'代理编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_social_client',
+    'COLUMN', N'agent_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'代理编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_social_client',
-     'COLUMN', N'agent_id'
+    'MS_Description', N'publicKey 公钥',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_social_client',
+    'COLUMN', N'public_key'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'状态',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_social_client',
-     'COLUMN', N'status'
+    'MS_Description', N'状态',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_social_client',
+    'COLUMN', N'status'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_social_client',
-     'COLUMN', N'creator'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_social_client',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_social_client',
-     'COLUMN', N'create_time'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_social_client',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_social_client',
-     'COLUMN', N'updater'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_social_client',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_social_client',
-     'COLUMN', N'update_time'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_social_client',
+    'COLUMN', N'update_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_social_client',
-     'COLUMN', N'deleted'
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_social_client',
+    'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'租户编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_social_client',
-     'COLUMN', N'tenant_id'
+    'MS_Description', N'租户编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_social_client',
+    'COLUMN', N'tenant_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'社交客户端表',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_social_client'
+    'MS_Description', N'社交客户端表',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_social_client'
 GO
 
 -- ----------------------------
@@ -10567,15 +12244,21 @@ BEGIN TRANSACTION
 GO
 SET IDENTITY_INSERT system_social_client ON
 GO
-INSERT INTO system_social_client (id, name, social_type, user_type, client_id, client_secret, agent_id, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1, N'钉钉', 20, 2, N'dingvrnreaje3yqvzhxg', N'i8E6iZyDvZj51JIb0tYsYfVQYOks9Cq1lgryEjFRqC79P3iJcrxEwT6Qk2QvLrLI', NULL, 0, N'', N'2023-10-18 11:21:18', N'1', N'2023-12-20 21:28:26', N'1', 1)
+INSERT INTO system_social_client (id, name, social_type, user_type, client_id, client_secret, agent_id, public_key, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1, N'钉钉', 20, 2, N'dingvrnreaje3yqvzhxg', N'i8E6iZyDvZj51JIb0tYsYfVQYOks9Cq1lgryEjFRqC79P3iJcrxEwT6Qk2QvLrLI', NULL, NULL, 0, N'', N'2023-10-18 11:21:18', N'1', N'2023-12-20 21:28:26', N'1', 1)
 GO
-INSERT INTO system_social_client (id, name, social_type, user_type, client_id, client_secret, agent_id, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2, N'钉钉（王土豆）', 20, 2, N'dingtsu9hpepjkbmthhw', N'FP_bnSq_HAHKCSncmJjw5hxhnzs6vaVDSZZn3egj6rdqTQ_hu5tQVJyLMpgCakdP', NULL, 0, N'', N'2023-10-18 11:21:18', N'', N'2023-12-20 21:28:26', N'1', 121)
+INSERT INTO system_social_client (id, name, social_type, user_type, client_id, client_secret, agent_id, public_key, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2, N'钉钉（王土豆）', 20, 2, N'dingtsu9hpepjkbmthhw', N'FP_bnSq_HAHKCSncmJjw5hxhnzs6vaVDSZZn3egj6rdqTQ_hu5tQVJyLMpgCakdP', NULL, NULL, 0, N'', N'2023-10-18 11:21:18', N'', N'2023-12-20 21:28:26', N'1', 121)
 GO
-INSERT INTO system_social_client (id, name, social_type, user_type, client_id, client_secret, agent_id, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3, N'微信公众号', 31, 1, N'wx5b23ba7a5589ecbb', N'2a7b3b20c537e52e74afd395eb85f61f', NULL, 0, N'', N'2023-10-18 16:07:46', N'1', N'2023-12-20 21:28:23', N'1', 1)
+INSERT INTO system_social_client (id, name, social_type, user_type, client_id, client_secret, agent_id, public_key, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3, N'微信公众号', 31, 1, N'wx5b23ba7a5589ecbb', N'2a7b3b20c537e52e74afd395eb85f61f', NULL, NULL, 0, N'', N'2023-10-18 16:07:46', N'1', N'2023-12-20 21:28:23', N'1', 1)
 GO
-INSERT INTO system_social_client (id, name, social_type, user_type, client_id, client_secret, agent_id, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (43, N'微信小程序', 34, 1, N'wx63c280fe3248a3e7', N'6f270509224a7ae1296bbf1c8cb97aed', NULL, 0, N'', N'2023-10-19 13:37:41', N'1', N'2023-12-20 21:28:25', N'1', 1)
+INSERT INTO system_social_client (id, name, social_type, user_type, client_id, client_secret, agent_id, public_key, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (43, N'微信小程序', 34, 1, N'wx63c280fe3248a3e7', N'6f270509224a7ae1296bbf1c8cb97aed', NULL, NULL, 0, N'', N'2023-10-19 13:37:41', N'1', N'2023-12-20 21:28:25', N'1', 1)
 GO
-INSERT INTO system_social_client (id, name, social_type, user_type, client_id, client_secret, agent_id, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (44, N'1', 10, 1, N'2', N'3', NULL, 0, N'1', N'2025-04-06 20:36:28', N'1', N'2025-04-06 20:43:12', N'1', 1)
+INSERT INTO system_social_client (id, name, social_type, user_type, client_id, client_secret, agent_id, public_key, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (44, N'1', 10, 1, N'2', N'3', NULL, NULL, 0, N'1', N'2025-04-06 20:36:28', N'1', N'2025-04-06 20:43:12', N'1', 1)
+GO
+INSERT INTO system_social_client (id, name, social_type, user_type, client_id, client_secret, agent_id, public_key, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (45, N'1', 10, 1, N'2', N'3', NULL, NULL, 1, N'1', N'2025-09-06 20:26:15', N'1', N'2025-09-06 20:27:55', N'1', 1)
+GO
+INSERT INTO system_social_client (id, name, social_type, user_type, client_id, client_secret, agent_id, public_key, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (46, N'1', 10, 1, N'2', N'3', NULL, NULL, 0, N'1', N'2025-11-29 16:04:23', N'1', N'2025-11-29 16:04:26', N'1', 1)
+GO
+INSERT INTO system_social_client (id, name, social_type, user_type, client_id, client_secret, agent_id, public_key, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (47, N'123', 10, 1, N'1', N'2', N'3', NULL, 0, N'1', N'2025-12-21 10:27:02', N'1', N'2025-12-21 10:27:20', N'1', 1)
 GO
 SET IDENTITY_INSERT system_social_client OFF
 GO
@@ -10588,143 +12271,147 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS system_social_user
 GO
-CREATE TABLE system_social_user
-(
-    id             bigint                                  NOT NULL PRIMARY KEY IDENTITY,
-    type           tinyint                                 NOT NULL,
-    openid         nvarchar(32)                            NOT NULL,
-    token          nvarchar(256) DEFAULT NULL              NULL,
-    raw_token_info nvarchar(1024)                          NOT NULL,
-    nickname       nvarchar(32)                            NOT NULL,
-    avatar         nvarchar(255) DEFAULT NULL              NULL,
-    raw_user_info  nvarchar(1024)                          NOT NULL,
-    code           nvarchar(256)                           NOT NULL,
-    state          nvarchar(256) DEFAULT NULL              NULL,
-    creator        nvarchar(64)  DEFAULT ''                NULL,
-    create_time    datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater        nvarchar(64)  DEFAULT ''                NULL,
-    update_time    datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted        bit           DEFAULT 0                 NOT NULL,
-    tenant_id      bigint        DEFAULT 0                 NOT NULL
+CREATE TABLE system_social_user (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    type tinyint  NOT NULL,
+    openid nvarchar(32)  NOT NULL,
+    token nvarchar(256) DEFAULT NULL NULL,
+    raw_token_info nvarchar(1024)  NOT NULL,
+    nickname nvarchar(32)  NOT NULL,
+    avatar nvarchar(255) DEFAULT NULL NULL,
+    raw_user_info nvarchar(1024)  NOT NULL,
+    code nvarchar(256)  NOT NULL,
+    state nvarchar(256) DEFAULT NULL NULL,
+    creator nvarchar(64) DEFAULT '' NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT 0 NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 )
 GO
 
-EXEC sp_addextendedproperty
-     'MS_Description', N'主键 ( 自增策略)',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_social_user',
-     'COLUMN', N'id'
+CREATE INDEX idx_system_social_user_01 ON system_social_user (type, openid)
+GO
+CREATE INDEX idx_system_social_user_02 ON system_social_user (type, code, state)
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'社交平台的类型',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_social_user',
-     'COLUMN', N'type'
+    'MS_Description', N'主键(自增策略)',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_social_user',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'社交 openid',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_social_user',
-     'COLUMN', N'openid'
+    'MS_Description', N'社交平台的类型',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_social_user',
+    'COLUMN', N'type'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'社交 token',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_social_user',
-     'COLUMN', N'token'
+    'MS_Description', N'社交 openid',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_social_user',
+    'COLUMN', N'openid'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'原始 Token 数据，一般是 JSON 格式',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_social_user',
-     'COLUMN', N'raw_token_info'
+    'MS_Description', N'社交 token',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_social_user',
+    'COLUMN', N'token'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'用户昵称',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_social_user',
-     'COLUMN', N'nickname'
+    'MS_Description', N'原始 Token 数据，一般是 JSON 格式',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_social_user',
+    'COLUMN', N'raw_token_info'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'用户头像',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_social_user',
-     'COLUMN', N'avatar'
+    'MS_Description', N'用户昵称',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_social_user',
+    'COLUMN', N'nickname'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'原始用户数据，一般是 JSON 格式',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_social_user',
-     'COLUMN', N'raw_user_info'
+    'MS_Description', N'用户头像',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_social_user',
+    'COLUMN', N'avatar'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'最后一次的认证 code',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_social_user',
-     'COLUMN', N'code'
+    'MS_Description', N'原始用户数据，一般是 JSON 格式',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_social_user',
+    'COLUMN', N'raw_user_info'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'最后一次的认证 state',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_social_user',
-     'COLUMN', N'state'
+    'MS_Description', N'最后一次的认证 code',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_social_user',
+    'COLUMN', N'code'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_social_user',
-     'COLUMN', N'creator'
+    'MS_Description', N'最后一次的认证 state',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_social_user',
+    'COLUMN', N'state'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_social_user',
-     'COLUMN', N'create_time'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_social_user',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_social_user',
-     'COLUMN', N'updater'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_social_user',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_social_user',
-     'COLUMN', N'update_time'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_social_user',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_social_user',
-     'COLUMN', N'deleted'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_social_user',
+    'COLUMN', N'update_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'租户编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_social_user',
-     'COLUMN', N'tenant_id'
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_social_user',
+    'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'社交用户表',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_social_user'
+    'MS_Description', N'租户编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_social_user',
+    'COLUMN', N'tenant_id'
+GO
+
+EXEC sp_addextendedproperty
+    'MS_Description', N'社交用户表',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_social_user'
 GO
 
 -- ----------------------------
@@ -10732,103 +12419,105 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS system_social_user_bind
 GO
-CREATE TABLE system_social_user_bind
-(
-    id             bigint                                 NOT NULL PRIMARY KEY IDENTITY,
-    user_id        bigint                                 NOT NULL,
-    user_type      tinyint                                NOT NULL,
-    social_type    tinyint                                NOT NULL,
-    social_user_id bigint                                 NOT NULL,
-    creator        nvarchar(64) DEFAULT ''                NULL,
-    create_time    datetime2    DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater        nvarchar(64) DEFAULT ''                NULL,
-    update_time    datetime2    DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted        bit          DEFAULT 0                 NOT NULL,
-    tenant_id      bigint       DEFAULT 0                 NOT NULL
+CREATE TABLE system_social_user_bind (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    user_id bigint  NOT NULL,
+    user_type tinyint  NOT NULL,
+    social_type tinyint  NOT NULL,
+    social_user_id bigint  NOT NULL,
+    creator nvarchar(64) DEFAULT '' NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT 0 NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 )
 GO
 
-EXEC sp_addextendedproperty
-     'MS_Description', N'主键 ( 自增策略)',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_social_user_bind',
-     'COLUMN', N'id'
+CREATE INDEX idx_system_social_user_bind_01 ON system_social_user_bind (user_type, social_user_id)
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'用户编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_social_user_bind',
-     'COLUMN', N'user_id'
+    'MS_Description', N'主键(自增策略)',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_social_user_bind',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'用户类型',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_social_user_bind',
-     'COLUMN', N'user_type'
+    'MS_Description', N'用户编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_social_user_bind',
+    'COLUMN', N'user_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'社交平台的类型',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_social_user_bind',
-     'COLUMN', N'social_type'
+    'MS_Description', N'用户类型',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_social_user_bind',
+    'COLUMN', N'user_type'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'社交用户的编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_social_user_bind',
-     'COLUMN', N'social_user_id'
+    'MS_Description', N'社交平台的类型',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_social_user_bind',
+    'COLUMN', N'social_type'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_social_user_bind',
-     'COLUMN', N'creator'
+    'MS_Description', N'社交用户的编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_social_user_bind',
+    'COLUMN', N'social_user_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_social_user_bind',
-     'COLUMN', N'create_time'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_social_user_bind',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_social_user_bind',
-     'COLUMN', N'updater'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_social_user_bind',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_social_user_bind',
-     'COLUMN', N'update_time'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_social_user_bind',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_social_user_bind',
-     'COLUMN', N'deleted'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_social_user_bind',
+    'COLUMN', N'update_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'租户编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_social_user_bind',
-     'COLUMN', N'tenant_id'
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_social_user_bind',
+    'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'社交绑定表',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_social_user_bind'
+    'MS_Description', N'租户编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_social_user_bind',
+    'COLUMN', N'tenant_id'
+GO
+
+EXEC sp_addextendedproperty
+    'MS_Description', N'社交绑定表',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_social_user_bind'
 GO
 
 -- ----------------------------
@@ -10836,135 +12525,134 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS system_tenant
 GO
-CREATE TABLE system_tenant
-(
-    id              bigint                                  NOT NULL PRIMARY KEY IDENTITY,
-    name            nvarchar(30)                            NOT NULL,
-    contact_user_id bigint        DEFAULT NULL              NULL,
-    contact_name    nvarchar(30)                            NOT NULL,
-    contact_mobile  nvarchar(500) DEFAULT NULL              NULL,
-    status          tinyint       DEFAULT 0                 NOT NULL,
-    websites        nvarchar(256) DEFAULT ''                NULL,
-    package_id      bigint                                  NOT NULL,
-    expire_time     datetime2                               NOT NULL,
-    account_count   int                                     NOT NULL,
-    creator         nvarchar(64)  DEFAULT ''                NOT NULL,
-    create_time     datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater         nvarchar(64)  DEFAULT ''                NULL,
-    update_time     datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted         bit           DEFAULT 0                 NOT NULL
+CREATE TABLE system_tenant (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    name nvarchar(30)  NOT NULL,
+    contact_user_id bigint DEFAULT NULL NULL,
+    contact_name nvarchar(30)  NOT NULL,
+    contact_mobile nvarchar(500) DEFAULT NULL NULL,
+    status tinyint DEFAULT 0 NOT NULL,
+    websites nvarchar(1024) DEFAULT '' NULL,
+    package_id bigint  NOT NULL,
+    expire_time datetime2  NOT NULL,
+    account_count int  NOT NULL,
+    creator nvarchar(64) DEFAULT '' NOT NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT 0 NOT NULL
 )
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'租户编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_tenant',
-     'COLUMN', N'id'
+    'MS_Description', N'租户编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_tenant',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'租户名',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_tenant',
-     'COLUMN', N'name'
+    'MS_Description', N'租户名',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_tenant',
+    'COLUMN', N'name'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'联系人的用户编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_tenant',
-     'COLUMN', N'contact_user_id'
+    'MS_Description', N'联系人的用户编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_tenant',
+    'COLUMN', N'contact_user_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'联系人',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_tenant',
-     'COLUMN', N'contact_name'
+    'MS_Description', N'联系人',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_tenant',
+    'COLUMN', N'contact_name'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'联系手机',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_tenant',
-     'COLUMN', N'contact_mobile'
+    'MS_Description', N'联系手机',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_tenant',
+    'COLUMN', N'contact_mobile'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'租户状态（0正常 1停用）',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_tenant',
-     'COLUMN', N'status'
+    'MS_Description', N'租户状态',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_tenant',
+    'COLUMN', N'status'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'绑定域名',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_tenant',
-     'COLUMN', N'website'
+    'MS_Description', N'绑定域名数组',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_tenant',
+    'COLUMN', N'websites'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'租户套餐编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_tenant',
-     'COLUMN', N'package_id'
+    'MS_Description', N'租户套餐编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_tenant',
+    'COLUMN', N'package_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'过期时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_tenant',
-     'COLUMN', N'expire_time'
+    'MS_Description', N'过期时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_tenant',
+    'COLUMN', N'expire_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'账号数量',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_tenant',
-     'COLUMN', N'account_count'
+    'MS_Description', N'账号数量',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_tenant',
+    'COLUMN', N'account_count'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_tenant',
-     'COLUMN', N'creator'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_tenant',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_tenant',
-     'COLUMN', N'create_time'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_tenant',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_tenant',
-     'COLUMN', N'updater'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_tenant',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_tenant',
-     'COLUMN', N'update_time'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_tenant',
+    'COLUMN', N'update_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_tenant',
-     'COLUMN', N'deleted'
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_tenant',
+    'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'租户表',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_tenant'
+    'MS_Description', N'租户表',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_tenant'
 GO
 
 -- ----------------------------
@@ -10975,11 +12663,11 @@ BEGIN TRANSACTION
 GO
 SET IDENTITY_INSERT system_tenant ON
 GO
-INSERT INTO system_tenant (id, name, contact_user_id, contact_name, contact_mobile, status, websites, package_id, expire_time, account_count, creator, create_time, updater, update_time, deleted) VALUES (1, N'芋道源码', NULL, N'芋艿', N'17321315478', 0, N'www.iocoder.cn', 0, N'2099-02-19 17:14:16', 9999, N'1', N'2021-01-05 17:03:47', N'1', N'2023-11-06 11:41:41', N'0')
+INSERT INTO system_tenant (id, name, contact_user_id, contact_name, contact_mobile, status, websites, package_id, expire_time, account_count, creator, create_time, updater, update_time, deleted) VALUES (1, N'芋道源码', NULL, N'芋艿', N'17321315478', 0, N'www.iocoder.cn,127.0.0.1:3000,wxc4598c446f8a9cb3', 0, N'2099-02-19 17:14:16', 9999, N'1', N'2021-01-05 17:03:47', N'1', N'2025-08-19 05:18:41', N'0')
 GO
-INSERT INTO system_tenant (id, name, contact_user_id, contact_name, contact_mobile, status, websites, package_id, expire_time, account_count, creator, create_time, updater, update_time, deleted) VALUES (121, N'小租户', 110, N'小王2', N'15601691300', 0, N'zsxq.iocoder.cn', 111, N'2026-07-10 00:00:00', 30, N'1', N'2022-02-22 00:56:14', N'1', N'2025-04-03 21:33:01', N'0')
+INSERT INTO system_tenant (id, name, contact_user_id, contact_name, contact_mobile, status, websites, package_id, expire_time, account_count, creator, create_time, updater, update_time, deleted) VALUES (121, N'小租户', 110, N'小王2', N'15601691300', 0, N'zsxq.iocoder.cn,123321', 111, N'2026-07-10 00:00:00', 30, N'1', N'2022-02-22 00:56:14', N'1', N'2025-08-19 21:19:29', N'0')
 GO
-INSERT INTO system_tenant (id, name, contact_user_id, contact_name, contact_mobile, status, websites, package_id, expire_time, account_count, creator, create_time, updater, update_time, deleted) VALUES (122, N'测试租户', 113, N'芋道', N'15601691300', 0, N'test.iocoder.cn', 111, N'2022-04-29 00:00:00', 50, N'1', N'2022-03-07 21:37:58', N'1', N'2024-09-22 12:10:50', N'0')
+INSERT INTO system_tenant (id, name, contact_user_id, contact_name, contact_mobile, status, websites, package_id, expire_time, account_count, creator, create_time, updater, update_time, deleted) VALUES (122, N'测试租户', 113, N'芋道', N'15601691300', 0, N'test.iocoder.cn,222,333', 111, N'2023-04-29 00:00:00', 50, N'1', N'2022-03-07 21:37:58', N'1', N'2025-12-21 09:50:00', N'0')
 GO
 SET IDENTITY_INSERT system_tenant OFF
 GO
@@ -10992,95 +12680,94 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS system_tenant_package
 GO
-CREATE TABLE system_tenant_package
-(
-    id          bigint                                  NOT NULL PRIMARY KEY IDENTITY,
-    name        nvarchar(30)                            NOT NULL,
-    status      tinyint       DEFAULT 0                 NOT NULL,
-    remark      nvarchar(256) DEFAULT ''                NULL,
-    menu_ids    nvarchar(4000)                          NOT NULL,
-    creator     nvarchar(64)  DEFAULT ''                NOT NULL,
-    create_time datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater     nvarchar(64)  DEFAULT ''                NULL,
-    update_time datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted     bit           DEFAULT 0                 NOT NULL
+CREATE TABLE system_tenant_package (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    name nvarchar(30)  NOT NULL,
+    status tinyint DEFAULT 0 NOT NULL,
+    remark nvarchar(256) DEFAULT '' NULL,
+    menu_ids nvarchar(4000)  NOT NULL,
+    creator nvarchar(64) DEFAULT '' NOT NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT 0 NOT NULL
 )
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'套餐编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_tenant_package',
-     'COLUMN', N'id'
+    'MS_Description', N'套餐编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_tenant_package',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'套餐名',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_tenant_package',
-     'COLUMN', N'name'
+    'MS_Description', N'套餐名',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_tenant_package',
+    'COLUMN', N'name'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'租户状态（0正常 1停用）',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_tenant_package',
-     'COLUMN', N'status'
+    'MS_Description', N'租户状态（0正常 1停用）',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_tenant_package',
+    'COLUMN', N'status'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'备注',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_tenant_package',
-     'COLUMN', N'remark'
+    'MS_Description', N'备注',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_tenant_package',
+    'COLUMN', N'remark'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'关联的菜单编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_tenant_package',
-     'COLUMN', N'menu_ids'
+    'MS_Description', N'关联的菜单编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_tenant_package',
+    'COLUMN', N'menu_ids'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_tenant_package',
-     'COLUMN', N'creator'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_tenant_package',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_tenant_package',
-     'COLUMN', N'create_time'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_tenant_package',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_tenant_package',
-     'COLUMN', N'updater'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_tenant_package',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_tenant_package',
-     'COLUMN', N'update_time'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_tenant_package',
+    'COLUMN', N'update_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_tenant_package',
-     'COLUMN', N'deleted'
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_tenant_package',
+    'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'租户套餐表',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_tenant_package'
+    'MS_Description', N'租户套餐表',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_tenant_package'
 GO
 
 -- ----------------------------
@@ -11091,9 +12778,7 @@ BEGIN TRANSACTION
 GO
 SET IDENTITY_INSERT system_tenant_package ON
 GO
-INSERT INTO system_tenant_package (id, name, status, remark, menu_ids, creator, create_time, updater, update_time, deleted) VALUES (111, N'普通套餐', 0, N'小功能', N'[1,2,5,1031,1032,1033,1034,1035,1036,1037,1038,1039,1050,1051,1052,1053,1054,1056,1057,1058,1059,1060,1063,1064,1065,1066,1067,1070,1075,1077,1078,1082,1083,1084,1085,1086,1087,1088,1089,1090,1091,1092,1118,1119,1120,100,101,102,103,106,107,110,111,112,113,1138,114,1139,115,1140,116,1141,1142,1143,2713,2714,2715,2716,2717,2718,2720,1185,2721,1186,2722,1187,2723,1188,2724,1189,2725,1190,2726,1191,2727,2472,1192,2728,1193,2729,1194,2730,1195,2731,1196,2732,1197,2733,2478,1198,2734,2479,1199,2735,2480,1200,2481,1201,2482,1202,2483,2739,2484,2740,2485,2486,2487,1207,2488,1208,2489,1209,2490,1210,2491,1211,2492,1212,2493,1213,2494,2495,1215,1216,2497,1217,1218,1219,1220,1221,1222,1224,1225,1226,1227,1228,1229,1237,1238,1239,1240,1241,1242,1243,2525,1255,1256,1001,1257,1002,1258,1003,1259,1004,1260,1005,1006,1007,1008,1009,1010,1011,1012,1013,1014,1015,1016,1017,1018,1019,1020]', N'1', N'2022-02-22 00:54:00', N'1', N'2024-07-13 22:37:24', N'0')
-GO
-INSERT INTO system_tenant_package (id, name, status, remark, menu_ids, creator, create_time, updater, update_time, deleted) VALUES (112, N'再来一个套餐', 0, N'1234', N'[1024,1,1025,1026,2,1027,1028,1029,1030,1031,1032,1033,1034,1035,1036,1037,1038,1039,1040,1042,1043,1045,1046,1048,1050,1051,1052,1053,1054,1056,1057,1058,2083,1059,1060,1063,1064,1065,1066,1067,1070,1075,1077,1078,1082,1083,1084,1085,1086,1087,1088,1089,1090,1091,1092,1093,1094,1095,1096,1097,1098,1100,1101,1102,1103,1104,1105,1106,2130,1107,2131,1108,2132,1109,2133,2134,2135,2136,2137,2138,2139,2140,2141,2142,2143,2144,2145,2146,2147,100,2148,101,2149,102,2150,103,2151,104,2152,105,106,107,108,109,110,111,112,113,1138,114,1139,115,1140,116,1141,1142,1143,2739,2740,1224,1225,1226,1227,1228,1229,1237,1238,1239,1240,1241,1242,1243,1255,1256,1257,1258,1259,1260,1261,1263,1264,1265,1266,1267,2447,2448,2449,2450,2451,2452,2453,2472,2478,2479,2480,2481,2482,2483,2484,2485,2486,2487,2488,2489,2490,2491,2492,2493,2494,2495,2497,2525,1001,1002,1003,1004,1005,1006,1007,1008,1009,1010,1011,1012,500,1013,501,1014,1015,1016,1017,1018,1019,1020,1021,1022,1023]', N'1', N'2025-04-04 08:15:02', N'1', N'2025-04-04 08:15:21', N'0')
+INSERT INTO system_tenant_package (id, name, status, remark, menu_ids, creator, create_time, updater, update_time, deleted) VALUES (111, N'普通套餐', 0, N'小功能', N'[1,2,5,1031,1032,1033,1034,1035,1036,1037,1038,1039,1050,1051,1052,1053,1054,1056,1057,1058,1059,1060,1063,1064,1065,1066,1067,1070,1075,1077,1078,1082,1083,1084,1085,1086,1087,1088,1089,1090,1091,1092,1117,1118,1119,1120,100,101,102,1126,103,1127,1128,1129,106,1130,107,1132,1133,110,1134,111,1135,112,1136,113,1137,2161,114,1138,1139,115,1140,116,1141,1142,1143,1150,1161,1162,1166,1173,1174,2713,2714,1178,2715,2716,2717,2718,2720,2721,1185,2722,1186,1187,2723,1188,2724,1189,2725,1190,2726,1191,2727,1192,2728,2729,1193,1194,2730,1195,2731,2732,1197,2733,1198,2734,1199,2735,1200,1201,1202,2739,2740,1207,1208,1209,2745,1210,2746,1211,2747,1212,2748,1213,1215,1216,1217,1218,1219,1220,2756,1221,2757,1222,1224,1225,1226,1227,1228,1229,1237,1238,2262,1239,1240,1241,1242,1243,2275,2276,2277,1255,1256,1257,2281,1258,2282,1259,2283,1260,2284,2285,2287,2288,2293,2294,2297,2300,2301,2302,2317,2318,2319,2320,2321,2322,2323,2324,2325,2326,2327,2328,2329,2330,2331,2332,2333,2334,2335,2363,2364,5011,5012,2472,2478,2479,2480,2481,2482,2483,2484,2485,2486,2487,2488,2489,2490,2491,2492,2493,2494,2495,2497,2525,1001,1002,1003,1004,1005,1006,1007,1008,1009,1010,1011,1012,1013,2549,1014,2550,1015,2551,1016,2552,1017,2553,1018,2554,1019,2555,1020,2556,2557,2558,2559]', N'1', N'2022-02-22 00:54:00', N'1', N'2025-09-06 20:52:25', N'0')
 GO
 SET IDENTITY_INSERT system_tenant_package OFF
 GO
@@ -11106,87 +12791,86 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS system_user_post
 GO
-CREATE TABLE system_user_post
-(
-    id          bigint                                 NOT NULL PRIMARY KEY IDENTITY,
-    user_id     bigint       DEFAULT 0                 NOT NULL,
-    post_id     bigint       DEFAULT 0                 NOT NULL,
-    creator     nvarchar(64) DEFAULT ''                NULL,
-    create_time datetime2    DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater     nvarchar(64) DEFAULT ''                NULL,
-    update_time datetime2    DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted     bit          DEFAULT 0                 NOT NULL,
-    tenant_id   bigint       DEFAULT 0                 NOT NULL
+CREATE TABLE system_user_post (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    user_id bigint DEFAULT 0 NOT NULL,
+    post_id bigint DEFAULT 0 NOT NULL,
+    creator nvarchar(64) DEFAULT '' NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT 0 NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 )
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'id',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_user_post',
-     'COLUMN', N'id'
+    'MS_Description', N'id',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_user_post',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'用户ID',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_user_post',
-     'COLUMN', N'user_id'
+    'MS_Description', N'用户ID',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_user_post',
+    'COLUMN', N'user_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'岗位ID',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_user_post',
-     'COLUMN', N'post_id'
+    'MS_Description', N'岗位ID',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_user_post',
+    'COLUMN', N'post_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_user_post',
-     'COLUMN', N'creator'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_user_post',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_user_post',
-     'COLUMN', N'create_time'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_user_post',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_user_post',
-     'COLUMN', N'updater'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_user_post',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_user_post',
-     'COLUMN', N'update_time'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_user_post',
+    'COLUMN', N'update_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_user_post',
-     'COLUMN', N'deleted'
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_user_post',
+    'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'租户编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_user_post',
-     'COLUMN', N'tenant_id'
+    'MS_Description', N'租户编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_user_post',
+    'COLUMN', N'tenant_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'用户岗位表',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_user_post'
+    'MS_Description', N'用户岗位表',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_user_post'
 GO
 
 -- ----------------------------
@@ -11215,6 +12899,10 @@ INSERT INTO system_user_post (id, user_id, post_id, creator, create_time, update
 GO
 INSERT INTO system_user_post (id, user_id, post_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (125, 1, 2, N'1', N'2024-07-13 22:31:39', N'1', N'2024-07-13 22:31:39', N'0', 1)
 GO
+INSERT INTO system_user_post (id, user_id, post_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (128, 139, 2, N'1', N'2025-12-05 21:43:27', N'1', N'2025-12-05 21:43:27', N'0', 1)
+GO
+INSERT INTO system_user_post (id, user_id, post_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (129, 139, 4, N'1', N'2025-12-05 21:43:27', N'1', N'2025-12-05 21:43:27', N'0', 1)
+GO
 SET IDENTITY_INSERT system_user_post OFF
 GO
 COMMIT
@@ -11226,87 +12914,89 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS system_user_role
 GO
-CREATE TABLE system_user_role
-(
-    id          bigint                                 NOT NULL PRIMARY KEY IDENTITY,
-    user_id     bigint                                 NOT NULL,
-    role_id     bigint                                 NOT NULL,
-    creator     nvarchar(64) DEFAULT ''                NULL,
-    create_time datetime2    DEFAULT CURRENT_TIMESTAMP NULL,
-    updater     nvarchar(64) DEFAULT ''                NULL,
-    update_time datetime2    DEFAULT CURRENT_TIMESTAMP NULL,
-    deleted     bit          DEFAULT 0                 NOT NULL,
-    tenant_id   bigint       DEFAULT 0                 NOT NULL
+CREATE TABLE system_user_role (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    user_id bigint  NOT NULL,
+    role_id bigint  NOT NULL,
+    creator nvarchar(64) DEFAULT '' NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NULL,
+    deleted bit DEFAULT 0 NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 )
 GO
 
-EXEC sp_addextendedproperty
-     'MS_Description', N'自增编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_user_role',
-     'COLUMN', N'id'
+CREATE INDEX idx_system_user_role_01 ON system_user_role (user_id)
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'用户ID',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_user_role',
-     'COLUMN', N'user_id'
+    'MS_Description', N'自增编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_user_role',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'角色ID',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_user_role',
-     'COLUMN', N'role_id'
+    'MS_Description', N'用户ID',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_user_role',
+    'COLUMN', N'user_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_user_role',
-     'COLUMN', N'creator'
+    'MS_Description', N'角色ID',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_user_role',
+    'COLUMN', N'role_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_user_role',
-     'COLUMN', N'create_time'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_user_role',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_user_role',
-     'COLUMN', N'updater'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_user_role',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_user_role',
-     'COLUMN', N'update_time'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_user_role',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_user_role',
-     'COLUMN', N'deleted'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_user_role',
+    'COLUMN', N'update_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'租户编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_user_role',
-     'COLUMN', N'tenant_id'
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_user_role',
+    'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'用户和角色关联表',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_user_role'
+    'MS_Description', N'租户编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_user_role',
+    'COLUMN', N'tenant_id'
+GO
+
+EXEC sp_addextendedproperty
+    'MS_Description', N'用户和角色关联表',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_user_role'
 GO
 
 -- ----------------------------
@@ -11320,8 +13010,6 @@ GO
 INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1, 1, 1, N'', N'2022-01-11 13:19:45', N'', N'2022-05-12 12:35:17', N'0', 1)
 GO
 INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2, 2, 2, N'', N'2022-01-11 13:19:45', N'', N'2022-05-12 12:35:13', N'0', 1)
-GO
-INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4, 100, 101, N'', N'2022-01-11 13:19:45', N'', N'2022-05-12 12:35:13', N'0', 1)
 GO
 INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (5, 100, 1, N'', N'2022-01-11 13:19:45', N'', N'2022-05-12 12:35:12', N'0', 1)
 GO
@@ -11343,13 +13031,23 @@ INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, update
 GO
 INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (36, 118, 1, N'1', N'2024-03-17 09:12:08', N'1', N'2024-03-17 09:12:08', N'0', 1)
 GO
-INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (38, 114, 101, N'1', N'2024-03-24 22:23:03', N'1', N'2024-03-24 22:23:03', N'0', 1)
-GO
 INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (46, 117, 1, N'1', N'2024-10-02 10:16:11', N'1', N'2024-10-02 10:16:11', N'0', 1)
 GO
 INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (47, 104, 2, N'1', N'2025-01-04 10:40:33', N'1', N'2025-01-04 10:40:33', N'0', 1)
 GO
 INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (48, 100, 155, N'1', N'2025-04-04 10:41:14', N'1', N'2025-04-04 10:41:14', N'0', 1)
+GO
+INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (49, 142, 1, N'1', N'2025-07-23 09:11:42', N'1', N'2025-07-23 09:11:42', N'0', 1)
+GO
+INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (50, 142, 2, N'1', N'2025-10-07 20:50:37', N'1', N'2025-10-07 20:50:37', N'0', 1)
+GO
+INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (51, 139, 1, N'1', N'2025-12-05 22:36:57', N'1', N'2025-12-05 22:36:57', N'0', 1)
+GO
+INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (52, 139, 2, N'1', N'2025-12-05 22:37:00', N'1', N'2025-12-05 22:37:00', N'0', 1)
+GO
+INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (53, 114, 2, N'1', N'2026-01-04 18:15:40', N'1', N'2026-01-04 18:15:40', N'0', 1)
+GO
+INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (54, 114, 3, N'1', N'2026-01-04 18:16:19', N'1', N'2026-01-04 18:16:19', N'0', 1)
 GO
 SET IDENTITY_INSERT system_user_role OFF
 GO
@@ -11362,175 +13060,183 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS system_users
 GO
-CREATE TABLE system_users
-(
-    id          bigint                                  NOT NULL PRIMARY KEY IDENTITY,
-    username    nvarchar(30)                            NOT NULL,
-    password    nvarchar(100) DEFAULT ''                NOT NULL,
-    nickname    nvarchar(30)                            NOT NULL,
-    remark      nvarchar(500) DEFAULT NULL              NULL,
-    dept_id     bigint        DEFAULT NULL              NULL,
-    post_ids    nvarchar(255) DEFAULT NULL              NULL,
-    email       nvarchar(50)  DEFAULT ''                NULL,
-    mobile      nvarchar(11)  DEFAULT ''                NULL,
-    sex         tinyint       DEFAULT 0                 NULL,
-    avatar      nvarchar(512) DEFAULT ''                NULL,
-    status      tinyint       DEFAULT 0                 NOT NULL,
-    login_ip    nvarchar(50)  DEFAULT ''                NULL,
-    login_date  datetime2     DEFAULT NULL              NULL,
-    creator     nvarchar(64)  DEFAULT ''                NULL,
-    create_time datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater     nvarchar(64)  DEFAULT ''                NULL,
-    update_time datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted     bit           DEFAULT 0                 NOT NULL,
-    tenant_id   bigint        DEFAULT 0                 NOT NULL
+CREATE TABLE system_users (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    username nvarchar(30)  NOT NULL,
+    password nvarchar(100) DEFAULT '' NOT NULL,
+    nickname nvarchar(30)  NOT NULL,
+    remark nvarchar(500) DEFAULT NULL NULL,
+    dept_id bigint DEFAULT NULL NULL,
+    post_ids nvarchar(255) DEFAULT NULL NULL,
+    email nvarchar(50) DEFAULT '' NULL,
+    mobile nvarchar(11) DEFAULT '' NULL,
+    sex tinyint DEFAULT 0 NULL,
+    avatar nvarchar(512) DEFAULT '' NULL,
+    status tinyint DEFAULT 0 NOT NULL,
+    login_ip nvarchar(50) DEFAULT '' NULL,
+    login_date datetime2 DEFAULT NULL NULL,
+    creator nvarchar(64) DEFAULT '' NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT 0 NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 )
 GO
 
-EXEC sp_addextendedproperty
-     'MS_Description', N'用户ID',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_users',
-     'COLUMN', N'id'
+CREATE INDEX idx_system_users_01 ON system_users (username)
+GO
+CREATE INDEX idx_system_users_02 ON system_users (mobile)
+GO
+CREATE INDEX idx_system_users_03 ON system_users (email)
+GO
+CREATE INDEX idx_system_users_04 ON system_users (dept_id)
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'用户账号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_users',
-     'COLUMN', N'username'
+    'MS_Description', N'用户ID',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_users',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'密码',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_users',
-     'COLUMN', N'password'
+    'MS_Description', N'用户账号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_users',
+    'COLUMN', N'username'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'用户昵称',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_users',
-     'COLUMN', N'nickname'
+    'MS_Description', N'密码',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_users',
+    'COLUMN', N'password'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'备注',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_users',
-     'COLUMN', N'remark'
+    'MS_Description', N'用户昵称',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_users',
+    'COLUMN', N'nickname'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'部门ID',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_users',
-     'COLUMN', N'dept_id'
+    'MS_Description', N'备注',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_users',
+    'COLUMN', N'remark'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'岗位编号数组',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_users',
-     'COLUMN', N'post_ids'
+    'MS_Description', N'部门ID',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_users',
+    'COLUMN', N'dept_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'用户邮箱',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_users',
-     'COLUMN', N'email'
+    'MS_Description', N'岗位编号数组',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_users',
+    'COLUMN', N'post_ids'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'手机号码',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_users',
-     'COLUMN', N'mobile'
+    'MS_Description', N'用户邮箱',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_users',
+    'COLUMN', N'email'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'用户性别',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_users',
-     'COLUMN', N'sex'
+    'MS_Description', N'手机号码',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_users',
+    'COLUMN', N'mobile'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'头像地址',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_users',
-     'COLUMN', N'avatar'
+    'MS_Description', N'用户性别',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_users',
+    'COLUMN', N'sex'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'帐号状态（0正常 1停用）',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_users',
-     'COLUMN', N'status'
+    'MS_Description', N'头像地址',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_users',
+    'COLUMN', N'avatar'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'最后登录IP',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_users',
-     'COLUMN', N'login_ip'
+    'MS_Description', N'帐号状态（0正常 1停用）',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_users',
+    'COLUMN', N'status'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'最后登录时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_users',
-     'COLUMN', N'login_date'
+    'MS_Description', N'最后登录IP',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_users',
+    'COLUMN', N'login_ip'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_users',
-     'COLUMN', N'creator'
+    'MS_Description', N'最后登录时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_users',
+    'COLUMN', N'login_date'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_users',
-     'COLUMN', N'create_time'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_users',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_users',
-     'COLUMN', N'updater'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_users',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_users',
-     'COLUMN', N'update_time'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_users',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_users',
-     'COLUMN', N'deleted'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_users',
+    'COLUMN', N'update_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'租户编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_users',
-     'COLUMN', N'tenant_id'
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_users',
+    'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'用户信息表',
-     'SCHEMA', N'dbo',
-     'TABLE', N'system_users'
+    'MS_Description', N'租户编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_users',
+    'COLUMN', N'tenant_id'
+GO
+
+EXEC sp_addextendedproperty
+    'MS_Description', N'用户信息表',
+    'SCHEMA', N'dbo',
+    'TABLE', N'system_users'
 GO
 
 -- ----------------------------
@@ -11541,13 +13247,13 @@ BEGIN TRANSACTION
 GO
 SET IDENTITY_INSERT system_users ON
 GO
-INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1, N'admin', N'$2a$04$KljJDa/LK7QfDm0lF5OhuePhlPfjRH3tB2Wu351Uidz.oQGJXevPi', N'芋道源码', N'管理员', 103, N'[1,2]', N'11aoteman@126.com', N'18818260277', 2, N'http://test.yudao.iocoder.cn/test/20250502/avatar_1746154660449.png', 0, N'0:0:0:0:0:0:0:1', N'2025-05-10 18:03:15', N'admin', N'2021-01-05 17:03:47', NULL, N'2025-05-10 18:03:15', N'0', 1)
+INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1, N'admin', N'$2a$04$.vd8nPeLwxt6hnSzmAoAyul8BOLX7Cib6QhcxRe30rfvrIPQHH1OG', N'芋道源码', N'管理员', 103, N'[1,2]', N'13aoteman@126.com', N'18818260272', 1, N'http://test.yudao.iocoder.cn/user/avatar/20251220/blob_1766215463801.jpg', 0, N'0:0:0:0:0:0:0:1', N'2026-04-17 08:47:40', N'admin', N'2021-01-05 17:03:47', NULL, N'2026-04-17 08:47:40', N'0', 1)
 GO
-INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (100, N'yudao', N'$2a$04$h.aaPKgO.odHepnk5PCsWeEwKdojFWdTItxGKfx1r0e1CSeBzsTJ6', N'芋道', N'不要吓我', 104, N'[1]', N'yudao@iocoder.cn', N'15601691300', 1, NULL, 0, N'0:0:0:0:0:0:0:1', N'2025-04-08 09:36:40', N'', N'2021-01-07 09:07:17', NULL, N'2025-04-21 14:23:08', N'0', 1)
+INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (100, N'yudao', N'$2a$04$h.aaPKgO.odHepnk5PCsWeEwKdojFWdTItxGKfx1r0e1CSeBzsTJ6', N'芋道', N'不要吓我', 104, N'[1]', N'yudao@iocoder.cn', N'15601691300', 1, NULL, 0, N'0:0:0:0:0:0:0:1', N'2025-12-15 21:47:26', N'', N'2021-01-07 09:07:17', NULL, N'2025-12-15 21:47:26', N'0', 1)
 GO
-INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (103, N'yuanma', N'$2a$04$fUBSmjKCPYAUmnMzOb6qE.eZCGPhHi1JmAKclODbfS/O7fHOl2bH6', N'源码', NULL, 106, NULL, N'yuanma@iocoder.cn', N'15601701300', 0, NULL, 0, N'0:0:0:0:0:0:0:1', N'2024-08-11 17:48:12', N'', N'2021-01-13 23:50:35', NULL, N'2025-04-21 14:23:08', N'0', 1)
+INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (103, N'yuanma', N'$2a$04$fUBSmjKCPYAUmnMzOb6qE.eZCGPhHi1JmAKclODbfS/O7fHOl2bH6', N'源码', NULL, 106, NULL, N'yuanma@iocoder.cn', N'15601701300', 0, NULL, 0, N'0:0:0:0:0:0:0:1', N'2024-08-11 17:48:12', N'', N'2021-01-13 23:50:35', N'1', N'2025-07-09 23:41:58', N'0', 1)
 GO
-INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (104, N'test', N'$2a$04$BrwaYn303hjA/6TnXqdGoOLhyHOAA0bVrAFu6.1dJKycqKUnIoRz2', N'测试号', NULL, 107, N'[1,2]', N'111@qq.com', N'15601691200', 1, NULL, 0, N'0:0:0:0:0:0:0:1', N'2025-03-28 20:01:16', N'', N'2021-01-21 02:13:53', NULL, N'2025-04-21 14:23:08', N'0', 1)
+INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (104, N'test', N'$2a$04$BrwaYn303hjA/6TnXqdGoOLhyHOAA0bVrAFu6.1dJKycqKUnIoRz2', N'测试号', NULL, 107, N'[1,2]', N'111@qq.com', N'15601691200', 1, NULL, 0, N'0:0:0:0:0:0:0:1', N'2026-01-04 18:09:54', N'', N'2021-01-21 02:13:53', NULL, N'2026-01-04 18:09:54', N'0', 1)
 GO
 INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (107, N'admin107', N'$2a$10$dYOOBKMO93v/.ReCqzyFg.o67Tqk.bbc2bhrpyBGkIw9aypCtr2pm', N'芋艿', NULL, NULL, NULL, N'', N'15601691300', 0, NULL, 0, N'', NULL, N'1', N'2022-02-20 22:59:33', N'1', N'2025-04-21 14:23:08', N'0', 118)
 GO
@@ -11563,19 +13269,23 @@ INSERT INTO system_users (id, username, password, nickname, remark, dept_id, pos
 GO
 INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (113, N'aoteman', N'$2a$10$0acJOIk2D25/oC87nyclE..0lzeu9DtQ/n3geP4fkun/zIVRhHJIO', N'芋道1', NULL, NULL, NULL, N'', N'15601691300', 0, NULL, 0, N'127.0.0.1', N'2022-03-19 18:38:51', N'1', N'2022-03-07 21:37:58', N'1', N'2025-05-05 15:30:53', N'0', 122)
 GO
-INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (114, N'hrmgr', N'$2a$10$TR4eybBioGRhBmDBWkqWLO6NIh3mzYa8KBKDDB5woiGYFVlRAi.fu', N'hr 小姐姐', NULL, NULL, N'[5]', N'', N'15601691236', 1, NULL, 0, N'0:0:0:0:0:0:0:1', N'2024-03-24 22:21:05', N'1', N'2022-03-19 21:50:58', NULL, N'2025-04-21 14:23:08', N'0', 1)
+INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (114, N'hrmgr', N'$2a$10$TR4eybBioGRhBmDBWkqWLO6NIh3mzYa8KBKDDB5woiGYFVlRAi.fu', N'hr 小姐姐', NULL, NULL, N'[5]', N'', N'15601691236', 1, NULL, 0, N'0:0:0:0:0:0:0:1', N'2026-01-04 18:16:01', N'1', N'2022-03-19 21:50:58', NULL, N'2026-01-04 18:16:01', N'0', 1)
 GO
 INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (115, N'aotemane', N'$2a$04$GcyP0Vyzb2F2Yni5PuIK9ueGxM0tkZGMtDwVRwrNbtMvorzbpNsV2', N'阿呆', N'11222', 102, N'[1,2]', N'7648@qq.com', N'15601691229', 2, NULL, 0, N'', NULL, N'1', N'2022-04-30 02:55:43', N'1', N'2025-04-21 14:23:08', N'0', 1)
 GO
-INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (117, N'admin123', N'$2a$04$sEtimsHu9YCkYY4/oqElHem2Ijc9ld20eYO6lN.g/21NfLUTDLB9W', N'测试号02', N'1111', 100, N'[2]', N'', N'15601691234', 1, NULL, 0, N'0:0:0:0:0:0:0:1', N'2024-10-02 10:16:20', N'1', N'2022-07-09 17:40:26', NULL, N'2025-04-21 14:23:08', N'0', 1)
+INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (117, N'admin123', N'$2a$04$sEtimsHu9YCkYY4/oqElHem2Ijc9ld20eYO6lN.g/21NfLUTDLB9W', N'测试号02', N'1111', 100, N'[2]', N'', N'15601691234', 1, NULL, 0, N'0:0:0:0:0:0:0:1', N'2024-10-02 10:16:20', N'1', N'2022-07-09 17:40:26', N'1', N'2025-05-14 09:56:04', N'0', 1)
 GO
-INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (118, N'goudan', N'$2a$04$jth0yOj8cSJq84D6vrzusOHDwW/LpBfgBnQ6bfFlD8zNZfM632Ta2', N'狗蛋', NULL, 103, N'[1]', N'', N'15601691239', 1, NULL, 0, N'0:0:0:0:0:0:0:1', N'2024-03-17 09:10:27', N'1', N'2022-07-09 17:44:43', N'1', N'2025-04-21 14:23:08', N'0', 1)
+INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (118, N'goudan', N'$2a$04$3suGZjnA6rM5bErf38u1felbgqbsPHGdRG3l9NkxPCEt2ah9Y6aJi', N'狗蛋', NULL, 103, N'[1]', N'', N'15601691239', 1, NULL, 0, N'0:0:0:0:0:0:0:1', N'2025-11-23 15:28:25', N'1', N'2022-07-09 17:44:43', NULL, N'2025-11-23 15:28:25', N'0', 1)
 GO
-INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (131, N'hh', N'$2a$04$jyH9h6.gaw8mpOjPfHIpx.8as2Rzfcmdlj5rlJFwgCw4rsv/MTb2K', N'呵呵', NULL, 100, N'[]', N'777@qq.com', N'15601882312', 1, NULL, 0, N'', NULL, N'1', N'2024-04-27 08:45:56', N'1', N'2025-04-21 14:23:08', N'0', 1)
+INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (139, N'wwbwwb', N'$2a$04$FJLIyg8lbPytP29pbZaiU.LesJvCsYfEaHqQfB0pGQhK3e9BeZmLy', N'小秃头', N'123', 108, N'[2,4]', N'', N'', 1, NULL, 0, N'0:0:0:0:0:0:0:1', N'2024-09-10 21:03:58', NULL, N'2024-09-10 21:03:58', N'1', N'2025-12-15 22:38:15', N'0', 1)
 GO
-INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (139, N'wwbwwb', N'$2a$04$aOHoFbQU6zfBk/1Z9raF/ugTdhjNdx7culC1HhO0zvoczAnahCiMq', N'小秃头', NULL, NULL, NULL, N'', N'', 0, NULL, 0, N'0:0:0:0:0:0:0:1', N'2024-09-10 21:03:58', NULL, N'2024-09-10 21:03:58', NULL, N'2025-04-21 14:23:08', N'0', 1)
+INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (141, N'admin1', N'$2a$04$oj6F6d7HrZ70kYVD3TNzEu.m3TPUzajOVuC66zdKna8KRerK1FmVa', N'新用户', NULL, NULL, NULL, N'', N'', 0, N'', 0, N'0:0:0:0:0:0:0:1', N'2025-04-08 13:09:07', N'1', N'2025-04-08 13:09:07', N'1', N'2025-05-14 19:11:48', N'0', 1)
 GO
-INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (141, N'admin1', N'$2a$04$oj6F6d7HrZ70kYVD3TNzEu.m3TPUzajOVuC66zdKna8KRerK1FmVa', N'新用户', NULL, NULL, NULL, N'', N'', 0, N'', 0, N'0:0:0:0:0:0:0:1', N'2025-04-08 13:09:07', N'1', N'2025-04-08 13:09:07', N'1', N'2025-04-08 13:09:07', N'0', 1)
+INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (142, N'test01', N'$2a$04$4bCYWZkjxxOC4QE0LY2M9uEEKWeJbLfs489NFtQoyidL5I0FndRaO', N'test01', N'', NULL, N'[]', N'', N'19021719925', 1, N'', 0, N'0:0:0:0:0:0:0:1', N'2025-07-29 19:47:17', N'1', N'2025-07-09 21:07:10', NULL, N'2025-12-02 13:23:11', N'0', 1)
+GO
+INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (143, N'a00001', N'$2a$04$GhVHFviOw/SsTmiQtifHJesDYFlHMeGK7OWh7aGCCjGGVCmbHVAwa', N'a00001', NULL, 104, NULL, N'', N'', 0, N'', 0, N'0:0:0:0:0:0:0:1', N'2025-12-01 16:10:13', NULL, N'2025-12-01 16:10:13', N'1', N'2025-12-05 21:34:05', N'0', 1)
+GO
+INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (144, N'aoteman001', N'$2a$04$omQOmhz8OyUFBKw77nr8KOtMp6xdvoQ1gWStjk9r8.OYT3Bv6oEYe', N'aoteman001', NULL, 116, NULL, N'', N'', 0, N'', 1, N'0:0:0:0:0:0:0:1', N'2025-12-01 17:05:27', N'1', N'2025-12-01 17:05:27', N'1', N'2025-12-15 15:55:54', N'0', 1)
 GO
 SET IDENTITY_INSERT system_users OFF
 GO
@@ -11588,111 +13298,110 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS yudao_demo01_contact
 GO
-CREATE TABLE yudao_demo01_contact
-(
-    id          bigint                                  NOT NULL PRIMARY KEY IDENTITY,
-    name        nvarchar(100) DEFAULT ''                NOT NULL,
-    sex         tinyint                                 NOT NULL,
-    birthday    datetime2                               NOT NULL,
-    description nvarchar(255)                           NOT NULL,
-    avatar      nvarchar(512) DEFAULT NULL              NULL,
-    creator     nvarchar(64)  DEFAULT ''                NULL,
-    create_time datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater     nvarchar(64)  DEFAULT ''                NULL,
-    update_time datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted     bit           DEFAULT 0                 NOT NULL,
-    tenant_id   bigint        DEFAULT 0                 NOT NULL
+CREATE TABLE yudao_demo01_contact (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    name nvarchar(100) DEFAULT '' NOT NULL,
+    sex tinyint  NOT NULL,
+    birthday datetime2  NOT NULL,
+    description nvarchar(255)  NOT NULL,
+    avatar nvarchar(512) DEFAULT NULL NULL,
+    creator nvarchar(64) DEFAULT '' NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT 0 NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 )
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo01_contact',
-     'COLUMN', N'id'
+    'MS_Description', N'编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo01_contact',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'名字',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo01_contact',
-     'COLUMN', N'name'
+    'MS_Description', N'名字',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo01_contact',
+    'COLUMN', N'name'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'性别',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo01_contact',
-     'COLUMN', N'sex'
+    'MS_Description', N'性别',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo01_contact',
+    'COLUMN', N'sex'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'出生年',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo01_contact',
-     'COLUMN', N'birthday'
+    'MS_Description', N'出生年',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo01_contact',
+    'COLUMN', N'birthday'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'简介',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo01_contact',
-     'COLUMN', N'description'
+    'MS_Description', N'简介',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo01_contact',
+    'COLUMN', N'description'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'头像',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo01_contact',
-     'COLUMN', N'avatar'
+    'MS_Description', N'头像',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo01_contact',
+    'COLUMN', N'avatar'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo01_contact',
-     'COLUMN', N'creator'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo01_contact',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo01_contact',
-     'COLUMN', N'create_time'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo01_contact',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo01_contact',
-     'COLUMN', N'updater'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo01_contact',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo01_contact',
-     'COLUMN', N'update_time'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo01_contact',
+    'COLUMN', N'update_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo01_contact',
-     'COLUMN', N'deleted'
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo01_contact',
+    'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'租户编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo01_contact',
-     'COLUMN', N'tenant_id'
+    'MS_Description', N'租户编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo01_contact',
+    'COLUMN', N'tenant_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'示例联系人表',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo01_contact'
+    'MS_Description', N'示例联系人表',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo01_contact'
 GO
 
 -- ----------------------------
@@ -11716,87 +13425,86 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS yudao_demo02_category
 GO
-CREATE TABLE yudao_demo02_category
-(
-    id          bigint                                  NOT NULL PRIMARY KEY IDENTITY,
-    name        nvarchar(100) DEFAULT ''                NOT NULL,
-    parent_id   bigint                                  NOT NULL,
-    creator     nvarchar(64)  DEFAULT ''                NULL,
-    create_time datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater     nvarchar(64)  DEFAULT ''                NULL,
-    update_time datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted     bit           DEFAULT 0                 NOT NULL,
-    tenant_id   bigint        DEFAULT 0                 NOT NULL
+CREATE TABLE yudao_demo02_category (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    name nvarchar(100) DEFAULT '' NOT NULL,
+    parent_id bigint  NOT NULL,
+    creator nvarchar(64) DEFAULT '' NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT 0 NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 )
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo02_category',
-     'COLUMN', N'id'
+    'MS_Description', N'编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo02_category',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'名字',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo02_category',
-     'COLUMN', N'name'
+    'MS_Description', N'名字',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo02_category',
+    'COLUMN', N'name'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'父级编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo02_category',
-     'COLUMN', N'parent_id'
+    'MS_Description', N'父级编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo02_category',
+    'COLUMN', N'parent_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo02_category',
-     'COLUMN', N'creator'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo02_category',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo02_category',
-     'COLUMN', N'create_time'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo02_category',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo02_category',
-     'COLUMN', N'updater'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo02_category',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo02_category',
-     'COLUMN', N'update_time'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo02_category',
+    'COLUMN', N'update_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo02_category',
-     'COLUMN', N'deleted'
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo02_category',
+    'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'租户编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo02_category',
-     'COLUMN', N'tenant_id'
+    'MS_Description', N'租户编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo02_category',
+    'COLUMN', N'tenant_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'示例分类表',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo02_category'
+    'MS_Description', N'示例分类表',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo02_category'
 GO
 
 -- ----------------------------
@@ -11819,6 +13527,8 @@ INSERT INTO yudao_demo02_category (id, name, parent_id, creator, create_time, up
 GO
 INSERT INTO yudao_demo02_category (id, name, parent_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6, N'11', 3, N'1', N'2023-11-24 19:29:34', N'1', N'2023-11-24 19:29:34', N'0', 1)
 GO
+INSERT INTO yudao_demo02_category (id, name, parent_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (7, N'1', 0, N'1', N'2025-10-01 09:19:20', N'1', N'2025-10-01 09:19:20', N'0', 1)
+GO
 SET IDENTITY_INSERT yudao_demo02_category OFF
 GO
 COMMIT
@@ -11830,95 +13540,94 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS yudao_demo03_course
 GO
-CREATE TABLE yudao_demo03_course
-(
-    id          bigint                                  NOT NULL PRIMARY KEY IDENTITY,
-    student_id  bigint                                  NOT NULL,
-    name        nvarchar(100) DEFAULT ''                NOT NULL,
-    score       tinyint                                 NOT NULL,
-    creator     nvarchar(64)  DEFAULT ''                NULL,
-    create_time datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater     nvarchar(64)  DEFAULT ''                NULL,
-    update_time datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted     bit           DEFAULT 0                 NOT NULL,
-    tenant_id   bigint        DEFAULT 0                 NOT NULL
+CREATE TABLE yudao_demo03_course (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    student_id bigint  NOT NULL,
+    name nvarchar(100) DEFAULT '' NOT NULL,
+    score tinyint  NOT NULL,
+    creator nvarchar(64) DEFAULT '' NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT 0 NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 )
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo03_course',
-     'COLUMN', N'id'
+    'MS_Description', N'编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo03_course',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'学生编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo03_course',
-     'COLUMN', N'student_id'
+    'MS_Description', N'学生编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo03_course',
+    'COLUMN', N'student_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'名字',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo03_course',
-     'COLUMN', N'name'
+    'MS_Description', N'名字',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo03_course',
+    'COLUMN', N'name'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'分数',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo03_course',
-     'COLUMN', N'score'
+    'MS_Description', N'分数',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo03_course',
+    'COLUMN', N'score'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo03_course',
-     'COLUMN', N'creator'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo03_course',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo03_course',
-     'COLUMN', N'create_time'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo03_course',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo03_course',
-     'COLUMN', N'updater'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo03_course',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo03_course',
-     'COLUMN', N'update_time'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo03_course',
+    'COLUMN', N'update_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo03_course',
-     'COLUMN', N'deleted'
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo03_course',
+    'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'租户编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo03_course',
-     'COLUMN', N'tenant_id'
+    'MS_Description', N'租户编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo03_course',
+    'COLUMN', N'tenant_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'学生课程表',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo03_course'
+    'MS_Description', N'学生课程表',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo03_course'
 GO
 
 -- ----------------------------
@@ -11974,95 +13683,94 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS yudao_demo03_grade
 GO
-CREATE TABLE yudao_demo03_grade
-(
-    id          bigint                                  NOT NULL PRIMARY KEY IDENTITY,
-    student_id  bigint                                  NOT NULL,
-    name        nvarchar(100) DEFAULT ''                NOT NULL,
-    teacher     nvarchar(255)                           NOT NULL,
-    creator     nvarchar(64)  DEFAULT ''                NULL,
-    create_time datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater     nvarchar(64)  DEFAULT ''                NULL,
-    update_time datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted     bit           DEFAULT 0                 NOT NULL,
-    tenant_id   bigint        DEFAULT 0                 NOT NULL
+CREATE TABLE yudao_demo03_grade (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    student_id bigint  NOT NULL,
+    name nvarchar(100) DEFAULT '' NOT NULL,
+    teacher nvarchar(255)  NOT NULL,
+    creator nvarchar(64) DEFAULT '' NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT 0 NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 )
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo03_grade',
-     'COLUMN', N'id'
+    'MS_Description', N'编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo03_grade',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'学生编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo03_grade',
-     'COLUMN', N'student_id'
+    'MS_Description', N'学生编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo03_grade',
+    'COLUMN', N'student_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'名字',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo03_grade',
-     'COLUMN', N'name'
+    'MS_Description', N'名字',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo03_grade',
+    'COLUMN', N'name'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'班主任',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo03_grade',
-     'COLUMN', N'teacher'
+    'MS_Description', N'班主任',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo03_grade',
+    'COLUMN', N'teacher'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo03_grade',
-     'COLUMN', N'creator'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo03_grade',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo03_grade',
-     'COLUMN', N'create_time'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo03_grade',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo03_grade',
-     'COLUMN', N'updater'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo03_grade',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo03_grade',
-     'COLUMN', N'update_time'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo03_grade',
+    'COLUMN', N'update_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo03_grade',
-     'COLUMN', N'deleted'
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo03_grade',
+    'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'租户编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo03_grade',
-     'COLUMN', N'tenant_id'
+    'MS_Description', N'租户编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo03_grade',
+    'COLUMN', N'tenant_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'学生班级表',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo03_grade'
+    'MS_Description', N'学生班级表',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo03_grade'
 GO
 
 -- ----------------------------
@@ -12090,103 +13798,102 @@ GO
 -- ----------------------------
 DROP TABLE IF EXISTS yudao_demo03_student
 GO
-CREATE TABLE yudao_demo03_student
-(
-    id          bigint                                  NOT NULL PRIMARY KEY IDENTITY,
-    name        nvarchar(100) DEFAULT ''                NOT NULL,
-    sex         tinyint                                 NOT NULL,
-    birthday    datetime2                               NOT NULL,
-    description nvarchar(255)                           NOT NULL,
-    creator     nvarchar(64)  DEFAULT ''                NULL,
-    create_time datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater     nvarchar(64)  DEFAULT ''                NULL,
-    update_time datetime2     DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted     bit           DEFAULT 0                 NOT NULL,
-    tenant_id   bigint        DEFAULT 0                 NOT NULL
+CREATE TABLE yudao_demo03_student (
+    id bigint NOT NULL PRIMARY KEY IDENTITY,
+    name nvarchar(100) DEFAULT '' NOT NULL,
+    sex tinyint  NOT NULL,
+    birthday datetime2  NOT NULL,
+    description nvarchar(255)  NOT NULL,
+    creator nvarchar(64) DEFAULT '' NULL,
+    create_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater nvarchar(64) DEFAULT '' NULL,
+    update_time datetime2 DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted bit DEFAULT 0 NOT NULL,
+    tenant_id bigint DEFAULT 0 NOT NULL
 )
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo03_student',
-     'COLUMN', N'id'
+    'MS_Description', N'编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo03_student',
+    'COLUMN', N'id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'名字',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo03_student',
-     'COLUMN', N'name'
+    'MS_Description', N'名字',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo03_student',
+    'COLUMN', N'name'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'性别',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo03_student',
-     'COLUMN', N'sex'
+    'MS_Description', N'性别',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo03_student',
+    'COLUMN', N'sex'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'出生日期',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo03_student',
-     'COLUMN', N'birthday'
+    'MS_Description', N'出生日期',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo03_student',
+    'COLUMN', N'birthday'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'简介',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo03_student',
-     'COLUMN', N'description'
+    'MS_Description', N'简介',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo03_student',
+    'COLUMN', N'description'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo03_student',
-     'COLUMN', N'creator'
+    'MS_Description', N'创建者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo03_student',
+    'COLUMN', N'creator'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'创建时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo03_student',
-     'COLUMN', N'create_time'
+    'MS_Description', N'创建时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo03_student',
+    'COLUMN', N'create_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新者',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo03_student',
-     'COLUMN', N'updater'
+    'MS_Description', N'更新者',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo03_student',
+    'COLUMN', N'updater'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'更新时间',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo03_student',
-     'COLUMN', N'update_time'
+    'MS_Description', N'更新时间',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo03_student',
+    'COLUMN', N'update_time'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'是否删除',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo03_student',
-     'COLUMN', N'deleted'
+    'MS_Description', N'是否删除',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo03_student',
+    'COLUMN', N'deleted'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'租户编号',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo03_student',
-     'COLUMN', N'tenant_id'
+    'MS_Description', N'租户编号',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo03_student',
+    'COLUMN', N'tenant_id'
 GO
 
 EXEC sp_addextendedproperty
-     'MS_Description', N'学生表',
-     'SCHEMA', N'dbo',
-     'TABLE', N'yudao_demo03_student'
+    'MS_Description', N'学生表',
+    'SCHEMA', N'dbo',
+    'TABLE', N'yudao_demo03_student'
 GO
 
 -- ----------------------------
@@ -12208,4 +13915,3 @@ GO
 COMMIT
 GO
 -- @formatter:on
-

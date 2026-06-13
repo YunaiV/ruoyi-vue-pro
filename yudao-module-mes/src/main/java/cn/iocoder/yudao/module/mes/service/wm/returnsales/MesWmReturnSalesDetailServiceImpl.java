@@ -1,14 +1,17 @@
 package cn.iocoder.yudao.module.mes.service.wm.returnsales;
 
 import cn.hutool.core.util.ObjUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.mes.controller.admin.wm.returnsales.vo.detail.MesWmReturnSalesDetailSaveReqVO;
 import cn.iocoder.yudao.module.mes.dal.dataobject.wm.returnsales.MesWmReturnSalesDO;
+import cn.iocoder.yudao.module.mes.dal.dataobject.wm.batch.MesWmBatchDO;
 import cn.iocoder.yudao.module.mes.dal.dataobject.wm.returnsales.MesWmReturnSalesDetailDO;
 import cn.iocoder.yudao.module.mes.dal.dataobject.wm.returnsales.MesWmReturnSalesLineDO;
 import cn.iocoder.yudao.module.mes.dal.mysql.wm.returnsales.MesWmReturnSalesDetailMapper;
 import cn.iocoder.yudao.module.mes.enums.wm.MesWmReturnSalesStatusEnum;
+import cn.iocoder.yudao.module.mes.service.wm.batch.MesWmBatchService;
 import cn.iocoder.yudao.module.mes.service.wm.materialstock.MesWmMaterialStockService;
 import cn.iocoder.yudao.module.mes.service.wm.warehouse.MesWmWarehouseAreaService;
 import jakarta.annotation.Resource;
@@ -40,16 +43,17 @@ public class MesWmReturnSalesDetailServiceImpl implements MesWmReturnSalesDetail
     @Resource
     @Lazy
     private MesWmReturnSalesService returnSalesService;
-
     @Resource
     private MesWmWarehouseAreaService warehouseAreaService;
-
+    @Resource
+    private MesWmBatchService batchService;
     @Resource
     @Lazy
     private MesWmMaterialStockService materialStockService;
 
     @Override
     public Long createReturnSalesDetail(MesWmReturnSalesDetailSaveReqVO createReqVO) {
+        // 校验保存数据
         validateReturnSalesDetailSaveData(createReqVO);
 
         // 插入
@@ -62,6 +66,7 @@ public class MesWmReturnSalesDetailServiceImpl implements MesWmReturnSalesDetail
     public void updateReturnSalesDetail(MesWmReturnSalesDetailSaveReqVO updateReqVO) {
         // 校验存在
         validateReturnSalesDetailExists(updateReqVO.getId());
+        // 校验保存数据
         validateReturnSalesDetailSaveData(updateReqVO);
 
         // 更新
@@ -138,6 +143,9 @@ public class MesWmReturnSalesDetailServiceImpl implements MesWmReturnSalesDetail
         materialStockService.checkAreaMixingRule(reqVO.getAreaId(), reqVO.getItemId(), reqVO.getBatchId());
         // 校验明细总数量不超过行数量（排除自身）
         validateDetailQuantityNotExceed(reqVO.getLineId(), reqVO.getQuantity(), reqVO.getId(), line);
+
+        // 根据 batchCode 解析 batchId（必须在混放规则校验之前，因为它依赖 batchId）
+        fillBatchId(reqVO);
     }
 
     /**
@@ -159,6 +167,19 @@ public class MesWmReturnSalesDetailServiceImpl implements MesWmReturnSalesDetail
         // 校验：已有 + 本次 <= 行数量
         if (existingTotal.add(newQuantity).compareTo(line.getQuantity()) > 0) {
             throw exception(WM_RETURN_SALES_DETAIL_QUANTITY_EXCEED);
+        }
+    }
+
+    /**
+     * 根据 batchCode 解析并回填 batchId
+     */
+    private void fillBatchId(MesWmReturnSalesDetailSaveReqVO reqVO) {
+        if (StrUtil.isBlank(reqVO.getBatchCode())) {
+            return;
+        }
+        MesWmBatchDO batch = batchService.getBatchByCode(reqVO.getBatchCode());
+        if (batch != null) {
+            reqVO.setBatchId(batch.getId());
         }
     }
 

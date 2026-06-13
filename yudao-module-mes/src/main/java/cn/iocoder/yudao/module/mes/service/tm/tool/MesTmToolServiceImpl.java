@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.mes.service.tm.tool;
 
-import java.util.Collections;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -11,18 +10,19 @@ import cn.iocoder.yudao.module.mes.dal.mysql.tm.tool.MesTmToolMapper;
 import cn.iocoder.yudao.module.mes.enums.tm.MesTmMaintenTypeEnum;
 import cn.iocoder.yudao.module.mes.enums.wm.BarcodeBizTypeEnum;
 import cn.iocoder.yudao.module.mes.service.wm.barcode.MesWmBarcodeService;
+import cn.iocoder.yudao.module.mes.service.wm.batch.MesWmBatchService;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.mes.enums.ErrorCodeConstants.TM_TOOL_CODE_DUPLICATE;
-import static cn.iocoder.yudao.module.mes.enums.ErrorCodeConstants.TM_TOOL_NOT_EXISTS;
+import static cn.iocoder.yudao.module.mes.enums.ErrorCodeConstants.*;
 
 /**
  * MES 工具台账 Service 实现类
@@ -39,9 +39,11 @@ public class MesTmToolServiceImpl implements MesTmToolService {
     @Resource
     @Lazy // 延迟加载，避免循环依赖
     private MesTmToolTypeService toolTypeService;
-
     @Resource
     private MesWmBarcodeService barcodeService;
+    @Resource
+    @Lazy
+    private MesWmBatchService batchService;
 
     @Override
     public Long createTool(MesTmToolSaveReqVO createReqVO) {
@@ -87,6 +89,11 @@ public class MesTmToolServiceImpl implements MesTmToolService {
     public void deleteTool(Long id) {
         // 校验存在
         validateToolExists(id);
+        // 校验是否被批次引用
+        if (batchService.getBatchCountByToolId(id) > 0) {
+            throw exception(TM_TOOL_HAS_BATCH);
+        }
+
         // 删除
         toolMapper.deleteById(id);
     }
@@ -118,6 +125,11 @@ public class MesTmToolServiceImpl implements MesTmToolService {
     @Override
     public PageResult<MesTmToolDO> getToolPage(MesTmToolPageReqVO pageReqVO) {
         return toolMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public Long getToolCountByToolTypeId(Long toolTypeId) {
+        return toolMapper.selectCountByToolTypeId(toolTypeId);
     }
 
     @Override

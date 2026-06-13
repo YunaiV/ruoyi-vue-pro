@@ -41,6 +41,7 @@ import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
@@ -295,7 +296,7 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
                 .filter(msg -> isMessageVisible(msg, memberMap.get(msg.getGroupId()), userId))
                 .sorted(Comparator.comparing(ImGroupMessageDO::getId))
                 .limit(size)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     /**

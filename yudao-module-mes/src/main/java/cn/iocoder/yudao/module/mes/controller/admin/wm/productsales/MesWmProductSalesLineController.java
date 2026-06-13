@@ -40,10 +40,8 @@ public class MesWmProductSalesLineController {
 
     @Resource
     private MesWmProductSalesLineService productSalesLineService;
-
     @Resource
     private MesMdItemService itemService;
-
     @Resource
     private MesMdUnitMeasureService unitMeasureService;
 

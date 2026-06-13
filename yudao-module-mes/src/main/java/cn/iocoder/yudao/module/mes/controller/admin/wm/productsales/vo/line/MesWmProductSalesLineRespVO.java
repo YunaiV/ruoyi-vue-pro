@@ -16,6 +16,9 @@ public class MesWmProductSalesLineRespVO {
     @Schema(description = "出库单ID", example = "1")
     private Long salesId;
 
+    @Schema(description = "发货通知单行ID", example = "1")
+    private Long noticeLineId;
+
     @Schema(description = "物料ID", example = "1")
     private Long itemId;
 

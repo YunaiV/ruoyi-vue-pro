@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.mes.service.wm.productproduce;
 
 import cn.hutool.core.collection.ListUtil;
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.mes.dal.dataobject.wm.productproduce.MesWmProductProduceDO;
 import cn.iocoder.yudao.module.mes.dal.dataobject.wm.productproduce.MesWmProductProduceDetailDO;
@@ -27,8 +28,8 @@ import java.math.BigDecimal;
 
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static cn.iocoder.yudao.module.mes.enums.ErrorCodeConstants.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /**
@@ -66,6 +67,7 @@ public class MesWmProductProduceServiceImplTest extends BaseDbUnitTest {
     public void testSplitPendingAndFinishProduce_withUnqualified() {
         // 准备数据：插入一个 PREPARE 状态的产出单
         Long feedbackId = randomLongId();
+        Long sourceLineId = 100L;
         Long itemId = randomLongId();
         Long batchId = randomLongId();
         String batchCode = "BATCH-001";
@@ -85,19 +87,17 @@ public class MesWmProductProduceServiceImplTest extends BaseDbUnitTest {
         when(locationService.getWarehouseLocationByCode(MesWmWarehouseLocationDO.WIP_VIRTUAL_LOCATION)).thenReturn(loc);
         when(areaService.getWarehouseAreaByCode(MesWmWarehouseAreaDO.WIP_VIRTUAL_AREA)).thenReturn(area);
 
-        // mock: 返回一条 PENDING 的产出行
+        // mock: 通过 sourceLineId 直接定位 PENDING 产出行
         MesWmProductProduceLineDO pendingLine = MesWmProductProduceLineDO.builder()
-                .id(100L).produceId(produce.getId()).feedbackId(feedbackId)
+                .id(sourceLineId).produceId(produce.getId()).feedbackId(feedbackId)
                 .itemId(itemId).quantity(BigDecimal.valueOf(100))
                 .batchId(batchId).batchCode(batchCode)
                 .qualityStatus(MesWmQualityStatusEnum.PENDING.getStatus())
                 .build();
-        when(productProduceLineService.getProductProduceLineListByProduceId(produce.getId()))
-                .thenReturn(ListUtil.of(pendingLine));
+        when(productProduceLineService.validateProductProduceLineExists(sourceLineId))
+                .thenReturn(pendingLine);
 
-        // mock: finishProductProduce 内部会再查一次行和明细（用于创建库存事务）
-        // 由于 finishProductProduce 在拆分行后调用，此时行已经变了，但由于 line/detail 是 mock 的，
-        // 我们需要 mock 已拆分后的行给 finishProductProduce
+        // mock: finishProductProduce 内部查行和明细（用于创建库存事务）
         MesWmProductProduceLineDO qualifiedLine = MesWmProductProduceLineDO.builder()
                 .id(100L).produceId(produce.getId()).itemId(itemId)
                 .quantity(BigDecimal.valueOf(80))
@@ -108,10 +108,8 @@ public class MesWmProductProduceServiceImplTest extends BaseDbUnitTest {
                 .quantity(BigDecimal.valueOf(20))
                 .qualityStatus(MesWmQualityStatusEnum.FAIL.getStatus())
                 .build();
-        // finishProductProduce 内部第二次调用 getProductProduceLineListByProduceId
         when(productProduceLineService.getProductProduceLineListByProduceId(produce.getId()))
-                .thenReturn(ListUtil.of(pendingLine))         // 第 1 次：splitPendingAndFinishProduce 查待检行
-                .thenReturn(ListUtil.of(qualifiedLine, unqualifiedLine)); // 第 2 次：finishProductProduce 查所有行
+                .thenReturn(ListUtil.of(qualifiedLine, unqualifiedLine));
 
         // mock: finishProductProduce 中按行查明细
         MesWmProductProduceDetailDO qualifiedDetail = MesWmProductProduceDetailDO.builder()
@@ -124,7 +122,8 @@ public class MesWmProductProduceServiceImplTest extends BaseDbUnitTest {
                 .thenReturn(ListUtil.of(unqualifiedDetail));
 
         // 调用
-        productProduceService.splitPendingAndFinishProduce(feedbackId, BigDecimal.valueOf(80), BigDecimal.valueOf(20));
+        productProduceService.splitPendingAndFinishProduce(feedbackId, sourceLineId,
+                BigDecimal.valueOf(80), BigDecimal.valueOf(20));
 
         // 断言 1：不合格品行 - 新建了一行
         ArgumentCaptor<MesWmProductProduceLineDO> lineCaptor = ArgumentCaptor.forClass(MesWmProductProduceLineDO.class);
@@ -156,6 +155,7 @@ public class MesWmProductProduceServiceImplTest extends BaseDbUnitTest {
     public void testSplitPendingAndFinishProduce_allQualified() {
         // 准备数据：全部合格品场景
         Long feedbackId = randomLongId();
+        Long sourceLineId = 200L;
         Long itemId = randomLongId();
 
         MesWmProductProduceDO produce = randomPojo(MesWmProductProduceDO.class, o -> {
@@ -173,30 +173,31 @@ public class MesWmProductProduceServiceImplTest extends BaseDbUnitTest {
         when(locationService.getWarehouseLocationByCode(any())).thenReturn(loc);
         when(areaService.getWarehouseAreaByCode(any())).thenReturn(area);
 
+        // mock: 通过 sourceLineId 直接定位 PENDING 产出行
         MesWmProductProduceLineDO pendingLine = MesWmProductProduceLineDO.builder()
-                .id(200L).produceId(produce.getId()).feedbackId(feedbackId)
+                .id(sourceLineId).produceId(produce.getId()).feedbackId(feedbackId)
                 .itemId(itemId).quantity(BigDecimal.valueOf(50))
                 .qualityStatus(MesWmQualityStatusEnum.PENDING.getStatus())
                 .build();
+        when(productProduceLineService.validateProductProduceLineExists(sourceLineId))
+                .thenReturn(pendingLine);
 
-        // 第 1 次查行（拆分阶段）返回 PENDING 行；第 2 次查行（finishProductProduce）返回已更新的合格行
+        // mock: finishProductProduce 查行和明细
         MesWmProductProduceLineDO qualifiedLine = MesWmProductProduceLineDO.builder()
                 .id(200L).produceId(produce.getId()).itemId(itemId)
                 .quantity(BigDecimal.valueOf(50))
                 .qualityStatus(MesWmQualityStatusEnum.PASS.getStatus())
                 .build();
         when(productProduceLineService.getProductProduceLineListByProduceId(produce.getId()))
-                .thenReturn(ListUtil.of(pendingLine))
                 .thenReturn(ListUtil.of(qualifiedLine));
-
-        // mock: finishProductProduce 中按行查明细
         MesWmProductProduceDetailDO detail = MesWmProductProduceDetailDO.builder()
                 .lineId(200L).quantity(BigDecimal.valueOf(50)).build();
         when(productProduceDetailService.getProductProduceDetailListByLineId(200L))
                 .thenReturn(ListUtil.of(detail));
 
         // 调用：不合格品数量 = 0
-        productProduceService.splitPendingAndFinishProduce(feedbackId, BigDecimal.valueOf(50), BigDecimal.ZERO);
+        productProduceService.splitPendingAndFinishProduce(feedbackId, sourceLineId,
+                BigDecimal.valueOf(50), BigDecimal.ZERO);
 
         // 断言 1：没有新建行（不合格品数量为 0）
         verify(productProduceLineService, never()).createProductProduceLine(any());
@@ -218,14 +219,18 @@ public class MesWmProductProduceServiceImplTest extends BaseDbUnitTest {
     public void testSplitPendingAndFinishProduce_produceNotExists() {
         // 调用不存在的 feedbackId，应该抛异常
         Long feedbackId = randomLongId();
-        assertThrows(Exception.class, () ->
-                productProduceService.splitPendingAndFinishProduce(feedbackId, BigDecimal.TEN, BigDecimal.ZERO));
+        Long sourceLineId = randomLongId();
+        ServiceException ex = assertThrows(ServiceException.class, () ->
+                productProduceService.splitPendingAndFinishProduce(feedbackId, sourceLineId,
+                        BigDecimal.TEN, BigDecimal.ZERO));
+        assertEquals(WM_PRODUCT_PRODUCE_NOT_EXISTS.getCode(), ex.getCode());
     }
 
     @Test
-    public void testSplitPendingAndFinishProduce_noPendingLine() {
-        // 准备数据：产出单存在，但没有 PENDING 行
+    public void testSplitPendingAndFinishProduce_lineNotExists() {
+        // 准备数据：产出单存在，但 sourceLineId 对应的行不存在
         Long feedbackId = randomLongId();
+        Long sourceLineId = randomLongId();
         MesWmProductProduceDO produce = randomPojo(MesWmProductProduceDO.class, o -> {
             o.setFeedbackId(feedbackId);
             o.setStatus(MesWmProductProduceStatusEnum.PREPARE.getStatus());
@@ -240,17 +245,15 @@ public class MesWmProductProduceServiceImplTest extends BaseDbUnitTest {
         when(locationService.getWarehouseLocationByCode(any())).thenReturn(loc);
         when(areaService.getWarehouseAreaByCode(any())).thenReturn(area);
 
-        // mock: 返回一条 PASS 状态的行（不是 PENDING）
-        MesWmProductProduceLineDO passLine = MesWmProductProduceLineDO.builder()
-                .id(300L).produceId(produce.getId())
-                .qualityStatus(MesWmQualityStatusEnum.PASS.getStatus())
-                .build();
-        when(productProduceLineService.getProductProduceLineListByProduceId(produce.getId()))
-                .thenReturn(ListUtil.of(passLine));
+        // mock: validateProductProduceLineExists 抛异常
+        when(productProduceLineService.validateProductProduceLineExists(sourceLineId))
+                .thenThrow(new ServiceException(WM_PRODUCT_PRODUCE_LINE_NOT_EXISTS));
 
-        // 调用，应该抛异常（找不到 PENDING 行）
-        assertThrows(Exception.class, () ->
-                productProduceService.splitPendingAndFinishProduce(feedbackId, BigDecimal.TEN, BigDecimal.ZERO));
+        // 调用，应该抛异常
+        ServiceException ex = assertThrows(ServiceException.class, () ->
+                productProduceService.splitPendingAndFinishProduce(feedbackId, sourceLineId,
+                        BigDecimal.TEN, BigDecimal.ZERO));
+        assertEquals(WM_PRODUCT_PRODUCE_LINE_NOT_EXISTS.getCode(), ex.getCode());
     }
 
 }

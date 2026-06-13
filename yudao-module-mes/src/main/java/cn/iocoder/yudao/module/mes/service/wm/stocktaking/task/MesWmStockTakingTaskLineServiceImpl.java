@@ -43,6 +43,7 @@ public class MesWmStockTakingTaskLineServiceImpl implements MesWmStockTakingTask
 
     @Resource
     private MesWmStockTakingTaskLineMapper stockTakingTaskLineMapper;
+
     @Resource
     private MesWmStockTakingPlanParamService stockTakingPlanParamService;
     @Resource

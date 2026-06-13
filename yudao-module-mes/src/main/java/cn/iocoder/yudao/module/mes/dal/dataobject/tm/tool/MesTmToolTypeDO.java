@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
+import cn.iocoder.yudao.module.mes.enums.DictTypeConstants;
 
 /**
  * MES 工具类型 DO
@@ -42,6 +43,7 @@ public class MesTmToolTypeDO extends BaseDO {
     /**
      * 保养维护类型
      *
+     * 字典 {@link DictTypeConstants#MES_TM_MAINTEN_TYPE}
      * 枚举 {@link MesTmMaintenTypeEnum}
      */
     private Integer maintenType;

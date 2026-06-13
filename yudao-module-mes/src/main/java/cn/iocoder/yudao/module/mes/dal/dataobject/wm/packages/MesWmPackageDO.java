@@ -10,6 +10,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import cn.iocoder.yudao.module.mes.enums.DictTypeConstants;
 
 /**
  * MES 装箱单 DO
@@ -97,6 +98,7 @@ public class MesWmPackageDO extends BaseDO {
     /**
      * 状态
      *
+     * 字典 {@link DictTypeConstants#MES_WM_PACKAGE_STATUS}
      * 枚举 {@link cn.iocoder.yudao.module.mes.enums.wm.MesWmPackageStatusEnum}
      */
     private Integer status;

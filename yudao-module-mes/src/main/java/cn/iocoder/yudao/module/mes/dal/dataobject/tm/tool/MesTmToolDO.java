@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import cn.iocoder.yudao.module.mes.enums.DictTypeConstants;
 
 /**
  * MES 工具台账 DO
@@ -45,7 +46,7 @@ public class MesTmToolDO extends BaseDO {
     /**
      * 型号规格
      */
-    private String spec;
+    private String specification;
     /**
      * 工具类型编号
      *
@@ -63,6 +64,7 @@ public class MesTmToolDO extends BaseDO {
     /**
      * 保养维护类型
      *
+     * 字典 {@link DictTypeConstants#MES_TM_MAINTEN_TYPE}
      * 枚举 {@link MesTmMaintenTypeEnum}
      */
     private Integer maintenType;
@@ -77,6 +79,7 @@ public class MesTmToolDO extends BaseDO {
     /**
      * 状态
      *
+     * 字典 {@link DictTypeConstants#MES_TM_TOOL_STATUS}
      * 枚举 {@link MesTmToolStatusEnum}
      */
     private Integer status;

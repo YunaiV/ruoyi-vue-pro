@@ -320,6 +320,17 @@ public class LocalDateTimeUtils {
     }
 
     /**
+     * 获取从开始日期起的日期列表
+     *
+     * @param startDate 开始日期
+     * @param days 天数
+     * @return 日期列表，包含开始日期
+     */
+    public static List<LocalDate> getDateList(LocalDate startDate, int days) {
+        return startDate.datesUntil(startDate.plusDays(days)).toList();
+    }
+
+    /**
      * 格式化时间范围
      *
      * @param startTime 开始时间

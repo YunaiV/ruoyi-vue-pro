@@ -12,6 +12,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 import java.math.BigDecimal;
+import cn.iocoder.yudao.module.mes.enums.DictTypeConstants;
 
 /**
  * MES 盘点任务行 DO
@@ -91,6 +92,7 @@ public class MesWmStockTakingTaskLineDO extends BaseDO {
     /**
      * 盘点状态
      *
+     * 字典 {@link DictTypeConstants#MES_WM_STOCK_TAKING_TASK_LINE_STATUS}
      * 枚举 {@link MesWmStockTakingTaskLineStatusEnum}
      */
     private Integer status;

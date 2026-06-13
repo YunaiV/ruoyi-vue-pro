@@ -5,7 +5,6 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleTriggerTypeEnum;
 import cn.iocoder.yudao.module.iot.service.rule.scene.matcher.IotBaseConditionMatcherTest;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
@@ -17,7 +16,6 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author HUIHUI
  */
-@Disabled // TODO @puhui999：单测有报错，先屏蔽
 public class IotTimerTriggerMatcherTest extends IotBaseConditionMatcherTest {
 
     private IotTimerTriggerMatcher matcher;
@@ -249,7 +247,8 @@ public class IotTimerTriggerMatcherTest extends IotBaseConditionMatcherTest {
     public void testMatches_rangeCronSuccess() {
         // 准备参数
         IotDeviceMessage message = createDeviceMessage();
-        IotSceneRuleDO.Trigger trigger = createValidTrigger("0 0 9-17 * * MON-FRI"); // 工作日9-17点
+        // quartz cron 中，day-of-month 与 day-of-week 不能同时为 *，需要把其中一个改成 ?
+        IotSceneRuleDO.Trigger trigger = createValidTrigger("0 0 9-17 ? * MON-FRI"); // 工作日 9-17 点
 
         // 调用
         boolean result = matcher.matches(message, trigger);

@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import cn.iocoder.yudao.module.mes.enums.DictTypeConstants;
 
 /**
  * MES 维修工单 DO
@@ -60,6 +61,7 @@ public class MesDvRepairDO extends BaseDO {
     /**
      * 维修结果
      *
+     * 字典 {@link DictTypeConstants#MES_DV_REPAIR_RESULT}
      * 枚举 {@link MesDvRepairResultEnum}
      */
     private Integer result;
@@ -91,6 +93,7 @@ public class MesDvRepairDO extends BaseDO {
     /**
      * 状态
      *
+     * 字典 {@link DictTypeConstants#MES_DV_REPAIR_STATUS}
      * 枚举 {@link MesDvRepairStatusEnum}
      */
     private Integer status;

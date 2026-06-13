@@ -43,16 +43,12 @@ public class MesProWorkOrderBomController {
 
     @Resource
     private MesProWorkOrderBomService workOrderBomService;
-
     @Resource
     private MesMdItemService itemService;
-
     @Resource
     private MesMdUnitMeasureService unitMeasureService;
-
     @Resource
     private MesMdItemTypeService itemTypeService;
-
     @Resource
     private MesMdProductBomService productBomService;
 
@@ -122,6 +118,8 @@ public class MesProWorkOrderBomController {
         Map<Long, MesMdItemDO> itemMap = itemService.getItemMap(leafItems.keySet());
         Map<Long, MesMdUnitMeasureDO> unitMeasureMap = unitMeasureService.getUnitMeasureMap(
                 convertSet(itemMap.values(), MesMdItemDO::getUnitMeasureId));
+        Map<Long, MesMdItemTypeDO> itemTypeMap = itemTypeService.getItemTypeMap(
+                convertSet(itemMap.values(), MesMdItemDO::getItemTypeId));
         List<MesProWorkOrderItemRespVO> result = new ArrayList<>(leafItems.size());
         for (Map.Entry<Long, BigDecimal> entry : leafItems.entrySet()) {
             MesMdItemDO item = itemMap.get(entry.getKey());
@@ -130,9 +128,11 @@ public class MesProWorkOrderBomController {
             }
             MesProWorkOrderItemRespVO vo = new MesProWorkOrderItemRespVO()
                     .setItemId(item.getId()).setQuantity(entry.getValue())
-                    .setItemCode(item.getCode()).setItemName(item.getName()).setItemSpec(item.getSpecification());
+                    .setItemCode(item.getCode()).setItemName(item.getName()).setItemSpecification(item.getSpecification());
             MapUtils.findAndThen(unitMeasureMap, item.getUnitMeasureId(),
                     unitMeasure -> vo.setUnitMeasureName(unitMeasure.getName()));
+            MapUtils.findAndThen(itemTypeMap, item.getItemTypeId(),
+                    itemType -> vo.setItemOrProduct(itemType.getItemOrProduct()));
             result.add(vo);
         }
         return success(result);
@@ -155,7 +155,7 @@ public class MesProWorkOrderBomController {
         return BeanUtils.toBean(list, MesProWorkOrderBomRespVO.class, vo -> {
             MapUtils.findAndThen(itemMap, vo.getItemId(), item -> {
                 vo.setItemName(item.getName()).setItemCode(item.getCode())
-                        .setItemSpec(item.getSpecification());
+                        .setItemSpecification(item.getSpecification());
                 MapUtils.findAndThen(itemTypeMap, item.getItemTypeId(),
                         itemType -> vo.setItemOrProduct(itemType.getItemOrProduct()));
                 MapUtils.findAndThen(unitMeasureMap, item.getUnitMeasureId(),

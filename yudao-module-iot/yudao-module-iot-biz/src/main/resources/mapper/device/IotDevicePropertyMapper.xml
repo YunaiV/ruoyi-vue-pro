@@ -55,7 +55,7 @@
         </foreach>
         )
         VALUES
-        (NOW, #{reportTime},
+        (#{ts}, #{reportTime},
         <foreach item="value" collection="properties.values" separator=",">
             #{value}
         </foreach>

@@ -1,0 +1,254 @@
+import type { VbenFormSchema } from '#/adapter/form';
+import type { VxeTableGridOptions } from '#/adapter/vxe-table';
+import type { InfraStudentApi } from '#/api/infra/demo';
+
+import { DICT_TYPE } from '@vben/constants';
+import { getDictOptions } from '@vben/hooks';
+
+import { getRangePickerDefaultProps } from '#/utils';
+
+/** 新增/修改的表单 */
+export function useFormSchema(): VbenFormSchema[] {
+  return [
+    {
+      fieldName: 'id',
+      component: 'Input',
+      dependencies: {
+        triggerFields: [''],
+        show: () => false,
+      },
+    },
+    {
+      fieldName: 'name',
+      label: '名字',
+      rules: 'required',
+      component: 'Input',
+      componentProps: {
+        placeholder: '请输入名字',
+      },
+    },
+    {
+      fieldName: 'description',
+      label: '简介',
+      rules: 'required',
+      component: 'Textarea',
+      componentProps: {
+        placeholder: '请输入简介',
+      },
+    },
+    {
+      fieldName: 'birthday',
+      label: '出生日期',
+      rules: 'required',
+      component: 'DatePicker',
+      componentProps: {
+        showTime: true,
+        format: 'YYYY-MM-DD HH:mm:ss',
+        valueFormat: 'x',
+      },
+    },
+    {
+      fieldName: 'sex',
+      label: '性别',
+      rules: 'required',
+      component: 'Select',
+      componentProps: {
+        options: getDictOptions(DICT_TYPE.SYSTEM_USER_SEX, 'number'),
+        placeholder: '请选择性别',
+      },
+    },
+    {
+      fieldName: 'enabled',
+      label: '是否有效',
+      rules: 'required',
+      component: 'RadioGroup',
+      componentProps: {
+        options: getDictOptions(DICT_TYPE.INFRA_BOOLEAN_STRING, 'boolean'),
+        buttonStyle: 'solid',
+        optionType: 'button',
+      },
+    },
+    {
+      fieldName: 'avatar',
+      label: '头像',
+      rules: 'required',
+      component: 'ImageUpload',
+    },
+    {
+      fieldName: 'video',
+      label: '附件',
+      rules: 'required',
+      component: 'FileUpload',
+    },
+    {
+      fieldName: 'memo',
+      label: '备注',
+      rules: 'required',
+      component: 'RichTextarea',
+    },
+  ];
+}
+
+/** 导入的表单 */
+export function useImportFormSchema(): VbenFormSchema[] {
+  return [
+    {
+      fieldName: 'file',
+      label: '学生数据',
+      component: 'Upload',
+      rules: 'required',
+      help: '仅允许导入 xls、xlsx 格式文件',
+    },
+  ];
+}
+
+/** 列表的搜索表单 */
+export function useGridFormSchema(): VbenFormSchema[] {
+  return [
+    {
+      fieldName: 'name',
+      label: '名字',
+      component: 'Input',
+      componentProps: {
+        allowClear: true,
+        placeholder: '请输入名字',
+      },
+    },
+    {
+      fieldName: 'birthday',
+      label: '出生日期',
+      component: 'RangePicker',
+      componentProps: {
+        ...getRangePickerDefaultProps(),
+        allowClear: true,
+      },
+    },
+    {
+      fieldName: 'sex',
+      label: '性别',
+      component: 'Select',
+      componentProps: {
+        allowClear: true,
+        options: getDictOptions(DICT_TYPE.SYSTEM_USER_SEX, 'number'),
+        placeholder: '请选择性别',
+      },
+    },
+    {
+      fieldName: 'enabled',
+      label: '是否有效',
+      component: 'Select',
+      componentProps: {
+        allowClear: true,
+        options: getDictOptions(DICT_TYPE.INFRA_BOOLEAN_STRING, 'boolean'),
+        placeholder: '请选择是否有效',
+      },
+    },
+    {
+      fieldName: 'createTime',
+      label: '创建时间',
+      component: 'RangePicker',
+      componentProps: {
+        ...getRangePickerDefaultProps(),
+        allowClear: true,
+      },
+    },
+  ];
+}
+
+/** 列表的字段 */
+export function useGridColumns(): VxeTableGridOptions<InfraStudentApi.Student>['columns'] {
+  return [
+  { type: 'checkbox', width: 40 },
+    {
+      field: 'id',
+      title: '编号',
+      minWidth: 120,
+      cellRender: {
+        name: 'CellDict',
+        props: { type: DICT_TYPE.$dictType.toUpperCase() },
+      },
+    },
+    {
+      field: 'name',
+      title: '名字',
+      minWidth: 120,
+      cellRender: {
+        name: 'CellDict',
+        props: { type: DICT_TYPE.$dictType.toUpperCase() },
+      },
+    },
+    {
+      field: 'description',
+      title: '简介',
+      minWidth: 120,
+      cellRender: {
+        name: 'CellDict',
+        props: { type: DICT_TYPE.$dictType.toUpperCase() },
+      },
+    },
+    {
+      field: 'birthday',
+      title: '出生日期',
+      minWidth: 120,
+      formatter: 'formatDateTime',
+    },
+    {
+      field: 'sex',
+      title: '性别',
+      minWidth: 120,
+      cellRender: {
+        name: 'CellDict',
+        props: { type: DICT_TYPE.SYSTEM_USER_SEX },
+      },
+    },
+    {
+      field: 'enabled',
+      title: '是否有效',
+      minWidth: 120,
+      cellRender: {
+        name: 'CellDict',
+        props: { type: DICT_TYPE.INFRA_BOOLEAN_STRING },
+      },
+    },
+    {
+      field: 'avatar',
+      title: '头像',
+      minWidth: 120,
+      cellRender: {
+        name: 'CellDict',
+        props: { type: DICT_TYPE.$dictType.toUpperCase() },
+      },
+    },
+    {
+      field: 'video',
+      title: '附件',
+      minWidth: 120,
+      cellRender: {
+        name: 'CellDict',
+        props: { type: DICT_TYPE.$dictType.toUpperCase() },
+      },
+    },
+    {
+      field: 'memo',
+      title: '备注',
+      minWidth: 120,
+      cellRender: {
+        name: 'CellDict',
+        props: { type: DICT_TYPE.$dictType.toUpperCase() },
+      },
+    },
+    {
+      field: 'createTime',
+      title: '创建时间',
+      minWidth: 120,
+      formatter: 'formatDateTime',
+    },
+    {
+      title: '操作',
+      width: 200,
+      fixed: 'right',
+      slots: { default: 'actions' },
+    },
+  ];
+}
+

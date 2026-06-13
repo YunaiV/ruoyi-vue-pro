@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
+import cn.iocoder.yudao.module.mes.enums.DictTypeConstants;
 
 /**
  * MES 设备保养记录明细 DO
@@ -43,8 +44,8 @@ public class MesDvMaintenRecordLineDO extends BaseDO {
     /**
      * 保养结果
      *
+     * 字典 {@link DictTypeConstants#MES_MAINTEN_STATUS}
      * 枚举 {@link MesDvMaintenStatusEnum}
-     * 字典类型 mes_mainten_status
      */
     private Integer status;
     /**

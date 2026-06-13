@@ -34,15 +34,15 @@ public class TongYiChatModelTests {
 
     private final DashScopeChatModel chatModel = DashScopeChatModel.builder()
             .dashScopeApi(DashScopeApi.builder()
-                    .apiKey("sk-47aa124781be4bfb95244cc62f63f7d0")
+                    .apiKey("sk-cd9f39e99ea54840bd1888282325f55a") // https://bailian.console.aliyun.com/cn-beijing/?tab=model#/api-key 获取密钥
                     .build())
             .defaultOptions(DashScopeChatOptions.builder()
-//                    .withModel("qwen1.5-72b-chat") // 模型
-                    .withModel("qwen3-235b-a22b-thinking-2507") // 模型
-//                    .withModel("deepseek-r1") // 模型（deepseek-r1）
-//                    .withModel("deepseek-v3") // 模型（deepseek-v3）
-//                    .withModel("deepseek-r1-distill-qwen-1.5b") // 模型（deepseek-r1-distill-qwen-1.5b）
-//                    .withEnableThinking(true)
+                    .multiModel(true) // 注意：当使用 qwen3.6-plus 等多模态模型，需要设置为 true，可见 https://help.aliyun.com/zh/model-studio/error-code#error-url 链接
+                    .model("qwen3.6-plus") // 模型
+//                    .model("deepseek-r1") // 模型（deepseek-r1）
+//                    .model("deepseek-v3") // 模型（deepseek-v3）
+//                    .model("deepseek-r1-distill-qwen-1.5b") // 模型（deepseek-r1-distill-qwen-1.5b）
+//                    .enableThinking(true)
                     .build())
             .build();
 
@@ -85,9 +85,9 @@ public class TongYiChatModelTests {
         List<Message> messages = new ArrayList<>();
         messages.add(new UserMessage("详细分析下，如何设计一个电商系统？"));
         DashScopeChatOptions options = DashScopeChatOptions.builder()
-                .withModel("qwen3-235b-a22b-thinking-2507")
+                .model("qwen3.6-plus").multiModel(true)
 //                .withModel("qwen-max-2025-01-25")
-                .withEnableThinking(true) // 必须设置，否则会报错
+                .enableThinking(true) // 必须设置，否则会报错
                 .build();
 
         // 调用
@@ -112,8 +112,8 @@ public class TongYiChatModelTests {
         Document document01 = new Document("abc");
         Document document02 = new Document("sapring");
         RerankOptions options = DashScopeRerankOptions.builder()
-                .withTopN(1)
-                .withModel("gte-rerank-v2")
+                .topN(1)
+                .model("gte-rerank-v2")
                 .build();
         RerankRequest rerankRequest = new RerankRequest(
                 query,

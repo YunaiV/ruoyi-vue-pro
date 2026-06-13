@@ -44,7 +44,7 @@ public class MesDvRepairRespVO {
 
     @Schema(description = "规格型号", example = "X-100")
     @ExcelProperty("规格型号")
-    private String machinerySpec;
+    private String machinerySpecification;
 
     @Schema(description = "报修日期")
     @ExcelProperty("报修日期")

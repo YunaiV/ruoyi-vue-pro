@@ -38,10 +38,8 @@ public class MesWmOutsourceReceiptLineController {
 
     @Resource
     private MesWmOutsourceReceiptLineService receiptLineService;
-
     @Resource
     private MesMdItemService itemService;
-
     @Resource
     private MesMdUnitMeasureService unitMeasureService;
 

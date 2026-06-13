@@ -37,26 +37,22 @@ public class MesWmOutsourceReceiptLineServiceImpl implements MesWmOutsourceRecei
 
     @Resource
     private MesMdItemService itemService;
-
     @Resource
     @Lazy
     private MesWmOutsourceReceiptDetailService outsourceReceiptDetailService;
-
     @Resource
     @Lazy
     private MesWmOutsourceReceiptService outsourceReceiptService;
-
     @Resource
     @Lazy
     private MesProWorkOrderService workOrderService;
-
     @Resource
     private MesWmBatchService batchService;
 
     @Override
     public Long createOutsourceReceiptLine(MesWmOutsourceReceiptLineSaveReqVO createReqVO) {
         // 校验物料存在
-        itemService.validateItemExists(createReqVO.getItemId());
+        itemService.validateItemExistsAndEnable(createReqVO.getItemId());
 
         // 插入
         MesWmOutsourceReceiptLineDO line = BeanUtils.toBean(createReqVO, MesWmOutsourceReceiptLineDO.class);
@@ -76,7 +72,7 @@ public class MesWmOutsourceReceiptLineServiceImpl implements MesWmOutsourceRecei
         // 校验存在
         validateOutsourceReceiptLineExists(updateReqVO.getId());
         // 校验物料存在
-        itemService.validateItemExists(updateReqVO.getItemId());
+        itemService.validateItemExistsAndEnable(updateReqVO.getItemId());
 
         // 更新
         MesWmOutsourceReceiptLineDO updateObj = BeanUtils.toBean(updateReqVO, MesWmOutsourceReceiptLineDO.class);

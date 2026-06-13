@@ -59,14 +59,6 @@ public interface MesProTaskService {
     PageResult<MesProTaskDO> getTaskPage(MesProTaskPageReqVO pageReqVO);
 
     /**
-     * 获得生产任务精简列表
-     *
-     * @param workOrderId 工单编号（可选）
-     * @return 生产任务列表
-     */
-    List<MesProTaskDO> getTaskListByWorkOrderId(Long workOrderId);
-
-    /**
      * 根据工单编号列表，批量获得生产任务列表
      *
      * @param workOrderIds 工单编号列表

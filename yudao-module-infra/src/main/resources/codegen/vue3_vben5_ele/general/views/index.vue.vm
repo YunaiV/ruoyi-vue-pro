@@ -31,7 +31,9 @@ import { get${simpleClassName}List, delete${simpleClassName}, export${simpleClas
 import { isEmpty } from '@vben/utils';
 import { get${simpleClassName}Page, delete${simpleClassName},#if ($deleteBatchEnable) delete${simpleClassName}List,#end export${simpleClassName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
 #end
-import { downloadFileFromBlobPart } from '@vben/utils';
+#if ($importEnable)
+import ${simpleClassName}Import from './modules/import-form.vue';
+#end
 
 #if ($table.templateType == 12 || $table.templateType == 11) ## 内嵌和erp情况
 /** 子表的列表 */
@@ -120,6 +122,17 @@ const [FormModal, formModalApi] = useVbenModal({
   connectedComponent: ${simpleClassName}Form,
   destroyOnClose: true,
 });
+#if ($importEnable)
+const [ImportFormModal, importFormModalApi] = useVbenModal({
+  connectedComponent: ${simpleClassName}Import,
+  destroyOnClose: true,
+});
+
+/** 导入${table.classComment} */
+function handleImport() {
+  importFormModalApi.open();
+}
+#end
 
 /** 创建${table.classComment} */
 function handleCreate() {
@@ -189,6 +202,7 @@ try {
 }
 }
 
+
 #if (${table.templateType} == 2)
 /** 切换树形展开/收缩状态 */
 const isExpanded = ref(true);
@@ -208,6 +222,9 @@ onMounted(() => {
 <template>
   <Page auto-content-height>
     <FormModal @success="getList" />
+#if ($importEnable)
+    <ImportFormModal @success="getList" />
+#end
 
     <ContentWrap v-if="!hiddenSearchBar">
       <!-- 搜索工作栏 -->
@@ -316,6 +333,16 @@ onMounted(() => {
           >
             {{ $t('ui.actionTitle.create', ['${table.classComment}']) }}
           </el-button>
+#if ($importEnable)
+          <el-button
+              class="ml-2"
+              type="primary"
+              @click="handleImport"
+              v-access:code="['${permissionPrefix}:import']"
+          >
+            导入
+          </el-button>
+#end
           <el-button
               :icon="h(Download)"
               type="primary"

@@ -77,13 +77,6 @@ public class MesQcIndicatorController {
         return success(BeanUtils.toBean(pageResult, MesQcIndicatorRespVO.class));
     }
 
-    @GetMapping("/simple-list")
-    @Operation(summary = "获得质检指标精简列表", description = "主要用于前端的下拉选项")
-    public CommonResult<List<MesQcIndicatorRespVO>> getIndicatorSimpleList() {
-        List<MesQcIndicatorDO> list = indicatorService.getIndicatorList();
-        return success(BeanUtils.toBean(list, MesQcIndicatorRespVO.class));
-    }
-
     @GetMapping("/export-excel")
     @Operation(summary = "导出质检指标 Excel")
     @PreAuthorize("@ss.hasPermission('mes:qc-indicator:export')")

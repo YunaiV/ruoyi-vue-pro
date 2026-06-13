@@ -69,10 +69,31 @@ public interface MesWmBatchService {
     List<MesWmBatchDO> getBackwardBatchList(String code);
 
     /**
-     * 获取批次列表
+     * 校验批次存在，并校验批次与物料的归属关系
      *
-     * @return 批次列表
+     * @param batchId 批次ID
+     * @param itemId  物料ID
+     * @return 批次记录
      */
-    List<MesWmBatchDO> getBatchList();
+    MesWmBatchDO validateBatchExists(Long batchId, Long itemId);
+
+    /**
+     * 校验批次存在，并校验批次与物料、客户/供应商的归属关系
+     *
+     * @param batchId  批次ID
+     * @param itemId   物料ID
+     * @param clientId 客户ID（可选，不为空时校验）
+     * @param vendorId 供应商ID（可选，不为空时校验）
+     * @return 批次记录
+     */
+    MesWmBatchDO validateBatchExists(Long batchId, Long itemId, Long clientId, Long vendorId);
+
+    /**
+     * 获取指定工具的批次数量
+     *
+     * @param toolId 工具编号
+     * @return 批次数量
+     */
+    Long getBatchCountByToolId(Long toolId);
 
 }

@@ -42,7 +42,7 @@ public class BpmOALeaveDO extends BaseDO {
     /**
      * 请假类型
      */
-    private String type;
+    private Integer type;
     /**
      * 原因
      */

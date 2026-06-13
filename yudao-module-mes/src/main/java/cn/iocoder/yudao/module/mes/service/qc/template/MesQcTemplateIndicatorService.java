@@ -6,6 +6,8 @@ import cn.iocoder.yudao.module.mes.controller.admin.qc.template.vo.indicator.Mes
 import cn.iocoder.yudao.module.mes.dal.dataobject.qc.template.MesQcTemplateIndicatorDO;
 import jakarta.validation.Valid;
 
+import java.util.List;
+
 /**
  * MES 质检方案-检测指标项 Service 接口
  *
@@ -57,5 +59,21 @@ public interface MesQcTemplateIndicatorService {
      * @param templateId 质检方案编号
      */
     void deleteTemplateIndicatorByTemplateId(Long templateId);
+
+    /**
+     * 根据方案编号，获得检测指标项列表
+     *
+     * @param templateId 质检方案编号
+     * @return 检测指标项列表
+     */
+    List<MesQcTemplateIndicatorDO> getTemplateIndicatorListByTemplateId(Long templateId);
+
+    /**
+     * 获取指定计量单位的检测指标项数量
+     *
+     * @param unitMeasureId 计量单位编号
+     * @return 检测指标项数量
+     */
+    Long getTemplateIndicatorCountByUnitMeasureId(Long unitMeasureId);
 
 }

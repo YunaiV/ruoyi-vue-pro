@@ -29,9 +29,11 @@ public class MesCalTeamMemberServiceImpl implements MesCalTeamMemberService {
 
     @Resource
     private MesCalTeamMemberMapper teamMemberMapper;
+
     @Resource
     @Lazy
     private MesCalTeamService teamService;
+
     @Resource
     private AdminUserApi adminUserApi;
 

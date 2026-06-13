@@ -48,10 +48,8 @@ public class MesMdItemController {
 
     @Resource
     private MesMdItemService itemService;
-
     @Resource
     private MesMdItemTypeService itemTypeService;
-
     @Resource
     private MesMdUnitMeasureService unitMeasureService;
 

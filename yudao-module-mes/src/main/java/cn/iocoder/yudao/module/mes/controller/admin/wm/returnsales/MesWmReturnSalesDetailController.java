@@ -42,19 +42,14 @@ public class MesWmReturnSalesDetailController {
 
     @Resource
     private MesWmReturnSalesDetailService returnSalesDetailService;
-
     @Resource
     private MesMdItemService itemService;
-
     @Resource
     private MesMdUnitMeasureService unitMeasureService;
-
     @Resource
     private MesWmWarehouseService warehouseService;
-
     @Resource
     private MesWmWarehouseLocationService locationService;
-
     @Resource
     private MesWmWarehouseAreaService areaService;
 

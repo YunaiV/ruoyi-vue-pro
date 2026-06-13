@@ -28,4 +28,8 @@ public interface MesWmOutsourceReceiptMapper extends BaseMapperX<MesWmOutsourceR
         return selectOne(MesWmOutsourceReceiptDO::getCode, code);
     }
 
+    default Long selectCountByVendorId(Long vendorId) {
+        return selectCount(MesWmOutsourceReceiptDO::getVendorId, vendorId);
+    }
+
 }

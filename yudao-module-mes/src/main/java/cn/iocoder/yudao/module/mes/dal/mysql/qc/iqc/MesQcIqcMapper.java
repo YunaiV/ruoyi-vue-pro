@@ -32,4 +32,8 @@ public interface MesQcIqcMapper extends BaseMapperX<MesQcIqcDO> {
         return selectOne(MesQcIqcDO::getCode, code);
     }
 
+    default Long selectCountByVendorId(Long vendorId) {
+        return selectCount(MesQcIqcDO::getVendorId, vendorId);
+    }
+
 }

@@ -33,7 +33,7 @@ public class MesTmToolRespVO {
 
     @Schema(description = "型号规格", example = "M5-100")
     @ExcelProperty("型号规格")
-    private String spec;
+    private String specification;
 
     @Schema(description = "工具类型编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
     private Long toolTypeId;

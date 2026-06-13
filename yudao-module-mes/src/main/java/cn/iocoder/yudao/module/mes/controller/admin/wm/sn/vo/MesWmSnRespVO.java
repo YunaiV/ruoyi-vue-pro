@@ -37,6 +37,10 @@ public class MesWmSnRespVO {
     @ExcelProperty("规格型号")
     private String specification;
 
+    @Schema(description = "单位", example = "个")
+    @ExcelProperty("单位")
+    private String unitName;
+
     @Schema(description = "批次号", example = "BATCH001")
     @ExcelProperty("批次号")
     private String batchCode;

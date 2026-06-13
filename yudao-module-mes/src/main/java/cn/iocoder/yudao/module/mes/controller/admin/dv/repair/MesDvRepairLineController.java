@@ -42,7 +42,6 @@ public class MesDvRepairLineController {
 
     @Resource
     private MesDvRepairLineService repairLineService;
-
     @Resource
     private MesDvSubjectService subjectService;
 

@@ -1,0 +1,126 @@
+<script lang="ts" setup>
+  import type { InfraStudentApi } from '#/api/infra/demo';
+
+  import { computed, ref, h, onMounted, watch, nextTick } from 'vue';
+
+  import { $t } from '#/locales';
+
+ import { Plus } from "@vben/icons";
+import { Button, Tabs, Checkbox, Input, Textarea, Select,RadioGroup,CheckboxGroup, DatePicker } from 'ant-design-vue';
+import { ImageUpload, FileUpload } from "#/components/upload";
+import { useVbenVxeGrid } from '#/adapter/vxe-table';
+import { useStudentContactGridEditColumns } from '../data';
+import { getStudentContactListByStudentId } from '#/api/infra/demo';
+
+const props = defineProps<{
+   studentId?: number // 学生编号（主表的关联字段）
+}>()
+
+ const [Grid, gridApi] = useVbenVxeGrid({
+gridOptions: {
+  columns: useStudentContactGridEditColumns(),
+  border: true,
+  showOverflow: true,
+  autoResize: true,
+  keepSource: true,
+  rowConfig: {
+    keyField: 'id',
+  },
+  pagerConfig: {
+    enabled: false,
+  },
+  toolbarConfig: {
+    enabled: false,
+  },
+},
+});
+
+/** 添加学生联系人 */
+const handleAdd = async () => {
+  await gridApi.grid.insertAt({} as InfraStudentApi.StudentContact, -1);
+}
+
+/** 删除学生联系人 */
+const handleDelete =  async (row: InfraStudentApi.StudentContact) => {
+  await gridApi.grid.remove(row);
+}
+
+/** 提供获取表格数据的方法供父组件调用 */
+defineExpose({
+  getData: (): InfraStudentApi.StudentContact[] => {
+    const data = gridApi.grid.getData() as InfraStudentApi.StudentContact[];
+    const removeRecords = gridApi.grid.getRemoveRecords() as InfraStudentApi.StudentContact[];
+    const insertRecords = gridApi.grid.getInsertRecords() as InfraStudentApi.StudentContact[];
+    return data
+        .filter((row) => !removeRecords.some((removed) => removed.id === row.id))
+        .concat(insertRecords.map((row: any) => ({ ...row, id: undefined })));
+  },
+});
+
+/** 监听主表的关联字段的变化，加载对应的子表数据 */
+watch(
+    () => props.studentId,
+    async (val) => {
+      if (!val) {
+        return;
+      }
+      await nextTick();
+      await gridApi.grid.loadData(await getStudentContactListByStudentId(props.studentId!));
+    },
+    { immediate: true },
+);
+</script>
+
+<template>
+   <Grid class="mx-4">
+                 <template #name="{ row }">
+                  <Input v-model:value="row.name" />
+                </template>
+                <template #description="{ row }">
+                  <Textarea v-model:value="row.description" />
+                </template>
+                <template #birthday="{ row }">
+                  <DatePicker
+                      v-model:value="row.birthday"
+                      :showTime="true"
+                      format="YYYY-MM-DD HH:mm:ss"
+                      valueFormat='x'
+                  />
+                </template>
+                <template #sex="{ row, column }">
+                  <Select v-model:value="row.sex" class="w-full">
+                    <Select.Option v-for="option in column.params.options" :key="option.value" :value="option.value">
+                      {{ option.label }}
+                    </Select.Option>
+                  </Select>
+                </template>
+                <template #enabled="{ row, column }">
+                  <RadioGroup v-model:value="row.enabled" :options="column.params.options" />
+                </template>
+                <template #avatar="{ row }">
+                  <ImageUpload v-model:value="row.avatar" />
+                </template>
+                <template #video="{ row }">
+                  <FileUpload v-model:value="row.video" />
+                </template>
+                <template #memo="{ row }">
+                  <Textarea v-model:value="row.memo" />
+                </template>
+    <template #actions="{ row }">
+      <Button
+          size="small"
+          type="link"
+          danger
+          @click="handleDelete(row)"
+          v-access:code="['infra:student:delete']"
+      >
+        {{ $t('ui.actionTitle.delete') }}
+      </Button>
+    </template>
+  </Grid>
+  <div class="flex justify-center -mt-4">
+    <Button :icon="h(Plus)" type="primary" ghost @click="handleAdd" v-access:code="['infra:student:create']">
+      {{ $t('ui.actionTitle.create', ['学生联系人']) }}
+    </Button>
+  </div>
+</template>

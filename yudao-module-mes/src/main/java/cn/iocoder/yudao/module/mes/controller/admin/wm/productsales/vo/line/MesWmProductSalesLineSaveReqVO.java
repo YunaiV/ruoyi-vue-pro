@@ -17,6 +17,9 @@ public class MesWmProductSalesLineSaveReqVO {
     @NotNull(message = "出库单ID不能为空")
     private Long salesId;
 
+    @Schema(description = "发货通知单行ID", example = "1")
+    private Long noticeLineId;
+
     @Schema(description = "物料ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "物料不能为空")
     private Long itemId;

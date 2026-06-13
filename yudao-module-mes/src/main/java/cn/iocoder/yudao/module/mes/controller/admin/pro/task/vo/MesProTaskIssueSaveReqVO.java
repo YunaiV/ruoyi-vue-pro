@@ -23,21 +23,21 @@ public class MesProTaskIssueSaveReqVO {
     @Schema(description = "工作站编号", example = "1")
     private Long workstationId;
 
+    @Schema(description = "来源单据类型", example = "MATERIAL_ISSUE")
+    private String sourceDocType;
+
     @Schema(description = "来源单据编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "来源单据编号不能为空")
     private Long sourceDocId;
 
+    @Schema(description = "来源单据行编号", example = "1")
+    private Long sourceLineId;
+
     @Schema(description = "来源单据编码", example = "DOC-001")
     private String sourceDocCode;
 
-    @Schema(description = "来源单据类型", example = "MATERIAL_ISSUE")
-    private String sourceDocType;
-
     @Schema(description = "投料批次", example = "BATCH-001")
     private String batchCode;
-
-    @Schema(description = "来源单据行编号", example = "1")
-    private Long sourceLineId;
 
     @Schema(description = "产品物料编号", example = "100")
     private Long itemId;

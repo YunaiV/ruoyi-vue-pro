@@ -29,4 +29,8 @@ public interface MesMdWorkstationToolMapper extends BaseMapperX<MesMdWorkstation
         delete(MesMdWorkstationToolDO::getWorkstationId, workstationId);
     }
 
+    default Long selectCountByToolTypeId(Long toolTypeId) {
+        return selectCount(MesMdWorkstationToolDO::getToolTypeId, toolTypeId);
+    }
+
 }

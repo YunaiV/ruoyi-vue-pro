@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 import java.math.BigDecimal;
+import cn.iocoder.yudao.module.mes.enums.DictTypeConstants;
 
 /**
  * MES 销售退货单行 DO
@@ -50,6 +51,10 @@ public class MesWmReturnSalesLineDO extends BaseDO {
      */
     private Long batchId;
     /**
+     * 批次号
+     */
+    private String batchCode;
+    /**
      * 退货检验单 ID
      */
     private Long rqcId;
@@ -60,6 +65,7 @@ public class MesWmReturnSalesLineDO extends BaseDO {
     /**
      * 质量状态
      *
+     * 字典 {@link DictTypeConstants#MES_WM_QUALITY_STATUS}
      * 枚举 {@link cn.iocoder.yudao.module.mes.enums.wm.MesWmQualityStatusEnum}
      */
     private Integer qualityStatus;

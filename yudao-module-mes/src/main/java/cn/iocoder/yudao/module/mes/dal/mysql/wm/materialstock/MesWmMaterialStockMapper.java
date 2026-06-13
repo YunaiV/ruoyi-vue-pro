@@ -21,18 +21,29 @@ public interface MesWmMaterialStockMapper extends BaseMapperX<MesWmMaterialStock
 
     default PageResult<MesWmMaterialStockDO> selectPage(MesWmMaterialStockPageReqVO reqVO,
                                                          Collection<Long> itemTypeIds,
-                                                         Collection<Long> itemIds) {
-        return selectPage(reqVO, new LambdaQueryWrapperX<MesWmMaterialStockDO>()
+                                                         Collection<Long> itemIds,
+                                                         Long virtualWarehouseId) {
+        LambdaQueryWrapperX<MesWmMaterialStockDO> wrapper = new LambdaQueryWrapperX<MesWmMaterialStockDO>()
                 .inIfPresent(MesWmMaterialStockDO::getItemTypeId, itemTypeIds)
                 .inIfPresent(MesWmMaterialStockDO::getItemId, itemIds)
                 .likeIfPresent(MesWmMaterialStockDO::getBatchCode, reqVO.getBatchCode())
+                .eqIfPresent(MesWmMaterialStockDO::getBatchId, reqVO.getBatchId())
                 .eqIfPresent(MesWmMaterialStockDO::getWarehouseId, reqVO.getWarehouseId())
                 .eqIfPresent(MesWmMaterialStockDO::getLocationId, reqVO.getLocationId())
                 .eqIfPresent(MesWmMaterialStockDO::getAreaId, reqVO.getAreaId())
                 .eqIfPresent(MesWmMaterialStockDO::getVendorId, reqVO.getVendorId())
-                .eqIfPresent(MesWmMaterialStockDO::getFrozen, reqVO.getFrozen())
-                .ne(MesWmMaterialStockDO::getQuantity, BigDecimal.ZERO)
-                .orderByAsc(MesWmMaterialStockDO::getReceiptTime));
+                .eqIfPresent(MesWmMaterialStockDO::getFrozen, reqVO.getFrozen());
+        wrapper.ne(MesWmMaterialStockDO::getQuantity, BigDecimal.ZERO)
+                .orderByAsc(MesWmMaterialStockDO::getReceiptTime);
+        // 虚拟仓过滤（Service 层已将 virtualFilter 解析为 virtualWarehouseId）
+        if (virtualWarehouseId != null) {
+            if (MesWmMaterialStockPageReqVO.VIRTUAL_FILTER_ONLY.equals(reqVO.getVirtualFilter())) {
+                wrapper.eq(MesWmMaterialStockDO::getWarehouseId, virtualWarehouseId);
+            } else if (MesWmMaterialStockPageReqVO.VIRTUAL_FILTER_EXCLUDE.equals(reqVO.getVirtualFilter())) {
+                wrapper.ne(MesWmMaterialStockDO::getWarehouseId, virtualWarehouseId);
+            }
+        }
+        return selectPage(reqVO, wrapper);
     }
 
     default Long selectCountByWarehouseId(Long warehouseId) {

@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.mes.service.dv.subject;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.mes.controller.admin.dv.subject.vo.MesDvSubjectPageReqVO;
@@ -32,7 +33,7 @@ public class MesDvSubjectServiceImpl implements MesDvSubjectService {
 
     @Resource
     private MesDvSubjectMapper subjectMapper;
-    // DONE @AI：调用对方的 service
+
     @Resource
     @Lazy
     private MesDvCheckPlanSubjectService checkPlanSubjectService;
@@ -77,6 +78,17 @@ public class MesDvSubjectServiceImpl implements MesDvSubjectService {
     public void validateSubjectExists(Long id) {
         if (subjectMapper.selectById(id) == null) {
             throw exception(DV_SUBJECT_NOT_EXISTS);
+        }
+    }
+
+    @Override
+    public void validateSubjectExistsAndEnable(Long id) {
+        MesDvSubjectDO subject = subjectMapper.selectById(id);
+        if (subject == null) {
+            throw exception(DV_SUBJECT_NOT_EXISTS);
+        }
+        if (ObjUtil.notEqual(CommonStatusEnum.ENABLE.getStatus(), subject.getStatus())) {
+            throw exception(DV_SUBJECT_IS_DISABLE);
         }
     }
 

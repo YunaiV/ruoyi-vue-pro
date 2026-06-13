@@ -48,13 +48,10 @@ public class MesWmProductReceiptServiceImpl implements MesWmProductReceiptServic
 
     @Resource
     private MesWmProductReceiptLineService productReceiptLineService;
-
     @Resource
     private MesWmProductReceiptDetailService productReceiptDetailService;
-
     @Resource
     private MesWmTransactionService wmTransactionService;
-
     @Resource
     private MesProWorkOrderService workOrderService;
     @Resource
@@ -267,7 +264,7 @@ public class MesWmProductReceiptServiceImpl implements MesWmProductReceiptServic
         validateCodeUnique(reqVO.getId(), reqVO.getCode());
         // 校验工单存在
         return reqVO.getWorkOrderId() != null ?
-                workOrderService.validateWorkOrderExists(reqVO.getWorkOrderId()) : null;
+                workOrderService.validateWorkOrderConfirmed(reqVO.getWorkOrderId()) : null;
     }
 
     private void validateCodeUnique(Long id, String code) {

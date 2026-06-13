@@ -16,6 +16,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import cn.iocoder.yudao.module.mes.enums.DictTypeConstants;
 
 /**
  * MES 库存事务流水 DO
@@ -43,15 +44,10 @@ public class MesWmTransactionDO extends BaseDO {
     /**
      * 事务类型
      *
+     * 字典 {@link DictTypeConstants#MES_WM_TRANSACTION_TYPE}
      * 枚举 {@link MesWmTransactionTypeEnum}
      */
     private Integer type;
-    /**
-     * 本次变动数量
-     *
-     * 正数=入库，负数=出库
-     */
-    private BigDecimal quantity;
 
     /**
      * 业务类型
@@ -93,6 +89,12 @@ public class MesWmTransactionDO extends BaseDO {
      * 关联 {@link MesMdItemDO#getId()}
      */
     private Long itemId;
+    /**
+     * 本次变动数量
+     *
+     * 正数=入库，负数=出库
+     */
+    private BigDecimal quantity;
     /**
      * 批次 ID
      *

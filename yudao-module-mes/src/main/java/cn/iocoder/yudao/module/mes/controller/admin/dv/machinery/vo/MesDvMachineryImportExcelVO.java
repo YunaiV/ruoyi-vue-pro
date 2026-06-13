@@ -28,7 +28,7 @@ public class MesDvMachineryImportExcelVO {
     private String brand;
 
     @ExcelProperty("规格型号")
-    private String spec;
+    private String specification;
 
     @ExcelProperty("设备类型编码")
     private String machineryTypeCode;

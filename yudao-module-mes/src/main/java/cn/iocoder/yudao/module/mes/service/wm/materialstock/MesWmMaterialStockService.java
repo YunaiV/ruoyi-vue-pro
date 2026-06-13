@@ -132,4 +132,20 @@ public interface MesWmMaterialStockService {
      */
     void checkAreaMixingRule(Long areaId, Long itemId, Long batchId);
 
+    /**
+     * 校验前端选择的库存记录，兜底避免串单或越权提交
+     *
+     * @param materialStockId 库存记录编号
+     * @param itemId          物料编号
+     * @param batchId         批次编号
+     * @param batchCode       批次号（可选）
+     * @param warehouseId     仓库编号
+     * @param locationId      库区编号
+     * @param areaId          库位编号
+     * @param quantity        数量（可选，校验库存充足）
+     * @return 校验通过的库存记录
+     */
+    MesWmMaterialStockDO validateSelectedStock(Long materialStockId, Long itemId, Long batchId, String batchCode,
+                                               Long warehouseId, Long locationId, Long areaId, BigDecimal quantity);
+
 }

@@ -7,8 +7,6 @@ import cn.iocoder.yudao.module.mes.controller.admin.wm.salesnotice.vo.MesWmSales
 import cn.iocoder.yudao.module.mes.dal.dataobject.wm.salesnotice.MesWmSalesNoticeDO;
 import org.apache.ibatis.annotations.Mapper;
 
-import java.util.List;
-
 /**
  * MES 发货通知单 Mapper
  */
@@ -17,19 +15,16 @@ public interface MesWmSalesNoticeMapper extends BaseMapperX<MesWmSalesNoticeDO> 
 
     default PageResult<MesWmSalesNoticeDO> selectPage(MesWmSalesNoticePageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<MesWmSalesNoticeDO>()
-                .likeIfPresent(MesWmSalesNoticeDO::getNoticeCode, reqVO.getNoticeCode())
-                .likeIfPresent(MesWmSalesNoticeDO::getNoticeName, reqVO.getNoticeName())
+                .likeIfPresent(MesWmSalesNoticeDO::getCode, reqVO.getCode())
+                .likeIfPresent(MesWmSalesNoticeDO::getName, reqVO.getName())
                 .likeIfPresent(MesWmSalesNoticeDO::getSalesOrderCode, reqVO.getSalesOrderCode())
                 .eqIfPresent(MesWmSalesNoticeDO::getClientId, reqVO.getClientId())
+                .eqIfPresent(MesWmSalesNoticeDO::getStatus, reqVO.getStatus())
                 .orderByDesc(MesWmSalesNoticeDO::getId));
     }
 
-    default MesWmSalesNoticeDO selectByNoticeCode(String noticeCode) {
-        return selectOne(MesWmSalesNoticeDO::getNoticeCode, noticeCode);
-    }
-
-    default List<MesWmSalesNoticeDO> selectListByStatus(Integer status) {
-        return selectList(MesWmSalesNoticeDO::getStatus, status);
+    default MesWmSalesNoticeDO selectByCode(String code) {
+        return selectOne(MesWmSalesNoticeDO::getCode, code);
     }
 
 }

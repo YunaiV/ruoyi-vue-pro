@@ -33,7 +33,7 @@ public class MesProWorkOrderBomRespVO {
 
     @Schema(description = "规格型号", example = "10K 0603")
     @ExcelProperty("规格型号")
-    private String itemSpec;
+    private String itemSpecification;
 
     @Schema(description = "单位编号", example = "300")
     private Long unitMeasureId;

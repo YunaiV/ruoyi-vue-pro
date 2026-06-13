@@ -29,4 +29,8 @@ public interface MesWmOutsourceIssueMapper extends BaseMapperX<MesWmOutsourceIss
         return selectOne(MesWmOutsourceIssueDO::getCode, code);
     }
 
+    default Long selectCountByVendorId(Long vendorId) {
+        return selectCount(MesWmOutsourceIssueDO::getVendorId, vendorId);
+    }
+
 }

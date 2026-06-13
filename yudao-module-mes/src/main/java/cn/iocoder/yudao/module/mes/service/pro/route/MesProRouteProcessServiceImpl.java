@@ -191,8 +191,6 @@ public class MesProRouteProcessServiceImpl implements MesProRouteProcessService 
         // 1. 根据产品查找关联的工艺路线产品记录
         MesProRouteProductDO routeProduct = routeProductService.getRouteProductByItemId(productId);
         if (routeProduct == null) {
-            // TODO @芋艿：会不会存在配置了多个的情况？？？
-            // TODO @AI：会有这个情况么？
             return Collections.emptyList();
         }
         // 2. 返回该工艺路线的工序列表

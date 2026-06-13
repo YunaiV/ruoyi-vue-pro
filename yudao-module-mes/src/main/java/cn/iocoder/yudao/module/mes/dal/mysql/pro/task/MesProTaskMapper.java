@@ -3,7 +3,9 @@ package cn.iocoder.yudao.module.mes.dal.mysql.pro.task;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
 import cn.iocoder.yudao.module.mes.controller.admin.pro.task.vo.MesProTaskPageReqVO;
+import cn.iocoder.yudao.module.mes.dal.dataobject.pro.route.MesProRouteProcessDO;
 import cn.iocoder.yudao.module.mes.dal.dataobject.pro.task.MesProTaskDO;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
@@ -20,16 +22,26 @@ import java.util.List;
 public interface MesProTaskMapper extends BaseMapperX<MesProTaskDO> {
 
     default PageResult<MesProTaskDO> selectPage(MesProTaskPageReqVO reqVO) {
-        return selectPage(reqVO, new LambdaQueryWrapperX<MesProTaskDO>()
-                .likeIfPresent(MesProTaskDO::getCode, reqVO.getCode())
+        MPJLambdaWrapperX<MesProTaskDO> query = new MPJLambdaWrapperX<>();
+        query.selectAll(MesProTaskDO.class);
+        // 当需要按 checkFlag 过滤时，LEFT JOIN pro_route_process
+        if (reqVO.getCheckFlag() != null) {
+            query.leftJoin(MesProRouteProcessDO.class, on -> on
+                    .eq(MesProRouteProcessDO::getRouteId, MesProTaskDO::getRouteId)
+                    .eq(MesProRouteProcessDO::getProcessId, MesProTaskDO::getProcessId));
+            query.eq(MesProRouteProcessDO::getCheckFlag, reqVO.getCheckFlag());
+        }
+        query.likeIfPresent(MesProTaskDO::getCode, reqVO.getCode())
                 .likeIfPresent(MesProTaskDO::getName, reqVO.getName())
                 .eqIfPresent(MesProTaskDO::getWorkOrderId, reqVO.getWorkOrderId())
                 .eqIfPresent(MesProTaskDO::getRouteId, reqVO.getRouteId())
                 .eqIfPresent(MesProTaskDO::getProcessId, reqVO.getProcessId())
                 .eqIfPresent(MesProTaskDO::getWorkstationId, reqVO.getWorkstationId())
                 .eqIfPresent(MesProTaskDO::getStatus, reqVO.getStatus())
+                .inIfPresent(MesProTaskDO::getStatus, reqVO.getStatuses())
                 .betweenIfPresent(MesProTaskDO::getCreateTime, reqVO.getCreateTime())
-                .orderByDesc(MesProTaskDO::getId));
+                .orderByDesc(MesProTaskDO::getId);
+        return selectPage(reqVO, query);
     }
 
     default List<MesProTaskDO> selectListByWorkOrderId(Long workOrderId) {

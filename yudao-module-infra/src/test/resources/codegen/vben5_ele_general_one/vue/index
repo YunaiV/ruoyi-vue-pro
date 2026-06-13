@@ -1,0 +1,335 @@
+<script lang="ts" setup>
+import type { StudentApi } from '#/api/infra/student';
+
+import { ref, h, reactive, onMounted, nextTick } from 'vue';
+
+import { Page, useVbenModal } from '@vben/common-ui';
+import { DICT_TYPE } from '@vben/constants';
+import { getDictOptions } from '@vben/hooks';
+import { useTableToolbar, VbenVxeTableToolbar } from '@vben/plugins/vxe-table';
+import { cloneDeep, downloadFileFromBlobPart, formatDateTime } from '@vben/utils';
+import { ElButton, ElMessage, ElLoading, ElTabs, ElTabPane, ElPagination, ElForm, ElFormItem, ElDatePicker, ElSelect, ElOption, ElInput } from 'element-plus';
+import StudentForm from './modules/form.vue';
+import { Download, Plus, RefreshCw, Search, Trash2 } from '@vben/icons';
+import { ContentWrap } from '#/components/content-wrap';
+import { VxeColumn, VxeTable } from '#/adapter/vxe-table';
+
+
+import { $t } from '#/locales';
+import { isEmpty } from '@vben/utils';
+import { getStudentPage, deleteStudent, deleteStudentList, exportStudent } from '#/api/infra/student';
+
+
+const loading = ref(true) // 列表的加载中
+const list = ref<StudentApi.Student[]>([]) // 列表的数据
+
+const total = ref(0) // 列表的总页数
+const queryParams = reactive({
+  pageNo: 1,
+  pageSize: 10,
+                name: undefined,
+                birthday: undefined,
+                birthday: undefined,
+                sex: undefined,
+                enabled: undefined,
+                createTime: undefined,
+})
+const queryFormRef = ref() // 搜索的表单
+const exportLoading = ref(false) // 导出的加载中
+
+/** 查询列表 */
+const getList = async () => {
+  loading.value = true
+  try {
+    const params = cloneDeep(queryParams) as any;
+                if (params.birthday && Array.isArray(params.birthday)) {
+                  params.birthday = (params.birthday as string[]).join(',');
+                }
+                if (params.createTime && Array.isArray(params.createTime)) {
+                  params.createTime = (params.createTime as string[]).join(',');
+                }
+              const data = await getStudentPage(params)
+        list.value = data.list
+        total.value = data.total
+  } finally {
+    loading.value = false
+  }
+}
+
+/** 搜索按钮操作 */
+function handleQuery() {
+  queryParams.pageNo = 1
+  getList()
+}
+
+/** 重置按钮操作 */
+function resetQuery() {
+  queryFormRef.value.resetFields()
+  handleQuery()
+}
+
+const [FormModal, formModalApi] = useVbenModal({
+  connectedComponent: StudentForm,
+  destroyOnClose: true,
+});
+
+/** 创建学生 */
+function handleCreate() {
+  formModalApi.setData(null).open();
+}
+
+/** 编辑学生 */
+function handleEdit(row: StudentApi.Student) {
+  formModalApi.setData(row).open();
+}
+
+
+/** 删除学生 */
+async function handleDelete(row: StudentApi.Student) {
+  const loadingInstance = ElLoading.service({
+    text: $t('ui.actionMessage.deleting', [row.id]),
+  });
+  try {
+    await deleteStudent(row.id as number);
+    ElMessage.success($t('ui.actionMessage.deleteSuccess', [row.id]));
+    await getList();
+  } finally {
+    loadingInstance.close();
+  }
+}
+
+/** 批量删除学生 */
+async function handleDeleteBatch() {
+  const loadingInstance = ElLoading.service({
+    text: $t('ui.actionMessage.deleting'),
+  });
+  try {
+    await deleteStudentList(checkedIds.value);
+    checkedIds.value = [];
+    ElMessage.success($t('ui.actionMessage.deleteSuccess'));
+    await getList();
+  } finally {
+    loadingInstance.close();
+  }
+}
+
+const checkedIds = ref<number[]>([])
+function handleRowCheckboxChange({
+  records,
+}: {
+  records: StudentApi.Student[];
+}) {
+  checkedIds.value = records.map((item) => item.id!);
+}
+
+/** 导出表格 */
+async function handleExport() {
+try {
+  exportLoading.value = true;
+  const data = await exportStudent(queryParams);
+  downloadFileFromBlobPart({ fileName: '学生.xls', source: data });
+}finally {
+  exportLoading.value = false;
+}
+}
+
+
+
+/** 初始化 */
+const { hiddenSearchBar, tableToolbarRef, tableRef } = useTableToolbar();
+onMounted(() => {
+  getList();
+});
+</script>
+
+<template>
+  <Page auto-content-height>
+    <FormModal @success="getList" />
+
+    <ContentWrap v-if="!hiddenSearchBar">
+      <!-- 搜索工作栏 -->
+      <el-form
+          :model="queryParams"
+          ref="queryFormRef"
+          inline
+      >
+                    <el-form-item label="名字">
+                      <el-input
+                          v-model="queryParams.name"
+                          placeholder="请输入名字"
+                          clearable
+                          @keyup.enter="handleQuery"
+                           class="!w-[240px]"
+                      />
+                    </el-form-item>
+                        <el-form-item label="出生日期">
+                          <el-date-picker
+                              v-model="queryParams.birthday"
+                              value-format="YYYY-MM-DD"
+                              placeholder="选择出生日期"
+                              clearable
+                               class="!w-[240px]"
+                          />
+                        </el-form-item>
+                    <el-form-item label="性别">
+                      <el-select
+                          v-model="queryParams.sex"
+                          placeholder="请选择性别"
+                          clearable
+                           class="!w-[240px]"
+                      >
+                            <el-option
+                                v-for="dict in getDictOptions(DICT_TYPE.SYSTEM_USER_SEX, 'number')"
+                                :key="dict.value"
+                                :value="dict.value"
+                                :label="dict.label"
+                            />
+                      </el-select>
+                    </el-form-item>
+                    <el-form-item label="是否有效">
+                      <el-select
+                          v-model="queryParams.enabled"
+                          placeholder="请选择是否有效"
+                          clearable
+                           class="!w-[240px]"
+                      >
+                            <el-option
+                                v-for="dict in getDictOptions(DICT_TYPE.INFRA_BOOLEAN_STRING, 'boolean')"
+                                :key="dict.value"
+                                :value="dict.value"
+                                :label="dict.label"
+                            />
+                      </el-select>
+                    </el-form-item>
+                        <el-form-item label="创建时间">
+                          <el-date-picker
+                              v-model="queryParams.createTime"
+                              type="daterange"
+                              value-format="YYYY-MM-DD"
+                              range-separator="至"
+                              start-placeholder="开始日期"
+                              end-placeholder="结束日期"
+                              class="!w-[240px]"
+                          />
+                        </el-form-item>
+        <el-form-item>
+          <el-button class="ml-2" @click="resetQuery"> 重置 </el-button>
+          <el-button class="ml-2" @click="handleQuery" type="primary">
+            搜索
+          </el-button>
+        </el-form-item>
+      </el-form>
+    </ContentWrap>
+
+    <!-- 列表 -->
+    <ContentWrap title="学生">
+      <template #extra>
+        <TableToolbar
+            ref="tableToolbarRef"
+            v-model:hidden-search="hiddenSearchBar"
+        >
+          <el-button
+              class="ml-2"
+              :icon="h(Plus)"
+              type="primary"
+              @click="handleCreate"
+              v-access:code="['infra:student:create']"
+          >
+            {{ $t('ui.actionTitle.create', ['学生']) }}
+          </el-button>
+          <el-button
+              :icon="h(Download)"
+              type="primary"
+              class="ml-2"
+              :loading="exportLoading"
+              @click="handleExport"
+              v-access:code="['infra:student:export']"
+          >
+            {{ $t('ui.actionTitle.export') }}
+          </el-button>
+          <el-button
+              :icon="h(Trash2)"
+              type="danger"
+              class="ml-2"
+              :disabled="isEmpty(checkedIds)"
+              @click="handleDeleteBatch"
+              v-access:code="['infra:student:delete']"
+          >
+            批量删除
+          </el-button>
+        </TableToolbar>
+      </template>
+      <vxe-table
+          ref="tableRef"
+          :data="list"
+          show-overflow
+          :loading="loading"
+          @checkboxAll="handleRowCheckboxChange"
+          @checkboxChange="handleRowCheckboxChange"
+      >
+        <vxe-column type="checkbox" width="40"></vxe-column>
+                              <vxe-column field="id" title="编号" align="center" />
+                    <vxe-column field="name" title="名字" align="center" />
+                    <vxe-column field="description" title="简介" align="center" />
+                    <vxe-column field="birthday" title="出生日期" align="center">
+                      <template #default="{row}">
+                        {{formatDateTime(row.birthday)}}
+                      </template>
+                    </vxe-column>
+                    <vxe-column field="sex" title="性别" align="center">
+                      <template #default="{row}">
+                        <dict-tag :type="DICT_TYPE.SYSTEM_USER_SEX" :value="row.sex" />
+                      </template>
+                    </vxe-column>
+                    <vxe-column field="enabled" title="是否有效" align="center">
+                      <template #default="{row}">
+                        <dict-tag :type="DICT_TYPE.INFRA_BOOLEAN_STRING" :value="row.enabled" />
+                      </template>
+                    </vxe-column>
+                    <vxe-column field="avatar" title="头像" align="center" />
+                    <vxe-column field="video" title="附件" align="center" />
+                    <vxe-column field="memo" title="备注" align="center" />
+                    <vxe-column field="createTime" title="创建时间" align="center">
+                      <template #default="{row}">
+                        {{formatDateTime(row.createTime)}}
+                      </template>
+                    </vxe-column>
+        <vxe-column field="operation" title="操作" align="center">
+          <template #default="{row}">
+            <el-button
+                size="small"
+                type="primary"
+                link
+                @click="handleEdit(row as any)"
+                v-access:code="['infra:student:update']"
+            >
+              {{ $t('ui.actionTitle.edit') }}
+            </el-button>
+            <el-button
+                size="small"
+                type="danger"
+                link
+                class="ml-2"
+                @click="handleDelete(row as any)"
+                v-access:code="['infra:student:delete']"
+            >
+              {{ $t('ui.actionTitle.delete') }}
+            </el-button>
+          </template>
+        </vxe-column>
+      </vxe-table>
+      <!-- 分页 -->
+      <div class="mt-2 flex justify-end">
+        <el-pagination
+            :total="total"
+            v-model:current-page="queryParams.pageNo"
+            v-model:page-size="queryParams.pageSize"
+            :page-sizes="[10, 20, 50, 100]"
+            layout="total, sizes, prev, pager, next, jumper"
+            @size-change="getList"
+            @current-change="getList"
+        />
+      </div>
+    </ContentWrap>
+  </Page>
+</template>

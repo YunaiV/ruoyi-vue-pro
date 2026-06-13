@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.mes.service.qc.defectrecord.MesQcDefectRecordServ
 import cn.iocoder.yudao.module.mes.service.qc.template.MesQcTemplateItemService;
 import cn.iocoder.yudao.module.mes.service.wm.returnissue.MesWmReturnIssueLineService;
 import cn.iocoder.yudao.module.mes.service.wm.returnsales.MesWmReturnSalesLineService;
+import cn.iocoder.yudao.module.mes.service.qc.indicatorresult.MesQcIndicatorResultService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
@@ -56,6 +57,8 @@ public class MesQcRqcServiceImplTest extends BaseDbUnitTest {
     private MesQcDefectRecordService defectRecordService;
     @MockitoBean
     private AdminUserApi adminUserApi;
+    @MockitoBean
+    private MesQcIndicatorResultService indicatorResultService;
 
     @Test
     public void testFinishRqc_successWithReturnIssue() {

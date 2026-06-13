@@ -1,0 +1,103 @@
+<template>
+  <Dialog v-model="dialogVisible" title="${table.classComment}导入" width="400">
+    <el-upload
+      ref="uploadRef"
+      v-model:file-list="fileList"
+      :auto-upload="false"
+      :disabled="formLoading"
+      :limit="1"
+      :on-exceed="handleExceed"
+      accept=".xlsx, .xls"
+      action="none"
+      drag
+    >
+      <Icon icon="ep:upload" />
+      <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+      <template #tip>
+        <div class="el-upload__tip text-center">
+          <span>仅允许导入 xls、xlsx 格式文件。</span>
+          <el-link
+            :underline="false"
+            style="font-size: 12px; vertical-align: baseline"
+            type="primary"
+            @click="handleDownloadTemplate"
+          >
+            下载模板
+          </el-link>
+        </div>
+      </template>
+    </el-upload>
+    <template #footer>
+      <el-button :disabled="formLoading" type="primary" @click="submitForm">确 定</el-button>
+      <el-button @click="dialogVisible = false">取 消</el-button>
+    </template>
+  </Dialog>
+</template>
+<script setup lang="ts">
+import type { UploadUserFile } from 'element-plus'
+import download from '@/utils/download'
+import { ${simpleClassName}Api } from '@/api/${table.moduleName}/${table.businessName}'
+
+/** ${table.classComment} 导入 */
+defineOptions({ name: '${simpleClassName}ImportForm' })
+
+const message = useMessage() // 消息弹窗
+
+const dialogVisible = ref(false) // 弹窗的是否展示
+const formLoading = ref(false) // 表单的加载中：上传、下载模板
+const uploadRef = ref()
+const fileList = ref<UploadUserFile[]>([])
+
+/** 打开弹窗 */
+const open = async () => {
+  dialogVisible.value = true
+  await resetForm()
+}
+defineExpose({ open }) // 提供 open 方法，用于打开弹窗
+
+/** 提交导入 */
+const emit = defineEmits(['success']) // 定义 success 事件，用于操作成功后的回调
+const submitForm = async () => {
+  if (fileList.value.length === 0) {
+    message.error('请上传文件')
+    return
+  }
+  formLoading.value = true
+  try {
+    const formData = new FormData()
+    formData.append('file', fileList.value[0].raw as Blob)
+    const res = await ${simpleClassName}Api.import${simpleClassName}(formData)
+    const data = res.data
+    let text = '导入成功数量：' + data.successCount + '；导入失败数量：' + data.failureCount + '；'
+    if (data.failureCount > 0) {
+      for (const rowNo in data.failureRows) {
+        text += '< 第' + rowNo + '行: ' + data.failureRows[rowNo] + ' >'
+      }
+    }
+    message.alert(text)
+    dialogVisible.value = false
+    emit('success')
+  } finally {
+    formLoading.value = false
+    await resetForm()
+  }
+}
+
+/** 下载导入模板 */
+const handleDownloadTemplate = async () => {
+  const data = await ${simpleClassName}Api.import${simpleClassName}Template()
+  download.excel(data, '${table.classComment}导入模板.xls')
+}
+
+/** 文件超限 */
+const handleExceed = (): void => {
+  message.error('最多只能上传一个文件！')
+}
+
+/** 重置表单 */
+const resetForm = async () => {
+  fileList.value = []
+  await nextTick()
+  uploadRef.value?.clearFiles()
+}
+</script>

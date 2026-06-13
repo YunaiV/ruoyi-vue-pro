@@ -22,9 +22,9 @@ public class MesQcDefectSaveReqVO {
     @NotEmpty(message = "缺陷描述不能为空")
     private String name;
 
-    @Schema(description = "检测项类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "APPEARANCE")
-    @NotEmpty(message = "检测项类型不能为空")
-    private String type;
+    @Schema(description = "检测项类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
+    @NotNull(message = "检测项类型不能为空")
+    private Integer type;
 
     @Schema(description = "缺陷等级", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "缺陷等级不能为空")
@@ -34,4 +34,4 @@ public class MesQcDefectSaveReqVO {
     @Schema(description = "备注", example = "备注")
     private String remark;
 
-    }
+}

@@ -15,6 +15,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import cn.iocoder.yudao.module.mes.enums.DictTypeConstants;
 
 /**
  * MES 生产任务 DO
@@ -130,6 +131,7 @@ public class MesProTaskDO extends BaseDO {
     /**
      * 任务状态
      *
+     * 字典 {@link DictTypeConstants#MES_PRO_TASK_STATUS}
      * 枚举 {@link MesProTaskStatusEnum}
      */
     private Integer status;

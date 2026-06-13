@@ -32,4 +32,8 @@ public interface MesQcOqcLineMapper extends BaseMapperX<MesQcOqcLineDO> {
                 .eq(MesQcOqcLineDO::getOqcId, oqcId));
     }
 
+    default Long selectCountByUnitMeasureId(Long unitMeasureId) {
+        return selectCount(MesQcOqcLineDO::getUnitMeasureId, unitMeasureId);
+    }
+
 }

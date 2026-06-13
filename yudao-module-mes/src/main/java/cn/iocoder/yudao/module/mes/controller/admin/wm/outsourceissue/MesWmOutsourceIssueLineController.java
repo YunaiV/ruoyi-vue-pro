@@ -42,13 +42,10 @@ public class MesWmOutsourceIssueLineController {
 
     @Resource
     private MesWmOutsourceIssueLineService outsourceIssueLineService;
-
     @Resource
     private MesMdItemService itemService;
-
     @Resource
     private MesMdUnitMeasureService unitMeasureService;
-
     @Resource
     private MesWmBatchService batchService;
 

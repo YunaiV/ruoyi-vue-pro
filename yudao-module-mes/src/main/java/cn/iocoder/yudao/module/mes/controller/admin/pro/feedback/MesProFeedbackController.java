@@ -49,7 +49,7 @@ import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPOR
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAndThen;
-import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
+
 
 @Tag(name = "管理后台 - MES 生产报工")
 @RestController
@@ -158,7 +158,7 @@ public class MesProFeedbackController {
     @Parameter(name = "id", description = "编号", required = true)
     @PreAuthorize("@ss.hasPermission('mes:pro-feedback:approve')")
     public CommonResult<Boolean> approveFeedback(@RequestParam("id") Long id) {
-        return success(feedbackService.approveFeedback(id, getLoginUserId()));
+        return success(feedbackService.approveFeedback(id));
     }
 
     // ==================== 拼接 VO ====================

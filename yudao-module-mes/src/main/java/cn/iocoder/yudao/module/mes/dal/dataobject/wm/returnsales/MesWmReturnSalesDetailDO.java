@@ -59,6 +59,10 @@ public class MesWmReturnSalesDetailDO extends BaseDO {
      */
     private Long batchId;
     /**
+     * 批次号
+     */
+    private String batchCode;
+    /**
      * 仓库 ID
      *
      * 关联 {@link MesWmWarehouseDO#getId()}

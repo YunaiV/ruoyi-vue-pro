@@ -6,8 +6,8 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.mes.controller.admin.wm.warehouse.vo.location.MesWmWarehouseLocationPageReqVO;
 import cn.iocoder.yudao.module.mes.controller.admin.wm.warehouse.vo.location.MesWmWarehouseLocationSaveReqVO;
-import cn.iocoder.yudao.module.mes.dal.dataobject.wm.warehouse.MesWmWarehouseLocationDO;
 import cn.iocoder.yudao.module.mes.dal.dataobject.wm.warehouse.MesWmWarehouseDO;
+import cn.iocoder.yudao.module.mes.dal.dataobject.wm.warehouse.MesWmWarehouseLocationDO;
 import cn.iocoder.yudao.module.mes.dal.mysql.wm.warehouse.MesWmWarehouseLocationMapper;
 import cn.iocoder.yudao.module.mes.enums.wm.BarcodeBizTypeEnum;
 import cn.iocoder.yudao.module.mes.service.md.workstation.MesMdWorkstationService;
@@ -190,7 +190,6 @@ public class MesWmWarehouseLocationServiceImpl implements MesWmWarehouseLocation
             // 2.2 自动初始化
             MesWmWarehouseLocationDO newLocation = MesWmWarehouseLocationDO.builder()
                     .warehouseId(warehouse.getId()).code(code).name("虚拟线边库区")
-                    .areaStatus(cn.iocoder.yudao.framework.common.enums.CommonStatusEnum.ENABLE.getStatus())
                     .frozen(false).remark("系统自动初始化的虚拟线边库区")
                     .build();
             locationMapper.insert(newLocation);

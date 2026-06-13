@@ -97,9 +97,10 @@ public class IotWebSocketDataRuleAction extends
         }
     }
 
-    // TODO @puhui999：为什么这里要加锁呀？
     /**
      * 使用锁进行重连，保证同一服务器地址的重连操作线程安全
+     *
+     * 加锁原因：多线程并发发送消息时，多个线程可能同时检测到连接断开并尝试重连，使用锁 + 双重检查保证同一服务器地址只有一个线程执行重连操作
      *
      * @param webSocketClient WebSocket 客户端
      * @param config          配置信息

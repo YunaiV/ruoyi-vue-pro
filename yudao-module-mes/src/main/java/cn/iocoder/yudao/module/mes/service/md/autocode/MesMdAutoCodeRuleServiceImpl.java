@@ -29,7 +29,6 @@ public class MesMdAutoCodeRuleServiceImpl implements MesMdAutoCodeRuleService {
 
     @Resource
     private MesMdAutoCodeRuleMapper ruleMapper;
-
     @Resource
     private MesMdAutoCodePartMapper partMapper;
 

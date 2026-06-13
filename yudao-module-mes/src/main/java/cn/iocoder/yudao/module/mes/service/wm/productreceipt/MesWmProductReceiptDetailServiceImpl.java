@@ -28,7 +28,6 @@ public class MesWmProductReceiptDetailServiceImpl implements MesWmProductReceipt
     @Resource
     @Lazy
     private MesWmProductReceiptService productReceiptService;
-
     @Resource
     private MesWmWarehouseAreaService warehouseAreaService;
 

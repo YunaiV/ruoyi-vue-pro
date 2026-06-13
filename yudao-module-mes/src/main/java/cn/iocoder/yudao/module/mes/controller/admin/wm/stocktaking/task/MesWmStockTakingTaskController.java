@@ -44,6 +44,7 @@ public class MesWmStockTakingTaskController {
     private MesWmStockTakingTaskService stockTakingTaskService;
     @Resource
     private MesWmStockTakingPlanService stockTakingPlanService;
+
     @Resource
     private AdminUserApi adminUserApi;
 

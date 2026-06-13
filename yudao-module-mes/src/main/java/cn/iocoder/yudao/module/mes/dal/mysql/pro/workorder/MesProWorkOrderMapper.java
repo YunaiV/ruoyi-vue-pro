@@ -26,6 +26,7 @@ public interface MesProWorkOrderMapper extends BaseMapperX<MesProWorkOrderDO> {
                 .likeIfPresent(MesProWorkOrderDO::getOrderSourceCode, reqVO.getOrderSourceCode())
                 .eqIfPresent(MesProWorkOrderDO::getProductId, reqVO.getProductId())
                 .eqIfPresent(MesProWorkOrderDO::getClientId, reqVO.getClientId())
+                .eqIfPresent(MesProWorkOrderDO::getStatus, reqVO.getStatus())
                 .betweenIfPresent(MesProWorkOrderDO::getRequestDate, reqVO.getRequestDate())
                 .orderByDesc(MesProWorkOrderDO::getId));
     }
@@ -38,6 +39,10 @@ public interface MesProWorkOrderMapper extends BaseMapperX<MesProWorkOrderDO> {
         update(null, new LambdaUpdateWrapper<MesProWorkOrderDO>()
                 .eq(MesProWorkOrderDO::getId, id)
                 .setSql("quantity_produced = IFNULL(quantity_produced, 0) + " + incrQuantityProduced));
+    }
+
+    default Long selectCountByVendorId(Long vendorId) {
+        return selectCount(MesProWorkOrderDO::getVendorId, vendorId);
     }
 
 }

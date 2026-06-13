@@ -56,7 +56,10 @@ public class MesProTaskRespVO {
     private String itemName;
 
     @Schema(description = "规格型号", example = "100x200mm")
-    private String itemSpec;
+    private String itemSpecification;
+
+    @Schema(description = "计量单位名称", example = "个")
+    private String unitMeasureName;
 
     @Schema(description = "排产数量", example = "100.00")
     private BigDecimal quantity;
@@ -102,6 +105,9 @@ public class MesProTaskRespVO {
 
     @Schema(description = "任务状态", example = "0")
     private Integer status;
+
+    @Schema(description = "是否质检（派生自工艺路线工序 checkFlag）", example = "true")
+    private Boolean checkFlag;
 
     @Schema(description = "备注", example = "备注")
     private String remark;

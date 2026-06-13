@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.mes.service.md.workstation;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.mes.controller.admin.md.workstation.vo.MesMdWorkstationPageReqVO;
 import cn.iocoder.yudao.module.mes.controller.admin.md.workstation.vo.MesMdWorkstationSaveReqVO;
@@ -19,6 +20,7 @@ import cn.iocoder.yudao.module.mes.service.wm.warehouse.MesWmWarehouseLocationSe
 import cn.iocoder.yudao.module.mes.service.wm.warehouse.MesWmWarehouseService;
 import cn.iocoder.yudao.module.mes.service.pro.process.MesProProcessService;
 import jakarta.annotation.Resource;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -43,12 +45,12 @@ public class MesMdWorkstationServiceImpl implements MesMdWorkstationService {
     private MesMdWorkstationMapper workstationMapper;
 
     @Resource
+    @Lazy
     private MesMdWorkstationMachineService workstationMachineService;
     @Resource
     private MesMdWorkstationToolService workstationToolService;
     @Resource
     private MesMdWorkstationWorkerService workstationWorkerService;
-
     @Resource
     private MesMdWorkshopService workshopService;
     @Resource
@@ -97,7 +99,7 @@ public class MesMdWorkstationServiceImpl implements MesMdWorkstationService {
         // 校验车间存在
         validateWorkshopExists(reqVO.getWorkshopId());
         // 校验工序存在
-        processService.validateProcessExists(reqVO.getProcessId());
+        processService.validateProcessExistsAndEnable(reqVO.getProcessId());
         // 处理仓库层级（未指定仓库时自动设置虚拟线边库）
         handleWarehouseHierarchy(reqVO);
     }
@@ -121,6 +123,15 @@ public class MesMdWorkstationServiceImpl implements MesMdWorkstationService {
         MesMdWorkstationDO workstation = workstationMapper.selectById(id);
         if (workstation == null) {
             throw exception(MD_WORKSTATION_NOT_EXISTS);
+        }
+        return workstation;
+    }
+
+    @Override
+    public MesMdWorkstationDO validateWorkstationExistsAndEnable(Long id) {
+        MesMdWorkstationDO workstation = validateWorkstationExists(id);
+        if (ObjUtil.notEqual(CommonStatusEnum.ENABLE.getStatus(), workstation.getStatus())) {
+            throw exception(MD_WORKSTATION_IS_DISABLE);
         }
         return workstation;
     }
@@ -230,6 +241,11 @@ public class MesMdWorkstationServiceImpl implements MesMdWorkstationService {
     @Override
     public List<MesMdWorkstationDO> getWorkstationListByStatus(Integer status) {
         return workstationMapper.selectListByStatus(status);
+    }
+
+    @Override
+    public Long getWorkstationCountByWorkshopId(Long workshopId) {
+        return workstationMapper.selectCountByWorkshopId(workshopId);
     }
 
     @Override

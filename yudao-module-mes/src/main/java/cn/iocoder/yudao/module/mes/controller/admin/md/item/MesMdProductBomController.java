@@ -40,13 +40,10 @@ public class MesMdProductBomController {
 
     @Resource
     private MesMdProductBomService productBomService;
-
     @Resource
     private MesMdItemService itemService;
-
     @Resource
     private MesMdItemTypeService itemTypeService;
-
     @Resource
     private MesMdUnitMeasureService unitMeasureService;
 

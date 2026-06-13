@@ -46,13 +46,10 @@ public class MesWmProductReceiptController {
 
     @Resource
     private MesWmProductReceiptService productReceiptService;
-
     @Resource
     private MesProWorkOrderService workOrderService;
-
     @Resource
     private MesMdItemService itemService;
-
     @Resource
     private MesMdUnitMeasureService unitMeasureService;
 

@@ -43,7 +43,6 @@ public class MesWmProductSalesController {
 
     @Resource
     private MesWmProductSalesService productSalesService;
-
     @Resource
     private MesMdClientService clientService;
     @Resource
@@ -174,7 +173,7 @@ public class MesWmProductSalesController {
             MapUtils.findAndThen(clientMap, vo.getClientId(), client ->
                     vo.setClientName(client.getName()).setClientCode(client.getCode()));
             MapUtils.findAndThen(noticeMap, vo.getNoticeId(),
-                    notice -> vo.setNoticeCode(notice.getNoticeCode()));
+                    notice -> vo.setNoticeCode(notice.getCode()));
         });
     }
 

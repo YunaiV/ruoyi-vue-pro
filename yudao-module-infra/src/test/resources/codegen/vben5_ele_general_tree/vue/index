@@ -1,0 +1,226 @@
+<script lang="ts" setup>
+import type { CategoryApi } from '#/api/infra/category';
+
+import { ref, h, reactive, onMounted, nextTick } from 'vue';
+
+import { Page, useVbenModal } from '@vben/common-ui';
+import { getDictOptions } from '@vben/hooks';
+import { useTableToolbar, VbenVxeTableToolbar } from '@vben/plugins/vxe-table';
+import { cloneDeep, downloadFileFromBlobPart, formatDateTime } from '@vben/utils';
+import { ElButton, ElMessage, ElLoading, ElTabs, ElTabPane, ElPagination, ElForm, ElFormItem, ElDatePicker, ElSelect, ElOption, ElInput } from 'element-plus';
+import CategoryForm from './modules/form.vue';
+import { Download, Plus, RefreshCw, Search, Trash2 } from '@vben/icons';
+import { ContentWrap } from '#/components/content-wrap';
+import { VxeColumn, VxeTable } from '#/adapter/vxe-table';
+
+
+import { $t } from '#/locales';
+import { handleTree,isEmpty } from '@vben/utils'
+import { getCategoryList, deleteCategory, exportCategory } from '#/api/infra/category';
+
+
+const loading = ref(true) // 列表的加载中
+const list = ref<any[]>([]) // 树列表的数据
+
+const queryParams = reactive({
+                name: undefined,
+})
+const queryFormRef = ref() // 搜索的表单
+const exportLoading = ref(false) // 导出的加载中
+
+/** 查询列表 */
+const getList = async () => {
+  loading.value = true
+  try {
+    const params = cloneDeep(queryParams) as any;
+              list.value = await getCategoryList(params);
+  } finally {
+    loading.value = false
+  }
+}
+
+/** 搜索按钮操作 */
+function handleQuery() {
+  getList()
+}
+
+/** 重置按钮操作 */
+function resetQuery() {
+  queryFormRef.value.resetFields()
+  handleQuery()
+}
+
+const [FormModal, formModalApi] = useVbenModal({
+  connectedComponent: CategoryForm,
+  destroyOnClose: true,
+});
+
+/** 创建分类 */
+function handleCreate() {
+  formModalApi.setData(null).open();
+}
+
+/** 编辑分类 */
+function handleEdit(row: CategoryApi.Category) {
+  formModalApi.setData(row).open();
+}
+
+/** 新增下级分类 */
+function handleAppend(row: CategoryApi.Category) {
+  formModalApi.setData({ parentId: row.id }).open();
+}
+
+/** 删除分类 */
+async function handleDelete(row: CategoryApi.Category) {
+  const loadingInstance = ElLoading.service({
+    text: $t('ui.actionMessage.deleting', [row.id]),
+  });
+  try {
+    await deleteCategory(row.id as number);
+    ElMessage.success($t('ui.actionMessage.deleteSuccess', [row.id]));
+    await getList();
+  } finally {
+    loadingInstance.close();
+  }
+}
+
+
+/** 导出表格 */
+async function handleExport() {
+try {
+  exportLoading.value = true;
+  const data = await exportCategory(queryParams);
+  downloadFileFromBlobPart({ fileName: '分类.xls', source: data });
+}finally {
+  exportLoading.value = false;
+}
+}
+
+
+/** 切换树形展开/收缩状态 */
+const isExpanded = ref(true);
+function handleExpand() {
+  isExpanded.value = !isExpanded.value;
+  tableRef.value?.setAllTreeExpand(isExpanded.value);
+}
+
+/** 初始化 */
+const { hiddenSearchBar, tableToolbarRef, tableRef } = useTableToolbar();
+onMounted(() => {
+  getList();
+});
+</script>
+
+<template>
+  <Page auto-content-height>
+    <FormModal @success="getList" />
+
+    <ContentWrap v-if="!hiddenSearchBar">
+      <!-- 搜索工作栏 -->
+      <el-form
+          :model="queryParams"
+          ref="queryFormRef"
+          inline
+      >
+                    <el-form-item label="名字">
+                      <el-input
+                          v-model="queryParams.name"
+                          placeholder="请输入名字"
+                          clearable
+                          @keyup.enter="handleQuery"
+                           class="!w-[240px]"
+                      />
+                    </el-form-item>
+        <el-form-item>
+          <el-button class="ml-2" @click="resetQuery"> 重置 </el-button>
+          <el-button class="ml-2" @click="handleQuery" type="primary">
+            搜索
+          </el-button>
+        </el-form-item>
+      </el-form>
+    </ContentWrap>
+
+    <!-- 列表 -->
+    <ContentWrap title="分类">
+      <template #extra>
+        <TableToolbar
+            ref="tableToolbarRef"
+            v-model:hidden-search="hiddenSearchBar"
+        >
+          <el-button @click="handleExpand" class="mr-2">
+            {{ isExpanded ? '收缩' : '展开' }}
+          </el-button>
+          <el-button
+              class="ml-2"
+              :icon="h(Plus)"
+              type="primary"
+              @click="handleCreate"
+              v-access:code="['infra:category:create']"
+          >
+            {{ $t('ui.actionTitle.create', ['分类']) }}
+          </el-button>
+          <el-button
+              :icon="h(Download)"
+              type="primary"
+              class="ml-2"
+              :loading="exportLoading"
+              @click="handleExport"
+              v-access:code="['infra:category:export']"
+          >
+            {{ $t('ui.actionTitle.export') }}
+          </el-button>
+        </TableToolbar>
+      </template>
+      <vxe-table
+          ref="tableRef"
+          :data="list"
+          :tree-config="{
+          parentField: 'parentId',
+          rowField: 'id',
+          transform: true,
+          expandAll: true,
+          reserve: true,
+        }"
+          show-overflow
+          :loading="loading"
+      >
+                              <vxe-column field="id" title="编号" align="center" />
+                    <vxe-column field="name" title="名字" align="center"  tree-node/>
+                    <vxe-column field="parentId" title="父编号" align="center" />
+        <vxe-column field="operation" title="操作" align="center">
+          <template #default="{row}">
+  <el-button
+      size="small"
+      type="primary"
+      link
+      @click="handleAppend(row as any)"
+      v-access:code="['infra:category:create']"
+  >
+    新增下级
+  </el-button>
+            <el-button
+                size="small"
+                type="primary"
+                link
+                @click="handleEdit(row as any)"
+                v-access:code="['infra:category:update']"
+            >
+              {{ $t('ui.actionTitle.edit') }}
+            </el-button>
+            <el-button
+                size="small"
+                type="danger"
+                link
+                class="ml-2"
+                :disabled="!isEmpty(row?.children)"
+                @click="handleDelete(row as any)"
+                v-access:code="['infra:category:delete']"
+            >
+              {{ $t('ui.actionTitle.delete') }}
+            </el-button>
+          </template>
+        </vxe-column>
+      </vxe-table>
+    </ContentWrap>
+  </Page>
+</template>

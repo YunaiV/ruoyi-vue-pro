@@ -12,6 +12,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import cn.iocoder.yudao.module.mes.enums.DictTypeConstants;
 
 /**
  * MES 安灯呼叫记录 DO
@@ -70,12 +71,14 @@ public class MesProAndonRecordDO extends BaseDO {
     /**
      * 级别（快照值）
      *
+     * 字典 {@link DictTypeConstants#MES_PRO_ANDON_LEVEL}
      * 枚举 {@link MesProAndonLevelEnum}
      */
     private Integer level;
     /**
      * 处置状态
      *
+     * 字典 {@link DictTypeConstants#MES_PRO_ANDON_STATUS}
      * 枚举 {@link MesProAndonStatusEnum}
      */
     private Integer status;

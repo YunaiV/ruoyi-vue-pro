@@ -81,6 +81,7 @@ public interface IotDevicePropertyMapper {
 
     void insert(@Param("device") IotDeviceDO device,
                 @Param("properties") Map<String, Object> properties,
+                @Param("ts") Long ts,
                 @Param("reportTime") Long reportTime);
 
     List<IotDevicePropertyRespVO> selectListByHistory(@Param("reqVO") IotDevicePropertyHistoryListReqVO reqVO);

@@ -68,6 +68,14 @@ public interface MesMdItemService {
     MesMdItemDO validateItemExists(Long id);
 
     /**
+     * 校验物料产品存在且启用
+     *
+     * @param id 编号
+     * @return 物料产品
+     */
+    MesMdItemDO validateItemExistsAndEnable(Long id);
+
+    /**
      * 获得物料产品分页
      *
      * @param pageReqVO 分页查询
@@ -109,5 +117,13 @@ public interface MesMdItemService {
      * @return 导入结果
      */
     MesMdItemImportRespVO importItemList(List<MesMdItemImportExcelVO> importItems, boolean updateSupport);
+
+    /**
+     * 基于计量单位编号，获得物料数量
+     *
+     * @param unitMeasureId 计量单位编号
+     * @return 物料数量
+     */
+    Long getItemCountByUnitMeasureId(Long unitMeasureId);
 
 }

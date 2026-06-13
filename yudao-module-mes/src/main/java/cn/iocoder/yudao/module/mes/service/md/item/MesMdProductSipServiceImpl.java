@@ -59,7 +59,7 @@ public class MesMdProductSipServiceImpl implements MesMdProductSipService {
         validateSortUnique(reqVO.getItemId(), reqVO.getSort(), excludeId);
         // 校验工序存在
         if (reqVO.getProcessId() != null) {
-            processService.validateProcessExists(reqVO.getProcessId());
+            processService.validateProcessExistsAndEnable(reqVO.getProcessId());
         }
     }
 

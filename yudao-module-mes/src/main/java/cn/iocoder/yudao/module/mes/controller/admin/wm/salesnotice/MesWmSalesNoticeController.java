@@ -42,7 +42,6 @@ public class MesWmSalesNoticeController {
 
     @Resource
     private MesWmSalesNoticeService salesNoticeService;
-
     @Resource
     private MesMdClientService clientService;
 
@@ -110,15 +109,6 @@ public class MesWmSalesNoticeController {
     public CommonResult<Boolean> submitSalesNotice(@RequestParam("id") Long id) {
         salesNoticeService.submitSalesNotice(id);
         return success(true);
-    }
-
-    @GetMapping("/simple-list")
-    @Operation(summary = "获得发货通知单精简列表")
-    @Parameter(name = "status", description = "状态", example = "1")
-    public CommonResult<List<MesWmSalesNoticeRespVO>> getSalesNoticeSimpleList(
-            @RequestParam(value = "status", required = false) Integer status) {
-        List<MesWmSalesNoticeDO> list = salesNoticeService.getSalesNoticeListByStatus(status);
-        return success(buildRespVOList(list));
     }
 
     // ==================== 拼接 VO ====================

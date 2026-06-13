@@ -8,10 +8,12 @@ import cn.iocoder.yudao.module.mes.controller.admin.wm.returnsales.vo.line.MesWm
 import cn.iocoder.yudao.module.mes.controller.admin.wm.returnsales.vo.line.MesWmReturnSalesLineSaveReqVO;
 import cn.iocoder.yudao.module.mes.dal.dataobject.md.item.MesMdItemDO;
 import cn.iocoder.yudao.module.mes.dal.dataobject.wm.returnsales.MesWmReturnSalesLineDO;
+import cn.iocoder.yudao.module.mes.dal.dataobject.wm.returnsales.MesWmReturnSalesDO;
 import cn.iocoder.yudao.module.mes.dal.mysql.wm.returnsales.MesWmReturnSalesLineMapper;
 import cn.iocoder.yudao.module.mes.enums.wm.MesWmQualityStatusEnum;
 import cn.iocoder.yudao.module.mes.enums.wm.MesWmReturnSalesStatusEnum;
 import cn.iocoder.yudao.module.mes.service.md.item.MesMdItemService;
+import cn.iocoder.yudao.module.mes.service.wm.batch.MesWmBatchService;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -43,6 +45,8 @@ public class MesWmReturnSalesLineServiceImpl implements MesWmReturnSalesLineServ
     @Resource
     private MesMdItemService itemService;
     @Resource
+    private MesWmBatchService batchService;
+    @Resource
     @Lazy
     private MesWmReturnSalesDetailService returnSalesDetailService;
 
@@ -61,7 +65,9 @@ public class MesWmReturnSalesLineServiceImpl implements MesWmReturnSalesLineServ
     @Override
     public void updateReturnSalesLine(MesWmReturnSalesLineSaveReqVO updateReqVO) {
         // 校验存在
-        validateReturnSalesLineExists(updateReqVO.getId());
+        MesWmReturnSalesLineDO oldLine = validateReturnSalesLineExists(updateReqVO.getId());
+        // 固定父单 ID，防止通过接口篡改
+        updateReqVO.setReturnId(oldLine.getReturnId());
         validateLineSaveData(updateReqVO);
 
         // 更新
@@ -78,7 +84,7 @@ public class MesWmReturnSalesLineServiceImpl implements MesWmReturnSalesLineServ
         // 校验退货单存在 + 草稿状态
         returnSalesService.validateReturnSalesExistsAndPrepare(reqVO.getReturnId());
         // 校验物料存在 + 批次管理
-        validateItemBatchManagement(reqVO.getItemId(), reqVO.getBatchId());
+        validateItemBatchManagement(reqVO.getReturnId(), reqVO.getItemId(), reqVO.getBatchId());
     }
 
     @Override
@@ -144,14 +150,21 @@ public class MesWmReturnSalesLineServiceImpl implements MesWmReturnSalesLineServ
     /**
      * 校验物料批次管理
      *
-     * @param itemId 物料ID
-     * @param batchId 批次ID
+     * @param returnId 退货单ID
+     * @param itemId   物料ID
+     * @param batchId  批次ID
      */
-    private void validateItemBatchManagement(Long itemId, Long batchId) {
-        MesMdItemDO item = itemService.validateItemExists(itemId);
+    private void validateItemBatchManagement(Long returnId, Long itemId, Long batchId) {
+        MesMdItemDO item = itemService.validateItemExistsAndEnable(itemId);
         // 如果物料启用了批次管理，则必须选择批次
         if (Boolean.TRUE.equals(item.getBatchFlag()) && batchId == null) {
             throw exception(MD_ITEM_BATCH_REQUIRED);
+        }
+        // 校验批次存在且属于当前物料和客户
+        if (batchId != null) {
+            // 从父单获取客户ID，校验批次归属
+            MesWmReturnSalesDO returnSales = returnSalesService.validateReturnSalesExistsAndPrepare(returnId);
+            batchService.validateBatchExists(batchId, itemId, returnSales.getClientId(), null);
         }
     }
 
