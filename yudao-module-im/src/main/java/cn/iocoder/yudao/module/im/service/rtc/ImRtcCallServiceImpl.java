@@ -707,7 +707,6 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
         }
 
         // 3.1 群通话：推 RTC_CALL(NO_ANSWER) 让前端 banner 移除该人 + 级联关房判定
-        // TODO DONE @AI：拆分独立 NO_ANSWER 信令，不再复用 REJECT
         if (ImConversationTypeEnum.isGroup(call.getConversationType())) {
             pushCallNoAnswerNotification(call, userId, userMap.get(userId));
             endSessionIfTerminal(call, userId);

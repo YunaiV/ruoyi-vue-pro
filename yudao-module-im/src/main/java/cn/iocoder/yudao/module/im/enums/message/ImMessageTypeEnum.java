@@ -127,10 +127,6 @@ public enum ImMessageTypeEnum implements ArrayValuable<Integer> {
     RTC_CALL_END(1611, "通话结束", true, false),
 
     // ========== 好友通知（1201-1210 直接复用 OpenIM 段位编号） ==========
-    // TODO @芋艿：FRIEND_REQUEST_* 与 GROUP_REQUEST_* 都是 persistent=false 的 SysMsg，离线 pull 拉不到，
-    //  目前可能丢失「实时 toast 提醒」体验（业务状态不丢，前端上线 fetch{Friend,Group}RequestList 能补回来）；
-    //  未来思考下怎么优化：候选方案 1）改 persistent=true 入私聊消息流 + 让客户端按 type 自渲染；
-    //  2）服务端补一个「未读通知拉取」接口给前端冷启动调用。
     /**
      * 对应 OpenIM：FriendApplicationApprovedNotification 1201
      * 对应自己的类：FriendRequestApprovedNotification
