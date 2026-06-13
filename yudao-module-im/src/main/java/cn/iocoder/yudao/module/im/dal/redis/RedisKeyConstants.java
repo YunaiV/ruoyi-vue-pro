@@ -9,20 +9,6 @@ package cn.iocoder.yudao.module.im.dal.redis;
 public interface RedisKeyConstants {
 
     /**
-     * 群消息已读位置
-     * KEY 格式：  im:group:message:read:{groupId}
-     * VALUE 数据类型： Hash (field: userId, value: maxReadMessageId)
-     */
-    String GROUP_MESSAGE_READ = "im:group:message:read:%s";
-
-    /**
-     * 频道消息已读位置
-     * KEY 格式：  im:channel:message:read:{channelId}
-     * VALUE 数据类型： Hash (field: userId, value: maxReadMessageId)
-     */
-    String CHANNEL_MESSAGE_READ = "im:channel:message:read:%s";
-
-    /**
      * 好友关系状态缓存（合并「是否好友」+「是否拉黑」两态）
      * <p>
      * KEY 格式：friend_state:{userId}_{friendUserId}
@@ -44,7 +30,7 @@ public interface RedisKeyConstants {
      * KEY 格式：group_member_ids:{groupId}
      * VALUE 数据类型：List<Long>
      * <p>
-     * 说明：只缓存轻量的 userId 列表，适合"群消息推送目标"这类只关心 userId 的场景。
+     * 说明：只缓存轻量的 userId 列表，适合「群消息推送目标」这类只关心 userId 的场景
      */
     String GROUP_MEMBER_IDS = "group_member_ids";
 

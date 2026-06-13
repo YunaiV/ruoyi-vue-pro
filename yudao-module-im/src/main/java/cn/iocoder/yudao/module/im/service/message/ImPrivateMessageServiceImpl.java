@@ -12,9 +12,11 @@ import cn.iocoder.yudao.module.im.controller.admin.message.vo.privates.ImPrivate
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.privates.ImPrivateMessageSendReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImPrivateMessageDO;
 import cn.iocoder.yudao.module.im.dal.mysql.message.ImPrivateMessageMapper;
+import cn.iocoder.yudao.module.im.enums.ImConversationTypeEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
 import cn.iocoder.yudao.module.im.framework.config.ImProperties;
+import cn.iocoder.yudao.module.im.service.conversation.ImConversationReadService;
 import cn.iocoder.yudao.module.im.service.friend.ImFriendService;
 import cn.iocoder.yudao.module.im.service.message.dto.ImPrivateMessageSendDTO;
 import cn.iocoder.yudao.module.im.service.sensitiveword.ImSensitiveWordService;
@@ -25,6 +27,7 @@ import cn.iocoder.yudao.module.im.service.websocket.dto.message.RecallMessage;
 import cn.iocoder.yudao.module.im.util.ImMessageUtils;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -52,6 +55,8 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
     private ImFriendService friendService;
     @Resource
     private ImSensitiveWordService sensitiveWordService;
+    @Resource
+    private ImConversationReadService conversationReadService;
 
     @Resource
     private ImWebSocketService imWebSocketService;
@@ -80,10 +85,16 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
 
         // 2.1 引用 quote 消息规范化
         reqVO.setContent(normalizeQuoteContent(reqVO, senderId));
-        // 2.2 构建并保存消息
+        // 2.2 构建并保存消息；唯一键冲突时回查已存在消息返回
         ImPrivateMessageDO message = BeanUtils.toBean(reqVO, ImPrivateMessageDO.class, m -> m
                 .setSenderId(senderId).setStatus(ImMessageStatusEnum.UNREAD.getStatus()).setSendTime(LocalDateTime.now()));
-        privateMessageMapper.insert(message);
+        try {
+            privateMessageMapper.insert(message);
+        } catch (DuplicateKeyException e) {
+            log.warn("[sendPrivateMessage][senderId({}) clientMessageId({}) 并发插入冲突，回查返回]",
+                    senderId, reqVO.getClientMessageId());
+            return privateMessageMapper.selectBySenderIdAndClientMessageId(senderId, reqVO.getClientMessageId());
+        }
 
         // 3. WebSocket 异步推送：接收方 + 发送方多端同步
         ImPrivateMessageDTO websocketMessage = ImPrivateMessageDTO.ofSend(message);
@@ -211,16 +222,21 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
             throw exception(MESSAGE_PRIVATE_READ_DISABLED);
         }
         Assert.notNull(messageId, "已读消息编号不能为空");
-        // 2. 把 (receiverId → userId) 这条会话上、id <= messageId 的未读消息一步更新为已读
+
+        // 2. status 双写：把 (receiverId → userId) 上 id <= messageId 的未读消息置为已读
         // 仅 UNREAD 行被命中，避免覆盖已撤回/已读的状态；select-then-update 合成单条 SQL 后也消除了竞态窗口
-        int updated = privateMessageMapper.updateBySenderIdAndReceiverIdAndIdLeAndStatus(
+        privateMessageMapper.updateBySenderIdAndReceiverIdAndIdLeAndStatus(
                 receiverId, userId, messageId, ImMessageStatusEnum.UNREAD.getStatus(),
                 new ImPrivateMessageDO().setStatus(ImMessageStatusEnum.READ.getStatus()));
-        if (updated == 0) {
+
+        // 3. 同步写 im_conversation_read（读位置唯一权威，单调递增）；读位置前进才下发事件
+        boolean advanced = conversationReadService.updateConversationReadPosition(
+                userId, ImConversationTypeEnum.PRIVATE.getType(), receiverId, messageId);
+        if (!advanced) {
             return;
         }
 
-        // 3. 异步发送 READ + RECEIPT 事件（已读位置以前端上报为准，与多端 / 对方 UI 显示一致）
+        // 4. 异步发送 READ + RECEIPT 事件（已读位置以前端上报为准，与多端 / 对方 UI 显示一致）
         imWebSocketService.sendPrivateMessageAsync(userId,
                 ImPrivateMessageDTO.ofRead(userId, receiverId, messageId));
         imWebSocketService.sendPrivateMessageAsync(receiverId,

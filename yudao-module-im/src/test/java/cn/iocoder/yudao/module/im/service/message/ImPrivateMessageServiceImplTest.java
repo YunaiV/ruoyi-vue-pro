@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.im.dal.mysql.message.ImPrivateMessageMapper;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
 import cn.iocoder.yudao.module.im.framework.config.ImProperties;
+import cn.iocoder.yudao.module.im.service.conversation.ImConversationReadService;
 import cn.iocoder.yudao.module.im.service.friend.ImFriendService;
 import cn.iocoder.yudao.module.im.service.sensitiveword.ImSensitiveWordService;
 import cn.iocoder.yudao.module.im.service.message.dto.ImPrivateMessageSendDTO;
@@ -46,6 +47,8 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
     private ImFriendService friendService;
     @Mock
     private ImSensitiveWordService sensitiveWordService;
+    @Mock
+    private ImConversationReadService conversationReadService;
     @Mock
     private ImWebSocketService imWebSocketService;
 
@@ -167,6 +170,9 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
                 eq(2L), eq(1L), eq(5L),
                 eq(ImMessageStatusEnum.UNREAD.getStatus()), any(ImPrivateMessageDO.class)))
                 .thenReturn(2);
+        // 读位置前进 → 才下发事件
+        when(conversationReadService.updateConversationReadPosition(anyLong(), anyInt(), anyLong(), anyLong()))
+                .thenReturn(true);
 
         // 调用
         privateMessageService.readPrivateMessages(1L, 2L, 5L);

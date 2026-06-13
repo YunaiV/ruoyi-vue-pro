@@ -193,8 +193,6 @@ public class ImGroupServiceImpl implements ImGroupService {
                 .setStatus(CommonStatusEnum.DISABLE.getStatus()).setDissolvedTime(LocalDateTime.now()));
         // 2.2 移除全部群成员
         groupMemberService.removeGroupMembersByGroupId(id);
-        // 2.3 清理已读缓存
-        groupMessageService.deleteReadMaxMessageIdMap(id);
     }
 
     // ==================== 群成员的写操作 ====================
@@ -267,10 +265,8 @@ public class ImGroupServiceImpl implements ImGroupService {
         // 2. 先发广播，后移成员（见类 javadoc）
         groupMessageService.sendGroupMessage(userId, ImGroupMessageSendDTO.ofGroupMemberQuit(groupId, userId));
 
-        // 3.1 移除群成员
+        // 3. 移除群成员
         groupMemberService.removeGroupMember(groupId, userId);
-        // 3.2 清理已读缓存
-        groupMessageService.deleteReadMaxMessageId(groupId, userId);
     }
 
     @Override
@@ -307,10 +303,8 @@ public class ImGroupServiceImpl implements ImGroupService {
         groupMessageService.sendGroupMessage(userId,
                 ImGroupMessageSendDTO.ofGroupMemberKick(groupId, userId, validTargetUserIds));
 
-        // 3.1 批量移除群成员
+        // 3. 批量移除群成员；不清理读位置（保留退群前历史已读，供离线补偿）
         groupMemberService.removeGroupMembers(groupId, validTargetUserIds);
-        // 3.2 批量清理已读缓存
-        groupMessageService.deleteReadMaxMessageIds(groupId, validTargetUserIds);
     }
 
     @Override
@@ -599,6 +593,7 @@ public class ImGroupServiceImpl implements ImGroupService {
         return convertMap(groupMapper.selectByIds(ids), ImGroupDO::getId);
     }
 
+    // TODO @AI：是不是可以拉退出的也可以哈？前端自己按需过滤！
     @Override
     public List<ImGroupDO> getMyGroupList(Long userId) {
         // 1.1 查用户所在的、仍有效的群成员记录（仅 ENABLE 状态）
