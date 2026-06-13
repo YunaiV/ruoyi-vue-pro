@@ -1653,9 +1653,9 @@ INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_t
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3443, 1, '草稿', '0', 'mes_wm_product_produce_status', 0, 'info', '', '草稿状态', '1', '2026-04-05 15:53:46', '1', '2026-04-05 15:53:46', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3444, 2, '已完成', '4', 'mes_wm_product_produce_status', 0, 'success', '', '已完成状态', '1', '2026-04-05 15:53:46', '1', '2026-04-05 15:53:46', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3445, 3, '已取消', '5', 'mes_wm_product_produce_status', 0, 'danger', '', '已取消状态', '1', '2026-04-05 15:53:46', '1', '2026-04-05 15:53:46', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3446, 0, 'è‰ç¨¿', '0', 'mes_pro_task_status', 0, '', '', NULL, '1', '2026-04-16 09:47:00', '1', '2026-04-16 09:47:00', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3447, 1, 'å·²å®Œæˆ', '4', 'mes_pro_task_status', 0, '', '', NULL, '1', '2026-04-16 09:47:00', '1', '2026-04-16 09:47:00', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3448, 2, 'å·²å–æ¶ˆ', '5', 'mes_pro_task_status', 0, '', '', NULL, '1', '2026-04-16 09:47:00', '1', '2026-04-16 09:47:00', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3446, 0, '草稿', '0', 'mes_pro_task_status', 0, '', '', NULL, '1', '2026-04-16 09:47:00', '1', '2026-04-16 09:47:00', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3447, 1, '已完成', '4', 'mes_pro_task_status', 0, '', '', NULL, '1', '2026-04-16 09:47:00', '1', '2026-04-16 09:47:00', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3448, 2, '已取消', '5', 'mes_pro_task_status', 0, '', '', NULL, '1', '2026-04-16 09:47:00', '1', '2026-04-16 09:47:00', '0');
 COMMIT;
 -- @formatter:on
 
@@ -5943,4 +5943,3 @@ COMMIT;
 DROP SEQUENCE IF EXISTS yudao_demo03_student_seq;
 CREATE SEQUENCE yudao_demo03_student_seq
     START 10;
-
