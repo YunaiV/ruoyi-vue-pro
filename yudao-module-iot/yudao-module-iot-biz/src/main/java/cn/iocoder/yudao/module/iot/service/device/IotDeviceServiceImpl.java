@@ -37,6 +37,7 @@ import cn.iocoder.yudao.module.iot.dal.mysql.device.IotDeviceMapper;
 import cn.iocoder.yudao.module.iot.dal.redis.RedisKeyConstants;
 import cn.iocoder.yudao.module.iot.enums.product.IotProductDeviceTypeEnum;
 import cn.iocoder.yudao.module.iot.service.device.message.IotDeviceMessageService;
+import cn.iocoder.yudao.module.iot.service.device.shadow.IotDeviceShadowService;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import jakarta.annotation.Resource;
 import jakarta.validation.ConstraintViolationException;
@@ -81,6 +82,9 @@ public class IotDeviceServiceImpl implements IotDeviceService {
     @Resource
     @Lazy // 延迟加载，解决循环依赖
     private IotDeviceMessageService deviceMessageService;
+    @Resource
+    @Lazy // 延迟加载，解决循环依赖
+    private IotDeviceShadowService deviceShadowService;
 
     private IotDeviceServiceImpl getSelf() {
         return SpringUtil.getBean(getClass());
@@ -209,7 +213,10 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         // 2. 删除设备
         deviceMapper.deleteById(id);
 
-        // 3. 清空对应缓存
+        // 3. 级联删除影子
+        deviceShadowService.deleteByDeviceId(id);
+
+        // 4. 清空对应缓存
         deleteDeviceCache(device);
     }
 
@@ -235,7 +242,10 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         // 2. 删除设备
         deviceMapper.deleteByIds(ids);
 
-        // 3. 清空对应缓存
+        // 3. 级联删除影子
+        ids.forEach(deviceShadowService::deleteByDeviceId);
+
+        // 4. 清空对应缓存
         deleteDeviceCache(devices);
     }
 

@@ -2,7 +2,9 @@ package cn.iocoder.yudao.module.iot.gateway.service.device.message;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceRespDTO;
+import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.enums.IotSerializeTypeEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.mq.producer.IotDeviceMessageProducer;
@@ -40,6 +42,10 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
     @Override
     public byte[] serializeDeviceMessage(IotDeviceMessage message,
                                          String productKey, String deviceName) {
+        // 影子透传：直接序列化 params 为原始线 JSON，忽略产品 serializeType
+        if (IotDeviceMessageMethodEnum.isPassthrough(message.getMethod())) {
+            return JsonUtils.toJsonByte(message.getParams());
+        }
         // 1.1 获取设备信息
         IotDeviceRespDTO device = deviceService.getDeviceFromCache(productKey, deviceName);
         if (device == null) {
@@ -56,6 +62,10 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
     @Override
     public byte[] serializeDeviceMessage(IotDeviceMessage message,
                                          IotSerializeTypeEnum serializeType) {
+        // 影子透传
+        if (IotDeviceMessageMethodEnum.isPassthrough(message.getMethod())) {
+            return JsonUtils.toJsonByte(message.getParams());
+        }
         // 1. 获取序列化器
         IotMessageSerializer serializer = messageSerializerManager.get(serializeType);
         if (serializer == null) {

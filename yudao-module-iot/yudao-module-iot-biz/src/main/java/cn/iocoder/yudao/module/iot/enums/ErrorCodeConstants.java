@@ -62,6 +62,10 @@ public interface ErrorCodeConstants {
     ErrorCode DEVICE_MODBUS_POINT_NOT_EXISTS = new ErrorCode(1_050_007_000, "设备 Modbus 点位配置不存在");
     ErrorCode DEVICE_MODBUS_POINT_EXISTS = new ErrorCode(1_050_007_001, "设备 Modbus 点位配置已存在");
 
+    // ========== 设备影子 1-050-007-100 ==========
+    ErrorCode DEVICE_SHADOW_NOT_ENABLED = new ErrorCode(1_050_007_100, "设备影子未启用");
+    ErrorCode DEVICE_SHADOW_VERSION_CONFLICT = new ErrorCode(1_050_007_101, "设备影子版本冲突");
+
     // ========== OTA 固件相关 1-050-008-000 ==========
 
     ErrorCode OTA_FIRMWARE_NOT_EXISTS = new ErrorCode(1_050_008_000, "固件信息不存在");
