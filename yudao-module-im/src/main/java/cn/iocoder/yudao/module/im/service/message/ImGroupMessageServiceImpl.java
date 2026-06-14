@@ -18,7 +18,7 @@ import cn.iocoder.yudao.module.im.dal.dataobject.message.ImGroupMessageDO;
 import cn.iocoder.yudao.module.im.dal.mysql.message.ImGroupMessageMapper;
 import cn.iocoder.yudao.module.im.enums.ImConversationTypeEnum;
 import cn.iocoder.yudao.module.im.enums.group.ImGroupMemberRoleEnum;
-import cn.iocoder.yudao.module.im.enums.message.ImGroupMessageReceiptStatusEnum;
+import cn.iocoder.yudao.module.im.enums.message.ImMessageReceiptStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
 import cn.iocoder.yudao.module.im.framework.config.ImProperties;
@@ -104,7 +104,7 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
         reqVO.setContent(normalizeQuoteContent(reqVO, senderMember, receiverUserIds));
         // 2.3 构建并保存消息；唯一键冲突时回查已存在消息返回
         ImGroupMessageDO message = BeanUtils.toBean(reqVO, ImGroupMessageDO.class, m -> m
-                .setSenderId(senderId).setStatus(ImMessageStatusEnum.UNREAD.getStatus()).setSendTime(LocalDateTime.now())
+                .setSenderId(senderId).setStatus(ImMessageStatusEnum.NORMAL.getStatus()).setSendTime(LocalDateTime.now())
                 .setReceiverUserIds(new ArrayList<>(receiverUserIds))
                 .setReceiptStatus(resolveReceiptStatus(reqVO.getReceipt())));
         try {
@@ -138,7 +138,7 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
         ImGroupMessageDO message = new ImGroupMessageDO().setClientMessageId(IdUtil.fastSimpleUUID())
                 .setSenderId(senderId).setGroupId(dto.getGroupId())
                 .setType(dto.getType()).setContent(contentString)
-                .setStatus(ImMessageStatusEnum.UNREAD.getStatus()).setSendTime(LocalDateTime.now())
+                .setStatus(ImMessageStatusEnum.NORMAL.getStatus()).setSendTime(LocalDateTime.now())
                 .setAtUserIds(dto.getAtUserIds()).setReceiverUserIds(new ArrayList<>(receiverUserIds))
                 .setReceiptStatus(resolveReceiptStatus(dto.getReceipt()));
         // 1.3 按 type.persistent 决定是否入库
@@ -206,52 +206,35 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
         // 2. 按 receiver_user_ids 快照过滤可见性，结果按 id 升序
         List<ImGroupMessageDO> messages = groupMessageMapper.selectListByMinId(userId, groupIds, minId, minSendTime, size);
 
-        // 3. 按当前用户补齐：消息已读态、本人发送的回执消息的已读人数
-        appendMessageStatusAndReceipt(userId, messages);
+        // 3. 补齐本人发送的回执消息的已读人数
+        appendMessageReceipt(userId, messages);
         log.info("[pullGroupMessageList][userId({}) minId({}) size({}) result({})]", userId, minId, size, messages.size());
         return messages;
     }
 
     /**
-     * 补全消息已读态和回执已读人数
+     * 补全本人发送消息的回执已读人数（readCount）
      * <p>
-     * 1. 消息已读态（status）：根据 im_conversation_read 读位置判断 READ / UNREAD，所有消息都补
-     * 2. 回执已读人数（readCount）：仅对本人发送、且需要回执（非 NO_RECEIPT）的消息，计算可见成员中的已读人数
+     * 仅对本人发送、且需要回执（非 NO_RECEIPT）的消息，按 receiver_user_ids 快照 ∩ 当前有效成员 - 发送者 算已读人数
      */
-    @SuppressWarnings({"StatementWithEmptyBody", "DataFlowIssue"})
-    private void appendMessageStatusAndReceipt(Long userId, List<ImGroupMessageDO> messages) {
+    @SuppressWarnings("DataFlowIssue")
+    private void appendMessageReceipt(Long userId, List<ImGroupMessageDO> messages) {
         if (CollUtil.isEmpty(messages)) {
             return;
         }
-        // 群已读关闭：不查读位置，status 保持 DB 原值（含撤回），readCount 不补齐
+        // 群已读关闭：不补 readCount
         if (BooleanUtil.isFalse(imProperties.getMessage().isGroupReadEnabled())) {
             return;
         }
-        Map<Long, Long> readMaxMessageIdsByGroup = new HashMap<>(); // 群 → 当前用户已读位置
         Map<Long, Map<Long, Long>> readPositionsByGroup = new HashMap<>(); // 群 → (用户 → 已读位置)
         Map<Long, List<ImGroupMemberDO>> membersByGroup = new HashMap<>(); // 群 → 全部成员列表
         for (ImGroupMessageDO message : messages) {
-            // 消息已读态（status）：撤回 > 已读 > 未读
-            Long groupId = message.getGroupId();
-            long readMaxMessageId = readMaxMessageIdsByGroup.computeIfAbsent(groupId, gid -> {
-                Long readMaxMsgId = conversationReadService.getConversationReadMessageId(
-                        userId, ImConversationTypeEnum.GROUP.getType(), gid);
-                return readMaxMsgId != null ? readMaxMsgId : -1L;
-            });
-            if (ImMessageStatusEnum.RECALL.getStatus().equals(message.getStatus())) {
-                // 保持撤回态
-            } else if (readMaxMessageId >= message.getId()) {
-                message.setStatus(ImMessageStatusEnum.READ.getStatus());
-            } else {
-                message.setStatus(ImMessageStatusEnum.UNREAD.getStatus());
-            }
-
-            // 回执已读人数（readCount）：仅补本人发送、且需要回执（非 NO_RECEIPT）的消息
-            // 读位置（status）所有消息都补；readCount 只服务「需要回执」的消息，不把已读位置和消息回执混为一谈
+            // 仅补本人发送、且需要回执（非 NO_RECEIPT）的消息
             if (ObjUtil.notEqual(message.getSenderId(), userId)
-                    || ImGroupMessageReceiptStatusEnum.NO_RECEIPT.getStatus().equals(message.getReceiptStatus())) {
+                    || ImMessageReceiptStatusEnum.NO_RECEIPT.getStatus().equals(message.getReceiptStatus())) {
                 continue;
             }
+            Long groupId = message.getGroupId();
             Map<Long, Long> positions = readPositionsByGroup.computeIfAbsent(groupId,
                     gid -> conversationReadService.getUserReadMessageIdMap(ImConversationTypeEnum.GROUP.getType(), gid));
             // 应读分母取当前有效成员（剔除已退群），与异步回执刷新、前端已读弹层口径一致
@@ -385,9 +368,9 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
                     uid -> allPositions.getOrDefault(uid, -1L) >= message.getId() ? 1 : null,
                     Integer::sum, 0);
             // 2.1.2 全部已读 → 标记回执完成
-            Integer newReceiptStatus = ImGroupMessageReceiptStatusEnum.PENDING.getStatus();
+            Integer newReceiptStatus = ImMessageReceiptStatusEnum.PENDING.getStatus();
             if (readCount >= receiverUserIds.size()) {
-                newReceiptStatus = ImGroupMessageReceiptStatusEnum.DONE.getStatus();
+                newReceiptStatus = ImMessageReceiptStatusEnum.DONE.getStatus();
                 groupMessageMapper.updateById(new ImGroupMessageDO().setId(message.getId())
                         .setReceiptStatus(newReceiptStatus));
             }
@@ -534,11 +517,11 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
      */
     private Integer resolveReceiptStatus(Boolean receipt) {
         if (BooleanUtil.isFalse(imProperties.getMessage().isGroupReadEnabled())) {
-            return ImGroupMessageReceiptStatusEnum.NO_RECEIPT.getStatus();
+            return ImMessageReceiptStatusEnum.NO_RECEIPT.getStatus();
         }
         return BooleanUtil.isTrue(receipt)
-                ? ImGroupMessageReceiptStatusEnum.PENDING.getStatus()
-                : ImGroupMessageReceiptStatusEnum.NO_RECEIPT.getStatus();
+                ? ImMessageReceiptStatusEnum.PENDING.getStatus()
+                : ImMessageReceiptStatusEnum.NO_RECEIPT.getStatus();
     }
 
     /**

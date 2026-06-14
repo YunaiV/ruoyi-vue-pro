@@ -245,7 +245,7 @@ public class ImStatisticsManagerMapperTest extends BaseDbUnitTest {
                 .senderId(senderId).receiverId(receiverId)
                 .type(ImMessageTypeEnum.TEXT.getType())
                 .content("{}")
-                .status(ImMessageStatusEnum.UNREAD.getStatus())
+                .status(ImMessageStatusEnum.NORMAL.getStatus())
                 .sendTime(sendTime).build();
     }
 
@@ -255,7 +255,7 @@ public class ImStatisticsManagerMapperTest extends BaseDbUnitTest {
                 .setSenderId(senderId).setGroupId(groupId)
                 .setType(ImMessageTypeEnum.TEXT.getType())
                 .setContent("{}")
-                .setStatus(ImMessageStatusEnum.UNREAD.getStatus())
+                .setStatus(ImMessageStatusEnum.NORMAL.getStatus())
                 .setSendTime(sendTime);
     }
 

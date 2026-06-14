@@ -7,7 +7,7 @@ import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.util.MyBatisUtils;
 import cn.iocoder.yudao.module.im.controller.admin.manager.message.vo.group.ImGroupMessageManagerPageReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImGroupMessageDO;
-import cn.iocoder.yudao.module.im.enums.message.ImGroupMessageReceiptStatusEnum;
+import cn.iocoder.yudao.module.im.enums.message.ImMessageReceiptStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -84,7 +84,7 @@ public interface ImGroupMessageMapper extends BaseMapperX<ImGroupMessageDO> {
     default List<ImGroupMessageDO> selectListByGroupIdAndPendingReceipt(Long groupId, Long minId, Long maxId) {
         return selectList(new LambdaQueryWrapperX<ImGroupMessageDO>()
                 .eq(ImGroupMessageDO::getGroupId, groupId)
-                .eq(ImGroupMessageDO::getReceiptStatus, ImGroupMessageReceiptStatusEnum.PENDING.getStatus())
+                .eq(ImGroupMessageDO::getReceiptStatus, ImMessageReceiptStatusEnum.PENDING.getStatus())
                 .gt(minId != null, ImGroupMessageDO::getId, minId)
                 .le(ImGroupMessageDO::getId, maxId)
                 .ne(ImGroupMessageDO::getStatus, ImMessageStatusEnum.RECALL.getStatus()));

@@ -35,5 +35,9 @@ public class ImPrivateMessageSendDTO {
      * true：覆盖为双向 + 入库
      */
     private Boolean persistent;
+    /**
+     * 是否需要回执；null 等价 false（系统消息默认不需要回执）
+     */
+    private Boolean receipt;
 
 }

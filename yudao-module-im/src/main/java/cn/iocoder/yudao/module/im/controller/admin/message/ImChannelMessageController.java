@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.channel.ImChannelMessagePullRespVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImChannelMessageDO;
-import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
+import cn.iocoder.yudao.module.im.enums.message.ImMessageReceiptStatusEnum;
 import cn.iocoder.yudao.module.im.service.message.ImChannelMessageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -51,14 +51,14 @@ public class ImChannelMessageController {
         if (CollUtil.isEmpty(list)) {
             return success(Collections.emptyList());
         }
-        // 2. 按 Redis 已读游标补 status；device A 已读后 device B 拉到这条不再算入未读
+        // 2. 按已读游标补 receiptStatus（已读 DONE / 未读 PENDING）
         Map<Long, Long> readMaxByChannel = channelMessageService.getChannelReadMaxMessageIdMap(
                 userId, convertSet(list, ImChannelMessageDO::getChannelId));
         return success(BeanUtils.toBean(list, ImChannelMessagePullRespVO.class, vo -> {
             Long readMax = readMaxByChannel.get(vo.getChannelId());
-            vo.setStatus(readMax != null && readMax >= vo.getId()
-                    ? ImMessageStatusEnum.READ.getStatus()
-                    : ImMessageStatusEnum.UNREAD.getStatus());
+            vo.setReceiptStatus(readMax != null && readMax >= vo.getId()
+                    ? ImMessageReceiptStatusEnum.DONE.getStatus()
+                    : ImMessageReceiptStatusEnum.PENDING.getStatus());
         }));
     }
 

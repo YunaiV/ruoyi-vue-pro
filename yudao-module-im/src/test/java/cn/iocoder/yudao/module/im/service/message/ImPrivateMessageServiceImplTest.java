@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.im.controller.admin.message.vo.privates.ImPrivate
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.privates.ImPrivateMessageSendReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImPrivateMessageDO;
 import cn.iocoder.yudao.module.im.dal.mysql.message.ImPrivateMessageMapper;
+import cn.iocoder.yudao.module.im.enums.message.ImMessageReceiptStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
 import cn.iocoder.yudao.module.im.framework.config.ImProperties;
@@ -87,7 +88,9 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
         assertEquals(1L, result.getSenderId());
         assertEquals(2L, result.getReceiverId());
         assertEquals(ImMessageTypeEnum.TEXT.getType(), result.getType());
-        assertEquals(ImMessageStatusEnum.UNREAD.getStatus(), result.getStatus());
+        assertEquals(ImMessageStatusEnum.NORMAL.getStatus(), result.getStatus());
+        assertEquals(ImMessageReceiptStatusEnum.PENDING.getStatus(), result.getReceiptStatus(),
+                "用户私聊消息默认需要回执（PENDING）");
         assertNotNull(result.getSendTime());
 
         // 验证调用
@@ -165,10 +168,10 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
 
     @Test
     public void testReadMessages_success() {
-        // 准备：前端上报已读到 messageId=5；mapper 返回更新行数 2 表示有未读被翻转
-        when(privateMessageMapper.updateBySenderIdAndReceiverIdAndIdLeAndStatus(
+        // 准备：前端上报已读到 messageId=5；mapper 返回更新行数 2 表示有待回执消息被标记完成
+        when(privateMessageMapper.updateBySenderIdAndReceiverIdAndIdLeAndReceiptStatus(
                 eq(2L), eq(1L), eq(5L),
-                eq(ImMessageStatusEnum.UNREAD.getStatus()), any(ImPrivateMessageDO.class)))
+                eq(ImMessageReceiptStatusEnum.PENDING.getStatus()), any(ImPrivateMessageDO.class)))
                 .thenReturn(2);
         // 读位置前进 → 才下发事件
         when(conversationReadService.updateConversationReadPosition(anyLong(), anyInt(), anyLong(), anyLong()))
@@ -177,10 +180,10 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
         // 调用
         privateMessageService.readPrivateMessages(1L, 2L, 5L);
 
-        // 断言：更新了消息状态
-        verify(privateMessageMapper).updateBySenderIdAndReceiverIdAndIdLeAndStatus(
+        // 断言：把待回执(PENDING)消息标记为已完成（DONE）；status 不再写 READ
+        verify(privateMessageMapper).updateBySenderIdAndReceiverIdAndIdLeAndReceiptStatus(
                 eq(2L), eq(1L), eq(5L),
-                eq(ImMessageStatusEnum.UNREAD.getStatus()), any(ImPrivateMessageDO.class));
+                eq(ImMessageReceiptStatusEnum.PENDING.getStatus()), any(ImPrivateMessageDO.class));
 
         // 断言：发送了 READ + RECEIPT 事件，payload 字段正确
         ArgumentCaptor<Long> userCaptor = ArgumentCaptor.forClass(Long.class);
@@ -210,7 +213,7 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
         // 准备
         ImPrivateMessageDO message = ImPrivateMessageDO.builder()
                 .id(10L).senderId(1L).receiverId(2L)
-                .status(ImMessageStatusEnum.UNREAD.getStatus())
+                .status(ImMessageStatusEnum.NORMAL.getStatus())
                 .sendTime(LocalDateTime.now()).build(); // 刚发送，5 分钟内
         when(privateMessageMapper.selectById(10L)).thenReturn(message);
         when(privateMessageMapper.updateById(any(ImPrivateMessageDO.class))).thenReturn(1);
@@ -233,7 +236,7 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
         // 准备
         ImPrivateMessageDO message = ImPrivateMessageDO.builder()
                 .id(10L).senderId(2L).receiverId(1L)
-                .status(ImMessageStatusEnum.UNREAD.getStatus())
+                .status(ImMessageStatusEnum.NORMAL.getStatus())
                 .sendTime(LocalDateTime.now()).build();
         when(privateMessageMapper.selectById(10L)).thenReturn(message);
 
@@ -274,7 +277,7 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
         // 准备：消息发送于 10 分钟前（超过 5 分钟窗口）
         ImPrivateMessageDO message = ImPrivateMessageDO.builder()
                 .id(10L).senderId(1L).receiverId(2L)
-                .status(ImMessageStatusEnum.UNREAD.getStatus())
+                .status(ImMessageStatusEnum.NORMAL.getStatus())
                 .sendTime(LocalDateTime.now().minusMinutes(10)).build();
         when(privateMessageMapper.selectById(10L)).thenReturn(message);
 
@@ -314,7 +317,7 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
                 () -> privateMessageService.readPrivateMessages(1L, 2L, 5L));
         assertEquals(MESSAGE_PRIVATE_READ_DISABLED.getCode(), exception.getCode());
         // 断言：不更新消息状态、不推送
-        verify(privateMessageMapper, never()).updateBySenderIdAndReceiverIdAndIdLeAndStatus(
+        verify(privateMessageMapper, never()).updateBySenderIdAndReceiverIdAndIdLeAndReceiptStatus(
                 anyLong(), anyLong(), anyLong(), anyInt(), any(ImPrivateMessageDO.class));
         verify(imWebSocketService, never()).sendPrivateMessageAsync(anyLong(), any(ImPrivateMessageDTO.class));
     }
@@ -336,9 +339,9 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
 
     @Test
     public void testGetMaxReadMessageId_hit() {
-        // 准备：对方读到我发的最大 id=10
-        when(privateMessageMapper.selectMaxIdBySenderIdAndReceiverIdAndStatus(
-                1L, 2L, ImMessageStatusEnum.READ.getStatus())).thenReturn(10L);
+        // 准备：对方(2) 在与我(1) 的会话里读位置=10
+        when(conversationReadService.getConversationReadMessageId(eq(2L), anyInt(), eq(1L)))
+                .thenReturn(10L);
 
         // 调用
         Long result = privateMessageService.getMaxReadMessageId(1L, 2L);
@@ -349,9 +352,9 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
 
     @Test
     public void testGetMaxReadMessageId_miss() {
-        // 准备：对方一条都没读过
-        when(privateMessageMapper.selectMaxIdBySenderIdAndReceiverIdAndStatus(
-                1L, 2L, ImMessageStatusEnum.READ.getStatus())).thenReturn(null);
+        // 准备：对方一条都没读过（读位置为 null）
+        when(conversationReadService.getConversationReadMessageId(eq(2L), anyInt(), eq(1L)))
+                .thenReturn(null);
 
         // 调用
         Long result = privateMessageService.getMaxReadMessageId(1L, 2L);
@@ -390,7 +393,7 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
         assertEquals(2L, message.getReceiverId());
         assertEquals(ImMessageTypeEnum.RECALL.getType(), message.getType());
         assertEquals("{\"messageId\":50}", message.getContent());
-        assertEquals(ImMessageStatusEnum.UNREAD.getStatus(), message.getStatus());
+        assertEquals(ImMessageStatusEnum.NORMAL.getStatus(), message.getStatus());
         assertNotNull(message.getClientMessageId());
         assertNotNull(message.getSendTime());
         // 断言：sender + receiver 双端推送

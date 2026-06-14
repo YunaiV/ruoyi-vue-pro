@@ -36,6 +36,9 @@ public class ImPrivateMessageManagerRespVO {
     @Schema(description = "消息状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
     private Integer status; // 参见 ImMessageStatusEnum 枚举类
 
+    @Schema(description = "回执状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
+    private Integer receiptStatus; // 参见 ImMessageReceiptStatusEnum 枚举类
+
     @Schema(description = "发送时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime sendTime;
 

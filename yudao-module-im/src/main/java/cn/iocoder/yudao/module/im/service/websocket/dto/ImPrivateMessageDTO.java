@@ -60,6 +60,10 @@ public class ImPrivateMessageDTO {
      */
     private Integer status;
     /**
+     * 回执状态
+     */
+    private Integer receiptStatus;
+    /**
      * 发送时间
      */
     private LocalDateTime sendTime;

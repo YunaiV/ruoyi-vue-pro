@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS "im_private_message" (
     "type" smallint NOT NULL COMMENT '消息类型',
     "content" varchar(8192) DEFAULT NULL COMMENT '消息内容',
     "status" tinyint NOT NULL COMMENT '消息状态',
+    "receipt_status" tinyint NOT NULL DEFAULT 0 COMMENT '回执状态',
     "send_time" timestamp NOT NULL COMMENT '发送时间',
     "creator" varchar(64) DEFAULT '',
     "create_time" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,

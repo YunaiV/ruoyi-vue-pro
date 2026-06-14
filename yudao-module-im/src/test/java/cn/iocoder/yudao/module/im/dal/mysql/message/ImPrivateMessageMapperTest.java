@@ -31,13 +31,13 @@ public class ImPrivateMessageMapperTest extends BaseDbUnitTest {
     @Test
     public void testSelectListByMinId() {
         // 准备：用户 1 发给用户 2
-        ImPrivateMessageDO msg1 = buildMessage(1L, 2L, ImMessageStatusEnum.UNREAD);
+        ImPrivateMessageDO msg1 = buildMessage(1L, 2L, ImMessageStatusEnum.NORMAL);
         mapper.insert(msg1);
         // 用户 2 发给用户 1
-        ImPrivateMessageDO msg2 = buildMessage(2L, 1L, ImMessageStatusEnum.UNREAD);
+        ImPrivateMessageDO msg2 = buildMessage(2L, 1L, ImMessageStatusEnum.NORMAL);
         mapper.insert(msg2);
         // 用户 3 发给用户 4（不相关）
-        ImPrivateMessageDO msg3 = buildMessage(3L, 4L, ImMessageStatusEnum.UNREAD);
+        ImPrivateMessageDO msg3 = buildMessage(3L, 4L, ImMessageStatusEnum.NORMAL);
         mapper.insert(msg3);
 
         // 调用：用户 1 从 id=0 拉取
@@ -52,9 +52,9 @@ public class ImPrivateMessageMapperTest extends BaseDbUnitTest {
     @Test
     public void testSelectListByMinId_withMinId() {
         // 准备
-        ImPrivateMessageDO msg1 = buildMessage(1L, 2L, ImMessageStatusEnum.UNREAD);
+        ImPrivateMessageDO msg1 = buildMessage(1L, 2L, ImMessageStatusEnum.NORMAL);
         mapper.insert(msg1);
-        ImPrivateMessageDO msg2 = buildMessage(2L, 1L, ImMessageStatusEnum.UNREAD);
+        ImPrivateMessageDO msg2 = buildMessage(2L, 1L, ImMessageStatusEnum.NORMAL);
         mapper.insert(msg2);
 
         // 调用：从 msg1.id 之后拉取
@@ -68,9 +68,9 @@ public class ImPrivateMessageMapperTest extends BaseDbUnitTest {
     @Test
     public void testSelectListByMinId_limitSize() {
         // 准备：插入 3 条
-        mapper.insert(buildMessage(1L, 2L, ImMessageStatusEnum.UNREAD));
-        mapper.insert(buildMessage(2L, 1L, ImMessageStatusEnum.UNREAD));
-        mapper.insert(buildMessage(1L, 2L, ImMessageStatusEnum.UNREAD));
+        mapper.insert(buildMessage(1L, 2L, ImMessageStatusEnum.NORMAL));
+        mapper.insert(buildMessage(2L, 1L, ImMessageStatusEnum.NORMAL));
+        mapper.insert(buildMessage(1L, 2L, ImMessageStatusEnum.NORMAL));
 
         // 调用：limit 2
         List<ImPrivateMessageDO> result = mapper.selectListByMinId(1L, 0L, FAR_PAST, 2);
@@ -82,10 +82,10 @@ public class ImPrivateMessageMapperTest extends BaseDbUnitTest {
     @Test
     public void testSelectListByMinId_sendTimeFilter() {
         // 准备：一条落在窗口内，一条落在窗口外
-        ImPrivateMessageDO newMsg = buildMessage(1L, 2L, ImMessageStatusEnum.UNREAD);
+        ImPrivateMessageDO newMsg = buildMessage(1L, 2L, ImMessageStatusEnum.NORMAL);
         newMsg.setSendTime(LocalDateTime.now().minusDays(1));
         mapper.insert(newMsg);
-        ImPrivateMessageDO oldMsg = buildMessage(1L, 2L, ImMessageStatusEnum.UNREAD);
+        ImPrivateMessageDO oldMsg = buildMessage(1L, 2L, ImMessageStatusEnum.NORMAL);
         oldMsg.setSendTime(LocalDateTime.now().minusDays(40));
         mapper.insert(oldMsg);
 
@@ -103,12 +103,12 @@ public class ImPrivateMessageMapperTest extends BaseDbUnitTest {
     @Test
     public void testSelectHistoryList_basic() {
         // 准备：用户 1 <-> 用户 2 的消息
-        ImPrivateMessageDO msg1 = buildMessage(1L, 2L, ImMessageStatusEnum.UNREAD);
+        ImPrivateMessageDO msg1 = buildMessage(1L, 2L, ImMessageStatusEnum.NORMAL);
         mapper.insert(msg1);
-        ImPrivateMessageDO msg2 = buildMessage(2L, 1L, ImMessageStatusEnum.UNREAD);
+        ImPrivateMessageDO msg2 = buildMessage(2L, 1L, ImMessageStatusEnum.NORMAL);
         mapper.insert(msg2);
         // 用户 1 <-> 用户 3 的消息（不相关）
-        ImPrivateMessageDO msg3 = buildMessage(1L, 3L, ImMessageStatusEnum.UNREAD);
+        ImPrivateMessageDO msg3 = buildMessage(1L, 3L, ImMessageStatusEnum.NORMAL);
         mapper.insert(msg3);
 
         // 调用
@@ -122,7 +122,7 @@ public class ImPrivateMessageMapperTest extends BaseDbUnitTest {
     @Test
     public void testSelectHistoryList_includeRecall() {
         // 准备
-        ImPrivateMessageDO msg1 = buildMessage(1L, 2L, ImMessageStatusEnum.UNREAD);
+        ImPrivateMessageDO msg1 = buildMessage(1L, 2L, ImMessageStatusEnum.NORMAL);
         mapper.insert(msg1);
         ImPrivateMessageDO msg2 = buildMessage(1L, 2L, ImMessageStatusEnum.RECALL);
         mapper.insert(msg2);
@@ -139,11 +139,11 @@ public class ImPrivateMessageMapperTest extends BaseDbUnitTest {
     @Test
     public void testSelectHistoryList_withMaxId() {
         // 准备
-        ImPrivateMessageDO msg1 = buildMessage(1L, 2L, ImMessageStatusEnum.UNREAD);
+        ImPrivateMessageDO msg1 = buildMessage(1L, 2L, ImMessageStatusEnum.NORMAL);
         mapper.insert(msg1);
-        ImPrivateMessageDO msg2 = buildMessage(1L, 2L, ImMessageStatusEnum.UNREAD);
+        ImPrivateMessageDO msg2 = buildMessage(1L, 2L, ImMessageStatusEnum.NORMAL);
         mapper.insert(msg2);
-        ImPrivateMessageDO msg3 = buildMessage(1L, 2L, ImMessageStatusEnum.UNREAD);
+        ImPrivateMessageDO msg3 = buildMessage(1L, 2L, ImMessageStatusEnum.NORMAL);
         mapper.insert(msg3);
 
         // 调用：从 msg3 往前拉
@@ -157,9 +157,9 @@ public class ImPrivateMessageMapperTest extends BaseDbUnitTest {
     @Test
     public void testSelectHistoryList_limit() {
         // 准备
-        mapper.insert(buildMessage(1L, 2L, ImMessageStatusEnum.UNREAD));
-        mapper.insert(buildMessage(2L, 1L, ImMessageStatusEnum.UNREAD));
-        mapper.insert(buildMessage(1L, 2L, ImMessageStatusEnum.UNREAD));
+        mapper.insert(buildMessage(1L, 2L, ImMessageStatusEnum.NORMAL));
+        mapper.insert(buildMessage(2L, 1L, ImMessageStatusEnum.NORMAL));
+        mapper.insert(buildMessage(1L, 2L, ImMessageStatusEnum.NORMAL));
 
         // 调用：limit 2
         List<ImPrivateMessageDO> result = mapper.selectHistoryList(1L, 2L, null, 2);
@@ -171,7 +171,7 @@ public class ImPrivateMessageMapperTest extends BaseDbUnitTest {
     @Test
     public void testSelectHistoryList_bidirectional() {
         // 准备：验证双向查询
-        ImPrivateMessageDO msg1 = buildMessage(2L, 1L, ImMessageStatusEnum.UNREAD); // 对方发的
+        ImPrivateMessageDO msg1 = buildMessage(2L, 1L, ImMessageStatusEnum.NORMAL); // 对方发的
         mapper.insert(msg1);
 
         // 调用：以用户 1 的视角查

@@ -12,7 +12,7 @@ import cn.iocoder.yudao.module.im.dal.dataobject.message.ImGroupMessageDO;
 import cn.iocoder.yudao.module.im.dal.mysql.message.ImGroupMessageMapper;
 import cn.iocoder.yudao.module.im.enums.ImConversationTypeEnum;
 import cn.iocoder.yudao.module.im.enums.group.ImGroupMemberRoleEnum;
-import cn.iocoder.yudao.module.im.enums.message.ImGroupMessageReceiptStatusEnum;
+import cn.iocoder.yudao.module.im.enums.message.ImMessageReceiptStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
 import cn.iocoder.yudao.module.im.framework.config.ImProperties;
@@ -111,8 +111,8 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
             assertNotNull(result);
             assertEquals(1L, result.getSenderId());
             assertEquals(10L, result.getGroupId());
-            assertEquals(ImMessageStatusEnum.UNREAD.getStatus(), result.getStatus());
-            assertEquals(ImGroupMessageReceiptStatusEnum.NO_RECEIPT.getStatus(), result.getReceiptStatus());
+            assertEquals(ImMessageStatusEnum.NORMAL.getStatus(), result.getStatus());
+            assertEquals(ImMessageReceiptStatusEnum.NO_RECEIPT.getStatus(), result.getReceiptStatus());
 
             // 验证推送给 3 个群成员（含发送者自己，用于多端同步）
             verify(imWebSocketService).sendGroupMessageAsync(argThat((Collection<Long> ids) ->
@@ -209,7 +209,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
         when(groupMemberService.getActiveGroupMemberUserIdsByGroupId(10L)).thenReturn(List.of(1L, 2L, 3L));
         // 被引用原消息：定向给 {1,2}（对发送人 1 可见，但不覆盖广播受众 {1,2,3}）
         ImGroupMessageDO original = ImGroupMessageDO.builder().id(500L).groupId(10L).senderId(2L)
-                .status(ImMessageStatusEnum.UNREAD.getStatus()).receiverUserIds(List.of(1L, 2L))
+                .status(ImMessageStatusEnum.NORMAL.getStatus()).receiverUserIds(List.of(1L, 2L))
                 .type(ImMessageTypeEnum.TEXT.getType()).content("{\"content\":\"密\"}")
                 .sendTime(LocalDateTime.now()).build();
         when(groupMessageMapper.selectById(500L)).thenReturn(original);
@@ -235,7 +235,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
         when(groupMemberService.validateMemberInGroup(10L, 1L)).thenReturn(member);
         when(groupMemberService.getActiveGroupMemberUserIdsByGroupId(10L)).thenReturn(List.of(1L, 2L, 3L));
         ImGroupMessageDO original = ImGroupMessageDO.builder().id(500L).groupId(10L).senderId(2L)
-                .status(ImMessageStatusEnum.UNREAD.getStatus()).receiverUserIds(List.of(1L, 2L, 3L))
+                .status(ImMessageStatusEnum.NORMAL.getStatus()).receiverUserIds(List.of(1L, 2L, 3L))
                 .type(ImMessageTypeEnum.TEXT.getType()).content("{\"content\":\"公开\"}")
                 .sendTime(LocalDateTime.now()).build();
         when(groupMessageMapper.selectById(500L)).thenReturn(original);
@@ -253,8 +253,8 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
     // ========== pull 测试 ==========
 
     @Test
-    public void testPullMessages_pullSetsReadFromCursor() {
-        // 准备：当前在群 10，无退群；拉到两条消息，已读位置为 7
+    public void testPullMessages_doesNotOverwriteStatus() {
+        // 准备：拉到两条消息；Phase 2 起 pull 不再按读位置覆盖 status，已读由前端按读位置判断
         LocalDateTime now = LocalDateTime.now();
         ImGroupMemberDO member = ImGroupMemberDO.builder()
                 .groupId(10L).userId(1L)
@@ -264,25 +264,22 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
 
         ImGroupMessageDO low = ImGroupMessageDO.builder()
                 .id(5L).groupId(10L).senderId(2L).receiverUserIds(List.of(1L))
-                .status(ImMessageStatusEnum.UNREAD.getStatus())
+                .status(ImMessageStatusEnum.NORMAL.getStatus())
                 .sendTime(now.minusHours(2)).build();
         ImGroupMessageDO high = ImGroupMessageDO.builder()
                 .id(10L).groupId(10L).senderId(2L).receiverUserIds(List.of(1L))
-                .status(ImMessageStatusEnum.UNREAD.getStatus())
+                .status(ImMessageStatusEnum.NORMAL.getStatus())
                 .sendTime(now.minusHours(1)).build();
         when(groupMessageMapper.selectListByMinId(eq(1L), anyCollection(), eq(0L),
                 any(LocalDateTime.class), eq(100)))
                 .thenReturn(List.of(low, high));
 
-        when(conversationReadService.getConversationReadMessageId(eq(1L), eq(ImConversationTypeEnum.GROUP.getType()), eq(10L)))
-                .thenReturn(7L);
-
         List<ImGroupMessageDO> result = groupMessageService.pullGroupMessageList(1L, 0L, 100);
 
-        // 断言：已读位置 7 → id<=7 为 READ，id>7 为 UNREAD
+        // 断言：status 保持 DB 原值（都 NORMAL），pull 不覆盖
         assertEquals(2, result.size());
-        assertEquals(ImMessageStatusEnum.READ.getStatus(), result.get(0).getStatus());
-        assertEquals(ImMessageStatusEnum.UNREAD.getStatus(), result.get(1).getStatus());
+        assertEquals(ImMessageStatusEnum.NORMAL.getStatus(), result.get(0).getStatus());
+        assertEquals(ImMessageStatusEnum.NORMAL.getStatus(), result.get(1).getStatus());
     }
 
     @Test
@@ -298,15 +295,13 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
         ImGroupMessageDO receiptMsg = ImGroupMessageDO.builder()
                 .id(100L).groupId(10L).senderId(1L)
                 .receiverUserIds(List.of(1L, 2L, 3L))
-                .status(ImMessageStatusEnum.UNREAD.getStatus())
-                .receiptStatus(ImGroupMessageReceiptStatusEnum.PENDING.getStatus())
+                .status(ImMessageStatusEnum.NORMAL.getStatus())
+                .receiptStatus(ImMessageReceiptStatusEnum.PENDING.getStatus())
                 .sendTime(now.minusHours(1)).build();
         when(groupMessageMapper.selectListByMinId(eq(1L), anyCollection(), eq(0L),
                 any(LocalDateTime.class), eq(100)))
                 .thenReturn(List.of(receiptMsg));
 
-        when(conversationReadService.getConversationReadMessageId(eq(1L), eq(ImConversationTypeEnum.GROUP.getType()), eq(10L)))
-                .thenReturn(100L);
         Map<Long, Long> positions = new HashMap<>();
         positions.put(1L, 100L);
         positions.put(2L, 100L);
@@ -334,7 +329,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
 
     @Test
     public void testPullMessages_noReceiptMessageSkipsReadCount() {
-        // 准备：本人发送但不需要回执（NO_RECEIPT）的消息——只补已读位置，不补 readCount
+        // 准备：本人发送但不需要回执（NO_RECEIPT）的消息——不补 readCount，status 也不被覆盖
         LocalDateTime now = LocalDateTime.now();
         ImGroupMemberDO member = ImGroupMemberDO.builder()
                 .groupId(10L).userId(1L)
@@ -345,20 +340,18 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
         ImGroupMessageDO noReceiptMsg = ImGroupMessageDO.builder()
                 .id(100L).groupId(10L).senderId(1L)
                 .receiverUserIds(List.of(1L, 2L, 3L))
-                .status(ImMessageStatusEnum.UNREAD.getStatus())
-                .receiptStatus(ImGroupMessageReceiptStatusEnum.NO_RECEIPT.getStatus())
+                .status(ImMessageStatusEnum.NORMAL.getStatus())
+                .receiptStatus(ImMessageReceiptStatusEnum.NO_RECEIPT.getStatus())
                 .sendTime(now.minusHours(1)).build();
         when(groupMessageMapper.selectListByMinId(eq(1L), anyCollection(), eq(0L),
                 any(LocalDateTime.class), eq(100)))
                 .thenReturn(List.of(noReceiptMsg));
-        when(conversationReadService.getConversationReadMessageId(eq(1L), eq(ImConversationTypeEnum.GROUP.getType()), eq(10L)))
-                .thenReturn(100L);
 
         List<ImGroupMessageDO> result = groupMessageService.pullGroupMessageList(1L, 0L, 100);
 
-        // 断言：读位置照常补（status=READ），但 NO_RECEIPT 不补 readCount，也不查 readCount 相关的读位置映射
+        // 断言：status 保持 NORMAL（pull 不覆盖），NO_RECEIPT 不补 readCount，也不查 readCount 相关的读位置映射
         assertEquals(1, result.size());
-        assertEquals(ImMessageStatusEnum.READ.getStatus(), result.get(0).getStatus());
+        assertEquals(ImMessageStatusEnum.NORMAL.getStatus(), result.get(0).getStatus());
         assertNull(result.get(0).getReadCount());
         verify(conversationReadService, never()).getUserReadMessageIdMap(anyInt(), anyLong());
     }
@@ -374,7 +367,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
             // 准备：消息由用户 1 发送，刚发送 5 分钟内
             ImGroupMessageDO message = ImGroupMessageDO.builder()
                     .id(50L).senderId(1L).groupId(10L)
-                    .status(ImMessageStatusEnum.UNREAD.getStatus())
+                    .status(ImMessageStatusEnum.NORMAL.getStatus())
                     .sendTime(LocalDateTime.now()).build();
             when(groupMessageMapper.selectById(50L)).thenReturn(message);
             // 撤回前需要校验用户仍在群中
@@ -407,7 +400,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
         // 准备
         ImGroupMessageDO message = ImGroupMessageDO.builder()
                 .id(50L).senderId(2L).groupId(10L)
-                .status(ImMessageStatusEnum.UNREAD.getStatus())
+                .status(ImMessageStatusEnum.NORMAL.getStatus())
                 .sendTime(LocalDateTime.now()).build();
         when(groupMessageMapper.selectById(50L)).thenReturn(message);
         when(groupMemberService.validateMemberInGroup(10L, 1L)).thenReturn(
@@ -443,7 +436,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
         // 准备：消息发送于 10 分钟前（超过 5 分钟窗口）
         ImGroupMessageDO message = ImGroupMessageDO.builder()
                 .id(50L).senderId(1L).groupId(10L)
-                .status(ImMessageStatusEnum.UNREAD.getStatus())
+                .status(ImMessageStatusEnum.NORMAL.getStatus())
                 .sendTime(LocalDateTime.now().minusMinutes(10)).build();
         when(groupMessageMapper.selectById(50L)).thenReturn(message);
         when(groupMemberService.validateMemberInGroup(10L, 1L)).thenReturn(
@@ -569,7 +562,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
             ImGroupMessageDO result = groupMessageService.sendGroupMessage(1L, reqVO);
 
             // 断言：receipt=true → 回执状态为 PENDING
-            assertEquals(ImGroupMessageReceiptStatusEnum.PENDING.getStatus(), result.getReceiptStatus());
+            assertEquals(ImMessageReceiptStatusEnum.PENDING.getStatus(), result.getReceiptStatus());
         }
     }
 
@@ -613,7 +606,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
         // 准备：消息合法、可撤回时间内，但发送人已退群
         ImGroupMessageDO message = ImGroupMessageDO.builder()
                 .id(50L).senderId(1L).groupId(10L)
-                .status(ImMessageStatusEnum.UNREAD.getStatus())
+                .status(ImMessageStatusEnum.NORMAL.getStatus())
                 .sendTime(LocalDateTime.now()).build();
         when(groupMessageMapper.selectById(50L)).thenReturn(message);
         when(groupMemberService.validateMemberInGroup(10L, 1L))
@@ -706,7 +699,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
 
             ImGroupMessageDO result = groupMessageService.sendGroupMessage(1L, reqVO);
 
-            assertEquals(ImGroupMessageReceiptStatusEnum.NO_RECEIPT.getStatus(), result.getReceiptStatus(),
+            assertEquals(ImMessageReceiptStatusEnum.NO_RECEIPT.getStatus(), result.getReceiptStatus(),
                     "群已读关闭时即使发送方传 receipt=true 也强制落 NO_RECEIPT");
         }
     }
@@ -762,8 +755,8 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
                 .id(100L).groupId(10L).senderId(5L)
                 .receiverUserIds(List.of(5L, 1L, 2L))
                 .sendTime(LocalDateTime.now().minusMinutes(1))
-                .receiptStatus(ImGroupMessageReceiptStatusEnum.PENDING.getStatus())
-                .status(ImMessageStatusEnum.UNREAD.getStatus()).build();
+                .receiptStatus(ImMessageReceiptStatusEnum.PENDING.getStatus())
+                .status(ImMessageStatusEnum.NORMAL.getStatus()).build();
         when(groupMessageMapper.selectListByGroupIdAndPendingReceipt(10L, 0L, 100L))
                 .thenReturn(List.of(pending));
         List<ImGroupMemberDO> activeMembers = List.of(
@@ -791,7 +784,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
         ArgumentCaptor<ImGroupMessageDO> captor = ArgumentCaptor.forClass(ImGroupMessageDO.class);
         verify(groupMessageMapper).updateById(captor.capture());
         assertEquals(100L, captor.getValue().getId());
-        assertEquals(ImGroupMessageReceiptStatusEnum.DONE.getStatus(), captor.getValue().getReceiptStatus());
+        assertEquals(ImMessageReceiptStatusEnum.DONE.getStatus(), captor.getValue().getReceiptStatus());
         // 断言：给消息发送方（5）推送 RECEIPT 事件
         verify(imWebSocketService).sendGroupMessageAsync(eq(5L), any(ImGroupMessageDTO.class));
     }
@@ -803,8 +796,8 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
                 .id(100L).groupId(10L).senderId(5L)
                 .receiverUserIds(List.of(5L, 1L, 2L))
                 .sendTime(LocalDateTime.now().minusMinutes(1))
-                .receiptStatus(ImGroupMessageReceiptStatusEnum.PENDING.getStatus())
-                .status(ImMessageStatusEnum.UNREAD.getStatus()).build();
+                .receiptStatus(ImMessageReceiptStatusEnum.PENDING.getStatus())
+                .status(ImMessageStatusEnum.NORMAL.getStatus()).build();
         when(groupMessageMapper.selectListByGroupIdAndPendingReceipt(10L, 0L, 100L))
                 .thenReturn(List.of(pending));
         List<ImGroupMemberDO> activeMembers = List.of(
@@ -910,8 +903,8 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
         assertEquals(10L, message.getGroupId());
         assertEquals(ImMessageTypeEnum.RECALL.getType(), message.getType());
         assertEquals("{\"messageId\":50}", message.getContent());
-        assertEquals(ImMessageStatusEnum.UNREAD.getStatus(), message.getStatus());
-        assertEquals(ImGroupMessageReceiptStatusEnum.NO_RECEIPT.getStatus(), message.getReceiptStatus());
+        assertEquals(ImMessageStatusEnum.NORMAL.getStatus(), message.getStatus());
+        assertEquals(ImMessageReceiptStatusEnum.NO_RECEIPT.getStatus(), message.getReceiptStatus());
         assertNotNull(message.getClientMessageId());
         assertNotNull(message.getSendTime());
     }
@@ -928,7 +921,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
 
         ArgumentCaptor<ImGroupMessageDO> captor = ArgumentCaptor.forClass(ImGroupMessageDO.class);
         verify(groupMessageMapper).insert(captor.capture());
-        assertEquals(ImGroupMessageReceiptStatusEnum.PENDING.getStatus(), captor.getValue().getReceiptStatus());
+        assertEquals(ImMessageReceiptStatusEnum.PENDING.getStatus(), captor.getValue().getReceiptStatus());
     }
 
     @Test

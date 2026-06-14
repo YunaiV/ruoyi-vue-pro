@@ -33,6 +33,9 @@ public class ImPrivateMessageSendReqVO {
     @NotEmpty(message = "消息内容不能为空")
     private String content;
 
+    @Schema(description = "是否需要回执", example = "false")
+    private Boolean receipt;
+
     /**
      * 仅允许用户消息（normal）类型
      */

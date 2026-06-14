@@ -61,7 +61,7 @@ public class ImPrivateMessageController {
 
     @GetMapping("/max-read-message-id")
     @Operation(summary = "查询对方已读到我发的最大消息 id",
-            description = "用于多端 / 离线场景下的已读位置补齐：进入会话或断线重连后调用，结果用于翻转本地自发消息状态")
+            description = "用于多端 / 离线场景下的已读位置补齐：进入会话或断线重连后调用，据此把本地自发消息更新为已读")
     @Parameter(name = "peerId", description = "对方用户编号", required = true, example = "2")
     public CommonResult<Long> getMaxReadMessageId(@RequestParam("peerId") Long peerId) {
         return success(privateMessageService.getMaxReadMessageId(getLoginUserId(), peerId));

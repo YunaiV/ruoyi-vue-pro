@@ -43,7 +43,7 @@ public class ImGroupMessageManagerRespVO {
     private List<String> atUserNicknames;
 
     @Schema(description = "回执状态", example = "0")
-    private Integer receiptStatus; // 参见 ImGroupMessageReceiptStatusEnum 枚举类
+    private Integer receiptStatus; // 参见 ImMessageReceiptStatusEnum 枚举类
 
     @Schema(description = "发送时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime sendTime;
