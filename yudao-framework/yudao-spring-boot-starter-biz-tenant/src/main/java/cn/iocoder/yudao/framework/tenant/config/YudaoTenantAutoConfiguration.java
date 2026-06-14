@@ -213,7 +213,7 @@ public class YudaoTenantAutoConfiguration {
     // ========== Job ==========
 
     @Configuration(proxyBeanMethods = false)
-    @ConditionalOnClass(name = "com.xxl.job.core.context.XxlJobContext")
+    @ConditionalOnClass(name = "cn.iocoder.yudao.framework.quartz.core.handler.JobHandler")
     public static class TenantJobConfiguration {
 
         @Bean
