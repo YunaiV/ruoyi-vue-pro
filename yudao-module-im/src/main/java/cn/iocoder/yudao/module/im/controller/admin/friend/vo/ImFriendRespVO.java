@@ -47,6 +47,9 @@ public class ImFriendRespVO {
     @Schema(description = "删除好友时间")
     private LocalDateTime deleteTime;
 
+    @Schema(description = "最近更新时间（增量拉取游标用）")
+    private LocalDateTime updateTime;
+
     // ========== 下面是聚合字段，方便前端显示 ==========
 
     @Schema(description = "好友昵称（实时聚合自 AdminUser）", example = "芋道")

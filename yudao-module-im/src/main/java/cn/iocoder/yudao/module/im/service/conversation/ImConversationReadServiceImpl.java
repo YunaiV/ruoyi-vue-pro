@@ -78,4 +78,9 @@ public class ImConversationReadServiceImpl implements ImConversationReadService 
         return convertMap(list, ImConversationReadDO::getTargetId, ImConversationReadDO::getMessageId);
     }
 
+    @Override
+    public List<ImConversationReadDO> pullConversationReadList(Long userId, Long lastUpdateTime, Long lastId, Integer limit) {
+        return conversationReadMapper.selectPullListByUserId(userId, lastUpdateTime, lastId, limit);
+    }
+
 }

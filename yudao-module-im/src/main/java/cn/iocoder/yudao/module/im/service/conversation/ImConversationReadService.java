@@ -1,6 +1,9 @@
 package cn.iocoder.yudao.module.im.service.conversation;
 
+import cn.iocoder.yudao.module.im.dal.dataobject.conversation.ImConversationReadDO;
+
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -49,5 +52,16 @@ public interface ImConversationReadService {
      * @return conversationId → 最大已读消息编号
      */
     Map<Long, Long> getConversationReadMessageIdMap(Long userId, Integer conversationType, Collection<Long> conversationIds);
+
+    /**
+     * 增量拉取当前用户的会话读位置（重连 / 离线补偿：按 update_time + id 游标）
+     *
+     * @param userId         用户编号
+     * @param lastUpdateTime 上次拉取到的最新更新时间（毫秒时间戳）；首次拉取传 null
+     * @param lastId         上次拉取到的最后一条记录 id；首次拉取传 null
+     * @param limit          单次拉取条数
+     * @return 会话读位置列表，按更新时间、id 正序
+     */
+    List<ImConversationReadDO> pullConversationReadList(Long userId, Long lastUpdateTime, Long lastId, Integer limit);
 
 }

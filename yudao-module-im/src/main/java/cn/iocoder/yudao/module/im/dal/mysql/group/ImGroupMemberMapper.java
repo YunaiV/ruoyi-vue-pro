@@ -130,7 +130,8 @@ public interface ImGroupMemberMapper extends BaseMapperX<ImGroupMemberDO> {
                 .set(ImGroupMemberDO::getAddSource, addSource)
                 .set(ImGroupMemberDO::getInviterUserId, inviterUserId)
                 .set(ImGroupMemberDO::getQuitTime, null)
-                .set(ImGroupMemberDO::getMuteEndTime, null));
+                .set(ImGroupMemberDO::getMuteEndTime, null)
+                .set(ImGroupMemberDO::getUpdateTime, joinTime));
     }
 
 }

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.im.dal.mysql.group;
 
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
@@ -41,6 +42,28 @@ public interface ImGroupRequestMapper extends BaseMapperX<ImGroupRequestDO> {
                 .eq(ImGroupRequestDO::getGroupId, groupId)
                 .orderByDesc(ImGroupRequestDO::getUpdateTime)
                 .orderByDesc(ImGroupRequestDO::getId));
+    }
+
+    /**
+     * 增量拉取「我管理的群」下的加群申请（含已处理，按 update_time + id 正向游标）
+     *
+     * @param groupIds       群编号集合
+     * @param lastUpdateTime 上次拉取到的更新时间；首次拉取传 null
+     * @param lastId         上次拉取到的记录编号；首次拉取传 null
+     * @param limit          拉取数量
+     * @return 加群申请列表
+     */
+    default List<ImGroupRequestDO> selectPullListByGroupIds(Collection<Long> groupIds, Long lastUpdateTime,
+                                                            Long lastId, Integer limit) {
+        LambdaQueryWrapperX<ImGroupRequestDO> query = new LambdaQueryWrapperX<ImGroupRequestDO>()
+                .in(ImGroupRequestDO::getGroupId, groupIds);
+        if (lastUpdateTime != null && lastId != null) {
+            LocalDateTime lastTime = LocalDateTimeUtil.of(lastUpdateTime);
+            query.and(w -> w.gt(ImGroupRequestDO::getUpdateTime, lastTime)
+                    .or(n -> n.eq(ImGroupRequestDO::getUpdateTime, lastTime).gt(ImGroupRequestDO::getId, lastId)));
+        }
+        return selectList(query.orderByAsc(ImGroupRequestDO::getUpdateTime).orderByAsc(ImGroupRequestDO::getId)
+                .last("LIMIT " + limit));
     }
 
     default int updateByIdAndHandleResult(Long id, Integer expectedHandleResult, ImGroupRequestDO updateObj) {

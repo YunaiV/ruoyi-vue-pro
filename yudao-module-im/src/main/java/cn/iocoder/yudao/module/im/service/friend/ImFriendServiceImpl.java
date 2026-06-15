@@ -99,6 +99,11 @@ public class ImFriendServiceImpl implements ImFriendService {
     }
 
     @Override
+    public List<ImFriendDO> pullFriendList(Long userId, Long lastUpdateTime, Long lastId, Integer limit) {
+        return friendMapper.selectPullListByUserId(userId, lastUpdateTime, lastId, limit);
+    }
+
+    @Override
     public List<ImFriendDO> getEnableFriendList(Long userId) {
         return friendMapper.selectListByUserIdAndStatus(userId, CommonStatusEnum.ENABLE.getStatus());
     }
@@ -294,7 +299,8 @@ public class ImFriendServiceImpl implements ImFriendService {
         }
         // 情况二：复用 DISABLE 旧记录 → 恢复 ENABLE + 重置 silent / pinned / blocked，对齐"重新加好友"语义
         if (exists != null) {
-            friendMapper.updateReAddFields(exists.getId(), CommonStatusEnum.ENABLE.getStatus(), LocalDateTime.now(),
+            LocalDateTime now = LocalDateTime.now();
+            friendMapper.updateReAddFields(exists.getId(), CommonStatusEnum.ENABLE.getStatus(), now, now,
                     false, false, false, displayName, addSource);
             return;
         }

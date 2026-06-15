@@ -212,14 +212,26 @@ public class ImGroupRequestServiceImpl implements ImGroupRequestService {
         // 1. 找出当前用户作为 OWNER / ADMIN 的所有群
         List<ImGroupMemberDO> myMembers = groupMemberService.getActiveGroupMemberListByUserId(userId);
         Set<Long> ownerOrAdminGroupIds = convertSet(myMembers,
-                ImGroupMemberDO::getGroupId,
-                m -> ImGroupMemberRoleEnum.isOwnerOrAdmin(m.getRole()));
+                ImGroupMemberDO::getGroupId, member -> ImGroupMemberRoleEnum.isOwnerOrAdmin(member.getRole()));
         if (CollUtil.isEmpty(ownerOrAdminGroupIds)) {
             return Collections.emptyList();
         }
         // 2. 一次拉所有群的未处理申请
         return groupRequestMapper.selectListByGroupIdsAndHandleResult(
                 ownerOrAdminGroupIds, ImGroupRequestHandleResultEnum.UNHANDLED.getResult());
+    }
+
+    @Override
+    public List<ImGroupRequestDO> pullGroupRequestList(Long userId, Long lastUpdateTime, Long lastId, Integer limit) {
+        // 1. 找出当前用户作为 OWNER / ADMIN 的所有群
+        List<ImGroupMemberDO> myMembers = groupMemberService.getActiveGroupMemberListByUserId(userId);
+        Set<Long> ownerOrAdminGroupIds = convertSet(myMembers,
+                ImGroupMemberDO::getGroupId, member -> ImGroupMemberRoleEnum.isOwnerOrAdmin(member.getRole()));
+        if (CollUtil.isEmpty(ownerOrAdminGroupIds)) {
+            return Collections.emptyList();
+        }
+        // 2. 按游标增量拉取这些群下的申请
+        return groupRequestMapper.selectPullListByGroupIds(ownerOrAdminGroupIds, lastUpdateTime, lastId, limit);
     }
 
     @Override

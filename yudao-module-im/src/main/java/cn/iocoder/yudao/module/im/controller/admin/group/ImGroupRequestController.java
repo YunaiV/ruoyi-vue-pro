@@ -19,9 +19,12 @@ import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.springframework.validation.annotation.Validated;
@@ -85,6 +88,22 @@ public class ImGroupRequestController {
     @Operation(summary = "查询「我管理的所有群」下的未处理加群申请列表（不分页）；前端 store 据此派生横幅红点 + Drawer 列表")
     public CommonResult<List<ImGroupRequestRespVO>> getUnhandledRequestList() {
         List<ImGroupRequestDO> list = groupRequestService.getUnhandledRequestListByOwnerOrAdmin(getLoginUserId());
+        return success(buildVOList(list));
+    }
+
+    @GetMapping("/pull")
+    @Operation(summary = "增量拉取「我管理的群」下的加群申请（重连 / 离线补偿）")
+    @Parameters({
+            @Parameter(name = "lastUpdateTime", description = "上次拉取到的最新更新时间（毫秒时间戳）；首次拉取不传"),
+            @Parameter(name = "lastId", description = "上次拉取到的最后一条记录 id；首次拉取不传"),
+            @Parameter(name = "limit", description = "单次拉取条数", required = true)
+    })
+    public CommonResult<List<ImGroupRequestRespVO>> pullMyGroupRequestList(
+            @RequestParam(value = "lastUpdateTime", required = false) Long lastUpdateTime,
+            @RequestParam(value = "lastId", required = false) Long lastId,
+            @RequestParam("limit") @Min(1) @Max(200) Integer limit) {
+        List<ImGroupRequestDO> list = groupRequestService.pullGroupRequestList(
+                getLoginUserId(), lastUpdateTime, lastId, limit);
         return success(buildVOList(list));
     }
 
