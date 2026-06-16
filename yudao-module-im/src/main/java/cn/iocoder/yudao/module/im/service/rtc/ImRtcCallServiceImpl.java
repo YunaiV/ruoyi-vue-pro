@@ -56,7 +56,7 @@ import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.*;
  * 并发幂等：同好友对 / 同群活跃唯一性走 {@link ImRtcCallLockRedisDAO} 分布式锁 + 锁内 SELECT 兜底；webhook 兜底走条件 UPDATE；
  * <p>
  * 推送通道分流：
- *   1601 RTC_CALL（INVITING / JOINED / REJECTED / NO_ANSWER / LEFT 子类型）→ {@link ImWebSocketService#sendPrivateMessageAsync} 仅推参与方；
+ *   1601 RTC_CALL（INVITING / JOINED / REJECTED / NO_ANSWER / LEFT 子类型）→ {@link ImWebSocketService#sendNotificationAsync} 仅推参与方；
  *   1602 / 1603 PARTICIPANT_CONNECTED / DISCONNECTED → {@link ImWebSocketService} 推参与方 + 群通话场景广播全群；
  *   1610 RTC_CALL_START + 1611 RTC_CALL_END → {@link ImPrivateMessageService} / {@link ImGroupMessageService} 入消息流当聊天 tip
  *   （START 仅群通话；两者分别在 invite / cancel(leave) 事务里 INSERT，自增 id 自然保证顺序）
@@ -1001,8 +1001,8 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
         String token = signToken(inviteeId, resolveDisplayName(invitee, inviteeId), call.getRoom());
         ImRtcCallNotification payload = ImRtcCallNotification.ofInvite(
                 call, inviter, imProperties.getRtc().getLivekitUrl(), token, inviteeIds);
-        webSocketService.sendPrivateMessageAsync(inviteeId, ImPrivateMessageDTO.ofRtcNotification(
-                ImMessageTypeEnum.RTC_CALL.getType(), call.getInviterUserId(), inviteeId, payload));
+        webSocketService.sendNotificationAsync(inviteeId, ImConversationTypeEnum.NONE.getType(),
+                ImContentTypeEnum.RTC_CALL.getType(), payload);
     }
 
     /**
@@ -1017,8 +1017,8 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
         AdminUserRespDTO operator = operatorUserId != null ? adminUserApi.getUser(operatorUserId) : null;
         ImRtcCallNotification payload = ImRtcCallNotification.ofReject(call, operatorUserId, operator);
         for (Long receiverUserId : getCallAudienceUserIdList(call)) {
-            webSocketService.sendPrivateMessageAsync(receiverUserId, ImPrivateMessageDTO.ofRtcNotification(
-                    ImMessageTypeEnum.RTC_CALL.getType(), operatorUserId, receiverUserId, payload));
+            webSocketService.sendNotificationAsync(receiverUserId, ImConversationTypeEnum.NONE.getType(),
+                    ImContentTypeEnum.RTC_CALL.getType(), payload);
         }
     }
 
@@ -1034,8 +1034,8 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
     private void pushCallNoAnswerNotification(ImRtcCallDO call, Long operatorUserId, AdminUserRespDTO operator) {
         ImRtcCallNotification payload = ImRtcCallNotification.ofNoAnswer(call, operatorUserId, operator);
         for (Long receiverUserId : getCallAudienceUserIdList(call)) {
-            webSocketService.sendPrivateMessageAsync(receiverUserId, ImPrivateMessageDTO.ofRtcNotification(
-                    ImMessageTypeEnum.RTC_CALL.getType(), operatorUserId, receiverUserId, payload));
+            webSocketService.sendNotificationAsync(receiverUserId, ImConversationTypeEnum.NONE.getType(),
+                    ImContentTypeEnum.RTC_CALL.getType(), payload);
         }
     }
 
@@ -1074,8 +1074,7 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
         if (CollUtil.isEmpty(receivers)) {
             return;
         }
-        ImPrivateMessageDTO dto = ImPrivateMessageDTO.ofRtcNotification(type, actorUserId, null, payload);
-        webSocketService.sendPrivateMessageAsync(receivers, dto);
+        webSocketService.sendNotificationAsync(receivers, ImConversationTypeEnum.NONE.getType(), type, payload);
     }
 
     /**

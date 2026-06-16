@@ -13,7 +13,8 @@ import cn.iocoder.yudao.module.im.dal.mysql.group.ImGroupRequestMapper;
 import cn.iocoder.yudao.module.im.enums.group.ImGroupAddSourceEnum;
 import cn.iocoder.yudao.module.im.enums.group.ImGroupMemberRoleEnum;
 import cn.iocoder.yudao.module.im.enums.group.ImGroupRequestHandleResultEnum;
-import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
+import cn.iocoder.yudao.module.im.enums.ImContentTypeEnum;
+import cn.iocoder.yudao.module.im.enums.ImConversationTypeEnum;
 import cn.iocoder.yudao.module.im.service.message.ImGroupMessageService;
 import cn.iocoder.yudao.module.im.service.message.dto.ImGroupMessageSendDTO;
 import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
@@ -100,8 +101,8 @@ public class ImGroupRequestServiceImpl implements ImGroupRequestService {
         AdminUserRespDTO applyUser = adminUserApi.getUser(userId);
         GroupRequestReceivedNotification payload = buildRequestNotification(group, request, applyUser);
         for (Long receiverUserId : getGroupMemberListByOwnerAndAdminUserIds(group)) {
-            websocketService.sendPrivateMessageAsync(receiverUserId, ImPrivateMessageDTO.ofGroupNotification(
-                    ImMessageTypeEnum.GROUP_REQUEST_RECEIVED.getType(), userId, receiverUserId, payload));
+            websocketService.sendNotificationAsync(receiverUserId, ImConversationTypeEnum.NONE.getType(),
+                    ImContentTypeEnum.GROUP_REQUEST_RECEIVED.getType(), payload);
         }
         return request;
     }
@@ -200,8 +201,8 @@ public class ImGroupRequestServiceImpl implements ImGroupRequestService {
             AdminUserRespDTO applyUser = userMap.get(request.getUserId());
             GroupRequestReceivedNotification payload = buildRequestNotification(group, request, applyUser);
             for (Long receiverUserId : ownerAndAdmins) {
-                websocketService.sendPrivateMessageAsync(receiverUserId, ImPrivateMessageDTO.ofGroupNotification(
-                        ImMessageTypeEnum.GROUP_REQUEST_RECEIVED.getType(), inviterUserId, receiverUserId, payload));
+                websocketService.sendNotificationAsync(receiverUserId, ImConversationTypeEnum.NONE.getType(),
+                        ImContentTypeEnum.GROUP_REQUEST_RECEIVED.getType(), payload);
             }
         }
     }
@@ -405,8 +406,8 @@ public class ImGroupRequestServiceImpl implements ImGroupRequestService {
         Set<Long> receivers = new LinkedHashSet<>(getGroupMemberListByOwnerAndAdminUserIds(group));
         receivers.add(applicantUserId);
         for (Long receiverUserId : receivers) {
-            websocketService.sendPrivateMessageAsync(receiverUserId, ImPrivateMessageDTO.ofGroupNotification(
-                    messageType, operatorUserId, receiverUserId, payload));
+            websocketService.sendNotificationAsync(receiverUserId, ImConversationTypeEnum.NONE.getType(),
+                    messageType, payload);
         }
     }
 

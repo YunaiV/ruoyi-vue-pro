@@ -118,7 +118,9 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
         }
 
         // 3. WebSocket 异步推送（快照内可见成员 + 发送方多端同步）
-        imWebSocketService.sendGroupMessageAsync(receiverUserIds, ImGroupMessageDTO.ofSend(message));
+        ImGroupMessageNotification notification = ImGroupMessageNotification.ofSend(message);
+        imWebSocketService.sendNotificationAsync(receiverUserIds, ImConversationTypeEnum.GROUP.getType(),
+                notification.getType(), notification);
         return message;
     }
 
@@ -149,7 +151,9 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
         }
 
         // 2. WebSocket 异步推送
-        imWebSocketService.sendGroupMessageAsync(receiverUserIds, ImGroupMessageDTO.ofSend(message));
+        ImGroupMessageNotification notification = ImGroupMessageNotification.ofSend(message);
+        imWebSocketService.sendNotificationAsync(receiverUserIds, ImConversationTypeEnum.GROUP.getType(),
+                notification.getType(), notification);
         return message;
     }
 
@@ -347,8 +351,9 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
     @SuppressWarnings("DataFlowIssue")
     public void readGroupMessageEvent(Long userId, Long groupId, Long prevMaxMessageId, Long newMaxMessageId) {
         // 1. 发送 READ 事件给自己的其他终端（多端同步）
-        imWebSocketService.sendGroupMessageAsync(userId,
-                ImGroupMessageDTO.ofRead(userId, groupId, newMaxMessageId));
+        imWebSocketService.sendNotificationAsync(userId, ImConversationTypeEnum.GROUP.getType(),
+                ImContentTypeEnum.READ.getType(),
+                ImMessageReadNotification.ofGroup(userId, groupId, newMaxMessageId));
 
         // 2. 刷新 (prevMaxMessageId, newMaxMessageId] 区间内的待回执消息
         List<ImGroupMessageDO> pendingMessages = groupMessageMapper.selectListByGroupIdAndPendingReceipt(
@@ -378,8 +383,9 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
             }
 
             // 2.2 发送 RECEIPT 事件给消息发送方（只有 ta 关心已读进度）
-            imWebSocketService.sendGroupMessageAsync(message.getSenderId(),
-                    ImGroupMessageDTO.ofReceipt(message.getId(), groupId, readCount, newReceiptStatus));
+            imWebSocketService.sendNotificationAsync(message.getSenderId(), ImConversationTypeEnum.GROUP.getType(),
+                    ImContentTypeEnum.RECEIPT.getType(),
+                    ImMessageReceiptNotification.ofGroup(message.getId(), groupId, readCount, newReceiptStatus));
         }
     }
 

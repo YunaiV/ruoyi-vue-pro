@@ -342,7 +342,7 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
             verify(groupMemberService).addGroupMembers(eq(10L), anyCollection(),
                     eq(ImGroupAddSourceEnum.INVITE.getSource()), eq(1L));
             verify(groupRequestService, never()).createInviteRequestList(anyLong(), anyLong(), anyCollection());
-            verify(webSocketService, never()).sendGroupMessageAsync(anyCollection(), any(ImGroupMessageDTO.class));
+            verify(webSocketService, never()).sendNotificationAsync(anyCollection(), anyInt(), anyInt(), any());
             ArgumentCaptor<ImGroupMessageSendDTO> dtoCaptor = ArgumentCaptor.forClass(ImGroupMessageSendDTO.class);
             verify(groupMessageService).sendGroupMessage(eq(1L), anyCollection(), dtoCaptor.capture());
             assertEquals(ImContentTypeEnum.GROUP_MEMBER_INVITE.getType(), dtoCaptor.getValue().getType());
@@ -526,7 +526,7 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
 
             // 断言：不会触发添加、不会推送
             verify(groupMemberService, never()).addGroupMembers(anyLong(), anyCollection());
-            verify(webSocketService, never()).sendGroupMessageAsync(anyCollection(), any(ImGroupMessageDTO.class));
+            verify(webSocketService, never()).sendNotificationAsync(anyCollection(), anyInt(), anyInt(), any());
         }
     }
 

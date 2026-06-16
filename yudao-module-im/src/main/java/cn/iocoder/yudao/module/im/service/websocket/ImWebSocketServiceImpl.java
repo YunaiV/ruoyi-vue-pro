@@ -34,55 +34,24 @@ public class ImWebSocketServiceImpl implements ImWebSocketService {
     private WebSocketSenderApi webSocketSenderApi;
 
     @Override
-    public void sendPrivateMessageAsync(Collection<Long> userIds, ImPrivateMessageDTO dto) {
-        // 说明：通过 executeAfterTransaction 保证事务提交后再推送，避免客户端收到消息后查询数据库时事务尚未提交
-        // 通过 getSelf() 获取 Spring 代理对象调用 @Async 方法，确保异步 AOP 生效（直接 this 调用会绕过代理）
-        executeAfterTransaction(() -> getSelf().doSendPrivateMessage(userIds, dto));
+    public void sendNotificationAsync(Collection<Long> userIds, Integer conversationType, Integer contentType,
+                                      Object payload) {
+        ImNotificationWebSocketDTO notification = buildNotification(conversationType, contentType, payload);
+        executeAfterTransaction(() -> getSelf().doSendNotification(userIds, notification));
     }
 
     @Override
-    public void sendGroupMessageAsync(Collection<Long> userIds, ImGroupMessageDTO dto) {
-        executeAfterTransaction(() -> getSelf().doSendGroupMessage(userIds, dto));
+    public void broadcastNotificationAsync(Integer conversationType, Integer contentType, Object payload) {
+        ImNotificationWebSocketDTO notification = buildNotification(conversationType, contentType, payload);
+        executeAfterTransaction(() -> getSelf().doBroadcastNotification(notification));
     }
 
-    @Override
-    public void sendChannelMessageAsync(Collection<Long> userIds, ImChannelMessageDTO dto) {
-        executeAfterTransaction(() -> getSelf().doSendChannelMessage(userIds, dto));
-    }
-
-    @Override
-    public void broadcastChannelMessageAsync(ImChannelMessageDTO dto) {
-        executeAfterTransaction(() -> getSelf().doBroadcastChannelMessage(dto));
-    }
-
-    /**
-     * 异步发送私聊 WebSocket 消息；多收件人共享同一 dto，避免按收件人重复注册 afterCommit 回调
-     */
-    @Async
-    public void doSendPrivateMessage(Collection<Long> userIds, ImPrivateMessageDTO dto) {
-        for (Long userId : getDistinctUserIds(userIds)) {
-            try {
-                webSocketSenderApi.sendObject(UserTypeEnum.ADMIN.getValue(), userId,
-                        ImPrivateMessageDTO.TYPE, dto);
-            } catch (Exception e) {
-                log.error("[doSendPrivateMessage][userId({}) dto({}) 发送失败]", userId, dto, e);
-            }
-        }
-    }
-
-    /**
-     * 异步发送群聊 WebSocket 消息
-     */
-    @Async
-    public void doSendGroupMessage(Collection<Long> userIds, ImGroupMessageDTO dto) {
-        for (Long userId : getDistinctUserIds(userIds)) {
-            try {
-                webSocketSenderApi.sendObject(UserTypeEnum.ADMIN.getValue(), userId,
-                        ImGroupMessageDTO.TYPE, dto);
-            } catch (Exception e) {
-                log.error("[doSendGroupMessage][userId({}) dto({}) 发送失败]", userId, dto, e);
-            }
-        }
+    private static ImNotificationWebSocketDTO buildNotification(Integer conversationType, Integer contentType,
+                                                                Object payload) {
+        return new ImNotificationWebSocketDTO()
+                .setConversationType(conversationType)
+                .setContentType(contentType)
+                .setPayload(payload);
     }
 
     /**

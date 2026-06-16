@@ -88,7 +88,7 @@ public class ImChannelMessageServiceImplTest extends BaseMockitoUnitTest {
         channelMessageService.readChannelMessages(1L, 10L, 100L);
 
         // 断言：读位置未前进 → 不推 READ 事件
-        verify(webSocketService, never()).sendChannelMessageAsync(anyLong(), any());
+        verify(webSocketService, never()).sendNotificationAsync(anyLong(), anyInt(), anyInt(), any());
     }
 
 }

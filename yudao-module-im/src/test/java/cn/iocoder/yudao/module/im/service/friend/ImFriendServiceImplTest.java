@@ -68,7 +68,7 @@ public class ImFriendServiceImplTest extends BaseMockitoUnitTest {
         assertEquals(100L, captor.getValue().getId());
         assertTrue(captor.getValue().getSilent());
         // 断言：推送了好友更新通知
-        verify(imWebSocketService).sendPrivateMessageAsync(eq(1L), any(ImPrivateMessageDTO.class));
+        verify(imWebSocketService).sendNotificationAsync(eq(1L), anyInt(), anyInt(), any());
     }
 
     @Test
@@ -100,7 +100,7 @@ public class ImFriendServiceImplTest extends BaseMockitoUnitTest {
                 () -> friendService.updateFriend(1L, reqVO));
         assertEquals(FRIEND_NOT_FRIEND.getCode(), exception.getCode());
         verify(imFriendMapper, never()).updateById(any(ImFriendDO.class));
-        verify(imWebSocketService, never()).sendPrivateMessageAsync(any(Long.class), any(ImPrivateMessageDTO.class));
+        verify(imWebSocketService, never()).sendNotificationAsync(any(Long.class), anyInt(), anyInt(), any());
     }
 
     @Test
@@ -123,7 +123,7 @@ public class ImFriendServiceImplTest extends BaseMockitoUnitTest {
         assertEquals("老张", captor.getValue().getDisplayName());
         assertNull(captor.getValue().getSilent());
         // 断言：推送好友更新通知
-        verify(imWebSocketService).sendPrivateMessageAsync(eq(1L), any(ImPrivateMessageDTO.class));
+        verify(imWebSocketService).sendNotificationAsync(eq(1L), anyInt(), anyInt(), any());
     }
 
     @Test
@@ -138,7 +138,7 @@ public class ImFriendServiceImplTest extends BaseMockitoUnitTest {
         // 断言：没查记录、没触发 SQL 更新 / 没发 WebSocket 推送
         verify(imFriendMapper, never()).selectByUserIdAndFriendUserId(anyLong(), anyLong());
         verify(imFriendMapper, never()).updateById(any(ImFriendDO.class));
-        verify(imWebSocketService, never()).sendPrivateMessageAsync(any(Long.class), any(ImPrivateMessageDTO.class));
+        verify(imWebSocketService, never()).sendNotificationAsync(any(Long.class), anyInt(), anyInt(), any());
     }
 
     // ========== addFriend0（内部方法，被 becomeFriends / silentReAddFriend 调用） ==========

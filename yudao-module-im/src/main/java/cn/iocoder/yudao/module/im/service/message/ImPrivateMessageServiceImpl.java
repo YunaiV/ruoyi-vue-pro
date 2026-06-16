@@ -103,9 +103,11 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
         }
 
         // 3. WebSocket 异步推送：接收方 + 发送方多端同步
-        ImPrivateMessageDTO websocketMessage = ImPrivateMessageDTO.ofSend(message);
-        imWebSocketService.sendPrivateMessageAsync(message.getReceiverId(), websocketMessage);
-        imWebSocketService.sendPrivateMessageAsync(senderId, websocketMessage);
+        ImPrivateMessageNotification notification = ImPrivateMessageNotification.ofSend(message);
+        imWebSocketService.sendNotificationAsync(message.getReceiverId(), ImConversationTypeEnum.PRIVATE.getType(),
+                notification.getType(), notification);
+        imWebSocketService.sendNotificationAsync(senderId, ImConversationTypeEnum.PRIVATE.getType(),
+                notification.getType(), notification);
         return message;
     }
 
@@ -131,11 +133,13 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
         }
 
         // 2. WebSocket 异步推送：双向（默认）；单边语义（persistent=false）下仅推 sender 多端，对方不感知
-        ImPrivateMessageDTO websocketMessage = ImPrivateMessageDTO.ofSend(message);
+        ImPrivateMessageNotification notification = ImPrivateMessageNotification.ofSend(message);
         if (persistent) {
-            imWebSocketService.sendPrivateMessageAsync(dto.getReceiverId(), websocketMessage);
+            imWebSocketService.sendNotificationAsync(dto.getReceiverId(), ImConversationTypeEnum.PRIVATE.getType(),
+                    notification.getType(), notification);
         }
-        imWebSocketService.sendPrivateMessageAsync(senderId, websocketMessage);
+        imWebSocketService.sendNotificationAsync(senderId, ImConversationTypeEnum.PRIVATE.getType(),
+                notification.getType(), notification);
         return message;
     }
 
@@ -256,10 +260,11 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
         }
 
         // 4. 异步发送 READ + RECEIPT 事件（已读位置以前端上报为准，与多端 / 对方 UI 显示一致）
-        imWebSocketService.sendPrivateMessageAsync(userId,
-                ImPrivateMessageDTO.ofRead(userId, receiverId, messageId));
-        imWebSocketService.sendPrivateMessageAsync(receiverId,
-                ImPrivateMessageDTO.ofReceipt(userId, receiverId, messageId));
+        imWebSocketService.sendNotificationAsync(userId, ImConversationTypeEnum.PRIVATE.getType(),
+                ImContentTypeEnum.READ.getType(), ImMessageReadNotification.ofPrivate(userId, receiverId, messageId));
+        imWebSocketService.sendNotificationAsync(receiverId, ImConversationTypeEnum.PRIVATE.getType(),
+                ImContentTypeEnum.RECEIPT.getType(),
+                ImMessageReceiptNotification.ofPrivate(userId, receiverId, messageId));
     }
 
     @Override

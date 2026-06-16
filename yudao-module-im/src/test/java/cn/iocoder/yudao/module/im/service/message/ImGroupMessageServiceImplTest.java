@@ -116,9 +116,16 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
             assertEquals(ImMessageReceiptStatusEnum.PENDING.getStatus(), result.getReceiptStatus());
 
             // 验证推送给 3 个群成员（含发送者自己，用于多端同步）
-            verify(imWebSocketService).sendGroupMessageAsync(argThat((Collection<Long> ids) ->
+            ArgumentCaptor<ImGroupMessageNotification> payloadCaptor =
+                    ArgumentCaptor.forClass(ImGroupMessageNotification.class);
+            verify(imWebSocketService).sendNotificationAsync(argThat((Collection<Long> ids) ->
                     ids.size() == 3 && ids.contains(1L) && ids.contains(2L) && ids.contains(3L)),
-                    any(ImGroupMessageDTO.class));
+                    eq(ImConversationTypeEnum.GROUP.getType()), eq(ImContentTypeEnum.TEXT.getType()),
+                    payloadCaptor.capture());
+            ImGroupMessageNotification payload = payloadCaptor.getValue();
+            assertEquals(ImMessageReceiptStatusEnum.PENDING.getStatus(), payload.getReceiptStatus());
+            assertEquals(0, payload.getReadCount());
+            assertEquals(List.of(1L, 2L, 3L), payload.getReceiverUserIds());
         }
     }
 
@@ -152,9 +159,9 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
 
             // 断言：固化快照必含发送者，推送目标补回发送者 = {1,2,3}
             assertTrue(result.getReceiverUserIds().contains(1L), "发送者必须在 receiver_user_ids 快照内");
-            verify(imWebSocketService).sendGroupMessageAsync(argThat((Collection<Long> ids) ->
+            verify(imWebSocketService).sendNotificationAsync(argThat((Collection<Long> ids) ->
                     ids.size() == 3 && ids.contains(1L) && ids.contains(2L) && ids.contains(3L)),
-                    any(ImGroupMessageDTO.class));
+                    anyInt(), anyInt(), any());
         }
     }
 
@@ -211,7 +218,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
         // 被引用原消息：定向给 {1,2}（对发送人 1 可见，但不覆盖广播受众 {1,2,3}）
         ImGroupMessageDO original = ImGroupMessageDO.builder().id(500L).groupId(10L).senderId(2L)
                 .status(ImMessageStatusEnum.NORMAL.getStatus()).receiverUserIds(List.of(1L, 2L))
-                .type(ImMessageTypeEnum.TEXT.getType()).content("{\"content\":\"密\"}")
+                .type(ImContentTypeEnum.TEXT.getType()).content("{\"content\":\"密\"}")
                 .sendTime(LocalDateTime.now()).build();
         when(groupMessageMapper.selectById(500L)).thenReturn(original);
 
@@ -237,7 +244,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
         when(groupMemberService.getActiveGroupMemberUserIdsByGroupId(10L)).thenReturn(List.of(1L, 2L, 3L));
         ImGroupMessageDO original = ImGroupMessageDO.builder().id(500L).groupId(10L).senderId(2L)
                 .status(ImMessageStatusEnum.NORMAL.getStatus()).receiverUserIds(List.of(1L, 2L, 3L))
-                .type(ImMessageTypeEnum.TEXT.getType()).content("{\"content\":\"公开\"}")
+                .type(ImContentTypeEnum.TEXT.getType()).content("{\"content\":\"公开\"}")
                 .sendTime(LocalDateTime.now()).build();
         when(groupMessageMapper.selectById(500L)).thenReturn(original);
         when(groupMessageMapper.insert(any(ImGroupMessageDO.class))).thenAnswer(invocation -> {
@@ -390,9 +397,9 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
             verify(groupMessageMapper).updateById(any(ImGroupMessageDO.class));
             verify(groupMessageMapper).insert(any(ImGroupMessageDO.class));
             // 验证：给 2 个活跃成员推送撤回提示
-            verify(imWebSocketService).sendGroupMessageAsync(argThat((Collection<Long> ids) ->
+            verify(imWebSocketService).sendNotificationAsync(argThat((Collection<Long> ids) ->
                     ids.size() == 2 && ids.contains(1L) && ids.contains(2L)),
-                    any(ImGroupMessageDTO.class));
+                    anyInt(), anyInt(), any());
         }
     }
 
@@ -588,7 +595,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
         assertEquals(MESSAGE_SENSITIVE_WORD_BLOCKED.getCode(), exception.getCode());
         // 断言：不入库、不推送
         verify(groupMessageMapper, never()).insert(any(ImGroupMessageDO.class));
-        verify(imWebSocketService, never()).sendGroupMessageAsync(anyCollection(), any(ImGroupMessageDTO.class));
+        verify(imWebSocketService, never()).sendNotificationAsync(anyCollection(), anyInt(), anyInt(), any());
     }
 
     // ========== 撤回：补充边界 ==========
@@ -649,7 +656,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
 
             // 断言：已读位置更新 + READ 事件
             verify(conversationReadService).updateConversationReadPosition(1L, ImConversationTypeEnum.GROUP.getType(), 10L, 100L);
-            verify(imWebSocketService).sendGroupMessageAsync(eq(1L), any(ImGroupMessageDTO.class));
+            verify(imWebSocketService).sendNotificationAsync(eq(1L), anyInt(), anyInt(), any());
         }
     }
 
@@ -664,7 +671,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
         assertEquals(MESSAGE_GROUP_READ_DISABLED.getCode(), exception.getCode());
         // 断言：已读位置不写、不推送
         verify(conversationReadService, never()).updateConversationReadPosition(anyLong(), anyInt(), anyLong(), anyLong());
-        verify(imWebSocketService, never()).sendGroupMessageAsync(anyLong(), any(ImGroupMessageDTO.class));
+        verify(imWebSocketService, never()).sendNotificationAsync(anyLong(), anyInt(), anyInt(), any());
     }
 
     @Test
@@ -726,7 +733,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
 
         // 断言：调用了 CAS 更新但读位置未前进 → 不推送
         verify(conversationReadService).updateConversationReadPosition(1L, ImConversationTypeEnum.GROUP.getType(), 10L, 100L);
-        verify(imWebSocketService, never()).sendGroupMessageAsync(anyLong(), any(ImGroupMessageDTO.class));
+        verify(imWebSocketService, never()).sendNotificationAsync(anyLong(), anyInt(), anyInt(), any());
     }
 
     @Test
@@ -787,7 +794,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
         assertEquals(100L, captor.getValue().getId());
         assertEquals(ImMessageReceiptStatusEnum.DONE.getStatus(), captor.getValue().getReceiptStatus());
         // 断言：给消息发送方（5）推送 RECEIPT 事件
-        verify(imWebSocketService).sendGroupMessageAsync(eq(5L), any(ImGroupMessageDTO.class));
+        verify(imWebSocketService).sendNotificationAsync(eq(5L), anyInt(), anyInt(), any());
     }
 
     @Test
@@ -824,7 +831,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
         // 断言：回执状态保持 PENDING，不更新 DB
         verify(groupMessageMapper, never()).updateById(any(ImGroupMessageDO.class));
         // 仍然推送 RECEIPT 事件给发送方（携带已读人数）
-        verify(imWebSocketService).sendGroupMessageAsync(eq(5L), any(ImGroupMessageDTO.class));
+        verify(imWebSocketService).sendNotificationAsync(eq(5L), anyInt(), anyInt(), any());
     }
 
     // ========== sendGroupMessage(senderId, dto)：receiverUserIds 定向过滤 ==========
@@ -833,17 +840,17 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
     public void testSendGroupMessage_noReceiverUserIds_broadcastsToAllMembers() {
         // 准备：无定向 → 应发给所有 ENABLE 成员（含发送者自己，多端同步）
         ImGroupMessageSendDTO dto = new ImGroupMessageSendDTO()
-                .setGroupId(10L).setType(ImMessageTypeEnum.RECALL.getType())
+                .setGroupId(10L).setType(ImContentTypeEnum.RECALL.getType())
                 .setContent("{\"messageId\":1}");
         when(groupMemberService.getActiveGroupMemberUserIdsByGroupId(10L))
                 .thenReturn(List.of(1L, 2L, 3L, 4L));
 
         groupMessageService.sendGroupMessage(1L, dto);
 
-        verify(imWebSocketService).sendGroupMessageAsync(argThat((Collection<Long> ids) ->
+        verify(imWebSocketService).sendNotificationAsync(argThat((Collection<Long> ids) ->
                         ids.size() == 4 && ids.contains(1L) && ids.contains(2L)
                                 && ids.contains(3L) && ids.contains(4L)),
-                any(ImGroupMessageDTO.class));
+                anyInt(), anyInt(), any());
     }
 
     @Test
@@ -851,7 +858,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
         // 准备：定向给 {2,3}，发送者 1；群成员 {1,2,3,4}
         // 预期推送目标：{1,2,3}（发送者自己多端同步 + 定向列表）；4 被过滤
         ImGroupMessageSendDTO dto = new ImGroupMessageSendDTO()
-                .setGroupId(10L).setType(ImMessageTypeEnum.RECALL.getType())
+                .setGroupId(10L).setType(ImContentTypeEnum.RECALL.getType())
                 .setContent("{\"messageId\":1}")
                 .setReceiverUserIds(List.of(2L, 3L));
         when(groupMemberService.getActiveGroupMemberUserIdsByGroupId(10L))
@@ -859,10 +866,10 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
 
         groupMessageService.sendGroupMessage(1L, dto);
 
-        verify(imWebSocketService).sendGroupMessageAsync(argThat((Collection<Long> ids) ->
+        verify(imWebSocketService).sendNotificationAsync(argThat((Collection<Long> ids) ->
                         ids.size() == 3 && ids.contains(1L) && ids.contains(2L)
                                 && ids.contains(3L) && !ids.contains(4L)),
-                any(ImGroupMessageDTO.class));
+                anyInt(), anyInt(), any());
     }
 
     @Test
@@ -870,7 +877,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
         // 边界：发送者不在群成员缓存里（理论上应先被 validateMemberInGroup 挡住，这里纯防御）
         // 预期：定向用户 + 发送者自己（始终纳入快照保证多端同步）；非定向成员 4 被过滤
         ImGroupMessageSendDTO dto = new ImGroupMessageSendDTO()
-                .setGroupId(10L).setType(ImMessageTypeEnum.RECALL.getType())
+                .setGroupId(10L).setType(ImContentTypeEnum.RECALL.getType())
                 .setContent("{\"messageId\":1}")
                 .setReceiverUserIds(List.of(2L, 3L));
         when(groupMemberService.getActiveGroupMemberUserIdsByGroupId(10L))
@@ -878,10 +885,10 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
 
         groupMessageService.sendGroupMessage(99L, dto);
 
-        verify(imWebSocketService).sendGroupMessageAsync(argThat((Collection<Long> ids) ->
+        verify(imWebSocketService).sendNotificationAsync(argThat((Collection<Long> ids) ->
                         ids.size() == 3 && ids.contains(2L) && ids.contains(3L)
                                 && ids.contains(99L) && !ids.contains(4L)),
-                any(ImGroupMessageDTO.class));
+                anyInt(), anyInt(), any());
     }
 
     // ========== sendGroupMessage(senderId, dto)：helper 行为 ==========
@@ -935,7 +942,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
         groupMessageService.sendGroupMessage(1L, dto);
 
         verify(groupMessageMapper, never()).insert(any(ImGroupMessageDO.class));
-        verify(imWebSocketService).sendGroupMessageAsync(anyCollection(), any(ImGroupMessageDTO.class));
+        verify(imWebSocketService).sendNotificationAsync(anyCollection(), anyInt(), anyInt(), any());
     }
 
     @Test
@@ -949,7 +956,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
 
         // 断言：不读取 active members，按调用方 targets 推送
         verify(groupMemberService, never()).getActiveGroupMemberUserIdsByGroupId(anyLong());
-        verify(imWebSocketService).sendGroupMessageAsync(eq(targets), any(ImGroupMessageDTO.class));
+        verify(imWebSocketService).sendNotificationAsync(eq(targets), anyInt(), anyInt(), any());
     }
 
     // ========== getGroupMessageList ==========

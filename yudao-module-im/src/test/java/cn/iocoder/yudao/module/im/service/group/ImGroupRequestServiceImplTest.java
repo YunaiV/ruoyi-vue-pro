@@ -116,7 +116,7 @@ public class ImGroupRequestServiceImplTest extends BaseMockitoUnitTest {
         verify(groupMemberService, never()).addGroupMember(anyLong(), anyLong(), anyInt(), anyInt(), anyLong());
         verify(groupRequestMapper).insert(any(ImGroupRequestDO.class));
         // 1503 推送给 owner(99) + admin(98)，去重后两条
-        verify(websocketService, times(2)).sendPrivateMessageAsync(anyLong(), any(ImPrivateMessageDTO.class));
+        verify(websocketService, times(2)).sendNotificationAsync(anyLong(), anyInt(), anyInt(), any());
     }
 
     @Test
@@ -149,7 +149,7 @@ public class ImGroupRequestServiceImplTest extends BaseMockitoUnitTest {
                 eq(ImGroupAddSourceEnum.SEARCH.getSource()), any());
         assertEquals(50L, result.getId());
         assertEquals(ImGroupRequestHandleResultEnum.UNHANDLED.getResult(), result.getHandleResult());
-        verify(websocketService).sendPrivateMessageAsync(eq(99L), any(ImPrivateMessageDTO.class));
+        verify(websocketService).sendNotificationAsync(eq(99L), anyInt(), anyInt(), any());
     }
 
     @Test
@@ -208,7 +208,7 @@ public class ImGroupRequestServiceImplTest extends BaseMockitoUnitTest {
         verify(groupMessageService).sendGroupMessage(eq(1L), dtoCaptor.capture());
         assertEquals(ImContentTypeEnum.GROUP_MEMBER_ENTER.getType(), dtoCaptor.getValue().getType());
         // 1505 推送给申请人 + owner，去重后两条
-        verify(websocketService, times(2)).sendPrivateMessageAsync(anyLong(), any(ImPrivateMessageDTO.class));
+        verify(websocketService, times(2)).sendNotificationAsync(anyLong(), anyInt(), anyInt(), any());
     }
 
     @Test
@@ -278,7 +278,7 @@ public class ImGroupRequestServiceImplTest extends BaseMockitoUnitTest {
 
         // 不写群成员；推 1506 给申请人 + 群主（同一人 1L 时去重为 1 + 申请人 2L = 2 条）
         verify(groupMemberService, never()).addGroupMember(anyLong(), anyLong(), anyInt(), any(), any());
-        verify(websocketService, times(2)).sendPrivateMessageAsync(anyLong(), any(ImPrivateMessageDTO.class));
+        verify(websocketService, times(2)).sendNotificationAsync(anyLong(), anyInt(), anyInt(), any());
     }
 
     // ==================== createInviteRequestList ====================
@@ -305,7 +305,7 @@ public class ImGroupRequestServiceImplTest extends BaseMockitoUnitTest {
         // 断言：插入 2 条 + 推 1503 给 owner（每条 1 帧）共 2 帧
         ArgumentCaptor<ImGroupRequestDO> captor = ArgumentCaptor.forClass(ImGroupRequestDO.class);
         verify(groupRequestMapper, times(2)).insert(captor.capture());
-        verify(websocketService, times(2)).sendPrivateMessageAsync(anyLong(), any(ImPrivateMessageDTO.class));
+        verify(websocketService, times(2)).sendNotificationAsync(anyLong(), anyInt(), anyInt(), any());
         // 断言：每条记录 inviterUserId=1 + addSource=INVITE，避免审批通过后回写群成员留痕的来源为空 / 脏带旧值
         Collection<ImGroupRequestDO> inserted = captor.getAllValues();
         assertEquals(2, inserted.size());
@@ -337,7 +337,7 @@ public class ImGroupRequestServiceImplTest extends BaseMockitoUnitTest {
         // 断言：复用并重置旧邀请申请
         verify(groupRequestMapper).updateInviteByIdReset(eq(50L), eq(1L),
                 eq(ImGroupAddSourceEnum.INVITE.getSource()), any());
-        verify(websocketService).sendPrivateMessageAsync(eq(99L), any(ImPrivateMessageDTO.class));
+        verify(websocketService).sendNotificationAsync(eq(99L), anyInt(), anyInt(), any());
     }
 
     private AdminUserRespDTO buildUser(Long id, String nickname) {

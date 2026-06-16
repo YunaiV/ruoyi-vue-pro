@@ -97,7 +97,8 @@ public class ImChannelMessageServiceImpl implements ImChannelMessageService {
      */
     @Async
     public void readChannelMessageEvent(Long userId, Long channelId, Long readId) {
-        webSocketService.sendChannelMessageAsync(userId, ImChannelMessageDTO.ofRead(channelId, readId));
+        webSocketService.sendNotificationAsync(userId, ImConversationTypeEnum.CHANNEL.getType(),
+                ImContentTypeEnum.READ.getType(), ImMessageReadNotification.ofChannel(channelId, readId));
     }
 
     private ImChannelMessageServiceImpl getSelf() {
@@ -121,11 +122,12 @@ public class ImChannelMessageServiceImpl implements ImChannelMessageService {
         channelMessageMapper.insert(message);
 
         // 3. 异步推 WebSocket：指定用户走点对点；全员（receiverUserIds 为空）走广播
-        ImChannelMessageDTO dto = ImChannelMessageDTO.ofSend(message);
+        ImChannelMessageNotification dto = ImChannelMessageNotification.ofSend(message);
         if (CollUtil.isNotEmpty(reqVO.getReceiverUserIds())) {
-            webSocketService.sendChannelMessageAsync(reqVO.getReceiverUserIds(), dto);
+            webSocketService.sendNotificationAsync(reqVO.getReceiverUserIds(), ImConversationTypeEnum.CHANNEL.getType(),
+                    dto.getType(), dto);
         } else {
-            webSocketService.broadcastChannelMessageAsync(dto);
+            webSocketService.broadcastNotificationAsync(ImConversationTypeEnum.CHANNEL.getType(), dto.getType(), dto);
         }
         return message.getId();
     }

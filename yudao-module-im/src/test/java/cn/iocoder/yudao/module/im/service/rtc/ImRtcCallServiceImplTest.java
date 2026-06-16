@@ -143,7 +143,7 @@ public class ImRtcCallServiceImplTest extends BaseMockitoUnitTest {
 
         // 断言：成功 1 个；NO_ANSWER 信令推到主叫；不触发 endSession
         assertEquals(1, result);
-        verify(webSocketService).sendPrivateMessageAsync(eq(200L), any(ImPrivateMessageDTO.class));
+        verify(webSocketService).sendNotificationAsync(eq(200L), anyInt(), anyInt(), any());
         verify(rtcCallMapper, never()).updateByIdAndStatusIn(any(), anyCollection(), any());
     }
 
@@ -238,7 +238,7 @@ public class ImRtcCallServiceImplTest extends BaseMockitoUnitTest {
         rtcCallService.noAnswerCallCheck(100L, "r1");
 
         // 断言：NO_ANSWER 信令推到主叫 200L；不触发 endSession
-        verify(webSocketService).sendPrivateMessageAsync(eq(200L), any(ImPrivateMessageDTO.class));
+        verify(webSocketService).sendNotificationAsync(eq(200L), anyInt(), anyInt(), any());
         verify(rtcCallMapper, never()).updateByIdAndStatusIn(any(), anyCollection(), any());
     }
 
