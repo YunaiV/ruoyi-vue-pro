@@ -460,15 +460,17 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
     // ========== 群已读测试 ==========
 
     @Test
-    public void testReadMessages_notInGroup() {
-        // 准备：当前用户不在群中
-        when(groupMemberService.validateMemberInGroup(10L, 1L))
-                .thenThrow(new ServiceException(GROUP_MEMBER_NOT_IN_GROUP.getCode(), GROUP_MEMBER_NOT_IN_GROUP.getMsg()));
+    public void testReadMessages_messageInvisible() {
+        // 准备：消息不在用户接收快照内
+        when(groupMessageMapper.selectById(100L)).thenReturn(ImGroupMessageDO.builder()
+                .id(100L).groupId(10L).senderId(2L).receiverUserIds(List.of(2L))
+                .sendTime(LocalDateTime.now()).build());
 
-        // 调用并断言：越权校验
+        // 调用并断言
         ServiceException exception = assertThrows(ServiceException.class,
                 () -> groupMessageService.readGroupMessages(1L, 10L, 100L));
-        assertEquals(GROUP_MEMBER_NOT_IN_GROUP.getCode(), exception.getCode());
+        assertEquals(MESSAGE_NOT_IN_GROUP.getCode(), exception.getCode());
+        verify(conversationReadService, never()).updateConversationReadPosition(anyLong(), anyInt(), anyLong(), anyLong());
     }
 
     @Test
@@ -636,11 +638,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
             springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImGroupMessageServiceImpl.class)))
                     .thenReturn(groupMessageService);
 
-            // 准备：用户在群；已读位置从 5 前进到 100
-            ImGroupMemberDO member = ImGroupMemberDO.builder()
-                    .groupId(10L).userId(1L)
-                    .status(CommonStatusEnum.ENABLE.getStatus()).build();
-            when(groupMemberService.validateMemberInGroup(10L, 1L)).thenReturn(member);
+            // 准备：消息对用户可见；已读位置从 5 前进到 100
             when(groupMessageMapper.selectById(100L)).thenReturn(ImGroupMessageDO.builder()
                     .id(100L).groupId(10L).senderId(2L).receiverUserIds(List.of(1L))
                     .sendTime(LocalDateTime.now()).build());
@@ -657,6 +655,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
             // 断言：已读位置更新 + READ 事件
             verify(conversationReadService).updateConversationReadPosition(1L, ImConversationTypeEnum.GROUP.getType(), 10L, 100L);
             verify(imWebSocketService).sendNotificationAsync(eq(1L), anyInt(), anyInt(), any());
+            verify(groupMemberService, never()).validateMemberInGroup(10L, 1L);
         }
     }
 
@@ -715,10 +714,6 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testReadGroupMessages_cursorAlreadyAhead() {
         // 准备：已读游标已 >= 目标，直接返回
-        ImGroupMemberDO member = ImGroupMemberDO.builder()
-                .groupId(10L).userId(1L)
-                .status(CommonStatusEnum.ENABLE.getStatus()).build();
-        when(groupMemberService.validateMemberInGroup(10L, 1L)).thenReturn(member);
         when(groupMessageMapper.selectById(100L)).thenReturn(ImGroupMessageDO.builder()
                 .id(100L).groupId(10L).senderId(2L).receiverUserIds(List.of(1L))
                 .sendTime(LocalDateTime.now()).build());
@@ -738,11 +733,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
 
     @Test
     public void testReadGroupMessages_messageNotInGroup() {
-        // 准备：用户在群，但 messageId 属于其它群
-        ImGroupMemberDO member = ImGroupMemberDO.builder()
-                .groupId(10L).userId(1L)
-                .status(CommonStatusEnum.ENABLE.getStatus()).build();
-        when(groupMemberService.validateMemberInGroup(10L, 1L)).thenReturn(member);
+        // 准备：messageId 属于其它群
         when(groupMessageMapper.selectById(100L)).thenReturn(ImGroupMessageDO.builder()
                 .id(100L).groupId(20L).senderId(2L).sendTime(LocalDateTime.now()).build());
 
@@ -751,6 +742,31 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
                 () -> groupMessageService.readGroupMessages(1L, 10L, 100L));
         assertEquals(MESSAGE_NOT_IN_GROUP.getCode(), exception.getCode());
         verify(conversationReadService, never()).updateConversationReadPosition(anyLong(), anyInt(), anyLong(), anyLong());
+    }
+
+    @Test
+    public void testReadGroupMessages_quitMemberVisibleMessage_success() {
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImGroupMessageServiceImpl.class)))
+                    .thenReturn(groupMessageService);
+
+            // 准备：历史消息的接收快照包含用户
+            when(groupMessageMapper.selectById(100L)).thenReturn(ImGroupMessageDO.builder()
+                    .id(100L).groupId(10L).senderId(2L).receiverUserIds(List.of(1L, 2L))
+                    .sendTime(LocalDateTime.now().minusMinutes(1)).build());
+            when(conversationReadService.getConversationReadMessageId(1L, ImConversationTypeEnum.GROUP.getType(), 10L))
+                    .thenReturn(0L);
+            when(conversationReadService.updateConversationReadPosition(1L, ImConversationTypeEnum.GROUP.getType(), 10L, 100L))
+                    .thenReturn(true);
+            when(groupMessageMapper.selectListByGroupIdAndPendingReceipt(10L, 0L, 100L)).thenReturn(List.of());
+
+            // 调用
+            groupMessageService.readGroupMessages(1L, 10L, 100L);
+
+            // 断言：不校验当前在群，直接推进已读位置
+            verify(groupMemberService, never()).validateMemberInGroup(10L, 1L);
+            verify(conversationReadService).updateConversationReadPosition(1L, ImConversationTypeEnum.GROUP.getType(), 10L, 100L);
+        }
     }
 
     // ========== 回执：DONE 状态迁移 ==========
