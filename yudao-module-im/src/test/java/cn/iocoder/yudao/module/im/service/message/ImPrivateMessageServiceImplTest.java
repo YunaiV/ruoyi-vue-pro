@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.im.dal.dataobject.message.ImPrivateMessageDO;
 import cn.iocoder.yudao.module.im.dal.mysql.message.ImPrivateMessageMapper;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageReceiptStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
-import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
+import cn.iocoder.yudao.module.im.enums.ImContentTypeEnum;
 import cn.iocoder.yudao.module.im.framework.config.ImProperties;
 import cn.iocoder.yudao.module.im.service.conversation.ImConversationReadService;
 import cn.iocoder.yudao.module.im.service.friend.ImFriendService;
@@ -380,7 +380,7 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
     public void testSendPrivateMessage_dto_persistsAndSerializesPojoContent() {
         // 准备：persistent=true 类型 + POJO content
         ImPrivateMessageSendDTO dto = new ImPrivateMessageSendDTO()
-                .setReceiverId(2L).setType(ImMessageTypeEnum.RECALL.getType())
+                .setReceiverId(2L).setType(ImContentTypeEnum.RECALL.getType())
                 .setContent(new RecallMessage().setMessageId(50L));
 
         privateMessageService.sendPrivateMessage(1L, dto);
@@ -391,7 +391,7 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
         ImPrivateMessageDO message = captor.getValue();
         assertEquals(1L, message.getSenderId());
         assertEquals(2L, message.getReceiverId());
-        assertEquals(ImMessageTypeEnum.RECALL.getType(), message.getType());
+        assertEquals(ImContentTypeEnum.RECALL.getType(), message.getType());
         assertEquals("{\"messageId\":50}", message.getContent());
         assertEquals(ImMessageStatusEnum.NORMAL.getStatus(), message.getStatus());
         assertNotNull(message.getClientMessageId());
@@ -405,7 +405,7 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
     public void testSendPrivateMessage_dto_nonPersistentTypeNotInserted() {
         // 准备：persistent=false 类型（FRIEND_DELETE 通知）→ 不入库；仅推 sender 多端，receiver 不感知
         ImPrivateMessageSendDTO dto = new ImPrivateMessageSendDTO()
-                .setReceiverId(2L).setType(ImMessageTypeEnum.FRIEND_DELETE.getType());
+                .setReceiverId(2L).setType(ImContentTypeEnum.FRIEND_DELETE.getType());
 
         privateMessageService.sendPrivateMessage(1L, dto);
 

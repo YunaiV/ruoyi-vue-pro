@@ -13,12 +13,13 @@ import cn.iocoder.yudao.module.im.dal.dataobject.channel.ImChannelMaterialDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImChannelMessageDO;
 import cn.iocoder.yudao.module.im.dal.mysql.message.ImChannelMessageMapper;
 import cn.iocoder.yudao.module.im.enums.ImConversationTypeEnum;
-import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
+import cn.iocoder.yudao.module.im.enums.ImContentTypeEnum;
 import cn.iocoder.yudao.module.im.service.channel.ImChannelMaterialService;
 import cn.iocoder.yudao.module.im.service.conversation.ImConversationReadService;
 import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
-import cn.iocoder.yudao.module.im.service.websocket.dto.ImChannelMessageDTO;
-import cn.iocoder.yudao.module.im.service.websocket.dto.message.MaterialMessage;
+import cn.iocoder.yudao.module.im.service.websocket.notification.message.ImChannelMessageNotification;
+import cn.iocoder.yudao.module.im.service.websocket.notification.message.ImMessageReadNotification;
+import cn.iocoder.yudao.module.im.dal.dataobject.message.content.MaterialMessage;
 import jakarta.annotation.Resource;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -116,7 +117,7 @@ public class ImChannelMessageServiceImpl implements ImChannelMessageService {
         String payloadJson = JsonUtils.toJsonString(payload);
         // 2.2 落库 1 行 message；reqVO 同名字段（materialId / receiverUserIds）自动拷贝，剩余字段补 set
         ImChannelMessageDO message = BeanUtils.toBean(reqVO, ImChannelMessageDO.class).setChannelId(material.getChannelId())
-                .setType(ImMessageTypeEnum.MATERIAL.getType()).setContent(payloadJson).setSendTime(LocalDateTime.now());
+                .setType(ImContentTypeEnum.MATERIAL.getType()).setContent(payloadJson).setSendTime(LocalDateTime.now());
         channelMessageMapper.insert(message);
 
         // 3. 异步推 WebSocket：指定用户走点对点；全员（receiverUserIds 为空）走广播

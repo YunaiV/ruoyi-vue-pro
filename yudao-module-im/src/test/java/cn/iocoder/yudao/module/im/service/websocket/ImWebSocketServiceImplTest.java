@@ -4,8 +4,11 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
-import cn.iocoder.yudao.module.im.service.websocket.dto.ImGroupMessageDTO;
-import cn.iocoder.yudao.module.im.service.websocket.dto.ImPrivateMessageDTO;
+import cn.iocoder.yudao.module.im.enums.ImContentTypeEnum;
+import cn.iocoder.yudao.module.im.enums.ImConversationTypeEnum;
+import cn.iocoder.yudao.module.im.service.websocket.notification.ImNotificationWebSocketDTO;
+import cn.iocoder.yudao.module.im.service.websocket.notification.message.ImGroupMessageNotification;
+import cn.iocoder.yudao.module.im.service.websocket.notification.message.ImPrivateMessageNotification;
 import cn.iocoder.yudao.module.infra.api.websocket.WebSocketSenderApi;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -21,6 +24,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
 /**
@@ -44,10 +48,10 @@ public class ImWebSocketServiceImplTest extends BaseMockitoUnitTest {
         }
     }
 
-    // ========== sendPrivateMessageAsync ==========
+    // ========== sendNotificationAsync ==========
 
     @Test
-    public void testSendPrivateMessageAsync_noTransactionSendsImmediately() {
+    public void testSendNotificationAsync_private_noTransactionSendsImmediately() {
         try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
             springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImWebSocketServiceImpl.class)))
                     .thenReturn(imWebSocketService);
@@ -60,12 +64,14 @@ public class ImWebSocketServiceImplTest extends BaseMockitoUnitTest {
 
             // 断言
             verify(webSocketSenderApi).sendObject(
-                    eq(UserTypeEnum.ADMIN.getValue()), eq(2L), eq(ImPrivateMessageDTO.TYPE), eq(dto));
+                    eq(UserTypeEnum.ADMIN.getValue()), eq(2L), eq(ImNotificationWebSocketDTO.TYPE),
+                    argThat(actual -> isNotification(actual, ImConversationTypeEnum.PRIVATE,
+                            ImContentTypeEnum.TEXT, dto)));
         }
     }
 
     @Test
-    public void testSendPrivateMessageAsync_inTransactionDeferredUntilCommit() {
+    public void testSendNotificationAsync_private_inTransactionDeferredUntilCommit() {
         try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
             springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImWebSocketServiceImpl.class)))
                     .thenReturn(imWebSocketService);
@@ -89,43 +95,51 @@ public class ImWebSocketServiceImplTest extends BaseMockitoUnitTest {
 
                 // 断言：提交后推送
                 verify(webSocketSenderApi).sendObject(
-                        eq(UserTypeEnum.ADMIN.getValue()), eq(2L), eq(ImPrivateMessageDTO.TYPE), eq(dto));
+                        eq(UserTypeEnum.ADMIN.getValue()), eq(2L), eq(ImNotificationWebSocketDTO.TYPE),
+                        argThat(actual -> isNotification(actual, ImConversationTypeEnum.PRIVATE,
+                                ImContentTypeEnum.TEXT, dto)));
             } finally {
                 TransactionSynchronizationManager.clear();
             }
         }
     }
 
-    // ========== sendGroupMessageAsync ==========
+    // ========== sendNotificationAsync ==========
 
     @Test
-    public void testSendGroupMessageAsync_fanOutToAllUsers() {
+    public void testSendNotificationAsync_group_fanOutToAllUsers() {
         try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
             springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImWebSocketServiceImpl.class)))
                     .thenReturn(imWebSocketService);
 
-            ImGroupMessageDTO dto = new ImGroupMessageDTO();
+            ImGroupMessageNotification dto = new ImGroupMessageNotification();
             dto.setGroupId(10L);
             dto.setSenderId(1L);
 
             imWebSocketService.sendGroupMessageAsync(ListUtil.of(1L, 2L, 3L), dto);
 
             verify(webSocketSenderApi).sendObject(
-                    eq(UserTypeEnum.ADMIN.getValue()), eq(1L), eq(ImGroupMessageDTO.TYPE), eq(dto));
+                    eq(UserTypeEnum.ADMIN.getValue()), eq(1L), eq(ImNotificationWebSocketDTO.TYPE),
+                    argThat(actual -> isNotification(actual, ImConversationTypeEnum.GROUP,
+                            ImContentTypeEnum.TEXT, dto)));
             verify(webSocketSenderApi).sendObject(
-                    eq(UserTypeEnum.ADMIN.getValue()), eq(2L), eq(ImGroupMessageDTO.TYPE), eq(dto));
+                    eq(UserTypeEnum.ADMIN.getValue()), eq(2L), eq(ImNotificationWebSocketDTO.TYPE),
+                    argThat(actual -> isNotification(actual, ImConversationTypeEnum.GROUP,
+                            ImContentTypeEnum.TEXT, dto)));
             verify(webSocketSenderApi).sendObject(
-                    eq(UserTypeEnum.ADMIN.getValue()), eq(3L), eq(ImGroupMessageDTO.TYPE), eq(dto));
+                    eq(UserTypeEnum.ADMIN.getValue()), eq(3L), eq(ImNotificationWebSocketDTO.TYPE),
+                    argThat(actual -> isNotification(actual, ImConversationTypeEnum.GROUP,
+                            ImContentTypeEnum.TEXT, dto)));
         }
     }
 
     @Test
-    public void testSendGroupMessageAsync_senderExceptionDoesNotBreakOthers() {
+    public void testSendNotificationAsync_group_senderExceptionDoesNotBreakOthers() {
         try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
             springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImWebSocketServiceImpl.class)))
                     .thenReturn(imWebSocketService);
 
-            ImGroupMessageDTO dto = new ImGroupMessageDTO();
+            ImGroupMessageNotification dto = new ImGroupMessageNotification();
             dto.setGroupId(10L);
             // 给 1 号用户推送时抛异常，不能影响 2/3 号
             doThrow(new RuntimeException("user offline"))
@@ -143,8 +157,8 @@ public class ImWebSocketServiceImplTest extends BaseMockitoUnitTest {
     public void testDoSendGroupMessage_emptyUserIds_noSend() {
         ImGroupMessageDTO dto = new ImGroupMessageDTO().setGroupId(10L);
 
-        imWebSocketService.doSendGroupMessage(Collections.emptyList(), dto);
-        imWebSocketService.doSendGroupMessage(null, dto);
+        imWebSocketService.doSendNotification(Collections.emptyList(), notification);
+        imWebSocketService.doSendNotification(null, notification);
 
         verifyNoInteractions(webSocketSenderApi);
     }
@@ -153,17 +167,21 @@ public class ImWebSocketServiceImplTest extends BaseMockitoUnitTest {
     public void testDoSendGroupMessage_distinctUserIds() {
         ImGroupMessageDTO dto = new ImGroupMessageDTO().setGroupId(10L);
 
-        imWebSocketService.doSendGroupMessage(Arrays.asList(1L, 2L, 1L, null), dto);
+        imWebSocketService.doSendNotification(Arrays.asList(1L, 2L, 1L, null), notification);
 
         verify(webSocketSenderApi).sendObject(
-                eq(UserTypeEnum.ADMIN.getValue()), eq(1L), eq(ImGroupMessageDTO.TYPE), eq(dto));
+                eq(UserTypeEnum.ADMIN.getValue()), eq(1L), eq(ImNotificationWebSocketDTO.TYPE),
+                argThat(actual -> isNotification(actual, ImConversationTypeEnum.GROUP,
+                        ImContentTypeEnum.TEXT, dto)));
         verify(webSocketSenderApi).sendObject(
-                eq(UserTypeEnum.ADMIN.getValue()), eq(2L), eq(ImGroupMessageDTO.TYPE), eq(dto));
+                eq(UserTypeEnum.ADMIN.getValue()), eq(2L), eq(ImNotificationWebSocketDTO.TYPE),
+                argThat(actual -> isNotification(actual, ImConversationTypeEnum.GROUP,
+                        ImContentTypeEnum.TEXT, dto)));
         verifyNoMoreInteractions(webSocketSenderApi);
     }
 
     @Test
-    public void testSendPrivateMessageAsync_exceptionSwallowed() {
+    public void testSendNotificationAsync_private_exceptionSwallowed() {
         try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
             springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImWebSocketServiceImpl.class)))
                     .thenReturn(imWebSocketService);
@@ -181,12 +199,12 @@ public class ImWebSocketServiceImplTest extends BaseMockitoUnitTest {
     }
 
     @Test
-    public void testSendGroupMessageAsync_singleUserDefaultOverload() {
+    public void testSendNotificationAsync_group_singleUserDefaultOverload() {
         try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
             springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImWebSocketServiceImpl.class)))
                     .thenReturn(imWebSocketService);
 
-            ImGroupMessageDTO dto = new ImGroupMessageDTO();
+            ImGroupMessageNotification dto = new ImGroupMessageNotification();
             dto.setGroupId(10L);
 
             imWebSocketService.sendGroupMessageAsync(42L, dto);

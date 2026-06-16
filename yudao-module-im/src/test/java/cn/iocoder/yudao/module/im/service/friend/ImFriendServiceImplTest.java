@@ -10,7 +10,6 @@ import cn.iocoder.yudao.module.im.dal.mysql.friend.ImFriendMapper;
 import cn.iocoder.yudao.module.im.service.message.ImPrivateMessageService;
 import cn.iocoder.yudao.module.im.service.message.dto.ImPrivateMessageSendDTO;
 import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
-import cn.iocoder.yudao.module.im.service.websocket.dto.ImPrivateMessageDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -158,7 +157,7 @@ public class ImFriendServiceImplTest extends BaseMockitoUnitTest {
         verify(imFriendMapper, never()).insert(any(ImFriendDO.class));
         verify(imFriendMapper, never()).updateById(any(ImFriendDO.class));
         verify(imFriendMapper, never()).updateReAddFields(anyLong(), anyInt(), any(LocalDateTime.class),
-                anyBoolean(), anyBoolean(), anyBoolean(), any(), any());
+                any(LocalDateTime.class), anyBoolean(), anyBoolean(), anyBoolean(), any(), any());
     }
 
     @Test
@@ -173,7 +172,7 @@ public class ImFriendServiceImplTest extends BaseMockitoUnitTest {
 
         // 断言：恢复 ENABLE，并清空 deleteTime
         verify(imFriendMapper).updateReAddFields(eq(10L), eq(CommonStatusEnum.ENABLE.getStatus()),
-                any(LocalDateTime.class), eq(false), eq(false), eq(false), isNull(), isNull());
+                any(LocalDateTime.class), any(LocalDateTime.class), eq(false), eq(false), eq(false), isNull(), isNull());
         verify(imFriendMapper, never()).insert(any(ImFriendDO.class));
     }
 

@@ -19,13 +19,13 @@ import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import cn.iocoder.yudao.module.im.dal.mysql.group.ImGroupMapper;
 import cn.iocoder.yudao.module.im.enums.group.ImGroupAddSourceEnum;
 import cn.iocoder.yudao.module.im.enums.group.ImGroupMemberRoleEnum;
-import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
+import cn.iocoder.yudao.module.im.enums.ImContentTypeEnum;
 import cn.iocoder.yudao.module.im.framework.config.ImProperties;
 import cn.iocoder.yudao.module.im.service.friend.ImFriendService;
 import cn.iocoder.yudao.module.im.service.message.ImGroupMessageService;
 import cn.iocoder.yudao.module.im.service.message.dto.ImGroupMessageSendDTO;
 import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
-import cn.iocoder.yudao.module.im.service.websocket.dto.ImGroupMessageDTO;
+import cn.iocoder.yudao.module.im.service.websocket.notification.message.ImGroupMessageNotification;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import org.junit.jupiter.api.Test;
@@ -100,7 +100,7 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
         // 验证：推送 GROUP_CREATE 通知（payload memberUserIds 含创建者自己）
         ArgumentCaptor<ImGroupMessageSendDTO> dtoCaptor = ArgumentCaptor.forClass(ImGroupMessageSendDTO.class);
         verify(groupMessageService).sendGroupMessage(eq(1L), anyCollection(), dtoCaptor.capture());
-        assertEquals(ImMessageTypeEnum.GROUP_CREATE.getType(), dtoCaptor.getValue().getType());
+        assertEquals(ImContentTypeEnum.GROUP_CREATE.getType(), dtoCaptor.getValue().getType());
     }
 
     @Test
@@ -132,7 +132,7 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
         // 验证：推送 GROUP_CREATE 通知，payload memberUserIds 含全员（创建者 + 邀请）
         ArgumentCaptor<ImGroupMessageSendDTO> dtoCaptor = ArgumentCaptor.forClass(ImGroupMessageSendDTO.class);
         verify(groupMessageService).sendGroupMessage(eq(1L), anyCollection(), dtoCaptor.capture());
-        assertEquals(ImMessageTypeEnum.GROUP_CREATE.getType(), dtoCaptor.getValue().getType());
+        assertEquals(ImContentTypeEnum.GROUP_CREATE.getType(), dtoCaptor.getValue().getType());
     }
 
     @Test
@@ -205,7 +205,7 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
             // 推送 GROUP_NAME_UPDATE 通知给全员
             ArgumentCaptor<ImGroupMessageSendDTO> dtoCaptor = ArgumentCaptor.forClass(ImGroupMessageSendDTO.class);
             verify(groupMessageService).sendGroupMessage(eq(1L), anyCollection(), dtoCaptor.capture());
-            assertEquals(ImMessageTypeEnum.GROUP_NAME_UPDATE.getType(), dtoCaptor.getValue().getType());
+            assertEquals(ImContentTypeEnum.GROUP_NAME_UPDATE.getType(), dtoCaptor.getValue().getType());
         }
     }
 
@@ -234,7 +234,7 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
             // 推送 GROUP_DISSOLVE 通知（send-before-remove，sendGroupMessage 内部查 active 自动覆盖全员，含群主多端同步）
             ArgumentCaptor<ImGroupMessageSendDTO> dtoCaptor = ArgumentCaptor.forClass(ImGroupMessageSendDTO.class);
             verify(groupMessageService).sendGroupMessage(eq(1L), dtoCaptor.capture());
-            assertEquals(ImMessageTypeEnum.GROUP_DISSOLVE.getType(), dtoCaptor.getValue().getType());
+            assertEquals(ImContentTypeEnum.GROUP_DISSOLVE.getType(), dtoCaptor.getValue().getType());
         }
     }
 
@@ -276,7 +276,7 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
             // 断言：使用管理员编号发通知并完成清理
             ArgumentCaptor<ImGroupMessageSendDTO> dtoCaptor = ArgumentCaptor.forClass(ImGroupMessageSendDTO.class);
             verify(groupMessageService).sendGroupMessage(eq(99L), dtoCaptor.capture());
-            assertEquals(ImMessageTypeEnum.GROUP_DISSOLVE.getType(), dtoCaptor.getValue().getType());
+            assertEquals(ImContentTypeEnum.GROUP_DISSOLVE.getType(), dtoCaptor.getValue().getType());
             verify(groupMemberService).removeGroupMembersByGroupId(10L);
         }
     }
@@ -345,7 +345,7 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
             verify(webSocketService, never()).sendGroupMessageAsync(anyCollection(), any(ImGroupMessageDTO.class));
             ArgumentCaptor<ImGroupMessageSendDTO> dtoCaptor = ArgumentCaptor.forClass(ImGroupMessageSendDTO.class);
             verify(groupMessageService).sendGroupMessage(eq(1L), anyCollection(), dtoCaptor.capture());
-            assertEquals(ImMessageTypeEnum.GROUP_MEMBER_INVITE.getType(), dtoCaptor.getValue().getType());
+            assertEquals(ImContentTypeEnum.GROUP_MEMBER_INVITE.getType(), dtoCaptor.getValue().getType());
         }
     }
 
@@ -429,7 +429,7 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
                     eq(ImGroupAddSourceEnum.INVITE.getSource()), eq(1L));
             ArgumentCaptor<ImGroupMessageSendDTO> dtoCaptor = ArgumentCaptor.forClass(ImGroupMessageSendDTO.class);
             verify(groupMessageService).sendGroupMessage(eq(1L), anyCollection(), dtoCaptor.capture());
-            assertEquals(ImMessageTypeEnum.GROUP_MEMBER_INVITE.getType(), dtoCaptor.getValue().getType());
+            assertEquals(ImContentTypeEnum.GROUP_MEMBER_INVITE.getType(), dtoCaptor.getValue().getType());
         }
     }
 
@@ -564,7 +564,7 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
             // 推送 GROUP_MEMBER_QUIT 通知给全员（含 quitter，前端自判清群）
             ArgumentCaptor<ImGroupMessageSendDTO> dtoCaptor = ArgumentCaptor.forClass(ImGroupMessageSendDTO.class);
             verify(groupMessageService).sendGroupMessage(eq(1L), dtoCaptor.capture());
-            assertEquals(ImMessageTypeEnum.GROUP_MEMBER_QUIT.getType(), dtoCaptor.getValue().getType());
+            assertEquals(ImContentTypeEnum.GROUP_MEMBER_QUIT.getType(), dtoCaptor.getValue().getType());
         }
     }
 
@@ -642,7 +642,7 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
             // 推送 GROUP_MEMBER_KICK 通知给全员（含被踢者，前端自判清群）
             ArgumentCaptor<ImGroupMessageSendDTO> dtoCaptor = ArgumentCaptor.forClass(ImGroupMessageSendDTO.class);
             verify(groupMessageService).sendGroupMessage(eq(1L), dtoCaptor.capture());
-            assertEquals(ImMessageTypeEnum.GROUP_MEMBER_KICK.getType(), dtoCaptor.getValue().getType());
+            assertEquals(ImContentTypeEnum.GROUP_MEMBER_KICK.getType(), dtoCaptor.getValue().getType());
         }
     }
 

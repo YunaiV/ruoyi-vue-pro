@@ -15,16 +15,18 @@ import cn.iocoder.yudao.module.im.dal.mysql.message.ImPrivateMessageMapper;
 import cn.iocoder.yudao.module.im.enums.ImConversationTypeEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageReceiptStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
-import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
+import cn.iocoder.yudao.module.im.enums.ImContentTypeEnum;
 import cn.iocoder.yudao.module.im.framework.config.ImProperties;
 import cn.iocoder.yudao.module.im.service.conversation.ImConversationReadService;
 import cn.iocoder.yudao.module.im.service.friend.ImFriendService;
 import cn.iocoder.yudao.module.im.service.message.dto.ImPrivateMessageSendDTO;
 import cn.iocoder.yudao.module.im.service.sensitiveword.ImSensitiveWordService;
 import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
-import cn.iocoder.yudao.module.im.service.websocket.dto.ImPrivateMessageDTO;
-import cn.iocoder.yudao.module.im.service.websocket.dto.message.QuoteMessage;
-import cn.iocoder.yudao.module.im.service.websocket.dto.message.RecallMessage;
+import cn.iocoder.yudao.module.im.service.websocket.notification.message.ImMessageReadNotification;
+import cn.iocoder.yudao.module.im.service.websocket.notification.message.ImMessageReceiptNotification;
+import cn.iocoder.yudao.module.im.service.websocket.notification.message.ImPrivateMessageNotification;
+import cn.iocoder.yudao.module.im.dal.dataobject.message.content.QuoteMessage;
+import cn.iocoder.yudao.module.im.dal.dataobject.message.content.RecallMessage;
 import cn.iocoder.yudao.module.im.util.ImMessageUtils;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -80,7 +82,7 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
         // 1.3 好友校验
         friendService.validateFriend(senderId, reqVO.getReceiverId());
         // 1.4 文本消息敏感词过滤
-        if (ImMessageTypeEnum.TEXT.getType().equals(reqVO.getType())) {
+        if (ImContentTypeEnum.TEXT.getType().equals(reqVO.getType())) {
             sensitiveWordService.validateText(reqVO.getContent());
         }
 
@@ -123,7 +125,7 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
         // 1.3 决定是否持久化：dto.persistent 优先；为 null 时按 type 默认
         boolean persistent = dto.getPersistent() != null
                 ? dto.getPersistent()
-                : ImMessageTypeEnum.validate(dto.getType()).isPersistent();
+                : ImContentTypeEnum.validate(dto.getType()).isPersistent();
         if (persistent) {
             privateMessageMapper.insert(message);
         }
@@ -177,7 +179,7 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
 
         // 3. 发送撤回事件
         return sendPrivateMessage(userId, new ImPrivateMessageSendDTO().setReceiverId(message.getReceiverId())
-                .setType(ImMessageTypeEnum.RECALL.getType()).setContent(new RecallMessage().setMessageId(messageId)));
+                .setType(ImContentTypeEnum.RECALL.getType()).setContent(new RecallMessage().setMessageId(messageId)));
     }
 
     /**

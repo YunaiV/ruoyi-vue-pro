@@ -29,7 +29,7 @@ public class ImGroupMessageManagerRespVO {
     private String senderNickname;
 
     @Schema(description = "消息类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    private Integer type; // 参见 ImMessageTypeEnum 枚举类
+    private Integer type; // 参见 ImContentTypeEnum 枚举类
 
     @Schema(description = "消息内容（JSON 格式）", requiredMode = Schema.RequiredMode.REQUIRED)
     private String content;

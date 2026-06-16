@@ -30,7 +30,7 @@ import cn.iocoder.yudao.module.im.dal.mysql.group.ImGroupMapper;
 import cn.iocoder.yudao.module.im.enums.group.ImGroupAddSourceEnum;
 import cn.iocoder.yudao.module.im.enums.group.ImGroupMemberRoleEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
-import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
+import cn.iocoder.yudao.module.im.enums.ImContentTypeEnum;
 import cn.iocoder.yudao.module.im.framework.config.ImProperties;
 import cn.iocoder.yudao.module.im.service.friend.ImFriendService;
 import cn.iocoder.yudao.module.im.service.message.ImGroupMessageService;
@@ -436,7 +436,7 @@ public class ImGroupServiceImpl implements ImGroupService {
         if (message == null || ObjUtil.notEqual(message.getGroupId(), groupId)) {
             throw exception(MESSAGE_NOT_IN_GROUP);
         }
-        if (!ImMessageTypeEnum.validate(message.getType()).isNormal()
+        if (!ImContentTypeEnum.validate(message.getType()).isNormal()
                 || ImMessageStatusEnum.RECALL.getStatus().equals(message.getStatus())) {
             throw exception(MESSAGE_NOT_IN_GROUP);
         }

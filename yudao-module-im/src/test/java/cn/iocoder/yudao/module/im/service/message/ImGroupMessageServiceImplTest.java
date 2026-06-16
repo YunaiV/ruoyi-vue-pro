@@ -14,7 +14,7 @@ import cn.iocoder.yudao.module.im.enums.ImConversationTypeEnum;
 import cn.iocoder.yudao.module.im.enums.group.ImGroupMemberRoleEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageReceiptStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
-import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
+import cn.iocoder.yudao.module.im.enums.ImContentTypeEnum;
 import cn.iocoder.yudao.module.im.framework.config.ImProperties;
 import cn.iocoder.yudao.module.im.service.conversation.ImConversationReadService;
 import cn.iocoder.yudao.module.im.service.group.ImGroupMemberService;
@@ -22,8 +22,8 @@ import cn.iocoder.yudao.module.im.service.group.ImGroupService;
 import cn.iocoder.yudao.module.im.service.message.dto.ImGroupMessageSendDTO;
 import cn.iocoder.yudao.module.im.service.sensitiveword.ImSensitiveWordService;
 import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
-import cn.iocoder.yudao.module.im.service.websocket.dto.ImGroupMessageDTO;
-import cn.iocoder.yudao.module.im.service.websocket.dto.message.RecallMessage;
+import cn.iocoder.yudao.module.im.service.websocket.notification.message.ImGroupMessageNotification;
+import cn.iocoder.yudao.module.im.dal.dataobject.message.content.RecallMessage;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
@@ -70,7 +70,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
         ImGroupMessageSendReqVO reqVO = new ImGroupMessageSendReqVO();
         reqVO.setClientMessageId("test-uuid-group-001");
         reqVO.setGroupId(10L);
-        reqVO.setType(ImMessageTypeEnum.TEXT.getType());
+        reqVO.setType(ImContentTypeEnum.TEXT.getType());
         reqVO.setContent("{\"content\":\"群聊你好\"}");
         return reqVO;
     }
@@ -85,6 +85,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
 
             // 准备
             ImGroupMessageSendReqVO reqVO = buildSendReqVO();
+            reqVO.setReceipt(true);
             when(groupMessageMapper.selectBySenderIdAndClientMessageId(1L, "test-uuid-group-001"))
                     .thenReturn(null);
             ImGroupDO group = new ImGroupDO();
@@ -112,7 +113,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
             assertEquals(1L, result.getSenderId());
             assertEquals(10L, result.getGroupId());
             assertEquals(ImMessageStatusEnum.NORMAL.getStatus(), result.getStatus());
-            assertEquals(ImMessageReceiptStatusEnum.NO_RECEIPT.getStatus(), result.getReceiptStatus());
+            assertEquals(ImMessageReceiptStatusEnum.PENDING.getStatus(), result.getReceiptStatus());
 
             // 验证推送给 3 个群成员（含发送者自己，用于多端同步）
             verify(imWebSocketService).sendGroupMessageAsync(argThat((Collection<Long> ids) ->
@@ -889,7 +890,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
     public void testSendGroupMessage_dto_persistsAndSerializesPojoContent() {
         // 准备：persistent=true 类型 + POJO content
         ImGroupMessageSendDTO dto = new ImGroupMessageSendDTO()
-                .setGroupId(10L).setType(ImMessageTypeEnum.RECALL.getType())
+                .setGroupId(10L).setType(ImContentTypeEnum.RECALL.getType())
                 .setContent(new RecallMessage().setMessageId(50L));
         when(groupMemberService.getActiveGroupMemberUserIdsByGroupId(10L)).thenReturn(List.of(1L));
 
@@ -901,7 +902,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
         ImGroupMessageDO message = captor.getValue();
         assertEquals(1L, message.getSenderId());
         assertEquals(10L, message.getGroupId());
-        assertEquals(ImMessageTypeEnum.RECALL.getType(), message.getType());
+        assertEquals(ImContentTypeEnum.RECALL.getType(), message.getType());
         assertEquals("{\"messageId\":50}", message.getContent());
         assertEquals(ImMessageStatusEnum.NORMAL.getStatus(), message.getStatus());
         assertEquals(ImMessageReceiptStatusEnum.NO_RECEIPT.getStatus(), message.getReceiptStatus());
@@ -913,7 +914,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
     public void testSendGroupMessage_dto_receiptPending() {
         // 准备：dto.receipt=true → receiptStatus=PENDING
         ImGroupMessageSendDTO dto = new ImGroupMessageSendDTO()
-                .setGroupId(10L).setType(ImMessageTypeEnum.RECALL.getType())
+                .setGroupId(10L).setType(ImContentTypeEnum.RECALL.getType())
                 .setContent("{\"messageId\":50}").setReceipt(true);
         when(groupMemberService.getActiveGroupMemberUserIdsByGroupId(10L)).thenReturn(List.of(1L));
 
@@ -928,7 +929,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
     public void testSendGroupMessage_dto_nonPersistentTypeNotInserted() {
         // 准备：persistent=false 类型（RECEIPT 回执）→ 不入库，仅推送
         ImGroupMessageSendDTO dto = new ImGroupMessageSendDTO()
-                .setGroupId(10L).setType(ImMessageTypeEnum.RECEIPT.getType());
+                .setGroupId(10L).setType(ImContentTypeEnum.RECEIPT.getType());
         when(groupMemberService.getActiveGroupMemberUserIdsByGroupId(10L)).thenReturn(List.of(1L, 2L));
 
         groupMessageService.sendGroupMessage(1L, dto);
@@ -942,7 +943,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
         // 准备：调用方传入显式 targets（解散场景成员已被批量 DISABLE，必须按移除前快照推送）
         Set<Long> targets = Set.of(1L, 2L, 3L);
         ImGroupMessageSendDTO dto = new ImGroupMessageSendDTO()
-                .setGroupId(10L).setType(ImMessageTypeEnum.GROUP_DISSOLVE.getType()).setContent("{}");
+                .setGroupId(10L).setType(ImContentTypeEnum.GROUP_DISSOLVE.getType()).setContent("{}");
 
         groupMessageService.sendGroupMessage(1L, targets, dto);
 

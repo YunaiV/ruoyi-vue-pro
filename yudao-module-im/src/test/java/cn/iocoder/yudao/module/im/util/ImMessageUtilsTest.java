@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.im.util;
 
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
-import cn.iocoder.yudao.module.im.service.websocket.dto.message.QuoteMessage;
+import cn.iocoder.yudao.module.im.dal.dataobject.message.content.QuoteMessage;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;

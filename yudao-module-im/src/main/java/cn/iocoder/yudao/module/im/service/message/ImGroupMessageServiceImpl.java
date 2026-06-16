@@ -20,7 +20,7 @@ import cn.iocoder.yudao.module.im.enums.ImConversationTypeEnum;
 import cn.iocoder.yudao.module.im.enums.group.ImGroupMemberRoleEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageReceiptStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
-import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
+import cn.iocoder.yudao.module.im.enums.ImContentTypeEnum;
 import cn.iocoder.yudao.module.im.framework.config.ImProperties;
 import cn.iocoder.yudao.module.im.service.conversation.ImConversationReadService;
 import cn.iocoder.yudao.module.im.service.group.ImGroupMemberService;
@@ -28,9 +28,11 @@ import cn.iocoder.yudao.module.im.service.group.ImGroupService;
 import cn.iocoder.yudao.module.im.service.message.dto.ImGroupMessageSendDTO;
 import cn.iocoder.yudao.module.im.service.sensitiveword.ImSensitiveWordService;
 import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
-import cn.iocoder.yudao.module.im.service.websocket.dto.ImGroupMessageDTO;
-import cn.iocoder.yudao.module.im.service.websocket.dto.message.QuoteMessage;
-import cn.iocoder.yudao.module.im.service.websocket.dto.message.RecallMessage;
+import cn.iocoder.yudao.module.im.service.websocket.notification.message.ImGroupMessageNotification;
+import cn.iocoder.yudao.module.im.service.websocket.notification.message.ImMessageReadNotification;
+import cn.iocoder.yudao.module.im.service.websocket.notification.message.ImMessageReceiptNotification;
+import cn.iocoder.yudao.module.im.dal.dataobject.message.content.QuoteMessage;
+import cn.iocoder.yudao.module.im.dal.dataobject.message.content.RecallMessage;
 import cn.iocoder.yudao.module.im.util.ImMessageUtils;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -93,7 +95,7 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
         // 1.4 禁言校验
         validateMuteStatus(group, senderMember);
         // 1.5 文本消息敏感词过滤
-        if (ImMessageTypeEnum.TEXT.getType().equals(reqVO.getType())) {
+        if (ImContentTypeEnum.TEXT.getType().equals(reqVO.getType())) {
             sensitiveWordService.validateText(reqVO.getContent());
         }
 
@@ -142,7 +144,7 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
                 .setAtUserIds(dto.getAtUserIds()).setReceiverUserIds(new ArrayList<>(receiverUserIds))
                 .setReceiptStatus(resolveReceiptStatus(dto.getReceipt()));
         // 1.3 按 type.persistent 决定是否入库
-        if (ImMessageTypeEnum.validate(dto.getType()).isPersistent()) {
+        if (ImContentTypeEnum.validate(dto.getType()).isPersistent()) {
             groupMessageMapper.insert(message);
         }
 
@@ -181,7 +183,7 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
 
         // 3. 发送撤回事件
         return sendGroupMessage(userId, new ImGroupMessageSendDTO().setGroupId(message.getGroupId())
-                .setType(ImMessageTypeEnum.RECALL.getType())
+                .setType(ImContentTypeEnum.RECALL.getType())
                 .setReceiverUserIds(message.getReceiverUserIds())
                 .setContent(new RecallMessage().setMessageId(messageId)));
     }

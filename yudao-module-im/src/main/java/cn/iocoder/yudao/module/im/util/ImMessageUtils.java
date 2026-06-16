@@ -4,8 +4,8 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
-import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
-import cn.iocoder.yudao.module.im.service.websocket.dto.message.QuoteMessage;
+import cn.iocoder.yudao.module.im.enums.ImContentTypeEnum;
+import cn.iocoder.yudao.module.im.dal.dataobject.message.content.QuoteMessage;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -39,9 +39,9 @@ public class ImMessageUtils {
      * @param content 消息内容
      */
     public static void validateUserMessageContent(Integer type, String content) {
-        ImMessageTypeEnum messageType;
+        ImContentTypeEnum messageType;
         try {
-            messageType = ImMessageTypeEnum.validate(type);
+            messageType = ImContentTypeEnum.validate(type);
         } catch (IllegalArgumentException e) {
             throw exception(MESSAGE_CONTENT_INVALID);
         }
@@ -52,23 +52,23 @@ public class ImMessageUtils {
         if (map == null) {
             throw exception(MESSAGE_CONTENT_INVALID);
         }
-        if (ImMessageTypeEnum.TEXT == messageType) {
+        if (ImContentTypeEnum.TEXT == messageType) {
             validateTextContent(map);
-        } else if (ImMessageTypeEnum.IMAGE == messageType || ImMessageTypeEnum.FACE == messageType) {
+        } else if (ImContentTypeEnum.IMAGE == messageType || ImContentTypeEnum.FACE == messageType) {
             validateUrl(getString(map, "url"));
-        } else if (ImMessageTypeEnum.VOICE == messageType) {
+        } else if (ImContentTypeEnum.VOICE == messageType) {
             validateUrl(getString(map, "url"));
             validatePositiveNumber(map.get("duration"));
-        } else if (ImMessageTypeEnum.VIDEO == messageType) {
+        } else if (ImContentTypeEnum.VIDEO == messageType) {
             validateUrl(getString(map, "url"));
-        } else if (ImMessageTypeEnum.FILE == messageType) {
+        } else if (ImContentTypeEnum.FILE == messageType) {
             validateUrl(getString(map, "url"));
             validateNotBlank(getString(map, "name"));
-        } else if (ImMessageTypeEnum.CARD == messageType) {
+        } else if (ImContentTypeEnum.CARD == messageType) {
             validateCardContent(map);
-        } else if (ImMessageTypeEnum.MERGE == messageType) {
+        } else if (ImContentTypeEnum.MERGE == messageType) {
             validateMergeContent(map);
-        } else if (ImMessageTypeEnum.MATERIAL == messageType) {
+        } else if (ImContentTypeEnum.MATERIAL == messageType) {
             validateMaterialContent(map);
         }
     }

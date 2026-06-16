@@ -13,11 +13,10 @@ import cn.iocoder.yudao.module.im.dal.mysql.group.ImGroupRequestMapper;
 import cn.iocoder.yudao.module.im.enums.group.ImGroupAddSourceEnum;
 import cn.iocoder.yudao.module.im.enums.group.ImGroupMemberRoleEnum;
 import cn.iocoder.yudao.module.im.enums.group.ImGroupRequestHandleResultEnum;
-import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
+import cn.iocoder.yudao.module.im.enums.ImContentTypeEnum;
 import cn.iocoder.yudao.module.im.service.message.ImGroupMessageService;
 import cn.iocoder.yudao.module.im.service.message.dto.ImGroupMessageSendDTO;
 import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
-import cn.iocoder.yudao.module.im.service.websocket.dto.ImPrivateMessageDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import org.junit.jupiter.api.Test;
@@ -84,7 +83,7 @@ public class ImGroupRequestServiceImplTest extends BaseMockitoUnitTest {
         // 推 1510 自由进群
         ArgumentCaptor<ImGroupMessageSendDTO> dtoCaptor = ArgumentCaptor.forClass(ImGroupMessageSendDTO.class);
         verify(groupMessageService).sendGroupMessage(eq(1L), dtoCaptor.capture());
-        assertEquals(ImMessageTypeEnum.GROUP_MEMBER_ENTER.getType(), dtoCaptor.getValue().getType());
+        assertEquals(ImContentTypeEnum.GROUP_MEMBER_ENTER.getType(), dtoCaptor.getValue().getType());
     }
 
     @Test
@@ -207,7 +206,7 @@ public class ImGroupRequestServiceImplTest extends BaseMockitoUnitTest {
                 eq(ImGroupAddSourceEnum.SEARCH.getSource()), isNull());
         ArgumentCaptor<ImGroupMessageSendDTO> dtoCaptor = ArgumentCaptor.forClass(ImGroupMessageSendDTO.class);
         verify(groupMessageService).sendGroupMessage(eq(1L), dtoCaptor.capture());
-        assertEquals(ImMessageTypeEnum.GROUP_MEMBER_ENTER.getType(), dtoCaptor.getValue().getType());
+        assertEquals(ImContentTypeEnum.GROUP_MEMBER_ENTER.getType(), dtoCaptor.getValue().getType());
         // 1505 推送给申请人 + owner，去重后两条
         verify(websocketService, times(2)).sendPrivateMessageAsync(anyLong(), any(ImPrivateMessageDTO.class));
     }

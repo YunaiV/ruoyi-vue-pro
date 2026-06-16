@@ -17,11 +17,10 @@ import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
 import cn.iocoder.yudao.module.im.service.message.ImGroupMessageService;
 import cn.iocoder.yudao.module.im.service.message.dto.ImGroupMessageSendDTO;
 import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
-import cn.iocoder.yudao.module.im.service.websocket.dto.ImPrivateMessageDTO;
-import cn.iocoder.yudao.module.im.service.websocket.dto.notification.group.BaseGroupNotification;
-import cn.iocoder.yudao.module.im.service.websocket.dto.notification.group.GroupRequestApprovedNotification;
-import cn.iocoder.yudao.module.im.service.websocket.dto.notification.group.GroupRequestReceivedNotification;
-import cn.iocoder.yudao.module.im.service.websocket.dto.notification.group.GroupRequestRejectedNotification;
+import cn.iocoder.yudao.module.im.service.websocket.notification.group.BaseGroupNotification;
+import cn.iocoder.yudao.module.im.service.websocket.notification.group.GroupRequestApprovedNotification;
+import cn.iocoder.yudao.module.im.service.websocket.notification.group.GroupRequestReceivedNotification;
+import cn.iocoder.yudao.module.im.service.websocket.notification.group.GroupRequestRejectedNotification;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import jakarta.annotation.Resource;
@@ -97,7 +96,7 @@ public class ImGroupRequestServiceImpl implements ImGroupRequestService {
         // 3. 情况二：群开启了审批，创建或复用一条主动申请记录
         ImGroupRequestDO request = createOrResetApplyRequest(groupId, userId, reqVO);
 
-        // 4. 1503 私聊定向推群主 + 全部管理员（多端同步）；payload 携带申请方昵称 / 头像
+        // 4. 1503 定向推群主 + 全部管理员（多端同步）；payload 携带申请方昵称 / 头像
         AdminUserRespDTO applyUser = adminUserApi.getUser(userId);
         GroupRequestReceivedNotification payload = buildRequestNotification(group, request, applyUser);
         for (Long receiverUserId : getGroupMemberListByOwnerAndAdminUserIds(group)) {
@@ -139,12 +138,12 @@ public class ImGroupRequestServiceImpl implements ImGroupRequestService {
         groupMemberService.addGroupMember(request.getGroupId(), request.getUserId(),
                 ImGroupMemberRoleEnum.NORMAL.getRole(), request.getAddSource(), request.getInviterUserId());
 
-        // 5.1 1505 私聊推送给申请人 + 群主 + 全部管理员（每端单推）
+        // 5.1 1505 定向推送给申请人 + 群主 + 全部管理员（每端单推）
         GroupRequestApprovedNotification payload = (GroupRequestApprovedNotification) new GroupRequestApprovedNotification()
                 .setRequestId(request.getId()).setGroupId(request.getGroupId()).setUserId(request.getUserId())
                 .setOperatorUserId(userId);
         broadcastToOwnerAdminsAndApplicant(request.getGroupId(), request.getUserId(), payload,
-                ImMessageTypeEnum.GROUP_REQUEST_APPROVED.getType(), userId);
+                ImContentTypeEnum.GROUP_REQUEST_APPROVED.getType(), userId);
         // 5.2 群事件：主动申请 → 1510 自由进群；被邀请 → 1509 成员加入
         if (request.getInviterUserId() == null) {
             groupMessageService.sendGroupMessage(userId,
@@ -174,12 +173,12 @@ public class ImGroupRequestServiceImpl implements ImGroupRequestService {
             throw exception(GROUP_REQUEST_HANDLED);
         }
 
-        // 3. 1506 私聊推送给申请人 + 群主 + 全部管理员
+        // 3. 1506 定向推送给申请人 + 群主 + 全部管理员
         GroupRequestRejectedNotification payload = (GroupRequestRejectedNotification) new GroupRequestRejectedNotification()
                 .setRequestId(request.getId()).setGroupId(request.getGroupId()).setUserId(request.getUserId())
                 .setHandleContent(handleContent).setOperatorUserId(userId);
         broadcastToOwnerAdminsAndApplicant(request.getGroupId(), request.getUserId(), payload,
-                ImMessageTypeEnum.GROUP_REQUEST_REJECTED.getType(), userId);
+                ImContentTypeEnum.GROUP_REQUEST_REJECTED.getType(), userId);
     }
 
     @Override
@@ -395,7 +394,7 @@ public class ImGroupRequestServiceImpl implements ImGroupRequestService {
     }
 
     /**
-     * 1505 / 1506 受众：申请人 + 群主 + 全部管理员；每端单独推一帧，前端按 receiver 是否申请人区分文案
+     * 1505 / 1506 受众：申请人 + 群主 + 全部管理员
      */
     private void broadcastToOwnerAdminsAndApplicant(Long groupId, Long applicantUserId, BaseGroupNotification payload,
                                                     Integer messageType, Long operatorUserId) {
