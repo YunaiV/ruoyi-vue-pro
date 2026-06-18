@@ -172,8 +172,6 @@ public class ImFriendRequestServiceImpl implements ImFriendRequestService {
     public void agreeFriendRequest(Long userId, Long requestId) {
         // 1.1 校验申请存在、未处理、操作人是接收方
         ImFriendRequestDO request = validateRequestForHandle(userId, requestId);
-        // 1.2 复验双方用户有效
-        adminUserApi.validateUserList(ListUtil.of(request.getFromUserId(), request.getToUserId()));
 
         // 2. 乐观锁更新申请处理结果
         ImFriendRequestDO updateObj = new ImFriendRequestDO()

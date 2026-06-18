@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.im.service.friend;
 
-import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
@@ -228,7 +227,7 @@ public class ImFriendRequestServiceImplTest extends BaseMockitoUnitTest {
         friendRequestService.agreeFriendRequest(2L, 100L);
 
         // 断言：双向建立好友 + 推 APPROVED 给发起方
-        verify(adminUserApi).validateUserList(ListUtil.of(1L, 2L));
+        verify(adminUserApi, never()).validateUserList(any());
         verify(friendService).becomeFriends(request);
         verify(websocketService).sendNotificationAsync(eq(1L), anyInt(), anyInt(), any());
     }
