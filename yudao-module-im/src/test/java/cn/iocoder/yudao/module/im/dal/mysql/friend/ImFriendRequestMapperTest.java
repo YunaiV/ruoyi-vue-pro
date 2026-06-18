@@ -11,7 +11,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * IM 好友申请记录 Mapper 单元测试
+ * {@link ImFriendRequestMapper} 的单元测试
  *
  * @author 芋道源码
  */

@@ -35,7 +35,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * IM 好友申请 Service 单元测试
+ * {@link ImFriendRequestServiceImpl} 的单元测试
  *
  * @author 芋道源码
  */

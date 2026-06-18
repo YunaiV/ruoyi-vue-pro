@@ -43,6 +43,11 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * {@link ImRtcCallServiceImpl} 的单元测试
+ *
+ * @author 芋道源码
+ */
 public class ImRtcCallServiceImplTest extends BaseMockitoUnitTest {
 
     @InjectMocks
@@ -63,7 +68,7 @@ public class ImRtcCallServiceImplTest extends BaseMockitoUnitTest {
     @Mock
     private ImGroupMemberService groupMemberService;
 
-    // ========== timeoutInvitingParticipants（Job 入口）==========
+    // ========== timeoutInvitingParticipants ==========
 
     @Test
     public void testTimeoutInvitingParticipants_emptyCandidates_returnsZeroAndNoDownstream() {
@@ -166,7 +171,7 @@ public class ImRtcCallServiceImplTest extends BaseMockitoUnitTest {
         verifyNoInteractions(webSocketService);
     }
 
-    // ========== noAnswerCallCheck（前端 timer 入口）==========
+    // ========== noAnswerCallCheck ==========
 
     @Test
     public void testNoAnswerCallCheck_authFails_silentNoOp() {

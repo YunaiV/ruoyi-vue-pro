@@ -25,7 +25,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * IM 数据看板 Mapper 单元测试
+ * {@link ImStatisticsManagerMapper} 的单元测试
  *
  * @author 芋道源码
  */

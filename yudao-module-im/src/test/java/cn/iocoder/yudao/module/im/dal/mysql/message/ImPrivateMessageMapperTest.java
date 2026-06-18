@@ -12,7 +12,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * IM 私聊消息 Mapper 单元测试
+ * {@link ImPrivateMessageMapper} 的单元测试
  *
  * @author 芋道源码
  */
@@ -21,9 +21,6 @@ public class ImPrivateMessageMapperTest extends BaseDbUnitTest {
     @Resource
     private ImPrivateMessageMapper mapper;
 
-    /**
-     * 一个足够早的时间作为 minSendTime，避免把测试数据过滤掉
-     */
     private static final LocalDateTime FAR_PAST = LocalDateTime.of(2000, 1, 1, 0, 0, 0);
 
     // ========== selectListByMinId ==========

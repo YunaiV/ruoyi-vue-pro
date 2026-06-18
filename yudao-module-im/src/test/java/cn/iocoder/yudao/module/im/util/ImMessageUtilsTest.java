@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * IM 消息内容工具类单元测试
+ * {@link ImMessageUtils} 的单元测试
  *
  * @author 芋道源码
  */

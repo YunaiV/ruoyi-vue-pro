@@ -19,7 +19,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 /**
- * IM 数据看板 Service 单元测试
+ * {@link ImStatisticsManagerServiceImpl} 的单元测试
  *
  * @author 芋道源码
  */
@@ -72,7 +72,7 @@ public class ImStatisticsManagerServiceImplTest extends BaseMockitoUnitTest {
         assertEquals(456L, service.getGroupMessageCount(BEGIN, END));
     }
 
-    // ========== 每日序列 toDailyCountMap ==========
+    // ========== 每日序列 ==========
 
     @Test
     public void testGetNewUserDailyCountMap_dateConvert() {

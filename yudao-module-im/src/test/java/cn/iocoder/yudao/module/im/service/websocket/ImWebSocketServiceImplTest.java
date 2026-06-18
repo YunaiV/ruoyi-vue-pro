@@ -28,7 +28,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
 /**
- * IM WebSocket 推送 Service 单元测试
+ * {@link ImWebSocketServiceImpl} 的单元测试
  *
  * @author 芋道源码
  */
@@ -48,7 +48,7 @@ public class ImWebSocketServiceImplTest extends BaseMockitoUnitTest {
         }
     }
 
-    // ========== sendNotificationAsync ==========
+    // ========== 私聊推送 ==========
 
     @Test
     public void testSendNotificationAsync_private_noTransactionSendsImmediately() {
@@ -108,7 +108,7 @@ public class ImWebSocketServiceImplTest extends BaseMockitoUnitTest {
         }
     }
 
-    // ========== sendNotificationAsync ==========
+    // ========== 群聊推送 ==========
 
     @Test
     public void testSendNotificationAsync_group_fanOutToAllUsers() {

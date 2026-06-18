@@ -34,7 +34,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 /**
- * IM 加群申请 Service 单元测试
+ * {@link ImGroupRequestServiceImpl} 的单元测试
  *
  * @author 芋道源码
  */

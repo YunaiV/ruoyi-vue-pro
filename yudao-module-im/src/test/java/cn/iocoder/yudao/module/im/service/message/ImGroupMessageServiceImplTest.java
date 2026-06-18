@@ -40,7 +40,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 /**
- * IM 群聊消息 Service 单元测试
+ * {@link ImGroupMessageServiceImpl} 的单元测试
  *
  * @author 芋道源码
  */
@@ -62,7 +62,6 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
     @Mock
     private ImWebSocketService imWebSocketService;
 
-    /** 用真实实例避免 NPE；默认值与生产保持一致（recallTimeoutMinutes=5、private/group read enabled=true、maxPullSize=1000）；个别用例可改字段测分支 */
     @Spy
     private ImProperties imProperties = new ImProperties();
 
@@ -546,7 +545,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
         assertEquals(GROUP_MEMBER_NOT_IN_GROUP.getCode(), exception.getCode());
     }
 
-    // ========== 发送：补充边界 ==========
+    // ========== 发送边界 ==========
 
     @Test
     public void testSendMessage_receiptPending() {
@@ -600,7 +599,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
         verify(imWebSocketService, never()).sendNotificationAsync(anyCollection(), anyInt(), anyInt(), any());
     }
 
-    // ========== 撤回：补充边界 ==========
+    // ========== 撤回边界 ==========
 
     @Test
     public void testRecallMessage_notExists() {
@@ -630,7 +629,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
         verify(groupMessageMapper, never()).insert(any(ImGroupMessageDO.class));
     }
 
-    // ========== 已读：happy path + 跳过 ==========
+    // ========== 已读事件 ==========
 
     @Test
     public void testReadGroupMessages_success() {
@@ -769,7 +768,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
         }
     }
 
-    // ========== 回执：DONE 状态迁移 ==========
+    // ========== 回执状态迁移 ==========
 
     @Test
     public void testReadGroupMessageEvent_receiptDoneTransition() {
@@ -850,7 +849,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
         verify(imWebSocketService).sendNotificationAsync(eq(5L), anyInt(), anyInt(), any());
     }
 
-    // ========== sendGroupMessage(senderId, dto)：receiverUserIds 定向过滤 ==========
+    // ========== 定向群消息 ==========
 
     @Test
     public void testSendGroupMessage_noReceiverUserIds_broadcastsToAllMembers() {
@@ -907,7 +906,7 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
                 anyInt(), anyInt(), any());
     }
 
-    // ========== sendGroupMessage(senderId, dto)：helper 行为 ==========
+    // ========== DTO 群消息 ==========
 
     @Test
     public void testSendGroupMessage_dto_persistsAndSerializesPojoContent() {

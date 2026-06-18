@@ -36,7 +36,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 /**
- * IM 私聊消息 Service 单元测试
+ * {@link ImPrivateMessageServiceImpl} 的单元测试
  *
  * @author 芋道源码
  */
@@ -56,7 +56,6 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
     @Mock
     private ImWebSocketService imWebSocketService;
 
-    /** 用真实实例避免 NPE；默认值与生产保持一致（recallTimeoutMinutes=5、private/group read enabled=true）；个别用例可改字段测分支 */
     @Spy
     private ImProperties imProperties = new ImProperties();
 
@@ -380,7 +379,7 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
         assertEquals(MESSAGE_PRIVATE_READ_DISABLED.getCode(), exception.getCode());
     }
 
-    // ========== sendPrivateMessage(senderId, dto)：helper 行为 ==========
+    // ========== DTO 私聊消息 ==========
 
     @Test
     public void testSendPrivateMessage_dto_persistsAndSerializesPojoContent() {

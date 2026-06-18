@@ -29,7 +29,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * IM 好友关系 Service 单元测试
+ * {@link ImFriendServiceImpl} 的单元测试
  *
  * @author 芋道源码
  */
@@ -141,7 +141,7 @@ public class ImFriendServiceImplTest extends BaseMockitoUnitTest {
         verify(imWebSocketService, never()).sendNotificationAsync(any(Long.class), anyInt(), anyInt(), any());
     }
 
-    // ========== addFriend0（内部方法，被 becomeFriends / silentReAddFriend 调用） ==========
+    // ========== 建立好友 ==========
 
     @Test
     public void testAddFriend0_existingEnabledSkip() {

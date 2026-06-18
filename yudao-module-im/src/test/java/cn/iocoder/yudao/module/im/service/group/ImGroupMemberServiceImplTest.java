@@ -24,7 +24,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 /**
- * IM 群成员 Service 单元测试
+ * {@link ImGroupMemberServiceImpl} 的单元测试
  *
  * @author 芋道源码
  */
