@@ -258,7 +258,7 @@ public class ImGroupMemberServiceImpl implements ImGroupMemberService {
                 .setId(member.getId());
         groupMemberMapper.updateById(updateObj);
 
-        // 3.1 displayUserName 是公开字段，单独走 GROUP_MEMBER_NICKNAME_UPDATE 广播给全员；空串视为「清空昵称」也要广播；与旧值相同跳过
+        // 3.1 displayUserName 是公开字段，单独走 GROUP_MEMBER_NICKNAME_UPDATE 在线同步给全员；空串视为「清空昵称」也要同步；与旧值相同跳过
         if (updateReqVO.getDisplayUserName() != null
                 && ObjUtil.notEqual(updateReqVO.getDisplayUserName(), member.getDisplayUserName())) {
             groupMessageService.sendGroupMessage(userId, ImGroupMessageSendDTO.ofGroupMemberNicknameUpdate(

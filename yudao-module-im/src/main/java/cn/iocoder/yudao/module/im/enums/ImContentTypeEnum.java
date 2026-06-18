@@ -281,9 +281,9 @@ public enum ImContentTypeEnum implements ArrayValuable<Integer> {
     /**
      * 对应 OpenIM：sdkws.GroupMemberInfoSetTips（GroupMemberInfoSetNotification 1516，窄化到 displayUserName）
      * 对应自己的类：GroupMemberNicknameUpdateNotification
-     * 场景：成员修改自己在群里的昵称，全员广播；前端按 displayUserName 局部更新对应 member
+     * 场景：成员修改自己在群里的昵称，在线成员同步对应 member
      */
-    GROUP_MEMBER_NICKNAME_UPDATE(1516, "成员昵称变更", true, false),
+    GROUP_MEMBER_NICKNAME_UPDATE(1516, "成员昵称变更", false, false),
     /**
      * 对应 OpenIM：GroupMemberSetToAdminNotification 1517
      * 对应自己的类：GroupAdminAddNotification

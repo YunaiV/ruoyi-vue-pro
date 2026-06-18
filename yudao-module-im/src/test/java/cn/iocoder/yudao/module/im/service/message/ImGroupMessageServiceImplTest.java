@@ -961,6 +961,20 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
     }
 
     @Test
+    public void testSendGroupMessage_dto_groupMemberNicknameUpdateNotInserted() {
+        // 准备：成员昵称变更只做在线同步，不入库
+        ImGroupMessageSendDTO dto = ImGroupMessageSendDTO.ofGroupMemberNicknameUpdate(10L, 1L, "群昵称");
+        when(groupMemberService.getActiveGroupMemberUserIdsByGroupId(10L)).thenReturn(List.of(1L, 2L));
+
+        groupMessageService.sendGroupMessage(1L, dto);
+
+        verify(groupMessageMapper, never()).insert(any(ImGroupMessageDO.class));
+        verify(imWebSocketService).sendNotificationAsync(argThat((Collection<Long> ids) ->
+                        ids.size() == 2 && ids.contains(1L) && ids.contains(2L)),
+                anyInt(), eq(ImContentTypeEnum.GROUP_MEMBER_NICKNAME_UPDATE.getType()), any());
+    }
+
+    @Test
     public void testSendGroupMessage_threeArg_explicitTargetsBypassActiveMembers() {
         // 准备：调用方传入显式 targets（解散场景成员已被批量 DISABLE，必须按移除前快照推送）
         Set<Long> targets = Set.of(1L, 2L, 3L);
