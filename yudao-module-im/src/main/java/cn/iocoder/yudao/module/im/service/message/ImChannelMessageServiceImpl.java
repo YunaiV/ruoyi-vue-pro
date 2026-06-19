@@ -57,7 +57,7 @@ public class ImChannelMessageServiceImpl implements ImChannelMessageService {
     // ==================== 用户端 ====================
 
     @Override
-    public List<ImChannelMessageDO> getMessageListForPull(Long userId, Long minId, Integer size) {
+    public List<ImChannelMessageDO> pullChannelMessageList(Long userId, Long minId, Integer size) {
         return channelMessageMapper.selectListByUserAndMinId(userId, minId, size);
     }
 

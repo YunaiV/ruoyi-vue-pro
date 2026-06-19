@@ -40,14 +40,14 @@ public class ImChannelMessageController {
 
     @GetMapping("/pull")
     @Operation(summary = "拉取频道消息（离线增量）；按 minId 游标分页")
-    public CommonResult<List<ImChannelMessagePullRespVO>> pull(
+    public CommonResult<List<ImChannelMessagePullRespVO>> pullChannelMessageList(
             @RequestParam(value = "minId", defaultValue = "0") @PositiveOrZero(message = "minId 不能小于 0") Long minId,
             @RequestParam(value = "size", defaultValue = "100")
             @Min(value = 1, message = "size 必须大于 0")
             @Max(value = 200, message = "size 一次最多 200 条") Integer size) {
         // 1. 拉取消息列表
         Long userId = getLoginUserId();
-        List<ImChannelMessageDO> list = channelMessageService.getMessageListForPull(userId, minId, size);
+        List<ImChannelMessageDO> list = channelMessageService.pullChannelMessageList(userId, minId, size);
         if (CollUtil.isEmpty(list)) {
             return success(Collections.emptyList());
         }
