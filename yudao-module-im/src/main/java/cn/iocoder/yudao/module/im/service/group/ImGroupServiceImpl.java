@@ -149,7 +149,9 @@ public class ImGroupServiceImpl implements ImGroupService {
         boolean nameChanged = StrUtil.isNotEmpty(updateReqVO.getName());
         boolean noticeChanged = updateReqVO.getNotice() != null;
         boolean avatarChanged = StrUtil.isNotEmpty(updateReqVO.getAvatar());
-        if (nameChanged || noticeChanged || avatarChanged) {
+        boolean joinApprovalChanged = updateReqVO.getJoinApproval() != null
+                && ObjUtil.notEqual(group.getJoinApproval(), updateReqVO.getJoinApproval());
+        if (nameChanged || noticeChanged || avatarChanged || joinApprovalChanged) {
             List<Long> memberUserIds = groupMemberService.getActiveGroupMemberUserIdsByGroupId(groupId);
             if (nameChanged) {
                 groupMessageService.sendGroupMessage(userId, memberUserIds, ImGroupMessageSendDTO.ofGroupNameUpdate(
@@ -161,7 +163,11 @@ public class ImGroupServiceImpl implements ImGroupService {
             }
             if (avatarChanged) {
                 groupMessageService.sendGroupMessage(userId, memberUserIds, ImGroupMessageSendDTO.ofGroupInfoUpdate(
-                        groupId, userId, group.getAvatar(), updateReqVO.getAvatar()));
+                        groupId, userId, group.getAvatar(), updateReqVO.getAvatar(), null, null));
+            }
+            if (joinApprovalChanged) {
+                groupMessageService.sendGroupMessage(userId, memberUserIds, ImGroupMessageSendDTO.ofGroupInfoUpdate(
+                        groupId, userId, null, null, group.getJoinApproval(), updateReqVO.getJoinApproval()));
             }
         }
 

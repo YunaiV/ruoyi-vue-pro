@@ -209,6 +209,58 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
         }
     }
 
+    @Test
+    public void testUpdateGroup_joinApprovalChanged() {
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImGroupServiceImpl.class)))
+                    .thenReturn(groupService);
+
+            // 准备
+            ImGroupDO group = ImGroupDO.builder().id(10L).name("群").ownerUserId(1L)
+                    .joinApproval(false).status(CommonStatusEnum.ENABLE.getStatus()).build();
+            when(groupMapper.selectById(10L)).thenReturn(group);
+
+            ImGroupUpdateReqVO reqVO = new ImGroupUpdateReqVO();
+            reqVO.setId(10L);
+            reqVO.setJoinApproval(true);
+
+            // 调用
+            ImGroupDO result = groupService.updateGroup(reqVO, 1L);
+
+            // 断言
+            verify(groupMapper).updateById(any(ImGroupDO.class));
+            assertTrue(result.getJoinApproval());
+            ArgumentCaptor<ImGroupMessageSendDTO> dtoCaptor = ArgumentCaptor.forClass(ImGroupMessageSendDTO.class);
+            verify(groupMessageService).sendGroupMessage(eq(1L), anyCollection(), dtoCaptor.capture());
+            assertEquals(ImContentTypeEnum.GROUP_INFO_UPDATE.getType(), dtoCaptor.getValue().getType());
+        }
+    }
+
+    @Test
+    public void testUpdateGroup_joinApprovalSame() {
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImGroupServiceImpl.class)))
+                    .thenReturn(groupService);
+
+            // 准备
+            ImGroupDO group = ImGroupDO.builder().id(10L).name("群").ownerUserId(1L)
+                    .joinApproval(true).status(CommonStatusEnum.ENABLE.getStatus()).build();
+            when(groupMapper.selectById(10L)).thenReturn(group);
+
+            ImGroupUpdateReqVO reqVO = new ImGroupUpdateReqVO();
+            reqVO.setId(10L);
+            reqVO.setJoinApproval(true);
+
+            // 调用
+            ImGroupDO result = groupService.updateGroup(reqVO, 1L);
+
+            // 断言
+            verify(groupMapper).updateById(any(ImGroupDO.class));
+            assertTrue(result.getJoinApproval());
+            verify(groupMessageService, never()).sendGroupMessage(anyLong(), anyCollection(), any());
+        }
+    }
+
     // ========== dissolveGroup ==========
 
     @Test

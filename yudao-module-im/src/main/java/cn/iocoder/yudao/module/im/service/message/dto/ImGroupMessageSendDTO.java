@@ -63,11 +63,15 @@ public class ImGroupMessageSendDTO {
                 .setType(ImContentTypeEnum.GROUP_CREATE.getType()).setContent(notification);
     }
 
-    public static ImGroupMessageSendDTO ofGroupInfoUpdate(Long groupId, Long operatorUserId, String oldAvatar, String newAvatar) {
+    public static ImGroupMessageSendDTO ofGroupInfoUpdate(Long groupId, Long operatorUserId,
+                                                          String oldAvatar, String newAvatar,
+                                                          Boolean oldJoinApproval, Boolean newJoinApproval) {
         GroupInfoUpdateNotification notification = new GroupInfoUpdateNotification();
         notification.setOperatorUserId(operatorUserId);
         notification.setOldAvatar(oldAvatar);
         notification.setNewAvatar(newAvatar);
+        notification.setOldJoinApproval(oldJoinApproval);
+        notification.setNewJoinApproval(newJoinApproval);
         return new ImGroupMessageSendDTO().setGroupId(groupId)
                 .setType(ImContentTypeEnum.GROUP_INFO_UPDATE.getType()).setContent(notification);
     }
