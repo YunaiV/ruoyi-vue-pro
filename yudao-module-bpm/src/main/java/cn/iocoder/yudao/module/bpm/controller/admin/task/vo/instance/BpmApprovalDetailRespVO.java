@@ -107,6 +107,9 @@ public class BpmApprovalDetailRespVO {
         @Schema(description = "签名", example = "https://www.iocoder.cn/sign.png")
         private String signPicUrl;
 
+        @Schema(description = "附件", example = "[https://test.yudao.iocoder.cn/20260609/test.txt]")
+        private List<String> attachments;
+
     }
 
 }

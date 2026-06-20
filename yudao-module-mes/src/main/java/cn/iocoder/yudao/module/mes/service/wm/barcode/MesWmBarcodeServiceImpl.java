@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.mes.service.wm.barcode;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
@@ -10,10 +11,11 @@ import cn.iocoder.yudao.module.mes.controller.admin.wm.barcode.vo.MesWmBarcodeSa
 import cn.iocoder.yudao.module.mes.dal.dataobject.wm.barcode.MesWmBarcodeConfigDO;
 import cn.iocoder.yudao.module.mes.dal.dataobject.wm.barcode.MesWmBarcodeDO;
 import cn.iocoder.yudao.module.mes.dal.mysql.wm.barcode.MesWmBarcodeMapper;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
+import java.util.Collection;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.mes.enums.ErrorCodeConstants.*;
@@ -164,6 +166,14 @@ public class MesWmBarcodeServiceImpl implements MesWmBarcodeService {
         validateBarcodeExists(id);
         // 删除
         barcodeMapper.deleteById(id);
+    }
+
+    @Override
+    public void deleteBarcodeByBizTypeAndBizIds(Integer bizType, Collection<Long> bizIds) {
+        if (CollUtil.isEmpty(bizIds)) {
+            return;
+        }
+        barcodeMapper.deleteByBizTypeAndBizIds(bizType, bizIds);
     }
 
     private MesWmBarcodeDO validateBarcodeExists(Long id) {

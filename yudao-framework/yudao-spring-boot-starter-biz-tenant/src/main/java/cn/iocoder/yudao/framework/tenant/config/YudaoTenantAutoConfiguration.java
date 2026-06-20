@@ -29,6 +29,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.cache.BatchStrategies;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
@@ -158,28 +159,37 @@ public class YudaoTenantAutoConfiguration {
 
     // ========== MQ ==========
 
-    @Bean
-    public TenantRedisMessageInterceptor tenantRedisMessageInterceptor() {
-        return new TenantRedisMessageInterceptor();
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnClass(name = "cn.iocoder.yudao.framework.mq.redis.core.interceptor.RedisMessageInterceptor")
+    public static class TenantRedisMQConfiguration {
+
+        @Bean
+        public TenantRedisMessageInterceptor tenantRedisMessageInterceptor() {
+            return new TenantRedisMessageInterceptor();
+        }
+
     }
 
-    @Bean
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnClass(name = "org.springframework.amqp.rabbit.core.RabbitTemplate")
-    public TenantRabbitMQInitializer tenantRabbitMQInitializer() {
-        return new TenantRabbitMQInitializer();
+    public static class TenantRabbitMQConfiguration {
+
+        @Bean
+        public TenantRabbitMQInitializer tenantRabbitMQInitializer() {
+            return new TenantRabbitMQInitializer();
+        }
+
     }
 
-    @Bean
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnClass(name = "org.apache.rocketmq.spring.core.RocketMQTemplate")
-    public TenantRocketMQInitializer tenantRocketMQInitializer() {
-        return new TenantRocketMQInitializer();
-    }
+    public static class TenantRocketMQConfiguration {
 
-    // ========== Job ==========
+        @Bean
+        public TenantRocketMQInitializer tenantRocketMQInitializer() {
+            return new TenantRocketMQInitializer();
+        }
 
-    @Bean
-    public TenantJobAspect tenantJobAspect(TenantFrameworkService tenantFrameworkService) {
-        return new TenantJobAspect(tenantFrameworkService);
     }
 
     // ========== Redis ==========
@@ -201,6 +211,19 @@ public class YudaoTenantAutoConfiguration {
         //             避免事务未提交就清缓存被并发读穿写脏值；无事务时立即生效，行为不变
         cacheManager.setTransactionAware(true);
         return cacheManager;
+    }
+
+    // ========== Job ==========
+
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnClass(name = "cn.iocoder.yudao.framework.quartz.core.handler.JobHandler")
+    public static class TenantJobConfiguration {
+
+        @Bean
+        public TenantJobAspect tenantJobAspect(TenantFrameworkService tenantFrameworkService) {
+            return new TenantJobAspect(tenantFrameworkService);
+        }
+
     }
 
 }

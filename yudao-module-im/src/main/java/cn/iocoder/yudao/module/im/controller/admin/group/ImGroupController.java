@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.im.controller.admin.group;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.im.controller.admin.group.vo.*;
@@ -193,13 +194,16 @@ public class ImGroupController {
         Map<Long, ImGroupMessageDO> messageMap = groupMessageService.getGroupMessageMap(allMessageIds);
         // 转换输出
         return convertList(groups, group -> {
-            ImGroupRespVO vo = BeanUtils.toBean(group, ImGroupRespVO.class);
-            if (!activeGroupIds.contains(group.getId()) || CollUtil.isEmpty(group.getPinnedMessageIds())) {
-                return vo;
+            ImGroupRespVO groupVO = BeanUtils.toBean(group, ImGroupRespVO.class);
+            // 标记登录用户在该群的成员状态，供前端区分当前群与历史退群
+            boolean joined = activeGroupIds.contains(group.getId());
+            groupVO.setJoinStatus(joined ? CommonStatusEnum.ENABLE.getStatus() : CommonStatusEnum.DISABLE.getStatus());
+            if (!joined || CollUtil.isEmpty(group.getPinnedMessageIds())) {
+                return groupVO;
             }
             // 按 pin 顺序输出，已被删除的消息（messageMap 没命中）跳过
             List<ImGroupMessageDO> pinnedMesages = convertList(group.getPinnedMessageIds(), messageMap::get);
-            return vo.setPinnedMessages(BeanUtils.toBean(pinnedMesages, ImGroupMessageRespVO.class));
+            return groupVO.setPinnedMessages(BeanUtils.toBean(pinnedMesages, ImGroupMessageRespVO.class));
         });
     }
 
