@@ -10,6 +10,10 @@ import static cn.iocoder.yudao.module.iot.dal.redis.RedisKeyConstants.DEVICE_SHA
 
 /**
  * {@link IotDeviceShadowDO} 的 Redis DAO
+ * <p>
+ * 影子缓存：DB 为准，Redis 仅作读缓存（cache-aside），写后失效。
+ *
+ * @author 芋道源码
  */
 @Repository
 public class DeviceShadowRedisDAO {

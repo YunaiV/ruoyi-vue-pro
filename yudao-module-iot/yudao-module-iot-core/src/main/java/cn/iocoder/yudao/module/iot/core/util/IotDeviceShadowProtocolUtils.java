@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.iot.core.enums.shadow;
+package cn.iocoder.yudao.module.iot.core.util;
 
 import cn.hutool.core.map.MapUtil;
 
@@ -6,19 +6,38 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static cn.iocoder.yudao.module.iot.core.enums.shadow.IotDeviceShadowProtocolConstants.*;
-
 /**
- * IoT 设备影子 metadata 读写工具
+ * IoT 设备影子协议工具
  * <p>
- * 结构：{ desired: { identifier: { timestamp } }, reported: { ... } }
+ * 内层 method、state 键名、payload 字段等与设备侧透传 JSON 对齐；并提供 metadata 读写。
  *
  * @author 芋道源码
  */
-public final class IotDeviceShadowMetadatas {
+public final class IotDeviceShadowProtocolUtils {
 
-    private IotDeviceShadowMetadatas() {
+    private IotDeviceShadowProtocolUtils() {
     }
+
+    // ========== 内层 method ==========
+
+    public static final String INNER_METHOD_GET = "get";
+    public static final String INNER_METHOD_UPDATE = "update";
+    public static final String INNER_METHOD_GET_REPLY = "get_reply";
+    public static final String INNER_METHOD_UPDATE_REPLY = "update_reply";
+
+    // ========== state / metadata 键 ==========
+
+    public static final String STATE_DESIRED = "desired";
+    public static final String STATE_REPORTED = "reported";
+    public static final String METADATA_TIMESTAMP = "timestamp";
+
+    // ========== payload 键（对齐 CommonResult：code / msg / data）==========
+
+    public static final String PAYLOAD_CODE = "code";
+    public static final String PAYLOAD_MSG = "msg";
+    public static final String PAYLOAD_DATA = "data";
+    public static final String PAYLOAD_STATE = "state";
+    public static final String PAYLOAD_VERSION = "version";
 
     /**
      * 获取 desired 下某属性的更新时间戳

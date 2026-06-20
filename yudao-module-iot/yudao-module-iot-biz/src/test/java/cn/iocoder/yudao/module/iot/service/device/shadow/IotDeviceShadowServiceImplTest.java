@@ -54,6 +54,20 @@ public class IotDeviceShadowServiceImplTest extends BaseMockitoUnitTest {
     }
 
     @Test
+    public void testGetOrCreateShadow_whenNotExists_insertNewRow() {
+        // 影子不存在时懒插入；并发下 DuplicateKeyException 由 getOrCreateShadow 兜底
+        IotDeviceDO device = buildDevice();
+        when(deviceShadowRedisDAO.get(device.getId())).thenReturn(null);
+        when(deviceShadowMapper.selectByDeviceId(device.getId())).thenReturn(null);
+
+        service.getOrCreateShadow(device);
+
+        ArgumentCaptor<IotDeviceShadowDO> captor = ArgumentCaptor.forClass(IotDeviceShadowDO.class);
+        verify(deviceShadowMapper).insert(captor.capture());
+        assertEquals(device.getId(), captor.getValue().getDeviceId());
+    }
+
+    @Test
     public void testHandleDeviceShadowUpdate_get_replyFullShadow() {
         IotDeviceDO device = buildDevice();
         IotDeviceShadowDO shadow = buildShadow(device, 2L);
@@ -106,6 +120,59 @@ public class IotDeviceShadowServiceImplTest extends BaseMockitoUnitTest {
     }
 
     @Test
+    public void testHandleDeviceShadowUpdate_versionGreaterThanLatest_send409() {
+        IotDeviceDO device = buildDevice();
+        IotDeviceShadowDO shadow = buildShadow(device, 1L);
+        when(deviceShadowRedisDAO.get(device.getId())).thenReturn(null);
+        when(deviceShadowMapper.selectByDeviceId(device.getId())).thenReturn(shadow);
+
+        Map<String, Object> reported = new HashMap<>();
+        reported.put("Temperature", 25);
+        Map<String, Object> state = new HashMap<>();
+        state.put("reported", reported);
+        Map<String, Object> params = new HashMap<>();
+        params.put("method", "update");
+        params.put("state", state);
+        params.put("version", 3L);
+        IotDeviceMessage message = IotDeviceMessage.requestOf(device.getId(), 1L, "server-1",
+                IotDeviceMessageMethodEnum.SHADOW_UPDATE.getMethod(), params);
+
+        service.handleDeviceShadowUpdate(device, message);
+
+        ArgumentCaptor<IotDeviceMessage> captor = ArgumentCaptor.forClass(IotDeviceMessage.class);
+        verify(deviceMessageService).sendDeviceMessage(captor.capture(), eq(device), eq("server-1"));
+        IotDeviceShadowReplyDTO reply = (IotDeviceShadowReplyDTO) captor.getValue().getParams();
+        @SuppressWarnings("unchecked")
+        Map<String, Object> payload = (Map<String, Object>) reply.getPayload();
+        assertEquals(409, payload.get("code"));
+        verify(deviceShadowMapper, never()).updateByDeviceIdAndVersion(any(), any(), any());
+    }
+
+    @Test
+    public void testHandleDeviceShadowUpdate_versionNull_forceUpdateWithoutVersionCheck() {
+        IotDeviceDO device = buildDevice();
+        IotDeviceShadowDO shadow = buildShadow(device, 5L);
+        when(deviceShadowRedisDAO.get(device.getId())).thenReturn(null);
+        when(deviceShadowMapper.selectByDeviceId(device.getId())).thenReturn(shadow);
+        when(deviceShadowMapper.updateByDeviceIdAndVersion(any(), eq(device.getId()), eq(5L))).thenReturn(1);
+
+        Map<String, Object> reported = new HashMap<>();
+        reported.put("Temperature", 25);
+        Map<String, Object> state = new HashMap<>();
+        state.put("reported", reported);
+        Map<String, Object> params = new HashMap<>();
+        params.put("method", "update");
+        params.put("state", state);
+        // 不传 version → 强制更新，跳过版本精确匹配
+        IotDeviceMessage message = IotDeviceMessage.requestOf(device.getId(), 1L, "server-1",
+                IotDeviceMessageMethodEnum.SHADOW_UPDATE.getMethod(), params);
+
+        service.handleDeviceShadowUpdate(device, message);
+
+        verify(deviceShadowMapper).updateByDeviceIdAndVersion(any(), eq(device.getId()), eq(5L));
+    }
+
+    @Test
     public void testHandleDeviceShadowUpdate_versionConflict_send409() {
         IotDeviceDO device = buildDevice();
         IotDeviceShadowDO shadow = buildShadow(device, 5L);
@@ -131,7 +198,7 @@ public class IotDeviceShadowServiceImplTest extends BaseMockitoUnitTest {
         assertEquals("update_reply", reply.getMethod());
         @SuppressWarnings("unchecked")
         Map<String, Object> payload = (Map<String, Object>) reply.getPayload();
-        assertEquals("error", payload.get("status"));
+        assertEquals(409, payload.get("code"));
         verify(deviceShadowMapper, never()).updateByDeviceIdAndVersion(any(), any(), any());
     }
 
@@ -244,9 +311,7 @@ public class IotDeviceShadowServiceImplTest extends BaseMockitoUnitTest {
         IotDeviceShadowReplyDTO reply = (IotDeviceShadowReplyDTO) captor.getValue().getParams();
         @SuppressWarnings("unchecked")
         Map<String, Object> payload = (Map<String, Object>) reply.getPayload();
-        @SuppressWarnings("unchecked")
-        Map<String, Object> content = (Map<String, Object>) payload.get("content");
-        assertEquals(401, content.get("errorcode"));
+        assertEquals(401, payload.get("code"));
     }
 
     @Test
@@ -283,7 +348,7 @@ public class IotDeviceShadowServiceImplTest extends BaseMockitoUnitTest {
         Map<String, Object> params = new HashMap<>();
         params.put("method", "update");
         params.put("state", state);
-        params.put("version", 2L);
+        // version=null：强制更新，CAS 重试时不受请求 version 约束
         IotDeviceMessage message = IotDeviceMessage.requestOf(device.getId(), 1L, "server-1",
                 IotDeviceMessageMethodEnum.SHADOW_UPDATE.getMethod(), params);
 
@@ -367,9 +432,7 @@ public class IotDeviceShadowServiceImplTest extends BaseMockitoUnitTest {
         assertEquals(0L, reply.getVersion());
         @SuppressWarnings("unchecked")
         Map<String, Object> payload = (Map<String, Object>) reply.getPayload();
-        @SuppressWarnings("unchecked")
-        Map<String, Object> content = (Map<String, Object>) payload.get("content");
-        assertEquals(500, content.get("errorcode"));
+        assertEquals(500, payload.get("code"));
     }
 
     @Test
@@ -397,9 +460,7 @@ public class IotDeviceShadowServiceImplTest extends BaseMockitoUnitTest {
         IotDeviceShadowReplyDTO reply = (IotDeviceShadowReplyDTO) captor.getValue().getParams();
         @SuppressWarnings("unchecked")
         Map<String, Object> payload = (Map<String, Object>) reply.getPayload();
-        @SuppressWarnings("unchecked")
-        Map<String, Object> content = (Map<String, Object>) payload.get("content");
-        assertEquals(500, content.get("errorcode"));
+        assertEquals(500, payload.get("code"));
         verify(deviceShadowMapper, never()).updateByDeviceIdAndVersion(any(), any(), any());
     }
 

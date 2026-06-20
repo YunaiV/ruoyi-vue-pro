@@ -8,7 +8,8 @@ import lombok.NoArgsConstructor;
 import java.util.HashMap;
 import java.util.Map;
 
-import static cn.iocoder.yudao.module.iot.core.enums.shadow.IotDeviceShadowProtocolConstants.*;
+import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.SUCCESS;
+import static cn.iocoder.yudao.module.iot.core.util.IotDeviceShadowProtocolUtils.*;
 
 /**
  * IoT 设备影子下行 Reply DTO
@@ -28,7 +29,7 @@ public class IotDeviceShadowReplyDTO {
     private String method;
 
     /**
-     * 回复载荷
+     * 回复载荷（对齐 CommonResult：code / msg / data）
      */
     private Object payload;
 
@@ -47,9 +48,9 @@ public class IotDeviceShadowReplyDTO {
         Map<String, Object> state = new HashMap<>();
         state.put(STATE_DESIRED, desired != null ? desired : new HashMap<>());
         state.put(STATE_REPORTED, reported != null ? reported : new HashMap<>());
-        Map<String, Object> payload = new HashMap<>();
-        payload.put(PAYLOAD_STATUS, STATUS_SUCCESS);
-        payload.put(PAYLOAD_STATE, state);
+        Map<String, Object> data = new HashMap<>();
+        data.put(PAYLOAD_STATE, state);
+        Map<String, Object> payload = buildSuccessPayload(data);
         return new IotDeviceShadowReplyDTO()
                 .setMethod(INNER_METHOD_GET_REPLY)
                 .setPayload(payload)
@@ -58,9 +59,9 @@ public class IotDeviceShadowReplyDTO {
     }
 
     public static IotDeviceShadowReplyDTO updateReplyOf(Long version, Long timestamp) {
-        Map<String, Object> payload = new HashMap<>();
-        payload.put(PAYLOAD_STATUS, STATUS_SUCCESS);
-        payload.put(PAYLOAD_VERSION, version);
+        Map<String, Object> data = new HashMap<>();
+        data.put(PAYLOAD_VERSION, version);
+        Map<String, Object> payload = buildSuccessPayload(data);
         return new IotDeviceShadowReplyDTO()
                 .setMethod(INNER_METHOD_UPDATE_REPLY)
                 .setPayload(payload)
@@ -68,19 +69,26 @@ public class IotDeviceShadowReplyDTO {
                 .setTimestamp(timestamp);
     }
 
-    public static IotDeviceShadowReplyDTO errorOf(Long version, Integer errorcode, String errormessage, Long timestamp) {
-        Map<String, Object> content = new HashMap<>();
-        content.put(PAYLOAD_ERROR_CODE, errorcode);
-        content.put(PAYLOAD_ERROR_MESSAGE, errormessage);
+    public static IotDeviceShadowReplyDTO errorOf(Long version, Integer errorCode, String errorMsg, Long timestamp) {
+        Map<String, Object> data = new HashMap<>();
+        data.put(PAYLOAD_VERSION, version);
         Map<String, Object> payload = new HashMap<>();
-        payload.put(PAYLOAD_STATUS, STATUS_ERROR);
-        payload.put(PAYLOAD_VERSION, version);
-        payload.put(PAYLOAD_CONTENT, content);
+        payload.put(PAYLOAD_CODE, errorCode);
+        payload.put(PAYLOAD_MSG, errorMsg);
+        payload.put(PAYLOAD_DATA, data);
         return new IotDeviceShadowReplyDTO()
                 .setMethod(INNER_METHOD_UPDATE_REPLY)
                 .setPayload(payload)
                 .setVersion(version)
                 .setTimestamp(timestamp);
+    }
+
+    private static Map<String, Object> buildSuccessPayload(Map<String, Object> data) {
+        Map<String, Object> payload = new HashMap<>();
+        payload.put(PAYLOAD_CODE, SUCCESS.getCode());
+        payload.put(PAYLOAD_MSG, SUCCESS.getMsg());
+        payload.put(PAYLOAD_DATA, data);
+        return payload;
     }
 
 }

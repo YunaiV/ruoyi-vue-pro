@@ -21,6 +21,7 @@ public interface RedisKeyConstants {
     /**
      * 设备影子数据缓存，采用 STRING 结构
      * <p>
+     * 影子缓存：DB 为准，Redis 仅读缓存（cache-aside），写后失效。
      * KEY 格式：device_shadow:{deviceId}
      * VALUE 数据类型：String(JSON) {@link cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceShadowDO}
      */

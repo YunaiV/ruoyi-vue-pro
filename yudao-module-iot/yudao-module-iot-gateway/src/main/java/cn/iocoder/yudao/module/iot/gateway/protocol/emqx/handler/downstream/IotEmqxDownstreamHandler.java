@@ -55,6 +55,11 @@ public class IotEmqxDownstreamHandler {
         // 2.2 构建载荷
         byte[] payload = deviceMessageService.serializeDeviceMessage(message, deviceInfo.getProductKey(),
                 deviceInfo.getDeviceName());
+        if (payload == null) {
+            log.warn("[handle][影子下行跳过，设备 ID: {}，method: {}，非 JSON 协议设备不支持影子透传]",
+                    message.getDeviceId(), message.getMethod());
+            return;
+        }
 
         // 3. 发布消息
         protocol.publishMessage(topic, payload);

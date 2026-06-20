@@ -17,6 +17,7 @@ import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.handler.upstream.IotMqt
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.handler.upstream.IotMqttRegisterHandler;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.handler.upstream.IotMqttUpstreamHandler;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.manager.IotMqttConnectionManager;
+import cn.iocoder.yudao.module.iot.gateway.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import cn.iocoder.yudao.module.iot.gateway.util.IotMqttTopicUtils;
 import io.netty.handler.codec.mqtt.MqttConnectReturnCode;
@@ -101,9 +102,10 @@ public class IotMqttProtocol implements IotProtocol {
         // 初始化 Handler
         this.deviceMessageService = SpringUtil.getBean(IotDeviceMessageService.class);
         IotDeviceCommonApi deviceApi = SpringUtil.getBean(IotDeviceCommonApi.class);
+        IotDeviceService deviceService = SpringUtil.getBean(IotDeviceService.class);
         this.authHandler = new IotMqttAuthHandler(connectionManager, deviceMessageService, deviceApi, serverId);
         this.registerHandler = new IotMqttRegisterHandler(connectionManager, deviceMessageService);
-        this.upstreamHandler = new IotMqttUpstreamHandler(connectionManager, deviceMessageService, serverId);
+        this.upstreamHandler = new IotMqttUpstreamHandler(connectionManager, deviceMessageService, deviceService, serverId);
     }
 
     @Override

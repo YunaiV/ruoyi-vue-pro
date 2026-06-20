@@ -7,7 +7,7 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.enums.shadow.IotDeviceShadowErrorCodeEnum;
-import cn.iocoder.yudao.module.iot.core.enums.shadow.IotDeviceShadowMetadatas;
+import cn.iocoder.yudao.module.iot.core.util.IotDeviceShadowProtocolUtils;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.topic.shadow.IotDeviceShadowReplyDTO;
 import cn.iocoder.yudao.module.iot.core.topic.shadow.IotDeviceShadowUpdateReqDTO;
@@ -32,8 +32,8 @@ import java.util.Map;
 import java.util.function.Function;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.iot.core.enums.shadow.IotDeviceShadowProtocolConstants.INNER_METHOD_GET;
-import static cn.iocoder.yudao.module.iot.core.enums.shadow.IotDeviceShadowProtocolConstants.INNER_METHOD_UPDATE;
+import static cn.iocoder.yudao.module.iot.core.util.IotDeviceShadowProtocolUtils.INNER_METHOD_GET;
+import static cn.iocoder.yudao.module.iot.core.util.IotDeviceShadowProtocolUtils.INNER_METHOD_UPDATE;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.DEVICE_SHADOW_NOT_ENABLED;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.DEVICE_SHADOW_VERSION_CONFLICT;
 
@@ -54,17 +54,19 @@ public class IotDeviceShadowServiceImpl implements IotDeviceShadowService {
     private IotDeviceShadowMapper deviceShadowMapper;
     @Resource
     private DeviceShadowRedisDAO deviceShadowRedisDAO;
+
     @Resource
     private IotDeviceService deviceService;
     @Resource
     private IotDevicePropertyService devicePropertyService;
+    // 解决 IotDeviceShadowServiceImpl 与 IotDeviceMessageService 循环依赖
     @Resource
     @Lazy
     private IotDeviceMessageService deviceMessageService;
 
     @Override
     public IotDeviceShadowDO getOrCreateShadow(IotDeviceDO device) {
-        IotDeviceShadowDO shadow = getShadowFromCacheOrDb(device.getId());
+        IotDeviceShadowDO shadow = getDeviceShadowFromCacheOrDb(device.getId());
         if (shadow != null) {
             return shadow;
         }
@@ -204,7 +206,7 @@ public class IotDeviceShadowServiceImpl implements IotDeviceShadowService {
     @Override
     public void resetShadow(Long deviceId) {
         deviceService.validateDeviceExists(deviceId);
-        IotDeviceShadowDO shadow = getShadowFromCacheOrDb(deviceId);
+        IotDeviceShadowDO shadow = getDeviceShadowFromCacheOrDb(deviceId);
         if (shadow == null) {
             return;
         }
@@ -219,7 +221,7 @@ public class IotDeviceShadowServiceImpl implements IotDeviceShadowService {
     @Transactional(rollbackFor = Exception.class)
     public void updateStatus(Long deviceId, Integer status) {
         IotDeviceDO device = deviceService.validateDeviceExists(deviceId);
-        IotDeviceShadowDO shadow = getShadowFromCacheOrDb(deviceId);
+        IotDeviceShadowDO shadow = getDeviceShadowFromCacheOrDb(deviceId);
         if (shadow == null) {
             // 影子行不存在时直接按目标 status 懒建，避免后续 getOrCreateShadow 始终以 ENABLE 插入
             IotDeviceShadowDO newShadow = buildEmptyShadow(device).status(status).build();
@@ -251,7 +253,8 @@ public class IotDeviceShadowServiceImpl implements IotDeviceShadowService {
     // ========== 内部方法 ==========
 
     private IotDeviceShadowDO buildReportedUpdate(IotDeviceShadowDO latest, IotDeviceShadowUpdateReqDTO req) {
-        if (req.getVersion() != null && req.getVersion() < latest.getVersion()) {
+        // 乐观锁：带 version 时必须与当前完全一致（null=强制更新、-1=清空已在上层处理）
+        if (req.getVersion() != null && !req.getVersion().equals(latest.getVersion())) {
             throw new ShadowUpdateRejectedException(latest.getVersion(), IotDeviceShadowErrorCodeEnum.VERSION_CONFLICT);
         }
         Map<String, Object> mergedReported = mergeMap(latest.getReported(), req.getState().getReported());
@@ -260,7 +263,7 @@ public class IotDeviceShadowServiceImpl implements IotDeviceShadowService {
         }
         long now = DateUtil.currentSeconds();
         Map<String, Object> metadata = latest.getMetadata() != null ? new HashMap<>(latest.getMetadata()) : new HashMap<>();
-        IotDeviceShadowMetadatas.putReportedTimestamps(metadata, req.getState().getReported().keySet(), now);
+        IotDeviceShadowProtocolUtils.putReportedTimestamps(metadata, req.getState().getReported().keySet(), now);
         return IotDeviceShadowDO.builder()
                 .reported(mergedReported)
                 .metadata(metadata)
@@ -273,7 +276,7 @@ public class IotDeviceShadowServiceImpl implements IotDeviceShadowService {
         long now = DateUtil.currentSeconds();
         Map<String, Object> mergedDesired = mergeMap(latest.getDesired(), desired);
         Map<String, Object> metadata = latest.getMetadata() != null ? new HashMap<>(latest.getMetadata()) : new HashMap<>();
-        IotDeviceShadowMetadatas.putDesiredTimestamps(metadata, desired.keySet(), now);
+        IotDeviceShadowProtocolUtils.putDesiredTimestamps(metadata, desired.keySet(), now);
         return IotDeviceShadowDO.builder()
                 .desired(mergedDesired)
                 .metadata(metadata)
@@ -302,7 +305,7 @@ public class IotDeviceShadowServiceImpl implements IotDeviceShadowService {
         for (int i = 0; i < OPTIMISTIC_LOCK_RETRY; i++) {
             // 首次尝试走缓存，重试时直读 DB 获取最新 version
             IotDeviceShadowDO latest = i == 0
-                    ? getShadowFromCacheOrDb(deviceId)
+                    ? getDeviceShadowFromCacheOrDb(deviceId)
                     : deviceShadowMapper.selectByDeviceId(deviceId);
             if (latest == null) {
                 throw ShadowCasExhaustedException.shadowNotFound();
@@ -311,6 +314,7 @@ public class IotDeviceShadowServiceImpl implements IotDeviceShadowService {
             IotDeviceShadowDO update = updateBuilder.apply(latest);
             int rows = deviceShadowMapper.updateByDeviceIdAndVersion(update, deviceId, latest.getVersion());
             if (rows > 0) {
+                // cache-aside：写后失效 Redis 读缓存
                 deviceShadowRedisDAO.delete(deviceId);
                 enrichCommittedShadow(update, latest);
                 return update;
@@ -352,7 +356,7 @@ public class IotDeviceShadowServiceImpl implements IotDeviceShadowService {
 
     private Long resolveShadowVersionSafely(Long deviceId) {
         try {
-            IotDeviceShadowDO shadow = getShadowFromCacheOrDb(deviceId);
+            IotDeviceShadowDO shadow = getDeviceShadowFromCacheOrDb(deviceId);
             return shadow != null ? shadow.getVersion() : 0L;
         } catch (Exception ex) {
             log.warn("[resolveShadowVersionSafely][device({}) 读取 version 失败，使用保底 0]", deviceId, ex);
@@ -373,7 +377,10 @@ public class IotDeviceShadowServiceImpl implements IotDeviceShadowService {
                 .shadowTime(DateUtil.currentSeconds());
     }
 
-    private IotDeviceShadowDO getShadowFromCacheOrDb(Long deviceId) {
+    /**
+     * cache-aside 读路径：Redis 命中则返回，否则查 DB 并回填缓存
+     */
+    private IotDeviceShadowDO getDeviceShadowFromCacheOrDb(Long deviceId) {
         IotDeviceShadowDO shadow = deviceShadowRedisDAO.get(deviceId);
         if (shadow != null) {
             return shadow;

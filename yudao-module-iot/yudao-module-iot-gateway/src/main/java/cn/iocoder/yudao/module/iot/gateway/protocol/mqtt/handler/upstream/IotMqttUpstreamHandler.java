@@ -2,10 +2,13 @@ package cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.handler.upstream;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ArrayUtil;
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceRespDTO;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
+import cn.iocoder.yudao.module.iot.core.enums.IotSerializeTypeEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.manager.IotMqttConnectionManager;
+import cn.iocoder.yudao.module.iot.gateway.serialize.IotShadowPassthroughCodec;
+import cn.iocoder.yudao.module.iot.gateway.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import cn.iocoder.yudao.module.iot.gateway.util.IotMqttTopicUtils;
 import io.vertx.mqtt.MqttEndpoint;
@@ -25,11 +28,14 @@ import java.util.stream.Collectors;
 public class IotMqttUpstreamHandler extends IotMqttAbstractHandler {
 
     private final String serverId;
+    private final IotDeviceService deviceService;
 
     public IotMqttUpstreamHandler(IotMqttConnectionManager connectionManager,
                                   IotDeviceMessageService deviceMessageService,
+                                  IotDeviceService deviceService,
                                   String serverId) {
         super(connectionManager, deviceMessageService);
+        this.deviceService = deviceService;
         this.serverId = serverId;
     }
 
@@ -69,8 +75,11 @@ public class IotMqttUpstreamHandler extends IotMqttAbstractHandler {
                     .collect(Collectors.joining("."));
             IotDeviceMessage message;
             if (IotDeviceMessageMethodEnum.isPassthrough(topicMethod)) {
-                // 影子透传：从 topic 解析 yudao method，原始 body 作为 params
-                Map<String, Object> params = JsonUtils.parseObject(payload, Map.class);
+                // 影子透传：按设备 serializeType 解码，原始 body 作为 params
+                IotDeviceRespDTO device = deviceService.getDeviceFromCache(productKey, deviceName);
+                IotSerializeTypeEnum serializeType = device != null
+                        ? IotSerializeTypeEnum.of(device.getSerializeType()) : null;
+                Map<String, Object> params = IotShadowPassthroughCodec.decode(payload, serializeType);
                 if (params == null) {
                     log.warn("[handleBusinessRequest][影子透传 payload 解析失败，客户端 ID: {}，主题: {}]", clientId, topic);
                     return;

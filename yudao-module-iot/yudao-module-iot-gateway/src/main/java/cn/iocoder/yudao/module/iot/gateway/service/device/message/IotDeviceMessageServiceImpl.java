@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.iot.gateway.service.device.message;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceRespDTO;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.enums.IotSerializeTypeEnum;
@@ -11,6 +10,7 @@ import cn.iocoder.yudao.module.iot.core.mq.producer.IotDeviceMessageProducer;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.gateway.serialize.IotMessageSerializer;
 import cn.iocoder.yudao.module.iot.gateway.serialize.IotMessageSerializerManager;
+import cn.iocoder.yudao.module.iot.gateway.serialize.IotShadowPassthroughCodec;
 import cn.iocoder.yudao.module.iot.gateway.service.device.IotDeviceService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -42,9 +42,13 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
     @Override
     public byte[] serializeDeviceMessage(IotDeviceMessage message,
                                          String productKey, String deviceName) {
-        // 影子透传：直接序列化 params 为原始线 JSON，忽略产品 serializeType
         if (IotDeviceMessageMethodEnum.isPassthrough(message.getMethod())) {
-            return JsonUtils.toJsonByte(message.getParams());
+            IotDeviceRespDTO device = deviceService.getDeviceFromCache(productKey, deviceName);
+            if (device == null) {
+                throw exception(DEVICE_NOT_EXISTS, productKey, deviceName);
+            }
+            IotSerializeTypeEnum serializeType = IotSerializeTypeEnum.of(device.getSerializeType());
+            return encodePassthrough(message, serializeType, productKey, deviceName);
         }
         // 1.1 获取设备信息
         IotDeviceRespDTO device = deviceService.getDeviceFromCache(productKey, deviceName);
@@ -62,9 +66,8 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
     @Override
     public byte[] serializeDeviceMessage(IotDeviceMessage message,
                                          IotSerializeTypeEnum serializeType) {
-        // 影子透传
         if (IotDeviceMessageMethodEnum.isPassthrough(message.getMethod())) {
-            return JsonUtils.toJsonByte(message.getParams());
+            return encodePassthrough(message, serializeType, null, null);
         }
         // 1. 获取序列化器
         IotMessageSerializer serializer = messageSerializerManager.get(serializeType);
@@ -133,6 +136,22 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
         if (StrUtil.isEmpty(message.getRequestId())) {
             message.setRequestId(message.getId());
         }
+    }
+
+    /**
+     * 影子透传编码；非 JSON 设备返回 null，由下行发布方跳过发送
+     */
+    private byte[] encodePassthrough(IotDeviceMessage message, IotSerializeTypeEnum serializeType,
+                                     String productKey, String deviceName) {
+        byte[] bytes = IotShadowPassthroughCodec.encode(message.getParams(), serializeType);
+        if (bytes != null) {
+            return bytes;
+        }
+        if (productKey != null && deviceName != null) {
+            log.warn("[encodePassthrough][影子下行跳过：设备({}/{}) serializeType={} 不支持，目前仅 JSON 协议设备可用]",
+                    productKey, deviceName, serializeType);
+        }
+        return null;
     }
 
 }
