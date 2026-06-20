@@ -64,19 +64,19 @@ public class IotDeviceShadowController {
             Assert.notNull(prop, "属性不能为空");
             return new IotDeviceShadowPropertyRespVO()
                     .setIdentifier(thingModel.getIdentifier()).setName(thingModel.getName())
-                    .setDataType(prop.getDataType()).setDataSpecs(prop.getDataSpecs()).setDataSpecsList(prop.getDataSpecsList())
+                    .setDataType(prop.getDataType()).setDataSpecs(prop.getDataSpecs())
+                    .setDataSpecsList(prop.getDataSpecsList())
                     .setDesiredValue(desired.get(thingModel.getIdentifier()))
                     .setReportedValue(reported.get(thingModel.getIdentifier()))
                     .setDesiredTime(IotDeviceShadowProtocolUtils.getDesiredTimestamp(metadata, thingModel.getIdentifier()))
                     .setReportedTime(IotDeviceShadowProtocolUtils.getReportedTimestamp(metadata, thingModel.getIdentifier()));
         });
 
-        IotDeviceShadowRespVO respVO = BeanUtils.toBean(shadow, IotDeviceShadowRespVO.class);
-        // toBean 会拷贝 DO 中同名标量；Map 字段须用下方已归一化的局部变量覆盖，避免 null 透传前端
-        respVO.setProperties(properties);
-        respVO.setDesired(desired);
-        respVO.setReported(reported);
-        respVO.setMetadata(metadata);
+        IotDeviceShadowRespVO respVO = BeanUtils.toBean(shadow, IotDeviceShadowRespVO.class)
+                .setProperties(properties)
+                .setDesired(desired)
+                .setReported(reported)
+                .setMetadata(metadata);
         return success(respVO);
     }
 
