@@ -768,6 +768,20 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
         }
     }
 
+    @Test
+    public void testReadGroupMessages_quitMemberInvisibleMessage() {
+        // 准备：消息不在历史接收快照内
+        when(groupMessageMapper.selectById(100L)).thenReturn(ImGroupMessageDO.builder()
+                .id(100L).groupId(10L).senderId(2L).receiverUserIds(List.of(2L))
+                .sendTime(LocalDateTime.now()).build());
+
+        // 调用并断言
+        ServiceException exception = assertThrows(ServiceException.class,
+                () -> groupMessageService.readGroupMessages(1L, 10L, 100L));
+        assertEquals(MESSAGE_NOT_IN_GROUP.getCode(), exception.getCode());
+        verify(conversationReadService, never()).updateConversationReadPosition(anyLong(), anyInt(), anyLong(), anyLong());
+    }
+
     // ========== 回执状态迁移 ==========
 
     @Test
