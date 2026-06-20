@@ -640,15 +640,17 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
     // ========== 群已读测试 ==========
 
     @Test
-    public void testReadMessages_notInGroup() {
-        // 准备：当前用户不在群中
-        when(groupMemberService.validateMemberInGroup(10L, 1L))
-                .thenThrow(new ServiceException(GROUP_MEMBER_NOT_IN_GROUP.getCode(), GROUP_MEMBER_NOT_IN_GROUP.getMsg()));
+    public void testReadMessages_messageInvisible() {
+        // 准备：用户不是群成员
+        when(groupMemberService.getGroupMember(10L, 1L)).thenReturn(null);
+        when(groupMessageMapper.selectById(100L)).thenReturn(ImGroupMessageDO.builder()
+                .id(100L).groupId(10L).senderId(2L).sendTime(LocalDateTime.now()).build());
 
-        // 调用并断言：越权校验
+        // 调用并断言
         ServiceException exception = assertThrows(ServiceException.class,
                 () -> groupMessageService.readGroupMessages(1L, 10L, 100L));
-        assertEquals(GROUP_MEMBER_NOT_IN_GROUP.getCode(), exception.getCode());
+        assertEquals(MESSAGE_NOT_IN_GROUP.getCode(), exception.getCode());
+        verify(groupMessageReadRedisDAO, never()).updateReadMaxMessageId(anyLong(), anyLong(), anyLong());
     }
 
     @Test
@@ -817,8 +819,9 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
             // 准备：用户在群；Redis 游标从 5 前进到 100
             ImGroupMemberDO member = ImGroupMemberDO.builder()
                     .groupId(10L).userId(1L)
-                    .status(CommonStatusEnum.ENABLE.getStatus()).build();
-            when(groupMemberService.validateMemberInGroup(10L, 1L)).thenReturn(member);
+                    .status(CommonStatusEnum.ENABLE.getStatus())
+                    .joinTime(LocalDateTime.now().minusDays(1)).build();
+            when(groupMemberService.getGroupMember(10L, 1L)).thenReturn(member);
             when(groupMessageMapper.selectById(100L)).thenReturn(ImGroupMessageDO.builder()
                     .id(100L).groupId(10L).senderId(2L).sendTime(LocalDateTime.now()).build());
             when(groupMessageReadRedisDAO.getReadMaxMessageId(10L, 1L)).thenReturn(5L);
@@ -891,8 +894,9 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
         // 准备：已读游标已 >= 目标，直接返回
         ImGroupMemberDO member = ImGroupMemberDO.builder()
                 .groupId(10L).userId(1L)
-                .status(CommonStatusEnum.ENABLE.getStatus()).build();
-        when(groupMemberService.validateMemberInGroup(10L, 1L)).thenReturn(member);
+                .status(CommonStatusEnum.ENABLE.getStatus())
+                .joinTime(LocalDateTime.now().minusDays(1)).build();
+        when(groupMemberService.getGroupMember(10L, 1L)).thenReturn(member);
         when(groupMessageMapper.selectById(100L)).thenReturn(ImGroupMessageDO.builder()
                 .id(100L).groupId(10L).senderId(2L).sendTime(LocalDateTime.now()).build());
         when(groupMessageReadRedisDAO.getReadMaxMessageId(10L, 1L)).thenReturn(200L);
@@ -910,10 +914,59 @@ public class ImGroupMessageServiceImplTest extends BaseMockitoUnitTest {
         // 准备：用户在群，但 messageId 属于其它群
         ImGroupMemberDO member = ImGroupMemberDO.builder()
                 .groupId(10L).userId(1L)
-                .status(CommonStatusEnum.ENABLE.getStatus()).build();
-        when(groupMemberService.validateMemberInGroup(10L, 1L)).thenReturn(member);
+                .status(CommonStatusEnum.ENABLE.getStatus())
+                .joinTime(LocalDateTime.now().minusDays(1)).build();
+        when(groupMemberService.getGroupMember(10L, 1L)).thenReturn(member);
         when(groupMessageMapper.selectById(100L)).thenReturn(ImGroupMessageDO.builder()
                 .id(100L).groupId(20L).senderId(2L).sendTime(LocalDateTime.now()).build());
+
+        // 调用并断言
+        ServiceException exception = assertThrows(ServiceException.class,
+                () -> groupMessageService.readGroupMessages(1L, 10L, 100L));
+        assertEquals(MESSAGE_NOT_IN_GROUP.getCode(), exception.getCode());
+        verify(groupMessageReadRedisDAO, never()).updateReadMaxMessageId(anyLong(), anyLong(), anyLong());
+    }
+
+    @Test
+    public void testReadGroupMessages_quitMemberVisibleMessage_success() {
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImGroupMessageServiceImpl.class)))
+                    .thenReturn(groupMessageService);
+
+            LocalDateTime now = LocalDateTime.now();
+            ImGroupMemberDO member = ImGroupMemberDO.builder()
+                    .groupId(10L).userId(1L)
+                    .status(CommonStatusEnum.DISABLE.getStatus())
+                    .joinTime(now.minusDays(1))
+                    .quitTime(now.plusMinutes(1)).build();
+            when(groupMemberService.getGroupMember(10L, 1L)).thenReturn(member);
+            when(groupMessageMapper.selectById(100L)).thenReturn(ImGroupMessageDO.builder()
+                    .id(100L).groupId(10L).senderId(2L).sendTime(now)
+                    .receiverUserIds(ListUtil.of(1L, 2L)).build());
+            when(groupMessageReadRedisDAO.getReadMaxMessageId(10L, 1L)).thenReturn(0L);
+            when(groupMessageMapper.selectListByGroupIdAndPendingReceipt(10L, 0L, 100L)).thenReturn(ListUtil.of());
+
+            // 调用
+            groupMessageService.readGroupMessages(1L, 10L, 100L);
+
+            // 断言：不校验当前在群，直接推进已读位置
+            verify(groupMemberService, never()).validateMemberInGroup(10L, 1L);
+            verify(groupMessageReadRedisDAO).updateReadMaxMessageId(10L, 1L, 100L);
+        }
+    }
+
+    @Test
+    public void testReadGroupMessages_quitMemberInvisibleMessage() {
+        LocalDateTime now = LocalDateTime.now();
+        ImGroupMemberDO member = ImGroupMemberDO.builder()
+                .groupId(10L).userId(1L)
+                .status(CommonStatusEnum.DISABLE.getStatus())
+                .joinTime(now.minusDays(2))
+                .quitTime(now.minusDays(1)).build();
+        when(groupMemberService.getGroupMember(10L, 1L)).thenReturn(member);
+        when(groupMessageMapper.selectById(100L)).thenReturn(ImGroupMessageDO.builder()
+                .id(100L).groupId(10L).senderId(2L).sendTime(now)
+                .receiverUserIds(ListUtil.of(1L, 2L)).build());
 
         // 调用并断言
         ServiceException exception = assertThrows(ServiceException.class,

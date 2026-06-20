@@ -21,6 +21,9 @@ public class BpmTaskApproveReqVO {
     @Schema(description = "签名", example = "https://www.iocoder.cn/sign.png")
     private String signPicUrl;
 
+    @Schema(description = "附件", example = "[https://test.yudao.iocoder.cn/20260609/test.txt]")
+    private List<String> attachments;
+
     @Schema(description = "变量实例（动态表单）", requiredMode = Schema.RequiredMode.REQUIRED)
     private Map<String, Object> variables;
 

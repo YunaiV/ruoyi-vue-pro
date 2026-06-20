@@ -357,8 +357,8 @@ public class ImGroupMessageServiceImpl implements ImGroupMessageService {
             throw exception(MESSAGE_GROUP_READ_DISABLED);
         }
         Assert.notNull(messageId, "已读消息编号不能为空");
-        // 1.1 校验用户在群中（权限校验）
-        ImGroupMemberDO member = groupMemberService.validateMemberInGroup(groupId, userId);
+        // 1.1 获取群成员记录
+        ImGroupMemberDO member = groupMemberService.getGroupMember(groupId, userId);
         // 1.2 校验消息属于当前群，且对当前用户可见
         ImGroupMessageDO message = groupMessageMapper.selectById(messageId);
         if (message == null

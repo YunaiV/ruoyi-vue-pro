@@ -10,6 +10,7 @@ uv run --with simple-ddl-parser convertor.py postgres ../mysql/ruoyi-vue-pro.sql
 uv run --with simple-ddl-parser convertor.py sqlserver ../mysql/ruoyi-vue-pro.sql > ../sqlserver/ruoyi-vue-pro.sql
 uv run --with simple-ddl-parser convertor.py kingbase ../mysql/ruoyi-vue-pro.sql > ../kingbase/ruoyi-vue-pro.sql
 uv run --with simple-ddl-parser convertor.py opengauss ../mysql/ruoyi-vue-pro.sql > ../opengauss/ruoyi-vue-pro.sql
+uv run --with simple-ddl-parser convertor.py highgo ../mysql/ruoyi-vue-pro.sql > ../highgo/ruoyi-vue-pro.sql
 uv run --with simple-ddl-parser convertor.py oracle ../mysql/ruoyi-vue-pro.sql > ../oracle/ruoyi-vue-pro.sql
 uv run --with simple-ddl-parser convertor.py dm8 ../mysql/ruoyi-vue-pro.sql > ../dm/ruoyi-vue-pro-dm8.sql
 """
@@ -1023,18 +1024,25 @@ class OpengaussConvertor(KingbaseConvertor):
         self.db_type = "OpenGauss"
 
 
+class HighGoConvertor(PostgreSQLConvertor):
+    def __init__(self, src):
+        super().__init__(src)
+        self.db_type = "HighGo"
+
+
 def main():
     parser = argparse.ArgumentParser(description="芋道系统数据库转换工具")
     parser.add_argument(
         "type",
         type=str,
         help="目标数据库类型",
-        choices=["postgres", "oracle", "sqlserver", "dm8", "kingbase", "opengauss"],
+        choices=["postgres", "oracle", "sqlserver", "dm8", "kingbase", "opengauss", "highgo"],
     )
     parser.add_argument(
         "path",
         type=str,
         help="源数据库脚本路径",
+        nargs="?",
         default="../mysql/ruoyi-vue-pro.sql"
     )
     args = parser.parse_args()
@@ -1053,6 +1061,8 @@ def main():
         convertor = KingbaseConvertor(sql_file)
     elif args.type == "opengauss":
         convertor = OpengaussConvertor(sql_file)
+    elif args.type == "highgo":
+        convertor = HighGoConvertor(sql_file)
     else:
         raise NotImplementedError(f"不支持目标数据库类型: {args.type}")
 

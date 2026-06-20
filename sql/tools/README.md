@@ -90,6 +90,25 @@ docker compose up -d opengauss
 docker compose exec opengauss bash -c '/usr/local/opengauss/bin/gsql -U $GS_USERNAME -W $GS_PASSWORD -d postgres -f /tmp/schema.sql'
 ```
 
+### 1.8 HighGo 瀚高数据库
+
+① 下载瀚高官方 Docker 镜像，并加载镜像文件。加载后，将镜像打成本地标签：
+
+```Bash
+docker load -i <highgo-image>.tar
+docker tag <image>:<tag> highgo:local
+```
+
+② 在项目 `sql/tools` 目录下运行：
+
+```Bash
+docker compose up -d highgo
+```
+
+> 注意：不同瀚高镜像的数据目录可能不同，如果容器无法启动，请按镜像实际 `PGDATA` 修改 `docker-compose.yaml` 中的 `highgo` 数据卷挂载目录。
+
+③ 启动完成后，需要手动导入 Quartz 和项目 SQL。瀚高兼容 PostgreSQL，具体客户端命令以当前镜像为准，可使用 `psql` 或瀚高镜像内置的兼容客户端执行 `/tmp/quartz.sql`、`/tmp/schema.sql`。
+
 ## 1.X 容器的销毁重建
 
 开发测试过程中，有时候需要创建全新干净的数据库。由于测试数据 Docker 容器采用数据卷 Volume 挂载数据库实例的数据目录，因此销毁数据需要停止容器后，删除数据卷，然后再重新创建容器。
@@ -103,7 +122,7 @@ docker volume rm ruoyi-vue-pro_postgres
 
 ## 2. MySQL 转换其它数据库
 
-项目提供了 `sql/tools/convertor.py` 脚本，支持将 MySQL 转换为 Oracle、PostgreSQL、SQL Server、达梦、人大金仓、OpenGauss 等数据库的脚本。
+项目提供了 `sql/tools/convertor.py` 脚本，支持将 MySQL 转换为 Oracle、PostgreSQL、SQL Server、达梦、人大金仓、OpenGauss、瀚高等数据库的脚本。
 
 ### 2.1 实现原理
 
@@ -118,11 +137,12 @@ pip install simple-ddl-parser
 # pip3 install simple-ddl-parser
 ```
 
-② 在 `sql/tools/` 目录下，执行如下命令打印生成 postgres 的脚本内容，其他可选参数有：`oracle`、`sqlserver`、`dm8`、`kingbase`、`opengauss`：
+② 在 `sql/tools/` 目录下，执行如下命令打印生成 postgres 的脚本内容，其他可选参数有：`oracle`、`sqlserver`、`dm8`、`kingbase`、`opengauss`、`highgo`：
 
 ```Bash
 python3 convertor.py postgres
 # python3 convertor.py postgres > tmp.sql
+# python3 convertor.py highgo ../mysql/ruoyi-vue-pro.sql > ../highgo/ruoyi-vue-pro.sql
 ```
 
 程序将 SQL 脚本打印到终端，可以重定向到临时文件 `tmp.sql`。

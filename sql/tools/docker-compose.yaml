@@ -7,6 +7,7 @@ volumes:
     dm8: { }
     kingbase: { }
     opengauss: { }
+    highgo: { }
 
 services:
     mysql:
@@ -132,3 +133,15 @@ services:
             - opengauss:/var/lib/opengauss
             - ../opengauss/ruoyi-vue-pro.sql:/tmp/schema.sql:ro
             # docker compose exec opengauss bash -c '/usr/local/opengauss/bin/gsql -U $GS_USERNAME -W $GS_PASSWORD -d postgres -f /tmp/schema.sql'
+
+    highgo:
+        # 使用瀚高官方提供的 Docker 镜像，加载后打成本地标签：
+        # docker tag <image>:<tag> highgo:local
+        image: highgo:local
+        restart: unless-stopped
+        ports:
+            - "5866:5866"
+        volumes:
+            - highgo:/home/highgo/hgdb/data
+            - ../highgo/quartz.sql:/tmp/quartz.sql:ro
+            - ../highgo/ruoyi-vue-pro.sql:/tmp/schema.sql:ro

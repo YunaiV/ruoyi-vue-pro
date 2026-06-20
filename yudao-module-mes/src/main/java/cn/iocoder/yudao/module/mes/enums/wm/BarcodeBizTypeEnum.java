@@ -22,6 +22,7 @@ public enum BarcodeBizTypeEnum implements ArrayValuable<Integer> {
     PACKAGE(MesBizTypeConstants.WM_PACKAGE, "装箱单"),
     STOCK(MesBizTypeConstants.WM_STOCK, "库存"),
     BATCH(MesBizTypeConstants.WM_BATCH, "批次"),
+    SN(MesBizTypeConstants.WM_SN, "SN 码"),
     PROCARD(MesBizTypeConstants.PRO_CARD, "流转卡"),
     WORKORDER(MesBizTypeConstants.PRO_WORKORDER, "工单"),
     TRANSORDER(MesBizTypeConstants.PRO_TRANS_ORDER, "流转单"),
