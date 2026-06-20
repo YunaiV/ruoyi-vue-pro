@@ -3931,11 +3931,11 @@ INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_t
 GO
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3445, 3, N'已取消', N'5', N'mes_wm_product_produce_status', 0, N'danger', N'', N'已取消状态', N'1', N'2026-04-05 15:53:46', N'1', N'2026-04-05 15:53:46', N'0')
 GO
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3446, 0, N'è‰ç¨¿', N'0', N'mes_pro_task_status', 0, N'', N'', NULL, N'1', N'2026-04-16 09:47:00', N'1', N'2026-04-16 09:47:00', N'0')
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3446, 0, N'草稿', N'0', N'mes_pro_task_status', 0, N'', N'', NULL, N'1', N'2026-04-16 09:47:00', N'1', N'2026-04-16 09:47:00', N'0')
 GO
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3447, 1, N'å·²å®Œæˆ', N'4', N'mes_pro_task_status', 0, N'', N'', NULL, N'1', N'2026-04-16 09:47:00', N'1', N'2026-04-16 09:47:00', N'0')
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3447, 1, N'已完成', N'4', N'mes_pro_task_status', 0, N'', N'', NULL, N'1', N'2026-04-16 09:47:00', N'1', N'2026-04-16 09:47:00', N'0')
 GO
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3448, 2, N'å·²å–æ¶ˆ', N'5', N'mes_pro_task_status', 0, N'', N'', NULL, N'1', N'2026-04-16 09:47:00', N'1', N'2026-04-16 09:47:00', N'0')
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3448, 2, N'已取消', N'5', N'mes_pro_task_status', 0, N'', N'', NULL, N'1', N'2026-04-16 09:47:00', N'1', N'2026-04-16 09:47:00', N'0')
 GO
 SET IDENTITY_INSERT system_dict_data OFF
 GO
@@ -13915,4 +13915,3 @@ GO
 COMMIT
 GO
 -- @formatter:on
-

@@ -3,42 +3,63 @@
 
  Source Server Type    : MySQL
 
- Target Server Type    : DM8
+ Target Server Type    : HighGo
 
- Date: 2026-05-03 09:41:52
+ Date: 2026-06-13 20:18:03
 */
 
 
 -- ----------------------------
+-- Table structure for dual
+-- ----------------------------
+DROP TABLE IF EXISTS dual;
+CREATE TABLE dual
+(
+    id int2
+);
+
+COMMENT ON TABLE dual IS '数据库连接的表';
+
+-- ----------------------------
+-- Records of dual
+-- ----------------------------
+-- @formatter:off
+INSERT INTO dual VALUES (1);
+-- @formatter:on
+
+-- ----------------------------
 -- Table structure for infra_api_access_log
 -- ----------------------------
+DROP TABLE IF EXISTS infra_api_access_log;
 CREATE TABLE infra_api_access_log (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    trace_id varchar(64) DEFAULT '' NULL,
-    user_id bigint DEFAULT 0 NOT NULL,
-    user_type smallint DEFAULT 0 NOT NULL,
-    application_name varchar(50)  NOT NULL,
-    request_method varchar(16) DEFAULT '' NULL,
-    request_url varchar(255) DEFAULT '' NULL,
-    request_params text  NULL,
-    response_body text  NULL,
-    user_ip varchar(50)  NOT NULL,
-    user_agent varchar(512)  NOT NULL,
-    operate_module varchar(50) DEFAULT NULL NULL,
-    operate_name varchar(50) DEFAULT NULL NULL,
-    operate_type smallint DEFAULT 0 NULL,
-    begin_time datetime  NOT NULL,
-    end_time datetime  NOT NULL,
-    duration int  NOT NULL,
-    result_code int DEFAULT 0 NOT NULL,
-    result_msg varchar(512) DEFAULT '' NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted bit DEFAULT '0' NOT NULL,
-    tenant_id bigint DEFAULT 0 NOT NULL
+    id int8 NOT NULL,
+  trace_id varchar(64) NOT NULL DEFAULT '',
+  user_id int8 NOT NULL DEFAULT 0,
+  user_type int2 NOT NULL DEFAULT 0,
+  application_name varchar(50) NOT NULL,
+  request_method varchar(16) NOT NULL DEFAULT '',
+  request_url varchar(255) NOT NULL DEFAULT '',
+  request_params text NULL,
+  response_body text NULL,
+  user_ip varchar(50) NOT NULL,
+  user_agent varchar(512) NOT NULL,
+  operate_module varchar(50) NULL DEFAULT NULL,
+  operate_name varchar(50) NULL DEFAULT NULL,
+  operate_type int2 NULL DEFAULT 0,
+  begin_time timestamp NOT NULL,
+  end_time timestamp NOT NULL,
+  duration int4 NOT NULL,
+  result_code int4 NOT NULL DEFAULT 0,
+  result_msg varchar(512) NULL DEFAULT '',
+  creator varchar(64) NULL DEFAULT '',
+  create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0,
+  tenant_id int8 NOT NULL DEFAULT 0
 );
+
+ALTER TABLE infra_api_access_log ADD CONSTRAINT pk_infra_api_access_log PRIMARY KEY (id);
 
 CREATE INDEX idx_infra_api_access_log_01 ON infra_api_access_log (create_time);
 
@@ -69,39 +90,46 @@ COMMENT ON COLUMN infra_api_access_log.deleted IS '是否删除';
 COMMENT ON COLUMN infra_api_access_log.tenant_id IS '租户编号';
 COMMENT ON TABLE infra_api_access_log IS 'API 访问日志表';
 
+DROP SEQUENCE IF EXISTS infra_api_access_log_seq;
+CREATE SEQUENCE infra_api_access_log_seq
+    START 1;
+
 -- ----------------------------
 -- Table structure for infra_api_error_log
 -- ----------------------------
+DROP TABLE IF EXISTS infra_api_error_log;
 CREATE TABLE infra_api_error_log (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    trace_id varchar(64)  NOT NULL,
-    user_id bigint DEFAULT 0 NOT NULL,
-    user_type smallint DEFAULT 0 NOT NULL,
-    application_name varchar(50)  NOT NULL,
-    request_method varchar(16)  NOT NULL,
-    request_url varchar(255)  NOT NULL,
-    request_params varchar(8000)  NOT NULL,
-    user_ip varchar(50)  NOT NULL,
-    user_agent varchar(512)  NOT NULL,
-    exception_time datetime  NOT NULL,
-    exception_name varchar(128) DEFAULT '' NULL,
-    exception_message text  NOT NULL,
-    exception_root_cause_message text  NOT NULL,
-    exception_stack_trace text  NOT NULL,
-    exception_class_name varchar(512)  NOT NULL,
-    exception_file_name varchar(512)  NOT NULL,
-    exception_method_name varchar(512)  NOT NULL,
-    exception_line_number int  NOT NULL,
-    process_status smallint  NOT NULL,
-    process_time datetime DEFAULT NULL NULL,
-    process_user_id int DEFAULT 0 NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted bit DEFAULT '0' NOT NULL,
-    tenant_id bigint DEFAULT 0 NOT NULL
+    id int8 NOT NULL,
+  trace_id varchar(64) NOT NULL,
+  user_id int8 NOT NULL DEFAULT 0,
+  user_type int2 NOT NULL DEFAULT 0,
+  application_name varchar(50) NOT NULL,
+  request_method varchar(16) NOT NULL,
+  request_url varchar(255) NOT NULL,
+  request_params varchar(8000) NOT NULL,
+  user_ip varchar(50) NOT NULL,
+  user_agent varchar(512) NOT NULL,
+  exception_time timestamp NOT NULL,
+  exception_name varchar(128) NOT NULL DEFAULT '',
+  exception_message text NOT NULL,
+  exception_root_cause_message text NOT NULL,
+  exception_stack_trace text NOT NULL,
+  exception_class_name varchar(512) NOT NULL,
+  exception_file_name varchar(512) NOT NULL,
+  exception_method_name varchar(512) NOT NULL,
+  exception_line_number int4 NOT NULL,
+  process_status int2 NOT NULL,
+  process_time timestamp NULL DEFAULT NULL,
+  process_user_id int4 NULL DEFAULT 0,
+  creator varchar(64) NULL DEFAULT '',
+  create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0,
+  tenant_id int8 NOT NULL DEFAULT 0
 );
+
+ALTER TABLE infra_api_error_log ADD CONSTRAINT pk_infra_api_error_log PRIMARY KEY (id);
 
 CREATE INDEX idx_infra_api_error_log_01 ON infra_api_error_log (create_time);
 
@@ -135,34 +163,41 @@ COMMENT ON COLUMN infra_api_error_log.deleted IS '是否删除';
 COMMENT ON COLUMN infra_api_error_log.tenant_id IS '租户编号';
 COMMENT ON TABLE infra_api_error_log IS '系统异常日志';
 
+DROP SEQUENCE IF EXISTS infra_api_error_log_seq;
+CREATE SEQUENCE infra_api_error_log_seq
+    START 1;
+
 -- ----------------------------
 -- Table structure for infra_codegen_column
 -- ----------------------------
+DROP TABLE IF EXISTS infra_codegen_column;
 CREATE TABLE infra_codegen_column (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    table_id bigint  NOT NULL,
-    column_name varchar(200)  NOT NULL,
-    data_type varchar(100)  NOT NULL,
-    column_comment varchar(500)  NOT NULL,
-    nullable bit  NOT NULL,
-    primary_key bit  NOT NULL,
-    ordinal_position int  NOT NULL,
-    java_type varchar(32)  NOT NULL,
-    java_field varchar(64)  NOT NULL,
-    dict_type varchar(200) DEFAULT '' NULL,
-    example varchar(64) DEFAULT NULL NULL,
-    create_operation bit  NOT NULL,
-    update_operation bit  NOT NULL,
-    list_operation bit  NOT NULL,
-    list_operation_condition varchar(32) DEFAULT '=' NOT NULL,
-    list_operation_result bit  NOT NULL,
-    html_type varchar(32)  NOT NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted bit DEFAULT '0' NOT NULL
+    id int8 NOT NULL,
+  table_id int8 NOT NULL,
+  column_name varchar(200) NOT NULL,
+  data_type varchar(100) NOT NULL,
+  column_comment varchar(500) NOT NULL,
+  nullable bool NOT NULL,
+  primary_key bool NOT NULL,
+  ordinal_position int4 NOT NULL,
+  java_type varchar(32) NOT NULL,
+  java_field varchar(64) NOT NULL,
+  dict_type varchar(200) NULL DEFAULT '',
+  example varchar(64) NULL DEFAULT NULL,
+  create_operation bool NOT NULL,
+  update_operation bool NOT NULL,
+  list_operation bool NOT NULL,
+  list_operation_condition varchar(32) NOT NULL DEFAULT '=',
+  list_operation_result bool NOT NULL,
+  html_type varchar(32) NOT NULL,
+  creator varchar(64) NULL DEFAULT '',
+  create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0
 );
+
+ALTER TABLE infra_codegen_column ADD CONSTRAINT pk_infra_codegen_column PRIMARY KEY (id);
 
 CREATE INDEX idx_infra_codegen_column_01 ON infra_codegen_column (table_id);
 
@@ -191,35 +226,42 @@ COMMENT ON COLUMN infra_codegen_column.update_time IS '更新时间';
 COMMENT ON COLUMN infra_codegen_column.deleted IS '是否删除';
 COMMENT ON TABLE infra_codegen_column IS '代码生成表字段定义';
 
+DROP SEQUENCE IF EXISTS infra_codegen_column_seq;
+CREATE SEQUENCE infra_codegen_column_seq
+    START 1;
+
 -- ----------------------------
 -- Table structure for infra_codegen_table
 -- ----------------------------
+DROP TABLE IF EXISTS infra_codegen_table;
 CREATE TABLE infra_codegen_table (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    data_source_config_id bigint  NOT NULL,
-    scene smallint DEFAULT 1 NOT NULL,
-    table_name varchar(200) DEFAULT '' NULL,
-    table_comment varchar(500) DEFAULT '' NULL,
-    remark varchar(500) DEFAULT NULL NULL,
-    module_name varchar(30)  NOT NULL,
-    business_name varchar(30)  NOT NULL,
-    class_name varchar(100) DEFAULT '' NULL,
-    class_comment varchar(50)  NOT NULL,
-    author varchar(50)  NOT NULL,
-    template_type smallint DEFAULT 1 NOT NULL,
-    front_type smallint  NOT NULL,
-    parent_menu_id bigint DEFAULT NULL NULL,
-    master_table_id bigint DEFAULT NULL NULL,
-    sub_join_column_id bigint DEFAULT NULL NULL,
-    sub_join_many bit DEFAULT NULL NULL,
-    tree_parent_column_id bigint DEFAULT NULL NULL,
-    tree_name_column_id bigint DEFAULT NULL NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted bit DEFAULT '0' NOT NULL
+    id int8 NOT NULL,
+  data_source_config_id int8 NOT NULL,
+  scene int2 NOT NULL DEFAULT 1,
+  table_name varchar(200) NOT NULL DEFAULT '',
+  table_comment varchar(500) NOT NULL DEFAULT '',
+  remark varchar(500) NULL DEFAULT NULL,
+  module_name varchar(30) NOT NULL,
+  business_name varchar(30) NOT NULL,
+  class_name varchar(100) NOT NULL DEFAULT '',
+  class_comment varchar(50) NOT NULL,
+  author varchar(50) NOT NULL,
+  template_type int2 NOT NULL DEFAULT 1,
+  front_type int2 NOT NULL,
+  parent_menu_id int8 NULL DEFAULT NULL,
+  master_table_id int8 NULL DEFAULT NULL,
+  sub_join_column_id int8 NULL DEFAULT NULL,
+  sub_join_many bool NULL DEFAULT NULL,
+  tree_parent_column_id int8 NULL DEFAULT NULL,
+  tree_name_column_id int8 NULL DEFAULT NULL,
+  creator varchar(64) NULL DEFAULT '',
+  create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0
 );
+
+ALTER TABLE infra_codegen_table ADD CONSTRAINT pk_infra_codegen_table PRIMARY KEY (id);
 
 COMMENT ON COLUMN infra_codegen_table.id IS '编号';
 COMMENT ON COLUMN infra_codegen_table.data_source_config_id IS '数据源配置的编号';
@@ -247,24 +289,31 @@ COMMENT ON COLUMN infra_codegen_table.update_time IS '更新时间';
 COMMENT ON COLUMN infra_codegen_table.deleted IS '是否删除';
 COMMENT ON TABLE infra_codegen_table IS '代码生成表定义';
 
+DROP SEQUENCE IF EXISTS infra_codegen_table_seq;
+CREATE SEQUENCE infra_codegen_table_seq
+    START 1;
+
 -- ----------------------------
 -- Table structure for infra_config
 -- ----------------------------
+DROP TABLE IF EXISTS infra_config;
 CREATE TABLE infra_config (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    category varchar(50)  NOT NULL,
-    type smallint  NOT NULL,
-    name varchar(100) DEFAULT '' NULL,
-    config_key varchar(100) DEFAULT '' NULL,
-    value varchar(500) DEFAULT '' NULL,
-    visible bit  NOT NULL,
-    remark varchar(500) DEFAULT NULL NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted bit DEFAULT '0' NOT NULL
+    id int8 NOT NULL,
+  category varchar(50) NOT NULL,
+  type int2 NOT NULL,
+  name varchar(100) NOT NULL DEFAULT '',
+  config_key varchar(100) NOT NULL DEFAULT '',
+  value varchar(500) NOT NULL DEFAULT '',
+  visible bool NOT NULL,
+  remark varchar(500) NULL DEFAULT NULL,
+  creator varchar(64) NULL DEFAULT '',
+  create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0
 );
+
+ALTER TABLE infra_config ADD CONSTRAINT pk_infra_config PRIMARY KEY (id);
 
 CREATE INDEX idx_infra_config_01 ON infra_config (config_key);
 
@@ -287,7 +336,7 @@ COMMENT ON TABLE infra_config IS '参数配置表';
 -- Records of infra_config
 -- ----------------------------
 -- @formatter:off
-SET IDENTITY_INSERT infra_config ON;
+BEGIN;
 INSERT INTO infra_config (id, category, type, name, config_key, value, visible, remark, creator, create_time, updater, update_time, deleted) VALUES (2, 'biz', 1, '用户管理-账号初始密码', 'system.user.init-password', '123456', '0', '初始化密码 123456', 'admin', '2021-01-05 17:03:48', '1', '2024-07-20 17:22:47', '0');
 INSERT INTO infra_config (id, category, type, name, config_key, value, visible, remark, creator, create_time, updater, update_time, deleted) VALUES (7, 'url', 2, 'MySQL 监控的地址', 'url.druid', '', '1', '', '1', '2023-04-07 13:41:16', '1', '2023-04-07 14:33:38', '0');
 INSERT INTO infra_config (id, category, type, name, config_key, value, visible, remark, creator, create_time, updater, update_time, deleted) VALUES (8, 'url', 2, 'SkyWalking 监控的地址', 'url.skywalking', '', '1', '', '1', '2023-04-07 13:41:16', '1', '2023-04-07 14:57:03', '0');
@@ -296,24 +345,30 @@ INSERT INTO infra_config (id, category, type, name, config_key, value, visible, 
 INSERT INTO infra_config (id, category, type, name, config_key, value, visible, remark, creator, create_time, updater, update_time, deleted) VALUES (12, 'test2', 2, 'test3', 'test4', 'test5', '1', 'test6', '1', '2023-12-03 09:55:16', '1', '2025-04-06 21:00:09', '0');
 INSERT INTO infra_config (id, category, type, name, config_key, value, visible, remark, creator, create_time, updater, update_time, deleted) VALUES (13, '用户管理-账号初始密码', 2, '用户管理-注册开关', 'system.user.register-enabled', 'true', '0', '', '1', '2025-04-26 17:23:41', '1', '2025-04-26 17:23:41', '0');
 COMMIT;
-SET IDENTITY_INSERT infra_config OFF;
 -- @formatter:on
+
+DROP SEQUENCE IF EXISTS infra_config_seq;
+CREATE SEQUENCE infra_config_seq
+    START 14;
 
 -- ----------------------------
 -- Table structure for infra_data_source_config
 -- ----------------------------
+DROP TABLE IF EXISTS infra_data_source_config;
 CREATE TABLE infra_data_source_config (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    name varchar(100) DEFAULT '' NULL,
-    url varchar(1024)  NOT NULL,
-    username varchar(255)  NOT NULL,
-    password varchar(255) DEFAULT '' NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted bit DEFAULT '0' NOT NULL
+    id int8 NOT NULL,
+  name varchar(100) NOT NULL DEFAULT '',
+  url varchar(1024) NOT NULL,
+  username varchar(255) NOT NULL,
+  password varchar(255) NOT NULL DEFAULT '',
+  creator varchar(64) NULL DEFAULT '',
+  create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0
 );
+
+ALTER TABLE infra_data_source_config ADD CONSTRAINT pk_infra_data_source_config PRIMARY KEY (id);
 
 COMMENT ON COLUMN infra_data_source_config.id IS '主键编号';
 COMMENT ON COLUMN infra_data_source_config.name IS '参数名称';
@@ -327,23 +382,30 @@ COMMENT ON COLUMN infra_data_source_config.update_time IS '更新时间';
 COMMENT ON COLUMN infra_data_source_config.deleted IS '是否删除';
 COMMENT ON TABLE infra_data_source_config IS '数据源配置表';
 
+DROP SEQUENCE IF EXISTS infra_data_source_config_seq;
+CREATE SEQUENCE infra_data_source_config_seq
+    START 1;
+
 -- ----------------------------
 -- Table structure for infra_file
 -- ----------------------------
+DROP TABLE IF EXISTS infra_file;
 CREATE TABLE infra_file (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    config_id bigint DEFAULT NULL NULL,
-    name varchar(256) DEFAULT NULL NULL,
-    path varchar(512)  NOT NULL,
-    url varchar(1024)  NOT NULL,
-    type varchar(128) DEFAULT NULL NULL,
-    size int  NOT NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted bit DEFAULT '0' NOT NULL
+    id int8 NOT NULL,
+  config_id int8 NULL DEFAULT NULL,
+  name varchar(256) NULL DEFAULT NULL,
+  path varchar(512) NOT NULL,
+  url varchar(1024) NOT NULL,
+  type varchar(128) NULL DEFAULT NULL,
+  size int4 NOT NULL,
+  creator varchar(64) NULL DEFAULT '',
+  create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0
 );
+
+ALTER TABLE infra_file ADD CONSTRAINT pk_infra_file PRIMARY KEY (id);
 
 COMMENT ON COLUMN infra_file.id IS '文件编号';
 COMMENT ON COLUMN infra_file.config_id IS '配置编号';
@@ -359,22 +421,29 @@ COMMENT ON COLUMN infra_file.update_time IS '更新时间';
 COMMENT ON COLUMN infra_file.deleted IS '是否删除';
 COMMENT ON TABLE infra_file IS '文件表';
 
+DROP SEQUENCE IF EXISTS infra_file_seq;
+CREATE SEQUENCE infra_file_seq
+    START 1;
+
 -- ----------------------------
 -- Table structure for infra_file_config
 -- ----------------------------
+DROP TABLE IF EXISTS infra_file_config;
 CREATE TABLE infra_file_config (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    name varchar(63)  NOT NULL,
-    storage smallint  NOT NULL,
-    remark varchar(255) DEFAULT NULL NULL,
-    master bit  NOT NULL,
-    config varchar(4096)  NOT NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted bit DEFAULT '0' NOT NULL
+    id int8 NOT NULL,
+  name varchar(63) NOT NULL,
+  storage int2 NOT NULL,
+  remark varchar(255) NULL DEFAULT NULL,
+  master bool NOT NULL,
+  config varchar(4096) NOT NULL,
+  creator varchar(64) NULL DEFAULT '',
+  create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0
 );
+
+ALTER TABLE infra_file_config ADD CONSTRAINT pk_infra_file_config PRIMARY KEY (id);
 
 COMMENT ON COLUMN infra_file_config.id IS '编号';
 COMMENT ON COLUMN infra_file_config.name IS '配置名';
@@ -393,36 +462,42 @@ COMMENT ON TABLE infra_file_config IS '文件配置表';
 -- Records of infra_file_config
 -- ----------------------------
 -- @formatter:off
-SET IDENTITY_INSERT infra_file_config ON;
-INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (4, '数据库（示例）', 1, '我是数据库', '0', '{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.db.DBFileClientConfig","domain":"http://127.0.0.1:48080"}', '1', '2022-03-15 23:56:24', '1', '2025-11-24 20:57:14', '0');
-INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (22, '七牛存储器（示例）', 20, '请换成你自己的密钥！！！', '1', '{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig","endpoint":"s3.cn-south-1.qiniucs.com","domain":"http://test.yudao.iocoder.cn","bucket":"ruoyi-vue-pro","accessKey":"3TvrJ70gl2Gt6IBe7_IZT1F6i_k0iMuRtyEv4EyS","accessSecret":"wd0tbVBYlp0S-ihA8Qg2hPLncoP83wyrIq24OZuY","enablePathStyleAccess":false,"enablePublicAccess":true}', '1', '2024-01-13 22:11:12', '1', '2025-11-24 20:57:14', '0');
-INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (24, '腾讯云存储（示例）', 20, '请换成你的密钥！！！', '0', '{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig","endpoint":"https://cos.ap-shanghai.myqcloud.com","domain":"http://tengxun-oss.iocoder.cn","bucket":"aoteman-1255880240","accessKey":"AKIDAF6WSh1uiIjwqtrOsGSN3WryqTM6cTMt","accessSecret":"X","enablePathStyleAccess":false,"enablePublicAccess":true}', '1', '2024-11-09 16:03:22', '1', '2025-11-24 20:57:14', '0');
-INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (25, '阿里云存储（示例）', 20, '', '0', '{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig","endpoint":"oss-cn-beijing.aliyuncs.com","domain":"http://ali-oss.iocoder.cn","bucket":"yunai-aoteman","accessKey":"LTAI5tEQLgnDyjh3WpNcdMKA","accessSecret":"X","enablePathStyleAccess":false,"enablePublicAccess":true}', '1', '2024-11-09 16:47:08', '1', '2025-11-24 20:57:14', '0');
-INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (26, '火山云存储（示例）', 20, '', '0', '{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig","endpoint":"tos-s3-cn-beijing.volces.com","domain":null,"bucket":"yunai","accessKey":"AKLTZjc3Zjc4MzZmMjU3NDk0ZTgxYmIyMmFkNTIwMDI1ZGE","accessSecret":"X==","enablePathStyleAccess":false,"enablePublicAccess":true}', '1', '2024-11-09 16:56:42', '1', '2025-11-24 20:57:14', '0');
-INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (27, '华为云存储（示例）', 20, '', '0', '{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig","endpoint":"obs.cn-east-3.myhuaweicloud.com","domain":"","bucket":"yudao","accessKey":"PVDONDEIOTW88LF8DC4U","accessSecret":"X","enablePathStyleAccess":false,"enablePublicAccess":true}', '1', '2024-11-09 17:18:41', '1', '2025-11-24 20:57:14', '0');
-INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (28, 'MinIO 存储（示例）', 20, '', '0', '{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig","endpoint":"http://127.0.0.1:9000","domain":"http://127.0.0.1:9000/yudao","bucket":"yudao","accessKey":"admin","accessSecret":"password","enablePathStyleAccess":false,"enablePublicAccess":true}', '1', '2024-11-09 17:43:10', '1', '2025-11-24 20:57:14', '0');
-INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (29, '本地存储（示例）', 10, 'mac/linux 使用 /，windows 使用 \\', '0', '{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.local.LocalFileClientConfig","basePath":"/Users/yunai/tmp/file","domain":"http://127.0.0.1:48080"}', '1', '2025-05-02 11:25:45', '1', '2025-11-24 20:57:14', '0');
-INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (30, 'SFTP 存储（示例）', 12, '', '0', '{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.sftp.SftpFileClientConfig","basePath":"/upload","domain":"http://127.0.0.1:48080","host":"127.0.0.1","port":2222,"username":"foo","password":"pass"}', '1', '2025-05-02 16:34:10', '1', '2025-11-24 20:57:14', '0');
-INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (34, '七牛云存储【私有】（示例）', 20, '请换成你自己的密钥！！！', '0', '{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig","endpoint":"s3.cn-south-1.qiniucs.com","domain":"http://t151glocd.hn-bkt.clouddn.com","bucket":"ruoyi-vue-pro-private","accessKey":"3TvrJ70gl2Gt6IBe7_IZT1F6i_k0iMuRtyEv4EyS","accessSecret":"wd0tbVBYlp0S-ihA8Qg2hPLncoP83wyrIq24OZuY","enablePathStyleAccess":false,"enablePublicAccess":false}', '1', '2025-08-17 21:22:00', '1', '2025-11-24 20:57:14', '0');
-INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (35, '1', 20, '1', '0', '{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig","endpoint":"http://www.baidu.com","domain":"http://www.xxx.com","bucket":"1","accessKey":"2","accessSecret":"3","enablePathStyleAccess":false,"enablePublicAccess":false,"region":"1"}', '1', '2025-10-02 14:32:12', '1', '2025-11-29 15:59:39', '0');
+BEGIN;
+INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (4, '数据库（示例）', 1, '我是数据库', '0', '{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.db.DBFileClientConfig","domain":"http://127.0.0.1:48080"}', '1', '2022-03-15 23:56:24', '1', '2026-05-17 14:05:15', '0');
+INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (22, '七牛存储器（示例）', 20, '请换成你自己的密钥！！！', '1', '{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig","endpoint":"s3.cn-south-1.qiniucs.com","domain":"http://test.yudao.iocoder.cn","bucket":"ruoyi-vue-pro","accessKey":"3TvrJ70gl2Gt6IBe7_IZT1F6i_k0iMuRtyEv4EyS","accessSecret":"wd0tbVBYlp0S-ihA8Qg2hPLncoP83wyrIq24OZuY","enablePathStyleAccess":false,"enablePublicAccess":true}', '1', '2024-01-13 22:11:12', '1', '2026-05-17 14:05:15', '0');
+INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (24, '腾讯云存储（示例）', 20, '请换成你的密钥！！！', '0', '{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig","endpoint":"https://cos.ap-shanghai.myqcloud.com","domain":"http://tengxun-oss.iocoder.cn","bucket":"aoteman-1255880240","accessKey":"AKIDAF6WSh1uiIjwqtrOsGSN3WryqTM6cTMt","accessSecret":"X","enablePathStyleAccess":false,"enablePublicAccess":true}', '1', '2024-11-09 16:03:22', '1', '2026-05-17 14:05:15', '0');
+INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (25, '阿里云存储（示例）', 20, '', '0', '{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig","endpoint":"oss-cn-beijing.aliyuncs.com","domain":"http://ali-oss.iocoder.cn","bucket":"yunai-aoteman","accessKey":"LTAI5tEQLgnDyjh3WpNcdMKA","accessSecret":"X","enablePathStyleAccess":false,"enablePublicAccess":true}', '1', '2024-11-09 16:47:08', '1', '2026-05-17 14:05:15', '0');
+INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (26, '火山云存储（示例）', 20, '', '0', '{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig","endpoint":"tos-s3-cn-beijing.volces.com","domain":null,"bucket":"yunai","accessKey":"AKLTZjc3Zjc4MzZmMjU3NDk0ZTgxYmIyMmFkNTIwMDI1ZGE","accessSecret":"X==","enablePathStyleAccess":false,"enablePublicAccess":true}', '1', '2024-11-09 16:56:42', '1', '2026-05-17 14:05:15', '0');
+INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (27, '华为云存储（示例）', 20, '', '0', '{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig","endpoint":"obs.cn-east-3.myhuaweicloud.com","domain":"","bucket":"yudao","accessKey":"PVDONDEIOTW88LF8DC4U","accessSecret":"X","enablePathStyleAccess":false,"enablePublicAccess":true}', '1', '2024-11-09 17:18:41', '1', '2026-05-17 14:05:15', '0');
+INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (28, 'MinIO 存储（示例）', 20, '', '0', '{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig","endpoint":"http://127.0.0.1:9000","domain":"http://127.0.0.1:9000/yudao","bucket":"yudao","accessKey":"admin","accessSecret":"password","enablePathStyleAccess":false,"enablePublicAccess":true}', '1', '2024-11-09 17:43:10', '1', '2026-05-17 14:05:15', '0');
+INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (29, '本地存储（示例）', 10, 'mac/linux 使用 /，windows 使用 \', '0', '{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.local.LocalFileClientConfig","basePath":"/Users/yunai/tmp/file","domain":"http://127.0.0.1:48080"}', '1', '2025-05-02 11:25:45', '1', '2026-05-17 14:05:15', '0');
+INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (30, 'SFTP 存储（示例）', 12, '', '0', '{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.sftp.SftpFileClientConfig","basePath":"/upload","domain":"http://127.0.0.1:48080","host":"127.0.0.1","port":2222,"username":"foo","password":"pass"}', '1', '2025-05-02 16:34:10', '1', '2026-05-17 14:05:15', '0');
+INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (34, '七牛云存储【私有】（示例）', 20, '请换成你自己的密钥！！！', '0', '{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig","endpoint":"s3.cn-south-1.qiniucs.com","domain":"http://t151glocd.hn-bkt.clouddn.com","bucket":"ruoyi-vue-pro-private","accessKey":"3TvrJ70gl2Gt6IBe7_IZT1F6i_k0iMuRtyEv4EyS","accessSecret":"wd0tbVBYlp0S-ihA8Qg2hPLncoP83wyrIq24OZuY","enablePathStyleAccess":false,"enablePublicAccess":false}', '1', '2025-08-17 21:22:00', '1', '2026-05-17 14:05:15', '0');
+INSERT INTO infra_file_config (id, name, storage, remark, master, config, creator, create_time, updater, update_time, deleted) VALUES (35, '1', 20, '1', '0', '{"@class":"cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig","endpoint":"http://www.baidu.com","domain":"http://www.xxx.com","bucket":"1","accessKey":"2","accessSecret":"3","enablePathStyleAccess":false,"enablePublicAccess":false,"region":"1"}', '1', '2025-10-02 14:32:12', '1', '2026-05-17 14:05:15', '0');
 COMMIT;
-SET IDENTITY_INSERT infra_file_config OFF;
 -- @formatter:on
+
+DROP SEQUENCE IF EXISTS infra_file_config_seq;
+CREATE SEQUENCE infra_file_config_seq
+    START 36;
 
 -- ----------------------------
 -- Table structure for infra_file_content
 -- ----------------------------
+DROP TABLE IF EXISTS infra_file_content;
 CREATE TABLE infra_file_content (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    config_id bigint  NOT NULL,
-    path varchar(512)  NOT NULL,
-    content blob  NOT NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted bit DEFAULT '0' NOT NULL
+    id int8 NOT NULL,
+  config_id int8 NOT NULL,
+  path varchar(512) NOT NULL,
+  content bytea NOT NULL,
+  creator varchar(64) NULL DEFAULT '',
+  create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0
 );
+
+ALTER TABLE infra_file_content ADD CONSTRAINT pk_infra_file_content PRIMARY KEY (id);
 
 CREATE INDEX idx_infra_file_content_01 ON infra_file_content (config_id, path);
 
@@ -437,25 +512,32 @@ COMMENT ON COLUMN infra_file_content.update_time IS '更新时间';
 COMMENT ON COLUMN infra_file_content.deleted IS '是否删除';
 COMMENT ON TABLE infra_file_content IS '文件表';
 
+DROP SEQUENCE IF EXISTS infra_file_content_seq;
+CREATE SEQUENCE infra_file_content_seq
+    START 1;
+
 -- ----------------------------
 -- Table structure for infra_job
 -- ----------------------------
+DROP TABLE IF EXISTS infra_job;
 CREATE TABLE infra_job (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    name varchar(32)  NOT NULL,
-    status smallint  NOT NULL,
-    handler_name varchar(64)  NOT NULL,
-    handler_param varchar(255) DEFAULT NULL NULL,
-    cron_expression varchar(32)  NOT NULL,
-    retry_count int DEFAULT 0 NOT NULL,
-    retry_interval int DEFAULT 0 NOT NULL,
-    monitor_timeout int DEFAULT 0 NOT NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted bit DEFAULT '0' NOT NULL
+    id int8 NOT NULL,
+  name varchar(32) NOT NULL,
+  status int2 NOT NULL,
+  handler_name varchar(64) NOT NULL,
+  handler_param varchar(255) NULL DEFAULT NULL,
+  cron_expression varchar(32) NOT NULL,
+  retry_count int4 NOT NULL DEFAULT 0,
+  retry_interval int4 NOT NULL DEFAULT 0,
+  monitor_timeout int4 NOT NULL DEFAULT 0,
+  creator varchar(64) NULL DEFAULT '',
+  create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0
 );
+
+ALTER TABLE infra_job ADD CONSTRAINT pk_infra_job PRIMARY KEY (id);
 
 COMMENT ON COLUMN infra_job.id IS '任务编号';
 COMMENT ON COLUMN infra_job.name IS '任务名称';
@@ -477,7 +559,7 @@ COMMENT ON TABLE infra_job IS '定时任务表';
 -- Records of infra_job
 -- ----------------------------
 -- @formatter:off
-SET IDENTITY_INSERT infra_job ON;
+BEGIN;
 INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expression, retry_count, retry_interval, monitor_timeout, creator, create_time, updater, update_time, deleted) VALUES (5, '支付通知 Job', 2, 'payNotifyJob', NULL, '* * * * * ?', 0, 0, 0, '1', '2021-10-27 08:34:42', '1', '2024-09-12 13:32:48', '0');
 INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expression, retry_count, retry_interval, monitor_timeout, creator, create_time, updater, update_time, deleted) VALUES (17, '支付订单同步 Job', 2, 'payOrderSyncJob', NULL, '0 0/1 * * * ?', 0, 0, 0, '1', '2023-07-22 14:36:26', '1', '2023-07-22 15:39:08', '0');
 INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expression, retry_count, retry_interval, monitor_timeout, creator, create_time, updater, update_time, deleted) VALUES (18, '支付订单过期 Job', 2, 'payOrderExpireJob', NULL, '0 0/1 * * * ?', 0, 0, 0, '1', '2023-07-22 15:36:23', '1', '2023-07-22 15:39:54', '0');
@@ -497,29 +579,35 @@ INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expre
 INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expression, retry_count, retry_interval, monitor_timeout, creator, create_time, updater, update_time, deleted) VALUES (39, 'Mall 优惠券过期 Job', 2, 'couponExpireJob', '', '0 * * * * ?', 0, 0, 0, '1', '2025-10-02 11:07:34', '1', '2025-10-02 11:07:37', '0');
 INSERT INTO infra_job (id, name, status, handler_name, handler_param, cron_expression, retry_count, retry_interval, monitor_timeout, creator, create_time, updater, update_time, deleted) VALUES (40, 'Mall 商品统计 Job', 2, 'productStatisticsJob', '', '0 0 0 * * ?', 0, 0, 0, '1', '2025-11-22 18:51:25', '1', '2025-11-22 18:56:21', '0');
 COMMIT;
-SET IDENTITY_INSERT infra_job OFF;
 -- @formatter:on
+
+DROP SEQUENCE IF EXISTS infra_job_seq;
+CREATE SEQUENCE infra_job_seq
+    START 41;
 
 -- ----------------------------
 -- Table structure for infra_job_log
 -- ----------------------------
+DROP TABLE IF EXISTS infra_job_log;
 CREATE TABLE infra_job_log (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    job_id bigint  NOT NULL,
-    handler_name varchar(64)  NOT NULL,
-    handler_param varchar(255) DEFAULT NULL NULL,
-    execute_index smallint DEFAULT 1 NOT NULL,
-    begin_time datetime  NOT NULL,
-    end_time datetime DEFAULT NULL NULL,
-    duration int DEFAULT NULL NULL,
-    status smallint  NOT NULL,
-    result varchar(4000) DEFAULT '' NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted bit DEFAULT '0' NOT NULL
+    id int8 NOT NULL,
+  job_id int8 NOT NULL,
+  handler_name varchar(64) NOT NULL,
+  handler_param varchar(255) NULL DEFAULT NULL,
+  execute_index int2 NOT NULL DEFAULT 1,
+  begin_time timestamp NOT NULL,
+  end_time timestamp NULL DEFAULT NULL,
+  duration int4 NULL DEFAULT NULL,
+  status int2 NOT NULL,
+  result varchar(4000) NULL DEFAULT '',
+  creator varchar(64) NULL DEFAULT '',
+  create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0
 );
+
+ALTER TABLE infra_job_log ADD CONSTRAINT pk_infra_job_log PRIMARY KEY (id);
 
 CREATE INDEX idx_infra_job_log_01 ON infra_job_log (job_id);
 CREATE INDEX idx_infra_job_log_02 ON infra_job_log (create_time);
@@ -541,25 +629,32 @@ COMMENT ON COLUMN infra_job_log.update_time IS '更新时间';
 COMMENT ON COLUMN infra_job_log.deleted IS '是否删除';
 COMMENT ON TABLE infra_job_log IS '定时任务日志表';
 
+DROP SEQUENCE IF EXISTS infra_job_log_seq;
+CREATE SEQUENCE infra_job_log_seq
+    START 1;
+
 -- ----------------------------
 -- Table structure for system_dept
 -- ----------------------------
+DROP TABLE IF EXISTS system_dept;
 CREATE TABLE system_dept (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    name varchar(30) DEFAULT '' NULL,
-    parent_id bigint DEFAULT 0 NOT NULL,
-    sort int DEFAULT 0 NOT NULL,
-    leader_user_id bigint DEFAULT NULL NULL,
-    phone varchar(11) DEFAULT NULL NULL,
-    email varchar(50) DEFAULT NULL NULL,
-    status smallint  NOT NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted bit DEFAULT '0' NOT NULL,
-    tenant_id bigint DEFAULT 0 NOT NULL
+    id int8 NOT NULL,
+  name varchar(30) NOT NULL DEFAULT '',
+  parent_id int8 NOT NULL DEFAULT 0,
+  sort int4 NOT NULL DEFAULT 0,
+  leader_user_id int8 NULL DEFAULT NULL,
+  phone varchar(11) NULL DEFAULT NULL,
+  email varchar(50) NULL DEFAULT NULL,
+  status int2 NOT NULL,
+  creator varchar(64) NULL DEFAULT '',
+  create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0,
+  tenant_id int8 NOT NULL DEFAULT 0
 );
+
+ALTER TABLE system_dept ADD CONSTRAINT pk_system_dept PRIMARY KEY (id);
 
 COMMENT ON COLUMN system_dept.id IS '部门id';
 COMMENT ON COLUMN system_dept.name IS '部门名称';
@@ -581,7 +676,7 @@ COMMENT ON TABLE system_dept IS '部门表';
 -- Records of system_dept
 -- ----------------------------
 -- @formatter:off
-SET IDENTITY_INSERT system_dept ON;
+BEGIN;
 INSERT INTO system_dept (id, name, parent_id, sort, leader_user_id, phone, email, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (100, '芋道源码', 0, 0, 1, '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '1', '2026-01-04 18:01:12', '0', 1);
 INSERT INTO system_dept (id, name, parent_id, sort, leader_user_id, phone, email, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (101, '深圳总公司', 100, 1, 104, '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '1', '2025-03-29 15:49:55', '0', 1);
 INSERT INTO system_dept (id, name, parent_id, sort, leader_user_id, phone, email, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (102, '长沙分公司', 100, 2, NULL, '15888888888', 'ry@qq.com', 0, 'admin', '2021-01-05 17:03:47', '', '2021-12-15 05:01:40', '0', 1);
@@ -599,28 +694,34 @@ INSERT INTO system_dept (id, name, parent_id, sort, leader_user_id, phone, email
 INSERT INTO system_dept (id, name, parent_id, sort, leader_user_id, phone, email, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (116, '某个子部门', 0, 1, NULL, NULL, NULL, 0, '1', '2025-12-08 14:51:12', '1', '2025-12-08 14:51:12', '0', 1);
 INSERT INTO system_dept (id, name, parent_id, sort, leader_user_id, phone, email, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (117, '某个子部门 2', 0, 2, NULL, NULL, NULL, 0, '1', '2025-12-08 14:51:25', '1', '2025-12-08 14:51:25', '0', 1);
 COMMIT;
-SET IDENTITY_INSERT system_dept OFF;
 -- @formatter:on
+
+DROP SEQUENCE IF EXISTS system_dept_seq;
+CREATE SEQUENCE system_dept_seq
+    START 118;
 
 -- ----------------------------
 -- Table structure for system_dict_data
 -- ----------------------------
+DROP TABLE IF EXISTS system_dict_data;
 CREATE TABLE system_dict_data (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    sort int DEFAULT 0 NOT NULL,
-    label varchar(100) DEFAULT '' NULL,
-    value varchar(100) DEFAULT '' NULL,
-    dict_type varchar(100) DEFAULT '' NULL,
-    status smallint DEFAULT 0 NOT NULL,
-    color_type varchar(100) DEFAULT '' NULL,
-    css_class varchar(100) DEFAULT '' NULL,
-    remark varchar(500) DEFAULT NULL NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted bit DEFAULT '0' NOT NULL
+    id int8 NOT NULL,
+  sort int4 NOT NULL DEFAULT 0,
+  label varchar(100) NOT NULL DEFAULT '',
+  value varchar(100) NOT NULL DEFAULT '',
+  dict_type varchar(100) NOT NULL DEFAULT '',
+  status int2 NOT NULL DEFAULT 0,
+  color_type varchar(100) NULL DEFAULT '',
+  css_class varchar(100) NULL DEFAULT '',
+  remark varchar(500) NULL DEFAULT NULL,
+  creator varchar(64) NULL DEFAULT '',
+  create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0
 );
+
+ALTER TABLE system_dict_data ADD CONSTRAINT pk_system_dict_data PRIMARY KEY (id);
 
 COMMENT ON COLUMN system_dict_data.id IS '字典编码';
 COMMENT ON COLUMN system_dict_data.sort IS '字典排序';
@@ -642,7 +743,7 @@ COMMENT ON TABLE system_dict_data IS '字典数据表';
 -- Records of system_dict_data
 -- ----------------------------
 -- @formatter:off
-SET IDENTITY_INSERT system_dict_data ON;
+BEGIN;
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1, 1, '男', '1', 'system_user_sex', 0, 'primary', 'A', '性别男', 'admin', '2021-01-05 17:03:48', '1', '2025-12-10 13:19:26', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (2, 2, '女', '2', 'system_user_sex', 0, 'success', '', '性别女', 'admin', '2021-01-05 17:03:48', '1', '2023-11-15 23:30:37', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (8, 1, '正常', '1', 'infra_job_status', 0, 'success', '', '正常状态', 'admin', '2021-01-05 17:03:48', '1', '2022-02-16 19:33:38', '0');
@@ -1270,6 +1371,8 @@ INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_t
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3034, 1, 'ttt', 'tt', 'iot_ota_task_record_status', 0, 'success', '', NULL, '1', '2025-09-06 00:02:21', '1', '2025-09-06 00:02:31', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3035, 40, '支付宝小程序', '40', 'system_social_type', 0, '', '', '', '1', '2023-11-04 13:05:38', '1', '2023-11-04 13:07:16', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3036, 60, 'Admin Uniapp 移动端', '60', 'infra_codegen_front_type', 0, '', '', NULL, '1', '2025-12-16 19:25:51', '1', '2025-12-17 09:46:15', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3037, 42, 'Vben5.0 Antdv Next Schema 模版', '42', 'infra_codegen_front_type', 0, '', '', '', '1', '2026-05-23 13:52:25', '1', '2026-05-23 13:52:25', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3038, 43, 'Vben5.0 Antdv Next 标准模版', '43', 'infra_codegen_front_type', 0, '', '', '', '1', '2026-05-23 13:52:25', '1', '2026-05-23 13:52:25', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3040, 1, 'UDP', 'udp', 'iot_protocol_type', 0, '', '', 'UDP 协议', '1', '2026-02-04 00:32:47', '1', '2026-02-04 00:32:47', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3041, 2, 'WebSocket', 'websocket', 'iot_protocol_type', 0, '', '', 'WebSocket 协议', '1', '2026-02-04 00:32:55', '1', '2026-02-04 00:32:55', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3042, 3, 'HTTP', 'http', 'iot_protocol_type', 0, '', '', 'HTTP 协议', '1', '2026-02-04 00:32:55', '1', '2026-02-04 00:32:55', '0');
@@ -1542,39 +1645,145 @@ INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_t
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3426, 3, '待上架', '3', 'mes_wm_return_sales_status', 0, 'primary', '', '', '1', '2026-04-03 17:20:25', '1', '2026-04-03 17:20:25', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3427, 4, '已完成', '4', 'mes_wm_return_sales_status', 0, 'success', '', '', '1', '2026-04-03 17:20:25', '1', '2026-04-03 17:20:25', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3428, 5, '已取消', '5', 'mes_wm_return_sales_status', 0, 'danger', '', '', '1', '2026-04-03 17:20:25', '1', '2026-04-03 17:20:25', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3429, 1, '尺寸', '1', 'mes_defect_type', 0, '', '', '', '1', '2026-04-04 12:49:51', '1', '2026-04-09 15:03:20', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3430, 2, '外观', '2', 'mes_defect_type', 0, '', '', '', '1', '2026-04-04 12:49:51', '1', '2026-04-09 15:03:20', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3431, 3, '重量', '3', 'mes_defect_type', 0, '', '', '', '1', '2026-04-04 12:49:51', '1', '2026-04-09 15:03:20', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3432, 4, '性能', '4', 'mes_defect_type', 0, '', '', '', '1', '2026-04-04 12:49:51', '1', '2026-04-09 15:03:20', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3433, 5, '成分', '5', 'mes_defect_type', 0, '', '', '', '1', '2026-04-04 12:49:51', '1', '2026-04-09 15:03:20', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3436, 1, '上工', '1', 'mes_pro_work_record_type', 0, 'success', '', '', '1', '2026-04-05 14:07:27', '1', '2026-04-05 14:07:27', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3437, 2, '下工', '2', 'mes_pro_work_record_type', 0, 'danger', '', '', '1', '2026-04-05 14:07:27', '1', '2026-04-05 14:07:27', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3443, 1, '草稿', '0', 'mes_wm_product_produce_status', 0, 'info', '', '草稿状态', '1', '2026-04-05 15:53:46', '1', '2026-04-05 15:53:46', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3444, 2, '已完成', '4', 'mes_wm_product_produce_status', 0, 'success', '', '已完成状态', '1', '2026-04-05 15:53:46', '1', '2026-04-05 15:53:46', '0');
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3445, 3, '已取消', '5', 'mes_wm_product_produce_status', 0, 'danger', '', '已取消状态', '1', '2026-04-05 15:53:46', '1', '2026-04-05 15:53:46', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3446, 0, '草稿', '0', 'mes_pro_task_status', 0, '', '', NULL, '1', '2026-04-16 09:47:00', '1', '2026-04-16 09:47:00', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3447, 1, '已完成', '4', 'mes_pro_task_status', 0, '', '', NULL, '1', '2026-04-16 09:47:00', '1', '2026-04-16 09:47:00', '0');
-INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3448, 2, '已取消', '5', 'mes_pro_task_status', 0, '', '', NULL, '1', '2026-04-16 09:47:00', '1', '2026-04-16 09:47:00', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3446, 0, 'è‰ç¨¿', '0', 'mes_pro_task_status', 0, '', '', NULL, '1', '2026-04-16 09:47:00', '1', '2026-04-16 09:47:00', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3447, 1, 'å·²å®Œæˆ', '4', 'mes_pro_task_status', 0, '', '', NULL, '1', '2026-04-16 09:47:00', '1', '2026-04-16 09:47:00', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3448, 2, 'å·²å–æ¶ˆ', '5', 'mes_pro_task_status', 0, '', '', NULL, '1', '2026-04-16 09:47:00', '1', '2026-04-16 09:47:00', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3520, 1, '未读', '0', 'im_private_message_status', 0, 'warning', '', '私聊=未读，群聊=正常', 'admin', '2026-04-30 11:35:07', 'admin', '2026-04-30 15:14:36', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3521, 2, '已撤回', '2', 'im_private_message_status', 0, 'danger', '', 'RECALL', 'admin', '2026-04-30 11:35:07', 'admin', '2026-04-30 15:14:36', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3522, 3, '已读', '3', 'im_private_message_status', 0, 'success', '', 'READ（仅私聊）', 'admin', '2026-04-30 11:35:07', 'admin', '2026-04-30 15:14:36', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3525, 1, '正常', '0', 'im_group_message_status', 0, 'success', '', '群聊正常（初始状态）', 'admin', '2026-04-30 15:14:36', 'admin', '2026-04-30 15:14:36', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3526, 2, '已撤回', '2', 'im_group_message_status', 0, 'danger', '', '群聊已撤回', 'admin', '2026-04-30 15:14:36', 'admin', '2026-04-30 15:14:36', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3530, 1, '不需要回执', '0', 'im_group_message_receipt_status', 0, 'info', '', 'NO_RECEIPT', 'admin', '2026-04-30 11:35:07', 'admin', '2026-04-30 11:35:07', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3531, 2, '待完成', '1', 'im_group_message_receipt_status', 0, 'warning', '', 'PENDING', 'admin', '2026-04-30 11:35:07', 'admin', '2026-04-30 11:35:07', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3532, 3, '已完成', '2', 'im_group_message_receipt_status', 0, 'success', '', 'DONE', 'admin', '2026-04-30 11:35:07', 'admin', '2026-04-30 11:35:07', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3540, 1, '正常', '0', 'im_friend_status', 0, 'success', '', '正常好友关系', 'admin', '2026-04-30 11:35:07', 'admin', '2026-04-30 11:35:07', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3541, 2, '已删除', '1', 'im_friend_status', 0, 'danger', '', '已删除好友关系', 'admin', '2026-04-30 11:35:07', 'admin', '2026-04-30 11:35:07', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3550, 1, '正常', '0', 'im_group_status', 0, 'success', '', '群正常', 'admin', '2026-04-30 11:35:07', 'admin', '2026-04-30 11:35:07', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3551, 2, '已解散', '1', 'im_group_status', 0, 'info', '', '群已解散', 'admin', '2026-04-30 11:35:07', 'admin', '2026-04-30 11:35:07', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3552, 1, '群主', '1', 'im_group_member_role', 0, 'primary', '', NULL, '1', '2026-05-02 02:14:12', '1', '2026-05-02 02:14:12', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3553, 2, '管理员', '2', 'im_group_member_role', 0, 'warning', '', NULL, '1', '2026-05-02 02:14:12', '1', '2026-05-02 02:14:12', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3554, 3, '普通成员', '3', 'im_group_member_role', 0, 'info', '', NULL, '1', '2026-05-02 02:14:12', '1', '2026-05-02 02:14:12', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3555, 1, '搜索', '1', 'im_friend_add_source', 0, 'default', '', NULL, '1', '2026-05-04 02:43:41', '1', '2026-05-05 11:46:57', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3556, 2, '群聊', '2', 'im_friend_add_source', 0, 'default', '', NULL, '1', '2026-05-04 02:43:41', '1', '2026-05-05 11:46:53', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3557, 3, '扫码', '3', 'im_friend_add_source', 0, 'default', '', NULL, '1', '2026-05-04 02:43:41', '1', '2026-05-05 11:46:50', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3558, 4, '名片', '4', 'im_friend_add_source', 0, 'default', '', NULL, '1', '2026-05-04 02:43:41', '1', '2026-05-05 11:46:48', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3559, 1, '等待验证', '0', 'im_friend_request_handle_result', 0, 'warning', '', NULL, '1', '2026-05-04 02:43:41', '1', '2026-05-04 02:43:41', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3560, 2, '已添加', '1', 'im_friend_request_handle_result', 0, 'success', '', NULL, '1', '2026-05-04 02:43:41', '1', '2026-05-04 02:43:41', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3561, 3, '已拒绝', '2', 'im_friend_request_handle_result', 0, 'info', '', NULL, '1', '2026-05-04 02:43:41', '1', '2026-05-04 02:43:41', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3562, 101, '文本', '101', 'im_message_type', 0, '', '', NULL, 'admin', '2026-05-05 11:52:30', 'admin', '2026-05-05 11:52:30', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3563, 102, '图片', '102', 'im_message_type', 0, 'success', '', NULL, 'admin', '2026-05-05 11:52:30', 'admin', '2026-05-05 11:52:30', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3564, 103, '语音', '103', 'im_message_type', 0, 'warning', '', NULL, 'admin', '2026-05-05 11:52:30', 'admin', '2026-05-05 11:52:30', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3565, 104, '视频', '104', 'im_message_type', 0, 'warning', '', NULL, 'admin', '2026-05-05 11:52:30', 'admin', '2026-05-05 11:52:30', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3566, 105, '文件', '105', 'im_message_type', 0, 'info', '', NULL, 'admin', '2026-05-05 11:52:30', 'admin', '2026-05-05 11:52:30', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3568, 2101, '撤回', '2101', 'im_message_type', 0, 'danger', '', NULL, 'admin', '2026-05-05 11:52:30', 'admin', '2026-05-05 11:52:30', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3569, 2200, '回执', '2200', 'im_message_type', 0, 'warning', '', NULL, 'admin', '2026-05-05 11:52:30', 'admin', '2026-05-05 11:52:30', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3570, 2201, '已读', '2201', 'im_message_type', 0, 'success', '', NULL, 'admin', '2026-05-05 11:52:30', 'admin', '2026-05-05 11:52:30', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3571, 1501, '群创建', '1501', 'im_message_type', 0, 'success', '', NULL, 'admin', '2026-05-05 11:52:30', 'admin', '2026-05-05 11:52:30', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3572, 1502, '群信息变更', '1502', 'im_message_type', 0, 'success', '', NULL, 'admin', '2026-05-05 11:52:30', 'admin', '2026-05-05 11:52:30', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3573, 1503, '入群申请', '1503', 'im_message_type', 0, 'success', '', NULL, 'admin', '2026-05-05 11:52:30', 'admin', '2026-05-05 11:52:30', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3574, 1504, '成员退群', '1504', 'im_message_type', 0, 'success', '', NULL, 'admin', '2026-05-05 11:52:30', 'admin', '2026-05-05 11:52:30', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3575, 1505, '入群申请通过', '1505', 'im_message_type', 0, 'success', '', NULL, 'admin', '2026-05-05 11:52:30', 'admin', '2026-05-05 11:52:30', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3576, 1506, '入群申请拒绝', '1506', 'im_message_type', 0, 'success', '', NULL, 'admin', '2026-05-05 11:52:30', 'admin', '2026-05-05 11:52:30', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3577, 1507, '群主转让', '1507', 'im_message_type', 0, 'success', '', NULL, 'admin', '2026-05-05 11:52:30', 'admin', '2026-05-05 11:52:30', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3578, 1508, '成员被移出', '1508', 'im_message_type', 0, 'success', '', NULL, 'admin', '2026-05-05 11:52:30', 'admin', '2026-05-05 11:52:30', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3579, 1509, '成员加入', '1509', 'im_message_type', 0, 'success', '', NULL, 'admin', '2026-05-05 11:52:30', 'admin', '2026-05-05 11:52:30', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3580, 1510, '自由进群', '1510', 'im_message_type', 0, 'success', '', NULL, 'admin', '2026-05-05 11:52:30', 'admin', '2026-05-05 11:52:30', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3581, 1511, '群解散', '1511', 'im_message_type', 0, 'success', '', NULL, 'admin', '2026-05-05 11:52:30', 'admin', '2026-05-05 11:52:30', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3582, 1512, '成员禁言', '1512', 'im_message_type', 0, 'success', '', NULL, 'admin', '2026-05-05 11:52:30', 'admin', '2026-05-05 11:52:30', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3583, 1513, '成员取消禁言', '1513', 'im_message_type', 0, 'success', '', NULL, 'admin', '2026-05-05 11:52:30', 'admin', '2026-05-05 11:52:30', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3584, 1514, '全群禁言', '1514', 'im_message_type', 0, 'success', '', NULL, 'admin', '2026-05-05 11:52:30', 'admin', '2026-05-05 11:52:30', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3585, 1515, '全群取消禁言', '1515', 'im_message_type', 0, 'success', '', NULL, 'admin', '2026-05-05 11:52:30', 'admin', '2026-05-05 11:52:30', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3586, 1516, '成员昵称变更', '1516', 'im_message_type', 0, 'success', '', NULL, 'admin', '2026-05-05 11:52:30', 'admin', '2026-05-05 11:52:30', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3587, 1517, '添加管理员', '1517', 'im_message_type', 0, 'success', '', NULL, 'admin', '2026-05-05 11:52:30', 'admin', '2026-05-05 11:52:30', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3588, 1518, '撤销管理员', '1518', 'im_message_type', 0, 'success', '', NULL, 'admin', '2026-05-05 11:52:30', 'admin', '2026-05-05 11:52:30', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3589, 1519, '群公告变更', '1519', 'im_message_type', 0, 'success', '', NULL, 'admin', '2026-05-05 11:52:30', 'admin', '2026-05-05 11:52:30', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3590, 1520, '群名变更', '1520', 'im_message_type', 0, 'success', '', NULL, 'admin', '2026-05-05 11:52:30', 'admin', '2026-05-05 11:52:30', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3591, 1531, '群消息置顶', '1531', 'im_message_type', 0, 'success', '', NULL, 'admin', '2026-05-05 11:52:30', 'admin', '2026-05-05 11:52:30', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3592, 1532, '群消息取消置顶', '1532', 'im_message_type', 0, 'success', '', NULL, 'admin', '2026-05-05 11:52:30', 'admin', '2026-05-05 11:52:30', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3593, 1533, '群封禁变更', '1533', 'im_message_type', 0, 'success', '', NULL, 'admin', '2026-05-05 11:52:30', 'admin', '2026-05-05 11:52:30', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3594, 1204, '新增好友', '1204', 'im_message_type', 0, 'success', '', NULL, 'admin', '2026-05-05 13:26:53', 'admin', '2026-05-05 13:26:53', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3595, 1205, '好友被删除', '1205', 'im_message_type', 0, 'warning', '', NULL, 'admin', '2026-05-05 13:26:53', 'admin', '2026-05-05 13:26:53', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3596, 1, '搜索', '1', 'im_group_add_source', 0, '', '', NULL, '', '2026-05-06 09:26:36', '', '2026-05-06 09:26:36', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3597, 2, '邀请', '2', 'im_group_add_source', 0, '', '', NULL, '', '2026-05-06 09:26:36', '', '2026-05-06 09:26:36', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3598, 3, '扫码', '3', 'im_group_add_source', 0, '', '', NULL, '', '2026-05-06 09:26:36', '', '2026-05-06 09:26:36', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3599, 4, '分享链接', '4', 'im_group_add_source', 0, '', '', NULL, '', '2026-05-06 09:26:36', '', '2026-05-06 09:26:36', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3600, 1, '未处理', '0', 'im_group_request_handle_result', 0, '', '', NULL, '', '2026-05-06 09:26:36', '', '2026-05-06 09:26:36', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3601, 2, '同意', '1', 'im_group_request_handle_result', 0, '', '', NULL, '', '2026-05-06 09:26:36', '', '2026-05-06 09:26:36', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3602, 3, '拒绝', '2', 'im_group_request_handle_result', 0, '', '', NULL, '', '2026-05-06 09:26:36', '', '2026-05-06 09:26:36', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1061051, 1, '客户', '1', 'merchant_type', 0, 'primary', '', '客户', '1', '2026-05-10 15:26:09', '1', '2026-05-10 15:26:09', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1061052, 2, '供应商', '2', 'merchant_type', 0, 'success', '', '供应商', '1', '2026-05-10 15:26:09', '1', '2026-05-10 15:26:09', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1061053, 3, '客户/供应商', '3', 'merchant_type', 0, 'warning', '', '客户/供应商', '1', '2026-05-10 15:26:09', '1', '2026-05-10 15:26:09', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1061061, 1, '入库单', '1', 'wms_order_type', 0, 'success', '', '', '1', '2026-05-10 17:51:46', '1', '2026-05-14 08:14:09', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1061062, 2, '出库单', '2', 'wms_order_type', 0, 'danger', '', '', '1', '2026-05-10 17:51:46', '1', '2026-05-14 08:14:09', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1061063, 3, '移库单', '3', 'wms_order_type', 0, 'primary', '', '', '1', '2026-05-10 17:51:46', '1', '2026-05-14 08:14:09', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1061064, 4, '盘库单', '4', 'wms_order_type', 0, 'warning', '', '', '1', '2026-05-10 17:51:46', '1', '2026-05-14 08:14:09', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1061071, 1, '草稿', '0', 'wms_order_status', 0, 'info', '', '草稿', '1', '2026-05-12 13:40:29', '1', '2026-05-12 13:40:29', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1061072, 2, '已完成', '4', 'wms_order_status', 0, 'success', '', '已完成', '1', '2026-05-12 13:40:29', '1', '2026-05-12 13:40:29', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1061073, 3, '已作废', '5', 'wms_order_status', 0, 'danger', '', '已作废', '1', '2026-05-12 13:40:29', '1', '2026-05-12 13:40:29', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1061081, 1, '生产入库', '100', 'wms_receipt_order_type', 0, 'success', '', '', '1', '2026-05-11 11:21:49', '1', '2026-05-14 02:21:20', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1061082, 2, '采购入库', '101', 'wms_receipt_order_type', 0, 'primary', '', '', '1', '2026-05-11 11:21:49', '1', '2026-05-14 02:21:20', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1061083, 3, '退货入库', '102', 'wms_receipt_order_type', 0, 'warning', '', '', '1', '2026-05-11 11:21:49', '1', '2026-05-14 02:21:20', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1061084, 4, '归还入库', '103', 'wms_receipt_order_type', 0, 'info', '', '', '1', '2026-05-13 16:02:33', '1', '2026-05-14 02:21:20', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1061091, 1, '退货出库', '200', 'wms_shipment_order_type', 0, 'warning', '', '退货出库', '1', '2026-05-12 17:48:35', '1', '2026-05-12 17:48:35', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1061092, 2, '销售出库', '201', 'wms_shipment_order_type', 0, 'primary', '', '销售出库', '1', '2026-05-12 17:48:35', '1', '2026-05-12 17:48:35', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1061093, 3, '生产出库', '202', 'wms_shipment_order_type', 0, 'success', '', '生产出库', '1', '2026-05-12 17:48:35', '1', '2026-05-12 17:48:35', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1061096, 1, '语音', '1', 'im_rtc_call_media_type', 0, '', '', '语音通话', 'admin', '2026-05-16 11:34:50', 'admin', '2026-05-16 11:34:50', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1061097, 2, '视频', '2', 'im_rtc_call_media_type', 0, '', '', '视频通话', 'admin', '2026-05-16 11:34:50', 'admin', '2026-05-16 11:34:50', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1061098, 1, '私聊', '1', 'im_rtc_call_conversation_type', 0, 'primary', '', '一对一私聊通话', 'admin', '2026-05-18 03:36:12', 'admin', '2026-05-18 03:36:12', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1061099, 2, '群聊', '2', 'im_rtc_call_conversation_type', 0, 'success', '', '群内多人通话', 'admin', '2026-05-18 03:36:12', 'admin', '2026-05-18 03:36:12', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1061100, 1, '创建', '10', 'im_rtc_call_status', 0, 'info', '', '通话已创建，等待接通', 'admin', '2026-05-18 03:36:12', 'admin', '2026-05-18 03:36:12', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1061101, 2, '进行中', '20', 'im_rtc_call_status', 0, 'primary', '', '已有人接通，通话中', 'admin', '2026-05-18 03:36:12', 'admin', '2026-05-18 03:36:12', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1061102, 3, '已结束', '30', 'im_rtc_call_status', 0, 'success', '', '通话结束', 'admin', '2026-05-18 03:36:12', 'admin', '2026-05-18 03:36:12', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1061103, 1, '通话结束', '1', 'im_rtc_call_end_reason', 0, 'success', '', '接通后任一方主动挂断', 'admin', '2026-05-18 03:36:12', 'admin', '2026-05-18 03:36:12', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1061104, 2, '已拒绝', '2', 'im_rtc_call_end_reason', 0, 'warning', '', '被叫接通前点拒接', 'admin', '2026-05-18 03:36:12', 'admin', '2026-05-18 03:36:12', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1061105, 3, '已取消', '3', 'im_rtc_call_end_reason', 0, 'info', '', '主叫接通前主动取消', 'admin', '2026-05-18 03:36:12', 'admin', '2026-05-18 03:36:12', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1061106, 4, '无人接听', '4', 'im_rtc_call_end_reason', 0, 'info', '', '振铃超时未接通', 'admin', '2026-05-18 03:36:12', 'admin', '2026-05-18 03:36:12', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1061107, 5, '对方正忙', '5', 'im_rtc_call_end_reason', 0, 'warning', '', '对方在另一通话中', 'admin', '2026-05-18 03:36:12', 'admin', '2026-05-18 03:36:12', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1061108, 6, '通话异常', '9', 'im_rtc_call_end_reason', 0, 'danger', '', '网络中断、设备失败等', 'admin', '2026-05-18 03:36:12', 'admin', '2026-05-18 03:36:12', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1061109, 1, '发起人', '1', 'im_rtc_participant_role', 0, 'primary', '', '通话发起者', 'admin', '2026-05-18 03:36:12', 'admin', '2026-05-18 03:36:12', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1061110, 2, '被邀请者', '2', 'im_rtc_participant_role', 0, 'info', '', '被邀请加入', 'admin', '2026-05-18 03:36:12', 'admin', '2026-05-18 03:36:12', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1061111, 3, '主动加入者', '3', 'im_rtc_participant_role', 0, 'success', '', '群通话场景，旁观者主动加入', 'admin', '2026-05-18 03:36:12', 'admin', '2026-05-18 03:36:12', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1061112, 1, '邀请中', '10', 'im_rtc_participant_status', 0, 'info', '', '已发出 invite，等待响应', 'admin', '2026-05-18 03:36:12', 'admin', '2026-05-18 03:36:12', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1061113, 2, '已加入', '20', 'im_rtc_participant_status', 0, 'primary', '', '已接通并进入房间', 'admin', '2026-05-18 03:36:12', 'admin', '2026-05-18 03:36:12', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1061114, 3, '已拒绝', '30', 'im_rtc_participant_status', 0, 'warning', '', '接通前点拒接', 'admin', '2026-05-18 03:36:12', 'admin', '2026-05-18 03:36:12', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1061115, 4, '未应答', '40', 'im_rtc_participant_status', 0, 'info', '', '通话已结束仍未应答', 'admin', '2026-05-18 03:36:12', 'admin', '2026-05-18 03:36:12', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1061116, 5, '已离开', '50', 'im_rtc_participant_status', 0, 'success', '', '接通后挂断 / 离开', 'admin', '2026-05-18 03:36:12', 'admin', '2026-05-18 03:36:12', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1061117, 1610, '通话开始', '1610', 'im_message_type', 0, 'info', '', '入消息流；私聊定向通知，群聊全员广播', 'admin', '2026-05-18 03:36:12', 'admin', '2026-05-18 03:36:12', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1061118, 1611, '通话结束', '1611', 'im_message_type', 0, 'info', '', '入消息流；私聊准气泡，群聊系统 tip', 'admin', '2026-05-18 03:36:12', 'admin', '2026-05-18 03:36:12', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1061119, 125, '素材', '125', 'im_message_type', 0, 'success', '', '频道运营推送的图文卡片消息', '1', '2026-05-18 13:14:34', '1', '2026-05-18 13:14:34', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1061120, 1, '富文本', '1', 'im_channel_material_type', 0, 'primary', '', '', '1', '2026-05-19 14:09:25', '1', '2026-05-19 14:09:25', '0');
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1061121, 2, '外链', '2', 'im_channel_material_type', 0, 'info', '', '', '1', '2026-05-19 14:09:25', '1', '2026-05-19 14:09:25', '0');
 COMMIT;
-SET IDENTITY_INSERT system_dict_data OFF;
 -- @formatter:on
+
+DROP SEQUENCE IF EXISTS system_dict_data_seq;
+CREATE SEQUENCE system_dict_data_seq
+    START 1061122;
 
 -- ----------------------------
 -- Table structure for system_dict_type
 -- ----------------------------
+DROP TABLE IF EXISTS system_dict_type;
 CREATE TABLE system_dict_type (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    name varchar(100) DEFAULT '' NULL,
-    type varchar(100) DEFAULT '' NULL,
-    status smallint DEFAULT 0 NOT NULL,
-    remark varchar(500) DEFAULT NULL NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted bit DEFAULT '0' NOT NULL,
-    deleted_time datetime DEFAULT NULL NULL
+    id int8 NOT NULL,
+  name varchar(100) NOT NULL DEFAULT '',
+  type varchar(100) NOT NULL DEFAULT '',
+  status int2 NOT NULL DEFAULT 0,
+  remark varchar(500) NULL DEFAULT NULL,
+  creator varchar(64) NULL DEFAULT '',
+  create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0,
+  deleted_time timestamp NULL DEFAULT NULL
 );
+
+ALTER TABLE system_dict_type ADD CONSTRAINT pk_system_dict_type PRIMARY KEY (id);
 
 COMMENT ON COLUMN system_dict_type.id IS '字典主键';
 COMMENT ON COLUMN system_dict_type.name IS '字典名称';
@@ -1593,7 +1802,7 @@ COMMENT ON TABLE system_dict_type IS '字典类型表';
 -- Records of system_dict_type
 -- ----------------------------
 -- @formatter:off
-SET IDENTITY_INSERT system_dict_type ON;
+BEGIN;
 INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1, '用户性别', 'system_user_sex', 0, NULL, 'admin', '2021-01-05 17:03:48', '1', '2022-05-16 20:29:32', '0', NULL);
 INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (6, '参数类型', 'infra_config_type', 0, NULL, 'admin', '2021-01-05 17:03:48', '', '2022-02-01 16:36:54', '0', NULL);
 INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (7, '通知类型', 'system_notice_type', 0, NULL, 'admin', '2021-01-05 17:03:48', '', '2022-02-01 16:35:26', '0', NULL);
@@ -1777,33 +1986,61 @@ INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_ti
 INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2131, 'MES 发货通知单状态', 'mes_wm_sales_notice_status', 0, 'MES 发货通知单状态', '1', '2026-03-30 08:54:30', '1', '2026-04-05 15:53:46', '0', NULL);
 INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2132, 'MES 杂项出库单状态', 'mes_wm_misc_issue_status', 0, '杂项出库单状态', '1', '2026-03-30 15:00:18', '1', '2026-04-05 15:05:41', '0', NULL);
 INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2133, 'MES 销售退货单状态', 'mes_wm_return_sales_status', 0, 'MES 销售退货单状态枚举', '1', '2026-04-03 17:20:25', '1', '2026-04-05 15:05:39', '0', NULL);
-INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2134, 'MES 缺陷检测项类型', 'mes_defect_type', 0, '缺陷模块的检测项类型字典', '1', '2026-04-04 12:49:51', '1', '2026-04-04 12:49:51', '0', NULL);
 INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2135, 'MES 上下工状态类型', 'mes_pro_work_record_type', 0, 'MES 上下工状态类型', '1', '2026-04-05 14:07:27', '1', '2026-04-05 14:07:27', '0', NULL);
 INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2138, 'MES 生产入库单状态', 'mes_wm_product_produce_status', 0, 'MES 生产入库单状态', '1', '2026-04-05 15:53:46', '1', '2026-04-05 15:53:46', '0', '1970-01-01 00:00:00');
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2200, 'IM 消息类型', 'im_message_type', 0, '对应 ImMessageTypeEnum', 'admin', '2026-04-30 11:35:07', 'admin', '2026-04-30 11:35:07', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2201, 'IM 私聊消息状态', 'im_private_message_status', 0, '对应 ImMessageStatusEnum；私聊 0=未读 / 2=已撤回 / 3=已读', 'admin', '2026-04-30 11:35:07', 'admin', '2026-04-30 15:14:36', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2202, 'IM 群消息回执状态', 'im_group_message_receipt_status', 0, '对应 ImGroupMessageReceiptStatusEnum', 'admin', '2026-04-30 11:35:07', 'admin', '2026-04-30 11:35:07', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2203, 'IM 好友状态', 'im_friend_status', 0, '0=正常 / 1=已删除', 'admin', '2026-04-30 11:35:07', 'admin', '2026-04-30 11:35:07', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2204, 'IM 群状态', 'im_group_status', 0, '0=正常 / 1=已解散', 'admin', '2026-04-30 11:35:07', 'admin', '2026-04-30 11:35:07', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2205, 'IM 群聊消息状态', 'im_group_message_status', 0, '对应 ImMessageStatusEnum；群聊 0=正常 / 2=已撤回（无未读概念）', 'admin', '2026-04-30 15:14:36', 'admin', '2026-04-30 15:14:36', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2206, 'IM 群成员角色', 'im_group_member_role', 0, NULL, '1', '2026-05-02 02:14:12', '1', '2026-05-02 02:14:12', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2207, 'IM 好友添加来源', 'im_friend_add_source', 0, NULL, '1', '2026-05-04 02:43:41', '1', '2026-05-04 02:43:41', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2208, 'IM 好友申请处理结果', 'im_friend_request_handle_result', 0, NULL, '1', '2026-05-04 02:43:41', '1', '2026-05-04 02:43:41', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2209, 'IM 加群来源', 'im_group_add_source', 0, NULL, '', '2026-05-06 09:26:36', '', '2026-05-06 09:26:36', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (2210, 'IM 加群申请处理结果', 'im_group_request_handle_result', 0, NULL, '', '2026-05-06 09:26:36', '', '2026-05-06 09:26:36', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1061050, '往来企业类型', 'merchant_type', 0, 'WMS 往来企业类型', '1', '2026-05-10 15:26:09', '1', '2026-05-10 15:26:09', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1061060, 'WMS 单据类型', 'wms_order_type', 0, 'WMS 单据类型', '1', '2026-05-10 17:51:46', '1', '2026-05-14 08:14:09', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1061070, 'WMS 单据状态', 'wms_order_status', 0, 'WMS 单据状态', '1', '2026-05-12 13:40:29', '1', '2026-05-12 13:40:29', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1061080, '入库单类型', 'wms_receipt_order_type', 0, 'WMS 入库单类型', '1', '2026-05-11 11:21:49', '1', '2026-05-12 13:40:29', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1061090, '出库单类型', 'wms_shipment_order_type', 0, 'WMS 出库单类型', '1', '2026-05-12 17:48:35', '1', '2026-05-12 17:48:35', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1061092, 'IM 通话媒体类型', 'im_rtc_call_media_type', 0, NULL, 'admin', '2026-05-16 11:34:50', 'admin', '2026-05-16 11:34:50', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1061093, 'IM 通话会话类型', 'im_rtc_call_conversation_type', 0, '1=私聊；2=群聊', 'admin', '2026-05-18 03:36:12', 'admin', '2026-05-18 03:36:12', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1061094, 'IM 通话状态', 'im_rtc_call_status', 0, '10=创建；20=进行中；30=已结束', 'admin', '2026-05-18 03:36:12', 'admin', '2026-05-18 03:36:12', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1061095, 'IM 通话结束原因', 'im_rtc_call_end_reason', 0, '1=通话结束；2=已拒绝；3=已取消；4=无人接听；5=对方正忙；9=通话异常', 'admin', '2026-05-18 03:36:12', 'admin', '2026-05-18 03:36:12', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1061096, 'IM 通话参与角色', 'im_rtc_participant_role', 0, '1=发起人；2=被邀请者；3=主动加入者', 'admin', '2026-05-18 03:36:12', 'admin', '2026-05-18 03:36:12', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1061097, 'IM 通话参与状态', 'im_rtc_participant_status', 0, '10=邀请中；20=已加入；30=已拒绝；40=未应答；50=已离开', 'admin', '2026-05-18 03:36:12', 'admin', '2026-05-18 03:36:12', '0', NULL);
+INSERT INTO system_dict_type (id, name, type, status, remark, creator, create_time, updater, update_time, deleted, deleted_time) VALUES (1061098, 'IM 频道素材内容类型', 'im_channel_material_type', 0, '1=站内富文本 / 2=外链', '1', '2026-05-19 14:09:25', '1', '2026-05-19 14:09:25', '0', NULL);
 COMMIT;
-SET IDENTITY_INSERT system_dict_type OFF;
 -- @formatter:on
+
+DROP SEQUENCE IF EXISTS system_dict_type_seq;
+CREATE SEQUENCE system_dict_type_seq
+    START 1061099;
 
 -- ----------------------------
 -- Table structure for system_login_log
 -- ----------------------------
+DROP TABLE IF EXISTS system_login_log;
 CREATE TABLE system_login_log (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    log_type bigint  NOT NULL,
-    trace_id varchar(64) DEFAULT '' NULL,
-    user_id bigint DEFAULT 0 NOT NULL,
-    user_type smallint DEFAULT 0 NOT NULL,
-    username varchar(50) DEFAULT '' NULL,
-    result smallint  NOT NULL,
-    user_ip varchar(50)  NOT NULL,
-    user_agent varchar(512)  NOT NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted bit DEFAULT '0' NOT NULL,
-    tenant_id bigint DEFAULT 0 NOT NULL
+    id int8 NOT NULL,
+  log_type int8 NOT NULL,
+  trace_id varchar(64) NOT NULL DEFAULT '',
+  user_id int8 NOT NULL DEFAULT 0,
+  user_type int2 NOT NULL DEFAULT 0,
+  username varchar(50) NOT NULL DEFAULT '',
+  result int2 NOT NULL,
+  user_ip varchar(50) NOT NULL,
+  user_agent varchar(512) NOT NULL,
+  creator varchar(64) NULL DEFAULT '',
+  create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0,
+  tenant_id int8 NOT NULL DEFAULT 0
 );
+
+ALTER TABLE system_login_log ADD CONSTRAINT pk_system_login_log PRIMARY KEY (id);
 
 CREATE INDEX idx_system_login_log_01 ON system_login_log (username);
 CREATE INDEX idx_system_login_log_02 ON system_login_log (create_time);
@@ -1825,24 +2062,31 @@ COMMENT ON COLUMN system_login_log.deleted IS '是否删除';
 COMMENT ON COLUMN system_login_log.tenant_id IS '租户编号';
 COMMENT ON TABLE system_login_log IS '系统访问记录';
 
+DROP SEQUENCE IF EXISTS system_login_log_seq;
+CREATE SEQUENCE system_login_log_seq
+    START 1;
+
 -- ----------------------------
 -- Table structure for system_mail_account
 -- ----------------------------
+DROP TABLE IF EXISTS system_mail_account;
 CREATE TABLE system_mail_account (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    mail varchar(255)  NOT NULL,
-    username varchar(255)  NOT NULL,
-    password varchar(255)  NOT NULL,
-    host varchar(255)  NOT NULL,
-    port int  NOT NULL,
-    ssl_enable bit DEFAULT '0' NOT NULL,
-    starttls_enable bit DEFAULT '0' NOT NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted bit DEFAULT '0' NOT NULL
+    id int8 NOT NULL,
+  mail varchar(255) NOT NULL,
+  username varchar(255) NOT NULL,
+  password varchar(255) NOT NULL,
+  host varchar(255) NOT NULL,
+  port int4 NOT NULL,
+  ssl_enable bool NOT NULL DEFAULT '0',
+  starttls_enable bool NOT NULL DEFAULT '0',
+  creator varchar(64) NULL DEFAULT '',
+  create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0
 );
+
+ALTER TABLE system_mail_account ADD CONSTRAINT pk_system_mail_account PRIMARY KEY (id);
 
 COMMENT ON COLUMN system_mail_account.id IS '主键';
 COMMENT ON COLUMN system_mail_account.mail IS '邮箱';
@@ -1863,43 +2107,49 @@ COMMENT ON TABLE system_mail_account IS '邮箱账号表';
 -- Records of system_mail_account
 -- ----------------------------
 -- @formatter:off
-SET IDENTITY_INSERT system_mail_account ON;
+BEGIN;
 INSERT INTO system_mail_account (id, mail, username, password, host, port, ssl_enable, starttls_enable, creator, create_time, updater, update_time, deleted) VALUES (1, '7684413@qq.com', '7684413@qq.com', '1234576', '127.0.0.1', 8080, '0', '0', '1', '2023-01-25 17:39:52', '1', '2025-04-04 16:34:40', '0');
 INSERT INTO system_mail_account (id, mail, username, password, host, port, ssl_enable, starttls_enable, creator, create_time, updater, update_time, deleted) VALUES (2, 'ydym_test@163.com', 'ydym_test@163.com', 'WBZTEINMIFVRYSOE', 'smtp.163.com', 465, '1', '0', '1', '2023-01-26 01:26:03', '1', '2025-12-20 18:09:32', '0');
 INSERT INTO system_mail_account (id, mail, username, password, host, port, ssl_enable, starttls_enable, creator, create_time, updater, update_time, deleted) VALUES (3, '76854114@qq.com', '3335', '11234', 'yunai1.cn', 466, '0', '0', '1', '2023-01-27 15:06:38', '1', '2023-01-27 07:08:36', '1');
 INSERT INTO system_mail_account (id, mail, username, password, host, port, ssl_enable, starttls_enable, creator, create_time, updater, update_time, deleted) VALUES (4, '7685413x@qq.com', '2', '3', '4', 5, '1', '0', '1', '2023-04-12 23:05:06', '1', '2023-04-12 15:05:11', '1');
 COMMIT;
-SET IDENTITY_INSERT system_mail_account OFF;
 -- @formatter:on
+
+DROP SEQUENCE IF EXISTS system_mail_account_seq;
+CREATE SEQUENCE system_mail_account_seq
+    START 5;
 
 -- ----------------------------
 -- Table structure for system_mail_log
 -- ----------------------------
+DROP TABLE IF EXISTS system_mail_log;
 CREATE TABLE system_mail_log (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    user_id bigint DEFAULT NULL NULL,
-    user_type smallint DEFAULT NULL NULL,
-    to_mails varchar(1024)  NOT NULL,
-    cc_mails varchar(1024) DEFAULT NULL NULL,
-    bcc_mails varchar(1024) DEFAULT NULL NULL,
-    account_id bigint  NOT NULL,
-    from_mail varchar(255)  NOT NULL,
-    template_id bigint  NOT NULL,
-    template_code varchar(63)  NOT NULL,
-    template_nickname varchar(255) DEFAULT NULL NULL,
-    template_title varchar(255)  NOT NULL,
-    template_content text  NOT NULL,
-    template_params varchar(255)  NOT NULL,
-    send_status smallint DEFAULT 0 NOT NULL,
-    send_time datetime DEFAULT NULL NULL,
-    send_message_id varchar(255) DEFAULT NULL NULL,
-    send_exception varchar(4096) DEFAULT NULL NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted bit DEFAULT '0' NOT NULL
+    id int8 NOT NULL,
+  user_id int8 NULL DEFAULT NULL,
+  user_type int2 NULL DEFAULT NULL,
+  to_mails varchar(1024) NOT NULL,
+  cc_mails varchar(1024) NULL DEFAULT NULL,
+  bcc_mails varchar(1024) NULL DEFAULT NULL,
+  account_id int8 NOT NULL,
+  from_mail varchar(255) NOT NULL,
+  template_id int8 NOT NULL,
+  template_code varchar(63) NOT NULL,
+  template_nickname varchar(255) NULL DEFAULT NULL,
+  template_title varchar(255) NOT NULL,
+  template_content text NOT NULL,
+  template_params varchar(255) NOT NULL,
+  send_status int2 NOT NULL DEFAULT 0,
+  send_time timestamp NULL DEFAULT NULL,
+  send_message_id varchar(255) NULL DEFAULT NULL,
+  send_exception varchar(4096) NULL DEFAULT NULL,
+  creator varchar(64) NULL DEFAULT '',
+  create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0
 );
+
+ALTER TABLE system_mail_log ADD CONSTRAINT pk_system_mail_log PRIMARY KEY (id);
 
 COMMENT ON COLUMN system_mail_log.id IS '编号';
 COMMENT ON COLUMN system_mail_log.user_id IS '用户编号';
@@ -1926,26 +2176,33 @@ COMMENT ON COLUMN system_mail_log.update_time IS '更新时间';
 COMMENT ON COLUMN system_mail_log.deleted IS '是否删除';
 COMMENT ON TABLE system_mail_log IS '邮件日志表';
 
+DROP SEQUENCE IF EXISTS system_mail_log_seq;
+CREATE SEQUENCE system_mail_log_seq
+    START 1;
+
 -- ----------------------------
 -- Table structure for system_mail_template
 -- ----------------------------
+DROP TABLE IF EXISTS system_mail_template;
 CREATE TABLE system_mail_template (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    name varchar(63)  NOT NULL,
-    code varchar(63)  NOT NULL,
-    account_id bigint  NOT NULL,
-    nickname varchar(255) DEFAULT NULL NULL,
-    title varchar(255)  NOT NULL,
-    content varchar(10240)  NOT NULL,
-    params varchar(255)  NOT NULL,
-    status smallint  NOT NULL,
-    remark varchar(255) DEFAULT NULL NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted bit DEFAULT '0' NOT NULL
+    id int8 NOT NULL,
+  name varchar(63) NOT NULL,
+  code varchar(63) NOT NULL,
+  account_id int8 NOT NULL,
+  nickname varchar(255) NULL DEFAULT NULL,
+  title varchar(255) NOT NULL,
+  content varchar(10240) NOT NULL,
+  params varchar(255) NOT NULL,
+  status int2 NOT NULL,
+  remark varchar(255) NULL DEFAULT NULL,
+  creator varchar(64) NULL DEFAULT '',
+  create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0
 );
+
+ALTER TABLE system_mail_template ADD CONSTRAINT pk_system_mail_template PRIMARY KEY (id);
 
 COMMENT ON COLUMN system_mail_template.id IS '编号';
 COMMENT ON COLUMN system_mail_template.name IS '模板名称';
@@ -1968,38 +2225,44 @@ COMMENT ON TABLE system_mail_template IS '邮件模版表';
 -- Records of system_mail_template
 -- ----------------------------
 -- @formatter:off
-SET IDENTITY_INSERT system_mail_template ON;
+BEGIN;
 INSERT INTO system_mail_template (id, name, code, account_id, nickname, title, content, params, status, remark, creator, create_time, updater, update_time, deleted) VALUES (13, '后台用户短信登录', 'admin-sms-login', 1, '奥特曼', '你猜我猜', '<p>您的验证码是{code}，名字是{name}</p>', '["code","name"]', 0, '3', '1', '2021-10-11 08:10:00', '1', '2023-12-02 19:51:14', '0');
 INSERT INTO system_mail_template (id, name, code, account_id, nickname, title, content, params, status, remark, creator, create_time, updater, update_time, deleted) VALUES (14, '测试模版', 'test_01', 2, '芋艿', '一个标题', '<p>你是 {key01} 吗？</p><p><br></p><p>是的话，赶紧 {key02} 一下！</p>', '["key01","key02"]', 0, NULL, '1', '2023-01-26 01:27:40', '1', '2025-07-26 21:48:45', '0');
 INSERT INTO system_mail_template (id, name, code, account_id, nickname, title, content, params, status, remark, creator, create_time, updater, update_time, deleted) VALUES (15, '3', '2', 2, '7', '4', '<p>45</p>', '[]', 1, '80', '1', '2023-01-27 15:50:35', '1', '2025-07-26 21:47:49', '1');
 COMMIT;
-SET IDENTITY_INSERT system_mail_template OFF;
 -- @formatter:on
+
+DROP SEQUENCE IF EXISTS system_mail_template_seq;
+CREATE SEQUENCE system_mail_template_seq
+    START 16;
 
 -- ----------------------------
 -- Table structure for system_menu
 -- ----------------------------
+DROP TABLE IF EXISTS system_menu;
 CREATE TABLE system_menu (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    name varchar(50)  NOT NULL,
-    permission varchar(100) DEFAULT '' NULL,
-    type smallint  NOT NULL,
-    sort int DEFAULT 0 NOT NULL,
-    parent_id bigint DEFAULT 0 NOT NULL,
-    path varchar(200) DEFAULT '' NULL,
-    icon varchar(100) DEFAULT '#' NULL,
-    component varchar(255) DEFAULT NULL NULL,
-    component_name varchar(255) DEFAULT NULL NULL,
-    status smallint DEFAULT 0 NOT NULL,
-    visible bit DEFAULT '1' NOT NULL,
-    keep_alive bit DEFAULT '1' NOT NULL,
-    always_show bit DEFAULT '1' NOT NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted bit DEFAULT '0' NOT NULL
+    id int8 NOT NULL,
+  name varchar(50) NOT NULL,
+  permission varchar(100) NOT NULL DEFAULT '',
+  type int2 NOT NULL,
+  sort int4 NOT NULL DEFAULT 0,
+  parent_id int8 NOT NULL DEFAULT 0,
+  path varchar(200) NULL DEFAULT '',
+  icon varchar(100) NULL DEFAULT '#',
+  component varchar(255) NULL DEFAULT NULL,
+  component_name varchar(255) NULL DEFAULT NULL,
+  status int2 NOT NULL DEFAULT 0,
+  visible bool NOT NULL DEFAULT '1',
+  keep_alive bool NOT NULL DEFAULT '1',
+  always_show bool NOT NULL DEFAULT '1',
+  creator varchar(64) NULL DEFAULT '',
+  create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0
 );
+
+ALTER TABLE system_menu ADD CONSTRAINT pk_system_menu PRIMARY KEY (id);
 
 COMMENT ON COLUMN system_menu.id IS '菜单ID';
 COMMENT ON COLUMN system_menu.name IS '菜单名称';
@@ -2026,7 +2289,7 @@ COMMENT ON TABLE system_menu IS '菜单权限表';
 -- Records of system_menu
 -- ----------------------------
 -- @formatter:off
-SET IDENTITY_INSERT system_menu ON;
+BEGIN;
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (1, '系统管理', '', 1, 10, 0, '/system', 'ep:tools', NULL, NULL, 0, '1', '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2025-03-15 21:30:27', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (2, '基础设施', '', 1, 20, 0, '/infra', 'ep:monitor', NULL, NULL, 0, '1', '1', '1', 'admin', '2021-01-05 17:03:48', '1', '2024-03-01 08:28:40', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5, 'OA 示例', '', 1, 40, 1185, 'oa', 'fa:road', NULL, NULL, 0, '1', '1', '1', 'admin', '2021-09-20 16:26:19', '1', '2024-02-29 12:38:13', '0');
@@ -2953,7 +3216,7 @@ INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5034, 'OTA 固件创建', 'iot:ota-firmware:create', 3, 2, 5032, '', '', '', '', 0, '1', '1', '1', '', '2025-06-30 07:50:29', '"1"', '2025-06-30 17:38:21', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5035, 'OTA 固件更新', 'iot:ota-firmware:update', 3, 3, 5032, '', '', '', '', 0, '1', '1', '1', '', '2025-06-30 07:50:29', '"1"', '2025-06-30 17:38:29', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5036, 'OTA 固件删除', 'iot:ota-firmware:delete', 3, 4, 5032, '', '', '', '', 0, '1', '1', '1', '', '2025-06-30 07:50:29', '"1"', '2025-06-30 17:38:37', '0');
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5037, 'OTA 升级任务查询', 'iot:ota-task:create', 3, 11, 5032, '', '', '', '', 0, '1', '1', '1', '1', '2025-07-02 23:56:56', '1', '2025-07-02 23:56:56', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5037, 'OTA 升级任务查询', 'iot:ota-task:query', 3, 11, 5032, '', '', '', '', 0, '1', '1', '1', '1', '2025-07-02 23:56:56', '1', '2026-05-19 08:48:53', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5038, 'OTA 升级任务取消', 'iot:ota-task:cancel', 3, 13, 5032, '', '', '', '', 0, '1', '1', '1', '1', '2025-07-02 23:57:26', '1', '2025-07-02 23:57:26', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5039, 'OTA 升级任务创建', 'iot:ota-task:create', 3, 12, 5032, '', '', '', '', 0, '1', '1', '1', '1', '2025-07-02 23:57:52', '1', '2025-07-02 23:57:52', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5040, 'OTA 升级记录查询', 'iot:ota-task-record:query', 3, 21, 5032, '', '', '', '', 0, '1', '1', '1', '1', '2025-07-02 23:58:30', '1', '2025-07-02 23:58:30', '0');
@@ -2963,7 +3226,7 @@ INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5044, '删除模版消息', 'mp:message-template:delete', 3, 2, 5042, '', '', '', '', 0, '1', '1', '1', '1', '2025-11-26 17:00:31', '1', '2025-11-26 18:45:05', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5045, '同步公众号模板', 'mp:message-template:sync', 3, 3, 5042, '', '', '', '', 0, '1', '1', '1', '1', '2025-11-26 17:00:55', '1', '2025-11-26 17:00:55', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5046, '给粉丝发送模版消息', 'mp:message-template:send', 3, 4, 5042, '', '', '', '', 0, '1', '1', '1', '1', '2025-11-26 17:01:11', '1', '2025-11-26 17:01:11', '0');
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5100, 'MES 系统', '', 1, 500, 0, '/mes', 'ep:cpu', '', '', 0, '1', '1', '1', '1', '2026-02-15 00:39:57', '1', '2026-04-05 23:22:56', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5100, 'MES 系统', '', 1, 320, 0, '/mes', 'ep:cpu', '', '', 0, '1', '1', '1', '1', '2026-02-15 00:39:57', '1', '2026-05-09 16:19:51', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5101, '基础数据', '', 1, 10, 5100, 'md', 'ep:data-analysis', '', '', 0, '1', '1', '1', '1', '2026-02-15 00:40:13', '1', '2026-02-15 00:40:13', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5110, '物料产品分类', '', 2, 2, 5101, 'item-type', 'ep:files', 'mes/md/item/type/index', 'MesMdItemType', 0, '1', '1', '1', '1', '2026-02-15 00:40:13', '1', '2026-02-15 13:58:29', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5111, '分类查询', 'mes:md-item-type:query', 3, 1, 5110, '', '', '', '', 0, '1', '1', '1', '1', '2026-02-15 00:40:13', '1', '2026-02-15 00:40:13', '0');
@@ -3348,26 +3611,152 @@ INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5983, '工作记录导出', 'mes:pro-workrecord:export', 3, 2, 5981, '', '', '', '', 0, '1', '1', '1', '1', '2026-04-05 14:08:44', '1', '2026-04-05 14:08:44', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5984, '上工下工', 'mes:pro-workrecord:clock', 3, 3, 5981, '', '', '', '', 0, '1', '1', '1', '1', '2026-04-05 14:08:44', '1', '2026-04-05 14:08:44', '0');
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (5985, 'MES 首页', 'mes:home:query', 2, 0, 5100, 'mes/home/index', 'ep:home-filled', 'mes/home/index', 'MesHome', 0, '1', '1', '1', '1', '2026-04-05 23:24:03', '1', '2026-04-06 01:20:52', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6400, 'WMS 系统', '', 1, 310, 0, '/wms', 'ep:box', '', '', 0, '1', '1', '1', '1', '2026-05-09 16:11:01', '1', '2026-05-09 16:11:01', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6401, '基础数据', '', 1, 6, 6400, 'md', 'ep:files', '', '', 0, '1', '1', '1', '1', '2026-05-09 16:11:01', '1', '2026-05-12 17:48:35', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6402, '仓库管理', '', 2, 1, 6401, 'warehouse', 'ep:office-building', 'wms/md/warehouse/index', 'WmsWarehouse', 0, '1', '1', '1', '1', '2026-05-09 16:11:01', '1', '2026-05-10 00:54:16', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6403, '仓库查询', 'wms:warehouse:query', 3, 1, 6402, '', '', '', '', 0, '1', '1', '1', '1', '2026-05-09 16:11:01', '1', '2026-05-09 16:11:01', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6404, '仓库创建', 'wms:warehouse:create', 3, 2, 6402, '', '', '', '', 0, '1', '1', '1', '1', '2026-05-09 16:11:01', '1', '2026-05-09 16:11:01', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6405, '仓库更新', 'wms:warehouse:update', 3, 3, 6402, '', '', '', '', 0, '1', '1', '1', '1', '2026-05-09 16:11:01', '1', '2026-05-09 16:11:01', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6406, '仓库删除', 'wms:warehouse:delete', 3, 4, 6402, '', '', '', '', 0, '1', '1', '1', '1', '2026-05-09 16:11:01', '1', '2026-05-09 16:11:01', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6411, '商品品牌', '', 2, 3, 6401, 'item/brand', 'ep:price-tag', 'wms/md/item/brand/index', 'WmsItemBrand', 0, '1', '1', '1', '1', '2026-05-10 01:43:12', '1', '2026-05-10 02:12:51', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6412, '品牌查询', 'wms:item-brand:query', 3, 1, 6411, '', '', '', '', 0, '1', '1', '1', '1', '2026-05-10 01:43:12', '1', '2026-05-10 01:43:12', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6413, '品牌创建', 'wms:item-brand:create', 3, 2, 6411, '', '', '', '', 0, '1', '1', '1', '1', '2026-05-10 01:43:12', '1', '2026-05-10 01:43:12', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6414, '品牌更新', 'wms:item-brand:update', 3, 3, 6411, '', '', '', '', 0, '1', '1', '1', '1', '2026-05-10 01:43:12', '1', '2026-05-10 01:43:12', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6415, '品牌删除', 'wms:item-brand:delete', 3, 4, 6411, '', '', '', '', 0, '1', '1', '1', '1', '2026-05-10 01:43:12', '1', '2026-05-10 01:43:12', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6416, '品牌导出', 'wms:item-brand:export', 3, 5, 6411, '', '', '', '', 0, '1', '1', '1', '1', '2026-05-10 01:43:12', '1', '2026-05-10 01:43:12', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6417, '仓库导出', 'wms:warehouse:export', 3, 5, 6402, '', '', '', '', 0, '1', '1', '1', '1', '2026-05-10 02:42:47', '1', '2026-05-10 02:42:47', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6419, '商品分类', '', 2, 2, 6401, 'item/category', 'ep:folder', 'wms/md/item/category/index', 'WmsItemCategory', 0, '1', '1', '1', '1', '2026-05-10 07:14:18', '1', '2026-05-10 07:14:18', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6420, '分类查询', 'wms:item-category:query', 3, 1, 6419, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-05-10 07:14:18', '1', '2026-05-10 07:14:18', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6421, '分类创建', 'wms:item-category:create', 3, 2, 6419, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-05-10 07:14:18', '1', '2026-05-10 07:14:18', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6422, '分类更新', 'wms:item-category:update', 3, 3, 6419, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-05-10 07:14:18', '1', '2026-05-10 07:14:18', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6423, '分类删除', 'wms:item-category:delete', 3, 4, 6419, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-05-10 07:14:18', '1', '2026-05-10 07:14:18', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6424, '商品管理', '', 2, 4, 6401, 'item', 'ep:goods', 'wms/md/item/index', 'WmsItem', 0, '1', '1', '1', '1', '2026-05-10 09:15:34', '1', '2026-05-10 09:15:34', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6425, '商品查询', 'wms:item:query', 3, 1, 6424, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-05-10 09:15:34', '1', '2026-05-10 09:15:34', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6426, '商品创建', 'wms:item:create', 3, 2, 6424, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-05-10 09:15:34', '1', '2026-05-10 09:15:34', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6427, '商品更新', 'wms:item:update', 3, 3, 6424, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-05-10 09:15:34', '1', '2026-05-10 09:15:34', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6428, '商品删除', 'wms:item:delete', 3, 4, 6424, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-05-10 09:15:34', '1', '2026-05-10 09:15:34', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6429, '商品导出', 'wms:item:export', 3, 5, 6424, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-05-10 09:15:34', '1', '2026-05-10 09:15:34', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6430, '往来企业', '', 2, 5, 6401, 'merchant', 'ep:office-building', 'wms/md/merchant/index', 'WmsMerchant', 0, '1', '1', '1', '1', '2026-05-10 15:26:09', '1', '2026-05-10 15:48:07', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6431, '往来企业查询', 'wms:merchant:query', 3, 1, 6430, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-05-10 15:26:09', '1', '2026-05-10 15:26:09', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6432, '往来企业创建', 'wms:merchant:create', 3, 2, 6430, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-05-10 15:26:09', '1', '2026-05-10 15:26:09', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6433, '往来企业更新', 'wms:merchant:update', 3, 3, 6430, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-05-10 15:26:09', '1', '2026-05-10 15:26:09', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6434, '往来企业删除', 'wms:merchant:delete', 3, 4, 6430, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-05-10 15:26:09', '1', '2026-05-10 15:26:09', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6435, '往来企业导出', 'wms:merchant:export', 3, 5, 6430, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-05-10 15:26:09', '1', '2026-05-10 15:26:09', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6440, '库存管理', '', 1, 5, 6400, 'inventory', 'ep:box', '', '', 0, '1', '1', '1', '1', '2026-05-10 17:51:46', '1', '2026-05-13 01:23:11', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6441, '库存统计', '', 2, 1, 6440, 'index', 'ep:data-board', 'wms/inventory/index/index', 'WmsInventory', 0, '1', '1', '1', '1', '2026-05-10 17:51:46', '1', '2026-05-11 02:08:28', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6442, '库存统计查询', 'wms:inventory:query', 3, 1, 6441, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-05-10 17:51:46', '1', '2026-05-11 00:30:41', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6445, '库存流水', '', 2, 2, 6440, 'history', 'ep:document', 'wms/inventory/history/index', 'WmsInventoryHistory', 0, '1', '1', '1', '1', '2026-05-10 17:51:46', '1', '2026-05-14 07:59:15', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6446, '库存流水查询', 'wms:inventory-history:query', 3, 1, 6445, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-05-10 17:51:46', '1', '2026-05-11 00:29:15', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6451, '入库管理', '', 2, 1, 6400, 'receipt', 'ep:download', 'wms/order/receipt/index', 'WmsReceiptOrder', 0, '1', '1', '1', '1', '2026-05-11 11:58:58', '1', '2026-05-11 16:58:02', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6452, '入库单查询', 'wms:receipt-order:query', 3, 1, 6451, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-05-11 11:58:58', '1', '2026-05-11 16:58:02', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6453, '入库单创建', 'wms:receipt-order:create', 3, 2, 6451, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-05-11 11:58:58', '1', '2026-05-11 16:58:02', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6454, '入库单更新', 'wms:receipt-order:update', 3, 3, 6451, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-05-11 11:58:58', '1', '2026-05-11 16:58:02', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6455, '入库单删除', 'wms:receipt-order:delete', 3, 4, 6451, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-05-11 11:58:58', '1', '2026-05-11 16:58:02', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6456, '入库单完成入库', 'wms:receipt-order:complete', 3, 5, 6451, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-05-11 11:58:58', '1', '2026-05-11 16:58:02', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6457, '入库单作废', 'wms:receipt-order:cancel', 3, 6, 6451, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-05-11 11:58:58', '1', '2026-05-12 16:27:16', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6458, '入库单导出', 'wms:receipt-order:export', 3, 7, 6451, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-05-11 16:58:02', '1', '2026-05-12 16:27:16', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6461, '出库管理', '', 2, 2, 6400, 'shipment', 'ep:upload', 'wms/order/shipment/index', 'WmsShipmentOrder', 0, '1', '1', '1', '1', '2026-05-12 17:48:35', '1', '2026-05-12 17:48:35', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6462, '出库单查询', 'wms:shipment-order:query', 3, 1, 6461, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-05-12 17:48:35', '1', '2026-05-12 17:48:35', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6463, '出库单创建', 'wms:shipment-order:create', 3, 2, 6461, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-05-12 17:48:35', '1', '2026-05-12 17:48:35', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6464, '出库单更新', 'wms:shipment-order:update', 3, 3, 6461, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-05-12 17:48:35', '1', '2026-05-12 17:48:35', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6465, '出库单删除', 'wms:shipment-order:delete', 3, 4, 6461, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-05-12 17:48:35', '1', '2026-05-12 17:48:35', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6466, '出库单完成出库', 'wms:shipment-order:complete', 3, 5, 6461, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-05-12 17:48:35', '1', '2026-05-12 17:48:35', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6467, '出库单作废', 'wms:shipment-order:cancel', 3, 6, 6461, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-05-12 17:48:35', '1', '2026-05-12 17:48:35', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6468, '出库单导出', 'wms:shipment-order:export', 3, 7, 6461, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-05-12 17:48:35', '1', '2026-05-12 17:48:35', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6470, '移库管理', '', 2, 3, 6400, 'movement', 'ep:sort', 'wms/order/movement/index', 'WmsMovementOrder', 0, '1', '1', '1', '1', '2026-05-13 01:23:11', '1', '2026-05-14 02:21:20', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6471, '移库单查询', 'wms:movement-order:query', 3, 1, 6470, '', '#', NULL, NULL, 0, '1', '1', '1', '1', '2026-05-13 01:23:11', '1', '2026-05-14 02:21:20', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6472, '移库单创建', 'wms:movement-order:create', 3, 2, 6470, '', '#', NULL, NULL, 0, '1', '1', '1', '1', '2026-05-13 01:23:11', '1', '2026-05-14 02:21:20', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6473, '移库单更新', 'wms:movement-order:update', 3, 3, 6470, '', '#', NULL, NULL, 0, '1', '1', '1', '1', '2026-05-13 01:23:11', '1', '2026-05-14 02:21:20', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6474, '移库单删除', 'wms:movement-order:delete', 3, 4, 6470, '', '#', NULL, NULL, 0, '1', '1', '1', '1', '2026-05-13 01:23:11', '1', '2026-05-14 02:21:20', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6475, '移库单完成移库', 'wms:movement-order:complete', 3, 5, 6470, '', '#', NULL, NULL, 0, '1', '1', '1', '1', '2026-05-13 01:23:11', '1', '2026-05-14 02:21:20', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6476, '移库单作废', 'wms:movement-order:cancel', 3, 6, 6470, '', '#', NULL, NULL, 0, '1', '1', '1', '1', '2026-05-13 01:23:11', '1', '2026-05-14 02:21:20', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6477, '移库单导出', 'wms:movement-order:export', 3, 7, 6470, '', '#', NULL, NULL, 0, '1', '1', '1', '1', '2026-05-13 01:23:11', '1', '2026-05-14 02:21:20', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6480, '盘库管理', '', 2, 4, 6400, 'check', 'ep:circle-check-filled', 'wms/order/check/index', 'WmsCheckOrder', 0, '1', '1', '1', '1', '2026-05-13 01:23:11', '1', '2026-05-14 02:21:20', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6481, '盘库单查询', 'wms:check-order:query', 3, 1, 6480, '', '#', NULL, NULL, 0, '1', '1', '1', '1', '2026-05-13 01:23:11', '1', '2026-05-14 02:21:20', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6482, '盘库单创建', 'wms:check-order:create', 3, 2, 6480, '', '#', NULL, NULL, 0, '1', '1', '1', '1', '2026-05-13 01:23:11', '1', '2026-05-14 02:21:20', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6483, '盘库单更新', 'wms:check-order:update', 3, 3, 6480, '', '#', NULL, NULL, 0, '1', '1', '1', '1', '2026-05-13 01:23:11', '1', '2026-05-14 02:21:20', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6484, '盘库单删除', 'wms:check-order:delete', 3, 4, 6480, '', '#', NULL, NULL, 0, '1', '1', '1', '1', '2026-05-13 01:23:11', '1', '2026-05-14 02:21:20', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6485, '盘库单完成盘库', 'wms:check-order:complete', 3, 5, 6480, '', '#', NULL, NULL, 0, '1', '1', '1', '1', '2026-05-13 01:23:11', '1', '2026-05-14 02:21:20', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6486, '盘库单作废', 'wms:check-order:cancel', 3, 6, 6480, '', '#', NULL, NULL, 0, '1', '1', '1', '1', '2026-05-13 01:23:11', '1', '2026-05-14 02:21:20', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6487, '盘库单导出', 'wms:check-order:export', 3, 7, 6480, '', '#', NULL, NULL, 0, '1', '1', '1', '1', '2026-05-13 01:23:11', '1', '2026-05-14 02:21:20', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6490, 'WMS 首页', 'wms:home:query', 2, 0, 6400, 'home', 'ep:home-filled', 'wms/home/index', 'WmsHome', 0, '1', '1', '1', '1', '2026-05-14 09:34:27', '1', '2026-05-14 10:05:06', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6500, 'IM 即时通讯', '', 1, 501, 0, '/im', 'ep:chat-dot-round', NULL, NULL, 0, '1', '1', '1', 'admin', '2026-04-30 09:11:20', '1', '2026-05-09 16:19:34', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6510, '数据统计', 'im:manager:statistics:query', 2, 10, 6500, 'statistics', 'ep:trend-charts', 'im/manager/statistics/index', 'ImStatistics', 0, '1', '1', '1', 'admin', '2026-04-30 09:11:20', '1', '2026-04-30 19:35:54', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6515, '好友申请', 'im:manager:friend-request:query', 2, 20, 6600, 'friend-request', 'ep:document', 'im/manager/friend/request/index', 'ImFriendRequest', 0, '1', '1', '1', '1', '2026-05-05 11:15:48', '1', '2026-05-07 00:40:35', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6520, '好友列表', 'im:manager:friend:list', 2, 10, 6600, 'friend', 'ep:user', 'im/manager/friend/index', 'ImFriend', 0, '1', '1', '1', 'admin', '2026-04-30 09:11:20', '1', '2026-05-07 00:40:35', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6521, '好友查询', 'im:manager:friend:query', 3, 10, 6520, '', '', NULL, NULL, 0, '1', '1', '1', 'admin', '2026-04-30 09:11:20', 'admin', '2026-04-30 09:11:20', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6530, '好友消息', 'im:manager:message:private:list', 2, 30, 6600, 'message', 'ep:chat-dot-square', 'im/manager/message/private/index', 'ImPrivateMessage', 0, '1', '1', '1', 'admin', '2026-04-30 09:11:20', '1', '2026-05-07 00:40:35', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6531, '私聊消息查询', 'im:manager:message:query', 3, 10, 6530, '', '', NULL, NULL, 0, '1', '1', '1', 'admin', '2026-04-30 09:11:20', 'admin', '2026-04-30 09:11:20', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6540, '群聊列表', 'im:manager:group:list', 2, 10, 6610, 'list', 'ep:user-filled', 'im/manager/group/index', 'ImGroup', 0, '1', '1', '1', 'admin', '2026-04-30 09:11:20', '1', '2026-05-07 00:40:35', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6541, '群组查询', 'im:manager:group:query', 3, 10, 6540, '', '', NULL, NULL, 0, '1', '1', '1', 'admin', '2026-04-30 09:11:20', 'admin', '2026-04-30 09:11:20', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6542, '群组封禁/解封', 'im:manager:group:ban', 3, 20, 6540, '', '', NULL, NULL, 0, '1', '1', '1', 'admin', '2026-04-30 09:11:20', 'admin', '2026-04-30 09:11:20', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6545, '群聊申请', 'im:manager:group-request:query', 2, 20, 6610, 'request', 'ep:document', 'im/manager/group/request/index', 'ImGroupRequest', 0, '1', '1', '1', '1', '2026-05-07 00:31:35', '1', '2026-05-07 00:40:35', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6550, '群聊消息', 'im:manager:message:group:list', 2, 30, 6610, 'message', 'ep:chat-line-round', 'im/manager/message/group/index', 'ImGroupMessage', 0, '1', '1', '1', 'admin', '2026-04-30 09:11:20', '1', '2026-05-07 00:40:35', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6551, '群聊消息查询', 'im:manager:message:query', 3, 10, 6550, '', '', NULL, NULL, 0, '1', '1', '1', 'admin', '2026-04-30 09:11:20', 'admin', '2026-04-30 09:11:20', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6560, '敏感词管理', 'im:manager:sensitive-word:list', 2, 60, 6500, 'sensitive-word', 'ep:warning', 'im/manager/sensitiveword/index', 'ImSensitiveWord', 0, '1', '1', '1', 'admin', '2026-04-30 09:11:20', '1', '2026-04-30 22:25:48', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6561, '敏感词查询', 'im:manager:sensitive-word:query', 3, 10, 6560, '', '', NULL, NULL, 0, '1', '1', '1', 'admin', '2026-04-30 09:11:20', 'admin', '2026-04-30 09:11:20', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6562, '敏感词新增', 'im:manager:sensitive-word:create', 3, 20, 6560, '', '', NULL, NULL, 0, '1', '1', '1', 'admin', '2026-04-30 09:11:20', 'admin', '2026-04-30 09:11:20', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6563, '敏感词修改', 'im:manager:sensitive-word:update', 3, 30, 6560, '', '', NULL, NULL, 0, '1', '1', '1', 'admin', '2026-04-30 09:11:20', 'admin', '2026-04-30 09:11:20', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6564, '敏感词删除', 'im:manager:sensitive-word:delete', 3, 40, 6560, '', '', NULL, NULL, 0, '1', '1', '1', 'admin', '2026-04-30 09:11:20', 'admin', '2026-04-30 09:11:20', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6570, '表情管理', '', 1, 70, 6500, 'face', 'ep:magic-stick', NULL, NULL, 0, '1', '1', '1', '', '2026-05-06 13:56:08', '', '2026-05-06 13:56:08', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6571, '系统表情', 'im:manager:face-pack:list', 2, 10, 6570, 'pack', 'ep:picture', 'im/manager/face/pack/index', 'ImManagerFacePack', 0, '1', '1', '1', '', '2026-05-06 13:56:08', '', '2026-05-06 13:56:08', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6572, '表情包查询', 'im:manager:face-pack:query', 3, 10, 6571, '', '', '', '', 0, '1', '1', '1', '', '2026-05-06 13:56:08', '', '2026-05-06 13:56:08', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6573, '表情包创建', 'im:manager:face-pack:create', 3, 20, 6571, '', '', '', '', 0, '1', '1', '1', '', '2026-05-06 13:56:08', '', '2026-05-06 13:56:08', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6574, '表情包修改', 'im:manager:face-pack:update', 3, 30, 6571, '', '', '', '', 0, '1', '1', '1', '', '2026-05-06 13:56:08', '', '2026-05-06 13:56:08', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6575, '表情包删除', 'im:manager:face-pack:delete', 3, 40, 6571, '', '', '', '', 0, '1', '1', '1', '', '2026-05-06 13:56:08', '', '2026-05-06 13:56:08', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6576, '表情图查询', 'im:manager:face-pack-item:query', 3, 50, 6571, '', '', '', '', 0, '1', '1', '1', '', '2026-05-06 13:56:08', '', '2026-05-06 13:56:08', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6577, '表情图创建', 'im:manager:face-pack-item:create', 3, 60, 6571, '', '', '', '', 0, '1', '1', '1', '', '2026-05-06 13:56:08', '', '2026-05-06 13:56:08', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6578, '表情图修改', 'im:manager:face-pack-item:update', 3, 70, 6571, '', '', '', '', 0, '1', '1', '1', '', '2026-05-06 13:56:08', '', '2026-05-06 13:56:08', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6579, '表情图删除', 'im:manager:face-pack-item:delete', 3, 80, 6571, '', '', '', '', 0, '1', '1', '1', '', '2026-05-06 13:56:08', '', '2026-05-06 13:56:08', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6580, '用户表情', 'im:manager:face-user-item:list', 2, 20, 6570, 'user-item', 'ep:user', 'im/manager/face/userItem/index', 'ImManagerFaceUserItem', 0, '1', '1', '1', '', '2026-05-06 13:56:08', '', '2026-05-06 14:24:20', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6581, '用户表情查询', 'im:manager:face-user-item:query', 3, 10, 6580, '', '', '', '', 0, '1', '1', '1', '', '2026-05-06 13:56:08', '', '2026-05-06 13:56:08', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6582, '用户表情删除', 'im:manager:face-user-item:delete', 3, 20, 6580, '', '', '', '', 0, '1', '1', '1', '', '2026-05-06 13:56:08', '', '2026-05-06 13:56:08', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6600, '私聊管理', '', 1, 20, 6500, 'private', 'ep:chat-round', NULL, NULL, 0, '1', '1', '1', '1', '2026-05-07 00:40:35', '1', '2026-05-07 00:40:35', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6610, '群聊管理', '', 1, 30, 6500, 'group', 'ep:chat-line-round', NULL, NULL, 0, '1', '1', '1', '1', '2026-05-07 00:40:35', '1', '2026-05-07 00:40:35', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6611, '通话记录', '', 2, 40, 6500, 'rtc', 'ep:phone', 'im/manager/rtc/index', 'ImRtcCall', 0, '1', '1', '1', 'admin', '2026-05-18 03:36:12', 'admin', '2026-05-18 03:36:12', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6612, '通话记录查询', 'im:manager:rtc:query', 3, 1, 6611, '', '', NULL, NULL, 0, '1', '1', '1', 'admin', '2026-05-18 03:36:12', 'admin', '2026-05-18 03:36:12', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6700, '频道管理', '', 1, 90, 6500, 'channel', 'ep:promotion', NULL, NULL, 0, '1', '1', '1', '1', '2026-05-18 13:14:34', '1', '2026-05-18 13:14:34', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6710, '频道列表', '', 2, 1, 6700, 'list', 'ep:promotion', 'im/manager/channel/list/index', 'ImChannel', 0, '1', '1', '1', '1', '2026-05-18 13:14:34', '1', '2026-05-19 09:44:34', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6711, '频道查询', 'im:manager:channel:query', 3, 1, 6710, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-05-18 13:14:34', '1', '2026-05-18 13:14:34', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6712, '频道创建', 'im:manager:channel:create', 3, 2, 6710, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-05-18 13:14:34', '1', '2026-05-18 13:14:34', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6713, '频道修改', 'im:manager:channel:update', 3, 3, 6710, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-05-18 13:14:34', '1', '2026-05-18 13:14:34', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6714, '频道删除', 'im:manager:channel:delete', 3, 4, 6710, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-05-18 13:14:34', '1', '2026-05-18 13:14:34', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6720, '频道素材', '', 2, 2, 6700, 'material', 'ep:document', 'im/manager/channel/material/index', 'ImChannelMaterial', 0, '1', '1', '1', '1', '2026-05-18 13:14:34', '1', '2026-05-19 09:44:34', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6721, '素材查询', 'im:manager:channel-material:query', 3, 1, 6720, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-05-18 13:14:34', '1', '2026-05-18 13:14:34', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6722, '素材创建', 'im:manager:channel-material:create', 3, 2, 6720, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-05-18 13:14:34', '1', '2026-05-18 13:14:34', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6723, '素材修改', 'im:manager:channel-material:update', 3, 3, 6720, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-05-18 13:14:34', '1', '2026-05-18 13:14:34', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6724, '素材删除', 'im:manager:channel-material:delete', 3, 4, 6720, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-05-18 13:14:34', '1', '2026-05-18 13:14:34', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6730, '频道消息', '', 2, 3, 6700, 'message', 'ep:message', 'im/manager/channel/message/index', 'ImChannelMessage', 0, '1', '1', '1', '1', '2026-05-18 13:14:34', '1', '2026-05-19 09:44:34', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6731, '消息查询', 'im:manager:channel-message:query', 3, 1, 6730, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-05-18 13:14:34', '1', '2026-05-18 13:14:34', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6732, '立即推送', 'im:manager:channel-message:send', 3, 2, 6730, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-05-18 13:14:34', '1', '2026-05-18 13:14:34', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6733, '消息删除', 'im:manager:channel-message:delete', 3, 3, 6730, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-05-18 13:14:34', '1', '2026-05-18 13:14:34', '0');
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (6734, '解散群', 'im:manager:group:dissolve', 3, 21, 6540, '', '', '', NULL, 0, '1', '1', '1', '1', '2026-05-24 12:02:38', '1', '2026-05-24 12:02:38', '0');
 COMMIT;
-SET IDENTITY_INSERT system_menu OFF;
 -- @formatter:on
+
+DROP SEQUENCE IF EXISTS system_menu_seq;
+CREATE SEQUENCE system_menu_seq
+    START 6735;
 
 -- ----------------------------
 -- Table structure for system_notice
 -- ----------------------------
+DROP TABLE IF EXISTS system_notice;
 CREATE TABLE system_notice (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    title varchar(50)  NOT NULL,
-    content text  NOT NULL,
-    type smallint  NOT NULL,
-    status smallint DEFAULT 0 NOT NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted bit DEFAULT '0' NOT NULL,
-    tenant_id bigint DEFAULT 0 NOT NULL
+    id int8 NOT NULL,
+  title varchar(50) NOT NULL,
+  content text NOT NULL,
+  type int2 NOT NULL,
+  status int2 NOT NULL DEFAULT 0,
+  creator varchar(64) NULL DEFAULT '',
+  create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0,
+  tenant_id int8 NOT NULL DEFAULT 0
 );
+
+ALTER TABLE system_notice ADD CONSTRAINT pk_system_notice PRIMARY KEY (id);
 
 COMMENT ON COLUMN system_notice.id IS '公告ID';
 COMMENT ON COLUMN system_notice.title IS '公告标题';
@@ -3386,36 +3775,42 @@ COMMENT ON TABLE system_notice IS '通知公告表';
 -- Records of system_notice
 -- ----------------------------
 -- @formatter:off
-SET IDENTITY_INSERT system_notice ON;
+BEGIN;
 INSERT INTO system_notice (id, title, content, type, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1, '芋道的公众', '<p>新版本内容133222</p>', 1, 0, 'admin', '2021-01-05 17:03:48', '"1"', '2025-08-31 09:38:22', '0', 1);
-INSERT INTO system_notice (id, title, content, type, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2, '维护通知：2018-07-01 系统凌晨维护', '<p><img src="http://test.yudao.iocoder.cn/b7cb3cf49b4b3258bf7309a09dd2f4e5.jpg" alt="" data-href="">11112222<img src="http://test.yudao.iocoder.cn/fe44fc7bdb82ca421184b2eebbaee9e2148d4a1827479a4eb4521e11d2a062ba.png" alt="image" data-href="http://test.yudao.iocoder.cn/fe44fc7bdb82ca421184b2eebbaee9e2148d4a1827479a4eb4521e11d2a062ba.png">3333</p>', 2, 1, 'admin', '2021-01-05 17:03:48', '1', '2025-04-18 23:56:40', '0', 1);
+INSERT INTO system_notice (id, title, content, type, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2, '维护通知：2018-07-01 系统凌晨维护', '<p><img src="http://test.yudao.iocoder.cn/b7cb3cf49b4b3258bf7309a09dd2f4e5.jpg" alt="" data-href="">11112222<img src="http://test.yudao.iocoder.cn/fe44fc7bdb82ca421184b2eebbaee9e2148d4a1827479a4eb4521e11d2a062ba.png" alt="image" data-href="http://test.yudao.iocoder.cn/fe44fc7bdb82ca421184b2eebbaee9e2148d4a1827479a4eb4521e11d2a062ba.png">3333</p>\n<p><img src="http://test.yudao.iocoder.cn/20260503/备份.jpg" alt="" width="258" height="258"><img src="http://test.yudao.iocoder.cn/20260503/萌萌的皮卡丘.png"></p>', 2, 1, 'admin', '2021-01-05 17:03:48', '1', '2026-05-03 23:07:48', '0', 1);
 INSERT INTO system_notice (id, title, content, type, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4, '我是测试标题', '<p>哈哈哈哈123</p>', 1, 0, '110', '2022-02-22 01:01:25', '110', '2022-02-22 01:01:46', '0', 121);
 COMMIT;
-SET IDENTITY_INSERT system_notice OFF;
 -- @formatter:on
+
+DROP SEQUENCE IF EXISTS system_notice_seq;
+CREATE SEQUENCE system_notice_seq
+    START 5;
 
 -- ----------------------------
 -- Table structure for system_notify_message
 -- ----------------------------
+DROP TABLE IF EXISTS system_notify_message;
 CREATE TABLE system_notify_message (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    user_id bigint  NOT NULL,
-    user_type smallint  NOT NULL,
-    template_id bigint  NOT NULL,
-    template_code varchar(64)  NOT NULL,
-    template_nickname varchar(63)  NOT NULL,
-    template_content varchar(1024)  NOT NULL,
-    template_type int  NOT NULL,
-    template_params varchar(255)  NOT NULL,
-    read_status bit  NOT NULL,
-    read_time datetime DEFAULT NULL NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted bit DEFAULT '0' NOT NULL,
-    tenant_id bigint DEFAULT 0 NOT NULL
+    id int8 NOT NULL,
+  user_id int8 NOT NULL,
+  user_type int2 NOT NULL,
+  template_id int8 NOT NULL,
+  template_code varchar(64) NOT NULL,
+  template_nickname varchar(63) NOT NULL,
+  template_content varchar(1024) NOT NULL,
+  template_type int4 NOT NULL,
+  template_params varchar(255) NOT NULL,
+  read_status bool NOT NULL,
+  read_time timestamp NULL DEFAULT NULL,
+  creator varchar(64) NULL DEFAULT '',
+  create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0,
+  tenant_id int8 NOT NULL DEFAULT 0
 );
+
+ALTER TABLE system_notify_message ADD CONSTRAINT pk_system_notify_message PRIMARY KEY (id);
 
 CREATE INDEX idx_system_notify_message_01 ON system_notify_message (user_id, user_type, read_status);
 
@@ -3442,7 +3837,7 @@ COMMENT ON TABLE system_notify_message IS '站内信消息表';
 -- Records of system_notify_message
 -- ----------------------------
 -- @formatter:off
-SET IDENTITY_INSERT system_notify_message ON;
+BEGIN;
 INSERT INTO system_notify_message (id, user_id, user_type, template_id, template_code, template_nickname, template_content, template_type, template_params, read_status, read_time, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2, 1, 2, 1, 'test', '123', '我是 1，我开始 2 了', 1, '{"name":"1","what":"2"}', '1', '2025-12-15 21:24:36', '1', '2023-01-28 11:44:08', '1', '2025-12-15 21:24:36', '0', 1);
 INSERT INTO system_notify_message (id, user_id, user_type, template_id, template_code, template_nickname, template_content, template_type, template_params, read_status, read_time, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3, 1, 2, 1, 'test', '123', '我是 1，我开始 2 了', 1, '{"name":"1","what":"2"}', '1', '2025-12-15 21:24:36', '1', '2023-01-28 11:45:04', '1', '2025-12-15 21:24:36', '0', 1);
 INSERT INTO system_notify_message (id, user_id, user_type, template_id, template_code, template_nickname, template_content, template_type, template_params, read_status, read_time, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4, 103, 2, 2, 'register', '系统消息', '你好，欢迎 哈哈 加入大家庭！', 2, '{"name":"哈哈"}', '0', NULL, '1', '2023-01-28 21:02:20', '1', '2023-01-28 21:02:20', '0', 1);
@@ -3453,28 +3848,34 @@ INSERT INTO system_notify_message (id, user_id, user_type, template_id, template
 INSERT INTO system_notify_message (id, user_id, user_type, template_id, template_code, template_nickname, template_content, template_type, template_params, read_status, read_time, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (9, 247, 1, 4, 'brokerage_withdraw_audit_approve', 'system', '您在2023-09-28 08:35:46提现￥0.09元的申请已通过审核', 2, '{"reason":null,"createTime":"2023-09-28 08:35:46","price":"0.09"}', '0', NULL, '1', '2023-09-28 16:36:22', '1', '2023-09-28 16:36:22', '0', 1);
 INSERT INTO system_notify_message (id, user_id, user_type, template_id, template_code, template_nickname, template_content, template_type, template_params, read_status, read_time, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (10, 247, 1, 4, 'brokerage_withdraw_audit_approve', 'system', '您在2023-09-30 20:59:40提现￥1.00元的申请已通过审核', 2, '{"reason":null,"createTime":"2023-09-30 20:59:40","price":"1.00"}', '0', NULL, '1', '2023-10-03 12:11:34', '1', '2023-10-03 12:11:34', '0', 1);
 COMMIT;
-SET IDENTITY_INSERT system_notify_message OFF;
 -- @formatter:on
+
+DROP SEQUENCE IF EXISTS system_notify_message_seq;
+CREATE SEQUENCE system_notify_message_seq
+    START 11;
 
 -- ----------------------------
 -- Table structure for system_notify_template
 -- ----------------------------
+DROP TABLE IF EXISTS system_notify_template;
 CREATE TABLE system_notify_template (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    name varchar(63)  NOT NULL,
-    code varchar(64)  NOT NULL,
-    nickname varchar(255)  NOT NULL,
-    content varchar(1024)  NOT NULL,
-    type smallint  NOT NULL,
-    params varchar(255) DEFAULT NULL NULL,
-    status smallint  NOT NULL,
-    remark varchar(255) DEFAULT NULL NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted bit DEFAULT '0' NOT NULL
+    id int8 NOT NULL,
+  name varchar(63) NOT NULL,
+  code varchar(64) NOT NULL,
+  nickname varchar(255) NOT NULL,
+  content varchar(1024) NOT NULL,
+  type int2 NOT NULL,
+  params varchar(255) NULL DEFAULT NULL,
+  status int2 NOT NULL,
+  remark varchar(255) NULL DEFAULT NULL,
+  creator varchar(64) NULL DEFAULT '',
+  create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0
 );
+
+ALTER TABLE system_notify_template ADD CONSTRAINT pk_system_notify_template PRIMARY KEY (id);
 
 COMMENT ON COLUMN system_notify_template.id IS '主键';
 COMMENT ON COLUMN system_notify_template.name IS '模板名称';
@@ -3492,26 +3893,33 @@ COMMENT ON COLUMN system_notify_template.update_time IS '更新时间';
 COMMENT ON COLUMN system_notify_template.deleted IS '是否删除';
 COMMENT ON TABLE system_notify_template IS '站内信模板表';
 
+DROP SEQUENCE IF EXISTS system_notify_template_seq;
+CREATE SEQUENCE system_notify_template_seq
+    START 1;
+
 -- ----------------------------
 -- Table structure for system_oauth2_access_token
 -- ----------------------------
+DROP TABLE IF EXISTS system_oauth2_access_token;
 CREATE TABLE system_oauth2_access_token (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    user_id bigint  NOT NULL,
-    user_type smallint  NOT NULL,
-    user_info varchar(512)  NOT NULL,
-    access_token varchar(255)  NOT NULL,
-    refresh_token varchar(32)  NOT NULL,
-    client_id varchar(255)  NOT NULL,
-    scopes varchar(255) DEFAULT NULL NULL,
-    expires_time datetime  NOT NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted bit DEFAULT '0' NOT NULL,
-    tenant_id bigint DEFAULT 0 NOT NULL
+    id int8 NOT NULL,
+  user_id int8 NOT NULL,
+  user_type int2 NOT NULL,
+  user_info varchar(512) NOT NULL,
+  access_token varchar(255) NOT NULL,
+  refresh_token varchar(32) NOT NULL,
+  client_id varchar(255) NOT NULL,
+  scopes varchar(255) NULL DEFAULT NULL,
+  expires_time timestamp NOT NULL,
+  creator varchar(64) NULL DEFAULT '',
+  create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0,
+  tenant_id int8 NOT NULL DEFAULT 0
 );
+
+ALTER TABLE system_oauth2_access_token ADD CONSTRAINT pk_system_oauth2_access_token PRIMARY KEY (id);
 
 CREATE INDEX idx_system_oauth2_access_token_01 ON system_oauth2_access_token (access_token);
 CREATE INDEX idx_system_oauth2_access_token_02 ON system_oauth2_access_token (refresh_token);
@@ -3533,24 +3941,31 @@ COMMENT ON COLUMN system_oauth2_access_token.deleted IS '是否删除';
 COMMENT ON COLUMN system_oauth2_access_token.tenant_id IS '租户编号';
 COMMENT ON TABLE system_oauth2_access_token IS 'OAuth2 访问令牌';
 
+DROP SEQUENCE IF EXISTS system_oauth2_access_token_seq;
+CREATE SEQUENCE system_oauth2_access_token_seq
+    START 1;
+
 -- ----------------------------
 -- Table structure for system_oauth2_approve
 -- ----------------------------
+DROP TABLE IF EXISTS system_oauth2_approve;
 CREATE TABLE system_oauth2_approve (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    user_id bigint  NOT NULL,
-    user_type smallint  NOT NULL,
-    client_id varchar(255)  NOT NULL,
-    scope varchar(255) DEFAULT '' NULL,
-    approved bit DEFAULT '0' NOT NULL,
-    expires_time datetime  NOT NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted bit DEFAULT '0' NOT NULL,
-    tenant_id bigint DEFAULT 0 NOT NULL
+    id int8 NOT NULL,
+  user_id int8 NOT NULL,
+  user_type int2 NOT NULL,
+  client_id varchar(255) NOT NULL,
+  scope varchar(255) NOT NULL DEFAULT '',
+  approved bool NOT NULL DEFAULT '0',
+  expires_time timestamp NOT NULL,
+  creator varchar(64) NULL DEFAULT '',
+  create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0,
+  tenant_id int8 NOT NULL DEFAULT 0
 );
+
+ALTER TABLE system_oauth2_approve ADD CONSTRAINT pk_system_oauth2_approve PRIMARY KEY (id);
 
 CREATE INDEX idx_system_oauth2_approve_01 ON system_oauth2_approve (user_id, user_type, client_id);
 
@@ -3569,32 +3984,39 @@ COMMENT ON COLUMN system_oauth2_approve.deleted IS '是否删除';
 COMMENT ON COLUMN system_oauth2_approve.tenant_id IS '租户编号';
 COMMENT ON TABLE system_oauth2_approve IS 'OAuth2 批准表';
 
+DROP SEQUENCE IF EXISTS system_oauth2_approve_seq;
+CREATE SEQUENCE system_oauth2_approve_seq
+    START 1;
+
 -- ----------------------------
 -- Table structure for system_oauth2_client
 -- ----------------------------
+DROP TABLE IF EXISTS system_oauth2_client;
 CREATE TABLE system_oauth2_client (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    client_id varchar(255)  NOT NULL,
-    secret varchar(255)  NOT NULL,
-    name varchar(255)  NOT NULL,
-    logo varchar(255)  NOT NULL,
-    description varchar(255) DEFAULT NULL NULL,
-    status smallint  NOT NULL,
-    access_token_validity_seconds int  NOT NULL,
-    refresh_token_validity_seconds int  NOT NULL,
-    redirect_uris varchar(255)  NOT NULL,
-    authorized_grant_types varchar(255)  NOT NULL,
-    scopes varchar(255) DEFAULT NULL NULL,
-    auto_approve_scopes varchar(255) DEFAULT NULL NULL,
-    authorities varchar(255) DEFAULT NULL NULL,
-    resource_ids varchar(255) DEFAULT NULL NULL,
-    additional_information varchar(4096) DEFAULT NULL NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted bit DEFAULT '0' NOT NULL
+    id int8 NOT NULL,
+  client_id varchar(255) NOT NULL,
+  secret varchar(255) NOT NULL,
+  name varchar(255) NOT NULL,
+  logo varchar(255) NOT NULL,
+  description varchar(255) NULL DEFAULT NULL,
+  status int2 NOT NULL,
+  access_token_validity_seconds int4 NOT NULL,
+  refresh_token_validity_seconds int4 NOT NULL,
+  redirect_uris varchar(255) NOT NULL,
+  authorized_grant_types varchar(255) NOT NULL,
+  scopes varchar(255) NULL DEFAULT NULL,
+  auto_approve_scopes varchar(255) NULL DEFAULT NULL,
+  authorities varchar(255) NULL DEFAULT NULL,
+  resource_ids varchar(255) NULL DEFAULT NULL,
+  additional_information varchar(4096) NULL DEFAULT NULL,
+  creator varchar(64) NULL DEFAULT '',
+  create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0
 );
+
+ALTER TABLE system_oauth2_client ADD CONSTRAINT pk_system_oauth2_client PRIMARY KEY (id);
 
 CREATE INDEX idx_system_oauth2_client_01 ON system_oauth2_client (client_id);
 
@@ -3625,35 +4047,41 @@ COMMENT ON TABLE system_oauth2_client IS 'OAuth2 客户端表';
 -- Records of system_oauth2_client
 -- ----------------------------
 -- @formatter:off
-SET IDENTITY_INSERT system_oauth2_client ON;
+BEGIN;
 INSERT INTO system_oauth2_client (id, client_id, secret, name, logo, description, status, access_token_validity_seconds, refresh_token_validity_seconds, redirect_uris, authorized_grant_types, scopes, auto_approve_scopes, authorities, resource_ids, additional_information, creator, create_time, updater, update_time, deleted) VALUES (1, 'default', 'admin123', '芋道源码', 'http://test.yudao.iocoder.cn/20250502/sort2_1746189740718.png', '我是描述', 0, 1800, 2592000, '["https://www.iocoder.cn","https://doc.iocoder.cn"]', '["password","authorization_code","implicit","refresh_token","client_credentials"]', '["user.read","user.write"]', '[]', '["user.read","user.write"]', '[]', '{}', '1', '2022-05-11 21:47:12', '1', '2025-12-07 20:07:09', '0');
 INSERT INTO system_oauth2_client (id, client_id, secret, name, logo, description, status, access_token_validity_seconds, refresh_token_validity_seconds, redirect_uris, authorized_grant_types, scopes, auto_approve_scopes, authorities, resource_ids, additional_information, creator, create_time, updater, update_time, deleted) VALUES (40, 'test', 'test2', 'biubiu', 'http://test.yudao.iocoder.cn/20251227/javayuanma_1766829882970.jpg', '啦啦啦啦', 0, 1800, 43200, '["https://www.iocoder.cn"]', '["password","authorization_code","implicit"]', '["user_info","projects"]', '["user_info"]', '[]', '[]', '{}', '1', '2022-05-12 00:28:20', '1', '2025-12-27 18:04:44', '0');
 INSERT INTO system_oauth2_client (id, client_id, secret, name, logo, description, status, access_token_validity_seconds, refresh_token_validity_seconds, redirect_uris, authorized_grant_types, scopes, auto_approve_scopes, authorities, resource_ids, additional_information, creator, create_time, updater, update_time, deleted) VALUES (41, 'yudao-sso-demo-by-code', 'test', '基于授权码模式，如何实现 SSO 单点登录？', 'http://test.yudao.iocoder.cn/it/20250502/sign_1746181948685.png', NULL, 0, 1800, 43200, '["http://127.0.0.1:18080"]', '["authorization_code","refresh_token"]', '["user.read","user.write"]', '[]', '[]', '[]', NULL, '1', '2022-09-29 13:28:31', '1', '2025-05-02 18:32:30', '0');
 INSERT INTO system_oauth2_client (id, client_id, secret, name, logo, description, status, access_token_validity_seconds, refresh_token_validity_seconds, redirect_uris, authorized_grant_types, scopes, auto_approve_scopes, authorities, resource_ids, additional_information, creator, create_time, updater, update_time, deleted) VALUES (42, 'yudao-sso-demo-by-password', 'test', '基于密码模式，如何实现 SSO 单点登录？', 'http://test.yudao.iocoder.cn/20251025/images (3)_1761360515810.jpeg', NULL, 0, 1800, 43200, '["http://127.0.0.1:18080"]', '["password","refresh_token"]', '["user.read","user.write"]', '[]', '[]', '[]', NULL, '1', '2022-10-04 17:40:16', '1', '2025-10-25 10:49:40', '0');
 COMMIT;
-SET IDENTITY_INSERT system_oauth2_client OFF;
 -- @formatter:on
+
+DROP SEQUENCE IF EXISTS system_oauth2_client_seq;
+CREATE SEQUENCE system_oauth2_client_seq
+    START 43;
 
 -- ----------------------------
 -- Table structure for system_oauth2_code
 -- ----------------------------
+DROP TABLE IF EXISTS system_oauth2_code;
 CREATE TABLE system_oauth2_code (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    user_id bigint  NOT NULL,
-    user_type smallint  NOT NULL,
-    code varchar(32)  NOT NULL,
-    client_id varchar(255)  NOT NULL,
-    scopes varchar(255) DEFAULT '' NULL,
-    expires_time datetime  NOT NULL,
-    redirect_uri varchar(255) DEFAULT NULL NULL,
-    state varchar(255) DEFAULT '' NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted bit DEFAULT '0' NOT NULL,
-    tenant_id bigint DEFAULT 0 NOT NULL
+    id int8 NOT NULL,
+  user_id int8 NOT NULL,
+  user_type int2 NOT NULL,
+  code varchar(32) NOT NULL,
+  client_id varchar(255) NOT NULL,
+  scopes varchar(255) NULL DEFAULT '',
+  expires_time timestamp NOT NULL,
+  redirect_uri varchar(255) NULL DEFAULT NULL,
+  state varchar(255) NOT NULL DEFAULT '',
+  creator varchar(64) NULL DEFAULT '',
+  create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0,
+  tenant_id int8 NOT NULL DEFAULT 0
 );
+
+ALTER TABLE system_oauth2_code ADD CONSTRAINT pk_system_oauth2_code PRIMARY KEY (id);
 
 CREATE INDEX idx_system_oauth2_code_01 ON system_oauth2_code (code);
 
@@ -3674,24 +4102,31 @@ COMMENT ON COLUMN system_oauth2_code.deleted IS '是否删除';
 COMMENT ON COLUMN system_oauth2_code.tenant_id IS '租户编号';
 COMMENT ON TABLE system_oauth2_code IS 'OAuth2 授权码表';
 
+DROP SEQUENCE IF EXISTS system_oauth2_code_seq;
+CREATE SEQUENCE system_oauth2_code_seq
+    START 1;
+
 -- ----------------------------
 -- Table structure for system_oauth2_refresh_token
 -- ----------------------------
+DROP TABLE IF EXISTS system_oauth2_refresh_token;
 CREATE TABLE system_oauth2_refresh_token (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    user_id bigint  NOT NULL,
-    refresh_token varchar(32)  NOT NULL,
-    user_type smallint  NOT NULL,
-    client_id varchar(255)  NOT NULL,
-    scopes varchar(255) DEFAULT NULL NULL,
-    expires_time datetime  NOT NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted bit DEFAULT '0' NOT NULL,
-    tenant_id bigint DEFAULT 0 NOT NULL
+    id int8 NOT NULL,
+  user_id int8 NOT NULL,
+  refresh_token varchar(32) NOT NULL,
+  user_type int2 NOT NULL,
+  client_id varchar(255) NOT NULL,
+  scopes varchar(255) NULL DEFAULT NULL,
+  expires_time timestamp NOT NULL,
+  creator varchar(64) NULL DEFAULT '',
+  create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0,
+  tenant_id int8 NOT NULL DEFAULT 0
 );
+
+ALTER TABLE system_oauth2_refresh_token ADD CONSTRAINT pk_system_oauth2_refresh_token PRIMARY KEY (id);
 
 CREATE INDEX idx_system_oauth2_refresh_token_01 ON system_oauth2_refresh_token (refresh_token);
 
@@ -3710,31 +4145,38 @@ COMMENT ON COLUMN system_oauth2_refresh_token.deleted IS '是否删除';
 COMMENT ON COLUMN system_oauth2_refresh_token.tenant_id IS '租户编号';
 COMMENT ON TABLE system_oauth2_refresh_token IS 'OAuth2 刷新令牌';
 
+DROP SEQUENCE IF EXISTS system_oauth2_refresh_token_seq;
+CREATE SEQUENCE system_oauth2_refresh_token_seq
+    START 1;
+
 -- ----------------------------
 -- Table structure for system_operate_log
 -- ----------------------------
+DROP TABLE IF EXISTS system_operate_log;
 CREATE TABLE system_operate_log (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    trace_id varchar(64) DEFAULT '' NULL,
-    user_id bigint  NOT NULL,
-    user_type smallint DEFAULT 0 NOT NULL,
-    type varchar(50)  NOT NULL,
-    sub_type varchar(50)  NOT NULL,
-    biz_id bigint  NOT NULL,
-    action varchar(2000) DEFAULT '' NULL,
-    success bit DEFAULT '1' NOT NULL,
-    extra varchar(2000) DEFAULT '' NULL,
-    request_method varchar(16) DEFAULT '' NULL,
-    request_url varchar(255) DEFAULT '' NULL,
-    user_ip varchar(50) DEFAULT NULL NULL,
-    user_agent varchar(512) DEFAULT NULL NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted bit DEFAULT '0' NOT NULL,
-    tenant_id bigint DEFAULT 0 NOT NULL
+    id int8 NOT NULL,
+  trace_id varchar(64) NOT NULL DEFAULT '',
+  user_id int8 NOT NULL,
+  user_type int2 NOT NULL DEFAULT 0,
+  type varchar(50) NOT NULL,
+  sub_type varchar(50) NOT NULL,
+  biz_id int8 NOT NULL,
+  action varchar(2000) NOT NULL DEFAULT '',
+  success bool NOT NULL DEFAULT '1',
+  extra varchar(2000) NOT NULL DEFAULT '',
+  request_method varchar(16) NULL DEFAULT '',
+  request_url varchar(255) NULL DEFAULT '',
+  user_ip varchar(50) NULL DEFAULT NULL,
+  user_agent varchar(512) NULL DEFAULT NULL,
+  creator varchar(64) NULL DEFAULT '',
+  create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0,
+  tenant_id int8 NOT NULL DEFAULT 0
 );
+
+ALTER TABLE system_operate_log ADD CONSTRAINT pk_system_operate_log PRIMARY KEY (id);
 
 CREATE INDEX idx_system_operate_log_01 ON system_operate_log (user_id);
 CREATE INDEX idx_system_operate_log_02 ON system_operate_log (create_time);
@@ -3761,23 +4203,30 @@ COMMENT ON COLUMN system_operate_log.deleted IS '是否删除';
 COMMENT ON COLUMN system_operate_log.tenant_id IS '租户编号';
 COMMENT ON TABLE system_operate_log IS '操作日志记录 V2 版本';
 
+DROP SEQUENCE IF EXISTS system_operate_log_seq;
+CREATE SEQUENCE system_operate_log_seq
+    START 1;
+
 -- ----------------------------
 -- Table structure for system_post
 -- ----------------------------
+DROP TABLE IF EXISTS system_post;
 CREATE TABLE system_post (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    code varchar(64)  NOT NULL,
-    name varchar(50)  NOT NULL,
-    sort int  NOT NULL,
-    status smallint  NOT NULL,
-    remark varchar(500) DEFAULT NULL NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted bit DEFAULT '0' NOT NULL,
-    tenant_id bigint DEFAULT 0 NOT NULL
+    id int8 NOT NULL,
+  code varchar(64) NOT NULL,
+  name varchar(50) NOT NULL,
+  sort int4 NOT NULL,
+  status int2 NOT NULL,
+  remark varchar(500) NULL DEFAULT NULL,
+  creator varchar(64) NULL DEFAULT '',
+  create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0,
+  tenant_id int8 NOT NULL DEFAULT 0
 );
+
+ALTER TABLE system_post ADD CONSTRAINT pk_system_post PRIMARY KEY (id);
 
 COMMENT ON COLUMN system_post.id IS '岗位ID';
 COMMENT ON COLUMN system_post.code IS '岗位编码';
@@ -3797,35 +4246,41 @@ COMMENT ON TABLE system_post IS '岗位信息表';
 -- Records of system_post
 -- ----------------------------
 -- @formatter:off
-SET IDENTITY_INSERT system_post ON;
+BEGIN;
 INSERT INTO system_post (id, code, name, sort, status, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2, 'se', '项目经理', 2, 0, '', 'admin', '2021-01-05 17:03:48', '1', '2025-12-15 22:38:43', '0', 1);
 INSERT INTO system_post (id, code, name, sort, status, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (4, 'user', '普通员工', 4, 0, '111222', 'admin', '2021-01-05 17:03:48', '1', '2025-03-24 21:32:40', '0', 1);
 INSERT INTO system_post (id, code, name, sort, status, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (5, 'HR', '人力资源', 5, 0, '`', '1', '2024-03-24 20:45:40', '1', '2025-03-29 19:08:10', '0', 1);
 INSERT INTO system_post (id, code, name, sort, status, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (7, 'test', '测试', 10, 0, NULL, '1', '2025-09-02 08:45:57', '1', '2025-09-02 08:45:57', '0', 1);
 COMMIT;
-SET IDENTITY_INSERT system_post OFF;
 -- @formatter:on
+
+DROP SEQUENCE IF EXISTS system_post_seq;
+CREATE SEQUENCE system_post_seq
+    START 8;
 
 -- ----------------------------
 -- Table structure for system_role
 -- ----------------------------
+DROP TABLE IF EXISTS system_role;
 CREATE TABLE system_role (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    name varchar(30)  NOT NULL,
-    code varchar(100)  NOT NULL,
-    sort int  NOT NULL,
-    data_scope smallint DEFAULT 1 NOT NULL,
-    data_scope_dept_ids varchar(500) DEFAULT '' NULL,
-    status smallint  NOT NULL,
-    type smallint  NOT NULL,
-    remark varchar(500) DEFAULT NULL NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted bit DEFAULT '0' NOT NULL,
-    tenant_id bigint DEFAULT 0 NOT NULL
+    id int8 NOT NULL,
+  name varchar(30) NOT NULL,
+  code varchar(100) NOT NULL,
+  sort int4 NOT NULL,
+  data_scope int2 NOT NULL DEFAULT 1,
+  data_scope_dept_ids varchar(500) NOT NULL DEFAULT '',
+  status int2 NOT NULL,
+  type int2 NOT NULL,
+  remark varchar(500) NULL DEFAULT NULL,
+  creator varchar(64) NULL DEFAULT '',
+  create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0,
+  tenant_id int8 NOT NULL DEFAULT 0
 );
+
+ALTER TABLE system_role ADD CONSTRAINT pk_system_role PRIMARY KEY (id);
 
 COMMENT ON COLUMN system_role.id IS '角色ID';
 COMMENT ON COLUMN system_role.name IS '角色名称';
@@ -3848,7 +4303,7 @@ COMMENT ON TABLE system_role IS '角色信息表';
 -- Records of system_role
 -- ----------------------------
 -- @formatter:off
-SET IDENTITY_INSERT system_role ON;
+BEGIN;
 INSERT INTO system_role (id, name, code, sort, data_scope, data_scope_dept_ids, status, type, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1, '超级管理员', 'super_admin', 1, 1, '', 0, 1, '超级管理员', 'admin', '2021-01-05 17:03:48', '', '2022-02-22 05:08:21', '0', 1);
 INSERT INTO system_role (id, name, code, sort, data_scope, data_scope_dept_ids, status, type, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2, '普通角色', 'common', 2, 2, '', 0, 1, '普通角色', 'admin', '2021-01-05 17:03:48', '', '2022-02-22 05:08:20', '0', 1);
 INSERT INTO system_role (id, name, code, sort, data_scope, data_scope_dept_ids, status, type, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3, 'CRM 管理员', 'crm_admin', 2, 1, '', 0, 1, 'CRM 专属角色', '1', '2024-02-24 10:51:13', '1', '2024-02-24 02:51:32', '0', 1);
@@ -3856,23 +4311,29 @@ INSERT INTO system_role (id, name, code, sort, data_scope, data_scope_dept_ids, 
 INSERT INTO system_role (id, name, code, sort, data_scope, data_scope_dept_ids, status, type, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (111, '租户管理员', 'tenant_admin', 0, 1, '', 0, 1, '系统自动生成', '1', '2022-03-07 21:37:58', '1', '2022-03-07 21:37:58', '0', 122);
 INSERT INTO system_role (id, name, code, sort, data_scope, data_scope_dept_ids, status, type, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (155, '测试数据权限1', 'test-dp', 4, 2, '[112,100,102,103,104,105,107,108]', 0, 2, '1111', '1', '2025-03-31 14:58:06', '1', '2025-12-04 23:29:40', '0', 1);
 COMMIT;
-SET IDENTITY_INSERT system_role OFF;
 -- @formatter:on
+
+DROP SEQUENCE IF EXISTS system_role_seq;
+CREATE SEQUENCE system_role_seq
+    START 156;
 
 -- ----------------------------
 -- Table structure for system_role_menu
 -- ----------------------------
+DROP TABLE IF EXISTS system_role_menu;
 CREATE TABLE system_role_menu (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    role_id bigint  NOT NULL,
-    menu_id bigint  NOT NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted bit DEFAULT '0' NOT NULL,
-    tenant_id bigint DEFAULT 0 NOT NULL
+    id int8 NOT NULL,
+  role_id int8 NOT NULL,
+  menu_id int8 NOT NULL,
+  creator varchar(64) NULL DEFAULT '',
+  create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0,
+  tenant_id int8 NOT NULL DEFAULT 0
 );
+
+ALTER TABLE system_role_menu ADD CONSTRAINT pk_system_role_menu PRIMARY KEY (id);
 
 CREATE INDEX idx_system_role_menu_01 ON system_role_menu (role_id);
 
@@ -3891,7 +4352,7 @@ COMMENT ON TABLE system_role_menu IS '角色和菜单关联表';
 -- Records of system_role_menu
 -- ----------------------------
 -- @formatter:off
-SET IDENTITY_INSERT system_role_menu ON;
+BEGIN;
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (263, 109, 1, '1', '2022-02-22 00:56:14', '1', '2022-02-22 00:56:14', '0', 121);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (434, 2, 1, '1', '2022-02-22 13:09:12', '1', '2022-02-22 13:09:12', '0', 1);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (454, 2, 1093, '1', '2022-02-22 13:09:12', '1', '2022-02-22 13:09:12', '0', 1);
@@ -4778,28 +5239,42 @@ INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, update
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6362, 109, 5811, '', '2026-03-30 03:13:05', '', '2026-03-30 03:13:05', '0', 121);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6363, 111, 5811, '', '2026-03-30 03:13:05', '', '2026-03-30 03:13:05', '0', 122);
 INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6364, 155, 5811, '', '2026-03-30 03:13:05', '', '2026-03-30 03:13:05', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6365, 2, 6400, '1', '2026-05-09 16:11:01', '1', '2026-05-09 16:11:01', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6366, 2, 6401, '1', '2026-05-09 16:11:01', '1', '2026-05-09 16:11:01', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6367, 2, 6402, '1', '2026-05-09 16:11:01', '1', '2026-05-09 16:11:01', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6368, 2, 6403, '1', '2026-05-09 16:11:01', '1', '2026-05-09 16:11:01', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6369, 2, 6404, '1', '2026-05-09 16:11:01', '1', '2026-05-09 16:11:01', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6370, 2, 6405, '1', '2026-05-09 16:11:01', '1', '2026-05-09 16:11:01', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6371, 2, 6406, '1', '2026-05-09 16:11:01', '1', '2026-05-09 16:11:01', '0', 1);
+INSERT INTO system_role_menu (id, role_id, menu_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6380, 2, 6490, '1', '2026-05-14 09:36:12', '1', '2026-05-14 09:36:12', '0', 1);
 COMMIT;
-SET IDENTITY_INSERT system_role_menu OFF;
 -- @formatter:on
+
+DROP SEQUENCE IF EXISTS system_role_menu_seq;
+CREATE SEQUENCE system_role_menu_seq
+    START 6381;
 
 -- ----------------------------
 -- Table structure for system_sms_channel
 -- ----------------------------
+DROP TABLE IF EXISTS system_sms_channel;
 CREATE TABLE system_sms_channel (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    signature varchar(12)  NOT NULL,
-    code varchar(63)  NOT NULL,
-    status smallint  NOT NULL,
-    remark varchar(255) DEFAULT NULL NULL,
-    api_key varchar(128)  NOT NULL,
-    api_secret varchar(128) DEFAULT NULL NULL,
-    callback_url varchar(255) DEFAULT NULL NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted bit DEFAULT '0' NOT NULL
+    id int8 NOT NULL,
+  signature varchar(12) NOT NULL,
+  code varchar(63) NOT NULL,
+  status int2 NOT NULL,
+  remark varchar(255) NULL DEFAULT NULL,
+  api_key varchar(128) NOT NULL,
+  api_secret varchar(128) NULL DEFAULT NULL,
+  callback_url varchar(255) NULL DEFAULT NULL,
+  creator varchar(64) NULL DEFAULT '',
+  create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0
 );
+
+ALTER TABLE system_sms_channel ADD CONSTRAINT pk_system_sms_channel PRIMARY KEY (id);
 
 COMMENT ON COLUMN system_sms_channel.id IS '编号';
 COMMENT ON COLUMN system_sms_channel.signature IS '短信签名';
@@ -4820,34 +5295,40 @@ COMMENT ON TABLE system_sms_channel IS '短信渠道';
 -- Records of system_sms_channel
 -- ----------------------------
 -- @formatter:off
-SET IDENTITY_INSERT system_sms_channel ON;
+BEGIN;
 INSERT INTO system_sms_channel (id, signature, code, status, remark, api_key, api_secret, callback_url, creator, create_time, updater, update_time, deleted) VALUES (2, 'Ballcat', 'ALIYUN', 0, '你要改哦，只有我可以用！！！！', 'LTAI5tCnKso2uG3kJ5gRav88', 'fGJ5SNXL7P1NHNRmJ7DJaMJGPyE55C', NULL, '', '2021-03-31 11:53:10', '1', '2024-08-04 08:53:26', '0');
 INSERT INTO system_sms_channel (id, signature, code, status, remark, api_key, api_secret, callback_url, creator, create_time, updater, update_time, deleted) VALUES (4, '测试渠道', 'DEBUG_DING_TALK', 0, '123', '696b5d8ead48071237e4aa5861ff08dbadb2b4ded1c688a7b7c9afc615579859', 'SEC5c4e5ff888bc8a9923ae47f59e7ccd30af1f14d93c55b4e2c9cb094e35aeed67', NULL, '1', '2021-04-13 00:23:14', '1', '2022-03-27 20:29:49', '0');
 INSERT INTO system_sms_channel (id, signature, code, status, remark, api_key, api_secret, callback_url, creator, create_time, updater, update_time, deleted) VALUES (7, 'mock腾讯云', 'TENCENT', 0, '123', '1 2', '2 3', '', '1', '2024-09-30 08:53:45', '1', '2025-12-20 11:30:18', '0');
 COMMIT;
-SET IDENTITY_INSERT system_sms_channel OFF;
 -- @formatter:on
+
+DROP SEQUENCE IF EXISTS system_sms_channel_seq;
+CREATE SEQUENCE system_sms_channel_seq
+    START 8;
 
 -- ----------------------------
 -- Table structure for system_sms_code
 -- ----------------------------
+DROP TABLE IF EXISTS system_sms_code;
 CREATE TABLE system_sms_code (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    mobile varchar(11)  NOT NULL,
-    code varchar(6)  NOT NULL,
-    create_ip varchar(15)  NOT NULL,
-    scene smallint  NOT NULL,
-    today_index smallint  NOT NULL,
-    used smallint  NOT NULL,
-    used_time datetime DEFAULT NULL NULL,
-    used_ip varchar(255) DEFAULT NULL NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted bit DEFAULT '0' NOT NULL,
-    tenant_id bigint DEFAULT 0 NOT NULL
+    id int8 NOT NULL,
+  mobile varchar(11) NOT NULL,
+  code varchar(6) NOT NULL,
+  create_ip varchar(15) NOT NULL,
+  scene int2 NOT NULL,
+  today_index int2 NOT NULL,
+  used int2 NOT NULL,
+  used_time timestamp NULL DEFAULT NULL,
+  used_ip varchar(255) NULL DEFAULT NULL,
+  creator varchar(64) NULL DEFAULT '',
+  create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0,
+  tenant_id int8 NOT NULL DEFAULT 0
 );
+
+ALTER TABLE system_sms_code ADD CONSTRAINT pk_system_sms_code PRIMARY KEY (id);
 
 CREATE INDEX idx_system_sms_code_01 ON system_sms_code (mobile);
 
@@ -4868,38 +5349,45 @@ COMMENT ON COLUMN system_sms_code.deleted IS '是否删除';
 COMMENT ON COLUMN system_sms_code.tenant_id IS '租户编号';
 COMMENT ON TABLE system_sms_code IS '手机验证码';
 
+DROP SEQUENCE IF EXISTS system_sms_code_seq;
+CREATE SEQUENCE system_sms_code_seq
+    START 1;
+
 -- ----------------------------
 -- Table structure for system_sms_log
 -- ----------------------------
+DROP TABLE IF EXISTS system_sms_log;
 CREATE TABLE system_sms_log (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    channel_id bigint  NOT NULL,
-    channel_code varchar(63)  NOT NULL,
-    template_id bigint  NOT NULL,
-    template_code varchar(63)  NOT NULL,
-    template_type smallint  NOT NULL,
-    template_content varchar(255)  NOT NULL,
-    template_params varchar(255)  NOT NULL,
-    api_template_id varchar(63)  NOT NULL,
-    mobile varchar(11)  NOT NULL,
-    user_id bigint DEFAULT NULL NULL,
-    user_type smallint DEFAULT NULL NULL,
-    send_status smallint DEFAULT 0 NOT NULL,
-    send_time datetime DEFAULT NULL NULL,
-    api_send_code varchar(63) DEFAULT NULL NULL,
-    api_send_msg varchar(255) DEFAULT NULL NULL,
-    api_request_id varchar(255) DEFAULT NULL NULL,
-    api_serial_no varchar(255) DEFAULT NULL NULL,
-    receive_status smallint DEFAULT 0 NOT NULL,
-    receive_time datetime DEFAULT NULL NULL,
-    api_receive_code varchar(63) DEFAULT NULL NULL,
-    api_receive_msg varchar(255) DEFAULT NULL NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted bit DEFAULT '0' NOT NULL
+    id int8 NOT NULL,
+  channel_id int8 NOT NULL,
+  channel_code varchar(63) NOT NULL,
+  template_id int8 NOT NULL,
+  template_code varchar(63) NOT NULL,
+  template_type int2 NOT NULL,
+  template_content varchar(255) NOT NULL,
+  template_params varchar(255) NOT NULL,
+  api_template_id varchar(63) NOT NULL,
+  mobile varchar(11) NOT NULL,
+  user_id int8 NULL DEFAULT NULL,
+  user_type int2 NULL DEFAULT NULL,
+  send_status int2 NOT NULL DEFAULT 0,
+  send_time timestamp NULL DEFAULT NULL,
+  api_send_code varchar(63) NULL DEFAULT NULL,
+  api_send_msg varchar(255) NULL DEFAULT NULL,
+  api_request_id varchar(255) NULL DEFAULT NULL,
+  api_serial_no varchar(255) NULL DEFAULT NULL,
+  receive_status int2 NOT NULL DEFAULT 0,
+  receive_time timestamp NULL DEFAULT NULL,
+  api_receive_code varchar(63) NULL DEFAULT NULL,
+  api_receive_msg varchar(255) NULL DEFAULT NULL,
+  creator varchar(64) NULL DEFAULT '',
+  create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0
 );
+
+ALTER TABLE system_sms_log ADD CONSTRAINT pk_system_sms_log PRIMARY KEY (id);
 
 COMMENT ON COLUMN system_sms_log.id IS '编号';
 COMMENT ON COLUMN system_sms_log.channel_id IS '短信渠道编号';
@@ -4930,27 +5418,34 @@ COMMENT ON COLUMN system_sms_log.update_time IS '更新时间';
 COMMENT ON COLUMN system_sms_log.deleted IS '是否删除';
 COMMENT ON TABLE system_sms_log IS '短信日志';
 
+DROP SEQUENCE IF EXISTS system_sms_log_seq;
+CREATE SEQUENCE system_sms_log_seq
+    START 1;
+
 -- ----------------------------
 -- Table structure for system_sms_template
 -- ----------------------------
+DROP TABLE IF EXISTS system_sms_template;
 CREATE TABLE system_sms_template (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    type smallint  NOT NULL,
-    status smallint  NOT NULL,
-    code varchar(63)  NOT NULL,
-    name varchar(63)  NOT NULL,
-    content varchar(255)  NOT NULL,
-    params varchar(255)  NOT NULL,
-    remark varchar(255) DEFAULT NULL NULL,
-    api_template_id varchar(63)  NOT NULL,
-    channel_id bigint  NOT NULL,
-    channel_code varchar(63)  NOT NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted bit DEFAULT '0' NOT NULL
+    id int8 NOT NULL,
+  type int2 NOT NULL,
+  status int2 NOT NULL,
+  code varchar(63) NOT NULL,
+  name varchar(63) NOT NULL,
+  content varchar(255) NOT NULL,
+  params varchar(255) NOT NULL,
+  remark varchar(255) NULL DEFAULT NULL,
+  api_template_id varchar(63) NOT NULL,
+  channel_id int8 NOT NULL,
+  channel_code varchar(63) NOT NULL,
+  creator varchar(64) NULL DEFAULT '',
+  create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0
 );
+
+ALTER TABLE system_sms_template ADD CONSTRAINT pk_system_sms_template PRIMARY KEY (id);
 
 COMMENT ON COLUMN system_sms_template.id IS '编号';
 COMMENT ON COLUMN system_sms_template.type IS '模板类型';
@@ -4974,7 +5469,7 @@ COMMENT ON TABLE system_sms_template IS '短信模板';
 -- Records of system_sms_template
 -- ----------------------------
 -- @formatter:off
-SET IDENTITY_INSERT system_sms_template ON;
+BEGIN;
 INSERT INTO system_sms_template (id, type, status, code, name, content, params, remark, api_template_id, channel_id, channel_code, creator, create_time, updater, update_time, deleted) VALUES (2, 1, 0, 'test_01', '测试验证码短信', '正在进行登录操作{operation}，您的验证码是{code}', '["operation","code"]', '测试备注', '4383920', 4, 'DEBUG_DING_TALK', '', '2021-03-31 10:49:38', '1', '2024-08-18 11:57:18', '0');
 INSERT INTO system_sms_template (id, type, status, code, name, content, params, remark, api_template_id, channel_id, channel_code, creator, create_time, updater, update_time, deleted) VALUES (3, 1, 0, 'test_02', '公告通知', '您的验证码{code}，该验证码5分钟内有效，请勿泄漏于他人！', '["code"]', NULL, 'SMS_207945135', 2, 'ALIYUN', '', '2021-03-31 11:56:30', '1', '2021-04-10 01:22:02', '0');
 INSERT INTO system_sms_template (id, type, status, code, name, content, params, remark, api_template_id, channel_id, channel_code, creator, create_time, updater, update_time, deleted) VALUES (6, 3, 0, 'test-01', '测试模板', '哈哈哈 {name}', '["name"]', 'f哈哈哈', '4383920', 4, 'DEBUG_DING_TALK', '1', '2021-04-10 01:07:21', '1', '2024-08-18 11:57:07', '0');
@@ -4991,29 +5486,35 @@ INSERT INTO system_sms_template (id, type, status, code, name, content, params, 
 INSERT INTO system_sms_template (id, type, status, code, name, content, params, remark, api_template_id, channel_id, channel_code, creator, create_time, updater, update_time, deleted) VALUES (18, 1, 0, 'admin-reset-password', '后台用户 - 忘记密码', '您的验证码{code}，该验证码 5 分钟内有效，请勿泄漏于他人！', '["code"]', '', 'null', 4, 'DEBUG_DING_TALK', '1', '2025-03-16 14:19:34', '1', '2025-03-16 14:19:45', '0');
 INSERT INTO system_sms_template (id, type, status, code, name, content, params, remark, api_template_id, channel_id, channel_code, creator, create_time, updater, update_time, deleted) VALUES (19, 1, 0, 'admin-sms-login', '后台用户短信登录', '您的验证码是{code}', '["code"]', '', '4372216', 4, 'DEBUG_DING_TALK', '1', '2025-04-08 09:36:03', '1', '2025-04-08 09:36:17', '0');
 COMMIT;
-SET IDENTITY_INSERT system_sms_template OFF;
 -- @formatter:on
+
+DROP SEQUENCE IF EXISTS system_sms_template_seq;
+CREATE SEQUENCE system_sms_template_seq
+    START 20;
 
 -- ----------------------------
 -- Table structure for system_social_client
 -- ----------------------------
+DROP TABLE IF EXISTS system_social_client;
 CREATE TABLE system_social_client (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    name varchar(255)  NOT NULL,
-    social_type smallint  NOT NULL,
-    user_type smallint  NOT NULL,
-    client_id varchar(255)  NOT NULL,
-    client_secret varchar(255)  NOT NULL,
-    agent_id varchar(255) DEFAULT NULL NULL,
-    public_key varchar(2048) DEFAULT NULL NULL,
-    status smallint  NOT NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted bit DEFAULT '0' NOT NULL,
-    tenant_id bigint DEFAULT 0 NOT NULL
+    id int8 NOT NULL,
+  name varchar(255) NOT NULL,
+  social_type int2 NOT NULL,
+  user_type int2 NOT NULL,
+  client_id varchar(255) NOT NULL,
+  client_secret varchar(255) NOT NULL,
+  agent_id varchar(255) NULL DEFAULT NULL,
+  public_key varchar(2048) NULL DEFAULT NULL,
+  status int2 NOT NULL,
+  creator varchar(64) NULL DEFAULT '',
+  create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0,
+  tenant_id int8 NOT NULL DEFAULT 0
 );
+
+ALTER TABLE system_social_client ADD CONSTRAINT pk_system_social_client PRIMARY KEY (id);
 
 COMMENT ON COLUMN system_social_client.id IS '编号';
 COMMENT ON COLUMN system_social_client.name IS '应用名';
@@ -5036,7 +5537,7 @@ COMMENT ON TABLE system_social_client IS '社交客户端表';
 -- Records of system_social_client
 -- ----------------------------
 -- @formatter:off
-SET IDENTITY_INSERT system_social_client ON;
+BEGIN;
 INSERT INTO system_social_client (id, name, social_type, user_type, client_id, client_secret, agent_id, public_key, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1, '钉钉', 20, 2, 'dingvrnreaje3yqvzhxg', 'i8E6iZyDvZj51JIb0tYsYfVQYOks9Cq1lgryEjFRqC79P3iJcrxEwT6Qk2QvLrLI', NULL, NULL, 0, '', '2023-10-18 11:21:18', '1', '2023-12-20 21:28:26', '1', 1);
 INSERT INTO system_social_client (id, name, social_type, user_type, client_id, client_secret, agent_id, public_key, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2, '钉钉（王土豆）', 20, 2, 'dingtsu9hpepjkbmthhw', 'FP_bnSq_HAHKCSncmJjw5hxhnzs6vaVDSZZn3egj6rdqTQ_hu5tQVJyLMpgCakdP', NULL, NULL, 0, '', '2023-10-18 11:21:18', '', '2023-12-20 21:28:26', '1', 121);
 INSERT INTO system_social_client (id, name, social_type, user_type, client_id, client_secret, agent_id, public_key, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3, '微信公众号', 31, 1, 'wx5b23ba7a5589ecbb', '2a7b3b20c537e52e74afd395eb85f61f', NULL, NULL, 0, '', '2023-10-18 16:07:46', '1', '2023-12-20 21:28:23', '1', 1);
@@ -5046,30 +5547,36 @@ INSERT INTO system_social_client (id, name, social_type, user_type, client_id, c
 INSERT INTO system_social_client (id, name, social_type, user_type, client_id, client_secret, agent_id, public_key, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (46, '1', 10, 1, '2', '3', NULL, NULL, 0, '1', '2025-11-29 16:04:23', '1', '2025-11-29 16:04:26', '1', 1);
 INSERT INTO system_social_client (id, name, social_type, user_type, client_id, client_secret, agent_id, public_key, status, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (47, '123', 10, 1, '1', '2', '3', NULL, 0, '1', '2025-12-21 10:27:02', '1', '2025-12-21 10:27:20', '1', 1);
 COMMIT;
-SET IDENTITY_INSERT system_social_client OFF;
 -- @formatter:on
+
+DROP SEQUENCE IF EXISTS system_social_client_seq;
+CREATE SEQUENCE system_social_client_seq
+    START 48;
 
 -- ----------------------------
 -- Table structure for system_social_user
 -- ----------------------------
+DROP TABLE IF EXISTS system_social_user;
 CREATE TABLE system_social_user (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    type smallint  NOT NULL,
-    openid varchar(32)  NOT NULL,
-    token varchar(256) DEFAULT NULL NULL,
-    raw_token_info varchar(1024)  NOT NULL,
-    nickname varchar(32)  NOT NULL,
-    avatar varchar(255) DEFAULT NULL NULL,
-    raw_user_info varchar(1024)  NOT NULL,
-    code varchar(256)  NOT NULL,
-    state varchar(256) DEFAULT NULL NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted bit DEFAULT '0' NOT NULL,
-    tenant_id bigint DEFAULT 0 NOT NULL
+    id int8 NOT NULL,
+  type int2 NOT NULL,
+  openid varchar(32) NOT NULL,
+  token varchar(256) NULL DEFAULT NULL,
+  raw_token_info varchar(1024) NOT NULL,
+  nickname varchar(32) NOT NULL,
+  avatar varchar(255) NULL DEFAULT NULL,
+  raw_user_info varchar(1024) NOT NULL,
+  code varchar(256) NOT NULL,
+  state varchar(256) NULL DEFAULT NULL,
+  creator varchar(64) NULL DEFAULT '',
+  create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0,
+  tenant_id int8 NOT NULL DEFAULT 0
 );
+
+ALTER TABLE system_social_user ADD CONSTRAINT pk_system_social_user PRIMARY KEY (id);
 
 CREATE INDEX idx_system_social_user_01 ON system_social_user (type, openid);
 CREATE INDEX idx_system_social_user_02 ON system_social_user (type, code, state);
@@ -5092,22 +5599,29 @@ COMMENT ON COLUMN system_social_user.deleted IS '是否删除';
 COMMENT ON COLUMN system_social_user.tenant_id IS '租户编号';
 COMMENT ON TABLE system_social_user IS '社交用户表';
 
+DROP SEQUENCE IF EXISTS system_social_user_seq;
+CREATE SEQUENCE system_social_user_seq
+    START 1;
+
 -- ----------------------------
 -- Table structure for system_social_user_bind
 -- ----------------------------
+DROP TABLE IF EXISTS system_social_user_bind;
 CREATE TABLE system_social_user_bind (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    user_id bigint  NOT NULL,
-    user_type smallint  NOT NULL,
-    social_type smallint  NOT NULL,
-    social_user_id bigint  NOT NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted bit DEFAULT '0' NOT NULL,
-    tenant_id bigint DEFAULT 0 NOT NULL
+    id int8 NOT NULL,
+  user_id int8 NOT NULL,
+  user_type int2 NOT NULL,
+  social_type int2 NOT NULL,
+  social_user_id int8 NOT NULL,
+  creator varchar(64) NULL DEFAULT '',
+  create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0,
+  tenant_id int8 NOT NULL DEFAULT 0
 );
+
+ALTER TABLE system_social_user_bind ADD CONSTRAINT pk_system_social_user_bind PRIMARY KEY (id);
 
 CREATE INDEX idx_system_social_user_bind_01 ON system_social_user_bind (user_type, social_user_id);
 
@@ -5124,26 +5638,33 @@ COMMENT ON COLUMN system_social_user_bind.deleted IS '是否删除';
 COMMENT ON COLUMN system_social_user_bind.tenant_id IS '租户编号';
 COMMENT ON TABLE system_social_user_bind IS '社交绑定表';
 
+DROP SEQUENCE IF EXISTS system_social_user_bind_seq;
+CREATE SEQUENCE system_social_user_bind_seq
+    START 1;
+
 -- ----------------------------
 -- Table structure for system_tenant
 -- ----------------------------
+DROP TABLE IF EXISTS system_tenant;
 CREATE TABLE system_tenant (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    name varchar(30)  NOT NULL,
-    contact_user_id bigint DEFAULT NULL NULL,
-    contact_name varchar(30)  NOT NULL,
-    contact_mobile varchar(500) DEFAULT NULL NULL,
-    status smallint DEFAULT 0 NOT NULL,
-    websites varchar(1024) DEFAULT '' NULL,
-    package_id bigint  NOT NULL,
-    expire_time datetime  NOT NULL,
-    account_count int  NOT NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted bit DEFAULT '0' NOT NULL
+    id int8 NOT NULL,
+  name varchar(30) NOT NULL,
+  contact_user_id int8 NULL DEFAULT NULL,
+  contact_name varchar(30) NOT NULL,
+  contact_mobile varchar(500) NULL DEFAULT NULL,
+  status int2 NOT NULL DEFAULT 0,
+  websites varchar(1024) NULL DEFAULT '',
+  package_id int8 NOT NULL,
+  expire_time timestamp NOT NULL,
+  account_count int4 NOT NULL,
+  creator varchar(64) NOT NULL DEFAULT '',
+  create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0
 );
+
+ALTER TABLE system_tenant ADD CONSTRAINT pk_system_tenant PRIMARY KEY (id);
 
 COMMENT ON COLUMN system_tenant.id IS '租户编号';
 COMMENT ON COLUMN system_tenant.name IS '租户名';
@@ -5166,29 +5687,35 @@ COMMENT ON TABLE system_tenant IS '租户表';
 -- Records of system_tenant
 -- ----------------------------
 -- @formatter:off
-SET IDENTITY_INSERT system_tenant ON;
+BEGIN;
 INSERT INTO system_tenant (id, name, contact_user_id, contact_name, contact_mobile, status, websites, package_id, expire_time, account_count, creator, create_time, updater, update_time, deleted) VALUES (1, '芋道源码', NULL, '芋艿', '17321315478', 0, 'www.iocoder.cn,127.0.0.1:3000,wxc4598c446f8a9cb3', 0, '2099-02-19 17:14:16', 9999, '1', '2021-01-05 17:03:47', '1', '2025-08-19 05:18:41', '0');
 INSERT INTO system_tenant (id, name, contact_user_id, contact_name, contact_mobile, status, websites, package_id, expire_time, account_count, creator, create_time, updater, update_time, deleted) VALUES (121, '小租户', 110, '小王2', '15601691300', 0, 'zsxq.iocoder.cn,123321', 111, '2026-07-10 00:00:00', 30, '1', '2022-02-22 00:56:14', '1', '2025-08-19 21:19:29', '0');
 INSERT INTO system_tenant (id, name, contact_user_id, contact_name, contact_mobile, status, websites, package_id, expire_time, account_count, creator, create_time, updater, update_time, deleted) VALUES (122, '测试租户', 113, '芋道', '15601691300', 0, 'test.iocoder.cn,222,333', 111, '2023-04-29 00:00:00', 50, '1', '2022-03-07 21:37:58', '1', '2025-12-21 09:50:00', '0');
 COMMIT;
-SET IDENTITY_INSERT system_tenant OFF;
 -- @formatter:on
+
+DROP SEQUENCE IF EXISTS system_tenant_seq;
+CREATE SEQUENCE system_tenant_seq
+    START 123;
 
 -- ----------------------------
 -- Table structure for system_tenant_package
 -- ----------------------------
+DROP TABLE IF EXISTS system_tenant_package;
 CREATE TABLE system_tenant_package (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    name varchar(30)  NOT NULL,
-    status smallint DEFAULT 0 NOT NULL,
-    remark varchar(256) DEFAULT '' NULL,
-    menu_ids varchar(4096)  NOT NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted bit DEFAULT '0' NOT NULL
+    id int8 NOT NULL,
+  name varchar(30) NOT NULL,
+  status int2 NOT NULL DEFAULT 0,
+  remark varchar(256) NULL DEFAULT '',
+  menu_ids varchar(4096) NOT NULL,
+  creator varchar(64) NOT NULL DEFAULT '',
+  create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0
 );
+
+ALTER TABLE system_tenant_package ADD CONSTRAINT pk_system_tenant_package PRIMARY KEY (id);
 
 COMMENT ON COLUMN system_tenant_package.id IS '套餐编号';
 COMMENT ON COLUMN system_tenant_package.name IS '套餐名';
@@ -5206,26 +5733,32 @@ COMMENT ON TABLE system_tenant_package IS '租户套餐表';
 -- Records of system_tenant_package
 -- ----------------------------
 -- @formatter:off
-SET IDENTITY_INSERT system_tenant_package ON;
+BEGIN;
 INSERT INTO system_tenant_package (id, name, status, remark, menu_ids, creator, create_time, updater, update_time, deleted) VALUES (111, '普通套餐', 0, '小功能', '[1,2,5,1031,1032,1033,1034,1035,1036,1037,1038,1039,1050,1051,1052,1053,1054,1056,1057,1058,1059,1060,1063,1064,1065,1066,1067,1070,1075,1077,1078,1082,1083,1084,1085,1086,1087,1088,1089,1090,1091,1092,1117,1118,1119,1120,100,101,102,1126,103,1127,1128,1129,106,1130,107,1132,1133,110,1134,111,1135,112,1136,113,1137,2161,114,1138,1139,115,1140,116,1141,1142,1143,1150,1161,1162,1166,1173,1174,2713,2714,1178,2715,2716,2717,2718,2720,2721,1185,2722,1186,1187,2723,1188,2724,1189,2725,1190,2726,1191,2727,1192,2728,2729,1193,1194,2730,1195,2731,2732,1197,2733,1198,2734,1199,2735,1200,1201,1202,2739,2740,1207,1208,1209,2745,1210,2746,1211,2747,1212,2748,1213,1215,1216,1217,1218,1219,1220,2756,1221,2757,1222,1224,1225,1226,1227,1228,1229,1237,1238,2262,1239,1240,1241,1242,1243,2275,2276,2277,1255,1256,1257,2281,1258,2282,1259,2283,1260,2284,2285,2287,2288,2293,2294,2297,2300,2301,2302,2317,2318,2319,2320,2321,2322,2323,2324,2325,2326,2327,2328,2329,2330,2331,2332,2333,2334,2335,2363,2364,5011,5012,2472,2478,2479,2480,2481,2482,2483,2484,2485,2486,2487,2488,2489,2490,2491,2492,2493,2494,2495,2497,2525,1001,1002,1003,1004,1005,1006,1007,1008,1009,1010,1011,1012,1013,2549,1014,2550,1015,2551,1016,2552,1017,2553,1018,2554,1019,2555,1020,2556,2557,2558,2559]', '1', '2022-02-22 00:54:00', '1', '2025-09-06 20:52:25', '0');
 COMMIT;
-SET IDENTITY_INSERT system_tenant_package OFF;
 -- @formatter:on
+
+DROP SEQUENCE IF EXISTS system_tenant_package_seq;
+CREATE SEQUENCE system_tenant_package_seq
+    START 112;
 
 -- ----------------------------
 -- Table structure for system_user_post
 -- ----------------------------
+DROP TABLE IF EXISTS system_user_post;
 CREATE TABLE system_user_post (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    user_id bigint DEFAULT 0 NOT NULL,
-    post_id bigint DEFAULT 0 NOT NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted bit DEFAULT '0' NOT NULL,
-    tenant_id bigint DEFAULT 0 NOT NULL
+    id int8 NOT NULL,
+  user_id int8 NOT NULL DEFAULT 0,
+  post_id int8 NOT NULL DEFAULT 0,
+  creator varchar(64) NULL DEFAULT '',
+  create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0,
+  tenant_id int8 NOT NULL DEFAULT 0
 );
+
+ALTER TABLE system_user_post ADD CONSTRAINT pk_system_user_post PRIMARY KEY (id);
 
 COMMENT ON COLUMN system_user_post.id IS 'id';
 COMMENT ON COLUMN system_user_post.user_id IS '用户ID';
@@ -5242,7 +5775,7 @@ COMMENT ON TABLE system_user_post IS '用户岗位表';
 -- Records of system_user_post
 -- ----------------------------
 -- @formatter:off
-SET IDENTITY_INSERT system_user_post ON;
+BEGIN;
 INSERT INTO system_user_post (id, user_id, post_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (112, 1, 1, 'admin', '2022-05-02 07:25:24', 'admin', '2022-05-02 07:25:24', '0', 1);
 INSERT INTO system_user_post (id, user_id, post_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (113, 100, 1, 'admin', '2022-05-02 07:25:24', 'admin', '2022-05-02 07:25:24', '0', 1);
 INSERT INTO system_user_post (id, user_id, post_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (115, 104, 1, '1', '2022-05-16 19:36:28', '1', '2022-05-16 19:36:28', '0', 1);
@@ -5255,23 +5788,29 @@ INSERT INTO system_user_post (id, user_id, post_id, creator, create_time, update
 INSERT INTO system_user_post (id, user_id, post_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (128, 139, 2, '1', '2025-12-05 21:43:27', '1', '2025-12-05 21:43:27', '0', 1);
 INSERT INTO system_user_post (id, user_id, post_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (129, 139, 4, '1', '2025-12-05 21:43:27', '1', '2025-12-05 21:43:27', '0', 1);
 COMMIT;
-SET IDENTITY_INSERT system_user_post OFF;
 -- @formatter:on
+
+DROP SEQUENCE IF EXISTS system_user_post_seq;
+CREATE SEQUENCE system_user_post_seq
+    START 130;
 
 -- ----------------------------
 -- Table structure for system_user_role
 -- ----------------------------
+DROP TABLE IF EXISTS system_user_role;
 CREATE TABLE system_user_role (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    user_id bigint  NOT NULL,
-    role_id bigint  NOT NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NULL,
-    deleted bit DEFAULT '0' NULL,
-    tenant_id bigint DEFAULT 0 NOT NULL
+    id int8 NOT NULL,
+  user_id int8 NOT NULL,
+  role_id int8 NOT NULL,
+  creator varchar(64) NULL DEFAULT '',
+  create_time timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0,
+  tenant_id int8 NOT NULL DEFAULT 0
 );
+
+ALTER TABLE system_user_role ADD CONSTRAINT pk_system_user_role PRIMARY KEY (id);
 
 CREATE INDEX idx_system_user_role_01 ON system_user_role (user_id);
 
@@ -5290,7 +5829,7 @@ COMMENT ON TABLE system_user_role IS '用户和角色关联表';
 -- Records of system_user_role
 -- ----------------------------
 -- @formatter:off
-SET IDENTITY_INSERT system_user_role ON;
+BEGIN;
 INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1, 1, 1, '', '2022-01-11 13:19:45', '', '2022-05-12 12:35:17', '0', 1);
 INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2, 2, 2, '', '2022-01-11 13:19:45', '', '2022-05-12 12:35:13', '0', 1);
 INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (5, 100, 1, '', '2022-01-11 13:19:45', '', '2022-05-12 12:35:12', '0', 1);
@@ -5313,34 +5852,40 @@ INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, update
 INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (53, 114, 2, '1', '2026-01-04 18:15:40', '1', '2026-01-04 18:15:40', '0', 1);
 INSERT INTO system_user_role (id, user_id, role_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (54, 114, 3, '1', '2026-01-04 18:16:19', '1', '2026-01-04 18:16:19', '0', 1);
 COMMIT;
-SET IDENTITY_INSERT system_user_role OFF;
 -- @formatter:on
+
+DROP SEQUENCE IF EXISTS system_user_role_seq;
+CREATE SEQUENCE system_user_role_seq
+    START 55;
 
 -- ----------------------------
 -- Table structure for system_users
 -- ----------------------------
+DROP TABLE IF EXISTS system_users;
 CREATE TABLE system_users (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    username varchar(30)  NOT NULL,
-    password varchar(100) DEFAULT '' NULL,
-    nickname varchar(30)  NOT NULL,
-    remark varchar(500) DEFAULT NULL NULL,
-    dept_id bigint DEFAULT NULL NULL,
-    post_ids varchar(255) DEFAULT NULL NULL,
-    email varchar(50) DEFAULT '' NULL,
-    mobile varchar(11) DEFAULT '' NULL,
-    sex smallint DEFAULT 0 NULL,
-    avatar varchar(512) DEFAULT '' NULL,
-    status smallint DEFAULT 0 NOT NULL,
-    login_ip varchar(50) DEFAULT '' NULL,
-    login_date datetime DEFAULT NULL NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted bit DEFAULT '0' NOT NULL,
-    tenant_id bigint DEFAULT 0 NOT NULL
+    id int8 NOT NULL,
+  username varchar(30) NOT NULL,
+  password varchar(100) NOT NULL DEFAULT '',
+  nickname varchar(30) NOT NULL,
+  remark varchar(500) NULL DEFAULT NULL,
+  dept_id int8 NULL DEFAULT NULL,
+  post_ids varchar(255) NULL DEFAULT NULL,
+  email varchar(50) NULL DEFAULT '',
+  mobile varchar(11) NULL DEFAULT '',
+  sex int2 NULL DEFAULT 0,
+  avatar varchar(512) NULL DEFAULT '',
+  status int2 NOT NULL DEFAULT 0,
+  login_ip varchar(50) NULL DEFAULT '',
+  login_date timestamp NULL DEFAULT NULL,
+  creator varchar(64) NULL DEFAULT '',
+  create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0,
+  tenant_id int8 NOT NULL DEFAULT 0
 );
+
+ALTER TABLE system_users ADD CONSTRAINT pk_system_users PRIMARY KEY (id);
 
 CREATE INDEX idx_system_users_01 ON system_users (username);
 CREATE INDEX idx_system_users_02 ON system_users (mobile);
@@ -5373,11 +5918,11 @@ COMMENT ON TABLE system_users IS '用户信息表';
 -- Records of system_users
 -- ----------------------------
 -- @formatter:off
-SET IDENTITY_INSERT system_users ON;
-INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1, 'admin', '$2a$04$.vd8nPeLwxt6hnSzmAoAyul8BOLX7Cib6QhcxRe30rfvrIPQHH1OG', '芋道源码', '管理员', 103, '[1,2]', '13aoteman@126.com', '18818260272', 1, 'http://test.yudao.iocoder.cn/user/avatar/20251220/blob_1766215463801.jpg', 0, '0:0:0:0:0:0:0:1', '2026-04-17 08:47:40', 'admin', '2021-01-05 17:03:47', NULL, '2026-04-17 08:47:40', '0', 1);
-INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (100, 'yudao', '$2a$04$h.aaPKgO.odHepnk5PCsWeEwKdojFWdTItxGKfx1r0e1CSeBzsTJ6', '芋道', '不要吓我', 104, '[1]', 'yudao@iocoder.cn', '15601691300', 1, NULL, 0, '0:0:0:0:0:0:0:1', '2025-12-15 21:47:26', '', '2021-01-07 09:07:17', NULL, '2025-12-15 21:47:26', '0', 1);
-INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (103, 'yuanma', '$2a$04$fUBSmjKCPYAUmnMzOb6qE.eZCGPhHi1JmAKclODbfS/O7fHOl2bH6', '源码', NULL, 106, NULL, 'yuanma@iocoder.cn', '15601701300', 0, NULL, 0, '0:0:0:0:0:0:0:1', '2024-08-11 17:48:12', '', '2021-01-13 23:50:35', '1', '2025-07-09 23:41:58', '0', 1);
-INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (104, 'test', '$2a$04$BrwaYn303hjA/6TnXqdGoOLhyHOAA0bVrAFu6.1dJKycqKUnIoRz2', '测试号', NULL, 107, '[1,2]', '111@qq.com', '15601691200', 1, NULL, 0, '0:0:0:0:0:0:0:1', '2026-01-04 18:09:54', '', '2021-01-21 02:13:53', NULL, '2026-01-04 18:09:54', '0', 1);
+BEGIN;
+INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1, 'admin', '$2a$04$.vd8nPeLwxt6hnSzmAoAyul8BOLX7Cib6QhcxRe30rfvrIPQHH1OG', '芋道源码', '管理员', 103, '[1,2]', '13aoteman@126.com', '18818260272', 1, 'http://test.yudao.iocoder.cn/20260517/blob_1778998103688.png', 0, '0:0:0:0:0:0:0:1', '2026-05-31 21:54:49', 'admin', '2021-01-05 17:03:47', NULL, '2026-05-31 21:54:49', '0', 1);
+INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (100, 'yudao', '$2a$04$.vd8nPeLwxt6hnSzmAoAyul8BOLX7Cib6QhcxRe30rfvrIPQHH1OG', '芋道', '不要吓我', 104, '[1]', 'yudao@iocoder.cn', '15601691300', 1, NULL, 0, '0:0:0:0:0:0:0:1', '2026-04-19 17:40:55', '', '2021-01-07 09:07:17', NULL, '2026-04-19 17:40:55', '0', 1);
+INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (103, 'yuanma', '$2a$04$k/d6mc0nySN0i2udwcI8Ee8V5aM5OHixBRbQfXmPuFTUl3Zf/DBs.', '源码', NULL, 106, NULL, 'yuanma@iocoder.cn', '15601701300', 0, NULL, 0, '0:0:0:0:0:0:0:1', '2026-04-27 13:19:27', '', '2021-01-13 23:50:35', NULL, '2026-04-27 13:19:27', '0', 1);
+INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (104, 'test', '$2a$04$BrwaYn303hjA/6TnXqdGoOLhyHOAA0bVrAFu6.1dJKycqKUnIoRz2', '测试号', NULL, 107, '[1,2]', '111@qq.com', '15601691200', 1, NULL, 0, '0:0:0:0:0:0:0:1', '2026-05-20 23:37:11', '', '2021-01-21 02:13:53', NULL, '2026-05-20 23:37:11', '0', 1);
 INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (107, 'admin107', '$2a$10$dYOOBKMO93v/.ReCqzyFg.o67Tqk.bbc2bhrpyBGkIw9aypCtr2pm', '芋艿', NULL, NULL, NULL, '', '15601691300', 0, NULL, 0, '', NULL, '1', '2022-02-20 22:59:33', '1', '2025-04-21 14:23:08', '0', 118);
 INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (108, 'admin108', '$2a$10$y6mfvKoNYL1GXWak8nYwVOH.kCWqjactkzdoIDgiKl93WN3Ejg.Lu', '芋艿', NULL, NULL, NULL, '', '15601691300', 0, NULL, 0, '', NULL, '1', '2022-02-20 23:00:50', '1', '2025-04-21 14:23:08', '0', 119);
 INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (109, 'admin109', '$2a$10$JAqvH0tEc0I7dfDVBI7zyuB4E3j.uH6daIjV53.vUS6PknFkDJkuK', '芋艿', NULL, NULL, NULL, '', '15601691300', 0, NULL, 0, '', NULL, '1', '2022-02-20 23:11:50', '1', '2025-04-21 14:23:08', '0', 120);
@@ -5393,28 +5938,34 @@ INSERT INTO system_users (id, username, password, nickname, remark, dept_id, pos
 INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (141, 'admin1', '$2a$04$oj6F6d7HrZ70kYVD3TNzEu.m3TPUzajOVuC66zdKna8KRerK1FmVa', '新用户', NULL, NULL, NULL, '', '', 0, '', 0, '0:0:0:0:0:0:0:1', '2025-04-08 13:09:07', '1', '2025-04-08 13:09:07', '1', '2025-05-14 19:11:48', '0', 1);
 INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (142, 'test01', '$2a$04$4bCYWZkjxxOC4QE0LY2M9uEEKWeJbLfs489NFtQoyidL5I0FndRaO', 'test01', '', NULL, '[]', '', '19021719925', 1, '', 0, '0:0:0:0:0:0:0:1', '2025-07-29 19:47:17', '1', '2025-07-09 21:07:10', NULL, '2025-12-02 13:23:11', '0', 1);
 INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (143, 'a00001', '$2a$04$GhVHFviOw/SsTmiQtifHJesDYFlHMeGK7OWh7aGCCjGGVCmbHVAwa', 'a00001', NULL, 104, NULL, '', '', 0, '', 0, '0:0:0:0:0:0:0:1', '2025-12-01 16:10:13', NULL, '2025-12-01 16:10:13', '1', '2025-12-05 21:34:05', '0', 1);
-INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (144, 'aoteman001', '$2a$04$omQOmhz8OyUFBKw77nr8KOtMp6xdvoQ1gWStjk9r8.OYT3Bv6oEYe', 'aoteman001', NULL, 116, NULL, '', '', 0, '', 1, '0:0:0:0:0:0:0:1', '2025-12-01 17:05:27', '1', '2025-12-01 17:05:27', '1', '2025-12-15 15:55:54', '0', 1);
+INSERT INTO system_users (id, username, password, nickname, remark, dept_id, post_ids, email, mobile, sex, avatar, status, login_ip, login_date, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (144, 'aoteman001', '$2a$04$omQOmhz8OyUFBKw77nr8KOtMp6xdvoQ1gWStjk9r8.OYT3Bv6oEYe', 'aoteman001', NULL, 104, NULL, '', '', 0, '', 1, '0:0:0:0:0:0:0:1', '2025-12-01 17:05:27', '1', '2025-12-01 17:05:27', '1', '2026-05-31 21:52:48', '0', 1);
 COMMIT;
-SET IDENTITY_INSERT system_users OFF;
 -- @formatter:on
+
+DROP SEQUENCE IF EXISTS system_users_seq;
+CREATE SEQUENCE system_users_seq
+    START 145;
 
 -- ----------------------------
 -- Table structure for yudao_demo01_contact
 -- ----------------------------
+DROP TABLE IF EXISTS yudao_demo01_contact;
 CREATE TABLE yudao_demo01_contact (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    name varchar(100) DEFAULT '' NULL,
-    sex smallint  NOT NULL,
-    birthday datetime  NOT NULL,
-    description varchar(255)  NOT NULL,
-    avatar varchar(512) DEFAULT NULL NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted bit DEFAULT '0' NOT NULL,
-    tenant_id bigint DEFAULT 0 NOT NULL
+    id int8 NOT NULL,
+  name varchar(100) NOT NULL DEFAULT '',
+  sex int2 NOT NULL,
+  birthday timestamp NOT NULL,
+  description varchar(255) NOT NULL,
+  avatar varchar(512) NULL DEFAULT NULL,
+  creator varchar(64) NULL DEFAULT '',
+  create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0,
+  tenant_id int8 NOT NULL DEFAULT 0
 );
+
+ALTER TABLE yudao_demo01_contact ADD CONSTRAINT pk_yudao_demo01_contact PRIMARY KEY (id);
 
 COMMENT ON COLUMN yudao_demo01_contact.id IS '编号';
 COMMENT ON COLUMN yudao_demo01_contact.name IS '名字';
@@ -5434,26 +5985,32 @@ COMMENT ON TABLE yudao_demo01_contact IS '示例联系人表';
 -- Records of yudao_demo01_contact
 -- ----------------------------
 -- @formatter:off
-SET IDENTITY_INSERT yudao_demo01_contact ON;
+BEGIN;
 INSERT INTO yudao_demo01_contact (id, name, sex, birthday, description, avatar, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1, '土豆', 2, '2023-11-07 00:00:00', '<p>天蚕土豆！呀</p>', 'http://127.0.0.1:48080/admin-api/infra/file/4/get/46f8fa1a37db3f3960d8910ff2fe3962ab3b2db87cf2f8ccb4dc8145b8bdf237.jpeg', '1', '2023-11-15 23:34:30', '1', '2023-11-15 23:47:39', '0', 1);
 COMMIT;
-SET IDENTITY_INSERT yudao_demo01_contact OFF;
 -- @formatter:on
+
+DROP SEQUENCE IF EXISTS yudao_demo01_contact_seq;
+CREATE SEQUENCE yudao_demo01_contact_seq
+    START 2;
 
 -- ----------------------------
 -- Table structure for yudao_demo02_category
 -- ----------------------------
+DROP TABLE IF EXISTS yudao_demo02_category;
 CREATE TABLE yudao_demo02_category (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    name varchar(100) DEFAULT '' NULL,
-    parent_id bigint  NOT NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted bit DEFAULT '0' NOT NULL,
-    tenant_id bigint DEFAULT 0 NOT NULL
+    id int8 NOT NULL,
+  name varchar(100) NOT NULL DEFAULT '',
+  parent_id int8 NOT NULL,
+  creator varchar(64) NULL DEFAULT '',
+  create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0,
+  tenant_id int8 NOT NULL DEFAULT 0
 );
+
+ALTER TABLE yudao_demo02_category ADD CONSTRAINT pk_yudao_demo02_category PRIMARY KEY (id);
 
 COMMENT ON COLUMN yudao_demo02_category.id IS '编号';
 COMMENT ON COLUMN yudao_demo02_category.name IS '名字';
@@ -5470,7 +6027,7 @@ COMMENT ON TABLE yudao_demo02_category IS '示例分类表';
 -- Records of yudao_demo02_category
 -- ----------------------------
 -- @formatter:off
-SET IDENTITY_INSERT yudao_demo02_category ON;
+BEGIN;
 INSERT INTO yudao_demo02_category (id, name, parent_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (1, '土豆', 0, '1', '2023-11-15 23:34:30', '1', '2023-11-16 20:24:23', '0', 1);
 INSERT INTO yudao_demo02_category (id, name, parent_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2, '番茄', 0, '1', '2023-11-16 20:24:00', '1', '2023-11-16 20:24:15', '0', 1);
 INSERT INTO yudao_demo02_category (id, name, parent_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3, '怪怪', 0, '1', '2023-11-16 20:24:32', '1', '2023-11-16 20:24:32', '0', 1);
@@ -5479,24 +6036,30 @@ INSERT INTO yudao_demo02_category (id, name, parent_id, creator, create_time, up
 INSERT INTO yudao_demo02_category (id, name, parent_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6, '11', 3, '1', '2023-11-24 19:29:34', '1', '2023-11-24 19:29:34', '0', 1);
 INSERT INTO yudao_demo02_category (id, name, parent_id, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (7, '1', 0, '1', '2025-10-01 09:19:20', '1', '2025-10-01 09:19:20', '0', 1);
 COMMIT;
-SET IDENTITY_INSERT yudao_demo02_category OFF;
 -- @formatter:on
+
+DROP SEQUENCE IF EXISTS yudao_demo02_category_seq;
+CREATE SEQUENCE yudao_demo02_category_seq
+    START 8;
 
 -- ----------------------------
 -- Table structure for yudao_demo03_course
 -- ----------------------------
+DROP TABLE IF EXISTS yudao_demo03_course;
 CREATE TABLE yudao_demo03_course (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    student_id bigint  NOT NULL,
-    name varchar(100) DEFAULT '' NULL,
-    score smallint  NOT NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted bit DEFAULT '0' NOT NULL,
-    tenant_id bigint DEFAULT 0 NOT NULL
+    id int8 NOT NULL,
+  student_id int8 NOT NULL,
+  name varchar(100) NOT NULL DEFAULT '',
+  score int2 NOT NULL,
+  creator varchar(64) NULL DEFAULT '',
+  create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0,
+  tenant_id int8 NOT NULL DEFAULT 0
 );
+
+ALTER TABLE yudao_demo03_course ADD CONSTRAINT pk_yudao_demo03_course PRIMARY KEY (id);
 
 COMMENT ON COLUMN yudao_demo03_course.id IS '编号';
 COMMENT ON COLUMN yudao_demo03_course.student_id IS '学生编号';
@@ -5514,7 +6077,7 @@ COMMENT ON TABLE yudao_demo03_course IS '学生课程表';
 -- Records of yudao_demo03_course
 -- ----------------------------
 -- @formatter:off
-SET IDENTITY_INSERT yudao_demo03_course ON;
+BEGIN;
 INSERT INTO yudao_demo03_course (id, student_id, name, score, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2, 2, '语文', 66, '1', '2023-11-16 23:21:49', '1', '2024-09-17 10:55:30', '1', 1);
 INSERT INTO yudao_demo03_course (id, student_id, name, score, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (3, 2, '数学', 22, '1', '2023-11-16 23:21:49', '1', '2024-09-17 10:55:30', '1', 1);
 INSERT INTO yudao_demo03_course (id, student_id, name, score, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (6, 5, '体育', 23, '1', '2023-11-16 23:22:46', '1', '2023-11-16 15:44:40', '1', 1);
@@ -5533,24 +6096,30 @@ INSERT INTO yudao_demo03_course (id, student_id, name, score, creator, create_ti
 INSERT INTO yudao_demo03_course (id, student_id, name, score, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (19, 9, '滑雪', 12, '1', '2023-11-17 13:13:20', '1', '2025-04-19 02:49:03', '1', 1);
 INSERT INTO yudao_demo03_course (id, student_id, name, score, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (20, 9, '滑雪', 12, '1', '2023-11-17 13:13:20', '1', '2025-04-19 10:49:04', '0', 1);
 COMMIT;
-SET IDENTITY_INSERT yudao_demo03_course OFF;
 -- @formatter:on
+
+DROP SEQUENCE IF EXISTS yudao_demo03_course_seq;
+CREATE SEQUENCE yudao_demo03_course_seq
+    START 21;
 
 -- ----------------------------
 -- Table structure for yudao_demo03_grade
 -- ----------------------------
+DROP TABLE IF EXISTS yudao_demo03_grade;
 CREATE TABLE yudao_demo03_grade (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    student_id bigint  NOT NULL,
-    name varchar(100) DEFAULT '' NULL,
-    teacher varchar(255)  NOT NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted bit DEFAULT '0' NOT NULL,
-    tenant_id bigint DEFAULT 0 NOT NULL
+    id int8 NOT NULL,
+  student_id int8 NOT NULL,
+  name varchar(100) NOT NULL DEFAULT '',
+  teacher varchar(255) NOT NULL,
+  creator varchar(64) NULL DEFAULT '',
+  create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0,
+  tenant_id int8 NOT NULL DEFAULT 0
 );
+
+ALTER TABLE yudao_demo03_grade ADD CONSTRAINT pk_yudao_demo03_grade PRIMARY KEY (id);
 
 COMMENT ON COLUMN yudao_demo03_grade.id IS '编号';
 COMMENT ON COLUMN yudao_demo03_grade.student_id IS '学生编号';
@@ -5568,30 +6137,36 @@ COMMENT ON TABLE yudao_demo03_grade IS '学生班级表';
 -- Records of yudao_demo03_grade
 -- ----------------------------
 -- @formatter:off
-SET IDENTITY_INSERT yudao_demo03_grade ON;
+BEGIN;
 INSERT INTO yudao_demo03_grade (id, student_id, name, teacher, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (7, 2, '三年 2 班', '周杰伦', '1', '2023-11-16 23:21:49', '1', '2024-09-17 18:55:31', '0', 1);
 INSERT INTO yudao_demo03_grade (id, student_id, name, teacher, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (8, 5, '华为', '遥遥领先', '1', '2023-11-16 23:22:46', '1', '2024-09-17 18:55:29', '0', 1);
 INSERT INTO yudao_demo03_grade (id, student_id, name, teacher, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (9, 9, '小图', '小娃111', '1', '2023-11-17 13:10:23', '1', '2025-04-19 10:49:04', '0', 1);
 COMMIT;
-SET IDENTITY_INSERT yudao_demo03_grade OFF;
 -- @formatter:on
+
+DROP SEQUENCE IF EXISTS yudao_demo03_grade_seq;
+CREATE SEQUENCE yudao_demo03_grade_seq
+    START 10;
 
 -- ----------------------------
 -- Table structure for yudao_demo03_student
 -- ----------------------------
+DROP TABLE IF EXISTS yudao_demo03_student;
 CREATE TABLE yudao_demo03_student (
-    id bigint NOT NULL PRIMARY KEY IDENTITY,
-    name varchar(100) DEFAULT '' NULL,
-    sex smallint  NOT NULL,
-    birthday datetime  NOT NULL,
-    description varchar(255)  NOT NULL,
-    creator varchar(64) DEFAULT '' NULL,
-    create_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater varchar(64) DEFAULT '' NULL,
-    update_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted bit DEFAULT '0' NOT NULL,
-    tenant_id bigint DEFAULT 0 NOT NULL
+    id int8 NOT NULL,
+  name varchar(100) NOT NULL DEFAULT '',
+  sex int2 NOT NULL,
+  birthday timestamp NOT NULL,
+  description varchar(255) NOT NULL,
+  creator varchar(64) NULL DEFAULT '',
+  create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updater varchar(64) NULL DEFAULT '',
+  update_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  deleted int2 NOT NULL DEFAULT 0,
+  tenant_id int8 NOT NULL DEFAULT 0
 );
+
+ALTER TABLE yudao_demo03_student ADD CONSTRAINT pk_yudao_demo03_student PRIMARY KEY (id);
 
 COMMENT ON COLUMN yudao_demo03_student.id IS '编号';
 COMMENT ON COLUMN yudao_demo03_student.name IS '名字';
@@ -5610,10 +6185,14 @@ COMMENT ON TABLE yudao_demo03_student IS '学生表';
 -- Records of yudao_demo03_student
 -- ----------------------------
 -- @formatter:off
-SET IDENTITY_INSERT yudao_demo03_student ON;
+BEGIN;
 INSERT INTO yudao_demo03_student (id, name, sex, birthday, description, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (2, '小白', 1, '2023-11-16 00:00:00', '<p>厉害</p>', '1', '2023-11-16 23:21:49', '1', '2024-09-17 18:55:31', '0', 1);
 INSERT INTO yudao_demo03_student (id, name, sex, birthday, description, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (5, '大黑', 2, '2023-11-13 00:00:00', '<p>你在教我做事?</p>', '1', '2023-11-16 23:22:46', '1', '2024-09-17 18:55:29', '0', 1);
 INSERT INTO yudao_demo03_student (id, name, sex, birthday, description, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (9, '小花', 1, '2023-11-07 00:00:00', '<p>哈哈哈</p>', '1', '2023-11-17 00:04:47', '1', '2025-04-19 10:49:04', '0', 1);
 COMMIT;
-SET IDENTITY_INSERT yudao_demo03_student OFF;
 -- @formatter:on
+
+DROP SEQUENCE IF EXISTS yudao_demo03_student_seq;
+CREATE SEQUENCE yudao_demo03_student_seq
+    START 10;
+

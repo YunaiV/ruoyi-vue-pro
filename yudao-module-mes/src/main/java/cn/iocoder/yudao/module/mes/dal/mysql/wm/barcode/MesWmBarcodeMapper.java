@@ -7,6 +7,8 @@ import cn.iocoder.yudao.module.mes.controller.admin.wm.barcode.vo.MesWmBarcodePa
 import cn.iocoder.yudao.module.mes.dal.dataobject.wm.barcode.MesWmBarcodeDO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.Collection;
+
 /**
  * MES 条码清单 Mapper
  *
@@ -41,6 +43,12 @@ public interface MesWmBarcodeMapper extends BaseMapperX<MesWmBarcodeDO> {
 
     default Long selectCountByConfigId(Long configId) {
         return selectCount(MesWmBarcodeDO::getConfigId, configId);
+    }
+
+    default int deleteByBizTypeAndBizIds(Integer bizType, Collection<Long> bizIds) {
+        return delete(new LambdaQueryWrapperX<MesWmBarcodeDO>()
+                .eq(MesWmBarcodeDO::getBizType, bizType)
+                .inIfPresent(MesWmBarcodeDO::getBizId, bizIds));
     }
 
 }
