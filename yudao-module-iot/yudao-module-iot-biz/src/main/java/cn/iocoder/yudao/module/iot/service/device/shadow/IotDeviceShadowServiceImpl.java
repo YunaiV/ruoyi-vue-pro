@@ -7,10 +7,10 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.enums.shadow.IotDeviceShadowErrorCodeEnum;
-import cn.iocoder.yudao.module.iot.core.util.IotDeviceShadowProtocolUtils;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.topic.shadow.IotDeviceShadowReplyDTO;
 import cn.iocoder.yudao.module.iot.core.topic.shadow.IotDeviceShadowUpdateReqDTO;
+import cn.iocoder.yudao.module.iot.core.util.IotDeviceShadowProtocolUtils;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceShadowDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.device.IotDeviceShadowMapper;
@@ -32,8 +32,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.iot.core.util.IotDeviceShadowProtocolUtils.INNER_METHOD_GET;
-import static cn.iocoder.yudao.module.iot.core.util.IotDeviceShadowProtocolUtils.INNER_METHOD_UPDATE;
+import static cn.iocoder.yudao.module.iot.core.util.IotDeviceShadowProtocolUtils.*;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.DEVICE_SHADOW_NOT_ENABLED;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.DEVICE_SHADOW_VERSION_CONFLICT;
 
@@ -89,23 +88,26 @@ public class IotDeviceShadowServiceImpl implements IotDeviceShadowService {
         } catch (Exception ex) {
             log.error("[handleDeviceShadowUpdate][device({}) message({}) 处理异常]", device.getId(), message, ex);
             Long version = resolveShadowVersionSafely(device.getId());
-            sendShadowReplySafely(device, message.getServerId(), IotDeviceShadowReplyDTO.errorOf(version,
+            sendShadowReplySafely(device, message.getServerId(), IotDeviceShadowReplyDTO.errorOf(
+                    extractInnerMethod(message.getParams()), version,
                     IotDeviceShadowErrorCodeEnum.SERVER_ERROR.getCode(),
                     IotDeviceShadowErrorCodeEnum.SERVER_ERROR.getMessage(), DateUtil.currentSeconds()));
         }
     }
 
     private void handleDeviceShadowUpdate0(IotDeviceDO device, IotDeviceMessage message) {
-        // 1. 解析请求
+        // 1. 解析请求（影子 body 当前按 JSON 建模，非 JSON 设备在 gateway 透传层已拒绝）
         IotDeviceShadowUpdateReqDTO req = JsonUtils.convertObject(message.getParams(), IotDeviceShadowUpdateReqDTO.class);
         if (req == null) {
-            sendShadowReplySafely(device, message.getServerId(), IotDeviceShadowReplyDTO.errorOf(0L,
+            sendShadowReplySafely(device, message.getServerId(), IotDeviceShadowReplyDTO.errorOf(
+                    extractInnerMethod(message.getParams()), 0L,
                     IotDeviceShadowErrorCodeEnum.JSON_FORMAT_ERROR.getCode(),
                     IotDeviceShadowErrorCodeEnum.JSON_FORMAT_ERROR.getMessage(), DateUtil.currentSeconds()));
             return;
         }
         if (StrUtil.isEmpty(req.getMethod())) {
-            sendShadowReplySafely(device, message.getServerId(), IotDeviceShadowReplyDTO.errorOf(resolveShadowVersionSafely(device.getId()),
+            sendShadowReplySafely(device, message.getServerId(), IotDeviceShadowReplyDTO.errorOf(
+                    INNER_METHOD_UPDATE, resolveShadowVersionSafely(device.getId()),
                     IotDeviceShadowErrorCodeEnum.METHOD_MISSING.getCode(),
                     IotDeviceShadowErrorCodeEnum.METHOD_MISSING.getMessage(), DateUtil.currentSeconds()));
             return;
@@ -128,7 +130,8 @@ public class IotDeviceShadowServiceImpl implements IotDeviceShadowService {
             handleReportedUpdate(device, message.getServerId(), req);
             return;
         }
-        sendShadowReplySafely(device, message.getServerId(), IotDeviceShadowReplyDTO.errorOf(shadow.getVersion(),
+        sendShadowReplySafely(device, message.getServerId(), IotDeviceShadowReplyDTO.errorOf(
+                req.getMethod(), shadow.getVersion(),
                 IotDeviceShadowErrorCodeEnum.INVALID_METHOD.getCode(),
                 IotDeviceShadowErrorCodeEnum.INVALID_METHOD.getMessage(), DateUtil.currentSeconds()));
     }
@@ -137,19 +140,22 @@ public class IotDeviceShadowServiceImpl implements IotDeviceShadowService {
         Long deviceId = device.getId();
 
         if (req.getState() == null) {
-            sendShadowReplySafely(device, serverId, IotDeviceShadowReplyDTO.errorOf(resolveShadowVersionSafely(deviceId),
+            sendShadowReplySafely(device, serverId, IotDeviceShadowReplyDTO.errorOf(
+                    INNER_METHOD_UPDATE, resolveShadowVersionSafely(deviceId),
                     IotDeviceShadowErrorCodeEnum.STATE_MISSING.getCode(),
                     IotDeviceShadowErrorCodeEnum.STATE_MISSING.getMessage(), DateUtil.currentSeconds()));
             return;
         }
         if (req.getState().getReported() == null) {
-            sendShadowReplySafely(device, serverId, IotDeviceShadowReplyDTO.errorOf(resolveShadowVersionSafely(deviceId),
+            sendShadowReplySafely(device, serverId, IotDeviceShadowReplyDTO.errorOf(
+                    INNER_METHOD_UPDATE, resolveShadowVersionSafely(deviceId),
                     IotDeviceShadowErrorCodeEnum.REPORTED_MISSING.getCode(),
                     IotDeviceShadowErrorCodeEnum.REPORTED_MISSING.getMessage(), DateUtil.currentSeconds()));
             return;
         }
         if (CollUtil.isEmpty(req.getState().getReported())) {
-            sendShadowReplySafely(device, serverId, IotDeviceShadowReplyDTO.errorOf(resolveShadowVersionSafely(deviceId),
+            sendShadowReplySafely(device, serverId, IotDeviceShadowReplyDTO.errorOf(
+                    INNER_METHOD_UPDATE, resolveShadowVersionSafely(deviceId),
                     IotDeviceShadowErrorCodeEnum.REPORTED_EMPTY.getCode(),
                     IotDeviceShadowErrorCodeEnum.REPORTED_EMPTY.getMessage(), DateUtil.currentSeconds()));
             return;
@@ -171,7 +177,8 @@ public class IotDeviceShadowServiceImpl implements IotDeviceShadowService {
             sendShadowReplySafely(device, serverId, IotDeviceShadowReplyDTO.updateReplyOf(committed.getVersion(),
                     committed.getShadowTime()));
         } catch (ShadowUpdateRejectedException ex) {
-            sendShadowReplySafely(device, serverId, IotDeviceShadowReplyDTO.errorOf(ex.getVersion(),
+            sendShadowReplySafely(device, serverId, IotDeviceShadowReplyDTO.errorOf(
+                    INNER_METHOD_UPDATE, ex.getVersion(),
                     ex.getErrorCode().getCode(), ex.getErrorCode().getMessage(), DateUtil.currentSeconds()));
         } catch (ShadowCasExhaustedException ex) {
             handleCasExhaustedForDevice(device, serverId, ex);
@@ -340,7 +347,8 @@ public class IotDeviceShadowServiceImpl implements IotDeviceShadowService {
 
     private void handleCasExhaustedForDevice(IotDeviceDO device, String serverId, ShadowCasExhaustedException ex) {
         if (ex.isShadowNotFound()) {
-            sendShadowReplySafely(device, serverId, IotDeviceShadowReplyDTO.errorOf(0L,
+            sendShadowReplySafely(device, serverId, IotDeviceShadowReplyDTO.errorOf(
+                    INNER_METHOD_UPDATE, 0L,
                     IotDeviceShadowErrorCodeEnum.SERVER_ERROR.getCode(),
                     IotDeviceShadowErrorCodeEnum.SERVER_ERROR.getMessage(), DateUtil.currentSeconds()));
             return;
@@ -349,7 +357,8 @@ public class IotDeviceShadowServiceImpl implements IotDeviceShadowService {
     }
 
     private void sendVersionConflictReply(IotDeviceDO device, String serverId, Long version) {
-        sendShadowReplySafely(device, serverId, IotDeviceShadowReplyDTO.errorOf(version,
+        sendShadowReplySafely(device, serverId, IotDeviceShadowReplyDTO.errorOf(
+                INNER_METHOD_UPDATE, version,
                 IotDeviceShadowErrorCodeEnum.VERSION_CONFLICT.getCode(),
                 IotDeviceShadowErrorCodeEnum.VERSION_CONFLICT.getMessage(), DateUtil.currentSeconds()));
     }

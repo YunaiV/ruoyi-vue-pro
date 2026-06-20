@@ -2,20 +2,15 @@ package cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.handler.upstream;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ArrayUtil;
-import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceRespDTO;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
-import cn.iocoder.yudao.module.iot.core.enums.IotSerializeTypeEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.manager.IotMqttConnectionManager;
-import cn.iocoder.yudao.module.iot.gateway.serialize.IotShadowPassthroughCodec;
-import cn.iocoder.yudao.module.iot.gateway.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import cn.iocoder.yudao.module.iot.gateway.util.IotMqttTopicUtils;
 import io.vertx.mqtt.MqttEndpoint;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Arrays;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -28,14 +23,11 @@ import java.util.stream.Collectors;
 public class IotMqttUpstreamHandler extends IotMqttAbstractHandler {
 
     private final String serverId;
-    private final IotDeviceService deviceService;
 
     public IotMqttUpstreamHandler(IotMqttConnectionManager connectionManager,
                                   IotDeviceMessageService deviceMessageService,
-                                  IotDeviceService deviceService,
                                   String serverId) {
         super(connectionManager, deviceMessageService);
-        this.deviceService = deviceService;
         this.serverId = serverId;
     }
 
@@ -75,17 +67,11 @@ public class IotMqttUpstreamHandler extends IotMqttAbstractHandler {
                     .collect(Collectors.joining("."));
             IotDeviceMessage message;
             if (IotDeviceMessageMethodEnum.isPassthrough(topicMethod)) {
-                // 影子透传：按设备 serializeType 解码，原始 body 作为 params
-                IotDeviceRespDTO device = deviceService.getDeviceFromCache(productKey, deviceName);
-                IotSerializeTypeEnum serializeType = device != null
-                        ? IotSerializeTypeEnum.of(device.getSerializeType()) : null;
-                Map<String, Object> params = IotShadowPassthroughCodec.decode(payload, serializeType);
-                if (params == null) {
+                message = deviceMessageService.deserializePassthroughMessage(payload, topicMethod, productKey, deviceName);
+                if (message == null) {
                     log.warn("[handleBusinessRequest][影子透传 payload 解析失败，客户端 ID: {}，主题: {}]", clientId, topic);
                     return;
                 }
-                String requestId = (String) params.get("id");
-                message = IotDeviceMessage.requestOf(requestId, topicMethod, params);
             } else {
                 message = deviceMessageService.deserializeDeviceMessage(payload, productKey, deviceName);
                 if (message == null) {

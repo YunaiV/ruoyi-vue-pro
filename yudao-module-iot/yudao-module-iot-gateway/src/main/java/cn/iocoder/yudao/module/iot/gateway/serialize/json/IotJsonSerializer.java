@@ -6,6 +6,8 @@ import cn.iocoder.yudao.module.iot.core.enums.IotSerializeTypeEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.gateway.serialize.IotMessageSerializer;
 
+import java.util.Map;
+
 /**
  * JSON 格式的消息序列化器
  *
@@ -32,6 +34,19 @@ public class IotJsonSerializer implements IotMessageSerializer {
         IotDeviceMessage message = JsonUtils.parseObject(bytes, IotDeviceMessage.class);
         Assert.notNull(message, "消息解码失败");
         return message;
+    }
+
+    @Override
+    public byte[] encodeRaw(Object value) {
+        Assert.notNull(value, "待编码数据不能为空");
+        return JsonUtils.toJsonByte(value);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> decodeRaw(byte[] bytes) {
+        Assert.notNull(bytes, "待解码数据不能为空");
+        return JsonUtils.parseObject(bytes, Map.class);
     }
 
 }

@@ -14,7 +14,8 @@ import static cn.iocoder.yudao.module.iot.core.util.IotDeviceShadowProtocolUtils
 /**
  * IoT 设备影子下行 Reply DTO
  * <p>
- * 用于 {@link IotDeviceMessageMethodEnum#SHADOW_GET} 消息的 params 参数（透传原始线 body）
+ * 扁平对齐 CommonResult + method，用于 {@link IotDeviceMessageMethodEnum#SHADOW_GET} 透传线 body。
+ * 错误回复的 {@link #data} 仍携带 version 供设备 resync，有意偏离纯 CommonResult（error 时 data 通常为 null）。
  *
  * @author 芋道源码
  */
@@ -29,19 +30,19 @@ public class IotDeviceShadowReplyDTO {
     private String method;
 
     /**
-     * 回复载荷（对齐 CommonResult：code / msg / data）
+     * 结果码，0 表示成功
      */
-    private Object payload;
+    private Integer code;
 
     /**
-     * 影子版本号
+     * 结果描述
      */
-    private Long version;
+    private String msg;
 
     /**
-     * 时间戳（epoch 秒）
+     * 业务数据：get_reply 为 {state, version, timestamp}；update_reply 为 {version, timestamp}
      */
-    private Long timestamp;
+    private Object data;
 
     public static IotDeviceShadowReplyDTO getReplyOf(Map<String, Object> desired, Map<String, Object> reported,
                                                      Long version, Long timestamp) {
@@ -50,45 +51,29 @@ public class IotDeviceShadowReplyDTO {
         state.put(STATE_REPORTED, reported != null ? reported : new HashMap<>());
         Map<String, Object> data = new HashMap<>();
         data.put(PAYLOAD_STATE, state);
-        Map<String, Object> payload = buildSuccessPayload(data);
-        return new IotDeviceShadowReplyDTO()
-                .setMethod(INNER_METHOD_GET_REPLY)
-                .setPayload(payload)
-                .setVersion(version)
-                .setTimestamp(timestamp);
+        data.put(PAYLOAD_VERSION, version);
+        data.put(METADATA_TIMESTAMP, timestamp);
+        return of(INNER_METHOD_GET_REPLY, SUCCESS.getCode(), SUCCESS.getMsg(), data);
     }
 
     public static IotDeviceShadowReplyDTO updateReplyOf(Long version, Long timestamp) {
-        Map<String, Object> data = new HashMap<>();
-        data.put(PAYLOAD_VERSION, version);
-        Map<String, Object> payload = buildSuccessPayload(data);
-        return new IotDeviceShadowReplyDTO()
-                .setMethod(INNER_METHOD_UPDATE_REPLY)
-                .setPayload(payload)
-                .setVersion(version)
-                .setTimestamp(timestamp);
+        return of(INNER_METHOD_UPDATE_REPLY, SUCCESS.getCode(), SUCCESS.getMsg(), dataWithVersionTimestamp(version, timestamp));
     }
 
-    public static IotDeviceShadowReplyDTO errorOf(Long version, Integer errorCode, String errorMsg, Long timestamp) {
-        Map<String, Object> data = new HashMap<>();
-        data.put(PAYLOAD_VERSION, version);
-        Map<String, Object> payload = new HashMap<>();
-        payload.put(PAYLOAD_CODE, errorCode);
-        payload.put(PAYLOAD_MSG, errorMsg);
-        payload.put(PAYLOAD_DATA, data);
-        return new IotDeviceShadowReplyDTO()
-                .setMethod(INNER_METHOD_UPDATE_REPLY)
-                .setPayload(payload)
-                .setVersion(version)
-                .setTimestamp(timestamp);
+    public static IotDeviceShadowReplyDTO errorOf(String innerMethod, Long version, Integer errorCode,
+                                                  String errorMsg, Long timestamp) {
+        return of(toReplyMethod(innerMethod), errorCode, errorMsg, dataWithVersionTimestamp(version, timestamp));
     }
 
-    private static Map<String, Object> buildSuccessPayload(Map<String, Object> data) {
-        Map<String, Object> payload = new HashMap<>();
-        payload.put(PAYLOAD_CODE, SUCCESS.getCode());
-        payload.put(PAYLOAD_MSG, SUCCESS.getMsg());
-        payload.put(PAYLOAD_DATA, data);
-        return payload;
+    private static IotDeviceShadowReplyDTO of(String method, Integer code, String msg, Map<String, Object> data) {
+        return new IotDeviceShadowReplyDTO().setMethod(method).setCode(code).setMsg(msg).setData(data);
+    }
+
+    private static Map<String, Object> dataWithVersionTimestamp(Long version, Long timestamp) {
+        Map<String, Object> data = new HashMap<>();
+        data.put(PAYLOAD_VERSION, version);
+        data.put(METADATA_TIMESTAMP, timestamp);
+        return data;
     }
 
 }

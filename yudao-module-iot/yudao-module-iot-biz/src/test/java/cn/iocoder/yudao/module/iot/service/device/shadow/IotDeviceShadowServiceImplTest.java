@@ -85,7 +85,7 @@ public class IotDeviceShadowServiceImplTest extends BaseMockitoUnitTest {
         verify(deviceMessageService).sendDeviceMessage(captor.capture(), eq(device), eq("server-1"));
         IotDeviceShadowReplyDTO reply = (IotDeviceShadowReplyDTO) captor.getValue().getParams();
         assertEquals("get_reply", reply.getMethod());
-        assertEquals(2L, reply.getVersion());
+        assertEquals(2L, getReplyVersion(reply));
     }
 
     @Test
@@ -142,9 +142,7 @@ public class IotDeviceShadowServiceImplTest extends BaseMockitoUnitTest {
         ArgumentCaptor<IotDeviceMessage> captor = ArgumentCaptor.forClass(IotDeviceMessage.class);
         verify(deviceMessageService).sendDeviceMessage(captor.capture(), eq(device), eq("server-1"));
         IotDeviceShadowReplyDTO reply = (IotDeviceShadowReplyDTO) captor.getValue().getParams();
-        @SuppressWarnings("unchecked")
-        Map<String, Object> payload = (Map<String, Object>) reply.getPayload();
-        assertEquals(409, payload.get("code"));
+        assertEquals(409, reply.getCode());
         verify(deviceShadowMapper, never()).updateByDeviceIdAndVersion(any(), any(), any());
     }
 
@@ -196,9 +194,7 @@ public class IotDeviceShadowServiceImplTest extends BaseMockitoUnitTest {
         verify(deviceMessageService).sendDeviceMessage(captor.capture(), eq(device), eq("server-1"));
         IotDeviceShadowReplyDTO reply = (IotDeviceShadowReplyDTO) captor.getValue().getParams();
         assertEquals("update_reply", reply.getMethod());
-        @SuppressWarnings("unchecked")
-        Map<String, Object> payload = (Map<String, Object>) reply.getPayload();
-        assertEquals(409, payload.get("code"));
+        assertEquals(409, reply.getCode());
         verify(deviceShadowMapper, never()).updateByDeviceIdAndVersion(any(), any(), any());
     }
 
@@ -268,7 +264,7 @@ public class IotDeviceShadowServiceImplTest extends BaseMockitoUnitTest {
         verify(deviceMessageService).sendDeviceMessage(captor.capture(), eq(device), eq("server-1"));
         IotDeviceShadowReplyDTO reply = (IotDeviceShadowReplyDTO) captor.getValue().getParams();
         assertEquals("get_reply", reply.getMethod());
-        assertEquals(2L, reply.getVersion());
+        assertEquals(2L, getReplyVersion(reply));
         // getOrCreateShadow + CAS 各一次 SELECT，推送不再额外查库
         verify(deviceShadowMapper, times(2)).selectByDeviceId(deviceId);
         verify(deviceShadowRedisDAO).delete(deviceId);
@@ -293,6 +289,21 @@ public class IotDeviceShadowServiceImplTest extends BaseMockitoUnitTest {
     }
 
     @Test
+    public void testHandleDeviceShadowUpdate_invalidParams_send400() {
+        IotDeviceDO device = buildDevice();
+
+        IotDeviceMessage message = IotDeviceMessage.requestOf(device.getId(), 1L, "server-1",
+                IotDeviceMessageMethodEnum.SHADOW_UPDATE.getMethod(), null);
+
+        service.handleDeviceShadowUpdate(device, message);
+
+        ArgumentCaptor<IotDeviceMessage> captor = ArgumentCaptor.forClass(IotDeviceMessage.class);
+        verify(deviceMessageService).sendDeviceMessage(captor.capture(), eq(device), eq("server-1"));
+        IotDeviceShadowReplyDTO reply = (IotDeviceShadowReplyDTO) captor.getValue().getParams();
+        assertEquals(400, reply.getCode());
+    }
+
+    @Test
     public void testHandleDeviceShadowUpdate_methodMissing_send401() {
         IotDeviceDO device = buildDevice();
         IotDeviceShadowDO shadow = buildShadow(device, 3L);
@@ -309,9 +320,7 @@ public class IotDeviceShadowServiceImplTest extends BaseMockitoUnitTest {
         ArgumentCaptor<IotDeviceMessage> captor = ArgumentCaptor.forClass(IotDeviceMessage.class);
         verify(deviceMessageService).sendDeviceMessage(captor.capture(), eq(device), eq("server-1"));
         IotDeviceShadowReplyDTO reply = (IotDeviceShadowReplyDTO) captor.getValue().getParams();
-        @SuppressWarnings("unchecked")
-        Map<String, Object> payload = (Map<String, Object>) reply.getPayload();
-        assertEquals(401, payload.get("code"));
+        assertEquals(401, reply.getCode());
     }
 
     @Test
@@ -365,7 +374,7 @@ public class IotDeviceShadowServiceImplTest extends BaseMockitoUnitTest {
         ArgumentCaptor<IotDeviceMessage> replyCaptor = ArgumentCaptor.forClass(IotDeviceMessage.class);
         verify(deviceMessageService).sendDeviceMessage(replyCaptor.capture(), eq(device), eq("server-1"));
         IotDeviceShadowReplyDTO reply = (IotDeviceShadowReplyDTO) replyCaptor.getValue().getParams();
-        assertEquals(3L, reply.getVersion());
+        assertEquals(3L, getReplyVersion(reply));
     }
 
     @Test
@@ -429,10 +438,8 @@ public class IotDeviceShadowServiceImplTest extends BaseMockitoUnitTest {
         ArgumentCaptor<IotDeviceMessage> captor = ArgumentCaptor.forClass(IotDeviceMessage.class);
         verify(deviceMessageService).sendDeviceMessage(captor.capture(), eq(device), eq("server-1"));
         IotDeviceShadowReplyDTO reply = (IotDeviceShadowReplyDTO) captor.getValue().getParams();
-        assertEquals(0L, reply.getVersion());
-        @SuppressWarnings("unchecked")
-        Map<String, Object> payload = (Map<String, Object>) reply.getPayload();
-        assertEquals(500, payload.get("code"));
+        assertEquals(0L, getReplyVersion(reply));
+        assertEquals(500, reply.getCode());
     }
 
     @Test
@@ -458,9 +465,7 @@ public class IotDeviceShadowServiceImplTest extends BaseMockitoUnitTest {
         ArgumentCaptor<IotDeviceMessage> captor = ArgumentCaptor.forClass(IotDeviceMessage.class);
         verify(deviceMessageService).sendDeviceMessage(captor.capture(), eq(device), eq("server-1"));
         IotDeviceShadowReplyDTO reply = (IotDeviceShadowReplyDTO) captor.getValue().getParams();
-        @SuppressWarnings("unchecked")
-        Map<String, Object> payload = (Map<String, Object>) reply.getPayload();
-        assertEquals(500, payload.get("code"));
+        assertEquals(500, reply.getCode());
         verify(deviceShadowMapper, never()).updateByDeviceIdAndVersion(any(), any(), any());
     }
 
@@ -491,6 +496,15 @@ public class IotDeviceShadowServiceImplTest extends BaseMockitoUnitTest {
                 .shadowTime(1000L)
                 .status(status)
                 .build();
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Long getReplyVersion(IotDeviceShadowReplyDTO reply) {
+        if (!(reply.getData() instanceof Map)) {
+            return null;
+        }
+        Object version = ((Map<String, Object>) reply.getData()).get("version");
+        return version instanceof Number ? ((Number) version).longValue() : null;
     }
 
 }

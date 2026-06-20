@@ -44,11 +44,6 @@ public class IotDeviceShadowUpdateReqDTO {
          */
         private Map<String, Object> reported;
 
-        /**
-         * 期望状态
-         */
-        private Map<String, Object> desired;
-
     }
 
 }

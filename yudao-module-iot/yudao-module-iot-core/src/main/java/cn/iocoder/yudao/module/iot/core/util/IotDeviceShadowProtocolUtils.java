@@ -31,13 +31,31 @@ public final class IotDeviceShadowProtocolUtils {
     public static final String STATE_REPORTED = "reported";
     public static final String METADATA_TIMESTAMP = "timestamp";
 
-    // ========== payload 键（对齐 CommonResult：code / msg / data）==========
+    // ========== reply data 键 ==========
 
-    public static final String PAYLOAD_CODE = "code";
-    public static final String PAYLOAD_MSG = "msg";
-    public static final String PAYLOAD_DATA = "data";
     public static final String PAYLOAD_STATE = "state";
     public static final String PAYLOAD_VERSION = "version";
+
+    /**
+     * 由内层 method 推导 reply method（get → get_reply，其余 → update_reply）
+     */
+    public static String toReplyMethod(String innerMethod) {
+        if (INNER_METHOD_GET.equals(innerMethod)) {
+            return INNER_METHOD_GET_REPLY;
+        }
+        return INNER_METHOD_UPDATE_REPLY;
+    }
+
+    /**
+     * 从透传 params 提取内层 method；无法解析时默认 update
+     */
+    public static String extractInnerMethod(Object params) {
+        if (!(params instanceof Map)) {
+            return INNER_METHOD_UPDATE;
+        }
+        Object method = ((Map<?, ?>) params).get("method");
+        return method != null ? String.valueOf(method) : INNER_METHOD_UPDATE;
+    }
 
     /**
      * 获取 desired 下某属性的更新时间戳

@@ -62,4 +62,16 @@ public interface IotDeviceMessageService {
     void sendDeviceMessage(IotDeviceMessage message,
                            String productKey, String deviceName, String serverId);
 
+    /**
+     * 透传上行组装：按设备 serializeType 解码 body，提取 id 作 requestId，构建消息
+     *
+     * @param payload    原始 body
+     * @param method     透传 method（来自 topic 等，如 thing.shadow.update）
+     * @param productKey 产品 Key
+     * @param deviceName 设备名称
+     * @return 设备消息；解码失败返回 null
+     */
+    IotDeviceMessage deserializePassthroughMessage(byte[] payload, String method,
+                                                   String productKey, String deviceName);
+
 }
