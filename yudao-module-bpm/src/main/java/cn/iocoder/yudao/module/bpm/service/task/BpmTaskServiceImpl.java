@@ -698,8 +698,12 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
             // 2.2 情况二：如果节点中的审批人策略为 审批人，在审批时选择下一个节点的审批人，并且该节点的审批人为空
             if (ObjUtil.equals(candidateStrategy, BpmTaskCandidateStrategyEnum.APPROVE_USER_SELECT.getStrategy())) {
-                // 如果节点存在，但未配置审批人
+                // 特殊：如果当前节点已经存在审批人，则不允许覆盖。 例如并行节点后，设置的审批人自选节点。 https://t.zsxq.com/daxv1
                 Map<String, List<Long>> approveUserSelectAssignees = FlowableUtils.getApproveUserSelectAssignees(processInstance.getProcessVariables());
+                if (approveUserSelectAssignees != null && CollUtil.isNotEmpty(approveUserSelectAssignees.get(nextFlowNode.getId()))) {
+                    continue;
+                }
+                // 如果节点存在，但未配置审批人
                 List<Long> assignees = nextAssignees != null ? nextAssignees.get(nextFlowNode.getId()) : null;
                 if (CollUtil.isEmpty(assignees)) {
                     throw exception(PROCESS_INSTANCE_APPROVE_USER_SELECT_ASSIGNEES_NOT_CONFIG, nextFlowNode.getName());
