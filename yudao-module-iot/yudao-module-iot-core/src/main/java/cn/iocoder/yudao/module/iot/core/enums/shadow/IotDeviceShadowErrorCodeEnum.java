@@ -6,8 +6,10 @@ import lombok.Getter;
 /**
  * IoT 设备影子设备侧错误码枚举
  * <p>
- * 设备侧 wire code，仅用于回填 {@code update_reply.code/msg}，不走 {@link cn.iocoder.yudao.framework.common.pojo.CommonResult}。
- * 服务端内部异常请使用 {@link cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants}（如 {@code DEVICE_SHADOW_NOT_ENABLED}）。
+ * 设备侧 wire code，仅用于回填 {@code update_reply.code/msg}，不走
+ * {@link cn.iocoder.yudao.framework.common.pojo.CommonResult}。
+ * 服务端内部异常请使用 {@link cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants}（如
+ * {@code DEVICE_SHADOW_NOT_ENABLED}）。
  *
  * @author 芋道源码
  */

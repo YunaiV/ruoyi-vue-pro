@@ -14,8 +14,10 @@ import static cn.iocoder.yudao.module.iot.core.util.IotDeviceShadowProtocolUtils
 /**
  * IoT 设备影子下行 Reply DTO
  * <p>
- * 扁平对齐 CommonResult + method，用于 {@link IotDeviceMessageMethodEnum#SHADOW_GET} 透传线 body。
- * 错误回复的 {@link #data} 仍携带 version 供设备 resync，有意偏离纯 CommonResult（error 时 data 通常为 null）。
+ * 扁平对齐 CommonResult + method，用于 {@link IotDeviceMessageMethodEnum#SHADOW_GET}
+ * 透传线 body。
+ * 错误回复的 {@link #data} 仍携带 version 供设备 resync，有意偏离纯 CommonResult（error 时 data
+ * 通常为 null）。
  *
  * @author 芋道源码
  */
@@ -40,12 +42,13 @@ public class IotDeviceShadowReplyDTO {
     private String msg;
 
     /**
-     * 业务数据：get_reply 为 {state, version, timestamp}；update_reply 为 {version, timestamp}
+     * 业务数据：get_reply 为 {state, version, timestamp}；update_reply 为 {version,
+     * timestamp}
      */
     private Object data;
 
     public static IotDeviceShadowReplyDTO getReplyOf(Map<String, Object> desired, Map<String, Object> reported,
-                                                     Long version, Long timestamp) {
+            Long version, Long timestamp) {
         Map<String, Object> state = new HashMap<>();
         state.put(STATE_DESIRED, desired != null ? desired : new HashMap<>());
         state.put(STATE_REPORTED, reported != null ? reported : new HashMap<>());
@@ -57,11 +60,12 @@ public class IotDeviceShadowReplyDTO {
     }
 
     public static IotDeviceShadowReplyDTO updateReplyOf(Long version, Long timestamp) {
-        return of(INNER_METHOD_UPDATE_REPLY, SUCCESS.getCode(), SUCCESS.getMsg(), dataWithVersionTimestamp(version, timestamp));
+        return of(INNER_METHOD_UPDATE_REPLY, SUCCESS.getCode(), SUCCESS.getMsg(),
+                dataWithVersionTimestamp(version, timestamp));
     }
 
     public static IotDeviceShadowReplyDTO errorOf(String innerMethod, Long version, Integer errorCode,
-                                                  String errorMsg, Long timestamp) {
+            String errorMsg, Long timestamp) {
         return of(toReplyMethod(innerMethod), errorCode, errorMsg, dataWithVersionTimestamp(version, timestamp));
     }
 

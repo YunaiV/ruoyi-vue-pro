@@ -339,16 +339,17 @@ public class IotDeviceShadowServiceImplTest extends BaseMockitoUnitTest {
             // 前两次 select 返回 v=1 的快照，之后返回 v=2 的最新快照
             return selectCount.incrementAndGet() <= 2 ? staleShadow : latestShadow;
         });
-        when(deviceShadowMapper.updateByDeviceIdAndVersion(any(), eq(device.getId()), anyLong())).thenAnswer(invocation -> {
-            Long expectVersion = invocation.getArgument(2);
-            if (expectVersion == 1L) {
-                return 0;
-            }
-            if (expectVersion == 2L) {
-                return 1;
-            }
-            return 0;
-        });
+        when(deviceShadowMapper.updateByDeviceIdAndVersion(any(), eq(device.getId()), anyLong()))
+                .thenAnswer(invocation -> {
+                    Long expectVersion = invocation.getArgument(2);
+                    if (expectVersion == 1L) {
+                        return 0;
+                    }
+                    if (expectVersion == 2L) {
+                        return 1;
+                    }
+                    return 0;
+                });
 
         Map<String, Object> reported = new HashMap<>();
         reported.put("Temperature", 25);
@@ -364,7 +365,8 @@ public class IotDeviceShadowServiceImplTest extends BaseMockitoUnitTest {
         service.handleDeviceShadowUpdate(device, message);
 
         ArgumentCaptor<IotDeviceShadowDO> updateCaptor = ArgumentCaptor.forClass(IotDeviceShadowDO.class);
-        verify(deviceShadowMapper, atLeastOnce()).updateByDeviceIdAndVersion(updateCaptor.capture(), eq(device.getId()), any());
+        verify(deviceShadowMapper, atLeastOnce()).updateByDeviceIdAndVersion(updateCaptor.capture(), eq(device.getId()),
+                any());
         IotDeviceShadowDO finalUpdate = updateCaptor.getAllValues().get(updateCaptor.getAllValues().size() - 1);
         // 重试时应基于 v=2 的最新 reported 合并，保留 Humidity=50
         assertEquals(25, finalUpdate.getReported().get("Temperature"));

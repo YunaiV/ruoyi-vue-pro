@@ -43,7 +43,7 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
 
     @Override
     public byte[] serializeDeviceMessage(IotDeviceMessage message,
-                                         String productKey, String deviceName) {
+            String productKey, String deviceName) {
         if (IotDeviceMessageMethodEnum.isPassthrough(message.getMethod())) {
             IotDeviceRespDTO device = deviceService.getDeviceFromCache(productKey, deviceName);
             if (device == null) {
@@ -67,7 +67,7 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
 
     @Override
     public byte[] serializeDeviceMessage(IotDeviceMessage message,
-                                         IotSerializeTypeEnum serializeType) {
+            IotSerializeTypeEnum serializeType) {
         if (IotDeviceMessageMethodEnum.isPassthrough(message.getMethod())) {
             return encodePassthrough(message, serializeType, null, null);
         }
@@ -83,7 +83,7 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
 
     @Override
     public IotDeviceMessage deserializeDeviceMessage(byte[] bytes,
-                                                     String productKey, String deviceName) {
+            String productKey, String deviceName) {
         // 1.1 获取设备信息
         IotDeviceRespDTO device = deviceService.getDeviceFromCache(productKey, deviceName);
         if (device == null) {
@@ -111,7 +111,7 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
 
     @Override
     public IotDeviceMessage deserializePassthroughMessage(byte[] payload, String method,
-                                                          String productKey, String deviceName) {
+            String productKey, String deviceName) {
         IotDeviceRespDTO device = deviceService.getDeviceFromCache(productKey, deviceName);
         if (device == null) {
             throw exception(DEVICE_NOT_EXISTS, productKey, deviceName);
@@ -128,7 +128,7 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
 
     @Override
     public void sendDeviceMessage(IotDeviceMessage message,
-                                  String productKey, String deviceName, String serverId) {
+            String productKey, String deviceName, String serverId) {
         // 1. 获取设备信息
         IotDeviceRespDTO device = deviceService.getDeviceFromCache(productKey, deviceName);
         if (device == null) {
@@ -148,7 +148,7 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
      * @param serverId 设备连接的 serverId
      */
     private void appendDeviceMessage(IotDeviceMessage message,
-                                     IotDeviceRespDTO device, String serverId) {
+            IotDeviceRespDTO device, String serverId) {
         message.setId(IotDeviceMessageUtils.generateMessageId()).setReportTime(LocalDateTime.now())
                 .setDeviceId(device.getId()).setTenantId(device.getTenantId()).setServerId(serverId);
         // 特殊：如果设备没有指定 requestId，则使用 messageId
@@ -161,7 +161,7 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
      * 影子透传编码；不支持的 serializeType 返回 null，由下行发布方跳过发送
      */
     private byte[] encodePassthrough(IotDeviceMessage message, IotSerializeTypeEnum serializeType,
-                                     String productKey, String deviceName) {
+            String productKey, String deviceName) {
         return passthroughRaw("encodePassthrough", serializeType, productKey, deviceName, false,
                 serializer -> serializer.encodeRaw(message.getParams()));
     }
@@ -170,14 +170,14 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
      * 影子透传解码；解析失败或不支持的 serializeType 返回 null
      */
     private Map<String, Object> decodePassthrough(byte[] bytes, IotSerializeTypeEnum serializeType,
-                                                  String productKey, String deviceName) {
+            String productKey, String deviceName) {
         return passthroughRaw("decodePassthrough", serializeType, productKey, deviceName, true,
                 serializer -> serializer.decodeRaw(bytes));
     }
 
     private <T> T passthroughRaw(String op, IotSerializeTypeEnum serializeType,
-                                 String productKey, String deviceName, boolean decode,
-                                 Function<IotMessageSerializer, T> action) {
+            String productKey, String deviceName, boolean decode,
+            Function<IotMessageSerializer, T> action) {
         IotMessageSerializer serializer = getPassthroughSerializer(serializeType);
         if (serializer == null) {
             warnPassthroughUnsupported(op, serializeType, productKey, deviceName);
@@ -204,7 +204,7 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
     }
 
     private void warnPassthroughUnsupported(String op, IotSerializeTypeEnum serializeType,
-                                            String productKey, String deviceName) {
+            String productKey, String deviceName) {
         if (productKey != null && deviceName != null) {
             log.warn("[{}][影子透传跳过：设备({}/{}) serializeType={} 不支持，目前仅 JSON 协议设备可用]",
                     op, productKey, deviceName, serializeType);

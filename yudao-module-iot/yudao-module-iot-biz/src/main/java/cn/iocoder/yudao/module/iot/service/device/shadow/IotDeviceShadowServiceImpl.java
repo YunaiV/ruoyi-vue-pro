@@ -97,7 +97,8 @@ public class IotDeviceShadowServiceImpl implements IotDeviceShadowService {
 
     private void handleDeviceShadowUpdate0(IotDeviceDO device, IotDeviceMessage message) {
         // 1. 解析请求（影子 body 当前按 JSON 建模，非 JSON 设备在 gateway 透传层已拒绝）
-        IotDeviceShadowUpdateReqDTO req = JsonUtils.convertObject(message.getParams(), IotDeviceShadowUpdateReqDTO.class);
+        IotDeviceShadowUpdateReqDTO req = JsonUtils.convertObject(message.getParams(),
+                IotDeviceShadowUpdateReqDTO.class);
         if (req == null) {
             sendShadowReplySafely(device, message.getServerId(), IotDeviceShadowReplyDTO.errorOf(
                     extractInnerMethod(message.getParams()), 0L,
@@ -165,7 +166,8 @@ public class IotDeviceShadowServiceImpl implements IotDeviceShadowService {
         if (req.getVersion() != null && req.getVersion() == -1L) {
             try {
                 resetShadowWithRetry(deviceId);
-                sendShadowReplySafely(device, serverId, IotDeviceShadowReplyDTO.updateReplyOf(0L, DateUtil.currentSeconds()));
+                sendShadowReplySafely(device, serverId,
+                        IotDeviceShadowReplyDTO.updateReplyOf(0L, DateUtil.currentSeconds()));
             } catch (ShadowCasExhaustedException ex) {
                 handleCasExhaustedForDevice(device, serverId, ex);
             }
@@ -266,10 +268,12 @@ public class IotDeviceShadowServiceImpl implements IotDeviceShadowService {
         }
         Map<String, Object> mergedReported = mergeMap(latest.getReported(), req.getState().getReported());
         if (mergedReported.size() > MAX_PROPERTY_COUNT) {
-            throw new ShadowUpdateRejectedException(latest.getVersion(), IotDeviceShadowErrorCodeEnum.PROPERTY_COUNT_EXCEEDED);
+            throw new ShadowUpdateRejectedException(latest.getVersion(),
+                    IotDeviceShadowErrorCodeEnum.PROPERTY_COUNT_EXCEEDED);
         }
         long now = DateUtil.currentSeconds();
-        Map<String, Object> metadata = latest.getMetadata() != null ? new HashMap<>(latest.getMetadata()) : new HashMap<>();
+        Map<String, Object> metadata = latest.getMetadata() != null ? new HashMap<>(latest.getMetadata())
+                : new HashMap<>();
         IotDeviceShadowProtocolUtils.putReportedTimestamps(metadata, req.getState().getReported().keySet(), now);
         return IotDeviceShadowDO.builder()
                 .reported(mergedReported)
@@ -282,7 +286,8 @@ public class IotDeviceShadowServiceImpl implements IotDeviceShadowService {
     private IotDeviceShadowDO buildDesiredUpdate(IotDeviceShadowDO latest, Map<String, Object> desired) {
         long now = DateUtil.currentSeconds();
         Map<String, Object> mergedDesired = mergeMap(latest.getDesired(), desired);
-        Map<String, Object> metadata = latest.getMetadata() != null ? new HashMap<>(latest.getMetadata()) : new HashMap<>();
+        Map<String, Object> metadata = latest.getMetadata() != null ? new HashMap<>(latest.getMetadata())
+                : new HashMap<>();
         IotDeviceShadowProtocolUtils.putDesiredTimestamps(metadata, desired.keySet(), now);
         return IotDeviceShadowDO.builder()
                 .desired(mergedDesired)
@@ -307,7 +312,8 @@ public class IotDeviceShadowServiceImpl implements IotDeviceShadowService {
      *
      * @return 写入成功后的 update DO（回填未更新字段，便于构建全量回复）
      */
-    private IotDeviceShadowDO casUpdateShadow(Long deviceId, Function<IotDeviceShadowDO, IotDeviceShadowDO> updateBuilder) {
+    private IotDeviceShadowDO casUpdateShadow(Long deviceId,
+            Function<IotDeviceShadowDO, IotDeviceShadowDO> updateBuilder) {
         Long lastKnownVersion = 0L;
         for (int i = 0; i < OPTIMISTIC_LOCK_RETRY; i++) {
             // 首次尝试走缓存，重试时直读 DB 获取最新 version
