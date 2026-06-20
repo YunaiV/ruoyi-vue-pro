@@ -997,7 +997,7 @@ public class BpmnModelUtils {
                 continue;
             }
             hasSequenceFlow.add(outgoingFlow.getId());
-
+            // 获取目标节点
             FlowElement targetElement = bpmnModel.getFlowElement(outgoingFlow.getTargetRef());
             if (targetElement == null || targetElement instanceof EndEvent) {
                 continue;

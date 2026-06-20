@@ -276,9 +276,9 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             processVariables.putAll(reqVO.getProcessVariables());
         }
 
-        // 3. 获取下一个将要执行的节点集合
+        // 3.1 获取下一个将要执行的节点集合
         FlowElement flowElement = bpmnModel.getFlowElement(task.getTaskDefinitionKey());
-        //  获取 UserTask 节点
+        // 3.2 获取 UserTask 节点
         List<UserTask> nextUserTaskList = BpmnModelUtils.getNextUserTasks(flowElement, bpmnModel, processVariables);
         List<ActivityNode> nextActivityNodes = convertList(nextUserTaskList, node -> new ActivityNode().setId(node.getId())
                 .setName(node.getName()).setNodeType(BpmSimpleModelNodeTypeEnum.APPROVE_NODE.getType())
