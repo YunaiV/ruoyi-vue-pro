@@ -669,10 +669,10 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         }
         // 1. 获取下一个将要执行的节点集合
         FlowElement flowElement = bpmnModel.getFlowElement(taskDefinitionKey);
-        List<FlowNode> nextFlowNodes = getNextFlowNodes(flowElement, bpmnModel, variables);
+        List<UserTask> nextFlowNodes = getNextUserTasks(flowElement, bpmnModel, variables);
 
         // 2. 校验选择的下一个节点的审批人，是否合法
-        for (FlowNode nextFlowNode : nextFlowNodes) {
+        for (UserTask nextFlowNode : nextFlowNodes) {
             Integer candidateStrategy = parseCandidateStrategy(nextFlowNode);
             // 2.1 情况一：如果节点中的审批人策略为 发起人自选
             if (ObjUtil.equals(candidateStrategy, BpmTaskCandidateStrategyEnum.START_USER_SELECT.getStrategy())) {
