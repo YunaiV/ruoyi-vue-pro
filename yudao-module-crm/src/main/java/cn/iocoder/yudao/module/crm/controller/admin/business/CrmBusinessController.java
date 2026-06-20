@@ -138,6 +138,17 @@ public class CrmBusinessController {
                         .setCustomerId(business.getCustomerId())));
     }
 
+    @GetMapping("/list-by-customer")
+    @Operation(summary = "获得商机列表，基于指定客户")
+    @Parameter(name = "customerId", description = "客户编号", required = true)
+    @PreAuthorize("@ss.hasPermission('crm:business:query')")
+    public CommonResult<List<CrmBusinessRespVO>> getBusinessListByCustomer(@RequestParam("customerId") Long customerId) {
+        List<CrmBusinessDO> list = businessService.getBusinessListByCustomerId(customerId);
+        return success(convertList(list, business -> // 只返回 id、name 字段
+                new CrmBusinessRespVO().setId(business.getId()).setName(business.getName())
+                        .setCustomerId(business.getCustomerId())));
+    }
+
     @GetMapping("/page")
     @Operation(summary = "获得商机分页")
     @PreAuthorize("@ss.hasPermission('crm:business:query')")

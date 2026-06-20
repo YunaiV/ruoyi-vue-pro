@@ -378,6 +378,12 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
     }
 
     @Override
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#customerId", level = CrmPermissionLevelEnum.READ)
+    public List<CrmBusinessDO> getBusinessListByCustomerId(Long customerId) {
+        return businessMapper.selectListByCustomerId(customerId);
+    }
+
+    @Override
     public PageResult<CrmBusinessDO> getBusinessPageByDate(CrmStatisticsFunnelReqVO pageVO) {
         return businessMapper.selectPage(pageVO);
     }
