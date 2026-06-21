@@ -70,7 +70,6 @@ public enum IotDeviceMessageMethodEnum implements ArrayValuable<String> {
     // ========== 设备影子 ==========
 
     SHADOW_UPDATE("thing.shadow.update", "设备影子更新", true),
-    SHADOW_GET("thing.shadow.get", "设备影子获取", false),
 
     ;
 
@@ -83,15 +82,7 @@ public enum IotDeviceMessageMethodEnum implements ArrayValuable<String> {
     public static final Set<String> REPLY_DISABLED = SetUtils.asSet(
             STATE_UPDATE.getMethod(),
             OTA_PROGRESS.getMethod(), // 参考阿里云，OTA 升级进度上报，不进行回复
-            SHADOW_UPDATE.getMethod() // 设备影子由影子 Service 主动下发 thing.shadow.get
-    );
-
-    /**
-     * 透传方法集合：设备侧使用原始线格式，不套 IotDeviceMessage 封套
-     */
-    public static final Set<String> PASSTHROUGH_METHODS = SetUtils.asSet(
-            SHADOW_UPDATE.getMethod(),
-            SHADOW_GET.getMethod()
+            SHADOW_UPDATE.getMethod() // 设备影子由影子 Service 主动下发回复（thing/shadow/update_reply）
     );
 
     private final String method;
@@ -112,10 +103,6 @@ public enum IotDeviceMessageMethodEnum implements ArrayValuable<String> {
 
     public static boolean isReplyDisabled(String method) {
         return REPLY_DISABLED.contains(method);
-    }
-
-    public static boolean isPassthrough(String method) {
-        return PASSTHROUGH_METHODS.contains(method);
     }
 
 }

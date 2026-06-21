@@ -9,7 +9,7 @@ import java.util.Set;
 /**
  * IoT 设备影子协议工具
  * <p>
- * 内层 method、state 键名、payload 字段等与设备侧透传 JSON 对齐；并提供 metadata 读写。
+ * 内层 method、state 键名、reply data 字段等与设备侧标准封套 params/data 对齐；并提供 metadata 读写。
  *
  * @author 芋道源码
  */
@@ -18,12 +18,10 @@ public final class IotDeviceShadowProtocolUtils {
     private IotDeviceShadowProtocolUtils() {
     }
 
-    // ========== 内层 method ==========
+    // ========== 内层 method（上行 params.method） ==========
 
     public static final String INNER_METHOD_GET = "get";
     public static final String INNER_METHOD_UPDATE = "update";
-    public static final String INNER_METHOD_GET_REPLY = "get_reply";
-    public static final String INNER_METHOD_UPDATE_REPLY = "update_reply";
 
     // ========== state / metadata 键 ==========
 
@@ -37,24 +35,28 @@ public final class IotDeviceShadowProtocolUtils {
     public static final String PAYLOAD_VERSION = "version";
 
     /**
-     * 由内层 method 推导 reply method（get → get_reply，其余 → update_reply）
+     * 构建 get 响应 data：{ state:{desired,reported}, version, timestamp }
      */
-    public static String toReplyMethod(String innerMethod) {
-        if (INNER_METHOD_GET.equals(innerMethod)) {
-            return INNER_METHOD_GET_REPLY;
-        }
-        return INNER_METHOD_UPDATE_REPLY;
+    public static Map<String, Object> buildGetData(Map<String, Object> desired, Map<String, Object> reported,
+                                                   Long version, Long timestamp) {
+        Map<String, Object> state = new HashMap<>();
+        state.put(STATE_DESIRED, desired != null ? desired : new HashMap<>());
+        state.put(STATE_REPORTED, reported != null ? reported : new HashMap<>());
+        Map<String, Object> data = new HashMap<>();
+        data.put(PAYLOAD_STATE, state);
+        data.put(PAYLOAD_VERSION, version);
+        data.put(METADATA_TIMESTAMP, timestamp);
+        return data;
     }
 
     /**
-     * 从透传 params 提取内层 method；无法解析时默认 update
+     * 构建 update 响应 / 错误 data：{ version, timestamp }
      */
-    public static String extractInnerMethod(Object params) {
-        if (!(params instanceof Map)) {
-            return INNER_METHOD_UPDATE;
-        }
-        Object method = ((Map<?, ?>) params).get("method");
-        return method != null ? String.valueOf(method) : INNER_METHOD_UPDATE;
+    public static Map<String, Object> buildUpdateData(Long version, Long timestamp) {
+        Map<String, Object> data = new HashMap<>();
+        data.put(PAYLOAD_VERSION, version);
+        data.put(METADATA_TIMESTAMP, timestamp);
+        return data;
     }
 
     /**

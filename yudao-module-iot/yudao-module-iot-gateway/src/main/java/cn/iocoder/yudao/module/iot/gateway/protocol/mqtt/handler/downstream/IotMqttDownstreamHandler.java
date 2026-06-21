@@ -45,11 +45,6 @@ public class IotMqttDownstreamHandler {
             // 2.1 序列化消息
             byte[] payload = deviceMessageService.serializeDeviceMessage(message, connectionInfo.getProductKey(),
                     connectionInfo.getDeviceName());
-            if (payload == null) {
-                log.warn("[handle][影子下行跳过，设备 ID: {}，method: {}，非 JSON 协议设备不支持影子透传]",
-                        message.getDeviceId(), message.getMethod());
-                return;
-            }
             Assert.isTrue(payload.length > 0, "消息编码结果不能为空");
             // 2.2 构建主题
             Assert.notBlank(message.getMethod(), "消息方法不能为空");

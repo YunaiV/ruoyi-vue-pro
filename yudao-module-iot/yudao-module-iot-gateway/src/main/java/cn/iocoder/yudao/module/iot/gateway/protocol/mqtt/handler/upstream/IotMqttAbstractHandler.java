@@ -72,11 +72,6 @@ public abstract class IotMqttAbstractHandler {
         try {
             // 1.1 序列化消息（根据设备配置的序列化类型）
             byte[] encodedData = deviceMessageService.serializeDeviceMessage(responseMessage, productKey, deviceName);
-            if (encodedData == null) {
-                // 影子透传在非 JSON 设备上 encode 返回 null，跳过发布避免 NPE
-                log.warn("[writeResponse][影子下行跳过，客户端 ID: {}，method: {}]", endpoint.clientIdentifier(), method);
-                return;
-            }
             // 1.2 构建响应主题
             String replyTopic = IotMqttTopicUtils.buildTopicByMethod(method, productKey, deviceName, true);
 

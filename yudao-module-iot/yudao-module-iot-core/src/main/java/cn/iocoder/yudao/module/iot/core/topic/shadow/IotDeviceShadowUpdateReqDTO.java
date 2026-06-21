@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * IoT 设备影子上行 Request DTO
  * <p>
- * 用于 {@link IotDeviceMessageMethodEnum#SHADOW_UPDATE} 消息的 params 参数（透传原始线 body）
+ * 用于 {@link IotDeviceMessageMethodEnum#SHADOW_UPDATE} 标准封套的 params 参数
  *
  * @author 芋道源码
  */

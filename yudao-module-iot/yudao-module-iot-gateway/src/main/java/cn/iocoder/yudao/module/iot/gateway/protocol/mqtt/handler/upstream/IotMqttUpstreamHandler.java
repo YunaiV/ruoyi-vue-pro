@@ -2,17 +2,12 @@ package cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.handler.upstream;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ArrayUtil;
-import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.manager.IotMqttConnectionManager;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import cn.iocoder.yudao.module.iot.gateway.util.IotMqttTopicUtils;
 import io.vertx.mqtt.MqttEndpoint;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
 
 /**
  * IoT 网关 MQTT 上行消息处理器：处理业务消息（属性上报、事件上报等）
@@ -62,25 +57,14 @@ public class IotMqttUpstreamHandler extends IotMqttAbstractHandler {
                 return;
             }
 
-            // 2.1 反序列化消息
-            String topicMethod = Arrays.stream(topicParts, 4, topicParts.length)
-                    .collect(Collectors.joining("."));
-            IotDeviceMessage message;
-            if (IotDeviceMessageMethodEnum.isPassthrough(topicMethod)) {
-                message = deviceMessageService.deserializePassthroughMessage(payload, topicMethod, productKey, deviceName);
-                if (message == null) {
-                    log.warn("[handleBusinessRequest][影子透传 payload 解析失败，客户端 ID: {}，主题: {}]", clientId, topic);
-                    return;
-                }
-            } else {
-                message = deviceMessageService.deserializeDeviceMessage(payload, productKey, deviceName);
-                if (message == null) {
-                    log.warn("[handleBusinessRequest][消息解码失败，客户端 ID: {}，主题: {}]", clientId, topic);
-                    return;
-                }
-                // 2.2 标准化回复消息的 method（MQTT 协议中，设备回复消息的 method 会携带 _reply 后缀）
-                IotMqttTopicUtils.normalizeReplyMethod(message);
+            // 2.1 反序列化消息（标准 IotDeviceMessage 封套，method 来自 body）
+            IotDeviceMessage message = deviceMessageService.deserializeDeviceMessage(payload, productKey, deviceName);
+            if (message == null) {
+                log.warn("[handleBusinessRequest][消息解码失败，客户端 ID: {}，主题: {}]", clientId, topic);
+                return;
             }
+            // 2.2 标准化回复消息的 method（MQTT 协议中，设备回复消息的 method 会携带 _reply 后缀）
+            IotMqttTopicUtils.normalizeReplyMethod(message);
 
             // 3. 处理业务消息
             deviceMessageService.sendDeviceMessage(message, productKey, deviceName, serverId);
