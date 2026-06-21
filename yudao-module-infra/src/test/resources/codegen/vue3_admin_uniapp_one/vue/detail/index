@@ -51,7 +51,7 @@
 import type { Student } from '@/api/infra/demo'
 import { onUnload } from '@dcloudio/uni-app'
 import { onMounted, ref } from 'vue'
-import { useToast } from 'wot-design-uni'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { deleteStudent, getStudent } from '@/api/infra/demo'
 import { useAccess } from '@/hooks/useAccess'
 import { navigateBackPlus } from '@/utils'

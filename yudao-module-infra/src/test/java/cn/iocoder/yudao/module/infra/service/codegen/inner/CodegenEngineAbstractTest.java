@@ -152,10 +152,21 @@ public abstract class CodegenEngineAbstractTest extends BaseMockitoUnitTest {
     protected void writeResult(Map<String, String> result, String basePath) {
         // 写入文件内容
         List<Map<String, String>> asserts = new ArrayList<>();
+        Set<String> usedContentPaths = new LinkedHashSet<>();
         result.forEach((filePath, fileContent) -> {
             String lastFilePath = StrUtil.subAfter(filePath, '/', true);
-            String contentPath = StrUtil.subAfter(lastFilePath, '.', true)
-                    + '/' + StrUtil.subBefore(lastFilePath, '.', true);
+            String ext = StrUtil.subAfter(lastFilePath, '.', true);
+            String name = StrUtil.subBefore(lastFilePath, '.', true);
+            String contentPath = ext + '/' + name;
+            // 同名文件（如 index.vue 同时出现在 列表/form/detail）会撞名，撞名时前缀补上级目录区分；仍撞则加序号兜底，避免快照互相覆盖
+            if (usedContentPaths.contains(contentPath)) {
+                String parentDir = StrUtil.subAfter(StrUtil.subBefore(filePath, '/' + lastFilePath, true), '/', true);
+                contentPath = ext + '/' + parentDir + '/' + name;
+                for (int i = 2; usedContentPaths.contains(contentPath); i++) {
+                    contentPath = ext + '/' + parentDir + '/' + name + '-' + i;
+                }
+            }
+            usedContentPaths.add(contentPath);
             asserts.add(MapUtil.<String, String>builder().put("filePath", filePath)
                     .put("contentPath", contentPath).build());
             FileUtil.writeUtf8String(fileContent, basePath + "/" + contentPath);

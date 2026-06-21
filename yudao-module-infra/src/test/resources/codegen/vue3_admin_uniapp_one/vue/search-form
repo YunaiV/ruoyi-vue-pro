@@ -31,7 +31,7 @@
         <view class="yd-search-form-label">
           性别
         </view>
-        <wd-radio-group v-model="formData.sex" shape="button">
+        <wd-radio-group v-model="formData.sex" type="button">
           <wd-radio :value="-1">
             全部
           </wd-radio>
@@ -48,7 +48,7 @@
         <view class="yd-search-form-label">
           是否有效
         </view>
-        <wd-radio-group v-model="formData.enabled" shape="button">
+        <wd-radio-group v-model="formData.enabled" type="button">
           <wd-radio :value="-1">
             全部
           </wd-radio>
@@ -61,42 +61,7 @@
           </wd-radio>
         </wd-radio-group>
       </view>
-      <view class="yd-search-form-item">
-        <view class="yd-search-form-label">
-          创建时间
-        </view>
-        <view class="yd-search-form-date-range-container">
-          <view @click="visibleCreateTime[0] = true">
-            <view class="yd-search-form-date-range-picker">
-              {{ formatDate(formData.createTime?.[0]) || '开始日期' }}
-            </view>
-          </view>
-          -
-          <view @click="visibleCreateTime[1] = true">
-            <view class="yd-search-form-date-range-picker">
-              {{ formatDate(formData.createTime?.[1]) || '结束日期' }}
-            </view>
-          </view>
-        </view>
-        <wd-datetime-picker-view v-if="visibleCreateTime[0]" v-model="tempCreateTime[0]" type="date" />
-        <view v-if="visibleCreateTime[0]" class="yd-search-form-date-range-actions">
-          <wd-button size="small" plain @click="visibleCreateTime[0] = false">
-            取消
-          </wd-button>
-          <wd-button size="small" type="primary" @click="handleCreateTime0Confirm">
-            确定
-          </wd-button>
-        </view>
-        <wd-datetime-picker-view v-if="visibleCreateTime[1]" v-model="tempCreateTime[1]" type="date" />
-        <view v-if="visibleCreateTime[1]" class="yd-search-form-date-range-actions">
-          <wd-button size="small" plain @click="visibleCreateTime[1] = false">
-            取消
-          </wd-button>
-          <wd-button size="small" type="primary" @click="handleCreateTime1Confirm">
-            确定
-          </wd-button>
-        </view>
-      </view>
+      <yd-search-date-range v-model="formData.createTime" label="创建时间" />
       <view class="yd-search-form-actions">
         <wd-button class="flex-1" plain @click="handleReset">
           重置
@@ -150,21 +115,6 @@ const placeholder = computed(() => {
   }
   return conditions.length > 0 ? conditions.join(' | ') : '搜索学生'
 })
-
-const visibleCreateTime = ref<[boolean, boolean]>([false, false]) // 创建时间选择器状态
-const tempCreateTime = ref<[number, number]>([Date.now(), Date.now()]) // 创建时间临时值
-
-/** 确认创建时间开始日期 */
-function handleCreateTime0Confirm() {
-  formData.createTime = [tempCreateTime.value[0], formData.createTime?.[1]]
-  visibleCreateTime.value[0] = false
-}
-
-/** 确认创建时间结束日期 */
-function handleCreateTime1Confirm() {
-  formData.createTime = [formData.createTime?.[0], tempCreateTime.value[1]]
-  visibleCreateTime.value[1] = false
-}
 
 /** 搜索按钮操作 */
 function handleSearch() {
