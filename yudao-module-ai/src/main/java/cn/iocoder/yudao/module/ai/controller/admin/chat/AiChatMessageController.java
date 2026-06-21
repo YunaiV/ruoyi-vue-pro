@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessagePageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessageRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.chat.vo.message.AiChatMessageSendReqVO;
@@ -65,7 +66,12 @@ public class AiChatMessageController {
     @Operation(summary = "发送消息（流式）", description = "流式返回，响应较快")
     @PostMapping(value = "/send-stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<CommonResult<AiChatMessageSendRespVO>> sendChatMessageStream(@Valid @RequestBody AiChatMessageSendReqVO sendReqVO) {
-        return chatMessageService.sendChatMessageStream(sendReqVO, getLoginUserId());
+        try {
+            return chatMessageService.sendChatMessageStream(sendReqVO, getLoginUserId());
+        } catch (ServiceException e) {
+            // 预算超限等业务异常，以 SSE 事件返回给前端，避免 HttpMediaTypeNotAcceptableException
+            return Flux.just(CommonResult.error(e.getCode(), e.getMessage()));
+        }
     }
 
     @Operation(summary = "获得指定对话的消息列表")

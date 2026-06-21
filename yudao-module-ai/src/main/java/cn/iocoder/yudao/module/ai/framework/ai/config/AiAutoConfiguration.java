@@ -96,6 +96,7 @@ public class AiAutoConfiguration {
                         .temperature(properties.getTemperature())
                         .maxTokens(properties.getMaxTokens())
                         .topP(properties.getTopP())
+                        .streamUsage(true)
                         .build())
                 .toolCallingManager(getToolCallingManager())
                 .build();
@@ -124,6 +125,7 @@ public class AiAutoConfiguration {
                         .temperature(properties.getTemperature())
                         .maxTokens(properties.getMaxTokens())
                         .topP(properties.getTopP())
+                        .streamUsage(true)
                         .build())
                 .toolCallingManager(getToolCallingManager())
                 .build();
@@ -217,6 +219,7 @@ public class AiAutoConfiguration {
                         .temperature(properties.getTemperature())
                         .maxTokens(properties.getMaxTokens())
                         .topP(properties.getTopP())
+                        .streamUsage(true)
                         .build())
                 // TODO @芋艿：星火的 function call 有 bug，会报 ToolResponseMessage must have an id 错误！！！
                 .toolCallingManager(getToolCallingManager())
@@ -245,6 +248,7 @@ public class AiAutoConfiguration {
                         .temperature(properties.getTemperature())
                         .maxTokens(properties.getMaxTokens())
                         .topP(properties.getTopP())
+                        .streamUsage(true)
                         .build())
                 .toolCallingManager(getToolCallingManager())
                 .build();
@@ -280,6 +284,7 @@ public class AiAutoConfiguration {
                         .temperature(properties.getTemperature())
                         .maxTokens(properties.getMaxTokens())
                         .topP(properties.getTopP())
+                        .streamUsage(true)
                         .build())
                 .toolCallingManager(getToolCallingManager())
                 .build();
