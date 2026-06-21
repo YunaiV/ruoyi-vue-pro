@@ -384,6 +384,18 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
     }
 
     @Override
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACT, bizId = "#contactId", level = CrmPermissionLevelEnum.READ)
+    public List<CrmBusinessDO> getBusinessListByContact(Long contactId) {
+        // 1. 查询关联的商机编号
+        List<CrmContactBusinessDO> contactBusinessList = contactBusinessService.getContactBusinessListByContactId(contactId);
+        if (CollUtil.isEmpty(contactBusinessList)) {
+            return ListUtil.empty();
+        }
+        // 2. 查询商机列表
+        return businessMapper.selectByIds(convertSet(contactBusinessList, CrmContactBusinessDO::getBusinessId));
+    }
+
+    @Override
     public PageResult<CrmBusinessDO> getBusinessPageByDate(CrmStatisticsFunnelReqVO pageVO) {
         return businessMapper.selectPage(pageVO);
     }
