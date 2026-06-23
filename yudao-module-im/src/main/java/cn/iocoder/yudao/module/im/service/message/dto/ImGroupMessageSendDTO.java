@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.im.service.message.dto;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImGroupMessageDO;
 import cn.iocoder.yudao.module.im.enums.ImContentTypeEnum;
 import cn.iocoder.yudao.module.im.service.websocket.notification.group.*;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.util.ArrayList;

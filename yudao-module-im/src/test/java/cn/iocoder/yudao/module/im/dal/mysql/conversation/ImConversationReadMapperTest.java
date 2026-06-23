@@ -3,10 +3,11 @@ package cn.iocoder.yudao.module.im.dal.mysql.conversation;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.im.dal.dataobject.conversation.ImConversationReadDO;
 import cn.iocoder.yudao.module.im.enums.ImConversationTypeEnum;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -86,7 +87,7 @@ public class ImConversationReadMapperTest extends BaseDbUnitTest {
         mapper.insert(buildRead(1L, ImConversationTypeEnum.CHANNEL.getType(), 30L, 3L));
 
         List<ImConversationReadDO> list = mapper.selectListByUserIdAndConversations(
-                1L, ImConversationTypeEnum.CHANNEL.getType(), List.of(10L, 20L));
+                1L, ImConversationTypeEnum.CHANNEL.getType(), Arrays.asList(10L, 20L));
 
         assertEquals(2, list.size());
     }

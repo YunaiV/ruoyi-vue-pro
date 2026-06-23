@@ -11,7 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Arrays;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -65,7 +65,7 @@ public class ImChannelMessageServiceImplTest extends BaseMockitoUnitTest {
     public void testReadChannelMessages_notVisible() {
         // 准备：定向消息，接收人不含当前用户
         ImChannelMessageDO message = ImChannelMessageDO.builder()
-                .id(100L).channelId(10L).receiverUserIds(List.of(2L, 3L)).sendTime(LocalDateTime.now()).build();
+                .id(100L).channelId(10L).receiverUserIds(Arrays.asList(2L, 3L)).sendTime(LocalDateTime.now()).build();
         when(channelMessageMapper.selectById(100L)).thenReturn(message);
 
         // 调用

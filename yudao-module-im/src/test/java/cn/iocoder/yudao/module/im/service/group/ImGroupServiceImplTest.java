@@ -17,9 +17,9 @@ import cn.iocoder.yudao.module.im.dal.dataobject.friend.ImFriendDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import cn.iocoder.yudao.module.im.dal.mysql.group.ImGroupMapper;
+import cn.iocoder.yudao.module.im.enums.ImContentTypeEnum;
 import cn.iocoder.yudao.module.im.enums.group.ImGroupAddSourceEnum;
 import cn.iocoder.yudao.module.im.enums.group.ImGroupMemberRoleEnum;
-import cn.iocoder.yudao.module.im.enums.ImContentTypeEnum;
 import cn.iocoder.yudao.module.im.framework.config.ImProperties;
 import cn.iocoder.yudao.module.im.service.friend.ImFriendService;
 import cn.iocoder.yudao.module.im.service.message.ImGroupMessageService;
@@ -37,7 +37,10 @@ import org.mockito.Spy;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -108,13 +111,13 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
         // 准备：创建者 + 2 个初始成员，都是好友
         ImGroupCreateReqVO reqVO = new ImGroupCreateReqVO();
         reqVO.setName("测试群");
-        reqVO.setMemberUserIds(new ArrayList<>(List.of(2L, 3L)));
+        reqVO.setMemberUserIds(new ArrayList<>(Arrays.asList(2L, 3L)));
         when(groupMapper.insert(any(ImGroupDO.class))).thenAnswer(invocation -> {
             ImGroupDO group = invocation.getArgument(0);
             group.setId(100L);
             return 1;
         });
-        when(friendService.getActiveFriendList(eq(1L), anyCollection())).thenReturn(List.of(
+        when(friendService.getActiveFriendList(eq(1L), anyCollection())).thenReturn(Arrays.asList(
                 ImFriendDO.builder().userId(1L).friendUserId(2L)
                         .status(CommonStatusEnum.ENABLE.getStatus()).build(),
                 ImFriendDO.builder().userId(1L).friendUserId(3L)
@@ -140,15 +143,15 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
         // 准备：初始成员里有非好友
         ImGroupCreateReqVO reqVO = new ImGroupCreateReqVO();
         reqVO.setName("测试群");
-        reqVO.setMemberUserIds(new ArrayList<>(List.of(2L, 3L)));
+        reqVO.setMemberUserIds(new ArrayList<>(Arrays.asList(2L, 3L)));
         // 只有 2 是好友，3 不是
-        when(friendService.getActiveFriendList(eq(1L), anyCollection())).thenReturn(List.of(
+        when(friendService.getActiveFriendList(eq(1L), anyCollection())).thenReturn(Arrays.asList(
                 ImFriendDO.builder().userId(1L).friendUserId(2L)
                         .status(CommonStatusEnum.ENABLE.getStatus()).build()));
         AdminUserRespDTO u3 = new AdminUserRespDTO();
         u3.setId(3L);
         u3.setNickname("李四");
-        when(adminUserApi.getUserMap(anyCollection())).thenReturn(Map.of(3L, u3));
+        when(adminUserApi.getUserMap(anyCollection())).thenReturn(Collections.singletonMap(3L, u3));
 
         // 调用并断言
         ServiceException exception = assertThrows(ServiceException.class,
@@ -377,8 +380,8 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
             // 被邀请人 2 和 3 都是好友
             ImGroupMemberInviteReqVO reqVO = new ImGroupMemberInviteReqVO();
             reqVO.setGroupId(10L);
-            reqVO.setMemberUserIds(new ArrayList<>(List.of(2L, 3L)));
-            List<ImFriendDO> friends = List.of(
+            reqVO.setMemberUserIds(new ArrayList<>(Arrays.asList(2L, 3L)));
+            List<ImFriendDO> friends = Arrays.asList(
                     ImFriendDO.builder().userId(1L).friendUserId(2L)
                             .status(CommonStatusEnum.ENABLE.getStatus()).build(),
                     ImFriendDO.builder().userId(1L).friendUserId(3L)
@@ -416,7 +419,7 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
                     ImGroupMemberDO.builder().groupId(10L).userId(1L)
                             .role(ImGroupMemberRoleEnum.NORMAL.getRole())
                             .status(CommonStatusEnum.ENABLE.getStatus()).build());
-            when(groupMemberService.getActiveGroupMemberListByGroupId(10L)).thenReturn(List.of(
+            when(groupMemberService.getActiveGroupMemberListByGroupId(10L)).thenReturn(Arrays.asList(
                     ImGroupMemberDO.builder().groupId(10L).userId(99L)
                             .role(ImGroupMemberRoleEnum.OWNER.getRole())
                             .status(CommonStatusEnum.ENABLE.getStatus()).build(),
@@ -426,8 +429,8 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
 
             ImGroupMemberInviteReqVO reqVO = new ImGroupMemberInviteReqVO();
             reqVO.setGroupId(10L);
-            reqVO.setMemberUserIds(new ArrayList<>(List.of(2L, 3L)));
-            when(friendService.getActiveFriendList(eq(1L), anyCollection())).thenReturn(List.of(
+            reqVO.setMemberUserIds(new ArrayList<>(Arrays.asList(2L, 3L)));
+            when(friendService.getActiveFriendList(eq(1L), anyCollection())).thenReturn(Arrays.asList(
                     ImFriendDO.builder().userId(1L).friendUserId(2L)
                             .status(CommonStatusEnum.ENABLE.getStatus()).build(),
                     ImFriendDO.builder().userId(1L).friendUserId(3L)
@@ -458,15 +461,15 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
                     ImGroupMemberDO.builder().groupId(10L).userId(1L)
                             .role(ImGroupMemberRoleEnum.OWNER.getRole())
                             .status(CommonStatusEnum.ENABLE.getStatus()).build());
-            when(groupMemberService.getActiveGroupMemberListByGroupId(10L)).thenReturn(List.of(
+            when(groupMemberService.getActiveGroupMemberListByGroupId(10L)).thenReturn(Arrays.asList(
                     ImGroupMemberDO.builder().groupId(10L).userId(1L)
                             .role(ImGroupMemberRoleEnum.OWNER.getRole())
                             .status(CommonStatusEnum.ENABLE.getStatus()).build()));
 
             ImGroupMemberInviteReqVO reqVO = new ImGroupMemberInviteReqVO();
             reqVO.setGroupId(10L);
-            reqVO.setMemberUserIds(new ArrayList<>(List.of(2L, 3L)));
-            when(friendService.getActiveFriendList(eq(1L), anyCollection())).thenReturn(List.of(
+            reqVO.setMemberUserIds(new ArrayList<>(Arrays.asList(2L, 3L)));
+            when(friendService.getActiveFriendList(eq(1L), anyCollection())).thenReturn(Arrays.asList(
                     ImFriendDO.builder().userId(1L).friendUserId(2L)
                             .status(CommonStatusEnum.ENABLE.getStatus()).build(),
                     ImFriendDO.builder().userId(1L).friendUserId(3L)
@@ -495,18 +498,18 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
                     .status(CommonStatusEnum.ENABLE.getStatus()).build();
             when(groupMapper.selectById(10L)).thenReturn(group);
             when(groupMemberService.getActiveGroupMemberListByGroupId(10L))
-                    .thenReturn(List.of(ImGroupMemberDO.builder().groupId(10L).userId(1L)
+                    .thenReturn(Arrays.asList(ImGroupMemberDO.builder().groupId(10L).userId(1L)
                             .status(CommonStatusEnum.ENABLE.getStatus()).build()));
 
             ImGroupMemberInviteReqVO reqVO = new ImGroupMemberInviteReqVO();
             reqVO.setGroupId(10L);
-            reqVO.setMemberUserIds(new ArrayList<>(List.of(2L, 3L)));
+            reqVO.setMemberUserIds(new ArrayList<>(Arrays.asList(2L, 3L)));
             // 只有 2 是好友，3 不是
-            when(friendService.getActiveFriendList(eq(1L), anyCollection())).thenReturn(List.of(
+            when(friendService.getActiveFriendList(eq(1L), anyCollection())).thenReturn(Arrays.asList(
                     ImFriendDO.builder().userId(1L).friendUserId(2L)
                             .status(CommonStatusEnum.ENABLE.getStatus()).build()));
             AdminUserRespDTO u3 = new AdminUserRespDTO(); u3.setId(3L); u3.setNickname("李四");
-            when(adminUserApi.getUserMap(anyCollection())).thenReturn(Map.of(3L, u3));
+            when(adminUserApi.getUserMap(anyCollection())).thenReturn(Collections.singletonMap(3L, u3));
 
             ServiceException exception = assertThrows(ServiceException.class,
                     () -> groupService.inviteGroupMember(1L, reqVO));
@@ -534,9 +537,9 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
 
             ImGroupMemberInviteReqVO reqVO = new ImGroupMemberInviteReqVO();
             reqVO.setGroupId(10L);
-            reqVO.setMemberUserIds(new ArrayList<>(List.of(600L, 601L)));
+            reqVO.setMemberUserIds(new ArrayList<>(Arrays.asList(600L, 601L)));
             // 被邀请人都是好友
-            when(friendService.getActiveFriendList(eq(1L), anyCollection())).thenReturn(List.of(
+            when(friendService.getActiveFriendList(eq(1L), anyCollection())).thenReturn(Arrays.asList(
                     ImFriendDO.builder().userId(1L).friendUserId(600L)
                             .status(CommonStatusEnum.ENABLE.getStatus()).build(),
                     ImFriendDO.builder().userId(1L).friendUserId(601L)
@@ -562,7 +565,7 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
                     .status(CommonStatusEnum.ENABLE.getStatus()).build();
             when(groupMapper.selectById(10L)).thenReturn(group);
             // 用户 2 已在群中
-            when(groupMemberService.getActiveGroupMemberListByGroupId(10L)).thenReturn(List.of(
+            when(groupMemberService.getActiveGroupMemberListByGroupId(10L)).thenReturn(Arrays.asList(
                     ImGroupMemberDO.builder().groupId(10L).userId(1L)
                             .status(CommonStatusEnum.ENABLE.getStatus()).build(),
                     ImGroupMemberDO.builder().groupId(10L).userId(2L)
@@ -571,7 +574,7 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
 
             ImGroupMemberInviteReqVO reqVO = new ImGroupMemberInviteReqVO();
             reqVO.setGroupId(10L);
-            reqVO.setMemberUserIds(new ArrayList<>(List.of(2L))); // 只邀请 2，他已在群中
+            reqVO.setMemberUserIds(new ArrayList<>(Arrays.asList(2L))); // 只邀请 2，他已在群中
 
             // 调用
             groupService.inviteGroupMember(1L, reqVO);
@@ -654,7 +657,7 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
 
             ImGroupMemberRemoveReqVO reqVO = new ImGroupMemberRemoveReqVO();
             reqVO.setGroupId(10L);
-            reqVO.setMemberUserIds(List.of(1L, 2L));
+            reqVO.setMemberUserIds(Arrays.asList(1L, 2L));
 
             ServiceException exception = assertThrows(ServiceException.class,
                     () -> groupService.removeGroupMember(1L, reqVO));
@@ -676,7 +679,7 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
                     ImGroupMemberDO.builder().groupId(10L).userId(1L)
                             .role(ImGroupMemberRoleEnum.OWNER.getRole()).build());
             // 目标：两个普通成员
-            when(groupMemberService.getGroupMembers(eq(10L), anyCollection())).thenReturn(List.of(
+            when(groupMemberService.getGroupMembers(eq(10L), anyCollection())).thenReturn(Arrays.asList(
                     ImGroupMemberDO.builder().groupId(10L).userId(2L)
                             .role(ImGroupMemberRoleEnum.NORMAL.getRole())
                             .status(CommonStatusEnum.ENABLE.getStatus()).build(),
@@ -686,7 +689,7 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
 
             ImGroupMemberRemoveReqVO reqVO = new ImGroupMemberRemoveReqVO();
             reqVO.setGroupId(10L);
-            reqVO.setMemberUserIds(List.of(2L, 3L));
+            reqVO.setMemberUserIds(Arrays.asList(2L, 3L));
 
             groupService.removeGroupMember(1L, reqVO);
 
@@ -712,14 +715,14 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
                     ImGroupMemberDO.builder().groupId(10L).userId(1L)
                             .role(ImGroupMemberRoleEnum.ADMIN.getRole()).build());
             // 目标：另一个管理员
-            when(groupMemberService.getGroupMembers(eq(10L), anyCollection())).thenReturn(List.of(
+            when(groupMemberService.getGroupMembers(eq(10L), anyCollection())).thenReturn(Arrays.asList(
                     ImGroupMemberDO.builder().groupId(10L).userId(2L)
                             .role(ImGroupMemberRoleEnum.ADMIN.getRole())
                             .status(CommonStatusEnum.ENABLE.getStatus()).build()));
 
             ImGroupMemberRemoveReqVO reqVO = new ImGroupMemberRemoveReqVO();
             reqVO.setGroupId(10L);
-            reqVO.setMemberUserIds(List.of(2L));
+            reqVO.setMemberUserIds(Arrays.asList(2L));
 
             ServiceException exception = assertThrows(ServiceException.class,
                     () -> groupService.removeGroupMember(1L, reqVO));
@@ -741,14 +744,14 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
             when(groupMemberService.validateMemberInGroup(10L, 1L)).thenReturn(
                     ImGroupMemberDO.builder().groupId(10L).userId(1L)
                             .role(ImGroupMemberRoleEnum.OWNER.getRole()).build());
-            when(groupMemberService.getGroupMembers(eq(10L), anyCollection())).thenReturn(List.of(
+            when(groupMemberService.getGroupMembers(eq(10L), anyCollection())).thenReturn(Arrays.asList(
                     ImGroupMemberDO.builder().groupId(10L).userId(99L)
                             .role(ImGroupMemberRoleEnum.OWNER.getRole())
                             .status(CommonStatusEnum.ENABLE.getStatus()).build()));
 
             ImGroupMemberRemoveReqVO reqVO = new ImGroupMemberRemoveReqVO();
             reqVO.setGroupId(10L);
-            reqVO.setMemberUserIds(List.of(99L));
+            reqVO.setMemberUserIds(Arrays.asList(99L));
 
             ServiceException exception = assertThrows(ServiceException.class,
                     () -> groupService.removeGroupMember(1L, reqVO));
@@ -770,7 +773,7 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
                     ImGroupMemberDO.builder().groupId(10L).userId(1L)
                             .role(ImGroupMemberRoleEnum.OWNER.getRole()).build());
             // 目标：2L 有效普通成员；3L 已退群（DISABLE）的历史管理员，应被跳过而非拦截整批
-            when(groupMemberService.getGroupMembers(eq(10L), anyCollection())).thenReturn(List.of(
+            when(groupMemberService.getGroupMembers(eq(10L), anyCollection())).thenReturn(Arrays.asList(
                     ImGroupMemberDO.builder().groupId(10L).userId(2L)
                             .role(ImGroupMemberRoleEnum.NORMAL.getRole())
                             .status(CommonStatusEnum.ENABLE.getStatus()).build(),
@@ -780,14 +783,14 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
 
             ImGroupMemberRemoveReqVO reqVO = new ImGroupMemberRemoveReqVO();
             reqVO.setGroupId(10L);
-            reqVO.setMemberUserIds(List.of(2L, 3L));
+            reqVO.setMemberUserIds(Arrays.asList(2L, 3L));
 
             groupService.removeGroupMember(1L, reqVO);
 
             // 仅有效成员 2L 进入移除，已退群的 3L 被跳过
             ArgumentCaptor<Collection> removeCaptor = ArgumentCaptor.forClass(Collection.class);
             verify(groupMemberService).removeGroupMembers(eq(10L), removeCaptor.capture());
-            assertEquals(Set.of(2L), Set.copyOf(removeCaptor.getValue()));
+            assertEquals(Collections.singleton(2L), new HashSet<>(removeCaptor.getValue()));
         }
     }
 
@@ -803,7 +806,7 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
                     .status(CommonStatusEnum.ENABLE.getStatus()).build();
             when(groupMapper.selectByIdForUpdate(10L)).thenReturn(group);
             // 目标 3 是普通成员
-            when(groupMemberService.getGroupMembers(eq(10L), anyCollection())).thenReturn(List.of(
+            when(groupMemberService.getGroupMembers(eq(10L), anyCollection())).thenReturn(Arrays.asList(
                     ImGroupMemberDO.builder().userId(3L).status(CommonStatusEnum.ENABLE.getStatus())
                             .role(ImGroupMemberRoleEnum.NORMAL.getRole()).build()));
             // 群里已有 1 个 ADMIN，1 + 1 ≤ 3 不超上限
@@ -814,7 +817,7 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
 
             ImGroupAdminAddReqVO reqVO = new ImGroupAdminAddReqVO();
             reqVO.setId(10L);
-            reqVO.setUserIds(List.of(3L));
+            reqVO.setUserIds(Arrays.asList(3L));
 
             groupService.addGroupAdmin(1L, reqVO);
 
@@ -833,7 +836,7 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
             ImGroupDO group = ImGroupDO.builder().id(10L).ownerUserId(1L)
                     .status(CommonStatusEnum.ENABLE.getStatus()).build();
             when(groupMapper.selectByIdForUpdate(10L)).thenReturn(group);
-            when(groupMemberService.getGroupMembers(eq(10L), anyCollection())).thenReturn(List.of(
+            when(groupMemberService.getGroupMembers(eq(10L), anyCollection())).thenReturn(Arrays.asList(
                     ImGroupMemberDO.builder().userId(5L).status(CommonStatusEnum.ENABLE.getStatus())
                             .role(ImGroupMemberRoleEnum.NORMAL.getRole()).build()));
             // 群里已有 3 个 ADMIN（达到上限），再加 1 会超
@@ -842,7 +845,7 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
 
             ImGroupAdminAddReqVO reqVO = new ImGroupAdminAddReqVO();
             reqVO.setId(10L);
-            reqVO.setUserIds(List.of(5L));
+            reqVO.setUserIds(Arrays.asList(5L));
 
             ServiceException exception = assertThrows(ServiceException.class,
                     () -> groupService.addGroupAdmin(1L, reqVO));
@@ -860,13 +863,13 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
             ImGroupDO group = ImGroupDO.builder().id(10L).ownerUserId(1L)
                     .status(CommonStatusEnum.ENABLE.getStatus()).build();
             when(groupMapper.selectByIdForUpdate(10L)).thenReturn(group);
-            when(groupMemberService.getGroupMembers(eq(10L), anyCollection())).thenReturn(List.of(
+            when(groupMemberService.getGroupMembers(eq(10L), anyCollection())).thenReturn(Arrays.asList(
                     ImGroupMemberDO.builder().userId(1L).status(CommonStatusEnum.ENABLE.getStatus())
                             .role(ImGroupMemberRoleEnum.OWNER.getRole()).build()));
 
             ImGroupAdminAddReqVO reqVO = new ImGroupAdminAddReqVO();
             reqVO.setId(10L);
-            reqVO.setUserIds(List.of(1L));
+            reqVO.setUserIds(Arrays.asList(1L));
 
             ServiceException exception = assertThrows(ServiceException.class,
                     () -> groupService.addGroupAdmin(1L, reqVO));
@@ -884,13 +887,13 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
                     .status(CommonStatusEnum.ENABLE.getStatus()).build();
             when(groupMapper.selectByIdForUpdate(10L)).thenReturn(group);
             // 目标已是 ADMIN：再加无需操作
-            when(groupMemberService.getGroupMembers(eq(10L), anyCollection())).thenReturn(List.of(
+            when(groupMemberService.getGroupMembers(eq(10L), anyCollection())).thenReturn(Arrays.asList(
                     ImGroupMemberDO.builder().userId(2L).status(CommonStatusEnum.ENABLE.getStatus())
                             .role(ImGroupMemberRoleEnum.ADMIN.getRole()).build()));
 
             ImGroupAdminAddReqVO reqVO = new ImGroupAdminAddReqVO();
             reqVO.setId(10L);
-            reqVO.setUserIds(List.of(2L));
+            reqVO.setUserIds(Arrays.asList(2L));
 
             groupService.addGroupAdmin(1L, reqVO);
 
@@ -910,7 +913,7 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
             ImGroupDO group = ImGroupDO.builder().id(10L).ownerUserId(1L)
                     .status(CommonStatusEnum.ENABLE.getStatus()).build();
             when(groupMapper.selectByIdForUpdate(10L)).thenReturn(group);
-            when(groupMemberService.getGroupMembers(eq(10L), anyCollection())).thenReturn(List.of(
+            when(groupMemberService.getGroupMembers(eq(10L), anyCollection())).thenReturn(Arrays.asList(
                     ImGroupMemberDO.builder().userId(2L).status(CommonStatusEnum.ENABLE.getStatus())
                             .role(ImGroupMemberRoleEnum.ADMIN.getRole()).build()));
             when(groupMemberService.updateGroupMemberRole(eq(10L), anyCollection(),
@@ -918,7 +921,7 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
 
             ImGroupAdminRemoveReqVO reqVO = new ImGroupAdminRemoveReqVO();
             reqVO.setId(10L);
-            reqVO.setUserIds(List.of(2L));
+            reqVO.setUserIds(Arrays.asList(2L));
 
             groupService.removeGroupAdmin(1L, reqVO);
 
@@ -938,13 +941,13 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
                     .status(CommonStatusEnum.ENABLE.getStatus()).build();
             when(groupMapper.selectByIdForUpdate(10L)).thenReturn(group);
             // 目标已是 MEMBER：撤销无需操作
-            when(groupMemberService.getGroupMembers(eq(10L), anyCollection())).thenReturn(List.of(
+            when(groupMemberService.getGroupMembers(eq(10L), anyCollection())).thenReturn(Arrays.asList(
                     ImGroupMemberDO.builder().userId(2L).status(CommonStatusEnum.ENABLE.getStatus())
                             .role(ImGroupMemberRoleEnum.NORMAL.getRole()).build()));
 
             ImGroupAdminRemoveReqVO reqVO = new ImGroupAdminRemoveReqVO();
             reqVO.setId(10L);
-            reqVO.setUserIds(List.of(2L));
+            reqVO.setUserIds(Arrays.asList(2L));
 
             groupService.removeGroupAdmin(1L, reqVO);
 
@@ -966,9 +969,9 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
             when(groupMemberService.validateMemberInGroup(10L, 2L)).thenReturn(
                     ImGroupMemberDO.builder().groupId(10L).userId(2L)
                             .role(ImGroupMemberRoleEnum.NORMAL.getRole()).build());
-            when(groupMemberService.updateGroupMemberRole(eq(10L), eq(Set.of(2L)),
+            when(groupMemberService.updateGroupMemberRole(eq(10L), eq(Collections.singleton(2L)),
                     eq(ImGroupMemberRoleEnum.OWNER.getRole()))).thenReturn(1);
-            when(groupMemberService.updateGroupMemberRole(eq(10L), eq(Set.of(1L)),
+            when(groupMemberService.updateGroupMemberRole(eq(10L), eq(Collections.singleton(1L)),
                     eq(ImGroupMemberRoleEnum.NORMAL.getRole()))).thenReturn(1);
 
             ImGroupTransferOwnerReqVO reqVO = new ImGroupTransferOwnerReqVO();
@@ -982,9 +985,9 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
             verify(groupMapper).updateById(groupCaptor.capture());
             assertEquals(2L, groupCaptor.getValue().getOwnerUserId());
             // 旧群主 → MEMBER；新群主 → OWNER
-            verify(groupMemberService).updateGroupMemberRole(eq(10L), eq(Set.of(1L)),
+            verify(groupMemberService).updateGroupMemberRole(eq(10L), eq(Collections.singleton(1L)),
                     eq(ImGroupMemberRoleEnum.NORMAL.getRole()));
-            verify(groupMemberService).updateGroupMemberRole(eq(10L), eq(Set.of(2L)),
+            verify(groupMemberService).updateGroupMemberRole(eq(10L), eq(Collections.singleton(2L)),
                     eq(ImGroupMemberRoleEnum.OWNER.getRole()));
         }
     }
@@ -1162,7 +1165,7 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testGetMyGroupList_success() {
         // 曾经加入的所有群（含退群）
-        when(groupMemberService.getGroupMemberListByUserId(1L)).thenReturn(new ArrayList<>(List.of(
+        when(groupMemberService.getGroupMemberListByUserId(1L)).thenReturn(new ArrayList<>(Arrays.asList(
                 ImGroupMemberDO.builder().groupId(10L).userId(1L)
                         .status(CommonStatusEnum.ENABLE.getStatus()).build(),
                 ImGroupMemberDO.builder().groupId(20L).userId(1L)
@@ -1170,7 +1173,7 @@ public class ImGroupServiceImplTest extends BaseMockitoUnitTest {
                 ImGroupMemberDO.builder().groupId(30L).userId(1L)
                         .status(CommonStatusEnum.DISABLE.getStatus()).build()
         )));
-        List<ImGroupDO> groups = List.of(
+        List<ImGroupDO> groups = Arrays.asList(
                 ImGroupDO.builder().id(10L).status(CommonStatusEnum.ENABLE.getStatus()).build(),
                 ImGroupDO.builder().id(20L).status(CommonStatusEnum.ENABLE.getStatus()).build(),
                 ImGroupDO.builder().id(30L).status(CommonStatusEnum.ENABLE.getStatus()).build()

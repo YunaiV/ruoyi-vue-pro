@@ -12,7 +12,7 @@ import cn.iocoder.yudao.module.im.dal.mysql.message.ImGroupMessageMapper;
 import cn.iocoder.yudao.module.im.dal.mysql.message.ImPrivateMessageMapper;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
 import cn.iocoder.yudao.module.im.enums.ImContentTypeEnum;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.jdbc.core.JdbcTemplate;

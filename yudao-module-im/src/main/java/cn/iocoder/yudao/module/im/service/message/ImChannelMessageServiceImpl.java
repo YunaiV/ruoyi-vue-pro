@@ -20,7 +20,7 @@ import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
 import cn.iocoder.yudao.module.im.service.websocket.notification.message.ImChannelMessageNotification;
 import cn.iocoder.yudao.module.im.service.websocket.notification.message.ImMessageReadNotification;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.content.MaterialMessage;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

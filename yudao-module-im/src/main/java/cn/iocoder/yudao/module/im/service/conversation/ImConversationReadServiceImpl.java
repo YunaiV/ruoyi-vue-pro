@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.im.service.conversation;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.module.im.dal.dataobject.conversation.ImConversationReadDO;
 import cn.iocoder.yudao.module.im.dal.mysql.conversation.ImConversationReadMapper;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
