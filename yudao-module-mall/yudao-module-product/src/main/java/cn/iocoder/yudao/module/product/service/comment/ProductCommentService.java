@@ -53,6 +53,14 @@ public interface ProductCommentService {
     void replyComment(ProductCommentReplyReqVO replyVO, Long userId);
 
     /**
+     * 【管理员】获得商品评价
+     *
+     * @param id 评价编号
+     * @return 商品评价
+     */
+    ProductCommentDO getComment(Long id);
+
+    /**
      * 【管理员】获得商品评价分页
      *
      * @param pageReqVO 分页查询
