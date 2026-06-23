@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.product.controller.admin.comment.vo.*;
 import cn.iocoder.yudao.module.product.dal.dataobject.comment.ProductCommentDO;
 import cn.iocoder.yudao.module.product.service.comment.ProductCommentService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -33,6 +34,15 @@ public class ProductCommentController {
     public CommonResult<PageResult<ProductCommentRespVO>> getCommentPage(@Valid ProductCommentPageReqVO pageVO) {
         PageResult<ProductCommentDO> pageResult = productCommentService.getCommentPage(pageVO);
         return success(BeanUtils.toBean(pageResult, ProductCommentRespVO.class));
+    }
+
+    @GetMapping("/get")
+    @Operation(summary = "获得商品评价")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @PreAuthorize("@ss.hasPermission('product:comment:query')")
+    public CommonResult<ProductCommentRespVO> getComment(@RequestParam("id") Long id) {
+        ProductCommentDO comment = productCommentService.getComment(id);
+        return success(BeanUtils.toBean(comment, ProductCommentRespVO.class));
     }
 
     @PutMapping("/update-visible")

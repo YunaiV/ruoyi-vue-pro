@@ -304,4 +304,10 @@ public class CrmContactServiceImpl implements CrmContactService {
         return contactMapper.selectListByCustomerIdOwnerUserId(customerId, ownerUserId);
     }
 
+    @Override
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#customerId", level = CrmPermissionLevelEnum.READ)
+    public List<CrmContactDO> getContactListByCustomerId(Long customerId) {
+        return contactMapper.selectListByCustomerId(customerId);
+    }
+
 }

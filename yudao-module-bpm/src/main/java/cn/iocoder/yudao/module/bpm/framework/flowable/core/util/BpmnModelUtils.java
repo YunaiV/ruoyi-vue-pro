@@ -958,13 +958,88 @@ public class BpmnModelUtils {
     }
 
     /**
-     * 查找起始节点下一个用户任务列表列表
+     * 查找起始节点下一个用户任务列表, 该方法会递归向下查找：跳过非 UserTask 节点, 支持网关条件判断
+     *
+     * <ul>
+     *     <li>排他网关：走满足条件的唯一一条路径（含默认路径兜底）</li>
+     *     <li>包容网关：走所有满足条件的路径</li>
+     *     <li>并行网关：走所有出口路径</li>
+     * </ul>
+     *
+     * @param currentElement 当前节点
+     * @param bpmnModel      BPMN 模型
+     * @param variables      流程变量（用于网关条件判断）
+     * @return 下一个用户任务节点列表
+     */
+    public static List<UserTask> getNextUserTasks(FlowElement currentElement, BpmnModel bpmnModel,
+                                                      Map<String, Object> variables) {
+        return getNextUserTasks(currentElement, bpmnModel, variables, new HashSet<>(), new ArrayList<>());
+    }
+
+    private static List<UserTask> getNextUserTasks(FlowElement currentElement, BpmnModel bpmnModel,
+                                                       Map<String, Object> variables,
+                                                       Set<String> hasSequenceFlow, List<UserTask> userTaskList) {
+        // 1. 根据节点类型决定要遍历的出口连线
+        //    网关需要根据条件表达式筛选；其它节点直接取所有 outgoing flows
+        List<SequenceFlow> outgoingFlows;
+        if (currentElement instanceof Gateway) {
+            outgoingFlows = getGatewayOutgoingFlows((Gateway) currentElement, variables);
+        } else {
+            outgoingFlows = getElementOutgoingFlows(currentElement);
+        }
+        if (CollUtil.isEmpty(outgoingFlows)) {
+            return userTaskList;
+        }
+        // 2. 遍历出口连线，递归查找用户任务
+        for (SequenceFlow outgoingFlow : outgoingFlows) {
+            // 防止连线成环导致死循环
+            if (hasSequenceFlow.contains(outgoingFlow.getId())) {
+                continue;
+            }
+            hasSequenceFlow.add(outgoingFlow.getId());
+            // 获取目标节点
+            FlowElement targetElement = bpmnModel.getFlowElement(outgoingFlow.getTargetRef());
+            if (targetElement == null || targetElement instanceof EndEvent) {
+                continue;
+            }
+            if (targetElement instanceof UserTask) {
+                // 找到用户任务：加入结果
+                userTaskList.add((UserTask) targetElement);
+            } else {
+                // 非用户任务（网关、服务任务、中间事件等）：继续递归向下查找
+                getNextUserTasks(targetElement, bpmnModel, variables, hasSequenceFlow, userTaskList);
+            }
+        }
+        return userTaskList;
+    }
+
+    /**
+     * 根据网关类型与流程变量，筛选网关的出口连线
+     *
+     * @param gateway   网关节点
+     * @param variables 流程变量
+     * @return 命中的出口连线列表
+     */
+    private static List<SequenceFlow> getGatewayOutgoingFlows(Gateway gateway, Map<String, Object> variables) {
+        if (gateway instanceof ExclusiveGateway) {
+            SequenceFlow matchFlow = findMatchSequenceFlowByExclusiveGateway(gateway, variables);
+            return matchFlow == null ? Collections.emptyList() : Collections.singletonList(matchFlow);
+        }
+        if (gateway instanceof InclusiveGateway) {
+            return new ArrayList<>(findMatchSequenceFlowsByInclusiveGateway(gateway, variables));
+        }
+        // 默认（并行网关等）：走所有出口
+        return gateway.getOutgoingFlows();
+    }
+
+    /**
+     * 查找起始节点下一个用户任务列表列表, 不判断网关条件
      *
      * @param source 起始节点
      * @return 结果
      */
     public static List<UserTask> getNextUserTasks(FlowElement source) {
-        return getNextUserTasks(source, null, null);
+        return getNextUserTasks(source, new HashSet<>(), new ArrayList<>());
     }
 
     /**

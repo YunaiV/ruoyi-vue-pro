@@ -11,12 +11,13 @@ import cn.iocoder.yudao.module.im.dal.dataobject.friend.ImFriendDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.friend.ImFriendRequestDO;
 import cn.iocoder.yudao.module.im.dal.mysql.friend.ImFriendMapper;
 import cn.iocoder.yudao.module.im.enums.friend.ImFriendStateEnum;
-import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
+import cn.iocoder.yudao.module.im.enums.ImContentTypeEnum;
+import cn.iocoder.yudao.module.im.enums.ImConversationTypeEnum;
 import cn.iocoder.yudao.module.im.service.message.ImPrivateMessageService;
 import cn.iocoder.yudao.module.im.service.message.dto.ImPrivateMessageSendDTO;
 import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
-import cn.iocoder.yudao.module.im.service.websocket.dto.ImPrivateMessageDTO;
-import cn.iocoder.yudao.module.im.service.websocket.dto.notification.friend.*;
+import cn.iocoder.yudao.module.im.service.websocket.notification.friend.*;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -26,7 +27,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
@@ -99,6 +99,11 @@ public class ImFriendServiceImpl implements ImFriendService {
     }
 
     @Override
+    public List<ImFriendDO> pullFriendList(Long userId, Long lastUpdateTime, Long lastId, Integer limit) {
+        return friendMapper.selectPullListByUserId(userId, lastUpdateTime, lastId, limit);
+    }
+
+    @Override
     public List<ImFriendDO> getEnableFriendList(Long userId) {
         return friendMapper.selectListByUserIdAndStatus(userId, CommonStatusEnum.ENABLE.getStatus());
     }
@@ -155,8 +160,8 @@ public class ImFriendServiceImpl implements ImFriendService {
         FriendUpdateNotification payload = (FriendUpdateNotification) new FriendUpdateNotification()
                 .setDisplayName(reqVO.getDisplayName()).setSilent(reqVO.getSilent()).setPinned(reqVO.getPinned())
                 .setOperatorUserId(userId).setFriendUserId(reqVO.getFriendUserId());
-        websocketService.sendPrivateMessageAsync(userId, ImPrivateMessageDTO.ofFriendNotification(
-                ImMessageTypeEnum.FRIEND_UPDATE.getType(), userId, userId, payload));
+        websocketService.sendNotificationAsync(userId, ImConversationTypeEnum.NONE.getType(),
+                ImContentTypeEnum.FRIEND_UPDATE.getType(), payload);
     }
 
     @Override
@@ -178,7 +183,7 @@ public class ImFriendServiceImpl implements ImFriendService {
         FriendAddNotification payload = (FriendAddNotification) new FriendAddNotification()
                 .setOperatorUserId(fromUserId).setFriendUserId(toUserId);
         privateMessageService.sendPrivateMessage(fromUserId, new ImPrivateMessageSendDTO()
-                .setReceiverId(toUserId).setType(ImMessageTypeEnum.FRIEND_ADD.getType()).setContent(payload));
+                .setReceiverId(toUserId).setType(ImContentTypeEnum.FRIEND_ADD.getType()).setContent(payload));
     }
 
     @Override
@@ -197,7 +202,7 @@ public class ImFriendServiceImpl implements ImFriendService {
         FriendAddNotification payload = (FriendAddNotification) new FriendAddNotification()
                 .setOperatorUserId(friendUserId).setFriendUserId(friendUserId);
         privateMessageService.sendPrivateMessage(userId, new ImPrivateMessageSendDTO()
-                .setReceiverId(friendUserId).setType(ImMessageTypeEnum.FRIEND_ADD.getType())
+                .setReceiverId(friendUserId).setType(ImContentTypeEnum.FRIEND_ADD.getType())
                 .setContent(payload).setPersistent(false));
     }
 
@@ -219,7 +224,7 @@ public class ImFriendServiceImpl implements ImFriendService {
         FriendDeleteNotification payload = ((FriendDeleteNotification) new FriendDeleteNotification()
                 .setOperatorUserId(userId).setFriendUserId(friendUserId)).setClear(clear);
         privateMessageService.sendPrivateMessage(userId, new ImPrivateMessageSendDTO()
-                .setReceiverId(friendUserId).setType(ImMessageTypeEnum.FRIEND_DELETE.getType())
+                .setReceiverId(friendUserId).setType(ImContentTypeEnum.FRIEND_DELETE.getType())
                 .setContent(payload).setPersistent(false));
     }
 
@@ -245,8 +250,8 @@ public class ImFriendServiceImpl implements ImFriendService {
         // 3. 推 FRIEND_BLOCK 给 A 多端
         FriendBlockNotification payload = (FriendBlockNotification) new FriendBlockNotification()
                 .setOperatorUserId(userId).setFriendUserId(friendUserId);
-        websocketService.sendPrivateMessageAsync(userId, ImPrivateMessageDTO.ofFriendNotification(
-                ImMessageTypeEnum.FRIEND_BLOCK.getType(), userId, userId, payload));
+        websocketService.sendNotificationAsync(userId, ImConversationTypeEnum.NONE.getType(),
+                ImContentTypeEnum.FRIEND_BLOCK.getType(), payload);
     }
 
     @Override
@@ -271,8 +276,8 @@ public class ImFriendServiceImpl implements ImFriendService {
         // 3. 推 FRIEND_UNBLOCK 给 A 多端
         FriendUnblockNotification payload = (FriendUnblockNotification) new FriendUnblockNotification()
                 .setOperatorUserId(userId).setFriendUserId(friendUserId);
-        websocketService.sendPrivateMessageAsync(userId, ImPrivateMessageDTO.ofFriendNotification(
-                ImMessageTypeEnum.FRIEND_UNBLOCK.getType(), userId, userId, payload));
+        websocketService.sendNotificationAsync(userId, ImConversationTypeEnum.NONE.getType(),
+                ImContentTypeEnum.FRIEND_UNBLOCK.getType(), payload);
     }
 
     /**
@@ -294,7 +299,8 @@ public class ImFriendServiceImpl implements ImFriendService {
         }
         // 情况二：复用 DISABLE 旧记录 → 恢复 ENABLE + 重置 silent / pinned / blocked，对齐"重新加好友"语义
         if (exists != null) {
-            friendMapper.updateReAddFields(exists.getId(), CommonStatusEnum.ENABLE.getStatus(), LocalDateTime.now(),
+            LocalDateTime now = LocalDateTime.now();
+            friendMapper.updateReAddFields(exists.getId(), CommonStatusEnum.ENABLE.getStatus(), now, now,
                     false, false, false, displayName, addSource);
             return;
         }

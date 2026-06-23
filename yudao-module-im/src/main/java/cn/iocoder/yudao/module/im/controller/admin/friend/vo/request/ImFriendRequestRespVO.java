@@ -41,6 +41,9 @@ public class ImFriendRequestRespVO {
     @Schema(description = "申请创建时间")
     private LocalDateTime createTime;
 
+    @Schema(description = "最近更新时间（增量拉取游标用）")
+    private LocalDateTime updateTime;
+
     // ========== 下面是聚合字段，方便前端显示 ==========
 
     @Schema(description = "发起方昵称（实时聚合自 AdminUser）", example = "芋道")

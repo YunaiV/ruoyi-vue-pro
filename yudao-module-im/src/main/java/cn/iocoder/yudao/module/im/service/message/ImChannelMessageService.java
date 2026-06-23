@@ -27,7 +27,7 @@ public interface ImChannelMessageService {
      * @param size   返回条数
      * @return 频道消息列表；按 id 升序
      */
-    List<ImChannelMessageDO> getMessageListForPull(Long userId, Long minId, Integer size);
+    List<ImChannelMessageDO> pullChannelMessageList(Long userId, Long minId, Integer size);
 
     /**
      * 上报频道消息已读位置；同步推 READ 事件给自己多端

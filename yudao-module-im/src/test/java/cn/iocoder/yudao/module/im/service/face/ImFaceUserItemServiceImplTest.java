@@ -26,7 +26,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * IM 用户私有表情 Service 单元测试
+ * {@link ImFaceUserItemServiceImpl} 的单元测试
  *
  * @author 芋道源码
  */
@@ -141,7 +141,7 @@ public class ImFaceUserItemServiceImplTest extends BaseMockitoUnitTest {
         verify(faceUserItemMapper, never()).deleteById(anyLong());
     }
 
-    // ========== deleteFaceUserItem（管理后台 by id） ==========
+    // ========== deleteFaceUserItem（管理后台） ==========
 
     @Test
     public void testDeleteFaceUserItemAdmin_success() {

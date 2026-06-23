@@ -12,18 +12,24 @@ import cn.iocoder.yudao.module.im.controller.admin.message.vo.privates.ImPrivate
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.privates.ImPrivateMessageSendReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImPrivateMessageDO;
 import cn.iocoder.yudao.module.im.dal.mysql.message.ImPrivateMessageMapper;
+import cn.iocoder.yudao.module.im.enums.ImConversationTypeEnum;
+import cn.iocoder.yudao.module.im.enums.message.ImMessageReceiptStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
-import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
+import cn.iocoder.yudao.module.im.enums.ImContentTypeEnum;
 import cn.iocoder.yudao.module.im.framework.config.ImProperties;
+import cn.iocoder.yudao.module.im.service.conversation.ImConversationReadService;
 import cn.iocoder.yudao.module.im.service.friend.ImFriendService;
 import cn.iocoder.yudao.module.im.service.message.dto.ImPrivateMessageSendDTO;
 import cn.iocoder.yudao.module.im.service.sensitiveword.ImSensitiveWordService;
 import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
-import cn.iocoder.yudao.module.im.service.websocket.dto.ImPrivateMessageDTO;
-import cn.iocoder.yudao.module.im.service.websocket.dto.message.QuoteMessage;
-import cn.iocoder.yudao.module.im.service.websocket.dto.message.RecallMessage;
+import cn.iocoder.yudao.module.im.service.websocket.notification.message.ImMessageReadNotification;
+import cn.iocoder.yudao.module.im.service.websocket.notification.message.ImMessageReceiptNotification;
+import cn.iocoder.yudao.module.im.service.websocket.notification.message.ImPrivateMessageNotification;
+import cn.iocoder.yudao.module.im.dal.dataobject.message.content.QuoteMessage;
+import cn.iocoder.yudao.module.im.dal.dataobject.message.content.RecallMessage;
 import cn.iocoder.yudao.module.im.util.ImMessageUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -52,6 +58,8 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
     private ImFriendService friendService;
     @Resource
     private ImSensitiveWordService sensitiveWordService;
+    @Resource
+    private ImConversationReadService conversationReadService;
 
     @Resource
     private ImWebSocketService imWebSocketService;
@@ -74,21 +82,32 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
         // 1.3 好友校验
         friendService.validateFriend(senderId, reqVO.getReceiverId());
         // 1.4 文本消息敏感词过滤
-        if (ImMessageTypeEnum.TEXT.getType().equals(reqVO.getType())) {
+        if (ImContentTypeEnum.TEXT.getType().equals(reqVO.getType())) {
             sensitiveWordService.validateText(reqVO.getContent());
         }
 
         // 2.1 引用 quote 消息规范化
         reqVO.setContent(normalizeQuoteContent(reqVO, senderId));
-        // 2.2 构建并保存消息
+        // 2.2 构建并保存消息；唯一键冲突时回查已存在消息返回
+        // 用户私聊消息默认需要回执（receipt 不传按 true）；系统通知走 DTO 通道，默认不回执
+        Boolean receipt = reqVO.getReceipt() != null ? reqVO.getReceipt() : Boolean.TRUE;
         ImPrivateMessageDO message = BeanUtils.toBean(reqVO, ImPrivateMessageDO.class, m -> m
-                .setSenderId(senderId).setStatus(ImMessageStatusEnum.UNREAD.getStatus()).setSendTime(LocalDateTime.now()));
-        privateMessageMapper.insert(message);
+                .setSenderId(senderId).setStatus(ImMessageStatusEnum.NORMAL.getStatus())
+                .setReceiptStatus(resolveReceiptStatus(receipt)).setSendTime(LocalDateTime.now()));
+        try {
+            privateMessageMapper.insert(message);
+        } catch (DuplicateKeyException e) {
+            log.warn("[sendPrivateMessage][senderId({}) clientMessageId({}) 并发插入冲突，回查返回]",
+                    senderId, reqVO.getClientMessageId());
+            return privateMessageMapper.selectBySenderIdAndClientMessageId(senderId, reqVO.getClientMessageId());
+        }
 
         // 3. WebSocket 异步推送：接收方 + 发送方多端同步
-        ImPrivateMessageDTO websocketMessage = ImPrivateMessageDTO.ofSend(message);
-        imWebSocketService.sendPrivateMessageAsync(message.getReceiverId(), websocketMessage);
-        imWebSocketService.sendPrivateMessageAsync(senderId, websocketMessage);
+        ImPrivateMessageNotification notification = ImPrivateMessageNotification.ofSend(message);
+        imWebSocketService.sendNotificationAsync(message.getReceiverId(), ImConversationTypeEnum.PRIVATE.getType(),
+                notification.getType(), notification);
+        imWebSocketService.sendNotificationAsync(senderId, ImConversationTypeEnum.PRIVATE.getType(),
+                notification.getType(), notification);
         return message;
     }
 
@@ -103,22 +122,37 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
         ImPrivateMessageDO message = new ImPrivateMessageDO().setClientMessageId(IdUtil.fastSimpleUUID())
                 .setSenderId(senderId).setReceiverId(dto.getReceiverId())
                 .setType(dto.getType()).setContent(contentString)
-                .setStatus(ImMessageStatusEnum.UNREAD.getStatus()).setSendTime(LocalDateTime.now());
+                .setStatus(ImMessageStatusEnum.NORMAL.getStatus())
+                .setReceiptStatus(resolveReceiptStatus(dto.getReceipt())).setSendTime(LocalDateTime.now());
         // 1.3 决定是否持久化：dto.persistent 优先；为 null 时按 type 默认
         boolean persistent = dto.getPersistent() != null
                 ? dto.getPersistent()
-                : ImMessageTypeEnum.validate(dto.getType()).isPersistent();
+                : ImContentTypeEnum.validate(dto.getType()).isPersistent();
         if (persistent) {
             privateMessageMapper.insert(message);
         }
 
         // 2. WebSocket 异步推送：双向（默认）；单边语义（persistent=false）下仅推 sender 多端，对方不感知
-        ImPrivateMessageDTO websocketMessage = ImPrivateMessageDTO.ofSend(message);
+        ImPrivateMessageNotification notification = ImPrivateMessageNotification.ofSend(message);
         if (persistent) {
-            imWebSocketService.sendPrivateMessageAsync(dto.getReceiverId(), websocketMessage);
+            imWebSocketService.sendNotificationAsync(dto.getReceiverId(), ImConversationTypeEnum.PRIVATE.getType(),
+                    notification.getType(), notification);
         }
-        imWebSocketService.sendPrivateMessageAsync(senderId, websocketMessage);
+        imWebSocketService.sendNotificationAsync(senderId, ImConversationTypeEnum.PRIVATE.getType(),
+                notification.getType(), notification);
         return message;
+    }
+
+    /**
+     * 计算私聊消息回执 status：私聊已读关闭时强制 NO_RECEIPT，忽略发送方传入的 receipt（receipt 为 null 等价 false）
+     */
+    private Integer resolveReceiptStatus(Boolean receipt) {
+        if (BooleanUtil.isFalse(imProperties.getMessage().isPrivateReadEnabled())) {
+            return ImMessageReceiptStatusEnum.NO_RECEIPT.getStatus();
+        }
+        return BooleanUtil.isTrue(receipt)
+                ? ImMessageReceiptStatusEnum.PENDING.getStatus()
+                : ImMessageReceiptStatusEnum.NO_RECEIPT.getStatus();
     }
 
     @Override
@@ -149,7 +183,7 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
 
         // 3. 发送撤回事件
         return sendPrivateMessage(userId, new ImPrivateMessageSendDTO().setReceiverId(message.getReceiverId())
-                .setType(ImMessageTypeEnum.RECALL.getType()).setContent(new RecallMessage().setMessageId(messageId)));
+                .setType(ImContentTypeEnum.RECALL.getType()).setContent(new RecallMessage().setMessageId(messageId)));
     }
 
     /**
@@ -211,20 +245,26 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
             throw exception(MESSAGE_PRIVATE_READ_DISABLED);
         }
         Assert.notNull(messageId, "已读消息编号不能为空");
-        // 2. 把 (receiverId → userId) 这条会话上、id <= messageId 的未读消息一步更新为已读
-        // 仅 UNREAD 行被命中，避免覆盖已撤回/已读的状态；select-then-update 合成单条 SQL 后也消除了竞态窗口
-        int updated = privateMessageMapper.updateBySenderIdAndReceiverIdAndIdLeAndStatus(
-                receiverId, userId, messageId, ImMessageStatusEnum.UNREAD.getStatus(),
-                new ImPrivateMessageDO().setStatus(ImMessageStatusEnum.READ.getStatus()));
-        if (updated == 0) {
+
+        // 2. 回执置 DONE：把 (receiverId → userId) 上 id <= messageId、待回执(PENDING) 的消息标记为已完成
+        // status 不再表达已读（保持 NORMAL）；只翻 PENDING 行，避免覆盖 NO_RECEIPT / 已 DONE
+        privateMessageMapper.updateBySenderIdAndReceiverIdAndIdLeAndReceiptStatus(
+                receiverId, userId, messageId, ImMessageReceiptStatusEnum.PENDING.getStatus(),
+                new ImPrivateMessageDO().setReceiptStatus(ImMessageReceiptStatusEnum.DONE.getStatus()));
+
+        // 3. 同步写 im_conversation_read（读位置唯一权威，单调递增）；读位置前进才下发事件
+        boolean advanced = conversationReadService.updateConversationReadPosition(
+                userId, ImConversationTypeEnum.PRIVATE.getType(), receiverId, messageId);
+        if (!advanced) {
             return;
         }
 
-        // 3. 异步发送 READ + RECEIPT 事件（已读位置以前端上报为准，与多端 / 对方 UI 显示一致）
-        imWebSocketService.sendPrivateMessageAsync(userId,
-                ImPrivateMessageDTO.ofRead(userId, receiverId, messageId));
-        imWebSocketService.sendPrivateMessageAsync(receiverId,
-                ImPrivateMessageDTO.ofReceipt(userId, receiverId, messageId));
+        // 4. 异步发送 READ + RECEIPT 事件（已读位置以前端上报为准，与多端 / 对方 UI 显示一致）
+        imWebSocketService.sendNotificationAsync(userId, ImConversationTypeEnum.PRIVATE.getType(),
+                ImContentTypeEnum.READ.getType(), ImMessageReadNotification.ofPrivate(userId, receiverId, messageId));
+        imWebSocketService.sendNotificationAsync(receiverId, ImConversationTypeEnum.PRIVATE.getType(),
+                ImContentTypeEnum.RECEIPT.getType(),
+                ImMessageReceiptNotification.ofPrivate(userId, receiverId, messageId));
     }
 
     @Override
@@ -232,8 +272,9 @@ public class ImPrivateMessageServiceImpl implements ImPrivateMessageService {
         if (BooleanUtil.isFalse(imProperties.getMessage().isPrivateReadEnabled())) {
             throw exception(MESSAGE_PRIVATE_READ_DISABLED);
         }
-        return privateMessageMapper.selectMaxIdBySenderIdAndReceiverIdAndStatus(
-                userId, peerId, ImMessageStatusEnum.READ.getStatus());
+        // 对端 peer 在「与 userId 的会话」里的读位置 = peer 把 userId 发的消息读到哪
+        return conversationReadService.getConversationReadMessageId(
+                peerId, ImConversationTypeEnum.PRIVATE.getType(), userId);
     }
 
     @Override

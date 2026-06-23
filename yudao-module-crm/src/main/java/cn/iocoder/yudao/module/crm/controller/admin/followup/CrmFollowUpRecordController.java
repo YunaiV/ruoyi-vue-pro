@@ -11,9 +11,12 @@ import cn.iocoder.yudao.module.crm.controller.admin.followup.vo.CrmFollowUpRecor
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.followup.CrmFollowUpRecordDO;
+import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
+import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.service.business.CrmBusinessService;
 import cn.iocoder.yudao.module.crm.service.contact.CrmContactService;
 import cn.iocoder.yudao.module.crm.service.followup.CrmFollowUpRecordService;
+import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,10 +30,13 @@ import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.Map;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSetByFlatMap;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
+import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.CRM_PERMISSION_DENIED;
+import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.FOLLOW_UP_RECORD_NOT_EXISTS;
 
 
 @Tag(name = "管理后台 - 跟进记录")
@@ -45,6 +51,8 @@ public class CrmFollowUpRecordController {
     private CrmContactService contactService;
     @Resource
     private CrmBusinessService businessService;
+    @Resource
+    private CrmPermissionService permissionService;
 
     @Resource
     private AdminUserApi adminUserApi;
@@ -68,6 +76,13 @@ public class CrmFollowUpRecordController {
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     public CommonResult<CrmFollowUpRecordRespVO> getFollowUpRecord(@RequestParam("id") Long id) {
         CrmFollowUpRecordDO followUpRecord = followUpRecordService.getFollowUpRecord(id);
+        if (followUpRecord == null) {
+            throw exception(FOLLOW_UP_RECORD_NOT_EXISTS);
+        }
+        if (!permissionService.hasPermission(followUpRecord.getBizType(), followUpRecord.getBizId(),
+                getLoginUserId(), CrmPermissionLevelEnum.READ)) {
+            throw exception(CRM_PERMISSION_DENIED, CrmBizTypeEnum.getNameByType(followUpRecord.getBizType()));
+        }
         return success(BeanUtils.toBean(followUpRecord, CrmFollowUpRecordRespVO.class));
     }
 

@@ -112,7 +112,7 @@ public class ImStatisticsManagerController {
     }
 
     @GetMapping("/message-type-distribution")
-    @Operation(summary = "获得消息类型分布（最近 30 天）")
+    @Operation(summary = "获得内容类型分布（最近 30 天）")
     @PreAuthorize("@ss.hasPermission('im:manager:statistics:query')")
     public CommonResult<List<ImStatisticsManagerMessageTypeRespVO>> getMessageTypeDistribution() {
         LocalDateTime endTime = LocalDate.now().plusDays(1).atStartOfDay();

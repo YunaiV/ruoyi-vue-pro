@@ -61,14 +61,14 @@ public class ErpSaleOrderController {
 
     @PostMapping("/create")
     @Operation(summary = "创建销售订单")
-    @PreAuthorize("@ss.hasPermission('erp:sale-out:create')")
+    @PreAuthorize("@ss.hasPermission('erp:sale-order:create')")
     public CommonResult<Long> createSaleOrder(@Valid @RequestBody ErpSaleOrderSaveReqVO createReqVO) {
         return success(saleOrderService.createSaleOrder(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新销售订单")
-    @PreAuthorize("@ss.hasPermission('erp:sale-out:update')")
+    @PreAuthorize("@ss.hasPermission('erp:sale-order:update')")
     public CommonResult<Boolean> updateSaleOrder(@Valid @RequestBody ErpSaleOrderSaveReqVO updateReqVO) {
         saleOrderService.updateSaleOrder(updateReqVO);
         return success(true);
@@ -76,7 +76,7 @@ public class ErpSaleOrderController {
 
     @PutMapping("/update-status")
     @Operation(summary = "更新销售订单的状态")
-    @PreAuthorize("@ss.hasPermission('erp:sale-out:update-status')")
+    @PreAuthorize("@ss.hasPermission('erp:sale-order:update-status')")
     public CommonResult<Boolean> updateSaleOrderStatus(@RequestParam("id") Long id,
                                                       @RequestParam("status") Integer status) {
         saleOrderService.updateSaleOrderStatus(id, status);
@@ -86,7 +86,7 @@ public class ErpSaleOrderController {
     @DeleteMapping("/delete")
     @Operation(summary = "删除销售订单")
     @Parameter(name = "ids", description = "编号数组", required = true)
-    @PreAuthorize("@ss.hasPermission('erp:sale-out:delete')")
+    @PreAuthorize("@ss.hasPermission('erp:sale-order:delete')")
     public CommonResult<Boolean> deleteSaleOrder(@RequestParam("ids") List<Long> ids) {
         saleOrderService.deleteSaleOrder(ids);
         return success(true);
@@ -95,7 +95,7 @@ public class ErpSaleOrderController {
     @GetMapping("/get")
     @Operation(summary = "获得销售订单")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
-    @PreAuthorize("@ss.hasPermission('erp:sale-out:query')")
+    @PreAuthorize("@ss.hasPermission('erp:sale-order:query')")
     public CommonResult<ErpSaleOrderRespVO> getSaleOrder(@RequestParam("id") Long id) {
         ErpSaleOrderDO saleOrder = saleOrderService.getSaleOrder(id);
         if (saleOrder == null) {
@@ -115,7 +115,7 @@ public class ErpSaleOrderController {
 
     @GetMapping("/page")
     @Operation(summary = "获得销售订单分页")
-    @PreAuthorize("@ss.hasPermission('erp:sale-out:query')")
+    @PreAuthorize("@ss.hasPermission('erp:sale-order:query')")
     public CommonResult<PageResult<ErpSaleOrderRespVO>> getSaleOrderPage(@Valid ErpSaleOrderPageReqVO pageReqVO) {
         PageResult<ErpSaleOrderDO> pageResult = saleOrderService.getSaleOrderPage(pageReqVO);
         return success(buildSaleOrderVOPageResult(pageResult));
@@ -123,7 +123,7 @@ public class ErpSaleOrderController {
 
     @GetMapping("/export-excel")
     @Operation(summary = "导出销售订单 Excel")
-    @PreAuthorize("@ss.hasPermission('erp:sale-out:export')")
+    @PreAuthorize("@ss.hasPermission('erp:sale-order:export')")
     @ApiAccessLog(operateType = EXPORT)
     public void exportSaleOrderExcel(@Valid ErpSaleOrderPageReqVO pageReqVO,
                                     HttpServletResponse response) throws IOException {

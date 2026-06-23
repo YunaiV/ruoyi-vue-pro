@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.im.dal.mysql.group;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
@@ -59,20 +58,8 @@ public interface ImGroupMemberMapper extends BaseMapperX<ImGroupMemberDO> {
                 .eq(ImGroupMemberDO::getStatus, status));
     }
 
-    /**
-     * 查询用户已退群的成员记录
-     * <p>
-     * 当 {@code minQuitTime} 非空时额外按 {@code quitTime ≥ minQuitTime} 过滤。
-     *
-     * @param userId      用户编号
-     * @param minQuitTime 最早退群时间（含），可空
-     * @return 已退群成员记录列表
-     */
-    default List<ImGroupMemberDO> selectQuitListByUserId(Long userId, LocalDateTime minQuitTime) {
-        return selectList(new LambdaQueryWrapperX<ImGroupMemberDO>()
-                .eq(ImGroupMemberDO::getUserId, userId)
-                .eq(ImGroupMemberDO::getStatus, CommonStatusEnum.DISABLE.getStatus())
-                .geIfPresent(ImGroupMemberDO::getQuitTime, minQuitTime));
+    default List<ImGroupMemberDO> selectListByUserId(Long userId) {
+        return selectList(ImGroupMemberDO::getUserId, userId);
     }
 
     @SuppressWarnings("UnusedReturnValue")
@@ -143,7 +130,8 @@ public interface ImGroupMemberMapper extends BaseMapperX<ImGroupMemberDO> {
                 .set(ImGroupMemberDO::getAddSource, addSource)
                 .set(ImGroupMemberDO::getInviterUserId, inviterUserId)
                 .set(ImGroupMemberDO::getQuitTime, null)
-                .set(ImGroupMemberDO::getMuteEndTime, null));
+                .set(ImGroupMemberDO::getMuteEndTime, null)
+                .set(ImGroupMemberDO::getUpdateTime, joinTime));
     }
 
 }

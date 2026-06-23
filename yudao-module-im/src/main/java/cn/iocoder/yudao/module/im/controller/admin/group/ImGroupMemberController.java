@@ -16,11 +16,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
-import javax.validation.Valid;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -88,7 +89,7 @@ public class ImGroupMemberController {
     }
 
     @GetMapping("/list")
-    @Operation(summary = "获得指定群的成员列表")
+    @Operation(summary = "获得指定群的成员列表（按群全量拉取，作为前端本地成员 cache 的完整基线）")
     @Parameter(name = "groupId", description = "群编号", required = true, example = "1024")
     public CommonResult<List<ImGroupMemberRespVO>> getGroupMemberList(@RequestParam("groupId") Long groupId) {
         // 1.1 查询群成员列表（包含 DISABLE 已退群的成员，不按时间过滤）
@@ -101,16 +102,30 @@ public class ImGroupMemberController {
             throw exception(GROUP_MEMBER_NOT_IN_GROUP);
         }
 
-        // 2.批量聚合 AdminUser 信息（昵称 / 头像）
+        // 2. 批量聚合昵称 / 头像，并对非本人置空私人字段
+        return success(buildGroupMemberRespVOList(members));
+    }
+
+    // ========== 私有方法：VO 组装 ==========
+
+    /**
+     * 群成员列表批量转 VO ＋ 关联回填昵称 ／ 头像，并对非本人置空私人字段
+     */
+    private List<ImGroupMemberRespVO> buildGroupMemberRespVOList(List<ImGroupMemberDO> members) {
+        if (CollUtil.isEmpty(members)) {
+            return Collections.emptyList();
+        }
+        Long loginUserId = getLoginUserId();
+        // 批量聚合 AdminUser 信息（昵称 ／ 头像），避免 N+1
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
                 convertList(members, ImGroupMemberDO::getUserId));
-        return success(convertList(members, m -> {
-            ImGroupMemberRespVO vo = BeanUtils.toBean(m, ImGroupMemberRespVO.class);
-            MapUtils.findAndThen(userMap, m.getUserId(), user ->
+        return convertList(members, member -> {
+            ImGroupMemberRespVO vo = BeanUtils.toBean(member, ImGroupMemberRespVO.class);
+            MapUtils.findAndThen(userMap, member.getUserId(), user ->
                     vo.setNickname(user.getNickname()).setAvatar(user.getAvatar()));
-            hidePrivateFieldsIfNotSelf(vo, m.getUserId(), loginUserId);
+            hidePrivateFieldsIfNotSelf(vo, member.getUserId(), loginUserId);
             return vo;
-        }));
+        });
     }
 
     /**

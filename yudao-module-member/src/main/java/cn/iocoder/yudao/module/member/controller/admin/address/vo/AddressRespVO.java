@@ -16,4 +16,7 @@ public class AddressRespVO extends AddressBaseVO {
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
+    @Schema(description = "地区名称", example = "上海上海市普陀区")
+    private String areaName;
+
 }

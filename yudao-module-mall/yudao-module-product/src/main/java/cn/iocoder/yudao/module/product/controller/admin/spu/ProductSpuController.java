@@ -118,10 +118,10 @@ public class ProductSpuController {
     }
 
     @GetMapping("/get-count")
-    @Operation(summary = "获得商品 SPU 分页 tab count")
+    @Operation(summary = "获得商品 SPU 分页 tab count（支持按 name/categoryId/createTime 筛选）")
     @PreAuthorize("@ss.hasPermission('product:spu:query')")
-    public CommonResult<Map<Integer, Long>> getSpuCount() {
-        return success(productSpuService.getTabsCount());
+    public CommonResult<Map<Integer, Long>> getSpuCount(ProductSpuPageReqVO reqVO) {
+        return success(productSpuService.getTabsCount(reqVO));
     }
 
     @GetMapping("/export-excel")

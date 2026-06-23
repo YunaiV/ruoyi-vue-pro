@@ -22,7 +22,7 @@ public class ImGroupMessageManagerPageReqVO extends PageParam {
     private Long senderId;
 
     @Schema(description = "消息类型", example = "1")
-    private Integer type; // 参见 ImMessageTypeEnum 枚举类
+    private Integer type; // 参见 ImContentTypeEnum 枚举类
 
     @Schema(description = "消息内容", example = "你好")
     private String content;

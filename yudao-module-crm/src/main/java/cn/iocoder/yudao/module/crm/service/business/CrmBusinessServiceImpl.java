@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.crm.service.business;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -15,6 +16,7 @@ import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessProductDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessStatusDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactBusinessDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.contact.CrmContactDO;
 import cn.iocoder.yudao.module.crm.dal.mysql.business.CrmBusinessMapper;
 import cn.iocoder.yudao.module.crm.dal.mysql.business.CrmBusinessProductMapper;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
@@ -194,9 +196,15 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
         if (saveReqVO.getCustomerId() != null) {
             customerService.validateCustomer(saveReqVO.getCustomerId());
         }
-        // 校验联系人
+        // 校验联系人（且必须与商机属于同一客户，避免跨客户关联）
         if (saveReqVO.getContactId() != null) {
             contactService.validateContact(saveReqVO.getContactId());
+            if (saveReqVO.getCustomerId() != null) {
+                CrmContactDO contact = contactService.getContact(saveReqVO.getContactId());
+                if (ObjUtil.notEqual(saveReqVO.getCustomerId(), contact.getCustomerId())) {
+                    throw exception(BUSINESS_CONTACT_CUSTOMER_NOT_MATCH);
+                }
+            }
         }
         // 校验负责人
         if (saveReqVO.getOwnerUserId() != null) {
@@ -375,6 +383,24 @@ public class CrmBusinessServiceImpl implements CrmBusinessService {
     @Override
     public List<CrmBusinessDO> getBusinessListByCustomerIdOwnerUserId(Long customerId, Long ownerUserId) {
         return businessMapper.selectListByCustomerIdOwnerUserId(customerId, ownerUserId);
+    }
+
+    @Override
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CUSTOMER, bizId = "#customerId", level = CrmPermissionLevelEnum.READ)
+    public List<CrmBusinessDO> getBusinessListByCustomerId(Long customerId) {
+        return businessMapper.selectListByCustomerId(customerId);
+    }
+
+    @Override
+    @CrmPermission(bizType = CrmBizTypeEnum.CRM_CONTACT, bizId = "#contactId", level = CrmPermissionLevelEnum.READ)
+    public List<CrmBusinessDO> getBusinessListByContact(Long contactId) {
+        // 1. 查询关联的商机编号
+        List<CrmContactBusinessDO> contactBusinessList = contactBusinessService.getContactBusinessListByContactId(contactId);
+        if (CollUtil.isEmpty(contactBusinessList)) {
+            return ListUtil.empty();
+        }
+        // 2. 查询商机列表
+        return businessMapper.selectByIds(convertSet(contactBusinessList, CrmContactBusinessDO::getBusinessId));
     }
 
     @Override

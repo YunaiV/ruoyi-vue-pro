@@ -15,12 +15,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -46,9 +48,23 @@ public class ImFriendController {
     @GetMapping("/list")
     @Operation(summary = "获得当前登录用户的好友列表")
     public CommonResult<List<ImFriendRespVO>> getMyFriendList() {
-        // 含 DISABLE 历史好友：保留给前端展示「已删除好友」的历史对话信息；前端按 status 决定会话级联清理
         List<ImFriendDO> friends = friendService.getFriendList(getLoginUserId());
         return success(buildFriendRespVOList(friends));
+    }
+
+    @GetMapping("/pull")
+    @Operation(summary = "增量拉取当前用户的好友关系（重连 / 离线补偿）")
+    @Parameters({
+            @Parameter(name = "lastUpdateTime", description = "上次拉取到的最新更新时间（毫秒时间戳）；首次拉取不传"),
+            @Parameter(name = "lastId", description = "上次拉取到的最后一条记录 id；首次拉取不传"),
+            @Parameter(name = "limit", description = "单次拉取条数", required = true)
+    })
+    public CommonResult<List<ImFriendRespVO>> pullMyFriendList(
+            @RequestParam(value = "lastUpdateTime", required = false) Long lastUpdateTime,
+            @RequestParam(value = "lastId", required = false) Long lastId,
+            @RequestParam("limit") @Min(1) @Max(200) Integer limit) {
+        List<ImFriendDO> list = friendService.pullFriendList(getLoginUserId(), lastUpdateTime, lastId, limit);
+        return success(buildFriendRespVOList(list));
     }
 
     @GetMapping("/get")
@@ -62,8 +78,8 @@ public class ImFriendController {
     @DeleteMapping("/delete")
     @Operation(summary = "删除好友（单向软删除）")
     @Parameters({
-            @Parameter(description = "好友的用户编号", required = true, example = "2048"),
-            @Parameter(description = "是否级联清理本端相关数据（如私聊会话）")
+            @Parameter(name = "friendUserId", description = "好友的用户编号", required = true, example = "2048"),
+            @Parameter(name = "clear", description = "是否级联清理本端相关数据（如私聊会话）")
     })
     public CommonResult<Boolean> deleteFriend(
             @RequestParam("friendUserId") @NotNull(message = "好友用户编号不能为空") Long friendUserId,

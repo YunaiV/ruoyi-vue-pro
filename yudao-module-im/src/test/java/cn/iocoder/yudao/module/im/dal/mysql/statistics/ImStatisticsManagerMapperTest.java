@@ -11,12 +11,12 @@ import cn.iocoder.yudao.module.im.dal.mysql.group.ImGroupMemberMapper;
 import cn.iocoder.yudao.module.im.dal.mysql.message.ImGroupMessageMapper;
 import cn.iocoder.yudao.module.im.dal.mysql.message.ImPrivateMessageMapper;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
-import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
+import cn.iocoder.yudao.module.im.enums.ImContentTypeEnum;
+import jakarta.annotation.Resource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import javax.annotation.Resource;
 import javax.sql.DataSource;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,7 +25,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * IM 数据看板 Mapper 单元测试
+ * {@link ImStatisticsManagerMapper} 的单元测试
  *
  * @author 芋道源码
  */
@@ -194,10 +194,10 @@ public class ImStatisticsManagerMapperTest extends BaseDbUnitTest {
     @Test
     public void testSelectMessageTypeDistribution_mergePrivateAndGroup() {
         // 准备：私聊 type=0 ×1，群聊 type=0 ×2、type=1 ×1
-        privateMessageMapper.insert(buildPrivate(1L, 2L, WINDOW_BEGIN.plusDays(1)).setType(ImMessageTypeEnum.TEXT.getType()));
-        groupMessageMapper.insert(buildGroupMessage(1L, 100L, WINDOW_BEGIN.plusDays(1)).setType(ImMessageTypeEnum.TEXT.getType()));
-        groupMessageMapper.insert(buildGroupMessage(1L, 100L, WINDOW_BEGIN.plusDays(1)).setType(ImMessageTypeEnum.TEXT.getType()));
-        groupMessageMapper.insert(buildGroupMessage(1L, 100L, WINDOW_BEGIN.plusDays(1)).setType(ImMessageTypeEnum.IMAGE.getType()));
+        privateMessageMapper.insert(buildPrivate(1L, 2L, WINDOW_BEGIN.plusDays(1)).setType(ImContentTypeEnum.TEXT.getType()));
+        groupMessageMapper.insert(buildGroupMessage(1L, 100L, WINDOW_BEGIN.plusDays(1)).setType(ImContentTypeEnum.TEXT.getType()));
+        groupMessageMapper.insert(buildGroupMessage(1L, 100L, WINDOW_BEGIN.plusDays(1)).setType(ImContentTypeEnum.TEXT.getType()));
+        groupMessageMapper.insert(buildGroupMessage(1L, 100L, WINDOW_BEGIN.plusDays(1)).setType(ImContentTypeEnum.IMAGE.getType()));
 
         // 调用
         List<Map<String, Object>> dist = mapper.selectMessageTypeDistribution(WINDOW_BEGIN, WINDOW_END);
@@ -205,8 +205,8 @@ public class ImStatisticsManagerMapperTest extends BaseDbUnitTest {
         // 断言：type=TEXT(0) → 3；type=IMAGE(1) → 1
         Map<Object, Long> byType = dist.stream().collect(java.util.stream.Collectors.toMap(
                 m -> ((Number) m.get("type")).intValue(), m -> ((Number) m.get("count")).longValue()));
-        assertEquals(3L, byType.get(ImMessageTypeEnum.TEXT.getType()));
-        assertEquals(1L, byType.get(ImMessageTypeEnum.IMAGE.getType()));
+        assertEquals(3L, byType.get(ImContentTypeEnum.TEXT.getType()));
+        assertEquals(1L, byType.get(ImContentTypeEnum.IMAGE.getType()));
     }
 
     @Test
@@ -243,9 +243,9 @@ public class ImStatisticsManagerMapperTest extends BaseDbUnitTest {
         return ImPrivateMessageDO.builder()
                 .clientMessageId("uuid-" + System.nanoTime())
                 .senderId(senderId).receiverId(receiverId)
-                .type(ImMessageTypeEnum.TEXT.getType())
+                .type(ImContentTypeEnum.TEXT.getType())
                 .content("{}")
-                .status(ImMessageStatusEnum.UNREAD.getStatus())
+                .status(ImMessageStatusEnum.NORMAL.getStatus())
                 .sendTime(sendTime).build();
     }
 
@@ -253,9 +253,9 @@ public class ImStatisticsManagerMapperTest extends BaseDbUnitTest {
         return new ImGroupMessageDO()
                 .setClientMessageId("uuid-" + System.nanoTime())
                 .setSenderId(senderId).setGroupId(groupId)
-                .setType(ImMessageTypeEnum.TEXT.getType())
+                .setType(ImContentTypeEnum.TEXT.getType())
                 .setContent("{}")
-                .setStatus(ImMessageStatusEnum.UNREAD.getStatus())
+                .setStatus(ImMessageStatusEnum.NORMAL.getStatus())
                 .setSendTime(sendTime);
     }
 

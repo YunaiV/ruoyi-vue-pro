@@ -3,9 +3,9 @@ package cn.iocoder.yudao.module.im.dal.dataobject.message;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
 import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupDO;
-import cn.iocoder.yudao.module.im.enums.message.ImGroupMessageReceiptStatusEnum;
+import cn.iocoder.yudao.module.im.enums.message.ImMessageReceiptStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
-import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
+import cn.iocoder.yudao.module.im.enums.ImContentTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -54,7 +54,7 @@ public class ImGroupMessageDO extends BaseDO {
     /**
      * 消息类型
      * <p>
-     * 枚举 {@link ImMessageTypeEnum}
+     * 枚举 {@link ImContentTypeEnum}
      */
     private Integer type;
     /**
@@ -67,8 +67,6 @@ public class ImGroupMessageDO extends BaseDO {
      * 消息状态
      * <p>
      * 枚举 {@link ImMessageStatusEnum}
-     *
-     * 为什么没有 READ 状态？与单聊的差异：单聊用 UNREAD/READ 跟踪每条消息状态，群聊用 Redis 存储每个成员的已读位置（游标模型）
      */
     private Integer status;
     /**
@@ -94,7 +92,7 @@ public class ImGroupMessageDO extends BaseDO {
     /**
      * 回执状态
      * <p>
-     * 枚举 {@link ImGroupMessageReceiptStatusEnum}
+     * 枚举 {@link ImMessageReceiptStatusEnum}
      */
     private Integer receiptStatus;
 

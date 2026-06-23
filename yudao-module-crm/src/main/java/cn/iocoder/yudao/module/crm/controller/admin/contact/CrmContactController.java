@@ -114,6 +114,17 @@ public class CrmContactController {
                         .setCustomerId(contact.getCustomerId())));
     }
 
+    @GetMapping("/list-by-customer")
+    @Operation(summary = "获得联系人列表，基于指定客户")
+    @Parameter(name = "customerId", description = "客户编号", required = true)
+    @PreAuthorize("@ss.hasPermission('crm:contact:query')")
+    public CommonResult<List<CrmContactRespVO>> getContactListByCustomer(@RequestParam("customerId") Long customerId) {
+        List<CrmContactDO> list = contactService.getContactListByCustomerId(customerId);
+        return success(convertList(list, contact -> // 只返回 id、name 字段
+                new CrmContactRespVO().setId(contact.getId()).setName(contact.getName())
+                        .setCustomerId(contact.getCustomerId())));
+    }
+
     @GetMapping("/page")
     @Operation(summary = "获得联系人分页")
     @PreAuthorize("@ss.hasPermission('crm:contact:query')")

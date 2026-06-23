@@ -15,7 +15,7 @@ import cn.iocoder.yudao.module.im.dal.mysql.rtc.ImRtcCallMapper;
 import cn.iocoder.yudao.module.im.dal.mysql.rtc.ImRtcParticipantMapper;
 import cn.iocoder.yudao.module.im.dal.redis.rtc.ImRtcCallLockRedisDAO;
 import cn.iocoder.yudao.module.im.enums.ImConversationTypeEnum;
-import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
+import cn.iocoder.yudao.module.im.enums.ImContentTypeEnum;
 import cn.iocoder.yudao.module.im.enums.rtc.ImRtcCallEndReasonEnum;
 import cn.iocoder.yudao.module.im.enums.rtc.ImRtcCallStatusEnum;
 import cn.iocoder.yudao.module.im.enums.rtc.ImRtcParticipantRoleEnum;
@@ -30,8 +30,7 @@ import cn.iocoder.yudao.module.im.service.message.ImPrivateMessageService;
 import cn.iocoder.yudao.module.im.service.message.dto.ImGroupMessageSendDTO;
 import cn.iocoder.yudao.module.im.service.message.dto.ImPrivateMessageSendDTO;
 import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
-import cn.iocoder.yudao.module.im.service.websocket.dto.ImPrivateMessageDTO;
-import cn.iocoder.yudao.module.im.service.websocket.dto.notification.rtc.*;
+import cn.iocoder.yudao.module.im.service.websocket.notification.rtc.*;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import lombok.SneakyThrows;
@@ -57,7 +56,7 @@ import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.*;
  * 并发幂等：同好友对 / 同群活跃唯一性走 {@link ImRtcCallLockRedisDAO} 分布式锁 + 锁内 SELECT 兜底；webhook 兜底走条件 UPDATE；
  * <p>
  * 推送通道分流：
- *   1601 RTC_CALL（INVITING / JOINED / REJECTED / NO_ANSWER / LEFT 子类型）→ {@link ImWebSocketService#sendPrivateMessageAsync} 仅推参与方；
+ *   1601 RTC_CALL（INVITING / JOINED / REJECTED / NO_ANSWER / LEFT 子类型）→ {@link ImWebSocketService#sendNotificationAsync} 仅推参与方；
  *   1602 / 1603 PARTICIPANT_CONNECTED / DISCONNECTED → {@link ImWebSocketService} 推参与方 + 群通话场景广播全群；
  *   1610 RTC_CALL_START + 1611 RTC_CALL_END → {@link ImPrivateMessageService} / {@link ImGroupMessageService} 入消息流当聊天 tip
  *   （START 仅群通话；两者分别在 invite / cancel(leave) 事务里 INSERT，自增 id 自然保证顺序）
@@ -707,7 +706,6 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
         }
 
         // 3.1 群通话：推 RTC_CALL(NO_ANSWER) 让前端 banner 移除该人 + 级联关房判定
-        // TODO DONE @AI：拆分独立 NO_ANSWER 信令，不再复用 REJECT
         if (ImConversationTypeEnum.isGroup(call.getConversationType())) {
             pushCallNoAnswerNotification(call, userId, userMap.get(userId));
             endSessionIfTerminal(call, userId);
@@ -1003,8 +1001,8 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
         String token = signToken(inviteeId, resolveDisplayName(invitee, inviteeId), call.getRoom());
         ImRtcCallNotification payload = ImRtcCallNotification.ofInvite(
                 call, inviter, imProperties.getRtc().getLivekitUrl(), token, inviteeIds);
-        webSocketService.sendPrivateMessageAsync(inviteeId, ImPrivateMessageDTO.ofRtcNotification(
-                ImMessageTypeEnum.RTC_CALL.getType(), call.getInviterUserId(), inviteeId, payload));
+        webSocketService.sendNotificationAsync(inviteeId, ImConversationTypeEnum.NONE.getType(),
+                ImContentTypeEnum.RTC_CALL.getType(), payload);
     }
 
     /**
@@ -1019,8 +1017,8 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
         AdminUserRespDTO operator = operatorUserId != null ? adminUserApi.getUser(operatorUserId) : null;
         ImRtcCallNotification payload = ImRtcCallNotification.ofReject(call, operatorUserId, operator);
         for (Long receiverUserId : getCallAudienceUserIdList(call)) {
-            webSocketService.sendPrivateMessageAsync(receiverUserId, ImPrivateMessageDTO.ofRtcNotification(
-                    ImMessageTypeEnum.RTC_CALL.getType(), operatorUserId, receiverUserId, payload));
+            webSocketService.sendNotificationAsync(receiverUserId, ImConversationTypeEnum.NONE.getType(),
+                    ImContentTypeEnum.RTC_CALL.getType(), payload);
         }
     }
 
@@ -1036,8 +1034,8 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
     private void pushCallNoAnswerNotification(ImRtcCallDO call, Long operatorUserId, AdminUserRespDTO operator) {
         ImRtcCallNotification payload = ImRtcCallNotification.ofNoAnswer(call, operatorUserId, operator);
         for (Long receiverUserId : getCallAudienceUserIdList(call)) {
-            webSocketService.sendPrivateMessageAsync(receiverUserId, ImPrivateMessageDTO.ofRtcNotification(
-                    ImMessageTypeEnum.RTC_CALL.getType(), operatorUserId, receiverUserId, payload));
+            webSocketService.sendNotificationAsync(receiverUserId, ImConversationTypeEnum.NONE.getType(),
+                    ImContentTypeEnum.RTC_CALL.getType(), payload);
         }
     }
 
@@ -1048,7 +1046,7 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
      * @param userId  加入的参与者用户编号
      */
     private void pushParticipantConnectedNotification(ImRtcCallDO call, Long userId) {
-        pushParticipantNotification(call, ImMessageTypeEnum.RTC_PARTICIPANT_CONNECTED.getType(), userId,
+        pushParticipantNotification(call, ImContentTypeEnum.RTC_PARTICIPANT_CONNECTED.getType(), userId,
                 ImRtcParticipantConnectedNotification.of(call, userId));
     }
 
@@ -1059,7 +1057,7 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
      * @param userId  离开的参与者用户编号
      */
     private void pushParticipantDisconnectedNotification(ImRtcCallDO call, Long userId) {
-        pushParticipantNotification(call, ImMessageTypeEnum.RTC_PARTICIPANT_DISCONNECTED.getType(), userId,
+        pushParticipantNotification(call, ImContentTypeEnum.RTC_PARTICIPANT_DISCONNECTED.getType(), userId,
                 ImRtcParticipantDisconnectedNotification.of(call, userId));
     }
 
@@ -1076,8 +1074,7 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
         if (CollUtil.isEmpty(receivers)) {
             return;
         }
-        ImPrivateMessageDTO dto = ImPrivateMessageDTO.ofRtcNotification(type, actorUserId, null, payload);
-        webSocketService.sendPrivateMessageAsync(receivers, dto);
+        webSocketService.sendNotificationAsync(receivers, ImConversationTypeEnum.NONE.getType(), type, payload);
     }
 
     /**
@@ -1092,7 +1089,7 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
     private void pushCallStartNotification(ImRtcCallDO call, AdminUserRespDTO inviter, Set<Long> invitees) {
         ImRtcCallStartNotification payload = ImRtcCallStartNotification.of(call, inviter);
         Long peerUserId = ImConversationTypeEnum.isGroup(call.getConversationType()) ? null : CollUtil.getFirst(invitees);
-        pushCallChatMessage(call, ImMessageTypeEnum.RTC_CALL_START, payload, peerUserId);
+        pushCallChatMessage(call, ImContentTypeEnum.RTC_CALL_START, payload, peerUserId);
     }
 
     /**
@@ -1116,7 +1113,7 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
                     p -> ObjUtil.notEqual(p.getUserId(), call.getInviterUserId()));
             peerUserId = peer != null ? peer.getUserId() : null;
         }
-        pushCallChatMessage(call, ImMessageTypeEnum.RTC_CALL_END, payload, peerUserId);
+        pushCallChatMessage(call, ImContentTypeEnum.RTC_CALL_END, payload, peerUserId);
     }
 
     /**
@@ -1129,7 +1126,7 @@ public class ImRtcCallServiceImpl implements ImRtcCallService {
      * @param payload    推送 payload
      * @param peerUserId 私聊对端用户编号；群聊忽略，私聊缺失时回退为 senderId
      */
-    private void pushCallChatMessage(ImRtcCallDO call, ImMessageTypeEnum type, Object payload, Long peerUserId) {
+    private void pushCallChatMessage(ImRtcCallDO call, ImContentTypeEnum type, Object payload, Long peerUserId) {
         Long senderId = call.getInviterUserId();
         if (ImConversationTypeEnum.isGroup(call.getConversationType())) {
             ImGroupMessageSendDTO dto = new ImGroupMessageSendDTO().setGroupId(call.getGroupId())

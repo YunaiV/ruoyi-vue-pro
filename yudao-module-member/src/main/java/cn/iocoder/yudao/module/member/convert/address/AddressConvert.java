@@ -40,6 +40,9 @@ public interface AddressConvert {
         return AreaUtils.format(areaId);
     }
 
+    @Mapping(source = "areaId", target = "areaName", qualifiedByName = "convertAreaIdToAreaName")
+    AddressRespVO convert03(MemberAddressDO bean);
+
     List<AddressRespVO> convertList2(List<MemberAddressDO> list);
 
 }
