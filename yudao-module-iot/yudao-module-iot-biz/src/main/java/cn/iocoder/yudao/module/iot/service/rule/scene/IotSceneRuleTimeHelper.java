@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.iot.service.rule.scene;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.text.CharPool;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleConditionOperatorEnum;
 import cn.iocoder.yudao.module.iot.service.rule.scene.matcher.condition.IotCurrentTimeConditionMatcher;
 import cn.iocoder.yudao.module.iot.service.rule.scene.timer.IotTimerConditionEvaluator;
@@ -11,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -73,7 +73,7 @@ public class IotSceneRuleTimeHelper {
             LocalDateTime now = LocalDateTime.now();
             if (isDateTimeOperator(operatorEnum)) {
                 // 日期时间匹配（时间戳，秒级）
-                long currentTimestamp = now.atZone(ZoneId.systemDefault()).toEpochSecond();
+                long currentTimestamp = LocalDateTimeUtils.toEpochSecond(now);
                 return matchDateTime(currentTimestamp, operatorEnum, param);
             } else {
                 // 当日时间匹配（HH:mm:ss）

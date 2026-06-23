@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.system.framework.sms.core.client.impl;
 
 import cn.hutool.core.collection.CollStreamUtil;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.crypto.SecureUtil;
@@ -10,6 +9,7 @@ import cn.hutool.crypto.digest.HmacAlgorithm;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
+import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
 import cn.iocoder.yudao.module.system.framework.sms.core.client.dto.SmsReceiveRespDTO;
 import cn.iocoder.yudao.module.system.framework.sms.core.client.dto.SmsSendRespDTO;
@@ -120,7 +120,7 @@ public class QiniuSmsClient extends AbstractSmsClient {
                         .setSuccess("DELIVRD".equals(statusObj.getStr("status"))) // 是否接收成功
                         .setErrorMsg(statusObj.getStr("status")) // 状态报告编码
                         .setMobile(statusObj.getStr("mobile")) // 手机号
-                        .setReceiveTime(LocalDateTimeUtil.of(statusObj.getLong("delivrd_at") * 1000L)) // 状态报告时间
+                        .setReceiveTime(LocalDateTimeUtils.ofEpochSecond(statusObj.getLong("delivrd_at"))) // 状态报告时间
                         .setSerialNo(statusObj.getStr("message_id")) // 发送序列号
                         .setLogId(statusObj.getLong("seq")); // 用户序列号
             }
