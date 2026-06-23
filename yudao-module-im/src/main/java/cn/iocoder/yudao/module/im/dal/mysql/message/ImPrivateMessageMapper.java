@@ -67,23 +67,13 @@ public interface ImPrivateMessageMapper extends BaseMapperX<ImPrivateMessageDO> 
                 .eq(ImPrivateMessageDO::getClientMessageId, clientMessageId));
     }
 
-    default Long selectMaxIdBySenderIdAndReceiverIdAndStatus(Long senderId, Long receiverId, Integer status) {
-        ImPrivateMessageDO message = selectOne(new LambdaQueryWrapperX<ImPrivateMessageDO>()
-                .eq(ImPrivateMessageDO::getSenderId, senderId)
-                .eq(ImPrivateMessageDO::getReceiverId, receiverId)
-                .eq(ImPrivateMessageDO::getStatus, status)
-                .orderByDesc(ImPrivateMessageDO::getId)
-                .last("LIMIT 1"));
-        return message != null ? message.getId() : null;
-    }
-
-    default int updateBySenderIdAndReceiverIdAndIdLeAndStatus(Long senderId, Long receiverId, Long maxMessageId,
-                                                              Integer whereStatus, ImPrivateMessageDO updateObj) {
+    default int updateBySenderIdAndReceiverIdAndIdLeAndReceiptStatus(Long senderId, Long receiverId, Long maxMessageId,
+                                                                     Integer whereReceiptStatus, ImPrivateMessageDO updateObj) {
         return update(updateObj, new LambdaQueryWrapperX<ImPrivateMessageDO>()
                 .eq(ImPrivateMessageDO::getSenderId, senderId)
                 .eq(ImPrivateMessageDO::getReceiverId, receiverId)
                 .le(ImPrivateMessageDO::getId, maxMessageId)
-                .eq(ImPrivateMessageDO::getStatus, whereStatus));
+                .eq(ImPrivateMessageDO::getReceiptStatus, whereReceiptStatus));
     }
 
     default PageResult<ImPrivateMessageDO> selectPage(ImPrivateMessageManagerPageReqVO reqVO) {

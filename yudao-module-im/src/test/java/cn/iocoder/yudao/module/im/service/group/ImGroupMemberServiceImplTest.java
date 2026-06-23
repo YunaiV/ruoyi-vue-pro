@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.im.dal.dataobject.group.ImGroupMemberDO;
 import cn.iocoder.yudao.module.im.dal.mysql.group.ImGroupMemberMapper;
 import cn.iocoder.yudao.module.im.enums.group.ImGroupMemberRoleEnum;
 import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
-import cn.iocoder.yudao.module.im.service.websocket.dto.ImGroupMessageDTO;
+import cn.iocoder.yudao.module.im.service.websocket.notification.message.ImGroupMessageNotification;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
@@ -24,7 +24,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 /**
- * IM 群成员 Service 单元测试
+ * {@link ImGroupMemberServiceImpl} 的单元测试
  *
  * @author 芋道源码
  */
@@ -242,7 +242,7 @@ public class ImGroupMemberServiceImplTest extends BaseMockitoUnitTest {
         verify(groupMemberMapper).updateById(captor.capture());
         assertEquals(50L, captor.getValue().getId());
         assertTrue(captor.getValue().getSilent());
-        // 公开字段昵称变化 → 全员广播 GROUP_MEMBER_NICKNAME_UPDATE
+        // 公开字段昵称变化 → 全员在线同步 GROUP_MEMBER_NICKNAME_UPDATE
         verify(groupMessageService).sendGroupMessage(eq(1L), any(cn.iocoder.yudao.module.im.service.message.dto.ImGroupMessageSendDTO.class));
         // 个人字段 silent 变化 → 仅自己多端同步 GROUP_MEMBER_SETTING_UPDATE
         verify(groupMessageService).sendGroupMessage(eq(1L), eq(ListUtil.of(1L)),

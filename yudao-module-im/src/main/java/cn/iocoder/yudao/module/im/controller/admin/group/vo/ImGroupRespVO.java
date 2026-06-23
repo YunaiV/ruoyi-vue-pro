@@ -50,6 +50,12 @@ public class ImGroupRespVO {
     @Schema(description = "当前登录用户在该群的成员状态：在群 / 已退群（历史退群群仍返回，供前端展示离线消息的群名 / 头像）")
     private Integer joinStatus; // 参见 CommonStatusEnum 枚举
 
+    @Schema(description = "当前登录用户对该群的备注")
+    private String groupRemark;
+
+    @Schema(description = "当前登录用户是否免打扰")
+    private Boolean silent;
+
     @Schema(description = "群置顶消息列表，按 pin 顺序（最先置顶的在前）；非该群有效成员时为空")
     private List<ImGroupMessageRespVO> pinnedMessages;
 

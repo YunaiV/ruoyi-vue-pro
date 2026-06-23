@@ -154,7 +154,7 @@ public interface ImStatisticsManagerMapper {
                                                            @Param("endTime") LocalDateTime endTime);
 
     /**
-     * 区间内消息类型分布（私聊+群聊合并）
+     * 区间内内容类型分布（私聊+群聊合并）
      *
      * @return [{type: 0, count: 123}, ...]
      */

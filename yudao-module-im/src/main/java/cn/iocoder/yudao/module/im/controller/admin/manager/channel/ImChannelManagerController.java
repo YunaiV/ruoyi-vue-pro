@@ -75,7 +75,6 @@ public class ImChannelManagerController {
     @GetMapping("/simple-list")
     @Operation(summary = "获得启用的频道精简列表；前端表单选择频道时调用")
     public CommonResult<List<ImChannelRespVO>> getSimpleChannelList() {
-        // TODO DONE @AI：getChannelListByStatus 统一命名
         List<ImChannelDO> list = channelService.getChannelListByStatus(CommonStatusEnum.ENABLE.getStatus());
         return success(BeanUtils.toBean(list, ImChannelRespVO.class));
     }

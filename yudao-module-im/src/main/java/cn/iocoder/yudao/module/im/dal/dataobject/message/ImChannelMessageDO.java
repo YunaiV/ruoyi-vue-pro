@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
 import cn.iocoder.yudao.module.im.dal.dataobject.channel.ImChannelDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.channel.ImChannelMaterialDO;
-import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
+import cn.iocoder.yudao.module.im.enums.ImContentTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -54,7 +54,7 @@ public class ImChannelMessageDO extends BaseDO {
     /**
      * 消息类型
      * <p>
-     * 枚举 {@link ImMessageTypeEnum}
+     * 枚举 {@link ImContentTypeEnum}
      */
     private Integer type;
     /**

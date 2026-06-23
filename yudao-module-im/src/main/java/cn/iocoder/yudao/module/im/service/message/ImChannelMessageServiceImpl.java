@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.im.service.message;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
@@ -11,12 +12,14 @@ import cn.iocoder.yudao.module.im.controller.admin.manager.message.vo.channel.Im
 import cn.iocoder.yudao.module.im.dal.dataobject.channel.ImChannelMaterialDO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImChannelMessageDO;
 import cn.iocoder.yudao.module.im.dal.mysql.message.ImChannelMessageMapper;
-import cn.iocoder.yudao.module.im.dal.redis.message.ImChannelMessageReadRedisDAO;
-import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
+import cn.iocoder.yudao.module.im.enums.ImConversationTypeEnum;
+import cn.iocoder.yudao.module.im.enums.ImContentTypeEnum;
 import cn.iocoder.yudao.module.im.service.channel.ImChannelMaterialService;
+import cn.iocoder.yudao.module.im.service.conversation.ImConversationReadService;
 import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
-import cn.iocoder.yudao.module.im.service.websocket.dto.ImChannelMessageDTO;
-import cn.iocoder.yudao.module.im.service.websocket.dto.message.MaterialMessage;
+import cn.iocoder.yudao.module.im.service.websocket.notification.message.ImChannelMessageNotification;
+import cn.iocoder.yudao.module.im.service.websocket.notification.message.ImMessageReadNotification;
+import cn.iocoder.yudao.module.im.dal.dataobject.message.content.MaterialMessage;
 import jakarta.annotation.Resource;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -25,7 +28,6 @@ import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -50,39 +52,41 @@ public class ImChannelMessageServiceImpl implements ImChannelMessageService {
     private ImWebSocketService webSocketService;
 
     @Resource
-    private ImChannelMessageReadRedisDAO channelMessageReadRedisDAO;
+    private ImConversationReadService conversationReadService;
 
     // ==================== 用户端 ====================
 
     @Override
-    public List<ImChannelMessageDO> getMessageListForPull(Long userId, Long minId, Integer size) {
+    public List<ImChannelMessageDO> pullChannelMessageList(Long userId, Long minId, Integer size) {
         return channelMessageMapper.selectListByUserAndMinId(userId, minId, size);
     }
 
     @Override
     public Map<Long, Long> getChannelReadMaxMessageIdMap(Long userId, Collection<Long> channelIds) {
-        Map<Long, Long> result = new HashMap<>(channelIds.size());
-        for (Long channelId : channelIds) {
-            Long max = channelMessageReadRedisDAO.getReadMaxMessageId(channelId, userId);
-            if (max != null) {
-                result.put(channelId, max);
-            }
-        }
-        return result;
+        return conversationReadService.getConversationReadMessageIdMap(
+                userId, ImConversationTypeEnum.CHANNEL.getType(), channelIds);
     }
 
     @Override
     public void readChannelMessages(Long userId, Long channelId, Long messageId) {
         Assert.notNull(channelId, "频道编号不能为空");
         Assert.notNull(messageId, "已读消息编号不能为空");
-        // 1. 已读位置未前进，直接返回
-        Long prevMaxMessageId = channelMessageReadRedisDAO.getReadMaxMessageId(channelId, userId);
-        if (prevMaxMessageId != null && prevMaxMessageId >= messageId) {
+        // 1.1 校验消息真实存在且属于该频道，避免未来 / 伪造 messageId 污染读位置
+        ImChannelMessageDO message = channelMessageMapper.selectById(messageId);
+        if (message == null || ObjUtil.notEqual(message.getChannelId(), channelId)) {
+            return;
+        }
+        // 1.2 定向消息校验对当前用户可见（receiver_user_ids 为空表示全员可见）
+        if (CollUtil.isNotEmpty(message.getReceiverUserIds()) && !message.getReceiverUserIds().contains(userId)) {
             return;
         }
 
-        // 2. 更新 Redis 频道已读位置
-        channelMessageReadRedisDAO.updateReadMaxMessageId(channelId, userId, messageId);
+        // 2. 更新频道已读位置；读位置未前进则不推
+        boolean advanced = conversationReadService.updateConversationReadPosition(
+                userId, ImConversationTypeEnum.CHANNEL.getType(), channelId, messageId);
+        if (!advanced) {
+            return;
+        }
 
         // 3. 异步推 READ 事件给自己多端同步
         getSelf().readChannelMessageEvent(userId, channelId, messageId);
@@ -93,7 +97,8 @@ public class ImChannelMessageServiceImpl implements ImChannelMessageService {
      */
     @Async
     public void readChannelMessageEvent(Long userId, Long channelId, Long readId) {
-        webSocketService.sendChannelMessageAsync(userId, ImChannelMessageDTO.ofRead(channelId, readId));
+        webSocketService.sendNotificationAsync(userId, ImConversationTypeEnum.CHANNEL.getType(),
+                ImContentTypeEnum.READ.getType(), ImMessageReadNotification.ofChannel(channelId, readId));
     }
 
     private ImChannelMessageServiceImpl getSelf() {
@@ -113,15 +118,16 @@ public class ImChannelMessageServiceImpl implements ImChannelMessageService {
         String payloadJson = JsonUtils.toJsonString(payload);
         // 2.2 落库 1 行 message；reqVO 同名字段（materialId / receiverUserIds）自动拷贝，剩余字段补 set
         ImChannelMessageDO message = BeanUtils.toBean(reqVO, ImChannelMessageDO.class).setChannelId(material.getChannelId())
-                .setType(ImMessageTypeEnum.MATERIAL.getType()).setContent(payloadJson).setSendTime(LocalDateTime.now());
+                .setType(ImContentTypeEnum.MATERIAL.getType()).setContent(payloadJson).setSendTime(LocalDateTime.now());
         channelMessageMapper.insert(message);
 
         // 3. 异步推 WebSocket：指定用户走点对点；全员（receiverUserIds 为空）走广播
-        ImChannelMessageDTO dto = ImChannelMessageDTO.ofSend(message);
+        ImChannelMessageNotification dto = ImChannelMessageNotification.ofSend(message);
         if (CollUtil.isNotEmpty(reqVO.getReceiverUserIds())) {
-            webSocketService.sendChannelMessageAsync(reqVO.getReceiverUserIds(), dto);
+            webSocketService.sendNotificationAsync(reqVO.getReceiverUserIds(), ImConversationTypeEnum.CHANNEL.getType(),
+                    dto.getType(), dto);
         } else {
-            webSocketService.broadcastChannelMessageAsync(dto);
+            webSocketService.broadcastNotificationAsync(ImConversationTypeEnum.CHANNEL.getType(), dto.getType(), dto);
         }
         return message.getId();
     }

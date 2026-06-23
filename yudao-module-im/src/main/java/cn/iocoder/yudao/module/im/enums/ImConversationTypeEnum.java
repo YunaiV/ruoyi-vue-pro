@@ -16,6 +16,7 @@ import java.util.Objects;
 @Getter
 public enum ImConversationTypeEnum implements ArrayValuable<Integer> {
 
+    NONE(0, "无会话"), // 无会话
     PRIVATE(1, "私聊"), // 私聊
     GROUP(2, "群聊"), // 群聊
     CHANNEL(3, "频道"); // 频道 / 公众号
@@ -34,6 +35,10 @@ public enum ImConversationTypeEnum implements ArrayValuable<Integer> {
     @Override
     public Integer[] array() {
         return ARRAYS;
+    }
+
+    public static boolean isNone(Integer type) {
+        return Objects.equals(NONE.type, type);
     }
 
     public static boolean isPrivate(Integer type) {

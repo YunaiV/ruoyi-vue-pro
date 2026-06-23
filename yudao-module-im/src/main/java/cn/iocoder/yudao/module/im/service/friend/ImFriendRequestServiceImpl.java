@@ -14,13 +14,13 @@ import cn.iocoder.yudao.module.im.dal.dataobject.friend.ImFriendRequestDO;
 import cn.iocoder.yudao.module.im.dal.mysql.friend.ImFriendRequestMapper;
 import cn.iocoder.yudao.module.im.enums.friend.ImFriendRequestHandleResultEnum;
 import cn.iocoder.yudao.module.im.enums.friend.ImFriendStateEnum;
-import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
+import cn.iocoder.yudao.module.im.enums.ImContentTypeEnum;
+import cn.iocoder.yudao.module.im.enums.ImConversationTypeEnum;
 import cn.iocoder.yudao.module.im.framework.config.ImProperties;
 import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
-import cn.iocoder.yudao.module.im.service.websocket.dto.ImPrivateMessageDTO;
-import cn.iocoder.yudao.module.im.service.websocket.dto.notification.friend.FriendRequestApprovedNotification;
-import cn.iocoder.yudao.module.im.service.websocket.dto.notification.friend.FriendRequestNotification;
-import cn.iocoder.yudao.module.im.service.websocket.dto.notification.friend.FriendRequestRejectedNotification;
+import cn.iocoder.yudao.module.im.service.websocket.notification.friend.FriendRequestApprovedNotification;
+import cn.iocoder.yudao.module.im.service.websocket.notification.friend.FriendRequestNotification;
+import cn.iocoder.yudao.module.im.service.websocket.notification.friend.FriendRequestRejectedNotification;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import jakarta.annotation.Resource;
@@ -105,8 +105,8 @@ public class ImFriendRequestServiceImpl implements ImFriendRequestService {
         if (fromUser != null) {
             payload.setFromNickname(fromUser.getNickname()).setFromAvatar(fromUser.getAvatar());
         }
-        websocketService.sendPrivateMessageAsync(toUserId, ImPrivateMessageDTO.ofFriendNotification(
-                ImMessageTypeEnum.FRIEND_REQUEST_RECEIVED.getType(), fromUserId, toUserId, payload));
+        websocketService.sendNotificationAsync(toUserId, ImConversationTypeEnum.NONE.getType(),
+                ImContentTypeEnum.FRIEND_REQUEST_RECEIVED.getType(), payload);
 
         // 4. 全局自动通过开关：注册 afterCommit 回调，事务提交后再走同意流程
         //    回调内 try/catch 兜底 —— afterCommit 异常会被 Spring 静默吞掉，否则同意失败时申请方永远等不到 APPROVED
@@ -172,8 +172,6 @@ public class ImFriendRequestServiceImpl implements ImFriendRequestService {
     public void agreeFriendRequest(Long userId, Long requestId) {
         // 1.1 校验申请存在、未处理、操作人是接收方
         ImFriendRequestDO request = validateRequestForHandle(userId, requestId);
-        // 1.2 复验双方用户有效
-        adminUserApi.validateUserList(ListUtil.of(request.getFromUserId(), request.getToUserId()));
 
         // 2. 乐观锁更新申请处理结果
         ImFriendRequestDO updateObj = new ImFriendRequestDO()
@@ -192,8 +190,8 @@ public class ImFriendRequestServiceImpl implements ImFriendRequestService {
         FriendRequestApprovedNotification payload = (FriendRequestApprovedNotification)
                 new FriendRequestApprovedNotification().setRequestId(request.getId())
                         .setOperatorUserId(userId).setFriendUserId(userId);
-        websocketService.sendPrivateMessageAsync(request.getFromUserId(), ImPrivateMessageDTO.ofFriendNotification(
-                ImMessageTypeEnum.FRIEND_REQUEST_APPROVED.getType(), userId, request.getFromUserId(), payload));
+        websocketService.sendNotificationAsync(request.getFromUserId(), ImConversationTypeEnum.NONE.getType(),
+                ImContentTypeEnum.FRIEND_REQUEST_APPROVED.getType(), payload);
     }
 
     @Override
@@ -217,8 +215,8 @@ public class ImFriendRequestServiceImpl implements ImFriendRequestService {
                 new FriendRequestRejectedNotification().setRequestId(request.getId())
                         .setHandleContent(handleContent)
                         .setOperatorUserId(userId).setFriendUserId(userId);
-        websocketService.sendPrivateMessageAsync(request.getFromUserId(), ImPrivateMessageDTO.ofFriendNotification(
-                ImMessageTypeEnum.FRIEND_REQUEST_REJECTED.getType(), userId, request.getFromUserId(), payload));
+        websocketService.sendNotificationAsync(request.getFromUserId(), ImConversationTypeEnum.NONE.getType(),
+                ImContentTypeEnum.FRIEND_REQUEST_REJECTED.getType(), payload);
     }
 
     @Override
@@ -231,6 +229,11 @@ public class ImFriendRequestServiceImpl implements ImFriendRequestService {
                 maxRequest != null ? maxRequest.getUpdateTime() : null,
                 maxRequest != null ? maxRequest.getId() : null,
                 limit);
+    }
+
+    @Override
+    public List<ImFriendRequestDO> pullFriendRequestList(Long userId, Long lastUpdateTime, Long lastId, Integer limit) {
+        return friendRequestMapper.selectPullListByUserId(userId, lastUpdateTime, lastId, limit);
     }
 
     @Override

@@ -2,11 +2,11 @@ package cn.iocoder.yudao.module.im.mq.consumer.friend;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.module.im.dal.dataobject.friend.ImFriendDO;
-import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
+import cn.iocoder.yudao.module.im.enums.ImContentTypeEnum;
+import cn.iocoder.yudao.module.im.enums.ImConversationTypeEnum;
 import cn.iocoder.yudao.module.im.service.friend.ImFriendService;
 import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
-import cn.iocoder.yudao.module.im.service.websocket.dto.ImPrivateMessageDTO;
-import cn.iocoder.yudao.module.im.service.websocket.dto.notification.friend.FriendInfoUpdatedNotification;
+import cn.iocoder.yudao.module.im.service.websocket.notification.friend.FriendInfoUpdatedNotification;
 import cn.iocoder.yudao.module.system.api.message.user.AdminUserProfileUpdateMessage;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -52,8 +52,9 @@ public class AdminUserProfileUpdateConsumer {
                 try {
                     FriendInfoUpdatedNotification payload = (FriendInfoUpdatedNotification) new FriendInfoUpdatedNotification()
                             .setOperatorUserId(userId).setFriendUserId(userId);
-                    websocketService.sendPrivateMessageAsync(friend.getFriendUserId(), ImPrivateMessageDTO.ofFriendNotification(
-                            ImMessageTypeEnum.FRIEND_INFO_UPDATED.getType(), userId, friend.getFriendUserId(), payload));
+                    websocketService.sendNotificationAsync(friend.getFriendUserId(),
+                            ImConversationTypeEnum.NONE.getType(),
+                            ImContentTypeEnum.FRIEND_INFO_UPDATED.getType(), payload);
                     successCount++;
                 } catch (Exception e) {
                     log.warn("[onMessage][userId({}) friendUserId({}) 推送失败]",

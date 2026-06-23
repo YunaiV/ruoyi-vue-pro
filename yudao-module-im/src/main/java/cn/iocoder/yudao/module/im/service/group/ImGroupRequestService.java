@@ -64,6 +64,19 @@ public interface ImGroupRequestService {
     List<ImGroupRequestDO> getUnhandledRequestListByOwnerOrAdmin(Long userId);
 
     /**
+     * 增量拉取「我管理的群」下的加群申请（重连 / 离线补偿：含已处理，按 update_time + id 游标）
+     * <p>
+     * 作用域与 {@link #getUnhandledRequestListByOwnerOrAdmin} 一致：按 ImGroupMember.role 取我作为 OWNER / ADMIN 的群
+     *
+     * @param userId         当前用户编号
+     * @param lastUpdateTime 游标：上次拉取的最后一条更新时间戳（毫秒）
+     * @param lastId         游标：上次拉取的最后一条申请编号
+     * @param limit          单次拉取条数
+     * @return 申请记录列表
+     */
+    List<ImGroupRequestDO> pullGroupRequestList(Long userId, Long lastUpdateTime, Long lastId, Integer limit);
+
+    /**
      * 拉取指定群下的全部加群申请（含已处理）；仅群主 / 管理员可查
      * <p>
      * 用于群「进群申请」子页：最新一条卡片化突出 + 历史申请按 id 倒序

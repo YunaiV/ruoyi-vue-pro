@@ -4,8 +4,11 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
-import cn.iocoder.yudao.module.im.service.websocket.dto.ImGroupMessageDTO;
-import cn.iocoder.yudao.module.im.service.websocket.dto.ImPrivateMessageDTO;
+import cn.iocoder.yudao.module.im.enums.ImContentTypeEnum;
+import cn.iocoder.yudao.module.im.enums.ImConversationTypeEnum;
+import cn.iocoder.yudao.module.im.service.websocket.notification.ImNotificationWebSocketDTO;
+import cn.iocoder.yudao.module.im.service.websocket.notification.message.ImGroupMessageNotification;
+import cn.iocoder.yudao.module.im.service.websocket.notification.message.ImPrivateMessageNotification;
 import cn.iocoder.yudao.module.infra.api.websocket.WebSocketSenderApi;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -21,10 +24,11 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
 /**
- * IM WebSocket 推送 Service 单元测试
+ * {@link ImWebSocketServiceImpl} 的单元测试
  *
  * @author 芋道源码
  */
@@ -44,28 +48,32 @@ public class ImWebSocketServiceImplTest extends BaseMockitoUnitTest {
         }
     }
 
-    // ========== sendPrivateMessageAsync ==========
+    // ========== 私聊推送 ==========
 
     @Test
-    public void testSendPrivateMessageAsync_noTransactionSendsImmediately() {
+    public void testSendNotificationAsync_private_noTransactionSendsImmediately() {
         try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
             springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImWebSocketServiceImpl.class)))
                     .thenReturn(imWebSocketService);
 
             // 准备
-            ImPrivateMessageDTO dto = new ImPrivateMessageDTO().setSenderId(1L).setReceiverId(2L);
+            ImPrivateMessageNotification dto = new ImPrivateMessageNotification().setSenderId(1L).setReceiverId(2L)
+                    .setType(ImContentTypeEnum.TEXT.getType());
 
             // 调用：无事务，应立即发送
-            imWebSocketService.sendPrivateMessageAsync(2L, dto);
+            imWebSocketService.sendNotificationAsync(2L, ImConversationTypeEnum.PRIVATE.getType(),
+                    ImContentTypeEnum.TEXT.getType(), dto);
 
             // 断言
             verify(webSocketSenderApi).sendObject(
-                    eq(UserTypeEnum.ADMIN.getValue()), eq(2L), eq(ImPrivateMessageDTO.TYPE), eq(dto));
+                    eq(UserTypeEnum.ADMIN.getValue()), eq(2L), eq(ImNotificationWebSocketDTO.TYPE),
+                    argThat(actual -> isNotification(actual, ImConversationTypeEnum.PRIVATE,
+                            ImContentTypeEnum.TEXT, dto)));
         }
     }
 
     @Test
-    public void testSendPrivateMessageAsync_inTransactionDeferredUntilCommit() {
+    public void testSendNotificationAsync_private_inTransactionDeferredUntilCommit() {
         try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
             springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImWebSocketServiceImpl.class)))
                     .thenReturn(imWebSocketService);
@@ -73,10 +81,12 @@ public class ImWebSocketServiceImplTest extends BaseMockitoUnitTest {
             // 准备：开启事务同步
             TransactionSynchronizationManager.initSynchronization();
             try {
-                ImPrivateMessageDTO dto = new ImPrivateMessageDTO().setSenderId(1L).setReceiverId(2L);
+                ImPrivateMessageNotification dto = new ImPrivateMessageNotification().setSenderId(1L).setReceiverId(2L)
+                        .setType(ImContentTypeEnum.TEXT.getType());
 
                 // 调用
-                imWebSocketService.sendPrivateMessageAsync(2L, dto);
+                imWebSocketService.sendNotificationAsync(2L, ImConversationTypeEnum.PRIVATE.getType(),
+                        ImContentTypeEnum.TEXT.getType(), dto);
 
                 // 断言：事务未提交，未推送
                 verify(webSocketSenderApi, never()).sendObject(anyInt(), anyLong(), anyString(), any());
@@ -89,49 +99,60 @@ public class ImWebSocketServiceImplTest extends BaseMockitoUnitTest {
 
                 // 断言：提交后推送
                 verify(webSocketSenderApi).sendObject(
-                        eq(UserTypeEnum.ADMIN.getValue()), eq(2L), eq(ImPrivateMessageDTO.TYPE), eq(dto));
+                        eq(UserTypeEnum.ADMIN.getValue()), eq(2L), eq(ImNotificationWebSocketDTO.TYPE),
+                        argThat(actual -> isNotification(actual, ImConversationTypeEnum.PRIVATE,
+                                ImContentTypeEnum.TEXT, dto)));
             } finally {
                 TransactionSynchronizationManager.clear();
             }
         }
     }
 
-    // ========== sendGroupMessageAsync ==========
+    // ========== 群聊推送 ==========
 
     @Test
-    public void testSendGroupMessageAsync_fanOutToAllUsers() {
+    public void testSendNotificationAsync_group_fanOutToAllUsers() {
         try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
             springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImWebSocketServiceImpl.class)))
                     .thenReturn(imWebSocketService);
 
-            ImGroupMessageDTO dto = new ImGroupMessageDTO();
+            ImGroupMessageNotification dto = new ImGroupMessageNotification();
             dto.setGroupId(10L);
             dto.setSenderId(1L);
+            dto.setType(ImContentTypeEnum.TEXT.getType());
 
-            imWebSocketService.sendGroupMessageAsync(ListUtil.of(1L, 2L, 3L), dto);
+            imWebSocketService.sendNotificationAsync(ListUtil.of(1L, 2L, 3L),
+                    ImConversationTypeEnum.GROUP.getType(), ImContentTypeEnum.TEXT.getType(), dto);
 
             verify(webSocketSenderApi).sendObject(
-                    eq(UserTypeEnum.ADMIN.getValue()), eq(1L), eq(ImGroupMessageDTO.TYPE), eq(dto));
+                    eq(UserTypeEnum.ADMIN.getValue()), eq(1L), eq(ImNotificationWebSocketDTO.TYPE),
+                    argThat(actual -> isNotification(actual, ImConversationTypeEnum.GROUP,
+                            ImContentTypeEnum.TEXT, dto)));
             verify(webSocketSenderApi).sendObject(
-                    eq(UserTypeEnum.ADMIN.getValue()), eq(2L), eq(ImGroupMessageDTO.TYPE), eq(dto));
+                    eq(UserTypeEnum.ADMIN.getValue()), eq(2L), eq(ImNotificationWebSocketDTO.TYPE),
+                    argThat(actual -> isNotification(actual, ImConversationTypeEnum.GROUP,
+                            ImContentTypeEnum.TEXT, dto)));
             verify(webSocketSenderApi).sendObject(
-                    eq(UserTypeEnum.ADMIN.getValue()), eq(3L), eq(ImGroupMessageDTO.TYPE), eq(dto));
+                    eq(UserTypeEnum.ADMIN.getValue()), eq(3L), eq(ImNotificationWebSocketDTO.TYPE),
+                    argThat(actual -> isNotification(actual, ImConversationTypeEnum.GROUP,
+                            ImContentTypeEnum.TEXT, dto)));
         }
     }
 
     @Test
-    public void testSendGroupMessageAsync_senderExceptionDoesNotBreakOthers() {
+    public void testSendNotificationAsync_group_senderExceptionDoesNotBreakOthers() {
         try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
             springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImWebSocketServiceImpl.class)))
                     .thenReturn(imWebSocketService);
 
-            ImGroupMessageDTO dto = new ImGroupMessageDTO();
+            ImGroupMessageNotification dto = new ImGroupMessageNotification();
             dto.setGroupId(10L);
             // 给 1 号用户推送时抛异常，不能影响 2/3 号
             doThrow(new RuntimeException("user offline"))
                     .when(webSocketSenderApi).sendObject(anyInt(), eq(1L), anyString(), any());
 
-            imWebSocketService.sendGroupMessageAsync(ListUtil.of(1L, 2L, 3L), dto);
+            imWebSocketService.sendNotificationAsync(ListUtil.of(1L, 2L, 3L),
+                    ImConversationTypeEnum.GROUP.getType(), ImContentTypeEnum.TEXT.getType(), dto);
 
             // 2L 和 3L 也都被推送
             verify(webSocketSenderApi).sendObject(anyInt(), eq(2L), anyString(), any());
@@ -140,60 +161,96 @@ public class ImWebSocketServiceImplTest extends BaseMockitoUnitTest {
     }
 
     @Test
-    public void testDoSendGroupMessage_emptyUserIds_noSend() {
-        ImGroupMessageDTO dto = new ImGroupMessageDTO().setGroupId(10L);
+    public void testDoSendNotification_emptyUserIds_noSend() {
+        ImGroupMessageNotification dto = new ImGroupMessageNotification();
+        dto.setGroupId(10L);
+        dto.setType(ImContentTypeEnum.TEXT.getType());
+        ImNotificationWebSocketDTO notification = buildNotification(ImConversationTypeEnum.GROUP,
+                ImContentTypeEnum.TEXT, dto);
 
-        imWebSocketService.doSendGroupMessage(Collections.emptyList(), dto);
-        imWebSocketService.doSendGroupMessage(null, dto);
+        imWebSocketService.doSendNotification(Collections.emptyList(), notification);
+        imWebSocketService.doSendNotification(null, notification);
 
         verifyNoInteractions(webSocketSenderApi);
     }
 
     @Test
-    public void testDoSendGroupMessage_distinctUserIds() {
-        ImGroupMessageDTO dto = new ImGroupMessageDTO().setGroupId(10L);
+    public void testDoSendNotification_distinctUserIds() {
+        ImGroupMessageNotification dto = new ImGroupMessageNotification();
+        dto.setGroupId(10L);
+        dto.setType(ImContentTypeEnum.TEXT.getType());
+        ImNotificationWebSocketDTO notification = buildNotification(ImConversationTypeEnum.GROUP,
+                ImContentTypeEnum.TEXT, dto);
 
-        imWebSocketService.doSendGroupMessage(Arrays.asList(1L, 2L, 1L, null), dto);
+        imWebSocketService.doSendNotification(Arrays.asList(1L, 2L, 1L, null), notification);
 
         verify(webSocketSenderApi).sendObject(
-                eq(UserTypeEnum.ADMIN.getValue()), eq(1L), eq(ImGroupMessageDTO.TYPE), eq(dto));
+                eq(UserTypeEnum.ADMIN.getValue()), eq(1L), eq(ImNotificationWebSocketDTO.TYPE),
+                argThat(actual -> isNotification(actual, ImConversationTypeEnum.GROUP,
+                        ImContentTypeEnum.TEXT, dto)));
         verify(webSocketSenderApi).sendObject(
-                eq(UserTypeEnum.ADMIN.getValue()), eq(2L), eq(ImGroupMessageDTO.TYPE), eq(dto));
+                eq(UserTypeEnum.ADMIN.getValue()), eq(2L), eq(ImNotificationWebSocketDTO.TYPE),
+                argThat(actual -> isNotification(actual, ImConversationTypeEnum.GROUP,
+                        ImContentTypeEnum.TEXT, dto)));
         verifyNoMoreInteractions(webSocketSenderApi);
     }
 
     @Test
-    public void testSendPrivateMessageAsync_exceptionSwallowed() {
+    public void testSendNotificationAsync_private_exceptionSwallowed() {
         try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
             springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImWebSocketServiceImpl.class)))
                     .thenReturn(imWebSocketService);
 
             // 准备：sender 抛异常
-            ImPrivateMessageDTO dto = new ImPrivateMessageDTO().setSenderId(1L).setReceiverId(2L);
+            ImPrivateMessageNotification dto = new ImPrivateMessageNotification().setSenderId(1L).setReceiverId(2L)
+                    .setType(ImContentTypeEnum.TEXT.getType());
             doThrow(new RuntimeException("user offline"))
                     .when(webSocketSenderApi).sendObject(anyInt(), anyLong(), anyString(), any());
 
             // 调用：异常应被吞掉，不向上抛
-            imWebSocketService.sendPrivateMessageAsync(2L, dto);
+            imWebSocketService.sendNotificationAsync(2L, ImConversationTypeEnum.PRIVATE.getType(),
+                    ImContentTypeEnum.TEXT.getType(), dto);
 
             verify(webSocketSenderApi).sendObject(anyInt(), eq(2L), anyString(), any());
         }
     }
 
     @Test
-    public void testSendGroupMessageAsync_singleUserDefaultOverload() {
+    public void testSendNotificationAsync_group_singleUserDefaultOverload() {
         try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
             springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(ImWebSocketServiceImpl.class)))
                     .thenReturn(imWebSocketService);
 
-            ImGroupMessageDTO dto = new ImGroupMessageDTO();
+            ImGroupMessageNotification dto = new ImGroupMessageNotification();
             dto.setGroupId(10L);
+            dto.setType(ImContentTypeEnum.TEXT.getType());
 
-            imWebSocketService.sendGroupMessageAsync(42L, dto);
+            imWebSocketService.sendNotificationAsync(42L, ImConversationTypeEnum.GROUP.getType(),
+                    ImContentTypeEnum.TEXT.getType(), dto);
 
             verify(webSocketSenderApi).sendObject(
-                    eq(UserTypeEnum.ADMIN.getValue()), eq(42L), eq(ImGroupMessageDTO.TYPE), eq(dto));
+                    eq(UserTypeEnum.ADMIN.getValue()), eq(42L), eq(ImNotificationWebSocketDTO.TYPE),
+                    argThat(actual -> isNotification(actual, ImConversationTypeEnum.GROUP,
+                            ImContentTypeEnum.TEXT, dto)));
         }
+    }
+
+    private static boolean isNotification(Object object, ImConversationTypeEnum conversationType,
+                                          ImContentTypeEnum contentType, Object payload) {
+        if (!(object instanceof ImNotificationWebSocketDTO notification)) {
+            return false;
+        }
+        return conversationType.getType().equals(notification.getConversationType())
+                && contentType.getType().equals(notification.getContentType())
+                && payload == notification.getPayload();
+    }
+
+    private static ImNotificationWebSocketDTO buildNotification(ImConversationTypeEnum conversationType,
+                                                                ImContentTypeEnum contentType, Object payload) {
+        return new ImNotificationWebSocketDTO()
+                .setConversationType(conversationType.getType())
+                .setContentType(contentType.getType())
+                .setPayload(payload);
     }
 
 }

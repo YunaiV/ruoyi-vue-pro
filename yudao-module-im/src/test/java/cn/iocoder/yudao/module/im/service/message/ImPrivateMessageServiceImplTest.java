@@ -7,15 +7,20 @@ import cn.iocoder.yudao.module.im.controller.admin.message.vo.privates.ImPrivate
 import cn.iocoder.yudao.module.im.controller.admin.message.vo.privates.ImPrivateMessageSendReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImPrivateMessageDO;
 import cn.iocoder.yudao.module.im.dal.mysql.message.ImPrivateMessageMapper;
+import cn.iocoder.yudao.module.im.enums.ImConversationTypeEnum;
+import cn.iocoder.yudao.module.im.enums.message.ImMessageReceiptStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
-import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
+import cn.iocoder.yudao.module.im.enums.ImContentTypeEnum;
 import cn.iocoder.yudao.module.im.framework.config.ImProperties;
+import cn.iocoder.yudao.module.im.service.conversation.ImConversationReadService;
 import cn.iocoder.yudao.module.im.service.friend.ImFriendService;
 import cn.iocoder.yudao.module.im.service.sensitiveword.ImSensitiveWordService;
 import cn.iocoder.yudao.module.im.service.message.dto.ImPrivateMessageSendDTO;
 import cn.iocoder.yudao.module.im.service.websocket.ImWebSocketService;
-import cn.iocoder.yudao.module.im.service.websocket.dto.ImPrivateMessageDTO;
-import cn.iocoder.yudao.module.im.service.websocket.dto.message.RecallMessage;
+import cn.iocoder.yudao.module.im.service.websocket.notification.message.ImMessageReadNotification;
+import cn.iocoder.yudao.module.im.service.websocket.notification.message.ImMessageReceiptNotification;
+import cn.iocoder.yudao.module.im.service.websocket.notification.message.ImPrivateMessageNotification;
+import cn.iocoder.yudao.module.im.dal.dataobject.message.content.RecallMessage;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
@@ -31,7 +36,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 /**
- * IM 私聊消息 Service 单元测试
+ * {@link ImPrivateMessageServiceImpl} 的单元测试
  *
  * @author 芋道源码
  */
@@ -47,9 +52,10 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
     @Mock
     private ImSensitiveWordService sensitiveWordService;
     @Mock
+    private ImConversationReadService conversationReadService;
+    @Mock
     private ImWebSocketService imWebSocketService;
 
-    /** 用真实实例避免 NPE；默认值与生产保持一致（recallTimeoutMinutes=5、private/group read enabled=true）；个别用例可改字段测分支 */
     @Spy
     private ImProperties imProperties = new ImProperties();
 
@@ -57,7 +63,7 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
         ImPrivateMessageSendReqVO reqVO = new ImPrivateMessageSendReqVO();
         reqVO.setClientMessageId("test-uuid-001");
         reqVO.setReceiverId(2L);
-        reqVO.setType(ImMessageTypeEnum.TEXT.getType());
+        reqVO.setType(ImContentTypeEnum.TEXT.getType());
         reqVO.setContent("{\"content\":\"你好\"}");
         return reqVO;
     }
@@ -83,8 +89,10 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
         assertNotNull(result);
         assertEquals(1L, result.getSenderId());
         assertEquals(2L, result.getReceiverId());
-        assertEquals(ImMessageTypeEnum.TEXT.getType(), result.getType());
-        assertEquals(ImMessageStatusEnum.UNREAD.getStatus(), result.getStatus());
+        assertEquals(ImContentTypeEnum.TEXT.getType(), result.getType());
+        assertEquals(ImMessageStatusEnum.NORMAL.getStatus(), result.getStatus());
+        assertEquals(ImMessageReceiptStatusEnum.PENDING.getStatus(), result.getReceiptStatus(),
+                "用户私聊消息默认需要回执（PENDING）");
         assertNotNull(result.getSendTime());
 
         // 验证调用
@@ -92,8 +100,8 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
         verify(sensitiveWordService).validateText(reqVO.getContent());
         verify(privateMessageMapper).insert(any(ImPrivateMessageDO.class));
         // 验证推送给接收方和发送方
-        verify(imWebSocketService).sendPrivateMessageAsync(eq(2L), any(ImPrivateMessageDTO.class));
-        verify(imWebSocketService).sendPrivateMessageAsync(eq(1L), any(ImPrivateMessageDTO.class));
+        verify(imWebSocketService).sendNotificationAsync(eq(2L), anyInt(), anyInt(), any());
+        verify(imWebSocketService).sendNotificationAsync(eq(1L), anyInt(), anyInt(), any());
     }
 
     @Test
@@ -162,38 +170,44 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
 
     @Test
     public void testReadMessages_success() {
-        // 准备：前端上报已读到 messageId=5；mapper 返回更新行数 2 表示有未读被翻转
-        when(privateMessageMapper.updateBySenderIdAndReceiverIdAndIdLeAndStatus(
+        // 准备：前端上报已读到 messageId=5；mapper 返回更新行数 2 表示有待回执消息被标记完成
+        when(privateMessageMapper.updateBySenderIdAndReceiverIdAndIdLeAndReceiptStatus(
                 eq(2L), eq(1L), eq(5L),
-                eq(ImMessageStatusEnum.UNREAD.getStatus()), any(ImPrivateMessageDO.class)))
+                eq(ImMessageReceiptStatusEnum.PENDING.getStatus()), any(ImPrivateMessageDO.class)))
                 .thenReturn(2);
+        // 读位置前进 → 才下发事件
+        when(conversationReadService.updateConversationReadPosition(anyLong(), anyInt(), anyLong(), anyLong()))
+                .thenReturn(true);
 
         // 调用
         privateMessageService.readPrivateMessages(1L, 2L, 5L);
 
-        // 断言：更新了消息状态
-        verify(privateMessageMapper).updateBySenderIdAndReceiverIdAndIdLeAndStatus(
+        // 断言：把待回执(PENDING)消息标记为已完成（DONE）；status 不再写 READ
+        verify(privateMessageMapper).updateBySenderIdAndReceiverIdAndIdLeAndReceiptStatus(
                 eq(2L), eq(1L), eq(5L),
-                eq(ImMessageStatusEnum.UNREAD.getStatus()), any(ImPrivateMessageDO.class));
+                eq(ImMessageReceiptStatusEnum.PENDING.getStatus()), any(ImPrivateMessageDO.class));
 
         // 断言：发送了 READ + RECEIPT 事件，payload 字段正确
         ArgumentCaptor<Long> userCaptor = ArgumentCaptor.forClass(Long.class);
-        ArgumentCaptor<ImPrivateMessageDTO> contentCaptor = ArgumentCaptor.forClass(ImPrivateMessageDTO.class);
-        verify(imWebSocketService, times(2)).sendPrivateMessageAsync(
-                userCaptor.capture(), contentCaptor.capture());
+        ArgumentCaptor<Integer> contentTypeCaptor = ArgumentCaptor.forClass(Integer.class);
+        ArgumentCaptor<Object> payloadCaptor = ArgumentCaptor.forClass(Object.class);
+        verify(imWebSocketService, times(2)).sendNotificationAsync(
+                userCaptor.capture(), eq(ImConversationTypeEnum.PRIVATE.getType()),
+                contentTypeCaptor.capture(), payloadCaptor.capture());
 
         // 第一次：发给自己的 READ 事件
         assertEquals(1L, userCaptor.getAllValues().get(0));
-        ImPrivateMessageDTO readPayload = contentCaptor.getAllValues().get(0);
-        assertEquals(ImMessageTypeEnum.READ.getType(), readPayload.getType());
+        assertEquals(ImContentTypeEnum.READ.getType(), contentTypeCaptor.getAllValues().get(0));
+        ImMessageReadNotification readPayload = (ImMessageReadNotification) payloadCaptor.getAllValues().get(0);
         assertEquals(1L, readPayload.getSenderId());
         assertEquals(2L, readPayload.getReceiverId());
         assertEquals(5L, readPayload.getId(), "READ id 应为前端上报的 messageId");
 
         // 第二次：发给对方的 RECEIPT 事件
         assertEquals(2L, userCaptor.getAllValues().get(1));
-        ImPrivateMessageDTO receiptPayload = contentCaptor.getAllValues().get(1);
-        assertEquals(ImMessageTypeEnum.RECEIPT.getType(), receiptPayload.getType());
+        assertEquals(ImContentTypeEnum.RECEIPT.getType(), contentTypeCaptor.getAllValues().get(1));
+        ImMessageReceiptNotification receiptPayload =
+                (ImMessageReceiptNotification) payloadCaptor.getAllValues().get(1);
         assertEquals(5L, receiptPayload.getId(), "RECEIPT id 应为前端上报的 messageId");
     }
 
@@ -204,7 +218,7 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
         // 准备
         ImPrivateMessageDO message = ImPrivateMessageDO.builder()
                 .id(10L).senderId(1L).receiverId(2L)
-                .status(ImMessageStatusEnum.UNREAD.getStatus())
+                .status(ImMessageStatusEnum.NORMAL.getStatus())
                 .sendTime(LocalDateTime.now()).build(); // 刚发送，5 分钟内
         when(privateMessageMapper.selectById(10L)).thenReturn(message);
         when(privateMessageMapper.updateById(any(ImPrivateMessageDO.class))).thenReturn(1);
@@ -219,7 +233,7 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
         verify(privateMessageMapper).updateById(any(ImPrivateMessageDO.class));
         verify(privateMessageMapper).insert(any(ImPrivateMessageDO.class));
         // 验证推送了消息（给接收方和发送方）
-        verify(imWebSocketService, times(2)).sendPrivateMessageAsync(anyLong(), any(ImPrivateMessageDTO.class));
+        verify(imWebSocketService, times(2)).sendNotificationAsync(anyLong(), anyInt(), anyInt(), any());
     }
 
     @Test
@@ -227,7 +241,7 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
         // 准备
         ImPrivateMessageDO message = ImPrivateMessageDO.builder()
                 .id(10L).senderId(2L).receiverId(1L)
-                .status(ImMessageStatusEnum.UNREAD.getStatus())
+                .status(ImMessageStatusEnum.NORMAL.getStatus())
                 .sendTime(LocalDateTime.now()).build();
         when(privateMessageMapper.selectById(10L)).thenReturn(message);
 
@@ -268,7 +282,7 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
         // 准备：消息发送于 10 分钟前（超过 5 分钟窗口）
         ImPrivateMessageDO message = ImPrivateMessageDO.builder()
                 .id(10L).senderId(1L).receiverId(2L)
-                .status(ImMessageStatusEnum.UNREAD.getStatus())
+                .status(ImMessageStatusEnum.NORMAL.getStatus())
                 .sendTime(LocalDateTime.now().minusMinutes(10)).build();
         when(privateMessageMapper.selectById(10L)).thenReturn(message);
 
@@ -295,7 +309,7 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
         assertEquals(MESSAGE_SENSITIVE_WORD_BLOCKED.getCode(), exception.getCode());
         // 断言：不入库、不推送
         verify(privateMessageMapper, never()).insert(any(ImPrivateMessageDO.class));
-        verify(imWebSocketService, never()).sendPrivateMessageAsync(anyLong(), any(ImPrivateMessageDTO.class));
+        verify(imWebSocketService, never()).sendNotificationAsync(anyLong(), anyInt(), anyInt(), any());
     }
 
     @Test
@@ -308,33 +322,31 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
                 () -> privateMessageService.readPrivateMessages(1L, 2L, 5L));
         assertEquals(MESSAGE_PRIVATE_READ_DISABLED.getCode(), exception.getCode());
         // 断言：不更新消息状态、不推送
-        verify(privateMessageMapper, never()).updateBySenderIdAndReceiverIdAndIdLeAndStatus(
+        verify(privateMessageMapper, never()).updateBySenderIdAndReceiverIdAndIdLeAndReceiptStatus(
                 anyLong(), anyLong(), anyLong(), anyInt(), any(ImPrivateMessageDO.class));
-        verify(imWebSocketService, never()).sendPrivateMessageAsync(anyLong(), any(ImPrivateMessageDTO.class));
+        verify(imWebSocketService, never()).sendNotificationAsync(anyLong(), anyInt(), anyInt(), any());
     }
 
     @Test
-    public void testReadMessages_noUnread() {
-        // 准备：mapper 返回 0 表示 id <= messageId 范围内没有未读消息
-        when(privateMessageMapper.updateBySenderIdAndReceiverIdAndIdLeAndStatus(
-                eq(2L), eq(1L), eq(5L),
-                eq(ImMessageStatusEnum.UNREAD.getStatus()), any(ImPrivateMessageDO.class)))
-                .thenReturn(0);
+    public void testReadMessages_notAdvanced() {
+        // 准备：读位置未前进（已读过 / CAS 失败），不下发事件
+        when(conversationReadService.updateConversationReadPosition(anyLong(), anyInt(), anyLong(), anyLong()))
+                .thenReturn(false);
 
         // 调用
         privateMessageService.readPrivateMessages(1L, 2L, 5L);
 
-        // 断言：不推送 READ / RECEIPT
-        verify(imWebSocketService, never()).sendPrivateMessageAsync(anyLong(), any(ImPrivateMessageDTO.class));
+        // 断言：读位置没前进，不推送 READ / RECEIPT
+        verify(imWebSocketService, never()).sendNotificationAsync(anyLong(), anyInt(), anyInt(), any());
     }
 
     // ========== getMaxReadMessageId 测试 ==========
 
     @Test
     public void testGetMaxReadMessageId_hit() {
-        // 准备：对方读到我发的最大 id=10
-        when(privateMessageMapper.selectMaxIdBySenderIdAndReceiverIdAndStatus(
-                1L, 2L, ImMessageStatusEnum.READ.getStatus())).thenReturn(10L);
+        // 准备：对方(2) 在与我(1) 的会话里读位置=10
+        when(conversationReadService.getConversationReadMessageId(eq(2L), anyInt(), eq(1L)))
+                .thenReturn(10L);
 
         // 调用
         Long result = privateMessageService.getMaxReadMessageId(1L, 2L);
@@ -345,9 +357,9 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
 
     @Test
     public void testGetMaxReadMessageId_miss() {
-        // 准备：对方一条都没读过
-        when(privateMessageMapper.selectMaxIdBySenderIdAndReceiverIdAndStatus(
-                1L, 2L, ImMessageStatusEnum.READ.getStatus())).thenReturn(null);
+        // 准备：对方一条都没读过（读位置为 null）
+        when(conversationReadService.getConversationReadMessageId(eq(2L), anyInt(), eq(1L)))
+                .thenReturn(null);
 
         // 调用
         Long result = privateMessageService.getMaxReadMessageId(1L, 2L);
@@ -367,13 +379,13 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
         assertEquals(MESSAGE_PRIVATE_READ_DISABLED.getCode(), exception.getCode());
     }
 
-    // ========== sendPrivateMessage(senderId, dto)：helper 行为 ==========
+    // ========== DTO 私聊消息 ==========
 
     @Test
     public void testSendPrivateMessage_dto_persistsAndSerializesPojoContent() {
         // 准备：persistent=true 类型 + POJO content
         ImPrivateMessageSendDTO dto = new ImPrivateMessageSendDTO()
-                .setReceiverId(2L).setType(ImMessageTypeEnum.RECALL.getType())
+                .setReceiverId(2L).setType(ImContentTypeEnum.RECALL.getType())
                 .setContent(new RecallMessage().setMessageId(50L));
 
         privateMessageService.sendPrivateMessage(1L, dto);
@@ -384,27 +396,27 @@ public class ImPrivateMessageServiceImplTest extends BaseMockitoUnitTest {
         ImPrivateMessageDO message = captor.getValue();
         assertEquals(1L, message.getSenderId());
         assertEquals(2L, message.getReceiverId());
-        assertEquals(ImMessageTypeEnum.RECALL.getType(), message.getType());
+        assertEquals(ImContentTypeEnum.RECALL.getType(), message.getType());
         assertEquals("{\"messageId\":50}", message.getContent());
-        assertEquals(ImMessageStatusEnum.UNREAD.getStatus(), message.getStatus());
+        assertEquals(ImMessageStatusEnum.NORMAL.getStatus(), message.getStatus());
         assertNotNull(message.getClientMessageId());
         assertNotNull(message.getSendTime());
         // 断言：sender + receiver 双端推送
-        verify(imWebSocketService).sendPrivateMessageAsync(eq(1L), any(ImPrivateMessageDTO.class));
-        verify(imWebSocketService).sendPrivateMessageAsync(eq(2L), any(ImPrivateMessageDTO.class));
+        verify(imWebSocketService).sendNotificationAsync(eq(1L), anyInt(), anyInt(), any());
+        verify(imWebSocketService).sendNotificationAsync(eq(2L), anyInt(), anyInt(), any());
     }
 
     @Test
     public void testSendPrivateMessage_dto_nonPersistentTypeNotInserted() {
         // 准备：persistent=false 类型（FRIEND_DELETE 通知）→ 不入库；仅推 sender 多端，receiver 不感知
         ImPrivateMessageSendDTO dto = new ImPrivateMessageSendDTO()
-                .setReceiverId(2L).setType(ImMessageTypeEnum.FRIEND_DELETE.getType());
+                .setReceiverId(2L).setType(ImContentTypeEnum.FRIEND_DELETE.getType());
 
         privateMessageService.sendPrivateMessage(1L, dto);
 
         verify(privateMessageMapper, never()).insert(any(ImPrivateMessageDO.class));
-        verify(imWebSocketService).sendPrivateMessageAsync(eq(1L), any(ImPrivateMessageDTO.class));
-        verify(imWebSocketService, never()).sendPrivateMessageAsync(eq(2L), any(ImPrivateMessageDTO.class));
+        verify(imWebSocketService).sendNotificationAsync(eq(1L), anyInt(), anyInt(), any());
+        verify(imWebSocketService, never()).sendNotificationAsync(eq(2L), anyInt(), anyInt(), any());
     }
 
     // ========== getPrivateMessageList ==========

@@ -25,7 +25,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * IM 表情包 Service 单元测试
+ * {@link ImFacePackServiceImpl} 的单元测试
  *
  * @author 芋道源码
  */

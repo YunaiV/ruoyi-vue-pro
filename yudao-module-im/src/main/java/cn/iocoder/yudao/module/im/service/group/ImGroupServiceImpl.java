@@ -30,7 +30,7 @@ import cn.iocoder.yudao.module.im.dal.mysql.group.ImGroupMapper;
 import cn.iocoder.yudao.module.im.enums.group.ImGroupAddSourceEnum;
 import cn.iocoder.yudao.module.im.enums.group.ImGroupMemberRoleEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
-import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
+import cn.iocoder.yudao.module.im.enums.ImContentTypeEnum;
 import cn.iocoder.yudao.module.im.framework.config.ImProperties;
 import cn.iocoder.yudao.module.im.service.friend.ImFriendService;
 import cn.iocoder.yudao.module.im.service.message.ImGroupMessageService;
@@ -149,7 +149,9 @@ public class ImGroupServiceImpl implements ImGroupService {
         boolean nameChanged = StrUtil.isNotEmpty(updateReqVO.getName());
         boolean noticeChanged = updateReqVO.getNotice() != null;
         boolean avatarChanged = StrUtil.isNotEmpty(updateReqVO.getAvatar());
-        if (nameChanged || noticeChanged || avatarChanged) {
+        boolean joinApprovalChanged = updateReqVO.getJoinApproval() != null
+                && ObjUtil.notEqual(group.getJoinApproval(), updateReqVO.getJoinApproval());
+        if (nameChanged || noticeChanged || avatarChanged || joinApprovalChanged) {
             List<Long> memberUserIds = groupMemberService.getActiveGroupMemberUserIdsByGroupId(groupId);
             if (nameChanged) {
                 groupMessageService.sendGroupMessage(userId, memberUserIds, ImGroupMessageSendDTO.ofGroupNameUpdate(
@@ -161,7 +163,11 @@ public class ImGroupServiceImpl implements ImGroupService {
             }
             if (avatarChanged) {
                 groupMessageService.sendGroupMessage(userId, memberUserIds, ImGroupMessageSendDTO.ofGroupInfoUpdate(
-                        groupId, userId, group.getAvatar(), updateReqVO.getAvatar()));
+                        groupId, userId, group.getAvatar(), updateReqVO.getAvatar(), null, null));
+            }
+            if (joinApprovalChanged) {
+                groupMessageService.sendGroupMessage(userId, memberUserIds, ImGroupMessageSendDTO.ofGroupInfoUpdate(
+                        groupId, userId, null, null, group.getJoinApproval(), updateReqVO.getJoinApproval()));
             }
         }
 
@@ -193,8 +199,6 @@ public class ImGroupServiceImpl implements ImGroupService {
                 .setStatus(CommonStatusEnum.DISABLE.getStatus()).setDissolvedTime(LocalDateTime.now()));
         // 2.2 移除全部群成员
         groupMemberService.removeGroupMembersByGroupId(id);
-        // 2.3 清理已读缓存
-        groupMessageService.deleteReadMaxMessageIdMap(id);
     }
 
     // ==================== 群成员的写操作 ====================
@@ -267,10 +271,8 @@ public class ImGroupServiceImpl implements ImGroupService {
         // 2. 先发广播，后移成员（见类 javadoc）
         groupMessageService.sendGroupMessage(userId, ImGroupMessageSendDTO.ofGroupMemberQuit(groupId, userId));
 
-        // 3.1 移除群成员
+        // 3. 移除群成员
         groupMemberService.removeGroupMember(groupId, userId);
-        // 3.2 清理已读缓存
-        groupMessageService.deleteReadMaxMessageId(groupId, userId);
     }
 
     @Override
@@ -307,10 +309,8 @@ public class ImGroupServiceImpl implements ImGroupService {
         groupMessageService.sendGroupMessage(userId,
                 ImGroupMessageSendDTO.ofGroupMemberKick(groupId, userId, validTargetUserIds));
 
-        // 3.1 批量移除群成员
+        // 3. 批量移除群成员；不清理读位置（保留退群前历史已读，供离线补偿）
         groupMemberService.removeGroupMembers(groupId, validTargetUserIds);
-        // 3.2 批量清理已读缓存
-        groupMessageService.deleteReadMaxMessageIds(groupId, validTargetUserIds);
     }
 
     @Override
@@ -442,7 +442,7 @@ public class ImGroupServiceImpl implements ImGroupService {
         if (message == null || ObjUtil.notEqual(message.getGroupId(), groupId)) {
             throw exception(MESSAGE_NOT_IN_GROUP);
         }
-        if (!ImMessageTypeEnum.validate(message.getType()).isNormal()
+        if (!ImContentTypeEnum.validate(message.getType()).isNormal()
                 || ImMessageStatusEnum.RECALL.getStatus().equals(message.getStatus())) {
             throw exception(MESSAGE_NOT_IN_GROUP);
         }
@@ -601,11 +601,8 @@ public class ImGroupServiceImpl implements ImGroupService {
 
     @Override
     public List<ImGroupDO> getMyGroupList(Long userId) {
-        // 1.1 查用户所在的、仍有效的群成员记录（仅 ENABLE 状态）
-        List<ImGroupMemberDO> members = groupMemberService.getActiveGroupMemberListByUserId(userId);
-        // 1.2 再查最近 N 天（与群消息离线拉取窗口一致）内退群的成员记录（退群前可能有离线消息需要展示，一并返回作为前端缓存）
-        LocalDateTime minQuitTime = LocalDateTime.now().minusDays(imProperties.getMessage().getGroupPullMaxDays());
-        members.addAll(groupMemberService.getQuitGroupMemberListByUserId(userId, minQuitTime));
+        // 1. 查用户曾经加入的所有群（含退群，前端按需过滤）；退群前的离线消息也要能展示
+        List<ImGroupMemberDO> members = groupMemberService.getGroupMemberListByUserId(userId);
         if (CollUtil.isEmpty(members)) {
             return Collections.emptyList();
         }

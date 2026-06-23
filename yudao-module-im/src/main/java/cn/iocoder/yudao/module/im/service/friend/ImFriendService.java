@@ -43,6 +43,11 @@ public interface ImFriendService {
     List<ImFriendDO> getFriendList(Long userId);
 
     /**
+     * 增量拉取当前用户的好友关系（重连 / 离线补偿：含已删除，按 update_time + id 游标）
+     */
+    List<ImFriendDO> pullFriendList(Long userId, Long lastUpdateTime, Long lastId, Integer limit);
+
+    /**
      * 获得当前用户的有效好友列表（仅 ENABLE 状态）
      */
     List<ImFriendDO> getEnableFriendList(Long userId);

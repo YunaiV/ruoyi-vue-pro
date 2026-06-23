@@ -51,6 +51,17 @@ public interface ImFriendRequestService {
     List<ImFriendRequestDO> getMyFriendRequestList(Long userId, Long maxId, Integer limit);
 
     /**
+     * 增量拉取「我相关」的好友申请（重连 / 离线补偿：双向 OR，按 update_time + id 游标）
+     *
+     * @param userId         用户编号
+     * @param lastUpdateTime 上次拉取到的最新更新时间（毫秒时间戳）；首次拉取传 null
+     * @param lastId         上次拉取到的最后一条记录 id；首次拉取传 null
+     * @param limit          单次拉取条数
+     * @return 申请记录列表，按更新时间、id 正序
+     */
+    List<ImFriendRequestDO> pullFriendRequestList(Long userId, Long lastUpdateTime, Long lastId, Integer limit);
+
+    /**
      * 按 id 单查申请记录；通用读接口，调用方自行做越权过滤
      */
     ImFriendRequestDO getFriendRequest(Long id);

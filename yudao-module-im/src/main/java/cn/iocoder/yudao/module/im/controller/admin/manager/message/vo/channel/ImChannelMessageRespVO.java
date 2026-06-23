@@ -29,7 +29,7 @@ public class ImChannelMessageRespVO {
     private String materialCoverUrl;
 
     @Schema(description = "消息类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "125")
-    private Integer type; // 参见 ImMessageTypeEnum 枚举类
+    private Integer type; // 参见 ImContentTypeEnum 枚举类
 
     @Schema(description = "消息内容；payload JSON 快照")
     private String content;
