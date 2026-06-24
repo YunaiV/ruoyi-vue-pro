@@ -3367,6 +3367,10 @@ INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_t
 GO
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3036, 60, N'Admin Uniapp 移动端', N'60', N'infra_codegen_front_type', 0, N'', N'', NULL, N'1', N'2025-12-16 19:25:51', N'1', N'2025-12-17 09:46:15', N'0')
 GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3037, 42, N'Vben5.0 Antdv Next Schema 模版', N'42', N'infra_codegen_front_type', 0, N'', N'', N'', N'1', N'2026-05-16 00:00:00', N'1', N'2026-05-16 00:00:00', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3038, 43, N'Vben5.0 Antdv Next 标准模版', N'43', N'infra_codegen_front_type', 0, N'', N'', N'', N'1', N'2026-05-16 00:00:00', N'1', N'2026-05-16 00:00:00', N'0')
+GO
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3040, 1, N'UDP', N'udp', N'iot_protocol_type', 0, N'', N'', N'UDP 协议', N'1', N'2026-02-04 00:32:47', N'1', N'2026-02-04 00:32:47', N'0')
 GO
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3041, 2, N'WebSocket', N'websocket', N'iot_protocol_type', 0, N'', N'', N'WebSocket 协议', N'1', N'2026-02-04 00:32:55', N'1', N'2026-02-04 00:32:55', N'0')
