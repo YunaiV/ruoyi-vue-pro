@@ -187,7 +187,7 @@ public class JsonUtils {
         }
         try {
             return objectMapper.readValue(text, new TypeReference<Map<String, Object>>() {});
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             return null;
         }
     }
