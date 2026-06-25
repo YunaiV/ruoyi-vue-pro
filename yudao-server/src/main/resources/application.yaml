@@ -265,7 +265,7 @@ yudao:
     permit-all_urls:
       - /admin-api/mp/open/** # 微信公众号开放平台，微信回调接口，不需要登录
   api-encrypt:
-    enable: false # 是否开启 API 加密。Spring Boot 可执行 jar 下 Hutool AES 会触发 BC Provider 签名校验，临时关闭
+    enable: true # 是否开启 API 加密。Spring Boot 可执行 jar 下 Hutool AES 会触发 BC Provider 签名校验，临时关闭
     algorithm: AES # 加密算法，支持 AES、RSA 等
     request-key: 52549111389893486934626385991395 # 【AES 案例】请求加密的秘钥，，必须 16、24、32 位
     response-key: 96103715984234343991809655248883 # 【AES 案例】响应加密的秘钥，AES 案例，必须 16、24、32 位

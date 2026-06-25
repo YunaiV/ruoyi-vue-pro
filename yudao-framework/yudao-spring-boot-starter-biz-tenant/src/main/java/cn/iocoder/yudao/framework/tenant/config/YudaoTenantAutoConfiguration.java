@@ -42,8 +42,14 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import org.springframework.web.util.pattern.PathPattern;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
 @AutoConfiguration
 @ConditionalOnProperty(prefix = "yudao.tenant", value = "enable", matchIfMissing = true) // 允许使用 yudao.tenant.enable=false 禁用多租户
@@ -125,6 +131,7 @@ public class YudaoTenantAutoConfiguration {
      *
      * @return 忽略租户的 URL 集合
      */
+    @SuppressWarnings("removal")
     private Set<String> getTenantIgnoreUrls() {
         Set<String> ignoreUrls = new HashSet<>();
         // 获得接口对应的 HandlerMethod 集合
@@ -139,7 +146,13 @@ public class YudaoTenantAutoConfiguration {
                 continue;
             }
             // 添加到忽略的 URL 中
-            ignoreUrls.addAll(entry.getKey().getPatternValues());
+            if (entry.getKey().getPatternsCondition() != null) {
+                ignoreUrls.addAll(entry.getKey().getPatternsCondition().getPatterns());
+            }
+            if (entry.getKey().getPathPatternsCondition() != null) {
+                ignoreUrls.addAll(
+                        convertList(entry.getKey().getPathPatternsCondition().getPatterns(), PathPattern::getPatternString));
+            }
         }
         return ignoreUrls;
     }

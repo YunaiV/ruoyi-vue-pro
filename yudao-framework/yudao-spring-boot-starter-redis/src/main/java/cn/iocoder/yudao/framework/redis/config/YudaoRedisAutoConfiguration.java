@@ -8,6 +8,9 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
+import tools.jackson.databind.DefaultTyping;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 
 /**
  * Redis 配置类
@@ -35,7 +38,14 @@ public class YudaoRedisAutoConfiguration {
     }
 
     public static RedisSerializer<?> buildRedisSerializer() {
-        return new GenericJacksonJsonRedisSerializer(JsonUtils.getObjectMapper());
+        // 基于 JsonUtils 的 ObjectMapper rebuild 出一个 Redis 专用实例，启用 DefaultTyping 写入 @class 类型信息。
+        // 原因：Spring Data Redis 4.0 的 GenericJacksonJsonRedisSerializer 不再默认启用 DefaultTyping，
+        //      会导致 @Cacheable 等场景反序列化时退化为 LinkedHashMap，无法还原为原始对象。
+        ObjectMapper redisMapper = JsonUtils.getObjectMapper().rebuild()
+                .activateDefaultTypingAsProperty(BasicPolymorphicTypeValidator.builder()
+                        .allowIfBaseType(Object.class).build(), DefaultTyping.NON_FINAL, "@class")
+                .build();
+        return new GenericJacksonJsonRedisSerializer(redisMapper);
     }
 
 }
