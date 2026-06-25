@@ -158,6 +158,14 @@ public interface AdminUserService {
      */
     List<AdminUserDO> getUserList(Collection<Long> ids);
 
+
+    /**
+     * 获得全部用户列表
+     *
+     * @return 用户列表
+     */
+    List<AdminUserDO> getUserListAll();
+
     /**
      * 校验用户们是否有效。如下情况，视为无效：
      * 1. 用户编号不存在
@@ -204,6 +212,13 @@ public interface AdminUserService {
      * @return 用户们
      */
     List<AdminUserDO> getUserListByStatus(Integer status);
+
+    /**
+     * 获得指定部门的用户
+     * @param deptIds
+     * @return
+     */
+    List<AdminUserDO> getDeptUsers(Collection<Long> deptIds);
 
     /**
      * 判断密码是否匹配

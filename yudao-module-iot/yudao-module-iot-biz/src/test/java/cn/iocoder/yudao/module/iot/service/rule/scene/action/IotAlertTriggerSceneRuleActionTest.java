@@ -106,6 +106,9 @@ public class IotAlertTriggerSceneRuleActionTest extends BaseMockitoUnitTest {
                     IotAlertReceiveTypeEnum.SMS.getType(),
                     IotAlertReceiveTypeEnum.MAIL.getType(),
                     IotAlertReceiveTypeEnum.NOTIFY.getType()));
+            c.setSmsTemplateCode("custom_sms");
+            c.setMailTemplateCode("custom_mail");
+            c.setNotifyTemplateCode("custom_notify");
         });
         IotDeviceDO device = randomPojo(IotDeviceDO.class);
 
@@ -130,13 +133,13 @@ public class IotAlertTriggerSceneRuleActionTest extends BaseMockitoUnitTest {
         ArgumentCaptor<SmsSendSingleToUserReqDTO> smsCaptor = ArgumentCaptor.forClass(SmsSendSingleToUserReqDTO.class);
         verify(smsSendApi, times(1)).sendSingleSmsToAdmin(smsCaptor.capture());
         assertEquals(userId, smsCaptor.getValue().getUserId());
-        assertEquals(IotAlertReceiveTypeEnum.SMS.getTemplateCode(), smsCaptor.getValue().getTemplateCode());
+        assertEquals("custom_sms", smsCaptor.getValue().getTemplateCode());
         ArgumentCaptor<MailSendSingleToUserReqDTO> mailCaptor = ArgumentCaptor.forClass(MailSendSingleToUserReqDTO.class);
         verify(mailSendApi, times(1)).sendSingleMailToAdmin(mailCaptor.capture());
-        assertEquals(IotAlertReceiveTypeEnum.MAIL.getTemplateCode(), mailCaptor.getValue().getTemplateCode());
+        assertEquals("custom_mail", mailCaptor.getValue().getTemplateCode());
         ArgumentCaptor<NotifySendSingleToUserReqDTO> notifyCaptor = ArgumentCaptor.forClass(NotifySendSingleToUserReqDTO.class);
         verify(notifyMessageSendApi, times(1)).sendSingleMessageToAdmin(notifyCaptor.capture());
-        assertEquals(IotAlertReceiveTypeEnum.NOTIFY.getTemplateCode(), notifyCaptor.getValue().getTemplateCode());
+        assertEquals("custom_notify", notifyCaptor.getValue().getTemplateCode());
     }
 
     @Test

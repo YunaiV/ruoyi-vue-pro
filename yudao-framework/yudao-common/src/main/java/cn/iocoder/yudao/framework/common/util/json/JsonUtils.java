@@ -22,6 +22,7 @@ import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * JSON 工具类
@@ -175,6 +176,23 @@ public class JsonUtils {
     }
 
     /**
+     * 解析 JSON 字符串成 Map，空字符串或解析失败返回 null
+     *
+     * @param text JSON 字符串
+     * @return Map 对象
+     */
+    public static Map<String, Object> parseMap(String text) {
+        if (StrUtil.isEmpty(text)) {
+            return null;
+        }
+        try {
+            return objectMapper.readValue(text, new TypeReference<Map<String, Object>>() {});
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    /**
      * 解析 JSON 字符串成指定类型的对象，如果解析失败，则返回 null
      *
      * @param text 字符串
@@ -234,6 +252,14 @@ public class JsonUtils {
             log.error("json parse err,json:{}", text, e);
             throw new RuntimeException(e);
         }
+    }
+
+    public static String getText(JsonNode node, String fieldName) {
+        if (node == null) {
+            return null;
+        }
+        JsonNode value = node.get(fieldName);
+        return value != null && !value.isNull() ? value.asText() : null;
     }
 
     public static boolean isJson(String text) {

@@ -256,23 +256,19 @@ public class ProductSpuServiceImpl implements ProductSpuService {
     }
 
     @Override
-    public Map<Integer, Long> getTabsCount() {
+    public Map<Integer, Long> getTabsCount(ProductSpuPageReqVO reqVO) {
         Map<Integer, Long> counts = Maps.newLinkedHashMapWithExpectedSize(5);
-        // 查询销售中的商品数量
+        // 每个 tab 的数量 = 筛选条件（name/categoryId/createTime）+ 该 tab 的状态/库存条件
         counts.put(ProductSpuPageReqVO.FOR_SALE,
-                productSpuMapper.selectCount(ProductSpuDO::getStatus, ProductSpuStatusEnum.ENABLE.getStatus()));
-        // 查询仓库中的商品数量
+                productSpuMapper.selectCountByTab(reqVO, ProductSpuPageReqVO.FOR_SALE));
         counts.put(ProductSpuPageReqVO.IN_WAREHOUSE,
-                productSpuMapper.selectCount(ProductSpuDO::getStatus, ProductSpuStatusEnum.DISABLE.getStatus()));
-        // 查询售空的商品数量
+                productSpuMapper.selectCountByTab(reqVO, ProductSpuPageReqVO.IN_WAREHOUSE));
         counts.put(ProductSpuPageReqVO.SOLD_OUT,
-                productSpuMapper.selectCount(ProductSpuDO::getStock, 0));
-        // 查询触发警戒库存的商品数量
+                productSpuMapper.selectCountByTab(reqVO, ProductSpuPageReqVO.SOLD_OUT));
         counts.put(ProductSpuPageReqVO.ALERT_STOCK,
-                productSpuMapper.selectCount());
-        // 查询回收站中的商品数量
+                productSpuMapper.selectCountByTab(reqVO, ProductSpuPageReqVO.ALERT_STOCK));
         counts.put(ProductSpuPageReqVO.RECYCLE_BIN,
-                productSpuMapper.selectCount(ProductSpuDO::getStatus, ProductSpuStatusEnum.RECYCLE.getStatus()));
+                productSpuMapper.selectCountByTab(reqVO, ProductSpuPageReqVO.RECYCLE_BIN));
         return counts;
     }
 

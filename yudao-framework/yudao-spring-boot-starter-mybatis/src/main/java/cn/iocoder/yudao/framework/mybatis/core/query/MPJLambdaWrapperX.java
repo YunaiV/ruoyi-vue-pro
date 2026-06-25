@@ -27,6 +27,13 @@ public class MPJLambdaWrapperX<T> extends MPJLambdaWrapper<T> {
         return this;
     }
 
+    public <S> MPJLambdaWrapperX<T> likeRightIfPresent(SFunction<S, ?> column, String val) {
+        if (StringUtils.hasText(val)) {
+            return (MPJLambdaWrapperX<T>) super.likeRight(column, val);
+        }
+        return this;
+    }
+
     public <S> MPJLambdaWrapperX<T> inIfPresent(SFunction<S, ?> column, Collection<?> values) {
         if (ObjectUtil.isAllNotEmpty(values) && !ArrayUtil.isEmpty(values)) {
             return (MPJLambdaWrapperX<T>) super.in(column, values);
@@ -101,7 +108,6 @@ public class MPJLambdaWrapperX<T> extends MPJLambdaWrapper<T> {
         }
         return this;
     }
-
 
     // ========== 重写父类方法，方便链式调用 ==========
 

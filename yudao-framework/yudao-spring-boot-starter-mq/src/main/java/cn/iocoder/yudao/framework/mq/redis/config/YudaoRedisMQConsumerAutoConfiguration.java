@@ -12,7 +12,6 @@ import cn.iocoder.yudao.framework.mq.redis.core.stream.AbstractRedisStreamMessag
 import cn.iocoder.yudao.framework.redis.config.YudaoRedisAutoConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
@@ -70,7 +69,8 @@ public class YudaoRedisMQConsumerAutoConfiguration {
     public RedisPendingMessageResendJob redisPendingMessageResendJob(List<AbstractRedisStreamMessageListener<?>> listeners,
                                                                      RedisMQTemplate redisTemplate,
                                                                      RedissonClient redissonClient) {
-        return new RedisPendingMessageResendJob(listeners, redisTemplate, redissonClient);
+        return new RedisPendingMessageResendJob(listeners, redisTemplate, redissonClient,
+                RedisPendingMessageResendJob.DEFAULT_RESEND_LOCK_KEY);
     }
 
     /**
@@ -81,7 +81,8 @@ public class YudaoRedisMQConsumerAutoConfiguration {
     public RedisStreamMessageCleanupJob redisStreamMessageCleanupJob(List<AbstractRedisStreamMessageListener<?>> listeners,
                                                                      RedisMQTemplate redisTemplate,
                                                                      RedissonClient redissonClient) {
-        return new RedisStreamMessageCleanupJob(listeners, redisTemplate, redissonClient);
+        return new RedisStreamMessageCleanupJob(listeners, redisTemplate, redissonClient,
+                RedisStreamMessageCleanupJob.DEFAULT_CLEANUP_LOCK_KEY);
     }
 
     /**

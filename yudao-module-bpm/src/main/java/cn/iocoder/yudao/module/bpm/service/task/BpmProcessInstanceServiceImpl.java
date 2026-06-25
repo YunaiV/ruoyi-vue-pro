@@ -7,7 +7,6 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
@@ -25,6 +24,7 @@ import cn.iocoder.yudao.module.bpm.dal.redis.BpmProcessIdRedisDAO;
 import cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeTypeEnum;
+import cn.iocoder.yudao.module.bpm.enums.task.BpmAttachmentTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceStatusEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmReasonEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskStatusEnum;
@@ -57,6 +57,7 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
+import org.flowable.engine.task.Attachment;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.springframework.context.annotation.Lazy;
@@ -275,11 +276,10 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             processVariables.putAll(reqVO.getProcessVariables());
         }
 
-        // 3. 获取下一个将要执行的节点集合
+        // 3.1 获取下一个将要执行的节点集合
         FlowElement flowElement = bpmnModel.getFlowElement(task.getTaskDefinitionKey());
-        List<FlowNode> nextFlowNodes = BpmnModelUtils.getNextFlowNodes(flowElement, bpmnModel, processVariables);
-        // 仅仅获取 UserTask 节点  TODO add from jason：如果网关节点和网关节点相连，获取下个 UserTask. 貌似有点不准。
-        List<FlowNode> nextUserTaskList = CollectionUtils.filterList(nextFlowNodes, node -> node instanceof UserTask);
+        // 3.2 获取 UserTask 节点
+        List<UserTask> nextUserTaskList = BpmnModelUtils.getNextUserTasks(flowElement, bpmnModel, processVariables);
         List<ActivityNode> nextActivityNodes = convertList(nextUserTaskList, node -> new ActivityNode().setId(node.getId())
                 .setName(node.getName()).setNodeType(BpmSimpleModelNodeTypeEnum.APPROVE_NODE.getType())
                 .setStatus(BpmTaskStatusEnum.RUNNING.getStatus())
@@ -404,8 +404,13 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         // 遍历 tasks 列表，只处理已结束的 UserTask
         // 为什么不通过 activities 呢？因为，加签场景下，它只存在于 tasks，没有 activities，导致如果遍历 activities 的话，它无法成为一个节点
         List<HistoricTaskInstance> endTasks = filterList(tasks, task -> task.getEndTime() != null);
+        // 获取已完成节点的附件
+        Set<String> endTaskIds = convertSet(endTasks, HistoricTaskInstance::getId);
+        List<Attachment> attachments = taskService.getAttachments(historicProcessInstance.getId(), endTaskIds, BpmAttachmentTypeEnum.TASK_ATTACHMENT);
+        Map<String, List<Attachment>> taskAttachmentMap = convertMultiMap(attachments, Attachment::getTaskId);
         List<ActivityNode> approvalNodes = convertList(endTasks, task -> {
             FlowElement flowNode = BpmnModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
+            List<Attachment> taskAttachments = taskAttachmentMap.get(task.getId());
             ActivityNode activityNode = new ActivityNode().setId(task.getTaskDefinitionKey()).setName(task.getName())
                     .setNodeType(START_USER_NODE_ID.equals(task.getTaskDefinitionKey())
                             ? BpmSimpleModelNodeTypeEnum.START_USER_NODE.getType()
@@ -414,7 +419,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                     .setStatus(getEndActivityNodeStatus(task))
                     .setCandidateStrategy(BpmnModelUtils.parseCandidateStrategy(flowNode))
                     .setStartTime(DateUtils.of(task.getCreateTime())).setEndTime(DateUtils.of(task.getEndTime()))
-                    .setTasks(singletonList(BpmProcessInstanceConvert.INSTANCE.buildApprovalTaskInfo(task)));
+                    .setTasks(singletonList(BpmProcessInstanceConvert.INSTANCE.buildApprovalTaskInfo(task, taskAttachments)));
             // 如果是取消状态，则跳过
             if (BpmTaskStatusEnum.isCancelStatus(activityNode.getStatus())) {
                 return null;
@@ -528,14 +533,14 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                 if (task == null) {
                     continue;
                 }
-                activityNode.getTasks().add(BpmProcessInstanceConvert.INSTANCE.buildApprovalTaskInfo(task));
+                activityNode.getTasks().add(BpmProcessInstanceConvert.INSTANCE.buildApprovalTaskInfo(task, null));
                 // 加签子任务，需要过滤掉已经完成的加签子任务
                 List<HistoricTaskInstance> childrenTasks = filterList(
                         taskService.getAllChildrenTaskListByParentTaskId(activity.getTaskId(), tasks),
                         childTask -> childTask.getEndTime() == null);
                 if (CollUtil.isNotEmpty(childrenTasks)) {
                     activityNode.getTasks().addAll(
-                            convertList(childrenTasks, BpmProcessInstanceConvert.INSTANCE::buildApprovalTaskInfo));
+                            convertList(childrenTasks, item->BpmProcessInstanceConvert.INSTANCE.buildApprovalTaskInfo(item, null)));
                 }
             }
             // 处理每个任务的 candidateUsers 属性：如果是依次审批，需要预测它的后续审批人。因为 Task 是审批完一个，创建一个新的 Task

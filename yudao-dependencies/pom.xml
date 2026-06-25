@@ -14,7 +14,7 @@
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
     <properties>
-        <revision>2026.04-SNAPSHOT</revision>
+        <revision>2026.05-SNAPSHOT</revision>
         <flatten-maven-plugin.version>1.7.2</flatten-maven-plugin.version>
         <!-- 统一依赖管理 -->
         <spring.boot.version>4.1.0</spring.boot.version>
@@ -50,6 +50,8 @@
         <!-- 工具类相关 -->
         <anji-plus-captcha.version>1.4.0</anji-plus-captcha.version>
         <jsoup.version>1.22.2</jsoup.version>
+        <sensitive-word.version>0.29.5</sensitive-word.version>
+        <pinyin4j.version>2.5.1</pinyin4j.version>
         <lombok.version>1.18.46</lombok.version>
         <mapstruct.version>1.6.3</mapstruct.version>
         <hutool-5.version>5.8.44</hutool-5.version>
@@ -57,6 +59,7 @@
         <fastexcel.version>1.3.0</fastexcel.version>
         <velocity.version>2.4.1</velocity.version>
         <fastjson.version>1.2.83</fastjson.version>
+        <fastjson2.version>2.0.61</fastjson2.version>
         <guava.version>33.6.0-jre</guava.version>
         <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
         <commons-net.version>3.13.0</commons-net.version>
@@ -65,7 +68,7 @@
         <tika-core.version>3.3.0</tika-core.version>
         <ip2region.version>2.7.0</ip2region.version>
         <bizlog-sdk.version>3.0.6</bizlog-sdk.version>
-        <netty.version>4.2.12.Final</netty.version>
+        <netty.version>4.2.14.Final</netty.version>
         <mqtt.version>1.2.5</mqtt.version>
         <vertx.version>4.5.26</vertx.version>
         <okhttp.version>4.12.0</okhttp.version>
@@ -75,10 +78,11 @@
         <awssdk.version>2.44.0</awssdk.version>
         <justauth.version>1.16.7</justauth.version>
         <justauth-starter.version>1.4.0</justauth-starter.version>
-        <jimureport.version>2.3.2</jimureport.version>
+        <jimureport.version>2.3.4</jimureport.version>
         <jimubi.version>2.3.2</jimubi.version>
         <weixin-java.version>4.8.2-20260501.180637</weixin-java.version>
-        <alipay-sdk-java.version>4.40.771.ALL</alipay-sdk-java.version>
+        <bouncycastle.version>1.80</bouncycastle.version>
+        <alipay-sdk-java.version>4.40.806.ALL</alipay-sdk-java.version>
     </properties>
 
     <dependencyManagement>
@@ -521,6 +525,11 @@
                 <artifactId>fastjson</artifactId>
                 <version>${fastjson.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.alibaba.fastjson2</groupId>
+                <artifactId>fastjson2</artifactId>
+                <version>${fastjson2.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>com.google.guava</groupId>
@@ -567,6 +576,18 @@
                 <groupId>org.jsoup</groupId>
                 <artifactId>jsoup</artifactId>
                 <version>${jsoup.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.github.houbb</groupId>
+                <artifactId>sensitive-word</artifactId> <!-- 敏感词检测：trie 树高效匹配 -->
+                <version>${sensitive-word.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.belerweb</groupId>
+                <artifactId>pinyin4j</artifactId> <!-- 汉字转拼音：作为 hutool PinyinUtil 的底层引擎 -->
+                <version>${pinyin4j.version}</version>
             </dependency>
 
             <!-- Vert.x -->
@@ -655,6 +676,24 @@
                         <artifactId>bcprov-jdk15on</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+
+            <!-- 锁定 weixin-java 传递依赖，避免 Maven 版本范围自动升级到 1.80.2 后 Fat Jar 启动失败。
+                 反馈：https://t.zsxq.com/pCVBo -->
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk18on</artifactId>
+                <version>${bouncycastle.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcutil-jdk18on</artifactId>
+                <version>${bouncycastle.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcpkix-jdk18on</artifactId>
+                <version>${bouncycastle.version}</version>
             </dependency>
 
             <dependency>

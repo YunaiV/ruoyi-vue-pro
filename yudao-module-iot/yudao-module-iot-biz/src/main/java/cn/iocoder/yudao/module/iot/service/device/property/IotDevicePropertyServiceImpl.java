@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.iot.service.device.property;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjUtil;
@@ -148,8 +147,16 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
         // 1. 根据物模型，拼接合法的属性
         // TODO @芋艿：【待定 004】赋能后，属性到底以 thingModel 为准（ik），还是 db 的表结构为准（tl）？
         List<IotThingModelDO> thingModels = thingModelService.getThingModelListByProductIdFromCache(device.getProductId());
-        Map<String, Object> properties = new HashMap<>();
+        Map<String, Object> properties = new LinkedHashMap<>();
         params.forEach((key, value) -> {
+            if (!(key instanceof CharSequence)) {
+                log.error("[saveDeviceProperty][消息({}) 的属性 key({}) 类型不正确]", message, key);
+                return;
+            }
+            if (value == null) {
+                log.warn("[saveDeviceProperty][消息({}) 的属性({}) 值为空，跳过]", message, key);
+                return;
+            }
             // 忽略大小写匹配物模型，避免设备上报的 key 与 identifier 大小写不一致导致丢失
             IotThingModelDO thingModel = CollUtil.findOne(thingModels,
                     o -> StrUtil.equalsIgnoreCase(o.getIdentifier(), (CharSequence) key));
@@ -158,21 +165,9 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
                 return;
             }
             String identifier = thingModel.getIdentifier(); // 统一以物模型 identifier 作为 key，避免大小写问题
-            String dataType = thingModel.getProperty().getDataType();
-            if (ObjectUtils.equalsAny(dataType,
-                    IotDataSpecsDataTypeEnum.STRUCT.getDataType(), IotDataSpecsDataTypeEnum.ARRAY.getDataType())) {
-                // 特殊：STRUCT 和 ARRAY 类型，在 TDengine 里，有没对应数据类型，只能通过 JSON 来存储
-                properties.put(identifier, JsonUtils.toJsonString(value));
-            } else if (IotDataSpecsDataTypeEnum.INT.getDataType().equals(dataType)) {
-                properties.put(identifier, Convert.toInt(value));
-            } else if (IotDataSpecsDataTypeEnum.FLOAT.getDataType().equals(dataType)) {
-                properties.put(identifier, Convert.toFloat(value));
-            } else if (IotDataSpecsDataTypeEnum.DOUBLE.getDataType().equals(dataType)) {
-                properties.put(identifier, Convert.toDouble(value));
-            } else if (IotDataSpecsDataTypeEnum.BOOL.getDataType().equals(dataType)) {
-                properties.put(identifier, Convert.toBool(value, false) ? (byte) 1 : (byte) 0);
-            } else {
-                properties.put(identifier, value);
+            Object convertedValue = convertPropertyValue(message, thingModel, value);
+            if (convertedValue != null) {
+                properties.put(identifier, convertedValue);
             }
         });
         if (CollUtil.isEmpty(properties)) {
@@ -192,6 +187,23 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
         // 2.3 提取 GeoLocation 并更新设备定位
         // 为什么 properties 为空，也要执行定位更新？因为可能上报的属性里，没有合法属性，但是包含 GeoLocation 定位属性
         extractAndUpdateDeviceLocation(device, (Map<?, ?>) message.getParams());
+    }
+
+    private Object convertPropertyValue(IotDeviceMessage message, IotThingModelDO thingModel, Object value) {
+        String identifier = thingModel.getIdentifier();
+        String dataType = thingModel.getProperty().getDataType();
+        try {
+            Object convertedValue = thingModelService.convertThingModelPropertyValue(thingModel, value);
+            if (convertedValue == null) {
+                log.warn("[saveDeviceProperty][消息({}) 的属性({}) 值({}) 无法转换为类型({})，跳过]",
+                        message, identifier, value, dataType);
+            }
+            return convertedValue;
+        } catch (Exception e) {
+            log.error("[saveDeviceProperty][消息({}) 的属性({}) 值({}) 转换为类型({}) 异常，跳过]",
+                    message, identifier, value, dataType, e);
+            return null;
+        }
     }
 
     @Override

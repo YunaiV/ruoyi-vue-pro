@@ -108,4 +108,13 @@ public interface IotThingModelService {
      */
     void validateThingModelListExists(Long productId, Set<String> identifiers);
 
+    /**
+     * 按物模型属性的数据类型转换设备上报值
+     *
+     * @param thingModel 物模型
+     * @param value 设备上报值
+     * @return 转换后的值；无法转换时返回 null
+     */
+    Object convertThingModelPropertyValue(IotThingModelDO thingModel, Object value);
+
 }

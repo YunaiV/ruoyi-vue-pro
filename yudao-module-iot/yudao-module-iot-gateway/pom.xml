@@ -30,9 +30,13 @@
 
         <!-- 消息队列相关 -->
         <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
             <groupId>org.apache.rocketmq</groupId>
             <artifactId>rocketmq-spring-boot-starter</artifactId>
-            <!-- TODO @芋艿：消息队列，后续可能去掉，默认不使用 rocketmq -->
             <optional>true</optional>
         </dependency>
 

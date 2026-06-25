@@ -34,11 +34,6 @@ import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPOR
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
-/**
- * 管理后台 - MES 销售退货单 Controller
- *
- * @author 芋道源码
- */
 @Tag(name = "管理后台 - MES 销售退货单")
 @RestController
 @RequestMapping("/mes/wm/return-sales")

@@ -99,6 +99,42 @@ public class MesMdAutoCodeRecordServiceImplTest {
     }
 
     @Test
+    public void testGenerateAutoCode_retryWhenResultExists() {
+        // 准备参数
+        String ruleCode = "DV_MACHINERY_CODE";
+        MesMdAutoCodeRuleDO rule = new MesMdAutoCodeRuleDO().setId(5L).setCode(ruleCode).setPadded(false);
+        MesMdAutoCodePartDO part1 = new MesMdAutoCodePartDO().setType(MesMdAutoCodePartTypeEnum.FIXED_CHAR.getType())
+                .setFixCharacter("M").setLength(1).setSort(1);
+        MesMdAutoCodePartDO part2 = new MesMdAutoCodePartDO().setType(MesMdAutoCodePartTypeEnum.SERIAL_NUMBER.getType())
+                .setSerialStartNo(1).setSerialStep(1).setLength(5).setSort(2).setCycleFlag(false);
+        // mock
+        when(ruleService.getAutoCodeRuleByCode(ruleCode)).thenReturn(rule);
+        when(partService.getAutoCodePartListByRuleId(5L)).thenReturn(Arrays.asList(part1, part2));
+        when(fixedCharStrategy.generate(eq(part1), any(MesMdAutoCodeContext.class))).thenReturn("M");
+        long[] serialNoRef = {0L};
+        when(serialNumberStrategy.generate(eq(part2), any(MesMdAutoCodeContext.class))).thenAnswer(invocation -> {
+            MesMdAutoCodeContext context = invocation.getArgument(1);
+            long serialNo = ++serialNoRef[0];
+            context.setSerialNo(serialNo);
+            return String.format("%05d", serialNo);
+        });
+        when(recordMapper.selectByResult("M00001")).thenReturn(new MesMdAutoCodeRecordDO());
+        when(recordMapper.selectByResult("M00002")).thenReturn(new MesMdAutoCodeRecordDO());
+        when(recordMapper.selectByResult("M00003")).thenReturn(null);
+
+        // 调用
+        String result = recordService.generateAutoCode(ruleCode, null);
+        // 断言
+        assertEquals("M00003", result);
+        ArgumentCaptor<MesMdAutoCodeRecordDO> captor = ArgumentCaptor.forClass(MesMdAutoCodeRecordDO.class);
+        verify(recordMapper).insert(captor.capture());
+        MesMdAutoCodeRecordDO record = captor.getValue();
+        assertEquals(5L, record.getRuleId());
+        assertEquals("M00003", record.getResult());
+        assertEquals(3L, record.getSerialNo());
+    }
+
+    @Test
     public void testGenerateAutoCode_withInputChar() {
         // 准备参数
         String ruleCode = "CLIENT_CODE";

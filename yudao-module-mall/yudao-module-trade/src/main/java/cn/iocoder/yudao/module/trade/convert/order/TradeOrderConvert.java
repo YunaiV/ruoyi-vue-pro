@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.trade.convert.order;
 
 import cn.hutool.core.util.BooleanUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -268,8 +269,8 @@ public interface TradeOrderConvert {
                 .setTitle(StrUtil.format("{}成功购买{}", user.getNickname(), item.getSpuName()));
         if (BooleanUtil.isTrue(spu.getSubCommissionType())) {
             // 特殊：单独设置的佣金需要乘以购买数量。关联 https://gitee.com/yudaocode/yudao-mall-uniapp/issues/ICY7SJ
-            bo.setFirstFixedPrice(sku.getFirstBrokeragePrice() * item.getCount())
-                    .setSecondFixedPrice(sku.getSecondBrokeragePrice() * item.getCount());
+            bo.setFirstFixedPrice(ObjectUtil.defaultIfNull(sku.getFirstBrokeragePrice(), 0) * item.getCount())
+                    .setSecondFixedPrice(ObjectUtil.defaultIfNull(sku.getSecondBrokeragePrice(), 0) * item.getCount());
         }
         return bo;
     }

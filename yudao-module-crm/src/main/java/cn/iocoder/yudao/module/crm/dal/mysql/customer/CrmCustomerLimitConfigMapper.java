@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.crm.dal.mysql.customer;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.mybatis.core.util.MyBatisUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.customer.vo.limitconfig.CrmCustomerLimitConfigPageReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.customer.CrmCustomerLimitConfigDO;
 import org.apache.ibatis.annotations.Mapper;
@@ -28,9 +29,9 @@ public interface CrmCustomerLimitConfigMapper extends BaseMapperX<CrmCustomerLim
         LambdaQueryWrapperX<CrmCustomerLimitConfigDO> query = new LambdaQueryWrapperX<CrmCustomerLimitConfigDO>()
                 .eq(CrmCustomerLimitConfigDO::getType, type);
         query.and(w -> {
-            w.apply("FIND_IN_SET({0}, user_ids) > 0", userId);
+            w.apply(MyBatisUtils.findInSet("user_ids"), userId);
             if (deptId != null) {
-                w.or().apply("FIND_IN_SET({0}, dept_ids) > 0", deptId);
+                w.or().apply(MyBatisUtils.findInSet("dept_ids"), deptId);
             }
         });
         return selectList(query);

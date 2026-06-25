@@ -140,6 +140,11 @@ public class ProductCommentServiceImpl implements ProductCommentService {
     }
 
     @Override
+    public ProductCommentDO getComment(Long id) {
+        return validateCommentExists(id);
+    }
+
+    @Override
     public PageResult<ProductCommentDO> getCommentPage(ProductCommentPageReqVO pageReqVO) {
         return productCommentMapper.selectPage(pageReqVO);
     }

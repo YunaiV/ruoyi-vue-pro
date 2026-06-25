@@ -23,6 +23,7 @@ import net.sf.jsqlparser.schema.Table;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * MyBatis 工具类
@@ -30,6 +31,12 @@ import java.util.List;
 public class MyBatisUtils {
 
     private static final String MYSQL_ESCAPE_CHARACTER = "`";
+
+    private static final Pattern SAFE_COLUMN_NAME_PATTERN = Pattern.compile("^[a-zA-Z0-9_]+(\\.[a-zA-Z0-9_]+)*$");
+
+    private static final String FIND_IN_SET_VALUE_PLACEHOLDER = "#{value}";
+
+    private static final String FIND_IN_SET_COLUMN_PLACEHOLDER = "#{column}";
 
     public static <T> Page<T> buildPage(PageParam pageParam) {
         return buildPage(pageParam, null);
@@ -42,8 +49,11 @@ public class MyBatisUtils {
         // 排序字段
         if (CollUtil.isNotEmpty(sortingFields)) {
             for (SortingField sortingField : sortingFields) {
-                page.addOrder(new OrderItem().setAsc(SortingField.ORDER_ASC.equals(sortingField.getOrder()))
-                        .setColumn(StrUtil.toUnderlineCase(sortingField.getField())));
+                String columnName = buildSafeOrderColumn(sortingField.getField());
+                if (columnName == null) {
+                    continue;
+                }
+                page.addOrder(new OrderItem().setAsc(isAscOrder(sortingField.getOrder())).setColumn(columnName));
             }
         }
         return page;
@@ -57,28 +67,50 @@ public class MyBatisUtils {
         if (wrapper instanceof QueryWrapper<T>) {
             QueryWrapper<T> query = (QueryWrapper<T>) wrapper;
             for (SortingField sortingField : sortingFields) {
-                query.orderBy(true,
-                        SortingField.ORDER_ASC.equals(sortingField.getOrder()),
-                        StrUtil.toUnderlineCase(sortingField.getField()));
+                String columnName = buildSafeOrderColumn(sortingField.getField());
+                if (columnName == null) {
+                    continue;
+                }
+                query.orderBy(true, isAscOrder(sortingField.getOrder()), columnName);
             }
         } else if (wrapper instanceof LambdaQueryWrapper<T>) {
             // LambdaQueryWrapper 不直接支持字符串字段排序，使用 last 方法拼接 ORDER BY
             LambdaQueryWrapper<T> lambdaQuery = (LambdaQueryWrapper<T>) wrapper;
             StringBuilder orderBy = new StringBuilder();
             for (SortingField sortingField : sortingFields) {
+                String columnName = buildSafeOrderColumn(sortingField.getField());
+                if (columnName == null) {
+                    continue;
+                }
                 if (StrUtil.isNotEmpty(orderBy)) {
                     orderBy.append(", ");
                 }
-                orderBy.append(StrUtil.toUnderlineCase(sortingField.getField()))
-                       .append(" ")
-                       .append(SortingField.ORDER_ASC.equals(sortingField.getOrder()) ? "ASC" : "DESC");
+                orderBy.append(columnName).append(" ").append(getOrderDirection(sortingField.getOrder()));
             }
-            lambdaQuery.last("ORDER BY " + orderBy);
+            if (StrUtil.isNotEmpty(orderBy)) {
+                lambdaQuery.last("ORDER BY " + orderBy);
+            }
             // 另外个思路：https://blog.csdn.net/m0_59084856/article/details/138450913
         } else {
             throw new IllegalArgumentException("Unsupported wrapper type: " + wrapper.getClass().getName());
         }
 
+    }
+
+    public static boolean isAscOrder(String order) {
+        return SortingField.ORDER_ASC.equals(order);
+    }
+
+    public static String getOrderDirection(String order) {
+        return isAscOrder(order) ? "ASC" : "DESC";
+    }
+
+    private static String buildSafeOrderColumn(String field) {
+        String columnName = StrUtil.toUnderlineCase(field);
+        if (StrUtil.isEmpty(columnName) || !SAFE_COLUMN_NAME_PATTERN.matcher(columnName).matches()) {
+            return null;
+        }
+        return columnName;
     }
 
     /**
@@ -129,15 +161,43 @@ public class MyBatisUtils {
     /**
      * 跨数据库的 find_in_set 实现
      *
-     * @param column 字段名称
-     * @param value  查询值(不带单引号)
+     * @param columnName 字段名称
      * @return sql
      */
-    public static String findInSet(String column, Object value) {
+    public static String findInSet(String columnName) {
+        return findInSet(columnName, 0);
+    }
+
+    /**
+     * 跨数据库的 find_in_set 实现，适用于同一个 apply 语句中有多个参数的场景
+     *
+     * @param columnName 字段名称
+     * @param paramIndex apply 参数序号
+     * @return sql
+     */
+    public static String findInSetWithParamIndex(String columnName, int paramIndex) {
+        return findInSet(columnName, paramIndex);
+    }
+
+    private static String findInSet(String columnName, int paramIndex) {
         DbType dbType = JdbcUtils.getDbType();
+        return findInSet(dbType, columnName, paramIndex);
+    }
+
+    static String findInSet(DbType dbType, String columnName, int paramIndex) {
+        if (!isSafeColumnName(columnName)) {
+            throw new IllegalArgumentException("Invalid column name: " + columnName);
+        }
+        if (paramIndex < 0) {
+            throw new IllegalArgumentException("Invalid param index: " + paramIndex);
+        }
         return DbTypeEnum.getFindInSetTemplate(dbType)
-                .replace("#{column}", column)
-                .replace("#{value}", StrUtil.toString(value));
+                .replace(FIND_IN_SET_COLUMN_PLACEHOLDER, columnName)
+                .replace(FIND_IN_SET_VALUE_PLACEHOLDER, "{" + paramIndex + "}");
+    }
+
+    private static boolean isSafeColumnName(String columnName) {
+        return StrUtil.isNotEmpty(columnName) && SAFE_COLUMN_NAME_PATTERN.matcher(columnName).matches();
     }
 
     /**

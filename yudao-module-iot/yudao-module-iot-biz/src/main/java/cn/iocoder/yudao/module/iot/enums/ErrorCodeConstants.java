@@ -98,6 +98,9 @@ public interface ErrorCodeConstants {
 
     // ========== IoT 告警配置 1-050-013-000 ==========
     ErrorCode ALERT_CONFIG_NOT_EXISTS = new ErrorCode(1_050_013_000, "IoT 告警配置不存在");
+    ErrorCode ALERT_CONFIG_SMS_TEMPLATE_REQUIRED = new ErrorCode(1_050_013_001, "已选择短信接收方式，短信模板不能为空");
+    ErrorCode ALERT_CONFIG_MAIL_TEMPLATE_REQUIRED = new ErrorCode(1_050_013_002, "已选择邮件接收方式，邮件模板不能为空");
+    ErrorCode ALERT_CONFIG_NOTIFY_TEMPLATE_REQUIRED = new ErrorCode(1_050_013_003, "已选择站内信接收方式，站内信模板不能为空");
 
     // ========== IoT 告警记录 1-050-014-000 ==========
     ErrorCode ALERT_RECORD_NOT_EXISTS = new ErrorCode(1_050_014_000, "IoT 告警记录不存在");

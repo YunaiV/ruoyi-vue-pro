@@ -26,11 +26,6 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
-/**
- * MES 杂项入库单 Controller
- *
- * @author 芋道源码
- */
 @Tag(name = "管理后台 - MES 杂项入库单")
 @RestController
 @RequestMapping("/mes/wm/misc-receipt")

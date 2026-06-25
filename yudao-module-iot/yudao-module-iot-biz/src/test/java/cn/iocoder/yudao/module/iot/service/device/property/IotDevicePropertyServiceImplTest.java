@@ -54,6 +54,7 @@ public class IotDevicePropertyServiceImplTest extends BaseMockitoUnitTest {
         // mock 行为
         when(thingModelService.getThingModelListByProductIdFromCache(device.getProductId()))
                 .thenReturn(singletonList(thingModel));
+        when(thingModelService.convertThingModelPropertyValue(thingModel, 100)).thenReturn(100);
 
         // 调用
         service.saveDeviceProperty(device, message);
@@ -91,64 +92,62 @@ public class IotDevicePropertyServiceImplTest extends BaseMockitoUnitTest {
     }
 
     @Test
-    public void testSaveDeviceProperty_boolFromBooleanTrue() {
-        // 准备参数：物模型为 BOOL，设备上报原生 boolean true
-        assertBoolValueConvertedToByte(true, (byte) 1);
-    }
-
-    @Test
-    public void testSaveDeviceProperty_boolFromBooleanFalse() {
-        // 准备参数：物模型为 BOOL，设备上报原生 boolean false
-        assertBoolValueConvertedToByte(false, (byte) 0);
-    }
-
-    @Test
-    public void testSaveDeviceProperty_boolFromStringTrue() {
-        // 准备参数：物模型为 BOOL，设备上报字符串 "true"
-        assertBoolValueConvertedToByte("true", (byte) 1);
-    }
-
-    @Test
-    public void testSaveDeviceProperty_boolFromStringFalse() {
-        // 准备参数：物模型为 BOOL，设备上报字符串 "false"
-        assertBoolValueConvertedToByte("false", (byte) 0);
-    }
-
-    @Test
-    public void testSaveDeviceProperty_boolFromNumberOne() {
-        // 准备参数：物模型为 BOOL，设备上报数字 1
-        assertBoolValueConvertedToByte(1, (byte) 1);
-    }
-
-    @Test
-    public void testSaveDeviceProperty_boolFromNumberZero() {
-        // 准备参数：物模型为 BOOL，设备上报数字 0
-        assertBoolValueConvertedToByte(0, (byte) 0);
-    }
-
-    /**
-     * 校验 BOOL 类型属性上报后，最终落到 properties Map 的值类型与数值
-     */
-    private void assertBoolValueConvertedToByte(Object reportedValue, byte expected) {
-        // 准备参数
+    public void testSaveDeviceProperty_convertValueFailed() {
+        // 准备参数：物模型存在，但是属性值无法按物模型转换
         IotDeviceDO device = buildDevice();
-        IotThingModelDO thingModel = buildThingModel("PowerSwitch", IotDataSpecsDataTypeEnum.BOOL.getDataType());
+        IotThingModelDO temperature = buildThingModel("Temperature", IotDataSpecsDataTypeEnum.INT.getDataType());
         Map<String, Object> params = new HashMap<>();
-        params.put("PowerSwitch", reportedValue);
+        params.put("Temperature", "abc");
         IotDeviceMessage message = buildMessage(params);
 
-        // mock 行为
+        when(thingModelService.getThingModelListByProductIdFromCache(device.getProductId()))
+                .thenReturn(singletonList(temperature));
+        when(thingModelService.convertThingModelPropertyValue(temperature, "abc")).thenReturn(null);
+
+        assertDoesNotThrow(() -> service.saveDeviceProperty(device, message));
+
+        verify(devicePropertyMapper, never()).insert(any(), any(), anyLong(), anyLong());
+        verify(deviceDataRedisDAO, never()).putAll(anyLong(), any());
+    }
+
+    @Test
+    public void testSaveDeviceProperty_skipNullValue() {
+        // 准备参数：属性值为空，不能写入 TDengine 与 Redis
+        IotDeviceDO device = buildDevice();
+        IotThingModelDO thingModel = buildThingModel("Temperature", IotDataSpecsDataTypeEnum.INT.getDataType());
+        Map<String, Object> params = new HashMap<>();
+        params.put("Temperature", null);
+        IotDeviceMessage message = buildMessage(params);
+
         when(thingModelService.getThingModelListByProductIdFromCache(device.getProductId()))
                 .thenReturn(singletonList(thingModel));
 
-        // 调用：不能抛异常
         assertDoesNotThrow(() -> service.saveDeviceProperty(device, message));
 
-        // 断言：写入的 value 是 byte 类型，且值匹配
+        verify(thingModelService, never()).convertThingModelPropertyValue(any(), any());
+        verify(devicePropertyMapper, never()).insert(any(), any(), anyLong(), anyLong());
+        verify(deviceDataRedisDAO, never()).putAll(anyLong(), any());
+    }
+
+    @Test
+    public void testSaveDeviceProperty_skipInvalidKeyType() {
+        // 准备参数：Map 中包含非字符串 key，不能因为强转失败影响其它合法属性
+        IotDeviceDO device = buildDevice();
+        IotThingModelDO thingModel = buildThingModel("PowerSwitch", IotDataSpecsDataTypeEnum.BOOL.getDataType());
+        Map<Object, Object> params = new HashMap<>();
+        params.put(123, 1);
+        params.put("PowerSwitch", true);
+        IotDeviceMessage message = buildMessage(params);
+
+        when(thingModelService.getThingModelListByProductIdFromCache(device.getProductId()))
+                .thenReturn(singletonList(thingModel));
+        when(thingModelService.convertThingModelPropertyValue(thingModel, true)).thenReturn((byte) 1);
+
+        assertDoesNotThrow(() -> service.saveDeviceProperty(device, message));
+
         Map<String, Object> dbProperties = captureMapperInsertProperties();
-        Object actual = dbProperties.get("PowerSwitch");
-        assertTrue(actual instanceof Byte, "BOOL 属性应被转为 Byte 类型，实际为 " + (actual == null ? "null" : actual.getClass()));
-        assertEquals(expected, actual);
+        assertEquals(1, dbProperties.size());
+        assertEquals((byte) 1, dbProperties.get("PowerSwitch"));
     }
 
     // ========== 辅助方法 ==========
@@ -173,7 +172,7 @@ public class IotDevicePropertyServiceImplTest extends BaseMockitoUnitTest {
     /**
      * 构造一条属性上报消息
      */
-    private IotDeviceMessage buildMessage(Map<String, Object> params) {
+    private IotDeviceMessage buildMessage(Map<?, ?> params) {
         IotDeviceMessage message = new IotDeviceMessage();
         message.setMethod(IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod());
         message.setParams(params);

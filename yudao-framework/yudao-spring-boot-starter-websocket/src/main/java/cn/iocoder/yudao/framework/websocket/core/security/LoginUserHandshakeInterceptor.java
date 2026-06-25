@@ -27,9 +27,10 @@ public class LoginUserHandshakeInterceptor implements HandshakeInterceptor {
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response,
                                    WebSocketHandler wsHandler, Map<String, Object> attributes) {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
-        if (loginUser != null) {
-            WebSocketFrameworkUtils.setLoginUser(loginUser, attributes);
+        if (loginUser == null) {
+            return false;
         }
+        WebSocketFrameworkUtils.setLoginUser(loginUser, attributes);
         return true;
     }
 

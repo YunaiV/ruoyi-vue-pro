@@ -6,6 +6,8 @@ import cn.iocoder.yudao.module.mes.controller.admin.wm.barcode.vo.MesWmBarcodeSa
 import cn.iocoder.yudao.module.mes.dal.dataobject.wm.barcode.MesWmBarcodeDO;
 import jakarta.validation.Valid;
 
+import java.util.Collection;
+
 /**
  * MES 条码清单 Service 接口
  *
@@ -34,6 +36,14 @@ public interface MesWmBarcodeService {
      * @param id 编号
      */
     void deleteBarcode(Long id);
+
+    /**
+     * 基于业务类型和业务编号数组，删除条码
+     *
+     * @param bizType 业务类型
+     * @param bizIds 业务编号数组
+     */
+    void deleteBarcodeByBizTypeAndBizIds(Integer bizType, Collection<Long> bizIds);
 
     /**
      * 获得条码

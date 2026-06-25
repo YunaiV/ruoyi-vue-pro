@@ -29,6 +29,7 @@ public final class MesBizTypeConstants {
     public static final int WM_STOCK = 106; // 库存：MesWmMaterialStockDO
     public static final int WM_BATCH = 107; // 批次：MesWmBatchDO
     public static final int WM_TRANSACTION = 108; // 库存事务流水：MesWmTransactionDO
+    public static final int WM_SN = 109; // SN 码：MesWmSnDO
     public static final int WM_ITEM_RECEIPT_IN = 110; // 采购入库：MesWmItemReceiptDO
     public static final int WM_TRANSFER_OUT = 111; // 调拨出库：MesWmTransferDO
     public static final int WM_TRANSFER_IN = 112; // 调拨入库：MesWmTransferDO

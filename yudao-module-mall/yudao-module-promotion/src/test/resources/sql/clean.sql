@@ -5,6 +5,7 @@ DELETE FROM "promotion_reward_activity";
 DELETE FROM "promotion_discount_activity";
 DELETE FROM "promotion_discount_product";
 DELETE FROM "promotion_seckill_config";
+DELETE FROM "promotion_combination_record";
 DELETE FROM "promotion_combination_activity";
 DELETE FROM "promotion_article_category";
 DELETE FROM "promotion_article";

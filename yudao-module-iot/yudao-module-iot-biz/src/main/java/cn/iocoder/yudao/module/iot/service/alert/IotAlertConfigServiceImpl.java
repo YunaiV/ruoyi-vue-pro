@@ -1,11 +1,14 @@
 package cn.iocoder.yudao.module.iot.service.alert;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.alert.vo.config.IotAlertConfigPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.alert.vo.config.IotAlertConfigSaveReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.alert.IotAlertConfigDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.alert.IotAlertConfigMapper;
+import cn.iocoder.yudao.module.iot.enums.alert.IotAlertReceiveTypeEnum;
 import cn.iocoder.yudao.module.iot.service.rule.scene.IotSceneRuleService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import jakarta.annotation.Resource;
@@ -16,7 +19,10 @@ import org.springframework.validation.annotation.Validated;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.ALERT_CONFIG_MAIL_TEMPLATE_REQUIRED;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.ALERT_CONFIG_NOT_EXISTS;
+import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.ALERT_CONFIG_NOTIFY_TEMPLATE_REQUIRED;
+import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.ALERT_CONFIG_SMS_TEMPLATE_REQUIRED;
 
 /**
  * IoT 告警配置 Service 实现类
@@ -42,6 +48,7 @@ public class IotAlertConfigServiceImpl implements IotAlertConfigService {
         // 校验关联数据是否存在
         sceneRuleService.validateSceneRuleList(createReqVO.getSceneRuleIds());
         adminUserApi.validateUserList(createReqVO.getReceiveUserIds());
+        validateReceiveTemplates(createReqVO);
 
         // 插入
         IotAlertConfigDO alertConfig = BeanUtils.toBean(createReqVO, IotAlertConfigDO.class);
@@ -56,6 +63,7 @@ public class IotAlertConfigServiceImpl implements IotAlertConfigService {
         // 校验关联数据是否存在
         sceneRuleService.validateSceneRuleList(updateReqVO.getSceneRuleIds());
         adminUserApi.validateUserList(updateReqVO.getReceiveUserIds());
+        validateReceiveTemplates(updateReqVO);
 
         // 更新
         IotAlertConfigDO updateObj = BeanUtils.toBean(updateReqVO, IotAlertConfigDO.class);
@@ -73,6 +81,24 @@ public class IotAlertConfigServiceImpl implements IotAlertConfigService {
     private void validateAlertConfigExists(Long id) {
         if (alertConfigMapper.selectById(id) == null) {
             throw exception(ALERT_CONFIG_NOT_EXISTS);
+        }
+    }
+
+    private void validateReceiveTemplates(IotAlertConfigSaveReqVO reqVO) {
+        if (CollUtil.isEmpty(reqVO.getReceiveTypes())) {
+            return;
+        }
+        if (reqVO.getReceiveTypes().contains(IotAlertReceiveTypeEnum.SMS.getType())
+                && StrUtil.isBlank(reqVO.getSmsTemplateCode())) {
+            throw exception(ALERT_CONFIG_SMS_TEMPLATE_REQUIRED);
+        }
+        if (reqVO.getReceiveTypes().contains(IotAlertReceiveTypeEnum.MAIL.getType())
+                && StrUtil.isBlank(reqVO.getMailTemplateCode())) {
+            throw exception(ALERT_CONFIG_MAIL_TEMPLATE_REQUIRED);
+        }
+        if (reqVO.getReceiveTypes().contains(IotAlertReceiveTypeEnum.NOTIFY.getType())
+                && StrUtil.isBlank(reqVO.getNotifyTemplateCode())) {
+            throw exception(ALERT_CONFIG_NOTIFY_TEMPLATE_REQUIRED);
         }
     }
 

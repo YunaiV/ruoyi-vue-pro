@@ -245,6 +245,22 @@ public class SmsTemplateServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
+    public void testGetSmsTemplateListByStatus() {
+        // mock 数据
+        SmsTemplateDO dbSmsTemplate = randomSmsTemplateDO(o -> o.setStatus(CommonStatusEnum.ENABLE.getStatus()));
+        smsTemplateMapper.insert(dbSmsTemplate);
+        smsTemplateMapper.insert(ObjectUtils.cloneIgnoreId(dbSmsTemplate,
+                o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
+
+        // 调用
+        List<SmsTemplateDO> list = smsTemplateService.getSmsTemplateListByStatus(
+                CommonStatusEnum.ENABLE.getStatus());
+        // 断言
+        assertEquals(1, list.size());
+        assertPojoEquals(dbSmsTemplate, list.get(0));
+    }
+
+    @Test
     public void testGetSmsTemplateCountByChannelId() {
         // mock 数据
         SmsTemplateDO dbSmsTemplate = randomPojo(SmsTemplateDO.class, o -> o.setChannelId(1L));

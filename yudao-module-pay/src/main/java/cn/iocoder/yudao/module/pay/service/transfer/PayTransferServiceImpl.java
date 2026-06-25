@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.pay.service.transfer;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
@@ -162,6 +163,7 @@ public class PayTransferServiceImpl implements PayTransferService {
             throw exception(PAY_TRANSFER_NOT_FOUND);
         }
         if (PayTransferStatusEnum.isProcessing(transfer.getStatus())) { // 如果已经是转账中，直接返回，不用重复更新
+            updateChannelPackageInfoIfAbsent(transfer, notify);
             log.info("[notifyTransferProgressing][transfer({}) 已经是转账中状态，无需更新]", transfer.getId());
             return;
         }
@@ -175,9 +177,33 @@ public class PayTransferServiceImpl implements PayTransferService {
                 new PayTransferDO().setStatus(PayTransferStatusEnum.PROCESSING.getStatus())
                         .setChannelPackageInfo(notify.getChannelPackageInfo()));
         if (updateCounts == 0) {
+            PayTransferDO latestTransfer = transferMapper.selectById(transfer.getId());
+            if (latestTransfer != null && PayTransferStatusEnum.isProcessing(latestTransfer.getStatus())) {
+                updateChannelPackageInfoIfAbsent(latestTransfer, notify);
+                log.info("[notifyTransferProgressing][transfer({}) 已被并发更新为转账中状态，无需重复更新]",
+                        transfer.getId());
+                return;
+            }
             throw exception(PAY_TRANSFER_NOTIFY_FAIL_STATUS_IS_NOT_WAITING);
         }
         log.info("[notifyTransferProgressing][transfer({}) 更新为转账进行中状态]", transfer.getId());
+    }
+
+    /**
+     * 补充渠道 package 信息：处理同步任务先更新为转账中，发起转账接口后返回 channelPackageInfo 的场景
+     *
+     * @see <a href="https://github.com/YunaiV/ruoyi-vue-pro/issues/1144">Issue #1144</a>
+     */
+    private void updateChannelPackageInfoIfAbsent(PayTransferDO transfer, PayTransferRespDTO notify) {
+        if (StrUtil.isBlank(notify.getChannelPackageInfo())
+                || StrUtil.isNotBlank(transfer.getChannelPackageInfo())) {
+            return;
+        }
+        int updateCount = transferMapper.updateChannelPackageInfoIfAbsent(transfer.getId(),
+                notify.getChannelPackageInfo());
+        if (updateCount > 0) {
+            log.info("[updateChannelPackageInfoIfAbsent][transfer({}) 补充渠道 package 信息]", transfer.getId());
+        }
     }
 
     private void notifyTransferSuccess(PayChannelDO channel, PayTransferRespDTO notify) {

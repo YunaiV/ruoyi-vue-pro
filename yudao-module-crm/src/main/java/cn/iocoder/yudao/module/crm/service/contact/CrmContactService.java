@@ -169,4 +169,12 @@ public interface CrmContactService {
      */
     List<CrmContactDO> getContactListByCustomerIdOwnerUserId(Long customerId, Long ownerUserId);
 
+    /**
+     * 获得联系人列表，基于指定客户
+     *
+     * @param customerId 客户编号
+     * @return 联系人列表
+     */
+    List<CrmContactDO> getContactListByCustomerId(Long customerId);
+
 }

@@ -118,11 +118,12 @@ public interface ProductSpuService {
     void updateSpuStatus(ProductSpuUpdateStatusReqVO updateReqVO);
 
     /**
-     * 获取 SPU 列表标签对应的 Count 数量
+     * 获取 SPU 列表标签对应的 Count 数量（支持按 name/categoryId/createTime 筛选）
      *
+     * @param reqVO 筛选条件
      * @return Count 数量
      */
-    Map<Integer, Long> getTabsCount();
+    Map<Integer, Long> getTabsCount(ProductSpuPageReqVO reqVO);
 
     /**
      * 通过分类 categoryId 查询 SPU 个数

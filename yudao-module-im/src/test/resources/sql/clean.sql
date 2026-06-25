@@ -1,0 +1,15 @@
+DELETE FROM "im_private_message";
+DELETE FROM "im_group_message";
+DELETE FROM "im_conversation_read";
+DELETE FROM "im_group";
+DELETE FROM "im_group_member";
+DELETE FROM "im_friend";
+DELETE FROM "im_friend_request";
+DELETE FROM "im_group_request";
+DELETE FROM "im_face_pack";
+DELETE FROM "im_face_pack_item";
+DELETE FROM "im_face_user_item";
+DELETE FROM "im_rtc_call";
+DELETE FROM "im_rtc_participant";
+DELETE FROM "im_sensitive_word";
+DELETE FROM "system_users";

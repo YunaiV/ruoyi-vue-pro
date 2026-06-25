@@ -147,6 +147,22 @@ public interface ProductSpuMapper extends BaseMapperX<ProductSpuDO> {
     }
 
     /**
+     * 按筛选条件 + Tab 统计商品 SPU 数量（用于带筛选的 tab count）
+     *
+     * @param reqVO   筛选条件（name/categoryId/createTime）
+     * @param tabType Tab 标签类型
+     * @return 数量
+     */
+    default Long selectCountByTab(ProductSpuPageReqVO reqVO, Integer tabType) {
+        LambdaQueryWrapperX<ProductSpuDO> queryWrapper = new LambdaQueryWrapperX<ProductSpuDO>()
+                .likeIfPresent(ProductSpuDO::getName, reqVO.getName())
+                .eqIfPresent(ProductSpuDO::getCategoryId, reqVO.getCategoryId())
+                .betweenIfPresent(ProductSpuDO::getCreateTime, reqVO.getCreateTime());
+        appendTabQuery(tabType, queryWrapper);
+        return selectCount(queryWrapper);
+    }
+
+    /**
      * 更新商品 SPU 浏览量
      *
      * @param id        商品 SPU 编号

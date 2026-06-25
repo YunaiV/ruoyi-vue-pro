@@ -4,10 +4,12 @@ import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.member.api.user.MemberUserApi;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.coupon.CouponPageItemRespVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.coupon.CouponPageReqVO;
+import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.coupon.CouponRespVO;
 import cn.iocoder.yudao.module.promotion.controller.admin.coupon.vo.coupon.CouponSendReqVO;
 import cn.iocoder.yudao.module.promotion.convert.coupon.CouponConvert;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.coupon.CouponDO;
@@ -61,6 +63,15 @@ public class CouponController {
         pageResulVO.getList().forEach(itemRespVO -> MapUtils.findAndThen(userMap, itemRespVO.getUserId(),
                 userRespDTO -> itemRespVO.setNickname(userRespDTO.getNickname())));
         return success(pageResulVO);
+    }
+
+    @GetMapping("/get")
+    @Operation(summary = "获得优惠劵")
+    @Parameter(name = "id", description = "编号", required = true)
+    @PreAuthorize("@ss.hasPermission('promotion:coupon:query')")
+    public CommonResult<CouponRespVO> getCoupon(@RequestParam("id") Long id) {
+        CouponDO coupon = couponService.getCoupon(id);
+        return success(BeanUtils.toBean(coupon, CouponRespVO.class));
     }
 
     @PostMapping("/send")

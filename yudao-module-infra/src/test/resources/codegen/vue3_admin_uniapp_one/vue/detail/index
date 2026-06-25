@@ -1,0 +1,140 @@
+<template>
+  <view class="yd-page-container">
+    <!-- 顶部导航栏 -->
+    <wd-navbar
+      title="学生详情"
+      left-arrow placeholder safe-area-inset-top fixed
+      @click-left="handleBack"
+    />
+
+    <!-- 详情内容 -->
+    <view>
+      <wd-cell-group border>
+        <wd-cell title="编号" :value="formData?.id ?? '-'" />
+        <wd-cell title="名字" :value="formData?.name ?? '-'" />
+        <wd-cell title="简介" :value="formData?.description ?? '-'" />
+        <wd-cell title="出生日期" :value="formatDateTime(formData?.birthday) || '-'" />
+        <wd-cell title="性别">
+          <dict-tag :type="DICT_TYPE.SYSTEM_USER_SEX" :value="formData?.sex" />
+        </wd-cell>
+        <wd-cell title="是否有效">
+          <dict-tag :type="DICT_TYPE.INFRA_BOOLEAN_STRING" :value="formData?.enabled" />
+        </wd-cell>
+        <wd-cell title="头像" :value="formData?.avatar ?? '-'" />
+        <wd-cell title="附件" :value="formData?.video ?? '-'" />
+        <wd-cell title="备注" :value="formData?.memo ?? '-'" />
+        <wd-cell title="创建时间" :value="formatDateTime(formData?.createTime) || '-'" />
+      </wd-cell-group>
+    </view>
+
+    <!-- 底部操作按钮 -->
+    <view class="yd-detail-footer">
+      <view class="yd-detail-footer-actions">
+        <wd-button
+          v-if="hasAccessByCodes(['infra:student:update'])"
+          class="flex-1" type="warning" @click="handleEdit"
+        >
+          编辑
+        </wd-button>
+        <wd-button
+          v-if="hasAccessByCodes(['infra:student:delete'])"
+          class="flex-1" type="error" :loading="deleting" @click="handleDelete"
+        >
+          删除
+        </wd-button>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script lang="ts" setup>
+import type { Student } from '@/api/infra/demo'
+import { onUnload } from '@dcloudio/uni-app'
+import { onMounted, ref } from 'vue'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
+import { deleteStudent, getStudent } from '@/api/infra/demo'
+import { useAccess } from '@/hooks/useAccess'
+import { delay, navigateBackPlus } from '@/utils'
+import { DICT_TYPE } from '@/utils/constants'
+import { formatDateTime } from '@/utils/date'
+
+const props = defineProps<{
+  id?: number | any
+}>()
+
+definePage({
+  style: {
+    navigationBarTitleText: '',
+    navigationStyle: 'custom',
+  },
+})
+
+const { hasAccessByCodes } = useAccess()
+const toast = useToast()
+const formData = ref<Student>() // 详情数据
+const deleting = ref(false) // 删除状态
+
+/** 返回上一页 */
+function handleBack() {
+  navigateBackPlus('/pages-infra/demo/index')
+}
+
+/** 加载学生详情 */
+async function getDetail() {
+  if (!props.id || deleting.value) {
+    return
+  }
+  try {
+    toast.loading('加载中...')
+    formData.value = await getStudent(props.id)
+  } finally {
+    toast.close()
+  }
+}
+
+/** 编辑学生 */
+function handleEdit() {
+  uni.navigateTo({
+    url: `/pages-infra/demo/form/index?id=${props.id}`,
+  })
+}
+
+/** 删除学生 */
+function handleDelete() {
+  if (!props.id) {
+    return
+  }
+  uni.showModal({
+    title: '提示',
+    content: '确定要删除该学生吗？',
+    success: async (res) => {
+      if (!res.confirm) {
+        return
+      }
+      deleting.value = true
+      try {
+        await deleteStudent(props.id)
+        toast.success('删除成功')
+        uni.$emit('infra:demo:reload')
+        delay(handleBack)
+      } finally {
+        deleting.value = false
+      }
+    },
+  })
+}
+
+/** 初始化 */
+onMounted(() => {
+  uni.$on('infra:demo:reload', getDetail)
+  getDetail()
+})
+
+/** 卸载 */
+onUnload(() => {
+  uni.$off('infra:demo:reload', getDetail)
+})
+</script>
+
+<style lang="scss" scoped>
+</style>

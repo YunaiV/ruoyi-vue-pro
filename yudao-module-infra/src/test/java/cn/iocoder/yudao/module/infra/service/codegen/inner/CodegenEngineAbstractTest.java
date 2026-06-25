@@ -108,12 +108,21 @@ public abstract class CodegenEngineAbstractTest extends BaseMockitoUnitTest {
         asserts.forEach(assertMap -> {
             String contentPath = (String) assertMap.get("contentPath");
             String filePath = (String) assertMap.get("filePath");
-            String expected = ResourceUtil.readUtf8Str("codegen/" + path + "/" + contentPath)
-                    .replace("\r\n", "\n");
+            String expected = normalizeLineEndings(ResourceUtil.readUtf8Str("codegen/" + path + "/" + contentPath));
             String actual = result.get(filePath);
-            assertEquals(expected, actual == null ? null : actual.replace("\r\n", "\n"),
-                    filePath + "：不匹配");
+            assertEquals(expected, normalizeLineEndings(actual), filePath + "：不匹配");
         });
+    }
+
+    /**
+     * 统一换行符并忽略文件末尾换行，避免 Windows/Unix 落盘差异导致快照断言失败
+     */
+    private static String normalizeLineEndings(String content) {
+        if (content == null) {
+            return null;
+        }
+        content = content.replace("\r\n", "\n").replace('\r', '\n');
+        return content.replaceAll("\\n+\\z", "");
     }
 
     // ==================== 调试专用 ====================
@@ -143,10 +152,21 @@ public abstract class CodegenEngineAbstractTest extends BaseMockitoUnitTest {
     protected void writeResult(Map<String, String> result, String basePath) {
         // 写入文件内容
         List<Map<String, String>> asserts = new ArrayList<>();
+        Set<String> usedContentPaths = new LinkedHashSet<>();
         result.forEach((filePath, fileContent) -> {
             String lastFilePath = StrUtil.subAfter(filePath, '/', true);
-            String contentPath = StrUtil.subAfter(lastFilePath, '.', true)
-                    + '/' + StrUtil.subBefore(lastFilePath, '.', true);
+            String ext = StrUtil.subAfter(lastFilePath, '.', true);
+            String name = StrUtil.subBefore(lastFilePath, '.', true);
+            String contentPath = ext + '/' + name;
+            // 同名文件（如 index.vue 同时出现在 列表/form/detail）会撞名，撞名时前缀补上级目录区分；仍撞则加序号兜底，避免快照互相覆盖
+            if (usedContentPaths.contains(contentPath)) {
+                String parentDir = StrUtil.subAfter(StrUtil.subBefore(filePath, '/' + lastFilePath, true), '/', true);
+                contentPath = ext + '/' + parentDir + '/' + name;
+                for (int i = 2; usedContentPaths.contains(contentPath); i++) {
+                    contentPath = ext + '/' + parentDir + '/' + name + '-' + i;
+                }
+            }
+            usedContentPaths.add(contentPath);
             asserts.add(MapUtil.<String, String>builder().put("filePath", filePath)
                     .put("contentPath", contentPath).build());
             FileUtil.writeUtf8String(fileContent, basePath + "/" + contentPath);

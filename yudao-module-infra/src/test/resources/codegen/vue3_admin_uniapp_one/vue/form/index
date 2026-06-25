@@ -1,0 +1,187 @@
+<template>
+  <view class="yd-page-container">
+    <!-- 顶部导航栏 -->
+    <wd-navbar
+      :title="getTitle"
+      left-arrow placeholder safe-area-inset-top fixed
+      @click-left="handleBack"
+    />
+
+    <!-- 表单区域 -->
+    <view>
+      <wd-form ref="formRef" :model="formData" :schema="formSchema">
+        <wd-cell-group border>
+              <wd-form-item title="名字" title-width="180rpx" prop="name">
+            <wd-input
+              v-model="formData.name"
+              clearable
+              placeholder="请输入名字"
+            />
+          </wd-form-item>
+              <wd-form-item title="简介" title-width="180rpx" prop="description">
+            <wd-textarea
+              v-model="formData.description"
+              clearable
+              placeholder="请输入简介"
+              :maxlength="200"
+              show-word-limit
+            />
+          </wd-form-item>
+                  <wd-form-item
+            title="出生日期"
+            title-width="180rpx"
+            prop="birthday"
+            is-link
+            :value="formatDateTime(formData.birthday)"
+            placeholder="请选择出生日期"
+            @click="birthdayVisible = true"
+          />
+          <wd-datetime-picker
+            v-model="formData.birthday"
+            v-model:visible="birthdayVisible"
+            type="datetime"
+          />
+                  <yd-form-picker
+            v-model="formData.sex"
+            label="性别"
+            label-width="180rpx"
+            prop="sex"
+            :dict-type="DICT_TYPE.SYSTEM_USER_SEX"
+            placeholder="请选择性别"
+          />
+                  <wd-form-item title="是否有效" title-width="180rpx" prop="enabled" center>
+            <wd-radio-group v-model="formData.enabled" type="button">
+              <wd-radio
+                v-for="dict in getBoolDictOptions(DICT_TYPE.INFRA_BOOLEAN_STRING)"
+                :key="dict.value"
+                :value="dict.value"
+              >
+                {{ dict.label }}
+              </wd-radio>
+            </wd-radio-group>
+          </wd-form-item>
+                  <wd-form-item title="头像" title-width="180rpx" prop="avatar">
+            <yd-upload-img v-model="formData.avatar" directory="infra/demo" />
+          </wd-form-item>
+                  <wd-form-item title="附件" title-width="180rpx" prop="video">
+            <yd-upload-file v-model="formData.video" directory="infra/demo" />
+          </wd-form-item>
+                  <wd-form-item title="备注" title-width="180rpx" prop="memo">
+            <wd-input
+              v-model="formData.memo"
+              clearable
+              placeholder="请输入备注"
+            />
+          </wd-form-item>
+        </wd-cell-group>
+      </wd-form>
+    </view>
+
+    <!-- 底部保存按钮 -->
+    <view class="yd-detail-footer">
+      <wd-button
+        type="primary"
+        block
+        :loading="formLoading"
+        @click="handleSubmit"
+      >
+        保存
+      </wd-button>
+    </view>
+  </view>
+</template>
+
+<script lang="ts" setup>
+import type { FormInstance } from '@wot-ui/ui/components/wd-form/types'
+import type { Student } from '@/api/infra/demo'
+import { computed, onMounted, ref } from 'vue'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
+import { createStudent, getStudent, updateStudent } from '@/api/infra/demo'
+import { getBoolDictOptions } from '@/hooks/useDict'
+import { delay, navigateBackPlus } from '@/utils'
+import { DICT_TYPE } from '@/utils/constants'
+import { formatDateTime } from '@/utils/date'
+import { createFormSchema } from '@/utils/wot'
+
+const props = defineProps<{
+  id?: number | any
+}>()
+
+definePage({
+  style: {
+    navigationBarTitleText: '',
+    navigationStyle: 'custom',
+  },
+})
+
+const toast = useToast()
+const getTitle = computed(() => props.id ? '编辑学生' : '新增学生')
+const formLoading = ref(false) // 表单提交状态
+const formData = ref<Student>({
+  id: undefined,
+  name: '',
+  description: '',
+  birthday: undefined,
+  sex: 0,
+  enabled: false,
+  avatar: '',
+  video: '',
+  memo: '',
+}) // 表单数据
+const birthdayVisible = ref(false) // 出生日期选择器状态
+const formSchema = createFormSchema({
+  name: [{ required: true, message: '名字不能为空' }],
+  description: [{ required: true, message: '简介不能为空' }],
+  birthday: [{ required: true, message: '出生日期不能为空' }],
+  sex: [{ required: true, message: '性别不能为空' }],
+  enabled: [{ required: true, message: '是否有效不能为空' }],
+  avatar: [{ required: true, message: '头像不能为空' }],
+  video: [{ required: true, message: '附件不能为空' }],
+  memo: [{ required: true, message: '备注不能为空' }],
+}) // 表单校验规则
+const formRef = ref<FormInstance>() // 表单组件引用
+
+/** 返回上一页 */
+function handleBack() {
+  navigateBackPlus('/pages-infra/demo/index')
+}
+
+/** 加载学生详情 */
+async function getDetail() {
+  if (!props.id) {
+    return
+  }
+  formData.value = await getStudent(props.id)
+}
+
+/** 提交表单 */
+async function handleSubmit() {
+  const { valid } = await formRef.value.validate()
+  if (!valid) {
+    return
+  }
+
+  formLoading.value = true
+  try {
+    if (props.id) {
+      await updateStudent(formData.value)
+      toast.success('修改成功')
+    } else {
+      await createStudent(formData.value)
+      toast.success('新增成功')
+    }
+    uni.$emit('infra:demo:reload')
+    delay(handleBack)
+  } finally {
+    formLoading.value = false
+  }
+}
+
+/** 初始化 */
+onMounted(() => {
+  getDetail()
+})
+</script>
+
+<style lang="scss" scoped>
+</style>

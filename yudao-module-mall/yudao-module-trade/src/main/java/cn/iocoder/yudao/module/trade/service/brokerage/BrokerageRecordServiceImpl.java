@@ -38,7 +38,6 @@ import java.util.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.getMaxValue;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.getMinValue;
-import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.BROKERAGE_WITHDRAW_USER_BALANCE_NOT_ENOUGH;
 
 /**
@@ -143,7 +142,7 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
     int calculatePrice(Integer basePrice, Integer percent, Integer fixedPrice) {
         // 1. 优先使用固定佣金
         if (fixedPrice != null && fixedPrice >= 0) {
-            return ObjectUtil.defaultIfNull(fixedPrice, 0);
+            return fixedPrice;
         }
         // 2. 根据比例计算佣金
         if (basePrice != null && basePrice > 0 && percent != null && percent > 0) {
@@ -329,7 +328,7 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
             return respVO;
         }
         // 2.2 校验用户是否有分销资格
-        respVO.setEnabled(brokerageUserService.getUserBrokerageEnabled(getLoginUserId()));
+        respVO.setEnabled(brokerageUserService.getUserBrokerageEnabled(userId));
         if (BooleanUtil.isFalse(respVO.getEnabled())) {
             return respVO;
         }
@@ -339,22 +338,24 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
             return respVO;
         }
 
-        // 3.1 商品单独分佣模式
-        Integer fixedMinPrice = 0;
-        Integer fixedMaxPrice = 0;
-        Integer spuMinPrice = 0;
-        Integer spuMaxPrice = 0;
+        // 3.1 获取商品 SKU 列表
         List<ProductSkuRespDTO> skuList = productSkuApi.getSkuListBySpuId(ListUtil.of(spuId));
         if (BooleanUtil.isTrue(spu.getSubCommissionType())) {
-            fixedMinPrice = getMinValue(skuList, ProductSkuRespDTO::getFirstBrokeragePrice);
-            fixedMaxPrice = getMaxValue(skuList, ProductSkuRespDTO::getFirstBrokeragePrice);
-            // 3.2 全局分佣模式（根据商品价格比例计算）
+            // 3.2.1 商品独立分销模式：直接取 SKU 固定佣金
+            // 注意：固定佣金允许为 0，表示商家主动设为零佣金；为空时，也按 0 处理
+            Integer fixedMinPrice = getMinValue(skuList,
+                    sku -> ObjectUtil.defaultIfNull(sku.getFirstBrokeragePrice(), 0));
+            Integer fixedMaxPrice = getMaxValue(skuList,
+                    sku -> ObjectUtil.defaultIfNull(sku.getFirstBrokeragePrice(), 0));
+            respVO.setBrokerageMinPrice(calculatePrice(null, tradeConfig.getBrokerageFirstPercent(), fixedMinPrice))
+                    .setBrokerageMaxPrice(calculatePrice(null, tradeConfig.getBrokerageFirstPercent(), fixedMaxPrice));
         } else {
-            spuMinPrice = getMinValue(skuList, ProductSkuRespDTO::getPrice);
-            spuMaxPrice = getMaxValue(skuList, ProductSkuRespDTO::getPrice);
+            // 3.2.2 全局比例模式：固定佣金传 null，避免被默认值 0 提前拦截
+            Integer spuMinPrice = getMinValue(skuList, ProductSkuRespDTO::getPrice);
+            Integer spuMaxPrice = getMaxValue(skuList, ProductSkuRespDTO::getPrice);
+            respVO.setBrokerageMinPrice(calculatePrice(spuMinPrice, tradeConfig.getBrokerageFirstPercent(), null))
+                    .setBrokerageMaxPrice(calculatePrice(spuMaxPrice, tradeConfig.getBrokerageFirstPercent(), null));
         }
-        respVO.setBrokerageMinPrice(calculatePrice(spuMinPrice, tradeConfig.getBrokerageFirstPercent(), fixedMinPrice));
-        respVO.setBrokerageMaxPrice(calculatePrice(spuMaxPrice, tradeConfig.getBrokerageFirstPercent(), fixedMaxPrice));
         return respVO;
     }
 
