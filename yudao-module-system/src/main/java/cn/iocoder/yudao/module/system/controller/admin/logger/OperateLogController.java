@@ -11,7 +11,7 @@ import cn.iocoder.yudao.module.system.controller.admin.logger.vo.operatelog.Oper
 import cn.iocoder.yudao.module.system.controller.admin.logger.vo.operatelog.OperateLogRespVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.logger.OperateLogDO;
 import cn.iocoder.yudao.module.system.service.logger.OperateLogService;
-import com.fhs.core.trans.anno.TransMethodResult;
+import org.dromara.core.trans.anno.TransMethodResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

@@ -30,14 +30,14 @@
         <mybatis-plus.version>3.5.16</mybatis-plus.version>
         <mybatis-plus-join.version>1.5.7</mybatis-plus-join.version>
         <dynamic-datasource.version>4.5.0</dynamic-datasource.version>
-        <easy-trans.version>3.0.6</easy-trans.version>
-        <redisson.version>4.4.0</redisson.version>
+        <easy-trans.version>3.1.5</easy-trans.version>
+        <redisson.version>4.6.1</redisson.version>
         <dm8.jdbc.version>8.1.3.140</dm8.jdbc.version>
         <kingbase.jdbc.version>9.0.1.jre7</kingbase.jdbc.version>
         <opengauss.jdbc.version>7.0.0-RC3-og</opengauss.jdbc.version>
-        <taos.version>3.8.3</taos.version>
+        <taos.version>3.8.4</taos.version>
         <!-- 消息队列 -->
-        <rocketmq-spring.version>2.3.5</rocketmq-spring.version>
+        <rocketmq-spring.version>2.3.6</rocketmq-spring.version>
         <!-- 服务保障相关 -->
         <lock4j.version>2.2.7</lock4j.version>
         <!-- 监控相关 -->
@@ -46,7 +46,7 @@
         <opentracing.version>0.33.0</opentracing.version>
         <!-- Test 测试相关 -->
         <podam.version>7.2.11.RELEASE</podam.version> <!-- Spring Boot 2.X 最多使用 7.2.11 版本 -->
-        <jedis-mock.version>1.1.12</jedis-mock.version>
+        <jedis-mock.version>1.1.15</jedis-mock.version>
         <mockito-inline.version>4.11.0</mockito-inline.version>
         <!-- Bpm 工作流相关 -->
         <flowable.version>6.8.1</flowable.version>
@@ -57,20 +57,20 @@
         <pinyin4j.version>2.5.1</pinyin4j.version>
         <lombok.version>1.18.46</lombok.version>
         <mapstruct.version>1.6.3</mapstruct.version>
-        <hutool-5.version>5.8.44</hutool-5.version>
+        <hutool-5.version>5.8.46</hutool-5.version>
         <fastexcel.version>1.3.0</fastexcel.version>
         <velocity.version>2.4</velocity.version> <!-- JDK8 不能从 2.4 升级到 2.4.1，会报包不存在！！！！ -->
         <fastjson.version>1.2.83</fastjson.version>
-        <fastjson2.version>2.0.61</fastjson2.version>
+        <fastjson2.version>2.0.62</fastjson2.version>
         <guava.version>33.6.0-jre</guava.version>
         <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
         <commons-net.version>3.13.0</commons-net.version>
         <commons-lang3.version>3.20.0</commons-lang3.version>
-        <jsch.version>2.28.2</jsch.version>
+        <jsch.version>2.28.3</jsch.version>
         <tika-core.version>2.9.3</tika-core.version> <!-- JDK8 不能从 2.9.3 升级到 3.X，会报 JDK8 不支持 -->
         <ip2region.version>2.7.0</ip2region.version>
         <bizlog-sdk.version>3.0.6</bizlog-sdk.version>
-        <netty.version>4.2.14.Final</netty.version>
+        <netty.version>4.2.15.Final</netty.version>
         <mqtt.version>1.2.5</mqtt.version>
         <vertx.version>4.5.26</vertx.version>
         <okhttp.version>4.12.0</okhttp.version>
@@ -79,14 +79,14 @@
         <httpclient5.version>5.5.2</httpclient5.version> <!-- WxJava 4.8.x 需要 HttpClient5 5.4+，Spring Boot 2.7 默认 5.1.4 不兼容 -->
         <httpcore5.version>5.3.6</httpcore5.version> <!-- 配套 httpclient5 5.5.2，Spring Boot 2.7 默认 5.1.5 不兼容 -->
         <!-- 三方云服务相关 -->
-        <awssdk.version>2.44.0</awssdk.version>
+        <awssdk.version>2.46.17</awssdk.version>
         <justauth.version>1.16.7</justauth.version>
         <justauth-starter.version>1.4.0</justauth-starter.version>
         <jimureport.version>2.3.4</jimureport.version>
         <jimubi.version>2.3.2</jimubi.version>
-        <weixin-java.version>4.8.2-20260501.180637</weixin-java.version>
+        <weixin-java.version>4.8.4-20260623.211820</weixin-java.version>
         <bouncycastle.version>1.80</bouncycastle.version>
-        <alipay-sdk-java.version>4.40.806.ALL</alipay-sdk-java.version>
+        <alipay-sdk-java.version>4.40.865.ALL</alipay-sdk-java.version>
         <!-- 专属于 JDK8 安全漏洞升级 -->
         <logback.version>1.2.13</logback.version> <!-- 无法使用 1.3.X 版本，启动会报错 -->
     </properties>
@@ -234,7 +234,7 @@
             </dependency>
 
             <dependency>
-                <groupId>com.fhs-opensource</groupId> <!-- VO 数据翻译 -->
+                <groupId>org.dromara</groupId> <!-- VO 数据翻译 -->
                 <artifactId>easy-trans-spring-boot-starter</artifactId>
                 <version>${easy-trans.version}</version>
                 <exclusions>
@@ -249,12 +249,12 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>com.fhs-opensource</groupId>
+                <groupId>org.dromara</groupId>
                 <artifactId>easy-trans-mybatis-plus-extend</artifactId>
                 <version>${easy-trans.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.fhs-opensource</groupId>
+                <groupId>org.dromara</groupId>
                 <artifactId>easy-trans-anno</artifactId>
                 <version>${easy-trans.version}</version>
             </dependency>
@@ -276,8 +276,8 @@
                     </exclusion>
                     <exclusion>
                         <groupId>org.redisson</groupId>
-                        <!-- 使用 redisson-spring-data-27 替代，解决 Tuple NoClassDefFoundError 报错 -->
-                        <artifactId>redisson-spring-data-40</artifactId> <!-- Redisson 4.x 默认依赖 spring-data-40，排除后使用 spring-data-27 适配 Spring Boot 2.7 -->
+                        <!-- Redisson 4.6.x 默认依赖 redisson-spring-data-41（适配 Spring Data Redis 4.x），排除后使用下方的 spring-data-27 适配 Spring Boot 2.7 -->
+                        <artifactId>redisson-spring-data-41</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>

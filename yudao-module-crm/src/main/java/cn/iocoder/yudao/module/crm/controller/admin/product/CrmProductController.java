@@ -14,7 +14,7 @@ import cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductDO;
 import cn.iocoder.yudao.module.crm.enums.product.CrmProductStatusEnum;
 import cn.iocoder.yudao.module.crm.service.product.CrmProductService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import com.fhs.core.trans.anno.TransMethodResult;
+import org.dromara.core.trans.anno.TransMethodResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
