@@ -378,6 +378,11 @@ public class CouponServiceImpl implements CouponService {
         return couponMapper.selectByIdAndUserId(id, userId);
     }
 
+    @Override
+    public CouponDO getCoupon(Long id) {
+        return couponMapper.selectById(id);
+    }
+
     private CouponDO validateCouponExists(Long id) {
         CouponDO coupon = couponMapper.selectById(id);
         if (coupon == null) {

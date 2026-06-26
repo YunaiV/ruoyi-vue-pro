@@ -3,7 +3,6 @@ package cn.iocoder.yudao.framework.common.util.date;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.LocalDateTimeUtil;
-import cn.hutool.core.date.TemporalAccessorUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.DateIntervalEnum;
@@ -16,6 +15,7 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TimeZone;
 
 import static cn.hutool.core.date.DatePattern.*;
 
@@ -32,6 +32,11 @@ public class LocalDateTimeUtils {
     public static LocalDateTime EMPTY = buildTime(1970, 1, 1);
 
     public static DateTimeFormatter UTC_MS_WITH_XXX_OFFSET_FORMATTER = createFormatter(UTC_MS_WITH_XXX_OFFSET_PATTERN);
+
+    /**
+     * 默认时区
+     */
+    private static final ZoneId DEFAULT_ZONE_ID = TimeZone.getTimeZone(DateUtils.TIME_ZONE_DEFAULT).toZoneId();
 
     /**
      * 解析时间
@@ -63,6 +68,27 @@ public class LocalDateTimeUtils {
 
     public static boolean afterNow(LocalDateTime date) {
         return date.isAfter(LocalDateTime.now());
+    }
+
+    /**
+     * 将 Unix 秒时间戳转换为默认时区的本地时间
+     *
+     * @param epochSecond Unix 秒时间戳
+     * @return 本地时间
+     */
+    public static LocalDateTime ofEpochSecond(long epochSecond) {
+        return ofEpochSecond(epochSecond, DEFAULT_ZONE_ID);
+    }
+
+    /**
+     * 将 Unix 秒时间戳转换为指定时区的本地时间
+     *
+     * @param epochSecond Unix 秒时间戳
+     * @param zoneId 时区编号
+     * @return 本地时间
+     */
+    public static LocalDateTime ofEpochSecond(long epochSecond, ZoneId zoneId) {
+        return LocalDateTime.ofInstant(Instant.ofEpochSecond(epochSecond), zoneId);
     }
 
     /**
@@ -397,7 +423,18 @@ public class LocalDateTimeUtils {
      * @throws DateTimeException 如果转换过程中发生时间超出范围或其他时间处理异常
      */
     public static Long toEpochSecond(LocalDateTime sourceDateTime) {
-        return TemporalAccessorUtil.toInstant(sourceDateTime).getEpochSecond();
+        return toEpochSecond(sourceDateTime, DEFAULT_ZONE_ID);
+    }
+
+    /**
+     * 将给定的 {@link LocalDateTime} 按指定时区转换为自 Unix 纪元时间（1970-01-01T00:00:00Z）以来的秒数。
+     *
+     * @param sourceDateTime 需要转换的本地日期时间，不能为空
+     * @param zoneId 时区编号
+     * @return 自 1970-01-01T00:00:00Z 起的秒数（epoch second）
+     */
+    public static Long toEpochSecond(LocalDateTime sourceDateTime, ZoneId zoneId) {
+        return sourceDateTime.atZone(zoneId).toEpochSecond();
     }
 
 }

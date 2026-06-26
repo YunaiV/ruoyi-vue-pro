@@ -94,6 +94,14 @@ public interface PayChannelService {
     List<PayChannelDO> getEnableChannelList(Long appId);
 
     /**
+     * 获得指定应用的渠道列表
+     *
+     * @param appId 应用编号
+     * @return 渠道列表
+     */
+    List<PayChannelDO> getChannelListByAppId(Long appId);
+
+    /**
      * 获得指定编号的支付客户端
      *
      * @param id 编号

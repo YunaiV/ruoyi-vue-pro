@@ -71,6 +71,15 @@ public class PayChannelController {
         return success(PayChannelConvert.INSTANCE.convert(channel));
     }
 
+    @GetMapping("/list")
+    @Operation(summary = "获得指定应用的支付渠道列表")
+    @Parameter(name = "appId", description = "应用编号", required = true, example = "1")
+    @PreAuthorize("@ss.hasPermission('pay:channel:query')")
+    public CommonResult<List<PayChannelRespVO>> getChannelList(@RequestParam("appId") Long appId) {
+        List<PayChannelDO> list = channelService.getChannelListByAppId(appId);
+        return success(PayChannelConvert.INSTANCE.convertList(list));
+    }
+
     @GetMapping("/get-enable-code-list")
     @Operation(summary = "获得指定应用的开启的支付渠道编码列表")
     @Parameter(name = "appId", description = "应用编号", required = true, example = "1")

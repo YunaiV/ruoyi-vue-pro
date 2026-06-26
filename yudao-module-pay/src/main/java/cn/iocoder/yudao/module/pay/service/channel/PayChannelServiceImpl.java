@@ -157,6 +157,11 @@ public class PayChannelServiceImpl implements PayChannelService {
     }
 
     @Override
+    public List<PayChannelDO> getChannelListByAppId(Long appId) {
+        return payChannelMapper.selectListByAppId(appId);
+    }
+
+    @Override
     public PayClient getPayClient(Long id) {
         PayChannelDO channel = validPayChannel(id);
         return payClientFactory.createOrUpdatePayClient(id, channel.getCode(), channel.getConfig());

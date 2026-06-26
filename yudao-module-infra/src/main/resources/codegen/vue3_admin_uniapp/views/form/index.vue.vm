@@ -204,7 +204,7 @@ import { create${simpleClassName}, get${simpleClassName}, update${simpleClassNam
   #set ($dictImportNames = $dictImportNames.substring(0, $dictImportNames.length() - 1))
 import { $dictImportNames } from '@/hooks/useDict'
 #end
-import { navigateBackPlus } from '@/utils'
+import { delay, navigateBackPlus } from '@/utils'
 #if ($hasDict == 1)
 import { DICT_TYPE } from '@/utils/constants'
 #end
@@ -302,9 +302,7 @@ async function handleSubmit() {
       toast.success('新增成功')
     }
     uni.$emit('${table.moduleName}:${table.businessName}:reload')
-    setTimeout(() => {
-      handleBack()
-    }, 500)
+    delay(handleBack)
   } finally {
     formLoading.value = false
   }

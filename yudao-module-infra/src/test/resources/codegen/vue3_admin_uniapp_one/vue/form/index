@@ -98,7 +98,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { createStudent, getStudent, updateStudent } from '@/api/infra/demo'
 import { getBoolDictOptions } from '@/hooks/useDict'
-import { navigateBackPlus } from '@/utils'
+import { delay, navigateBackPlus } from '@/utils'
 import { DICT_TYPE } from '@/utils/constants'
 import { formatDateTime } from '@/utils/date'
 import { createFormSchema } from '@/utils/wot'
@@ -171,9 +171,7 @@ async function handleSubmit() {
       toast.success('新增成功')
     }
     uni.$emit('infra:demo:reload')
-    setTimeout(() => {
-      handleBack()
-    }, 500)
+    delay(handleBack)
   } finally {
     formLoading.value = false
   }
