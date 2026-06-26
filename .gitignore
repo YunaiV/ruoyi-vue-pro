@@ -53,3 +53,4 @@ application-my.yaml
 /yudao-ui-app/unpackage/
 .DS_Store
 **/.DS_Store
+outputs/yudao-dependencies/pom-update-summary.md

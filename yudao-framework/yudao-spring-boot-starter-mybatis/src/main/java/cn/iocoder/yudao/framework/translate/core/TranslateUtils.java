@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.framework.translate.core;
 
 import cn.hutool.core.collection.CollUtil;
-import com.fhs.core.trans.vo.VO;
-import com.fhs.trans.service.impl.TransService;
+import org.dromara.core.trans.vo.VO;
+import org.dromara.trans.service.impl.TransService;
 
 import java.util.List;
 

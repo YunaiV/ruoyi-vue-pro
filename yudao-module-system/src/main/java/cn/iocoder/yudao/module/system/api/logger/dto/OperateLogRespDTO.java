@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.system.api.logger.dto;
 
-import com.fhs.core.trans.anno.Trans;
-import com.fhs.core.trans.constant.TransType;
-import com.fhs.core.trans.vo.VO;
+import org.dromara.core.trans.anno.Trans;
+import org.dromara.core.trans.constant.TransType;
+import org.dromara.core.trans.vo.VO;
 import lombok.Data;
 
 import java.time.LocalDateTime;
