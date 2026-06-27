@@ -14,7 +14,6 @@ import cn.iocoder.yudao.module.wms.dal.dataobject.md.item.WmsItemSkuDO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -100,11 +99,8 @@ public interface WmsInventoryMapper extends BaseMapperX<WmsInventoryDO> {
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyList();
         }
-        List<Long> sortedIds = new ArrayList<>(ids);
-        Collections.sort(sortedIds);
         return selectList(new LambdaQueryWrapperX<WmsInventoryDO>()
-                .in(WmsInventoryDO::getId, sortedIds)
-                .orderByAsc(WmsInventoryDO::getId)
+                .in(WmsInventoryDO::getId, ids)
                 .last("FOR UPDATE"));
     }
 
