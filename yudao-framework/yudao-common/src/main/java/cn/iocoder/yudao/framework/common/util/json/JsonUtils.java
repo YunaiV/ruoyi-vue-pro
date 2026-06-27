@@ -6,12 +6,14 @@ import cn.hutool.json.JSONUtil;
 import cn.iocoder.yudao.framework.common.util.json.databind.TimestampLocalDateTimeDeserializer;
 import cn.iocoder.yudao.framework.common.util.json.databind.TimestampLocalDateTimeSerializer;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -33,17 +35,19 @@ import java.util.Map;
 public class JsonUtils {
 
     @Getter
-    private static ObjectMapper objectMapper = new ObjectMapper();
+    private static ObjectMapper objectMapper = buildObjectMapper();
 
-    static {
-        objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL); // 忽略 null 值
-        // 解决 LocalDateTime 的序列化
+    private static ObjectMapper buildObjectMapper() {
         SimpleModule simpleModule = new JavaTimeModule()
+                // 解决 LocalDateTime 的序列化
                 .addSerializer(LocalDateTime.class, TimestampLocalDateTimeSerializer.INSTANCE)
                 .addDeserializer(LocalDateTime.class, TimestampLocalDateTimeDeserializer.INSTANCE);
-        objectMapper.registerModules(simpleModule);
+        return JsonMapper.builder()
+                .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
+                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                .defaultPropertyInclusion(JsonInclude.Value.construct(JsonInclude.Include.NON_NULL, JsonInclude.Include.NON_NULL))
+                .addModule(simpleModule)
+                .build();
     }
 
     /**
@@ -78,7 +82,7 @@ public class JsonUtils {
         }
         try {
             return objectMapper.readValue(text, clazz);
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             log.error("json parse err,json:{}", text, e);
             throw new RuntimeException(e);
         }
@@ -92,7 +96,7 @@ public class JsonUtils {
             JsonNode treeNode = objectMapper.readTree(text);
             JsonNode pathNode = treeNode.path(path);
             return objectMapper.readValue(pathNode.toString(), clazz);
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             log.error("json parse err,json:{}", text, e);
             throw new RuntimeException(e);
         }
@@ -104,7 +108,7 @@ public class JsonUtils {
         }
         try {
             return objectMapper.readValue(text, objectMapper.getTypeFactory().constructType(type));
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             log.error("json parse err,json:{}", text, e);
             throw new RuntimeException(e);
         }
@@ -153,7 +157,7 @@ public class JsonUtils {
     public static <T> T parseObject(String text, TypeReference<T> typeReference) {
         try {
             return objectMapper.readValue(text, typeReference);
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             log.error("json parse err,json:{}", text, e);
             throw new RuntimeException(e);
         }
@@ -169,7 +173,7 @@ public class JsonUtils {
     public static <T> T parseObjectQuietly(String text, TypeReference<T> typeReference) {
         try {
             return objectMapper.readValue(text, typeReference);
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             return null;
         }
     }
@@ -186,7 +190,7 @@ public class JsonUtils {
         }
         try {
             return objectMapper.readValue(text, new TypeReference<Map<String, Object>>() {});
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             return null;
         }
     }
@@ -204,7 +208,7 @@ public class JsonUtils {
         }
         try {
             return objectMapper.readValue(text, clazz);
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             return null;
         }
     }
@@ -215,7 +219,7 @@ public class JsonUtils {
         }
         try {
             return objectMapper.readValue(text, objectMapper.getTypeFactory().constructCollectionType(List.class, clazz));
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             log.error("json parse err,json:{}", text, e);
             throw new RuntimeException(e);
         }
@@ -229,7 +233,7 @@ public class JsonUtils {
             JsonNode treeNode = objectMapper.readTree(text);
             JsonNode pathNode = treeNode.path(path);
             return objectMapper.readValue(pathNode.toString(), objectMapper.getTypeFactory().constructCollectionType(List.class, clazz));
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             log.error("json parse err,json:{}", text, e);
             throw new RuntimeException(e);
         }
@@ -238,7 +242,7 @@ public class JsonUtils {
     public static JsonNode parseTree(String text) {
         try {
             return objectMapper.readTree(text);
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             log.error("json parse err,json:{}", text, e);
             throw new RuntimeException(e);
         }
