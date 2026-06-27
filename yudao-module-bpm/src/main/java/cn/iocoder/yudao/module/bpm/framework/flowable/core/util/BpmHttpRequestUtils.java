@@ -166,7 +166,7 @@ public class BpmHttpRequestUtils {
     /**
      * 添加 HTTP 请求参数。请求头或者请求体
      *
-     * @param params           HTTP 请求参数
+     * @param headers          HTTP 请求头
      * @param paramSettings    HTTP 请求参数设置
      * @param processVariables 流程变量
      */
