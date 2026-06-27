@@ -84,12 +84,6 @@
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>dynamic-datasource-spring-boot4-starter</artifactId> <!-- 多数据源 -->
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-undertow</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>
