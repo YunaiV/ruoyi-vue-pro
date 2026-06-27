@@ -37,6 +37,7 @@ public class JsonUtils {
 
     private static ObjectMapper buildObjectMapper() {
         SimpleModule simpleModule = new SimpleModule()
+                // 解决 LocalDateTime 的序列化
                 .addSerializer(LocalDateTime.class, TimestampLocalDateTimeSerializer.INSTANCE)
                 .addDeserializer(LocalDateTime.class, TimestampLocalDateTimeDeserializer.INSTANCE);
         return JsonMapper.builder()
