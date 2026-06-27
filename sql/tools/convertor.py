@@ -871,7 +871,9 @@ class DM8Convertor(Convertor):
         type = type.lower()
 
         if type == "varchar":
-            return f"varchar({size})"
+            # MySQL varchar(n) is character-oriented. DM8 may treat varchar(n)
+            # as bytes, so use explicit CHAR semantics for generated scripts.
+            return f"varchar({size} char)"
         if type in ("int", "int unsigned"):
             return "int"
         if type in ("bigint", "bigint unsigned"):
