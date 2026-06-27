@@ -38,7 +38,7 @@
     <properties>
         <revision>2026.05-SNAPSHOT</revision>
         <!-- Maven 相关 -->
-        <java.version>21</java.version>
+        <java.version>25</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <maven-surefire-plugin.version>3.5.3</maven-surefire-plugin.version>
