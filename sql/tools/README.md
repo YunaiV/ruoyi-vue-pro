@@ -57,9 +57,11 @@ docker load -i dm8_20240715_x86_rh6_rq_single.tar
 ```Bash
 docker compose up -d dm8
 # 注意：启动完 dm 后，需要手动再执行如下命令，因为 dm 不支持初始化脚本
-docker compose exec dm8 bash -c '/opt/dmdbms/bin/disql SYSDBA/SYSDBA001 \`/tmp/schema.sql'
+docker compose exec dm8 bash -c 'printf "SET DEFINE OFF;\n" > /tmp/schema-with-define-off.sql && cat /tmp/schema.sql >> /tmp/schema-with-define-off.sql && /opt/dmdbms/bin/disql SYSDBA/SYSDBA001 \`/tmp/schema-with-define-off.sql'
 exit
 ```
+
+> 注意：项目 DM8 脚本使用 `varchar(n char)` 保持和 MySQL `varchar(n)` 一致的字符长度语义，建议初始化 DM8 时使用 `PAGE_SIZE=16`、`UNICODE_FLAG=1`。`sql/tools/docker-compose.yaml` 已按该配置提供示例。使用 `disql` 导入时需要先执行 `SET DEFINE OFF;`，避免数据里的 `&` 被当作变量替换。
 
 ### 1.6 KingbaseES 人大金仓
 
