@@ -1,5 +1,5 @@
 <p align="center">
- <img src="https://img.shields.io/badge/Spring%20Boot-3.5.15-blue.svg" alt="Downloads">
+ <img src="https://img.shields.io/badge/Spring%20Boot-4.1.0-blue.svg" alt="Downloads">
  <img src="https://img.shields.io/badge/Vue-3.2-blue.svg" alt="Downloads">
  <img src="https://img.shields.io/github/license/YunaiV/ruoyi-vue-pro" alt="Downloads" />
 </p>
@@ -350,26 +350,26 @@
 
 | 框架                                                                                          | 说明               | 版本             | 学习指南                                                           |
 |---------------------------------------------------------------------------------------------|------------------|----------------|----------------------------------------------------------------|
-| [Spring Boot](https://spring.io/projects/spring-boot)                                       | 应用开发框架           | 3.5.15         | [文档](https://github.com/YunaiV/SpringBoot-Labs)                |
+| [Spring Boot](https://spring.io/projects/spring-boot)                                       | 应用开发框架           | 4.1.0          | [文档](https://github.com/YunaiV/SpringBoot-Labs)                |
 | [MySQL](https://www.mysql.com/cn/)                                                          | 数据库服务器           | 5.7 / 8.0+     |                                                                |
 | [Druid](https://github.com/alibaba/druid)                                                   | JDBC 连接池、监控组件    | 1.2.28         | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
 | [MyBatis Plus](https://mp.baomidou.com/)                                                    | MyBatis 增强工具包    | 3.5.16         | [文档](http://www.iocoder.cn/Spring-Boot/MyBatis/?yudao)         |
 | [Dynamic Datasource](https://dynamic-datasource.com/)                                       | 动态数据源            | 4.5.0          | [文档](http://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao) |
 | [Redis](https://redis.io/)                                                                  | key-value 数据库    | 5.0 / 6.0 /7.0 |                                                                |
 | [Redisson](https://github.com/redisson/redisson)                                            | Redis 客户端        | 4.6.1          | [文档](http://www.iocoder.cn/Spring-Boot/Redis/?yudao)           |
-| [Spring MVC](https://github.com/spring-projects/spring-framework/tree/master/spring-webmvc) | MVC 框架           | 6.2.19         | [文档](http://www.iocoder.cn/SpringMVC/MVC/?yudao)               |
-| [Spring Security](https://github.com/spring-projects/spring-security)                       | Spring 安全框架      | 6.5.11         | [文档](http://www.iocoder.cn/Spring-Boot/Spring-Security/?yudao) |
-| [Hibernate Validator](https://github.com/hibernate/hibernate-validator)                     | 参数校验组件           | 8.0.3          | [文档](http://www.iocoder.cn/Spring-Boot/Validation/?yudao)      |
+| [Spring MVC](https://github.com/spring-projects/spring-framework/tree/master/spring-webmvc) | MVC 框架           | 7.0.8          | [文档](http://www.iocoder.cn/SpringMVC/MVC/?yudao)               |
+| [Spring Security](https://github.com/spring-projects/spring-security)                       | Spring 安全框架      | 7.1.0          | [文档](http://www.iocoder.cn/Spring-Boot/Spring-Security/?yudao) |
+| [Hibernate Validator](https://github.com/hibernate/hibernate-validator)                     | 参数校验组件           | 9.1.0          | [文档](http://www.iocoder.cn/Spring-Boot/Validation/?yudao)      |
 | [Flowable](https://github.com/flowable/flowable-engine)                                     | 工作流引擎            | 8.0.0          | [文档](https://doc.iocoder.cn/bpm/)                              |
-| [Quartz](https://github.com/quartz-scheduler)                                               | 任务调度组件           | 2.5.0          | [文档](http://www.iocoder.cn/Spring-Boot/Job/?yudao)             |
-| [Springdoc](https://springdoc.org/)                                                         | Swagger 文档       | 2.8.17         | [文档](http://www.iocoder.cn/Spring-Boot/Swagger/?yudao)         |
+| [Quartz](https://github.com/quartz-scheduler)                                               | 任务调度组件           | 2.5.2          | [文档](http://www.iocoder.cn/Spring-Boot/Job/?yudao)             |
+| [Springdoc](https://springdoc.org/)                                                         | Swagger 文档       | 3.0.3          | [文档](http://www.iocoder.cn/Spring-Boot/Swagger/?yudao)         |
 | [SkyWalking](https://skywalking.apache.org/)                                                | 分布式应用追踪系统        | 9.6.0          | [文档](http://www.iocoder.cn/Spring-Boot/SkyWalking/?yudao)      |
-| [Spring Boot Admin](https://github.com/codecentric/spring-boot-admin)                       | Spring Boot 监控平台 | 3.5.9          | [文档](http://www.iocoder.cn/Spring-Boot/Admin/?yudao)           |
-| [Jackson](https://github.com/FasterXML/jackson)                                             | JSON 工具库         | 2.21.4         |                                                                |
+| [Spring Boot Admin](https://github.com/codecentric/spring-boot-admin)                       | Spring Boot 监控平台 | 4.0.4          | [文档](http://www.iocoder.cn/Spring-Boot/Admin/?yudao)           |
+| [Jackson](https://github.com/FasterXML/jackson)                                             | JSON 工具库         | 3.1.4          |                                                                |
 | [MapStruct](https://mapstruct.org/)                                                         | Java Bean 转换     | 1.6.3          | [文档](http://www.iocoder.cn/Spring-Boot/MapStruct/?yudao)       |
 | [Lombok](https://projectlombok.org/)                                                        | 消除冗长的 Java 代码    | 1.18.46        | [文档](http://www.iocoder.cn/Spring-Boot/Lombok/?yudao)          |
-| [JUnit](https://junit.org/junit5/)                                                          | Java 单元测试框架      | 5.12.2         | -                                                              |
-| [Mockito](https://github.com/mockito/mockito)                                               | Java Mock 框架     | 5.17.0         | -                                                              |
+| [JUnit](https://junit.org/junit5/)                                                          | Java 单元测试框架      | 6.0.3          | -                                                              |
+| [Mockito](https://github.com/mockito/mockito)                                               | Java Mock 框架     | 5.23.0         | -                                                              |
 
 ## 🐷 演示图
 
