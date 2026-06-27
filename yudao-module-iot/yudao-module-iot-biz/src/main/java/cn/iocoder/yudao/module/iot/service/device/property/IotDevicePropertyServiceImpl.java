@@ -118,7 +118,7 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
     private List<TDengineTableField> buildTableFieldList(List<IotThingModelDO> thingModels) {
         return convertList(thingModels, thingModel -> {
             TDengineTableField field = new TDengineTableField(
-                    StrUtil.toUnderlineCase(thingModel.getIdentifier()), // TDengine 字段默认都是小写
+                    TDengineTableField.buildFieldName(thingModel.getIdentifier()),
                     TYPE_MAPPING.get(thingModel.getProperty().getDataType()));
             String dataType = thingModel.getProperty().getDataType();
             if (Objects.equals(dataType, IotDataSpecsDataTypeEnum.TEXT.getDataType())) {

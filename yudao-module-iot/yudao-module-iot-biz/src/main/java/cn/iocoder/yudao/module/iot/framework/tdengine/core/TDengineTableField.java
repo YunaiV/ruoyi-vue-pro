@@ -1,8 +1,11 @@
 package cn.iocoder.yudao.module.iot.framework.tdengine.core;
 
+import cn.hutool.core.util.StrUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.Locale;
 
 /**
  * TDEngine 表字段
@@ -59,6 +62,17 @@ public class TDengineTableField {
     public TDengineTableField(String field, String type) {
         this.field = field;
         this.type = type;
+    }
+
+    /**
+     * 构建字段名：TDengine 默认会将字段名转为小写，需要和建表、写入、查询保持一致。
+     * 例如：PT -> pt，PfT -> pf_t。
+     */
+    public static String buildFieldName(String field) {
+        if (StrUtil.isBlank(field)) {
+            return field;
+        }
+        return StrUtil.toUnderlineCase(field).toLowerCase(Locale.ROOT);
     }
 
 }

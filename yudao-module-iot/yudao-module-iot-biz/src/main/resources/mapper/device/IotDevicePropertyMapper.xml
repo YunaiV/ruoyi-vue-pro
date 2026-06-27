@@ -51,7 +51,7 @@
         TAGS ('${device.id}')
         (ts, report_time,
         <foreach item="key" collection="properties.keys" separator=",">
-            ${@cn.hutool.core.util.StrUtil@toUnderlineCase(key)}
+            ${@cn.iocoder.yudao.module.iot.framework.tdengine.core.TDengineTableField@buildFieldName(key)}
         </foreach>
         )
         VALUES
@@ -68,9 +68,9 @@
 
     <select id="selectListByHistory"
             resultType="cn.iocoder.yudao.module.iot.controller.admin.device.vo.property.IotDevicePropertyRespVO">
-        SELECT ${@cn.hutool.core.util.StrUtil@toUnderlineCase(reqVO.identifier)} AS `value`, ts AS update_time
+        SELECT ${@cn.iocoder.yudao.module.iot.framework.tdengine.core.TDengineTableField@buildFieldName(reqVO.identifier)} AS `value`, ts AS update_time
         FROM device_property_${reqVO.deviceId}
-        WHERE ${@cn.hutool.core.util.StrUtil@toUnderlineCase(reqVO.identifier)} IS NOT NULL
+        WHERE ${@cn.iocoder.yudao.module.iot.framework.tdengine.core.TDengineTableField@buildFieldName(reqVO.identifier)} IS NOT NULL
           AND ts BETWEEN ${@cn.hutool.core.date.LocalDateTimeUtil@toEpochMilli(reqVO.times[0])}
             AND ${@cn.hutool.core.date.LocalDateTimeUtil@toEpochMilli(reqVO.times[1])}
         ORDER BY ts DESC
