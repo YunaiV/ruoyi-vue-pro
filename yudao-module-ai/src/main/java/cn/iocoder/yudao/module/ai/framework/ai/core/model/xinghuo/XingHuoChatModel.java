@@ -43,8 +43,15 @@ public class XingHuoChatModel implements ChatModel {
     }
 
     @Override
+    public ChatOptions getOptions() {
+        return openAiChatModelV1.getOptions();
+    }
+
+    @Override
+    @Deprecated(forRemoval = true)
+    @SuppressWarnings("removal")
     public ChatOptions getDefaultOptions() {
-        return openAiChatModelV1.getDefaultOptions();
+        return getOptions();
     }
 
 }

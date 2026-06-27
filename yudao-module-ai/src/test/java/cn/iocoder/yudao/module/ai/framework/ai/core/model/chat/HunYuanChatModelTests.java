@@ -29,7 +29,7 @@ public class HunYuanChatModelTests {
                     .completionsPath(HunYuanChatModel.COMPLETE_PATH)
                     .apiKey("sk-abc") // apiKey
                     .build())
-            .defaultOptions(DeepSeekChatOptions.builder()
+            .options(DeepSeekChatOptions.builder()
                     .model(HunYuanChatModel.MODEL_DEFAULT) // 模型
                     .temperature(0.7)
                     .build())
@@ -91,7 +91,7 @@ public class HunYuanChatModelTests {
                     .completionsPath(HunYuanChatModel.COMPLETE_PATH)
                     .apiKey("sk-abc") // apiKey
                     .build())
-            .defaultOptions(DeepSeekChatOptions.builder()
+            .options(DeepSeekChatOptions.builder()
 //                    .model(HunYuanChatModel.DEEP_SEEK_MODEL_DEFAULT) // 模型（"deepseek-v3"）
                     .model("deepseek-r1") // 模型（"deepseek-r1"）
                     .temperature(0.7)

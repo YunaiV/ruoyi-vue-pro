@@ -26,8 +26,9 @@ public class DeepSeekChatModelTests {
             .deepSeekApi(DeepSeekApi.builder()
                     .apiKey("sk-eaf4172a057344dd9bc64b1f806b6axx") // apiKey
                     .build())
-            .defaultOptions(DeepSeekChatOptions.builder()
-                    .model("deepseek-chat") // 模型
+            .options(DeepSeekChatOptions.builder()
+                    .model("deepseek-v4-flash") // 模型
+//                    .model("deepseek-v4-pro") // 模型
                     .temperature(0.7)
                     .build())
             .build();

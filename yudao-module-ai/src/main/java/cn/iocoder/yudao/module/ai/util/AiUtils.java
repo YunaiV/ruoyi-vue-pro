@@ -8,20 +8,15 @@ import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.module.ai.enums.model.AiPlatformEnum;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
-import org.springaicommunity.moonshot.MoonshotChatOptions;
-import org.springaicommunity.qianfan.QianFanChatOptions;
 import org.springframework.ai.anthropic.AnthropicChatOptions;
-import org.springframework.ai.azure.openai.AzureOpenAiChatOptions;
 import org.springframework.ai.chat.messages.*;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.deepseek.DeepSeekAssistantMessage;
 import org.springframework.ai.deepseek.DeepSeekChatOptions;
-import org.springframework.ai.minimax.MiniMaxChatOptions;
 import org.springframework.ai.ollama.api.OllamaChatOptions;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.tool.ToolCallback;
-import org.springframework.ai.zhipuai.ZhiPuAiChatOptions;
 
 import java.util.*;
 
@@ -42,7 +37,8 @@ public class AiUtils {
      * @see <a href="https://help.aliyun.com/zh/model-studio/error-code#error-url">必须开启 withMultiModel 参数</a>
      */
     public static final Set<String> TONG_YI_MULTI_MODELS = SetUtils.asSet(
-            // qwen3.5 / 3.6 系列（统一多模态主干）
+            // qwen3.5 / 3.6 / 3.7 系列（统一多模态主干）
+            "qwen3.7-max", "qwen3.7-plus", "qwen3.7-flash",
             "qwen3.6-plus", "qwen3.6-flash",
             "qwen3.5-plus", "qwen3.5-flash",
             // qwen-vl 视觉理解
@@ -72,23 +68,16 @@ public class AiUtils {
                         .enableThinking(true) // TODO 芋艿：默认都开启 thinking 模式，后续可以让用户配置
                         .multiModel(TONG_YI_MULTI_MODELS.contains(model)) // 是否多模态模型
                         .toolCallbacks(toolCallbacks).toolContext(toolContext).build();
-            case YI_YAN:
-                return QianFanChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens).build();
             case DEEP_SEEK:
             case DOU_BAO: // 复用 DeepSeek 客户端
             case HUN_YUAN: // 复用 DeepSeek 客户端
             case SILICON_FLOW: // 复用 DeepSeek 客户端
             case XING_HUO: // 复用 DeepSeek 客户端
+            case YI_YAN: // 复用 DeepSeek 客户端
+            case ZHI_PU: // 复用 DeepSeek 客户端
+            case MINI_MAX: // 复用 DeepSeek 客户端
+            case MOONSHOT: // 复用 DeepSeek 客户端
                 return DeepSeekChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)
-                        .toolCallbacks(toolCallbacks).toolContext(toolContext).build();
-            case ZHI_PU:
-                return ZhiPuAiChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)
-                        .toolCallbacks(toolCallbacks).toolContext(toolContext).build();
-            case MINI_MAX:
-                return MiniMaxChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)
-                        .toolCallbacks(toolCallbacks).toolContext(toolContext).build();
-            case MOONSHOT:
-                return MoonshotChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)
                         .toolCallbacks(toolCallbacks).toolContext(toolContext).build();
             case OPENAI:
             case GEMINI: // 复用 OpenAI 客户端
@@ -97,7 +86,8 @@ public class AiUtils {
                 return OpenAiChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)
                         .toolCallbacks(toolCallbacks).toolContext(toolContext).build();
             case AZURE_OPENAI:
-                return AzureOpenAiChatOptions.builder().deploymentName(model).temperature(temperature).maxTokens(maxTokens)
+                return OpenAiChatOptions.builder().model(model).deploymentName(model).azure(true)
+                        .temperature(temperature).maxTokens(maxTokens)
                         .toolCallbacks(toolCallbacks).toolContext(toolContext).build();
             case ANTHROPIC:
                 return AnthropicChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)

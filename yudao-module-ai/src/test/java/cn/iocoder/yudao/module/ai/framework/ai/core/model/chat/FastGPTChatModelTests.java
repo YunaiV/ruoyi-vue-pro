@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.ai.framework.ai.core.model.chat;
 
-import com.openai.client.okhttp.OpenAIOkHttpClient;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.messages.Message;
@@ -9,6 +8,7 @@ import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.openai.OpenAiChatOptions;
 import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;
@@ -23,7 +23,7 @@ import java.util.Objects;
 public class FastGPTChatModelTests {
 
     private final OpenAiChatModel chatModel = OpenAiChatModel.builder()
-            .openAiClient(OpenAIOkHttpClient.builder()
+            .options(OpenAiChatOptions.builder()
                     .baseUrl("https://cloud.fastgpt.cn/api")
                     .apiKey("fastgpt-aqcc61kFtF8CeaglnGAfQOCIDWwjGdJVJHv6hIlMo28otFlva2aZNK") // apiKey
                     .build())

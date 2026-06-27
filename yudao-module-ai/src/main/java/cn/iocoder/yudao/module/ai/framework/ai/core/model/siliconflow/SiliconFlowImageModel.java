@@ -29,9 +29,9 @@ import org.springframework.ai.model.ModelOptionsUtils;
 import org.springframework.ai.openai.OpenAiImageModel;
 import org.springframework.ai.openai.metadata.OpenAiImageGenerationMetadata;
 import org.springframework.ai.retry.RetryUtils;
+import org.springframework.core.retry.RetryTemplate;
 import org.springframework.http.ResponseEntity;
 import org.jspecify.annotations.Nullable;
-import org.springframework.retry.support.RetryTemplate;
 import org.springframework.util.Assert;
 
 import java.util.List;
@@ -95,8 +95,8 @@ public class SiliconFlowImageModel implements ImageModel {
 			.observation(this.observationConvention, DEFAULT_OBSERVATION_CONVENTION, () -> observationContext,
 					this.observationRegistry)
 			.observe(() -> {
-				ResponseEntity<SiliconFlowImageApi.SiliconFlowImageResponse> imageResponseEntity = this.retryTemplate
-					.execute(ctx -> this.siliconFlowImageApi.createImage(imageRequest));
+					ResponseEntity<SiliconFlowImageApi.SiliconFlowImageResponse> imageResponseEntity = RetryUtils.execute(
+							this.retryTemplate, () -> this.siliconFlowImageApi.createImage(imageRequest));
 
 				ImageResponse imageResponse = convertResponse(imageResponseEntity, imageRequest);
 

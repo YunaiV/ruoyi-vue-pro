@@ -29,7 +29,7 @@ public class XingHuoChatModelTests {
                 .completionsPath(XingHuoChatModel.BASE_COMPLETIONS_PATH_V2)
                 .apiKey("75b161ed2aef4719b275d6e7f2a4d4cd:YWYxYWI2MTA4ODI2NGZlYTQyNjAzZTcz") // appKey:secretKey
                 .build())
-        .defaultOptions(DeepSeekChatOptions.builder()
+        .options(DeepSeekChatOptions.builder()
 //                .model("generalv3.5") // 模型
                 .model("x1") // 模型
                 .temperature(0.7)

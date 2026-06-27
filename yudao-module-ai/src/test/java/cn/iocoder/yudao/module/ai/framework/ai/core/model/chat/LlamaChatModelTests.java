@@ -27,7 +27,7 @@ public class LlamaChatModelTests {
             .ollamaApi(OllamaApi.builder()
                     .baseUrl("http://127.0.0.1:11434")  // Ollama 服务地址
                     .build())
-            .defaultOptions(OllamaChatOptions.builder()
+            .options(OllamaChatOptions.builder()
                     .model(OllamaModel.LLAMA3.getName()) // 模型
                     .build())
             .build();

@@ -8,6 +8,25 @@ spring:
   main:
     allow-circular-references: true # 允许循环依赖，因为项目是三层架构，无法避免这个情况。
 
+  autoconfigure:
+    # noinspection SpringBootApplicationYaml
+    exclude:
+      - org.springframework.ai.vectorstore.qdrant.autoconfigure.QdrantVectorStoreAutoConfiguration # 禁用 AI 模块的 Qdrant，手动创建
+      - org.springframework.ai.vectorstore.redis.autoconfigure.RedisVectorStoreAutoConfiguration # 禁用 AI 模块的 Redis，手动创建
+      - org.springframework.ai.vectorstore.milvus.autoconfigure.MilvusVectorStoreAutoConfiguration # 禁用 AI 模块的 Milvus，手动创建
+      - org.dromara.trans.config.TransServiceConfig # TODO 芋艿：easy-trans 兼容 Spring Boot 4 后移除（TransServiceConfig 引用了已移除的 RestTemplateBuilder）
+      # TODO 芋艿：spring-ai-alibaba 2.0.0-M1.1 的 DashScope 自动配置暂不兼容 Spring AI 2.0.0
+      - com.alibaba.cloud.ai.autoconfigure.dashscope.DashScopeChatAutoConfiguration
+      - com.alibaba.cloud.ai.autoconfigure.dashscope.DashScopeAgentAutoConfiguration
+      - com.alibaba.cloud.ai.autoconfigure.dashscope.DashScopeImageAutoConfiguration
+      - com.alibaba.cloud.ai.autoconfigure.dashscope.DashScopeVideoAutoConfiguration
+      - com.alibaba.cloud.ai.autoconfigure.dashscope.DashScopeAudioSpeechAutoConfiguration
+      - com.alibaba.cloud.ai.autoconfigure.dashscope.DashScopeAudioTranscriptionAutoConfiguration
+      - com.alibaba.cloud.ai.autoconfigure.dashscope.DashScopeRerankAutoConfiguration
+      - com.alibaba.cloud.ai.autoconfigure.dashscope.DashScopeEmbeddingAutoConfiguration
+      - com.alibaba.cloud.ai.autoconfigure.dashscope.DashScopeMultimodalEmbeddingAutoConfiguration
+      - com.alibaba.cloud.ai.autoconfigure.dashscope.DashScopeAsyncToolCallingManagerAutoConfiguration
+
   # Servlet 配置
   servlet:
     # 文件上传相关配置项
@@ -153,11 +172,6 @@ spring:
         client:
           host: 127.0.0.1
           port: 19530
-    qianfan: # 文心一言
-      api-key: x0cuLZ7XsaTCU08vuJWO87Lg
-      secret-key: R9mYF9dl9KASgi5RUq0FQt3wRisSnOcK
-    zhipuai: # 智谱 AI
-      api-key: 32f84543e54eee31f8d56b2bd6020573.3vh9idLJZ2ZhxDEs
     openai: # OpenAI 官方
       api-key: sk-aN6nWn3fILjrgLFT0fC4Aa60B72e4253826c77B29dC94f17
       base-url: https://api.gptsapi.net
@@ -174,10 +188,6 @@ spring:
       api-key: sk-e53UqbboF8QJCscYvzJscJxJXoFcFg4iJjl1oqgE7baJETmx
     dashscope: # 通义千问
       api-key: sk-47aa124781be4bfb95244cc62f6xxxx
-    minimax: # Minimax：https://www.minimaxi.com/
-      api-key: xxxx
-    moonshot: # 月之暗面（KIMI）
-      api-key: sk-abc
     deepseek: # DeepSeek
       api-key: sk-e94db327cc7d457d99a8de8810fc6b12
       chat:
@@ -230,6 +240,22 @@ yudao:
       enable: true
       api-key: sk-abc
       model: Baichuan4-Turbo
+    yiyan: # 文心一言
+      enable: false
+      api-key: bce-v3/xxxx
+      model: ernie-4.0-8k-latest
+    zhipu: # 智谱 AI（GLM）
+      enable: false
+      api-key: sk-abc
+      model: glm-5.2
+    minimax: # MiniMax
+      enable: false
+      api-key: xxxx
+      model: MiniMax-M3
+    moonshot: # 月之暗面（KIMI）
+      enable: false
+      api-key: sk-abc
+      model: kimi-k2.6
     midjourney:
       enable: true
   #    base-url: https://api.holdai.top/mj-relax/mj

@@ -1,15 +1,16 @@
 package cn.iocoder.yudao.module.ai.framework.ai.core.model.chat;
 
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.moonshot.MoonshotChatModel;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.springaicommunity.moonshot.MoonshotChatModel;
-import org.springaicommunity.moonshot.MoonshotChatOptions;
-import org.springaicommunity.moonshot.api.MoonshotApi;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.deepseek.DeepSeekChatModel;
+import org.springframework.ai.deepseek.DeepSeekChatOptions;
+import org.springframework.ai.deepseek.api.DeepSeekApi;
 import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;
@@ -22,14 +23,17 @@ import java.util.List;
  */
 public class MoonshotChatModelTests {
 
-    private final MoonshotChatModel chatModel = MoonshotChatModel.builder()
-            .moonshotApi(MoonshotApi.builder()
-                    .apiKey("sk-aHYYV1SARscItye5QQRRNbXij4fy65Ee7pNZlC9gsSQnUKXA") // 密钥
+    private final MoonshotChatModel chatModel = new MoonshotChatModel(DeepSeekChatModel.builder()
+            .deepSeekApi(DeepSeekApi.builder()
+                    .baseUrl(MoonshotChatModel.BASE_URL)
+                    .completionsPath(MoonshotChatModel.COMPLETE_PATH)
+                    .apiKey("sk-xxx") // 密钥
                     .build())
-            .defaultOptions(MoonshotChatOptions.builder()
-                    .model("kimi-k2-0711-preview") // 模型
+            .options(DeepSeekChatOptions.builder()
+                    .model(MoonshotChatModel.MODEL_DEFAULT) // 模型
+                    .temperature(1D)
                     .build())
-            .build();
+            .build());
 
     @Test
     @Disabled
@@ -63,16 +67,14 @@ public class MoonshotChatModelTests {
         }).then().block();
     }
 
-    // TODO @芋艿：暂时没解析 reasoning_content 结果，需要等官方修复
     @Test
     @Disabled
     public void testStream_thinking() {
         // 准备参数
         List<Message> messages = new ArrayList<>();
         messages.add(new UserMessage("详细分析下，如何设计一个电商系统？"));
-        MoonshotChatOptions options = MoonshotChatOptions.builder()
-//                .model("kimi-k2-0711-preview")
-                .model("kimi-thinking-preview")
+        DeepSeekChatOptions options = DeepSeekChatOptions.builder()
+                .model(MoonshotChatModel.MODEL_DEFAULT)
                 .build();
 
         // 调用

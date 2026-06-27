@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.ai.framework.ai.core.model.image;
 
-import com.openai.client.okhttp.OpenAIOkHttpClient;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.image.ImageOptions;
@@ -16,10 +15,12 @@ import org.springframework.ai.openai.OpenAiImageOptions;
  */
 public class OpenAiImageModelTests {
 
-    private final OpenAiImageModel imageModel = new OpenAiImageModel(OpenAIOkHttpClient.builder()
-            .baseUrl("https://api.holdai.top") // apiKey
-            .apiKey("sk-PytRecQlmjEteoa2RRN6cGnwslo72UUPLQVNEMS6K9yjbmpD")
-            .build());
+    private final OpenAiImageModel imageModel = OpenAiImageModel.builder()
+            .options(OpenAiImageOptions.builder()
+                    .baseUrl("https://api.holdai.top") // apiKey
+                    .apiKey("sk-xxx")
+                    .build())
+            .build();
 
     @Test
     @Disabled

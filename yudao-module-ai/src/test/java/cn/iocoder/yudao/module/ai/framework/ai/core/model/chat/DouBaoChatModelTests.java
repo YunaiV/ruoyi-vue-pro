@@ -32,7 +32,7 @@ public class DouBaoChatModelTests {
                     .completionsPath(DouBaoChatModel.COMPLETE_PATH)
                     .apiKey("5c1b5747-26d2-4ebd-a4e0-dd0e8d8b4272") // apiKey
                     .build())
-            .defaultOptions(DeepSeekChatOptions.builder()
+            .options(DeepSeekChatOptions.builder()
                     .model("doubao-1-5-lite-32k-250115") // 模型（doubao）
 //                    .model("doubao-seed-1-6-thinking-250715") // 模型（doubao）
 //                    .model("deepseek-r1-250120") // 模型（deepseek）

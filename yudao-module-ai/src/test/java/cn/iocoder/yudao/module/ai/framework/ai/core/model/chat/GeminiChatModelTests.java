@@ -1,7 +1,6 @@
 package cn.iocoder.yudao.module.ai.framework.ai.core.model.chat;
 
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.gemini.GeminiChatModel;
-import com.openai.client.okhttp.OpenAIOkHttpClient;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.messages.Message;
@@ -24,11 +23,9 @@ import java.util.List;
 public class GeminiChatModelTests {
 
     private final OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
-        .openAiClient(OpenAIOkHttpClient.builder()
+        .options(OpenAiChatOptions.builder()
                 .baseUrl(GeminiChatModel.BASE_URL)
                 .apiKey("AIzaSyAVoBxgoFvvte820vEQMma2LKBnC98bqMQ")
-                .build())
-        .options(OpenAiChatOptions.builder()
                 .model(GeminiChatModel.MODEL_DEFAULT) // 模型
                 .temperature(0.7)
                 .build())

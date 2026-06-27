@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.ai.framework.ai.core.model.chat;
 
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.zhipu.ZhiPuChatModel;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.messages.Message;
@@ -7,27 +8,30 @@ import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.zhipuai.ZhiPuAiChatModel;
-import org.springframework.ai.zhipuai.ZhiPuAiChatOptions;
-import org.springframework.ai.zhipuai.api.ZhiPuAiApi;
+import org.springframework.ai.deepseek.DeepSeekChatModel;
+import org.springframework.ai.deepseek.DeepSeekChatOptions;
+import org.springframework.ai.deepseek.api.DeepSeekApi;
 import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * {@link ZhiPuAiChatModel} 的集成测试
+ * {@link ZhiPuChatModel} 的集成测试
  *
  * @author 芋道源码
  */
 public class ZhiPuAiChatModelTests {
 
-    private final ZhiPuAiChatModel chatModel = new ZhiPuAiChatModel(
-            ZhiPuAiApi.builder().apiKey("2f35fb6ca4ea41fab898729b7fac086c.6ESSfPcCkxaKEUlR").build(), // 密钥
-            ZhiPuAiChatOptions.builder()
-                    .model(ZhiPuAiApi.ChatModel.GLM_4.getName()) // 模型
+    private final ZhiPuChatModel chatModel = new ZhiPuChatModel(DeepSeekChatModel.builder()
+            .deepSeekApi(DeepSeekApi.builder()
+                    .baseUrl(ZhiPuChatModel.BASE_URL)
+                    .apiKey("sk-xxx") // 密钥
+                    .build())
+            .options(DeepSeekChatOptions.builder()
+                    .model(ZhiPuChatModel.MODEL_DEFAULT) // 模型
                     .build()
-    );
+            ).build());
 
     @Test
     @Disabled
@@ -61,15 +65,14 @@ public class ZhiPuAiChatModelTests {
         }).then().block();
     }
 
-    // TODO @芋艿：暂时没解析 reasoning_content 结果，需要等官方修复
     @Test
     @Disabled
     public void testStream_thinking() {
         // 准备参数
         List<Message> messages = new ArrayList<>();
         messages.add(new UserMessage("详细分析下，如何设计一个电商系统？"));
-        ZhiPuAiChatOptions options = ZhiPuAiChatOptions.builder()
-                .model("GLM-4.5")
+        DeepSeekChatOptions options = DeepSeekChatOptions.builder()
+                .model(ZhiPuChatModel.MODEL_DEFAULT)
                 .build();
 
         // 调用

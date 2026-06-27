@@ -1,7 +1,5 @@
 package cn.iocoder.yudao.module.ai.framework.ai.core.model.chat;
 
-import com.openai.client.okhttp.OpenAIOkHttpClient;
-import com.azure.ai.openai.models.ReasoningEffortValue;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.messages.Message;
@@ -25,11 +23,9 @@ import java.util.Objects;
 public class OpenAIChatModelTests {
 
     private final OpenAiChatModel chatModel = OpenAiChatModel.builder()
-            .openAiClient(OpenAIOkHttpClient.builder()
-                    .baseUrl("https://api.holdai.top")
-                    .apiKey("sk-z5joyRoV1iFEnh2SAi8QPNrIZTXyQSyxTmD5CoNDQbFixK2l") // apiKey
-                    .build())
             .options(OpenAiChatOptions.builder()
+                    .baseUrl("https://api.holdai.top")
+                    .apiKey("sk-xxx") // apiKey
                     .model("gpt-5-nano-2025-08-07") // 模型
 //                    .model("o1") // 模型
                     .temperature(0.7)
@@ -79,7 +75,7 @@ public class OpenAIChatModelTests {
                 .model("gpt-5")
 //                .model("o4-mini")
 //                .model("o3-pro")
-                .reasoningEffort(ReasoningEffortValue.LOW.getValue())
+                .reasoningEffort("low")
                 .build();
 
         // 调用

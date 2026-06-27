@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.ai.framework.ai.core.model.chat;
 
-import com.anthropic.client.okhttp.AnthropicOkHttpClient;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.anthropic.AnthropicChatModel;
@@ -23,11 +22,9 @@ import java.util.List;
 public class AnthropicChatModelTest {
 
     private final AnthropicChatModel chatModel = AnthropicChatModel.builder()
-            .anthropicClient(AnthropicOkHttpClient.builder()
+            .options(AnthropicChatOptions.builder()
                     .apiKey("sk-muubv7cXeLw0Etgs743f365cD5Ea44429946Fa7e672d8942")
                     .baseUrl("https://aihubmix.com")
-                    .build())
-            .options(AnthropicChatOptions.builder()
                     .model("claude-sonnet-4-5")
                     .temperature(0.7)
                     .maxTokens(4096)

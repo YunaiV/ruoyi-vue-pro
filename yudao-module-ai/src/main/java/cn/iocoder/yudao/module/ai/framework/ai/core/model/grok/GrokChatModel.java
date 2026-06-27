@@ -37,8 +37,15 @@ public class GrokChatModel implements ChatModel {
     }
 
     @Override
+    public ChatOptions getOptions() {
+        return openAiChatModel.getOptions();
+    }
+
+    @Override
+    @Deprecated(forRemoval = true)
+    @SuppressWarnings("removal")
     public ChatOptions getDefaultOptions() {
-        return openAiChatModel.getDefaultOptions();
+        return getOptions();
     }
 
 }
