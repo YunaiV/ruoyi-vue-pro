@@ -23,10 +23,10 @@
 
 ## 🐰 版本说明
 
-| 版本                                                                  | JDK 8 + Spring Boot 2.7                                                   | JDK 17 + Spring Boot 3.5                                                              |
-|---------------------------------------------------------------------|---------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
-| 【完整版】[ruoyi-vue-pro](https://gitee.com/zhijiantianya/ruoyi-vue-pro) | [`master`](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/master/) 分支 | [`master-jdk17`](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/master-jdk17/) 分支 |
-| 【精简版】[yudao-boot-mini](https://gitee.com/yudaocode/yudao-boot-mini) | [`master`](https://gitee.com/yudaocode/yudao-boot-mini/tree/master/) 分支   | [`master-jdk17`](https://gitee.com/yudaocode/yudao-boot-mini/tree/master-jdk17/) 分支   |
+| 版本                                                                  | JDK 8 + Spring Boot 2.7                                                   | JDK 17/21 + Spring Boot 3.5                                                           | JDK 25 + Spring Boot 4.x                                                              |
+|---------------------------------------------------------------------|---------------------------------------------------------------------------|---------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
+| 【完整版】[ruoyi-vue-pro](https://gitee.com/zhijiantianya/ruoyi-vue-pro) | [`master`](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/master/) 分支 | [`master-jdk17`](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/master-jdk17/) 分支 | [`master-jdk25`](https://gitee.com/zhijiantianya/ruoyi-vue-pro/tree/master-jdk25/) 分支 |
+| 【精简版】[yudao-boot-mini](https://gitee.com/yudaocode/yudao-boot-mini) | [`master`](https://gitee.com/yudaocode/yudao-boot-mini/tree/master/) 分支   | [`master-jdk17`](https://gitee.com/yudaocode/yudao-boot-mini/tree/master-jdk17/) 分支   | [`master-jdk25`](https://gitee.com/yudaocode/yudao-boot-mini/tree/master-jdk25/) 分支   |
 
 * 【完整版】：包括系统功能、基础设施、会员中心、数据报表、工作流程、商城系统、微信公众号、CRM、ERP、WMS、MES、IM 即时通讯、AI 大模型、IoT 物联网等功能
 * 【精简版】：只包括系统功能、基础设施功能，不包括会员中心、数据报表、工作流程、商城系统、微信公众号、CRM、ERP、WMS、MES、IM 即时通讯、AI 大模型、IoT 物联网等功能
@@ -43,7 +43,7 @@
 
 ![架构图](/.image/common/ruoyi-vue-pro-architecture.png)
 
-* Java 后端：`master` 分支为 JDK 8 + Spring Boot 2.7，`master-jdk17` 分支为 JDK 17 + Spring Boot 3.5
+* Java 后端：`master` 分支为 JDK 8 + Spring Boot 2.7，`master-jdk17` 分支为 JDK 17/21 + Spring Boot 3.5，`master-jdk25` 分支为 JDK 25 + Spring Boot 4.x
 * 管理后台的电脑端：Vue3 提供 `element-plus`、`vben(ant-design-vue)` 两个版本，Vue2 提供 `element-ui` 版本
 * 管理后台的移动端：采用 `uni-app` 方案，一份代码多终端适配，同时支持 APP、小程序、H5！
 * 后端采用 Spring Boot 多模块架构、MySQL + MyBatis Plus、Redis + Redisson
