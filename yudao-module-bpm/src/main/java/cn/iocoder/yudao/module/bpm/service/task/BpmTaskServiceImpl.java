@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.*;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -622,9 +623,9 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         }
 
         // 4. 校验并处理 APPROVE_USER_SELECT 当前审批人，选择下一节点审批人的逻辑
-        Map<String, Object> variables = validateAndSetNextAssignees(task.getTaskDefinitionKey(), processVariables,
+        validateAndSetNextAssignees(task.getTaskDefinitionKey(), processVariables,
                 bpmnModel, reqVO.getNextAssignees(), instance);
-        runtimeService.setVariables(task.getProcessInstanceId(), variables);
+        runtimeService.setVariables(task.getProcessInstanceId(), processVariables);
 
         // 5. 如果当前节点 Id 存在于需要预测的流程节点中，从中移除。 流程变量在回退操作中设置
         Object needSimulateTaskIds = runtimeService.getVariable(task.getProcessInstanceId(), BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_NEED_SIMULATE_TASK_IDS);
@@ -642,7 +643,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         }
 
         // 7. 调用 BPM complete 去完成任务
-        taskService.complete(task.getId(), variables, true);
+        Map<String,Object> taskVariables = MapUtil.emptyIfNull(reqVO.getVariables()); // task local variables. 一般用于任务内嵌流程表单
+        taskService.complete(task.getId(), taskVariables, true);
 
         // 【加签专属】处理加签任务
         handleParentTaskIfSign(task.getParentTaskId());
