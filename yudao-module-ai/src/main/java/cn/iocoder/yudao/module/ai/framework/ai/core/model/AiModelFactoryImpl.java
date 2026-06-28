@@ -256,6 +256,8 @@ public class AiModelFactoryImpl implements AiModelFactory {
                     return buildTongYiEmbeddingModel(apiKey, model);
                 case OPENAI:
                     return buildOpenAiEmbeddingModel(apiKey, url, model);
+                case AZURE_OPENAI:
+                    return buildAzureOpenAiEmbeddingModel(apiKey, url, model);
                 case OLLAMA:
                     return buildOllamaEmbeddingModel(url, model);
                 default:
@@ -522,6 +524,21 @@ public class AiModelFactoryImpl implements AiModelFactory {
         OpenAiEmbeddingOptions.Builder optionsBuilder = OpenAiEmbeddingOptions.builder()
                 .apiKey(openAiToken)
                 .model(model);
+        if (StrUtil.isNotEmpty(url)) {
+            optionsBuilder.baseUrl(url);
+        }
+        return OpenAiEmbeddingModel.builder()
+                .metadataMode(MetadataMode.EMBED)
+                .options(optionsBuilder.build())
+                .build();
+    }
+
+    private OpenAiEmbeddingModel buildAzureOpenAiEmbeddingModel(String openAiToken, String url, String model) {
+        OpenAiEmbeddingOptions.Builder optionsBuilder = OpenAiEmbeddingOptions.builder()
+                .apiKey(openAiToken)
+                .model(model)
+                .deploymentName(model)
+                .azure(true);
         if (StrUtil.isNotEmpty(url)) {
             optionsBuilder.baseUrl(url);
         }
