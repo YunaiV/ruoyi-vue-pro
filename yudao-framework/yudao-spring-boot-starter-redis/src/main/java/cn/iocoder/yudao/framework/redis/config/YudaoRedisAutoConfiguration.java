@@ -28,9 +28,10 @@ public class YudaoRedisAutoConfiguration {
         // 使用 String 序列化方式，序列化 KEY 。
         template.setKeySerializer(RedisSerializer.string());
         template.setHashKeySerializer(RedisSerializer.string());
-        // 使用 JSON 序列化方式（库是 Jackson ），序列化 VALUE 。
-        template.setValueSerializer(buildRedisSerializer());
-        template.setHashValueSerializer(buildRedisSerializer());
+        // 使用 JSON 序列化方式，序列化 VALUE
+        RedisSerializer<?> redisSerializer = buildRedisSerializer();
+        template.setValueSerializer(redisSerializer);
+        template.setHashValueSerializer(redisSerializer);
         return template;
     }
 

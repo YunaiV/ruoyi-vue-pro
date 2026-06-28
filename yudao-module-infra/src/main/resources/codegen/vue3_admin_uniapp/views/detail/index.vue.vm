@@ -64,10 +64,10 @@
 import type { ${simpleClassName} } from '@/api/${table.moduleName}/${table.businessName}'
 import { onUnload } from '@dcloudio/uni-app'
 import { onMounted, ref } from 'vue'
-import { useToast } from 'wot-design-uni'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { delete${simpleClassName}, get${simpleClassName} } from '@/api/${table.moduleName}/${table.businessName}'
 import { useAccess } from '@/hooks/useAccess'
-import { navigateBackPlus } from '@/utils'
+import { delay, navigateBackPlus } from '@/utils'
 #if ($hasDict == 1)
 import { DICT_TYPE } from '@/utils/constants'
 #end
@@ -133,9 +133,7 @@ function handleDelete() {
         await delete${simpleClassName}(props.id)
         toast.success('删除成功')
         uni.$emit('${table.moduleName}:${table.businessName}:reload')
-        setTimeout(() => {
-          handleBack()
-        }, 500)
+        delay(handleBack)
       } finally {
         deleting.value = false
       }

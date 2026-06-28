@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.im.dal.mysql.friend;
 
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
@@ -28,6 +29,12 @@ public interface ImFriendRequestMapper extends BaseMapperX<ImFriendRequestDO> {
 
     /**
      * 拉取「我相关」的好友申请列表
+     *
+     * @param userId               当前用户编号
+     * @param maxRequestUpdateTime 起始更新时间；首次拉取传 null
+     * @param maxId                起始记录编号；首次拉取传 null
+     * @param limit                拉取数量
+     * @return 好友申请列表
      */
     default List<ImFriendRequestDO> selectMyList(Long userId, LocalDateTime maxRequestUpdateTime,
                                                  Long maxId, int limit) {
@@ -43,6 +50,28 @@ public interface ImFriendRequestMapper extends BaseMapperX<ImFriendRequestDO> {
                 .orderByDesc(ImFriendRequestDO::getId)
                 .last("LIMIT " + limit);
         return selectList(wrapper);
+    }
+
+    /**
+     * 增量拉取「我相关」的好友申请（双向 OR，按 update_time + id 正向游标）
+     *
+     * @param userId         当前用户编号
+     * @param lastUpdateTime 上次拉取到的更新时间；首次拉取传 null
+     * @param lastId         上次拉取到的记录编号；首次拉取传 null
+     * @param limit          拉取数量
+     * @return 好友申请列表
+     */
+    default List<ImFriendRequestDO> selectPullListByUserId(Long userId, Long lastUpdateTime, Long lastId, Integer limit) {
+        LambdaQueryWrapperX<ImFriendRequestDO> query = new LambdaQueryWrapperX<>();
+        query.and(w -> w.eq(ImFriendRequestDO::getFromUserId, userId)
+                .or().eq(ImFriendRequestDO::getToUserId, userId));
+        if (lastUpdateTime != null && lastId != null) {
+            LocalDateTime lastTime = LocalDateTimeUtil.of(lastUpdateTime);
+            query.and(w -> w.gt(ImFriendRequestDO::getUpdateTime, lastTime)
+                    .or(n -> n.eq(ImFriendRequestDO::getUpdateTime, lastTime).gt(ImFriendRequestDO::getId, lastId)));
+        }
+        return selectList(query.orderByAsc(ImFriendRequestDO::getUpdateTime).orderByAsc(ImFriendRequestDO::getId)
+                .last("LIMIT " + limit));
     }
 
     default int updateByIdAndHandleResult(Long id, Integer handleResult, ImFriendRequestDO updateObj) {

@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /**
- * IM 敏感词 Service 单元测试
+ * {@link ImSensitiveWordServiceImpl} 的单元测试
  *
  * @author 芋道源码
  */

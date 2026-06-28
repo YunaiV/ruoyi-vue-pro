@@ -80,7 +80,7 @@ public interface ImStatisticsManagerService {
     Map<LocalDateTime, Long> getGroupMessageDailyCountMap(LocalDateTime beginTime, LocalDateTime endTime);
 
     /**
-     * 获取区间内消息类型分布 Map（key 为消息类型）
+     * 获取区间内内容类型分布 Map（key 为消息类型）
      */
     Map<Integer, Long> getMessageTypeCountMap(LocalDateTime beginTime, LocalDateTime endTime);
 

@@ -1,8 +1,9 @@
 package cn.iocoder.yudao.module.im.dal.dataobject.message;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.module.im.enums.message.ImMessageReceiptStatusEnum;
 import cn.iocoder.yudao.module.im.enums.message.ImMessageStatusEnum;
-import cn.iocoder.yudao.module.im.enums.message.ImMessageTypeEnum;
+import cn.iocoder.yudao.module.im.enums.ImContentTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -49,7 +50,7 @@ public class ImPrivateMessageDO extends BaseDO {
     /**
      * 消息类型
      * <p>
-     * 枚举 {@link ImMessageTypeEnum}
+     * 枚举 {@link ImContentTypeEnum}
      */
     private Integer type;
     /**
@@ -64,6 +65,12 @@ public class ImPrivateMessageDO extends BaseDO {
      * 枚举 {@link ImMessageStatusEnum}
      */
     private Integer status;
+    /**
+     * 回执状态
+     * <p>
+     * 枚举 {@link ImMessageReceiptStatusEnum}
+     */
+    private Integer receiptStatus;
     /**
      * 发送时间
      */

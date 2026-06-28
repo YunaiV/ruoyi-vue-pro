@@ -28,4 +28,8 @@ public interface PayChannelMapper extends BaseMapperX<PayChannelDO> {
                 .eq(PayChannelDO::getStatus, status));
     }
 
+    default List<PayChannelDO> selectListByAppId(Long appId) {
+        return selectList(PayChannelDO::getAppId, appId);
+    }
+
 }

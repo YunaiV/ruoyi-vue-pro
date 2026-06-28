@@ -13,6 +13,7 @@ import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
@@ -79,12 +80,29 @@ public class ImFriendRequestController {
 
     @GetMapping("/list")
     @Operation(summary = "查询「我相关」的好友申请列表（游标分页：传 maxId 加载更多）")
+    @Parameters({
+            @Parameter(name = "maxId", description = "当前列表最旧记录的 id；首页不传"),
+            @Parameter(name = "limit", description = "单次拉取条数", required = true)
+    })
     public CommonResult<List<ImFriendRequestRespVO>> getMyFriendRequestList(
-            @Parameter(description = "当前列表最旧记录的 id；首页不传")
             @RequestParam(value = "maxId", required = false) Long maxId,
-            @Parameter(description = "单次拉取条数", required = true)
             @RequestParam("limit") @Min(1) @Max(200) Integer limit) {
         List<ImFriendRequestDO> list = friendRequestService.getMyFriendRequestList(getLoginUserId(), maxId, limit);
+        return success(buildList(list));
+    }
+
+    @GetMapping("/pull")
+    @Operation(summary = "增量拉取「我相关」的好友申请（重连 / 离线补偿）")
+    @Parameters({
+            @Parameter(name = "lastUpdateTime", description = "上次拉取到的最新更新时间（毫秒时间戳）；首次拉取不传"),
+            @Parameter(name = "lastId", description = "上次拉取到的最后一条记录 id；首次拉取不传"),
+            @Parameter(name = "limit", description = "单次拉取条数", required = true)
+    })
+    public CommonResult<List<ImFriendRequestRespVO>> pullMyFriendRequestList(
+            @RequestParam(value = "lastUpdateTime", required = false) Long lastUpdateTime,
+            @RequestParam(value = "lastId", required = false) Long lastId,
+            @RequestParam("limit") @Min(1) @Max(200) Integer limit) {
+        List<ImFriendRequestDO> list = friendRequestService.pullFriendRequestList(getLoginUserId(), lastUpdateTime, lastId, limit);
         return success(buildList(list));
     }
 

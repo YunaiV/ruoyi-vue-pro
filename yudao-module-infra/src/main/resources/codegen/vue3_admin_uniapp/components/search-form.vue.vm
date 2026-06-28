@@ -40,49 +40,13 @@
         />
       </view>
     #elseif ($column.htmlType == "datetime" && $listOperationCondition == "BETWEEN")
-      #set ($AttrName = $javaField.substring(0,1).toUpperCase() + ${javaField.substring(1)})
-      <view class="yd-search-form-item">
-        <view class="yd-search-form-label">
-          ${comment}
-        </view>
-        <view class="yd-search-form-date-range-container">
-          <view @click="visible${AttrName}[0] = true">
-            <view class="yd-search-form-date-range-picker">
-              {{ formatDate(formData.${javaField}?.[0]) || '开始日期' }}
-            </view>
-          </view>
-          -
-          <view @click="visible${AttrName}[1] = true">
-            <view class="yd-search-form-date-range-picker">
-              {{ formatDate(formData.${javaField}?.[1]) || '结束日期' }}
-            </view>
-          </view>
-        </view>
-        <wd-datetime-picker-view v-if="visible${AttrName}[0]" v-model="temp${AttrName}[0]" type="date" />
-        <view v-if="visible${AttrName}[0]" class="yd-search-form-date-range-actions">
-          <wd-button size="small" plain @click="visible${AttrName}[0] = false">
-            取消
-          </wd-button>
-          <wd-button size="small" type="primary" @click="handle${AttrName}0Confirm">
-            确定
-          </wd-button>
-        </view>
-        <wd-datetime-picker-view v-if="visible${AttrName}[1]" v-model="temp${AttrName}[1]" type="date" />
-        <view v-if="visible${AttrName}[1]" class="yd-search-form-date-range-actions">
-          <wd-button size="small" plain @click="visible${AttrName}[1] = false">
-            取消
-          </wd-button>
-          <wd-button size="small" type="primary" @click="handle${AttrName}1Confirm">
-            确定
-          </wd-button>
-        </view>
-      </view>
+      <yd-search-date-range v-model="formData.${javaField}" label="${comment}" />
     #elseif (($column.htmlType == "select" || $column.htmlType == "radio") && $dictType && "" != $dictType)
       <view class="yd-search-form-item">
         <view class="yd-search-form-label">
           ${comment}
         </view>
-        <wd-radio-group v-model="formData.${javaField}" shape="button">
+        <wd-radio-group v-model="formData.${javaField}" type="button">
           <wd-radio :value="-1">
             全部
           </wd-radio>
@@ -235,29 +199,6 @@ const placeholder = computed(() => {
 #end
   return conditions.length > 0 ? conditions.join(' | ') : '搜索${table.classComment}'
 })
-
-#if ($hasDateTimeBetween == 1)
-#foreach($column in $columns)
-  #if ($column.listOperation && $column.htmlType == "datetime" && $column.listOperationCondition == "BETWEEN")
-    #set ($javaField = $column.javaField)
-    #set ($AttrName = $javaField.substring(0,1).toUpperCase() + ${javaField.substring(1)})
-const visible${AttrName} = ref<[boolean, boolean]>([false, false]) // ${column.columnComment}选择器状态
-const temp${AttrName} = ref<[number, number]>([Date.now(), Date.now()]) // ${column.columnComment}临时值
-
-/** 确认${column.columnComment}开始日期 */
-function handle${AttrName}0Confirm() {
-  formData.${javaField} = [temp${AttrName}.value[0], formData.${javaField}?.[1]]
-  visible${AttrName}.value[0] = false
-}
-
-/** 确认${column.columnComment}结束日期 */
-function handle${AttrName}1Confirm() {
-  formData.${javaField} = [formData.${javaField}?.[0], temp${AttrName}.value[1]]
-  visible${AttrName}.value[1] = false
-}
-  #end
-#end
-#end
 
 /** 搜索按钮操作 */
 function handleSearch() {

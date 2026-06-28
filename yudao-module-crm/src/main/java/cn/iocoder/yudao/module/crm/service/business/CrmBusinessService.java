@@ -196,6 +196,22 @@ public interface CrmBusinessService {
     List<CrmBusinessDO> getBusinessListByCustomerIdOwnerUserId(Long customerId, Long ownerUserId);
 
     /**
+     * 获得商机列表，基于指定客户
+     *
+     * @param customerId 客户编号
+     * @return 商机列表
+     */
+    List<CrmBusinessDO> getBusinessListByCustomerId(Long customerId);
+
+    /**
+     * 获得商机列表，基于指定联系人
+     *
+     * @param contactId 联系人编号
+     * @return 商机列表
+     */
+    List<CrmBusinessDO> getBusinessListByContact(Long contactId);
+
+    /**
      * 获得商机分页，目前用于【数据统计】
      *
      * @param pageVO 请求

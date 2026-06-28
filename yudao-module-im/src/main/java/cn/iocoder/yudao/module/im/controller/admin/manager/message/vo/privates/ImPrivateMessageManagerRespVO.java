@@ -28,13 +28,16 @@ public class ImPrivateMessageManagerRespVO {
     private String receiverNickname;
 
     @Schema(description = "消息类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    private Integer type; // 参见 ImMessageTypeEnum 枚举类
+    private Integer type; // 参见 ImContentTypeEnum 枚举类
 
     @Schema(description = "消息内容（JSON 格式）", requiredMode = Schema.RequiredMode.REQUIRED)
     private String content;
 
     @Schema(description = "消息状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
     private Integer status; // 参见 ImMessageStatusEnum 枚举类
+
+    @Schema(description = "回执状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
+    private Integer receiptStatus; // 参见 ImMessageReceiptStatusEnum 枚举类
 
     @Schema(description = "发送时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime sendTime;

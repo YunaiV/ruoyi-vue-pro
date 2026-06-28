@@ -51,10 +51,10 @@
 import type { Student } from '@/api/infra/demo'
 import { onUnload } from '@dcloudio/uni-app'
 import { onMounted, ref } from 'vue'
-import { useToast } from 'wot-design-uni'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { deleteStudent, getStudent } from '@/api/infra/demo'
 import { useAccess } from '@/hooks/useAccess'
-import { navigateBackPlus } from '@/utils'
+import { delay, navigateBackPlus } from '@/utils'
 import { DICT_TYPE } from '@/utils/constants'
 import { formatDateTime } from '@/utils/date'
 
@@ -116,9 +116,7 @@ function handleDelete() {
         await deleteStudent(props.id)
         toast.success('删除成功')
         uni.$emit('infra:demo:reload')
-        setTimeout(() => {
-          handleBack()
-        }, 500)
+        delay(handleBack)
       } finally {
         deleting.value = false
       }

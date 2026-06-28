@@ -59,8 +59,8 @@ public interface ImPrivateMessageService {
     /**
      * 标记私聊消息已读
      * <p>
-     * 语义：将「对方发给当前用户、id <= messageId 的未读消息」一次性翻转为已读，
-     * 与群聊 readGroupMessages 对称，避免"select-then-update"两步式带来的竞态。
+     * 语义：把「对方发给当前用户、id <= messageId 的待回执消息」一次性更新为已完成（DONE）并前进读位置，
+     * 与群聊 readGroupMessages 对称，避免「select-then-update」两步式带来的竞态。
      *
      * @param userId     当前用户编号
      * @param receiverId 接收方用户编号（对方）
@@ -72,7 +72,7 @@ public interface ImPrivateMessageService {
      * 查询对方已读到我发的最大消息 id
      * <p>
      * 用于多端 / 离线场景下的已读位置补齐：客户端进入会话或断线重连后，
-     * 调用此接口拿到对方的 maxReadId，再按 id <= maxReadId 翻转本地自发消息为已读，弥补离线期间错过的 RECEIPT 推送事件。
+     * 调用此接口拿到对方的 maxReadId，再按 id <= maxReadId 更新本地自发消息的回执状态，弥补离线期间错过的 RECEIPT 推送事件。
      *
      * @param userId 当前用户编号
      * @param peerId 对方用户编号

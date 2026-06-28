@@ -65,6 +65,10 @@ public interface CrmBusinessMapper extends BaseMapperX<CrmBusinessDO> {
                 .eq(CrmBusinessDO::getOwnerUserId, ownerUserId));
     }
 
+    default List<CrmBusinessDO> selectListByCustomerId(Long customerId) {
+        return selectList(CrmBusinessDO::getCustomerId, customerId);
+    }
+
     default PageResult<CrmBusinessDO> selectPage(CrmStatisticsFunnelReqVO pageVO) {
         return selectPage(pageVO, new LambdaQueryWrapperX<CrmBusinessDO>()
                 .in(CrmBusinessDO::getOwnerUserId, pageVO.getUserIds())
