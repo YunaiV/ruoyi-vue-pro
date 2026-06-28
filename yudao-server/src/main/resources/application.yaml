@@ -154,11 +154,8 @@ spring:
           host: 127.0.0.1
           port: 19530
     openai: # OpenAI 官方
-      api-key: sk-aN6nWn3fILjrgLFT0fC4Aa60B72e4253826c77B29dC94f17
-      base-url: https://api.gptsapi.net
-    azure: # OpenAI 微软
-      openai:
-        endpoint: https://eastusprejade.openai.azure.com
+      base-url: https://api.teamorouter.com/v1
+      api-key: ${OPENAI_API_KEY}
     anthropic: # Anthropic Claude
       api-key: sk-muubv7cXeLw0Etgs743f365cD5Ea44429946Fa7e672d8942
     ollama:

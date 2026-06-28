@@ -17,22 +17,26 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * {@link OpenAiChatModel} 集成测试
+ * Azure OpenAI 集成测试
  *
  * @author 芋道源码
  */
-public class OpenAIChatModelTests {
+public class AzureOpenAIChatModelTests {
 
-    private static final String BASE_URL = "https://api.teamorouter.com/v1";
-    private static final String API_KEY = SystemUtil.get("OPENAI_API_KEY",
-            "sk-xxxx"); // 按需改成你的 OpenAI API Key
-    private static final String MODEL = "gpt-5.5";
+    private static final String BASE_URL = SystemUtil.get("AZURE_OPENAI_BASE_URL",
+            "https://eastusprejade.openai.azure.com");
+    private static final String API_KEY = SystemUtil.get("AZURE_OPENAI_API_KEY",
+            "sk-xxxx"); // 按需改成你的 Azure OpenAI API Key
+    private static final String DEPLOYMENT_NAME = SystemUtil.get("AZURE_OPENAI_DEPLOYMENT_NAME",
+            "gpt-5.4"); // Azure 上创建的模型部署名称
 
     private final OpenAiChatModel chatModel = OpenAiChatModel.builder()
             .options(OpenAiChatOptions.builder()
                     .baseUrl(BASE_URL)
                     .apiKey(API_KEY)
-                    .model(MODEL)
+                    .model(DEPLOYMENT_NAME)
+                    .microsoftFoundry(true)
+                    .deploymentName(DEPLOYMENT_NAME)
                     .temperature(0.7)
                     .build())
             .build();
@@ -58,34 +62,10 @@ public class OpenAIChatModelTests {
         // 准备参数
         List<Message> messages = new ArrayList<>();
         messages.add(new SystemMessage("你是一个优质的文言文作者，用文言文描述着各城市的人文风景。"));
-        messages.add(new UserMessage("帮我推理下，怎么实现一个用户中心！"));
+        messages.add(new UserMessage("1 + 1 = ？"));
 
         // 调用
         Flux<ChatResponse> flux = chatModel.stream(new Prompt(messages));
-        // 打印结果
-        flux.doOnNext(response -> {
-//            System.out.println(response);
-            System.out.println(Objects.requireNonNull(response.getResult()).getOutput());
-        }).then().block();
-    }
-
-    // TODO @芋艿：无法触发思考的字段返回，需要 response api：https://github.com/spring-projects/spring-ai/issues/2962
-    @Test
-    @Disabled
-    public void testStream_thinking() {
-        // 准备参数
-        List<Message> messages = new ArrayList<>();
-        messages.add(new UserMessage("详细分析下，如何设计一个电商系统？"));
-        OpenAiChatOptions options = OpenAiChatOptions.builder()
-                .baseUrl(BASE_URL)
-                .apiKey(API_KEY)
-                .model(MODEL)
-                .reasoningEffort("low") // https://help.openai.com/zh-hant/articles/5072518-controlling-the-length-of-openai-model-responses
-                .maxCompletionTokens(1024)
-                .build();
-
-        // 调用
-        Flux<ChatResponse> flux = chatModel.stream(new Prompt(messages, options));
         // 打印结果
         flux.doOnNext(response -> {
 //            System.out.println(response);

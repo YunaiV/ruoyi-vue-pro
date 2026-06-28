@@ -8,6 +8,7 @@ import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.module.ai.enums.model.AiPlatformEnum;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
+import cn.hutool.extra.spring.SpringUtil;
 import org.springframework.ai.anthropic.AnthropicChatOptions;
 import org.springframework.ai.chat.messages.*;
 import org.springframework.ai.chat.model.ChatResponse;
@@ -17,8 +18,12 @@ import org.springframework.ai.deepseek.DeepSeekChatOptions;
 import org.springframework.ai.ollama.api.OllamaChatOptions;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.tool.ToolCallback;
+import org.springframework.core.env.Environment;
 
 import java.util.*;
+
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.API_CONFIG_PLACEHOLDER_NOT_RESOLVED;
 
 /**
  * Spring AI 工具类
@@ -29,6 +34,23 @@ public class AiUtils {
 
     public static final String TOOL_CONTEXT_LOGIN_USER = "LOGIN_USER";
     public static final String TOOL_CONTEXT_TENANT_ID = "TENANT_ID";
+
+    /**
+     * 解析 DB 等动态配置里的 Spring 占位符，例如 ${OPENAI_API_KEY}
+     *
+     * @param value 待解析的配置值
+     * @return 解析后的配置值
+     */
+    public static String resolveSpringPlaceholders(String value) {
+        if (StrUtil.isBlank(value) || !StrUtil.contains(value, "${")) {
+            return value;
+        }
+        try {
+            return SpringUtil.getBean(Environment.class).resolveRequiredPlaceholders(value);
+        } catch (IllegalArgumentException ex) {
+            throw exception(API_CONFIG_PLACEHOLDER_NOT_RESOLVED, value);
+        }
+    }
 
     /**
      * 通义千问支持多模态的模型
