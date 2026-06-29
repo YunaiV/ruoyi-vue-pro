@@ -13,6 +13,7 @@ import cn.iocoder.yudao.module.ai.framework.ai.core.model.minimax.MiniMaxChatMod
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.moonshot.MoonshotChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlowApiConstants;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlowChatModel;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.stepfun.StepFunChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.xinghuo.XingHuoChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.yiyan.YiYanChatModel;
@@ -363,6 +364,23 @@ public class AiAutoConfiguration {
                 properties.getTemperature(), properties.getMaxTokens(), properties.getTopP()));
     }
 
+    @Bean
+    @ConditionalOnProperty(value = "yudao.ai.stepfun.enable", havingValue = "true")
+    public StepFunChatModel stepFunChatClient(YudaoAiProperties yudaoAiProperties) {
+        YudaoAiProperties.StepFun properties = yudaoAiProperties.getStepfun();
+        return buildStepFunChatClient(properties);
+    }
+
+    public StepFunChatModel buildStepFunChatClient(YudaoAiProperties.StepFun properties) {
+        if (StrUtil.isEmpty(properties.getModel())) {
+            properties.setModel(StepFunChatModel.MODEL_DEFAULT);
+        }
+        return new StepFunChatModel(buildDeepSeekCompatibleChatModel(
+                StrUtil.blankToDefault(properties.getBaseUrl(), StepFunChatModel.BASE_URL),
+                StepFunChatModel.COMPLETE_PATH, properties.getApiKey(), properties.getModel(),
+                properties.getTemperature(), properties.getMaxTokens(), properties.getTopP()));
+    }
+
     private static DeepSeekChatModel buildDeepSeekCompatibleChatModel(String baseUrl, String completionsPath,
                                                                      String apiKey, String model,
                                                                      Double temperature, Integer maxTokens,
@@ -397,7 +415,14 @@ public class AiAutoConfiguration {
         return new SunoApi(yudaoAiProperties.getSuno().getBaseUrl());
     }
 
-    public ChatModel buildGrokChatClient(YudaoAiProperties.Grok properties) {
+    @Bean
+    @ConditionalOnProperty(value = "yudao.ai.grok.enable", havingValue = "true")
+    public GrokChatModel grokChatClient(YudaoAiProperties yudaoAiProperties) {
+        YudaoAiProperties.Grok properties = yudaoAiProperties.getGrok();
+        return buildGrokChatClient(properties);
+    }
+
+    public GrokChatModel buildGrokChatClient(YudaoAiProperties.Grok properties) {
         if (StrUtil.isEmpty(properties.getModel())) {
             properties.setModel(GrokChatModel.MODEL_DEFAULT);
         }

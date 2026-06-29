@@ -21,6 +21,7 @@ import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlo
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlowChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlowImageApi;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlowImageModel;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.stepfun.StepFunChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.xinghuo.XingHuoChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.yiyan.YiYanChatModel;
@@ -134,6 +135,8 @@ public class AiModelFactoryImpl implements AiModelFactory {
                     return buildMiniMaxChatModel(apiKey, url);
                 case MOONSHOT:
                     return buildMoonshotChatModel(apiKey, url);
+                case STEP_FUN:
+                    return buildStepFunChatModel(apiKey, url);
                 case XING_HUO:
                     return buildXingHuoChatModel(apiKey);
                 case BAI_CHUAN:
@@ -178,6 +181,8 @@ public class AiModelFactoryImpl implements AiModelFactory {
                 return SpringUtil.getBean(MiniMaxChatModel.class);
             case MOONSHOT:
                 return SpringUtil.getBean(MoonshotChatModel.class);
+            case STEP_FUN:
+                return SpringUtil.getBean(StepFunChatModel.class);
             case XING_HUO:
                 return SpringUtil.getBean(XingHuoChatModel.class);
             case BAI_CHUAN:
@@ -395,6 +400,15 @@ public class AiModelFactoryImpl implements AiModelFactory {
         YudaoAiProperties.Moonshot properties = new YudaoAiProperties.Moonshot()
                 .setBaseUrl(url).setApiKey(apiKey);
         return new AiAutoConfiguration().buildMoonshotChatClient(properties);
+    }
+
+    /**
+     * 可参考 {@link AiAutoConfiguration#stepFunChatClient(YudaoAiProperties)}
+     */
+    private StepFunChatModel buildStepFunChatModel(String apiKey, String url) {
+        YudaoAiProperties.StepFun properties = new YudaoAiProperties.StepFun()
+                .setBaseUrl(url).setApiKey(apiKey);
+        return new AiAutoConfiguration().buildStepFunChatClient(properties);
     }
 
     /**

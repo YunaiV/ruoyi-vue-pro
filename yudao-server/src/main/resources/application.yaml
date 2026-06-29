@@ -235,6 +235,14 @@ yudao:
       enable: false
       api-key: ${MOONSHOT_API_KEY}
       model: kimi-k2.6
+    stepfun: # 阶跃星辰
+      enable: false
+      api-key: ${STEPFUN_API_KEY}
+      model: step-3.7-flash
+    grok: # Grok
+      enable: false
+      api-key: ${GROK_API_KEY}
+      model: grok-4.3
     midjourney:
       enable: true
   #    base-url: https://api.holdai.top/mj-relax/mj

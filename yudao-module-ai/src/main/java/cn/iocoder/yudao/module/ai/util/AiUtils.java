@@ -112,6 +112,7 @@ public class AiUtils {
             case MINI_MAX: // 复用 DeepSeek 客户端
             case MOONSHOT: // 复用 DeepSeek 客户端
             case BAI_CHUAN: // 复用 DeepSeek 客户端
+            case STEP_FUN: // 复用 DeepSeek 客户端
                 return DeepSeekChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)
                         .toolCallbacks(toolCallbacks).toolContext(toolContext).build();
             case OPENAI:
