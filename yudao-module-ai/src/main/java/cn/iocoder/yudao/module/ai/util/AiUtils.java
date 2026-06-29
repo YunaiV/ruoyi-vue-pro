@@ -15,6 +15,7 @@ import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.deepseek.DeepSeekAssistantMessage;
 import org.springframework.ai.deepseek.DeepSeekChatOptions;
+import org.springframework.ai.google.genai.GoogleGenAiChatOptions;
 import org.springframework.ai.ollama.api.OllamaChatOptions;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.tool.ToolCallback;
@@ -113,10 +114,12 @@ public class AiUtils {
                 return DeepSeekChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)
                         .toolCallbacks(toolCallbacks).toolContext(toolContext).build();
             case OPENAI:
-            case GEMINI: // 复用 OpenAI 客户端
             case BAI_CHUAN: // 复用 OpenAI 客户端
             case GROK: // 复用 OpenAI 客户端
                 return OpenAiChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)
+                        .toolCallbacks(toolCallbacks).toolContext(toolContext).build();
+            case GEMINI:
+                return GoogleGenAiChatOptions.builder().model(model).temperature(temperature).maxOutputTokens(maxTokens)
                         .toolCallbacks(toolCallbacks).toolContext(toolContext).build();
             case AZURE_OPENAI:
                 return OpenAiChatOptions.builder().model(model).deploymentName(model).azure(true)

@@ -6,7 +6,6 @@ import cn.iocoder.yudao.module.ai.framework.ai.core.model.AiModelFactory;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.AiModelFactoryImpl;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.baichuan.BaiChuanChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.doubao.DouBaoChatModel;
-import cn.iocoder.yudao.module.ai.framework.ai.core.model.gemini.GeminiChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.grok.GrokChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.hunyuan.HunYuanChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.midjourney.api.MidjourneyApi;
@@ -152,30 +151,6 @@ public class AiAutoConfiguration {
                 .build();
         return new DashScopeEmbeddingModel(dashScopeApi, MetadataMode.EMBED, options, RetryUtils.DEFAULT_RETRY_TEMPLATE,
                 observationRegistry);
-    }
-
-    @Bean
-    @ConditionalOnProperty(value = "yudao.ai.gemini.enable", havingValue = "true")
-    public GeminiChatModel geminiChatModel(YudaoAiProperties yudaoAiProperties) {
-        YudaoAiProperties.Gemini properties = yudaoAiProperties.getGemini();
-        return buildGeminiChatClient(properties);
-    }
-
-    public GeminiChatModel buildGeminiChatClient(YudaoAiProperties.Gemini properties) {
-        if (StrUtil.isEmpty(properties.getModel())) {
-            properties.setModel(GeminiChatModel.MODEL_DEFAULT);
-        }
-        OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
-                .options(OpenAiChatOptions.builder()
-                        .baseUrl(GeminiChatModel.BASE_URL)
-                        .apiKey(properties.getApiKey())
-                        .model(properties.getModel())
-                        .temperature(properties.getTemperature())
-                        .maxTokens(properties.getMaxTokens())
-                        .topP(properties.getTopP())
-                        .build())
-                .build();
-        return new GeminiChatModel(openAiChatModel);
     }
 
     @Bean

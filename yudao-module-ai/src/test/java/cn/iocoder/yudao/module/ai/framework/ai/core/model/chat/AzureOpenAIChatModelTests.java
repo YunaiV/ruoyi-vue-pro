@@ -26,7 +26,7 @@ import static cn.iocoder.yudao.module.ai.util.AiUtils.validateApiKey;
 public class AzureOpenAIChatModelTests {
 
     private static final String BASE_URL = SystemUtil.get("AZURE_OPENAI_BASE_URL",
-            "https://eastusprejade.openai.azure.com");
+            "https://xxx.openai.azure.com");
     private static final String API_KEY = SystemUtil.get("AZURE_OPENAI_API_KEY",
             "sk-xxxx"); // 按需改成你的 Azure OpenAI API Key
     private static final String DEPLOYMENT_NAME = SystemUtil.get("AZURE_OPENAI_DEPLOYMENT_NAME",

@@ -98,6 +98,11 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-starter-model-google-genai</artifactId>
+            <version>${spring-ai.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-starter-model-ollama</artifactId>
             <version>${spring-ai.version}</version>
         </dependency>

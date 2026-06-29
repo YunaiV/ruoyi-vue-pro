@@ -25,10 +25,12 @@ import static cn.iocoder.yudao.module.ai.util.AiUtils.validateApiKey;
  */
 public class OpenAIChatModelTests {
 
-    private static final String BASE_URL = "https://api.teamorouter.com/v1";
+    private static final String BASE_URL = SystemUtil.get("OPENAI_BASE_URL",
+            "https://api.teamorouter.com/v1");
     private static final String API_KEY = SystemUtil.get("OPENAI_API_KEY",
             "sk-xxxx"); // 按需改成你的 OpenAI API Key
-    private static final String MODEL = "gpt-5.5";
+    private static final String MODEL = SystemUtil.get("OPENAI_MODEL",
+            "gpt-5.5");
 
     private final OpenAiChatModel chatModel = OpenAiChatModel.builder()
             .options(OpenAiChatOptions.builder()

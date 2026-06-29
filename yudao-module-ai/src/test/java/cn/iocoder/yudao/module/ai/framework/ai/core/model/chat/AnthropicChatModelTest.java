@@ -25,10 +25,12 @@ import static cn.iocoder.yudao.module.ai.util.AiUtils.validateApiKey;
  */
 public class AnthropicChatModelTest {
 
-    private static final String BASE_URL = "https://api.teamorouter.com";
+    private static final String BASE_URL = SystemUtil.get("ANTHROPIC_BASE_URL",
+            "https://api.teamorouter.com");
     private static final String API_KEY = SystemUtil.get("ANTHROPIC_API_KEY",
             "sk-xxxx"); // 按需改成你的 Anthropic API Key
-    private static final String MODEL = "claude-sonnet-4-6";
+    private static final String MODEL = SystemUtil.get("ANTHROPIC_MODEL",
+            "claude-sonnet-4-6");
 
     private final AnthropicChatModel chatModel = AnthropicChatModel.builder()
             .options(AnthropicChatOptions.builder()

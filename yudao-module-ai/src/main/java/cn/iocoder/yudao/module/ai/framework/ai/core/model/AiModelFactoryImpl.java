@@ -13,7 +13,6 @@ import cn.iocoder.yudao.module.ai.framework.ai.config.AiAutoConfiguration;
 import cn.iocoder.yudao.module.ai.framework.ai.config.YudaoAiProperties;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.baichuan.BaiChuanChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.doubao.DouBaoChatModel;
-import cn.iocoder.yudao.module.ai.framework.ai.core.model.gemini.GeminiChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.hunyuan.HunYuanChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.minimax.MiniMaxChatModel;
@@ -33,6 +32,8 @@ import com.alibaba.cloud.ai.autoconfigure.dashscope.DashScopeImageAutoConfigurat
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatModel;
 import com.alibaba.cloud.ai.dashscope.embedding.text.DashScopeEmbeddingModel;
 import com.alibaba.cloud.ai.dashscope.image.DashScopeImageModel;
+import com.google.genai.Client;
+import com.google.genai.types.HttpOptions;
 import io.micrometer.observation.ObservationRegistry;
 import io.milvus.client.MilvusServiceClient;
 import io.qdrant.client.QdrantClient;
@@ -46,14 +47,18 @@ import org.springframework.ai.document.MetadataMode;
 import org.springframework.ai.embedding.BatchingStrategy;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.embedding.observation.EmbeddingModelObservationConvention;
+import org.springframework.ai.google.genai.GoogleGenAiChatModel;
+import org.springframework.ai.google.genai.GoogleGenAiChatOptions;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.model.anthropic.autoconfigure.AnthropicChatAutoConfiguration;
 import org.springframework.ai.model.deepseek.autoconfigure.DeepSeekChatAutoConfiguration;
+import org.springframework.ai.model.google.genai.autoconfigure.chat.GoogleGenAiChatAutoConfiguration;
 import org.springframework.ai.model.ollama.autoconfigure.OllamaChatAutoConfiguration;
 import org.springframework.ai.model.openai.autoconfigure.OpenAiChatAutoConfiguration;
 import org.springframework.ai.model.openai.autoconfigure.OpenAiEmbeddingAutoConfiguration;
 import org.springframework.ai.model.openai.autoconfigure.OpenAiImageAutoConfiguration;
 import org.springframework.ai.model.stabilityai.autoconfigure.StabilityAiImageAutoConfiguration;
+import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.OllamaEmbeddingModel;
 import org.springframework.ai.ollama.api.OllamaApi;
@@ -66,6 +71,7 @@ import org.springframework.ai.anthropic.AnthropicChatModel;
 import org.springframework.ai.anthropic.AnthropicChatOptions;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.OpenAiImageOptions;
+import org.springframework.ai.retry.RetryUtils;
 import org.springframework.ai.stabilityai.StabilityAiImageModel;
 import org.springframework.ai.stabilityai.api.StabilityAiApi;
 import org.springframework.ai.vectorstore.SimpleVectorStore;
@@ -93,6 +99,7 @@ import redis.clients.jedis.RedisClient;
 
 import java.io.File;
 import java.time.Duration;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
@@ -144,7 +151,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
                 case ANTHROPIC:
                     return buildAnthropicChatModel(apiKey, url);
                 case GEMINI:
-                    return buildGeminiChatModel(apiKey);
+                    return buildGeminiChatModel(apiKey, url);
                 case OLLAMA:
                     return buildOllamaChatModel(url);
                 case GROK:
@@ -186,7 +193,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
             case ANTHROPIC:
                 return SpringUtil.getBean(AnthropicChatModel.class);
             case GEMINI:
-                return SpringUtil.getBean(GeminiChatModel.class);
+                return SpringUtil.getBean(GoogleGenAiChatModel.class);
             case OLLAMA:
                 return SpringUtil.getBean(OllamaChatModel.class);
             default:
@@ -455,12 +462,26 @@ public class AiModelFactoryImpl implements AiModelFactory {
     }
 
     /**
-     * 可参考 {@link AiAutoConfiguration#buildGeminiChatClient(YudaoAiProperties.Gemini)}
+     * 可参考 {@link GoogleGenAiChatAutoConfiguration} 的 googleGenAiChatModel 方法
      */
-    private static GeminiChatModel buildGeminiChatModel(String apiKey) {
-        YudaoAiProperties.Gemini properties = SpringUtil.getBean(YudaoAiProperties.class)
-                .getGemini().setApiKey(apiKey);
-        return new AiAutoConfiguration().buildGeminiChatClient(properties);
+    private static GoogleGenAiChatModel buildGeminiChatModel(String apiKey, String url) {
+        Client.Builder clientBuilder = Client.builder().apiKey(apiKey);
+        if (StrUtil.isNotBlank(url)) {
+            clientBuilder.httpOptions(HttpOptions.builder()
+                    .baseUrl(url)
+                    // TeamOrouter 的 Gemini 原生协议使用 Authorization Bearer 鉴权
+                    .headers(Collections.singletonMap("Authorization", "Bearer " + apiKey))
+                    .build());
+        }
+        return GoogleGenAiChatModel.builder()
+                .genAiClient(clientBuilder.build())
+                .options(GoogleGenAiChatOptions.builder()
+                        .model("gemini-2.5-flash")
+                        .build())
+                .toolCallingManager(SpringUtil.getBean(ToolCallingManager.class))
+                .retryTemplate(RetryUtils.DEFAULT_RETRY_TEMPLATE)
+                .observationRegistry(SpringUtil.getBean(ObservationRegistry.class))
+                .build();
     }
 
     /**

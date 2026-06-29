@@ -14,11 +14,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class YudaoAiProperties {
 
     /**
-     * 谷歌 Gemini
-     */
-    private Gemini gemini;
-
-    /**
      * 字节豆包
      */
     private DouBao doubao;
@@ -78,19 +73,6 @@ public class YudaoAiProperties {
      * 网络搜索
      */
     private WebSearch webSearch;
-
-    @Data
-    public static class Gemini {
-
-        private String enable;
-        private String apiKey;
-
-        private String model;
-        private Double temperature;
-        private Integer maxTokens;
-        private Double topP;
-
-    }
 
     @Data
     public static class DouBao {
