@@ -270,17 +270,20 @@ public class AiAutoConfiguration {
         if (StrUtil.isEmpty(properties.getModel())) {
             properties.setModel(BaiChuanChatModel.MODEL_DEFAULT);
         }
-        OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
-                .options(OpenAiChatOptions.builder()
+        DeepSeekChatModel deepSeekChatModel = DeepSeekChatModel.builder()
+                .deepSeekApi(DeepSeekApi.builder()
                         .baseUrl(BaiChuanChatModel.BASE_URL)
                         .apiKey(properties.getApiKey())
+                        .completionsPath(BaiChuanChatModel.COMPLETE_PATH)
+                        .build())
+                .options(DeepSeekChatOptions.builder()
                         .model(properties.getModel())
                         .temperature(properties.getTemperature())
                         .maxTokens(properties.getMaxTokens())
                         .topP(properties.getTopP())
                         .build())
                 .build();
-        return new BaiChuanChatModel(openAiChatModel);
+        return new BaiChuanChatModel(deepSeekChatModel);
     }
 
     @Bean

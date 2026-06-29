@@ -6,7 +6,7 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.deepseek.DeepSeekChatModel;
 import reactor.core.publisher.Flux;
 
 /**
@@ -20,26 +20,28 @@ public class BaiChuanChatModel implements ChatModel {
 
     public static final String BASE_URL = "https://api.baichuan-ai.com";
 
-    public static final String MODEL_DEFAULT = "Baichuan4-Turbo";
+    public static final String COMPLETE_PATH = "/v1/chat/completions";
+
+    public static final String MODEL_DEFAULT = "Baichuan-M3";
 
     /**
-     * 兼容 OpenAI 接口，进行复用
+     * 兼容 OpenAI 接口，复用 DeepSeek 客户端
      */
-    private final OpenAiChatModel openAiChatModel;
+    private final DeepSeekChatModel deepSeekChatModel;
 
     @Override
     public ChatResponse call(Prompt prompt) {
-        return openAiChatModel.call(prompt);
+        return deepSeekChatModel.call(prompt);
     }
 
     @Override
     public Flux<ChatResponse> stream(Prompt prompt) {
-        return openAiChatModel.stream(prompt);
+        return deepSeekChatModel.stream(prompt);
     }
 
     @Override
     public ChatOptions getOptions() {
-        return openAiChatModel.getOptions();
+        return deepSeekChatModel.getOptions();
     }
 
     @Override

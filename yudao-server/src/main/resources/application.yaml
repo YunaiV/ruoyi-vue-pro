@@ -217,8 +217,8 @@ yudao:
       model: x2-flash
     baichuan: # 百川智能
       enable: true
-      api-key: sk-abc
-      model: Baichuan4-Turbo
+      api-key: ${BAICHUAN_API_KEY}
+      model: Baichuan-M3
     yiyan: # 文心一言
       enable: false
       api-key: ${YIYAN_API_KEY}

@@ -9,8 +9,9 @@ import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.openai.OpenAiChatModel;
-import org.springframework.ai.openai.OpenAiChatOptions;
+import org.springframework.ai.deepseek.DeepSeekChatModel;
+import org.springframework.ai.deepseek.DeepSeekChatOptions;
+import org.springframework.ai.deepseek.api.DeepSeekApi;
 import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;
@@ -31,16 +32,17 @@ public class BaiChuanChatModelTests {
     private static final String MODEL = SystemUtil.get("BAICHUAN_MODEL",
             BaiChuanChatModel.MODEL_DEFAULT);
 
-    private final OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
-            .options(OpenAiChatOptions.builder()
+    private final BaiChuanChatModel chatModel = new BaiChuanChatModel(DeepSeekChatModel.builder()
+            .deepSeekApi(DeepSeekApi.builder()
                     .baseUrl(BaiChuanChatModel.BASE_URL)
+                    .completionsPath(BaiChuanChatModel.COMPLETE_PATH)
                     .apiKey(API_KEY)
+                    .build())
+            .options(DeepSeekChatOptions.builder()
                     .model(MODEL)
                     .temperature(0.7)
                     .build())
-            .build();
-
-    private final BaiChuanChatModel chatModel = new BaiChuanChatModel(openAiChatModel);
+            .build());
 
     @Test
     @Disabled

@@ -111,10 +111,10 @@ public class AiUtils {
             case XING_HUO: // 复用 DeepSeek 客户端
             case MINI_MAX: // 复用 DeepSeek 客户端
             case MOONSHOT: // 复用 DeepSeek 客户端
+            case BAI_CHUAN: // 复用 DeepSeek 客户端
                 return DeepSeekChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)
                         .toolCallbacks(toolCallbacks).toolContext(toolContext).build();
             case OPENAI:
-            case BAI_CHUAN: // 复用 OpenAI 客户端
             case GROK: // 复用 OpenAI 客户端
                 return OpenAiChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)
                         .toolCallbacks(toolCallbacks).toolContext(toolContext).build();
