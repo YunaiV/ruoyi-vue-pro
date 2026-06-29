@@ -39,6 +39,8 @@ import io.milvus.client.MilvusServiceClient;
 import io.qdrant.client.QdrantClient;
 import io.qdrant.client.QdrantGrpcClient;
 import lombok.SneakyThrows;
+import org.springframework.ai.anthropic.AnthropicChatModel;
+import org.springframework.ai.anthropic.AnthropicChatOptions;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.deepseek.DeepSeekChatModel;
 import org.springframework.ai.deepseek.DeepSeekChatOptions;
@@ -63,14 +65,7 @@ import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.OllamaEmbeddingModel;
 import org.springframework.ai.ollama.api.OllamaApi;
 import org.springframework.ai.ollama.api.OllamaEmbeddingOptions;
-import org.springframework.ai.openai.OpenAiChatModel;
-import org.springframework.ai.openai.OpenAiEmbeddingModel;
-import org.springframework.ai.openai.OpenAiEmbeddingOptions;
-import org.springframework.ai.openai.OpenAiImageModel;
-import org.springframework.ai.anthropic.AnthropicChatModel;
-import org.springframework.ai.anthropic.AnthropicChatOptions;
-import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.ai.openai.OpenAiImageOptions;
+import org.springframework.ai.openai.*;
 import org.springframework.ai.retry.RetryUtils;
 import org.springframework.ai.stabilityai.StabilityAiImageModel;
 import org.springframework.ai.stabilityai.api.StabilityAiApi;
@@ -100,7 +95,6 @@ import redis.clients.jedis.RedisClient;
 import java.io.File;
 import java.time.Duration;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -406,11 +400,9 @@ public class AiModelFactoryImpl implements AiModelFactory {
     /**
      * 可参考 {@link AiAutoConfiguration#xingHuoChatClient(YudaoAiProperties)}
      */
-    private static XingHuoChatModel buildXingHuoChatModel(String key) {
-        List<String> keys = StrUtil.split(key, '|');
-        Assert.equals(keys.size(), 2, "XingHuoChatClient 的密钥需要 (appKey|secretKey) 格式");
+    private static XingHuoChatModel buildXingHuoChatModel(String apiKey) {
         YudaoAiProperties.XingHuo properties = new YudaoAiProperties.XingHuo()
-                .setAppKey(keys.get(0)).setSecretKey(keys.get(1));
+                .setApiKey(apiKey).setModel(XingHuoChatModel.MODEL_DEFAULT);
         return new AiAutoConfiguration().buildXingHuoChatClient(properties);
     }
 

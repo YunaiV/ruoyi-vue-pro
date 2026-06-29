@@ -106,9 +106,9 @@ public class AiUtils {
             case DOU_BAO: // 复用 DeepSeek 客户端
             case HUN_YUAN: // 复用 DeepSeek 客户端
             case SILICON_FLOW: // 复用 DeepSeek 客户端
-            case XING_HUO: // 复用 DeepSeek 客户端
             case YI_YAN: // 复用 DeepSeek 客户端
             case ZHI_PU: // 复用 DeepSeek 客户端
+            case XING_HUO: // 复用 DeepSeek 客户端
             case MINI_MAX: // 复用 DeepSeek 客户端
             case MOONSHOT: // 复用 DeepSeek 客户端
                 return DeepSeekChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)

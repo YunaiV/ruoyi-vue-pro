@@ -213,9 +213,8 @@ yudao:
       model: deepseek-ai/DeepSeek-V4-Pro
     xinghuo: # 讯飞星火
       enable: true
-      appKey: 75b161ed2aef4719b275d6e7f2a4d4cd
-      secretKey: YWYxYWI2MTA4ODI2NGZlYTQyNjAzZTcz
-      model: x1
+      api-key: ${XINGHUO_API_KEY}
+      model: x2-flash
     baichuan: # 百川智能
       enable: true
       api-key: sk-abc

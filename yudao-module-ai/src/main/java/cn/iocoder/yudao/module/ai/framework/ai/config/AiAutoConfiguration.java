@@ -248,19 +248,15 @@ public class AiAutoConfiguration {
         if (StrUtil.isEmpty(properties.getModel())) {
             properties.setModel(XingHuoChatModel.MODEL_DEFAULT);
         }
-        String baseUrl = "x1".equals(properties.getModel()) ? XingHuoChatModel.BASE_URL_V2
-                : XingHuoChatModel.BASE_URL_V1;
-        OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
-                .options(OpenAiChatOptions.builder()
-                        .baseUrl(baseUrl)
-                        .apiKey(properties.getAppKey() + ":" + properties.getSecretKey())
+        return XingHuoChatModel.builder()
+                .apiKey(properties.getApiKey())
+                .options(DeepSeekChatOptions.builder()
                         .model(properties.getModel())
                         .temperature(properties.getTemperature())
                         .maxTokens(properties.getMaxTokens())
                         .topP(properties.getTopP())
                         .build())
                 .build();
-        return new XingHuoChatModel(openAiChatModel);
     }
 
     @Bean

@@ -118,9 +118,7 @@ public class YudaoAiProperties {
     public static class XingHuo {
 
         private String enable;
-        private String appId;
-        private String appKey;
-        private String secretKey;
+        private String apiKey;
 
         private String model;
         private Double temperature;
