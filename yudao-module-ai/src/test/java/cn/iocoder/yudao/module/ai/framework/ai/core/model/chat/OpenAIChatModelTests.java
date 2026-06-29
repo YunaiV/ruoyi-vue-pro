@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static cn.iocoder.yudao.module.ai.util.AiUtils.validateApiKey;
+
 /**
  * {@link OpenAiChatModel} 集成测试
  *
@@ -40,6 +42,7 @@ public class OpenAIChatModelTests {
     @Test
     @Disabled
     public void testCall() {
+        validateApiKey(API_KEY);
         // 准备参数
         List<Message> messages = new ArrayList<>();
         messages.add(new SystemMessage("你是一个优质的文言文作者，用文言文描述着各城市的人文风景。"));
@@ -55,6 +58,7 @@ public class OpenAIChatModelTests {
     @Test
     @Disabled
     public void testStream() {
+        validateApiKey(API_KEY);
         // 准备参数
         List<Message> messages = new ArrayList<>();
         messages.add(new SystemMessage("你是一个优质的文言文作者，用文言文描述着各城市的人文风景。"));
@@ -73,6 +77,7 @@ public class OpenAIChatModelTests {
     @Test
     @Disabled
     public void testStream_thinking() {
+        validateApiKey(API_KEY);
         // 准备参数
         List<Message> messages = new ArrayList<>();
         messages.add(new UserMessage("详细分析下，如何设计一个电商系统？"));

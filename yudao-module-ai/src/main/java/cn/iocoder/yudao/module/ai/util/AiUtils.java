@@ -53,6 +53,17 @@ public class AiUtils {
     }
 
     /**
+     * 校验 API Key，避免集成测试使用默认占位值发起调用。
+     *
+     * @param apiKey API Key
+     */
+    public static void validateApiKey(String apiKey) {
+        if (StrUtil.isBlank(apiKey) || "sk-xxxx".equals(apiKey)) {
+            throw new IllegalStateException("apiKey 不能为空");
+        }
+    }
+
+    /**
      * 通义千问支持多模态的模型
      *
      * @see <a href="https://bailian.console.aliyun.com/cn-beijing/?tab=model#/model-market/all?providers=qwen&capabilities=VU">模型广场</a>

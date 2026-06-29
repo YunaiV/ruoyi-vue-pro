@@ -157,7 +157,8 @@ spring:
       base-url: https://api.teamorouter.com/v1
       api-key: ${OPENAI_API_KEY}
     anthropic: # Anthropic Claude
-      api-key: sk-muubv7cXeLw0Etgs743f365cD5Ea44429946Fa7e672d8942
+      base-url: https://api.teamorouter.com
+      api-key: ${ANTHROPIC_API_KEY}
     ollama:
       base-url: http://127.0.0.1:11434
       chat:
