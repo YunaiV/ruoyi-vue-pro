@@ -166,7 +166,7 @@ spring:
     stabilityai:
       api-key: sk-e53UqbboF8QJCscYvzJscJxJXoFcFg4iJjl1oqgE7baJETmx
     dashscope: # 通义千问
-      api-key: sk-47aa124781be4bfb95244cc62f6xxxx
+      api-key: ${DASHSCOPE_API_KEY}
     deepseek: # DeepSeek
       api-key: sk-e94db327cc7d457d99a8de8810fc6b12
       chat:
@@ -209,8 +209,8 @@ yudao:
       model: hunyuan-turbo
     siliconflow: # 硅基流动
       enable: true
-      api-key: sk-epsakfenqnyzoxhmbucsxlhkdqlcbnimslqoivkshalvdozz
-      model: deepseek-ai/DeepSeek-R1-Distill-Qwen-7B
+      api-key: ${SILICONFLOW_API_KEY}
+      model: deepseek-ai/DeepSeek-V4-Pro
     xinghuo: # 讯飞星火
       enable: true
       appKey: 75b161ed2aef4719b275d6e7f2a4d4cd
@@ -226,15 +226,15 @@ yudao:
       model: ernie-4.0-8k-latest
     zhipu: # 智谱 AI（GLM）
       enable: false
-      api-key: sk-abc
+      api-key: ${ZHIPU_API_KEY}
       model: glm-5.2
     minimax: # MiniMax
       enable: false
-      api-key: xxxx
+      api-key: ${MINIMAX_API_KEY}
       model: MiniMax-M3
     moonshot: # 月之暗面（KIMI）
       enable: false
-      api-key: sk-abc
+      api-key: ${MOONSHOT_API_KEY}
       model: kimi-k2.6
     midjourney:
       enable: true
