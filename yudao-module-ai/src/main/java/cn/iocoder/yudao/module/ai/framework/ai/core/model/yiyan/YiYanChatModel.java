@@ -20,7 +20,7 @@ public class YiYanChatModel implements ChatModel {
 
     public static final String BASE_URL = "https://qianfan.baidubce.com/v2";
 
-    public static final String MODEL_DEFAULT = "ernie-4.0-8k-latest";
+    public static final String MODEL_DEFAULT = "ernie-5.1";
 
     /**
      * 兼容 OpenAI 接口，复用 DeepSeek 客户端

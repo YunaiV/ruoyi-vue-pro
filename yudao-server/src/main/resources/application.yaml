@@ -221,8 +221,8 @@ yudao:
       model: Baichuan4-Turbo
     yiyan: # 文心一言
       enable: false
-      api-key: bce-v3/xxxx
-      model: ernie-4.0-8k-latest
+      api-key: ${YIYAN_API_KEY}
+      model: ernie-5.1
     zhipu: # 智谱 AI（GLM）
       enable: false
       api-key: ${ZHIPU_API_KEY}
