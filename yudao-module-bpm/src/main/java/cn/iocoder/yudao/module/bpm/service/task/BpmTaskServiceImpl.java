@@ -987,6 +987,9 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         //  改成 moveExecutionsToSingleActivityId 好像并没有遇到 ② 提到的超时提醒失效的问题。暂时先改回 moveExecutionsToSingleActivityId
         // ④ moveExecutionsToSingleActivityId 回退多实例的时候不会去删除多实例根, 应改成 moveActivityIdsToSingleActivityId
         // flowable 8.0.0  修复上面相关问题， 还修复了并行分支回退的问题 https://t.zsxq.com/z4d9i。
+        // ⑤ 使用 moveExecutionsToSingleActivityId 方法进行回退操作时，如果是多实例的用户任务【芋道用户任务默认为多实例】，不会删除多实例任务的根数据 ACT_RU_EXECUTION
+        // 会导致有一些问题，所以使用 moveActivityIdsToSingleActivityId。 但是该方法在 flowable 6.8.1 ~ 7.1.0 的版本会有 bug 阻塞回退功能
+        // 相关 issue: https://github.com/flowable/flowable-engine/issues/3944
         runtimeService.createChangeActivityStateBuilder()
                 .processInstanceId(currentTask.getProcessInstanceId())
                 .moveActivityIdsToSingleActivityId(returnTaskKeyList, reqVO.getTargetTaskDefinitionKey())
