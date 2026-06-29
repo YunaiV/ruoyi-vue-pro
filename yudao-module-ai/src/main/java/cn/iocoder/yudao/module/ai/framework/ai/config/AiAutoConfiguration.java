@@ -164,10 +164,13 @@ public class AiAutoConfiguration {
         if (StrUtil.isEmpty(properties.getModel())) {
             properties.setModel(DouBaoChatModel.MODEL_DEFAULT);
         }
-        OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
-                .options(OpenAiChatOptions.builder()
+        DeepSeekChatModel openAiChatModel = DeepSeekChatModel.builder()
+                .deepSeekApi(DeepSeekApi.builder()
                         .baseUrl(DouBaoChatModel.BASE_URL)
+                        .completionsPath(DouBaoChatModel.COMPLETE_PATH)
                         .apiKey(properties.getApiKey())
+                        .build())
+                .options(DeepSeekChatOptions.builder()
                         .model(properties.getModel())
                         .temperature(properties.getTemperature())
                         .maxTokens(properties.getMaxTokens())
@@ -214,11 +217,8 @@ public class AiAutoConfiguration {
         if (StrUtil.isEmpty(properties.getModel())) {
             properties.setModel(HunYuanChatModel.MODEL_DEFAULT);
         }
-        // 特殊：由于混元大模型不提供 deepseek，而是通过知识引擎，所以需要区分下 URL
         if (StrUtil.isEmpty(properties.getBaseUrl())) {
-            properties.setBaseUrl(
-                    StrUtil.startWithIgnoreCase(properties.getModel(), "deepseek") ? HunYuanChatModel.DEEP_SEEK_BASE_URL
-                            : HunYuanChatModel.BASE_URL);
+            properties.setBaseUrl(HunYuanChatModel.BASE_URL);
         }
         // 创建 DeepSeekChatModel、HunYuanChatModel 对象
         DeepSeekChatModel openAiChatModel = DeepSeekChatModel.builder()
