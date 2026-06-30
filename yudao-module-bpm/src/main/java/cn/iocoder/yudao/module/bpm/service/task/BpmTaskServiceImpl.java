@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.*;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -622,9 +623,9 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         }
 
         // 4. 校验并处理 APPROVE_USER_SELECT 当前审批人，选择下一节点审批人的逻辑
-        Map<String, Object> variables = validateAndSetNextAssignees(task.getTaskDefinitionKey(), processVariables,
+        validateAndSetNextAssignees(task.getTaskDefinitionKey(), processVariables,
                 bpmnModel, reqVO.getNextAssignees(), instance);
-        runtimeService.setVariables(task.getProcessInstanceId(), variables);
+        runtimeService.setVariables(task.getProcessInstanceId(), processVariables);
 
         // 5. 如果当前节点 Id 存在于需要预测的流程节点中，从中移除。 流程变量在回退操作中设置
         Object needSimulateTaskIds = runtimeService.getVariable(task.getProcessInstanceId(), BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_NEED_SIMULATE_TASK_IDS);
@@ -642,7 +643,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         }
 
         // 7. 调用 BPM complete 去完成任务
-        taskService.complete(task.getId(), variables, true);
+        Map<String,Object> taskVariables = MapUtil.emptyIfNull(reqVO.getVariables()); // task local variables. 一般用于任务内嵌流程表单
+        taskService.complete(task.getId(), taskVariables, true);
 
         // 【加签专属】处理加签任务
         handleParentTaskIfSign(task.getParentTaskId());
@@ -985,6 +987,9 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         //  改成 moveExecutionsToSingleActivityId 好像并没有遇到 ② 提到的超时提醒失效的问题。暂时先改回 moveExecutionsToSingleActivityId
         // ④ moveExecutionsToSingleActivityId 回退多实例的时候不会去删除多实例根, 应改成 moveActivityIdsToSingleActivityId
         // flowable 8.0.0  修复上面相关问题， 还修复了并行分支回退的问题 https://t.zsxq.com/z4d9i。
+        // ⑤ 使用 moveExecutionsToSingleActivityId 方法进行回退操作时，如果是多实例的用户任务【芋道用户任务默认为多实例】，不会删除多实例任务的根数据 ACT_RU_EXECUTION
+        // 会导致有一些问题，所以使用 moveActivityIdsToSingleActivityId。 但是该方法在 flowable 6.8.1 ~ 7.1.0 的版本会有 bug 阻塞回退功能
+        // 相关 issue: https://github.com/flowable/flowable-engine/issues/3944
         runtimeService.createChangeActivityStateBuilder()
                 .processInstanceId(currentTask.getProcessInstanceId())
                 .moveActivityIdsToSingleActivityId(returnTaskKeyList, reqVO.getTargetTaskDefinitionKey())
