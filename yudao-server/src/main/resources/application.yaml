@@ -154,11 +154,11 @@ spring:
           host: 127.0.0.1
           port: 19530
     openai: # OpenAI 官方
-      base-url: ${OPENAI_BASE_URL}
-      api-key: ${OPENAI_API_KEY}
+      base-url: ${OPENAI_BASE_URL:https://api.openai.com}
+      api-key: ${OPENAI_API_KEY:sk-xxxx}
     anthropic: # Anthropic Claude
-      base-url: ${ANTHROPIC_BASE_URL}
-      api-key: ${ANTHROPIC_API_KEY}
+      base-url: ${ANTHROPIC_BASE_URL:https://api.anthropic.com}
+      api-key: ${ANTHROPIC_API_KEY:sk-xxxx}
     ollama:
       base-url: http://127.0.0.1:11434
       chat:
@@ -166,15 +166,15 @@ spring:
     stabilityai:
       api-key: sk-e53UqbboF8QJCscYvzJscJxJXoFcFg4iJjl1oqgE7baJETmx
     dashscope: # 通义千问
-      api-key: ${DASHSCOPE_API_KEY}
+      api-key: ${DASHSCOPE_API_KEY:sk-xxxx}
     deepseek: # DeepSeek
-      api-key: ${DEEPSEEK_API_KEY}
+      api-key: ${DEEPSEEK_API_KEY:sk-xxxx}
       chat:
         options:
           model: deepseek-v4-flash
     google:
       genai: # 谷歌 Gemini
-        api-key: ${GEMINI_API_KEY}
+        api-key: ${GEMINI_API_KEY:sk-xxxx}
         chat:
           model: gemini-2.5-flash
     model:
@@ -201,47 +201,47 @@ yudao:
   ai:
     doubao: # 字节豆包
       enable: true
-      api-key: ${DOUBAO_API_KEY}
+      api-key: ${DOUBAO_API_KEY:sk-xxxx}
       model: doubao-seed-2-1-turbo-260628
     hunyuan: # 腾讯混元
       enable: true
-      api-key: ${HUNYUAN_API_KEY}
+      api-key: ${HUNYUAN_API_KEY:sk-xxxx}
       model: hy3-preview
     siliconflow: # 硅基流动
       enable: true
-      api-key: ${SILICONFLOW_API_KEY}
+      api-key: ${SILICONFLOW_API_KEY:sk-xxxx}
       model: deepseek-ai/DeepSeek-V4-Pro
     xinghuo: # 讯飞星火
       enable: true
-      api-key: ${XINGHUO_API_KEY}
+      api-key: ${XINGHUO_API_KEY:sk-xxxx}
       model: x2-flash
     baichuan: # 百川智能
       enable: true
-      api-key: ${BAICHUAN_API_KEY}
+      api-key: ${BAICHUAN_API_KEY:sk-xxxx}
       model: Baichuan-M3
     yiyan: # 文心一言
       enable: false
-      api-key: ${YIYAN_API_KEY}
+      api-key: ${YIYAN_API_KEY:sk-xxxx}
       model: ernie-5.1
     zhipu: # 智谱 AI（GLM）
       enable: false
-      api-key: ${ZHIPU_API_KEY}
+      api-key: ${ZHIPU_API_KEY:sk-xxxx}
       model: glm-5.2
     minimax: # MiniMax
       enable: false
-      api-key: ${MINIMAX_API_KEY}
+      api-key: ${MINIMAX_API_KEY:sk-xxxx}
       model: MiniMax-M3
     moonshot: # 月之暗面（KIMI）
       enable: false
-      api-key: ${MOONSHOT_API_KEY}
+      api-key: ${MOONSHOT_API_KEY:sk-xxxx}
       model: kimi-k2.6
     stepfun: # 阶跃星辰
       enable: false
-      api-key: ${STEPFUN_API_KEY}
+      api-key: ${STEPFUN_API_KEY:sk-xxxx}
       model: step-3.7-flash
     grok: # Grok
       enable: false
-      api-key: ${GROK_API_KEY}
+      api-key: ${GROK_API_KEY:sk-xxxx}
       model: grok-4.3
     midjourney:
       enable: true
