@@ -41,7 +41,7 @@
         <!-- 服务保障相关 -->
         <lock4j.version>2.2.7</lock4j.version>
         <!-- 监控相关 -->
-        <skywalking.version>8.12.0</skywalking.version>
+        <skywalking.version>9.6.0</skywalking.version>
         <spring-boot-admin.version>2.7.15</spring-boot-admin.version>
         <opentelemetry.version>1.39.0</opentelemetry.version>
         <!-- Test 测试相关 -->
