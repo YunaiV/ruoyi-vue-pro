@@ -5,9 +5,9 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.tracer.core.annotation.BizTrace;
 import cn.iocoder.yudao.framework.common.util.spring.SpringExpressionUtils;
 import cn.iocoder.yudao.framework.tracer.core.util.TracerFrameworkUtils;
-import io.opentracing.Span;
-import io.opentracing.Tracer;
-import io.opentracing.tag.Tags;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.context.Scope;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -36,10 +36,10 @@ public class BizTraceAspect {
     public Object around(ProceedingJoinPoint joinPoint, BizTrace trace) throws Throwable {
         // 创建 span
         String operationName = getOperationName(joinPoint, trace);
-        Span span = tracer.buildSpan(operationName)
-                .withTag(Tags.COMPONENT.getKey(), "biz")
-                .start();
-        try {
+        Span span = tracer.spanBuilder(operationName)
+                .setAttribute("component", "biz")
+                .startSpan();
+        try (Scope ignored = span.makeCurrent()) {
             // 执行原有方法
             return joinPoint.proceed();
         } catch (Throwable throwable) {
@@ -49,7 +49,7 @@ public class BizTraceAspect {
             // 设置 Span 的 biz 属性
             setBizTag(span, joinPoint, trace);
             // 完成 Span
-            span.finish();
+            span.end();
         }
     }
 
@@ -67,8 +67,8 @@ public class BizTraceAspect {
     private void setBizTag(Span span, ProceedingJoinPoint joinPoint, BizTrace trace) {
         try {
             Map<String, Object> result = SpringExpressionUtils.parseExpressions(joinPoint, asList(trace.type(), trace.id()));
-            span.setTag(BizTrace.TYPE_TAG, MapUtil.getStr(result, trace.type()));
-            span.setTag(BizTrace.ID_TAG, MapUtil.getStr(result, trace.id()));
+            span.setAttribute(BizTrace.TYPE_TAG, MapUtil.getStr(result, trace.type()));
+            span.setAttribute(BizTrace.ID_TAG, MapUtil.getStr(result, trace.id()));
         } catch (Exception ex) {
             log.error("[setBizTag][解析 bizType 与 bizId 发生异常]", ex);
         }
