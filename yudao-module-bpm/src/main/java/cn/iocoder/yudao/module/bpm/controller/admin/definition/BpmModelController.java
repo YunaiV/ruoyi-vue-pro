@@ -117,6 +117,14 @@ public class BpmModelController {
         return success(BpmModelConvert.INSTANCE.buildModel(model, bpmnBytes, simpleModel));
     }
 
+    @GetMapping("/export")
+    @Operation(summary = "导出模型")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @PreAuthorize("@ss.hasPermission('bpm:model:export')")
+    public CommonResult<BpmModelSaveReqVO> exportModel(@RequestParam("id") String id) {
+        return success(modelService.exportModel(id));
+    }
+
     @PostMapping("/create")
     @Operation(summary = "新建模型")
     @PreAuthorize("@ss.hasPermission('bpm:model:create')")

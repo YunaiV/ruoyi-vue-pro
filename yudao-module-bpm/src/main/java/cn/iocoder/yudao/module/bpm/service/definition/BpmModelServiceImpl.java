@@ -143,6 +143,12 @@ public class BpmModelServiceImpl implements BpmModelService {
     }
 
     @Override
+    public BpmModelSaveReqVO exportModel(String id) {
+        Model model = validateModelExists(id);
+        return BpmModelConvert.INSTANCE.convertToSaveReqVO(model);
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class) // 因为进行多个操作，所以开启事务
     public void updateModel(Long userId, BpmModelSaveReqVO updateReqVO) {
         // 1. 校验流程模型存在
