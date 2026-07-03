@@ -120,6 +120,29 @@ public class BpmModelServiceImpl implements BpmModelService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    public String importModel(@Valid BpmModelSaveReqVO reqVO) {
+        if (!ValidationUtils.isXmlNCName(reqVO.getKey())) {
+            throw exception(MODEL_KEY_VALID);
+        }
+        // 1. 校验流程标识已经存在
+        Model keyModel = getModelByKey(reqVO.getKey());
+        if (keyModel != null) {
+            throw exception(MODEL_KEY_EXISTS, reqVO.getKey());
+        }
+
+        // 2. 创建 Model 对象
+        reqVO.setSort(System.currentTimeMillis());
+        Model model = repositoryService.newModel();
+        BpmModelConvert.INSTANCE.copyToModel(model, reqVO);
+        model.setTenantId(FlowableUtils.getTenantId());
+
+        // 3. 保存模型
+        saveModel(model, reqVO);
+        return model.getId();
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class) // 因为进行多个操作，所以开启事务
     public void updateModel(Long userId, BpmModelSaveReqVO updateReqVO) {
         // 1. 校验流程模型存在
