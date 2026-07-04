@@ -1,40 +1,44 @@
 package cn.iocoder.yudao.framework.excel.core.convert;
 
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.dict.core.DictFrameworkUtils;
+import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.idev.excel.converters.Converter;
 import cn.idev.excel.enums.CellDataTypeEnum;
 import cn.idev.excel.metadata.GlobalConfiguration;
 import cn.idev.excel.metadata.data.ReadCellData;
 import cn.idev.excel.metadata.data.WriteCellData;
 import cn.idev.excel.metadata.property.ExcelContentProperty;
-import cn.iocoder.yudao.framework.dict.core.DictFrameworkUtils;
-import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import lombok.extern.slf4j.Slf4j;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 /**
- * Excel 数据字典转换器（多值转换器）
+ * Excel 多值数据字典转换器
+ *
+ * 数据库存储值使用半角逗号分隔，例如 {@code 1,2}
+ * Excel 展示使用顿号分隔，例如 {@code 男、女}
+ * 使用时，需要在字段上同时配置
+ * {@code @ExcelProperty(converter = MultiDictConvert.class)} 和 {@link DictFormat}
  *
  * @author NaCl
  */
 @Slf4j
 public class MultiDictConvert implements Converter<Object> {
 
-    /**
-     * Excel 中多值之间的分隔符（展示用中文顿号）
-     */
     private static final String EXCEL_SEPARATOR = "、";
-
-    /**
-     * 数据库存储多值之间的分隔符（英文逗号）
-     */
     private static final String DB_SEPARATOR = ",";
+    private static final String EXCEL_SEPARATOR_REGEX = "[、,，]";
 
     @Override
     public Class<?> supportJavaTypeKey() {
@@ -49,162 +53,155 @@ public class MultiDictConvert implements Converter<Object> {
     @Override
     public Object convertToJavaData(ReadCellData readCellData, ExcelContentProperty contentProperty,
                                     GlobalConfiguration globalConfiguration) {
-        String excelValue = readCellData.getStringValue();
-        // 空值处理
-        if (StrUtil.isBlank(excelValue)) {
-            return getEmptyValue(contentProperty.getField());
+        // 空时，返回空值
+        Field field = contentProperty.getField();
+        String labels = readCellData.getStringValue();
+        if (StrUtil.isBlank(labels)) {
+            return convertToFieldValue(field, new ArrayList<>());
         }
 
-        String type = getDictType(contentProperty);
-        // 按 Excel 分隔符拆分（支持中文顿号、英文逗号、中文逗号）
-        String[] labels = excelValue.split("[、,，]");
-        List<String> valueList = new ArrayList<>();
-        for (String label : labels) {
-            String trimmed = label.trim();
-            if (StrUtil.isBlank(trimmed)) {
+        // 使用字典解析
+        String type = getType(contentProperty);
+        String[] labelArray = labels.split(EXCEL_SEPARATOR_REGEX);
+        List<String> values = new ArrayList<>(labelArray.length);
+        for (String item : labelArray) {
+            String label = item.trim();
+            if (StrUtil.isBlank(label)) {
                 continue;
             }
-            String value = DictFrameworkUtils.parseDictDataValue(type, trimmed);
-            if (value != null) {
-                valueList.add(value);
-            } else {
-                log.error("[convertToJavaData][type({}) 无法解析字典标签({})]", type, trimmed);
+            String value = DictFrameworkUtils.parseDictDataValue(type, label);
+            if (value == null) {
+                log.error("[convertToJavaData][type({}) 解析不掉 label({})]", type, label);
+                return null;
             }
+            values.add(value);
         }
-
-        // 按字段类型返回对应格式
-        return convertToFieldType(valueList, contentProperty.getField());
+        // 将 String 的 value 转换成对应的属性
+        return convertToFieldValue(field, values);
     }
 
     @Override
     public WriteCellData<String> convertToExcelData(Object object, ExcelContentProperty contentProperty,
                                                     GlobalConfiguration globalConfiguration) {
-        // 空值处理
+        // 空时，返回空
         if (object == null) {
             return new WriteCellData<>("");
         }
 
-        String type = getDictType(contentProperty);
-        // 将字段值转换为字符串列表
-        List<String> valueList = convertFieldToList(object);
-
-        if (valueList.isEmpty()) {
-            return new WriteCellData<>("");
-        }
-
-        // 逐个转换为字典标签
-        List<String> labelList = new ArrayList<>();
-        for (String value : valueList) {
-            if (StrUtil.isBlank(value)) {
-                continue;
+        // 使用字典格式化
+        String type = getType(contentProperty);
+        List<String> values = convertToStringList(object);
+        List<String> labels = new ArrayList<>(values.size());
+        for (String value : values) {
+            String label = DictFrameworkUtils.parseDictDataLabel(type, value);
+            if (label == null) {
+                log.error("[convertToExcelData][type({}) 转换不了 value({})]", type, value);
+                return new WriteCellData<>("");
             }
-            String label = DictFrameworkUtils.parseDictDataLabel(type, value.trim());
-            if (label != null) {
-                labelList.add(label);
-            } else {
-                log.error("[convertToExcelData][type({}) 无法解析字典值({})]", type, value);
-            }
+            labels.add(label);
         }
-
-        if (labelList.isEmpty()) {
-            return new WriteCellData<>("");
-        }
-        // 用中文顿号拼接
-        return new WriteCellData<>(String.join(EXCEL_SEPARATOR, labelList));
+        // 生成 Excel 小表格
+        return new WriteCellData<>(String.join(EXCEL_SEPARATOR, labels));
     }
 
-    // ==================== 私有辅助方法 ====================
-
-    /**
-     * 获取字段上的 @DictFormat 注解值
-     */
-    private String getDictType(ExcelContentProperty contentProperty) {
-        DictFormat annotation = contentProperty.getField().getAnnotation(DictFormat.class);
-        if (annotation == null) {
-            throw new IllegalArgumentException(
-                    String.format("字段 %s 缺少 @DictFormat 注解", contentProperty.getField().getName()));
+    private static Object convertToFieldValue(Field field, List<String> values) {
+        Class<?> fieldClazz = field.getType();
+        if (String.class == fieldClazz) {
+            return String.join(DB_SEPARATOR, values);
         }
-        return annotation.value();
+        if (fieldClazz.isArray()) {
+            return convertToArray(fieldClazz.getComponentType(), values);
+        }
+        if (Collection.class.isAssignableFrom(fieldClazz)) {
+            return convertToCollection(field, values);
+        }
+        return Convert.convert(fieldClazz, String.join(DB_SEPARATOR, values));
     }
 
-    /**
-     * 根据字段类型返回对应的空值
-     */
-    private Object getEmptyValue(Field field) {
-        Class<?> type = field.getType();
-        if (type == String.class) {
-            return "";
-        } else if (type.isArray() && type.getComponentType() == String.class) {
-            return new String[0];
-        } else if (Collection.class.isAssignableFrom(type)) {
-            return new ArrayList<>();
+    private static Object convertToArray(Class<?> componentType, List<String> values) {
+        Object array = Array.newInstance(componentType, values.size());
+        for (int i = 0; i < values.size(); i++) {
+            Array.set(array, i, Convert.convert(componentType, values.get(i)));
         }
-        return null;
+        return array;
     }
 
-    /**
-     * 将 List<String> 转换为字段对应的类型
-     */
-    private Object convertToFieldType(List<String> valueList, Field field) {
-        Class<?> type = field.getType();
-        if (type == String.class) {
-            // String 类型：用英文逗号拼接
-            return String.join(DB_SEPARATOR, valueList);
-        } else if (type.isArray() && type.getComponentType() == String.class) {
-            // String[] 类型
-            return valueList.toArray(new String[0]);
-        } else if (type == List.class) {
-            // List<String> 类型
-            return new ArrayList<>(valueList);
-        } else if (type == java.util.Set.class) {
-            // Set<String> 类型
-            return new java.util.LinkedHashSet<>(valueList);
+    private static Collection<?> convertToCollection(Field field, List<String> values) {
+        Class<?> elementClazz = getCollectionElementClazz(field);
+        Collection<Object> result = createCollection(field.getType());
+        for (String value : values) {
+            result.add(Convert.convert(elementClazz, value));
         }
-        // 其他类型默认返回拼接字符串
-        return String.join(DB_SEPARATOR, valueList);
+        return result;
     }
 
-    /**
-     * 将字段值转换为字符串列表（支持多种类型）
-     */
     @SuppressWarnings("unchecked")
-    private List<String> convertFieldToList(Object object) {
-        if (object == null) {
-            return new ArrayList<>();
+    private static Collection<Object> createCollection(Class<?> fieldClazz) {
+        if (!fieldClazz.isInterface() && !Modifier.isAbstract(fieldClazz.getModifiers())) {
+            try {
+                return (Collection<Object>) fieldClazz.getDeclaredConstructor().newInstance();
+            } catch (Exception ignored) {
+                // 使用默认集合实现
+            }
         }
-        if (object instanceof String) {
-            String str = (String) object;
-            if (StrUtil.isBlank(str)) {
-                return new ArrayList<>();
-            }
-            // 按英文逗号拆分
-            return Arrays.stream(str.split(DB_SEPARATOR))
-                    .map(String::trim)
-                    .filter(StrUtil::isNotBlank)
-                    .collect(Collectors.toList());
-        } else if (object instanceof Collection) {
-            Collection<?> collection = (Collection<?>) object;
-            List<String> result = new ArrayList<>();
-            for (Object item : collection) {
-                if (item != null) {
-                    result.add(item.toString());
-                }
-            }
-            return result;
-        } else if (object.getClass().isArray()) {
-            Object[] array = (Object[]) object;
-            List<String> result = new ArrayList<>();
-            for (Object item : array) {
-                if (item != null) {
-                    result.add(item.toString());
-                }
-            }
-            return result;
-        }
-        // 其他类型直接转字符串
-        //Java 8
-        return new ArrayList<>(Arrays.asList(object.toString()));
-        //Java 17
-        //return new ArrayList<>(List.of(object.toString()));
+        return Set.class.isAssignableFrom(fieldClazz) ? new LinkedHashSet<>() : new ArrayList<>();
     }
+
+    private static Class<?> getCollectionElementClazz(Field field) {
+        Type genericType = field.getGenericType();
+        if (!(genericType instanceof ParameterizedType)) {
+            return String.class;
+        }
+        Type actualType = ((ParameterizedType) genericType).getActualTypeArguments()[0];
+        if (actualType instanceof Class<?>) {
+            return (Class<?>) actualType;
+        }
+        if (actualType instanceof ParameterizedType
+                && ((ParameterizedType) actualType).getRawType() instanceof Class<?>) {
+            return (Class<?>) ((ParameterizedType) actualType).getRawType();
+        }
+        return String.class;
+    }
+
+    private static List<String> convertToStringList(Object object) {
+        List<String> values = new ArrayList<>();
+        if (object instanceof String) {
+            String[] valueArray = ((String) object).split(DB_SEPARATOR);
+            for (String value : valueArray) {
+                addStringValue(values, value);
+            }
+            return values;
+        }
+        if (object instanceof Collection<?>) {
+            for (Object item : (Collection<?>) object) {
+                addStringValue(values, item);
+            }
+            return values;
+        }
+        if (object.getClass().isArray()) {
+            int length = Array.getLength(object);
+            for (int i = 0; i < length; i++) {
+                addStringValue(values, Array.get(object, i));
+            }
+            return values;
+        }
+        addStringValue(values, object);
+        return values;
+    }
+
+    private static void addStringValue(List<String> values, Object value) {
+        if (value == null) {
+            return;
+        }
+        String str = String.valueOf(value).trim();
+        if (StrUtil.isBlank(str)) {
+            return;
+        }
+        values.add(str);
+    }
+
+    private static String getType(ExcelContentProperty contentProperty) {
+        return contentProperty.getField().getAnnotation(DictFormat.class).value();
+    }
+
 }
