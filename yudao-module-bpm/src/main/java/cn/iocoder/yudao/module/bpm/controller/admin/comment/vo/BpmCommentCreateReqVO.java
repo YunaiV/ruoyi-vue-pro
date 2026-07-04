@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.bpm.controller.admin.comment.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Size;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 import lombok.Data;
 
 @Schema(description = "管理后台 - 流程评论创建 Request VO")
