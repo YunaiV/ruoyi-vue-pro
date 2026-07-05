@@ -53,4 +53,31 @@
         GROUP BY time
     </select>
 
+    <select id="selectContractSummary"
+            resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.performance.CrmStatisticsPerformanceSummaryRespVO">
+        SELECT DATE_FORMAT(contract.order_date, '%Y%m') AS time,
+               COUNT(DISTINCT contract.id) AS contract_count,
+               IFNULL(SUM(contract.total_price), 0) AS contract_price,
+               IFNULL(SUM(receivable.receivable_price), 0) AS receivable_price,
+               IFNULL(SUM(contract.total_price), 0) - IFNULL(SUM(receivable.receivable_price), 0) AS unreceived_price
+          FROM crm_contract AS contract
+                LEFT JOIN (
+                    SELECT contract_id,
+                           IFNULL(SUM(price), 0) AS receivable_price
+                      FROM crm_receivable
+                     WHERE deleted = 0
+                       AND audit_status = ${@cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum@APPROVE.status}
+                     GROUP BY contract_id
+                ) AS receivable ON contract.id = receivable.contract_id
+         WHERE contract.deleted = 0
+           AND contract.audit_status = ${@cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum@APPROVE.status}
+           AND contract.owner_user_id in
+                <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+                    #{userId}
+                </foreach>
+           AND contract.order_date between #{times[0],javaType=java.time.LocalDateTime} and
+                #{times[1],javaType=java.time.LocalDateTime}
+         GROUP BY time
+    </select>
+
 </mapper>

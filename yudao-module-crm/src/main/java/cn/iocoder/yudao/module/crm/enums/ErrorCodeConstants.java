@@ -104,6 +104,9 @@ public interface ErrorCodeConstants {
     ErrorCode FOLLOW_UP_RECORD_NOT_EXISTS = new ErrorCode(1_020_013_000, "跟进记录不存在");
     ErrorCode FOLLOW_UP_RECORD_DELETE_DENIED = new ErrorCode(1_020_013_001, "删除跟进记录失败，原因：没有权限");
 
-    // ========== 数据统计 1_020_014_000 ==========
+    // ========== 业绩目标配置 1_020_011_000 ==========
+    ErrorCode PERFORMANCE_CONFIG_NOT_EXISTS = new ErrorCode(1_020_011_000, "业绩目标配置不存在");
+    ErrorCode PERFORMANCE_CONFIG_EXISTS = new ErrorCode(1_020_011_001, "该对象当前年份的业绩目标配置已存在");
+    ErrorCode PERFORMANCE_CONFIG_TYPE_INVALID = new ErrorCode(1_020_011_002, "目标对象类型不正确");
 
 }
