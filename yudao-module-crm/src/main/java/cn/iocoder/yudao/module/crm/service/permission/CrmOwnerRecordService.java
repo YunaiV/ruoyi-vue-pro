@@ -4,7 +4,7 @@ import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.CrmSt
 import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.CrmStatisticsPoolSummaryByDateRespVO;
 import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.CrmStatisticsPoolSummaryByUserRespVO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmOwnerRecordCreateReqBO;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 
 import java.util.List;
 

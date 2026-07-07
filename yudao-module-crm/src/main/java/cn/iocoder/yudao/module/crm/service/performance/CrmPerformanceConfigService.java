@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.crm.controller.admin.performance.vo.config.CrmPerformanceConfigPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.performance.vo.config.CrmPerformanceConfigSaveReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.performance.CrmPerformanceConfigDO;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 
 import java.util.Collection;
 import java.util.List;
