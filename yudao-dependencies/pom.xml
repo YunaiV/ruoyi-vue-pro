@@ -76,8 +76,8 @@
         <okhttp.version>4.12.0</okhttp.version>
         <californium.version>3.14.0</californium.version>
         <j2mod.version>3.3.0</j2mod.version>
-        <httpclient5.version>5.5.2</httpclient5.version> <!-- WxJava 4.8.x 需要 HttpClient5 5.4+，Spring Boot 2.7 默认 5.1.4 不兼容 -->
-        <httpcore5.version>5.3.6</httpcore5.version> <!-- 配套 httpclient5 5.5.2，Spring Boot 2.7 默认 5.1.5 不兼容 -->
+        <httpclient5.version>5.5.1</httpclient5.version> <!-- WxJava 4.8.x 需要 HttpClient5 5.4+，Spring Boot 2.7 默认 5.1.4 不兼容；JDK8 兼容不能升级到 5.5.2+ -->
+        <httpcore5.version>5.3.6</httpcore5.version> <!-- 配套 httpclient5 5.5.1，Spring Boot 2.7 默认 5.1.5 不兼容 -->
         <!-- 三方云服务相关 -->
         <awssdk.version>2.46.17</awssdk.version>
         <justauth.version>1.16.7</justauth.version>
@@ -629,7 +629,7 @@
                 <version>${j2mod.version}</version>
             </dependency>
 
-            <!-- WxJava 4.8.x 需要 HttpClient5 5.4+，覆盖 Spring Boot 2.7 默认的 5.1.4 -->
+            <!-- WxJava 4.8.x 需要 HttpClient5 5.4+，覆盖 Spring Boot 2.7 默认的 5.1.4；JDK8 兼容不能升级到 5.5.2+ -->
             <dependency>
                 <groupId>org.apache.httpcomponents.client5</groupId>
                 <artifactId>httpclient5</artifactId>
