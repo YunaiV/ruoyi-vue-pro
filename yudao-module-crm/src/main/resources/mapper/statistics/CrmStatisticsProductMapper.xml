@@ -62,7 +62,7 @@
                 LEFT JOIN crm_product_category AS category ON product.category_id = category.id AND category.deleted = 0
          WHERE <include refid="ProductStatisticsWhere"/>
          GROUP BY category.id, category.name
-         ORDER BY product_total_price DESC, product_count DESC
+         ORDER BY product_count DESC, product_total_price DESC
     </select>
 
 </mapper>
