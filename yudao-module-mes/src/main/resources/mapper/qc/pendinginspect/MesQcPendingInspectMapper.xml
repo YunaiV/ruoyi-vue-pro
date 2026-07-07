@@ -167,15 +167,6 @@
             <if test="sourceDocCode != null and sourceDocCode != ''">
                 AND t.sourceDocCode LIKE CONCAT('%', #{sourceDocCode}, '%')
             </if>
-            <if test="sourceDocType != null">
-                AND t.sourceDocType = #{sourceDocType}
-            </if>
-            <if test="sourceDocId != null">
-                AND t.sourceDocId = #{sourceDocId}
-            </if>
-            <if test="sourceLineId != null">
-                AND t.sourceLineId = #{sourceLineId}
-            </if>
             <if test="qcType != null">
                 AND t.qcType = #{qcType}
             </if>
