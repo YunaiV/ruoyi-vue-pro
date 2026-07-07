@@ -30,6 +30,14 @@ public interface CrmStatisticsFunnelService {
     List<CrmStatisticsBusinessSummaryByEndStatusRespVO> getBusinessSummaryByEndStatus(CrmStatisticsFunnelReqVO reqVO);
 
     /**
+     * 获得商机阶段统计
+     *
+     * @param reqVO 请求
+     * @return 商机阶段统计
+     */
+    List<CrmStatisticsBusinessSummaryByStatusRespVO> getBusinessSummaryByStatus(CrmStatisticsFunnelReqVO reqVO);
+
+    /**
      * 获取新增商机分析(按日期)
      *
      * @param reqVO 请求

@@ -25,6 +25,9 @@
         <if test="status != null">
             AND end_status = #{status}
         </if>
+        <if test="reqVO.statusTypeId != null">
+            AND status_type_id = #{reqVO.statusTypeId}
+        </if>
         AND owner_user_id IN
         <foreach collection="reqVO.userIds" item="userId" open="(" close=")" separator=",">
             #{userId}
@@ -38,9 +41,12 @@
         SELECT
             end_status AS endStatus,
             COUNT(*) AS businessCount,
-            SUM(total_price) AS totalPrice
+            IFNULL(SUM(total_price), 0) AS totalPrice
         FROM crm_business
         WHERE deleted = 0 AND end_status IS NOT NULL
+        <if test="statusTypeId != null">
+            AND status_type_id = #{statusTypeId}
+        </if>
         AND owner_user_id IN
         <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
             #{userId}
@@ -50,14 +56,44 @@
         GROUP BY end_status
     </select>
 
+    <select id="selectBusinessSummaryListGroupByStatus"
+            resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.funnel.CrmStatisticsBusinessSummaryByStatusRespVO">
+        SELECT
+            status.id AS statusId,
+            status.name AS statusName,
+            status.percent AS statusPercent,
+            status.sort AS sort,
+            COUNT(business.id) AS businessCount,
+            IFNULL(SUM(business.total_price), 0) AS totalPrice
+        FROM crm_business_status status
+        LEFT JOIN crm_business business ON business.status_id = status.id
+            AND business.deleted = 0
+            AND business.end_status IS NULL
+            AND business.owner_user_id IN
+            <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+                #{userId}
+            </foreach>
+            AND business.create_time BETWEEN #{times[0],javaType=java.time.LocalDateTime} AND
+            #{times[1],javaType=java.time.LocalDateTime}
+        WHERE status.deleted = 0
+        <if test="statusTypeId != null">
+            AND status.type_id = #{statusTypeId}
+        </if>
+        GROUP BY status.id, status.name, status.percent, status.sort
+        ORDER BY status.sort ASC
+    </select>
+
     <select id="selectBusinessSummaryGroupByDate"
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.funnel.CrmStatisticsBusinessSummaryByDateRespVO">
         SELECT
             DATE_FORMAT(create_time, '%Y-%m-%d') AS time,
             COUNT(*) AS businessCreateCount,
-            SUM(total_price) AS totalPrice
+            IFNULL(SUM(total_price), 0) AS totalPrice
         FROM crm_business
         WHERE deleted = 0
+        <if test="statusTypeId != null">
+            AND status_type_id = #{statusTypeId}
+        </if>
         AND owner_user_id IN
         <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
             #{userId}
@@ -75,6 +111,9 @@
             SUM(IF(end_status = 1, 1, 0)) AS businessWinCount
         FROM crm_business
         WHERE deleted = 0
+        <if test="statusTypeId != null">
+            AND status_type_id = #{statusTypeId}
+        </if>
         AND owner_user_id IN
         <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
             #{userId}

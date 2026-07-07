@@ -28,7 +28,9 @@ import cn.iocoder.yudao.module.crm.service.business.CrmBusinessService;
 import cn.iocoder.yudao.module.crm.service.contact.CrmContactService;
 import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
 import cn.iocoder.yudao.module.crm.service.customer.bo.CrmCustomerCreateReqBO;
+import cn.iocoder.yudao.module.crm.service.permission.CrmOwnerRecordService;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
+import cn.iocoder.yudao.module.crm.service.permission.bo.CrmOwnerRecordCreateReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionTransferReqBO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -66,6 +68,8 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
 
     @Resource
     private CrmCustomerMapper customerMapper;
+    @Resource
+    private CrmOwnerRecordService ownerRecordService;
 
     @Resource
     private CrmPermissionService permissionService;
@@ -407,6 +411,7 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         // 2. 领取公海数据
         List<CrmCustomerDO> updateCustomers = new ArrayList<>();
         List<CrmPermissionCreateReqBO> createPermissions = new ArrayList<>();
+        List<CrmOwnerRecordCreateReqBO> ownerRecords = new ArrayList<>();
         customers.forEach(customer -> {
             // 2.1. 设置负责人
             updateCustomers.add(new CrmCustomerDO().setId(customer.getId())
@@ -414,11 +419,16 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
             // 2.2. 创建负责人数据权限
             createPermissions.add(new CrmPermissionCreateReqBO().setBizType(CrmBizTypeEnum.CRM_CUSTOMER.getType())
                     .setBizId(customer.getId()).setUserId(ownerUserId).setLevel(CrmPermissionLevelEnum.OWNER.getLevel()));
+            // 2.3. 记录负责人从公海变更为指定人员
+            ownerRecords.add(new CrmOwnerRecordCreateReqBO().setBizType(CrmBizTypeEnum.CRM_CUSTOMER.getType())
+                    .setBizId(customer.getId()).setPreOwnerUserId(customer.getOwnerUserId()).setPostOwnerUserId(ownerUserId));
         });
         // 2.2 更新客户负责人
         customerMapper.updateBatch(updateCustomers);
         // 2.3 创建负责人数据权限
         permissionService.createPermissionBatch(createPermissions);
+        // 2.4 记录负责人变更历史
+        ownerRecordService.createOwnerRecordList(ownerRecords);
         // TODO @芋艿：要不要处理关联的联系人？？？
 
         // 3. 记录操作日志
@@ -459,6 +469,8 @@ public class CrmCustomerServiceImpl implements CrmCustomerService {
         if (updateOwnerUserIncr == 0) {
             throw exception(CUSTOMER_UPDATE_OWNER_USER_FAIL);
         }
+        ownerRecordService.createOwnerRecord(new CrmOwnerRecordCreateReqBO().setBizType(CrmBizTypeEnum.CRM_CUSTOMER.getType())
+                .setBizId(customer.getId()).setPreOwnerUserId(customer.getOwnerUserId()).setPostOwnerUserId(null));
 
         // 2. 联系人的负责人，也要设置为 null。因为：因为领取后，负责人也要关联过来，这块和 receiveCustomer 是对应的
         contactService.updateOwnerUserIdByCustomerId(customer.getId(), null);

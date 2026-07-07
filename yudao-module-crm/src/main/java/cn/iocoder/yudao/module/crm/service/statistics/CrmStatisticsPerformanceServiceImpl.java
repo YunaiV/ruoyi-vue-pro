@@ -5,6 +5,7 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.performance.CrmStatisticsPerformanceReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.performance.CrmStatisticsPerformanceRespVO;
+import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.performance.CrmStatisticsPerformanceSummaryRespVO;
 import cn.iocoder.yudao.module.crm.dal.mysql.statistics.CrmStatisticsPerformanceMapper;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
@@ -54,6 +55,29 @@ public class CrmStatisticsPerformanceServiceImpl implements CrmStatisticsPerform
     @Override
     public List<CrmStatisticsPerformanceRespVO> getReceivablePricePerformance(CrmStatisticsPerformanceReqVO performanceReqVO) {
         return getPerformance(performanceReqVO, performanceMapper::selectReceivablePricePerformance);
+    }
+
+    @Override
+    public List<CrmStatisticsPerformanceSummaryRespVO> getContractSummary(CrmStatisticsPerformanceReqVO performanceReqVO) {
+        List<Long> userIds = getUserIds(performanceReqVO);
+        if (CollUtil.isEmpty(userIds)) {
+            return Collections.emptyList();
+        }
+        performanceReqVO.setUserIds(userIds);
+
+        int year = performanceReqVO.getTimes()[0].getYear();
+        List<CrmStatisticsPerformanceSummaryRespVO> summaryList = performanceMapper.selectContractSummary(performanceReqVO);
+        Map<String, CrmStatisticsPerformanceSummaryRespVO> summaryMap = convertMap(summaryList,
+                CrmStatisticsPerformanceSummaryRespVO::getTime);
+        List<CrmStatisticsPerformanceSummaryRespVO> result = new ArrayList<>();
+        for (int month = 1; month <= 12; month++) {
+            String currentMonth = String.format("%d%02d", year, month);
+            CrmStatisticsPerformanceSummaryRespVO summary = summaryMap.get(currentMonth);
+            result.add(summary != null ? summary : new CrmStatisticsPerformanceSummaryRespVO().setTime(currentMonth)
+                    .setContractCount(0).setContractPrice(BigDecimal.ZERO)
+                    .setReceivablePrice(BigDecimal.ZERO).setUnreceivedPrice(BigDecimal.ZERO));
+        }
+        return result;
     }
 
     /**
