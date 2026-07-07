@@ -72,6 +72,7 @@ public interface CrmBusinessMapper extends BaseMapperX<CrmBusinessDO> {
     default PageResult<CrmBusinessDO> selectPage(CrmStatisticsFunnelReqVO pageVO) {
         return selectPage(pageVO, new LambdaQueryWrapperX<CrmBusinessDO>()
                 .in(CrmBusinessDO::getOwnerUserId, pageVO.getUserIds())
+                .eqIfPresent(CrmBusinessDO::getStatusTypeId, pageVO.getStatusTypeId())
                 .betweenIfPresent(CrmBusinessDO::getCreateTime, pageVO.getTimes()));
     }
 

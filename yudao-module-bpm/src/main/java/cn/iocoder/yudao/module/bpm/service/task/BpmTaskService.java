@@ -104,6 +104,14 @@ public interface BpmTaskService {
     Task validateTask(Long userId, String taskId);
 
     /**
+     * 校验任务是否存在
+     *
+     * @param id 任务编号
+     * @return 任务
+     */
+    Task validateTaskExists(String id);
+
+    /**
      * 获取任务
      *
      * @param id 任务编号
@@ -126,6 +134,16 @@ public interface BpmTaskService {
      * @return 历史任务列表
      */
     List<HistoricTaskInstance> getHistoricTasks(Collection<String> taskIds);
+
+    /**
+     * 获取历史任务 Map
+     *
+     * @param taskIds 任务编号集合
+     * @return 历史任务 Map
+     */
+    default Map<String, HistoricTaskInstance> getHistoricTaskMap(Collection<String> taskIds) {
+        return CollectionUtils.convertMap(getHistoricTasks(taskIds), HistoricTaskInstance::getId);
+    }
 
     /**
      * 根据条件查询正在进行中的任务

@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.crm.controller.admin.statistics;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.performance.CrmStatisticsPerformanceReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.performance.CrmStatisticsPerformanceRespVO;
+import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.performance.CrmStatisticsPerformanceSummaryRespVO;
 import cn.iocoder.yudao.module.crm.service.statistics.CrmStatisticsPerformanceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -47,6 +48,13 @@ public class CrmStatisticsPerformanceController {
     @PreAuthorize("@ss.hasPermission('crm:statistics-performance:query')")
     public CommonResult<List<CrmStatisticsPerformanceRespVO>> getReceivablePriceStaffPerformance(@Valid CrmStatisticsPerformanceReqVO performanceReqVO) {
         return success(performanceService.getReceivablePricePerformance(performanceReqVO));
+    }
+
+    @GetMapping("/get-contract-summary")
+    @Operation(summary = "合同汇总表")
+    @PreAuthorize("@ss.hasPermission('crm:statistics-performance:query')")
+    public CommonResult<List<CrmStatisticsPerformanceSummaryRespVO>> getContractSummary(@Valid CrmStatisticsPerformanceReqVO performanceReqVO) {
+        return success(performanceService.getContractSummary(performanceReqVO));
     }
 
 }

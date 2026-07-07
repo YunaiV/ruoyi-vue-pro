@@ -10,6 +10,7 @@ import cn.iocoder.yudao.framework.ip.core.enums.AreaTypeEnum;
 import cn.iocoder.yudao.framework.ip.core.utils.AreaUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.*;
 import cn.iocoder.yudao.module.crm.dal.mysql.statistics.CrmStatisticsCustomerMapper;
+import cn.iocoder.yudao.module.crm.service.permission.CrmOwnerRecordService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -40,6 +41,9 @@ public class CrmStatisticsCustomerServiceImpl implements CrmStatisticsCustomerSe
 
     @Resource
     private CrmStatisticsCustomerMapper customerMapper;
+
+    @Resource
+    private CrmOwnerRecordService ownerRecordService;
 
     @Resource
     private AdminUserApi adminUserApi;
@@ -201,8 +205,8 @@ public class CrmStatisticsCustomerServiceImpl implements CrmStatisticsCustomerSe
         }
 
         // 2. 按天统计，获取分项统计数据
-        List<CrmStatisticsPoolSummaryByDateRespVO> customerPutCountList = customerMapper.selectPoolCustomerPutCountByDate(reqVO);
-        List<CrmStatisticsPoolSummaryByDateRespVO> customerTakeCountList = customerMapper.selectPoolCustomerTakeCountByDate(reqVO);
+        List<CrmStatisticsPoolSummaryByDateRespVO> customerPutCountList = ownerRecordService.getPoolCustomerPutCountByDate(reqVO);
+        List<CrmStatisticsPoolSummaryByDateRespVO> customerTakeCountList = ownerRecordService.getPoolCustomerTakeCountByDate(reqVO);
 
         // 3. 按照日期间隔，合并数据
         List<LocalDateTime[]> timeRanges = LocalDateTimeUtils.getDateRangeList(reqVO.getTimes()[0], reqVO.getTimes()[1], reqVO.getInterval());
@@ -228,8 +232,8 @@ public class CrmStatisticsCustomerServiceImpl implements CrmStatisticsCustomerSe
         }
 
         // 2. 按用户统计，获取分项统计数据
-        List<CrmStatisticsPoolSummaryByUserRespVO> customerPutCountList = customerMapper.selectPoolCustomerPutCountByUser(reqVO);
-        List<CrmStatisticsPoolSummaryByUserRespVO> customerTakeCountList = customerMapper.selectPoolCustomerTakeCountByUser(reqVO);
+        List<CrmStatisticsPoolSummaryByUserRespVO> customerPutCountList = ownerRecordService.getPoolCustomerPutCountByUser(reqVO);
+        List<CrmStatisticsPoolSummaryByUserRespVO> customerTakeCountList = ownerRecordService.getPoolCustomerTakeCountByUser(reqVO);
 
         // 3.1 按照用户，合并统计数据
         List<CrmStatisticsPoolSummaryByUserRespVO> summaryList = convertList(reqVO.getUserIds(), userId -> {
@@ -331,7 +335,6 @@ public class CrmStatisticsCustomerServiceImpl implements CrmStatisticsCustomerSe
         reqVO.setUserIds(userIds);
 
         // 2. 获取客户产品统计数据
-        // TODO @dhb52：未读取产品名
         return customerMapper.selectCustomerDealCycleGroupByProductId(reqVO);
     }
 
