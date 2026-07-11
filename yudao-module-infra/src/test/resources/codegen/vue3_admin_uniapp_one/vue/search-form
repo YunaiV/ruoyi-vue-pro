@@ -27,40 +27,18 @@
           clearable
         />
       </view>
-      <view class="yd-search-form-item">
-        <view class="yd-search-form-label">
-          性别
-        </view>
-        <wd-radio-group v-model="formData.sex" type="button">
-          <wd-radio :value="-1">
-            全部
-          </wd-radio>
-          <wd-radio
-            v-for="dict in getIntDictOptions(DICT_TYPE.SYSTEM_USER_SEX)"
-            :key="dict.value"
-            :value="dict.value"
-          >
-            {{ dict.label }}
-          </wd-radio>
-        </wd-radio-group>
-      </view>
-      <view class="yd-search-form-item">
-        <view class="yd-search-form-label">
-          是否有效
-        </view>
-        <wd-radio-group v-model="formData.enabled" type="button">
-          <wd-radio :value="-1">
-            全部
-          </wd-radio>
-          <wd-radio
-            v-for="dict in getBoolDictOptions(DICT_TYPE.INFRA_BOOLEAN_STRING)"
-            :key="dict.value"
-            :value="dict.value"
-          >
-            {{ dict.label }}
-          </wd-radio>
-        </wd-radio-group>
-      </view>
+      <yd-search-picker
+        v-model="formData.sex"
+        label="性别"
+        :columns="getIntDictOptions(DICT_TYPE.SYSTEM_USER_SEX)"
+        all-option
+      />
+      <yd-search-picker
+        v-model="formData.enabled"
+        label="是否有效"
+        :columns="getBoolDictOptions(DICT_TYPE.INFRA_BOOLEAN_STRING)"
+        all-option
+      />
       <yd-search-date-range v-model="formData.createTime" label="创建时间" />
       <view class="yd-search-form-actions">
         <wd-button class="flex-1" plain @click="handleReset">
@@ -90,8 +68,8 @@ const visible = ref(false) // 搜索弹窗显示状态
 const formData = reactive({
   name: undefined as string | undefined,
   birthday: undefined as string | undefined,
-  sex: -1, // -1 表示全部
-  enabled: -1 as -1 | boolean, // -1 表示全部
+  sex: undefined as number | undefined,
+  enabled: undefined as boolean | undefined,
   createTime: [undefined, undefined] as [number | undefined, number | undefined],
 }) // 搜索表单数据
 
@@ -104,10 +82,10 @@ const placeholder = computed(() => {
   if (formData.birthday) {
     conditions.push(`出生日期:${formData.birthday}`)
   }
-  if (formData.sex !== -1) {
+  if (formData.sex !== undefined) {
     conditions.push(`性别:${getDictLabel(DICT_TYPE.SYSTEM_USER_SEX, formData.sex)}`)
   }
-  if (formData.enabled !== -1) {
+  if (formData.enabled !== undefined) {
     conditions.push(`是否有效:${getDictLabel(DICT_TYPE.INFRA_BOOLEAN_STRING, formData.enabled)}`)
   }
   if (formData.createTime?.[0] && formData.createTime?.[1]) {
@@ -121,8 +99,6 @@ function handleSearch() {
   visible.value = false
   emit('search', {
     ...formData,
-    sex: formData.sex === -1 ? undefined : formData.sex,
-    enabled: formData.enabled === -1 ? undefined : formData.enabled,
     createTime: formatDateRange(formData.createTime),
   })
 }
@@ -131,8 +107,8 @@ function handleSearch() {
 function handleReset() {
   formData.name = undefined
   formData.birthday = undefined
-  formData.sex = -1
-  formData.enabled = -1
+  formData.sex = undefined
+  formData.enabled = undefined
   formData.createTime = [undefined, undefined]
   visible.value = false
   emit('reset')
