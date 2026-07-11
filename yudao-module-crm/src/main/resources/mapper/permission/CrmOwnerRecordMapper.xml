@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.iocoder.yudao.module.crm.dal.mysql.permission.CrmOwnerRecordMapper">
+
+    <select id="selectPoolCustomerPutCountByDate"
+            resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.CrmStatisticsPoolSummaryByDateRespVO">
+        SELECT DATE_FORMAT(create_time, '%Y-%m-%d') AS time,
+               COUNT(*) AS customer_put_count
+          FROM crm_owner_record
+         WHERE deleted = 0
+           AND biz_type = ${@cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum@CRM_CUSTOMER.type}
+           AND pre_owner_user_id IN
+                <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+                    #{userId}
+                </foreach>
+           AND post_owner_user_id IS NULL
+           AND create_time BETWEEN #{times[0],javaType=java.time.LocalDateTime} AND #{times[1],javaType=java.time.LocalDateTime}
+         GROUP BY time
+    </select>
+
+    <select id="selectPoolCustomerTakeCountByDate"
+            resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.CrmStatisticsPoolSummaryByDateRespVO">
+        SELECT DATE_FORMAT(create_time, '%Y-%m-%d') AS time,
+               COUNT(*) AS customer_take_count
+          FROM crm_owner_record
+         WHERE deleted = 0
+           AND biz_type = ${@cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum@CRM_CUSTOMER.type}
+           AND pre_owner_user_id IS NULL
+           AND post_owner_user_id IN
+                <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+                    #{userId}
+                </foreach>
+           AND create_time BETWEEN #{times[0],javaType=java.time.LocalDateTime} AND #{times[1],javaType=java.time.LocalDateTime}
+         GROUP BY time
+    </select>
+
+    <select id="selectPoolCustomerPutCountByUser"
+            resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.CrmStatisticsPoolSummaryByUserRespVO">
+        SELECT pre_owner_user_id AS owner_user_id,
+               COUNT(*) AS customer_put_count
+          FROM crm_owner_record
+         WHERE deleted = 0
+           AND biz_type = ${@cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum@CRM_CUSTOMER.type}
+           AND pre_owner_user_id IN
+                <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+                    #{userId}
+                </foreach>
+           AND post_owner_user_id IS NULL
+           AND create_time BETWEEN #{times[0],javaType=java.time.LocalDateTime} AND #{times[1],javaType=java.time.LocalDateTime}
+         GROUP BY pre_owner_user_id
+    </select>
+
+    <select id="selectPoolCustomerTakeCountByUser"
+            resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.CrmStatisticsPoolSummaryByUserRespVO">
+        SELECT post_owner_user_id AS owner_user_id,
+               COUNT(*) AS customer_take_count
+          FROM crm_owner_record
+         WHERE deleted = 0
+           AND biz_type = ${@cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum@CRM_CUSTOMER.type}
+           AND pre_owner_user_id IS NULL
+           AND post_owner_user_id IN
+                <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+                    #{userId}
+                </foreach>
+           AND create_time BETWEEN #{times[0],javaType=java.time.LocalDateTime} AND #{times[1],javaType=java.time.LocalDateTime}
+         GROUP BY post_owner_user_id
+    </select>
+
+</mapper>

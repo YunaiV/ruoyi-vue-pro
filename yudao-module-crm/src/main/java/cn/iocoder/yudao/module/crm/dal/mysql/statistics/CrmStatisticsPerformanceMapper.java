@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.crm.dal.mysql.statistics;
 
 import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.performance.CrmStatisticsPerformanceReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.performance.CrmStatisticsPerformanceRespVO;
+import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.performance.CrmStatisticsPerformanceSummaryRespVO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -37,5 +38,13 @@ public interface CrmStatisticsPerformanceMapper {
      * @return 员工回款金额
      */
     List<CrmStatisticsPerformanceRespVO> selectReceivablePricePerformance(CrmStatisticsPerformanceReqVO performanceReqVO);
+
+    /**
+     * 合同汇总表
+     *
+     * @param performanceReqVO 参数
+     * @return 合同汇总表
+     */
+    List<CrmStatisticsPerformanceSummaryRespVO> selectContractSummary(CrmStatisticsPerformanceReqVO performanceReqVO);
 
 }

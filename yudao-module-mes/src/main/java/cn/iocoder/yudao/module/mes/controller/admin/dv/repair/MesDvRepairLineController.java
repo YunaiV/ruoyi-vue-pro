@@ -89,6 +89,16 @@ public class MesDvRepairLineController {
         return success(new PageResult<>(buildRepairLineRespVOList(pageResult.getList()), pageResult.getTotal()));
     }
 
+    @GetMapping("/list-by-repair-id")
+    @Operation(summary = "获得指定维修工单的明细列表")
+    @Parameter(name = "repairId", description = "维修工单编号", required = true)
+    @PreAuthorize("@ss.hasPermission('mes:dv-repair:query')")
+    public CommonResult<List<MesDvRepairLineRespVO>> getRepairLineListByRepairId(
+            @RequestParam("repairId") Long repairId) {
+        List<MesDvRepairLineDO> list = repairLineService.getRepairLineListByRepairId(repairId);
+        return success(buildRepairLineRespVOList(list));
+    }
+
     @GetMapping("/export-excel")
     @Operation(summary = "导出维修工单行 Excel")
     @PreAuthorize("@ss.hasPermission('mes:dv-repair:export')")

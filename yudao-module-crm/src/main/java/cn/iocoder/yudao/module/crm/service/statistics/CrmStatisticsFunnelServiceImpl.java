@@ -71,6 +71,18 @@ public class CrmStatisticsFunnelServiceImpl implements CrmStatisticsFunnelServic
     }
 
     @Override
+    public List<CrmStatisticsBusinessSummaryByStatusRespVO> getBusinessSummaryByStatus(CrmStatisticsFunnelReqVO reqVO) {
+        // 1. 获得用户编号数组
+        reqVO.setUserIds(getUserIds(reqVO));
+        if (CollUtil.isEmpty(reqVO.getUserIds())) {
+            return Collections.emptyList();
+        }
+
+        // 2. 获得统计数据
+        return funnelMapper.selectBusinessSummaryListGroupByStatus(reqVO);
+    }
+
+    @Override
     public List<CrmStatisticsBusinessSummaryByDateRespVO> getBusinessSummaryByDate(CrmStatisticsFunnelReqVO reqVO) {
         // 1. 获得用户编号数组
         reqVO.setUserIds(getUserIds(reqVO));

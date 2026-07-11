@@ -28,6 +28,9 @@ public class CrmStatisticsFunnelReqVO extends PageParam {
     @Schema(description = "负责人用户 id", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "1")
     private Long userId;
 
+    @Schema(description = "商机状态组编号", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "1")
+    private Long statusTypeId;
+
     /**
      * userIds 目前不用前端传递，目前是方便后端通过 deptId 读取编号后，设置回来
      * 后续，可能会支持选择部分用户进行查询

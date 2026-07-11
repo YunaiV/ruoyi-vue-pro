@@ -4,11 +4,12 @@ package cn.iocoder.yudao.module.crm.service.statistics;
 
 import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.performance.CrmStatisticsPerformanceReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.performance.CrmStatisticsPerformanceRespVO;
+import cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.performance.CrmStatisticsPerformanceSummaryRespVO;
 
 import java.util.List;
 
 /**
- * CRM 员工绩效统计 Service 接口
+ * CRM 员工业绩统计 Service 接口
  *
  * @author scholar
  */
@@ -38,5 +39,12 @@ public interface CrmStatisticsPerformanceService {
      */
     List<CrmStatisticsPerformanceRespVO> getReceivablePricePerformance(CrmStatisticsPerformanceReqVO performanceReqVO);
 
+    /**
+     * 员工合同汇总表
+     *
+     * @param performanceReqVO 排行参数
+     * @return 员工合同汇总表
+     */
+    List<CrmStatisticsPerformanceSummaryRespVO> getContractSummary(CrmStatisticsPerformanceReqVO performanceReqVO);
 
 }

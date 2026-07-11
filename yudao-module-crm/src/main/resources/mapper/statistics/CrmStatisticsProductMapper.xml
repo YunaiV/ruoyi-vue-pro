@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.iocoder.yudao.module.crm.dal.mysql.statistics.CrmStatisticsProductMapper">
+
+    <sql id="ProductStatisticsWhere">
+        contract.deleted = 0
+        AND contract_product.deleted = 0
+        AND product.deleted = 0
+        AND contract.audit_status = ${@cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum@APPROVE.status}
+        AND contract.owner_user_id IN
+            <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+                #{userId}
+            </foreach>
+        AND contract.order_date BETWEEN #{times[0],javaType=java.time.LocalDateTime} AND #{times[1],javaType=java.time.LocalDateTime}
+        <if test="categoryIds != null and categoryIds.size() > 0">
+            AND product.category_id IN
+            <foreach collection="categoryIds" item="categoryId" open="(" close=")" separator=",">
+                #{categoryId}
+            </foreach>
+        </if>
+        <if test="productId != null">
+            AND product.id = #{productId}
+        </if>
+    </sql>
+
+    <select id="selectProductSalesList"
+            resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.product.CrmStatisticsProductSalesRespVO">
+        SELECT category.id AS category_id,
+               IFNULL(category.name, '未分类') AS category_name,
+               product.id AS product_id,
+               product.name AS product_name,
+               contract.id AS contract_id,
+               contract.no AS contract_no,
+               contract.name AS contract_name,
+               contract.owner_user_id,
+               owner.nickname AS owner_user_name,
+               customer.id AS customer_id,
+               customer.name AS customer_name,
+               contract_product.product_price,
+               contract_product.count AS product_count,
+               contract_product.total_price AS product_total_price
+          FROM crm_contract_product AS contract_product
+                INNER JOIN crm_contract AS contract ON contract_product.contract_id = contract.id
+                INNER JOIN crm_product AS product ON contract_product.product_id = product.id
+                LEFT JOIN crm_product_category AS category ON product.category_id = category.id AND category.deleted = 0
+                LEFT JOIN crm_customer AS customer ON contract.customer_id = customer.id AND customer.deleted = 0
+                LEFT JOIN system_users AS owner ON contract.owner_user_id = owner.id AND owner.deleted = 0
+         WHERE <include refid="ProductStatisticsWhere"/>
+         ORDER BY category.id ASC, product.id ASC, contract.order_date DESC
+    </select>
+
+    <select id="selectProductCategorySummary"
+            resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.product.CrmStatisticsProductCategoryRespVO">
+        SELECT category.id AS category_id,
+               IFNULL(category.name, '未分类') AS category_name,
+               COUNT(DISTINCT contract.id) AS contract_count,
+               IFNULL(SUM(contract_product.count), 0) AS product_count,
+               IFNULL(SUM(contract_product.total_price), 0) AS product_total_price
+          FROM crm_contract_product AS contract_product
+                INNER JOIN crm_contract AS contract ON contract_product.contract_id = contract.id
+                INNER JOIN crm_product AS product ON contract_product.product_id = product.id
+                LEFT JOIN crm_product_category AS category ON product.category_id = category.id AND category.deleted = 0
+         WHERE <include refid="ProductStatisticsWhere"/>
+         GROUP BY category.id, category.name
+         ORDER BY product_count DESC, product_total_price DESC
+    </select>
+
+</mapper>
