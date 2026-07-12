@@ -31,6 +31,14 @@ public interface AiMindMapService {
     void deleteMindMap(Long id);
 
     /**
+     * 获得思维导图
+     *
+     * @param id 编号
+     * @return 思维导图
+     */
+    AiMindMapDO getMindMap(Long id);
+
+    /**
      * 获得思维导图分页
      *
      * @param pageReqVO 分页查询

@@ -106,6 +106,20 @@ public class AiChatConversationController {
                 conversation -> conversation.setMessageCount(messageCountMap.getOrDefault(conversation.getId(), 0))));
     }
 
+    @GetMapping("/get")
+    @Operation(summary = "获得对话", description = "用于【对话管理】菜单")
+    @Parameter(name = "id", required = true, description = "对话编号", example = "1024")
+    @PreAuthorize("@ss.hasPermission('ai:chat-conversation:query')")
+    @TransMethodResult
+    public CommonResult<AiChatConversationRespVO> getChatConversation(@RequestParam("id") Long id) {
+        AiChatConversationDO conversation = chatConversationService.getChatConversation(id);
+        AiChatConversationRespVO respVO = BeanUtils.toBean(conversation, AiChatConversationRespVO.class);
+        if (respVO != null) {
+            respVO.setMessageCount(chatMessageService.getChatMessageCount(id));
+        }
+        return success(respVO);
+    }
+
     @Operation(summary = "管理员删除对话")
     @DeleteMapping("/delete-by-admin")
     @Parameter(name = "id", required = true, description = "对话编号", example = "1024")
