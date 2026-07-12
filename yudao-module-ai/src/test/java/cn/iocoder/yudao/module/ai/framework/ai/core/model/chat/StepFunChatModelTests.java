@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.ai.framework.ai.core.model.chat;
 
 import cn.hutool.system.SystemUtil;
-import cn.iocoder.yudao.module.ai.framework.ai.core.model.hunyuan.HunYuanChatModel;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.stepfun.StepFunChatModel;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.messages.Message;
@@ -21,30 +21,28 @@ import java.util.Objects;
 import static cn.iocoder.yudao.module.ai.util.AiUtils.validateApiKey;
 
 /**
- * {@link HunYuanChatModel} 集成测试
+ * {@link StepFunChatModel} 集成测试
  *
  * @author 芋道源码
  */
-public class HunYuanChatModelTests {
+public class StepFunChatModelTests {
 
-    private static final String API_KEY = SystemUtil.get("HUNYUAN_API_KEY",
+    private static final String API_KEY = SystemUtil.get("STEPFUN_API_KEY",
             "sk-xxxx");
-    private static final String MODEL = SystemUtil.get("HUNYUAN_MODEL",
-            HunYuanChatModel.MODEL_DEFAULT);
+    private static final String MODEL = SystemUtil.get("STEPFUN_MODEL",
+            StepFunChatModel.MODEL_DEFAULT);
 
-    private final DeepSeekChatModel openAiChatModel = DeepSeekChatModel.builder()
+    private final StepFunChatModel chatModel = new StepFunChatModel(DeepSeekChatModel.builder()
             .deepSeekApi(DeepSeekApi.builder()
-                    .baseUrl(HunYuanChatModel.BASE_URL)
-                    .completionsPath(HunYuanChatModel.COMPLETE_PATH)
-                    .apiKey(API_KEY) // apiKey
+                    .baseUrl(StepFunChatModel.BASE_URL)
+                    .completionsPath(StepFunChatModel.COMPLETE_PATH)
+                    .apiKey(API_KEY)
                     .build())
             .defaultOptions(DeepSeekChatOptions.builder()
-                    .model(MODEL) // 模型
+                    .model(MODEL)
                     .temperature(0.7)
                     .build())
-            .build();
-
-    private final HunYuanChatModel chatModel = new HunYuanChatModel(openAiChatModel);
+            .build());
 
     @Test
     @Disabled
@@ -58,6 +56,7 @@ public class HunYuanChatModelTests {
         // 调用
         ChatResponse response = chatModel.call(new Prompt(messages));
         // 打印结果
+        System.out.println(response);
         System.out.println(Objects.requireNonNull(response.getResult()).getOutput());
     }
 
@@ -73,26 +72,10 @@ public class HunYuanChatModelTests {
         // 调用
         Flux<ChatResponse> flux = chatModel.stream(new Prompt(messages));
         // 打印结果
-        flux.doOnNext(System.out::println).then().block();
-    }
-
-    @Test
-    @Disabled
-    public void testStream_thinking() {
-        validateApiKey(API_KEY);
-        // 准备参数
-        List<Message> messages = new ArrayList<>();
-        messages.add(new UserMessage("详细分析下，如何设计一个电商系统？"));
-        DeepSeekChatOptions options = DeepSeekChatOptions.builder()
-                .model(MODEL)
-                .build();
-
-        // 调用
-        Flux<ChatResponse> flux = chatModel.stream(new Prompt(messages, options));
-        // 打印结果
         flux.doOnNext(response -> {
 //            System.out.println(response);
-            System.out.println(response.getResult().getOutput());
+//            System.out.println(Objects.requireNonNull(response.getResult()).getOutput());
+            System.out.println(response.getResult() != null ? response.getResult().getOutput() : null);
         }).then().block();
     }
 

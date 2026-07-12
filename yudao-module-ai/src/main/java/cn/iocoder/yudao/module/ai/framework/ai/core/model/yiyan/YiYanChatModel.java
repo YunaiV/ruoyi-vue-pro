@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai.framework.ai.core.model.baichuan;
+package cn.iocoder.yudao.module.ai.framework.ai.core.model.yiyan;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,19 +10,17 @@ import org.springframework.ai.deepseek.DeepSeekChatModel;
 import reactor.core.publisher.Flux;
 
 /**
- * 百川 {@link ChatModel} 实现类
+ * 文心一言 {@link ChatModel} 实现类
  *
  * @author 芋道源码
  */
 @Slf4j
 @RequiredArgsConstructor
-public class BaiChuanChatModel implements ChatModel {
+public class YiYanChatModel implements ChatModel {
 
-    public static final String BASE_URL = "https://api.baichuan-ai.com";
+    public static final String BASE_URL = "https://qianfan.baidubce.com/v2";
 
-    public static final String COMPLETE_PATH = "/v1/chat/completions";
-
-    public static final String MODEL_DEFAULT = "Baichuan-M3";
+    public static final String MODEL_DEFAULT = "ernie-5.1";
 
     /**
      * 兼容 OpenAI 接口，复用 DeepSeek 客户端
