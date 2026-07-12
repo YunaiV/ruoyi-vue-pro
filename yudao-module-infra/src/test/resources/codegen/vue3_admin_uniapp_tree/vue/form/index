@@ -71,7 +71,7 @@ definePage({
 const toast = useToast()
 const getTitle = computed(() => props.id ? '编辑分类' : '新增分类')
 const formLoading = ref(false) // 表单提交状态
-const formData = ref<Category>({
+const formData = ref<Partial<Category>>({
   id: undefined,
   name: '',
   parentId: props.parentId ?? 0,
@@ -105,7 +105,7 @@ async function handleSubmit() {
 
   formLoading.value = true
   try {
-    const data = formData.value
+    const data = formData.value as Category
     if (props.id) {
       await updateCategory(data)
       toast.success('修改成功')

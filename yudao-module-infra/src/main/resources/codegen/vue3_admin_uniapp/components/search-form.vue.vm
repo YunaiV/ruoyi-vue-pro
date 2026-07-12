@@ -145,7 +145,7 @@ const formData = reactive({
       #else
   ${column.javaField}: undefined as number | undefined,
       #end
-    #elseif(${javaType} == "long" || ${javaType} == "integer" || ${javaType} == "short" || ${javaType} == "double" || ${javaType} == "bigdecimal" || ${javaType} == "byte")
+    #elseif(${javaType} == "long" || ${javaType} == "integer" || ${javaType} == "short" || ${javaType} == "float" || ${javaType} == "double" || ${javaType} == "bigdecimal" || ${javaType} == "byte")
   ${column.javaField}: undefined as number | undefined,
     #elseif(${javaType} == "boolean")
   ${column.javaField}: undefined as boolean | undefined,
@@ -174,7 +174,7 @@ const placeholder = computed(() => {
     conditions.push(`${comment}:#[[${]]#getDictLabel(DICT_TYPE.${dictType.toUpperCase()}, formData.${javaField})#[[}]]#`)
   }
     #else
-      #if(${javaType} == "long" || ${javaType} == "integer" || ${javaType} == "short" || ${javaType} == "double" || ${javaType} == "bigdecimal" || ${javaType} == "byte" || ${javaType} == "boolean")
+      #if(${javaType} == "long" || ${javaType} == "integer" || ${javaType} == "short" || ${javaType} == "float" || ${javaType} == "double" || ${javaType} == "bigdecimal" || ${javaType} == "byte" || ${javaType} == "boolean")
   if (formData.${javaField} !== undefined) {
     conditions.push(`${comment}:#[[${]]#formData.${javaField}#[[}]]#`)
   }

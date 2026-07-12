@@ -48,6 +48,9 @@ import java.util.*;
 
 import static cn.hutool.core.map.MapUtil.getStr;
 import static cn.hutool.core.text.CharSequenceUtil.*;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.CODEGEN_MASTER_TABLE_FIELD_DUPLICATE;
+import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.CODEGEN_MASTER_TABLE_NAME_DUPLICATE;
 
 /**
  * 代码生成的引擎，用于具体生成代码
@@ -426,16 +429,23 @@ public class CodegenEngine {
     private void generateCode(Map<String, String> result, Map<String, String> generatedSources, String vmPath,
                               String filePath, Map<String, Object> bindingMap) {
         filePath = formatFilePath(filePath, bindingMap);
-        String source = vmPath + (bindingMap.containsKey("subIndex") ? "[subIndex=" + bindingMap.get("subIndex") + "]" : "");
+        registerGeneratedSource(generatedSources, filePath, vmPath, bindingMap);
+        String content = templateEngine.getTemplate(vmPath).render(bindingMap);
+        // 格式化代码
+        content = prettyCode(content, vmPath);
+        result.put(filePath, content);
+    }
+
+    @VisibleForTesting
+    static void registerGeneratedSource(Map<String, String> generatedSources, String filePath, String vmPath,
+                                        Map<String, Object> bindingMap) {
+        String source = vmPath
+                + (bindingMap.containsKey("subIndex") ? "[subIndex=" + bindingMap.get("subIndex") + "]" : "");
         String previousSource = generatedSources.putIfAbsent(filePath, source);
         if (previousSource != null) {
             throw new IllegalStateException(String.format("生成文件路径重复：%s，来源模板：%s、%s",
                     filePath, previousSource, source));
         }
-        String content = templateEngine.getTemplate(vmPath).render(bindingMap);
-        // 格式化代码
-        content = prettyCode(content, vmPath);
-        result.put(filePath, content);
     }
 
     private void generateSubCode(CodegenTableDO table, List<CodegenTableDO> subTables,
@@ -561,6 +571,14 @@ public class CodegenEngine {
             List<String> subClassNameVars = new ArrayList<>();
             List<String> simpleClassNameUnderlineCases = new ArrayList<>();
             List<String> subSimpleClassNameStrikeCases = new ArrayList<>();
+            Set<String> masterSymbols = new HashSet<>();
+            masterSymbols.add(simpleClassName);
+            boolean mergeSubTableFields = ObjectUtils.equalsAny(table.getTemplateType(),
+                    CodegenTemplateTypeEnum.MASTER_NORMAL.getType(), CodegenTemplateTypeEnum.MASTER_INNER.getType());
+            Set<String> masterFieldSymbols = new HashSet<>();
+            if (mergeSubTableFields) {
+                columns.forEach(column -> masterFieldSymbols.add(column.getJavaField()));
+            }
             for (int i = 0; i < subTables.size(); i++) {
                 CodegenTableDO subTable = subTables.get(i);
                 List<CodegenColumnDO> subColumns = subColumnsList.get(i);
@@ -571,9 +589,18 @@ public class CodegenEngine {
                 subJoinColumnStrikeCases.add(toSymbolCase(subColumn.getJavaField(), '-')); // 将 DictType 转换成 dict-type
                 // className 相关
                 String subSimpleClassName = removePrefix(subTable.getClassName(), upperFirst(subTable.getModuleName()));
+                if (!masterSymbols.add(subSimpleClassName)) {
+                    throw exception(CODEGEN_MASTER_TABLE_NAME_DUPLICATE, subSimpleClassName);
+                }
+                String subClassNameVar = lowerFirst(subSimpleClassName);
+                String subFieldName = subClassNameVar
+                        + (Boolean.TRUE.equals(subTable.getSubJoinMany()) ? "s" : "");
+                if (mergeSubTableFields && !masterFieldSymbols.add(subFieldName)) {
+                    throw exception(CODEGEN_MASTER_TABLE_FIELD_DUPLICATE, subFieldName);
+                }
                 subSimpleClassNames.add(subSimpleClassName);
                 simpleClassNameUnderlineCases.add(toUnderlineCase(subSimpleClassName)); // 将 DictType 转换成 dict_type
-                subClassNameVars.add(lowerFirst(subSimpleClassName)); // 将 DictType 转换成 dictType，用于变量
+                subClassNameVars.add(subClassNameVar); // 将 DictType 转换成 dictType，用于变量
                 subSimpleClassNameStrikeCases.add(toSymbolCase(subSimpleClassName, '-')); // 将 DictType 转换成 dict-type
             }
             bindingMap.put("subPrimaryColumns", subPrimaryColumns);

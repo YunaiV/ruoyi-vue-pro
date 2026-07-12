@@ -4,7 +4,7 @@ import type { PageParam, PageResult } from '@/http/types'
 import { http } from '@/http/http'
 
 #set ($primaryJavaType = $primaryColumn.javaType.toLowerCase())
-#if(${primaryJavaType} == "long" || ${primaryJavaType} == "integer" || ${primaryJavaType} == "short" || ${primaryJavaType} == "double" || ${primaryJavaType} == "bigdecimal" || ${primaryJavaType} == "byte")
+#if(${primaryJavaType} == "long" || ${primaryJavaType} == "integer" || ${primaryJavaType} == "short" || ${primaryJavaType} == "float" || ${primaryJavaType} == "double" || ${primaryJavaType} == "bigdecimal" || ${primaryJavaType} == "byte")
 #set ($primaryTsType = "number")
 #else
 #set ($primaryTsType = "string")
@@ -20,7 +20,7 @@ export interface ${subSimpleClassName} {
 #if ($column.primaryKey || $column.createOperation || $column.updateOperation || $column.listOperationResult)
 #set ($javaType = $column.javaType.toLowerCase())
 #set ($optional = $column.nullable || $column.primaryKey || ($table.templateType != 11 && $column.id == $subJoinColumn.id))
-#if(${javaType} == "long" || ${javaType} == "integer" || ${javaType} == "short" || ${javaType} == "double" || ${javaType} == "bigdecimal" || ${javaType} == "byte")
+#if(${javaType} == "long" || ${javaType} == "integer" || ${javaType} == "short" || ${javaType} == "float" || ${javaType} == "double" || ${javaType} == "bigdecimal" || ${javaType} == "byte")
   ${column.javaField}#if($optional)?#end: number
 #elseif(${javaType} == "date" || ${javaType} == "localdate" || ${javaType} == "localdatetime")
   ${column.javaField}#if($optional)?#end: number
@@ -40,7 +40,7 @@ export interface ${simpleClassName} {
 #if ($column.primaryKey || $column.createOperation || $column.updateOperation || $column.listOperationResult)
 #set ($javaType = $column.javaType.toLowerCase())
 #set ($optional = $column.nullable || $column.primaryKey)
-#if(${javaType} == "long" || ${javaType} == "integer" || ${javaType} == "short" || ${javaType} == "double" || ${javaType} == "bigdecimal" || ${javaType} == "byte")
+#if(${javaType} == "long" || ${javaType} == "integer" || ${javaType} == "short" || ${javaType} == "float" || ${javaType} == "double" || ${javaType} == "bigdecimal" || ${javaType} == "byte")
   ${column.javaField}#if($optional)?#end: number
 #elseif(${javaType} == "date" || ${javaType} == "localdate" || ${javaType} == "localdatetime")
   ${column.javaField}#if($optional)?#end: number
@@ -101,13 +101,13 @@ export function delete${simpleClassName}(id: ${primaryTsType}) {
 #set ($subPrimaryColumn = $subPrimaryColumns.get($index))
 #set ($subJoinColumn = $subJoinColumns.get($index))
 #set ($subPrimaryJavaType = $subPrimaryColumn.javaType.toLowerCase())
-#if(${subPrimaryJavaType} == "long" || ${subPrimaryJavaType} == "integer" || ${subPrimaryJavaType} == "short" || ${subPrimaryJavaType} == "double" || ${subPrimaryJavaType} == "bigdecimal" || ${subPrimaryJavaType} == "byte")
+#if(${subPrimaryJavaType} == "long" || ${subPrimaryJavaType} == "integer" || ${subPrimaryJavaType} == "short" || ${subPrimaryJavaType} == "float" || ${subPrimaryJavaType} == "double" || ${subPrimaryJavaType} == "bigdecimal" || ${subPrimaryJavaType} == "byte")
 #set ($subPrimaryTsType = "number")
 #else
 #set ($subPrimaryTsType = "string")
 #end
 #set ($subJoinJavaType = $subJoinColumn.javaType.toLowerCase())
-#if(${subJoinJavaType} == "long" || ${subJoinJavaType} == "integer" || ${subJoinJavaType} == "short" || ${subJoinJavaType} == "double" || ${subJoinJavaType} == "bigdecimal" || ${subJoinJavaType} == "byte")
+#if(${subJoinJavaType} == "long" || ${subJoinJavaType} == "integer" || ${subJoinJavaType} == "short" || ${subJoinJavaType} == "float" || ${subJoinJavaType} == "double" || ${subJoinJavaType} == "bigdecimal" || ${subJoinJavaType} == "byte")
 #set ($subJoinTsType = "number")
 #else
 #set ($subJoinTsType = "string")

@@ -65,13 +65,15 @@
             <yd-upload-img v-model="formData.avatar" directory="infra/demo" />
           </wd-form-item>
           <wd-form-item title="附件" title-width="180rpx" prop="video">
-            <yd-upload-file v-model="formData.video" directory="infra/demo" />
+            <yd-upload-file v-model="formData.video" :limit="1" directory="infra/demo" />
           </wd-form-item>
           <wd-form-item title="备注" title-width="180rpx" prop="memo">
-            <wd-input
+            <wd-textarea
               v-model="formData.memo"
               clearable
               placeholder="请输入备注"
+              :maxlength="2000"
+              show-word-limit
             />
           </wd-form-item>
         </wd-cell-group>
@@ -120,13 +122,13 @@ definePage({
 const toast = useToast()
 const getTitle = computed(() => props.id ? '编辑学生' : '新增学生')
 const formLoading = ref(false) // 表单提交状态
-const formData = ref<Student>({
+const formData = ref<Partial<Student>>({
   id: undefined,
   name: '',
   description: '',
-  birthday: 0,
-  sex: 0,
-  enabled: false,
+  birthday: undefined,
+  sex: undefined,
+  enabled: undefined,
   avatar: '',
   video: '',
   memo: '',
@@ -166,7 +168,7 @@ async function handleSubmit() {
 
   formLoading.value = true
   try {
-    const data = formData.value
+    const data = formData.value as Student
     if (props.id) {
       await updateStudent(data)
       toast.success('修改成功')

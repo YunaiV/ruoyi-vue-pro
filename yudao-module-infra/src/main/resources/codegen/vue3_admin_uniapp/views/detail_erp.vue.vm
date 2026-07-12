@@ -101,7 +101,7 @@
 
 <script lang="ts" setup>
 #set ($primaryJavaType = $primaryColumn.javaType.toLowerCase())
-#if(${primaryJavaType} == "long" || ${primaryJavaType} == "integer" || ${primaryJavaType} == "short" || ${primaryJavaType} == "double" || ${primaryJavaType} == "bigdecimal" || ${primaryJavaType} == "byte")
+#if(${primaryJavaType} == "long" || ${primaryJavaType} == "integer" || ${primaryJavaType} == "short" || ${primaryJavaType} == "float" || ${primaryJavaType} == "double" || ${primaryJavaType} == "bigdecimal" || ${primaryJavaType} == "byte")
 #set ($primaryTsType = "number")
 #else
 #set ($primaryTsType = "string")

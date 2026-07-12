@@ -42,9 +42,13 @@
             label="${comment}"
             label-width="180rpx"
             prop="${javaField}"
+#if ($javaType == "Boolean")
+            :columns="getBoolDictOptions(DICT_TYPE.${dictType.toUpperCase()})"
+#else
             :dict-type="DICT_TYPE.${dictType.toUpperCase()}"
 #if ($javaType == "String")
             dict-kind="str"
+#end
 #end
             placeholder="请选择${comment}"
           />
@@ -62,14 +66,14 @@
             </wd-radio-group>
           </wd-form-item>
 ## 数字类型（无字典）
-#elseif (${javaType.toLowerCase()} == "long" || ${javaType.toLowerCase()} == "integer" || ${javaType.toLowerCase()} == "short" || ${javaType.toLowerCase()} == "double" || ${javaType.toLowerCase()} == "bigdecimal" || ${javaType.toLowerCase()} == "byte")
+#elseif (${javaType.toLowerCase()} == "long" || ${javaType.toLowerCase()} == "integer" || ${javaType.toLowerCase()} == "short" || ${javaType.toLowerCase()} == "float" || ${javaType.toLowerCase()} == "double" || ${javaType.toLowerCase()} == "bigdecimal" || ${javaType.toLowerCase()} == "byte")
           <wd-form-item title="${comment}" title-width="180rpx" prop="${javaField}">
             <wd-input-number
               v-model="formData.${javaField}"
 #if ($column.nullable)
               allow-null
 #end
-#if (${javaType.toLowerCase()} == "double" || ${javaType.toLowerCase()} == "bigdecimal")
+#if (${javaType.toLowerCase()} == "float" || ${javaType.toLowerCase()} == "double" || ${javaType.toLowerCase()} == "bigdecimal")
               :precision="2"
               input-type="number"
 #end
@@ -104,20 +108,20 @@
             v-model:visible="${javaField}Visible"
             :model-value="formData.${javaField} || Date.now()"
             type="${pickerType}"
-#if ($pickerType == "datetime")
             @update:model-value="value => formData.${javaField} = value"
-#else
-            @update:model-value="value => formData.${javaField} = value"
-#end
           />
 ## 文本域
-#elseif ($column.htmlType == "textarea")
+#elseif ($column.htmlType == "textarea" || $column.htmlType == "editor")
           <wd-form-item title="${comment}" title-width="180rpx" prop="${javaField}">
             <wd-textarea
               v-model="formData.${javaField}"
               clearable
               placeholder="请输入${comment}"
+#if ($column.htmlType == "editor")
+              :maxlength="2000"
+#else
               :maxlength="200"
+#end
               show-word-limit
             />
           </wd-form-item>
@@ -129,7 +133,7 @@
 ## 文件上传 → yd-upload-file
 #elseif ($column.htmlType == "fileUpload")
           <wd-form-item title="${comment}" title-width="180rpx" prop="${javaField}">
-            <yd-upload-file v-model="formData.${javaField}" directory="${table.moduleName}/${table.businessName}" />
+            <yd-upload-file v-model="formData.${javaField}" :limit="1" directory="${table.moduleName}/${table.businessName}" />
           </wd-form-item>
 ## 默认：文本输入
 #else
@@ -202,9 +206,13 @@
             v-model="item.${column.javaField}"
             label="${column.columnComment}"
             label-width="180rpx"
+#if ($column.javaType == "Boolean")
+            :columns="getBoolDictOptions(DICT_TYPE.${column.dictType.toUpperCase()})"
+#else
             :dict-type="DICT_TYPE.${column.dictType.toUpperCase()}"
 #if ($column.javaType == "String")
             dict-kind="str"
+#end
 #end
             placeholder="请选择${column.columnComment}"
           />
@@ -224,14 +232,14 @@
           <wd-form-item title="${column.columnComment}" title-width="180rpx" center>
             <wd-switch v-model="item.${column.javaField}" />
           </wd-form-item>
-#elseif ($javaType == "long" || $javaType == "integer" || $javaType == "short" || $javaType == "double" || $javaType == "bigdecimal" || $javaType == "byte")
+#elseif ($javaType == "long" || $javaType == "integer" || $javaType == "short" || $javaType == "float" || $javaType == "double" || $javaType == "bigdecimal" || $javaType == "byte")
           <wd-form-item title="${column.columnComment}" title-width="180rpx">
             <wd-input-number
               v-model="item.${column.javaField}"
 #if($column.nullable)
               allow-null
 #end
-#if ($javaType == "double" || $javaType == "bigdecimal")
+#if ($javaType == "float" || $javaType == "double" || $javaType == "bigdecimal")
               :precision="2"
               input-type="number"
 #end
@@ -259,15 +267,20 @@
             v-model:visible="subDateVisible[`${subClassNameVar}s.#[[${]]#index#[[}]]#.${column.javaField}`]"
             :model-value="item.${column.javaField} || Date.now()"
             type="${subPickerType}"
-#if ($javaType == "localdatetime")
             @update:model-value="value => item.${column.javaField} = value"
-#else
-            @update:model-value="value => item.${column.javaField} = value"
-#end
           />
-#elseif ($column.htmlType == "textarea")
+#elseif ($column.htmlType == "textarea" || $column.htmlType == "editor")
           <wd-form-item title="${column.columnComment}" title-width="180rpx">
-            <wd-textarea v-model="item.${column.javaField}" clearable placeholder="请输入${column.columnComment}" />
+            <wd-textarea
+              v-model="item.${column.javaField}"
+              clearable
+              placeholder="请输入${column.columnComment}"
+#if ($column.htmlType == "editor")
+              :maxlength="2000"
+#else
+              :maxlength="200"
+#end
+            />
           </wd-form-item>
 #elseif ($column.htmlType == "imageUpload")
           <wd-form-item title="${column.columnComment}" title-width="180rpx">
@@ -275,7 +288,7 @@
           </wd-form-item>
 #elseif ($column.htmlType == "fileUpload")
           <wd-form-item title="${column.columnComment}" title-width="180rpx">
-            <yd-upload-file v-model="item.${column.javaField}" directory="${table.moduleName}/${table.businessName}" />
+            <yd-upload-file v-model="item.${column.javaField}" :limit="1" directory="${table.moduleName}/${table.businessName}" />
           </wd-form-item>
 #else
           <wd-form-item title="${column.columnComment}" title-width="180rpx">
@@ -306,9 +319,13 @@
             v-model="${subClassNameVar}.${column.javaField}"
             label="${column.columnComment}"
             label-width="180rpx"
+#if ($column.javaType == "Boolean")
+            :columns="getBoolDictOptions(DICT_TYPE.${column.dictType.toUpperCase()})"
+#else
             :dict-type="DICT_TYPE.${column.dictType.toUpperCase()}"
 #if ($column.javaType == "String")
             dict-kind="str"
+#end
 #end
             placeholder="请选择${column.columnComment}"
           />
@@ -328,14 +345,14 @@
           <wd-form-item title="${column.columnComment}" title-width="180rpx" center>
             <wd-switch v-model="${subClassNameVar}.${column.javaField}" />
           </wd-form-item>
-#elseif ($javaType == "long" || $javaType == "integer" || $javaType == "short" || $javaType == "double" || $javaType == "bigdecimal" || $javaType == "byte")
+#elseif ($javaType == "long" || $javaType == "integer" || $javaType == "short" || $javaType == "float" || $javaType == "double" || $javaType == "bigdecimal" || $javaType == "byte")
           <wd-form-item title="${column.columnComment}" title-width="180rpx">
             <wd-input-number
               v-model="${subClassNameVar}.${column.javaField}"
 #if($column.nullable)
               allow-null
 #end
-#if ($javaType == "double" || $javaType == "bigdecimal")
+#if ($javaType == "float" || $javaType == "double" || $javaType == "bigdecimal")
               :precision="2"
               input-type="number"
 #end
@@ -363,15 +380,20 @@
             v-model:visible="subDateVisible['${subClassNameVar}.${column.javaField}']"
             :model-value="${subClassNameVar}.${column.javaField} || Date.now()"
             type="${subPickerType}"
-#if ($javaType == "localdatetime")
             @update:model-value="value => ${subClassNameVar}.${column.javaField} = value"
-#else
-            @update:model-value="value => ${subClassNameVar}.${column.javaField} = value"
-#end
           />
-#elseif ($column.htmlType == "textarea")
+#elseif ($column.htmlType == "textarea" || $column.htmlType == "editor")
           <wd-form-item title="${column.columnComment}" title-width="180rpx">
-            <wd-textarea v-model="${subClassNameVar}.${column.javaField}" clearable placeholder="请输入${column.columnComment}" />
+            <wd-textarea
+              v-model="${subClassNameVar}.${column.javaField}"
+              clearable
+              placeholder="请输入${column.columnComment}"
+#if ($column.htmlType == "editor")
+              :maxlength="2000"
+#else
+              :maxlength="200"
+#end
+            />
           </wd-form-item>
 #elseif ($column.htmlType == "imageUpload")
           <wd-form-item title="${column.columnComment}" title-width="180rpx">
@@ -379,7 +401,7 @@
           </wd-form-item>
 #elseif ($column.htmlType == "fileUpload")
           <wd-form-item title="${column.columnComment}" title-width="180rpx">
-            <yd-upload-file v-model="${subClassNameVar}.${column.javaField}" directory="${table.moduleName}/${table.businessName}" />
+            <yd-upload-file v-model="${subClassNameVar}.${column.javaField}" :limit="1" directory="${table.moduleName}/${table.businessName}" />
           </wd-form-item>
 #else
           <wd-form-item title="${column.columnComment}" title-width="180rpx">
@@ -412,7 +434,7 @@
 <script lang="ts" setup>
 import type { FormInstance } from '@wot-ui/ui/components/wd-form/types'
 #set ($primaryJavaType = $primaryColumn.javaType.toLowerCase())
-#if(${primaryJavaType} == "long" || ${primaryJavaType} == "integer" || ${primaryJavaType} == "short" || ${primaryJavaType} == "double" || ${primaryJavaType} == "bigdecimal" || ${primaryJavaType} == "byte")
+#if(${primaryJavaType} == "long" || ${primaryJavaType} == "integer" || ${primaryJavaType} == "short" || ${primaryJavaType} == "float" || ${primaryJavaType} == "double" || ${primaryJavaType} == "bigdecimal" || ${primaryJavaType} == "byte")
 #set ($primaryTsType = "number")
 #else
 #set ($primaryTsType = "string")
@@ -434,7 +456,7 @@ import type { FormInstance } from '@wot-ui/ui/components/wd-form/types'
 #set ($hasGetIntDictOptions = 1)
 #elseif ($column.htmlType == "radio" && $column.javaType == "String")
 #set ($hasGetStrDictOptions = 1)
-#elseif ($column.htmlType == "radio" && $column.javaType == "Boolean")
+#elseif (($column.htmlType == "select" || $column.htmlType == "radio") && $column.javaType == "Boolean")
 #set ($hasGetBoolDictOptions = 1)
 #elseif ($column.htmlType == "radio")
 #set ($hasGetDictOptions = 1)
@@ -460,7 +482,7 @@ import type { FormInstance } from '@wot-ui/ui/components/wd-form/types'
 #set ($hasGetIntDictOptions = 1)
 #elseif ($column.htmlType == "radio" && $column.javaType == "String")
 #set ($hasGetStrDictOptions = 1)
-#elseif ($column.htmlType == "radio" && $column.javaType == "Boolean")
+#elseif (($column.htmlType == "select" || $column.htmlType == "radio") && $column.javaType == "Boolean")
 #set ($hasGetBoolDictOptions = 1)
 #elseif ($column.htmlType == "radio")
 #set ($hasGetDictOptions = 1)
@@ -567,7 +589,7 @@ definePage({
 const toast = useToast()
 const getTitle = computed(() => props.id ? '编辑${table.classComment}' : '新增${table.classComment}')
 const formLoading = ref(false) // 表单提交状态
-const formData = ref<${simpleClassName}>({
+const formData = ref<Partial<${simpleClassName}>>({
 #foreach($column in $columns)
 #if (($column.createOperation || $column.updateOperation) || $column.primaryKey)
 #set ($javaType = $column.javaType.toLowerCase())
@@ -577,7 +599,9 @@ const formData = ref<${simpleClassName}>({
   ${column.javaField}: undefined,
 #elseif($table.templateType == 2 && $column.id == $treeParentColumn.id)
   ${column.javaField}: props.${column.javaField} ?? 0,
-#elseif(${javaType} == "long" || ${javaType} == "integer" || ${javaType} == "short" || ${javaType} == "double" || ${javaType} == "bigdecimal" || ${javaType} == "byte")
+#elseif(($column.htmlType == "select" || $column.htmlType == "radio") && $column.dictType && "" != $column.dictType)
+  ${column.javaField}: undefined,
+#elseif(${javaType} == "long" || ${javaType} == "integer" || ${javaType} == "short" || ${javaType} == "float" || ${javaType} == "double" || ${javaType} == "bigdecimal" || ${javaType} == "byte")
 #if($column.nullable)
   ${column.javaField}: undefined,
 #else
@@ -586,7 +610,7 @@ const formData = ref<${simpleClassName}>({
 #elseif(${javaType} == "boolean")
   ${column.javaField}: false,
 #elseif(${javaType} == "date" || ${javaType} == "localdate" || ${javaType} == "localdatetime")
-  ${column.javaField}:#if($column.nullable || $column.primaryKey || $javaFieldLower == "createtime" || $javaFieldLower == "updatetime") undefined#else 0#end,
+  ${column.javaField}: undefined,
 #else
   ${column.javaField}: '',
 #end
@@ -601,9 +625,9 @@ const formData = ref<${simpleClassName}>({
 #set ($subColumns = $subColumnsList.get($index))
 #set ($subJoinColumn = $subJoinColumns.get($index))
 #if ($subTable.subJoinMany)
-const ${subClassNameVar}s = ref<${subSimpleClassName}[]>([]) // ${subTable.classComment}数据
+const ${subClassNameVar}s = ref<Partial<${subSimpleClassName}>[]>([]) // ${subTable.classComment}数据
 #else
-const ${subClassNameVar} = ref<${subSimpleClassName} | null>(null) // ${subTable.classComment}数据
+const ${subClassNameVar} = ref<Partial<${subSimpleClassName}> | null>(null) // ${subTable.classComment}数据
 #end
 #end
 #end
@@ -646,7 +670,11 @@ function add${subClassNameVar.substring(0,1).toUpperCase()}${subClassNameVar.sub
 #foreach ($column in $subColumns)
 #if (($column.createOperation || $column.updateOperation) && !$column.primaryKey && $column.id != $subJoinColumn.id)
 #set ($javaType = $column.javaType.toLowerCase())
-    ${column.javaField}:#if($column.nullable) undefined#elseif($javaType == "long" || $javaType == "integer" || $javaType == "short" || $javaType == "double" || $javaType == "bigdecimal" || $javaType == "byte" || $javaType == "date" || $javaType == "localdate" || $javaType == "localdatetime") 0#elseif($javaType == "boolean") false#else ''#end,
+#if((($column.htmlType == "select" || $column.htmlType == "radio") && $column.dictType && "" != $column.dictType) || $javaType == "date" || $javaType == "localdate" || $javaType == "localdatetime")
+    ${column.javaField}: undefined,
+#else
+    ${column.javaField}:#if($column.nullable) undefined#elseif($javaType == "long" || $javaType == "integer" || $javaType == "short" || $javaType == "float" || $javaType == "double" || $javaType == "bigdecimal" || $javaType == "byte") 0#elseif($javaType == "boolean") false#else ''#end,
+#end
 #end
 #end
   })
@@ -664,7 +692,11 @@ function add${subClassNameVar.substring(0,1).toUpperCase()}${subClassNameVar.sub
 #foreach ($column in $subColumns)
 #if (($column.createOperation || $column.updateOperation) && !$column.primaryKey && $column.id != $subJoinColumn.id)
 #set ($javaType = $column.javaType.toLowerCase())
-    ${column.javaField}:#if($column.nullable) undefined#elseif($javaType == "long" || $javaType == "integer" || $javaType == "short" || $javaType == "double" || $javaType == "bigdecimal" || $javaType == "byte" || $javaType == "date" || $javaType == "localdate" || $javaType == "localdatetime") 0#elseif($javaType == "boolean") false#else ''#end,
+#if((($column.htmlType == "select" || $column.htmlType == "radio") && $column.dictType && "" != $column.dictType) || $javaType == "date" || $javaType == "localdate" || $javaType == "localdatetime")
+    ${column.javaField}: undefined,
+#else
+    ${column.javaField}:#if($column.nullable) undefined#elseif($javaType == "long" || $javaType == "integer" || $javaType == "short" || $javaType == "float" || $javaType == "double" || $javaType == "bigdecimal" || $javaType == "byte") 0#elseif($javaType == "boolean") false#else ''#end,
+#end
 #end
 #end
   }
@@ -771,16 +803,16 @@ async function handleSubmit() {
   formLoading.value = true
   try {
 #if ($table.templateType == 10 || $table.templateType == 12)
-    const data: ${simpleClassName} = {
+    const data = {
       ...formData.value,
 #foreach ($subTable in $subTables)
 #set ($index = $foreach.count - 1)
 #set ($subClassNameVar = $subClassNameVars.get($index))
       ${subClassNameVar}#if($subTable.subJoinMany)s#end: ${subClassNameVar}#if($subTable.subJoinMany)s#end.value,
 #end
-    }
+    } as ${simpleClassName}
 #else
-    const data = formData.value
+    const data = formData.value as ${simpleClassName}
 #end
     if (props.id) {
       await update${simpleClassName}(data)
