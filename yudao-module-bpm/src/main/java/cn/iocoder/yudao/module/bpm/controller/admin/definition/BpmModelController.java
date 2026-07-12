@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.*;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelUpdateReqVO;
@@ -39,9 +40,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
+import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.MODEL_IMPORT_FAIL_INVALID;
 
 @Tag(name = "管理后台 - 流程模型")
 @RestController
@@ -142,15 +145,23 @@ public class BpmModelController {
     @PreAuthorize("@ss.hasPermission('bpm:model:import')")
     public CommonResult<String> importModel(@RequestParam("file") MultipartFile file,
                                             @RequestParam(value = "key", required = false) String key,
-                                            @RequestParam(value = "name", required = false) String name) throws IOException
-    {
-        BpmModelSaveReqVO reqVO = JsonUtils.parseObject(file.getBytes(), BpmModelSaveReqVO.class);
+                                            @RequestParam(value = "name", required = false) String name) throws IOException {
+        BpmModelSaveReqVO reqVO;
+        try {
+            reqVO = JsonUtils.parseObject(file.getBytes(), BpmModelSaveReqVO.class);
+        } catch (RuntimeException ex) {
+            throw exception(MODEL_IMPORT_FAIL_INVALID);
+        }
+        if (reqVO == null) {
+            throw exception(MODEL_IMPORT_FAIL_INVALID);
+        }
         if (StrUtil.isNotEmpty(key)) {
             reqVO.setKey(key);
         }
         if (StrUtil.isNotEmpty(name)) {
             reqVO.setName(name);
         }
+        ValidationUtils.validate(reqVO);
         return success(modelService.importModel(reqVO));
     }
 
