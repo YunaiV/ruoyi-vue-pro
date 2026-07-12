@@ -12,21 +12,31 @@
       <wd-form ref="formRef" :model="formData" :schema="formSchema">
         <wd-cell-group border>
 #foreach($column in $columns)
-  #if (($column.createOperation || $column.updateOperation) && !$column.primaryKey)
-    #set ($dictType = $column.dictType)
-    #set ($javaField = $column.javaField)
-    #set ($javaType = $column.javaType)
-    #set ($comment = $column.columnComment)
-    #set ($dictMethod = "getDictOptions")
-    #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
-      #set ($dictMethod = "getIntDictOptions")
-    #elseif ($javaType == "String")
-      #set ($dictMethod = "getStrDictOptions")
-    #elseif ($javaType == "Boolean")
-      #set ($dictMethod = "getBoolDictOptions")
-    #end
-    ## 下拉选择（字典）→ yd-form-picker，内部按 dictType 解析选项，适合选项较多
-    #if ($column.htmlType == "select" && $dictType && "" != $dictType)
+#if (($column.createOperation || $column.updateOperation) && !$column.primaryKey)
+#set ($dictType = $column.dictType)
+#set ($javaField = $column.javaField)
+#set ($javaType = $column.javaType)
+#set ($comment = $column.columnComment)
+#set ($dictMethod = "getDictOptions")
+#if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
+#set ($dictMethod = "getIntDictOptions")
+#elseif ($javaType == "String")
+#set ($dictMethod = "getStrDictOptions")
+#elseif ($javaType == "Boolean")
+#set ($dictMethod = "getBoolDictOptions")
+#end
+## 树表的父级选择
+#if ($table.templateType == 2 && $column.id == $treeParentColumn.id)
+          <yd-tree-select
+            v-model="formData.${javaField}"
+            :data="treeData"
+            label="${comment}"
+            prop="${javaField}"
+            :props="{ label: '${treeNameColumn.javaField}', value: '${primaryColumn.javaField}' }"
+            placeholder="请选择${comment}"
+          />
+## 下拉选择（字典）→ yd-form-picker，内部按 dictType 解析选项，适合选项较多
+#elseif ($column.htmlType == "select" && $dictType && "" != $dictType)
           <yd-form-picker
             v-model="formData.${javaField}"
             label="${comment}"
@@ -38,8 +48,8 @@
 #end
             placeholder="请选择${comment}"
           />
-    ## 单选（字典）→ radio-group，适合选项较少
-    #elseif ($column.htmlType == "radio" && $dictType && "" != $dictType)
+## 单选（字典）→ radio-group，适合选项较少
+#elseif ($column.htmlType == "radio" && $dictType && "" != $dictType)
           <wd-form-item title="${comment}" title-width="180rpx" prop="${javaField}" center>
             <wd-radio-group v-model="formData.${javaField}" type="button">
               <wd-radio
@@ -51,11 +61,14 @@
               </wd-radio>
             </wd-radio-group>
           </wd-form-item>
-    ## 数字类型（无字典）
-    #elseif (${javaType.toLowerCase()} == "long" || ${javaType.toLowerCase()} == "integer" || ${javaType.toLowerCase()} == "short" || ${javaType.toLowerCase()} == "double" || ${javaType.toLowerCase()} == "bigdecimal" || ${javaType.toLowerCase()} == "byte")
+## 数字类型（无字典）
+#elseif (${javaType.toLowerCase()} == "long" || ${javaType.toLowerCase()} == "integer" || ${javaType.toLowerCase()} == "short" || ${javaType.toLowerCase()} == "double" || ${javaType.toLowerCase()} == "bigdecimal" || ${javaType.toLowerCase()} == "byte")
           <wd-form-item title="${comment}" title-width="180rpx" prop="${javaField}">
             <wd-input-number
               v-model="formData.${javaField}"
+#if ($column.nullable)
+              allow-null
+#end
 #if (${javaType.toLowerCase()} == "double" || ${javaType.toLowerCase()} == "bigdecimal")
               :precision="2"
               input-type="number"
@@ -63,37 +76,42 @@
               :min="0"
             />
           </wd-form-item>
-    ## 布尔类型
-    #elseif (${javaType.toLowerCase()} == "boolean")
+## 布尔类型
+#elseif (${javaType.toLowerCase()} == "boolean")
           <wd-form-item title="${comment}" title-width="180rpx" prop="${javaField}" center>
             <wd-switch v-model="formData.${javaField}" />
           </wd-form-item>
-    ## 日期时间类型
-    #elseif (${javaType.toLowerCase()} == "date" || ${javaType.toLowerCase()} == "localdate" || ${javaType.toLowerCase()} == "localdatetime")
-      #set ($pickerType = "date")
-      #if (${javaType.toLowerCase()} == "localdatetime")
-        #set ($pickerType = "datetime")
-      #end
+## 日期时间类型
+#elseif (${javaType.toLowerCase()} == "date" || ${javaType.toLowerCase()} == "localdate" || ${javaType.toLowerCase()} == "localdatetime")
+#set ($pickerType = "date")
+#if (${javaType.toLowerCase()} == "localdatetime")
+#set ($pickerType = "datetime")
+#end
           <wd-form-item
             title="${comment}"
             title-width="180rpx"
             prop="${javaField}"
             is-link
 #if ($pickerType == "datetime")
-            :value="formatDateTime(formData.${javaField})"
+            :value="formData.${javaField} ? formatDateTime(formData.${javaField}) : ''"
 #else
-            :value="formatDate(formData.${javaField})"
+            :value="formData.${javaField} ? formatDate(formData.${javaField}) : ''"
 #end
             placeholder="请选择${comment}"
             @click="${javaField}Visible = true"
           />
           <wd-datetime-picker
-            v-model="formData.${javaField}"
             v-model:visible="${javaField}Visible"
+            :model-value="formData.${javaField} || Date.now()"
             type="${pickerType}"
+#if ($pickerType == "datetime")
+            @update:model-value="value => formData.${javaField} = value"
+#else
+            @update:model-value="value => formData.${javaField} = value"
+#end
           />
-    ## 文本域
-    #elseif ($column.htmlType == "textarea")
+## 文本域
+#elseif ($column.htmlType == "textarea")
           <wd-form-item title="${comment}" title-width="180rpx" prop="${javaField}">
             <wd-textarea
               v-model="formData.${javaField}"
@@ -103,18 +121,18 @@
               show-word-limit
             />
           </wd-form-item>
-    ## 图片上传 → yd-upload-img（包 wd-form-item 才能注册到 wd-form 做校验/错误展示）
-    #elseif ($column.htmlType == "imageUpload")
+## 图片上传 → yd-upload-img（包 wd-form-item 才能注册到 wd-form 做校验/错误展示）
+#elseif ($column.htmlType == "imageUpload")
           <wd-form-item title="${comment}" title-width="180rpx" prop="${javaField}">
             <yd-upload-img v-model="formData.${javaField}" directory="${table.moduleName}/${table.businessName}" />
           </wd-form-item>
-    ## 文件上传 → yd-upload-file
-    #elseif ($column.htmlType == "fileUpload")
+## 文件上传 → yd-upload-file
+#elseif ($column.htmlType == "fileUpload")
           <wd-form-item title="${comment}" title-width="180rpx" prop="${javaField}">
             <yd-upload-file v-model="formData.${javaField}" directory="${table.moduleName}/${table.businessName}" />
           </wd-form-item>
-    ## 默认：文本输入
-    #else
+## 默认：文本输入
+#else
           <wd-form-item title="${comment}" title-width="180rpx" prop="${javaField}">
             <wd-input
               v-model="formData.${javaField}"
@@ -122,11 +140,259 @@
               placeholder="请输入${comment}"
             />
           </wd-form-item>
-    #end
-  #end
+#end
+#end
 #end
         </wd-cell-group>
       </wd-form>
+#if ($table.templateType == 10 || $table.templateType == 12)
+#foreach ($subTable in $subTables)
+#set ($index = $foreach.count - 1)
+#set ($subColumns = $subColumnsList.get($index))
+#set ($subJoinColumn = $subJoinColumns.get($index))
+#set ($subClassNameVar = $subClassNameVars.get($index))
+
+      <!-- 子表：${subTable.classComment} -->
+      <view class="mt-20rpx flex items-center justify-between px-24rpx py-16rpx">
+        <text class="text-28rpx text-[#333] font-semibold">${subTable.classComment}</text>
+#if ($subTable.subJoinMany)
+        <wd-button size="small" type="primary" variant="plain" @click="add${subClassNameVar.substring(0,1).toUpperCase()}${subClassNameVar.substring(1)}">
+          添加
+        </wd-button>
+#else
+        <wd-button
+          v-if="!${subClassNameVar}"
+          size="small"
+          type="primary"
+          variant="plain"
+          @click="add${subClassNameVar.substring(0,1).toUpperCase()}${subClassNameVar.substring(1)}()"
+        >
+          添加
+        </wd-button>
+#end
+      </view>
+      <view class="px-24rpx">
+#if ($subTable.subJoinMany)
+        <view v-if="!${subClassNameVar}s.length" class="rounded-12rpx bg-white py-40rpx text-center text-26rpx text-[#999]">
+          暂无${subTable.classComment}
+        </view>
+        <view
+          v-for="(item, index) in ${subClassNameVar}s"
+          :key="index"
+          class="mb-20rpx rounded-12rpx bg-white p-24rpx shadow-sm"
+        >
+          <view class="mb-16rpx flex justify-end">
+            <wd-button size="small" type="danger" variant="plain" @click="remove${subClassNameVar.substring(0,1).toUpperCase()}${subClassNameVar.substring(1)}(index)">
+              删除
+            </wd-button>
+          </view>
+#foreach ($column in $subColumns)
+#if (($column.createOperation || $column.updateOperation) && !$column.primaryKey && $column.id != $subJoinColumn.id)
+#set ($javaType = $column.javaType.toLowerCase())
+#set ($dictMethod = "getDictOptions")
+#if ($column.javaType == "Integer" || $column.javaType == "Long" || $column.javaType == "Byte" || $column.javaType == "Short")
+#set ($dictMethod = "getIntDictOptions")
+#elseif ($column.javaType == "String")
+#set ($dictMethod = "getStrDictOptions")
+#elseif ($column.javaType == "Boolean")
+#set ($dictMethod = "getBoolDictOptions")
+#end
+#if ($column.htmlType == "select" && $column.dictType && "" != $column.dictType)
+          <yd-form-picker
+            v-model="item.${column.javaField}"
+            label="${column.columnComment}"
+            label-width="180rpx"
+            :dict-type="DICT_TYPE.${column.dictType.toUpperCase()}"
+#if ($column.javaType == "String")
+            dict-kind="str"
+#end
+            placeholder="请选择${column.columnComment}"
+          />
+#elseif ($column.htmlType == "radio" && $column.dictType && "" != $column.dictType)
+          <wd-form-item title="${column.columnComment}" title-width="180rpx" center>
+            <wd-radio-group v-model="item.${column.javaField}" type="button">
+              <wd-radio
+                v-for="dict in $dictMethod(DICT_TYPE.${column.dictType.toUpperCase()})"
+                :key="dict.value"
+                :value="dict.value"
+              >
+                {{ dict.label }}
+              </wd-radio>
+            </wd-radio-group>
+          </wd-form-item>
+#elseif ($javaType == "boolean")
+          <wd-form-item title="${column.columnComment}" title-width="180rpx" center>
+            <wd-switch v-model="item.${column.javaField}" />
+          </wd-form-item>
+#elseif ($javaType == "long" || $javaType == "integer" || $javaType == "short" || $javaType == "double" || $javaType == "bigdecimal" || $javaType == "byte")
+          <wd-form-item title="${column.columnComment}" title-width="180rpx">
+            <wd-input-number
+              v-model="item.${column.javaField}"
+#if($column.nullable)
+              allow-null
+#end
+#if ($javaType == "double" || $javaType == "bigdecimal")
+              :precision="2"
+              input-type="number"
+#end
+              :min="0"
+            />
+          </wd-form-item>
+#elseif ($javaType == "date" || $javaType == "localdate" || $javaType == "localdatetime")
+#set ($subPickerType = "date")
+#if ($javaType == "localdatetime")
+#set ($subPickerType = "datetime")
+#end
+          <wd-form-item
+            title="${column.columnComment}"
+            title-width="180rpx"
+            is-link
+#if ($javaType == "localdatetime")
+            :value="item.${column.javaField} ? formatDateTime(item.${column.javaField}) : ''"
+#else
+            :value="item.${column.javaField} ? formatDate(item.${column.javaField}) : ''"
+#end
+            placeholder="请选择${column.columnComment}"
+            @click="subDateVisible[`${subClassNameVar}s.#[[${]]#index#[[}]]#.${column.javaField}`] = true"
+          />
+          <wd-datetime-picker
+            v-model:visible="subDateVisible[`${subClassNameVar}s.#[[${]]#index#[[}]]#.${column.javaField}`]"
+            :model-value="item.${column.javaField} || Date.now()"
+            type="${subPickerType}"
+#if ($javaType == "localdatetime")
+            @update:model-value="value => item.${column.javaField} = value"
+#else
+            @update:model-value="value => item.${column.javaField} = value"
+#end
+          />
+#elseif ($column.htmlType == "textarea")
+          <wd-form-item title="${column.columnComment}" title-width="180rpx">
+            <wd-textarea v-model="item.${column.javaField}" clearable placeholder="请输入${column.columnComment}" />
+          </wd-form-item>
+#elseif ($column.htmlType == "imageUpload")
+          <wd-form-item title="${column.columnComment}" title-width="180rpx">
+            <yd-upload-img v-model="item.${column.javaField}" directory="${table.moduleName}/${table.businessName}" />
+          </wd-form-item>
+#elseif ($column.htmlType == "fileUpload")
+          <wd-form-item title="${column.columnComment}" title-width="180rpx">
+            <yd-upload-file v-model="item.${column.javaField}" directory="${table.moduleName}/${table.businessName}" />
+          </wd-form-item>
+#else
+          <wd-form-item title="${column.columnComment}" title-width="180rpx">
+            <wd-input v-model="item.${column.javaField}" clearable placeholder="请输入${column.columnComment}" />
+          </wd-form-item>
+#end
+#end
+#end
+        </view>
+#else
+        <view v-if="!${subClassNameVar}" class="rounded-12rpx bg-white py-40rpx text-center text-26rpx text-[#999]">
+          暂无${subTable.classComment}
+        </view>
+        <view v-else class="rounded-12rpx bg-white p-24rpx shadow-sm">
+#foreach ($column in $subColumns)
+#if (($column.createOperation || $column.updateOperation) && !$column.primaryKey && $column.id != $subJoinColumn.id)
+#set ($javaType = $column.javaType.toLowerCase())
+#set ($dictMethod = "getDictOptions")
+#if ($column.javaType == "Integer" || $column.javaType == "Long" || $column.javaType == "Byte" || $column.javaType == "Short")
+#set ($dictMethod = "getIntDictOptions")
+#elseif ($column.javaType == "String")
+#set ($dictMethod = "getStrDictOptions")
+#elseif ($column.javaType == "Boolean")
+#set ($dictMethod = "getBoolDictOptions")
+#end
+#if ($column.htmlType == "select" && $column.dictType && "" != $column.dictType)
+          <yd-form-picker
+            v-model="${subClassNameVar}.${column.javaField}"
+            label="${column.columnComment}"
+            label-width="180rpx"
+            :dict-type="DICT_TYPE.${column.dictType.toUpperCase()}"
+#if ($column.javaType == "String")
+            dict-kind="str"
+#end
+            placeholder="请选择${column.columnComment}"
+          />
+#elseif ($column.htmlType == "radio" && $column.dictType && "" != $column.dictType)
+          <wd-form-item title="${column.columnComment}" title-width="180rpx" center>
+            <wd-radio-group v-model="${subClassNameVar}.${column.javaField}" type="button">
+              <wd-radio
+                v-for="dict in $dictMethod(DICT_TYPE.${column.dictType.toUpperCase()})"
+                :key="dict.value"
+                :value="dict.value"
+              >
+                {{ dict.label }}
+              </wd-radio>
+            </wd-radio-group>
+          </wd-form-item>
+#elseif ($javaType == "boolean")
+          <wd-form-item title="${column.columnComment}" title-width="180rpx" center>
+            <wd-switch v-model="${subClassNameVar}.${column.javaField}" />
+          </wd-form-item>
+#elseif ($javaType == "long" || $javaType == "integer" || $javaType == "short" || $javaType == "double" || $javaType == "bigdecimal" || $javaType == "byte")
+          <wd-form-item title="${column.columnComment}" title-width="180rpx">
+            <wd-input-number
+              v-model="${subClassNameVar}.${column.javaField}"
+#if($column.nullable)
+              allow-null
+#end
+#if ($javaType == "double" || $javaType == "bigdecimal")
+              :precision="2"
+              input-type="number"
+#end
+              :min="0"
+            />
+          </wd-form-item>
+#elseif ($javaType == "date" || $javaType == "localdate" || $javaType == "localdatetime")
+#set ($subPickerType = "date")
+#if ($javaType == "localdatetime")
+#set ($subPickerType = "datetime")
+#end
+          <wd-form-item
+            title="${column.columnComment}"
+            title-width="180rpx"
+            is-link
+#if ($javaType == "localdatetime")
+            :value="${subClassNameVar}.${column.javaField} ? formatDateTime(${subClassNameVar}.${column.javaField}) : ''"
+#else
+            :value="${subClassNameVar}.${column.javaField} ? formatDate(${subClassNameVar}.${column.javaField}) : ''"
+#end
+            placeholder="请选择${column.columnComment}"
+            @click="subDateVisible['${subClassNameVar}.${column.javaField}'] = true"
+          />
+          <wd-datetime-picker
+            v-model:visible="subDateVisible['${subClassNameVar}.${column.javaField}']"
+            :model-value="${subClassNameVar}.${column.javaField} || Date.now()"
+            type="${subPickerType}"
+#if ($javaType == "localdatetime")
+            @update:model-value="value => ${subClassNameVar}.${column.javaField} = value"
+#else
+            @update:model-value="value => ${subClassNameVar}.${column.javaField} = value"
+#end
+          />
+#elseif ($column.htmlType == "textarea")
+          <wd-form-item title="${column.columnComment}" title-width="180rpx">
+            <wd-textarea v-model="${subClassNameVar}.${column.javaField}" clearable placeholder="请输入${column.columnComment}" />
+          </wd-form-item>
+#elseif ($column.htmlType == "imageUpload")
+          <wd-form-item title="${column.columnComment}" title-width="180rpx">
+            <yd-upload-img v-model="${subClassNameVar}.${column.javaField}" directory="${table.moduleName}/${table.businessName}" />
+          </wd-form-item>
+#elseif ($column.htmlType == "fileUpload")
+          <wd-form-item title="${column.columnComment}" title-width="180rpx">
+            <yd-upload-file v-model="${subClassNameVar}.${column.javaField}" directory="${table.moduleName}/${table.businessName}" />
+          </wd-form-item>
+#else
+          <wd-form-item title="${column.columnComment}" title-width="180rpx">
+            <wd-input v-model="${subClassNameVar}.${column.javaField}" clearable placeholder="请输入${column.columnComment}" />
+          </wd-form-item>
+#end
+#end
+#end
+        </view>
+#end
+      </view>
+#end
+#end
     </view>
 
     <!-- 底部保存按钮 -->
@@ -154,54 +420,113 @@ import type { FormInstance } from '@wot-ui/ui/components/wd-form/types'
 #set ($hasDict = 0)
 #set ($hasDate = 0)
 #set ($hasDateTime = 0)
+#set ($hasSubDate = 0)
 #set ($hasGetDictOptions = 0)
 #set ($hasGetIntDictOptions = 0)
 #set ($hasGetStrDictOptions = 0)
 #set ($hasGetBoolDictOptions = 0)
 #foreach ($column in $columns)
-  #if (($column.createOperation || $column.updateOperation) && !$column.primaryKey
+#if (($column.createOperation || $column.updateOperation) && !$column.primaryKey
       && ($column.htmlType == "select" || $column.htmlType == "radio")
       && $column.dictType && "" != $column.dictType)
-    #set ($hasDict = 1)
-    #if ($column.htmlType == "radio" && ($column.javaType == "Integer" || $column.javaType == "Long" || $column.javaType == "Byte" || $column.javaType == "Short"))
-      #set ($hasGetIntDictOptions = 1)
-    #elseif ($column.htmlType == "radio" && $column.javaType == "String")
-      #set ($hasGetStrDictOptions = 1)
-    #elseif ($column.htmlType == "radio" && $column.javaType == "Boolean")
-      #set ($hasGetBoolDictOptions = 1)
-    #elseif ($column.htmlType == "radio")
-      #set ($hasGetDictOptions = 1)
-    #end
-  #end
-  #if (($column.createOperation || $column.updateOperation) && !$column.primaryKey
-      && (${column.javaType.toLowerCase()} == "date" || ${column.javaType.toLowerCase()} == "localdate"))
-    #set ($hasDate = 1)
-  #end
-  #if (($column.createOperation || $column.updateOperation) && !$column.primaryKey
-      && ${column.javaType.toLowerCase()} == "localdatetime")
-    #set ($hasDateTime = 1)
-  #end
+#set ($hasDict = 1)
+#if ($column.htmlType == "radio" && ($column.javaType == "Integer" || $column.javaType == "Long" || $column.javaType == "Byte" || $column.javaType == "Short"))
+#set ($hasGetIntDictOptions = 1)
+#elseif ($column.htmlType == "radio" && $column.javaType == "String")
+#set ($hasGetStrDictOptions = 1)
+#elseif ($column.htmlType == "radio" && $column.javaType == "Boolean")
+#set ($hasGetBoolDictOptions = 1)
+#elseif ($column.htmlType == "radio")
+#set ($hasGetDictOptions = 1)
 #end
-import type { ${simpleClassName} } from '@/api/${table.moduleName}/${table.businessName}'
+#end
+#if (($column.createOperation || $column.updateOperation) && !$column.primaryKey
+      && (${column.javaType.toLowerCase()} == "date" || ${column.javaType.toLowerCase()} == "localdate"))
+#set ($hasDate = 1)
+#end
+#if (($column.createOperation || $column.updateOperation) && !$column.primaryKey
+      && ${column.javaType.toLowerCase()} == "localdatetime")
+#set ($hasDateTime = 1)
+#end
+#end
+#if ($table.templateType == 10 || $table.templateType == 12)
+#foreach ($subColumns in $subColumnsList)
+#foreach ($column in $subColumns)
+#if (($column.createOperation || $column.updateOperation) && !$column.primaryKey
+      && ($column.htmlType == "select" || $column.htmlType == "radio")
+      && $column.dictType && "" != $column.dictType)
+#set ($hasDict = 1)
+#if ($column.htmlType == "radio" && ($column.javaType == "Integer" || $column.javaType == "Long" || $column.javaType == "Byte" || $column.javaType == "Short"))
+#set ($hasGetIntDictOptions = 1)
+#elseif ($column.htmlType == "radio" && $column.javaType == "String")
+#set ($hasGetStrDictOptions = 1)
+#elseif ($column.htmlType == "radio" && $column.javaType == "Boolean")
+#set ($hasGetBoolDictOptions = 1)
+#elseif ($column.htmlType == "radio")
+#set ($hasGetDictOptions = 1)
+#end
+#end
+#if (($column.createOperation || $column.updateOperation) && !$column.primaryKey
+      && (${column.javaType.toLowerCase()} == "date" || ${column.javaType.toLowerCase()} == "localdate"))
+#set ($hasDate = 1)
+#set ($hasSubDate = 1)
+#end
+#if (($column.createOperation || $column.updateOperation) && !$column.primaryKey
+      && ${column.javaType.toLowerCase()} == "localdatetime")
+#set ($hasDateTime = 1)
+#set ($hasSubDate = 1)
+#end
+#end
+#end
+#end
+import type {
+  ${simpleClassName},
+#if ($table.templateType == 10 || $table.templateType == 12)
+#foreach ($subSimpleClassName in $subSimpleClassNames)
+  ${subSimpleClassName},
+#end
+#end
+} from '@/api/${table.moduleName}/${table.businessName}'
 import { computed, onMounted, ref } from 'vue'
 import { useToast } from '@wot-ui/ui/components/wd-toast'
+#if ($table.templateType == 10 || $table.templateType == 12)
+import {
+  create${simpleClassName},
+  get${simpleClassName},
+#foreach ($subTable in $subTables)
+#set ($index = $foreach.count - 1)
+#set ($subSimpleClassName = $subSimpleClassNames.get($index))
+#set ($subJoinColumn = $subJoinColumns.get($index))
+#set ($SubJoinColumnName = $subJoinColumn.javaField.substring(0,1).toUpperCase() + $subJoinColumn.javaField.substring(1))
+#if ($subTable.subJoinMany)
+  get${subSimpleClassName}ListBy${SubJoinColumnName},
+#else
+  get${subSimpleClassName}By${SubJoinColumnName},
+#end
+#end
+  update${simpleClassName},
+} from '@/api/${table.moduleName}/${table.businessName}'
+#elseif ($table.templateType == 2)
+import { create${simpleClassName}, get${simpleClassName}, get${simpleClassName}List, update${simpleClassName} } from '@/api/${table.moduleName}/${table.businessName}'
+#else
 import { create${simpleClassName}, get${simpleClassName}, update${simpleClassName} } from '@/api/${table.moduleName}/${table.businessName}'
+#end
 #if ($hasGetDictOptions == 1 || $hasGetIntDictOptions == 1 || $hasGetStrDictOptions == 1 || $hasGetBoolDictOptions == 1)
-  #set ($dictImportNames = "")
-  #if ($hasGetDictOptions == 1)
-    #set ($dictImportNames = "${dictImportNames}getDictOptions, ")
-  #end
-  #if ($hasGetIntDictOptions == 1)
-    #set ($dictImportNames = "${dictImportNames}getIntDictOptions, ")
-  #end
-  #if ($hasGetStrDictOptions == 1)
-    #set ($dictImportNames = "${dictImportNames}getStrDictOptions, ")
-  #end
-  #if ($hasGetBoolDictOptions == 1)
-    #set ($dictImportNames = "${dictImportNames}getBoolDictOptions, ")
-  #end
-  #set ($dictImportNames = $dictImportNames.trim())
-  #set ($dictImportNames = $dictImportNames.substring(0, $dictImportNames.length() - 1))
+#set ($dictImportNames = "")
+#if ($hasGetDictOptions == 1)
+#set ($dictImportNames = "${dictImportNames}getDictOptions, ")
+#end
+#if ($hasGetIntDictOptions == 1)
+#set ($dictImportNames = "${dictImportNames}getIntDictOptions, ")
+#end
+#if ($hasGetStrDictOptions == 1)
+#set ($dictImportNames = "${dictImportNames}getStrDictOptions, ")
+#end
+#if ($hasGetBoolDictOptions == 1)
+#set ($dictImportNames = "${dictImportNames}getBoolDictOptions, ")
+#end
+#set ($dictImportNames = $dictImportNames.trim())
+#set ($dictImportNames = $dictImportNames.substring(0, $dictImportNames.length() - 1))
 import { $dictImportNames } from '@/hooks/useDict'
 #end
 import { delay, navigateBackPlus } from '@/utils'
@@ -209,21 +534,27 @@ import { delay, navigateBackPlus } from '@/utils'
 import { DICT_TYPE } from '@/utils/constants'
 #end
 #if ($hasDate == 1 || $hasDateTime == 1)
-  #set ($dateImportNames = "")
-  #if ($hasDate == 1)
-    #set ($dateImportNames = "${dateImportNames}formatDate, ")
-  #end
-  #if ($hasDateTime == 1)
-    #set ($dateImportNames = "${dateImportNames}formatDateTime, ")
-  #end
-  #set ($dateImportNames = $dateImportNames.trim())
-  #set ($dateImportNames = $dateImportNames.substring(0, $dateImportNames.length() - 1))
+#set ($dateImportNames = "")
+#if ($hasDate == 1)
+#set ($dateImportNames = "${dateImportNames}formatDate, ")
+#end
+#if ($hasDateTime == 1)
+#set ($dateImportNames = "${dateImportNames}formatDateTime, ")
+#end
+#set ($dateImportNames = $dateImportNames.trim())
+#set ($dateImportNames = $dateImportNames.substring(0, $dateImportNames.length() - 1))
 import { $dateImportNames } from '@/utils/date'
 #end
 import { createFormSchema } from '@/utils/wot'
+#if ($table.templateType == 2)
+import { handleTree } from '@/utils/tree'
+#end
 
 const props = defineProps<{
-  id?: ${primaryTsType} | any
+  id?: ${primaryTsType}
+#if ($table.templateType == 2)
+  ${treeParentColumn.javaField}?: ${primaryTsType}
+#end
 }>()
 
 definePage({
@@ -238,40 +569,153 @@ const getTitle = computed(() => props.id ? '编辑${table.classComment}' : '新�
 const formLoading = ref(false) // 表单提交状态
 const formData = ref<${simpleClassName}>({
 #foreach($column in $columns)
-  #if (($column.createOperation || $column.updateOperation) || $column.primaryKey)
-    #set ($javaType = $column.javaType.toLowerCase())
-    #set ($javaFieldLower = $column.javaField.toLowerCase())
-    #set ($optional = $column.nullable || $column.primaryKey || $javaFieldLower == "createtime" || $javaFieldLower == "updatetime")
-    #if ($column.primaryKey)
+#if (($column.createOperation || $column.updateOperation) || $column.primaryKey)
+#set ($javaType = $column.javaType.toLowerCase())
+#set ($javaFieldLower = $column.javaField.toLowerCase())
+#set ($optional = $column.nullable || $column.primaryKey || $javaFieldLower == "createtime" || $javaFieldLower == "updatetime")
+#if ($column.primaryKey)
   ${column.javaField}: undefined,
-    #elseif(${javaType} == "long" || ${javaType} == "integer" || ${javaType} == "short" || ${javaType} == "double" || ${javaType} == "bigdecimal" || ${javaType} == "byte")
+#elseif($table.templateType == 2 && $column.id == $treeParentColumn.id)
+  ${column.javaField}: props.${column.javaField} ?? 0,
+#elseif(${javaType} == "long" || ${javaType} == "integer" || ${javaType} == "short" || ${javaType} == "double" || ${javaType} == "bigdecimal" || ${javaType} == "byte")
+#if($column.nullable)
+  ${column.javaField}: undefined,
+#else
   ${column.javaField}: 0,
-    #elseif(${javaType} == "boolean")
+#end
+#elseif(${javaType} == "boolean")
   ${column.javaField}: false,
-    #elseif(${javaType} == "date" || ${javaType} == "localdate" || ${javaType} == "localdatetime")
-  ${column.javaField}: undefined,
-    #else
+#elseif(${javaType} == "date" || ${javaType} == "localdate" || ${javaType} == "localdatetime")
+  ${column.javaField}:#if($column.nullable || $column.primaryKey || $javaFieldLower == "createtime" || $javaFieldLower == "updatetime") undefined#else 0#end,
+#else
   ${column.javaField}: '',
-    #end
-  #end
+#end
+#end
 #end
 }) // 表单数据
+#if ($table.templateType == 10 || $table.templateType == 12)
+#foreach ($subTable in $subTables)
+#set ($index = $foreach.count - 1)
+#set ($subSimpleClassName = $subSimpleClassNames.get($index))
+#set ($subClassNameVar = $subClassNameVars.get($index))
+#set ($subColumns = $subColumnsList.get($index))
+#set ($subJoinColumn = $subJoinColumns.get($index))
+#if ($subTable.subJoinMany)
+const ${subClassNameVar}s = ref<${subSimpleClassName}[]>([]) // ${subTable.classComment}数据
+#else
+const ${subClassNameVar} = ref<${subSimpleClassName} | null>(null) // ${subTable.classComment}数据
+#end
+#end
+#end
 #foreach($column in $columns)
-  #if (($column.createOperation || $column.updateOperation) && !$column.primaryKey && (${column.javaType.toLowerCase()} == "date" || ${column.javaType.toLowerCase()} == "localdate" || ${column.javaType.toLowerCase()} == "localdatetime"))
+#if (($column.createOperation || $column.updateOperation) && !$column.primaryKey && (${column.javaType.toLowerCase()} == "date" || ${column.javaType.toLowerCase()} == "localdate" || ${column.javaType.toLowerCase()} == "localdatetime"))
 const ${column.javaField}Visible = ref(false) // ${column.columnComment}选择器状态
-  #end
+#end
+#end
+#if ($hasSubDate == 1)
+const subDateVisible = ref<Record<string, boolean>>({}) // 子表日期选择器状态
 #end
 const formSchema = createFormSchema({
 #foreach($column in $columns)
-  #set ($javaFieldLower = $column.javaField.toLowerCase())
-  #if (($column.createOperation || $column.updateOperation) && !$column.nullable && !$column.primaryKey
+#set ($javaFieldLower = $column.javaField.toLowerCase())
+#if (($column.createOperation || $column.updateOperation) && !$column.nullable && !$column.primaryKey
         && $javaFieldLower != "createtime" && $javaFieldLower != "updatetime")
   ${column.javaField}: [{ required: true, message: '${column.columnComment}不能为空' }],
-  #end
+#end
 #end
 }) // 表单校验规则
 const formRef = ref<FormInstance>() // 表单组件引用
+#if ($table.templateType == 2)
+const treeData = ref<${simpleClassName}[]>([]) // 父级树形选项
+#end
 
+#if ($table.templateType == 10 || $table.templateType == 12)
+#foreach ($subTable in $subTables)
+#set ($index = $foreach.count - 1)
+#set ($subSimpleClassName = $subSimpleClassNames.get($index))
+#set ($subClassNameVar = $subClassNameVars.get($index))
+#set ($subColumns = $subColumnsList.get($index))
+#set ($subJoinColumn = $subJoinColumns.get($index))
+#if ($subTable.subJoinMany)
+#set ($subClassNameVar = $subClassNameVars.get($index))
+#set ($subColumns = $subColumnsList.get($index))
+#set ($subJoinColumn = $subJoinColumns.get($index))
+/** 添加${subTable.classComment} */
+function add${subClassNameVar.substring(0,1).toUpperCase()}${subClassNameVar.substring(1)}() {
+  ${subClassNameVar}s.value.push({
+#foreach ($column in $subColumns)
+#if (($column.createOperation || $column.updateOperation) && !$column.primaryKey && $column.id != $subJoinColumn.id)
+#set ($javaType = $column.javaType.toLowerCase())
+    ${column.javaField}:#if($column.nullable) undefined#elseif($javaType == "long" || $javaType == "integer" || $javaType == "short" || $javaType == "double" || $javaType == "bigdecimal" || $javaType == "byte" || $javaType == "date" || $javaType == "localdate" || $javaType == "localdatetime") 0#elseif($javaType == "boolean") false#else ''#end,
+#end
+#end
+  })
+}
+
+/** 删除${subTable.classComment} */
+function remove${subClassNameVar.substring(0,1).toUpperCase()}${subClassNameVar.substring(1)}(index: number) {
+  ${subClassNameVar}s.value.splice(index, 1)
+}
+
+#else
+/** 添加${subTable.classComment} */
+function add${subClassNameVar.substring(0,1).toUpperCase()}${subClassNameVar.substring(1)}() {
+  ${subClassNameVar}.value = {
+#foreach ($column in $subColumns)
+#if (($column.createOperation || $column.updateOperation) && !$column.primaryKey && $column.id != $subJoinColumn.id)
+#set ($javaType = $column.javaType.toLowerCase())
+    ${column.javaField}:#if($column.nullable) undefined#elseif($javaType == "long" || $javaType == "integer" || $javaType == "short" || $javaType == "double" || $javaType == "bigdecimal" || $javaType == "byte" || $javaType == "date" || $javaType == "localdate" || $javaType == "localdatetime") 0#elseif($javaType == "boolean") false#else ''#end,
+#end
+#end
+  }
+}
+
+#end
+#end
+/** 校验主子表数据 */
+function isEmptySubValue(value: unknown) {
+  return value === undefined || value === null || value === ''
+}
+
+function validateSubTables() {
+#foreach ($subTable in $subTables)
+#set ($index = $foreach.count - 1)
+#set ($subClassNameVar = $subClassNameVars.get($index))
+#set ($subColumns = $subColumnsList.get($index))
+#set ($subJoinColumn = $subJoinColumns.get($index))
+#if ($subTable.subJoinMany)
+  for (let index = 0; index < ${subClassNameVar}s.value.length; index++) {
+    const item = ${subClassNameVar}s.value[index]!
+#foreach ($column in $subColumns)
+#set ($javaFieldLower = $column.javaField.toLowerCase())
+#if (($column.createOperation || $column.updateOperation) && !$column.nullable && !$column.primaryKey
+          && $column.id != $subJoinColumn.id && $javaFieldLower != "createtime" && $javaFieldLower != "updatetime")
+    if (isEmptySubValue(item.${column.javaField})) {
+      toast.warning(`${subTable.classComment}第#[[${]]#index + 1#[[}]]#项的${column.columnComment}不能为空`)
+      return false
+    }
+#end
+#end
+  }
+#else
+  if (${subClassNameVar}.value) {
+#foreach ($column in $subColumns)
+#set ($javaFieldLower = $column.javaField.toLowerCase())
+#if (($column.createOperation || $column.updateOperation) && !$column.nullable && !$column.primaryKey
+          && $column.id != $subJoinColumn.id && $javaFieldLower != "createtime" && $javaFieldLower != "updatetime")
+    if (isEmptySubValue(${subClassNameVar}.value.${column.javaField})) {
+      toast.warning('${subTable.classComment}的${column.columnComment}不能为空')
+      return false
+    }
+#end
+#end
+  }
+#end
+#end
+  return true
+}
+
+#end
 /** 返回上一页 */
 function handleBack() {
   navigateBackPlus('/pages-${table.moduleName}/${table.businessName}/index')
@@ -282,7 +726,34 @@ async function getDetail() {
   if (!props.id) {
     return
   }
+#if ($table.templateType == 10 || $table.templateType == 12)
+  const [data#foreach ($subTable in $subTables)#set ($index = $foreach.count - 1), ${subClassNameVars.get($index)}Data#end] = await Promise.all([
+    get${simpleClassName}(props.id),
+#foreach ($subTable in $subTables)
+#set ($index = $foreach.count - 1)
+#set ($subSimpleClassName = $subSimpleClassNames.get($index))
+#set ($subJoinColumn = $subJoinColumns.get($index))
+#set ($SubJoinColumnName = $subJoinColumn.javaField.substring(0,1).toUpperCase() + $subJoinColumn.javaField.substring(1))
+#if ($subTable.subJoinMany)
+    get${subSimpleClassName}ListBy${SubJoinColumnName}(props.id),
+#else
+    get${subSimpleClassName}By${SubJoinColumnName}(props.id),
+#end
+#end
+  ])
+  formData.value = data
+#foreach ($subTable in $subTables)
+#set ($index = $foreach.count - 1)
+#set ($subClassNameVar = $subClassNameVars.get($index))
+#if ($subTable.subJoinMany)
+  ${subClassNameVar}s.value = ${subClassNameVar}Data || []
+#else
+  ${subClassNameVar}.value = ${subClassNameVar}Data || null
+#end
+#end
+#else
   formData.value = await get${simpleClassName}(props.id)
+#end
 }
 
 /** 提交表单 */
@@ -291,14 +762,31 @@ async function handleSubmit() {
   if (!valid) {
     return
   }
+#if ($table.templateType == 10 || $table.templateType == 12)
+  if (!validateSubTables()) {
+    return
+  }
+#end
 
   formLoading.value = true
   try {
+#if ($table.templateType == 10 || $table.templateType == 12)
+    const data: ${simpleClassName} = {
+      ...formData.value,
+#foreach ($subTable in $subTables)
+#set ($index = $foreach.count - 1)
+#set ($subClassNameVar = $subClassNameVars.get($index))
+      ${subClassNameVar}#if($subTable.subJoinMany)s#end: ${subClassNameVar}#if($subTable.subJoinMany)s#end.value,
+#end
+    }
+#else
+    const data = formData.value
+#end
     if (props.id) {
-      await update${simpleClassName}(formData.value)
+      await update${simpleClassName}(data)
       toast.success('修改成功')
     } else {
-      await create${simpleClassName}(formData.value)
+      await create${simpleClassName}(data)
       toast.success('新增成功')
     }
     uni.$emit('${table.moduleName}:${table.businessName}:reload')
@@ -309,7 +797,16 @@ async function handleSubmit() {
 }
 
 /** 初始化 */
-onMounted(() => {
+onMounted(async () => {
+#if ($table.templateType == 2)
+  const data = await get${simpleClassName}List()
+  treeData.value = [{
+    ${primaryColumn.javaField}: 0,
+    ${treeNameColumn.javaField}: '顶级${table.classComment}',
+    ${treeParentColumn.javaField}: 0,
+    children: handleTree(data, '${primaryColumn.javaField}', '${treeParentColumn.javaField}'),
+  } as ${simpleClassName}]
+#end
   getDetail()
 })
 </script>
