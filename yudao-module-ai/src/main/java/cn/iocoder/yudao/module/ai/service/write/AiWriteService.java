@@ -31,6 +31,14 @@ public interface AiWriteService {
     void deleteWrite(Long id);
 
     /**
+     * 获得写作
+     *
+     * @param id 编号
+     * @return AI 写作
+     */
+    AiWriteDO getWrite(Long id);
+
+    /**
      * 获得写作分页
      *
      * @param pageReqVO 分页查询

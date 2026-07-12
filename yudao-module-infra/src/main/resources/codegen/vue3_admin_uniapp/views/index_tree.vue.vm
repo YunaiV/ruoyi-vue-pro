@@ -1,0 +1,151 @@
+<template>
+  <view class="yd-page-container">
+    <!-- 顶部导航栏 -->
+    <wd-navbar
+      title="${table.classComment}管理"
+      left-arrow placeholder safe-area-inset-top fixed
+      @click-left="handleBack"
+    />
+
+    <!-- 搜索组件 -->
+    <SearchForm @search="handleQuery" @reset="handleReset" />
+
+    <!-- 面包屑导航 -->
+    <Breadcrumb ref="breadcrumbRef" v-model="currentParentId" />
+
+    <!-- ${table.classComment}列表 -->
+    <view class="p-24rpx">
+      <view
+        v-for="item in currentList"
+        :key="item.${primaryColumn.javaField}"
+        class="mb-24rpx overflow-hidden rounded-12rpx bg-white shadow-sm"
+      >
+        <view class="p-24rpx" @click="handleDetail(item)">
+          <view class="flex items-center justify-between">
+            <view class="flex min-w-0 items-center">
+              <view class="mr-16rpx h-48rpx w-48rpx shrink-0 flex items-center justify-center rounded-8rpx bg-[#1890ff]">
+                <wd-icon name="folder" size="20px" color="#fff" />
+              </view>
+              <view class="truncate text-32rpx text-[#333] font-semibold">
+                {{ item.${treeNameColumn.javaField} }}
+              </view>
+            </view>
+            <view
+              v-if="item.children?.length"
+              class="ml-16rpx shrink-0 flex items-center"
+              @click.stop="handleEnterChildren(item)"
+            >
+              <text class="text-24rpx text-[#1890ff]">子级 ({{ item.children.length }})</text>
+              <wd-icon name="arrow-right" size="12px" color="#1890ff" />
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 空状态 -->
+      <view v-if="!loading && currentList.length === 0" class="py-100rpx text-center">
+        <wd-empty icon="content" tip="暂无${table.classComment}数据" />
+      </view>
+    </view>
+
+    <!-- 新增按钮 -->
+    <wd-fab
+      v-if="hasAccessByCodes(['${permissionPrefix}:create'])"
+      position="right-bottom"
+      type="primary"
+      :expandable="false"
+      @click="handleAdd"
+    />
+  </view>
+</template>
+
+<script lang="ts" setup>
+#set ($primaryJavaType = $primaryColumn.javaType.toLowerCase())
+#if(${primaryJavaType} == "long" || ${primaryJavaType} == "integer" || ${primaryJavaType} == "short" || ${primaryJavaType} == "float" || ${primaryJavaType} == "double" || ${primaryJavaType} == "bigdecimal" || ${primaryJavaType} == "byte")
+#set ($primaryTsType = "number")
+#else
+#set ($primaryTsType = "string")
+#end
+import type { ${simpleClassName} } from '@/api/${table.moduleName}/${table.businessName}'
+import { onUnload } from '@dcloudio/uni-app'
+import { computed, onMounted, ref } from 'vue'
+import { get${simpleClassName}List } from '@/api/${table.moduleName}/${table.businessName}'
+import { useAccess } from '@/hooks/useAccess'
+import { navigateBackPlus } from '@/utils'
+import { findChildren, handleTree } from '@/utils/tree'
+import Breadcrumb from './components/breadcrumb.vue'
+import SearchForm from './components/search-form.vue'
+
+definePage({
+  style: {
+    navigationBarTitleText: '',
+    navigationStyle: 'custom',
+  },
+})
+
+const { hasAccessByCodes } = useAccess()
+const loading = ref(false) // 列表加载状态
+const list = ref<${simpleClassName}[]>([]) // 完整树形列表
+const currentParentId = ref<${primaryTsType}>(0) // 当前层级的父节点编号
+const currentList = computed(() => currentParentId.value === 0
+  ? list.value
+  : findChildren(list.value, currentParentId.value, '${primaryColumn.javaField}')) // 当前层级列表
+const breadcrumbRef = ref<InstanceType<typeof Breadcrumb>>() // 面包屑组件引用
+const queryParams = ref<Record<string, any>>({}) // 查询参数
+
+/** 返回上一页或上一层级 */
+function handleBack() {
+  if (!breadcrumbRef.value?.back()) {
+    navigateBackPlus()
+  }
+}
+
+/** 进入子层级 */
+function handleEnterChildren(item: ${simpleClassName}) {
+  breadcrumbRef.value?.enter({ id: item.${primaryColumn.javaField}!, name: item.${treeNameColumn.javaField} })
+}
+
+/** 查询${table.classComment}列表 */
+async function getList() {
+  loading.value = true
+  try {
+    list.value = handleTree(await get${simpleClassName}List(queryParams.value), '${primaryColumn.javaField}', '${treeParentColumn.javaField}')
+  } finally {
+    loading.value = false
+  }
+}
+
+/** 搜索按钮操作 */
+function handleQuery(data?: Record<string, any>) {
+  queryParams.value = { ...data }
+  currentParentId.value = 0
+  breadcrumbRef.value?.reset()
+  getList()
+}
+
+/** 重置按钮操作 */
+function handleReset() {
+  handleQuery()
+}
+
+/** 新增${table.classComment} */
+function handleAdd() {
+  uni.navigateTo({ url: `/pages-${table.moduleName}/${table.businessName}/form/index?${treeParentColumn.javaField}=#[[${]]#currentParentId.value#[[}]]#` })
+}
+
+/** 查看详情 */
+function handleDetail(item: ${simpleClassName}) {
+  uni.navigateTo({ url: `/pages-${table.moduleName}/${table.businessName}/detail/index?id=#[[${]]#item.${primaryColumn.javaField}#[[}]]#` })
+}
+
+/** 初始化 */
+onMounted(() => {
+  getList()
+  uni.$on('${table.moduleName}:${table.businessName}:reload', getList)
+})
+
+/** 卸载 */
+onUnload(() => {
+  uni.$off('${table.moduleName}:${table.businessName}:reload', getList)
+})
+</script>

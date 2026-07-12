@@ -10,10 +10,15 @@ import cn.iocoder.yudao.module.ai.framework.ai.core.model.gemini.GeminiChatModel
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.grok.GrokChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.hunyuan.HunYuanChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.midjourney.api.MidjourneyApi;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.minimax.MiniMaxChatModel;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.moonshot.MoonshotChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlowApiConstants;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlowChatModel;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.stepfun.StepFunChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.xinghuo.XingHuoChatModel;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.yiyan.YiYanChatModel;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.zhipu.ZhiPuChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.webserch.AiWebSearchClient;
 import cn.iocoder.yudao.module.ai.framework.ai.core.webserch.bocha.AiBoChaWebSearchClient;
 import cn.iocoder.yudao.module.ai.tool.method.PersonService;
@@ -44,7 +49,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * 芋道 AI 自动配置
@@ -113,13 +117,13 @@ public class AiAutoConfiguration {
         if (StrUtil.isEmpty(properties.getModel())) {
             properties.setModel(DouBaoChatModel.MODEL_DEFAULT);
         }
-        OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
-                .openAiApi(OpenAiApi.builder()
+        DeepSeekChatModel openAiChatModel = DeepSeekChatModel.builder()
+                .deepSeekApi(DeepSeekApi.builder()
                         .baseUrl(DouBaoChatModel.BASE_URL)
                         .completionsPath(DouBaoChatModel.COMPLETE_PATH)
                         .apiKey(properties.getApiKey())
                         .build())
-                .defaultOptions(OpenAiChatOptions.builder()
+                .defaultOptions(DeepSeekChatOptions.builder()
                         .model(properties.getModel())
                         .temperature(properties.getTemperature())
                         .maxTokens(properties.getMaxTokens())
@@ -168,11 +172,8 @@ public class AiAutoConfiguration {
         if (StrUtil.isEmpty(properties.getModel())) {
             properties.setModel(HunYuanChatModel.MODEL_DEFAULT);
         }
-        // 特殊：由于混元大模型不提供 deepseek，而是通过知识引擎，所以需要区分下 URL
         if (StrUtil.isEmpty(properties.getBaseUrl())) {
-            properties.setBaseUrl(
-                    StrUtil.startWithIgnoreCase(properties.getModel(), "deepseek") ? HunYuanChatModel.DEEP_SEEK_BASE_URL
-                            : HunYuanChatModel.BASE_URL);
+            properties.setBaseUrl(HunYuanChatModel.BASE_URL);
         }
         // 创建 DeepSeekChatModel、HunYuanChatModel 对象
         DeepSeekChatModel openAiChatModel = DeepSeekChatModel.builder()
@@ -203,25 +204,15 @@ public class AiAutoConfiguration {
         if (StrUtil.isEmpty(properties.getModel())) {
             properties.setModel(XingHuoChatModel.MODEL_DEFAULT);
         }
-        OpenAiApi.Builder builder = OpenAiApi.builder()
-                .baseUrl(XingHuoChatModel.BASE_URL_V1)
-                .apiKey(properties.getAppKey() + ":" + properties.getSecretKey());
-        if ("x1".equals(properties.getModel())) {
-            builder.baseUrl(XingHuoChatModel.BASE_URL_V2)
-                    .completionsPath(XingHuoChatModel.BASE_COMPLETIONS_PATH_V2);
-        }
-        OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
-                .openAiApi(builder.build())
-                .defaultOptions(OpenAiChatOptions.builder()
+        return XingHuoChatModel.builder()
+                .apiKey(properties.getApiKey())
+                .options(DeepSeekChatOptions.builder()
                         .model(properties.getModel())
                         .temperature(properties.getTemperature())
                         .maxTokens(properties.getMaxTokens())
                         .topP(properties.getTopP())
                         .build())
-                // TODO @芋艿：星火的 function call 有 bug，会报 ToolResponseMessage must have an id 错误！！！
-                .toolCallingManager(getToolCallingManager())
                 .build();
-        return new XingHuoChatModel(openAiChatModel);
     }
 
     @Bean
@@ -235,12 +226,13 @@ public class AiAutoConfiguration {
         if (StrUtil.isEmpty(properties.getModel())) {
             properties.setModel(BaiChuanChatModel.MODEL_DEFAULT);
         }
-        OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
-                .openAiApi(OpenAiApi.builder()
+        DeepSeekChatModel deepSeekChatModel = DeepSeekChatModel.builder()
+                .deepSeekApi(DeepSeekApi.builder()
                         .baseUrl(BaiChuanChatModel.BASE_URL)
                         .apiKey(properties.getApiKey())
+                        .completionsPath(BaiChuanChatModel.COMPLETE_PATH)
                         .build())
-                .defaultOptions(OpenAiChatOptions.builder()
+                .defaultOptions(DeepSeekChatOptions.builder()
                         .model(properties.getModel())
                         .temperature(properties.getTemperature())
                         .maxTokens(properties.getMaxTokens())
@@ -248,7 +240,123 @@ public class AiAutoConfiguration {
                         .build())
                 .toolCallingManager(getToolCallingManager())
                 .build();
-        return new BaiChuanChatModel(openAiChatModel);
+        return new BaiChuanChatModel(deepSeekChatModel);
+    }
+
+    @Bean
+    @ConditionalOnProperty(value = "yudao.ai.yiyan.enable", havingValue = "true")
+    public YiYanChatModel yiYanChatClient(YudaoAiProperties yudaoAiProperties) {
+        YudaoAiProperties.YiYan properties = yudaoAiProperties.getYiyan();
+        return buildYiYanChatClient(properties);
+    }
+
+    public YiYanChatModel buildYiYanChatClient(YudaoAiProperties.YiYan properties) {
+        if (StrUtil.isEmpty(properties.getModel())) {
+            properties.setModel(YiYanChatModel.MODEL_DEFAULT);
+        }
+        return new YiYanChatModel(buildDeepSeekCompatibleChatModel(
+                StrUtil.blankToDefault(properties.getBaseUrl(), YiYanChatModel.BASE_URL),
+                null, properties.getApiKey(), properties.getModel(), properties.getTemperature(),
+                properties.getMaxTokens(), properties.getTopP()));
+    }
+
+    @Bean
+    @ConditionalOnProperty(value = "yudao.ai.zhipu.enable", havingValue = "true")
+    public ZhiPuChatModel zhiPuChatClient(YudaoAiProperties yudaoAiProperties) {
+        YudaoAiProperties.ZhiPu properties = yudaoAiProperties.getZhipu();
+        return buildZhiPuChatClient(properties);
+    }
+
+    public ZhiPuChatModel buildZhiPuChatClient(YudaoAiProperties.ZhiPu properties) {
+        if (StrUtil.isEmpty(properties.getModel())) {
+            properties.setModel(ZhiPuChatModel.MODEL_DEFAULT);
+        }
+        DeepSeekChatModel deepSeekChatModel = DeepSeekChatModel.builder()
+                .deepSeekApi(DeepSeekApi.builder()
+                        .baseUrl(StrUtil.blankToDefault(properties.getBaseUrl(), ZhiPuChatModel.BASE_URL))
+                        .apiKey(properties.getApiKey())
+                        .build())
+                .defaultOptions(DeepSeekChatOptions.builder()
+                        .model(properties.getModel())
+                        .temperature(properties.getTemperature())
+                        .maxTokens(properties.getMaxTokens())
+                        .topP(properties.getTopP())
+                        .build())
+                .build();
+        return new ZhiPuChatModel(deepSeekChatModel);
+    }
+
+    @Bean
+    @ConditionalOnProperty(value = "yudao.ai.minimax.enable", havingValue = "true")
+    public MiniMaxChatModel miniMaxChatClient(YudaoAiProperties yudaoAiProperties) {
+        YudaoAiProperties.MiniMax properties = yudaoAiProperties.getMinimax();
+        return buildMiniMaxChatClient(properties);
+    }
+
+    public MiniMaxChatModel buildMiniMaxChatClient(YudaoAiProperties.MiniMax properties) {
+        if (StrUtil.isEmpty(properties.getModel())) {
+            properties.setModel(MiniMaxChatModel.MODEL_DEFAULT);
+        }
+        return new MiniMaxChatModel(buildDeepSeekCompatibleChatModel(
+                StrUtil.blankToDefault(properties.getBaseUrl(), MiniMaxChatModel.BASE_URL),
+                null, properties.getApiKey(), properties.getModel(), properties.getTemperature(),
+                properties.getMaxTokens(), properties.getTopP()));
+    }
+
+    @Bean
+    @ConditionalOnProperty(value = "yudao.ai.moonshot.enable", havingValue = "true")
+    public MoonshotChatModel moonshotChatClient(YudaoAiProperties yudaoAiProperties) {
+        YudaoAiProperties.Moonshot properties = yudaoAiProperties.getMoonshot();
+        return buildMoonshotChatClient(properties);
+    }
+
+    public MoonshotChatModel buildMoonshotChatClient(YudaoAiProperties.Moonshot properties) {
+        if (StrUtil.isEmpty(properties.getModel())) {
+            properties.setModel(MoonshotChatModel.MODEL_DEFAULT);
+        }
+        return new MoonshotChatModel(buildDeepSeekCompatibleChatModel(
+                StrUtil.blankToDefault(properties.getBaseUrl(), MoonshotChatModel.BASE_URL),
+                MoonshotChatModel.COMPLETE_PATH, properties.getApiKey(), properties.getModel(),
+                properties.getTemperature(), properties.getMaxTokens(), properties.getTopP()));
+    }
+
+    @Bean
+    @ConditionalOnProperty(value = "yudao.ai.stepfun.enable", havingValue = "true")
+    public StepFunChatModel stepFunChatClient(YudaoAiProperties yudaoAiProperties) {
+        YudaoAiProperties.StepFun properties = yudaoAiProperties.getStepfun();
+        return buildStepFunChatClient(properties);
+    }
+
+    public StepFunChatModel buildStepFunChatClient(YudaoAiProperties.StepFun properties) {
+        if (StrUtil.isEmpty(properties.getModel())) {
+            properties.setModel(StepFunChatModel.MODEL_DEFAULT);
+        }
+        return new StepFunChatModel(buildDeepSeekCompatibleChatModel(
+                StrUtil.blankToDefault(properties.getBaseUrl(), StepFunChatModel.BASE_URL),
+                StepFunChatModel.COMPLETE_PATH, properties.getApiKey(), properties.getModel(),
+                properties.getTemperature(), properties.getMaxTokens(), properties.getTopP()));
+    }
+
+    private static DeepSeekChatModel buildDeepSeekCompatibleChatModel(String baseUrl, String completionsPath,
+                                                                     String apiKey, String model,
+                                                                     Double temperature, Integer maxTokens,
+                                                                     Double topP) {
+        DeepSeekApi.Builder apiBuilder = DeepSeekApi.builder()
+                .baseUrl(baseUrl)
+                .apiKey(apiKey);
+        if (StrUtil.isNotEmpty(completionsPath)) {
+            apiBuilder.completionsPath(completionsPath);
+        }
+        return DeepSeekChatModel.builder()
+                .deepSeekApi(apiBuilder.build())
+                .defaultOptions(DeepSeekChatOptions.builder()
+                        .model(model)
+                        .temperature(temperature)
+                        .maxTokens(maxTokens)
+                        .topP(topP)
+                        .build())
+                .toolCallingManager(getToolCallingManager())
+                .build();
     }
 
     @Bean
@@ -264,14 +372,20 @@ public class AiAutoConfiguration {
         return new SunoApi(yudaoAiProperties.getSuno().getBaseUrl());
     }
 
-    public ChatModel buildGrokChatClient(YudaoAiProperties.Grok properties) {
+    @Bean
+    @ConditionalOnProperty(value = "yudao.ai.grok.enable", havingValue = "true")
+    public GrokChatModel grokChatClient(YudaoAiProperties yudaoAiProperties) {
+        YudaoAiProperties.Grok properties = yudaoAiProperties.getGrok();
+        return buildGrokChatClient(properties);
+    }
+
+    public GrokChatModel buildGrokChatClient(YudaoAiProperties.Grok properties) {
         if (StrUtil.isEmpty(properties.getModel())) {
             properties.setModel(GrokChatModel.MODEL_DEFAULT);
         }
         OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
                 .openAiApi(OpenAiApi.builder()
-                        .baseUrl(Optional.ofNullable(properties.getBaseUrl())
-                                .orElse(GrokChatModel.BASE_URL))
+                        .baseUrl(StrUtil.blankToDefault(properties.getBaseUrl(), GrokChatModel.BASE_URL))
                         .completionsPath(GrokChatModel.COMPLETE_PATH)
                         .apiKey(properties.getApiKey())
                         .build())
@@ -283,7 +397,7 @@ public class AiAutoConfiguration {
                         .build())
                 .toolCallingManager(getToolCallingManager())
                 .build();
-        return new DouBaoChatModel(openAiChatModel);
+        return new GrokChatModel(openAiChatModel);
     }
 
     // ========== RAG 相关 ==========

@@ -1,0 +1,258 @@
+<template>
+  <view class="yd-page-container">
+    <!-- 顶部导航栏 -->
+    <wd-navbar title="${table.classComment}详情" left-arrow placeholder safe-area-inset-top fixed @click-left="handleBack" />
+
+    <view class="pb-160rpx">
+      <!-- 主表详情 -->
+      <wd-cell-group border title="${table.classComment}信息">
+#foreach($column in $columns)
+#if ($column.primaryKey || $column.listOperationResult || $column.createOperation || $column.updateOperation)
+#if ($column.dictType && "" != $column.dictType)
+        <wd-cell title="${column.columnComment}">
+          <dict-tag :type="DICT_TYPE.${column.dictType.toUpperCase()}" :value="formData?.${column.javaField}" />
+        </wd-cell>
+#elseif ($column.javaType == "LocalDateTime")
+        <wd-cell title="${column.columnComment}" :value="formatDateTime(formData?.${column.javaField}) || '-'" />
+#else
+        <wd-cell title="${column.columnComment}" :value="formData?.${column.javaField} ?? '-'" />
+#end
+#end
+#end
+      </wd-cell-group>
+
+#foreach ($subTable in $subTables)
+#set ($index = $foreach.count - 1)
+#set ($subColumns = $subColumnsList.get($index))
+#set ($subClassNameVar = $subClassNameVars.get($index))
+#set ($subPrimaryColumn = $subPrimaryColumns.get($index))
+#set ($pageSize = 10)
+#if (!$subTable.subJoinMany)
+#set ($pageSize = 1)
+#end
+      <!-- 子表：${subTable.classComment} -->
+      <view class="mt-20rpx flex items-center justify-between px-24rpx py-16rpx">
+        <text class="text-28rpx text-[#333] font-semibold">${subTable.classComment}（{{ ${subClassNameVar}Total }}）</text>
+        <wd-button
+#if (!$subTable.subJoinMany)
+          v-if="${subClassNameVar}Total === 0 && hasAccessByCodes(['${permissionPrefix}:create'])"
+#else
+          v-if="hasAccessByCodes(['${permissionPrefix}:create'])"
+#end
+          size="small" type="primary" variant="plain" @click="open${subClassNameVar.substring(0,1).toUpperCase()}${subClassNameVar.substring(1)}()"
+        >
+          添加
+        </wd-button>
+      </view>
+      <view class="px-24rpx">
+        <z-paging
+          ref="${subClassNameVar}PagingRef"
+          v-model="${subClassNameVar}List"
+          :fixed="false"
+          :auto="false"
+          height="560rpx"
+          :default-page-size="${pageSize}"
+          :refresher-enabled="false"
+          :inside-more="true"
+          :to-bottom-loading-more-enabled="false"
+          loading-more-default-text="点击加载更多"
+          empty-view-text="暂无${subTable.classComment}"
+          @query="query${subClassNameVar.substring(0,1).toUpperCase()}${subClassNameVar.substring(1)}List"
+        >
+          <view
+            v-for="item in ${subClassNameVar}List"
+            :key="item.${subPrimaryColumn.javaField}"
+            class="mb-16rpx rounded-12rpx bg-white p-24rpx shadow-sm"
+          >
+#foreach ($column in $subColumns)
+#if ($column.listOperationResult && !$column.primaryKey)
+            <view class="mb-8rpx text-28rpx text-[#666]">
+              ${column.columnComment}：{{ item.${column.javaField} ?? '-' }}
+            </view>
+#end
+#end
+            <view class="mt-16rpx flex justify-end gap-16rpx">
+              <wd-button size="small" variant="plain" @click="open${subClassNameVar.substring(0,1).toUpperCase()}${subClassNameVar.substring(1)}(item)">
+                编辑
+              </wd-button>
+              <wd-button size="small" type="danger" variant="plain" @click="remove${subClassNameVar.substring(0,1).toUpperCase()}${subClassNameVar.substring(1)}(item)">
+                删除
+              </wd-button>
+            </view>
+          </view>
+        </z-paging>
+      </view>
+#end
+    </view>
+
+    <!-- 底部操作按钮 -->
+    <view class="yd-detail-footer">
+      <view class="yd-detail-footer-actions">
+        <wd-button v-if="hasAccessByCodes(['${permissionPrefix}:update'])" class="flex-1" type="warning" @click="handleEdit">
+          编辑
+        </wd-button>
+        <wd-button v-if="hasAccessByCodes(['${permissionPrefix}:delete'])" class="flex-1" type="danger" :loading="deleting" @click="handleDelete">
+          删除
+        </wd-button>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script lang="ts" setup>
+#set ($primaryJavaType = $primaryColumn.javaType.toLowerCase())
+#if(${primaryJavaType} == "long" || ${primaryJavaType} == "integer" || ${primaryJavaType} == "short" || ${primaryJavaType} == "float" || ${primaryJavaType} == "double" || ${primaryJavaType} == "bigdecimal" || ${primaryJavaType} == "byte")
+#set ($primaryTsType = "number")
+#else
+#set ($primaryTsType = "string")
+#end
+#set ($hasDict = 0)
+#set ($hasDateTime = 0)
+#foreach($column in $columns)
+#if ($column.dictType && "" != $column.dictType)
+#set ($hasDict = 1)
+#end
+#if ($column.javaType == "LocalDateTime")
+#set ($hasDateTime = 1)
+#end
+#end
+import type {
+  ${simpleClassName},
+#foreach ($subSimpleClassName in $subSimpleClassNames)
+  ${subSimpleClassName},
+#end
+} from '@/api/${table.moduleName}/${table.businessName}'
+import { onShow } from '@dcloudio/uni-app'
+import { nextTick, ref } from 'vue'
+import { useDialog } from '@wot-ui/ui/components/wd-dialog'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
+import {
+  delete${simpleClassName},
+#foreach ($subSimpleClassName in $subSimpleClassNames)
+  delete${subSimpleClassName},
+#end
+  get${simpleClassName},
+#foreach ($subSimpleClassName in $subSimpleClassNames)
+  get${subSimpleClassName}Page,
+#end
+} from '@/api/${table.moduleName}/${table.businessName}'
+import { useAccess } from '@/hooks/useAccess'
+import { delay, navigateBackPlus } from '@/utils'
+#if ($hasDict == 1)
+import { DICT_TYPE } from '@/utils/constants'
+#end
+#if ($hasDateTime == 1)
+import { formatDateTime } from '@/utils/date'
+#end
+
+const props = defineProps<{ id?: ${primaryTsType} }>()
+
+definePage({
+  style: { navigationBarTitleText: '', navigationStyle: 'custom' },
+})
+
+const { hasAccessByCodes } = useAccess()
+const dialog = useDialog()
+const toast = useToast()
+const formData = ref<${simpleClassName}>() // 主表数据
+#foreach ($subTable in $subTables)
+#set ($index = $foreach.count - 1)
+#set ($subSimpleClassName = $subSimpleClassNames.get($index))
+#set ($subClassNameVar = $subClassNameVars.get($index))
+const ${subClassNameVar}List = ref<${subSimpleClassName}[]>([]) // ${subTable.classComment}列表
+const ${subClassNameVar}Total = ref(0) // ${subTable.classComment}总数
+const ${subClassNameVar}PagingRef = ref<any>() // ${subTable.classComment}分页组件引用
+#end
+const deleting = ref(false) // 主表删除状态
+
+/** 返回上一页 */
+function handleBack() {
+  navigateBackPlus('/pages-${table.moduleName}/${table.businessName}/index')
+}
+
+/** 加载主表 */
+async function loadMain() {
+  if (props.id) {
+    formData.value = await get${simpleClassName}(props.id)
+  }
+}
+
+#foreach ($subTable in $subTables)
+#set ($index = $foreach.count - 1)
+#set ($subSimpleClassName = $subSimpleClassNames.get($index))
+#set ($subClassNameVar = $subClassNameVars.get($index))
+#set ($subJoinColumn = $subJoinColumns.get($index))
+#set ($subPrimaryColumn = $subPrimaryColumns.get($index))
+/** 查询${subTable.classComment}列表 */
+async function query${subClassNameVar.substring(0,1).toUpperCase()}${subClassNameVar.substring(1)}List(pageNo: number, pageSize: number) {
+  if (!props.id) {
+    ${subClassNameVar}PagingRef.value?.completeByTotal([], 0)
+    return
+  }
+  try {
+    const data = await get${subSimpleClassName}Page({ ${subJoinColumn.javaField}: props.id, pageNo, pageSize })
+    ${subClassNameVar}Total.value = data.total
+    ${subClassNameVar}PagingRef.value?.completeByTotal(data.list, data.total)
+  } catch {
+    ${subClassNameVar}PagingRef.value?.complete(false)
+  }
+}
+
+/** 打开${subTable.classComment}表单 */
+function open${subClassNameVar.substring(0,1).toUpperCase()}${subClassNameVar.substring(1)}(item?: ${subSimpleClassName}) {
+  const query = [
+    `${subJoinColumn.javaField}=#[[${]]#props.id#[[}]]#`,
+    item?.${subPrimaryColumn.javaField} ? `id=#[[${]]#item.${subPrimaryColumn.javaField}#[[}]]#` : '',
+  ].filter(Boolean).join('&')
+  uni.navigateTo({ url: `/pages-${table.moduleName}/${table.businessName}/${subSimpleClassName_strikeCases.get($index)}/form/index?#[[${]]#query#[[}]]#` })
+}
+
+/** 删除${subTable.classComment} */
+async function remove${subClassNameVar.substring(0,1).toUpperCase()}${subClassNameVar.substring(1)}(item: ${subSimpleClassName}) {
+  try {
+    await dialog.confirm({ title: '提示', msg: '确定要删除该${subTable.classComment}吗？' })
+  } catch {
+    return
+  }
+  await delete${subSimpleClassName}(item.${subPrimaryColumn.javaField}!)
+  toast.success('删除成功')
+  ${subClassNameVar}PagingRef.value?.reload()
+}
+
+#end
+/** 编辑主表 */
+function handleEdit() {
+  uni.navigateTo({ url: `/pages-${table.moduleName}/${table.businessName}/form/index?id=#[[${]]#props.id#[[}]]#` })
+}
+
+/** 删除主表 */
+async function handleDelete() {
+  if (!props.id) {
+    return
+  }
+  try {
+    await dialog.confirm({ title: '提示', msg: '确定要删除该${table.classComment}吗？' })
+  } catch {
+    return
+  }
+  deleting.value = true
+  try {
+    await delete${simpleClassName}(props.id)
+    toast.success('删除成功')
+    uni.$emit('${table.moduleName}:${table.businessName}:reload')
+    delay(handleBack)
+  } finally {
+    deleting.value = false
+  }
+}
+
+/** 进入页面加载（含编辑和子表返回后刷新） */
+onShow(() => {
+  loadMain()
+  nextTick(() => {
+#foreach ($subClassNameVar in $subClassNameVars)
+    ${subClassNameVar}PagingRef.value?.reload()
+#end
+  })
+})
+</script>

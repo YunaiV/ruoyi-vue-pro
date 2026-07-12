@@ -6,13 +6,13 @@ export interface Student {
   id?: number
   name: string
   description: string
-  birthday: Date
+  birthday: number
   sex: number
   enabled: boolean
   avatar: string
   video: string
   memo: string
-  createTime?: Date
+  createTime?: number
 }
 
 /** 获取学生分页列表 */
