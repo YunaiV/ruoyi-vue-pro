@@ -1,0 +1,128 @@
+<template>
+  <view class="yd-page-container">
+    <!-- 顶部导航栏 -->
+    <wd-navbar
+      title="分类详情"
+      left-arrow placeholder safe-area-inset-top fixed
+      @click-left="handleBack"
+    />
+
+    <!-- 详情内容 -->
+    <view>
+      <wd-cell-group border>
+        <wd-cell title="编号" :value="formData?.id ?? '-'" />
+        <wd-cell title="名字" :value="formData?.name ?? '-'" />
+        <wd-cell title="父编号" :value="formData?.parentId ?? '-'" />
+      </wd-cell-group>
+    </view>
+
+    <!-- 底部操作按钮 -->
+    <view class="yd-detail-footer">
+      <view class="yd-detail-footer-actions">
+        <wd-button
+          v-if="hasAccessByCodes(['infra:category:update'])"
+          class="flex-1" type="warning" @click="handleEdit"
+        >
+          编辑
+        </wd-button>
+        <wd-button
+          v-if="hasAccessByCodes(['infra:category:delete'])"
+          class="flex-1" type="danger" :loading="deleting" @click="handleDelete"
+        >
+          删除
+        </wd-button>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script lang="ts" setup>
+import type { Category } from '@/api/infra/demo'
+import { onUnload } from '@dcloudio/uni-app'
+import { onMounted, ref } from 'vue'
+import { useDialog } from '@wot-ui/ui/components/wd-dialog'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
+import { deleteCategory, getCategory } from '@/api/infra/demo'
+import { useAccess } from '@/hooks/useAccess'
+import { delay, navigateBackPlus } from '@/utils'
+
+const props = defineProps<{
+  id?: number
+}>()
+
+definePage({
+  style: {
+    navigationBarTitleText: '',
+    navigationStyle: 'custom',
+  },
+})
+
+const { hasAccessByCodes } = useAccess()
+const dialog = useDialog()
+const toast = useToast()
+const formData = ref<Category>() // 详情数据
+const deleting = ref(false) // 删除状态
+
+/** 返回上一页 */
+function handleBack() {
+  navigateBackPlus('/pages-infra/demo/index')
+}
+
+/** 加载分类详情 */
+async function getDetail() {
+  if (!props.id || deleting.value) {
+    return
+  }
+  try {
+    toast.loading('加载中...')
+    formData.value = await getCategory(props.id)
+  } finally {
+    toast.close()
+  }
+}
+
+/** 编辑分类 */
+function handleEdit() {
+  uni.navigateTo({
+    url: `/pages-infra/demo/form/index?id=${props.id}`,
+  })
+}
+
+/** 删除分类 */
+async function handleDelete() {
+  if (!props.id) {
+    return
+  }
+  try {
+    await dialog.confirm({
+      title: '提示',
+      msg: '确定要删除该分类吗？',
+    })
+  } catch {
+    return
+  }
+  deleting.value = true
+  try {
+    await deleteCategory(props.id)
+    toast.success('删除成功')
+    uni.$emit('infra:demo:reload')
+    delay(handleBack)
+  } finally {
+    deleting.value = false
+  }
+}
+
+/** 初始化 */
+onMounted(() => {
+  uni.$on('infra:demo:reload', getDetail)
+  getDetail()
+})
+
+/** 卸载 */
+onUnload(() => {
+  uni.$off('infra:demo:reload', getDetail)
+})
+</script>
+
+<style lang="scss" scoped>
+</style>

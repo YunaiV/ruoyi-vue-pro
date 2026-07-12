@@ -119,6 +119,15 @@ public class AiImageController {
         return success(BeanUtils.toBean(pageResult, AiImageRespVO.class));
     }
 
+    @GetMapping("/get")
+    @Operation(summary = "获得绘画")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @PreAuthorize("@ss.hasPermission('ai:image:query')")
+    public CommonResult<AiImageRespVO> getImage(@RequestParam("id") Long id) {
+        AiImageDO image = imageService.getImage(id);
+        return success(BeanUtils.toBean(image, AiImageRespVO.class));
+    }
+
     @PutMapping("/update")
     @Operation(summary = "更新绘画")
     @PreAuthorize("@ss.hasPermission('ai:image:update')")

@@ -1,0 +1,145 @@
+<template>
+  <view class="yd-page-container">
+    <!-- 顶部导航栏 -->
+    <wd-navbar
+      title="分类管理"
+      left-arrow placeholder safe-area-inset-top fixed
+      @click-left="handleBack"
+    />
+
+    <!-- 搜索组件 -->
+    <SearchForm @search="handleQuery" @reset="handleReset" />
+
+    <!-- 面包屑导航 -->
+    <Breadcrumb ref="breadcrumbRef" v-model="currentParentId" />
+
+    <!-- 分类列表 -->
+    <view class="p-24rpx">
+      <view
+        v-for="item in currentList"
+        :key="item.id"
+        class="mb-24rpx overflow-hidden rounded-12rpx bg-white shadow-sm"
+      >
+        <view class="p-24rpx" @click="handleDetail(item)">
+          <view class="flex items-center justify-between">
+            <view class="flex min-w-0 items-center">
+              <view class="mr-16rpx h-48rpx w-48rpx shrink-0 flex items-center justify-center rounded-8rpx bg-[#1890ff]">
+                <wd-icon name="folder" size="20px" color="#fff" />
+              </view>
+              <view class="truncate text-32rpx text-[#333] font-semibold">
+                {{ item.name }}
+              </view>
+            </view>
+            <view
+              v-if="item.children?.length"
+              class="ml-16rpx shrink-0 flex items-center"
+              @click.stop="handleEnterChildren(item)"
+            >
+              <text class="text-24rpx text-[#1890ff]">子级 ({{ item.children.length }})</text>
+              <wd-icon name="arrow-right" size="12px" color="#1890ff" />
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 空状态 -->
+      <view v-if="!loading && currentList.length === 0" class="py-100rpx text-center">
+        <wd-empty icon="content" tip="暂无分类数据" />
+      </view>
+    </view>
+
+    <!-- 新增按钮 -->
+    <wd-fab
+      v-if="hasAccessByCodes(['infra:category:create'])"
+      position="right-bottom"
+      type="primary"
+      :expandable="false"
+      @click="handleAdd"
+    />
+  </view>
+</template>
+
+<script lang="ts" setup>
+import type { Category } from '@/api/infra/demo'
+import { onUnload } from '@dcloudio/uni-app'
+import { computed, onMounted, ref } from 'vue'
+import { getCategoryList } from '@/api/infra/demo'
+import { useAccess } from '@/hooks/useAccess'
+import { navigateBackPlus } from '@/utils'
+import { findChildren, handleTree } from '@/utils/tree'
+import Breadcrumb from './components/breadcrumb.vue'
+import SearchForm from './components/search-form.vue'
+
+definePage({
+  style: {
+    navigationBarTitleText: '',
+    navigationStyle: 'custom',
+  },
+})
+
+const { hasAccessByCodes } = useAccess()
+const loading = ref(false) // 列表加载状态
+const list = ref<Category[]>([]) // 完整树形列表
+const currentParentId = ref<number>(0) // 当前层级的父节点编号
+const currentList = computed(() => currentParentId.value === 0
+  ? list.value
+  : findChildren(list.value, currentParentId.value, 'id')) // 当前层级列表
+const breadcrumbRef = ref<InstanceType<typeof Breadcrumb>>() // 面包屑组件引用
+const queryParams = ref<Record<string, any>>({}) // 查询参数
+
+/** 返回上一页或上一层级 */
+function handleBack() {
+  if (!breadcrumbRef.value?.back()) {
+    navigateBackPlus()
+  }
+}
+
+/** 进入子层级 */
+function handleEnterChildren(item: Category) {
+  breadcrumbRef.value?.enter({ id: item.id!, name: item.name })
+}
+
+/** 查询分类列表 */
+async function getList() {
+  loading.value = true
+  try {
+    list.value = handleTree(await getCategoryList(queryParams.value), 'id', 'parentId')
+  } finally {
+    loading.value = false
+  }
+}
+
+/** 搜索按钮操作 */
+function handleQuery(data?: Record<string, any>) {
+  queryParams.value = { ...data }
+  currentParentId.value = 0
+  breadcrumbRef.value?.reset()
+  getList()
+}
+
+/** 重置按钮操作 */
+function handleReset() {
+  handleQuery()
+}
+
+/** 新增分类 */
+function handleAdd() {
+  uni.navigateTo({ url: `/pages-infra/demo/form/index?parentId=${currentParentId.value}` })
+}
+
+/** 查看详情 */
+function handleDetail(item: Category) {
+  uni.navigateTo({ url: `/pages-infra/demo/detail/index?id=${item.id}` })
+}
+
+/** 初始化 */
+onMounted(() => {
+  getList()
+  uni.$on('infra:demo:reload', getList)
+})
+
+/** 卸载 */
+onUnload(() => {
+  uni.$off('infra:demo:reload', getList)
+})
+</script>

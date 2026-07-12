@@ -1,0 +1,137 @@
+<template>
+  <view class="yd-page-container">
+    <!-- 顶部导航栏 -->
+    <wd-navbar
+      :title="getTitle"
+      left-arrow placeholder safe-area-inset-top fixed
+      @click-left="handleBack"
+    />
+
+    <!-- 表单区域 -->
+    <view>
+      <wd-form ref="formRef" :model="formData" :schema="formSchema">
+        <wd-cell-group border>
+          <wd-form-item title="名字" title-width="180rpx" prop="name">
+            <wd-input
+              v-model="formData.name"
+              clearable
+              placeholder="请输入名字"
+            />
+          </wd-form-item>
+          <yd-tree-select
+            v-model="formData.parentId"
+            :data="treeData"
+            label="父编号"
+            prop="parentId"
+            :props="{ label: 'name', value: 'id' }"
+            placeholder="请选择父编号"
+          />
+        </wd-cell-group>
+      </wd-form>
+    </view>
+
+    <!-- 底部保存按钮 -->
+    <view class="yd-detail-footer">
+      <wd-button
+        type="primary"
+        block
+        :loading="formLoading"
+        @click="handleSubmit"
+      >
+        保存
+      </wd-button>
+    </view>
+  </view>
+</template>
+
+<script lang="ts" setup>
+import type { FormInstance } from '@wot-ui/ui/components/wd-form/types'
+import type {
+  Category,
+} from '@/api/infra/demo'
+import { computed, onMounted, ref } from 'vue'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
+import { createCategory, getCategory, getCategoryList, updateCategory } from '@/api/infra/demo'
+import { delay, navigateBackPlus } from '@/utils'
+import { createFormSchema } from '@/utils/wot'
+import { handleTree } from '@/utils/tree'
+
+const props = defineProps<{
+  id?: number
+  parentId?: number
+}>()
+
+definePage({
+  style: {
+    navigationBarTitleText: '',
+    navigationStyle: 'custom',
+  },
+})
+
+const toast = useToast()
+const getTitle = computed(() => props.id ? '编辑分类' : '新增分类')
+const formLoading = ref(false) // 表单提交状态
+const formData = ref<Partial<Category>>({
+  id: undefined,
+  name: '',
+  parentId: props.parentId ?? 0,
+}) // 表单数据
+const formSchema = createFormSchema({
+  name: [{ required: true, message: '名字不能为空' }],
+  parentId: [{ required: true, message: '父编号不能为空' }],
+}) // 表单校验规则
+const formRef = ref<FormInstance>() // 表单组件引用
+const treeData = ref<Category[]>([]) // 父级树形选项
+
+/** 返回上一页 */
+function handleBack() {
+  navigateBackPlus('/pages-infra/demo/index')
+}
+
+/** 加载分类详情 */
+async function getDetail() {
+  if (!props.id) {
+    return
+  }
+  formData.value = await getCategory(props.id)
+}
+
+/** 提交表单 */
+async function handleSubmit() {
+  const { valid } = await formRef.value.validate()
+  if (!valid) {
+    return
+  }
+
+  formLoading.value = true
+  try {
+    const data = formData.value as Category
+    if (props.id) {
+      await updateCategory(data)
+      toast.success('修改成功')
+    } else {
+      await createCategory(data)
+      toast.success('新增成功')
+    }
+    uni.$emit('infra:demo:reload')
+    delay(handleBack)
+  } finally {
+    formLoading.value = false
+  }
+}
+
+/** 初始化 */
+onMounted(async () => {
+  const data = await getCategoryList()
+  treeData.value = [{
+    id: 0,
+    name: '顶级分类',
+    parentId: 0,
+    children: handleTree(data, 'id', 'parentId'),
+  } as Category]
+  getDetail()
+})
+</script>
+
+<style lang="scss" scoped>
+</style>
