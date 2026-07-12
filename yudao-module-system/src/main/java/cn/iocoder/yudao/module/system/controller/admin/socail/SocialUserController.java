@@ -57,7 +57,7 @@ public class SocialUserController {
         List<SocialUserDO> list = socialUserService.getSocialUserList(getLoginUserId(), UserTypeEnum.ADMIN.getValue());
         return success(convertList(list, socialUser -> new SocialUserRespVO() // 返回精简信息
                 .setId(socialUser.getId()).setType(socialUser.getType()).setOpenid(socialUser.getOpenid())
-                .setNickname(socialUser.getNickname()).setAvatar(socialUser.getNickname())));
+                .setNickname(socialUser.getNickname()).setAvatar(socialUser.getAvatar())));
     }
 
     // ==================== 社交用户 CRUD ====================
