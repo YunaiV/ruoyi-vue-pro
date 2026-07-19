@@ -124,7 +124,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     }
 
     @Override
-    public Long registerUser(AuthRegisterReqVO registerReqVO) {
+    public AdminUserDO registerUser(AuthRegisterReqVO registerReqVO) {
         // 1.1 校验是否开启注册
         if (ObjUtil.notEqual(configApi.getConfigValueByKey(USER_REGISTER_ENABLED_KEY), "true")) {
             throw exception(USER_REGISTER_DISABLED);
@@ -144,7 +144,7 @@ public class AdminUserServiceImpl implements AdminUserService {
         user.setStatus(CommonStatusEnum.ENABLE.getStatus()); // 默认开启
         user.setPassword(encodePassword(registerReqVO.getPassword())); // 加密密码
         userMapper.insert(user);
-        return user.getId();
+        return user;
     }
 
     @Override

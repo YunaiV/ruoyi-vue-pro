@@ -38,9 +38,9 @@ public interface AdminUserService {
      * 注册用户
      *
      * @param registerReqVO 用户信息
-     * @return 用户编号
+     * @return 用户信息
      */
-    Long registerUser(@Valid AuthRegisterReqVO registerReqVO);
+    AdminUserDO registerUser(@Valid AuthRegisterReqVO registerReqVO);
 
     /**
      * 修改用户
