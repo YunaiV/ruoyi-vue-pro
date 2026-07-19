@@ -34,7 +34,7 @@ public class PermissionController {
     @Parameter(name = "roleId", description = "角色编号", required = true)
     @GetMapping("/list-role-menus")
     @PreAuthorize("@ss.hasPermission('system:permission:assign-role-menu')")
-    public CommonResult<Set<Long>> getRoleMenuList(Long roleId) {
+    public CommonResult<Set<Long>> getRoleMenuList(@RequestParam("roleId") Long roleId) {
         return success(permissionService.getRoleMenuListByRoleId(roleId));
     }
 
