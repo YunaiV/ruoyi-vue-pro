@@ -560,12 +560,12 @@ public class AdminUserServiceImpl implements AdminUserService {
 
     @Override
     public List<AdminUserDO> getUserListByStatus(Integer status) {
-        return userMapper.selectListByStatus(status);
+        return getUserListByStatus(status, null);
     }
 
     @Override
-    public List<AdminUserDO> getDeptUsers(Collection<Long> deptIds) {
-        return userMapper.selectListByDeptIds(deptIds);
+    public List<AdminUserDO> getUserListByStatus(Integer status, Long deptId) {
+        return userMapper.selectListByStatusAndDeptId(status, deptId);
     }
 
     @Override

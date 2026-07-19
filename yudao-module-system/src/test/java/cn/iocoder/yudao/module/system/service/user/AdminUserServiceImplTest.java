@@ -722,6 +722,23 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
+    public void testGetUserListByStatusAndDeptId() {
+        // mock 数据
+        AdminUserDO user = randomAdminUserDO(o -> o.setStatus(CommonStatusEnum.ENABLE.getStatus()).setDeptId(1L));
+        userMapper.insert(user);
+        // 测试 status 不匹配
+        userMapper.insert(cloneIgnoreId(user, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
+        // 测试 deptId 不匹配
+        userMapper.insert(cloneIgnoreId(user, o -> o.setDeptId(2L)));
+
+        // 调用
+        List<AdminUserDO> result = userService.getUserListByStatus(CommonStatusEnum.ENABLE.getStatus(), 1L);
+        // 断言
+        assertEquals(1, result.size());
+        assertEquals(user, result.get(0));
+    }
+
+    @Test
     public void testValidateUserList_success() {
         // mock 数据
         AdminUserDO userDO = randomAdminUserDO().setStatus(CommonStatusEnum.ENABLE.getStatus());
