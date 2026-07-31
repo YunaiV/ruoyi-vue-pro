@@ -1,13 +1,11 @@
 package cn.iocoder.yudao.module.report.framework.jmreport.core.service;
 
-import com.alibaba.fastjson.JSONObject;
 import lombok.RequiredArgsConstructor;
 import org.jeecg.modules.drag.service.IOnlDragExternalService;
 import org.jeecg.modules.drag.vo.DragDictModel;
 import org.jeecg.modules.drag.vo.DragLogDTO;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * {@link IOnlDragExternalService} 实现类，提供积木仪表盘的查询等功能
@@ -22,11 +20,6 @@ import java.util.Map;
 public class JmOnlDragExternalServiceImpl implements IOnlDragExternalService {
 
     // ========== DictItem 相关 ==========
-
-    @Override
-    public Map<String, List<DragDictModel>> getManyDictItems(List<String> codeList, List<JSONObject> tableDictList) {
-        return IOnlDragExternalService.super.getManyDictItems(codeList, tableDictList);
-    }
 
     @Override
     public List<DragDictModel> getDictItems(String dictCode) {
