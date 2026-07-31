@@ -9,9 +9,12 @@ import com.baomidou.mybatisplus.annotation.DbType;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -241,7 +244,7 @@ public class CodegenEngineVben5AntdvNextTest extends CodegenEngineAbstractTest {
             }
         });
         return codegenEngine.execute(DbType.MYSQL, table, getColumnList("student"),
-                List.of(subTable), List.of(subColumns));
+                Collections.singletonList(subTable), Collections.singletonList(subColumns));
     }
 
     private Map<String, String> executeMaster(Integer frontType, CodegenTemplateTypeEnum templateType) {
@@ -372,14 +375,15 @@ public class CodegenEngineVben5AntdvNextTest extends CodegenEngineAbstractTest {
     }
 
     private static void assertRootValueImportsSorted(String filePath, String content) {
-        var matcher = ANTDV_NEXT_VALUE_IMPORT_PATTERN.matcher(content);
+        Matcher matcher = ANTDV_NEXT_VALUE_IMPORT_PATTERN.matcher(content);
         while (matcher.find()) {
             List<String> actual = Arrays.stream(matcher.group(1).split(","))
                     .map(String::trim)
                     .filter(item -> !item.isEmpty())
                     .map(item -> item.replaceFirst("^.*\\s+as\\s+", ""))
-                    .toList();
-            List<String> expected = actual.stream().sorted(String.CASE_INSENSITIVE_ORDER).toList();
+                    .collect(Collectors.toList());
+            List<String> expected = actual.stream().sorted(String.CASE_INSENSITIVE_ORDER)
+                    .collect(Collectors.toList());
             assertEquals(expected, actual, filePath + "：antdv-next 命名导入未按 natural 顺序排列");
         }
     }
@@ -406,7 +410,12 @@ public class CodegenEngineVben5AntdvNextTest extends CodegenEngineAbstractTest {
     }
 
     private static long countMatches(Pattern pattern, String content) {
-        return pattern.matcher(content).results().count();
+        Matcher matcher = pattern.matcher(content);
+        long count = 0;
+        while (matcher.find()) {
+            count++;
+        }
+        return count;
     }
 
     private static void assertRootImport(String filePath, String content, String importPrefix, String expectedRegex) {

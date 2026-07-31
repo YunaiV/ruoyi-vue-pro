@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.mes.controller.admin.dv.repair.vo.line.MesDvRepai
 import cn.iocoder.yudao.module.mes.dal.dataobject.dv.repair.MesDvRepairLineDO;
 import cn.iocoder.yudao.module.mes.dal.mysql.dv.repair.MesDvRepairLineMapper;
 import cn.iocoder.yudao.module.mes.service.dv.subject.MesDvSubjectService;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;

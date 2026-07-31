@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.annotation.DbType;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,7 +57,8 @@ public class CodegenEngineUniappTest extends CodegenEngineAbstractTest {
         assertTrue(searchForm.contains(":columns=\"getBoolDictOptions(DICT_TYPE.INFRA_BOOLEAN_STRING)\""));
 
         // 调用并断言字符串字典
-        columns.stream().filter(column -> "sex".equals(column.getJavaField())).findFirst().orElseThrow()
+        columns.stream().filter(column -> "sex".equals(column.getJavaField())).findFirst()
+                .orElseThrow(AssertionError::new)
                 .setJavaType("String");
         result = codegenEngine.execute(DbType.MYSQL, table, columns, null, null);
         searchForm = result.get("yudao-ui-admin-uniapp/src/pages-infra/demo/components/search-form.vue");
@@ -85,7 +87,8 @@ public class CodegenEngineUniappTest extends CodegenEngineAbstractTest {
                 .setFrontType(CodegenFrontTypeEnum.VUE3_ADMIN_UNIAPP_WOT.getType())
                 .setTemplateType(CodegenTemplateTypeEnum.ONE.getType());
         List<CodegenColumnDO> columns = getColumnList("student");
-        columns.stream().filter(column -> "memo".equals(column.getJavaField())).findFirst().orElseThrow()
+        columns.stream().filter(column -> "memo".equals(column.getJavaField())).findFirst()
+                .orElseThrow(AssertionError::new)
                 .setJavaType("Float").setHtmlType("input");
 
         // 调用
@@ -111,20 +114,22 @@ public class CodegenEngineUniappTest extends CodegenEngineAbstractTest {
                 .setFrontType(CodegenFrontTypeEnum.VUE3_ADMIN_UNIAPP_WOT.getType())
                 .setTemplateType(CodegenTemplateTypeEnum.MASTER_ERP.getType());
         List<CodegenColumnDO> columns = getColumnList("student");
-        columns.stream().filter(CodegenColumnDO::getPrimaryKey).findFirst().orElseThrow().setJavaType("String");
+        columns.stream().filter(CodegenColumnDO::getPrimaryKey).findFirst()
+                .orElseThrow(AssertionError::new).setJavaType("String");
         // 准备子表
         CodegenTableDO contactTable = getTable("contact")
                 .setTemplateType(CodegenTemplateTypeEnum.SUB.getType())
                 .setFrontType(CodegenFrontTypeEnum.VUE3_ADMIN_UNIAPP_WOT.getType())
                 .setSubJoinColumnId(100L).setSubJoinMany(true);
         List<CodegenColumnDO> contactColumns = getColumnList("contact");
-        contactColumns.stream().filter(CodegenColumnDO::getPrimaryKey).findFirst().orElseThrow().setJavaType("String");
+        contactColumns.stream().filter(CodegenColumnDO::getPrimaryKey).findFirst()
+                .orElseThrow(AssertionError::new).setJavaType("String");
         contactColumns.stream().filter(column -> Objects.equals(column.getId(), 100L))
-                .findFirst().orElseThrow().setJavaType("String");
+                .findFirst().orElseThrow(AssertionError::new).setJavaType("String");
 
         // 调用
         Map<String, String> result = codegenEngine.execute(DbType.MYSQL, table, columns,
-                List.of(contactTable), List.of(contactColumns));
+                Collections.singletonList(contactTable), Collections.singletonList(contactColumns));
         // 断言
         String api = result.get("yudao-ui-admin-uniapp/src/api/infra/demo/index.ts");
         assertTrue(api.contains("return http.post<string>('/infra/student/create', data)"));
@@ -308,7 +313,8 @@ public class CodegenEngineUniappTest extends CodegenEngineAbstractTest {
                 .setFrontType(CodegenFrontTypeEnum.VUE3_ELEMENT_PLUS.getType())
                 .setTemplateType(templateType.getType());
         List<CodegenColumnDO> columns = getColumnList("student");
-        columns.stream().filter(column -> "memo".equals(column.getJavaField())).findFirst().orElseThrow()
+        columns.stream().filter(column -> "memo".equals(column.getJavaField())).findFirst()
+                .orElseThrow(AssertionError::new)
                 .setJavaField("items");
         // 准备一对多子表 Item，生成属性名 items
         CodegenTableDO itemTable = getTable("contact").setModuleName("crm").setClassName("CrmItem")
@@ -317,7 +323,7 @@ public class CodegenEngineUniappTest extends CodegenEngineAbstractTest {
         // 调用并断言
         ServiceException exception = assertThrows(ServiceException.class,
                 () -> codegenEngine.execute(DbType.MYSQL, table, columns,
-                        List.of(itemTable), List.of(getColumnList("contact"))));
+                        Collections.singletonList(itemTable), Collections.singletonList(getColumnList("contact"))));
         assertTrue(exception.getMessage().contains("主子表属性名(items)重复"));
     }
 
