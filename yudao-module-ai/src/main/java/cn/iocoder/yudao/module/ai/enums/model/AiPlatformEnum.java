@@ -28,6 +28,7 @@ public enum AiPlatformEnum implements ArrayValuable<String> {
     MINI_MAX("MiniMax", "MiniMax"), // 稀宇科技
     MOONSHOT("Moonshot", "月之暗面"), // KIMI
     BAI_CHUAN("BaiChuan", "百川智能"), // 百川智能
+    STEP_FUN("StepFun", "阶跃星辰"), // 阶跃星辰
 
     // ========== 国外平台 ==========
 
@@ -40,7 +41,7 @@ public enum AiPlatformEnum implements ArrayValuable<String> {
     STABLE_DIFFUSION("StableDiffusion", "StableDiffusion"), // Stability AI
     MIDJOURNEY("Midjourney", "Midjourney"), // Midjourney
     SUNO("Suno", "Suno"), // Suno AI
-    GROK("Grok","Grok"), // Grok
+    GROK("Grok", "Grok"), // Grok
 
     ;
 

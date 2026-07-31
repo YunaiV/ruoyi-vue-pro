@@ -46,6 +46,14 @@ public interface AiChatMessageService {
     List<AiChatMessageDO> getChatMessageListByConversationId(Long conversationId);
 
     /**
+     * 获得聊天消息
+     *
+     * @param id 消息编号
+     * @return 聊天消息
+     */
+    AiChatMessageDO getChatMessage(Long id);
+
+    /**
      * 删除消息
      *
      * @param id 消息编号
@@ -67,6 +75,14 @@ public interface AiChatMessageService {
      * @param id 消息编号
      */
     void deleteChatMessageByAdmin(Long id);
+
+    /**
+     * 获得聊天对话的消息数量
+     *
+     * @param conversationId 对话编号
+     * @return 消息数量
+     */
+    Integer getChatMessageCount(Long conversationId);
 
     /**
      * 获得聊天对话的消息数量 Map

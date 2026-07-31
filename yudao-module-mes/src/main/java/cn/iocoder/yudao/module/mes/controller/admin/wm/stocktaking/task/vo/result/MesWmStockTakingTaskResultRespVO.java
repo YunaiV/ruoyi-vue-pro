@@ -77,6 +77,10 @@ public class MesWmStockTakingTaskResultRespVO {
     @ExcelProperty("账面数量")
     private BigDecimal quantity;
 
+    @Schema(description = "实盘数量", example = "98.000000")
+    @ExcelProperty("实盘数量")
+    private BigDecimal takingQuantity;
+
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;

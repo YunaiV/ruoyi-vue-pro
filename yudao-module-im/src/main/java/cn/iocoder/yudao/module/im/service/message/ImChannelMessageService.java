@@ -66,6 +66,14 @@ public interface ImChannelMessageService {
     PageResult<ImChannelMessageDO> getMessagePage(ImChannelMessagePageReqVO reqVO);
 
     /**
+     * 获得频道消息
+     *
+     * @param id 消息编号
+     * @return 频道消息
+     */
+    ImChannelMessageDO getMessage(Long id);
+
+    /**
      * 删除消息
      *
      * @param id 消息编号

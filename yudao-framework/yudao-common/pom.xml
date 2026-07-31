@@ -134,6 +134,11 @@
         </dependency>
 
         <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId> <!-- JustAuth、Jimu 等三方库仍使用 1.x 包名，由项目统一提供 fastjson2 兼容实现 -->
+        </dependency>
+
+        <dependency>
             <groupId>org.dromara</groupId> <!-- VO 数据翻译 -->
             <artifactId>easy-trans-anno</artifactId> <!-- 默认引入的原因，方便 xxx-module-api 包使用 -->
         </dependency>

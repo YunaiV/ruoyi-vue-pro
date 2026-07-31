@@ -171,6 +171,11 @@ public class AiWriteServiceImpl implements AiWriteService {
     }
 
     @Override
+    public AiWriteDO getWrite(Long id) {
+        return writeMapper.selectById(id);
+    }
+
+    @Override
     public PageResult<AiWriteDO> getWritePage(AiWritePageReqVO pageReqVO) {
         return writeMapper.selectPage(pageReqVO);
     }

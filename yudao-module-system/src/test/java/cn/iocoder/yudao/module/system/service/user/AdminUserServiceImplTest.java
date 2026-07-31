@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.system.service.user;
 
 import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
@@ -278,13 +279,14 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
         userMapper.insert(dbUser);
         // 准备参数
         Long userId = dbUser.getId();
-        Integer status = randomCommonStatus();
+        Integer status = CommonStatusEnum.DISABLE.getStatus();
 
         // 调用
         userService.updateUserStatus(userId, status);
         // 断言
         AdminUserDO user = userMapper.selectById(userId);
         assertEquals(status, user.getStatus());
+        verify(oauth2TokenService).removeAccessToken(userId, UserTypeEnum.ADMIN.getValue());
     }
 
     @Test
@@ -716,6 +718,23 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
 
         // 调用
         List<AdminUserDO> result = userService.getUserListByStatus(status);
+        // 断言
+        assertEquals(1, result.size());
+        assertEquals(user, result.get(0));
+    }
+
+    @Test
+    public void testGetUserListByStatusAndDeptId() {
+        // mock 数据
+        AdminUserDO user = randomAdminUserDO(o -> o.setStatus(CommonStatusEnum.ENABLE.getStatus()).setDeptId(1L));
+        userMapper.insert(user);
+        // 测试 status 不匹配
+        userMapper.insert(cloneIgnoreId(user, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
+        // 测试 deptId 不匹配
+        userMapper.insert(cloneIgnoreId(user, o -> o.setDeptId(2L)));
+
+        // 调用
+        List<AdminUserDO> result = userService.getUserListByStatus(CommonStatusEnum.ENABLE.getStatus(), 1L);
         // 断言
         assertEquals(1, result.size());
         assertEquals(user, result.get(0));

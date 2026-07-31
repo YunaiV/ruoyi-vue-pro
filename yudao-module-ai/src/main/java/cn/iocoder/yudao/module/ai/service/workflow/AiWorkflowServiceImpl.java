@@ -10,8 +10,8 @@ import cn.iocoder.yudao.module.ai.controller.admin.workflow.vo.AiWorkflowTestReq
 import cn.iocoder.yudao.module.ai.dal.dataobject.workflow.AiWorkflowDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.workflow.AiWorkflowMapper;
 import cn.iocoder.yudao.module.ai.service.model.AiModelService;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import dev.tinyflow.core.Tinyflow;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;

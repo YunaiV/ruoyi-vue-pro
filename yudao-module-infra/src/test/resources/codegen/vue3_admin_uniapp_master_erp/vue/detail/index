@@ -1,0 +1,342 @@
+<template>
+  <view class="yd-page-container">
+    <!-- 顶部导航栏 -->
+    <wd-navbar title="学生详情" left-arrow placeholder safe-area-inset-top fixed @click-left="handleBack" />
+
+    <view class="pb-160rpx">
+      <!-- 主表详情 -->
+      <wd-cell-group border title="学生信息">
+        <wd-cell title="编号" :value="formData?.id ?? '-'" />
+        <wd-cell title="名字" :value="formData?.name ?? '-'" />
+        <wd-cell title="简介" :value="formData?.description ?? '-'" />
+        <wd-cell title="出生日期" :value="formatDateTime(formData?.birthday) || '-'" />
+        <wd-cell title="性别">
+          <dict-tag :type="DICT_TYPE.SYSTEM_USER_SEX" :value="formData?.sex" />
+        </wd-cell>
+        <wd-cell title="是否有效">
+          <dict-tag :type="DICT_TYPE.INFRA_BOOLEAN_STRING" :value="formData?.enabled" />
+        </wd-cell>
+        <wd-cell title="头像" :value="formData?.avatar ?? '-'" />
+        <wd-cell title="附件" :value="formData?.video ?? '-'" />
+        <wd-cell title="备注" :value="formData?.memo ?? '-'" />
+        <wd-cell title="创建时间" :value="formatDateTime(formData?.createTime) || '-'" />
+      </wd-cell-group>
+
+      <!-- 子表：学生联系人 -->
+      <view class="mt-20rpx flex items-center justify-between px-24rpx py-16rpx">
+        <text class="text-28rpx text-[#333] font-semibold">学生联系人（{{ studentContactTotal }}）</text>
+        <wd-button
+          v-if="hasAccessByCodes(['infra:student:create'])"
+          size="small" type="primary" variant="plain" @click="openStudentContact()"
+        >
+          添加
+        </wd-button>
+      </view>
+      <view class="px-24rpx">
+        <z-paging
+          ref="studentContactPagingRef"
+          v-model="studentContactList"
+          :fixed="false"
+          :auto="false"
+          height="560rpx"
+          :default-page-size="10"
+          :refresher-enabled="false"
+          :inside-more="true"
+          :to-bottom-loading-more-enabled="false"
+          loading-more-default-text="点击加载更多"
+          empty-view-text="暂无学生联系人"
+          @query="queryStudentContactList"
+        >
+          <view
+            v-for="item in studentContactList"
+            :key="item.id"
+            class="mb-16rpx rounded-12rpx bg-white p-24rpx shadow-sm"
+          >
+            <view class="mb-8rpx text-28rpx text-[#666]">
+              学生编号：{{ item.studentId ?? '-' }}
+            </view>
+            <view class="mb-8rpx text-28rpx text-[#666]">
+              名字：{{ item.name ?? '-' }}
+            </view>
+            <view class="mb-8rpx text-28rpx text-[#666]">
+              简介：{{ item.description ?? '-' }}
+            </view>
+            <view class="mb-8rpx text-28rpx text-[#666]">
+              出生日期：{{ item.birthday ?? '-' }}
+            </view>
+            <view class="mb-8rpx text-28rpx text-[#666]">
+              性别：{{ item.sex ?? '-' }}
+            </view>
+            <view class="mb-8rpx text-28rpx text-[#666]">
+              是否有效：{{ item.enabled ?? '-' }}
+            </view>
+            <view class="mb-8rpx text-28rpx text-[#666]">
+              头像：{{ item.avatar ?? '-' }}
+            </view>
+            <view class="mb-8rpx text-28rpx text-[#666]">
+              附件：{{ item.video ?? '-' }}
+            </view>
+            <view class="mb-8rpx text-28rpx text-[#666]">
+              备注：{{ item.memo ?? '-' }}
+            </view>
+            <view class="mb-8rpx text-28rpx text-[#666]">
+              创建时间：{{ item.createTime ?? '-' }}
+            </view>
+            <view class="mt-16rpx flex justify-end gap-16rpx">
+              <wd-button size="small" variant="plain" @click="openStudentContact(item)">
+                编辑
+              </wd-button>
+              <wd-button size="small" type="danger" variant="plain" @click="removeStudentContact(item)">
+                删除
+              </wd-button>
+            </view>
+          </view>
+        </z-paging>
+      </view>
+      <!-- 子表：学生班主任 -->
+      <view class="mt-20rpx flex items-center justify-between px-24rpx py-16rpx">
+        <text class="text-28rpx text-[#333] font-semibold">学生班主任（{{ studentTeacherTotal }}）</text>
+        <wd-button
+          v-if="studentTeacherTotal === 0 && hasAccessByCodes(['infra:student:create'])"
+          size="small" type="primary" variant="plain" @click="openStudentTeacher()"
+        >
+          添加
+        </wd-button>
+      </view>
+      <view class="px-24rpx">
+        <z-paging
+          ref="studentTeacherPagingRef"
+          v-model="studentTeacherList"
+          :fixed="false"
+          :auto="false"
+          height="560rpx"
+          :default-page-size="1"
+          :refresher-enabled="false"
+          :inside-more="true"
+          :to-bottom-loading-more-enabled="false"
+          loading-more-default-text="点击加载更多"
+          empty-view-text="暂无学生班主任"
+          @query="queryStudentTeacherList"
+        >
+          <view
+            v-for="item in studentTeacherList"
+            :key="item.id"
+            class="mb-16rpx rounded-12rpx bg-white p-24rpx shadow-sm"
+          >
+            <view class="mb-8rpx text-28rpx text-[#666]">
+              学生编号：{{ item.studentId ?? '-' }}
+            </view>
+            <view class="mb-8rpx text-28rpx text-[#666]">
+              名字：{{ item.name ?? '-' }}
+            </view>
+            <view class="mb-8rpx text-28rpx text-[#666]">
+              简介：{{ item.description ?? '-' }}
+            </view>
+            <view class="mb-8rpx text-28rpx text-[#666]">
+              出生日期：{{ item.birthday ?? '-' }}
+            </view>
+            <view class="mb-8rpx text-28rpx text-[#666]">
+              性别：{{ item.sex ?? '-' }}
+            </view>
+            <view class="mb-8rpx text-28rpx text-[#666]">
+              是否有效：{{ item.enabled ?? '-' }}
+            </view>
+            <view class="mb-8rpx text-28rpx text-[#666]">
+              头像：{{ item.avatar ?? '-' }}
+            </view>
+            <view class="mb-8rpx text-28rpx text-[#666]">
+              附件：{{ item.video ?? '-' }}
+            </view>
+            <view class="mb-8rpx text-28rpx text-[#666]">
+              备注：{{ item.memo ?? '-' }}
+            </view>
+            <view class="mb-8rpx text-28rpx text-[#666]">
+              创建时间：{{ item.createTime ?? '-' }}
+            </view>
+            <view class="mt-16rpx flex justify-end gap-16rpx">
+              <wd-button size="small" variant="plain" @click="openStudentTeacher(item)">
+                编辑
+              </wd-button>
+              <wd-button size="small" type="danger" variant="plain" @click="removeStudentTeacher(item)">
+                删除
+              </wd-button>
+            </view>
+          </view>
+        </z-paging>
+      </view>
+    </view>
+
+    <!-- 底部操作按钮 -->
+    <view class="yd-detail-footer">
+      <view class="yd-detail-footer-actions">
+        <wd-button v-if="hasAccessByCodes(['infra:student:update'])" class="flex-1" type="warning" @click="handleEdit">
+          编辑
+        </wd-button>
+        <wd-button v-if="hasAccessByCodes(['infra:student:delete'])" class="flex-1" type="danger" :loading="deleting" @click="handleDelete">
+          删除
+        </wd-button>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script lang="ts" setup>
+import type {
+  Student,
+  StudentContact,
+  StudentTeacher,
+} from '@/api/infra/demo'
+import { onShow } from '@dcloudio/uni-app'
+import { nextTick, ref } from 'vue'
+import { useDialog } from '@wot-ui/ui/components/wd-dialog'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
+import {
+  deleteStudent,
+  deleteStudentContact,
+  deleteStudentTeacher,
+  getStudent,
+  getStudentContactPage,
+  getStudentTeacherPage,
+} from '@/api/infra/demo'
+import { useAccess } from '@/hooks/useAccess'
+import { delay, navigateBackPlus } from '@/utils'
+import { DICT_TYPE } from '@/utils/constants'
+import { formatDateTime } from '@/utils/date'
+
+const props = defineProps<{ id?: number }>()
+
+definePage({
+  style: { navigationBarTitleText: '', navigationStyle: 'custom' },
+})
+
+const { hasAccessByCodes } = useAccess()
+const dialog = useDialog()
+const toast = useToast()
+const formData = ref<Student>() // 主表数据
+const studentContactList = ref<StudentContact[]>([]) // 学生联系人列表
+const studentContactTotal = ref(0) // 学生联系人总数
+const studentContactPagingRef = ref<any>() // 学生联系人分页组件引用
+const studentTeacherList = ref<StudentTeacher[]>([]) // 学生班主任列表
+const studentTeacherTotal = ref(0) // 学生班主任总数
+const studentTeacherPagingRef = ref<any>() // 学生班主任分页组件引用
+const deleting = ref(false) // 主表删除状态
+
+/** 返回上一页 */
+function handleBack() {
+  navigateBackPlus('/pages-infra/demo/index')
+}
+
+/** 加载主表 */
+async function loadMain() {
+  if (props.id) {
+    formData.value = await getStudent(props.id)
+  }
+}
+
+/** 查询学生联系人列表 */
+async function queryStudentContactList(pageNo: number, pageSize: number) {
+  if (!props.id) {
+    studentContactPagingRef.value?.completeByTotal([], 0)
+    return
+  }
+  try {
+    const data = await getStudentContactPage({ studentId: props.id, pageNo, pageSize })
+    studentContactTotal.value = data.total
+    studentContactPagingRef.value?.completeByTotal(data.list, data.total)
+  } catch {
+    studentContactPagingRef.value?.complete(false)
+  }
+}
+
+/** 打开学生联系人表单 */
+function openStudentContact(item?: StudentContact) {
+  const query = [
+    `studentId=${props.id}`,
+    item?.id ? `id=${item.id}` : '',
+  ].filter(Boolean).join('&')
+  uni.navigateTo({ url: `/pages-infra/demo/student-contact/form/index?${query}` })
+}
+
+/** 删除学生联系人 */
+async function removeStudentContact(item: StudentContact) {
+  try {
+    await dialog.confirm({ title: '提示', msg: '确定要删除该学生联系人吗？' })
+  } catch {
+    return
+  }
+  await deleteStudentContact(item.id!)
+  toast.success('删除成功')
+  studentContactPagingRef.value?.reload()
+}
+
+/** 查询学生班主任列表 */
+async function queryStudentTeacherList(pageNo: number, pageSize: number) {
+  if (!props.id) {
+    studentTeacherPagingRef.value?.completeByTotal([], 0)
+    return
+  }
+  try {
+    const data = await getStudentTeacherPage({ studentId: props.id, pageNo, pageSize })
+    studentTeacherTotal.value = data.total
+    studentTeacherPagingRef.value?.completeByTotal(data.list, data.total)
+  } catch {
+    studentTeacherPagingRef.value?.complete(false)
+  }
+}
+
+/** 打开学生班主任表单 */
+function openStudentTeacher(item?: StudentTeacher) {
+  const query = [
+    `studentId=${props.id}`,
+    item?.id ? `id=${item.id}` : '',
+  ].filter(Boolean).join('&')
+  uni.navigateTo({ url: `/pages-infra/demo/student-teacher/form/index?${query}` })
+}
+
+/** 删除学生班主任 */
+async function removeStudentTeacher(item: StudentTeacher) {
+  try {
+    await dialog.confirm({ title: '提示', msg: '确定要删除该学生班主任吗？' })
+  } catch {
+    return
+  }
+  await deleteStudentTeacher(item.id!)
+  toast.success('删除成功')
+  studentTeacherPagingRef.value?.reload()
+}
+
+/** 编辑主表 */
+function handleEdit() {
+  uni.navigateTo({ url: `/pages-infra/demo/form/index?id=${props.id}` })
+}
+
+/** 删除主表 */
+async function handleDelete() {
+  if (!props.id) {
+    return
+  }
+  try {
+    await dialog.confirm({ title: '提示', msg: '确定要删除该学生吗？' })
+  } catch {
+    return
+  }
+  deleting.value = true
+  try {
+    await deleteStudent(props.id)
+    toast.success('删除成功')
+    uni.$emit('infra:demo:reload')
+    delay(handleBack)
+  } finally {
+    deleting.value = false
+  }
+}
+
+/** 进入页面加载（含编辑和子表返回后刷新） */
+onShow(() => {
+  loadMain()
+  nextTick(() => {
+    studentContactPagingRef.value?.reload()
+    studentTeacherPagingRef.value?.reload()
+  })
+})
+</script>

@@ -216,7 +216,8 @@ public class AdminAuthServiceImplTest extends BaseDbUnitTest {
             return true;
         })));
         // mock 方法（用户信息）
-        AdminUserDO user = randomPojo(AdminUserDO.class, o -> o.setId(1L));
+        AdminUserDO user = randomPojo(AdminUserDO.class, o -> o.setId(1L)
+                .setStatus(CommonStatusEnum.ENABLE.getStatus()));
         when(userService.getUserByMobile(eq(mobile))).thenReturn(user);
         // mock 缓存登录用户到 Redis
         OAuth2AccessTokenDO accessTokenDO = randomPojo(OAuth2AccessTokenDO.class, o -> o.setUserId(1L)
@@ -244,7 +245,8 @@ public class AdminAuthServiceImplTest extends BaseDbUnitTest {
         when(socialUserService.getSocialUserByCode(eq(UserTypeEnum.ADMIN.getValue()), eq(reqVO.getType()),
                 eq(reqVO.getCode()), eq(reqVO.getState()))).thenReturn(new SocialUserRespDTO(randomString(), randomString(), randomString(), userId));
         // mock（用户）
-        AdminUserDO user = randomPojo(AdminUserDO.class, o -> o.setId(userId));
+        AdminUserDO user = randomPojo(AdminUserDO.class, o -> o.setId(userId)
+                .setStatus(CommonStatusEnum.ENABLE.getStatus()));
         when(userService.getUser(eq(userId))).thenReturn(user);
         // mock 缓存登录用户到 Redis
         OAuth2AccessTokenDO accessTokenDO = randomPojo(OAuth2AccessTokenDO.class, o -> o.setUserId(1L)
@@ -261,6 +263,62 @@ public class AdminAuthServiceImplTest extends BaseDbUnitTest {
                         && o.getResult().equals(LoginResultEnum.SUCCESS.getResult())
                         && o.getUserId().equals(user.getId()))
         );
+    }
+
+    @Test
+    public void testSmsLogin_userDisabled() {
+        // 准备参数
+        AuthSmsLoginReqVO reqVO = new AuthSmsLoginReqVO(randomString(), randomString());
+        AdminUserDO user = randomPojo(AdminUserDO.class, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus()));
+        when(userService.getUserByMobile(eq(reqVO.getMobile()))).thenReturn(user);
+
+        // 调用，并断言
+        assertServiceException(() -> authService.smsLogin(reqVO), AUTH_LOGIN_USER_DISABLED);
+        verify(loginLogService).createLoginLog(argThat(o ->
+                o.getLogType().equals(LoginLogTypeEnum.LOGIN_MOBILE.getType())
+                        && o.getResult().equals(LoginResultEnum.USER_DISABLED.getResult())
+                        && o.getUserId().equals(user.getId())));
+        verify(oauth2TokenService, never()).createAccessToken(anyLong(), anyInt(), anyString(), any());
+    }
+
+    @Test
+    public void testSocialLogin_userDisabled() {
+        // 准备参数
+        AuthSocialLoginReqVO reqVO = randomPojo(AuthSocialLoginReqVO.class);
+        Long userId = 1L;
+        when(socialUserService.getSocialUserByCode(eq(UserTypeEnum.ADMIN.getValue()), eq(reqVO.getType()),
+                eq(reqVO.getCode()), eq(reqVO.getState())))
+                .thenReturn(new SocialUserRespDTO(randomString(), randomString(), randomString(), userId));
+        AdminUserDO user = randomPojo(AdminUserDO.class, o -> o.setId(userId)
+                .setStatus(CommonStatusEnum.DISABLE.getStatus()));
+        when(userService.getUser(eq(userId))).thenReturn(user);
+
+        // 调用，并断言
+        assertServiceException(() -> authService.socialLogin(reqVO), AUTH_LOGIN_USER_DISABLED);
+        verify(loginLogService).createLoginLog(argThat(o ->
+                o.getLogType().equals(LoginLogTypeEnum.LOGIN_SOCIAL.getType())
+                        && o.getResult().equals(LoginResultEnum.USER_DISABLED.getResult())
+                        && o.getUserId().equals(user.getId())));
+        verify(oauth2TokenService, never()).createAccessToken(anyLong(), anyInt(), anyString(), any());
+    }
+
+    @Test
+    public void testRegister_success() {
+        // 准备参数
+        AuthRegisterReqVO reqVO = randomPojo(AuthRegisterReqVO.class);
+        authService.setCaptchaEnable(false);
+        AdminUserDO user = randomPojo(AdminUserDO.class, o -> o.setId(1L)
+                .setUsername(reqVO.getUsername()).setStatus(CommonStatusEnum.ENABLE.getStatus()));
+        when(userService.registerUser(reqVO)).thenReturn(user);
+        OAuth2AccessTokenDO accessTokenDO = randomPojo(OAuth2AccessTokenDO.class, o -> o.setUserId(user.getId())
+                .setUserType(UserTypeEnum.ADMIN.getValue()));
+        when(oauth2TokenService.createAccessToken(eq(user.getId()), eq(UserTypeEnum.ADMIN.getValue()),
+                eq("default"), isNull())).thenReturn(accessTokenDO);
+
+        // 调用，并断言
+        AuthLoginRespVO loginRespVO = authService.register(reqVO);
+        assertPojoEquals(accessTokenDO, loginRespVO);
+        verify(userService, never()).getUser(anyLong());
     }
 
     @Test

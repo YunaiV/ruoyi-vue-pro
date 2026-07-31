@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import type { FileType } from 'antdv-next/es/upload/interface';
-
 import { ref } from 'vue';
 
 import { useVbenModal } from '@vben/common-ui';
@@ -43,8 +41,8 @@ const [Modal, modalApi] = useVbenModal({
 });
 
 /** 上传前：拦截 antd Upload 的自动上传，文件存到 ref */
-function beforeUpload(file: FileType) {
-  fileRef.value = file as unknown as File;
+function beforeUpload(file: File) {
+  fileRef.value = file;
   return false;
 }
 

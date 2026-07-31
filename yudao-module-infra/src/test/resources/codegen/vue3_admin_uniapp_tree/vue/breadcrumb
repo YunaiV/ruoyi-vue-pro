@@ -1,0 +1,87 @@
+<template>
+  <view class="bg-white px-24rpx py-16rpx">
+    <scroll-view scroll-x class="whitespace-nowrap">
+      <view class="inline-flex items-center">
+        <view
+          class="flex items-center text-28rpx"
+          :class="items.length > 0 ? 'text-[#1890ff]' : 'text-[#333]'"
+          @click="handleClick(-1)"
+        >
+          <text>全部分类</text>
+        </view>
+        <template v-for="(item, index) in items" :key="item.id">
+          <wd-icon name="arrow-right" size="12px" color="#999" custom-class="mx-8rpx" />
+          <view
+            class="flex items-center text-28rpx"
+            :class="index < items.length - 1 ? 'text-[#1890ff]' : 'text-[#333]'"
+            @click="handleClick(index)"
+          >
+            <text>{{ item.name }}</text>
+          </view>
+        </template>
+      </view>
+    </scroll-view>
+  </view>
+</template>
+
+<script lang="ts" setup>
+import { ref, watch } from 'vue'
+
+interface BreadcrumbItem {
+  id: number
+  name: string
+}
+
+const props = defineProps<{
+  modelValue: number
+}>()
+
+const emit = defineEmits<{
+  'update:modelValue': [value: number]
+}>()
+
+const items = ref<BreadcrumbItem[]>([]) // 面包屑数据
+
+/** 监听外部值变化 */
+watch(() => props.modelValue, (value) => {
+  if (value === 0) {
+    items.value = []
+  }
+})
+
+/** 点击面包屑 */
+function handleClick(index: number) {
+  if (index === -1) {
+    reset()
+    return
+  }
+  if (index < items.value.length - 1) {
+    items.value = items.value.slice(0, index + 1)
+    emit('update:modelValue', items.value[index].id)
+  }
+}
+
+/** 进入子层级 */
+function enter(item: BreadcrumbItem) {
+  items.value.push(item)
+  emit('update:modelValue', item.id)
+}
+
+/** 返回上一层级 */
+function back(): boolean {
+  if (items.value.length === 0) {
+    return false
+  }
+  items.value.pop()
+  emit('update:modelValue', items.value.at(-1)?.id ?? 0)
+  return true
+}
+
+/** 重置面包屑 */
+function reset() {
+  items.value = []
+  emit('update:modelValue', 0)
+}
+
+defineExpose({ back, enter, reset })
+</script>

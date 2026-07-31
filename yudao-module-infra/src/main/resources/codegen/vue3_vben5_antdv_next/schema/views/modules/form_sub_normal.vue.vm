@@ -5,6 +5,12 @@
 #set ($subClassNameVar = $subClassNameVars.get($subIndex))
 #set ($SubJoinColumnName = $subJoinColumn.javaField.substring(0,1).toUpperCase() + ${subJoinColumn.javaField.substring(1)})##首字母大写
 #set ($apiName = "${table.moduleName.substring(0,1).toUpperCase()}${table.moduleName.substring(1)}${simpleClassName}Api")
+#set ($selectOptionEnable = false)
+#foreach ($column in $subColumns)
+  #if (($column.createOperation || $column.updateOperation) && $column.id != $subJoinColumn.id && $column.htmlType == "select")
+    #set ($selectOptionEnable = true)
+  #end
+#end
 <script lang="ts" setup>
   import type { ${apiName} } from '#/api/${table.moduleName}/${table.businessName}';
 
@@ -14,7 +20,19 @@
 
 #if ($subTable.subJoinMany) ## 一对多
 import { Plus } from "@vben/icons";
-import { Button, Tabs, Checkbox, Input, TextArea, Select,RadioGroup,CheckboxGroup, DatePicker } from 'antdv-next';
+import {
+  Button,
+  Checkbox,
+  CheckboxGroup,
+  DatePicker,
+  Input,
+  RadioGroup,
+  Select,
+#if ($selectOptionEnable)
+  SelectOption,
+#end
+  TextArea,
+} from 'antdv-next';
 import { ImageUpload, FileUpload } from "#/components/upload";
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { use${subSimpleClassName}GridEditColumns } from '../data';

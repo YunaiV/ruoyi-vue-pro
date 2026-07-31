@@ -42,6 +42,11 @@ public class OAuth2TokenApiImpl implements OAuth2TokenCommonApi {
     }
 
     @Override
+    public void removeAccessToken(Long userId, Integer userType) {
+        oauth2TokenService.removeAccessToken(userId, userType);
+    }
+
+    @Override
     public OAuth2AccessTokenRespDTO refreshAccessToken(String refreshToken, String clientId) {
         OAuth2AccessTokenDO accessTokenDO = oauth2TokenService.refreshAccessToken(refreshToken, clientId);
         return BeanUtils.toBean(accessTokenDO, OAuth2AccessTokenRespDTO.class);

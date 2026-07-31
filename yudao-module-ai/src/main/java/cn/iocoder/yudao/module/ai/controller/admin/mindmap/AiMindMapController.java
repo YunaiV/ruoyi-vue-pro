@@ -46,6 +46,15 @@ public class AiMindMapController {
         return success(true);
     }
 
+    @GetMapping("/get")
+    @Operation(summary = "获得思维导图")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @PreAuthorize("@ss.hasPermission('ai:mind-map:query')")
+    public CommonResult<AiMindMapRespVO> getMindMap(@RequestParam("id") Long id) {
+        AiMindMapDO mindMap = mindMapService.getMindMap(id);
+        return success(BeanUtils.toBean(mindMap, AiMindMapRespVO.class));
+    }
+
     @GetMapping("/page")
     @Operation(summary = "获得思维导图分页")
     @PreAuthorize("@ss.hasPermission('ai:mind-map:query')")

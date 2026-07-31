@@ -89,6 +89,16 @@ public class MesDvMaintenRecordLineController {
         return success(new PageResult<>(buildMaintenRecordLineRespVOList(pageResult.getList()), pageResult.getTotal()));
     }
 
+    @GetMapping("/list-by-record-id")
+    @Operation(summary = "获得指定保养记录的明细列表")
+    @Parameter(name = "recordId", description = "保养记录编号", required = true)
+    @PreAuthorize("@ss.hasPermission('mes:dv-mainten-record:query')")
+    public CommonResult<List<MesDvMaintenRecordLineRespVO>> getMaintenRecordLineListByRecordId(
+            @RequestParam("recordId") Long recordId) {
+        List<MesDvMaintenRecordLineDO> list = maintenRecordLineService.getMaintenRecordLineListByRecordId(recordId);
+        return success(buildMaintenRecordLineRespVOList(list));
+    }
+
     @GetMapping("/export-excel")
     @Operation(summary = "导出设备保养记录明细 Excel")
     @PreAuthorize("@ss.hasPermission('mes:dv-mainten-record:export')")

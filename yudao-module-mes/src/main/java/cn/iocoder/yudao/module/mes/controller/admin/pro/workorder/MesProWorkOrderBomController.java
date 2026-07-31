@@ -97,6 +97,16 @@ public class MesProWorkOrderBomController {
         return success(new PageResult<>(buildWorkOrderBomRespVOList(pageResult.getList()), pageResult.getTotal()));
     }
 
+    @GetMapping("/list-by-work-order-id")
+    @Operation(summary = "获得工单 BOM 列表")
+    @Parameter(name = "workOrderId", description = "工单编号", required = true)
+    @PreAuthorize("@ss.hasPermission('mes:pro-work-order:query')")
+    public CommonResult<List<MesProWorkOrderBomRespVO>> getWorkOrderBomListByWorkOrderId(
+            @RequestParam("workOrderId") Long workOrderId) {
+        List<MesProWorkOrderBomDO> list = workOrderBomService.getWorkOrderBomListByWorkOrderId(workOrderId);
+        return success(buildWorkOrderBomRespVOList(list));
+    }
+
     @GetMapping("/item-list-by-work-order-id")
     @Operation(summary = "获得工单物料需求列表")
     @Parameter(name = "workOrderId", description = "工单编号", required = true)

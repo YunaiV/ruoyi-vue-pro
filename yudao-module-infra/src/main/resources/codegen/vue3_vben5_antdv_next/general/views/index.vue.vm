@@ -1,3 +1,13 @@
+#set ($rangePickerEnable = false)
+#set ($selectOptionEnable = false)
+#foreach ($column in $columns)
+  #if ($column.listOperation && $column.htmlType == "datetime" && $column.listOperationCondition == "BETWEEN")
+    #set ($rangePickerEnable = true)
+  #end
+  #if ($column.listOperation && ($column.htmlType == "select" || $column.htmlType == "radio" || $column.htmlType == "checkbox"))
+    #set ($selectOptionEnable = true)
+  #end
+#end
 <script lang="ts" setup>
 import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${table.businessName}';
 
@@ -8,12 +18,14 @@ import { DICT_TYPE } from '@vben/constants';
 import { getDictOptions } from '@vben/hooks';
 import { useTableToolbar, VbenVxeTableToolbar } from '@vben/plugins/vxe-table';
 import { cloneDeep, downloadFileFromBlobPart, formatDateTime, isEmpty } from '@vben/utils';
-import { Button, Card, message, Tabs, Pagination, Form, RangePicker, DatePicker, Select, Input } from 'antdv-next';
+import { Button, Card, DatePicker, Form, FormItem, Input, message, Pagination#if ($rangePickerEnable), DateRangePicker as RangePicker#end, Select#if ($selectOptionEnable), SelectOption#end#if ( $table.templateType == 11 || $table.templateType == 12 ), TabPane, Tabs#end } from 'antdv-next';
 import ${simpleClassName}Form from './modules/form.vue';
 import { Download, Plus, RefreshCw, Search, Trash2 } from '@vben/icons';
 import { DictTag } from '#/components/dict-tag';
 import { VxeColumn, VxeTable } from '#/adapter/vxe-table';
+#if ($rangePickerEnable)
 import { getRangePickerDefaultProps } from '#/utils/rangePickerProps';
+#end
 
 ## 特殊：主子表专属逻辑
 #if ( $table.templateType == 11 || $table.templateType == 12 )
@@ -249,7 +261,7 @@ onMounted(() => {
                       #set ($dictMethod = "boolean")
                   #end
                   #if ($column.htmlType == "input")
-                    <Form.Item label="${comment}" name="${javaField}">
+                    <FormItem label="${comment}" name="${javaField}">
                       <Input
                           v-model:value="queryParams.${javaField}"
                           placeholder="请输入${comment}"
@@ -257,9 +269,9 @@ onMounted(() => {
                           @pressEnter="handleQuery"
                            class="w-full"
                       />
-                    </Form.Item>
+                    </FormItem>
                   #elseif ($column.htmlType == "select" || $column.htmlType == "radio" || $column.htmlType == "checkbox")
-                    <Form.Item label="${comment}" name="${javaField}">
+                    <FormItem label="${comment}" name="${javaField}">
                       <Select
                           v-model:value="queryParams.${javaField}"
                           placeholder="请选择${comment}"
@@ -278,10 +290,10 @@ onMounted(() => {
                             <SelectOption label="请选择字典生成" value="" />
                           #end
                       </Select>
-                    </Form.Item>
+                    </FormItem>
                   #elseif($column.htmlType == "datetime")
                       #if ($column.listOperationCondition != "BETWEEN")## 非范围
-                        <Form.Item label="${comment}" name="${javaField}">
+                        <FormItem label="${comment}" name="${javaField}">
                           <DatePicker
                               v-model:value="queryParams.${javaField}"
                               valueFormat="YYYY-MM-DD"
@@ -289,25 +301,25 @@ onMounted(() => {
                               allowClear
                                class="w-full"
                           />
-                        </Form.Item>
+                        </FormItem>
                       #else## 范围
-                        <Form.Item label="${comment}" name="${javaField}">
+                        <FormItem label="${comment}" name="${javaField}">
                           <RangePicker
                               v-model:value="queryParams.${javaField}"
                               v-bind="getRangePickerDefaultProps()"
                               class="w-full"
                           />
-                        </Form.Item>
+                        </FormItem>
                       #end
                   #end
               #end
           #end
-        <Form.Item>
+        <FormItem>
           <Button class="ml-2" @click="resetQuery"> 重置 </Button>
           <Button class="ml-2" @click="handleQuery" type="primary">
             搜索
           </Button>
-        </Form.Item>
+        </FormItem>
       </Form>
     </Card>
 

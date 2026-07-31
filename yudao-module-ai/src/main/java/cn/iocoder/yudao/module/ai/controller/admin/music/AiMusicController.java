@@ -78,6 +78,15 @@ public class AiMusicController {
         return success(BeanUtils.toBean(pageResult, AiMusicRespVO.class));
     }
 
+    @GetMapping("/get")
+    @Operation(summary = "获得音乐")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @PreAuthorize("@ss.hasPermission('ai:music:query')")
+    public CommonResult<AiMusicRespVO> getMusic(@RequestParam("id") Long id) {
+        AiMusicDO music = musicService.getMusic(id);
+        return success(BeanUtils.toBean(music, AiMusicRespVO.class));
+    }
+
     @DeleteMapping("/delete")
     @Operation(summary = "删除音乐")
     @Parameter(name = "id", description = "编号", required = true)
