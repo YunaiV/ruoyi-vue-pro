@@ -138,6 +138,11 @@ public class ImChannelMessageServiceImpl implements ImChannelMessageService {
     }
 
     @Override
+    public ImChannelMessageDO getMessage(Long id) {
+        return channelMessageMapper.selectById(id);
+    }
+
+    @Override
     public void deleteMessage(Long id) {
         if (channelMessageMapper.selectById(id) == null) {
             throw exception(IM_CHANNEL_MESSAGE_NOT_EXISTS);

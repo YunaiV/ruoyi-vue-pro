@@ -164,7 +164,7 @@ spring:
       chat:
         model: llama3
     stabilityai:
-      api-key: sk-e53UqbboF8QJCscYvzJscJxJXoFcFg4iJjl1oqgE7baJETmx
+      api-key: ${STABILITYAI_API_KEY:sk-xxxx}
     dashscope: # 通义千问
       api-key: ${DASHSCOPE_API_KEY:sk-xxxx}
     deepseek: # DeepSeek
@@ -247,7 +247,7 @@ yudao:
       enable: true
   #    base-url: https://api.holdai.top/mj-relax/mj
       base-url: https://api.holdai.top/mj
-      api-key: sk-dZEPiVaNcT3FHhef51996bAa0bC74806BeAb620dA5Da10Bf
+      api-key: ${MIDJOURNEY_API_KEY:sk-xxxx}
       notify-url: http://java.nat300.top/admin-api/ai/image/midjourney/notify
     suno:
       enable: true
@@ -255,7 +255,7 @@ yudao:
       base-url: http://127.0.0.1:3001
     web-search:
       enable: true
-      api-key: sk-40500e52840f4d24b956d0b1d80d9abe
+      api-key: ${WEB_SEARCH_API_KEY:sk-xxxx}
 
 --- #################### 芋道相关配置 ####################
 

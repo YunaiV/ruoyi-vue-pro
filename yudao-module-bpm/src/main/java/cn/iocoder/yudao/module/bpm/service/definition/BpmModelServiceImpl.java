@@ -131,7 +131,7 @@ public class BpmModelServiceImpl implements BpmModelService {
             throw exception(MODEL_KEY_EXISTS, reqVO.getKey());
         }
 
-        // 2. 创建 Model 对象
+        // 2. 创建 Model 对象，并归属到当前租户
         reqVO.setSort(System.currentTimeMillis());
         Model model = repositoryService.newModel();
         BpmModelConvert.INSTANCE.copyToModel(model, reqVO);
@@ -145,7 +145,14 @@ public class BpmModelServiceImpl implements BpmModelService {
     @Override
     public BpmModelSaveReqVO exportModel(String id) {
         Model model = validateModelExists(id);
-        return BpmModelConvert.INSTANCE.convertToSaveReqVO(model);
+        BpmModelSaveReqVO result = BpmModelConvert.INSTANCE.convertToSaveReqVO(model);
+        if (Objects.equals(result.getType(), BpmModelTypeEnum.BPMN.getType())) {
+            byte[] bpmnBytes = getModelBpmnXML(id);
+            result.setBpmnXml(ArrayUtil.isEmpty(bpmnBytes) ? null : StrUtil.utf8Str(bpmnBytes));
+        } else if (Objects.equals(result.getType(), BpmModelTypeEnum.SIMPLE.getType())) {
+            result.setSimpleModel(JsonUtils.parseObject(getModelSimpleJson(id), BpmSimpleModelNodeVO.class));
+        }
+        return result;
     }
 
     @Override
@@ -216,7 +223,8 @@ public class BpmModelServiceImpl implements BpmModelService {
     }
 
     private Model validateModelExists(String id) {
-        Model model = repositoryService.getModel(id);
+        Model model = repositoryService.createModelQuery()
+                .modelId(id).modelTenantId(FlowableUtils.getTenantId()).singleResult();
         if (model == null) {
             throw exception(MODEL_NOT_EXISTS);
         }
@@ -458,7 +466,8 @@ public class BpmModelServiceImpl implements BpmModelService {
 
     @Override
     public Model getModel(String id) {
-        return repositoryService.getModel(id);
+        return repositoryService.createModelQuery()
+                .modelId(id).modelTenantId(FlowableUtils.getTenantId()).singleResult();
     }
 
     @Override

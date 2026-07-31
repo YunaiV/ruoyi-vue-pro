@@ -91,10 +91,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
             throw exception(AUTH_LOGIN_BAD_CREDENTIALS);
         }
         // 校验是否禁用
-        if (CommonStatusEnum.isDisable(user.getStatus())) {
-            createLoginLog(user.getId(), username, logTypeEnum, LoginResultEnum.USER_DISABLED);
-            throw exception(AUTH_LOGIN_USER_DISABLED);
-        }
+        validateUserStatus(user, username, logTypeEnum);
         return user;
     }
 
@@ -113,7 +110,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
                     reqVO.getSocialType(), reqVO.getSocialCode(), reqVO.getSocialState()));
         }
         // 创建 Token 令牌，记录登录日志
-        return createTokenAfterLoginSuccess(user.getId(), reqVO.getUsername(), LoginLogTypeEnum.LOGIN_USERNAME);
+        return createTokenAfterLoginSuccess(user, reqVO.getUsername(), LoginLogTypeEnum.LOGIN_USERNAME);
     }
 
     @Override
@@ -146,7 +143,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         }
 
         // 创建 Token 令牌，记录登录日志
-        return createTokenAfterLoginSuccess(user.getId(), reqVO.getMobile(), LoginLogTypeEnum.LOGIN_MOBILE);
+        return createTokenAfterLoginSuccess(user, reqVO.getMobile(), LoginLogTypeEnum.LOGIN_MOBILE);
     }
 
     private void createLoginLog(Long userId, String username,
@@ -184,7 +181,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         }
 
         // 创建 Token 令牌，记录登录日志
-        return createTokenAfterLoginSuccess(user.getId(), user.getUsername(), LoginLogTypeEnum.LOGIN_SOCIAL);
+        return createTokenAfterLoginSuccess(user, user.getUsername(), LoginLogTypeEnum.LOGIN_SOCIAL);
     }
 
     @VisibleForTesting
@@ -209,14 +206,24 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         return captchaService.verification(captchaVO);
     }
 
-    private AuthLoginRespVO createTokenAfterLoginSuccess(Long userId, String username, LoginLogTypeEnum logType) {
+    private AuthLoginRespVO createTokenAfterLoginSuccess(AdminUserDO user, String username, LoginLogTypeEnum logType) {
+        // 统一校验用户状态，避免短信、社交等登录方式遗漏
+        validateUserStatus(user, username, logType);
+
         // 插入登陆日志
-        createLoginLog(userId, username, logType, LoginResultEnum.SUCCESS);
+        createLoginLog(user.getId(), username, logType, LoginResultEnum.SUCCESS);
         // 创建访问令牌
-        OAuth2AccessTokenDO accessTokenDO = oauth2TokenService.createAccessToken(userId, getUserType().getValue(),
+        OAuth2AccessTokenDO accessTokenDO = oauth2TokenService.createAccessToken(user.getId(), getUserType().getValue(),
                 OAuth2ClientConstants.CLIENT_ID_DEFAULT, null);
         // 构建返回结果
         return BeanUtils.toBean(accessTokenDO, AuthLoginRespVO.class);
+    }
+
+    private void validateUserStatus(AdminUserDO user, String username, LoginLogTypeEnum logType) {
+        if (CommonStatusEnum.isDisable(user.getStatus())) {
+            createLoginLog(user.getId(), username, logType, LoginResultEnum.USER_DISABLED);
+            throw exception(AUTH_LOGIN_USER_DISABLED);
+        }
     }
 
     @Override
@@ -271,10 +278,10 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         validateCaptcha(registerReqVO);
 
         // 2. 校验用户名是否已存在
-        Long userId = userService.registerUser(registerReqVO);
+        AdminUserDO user = userService.registerUser(registerReqVO);
 
         // 3. 创建 Token 令牌，记录登录日志
-        return createTokenAfterLoginSuccess(userId, registerReqVO.getUsername(), LoginLogTypeEnum.LOGIN_USERNAME);
+        return createTokenAfterLoginSuccess(user, registerReqVO.getUsername(), LoginLogTypeEnum.LOGIN_USERNAME);
     }
 
     @VisibleForTesting
