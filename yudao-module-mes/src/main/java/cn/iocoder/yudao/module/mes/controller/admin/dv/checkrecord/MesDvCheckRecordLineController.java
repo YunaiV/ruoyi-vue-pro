@@ -83,6 +83,16 @@ public class MesDvCheckRecordLineController {
         return success(new PageResult<>(buildCheckRecordLineRespVOList(pageResult.getList()), pageResult.getTotal()));
     }
 
+    @GetMapping("/list-by-record-id")
+    @Operation(summary = "获得指定点检记录的明细列表")
+    @Parameter(name = "recordId", description = "点检记录编号", required = true)
+    @PreAuthorize("@ss.hasPermission('mes:dv-check-record:query')")
+    public CommonResult<List<MesDvCheckRecordLineRespVO>> getCheckRecordLineListByRecordId(
+            @RequestParam("recordId") Long recordId) {
+        List<MesDvCheckRecordLineDO> list = checkRecordLineService.getCheckRecordLineListByRecordId(recordId);
+        return success(buildCheckRecordLineRespVOList(list));
+    }
+
     // ==================== 拼接 VO ====================
 
     private List<MesDvCheckRecordLineRespVO> buildCheckRecordLineRespVOList(List<MesDvCheckRecordLineDO> list) {

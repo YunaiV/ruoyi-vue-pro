@@ -154,6 +154,11 @@ public class AiMindMapServiceImpl implements AiMindMapService {
     }
 
     @Override
+    public AiMindMapDO getMindMap(Long id) {
+        return mindMapMapper.selectById(id);
+    }
+
+    @Override
     public PageResult<AiMindMapDO> getMindMapPage(AiMindMapPageReqVO pageReqVO) {
         return mindMapMapper.selectPage(pageReqVO);
     }

@@ -12,12 +12,12 @@ import cn.iocoder.yudao.module.pay.framework.pay.core.client.PayClient;
 import cn.iocoder.yudao.module.pay.framework.pay.core.client.PayClientFactory;
 import cn.iocoder.yudao.module.pay.framework.pay.core.client.impl.alipay.AlipayPayClientConfig;
 import cn.iocoder.yudao.module.pay.framework.pay.core.client.impl.weixin.WxPayClientConfig;
+import jakarta.annotation.Resource;
+import jakarta.validation.Validator;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-import javax.annotation.Resource;
-import javax.validation.Validator;
 import java.util.Collections;
 import java.util.List;
 
@@ -39,9 +39,9 @@ public class PayChannelServiceTest extends BaseDbUnitTest {
     @Resource
     private PayChannelMapper channelMapper;
 
-    @MockBean
+    @MockitoBean
     private PayClientFactory payClientFactory;
-    @MockBean
+    @MockitoBean
     private Validator validator;
 
     @Test

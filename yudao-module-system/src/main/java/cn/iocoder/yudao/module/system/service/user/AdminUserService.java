@@ -11,7 +11,8 @@ import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserImportRe
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
+import org.springframework.lang.Nullable;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -37,9 +38,9 @@ public interface AdminUserService {
      * 注册用户
      *
      * @param registerReqVO 用户信息
-     * @return 用户编号
+     * @return 用户信息
      */
-    Long registerUser(@Valid AuthRegisterReqVO registerReqVO);
+    AdminUserDO registerUser(@Valid AuthRegisterReqVO registerReqVO);
 
     /**
      * 修改用户
@@ -214,11 +215,13 @@ public interface AdminUserService {
     List<AdminUserDO> getUserListByStatus(Integer status);
 
     /**
-     * 获得指定部门的用户
-     * @param deptIds
-     * @return
+     * 获得指定状态和部门的用户们
+     *
+     * @param status 状态
+     * @param deptId 部门编号，{@code null} 表示不筛选部门
+     * @return 用户们
      */
-    List<AdminUserDO> getDeptUsers(Collection<Long> deptIds);
+    List<AdminUserDO> getUserListByStatus(Integer status, @Nullable Long deptId);
 
     /**
      * 判断密码是否匹配

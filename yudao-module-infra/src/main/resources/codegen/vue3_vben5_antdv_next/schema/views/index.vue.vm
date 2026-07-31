@@ -8,7 +8,7 @@ import { ref } from 'vue';
 import {#if ($table.templateType != 2 && $deleteBatchEnable) confirm,#end Page, useVbenModal } from '@vben/common-ui';
 import { downloadFileFromBlobPart#if ($table.templateType != 2 && $deleteBatchEnable), isEmpty#end } from '@vben/utils';
 
-import { message#if ($table.templateType == 11), Tabs#end } from 'antdv-next';
+import { message#if ($table.templateType == 11 || $table.templateType == 12), TabPane, Tabs#end } from 'antdv-next';
 
 import { ACTION_ICON, TableAction, useVbenVxeGrid } from '#/adapter/vxe-table';
 #if (${table.templateType} == 2)## 树表接口

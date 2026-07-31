@@ -133,13 +133,8 @@ public class UserController {
     @Operation(summary = "获取用户精简信息列表", description = "只包含被开启的用户，主要用于前端的下拉选项")
     public CommonResult<List<UserSimpleRespVO>> getSimpleUserList(
             @RequestParam(value = "deptId", required = false) Long deptId) {
-        List<AdminUserDO> list;
-        if (deptId != null) {
-            List<Long> deptIds = Collections.singletonList(deptId);
-            list = userService.getDeptUsers(deptIds);
-        } else {
-            list = userService.getUserListByStatus(CommonStatusEnum.ENABLE.getStatus());
-        }
+        List<AdminUserDO> list = userService.getUserListByStatus(
+                CommonStatusEnum.ENABLE.getStatus(), deptId);
 
         // 拼接数据
         Map<Long, DeptDO> deptMap = deptService.getDeptMap(

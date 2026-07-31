@@ -16,6 +16,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
@@ -39,7 +40,7 @@ public class LoginLogController {
     @GetMapping("/get")
     @Operation(summary = "获得登录日志")
     @PreAuthorize("@ss.hasPermission('system:login-log:query')")
-    public CommonResult<LoginLogRespVO> getLoginLog(Long id) {
+    public CommonResult<LoginLogRespVO> getLoginLog(@RequestParam("id") Long id) {
         LoginLogDO loginLog = loginLogService.getLoginLog(id);
         return success(BeanUtils.toBean(loginLog, LoginLogRespVO.class));
     }

@@ -7,11 +7,12 @@ import cn.iocoder.yudao.module.mes.controller.admin.dv.repair.vo.line.MesDvRepai
 import cn.iocoder.yudao.module.mes.dal.dataobject.dv.repair.MesDvRepairLineDO;
 import cn.iocoder.yudao.module.mes.dal.mysql.dv.repair.MesDvRepairLineMapper;
 import cn.iocoder.yudao.module.mes.service.dv.subject.MesDvSubjectService;
+import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.mes.enums.ErrorCodeConstants.*;
@@ -98,6 +99,11 @@ public class MesDvRepairLineServiceImpl implements MesDvRepairLineService {
     @Override
     public PageResult<MesDvRepairLineDO> getRepairLinePage(MesDvRepairLinePageReqVO pageReqVO) {
         return repairLineMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public List<MesDvRepairLineDO> getRepairLineListByRepairId(Long repairId) {
+        return repairLineMapper.selectListByRepairId(repairId);
     }
 
     @Override

@@ -46,6 +46,15 @@ public class AiWriteController {
         return success(true);
     }
 
+    @GetMapping("/get")
+    @Operation(summary = "获得写作")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @PreAuthorize("@ss.hasPermission('ai:write:query')")
+    public CommonResult<AiWriteRespVO> getWrite(@RequestParam("id") Long id) {
+        AiWriteDO write = writeService.getWrite(id);
+        return success(BeanUtils.toBean(write, AiWriteRespVO.class));
+    }
+
     @GetMapping("/page")
     @Operation(summary = "获得写作分页")
     @PreAuthorize("@ss.hasPermission('ai:write:query')")

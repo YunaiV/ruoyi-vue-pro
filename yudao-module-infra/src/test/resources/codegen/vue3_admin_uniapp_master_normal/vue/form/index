@@ -1,0 +1,480 @@
+<template>
+  <view class="yd-page-container">
+    <!-- 顶部导航栏 -->
+    <wd-navbar
+      :title="getTitle"
+      left-arrow placeholder safe-area-inset-top fixed
+      @click-left="handleBack"
+    />
+
+    <!-- 表单区域 -->
+    <view>
+      <wd-form ref="formRef" :model="formData" :schema="formSchema">
+        <wd-cell-group border>
+          <wd-form-item title="名字" title-width="180rpx" prop="name">
+            <wd-input
+              v-model="formData.name"
+              clearable
+              placeholder="请输入名字"
+            />
+          </wd-form-item>
+          <wd-form-item title="简介" title-width="180rpx" prop="description">
+            <wd-textarea
+              v-model="formData.description"
+              clearable
+              placeholder="请输入简介"
+              :maxlength="200"
+              show-word-limit
+            />
+          </wd-form-item>
+          <wd-form-item
+            title="出生日期"
+            title-width="180rpx"
+            prop="birthday"
+            is-link
+            :value="formData.birthday ? formatDateTime(formData.birthday) : ''"
+            placeholder="请选择出生日期"
+            @click="birthdayVisible = true"
+          />
+          <wd-datetime-picker
+            v-model:visible="birthdayVisible"
+            :model-value="formData.birthday || Date.now()"
+            type="datetime"
+            @update:model-value="value => formData.birthday = value"
+          />
+          <yd-form-picker
+            v-model="formData.sex"
+            label="性别"
+            label-width="180rpx"
+            prop="sex"
+            :dict-type="DICT_TYPE.SYSTEM_USER_SEX"
+            placeholder="请选择性别"
+          />
+          <wd-form-item title="是否有效" title-width="180rpx" prop="enabled" center>
+            <wd-radio-group v-model="formData.enabled" type="button">
+              <wd-radio
+                v-for="dict in getBoolDictOptions(DICT_TYPE.INFRA_BOOLEAN_STRING)"
+                :key="dict.value"
+                :value="dict.value"
+              >
+                {{ dict.label }}
+              </wd-radio>
+            </wd-radio-group>
+          </wd-form-item>
+          <wd-form-item title="头像" title-width="180rpx" prop="avatar">
+            <yd-upload-img v-model="formData.avatar" directory="infra/demo" />
+          </wd-form-item>
+          <wd-form-item title="附件" title-width="180rpx" prop="video">
+            <yd-upload-file v-model="formData.video" :limit="1" directory="infra/demo" />
+          </wd-form-item>
+          <wd-form-item title="备注" title-width="180rpx" prop="memo">
+            <wd-textarea
+              v-model="formData.memo"
+              clearable
+              placeholder="请输入备注"
+              :maxlength="2000"
+              show-word-limit
+            />
+          </wd-form-item>
+        </wd-cell-group>
+      </wd-form>
+
+      <!-- 子表：学生联系人 -->
+      <view class="mt-20rpx flex items-center justify-between px-24rpx py-16rpx">
+        <text class="text-28rpx text-[#333] font-semibold">学生联系人</text>
+        <wd-button size="small" type="primary" variant="plain" @click="addStudentContact">
+          添加
+        </wd-button>
+      </view>
+      <view class="px-24rpx">
+        <view v-if="!studentContacts.length" class="rounded-12rpx bg-white py-40rpx text-center text-26rpx text-[#999]">
+          暂无学生联系人
+        </view>
+        <view
+          v-for="(item, index) in studentContacts"
+          :key="index"
+          class="mb-20rpx rounded-12rpx bg-white p-24rpx shadow-sm"
+        >
+          <view class="mb-16rpx flex justify-end">
+            <wd-button size="small" type="danger" variant="plain" @click="removeStudentContact(index)">
+              删除
+            </wd-button>
+          </view>
+          <wd-form-item title="名字" title-width="180rpx">
+            <wd-input v-model="item.name" clearable placeholder="请输入名字" />
+          </wd-form-item>
+          <wd-form-item title="简介" title-width="180rpx">
+            <wd-textarea
+              v-model="item.description"
+              clearable
+              placeholder="请输入简介"
+              :maxlength="200"
+            />
+          </wd-form-item>
+          <wd-form-item
+            title="出生日期"
+            title-width="180rpx"
+            is-link
+            :value="item.birthday ? formatDateTime(item.birthday) : ''"
+            placeholder="请选择出生日期"
+            @click="subDateVisible[`studentContacts.${index}.birthday`] = true"
+          />
+          <wd-datetime-picker
+            v-model:visible="subDateVisible[`studentContacts.${index}.birthday`]"
+            :model-value="item.birthday || Date.now()"
+            type="datetime"
+            @update:model-value="value => item.birthday = value"
+          />
+          <yd-form-picker
+            v-model="item.sex"
+            label="性别"
+            label-width="180rpx"
+            :dict-type="DICT_TYPE.SYSTEM_USER_SEX"
+            placeholder="请选择性别"
+          />
+          <wd-form-item title="是否有效" title-width="180rpx" center>
+            <wd-radio-group v-model="item.enabled" type="button">
+              <wd-radio
+                v-for="dict in getBoolDictOptions(DICT_TYPE.INFRA_BOOLEAN_STRING)"
+                :key="dict.value"
+                :value="dict.value"
+              >
+                {{ dict.label }}
+              </wd-radio>
+            </wd-radio-group>
+          </wd-form-item>
+          <wd-form-item title="头像" title-width="180rpx">
+            <yd-upload-img v-model="item.avatar" directory="infra/demo" />
+          </wd-form-item>
+          <wd-form-item title="附件" title-width="180rpx">
+            <yd-upload-file v-model="item.video" :limit="1" directory="infra/demo" />
+          </wd-form-item>
+          <wd-form-item title="备注" title-width="180rpx">
+            <wd-textarea
+              v-model="item.memo"
+              clearable
+              placeholder="请输入备注"
+              :maxlength="2000"
+            />
+          </wd-form-item>
+        </view>
+      </view>
+
+      <!-- 子表：学生班主任 -->
+      <view class="mt-20rpx flex items-center justify-between px-24rpx py-16rpx">
+        <text class="text-28rpx text-[#333] font-semibold">学生班主任</text>
+        <wd-button
+          v-if="!studentTeacher"
+          size="small"
+          type="primary"
+          variant="plain"
+          @click="addStudentTeacher()"
+        >
+          添加
+        </wd-button>
+      </view>
+      <view class="px-24rpx">
+        <view v-if="!studentTeacher" class="rounded-12rpx bg-white py-40rpx text-center text-26rpx text-[#999]">
+          暂无学生班主任
+        </view>
+        <view v-else class="rounded-12rpx bg-white p-24rpx shadow-sm">
+          <wd-form-item title="名字" title-width="180rpx">
+            <wd-input v-model="studentTeacher.name" clearable placeholder="请输入名字" />
+          </wd-form-item>
+          <wd-form-item title="简介" title-width="180rpx">
+            <wd-textarea
+              v-model="studentTeacher.description"
+              clearable
+              placeholder="请输入简介"
+              :maxlength="200"
+            />
+          </wd-form-item>
+          <wd-form-item
+            title="出生日期"
+            title-width="180rpx"
+            is-link
+            :value="studentTeacher.birthday ? formatDateTime(studentTeacher.birthday) : ''"
+            placeholder="请选择出生日期"
+            @click="subDateVisible['studentTeacher.birthday'] = true"
+          />
+          <wd-datetime-picker
+            v-model:visible="subDateVisible['studentTeacher.birthday']"
+            :model-value="studentTeacher.birthday || Date.now()"
+            type="datetime"
+            @update:model-value="value => studentTeacher.birthday = value"
+          />
+          <yd-form-picker
+            v-model="studentTeacher.sex"
+            label="性别"
+            label-width="180rpx"
+            :dict-type="DICT_TYPE.SYSTEM_USER_SEX"
+            placeholder="请选择性别"
+          />
+          <wd-form-item title="是否有效" title-width="180rpx" center>
+            <wd-radio-group v-model="studentTeacher.enabled" type="button">
+              <wd-radio
+                v-for="dict in getBoolDictOptions(DICT_TYPE.INFRA_BOOLEAN_STRING)"
+                :key="dict.value"
+                :value="dict.value"
+              >
+                {{ dict.label }}
+              </wd-radio>
+            </wd-radio-group>
+          </wd-form-item>
+          <wd-form-item title="头像" title-width="180rpx">
+            <yd-upload-img v-model="studentTeacher.avatar" directory="infra/demo" />
+          </wd-form-item>
+          <wd-form-item title="附件" title-width="180rpx">
+            <yd-upload-file v-model="studentTeacher.video" :limit="1" directory="infra/demo" />
+          </wd-form-item>
+          <wd-form-item title="备注" title-width="180rpx">
+            <wd-textarea
+              v-model="studentTeacher.memo"
+              clearable
+              placeholder="请输入备注"
+              :maxlength="2000"
+            />
+          </wd-form-item>
+        </view>
+      </view>
+    </view>
+
+    <!-- 底部保存按钮 -->
+    <view class="yd-detail-footer">
+      <wd-button
+        type="primary"
+        block
+        :loading="formLoading"
+        @click="handleSubmit"
+      >
+        保存
+      </wd-button>
+    </view>
+  </view>
+</template>
+
+<script lang="ts" setup>
+import type { FormInstance } from '@wot-ui/ui/components/wd-form/types'
+import type {
+  Student,
+  StudentContact,
+  StudentTeacher,
+} from '@/api/infra/demo'
+import { computed, onMounted, ref } from 'vue'
+import { useToast } from '@wot-ui/ui/components/wd-toast'
+import {
+  createStudent,
+  getStudent,
+  getStudentContactListByStudentId,
+  getStudentTeacherByStudentId,
+  updateStudent,
+} from '@/api/infra/demo'
+import { getBoolDictOptions } from '@/hooks/useDict'
+import { delay, navigateBackPlus } from '@/utils'
+import { DICT_TYPE } from '@/utils/constants'
+import { formatDateTime } from '@/utils/date'
+import { createFormSchema } from '@/utils/wot'
+
+const props = defineProps<{
+  id?: number
+}>()
+
+definePage({
+  style: {
+    navigationBarTitleText: '',
+    navigationStyle: 'custom',
+  },
+})
+
+const toast = useToast()
+const getTitle = computed(() => props.id ? '编辑学生' : '新增学生')
+const formLoading = ref(false) // 表单提交状态
+const formData = ref<Partial<Student>>({
+  id: undefined,
+  name: '',
+  description: '',
+  birthday: undefined,
+  sex: undefined,
+  enabled: undefined,
+  avatar: '',
+  video: '',
+  memo: '',
+}) // 表单数据
+const studentContacts = ref<Partial<StudentContact>[]>([]) // 学生联系人数据
+const studentTeacher = ref<Partial<StudentTeacher> | null>(null) // 学生班主任数据
+const birthdayVisible = ref(false) // 出生日期选择器状态
+const subDateVisible = ref<Record<string, boolean>>({}) // 子表日期选择器状态
+const formSchema = createFormSchema({
+  name: [{ required: true, message: '名字不能为空' }],
+  description: [{ required: true, message: '简介不能为空' }],
+  birthday: [{ required: true, message: '出生日期不能为空' }],
+  sex: [{ required: true, message: '性别不能为空' }],
+  enabled: [{ required: true, message: '是否有效不能为空' }],
+  avatar: [{ required: true, message: '头像不能为空' }],
+  video: [{ required: true, message: '附件不能为空' }],
+  memo: [{ required: true, message: '备注不能为空' }],
+}) // 表单校验规则
+const formRef = ref<FormInstance>() // 表单组件引用
+
+/** 添加学生联系人 */
+function addStudentContact() {
+  studentContacts.value.push({
+    name: '',
+    description: '',
+    birthday: undefined,
+    sex: undefined,
+    enabled: undefined,
+    avatar: '',
+    video: undefined,
+    memo: '',
+  })
+}
+
+/** 删除学生联系人 */
+function removeStudentContact(index: number) {
+  studentContacts.value.splice(index, 1)
+}
+
+/** 添加学生班主任 */
+function addStudentTeacher() {
+  studentTeacher.value = {
+    name: '',
+    description: '',
+    birthday: undefined,
+    sex: undefined,
+    enabled: undefined,
+    avatar: '',
+    video: undefined,
+    memo: '',
+  }
+}
+
+/** 校验主子表数据 */
+function isEmptySubValue(value: unknown) {
+  return value === undefined || value === null || value === ''
+}
+
+function validateSubTables() {
+  for (let index = 0; index < studentContacts.value.length; index++) {
+    const item = studentContacts.value[index]!
+    if (isEmptySubValue(item.name)) {
+      toast.warning(`学生联系人第${index + 1}项的名字不能为空`)
+      return false
+    }
+    if (isEmptySubValue(item.description)) {
+      toast.warning(`学生联系人第${index + 1}项的简介不能为空`)
+      return false
+    }
+    if (isEmptySubValue(item.birthday)) {
+      toast.warning(`学生联系人第${index + 1}项的出生日期不能为空`)
+      return false
+    }
+    if (isEmptySubValue(item.sex)) {
+      toast.warning(`学生联系人第${index + 1}项的性别不能为空`)
+      return false
+    }
+    if (isEmptySubValue(item.enabled)) {
+      toast.warning(`学生联系人第${index + 1}项的是否有效不能为空`)
+      return false
+    }
+    if (isEmptySubValue(item.avatar)) {
+      toast.warning(`学生联系人第${index + 1}项的头像不能为空`)
+      return false
+    }
+    if (isEmptySubValue(item.memo)) {
+      toast.warning(`学生联系人第${index + 1}项的备注不能为空`)
+      return false
+    }
+  }
+  if (studentTeacher.value) {
+    if (isEmptySubValue(studentTeacher.value.name)) {
+      toast.warning('学生班主任的名字不能为空')
+      return false
+    }
+    if (isEmptySubValue(studentTeacher.value.description)) {
+      toast.warning('学生班主任的简介不能为空')
+      return false
+    }
+    if (isEmptySubValue(studentTeacher.value.birthday)) {
+      toast.warning('学生班主任的出生日期不能为空')
+      return false
+    }
+    if (isEmptySubValue(studentTeacher.value.sex)) {
+      toast.warning('学生班主任的性别不能为空')
+      return false
+    }
+    if (isEmptySubValue(studentTeacher.value.enabled)) {
+      toast.warning('学生班主任的是否有效不能为空')
+      return false
+    }
+    if (isEmptySubValue(studentTeacher.value.avatar)) {
+      toast.warning('学生班主任的头像不能为空')
+      return false
+    }
+    if (isEmptySubValue(studentTeacher.value.memo)) {
+      toast.warning('学生班主任的备注不能为空')
+      return false
+    }
+  }
+  return true
+}
+
+/** 返回上一页 */
+function handleBack() {
+  navigateBackPlus('/pages-infra/demo/index')
+}
+
+/** 加载学生详情 */
+async function getDetail() {
+  if (!props.id) {
+    return
+  }
+  const [data, studentContactData, studentTeacherData] = await Promise.all([
+    getStudent(props.id),
+    getStudentContactListByStudentId(props.id),
+    getStudentTeacherByStudentId(props.id),
+  ])
+  formData.value = data
+  studentContacts.value = studentContactData || []
+  studentTeacher.value = studentTeacherData || null
+}
+
+/** 提交表单 */
+async function handleSubmit() {
+  const { valid } = await formRef.value.validate()
+  if (!valid) {
+    return
+  }
+  if (!validateSubTables()) {
+    return
+  }
+
+  formLoading.value = true
+  try {
+    const data = {
+      ...formData.value,
+      studentContacts: studentContacts.value,
+      studentTeacher: studentTeacher.value,
+    } as Student
+    if (props.id) {
+      await updateStudent(data)
+      toast.success('修改成功')
+    } else {
+      await createStudent(data)
+      toast.success('新增成功')
+    }
+    uni.$emit('infra:demo:reload')
+    delay(handleBack)
+  } finally {
+    formLoading.value = false
+  }
+}
+
+/** 初始化 */
+onMounted(async () => {
+  getDetail()
+})
+</script>
+
+<style lang="scss" scoped>
+</style>

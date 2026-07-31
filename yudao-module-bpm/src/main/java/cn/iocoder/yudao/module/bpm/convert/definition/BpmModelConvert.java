@@ -111,6 +111,18 @@ public interface BpmModelConvert {
         model.setMetaInfo(JsonUtils.toJsonString(BeanUtils.toBean(reqVO, BpmModelMetaInfoVO.class)));
     }
 
+    default BpmModelSaveReqVO convertToSaveReqVO(Model model) {
+        BpmModelMetaInfoVO metaInfo = parseMetaInfo(model);
+        BpmModelSaveReqVO reqVO = new BpmModelSaveReqVO();
+        reqVO.setKey(model.getKey());
+        reqVO.setName(model.getName());
+        reqVO.setCategory(model.getCategory());
+        if (metaInfo != null) {
+            BeanUtils.copyProperties(metaInfo, reqVO);
+        }
+        return reqVO;
+    }
+
     default BpmModelMetaInfoVO parseMetaInfo(Model model) {
         BpmModelMetaInfoVO vo = JsonUtils.parseObject(model.getMetaInfo(), BpmModelMetaInfoVO.class);
         if (vo == null) {

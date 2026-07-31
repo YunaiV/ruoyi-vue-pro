@@ -38,6 +38,15 @@ public interface OAuth2TokenCommonApi {
     OAuth2AccessTokenRespDTO removeAccessToken(String accessToken);
 
     /**
+     * 移除用户的所有访问令牌
+     * 注意：该流程中，会移除相关的刷新令牌
+     *
+     * @param userId 用户编号
+     * @param userType 用户类型
+     */
+    void removeAccessToken(Long userId, Integer userType);
+
+    /**
      * 刷新访问令牌
      *
      * @param refreshToken 刷新令牌

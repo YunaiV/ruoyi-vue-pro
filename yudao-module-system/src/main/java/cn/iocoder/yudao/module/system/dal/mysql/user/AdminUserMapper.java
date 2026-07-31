@@ -41,7 +41,13 @@ public interface AdminUserMapper extends BaseMapperX<AdminUserDO> {
     }
 
     default List<AdminUserDO> selectListByStatus(Integer status) {
-        return selectList(AdminUserDO::getStatus, status);
+        return selectListByStatusAndDeptId(status, null);
+    }
+
+    default List<AdminUserDO> selectListByStatusAndDeptId(Integer status, Long deptId) {
+        return selectList(new LambdaQueryWrapperX<AdminUserDO>()
+                .eq(AdminUserDO::getStatus, status)
+                .eqIfPresent(AdminUserDO::getDeptId, deptId));
     }
 
     default List<AdminUserDO> selectListByDeptIds(Collection<Long> deptIds) {

@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import type { FileType } from 'antdv-next/es/upload/interface';
-
 import { useVbenModal } from '@vben/common-ui';
 import { downloadFileFromBlobPart } from '@vben/utils';
 
@@ -46,7 +44,7 @@ const [Modal, modalApi] = useVbenModal({
 });
 
 /** 上传前 */
-function beforeUpload(file: FileType) {
+function beforeUpload(file: File) {
   formApi.setFieldValue('file', file);
   return false;
 }

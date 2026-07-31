@@ -15,7 +15,7 @@ bash verify.sh
 - 7880：HTTP / WebSocket 信令；
 - 7881：WebRTC TCP fallback；
 - 7882/UDP：WebRTC 媒体；
-- macOS / Windows：当前 `docker-compose.yml` 走端口映射模式，webhook URL 用 `host.docker.internal:48080` 让容器访问到宿主机 yudao 后端；
+- macOS / Windows：当前 `docker-compose.yml` 走端口映射模式，`rtc.node_ip` 使用 `127.0.0.1` 让浏览器访问映射后的媒体端口，webhook URL 用 `host.docker.internal:48080` 让容器访问到宿主机 yudao 后端；
 - macOS 上 host network（`network_mode: host`）需要 Docker Desktop 4.34+ 并在 Settings → Resources → Network 勾选「Enable host networking」，老版本静默失败（容器跑得起来但端口完全不通）；
 - Linux：可以把 `docker-compose.yml` 改成 `network_mode: host` + 删 `ports:` 段，并把 `livekit.yaml` 的 webhook URL 改为 `http://127.0.0.1:48080/admin-api/im/livekit/webhook`。
 
