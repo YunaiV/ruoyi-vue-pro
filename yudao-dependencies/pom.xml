@@ -42,6 +42,7 @@
         <spring-boot-admin.version>4.0.4</spring-boot-admin.version>
         <opentelemetry.version>1.39.0</opentelemetry.version>
         <!-- Test 测试相关 -->
+        <h2.version>2.3.232</h2.version>
         <podam.version>8.0.2.RELEASE</podam.version>
         <jedis-mock.version>1.1.15</jedis-mock.version>
         <mockito-inline.version>5.2.0</mockito-inline.version>
@@ -420,6 +421,12 @@
                         <artifactId>mockito-core</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <version>${h2.version}</version>
             </dependency>
 
             <dependency>
