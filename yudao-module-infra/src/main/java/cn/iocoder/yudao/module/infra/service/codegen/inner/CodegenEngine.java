@@ -80,9 +80,9 @@ public class CodegenEngine {
             .put(javaTemplatePath("dal/do_sub"), // 特殊：主子表专属逻辑
                     javaModuleImplMainFilePath("dal/dataobject/${table.businessName}/${subTable.className}DO"))
             .put(javaTemplatePath("dal/mapper"),
-                    javaModuleImplMainFilePath("dal/mysql/${table.businessName}/${table.className}Mapper"))
+                    javaModuleImplMainFilePath("dal/${dalPackageSegment}/${table.businessName}/${table.className}Mapper"))
             .put(javaTemplatePath("dal/mapper_sub"), // 特殊：主子表专属逻辑
-                    javaModuleImplMainFilePath("dal/mysql/${table.businessName}/${subTable.className}Mapper"))
+                    javaModuleImplMainFilePath("dal/${dalPackageSegment}/${table.businessName}/${subTable.className}Mapper"))
             .put(javaTemplatePath("dal/mapper.xml"), mapperXmlFilePath())
             .put(javaTemplatePath("service/serviceImpl"),
                     javaModuleImplMainFilePath("service/${table.businessName}/${table.className}ServiceImpl"))
@@ -490,6 +490,7 @@ public class CodegenEngine {
         // 创建 bindingMap
         Map<String, Object> bindingMap = new HashMap<>(globalBindingMap);
         bindingMap.put("dbType", dbType);
+        bindingMap.put("dalPackageSegment", getDalPackageSegment(dbType)); // 根据数据库类型生成 DAL 包名
         bindingMap.put("table", table);
         bindingMap.put("columns", columns);
         bindingMap.put("primaryColumn", CollectionUtils.findFirst(columns, CodegenColumnDO::getPrimaryKey)); // 主键字段
@@ -604,6 +605,8 @@ public class CodegenEngine {
     private String formatFilePath(String filePath, Map<String, Object> bindingMap) {
         filePath = StrUtil.replace(filePath, "${basePackage}",
                 getStr(bindingMap, "basePackage").replaceAll("\\.", "/"));
+        filePath = StrUtil.replace(filePath, "${dalPackageSegment}",
+                getStr(bindingMap, "dalPackageSegment"));
         filePath = StrUtil.replace(filePath, "${classNameVar}",
                 getStr(bindingMap, "classNameVar"));
         filePath = StrUtil.replace(filePath, "${simpleClassName}",
@@ -728,6 +731,19 @@ public class CodegenEngine {
 
     private static String vue3Vben5AntdvNextGeneralTemplatePath(String path) {
         return "codegen/vue3_vben5_antdv_next/general/" + path + ".vm";
+    }
+
+    @VisibleForTesting
+    static String getDalPackageSegment(DbType dbType) {
+        switch (dbType) {
+            case POSTGRE_SQL:  return "postgresql";
+            case ORACLE:       return "oracle";
+            case SQL_SERVER:
+            case SQL_SERVER2005: return "sqlserver";
+            case DM:           return "dm";
+            case KINGBASE_ES:  return "kingbasees";
+            default:           return "mysql";
+        }
     }
 
     private static boolean isSubTemplate(String path) {

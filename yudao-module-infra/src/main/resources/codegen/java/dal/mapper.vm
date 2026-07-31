@@ -1,4 +1,4 @@
-package ${basePackage}.module.${table.moduleName}.dal.mysql.${table.businessName};
+package ${basePackage}.module.${table.moduleName}.dal.${dalPackageSegment}.${table.businessName};
 
 import java.util.*;
 

@@ -29,11 +29,11 @@ import ${PageResultClassName};
 import ${PageParamClassName};
 import ${BeanUtils};
 
-import ${basePackage}.module.${table.moduleName}.dal.mysql.${table.businessName}.${table.className}Mapper;
+import ${basePackage}.module.${table.moduleName}.dal.${dalPackageSegment}.${table.businessName}.${table.className}Mapper;
 ## 特殊：主子表专属逻辑
 #foreach ($subTable in $subTables)
 #set ($index = $foreach.count - 1)
-import ${basePackage}.module.${subTable.moduleName}.dal.mysql.${subTable.businessName}.${subTable.className}Mapper;
+import ${basePackage}.module.${subTable.moduleName}.dal.${dalPackageSegment}.${subTable.businessName}.${subTable.className}Mapper;
 #end
 
 import static ${ServiceExceptionUtilClassName}.exception;

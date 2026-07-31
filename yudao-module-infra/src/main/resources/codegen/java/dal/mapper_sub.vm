@@ -2,7 +2,7 @@
 #set ($subColumns = $subJoinColumnsList.get($subIndex))##当前字段数组
 #set ($subJoinColumn = $subJoinColumns.get($subIndex))##当前 join 字段
 #set ($SubJoinColumnName = $subJoinColumn.javaField.substring(0,1).toUpperCase() + ${subJoinColumn.javaField.substring(1)})##首字母大写
-package ${basePackage}.module.${subTable.moduleName}.dal.mysql.${subTable.businessName};
+package ${basePackage}.module.${subTable.moduleName}.dal.${dalPackageSegment}.${subTable.businessName};
 
 import java.util.*;
 
