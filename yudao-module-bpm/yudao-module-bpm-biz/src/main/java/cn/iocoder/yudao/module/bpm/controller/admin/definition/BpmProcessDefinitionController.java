@@ -12,12 +12,14 @@ import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitio
 import cn.iocoder.yudao.module.bpm.service.definition.BpmCategoryService;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmFormService;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmProcessDefinitionService;
+import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.common.engine.impl.db.SuspensionState;
+import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -48,6 +50,8 @@ public class BpmProcessDefinitionController {
     private BpmFormService formService;
     @Resource
     private BpmCategoryService categoryService;
+    @Resource
+    private BpmProcessInstanceService processInstanceService;
 
     @GetMapping("/page")
     @Operation(summary = "获得流程定义分页")
@@ -128,6 +132,37 @@ public class BpmProcessDefinitionController {
         BpmnModel bpmnModel = processDefinitionService.getProcessDefinitionBpmnModel(processDefinition.getId());
         return success(BpmProcessDefinitionConvert.INSTANCE.buildProcessDefinition(
                 processDefinition, null, processDefinitionInfo, null, null, bpmnModel));
+    }
+
+    @GetMapping("/get-definition-version")
+    @Operation(summary = "获得流程实例所属的流程定义的版本号")
+    @Parameter(name = "id", description = "流程实例的编号", required = true)
+    public CommonResult<Integer> getProcessDefinitionVersion(@RequestParam("id") String id) {
+        HistoricProcessInstance processInstance = processInstanceService.getHistoricProcessInstance(id);
+        if (processInstance == null) {
+            return success(null);
+        }
+        ProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(
+                processInstance.getProcessDefinitionId());
+        return success(processDefinition == null ? null : processDefinition.getVersion());
+    }
+
+    @GetMapping("/get-definition-latest-version")
+    @Operation(summary = "获得流程实例所属的流程定义的最新版本号")
+    @Parameter(name = "id", description = "流程实例的编号", required = true)
+    public CommonResult<Integer> getProcessDefinitionLatestVersion(@RequestParam("id") String id) {
+        HistoricProcessInstance processInstance = processInstanceService.getHistoricProcessInstance(id);
+        if (processInstance == null) {
+            return success(null);
+        }
+        ProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(
+                processInstance.getProcessDefinitionId());
+        if (processDefinition == null) {
+            return success(null);
+        }
+        ProcessDefinition latestProcessDefinition = processDefinitionService.getLatestProcessDefinition(
+                processDefinition.getKey());
+        return success(latestProcessDefinition == null ? null : latestProcessDefinition.getVersion());
     }
 
 }

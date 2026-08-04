@@ -178,4 +178,13 @@ public interface BpmProcessDefinitionService {
      */
     Deployment getDeployment(String id);
 
+    /**
+     * 获得流程定义标识对应的最新版本的流程定义
+     *
+     * @param key 流程定义的标识
+     * @return 流程定义
+     */
+    ProcessDefinition getLatestProcessDefinition(String key);
+
+
 }

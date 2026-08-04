@@ -132,6 +132,13 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
     }
 
     @Override
+    public ProcessDefinition getLatestProcessDefinition(String key) {
+        return repositoryService.createProcessDefinitionQuery()
+                .processDefinitionTenantId(FlowableUtils.getTenantId())
+                .processDefinitionKey(key).latestVersion().singleResult();
+    }
+
+    @Override
     public String createProcessDefinition(Model model, BpmModelMetaInfoVO modelMetaInfo,
                                           byte[] bpmnBytes, String simpleJson, BpmFormDO form) {
         // 创建 Deployment 部署
