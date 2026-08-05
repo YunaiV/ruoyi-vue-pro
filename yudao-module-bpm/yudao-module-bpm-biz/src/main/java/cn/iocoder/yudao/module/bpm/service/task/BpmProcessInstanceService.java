@@ -183,9 +183,16 @@ public interface BpmProcessInstanceService {
     void processProcessInstanceCompleted(ProcessInstance instance);
 
     /**
-     * 处理 ProcessInstance 开始事件，例如说：流程前置通知
+     * 处理 ProcessInstance 创建事件，例如说：流程前置通知
      *
      * @param instance 流程任务
      */
     void processProcessInstanceCreated(ProcessInstance instance);
+
+    /**
+     * 处理 ProcessInstance 启动事件，与processProcessInstanceCreated的区别是：启动事件触发时，初始的流程变量已经set，可以使用流程变量
+     *
+     * @param instance 流程任务
+     */
+    void processProcessInstanceStarted(ProcessInstance instance);
 }

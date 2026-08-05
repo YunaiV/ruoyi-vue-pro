@@ -937,4 +937,15 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         });
     }
 
+    @Override
+    public void processProcessInstanceStarted(ProcessInstance instance) {
+        // 注意：需要基于 instance 设置租户编号，避免 Flowable 内部异步时，丢失租户编号
+        FlowableUtils.execute(instance.getTenantId(), () -> {
+            // 发送流程实例启动事件
+            processInstanceEventPublisher.sendProcessInstanceResultEvent(
+                    BpmProcessInstanceConvert.INSTANCE.buildProcessInstanceStatusEvent(
+                            this, instance,
+                            BpmProcessInstanceStatusEnum.STARTED.getStatus()));
+        });
+    }
 }

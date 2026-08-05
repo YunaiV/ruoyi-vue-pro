@@ -17,6 +17,7 @@ import java.util.Arrays;
 public enum BpmProcessInstanceStatusEnum implements ArrayValuable<Integer> {
 
     NOT_START(-1, "未开始"),
+    STARTED(0, "已启动"),
     RUNNING(1, "审批中"),
     APPROVE(2, "审批通过"),
     REJECT(3, "审批不通过"),

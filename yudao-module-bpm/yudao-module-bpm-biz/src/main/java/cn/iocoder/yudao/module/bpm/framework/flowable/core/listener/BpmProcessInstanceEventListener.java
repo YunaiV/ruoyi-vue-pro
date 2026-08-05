@@ -7,6 +7,7 @@ import org.flowable.common.engine.api.delegate.event.FlowableEngineEntityEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.AbstractFlowableEngineEventListener;
 import org.flowable.engine.delegate.event.FlowableCancelledEvent;
+import org.flowable.engine.delegate.event.FlowableProcessStartedEvent;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -23,6 +24,7 @@ public class BpmProcessInstanceEventListener extends AbstractFlowableEngineEvent
 
     public static final Set<FlowableEngineEventType> PROCESS_INSTANCE_EVENTS = ImmutableSet.<FlowableEngineEventType>builder()
             .add(FlowableEngineEventType.PROCESS_CREATED)
+            .add(FlowableEngineEventType.PROCESS_STARTED)
             .add(FlowableEngineEventType.PROCESS_COMPLETED)
             .add(FlowableEngineEventType.PROCESS_CANCELLED)
             .build();
@@ -38,6 +40,11 @@ public class BpmProcessInstanceEventListener extends AbstractFlowableEngineEvent
     @Override
     protected void processCreated(FlowableEngineEntityEvent event) {
         processInstanceService.processProcessInstanceCreated((ProcessInstance)event.getEntity());
+    }
+
+    @Override
+    protected void processStarted(FlowableProcessStartedEvent event) {
+        processInstanceService.processProcessInstanceStarted((ProcessInstance)event.getEntity());
     }
 
     @Override
