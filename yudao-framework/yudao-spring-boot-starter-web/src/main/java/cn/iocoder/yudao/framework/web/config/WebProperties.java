@@ -24,6 +24,7 @@ public class WebProperties {
     private Api adminApi = new Api("/admin-api", "**.controller.admin.**");
 
     @NotNull(message = "Admin UI 不能为空")
+    @Valid
     private Ui adminUi;
 
     @Data
@@ -54,7 +55,6 @@ public class WebProperties {
     }
 
     @Data
-    @Valid
     public static class Ui {
 
         /**
