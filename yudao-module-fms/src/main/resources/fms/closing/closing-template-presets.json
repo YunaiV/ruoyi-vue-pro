@@ -1,0 +1,458 @@
+[
+  {
+    "code": "daily-travel-reimbursement",
+    "name": "报销差旅费",
+    "category": "DAILY_EXPENSE",
+    "sort": 10,
+    "entries": [
+      {
+        "subjectCode": "560107",
+        "digest": "报销差旅费",
+        "direction": "DEBIT",
+        "amountRatio": 100
+      },
+      {
+        "subjectCode": "1001",
+        "digest": "报销差旅费",
+        "direction": "CREDIT",
+        "amountRatio": 100
+      }
+    ]
+  },
+  {
+    "code": "daily-telephone-expense",
+    "name": "报销电话费",
+    "category": "DAILY_EXPENSE",
+    "sort": 20,
+    "entries": [
+      {
+        "subjectCode": "560101",
+        "digest": "报销电话费",
+        "direction": "DEBIT",
+        "amountRatio": 100
+      },
+      {
+        "subjectCode": "1001",
+        "digest": "报销电话费",
+        "direction": "CREDIT",
+        "amountRatio": 100
+      }
+    ]
+  },
+  {
+    "code": "daily-bank-fee",
+    "name": "支付银行手续费",
+    "category": "DAILY_EXPENSE",
+    "sort": 30,
+    "entries": [
+      {
+        "subjectCode": "560303",
+        "digest": "支付银行手续费",
+        "direction": "DEBIT",
+        "amountRatio": 100
+      },
+      {
+        "subjectCode": "1002",
+        "digest": "支付银行手续费",
+        "direction": "CREDIT",
+        "amountRatio": 100
+      }
+    ]
+  },
+  {
+    "code": "daily-payroll",
+    "name": "支付工资",
+    "category": "DAILY_EXPENSE",
+    "sort": 40,
+    "entries": [
+      {
+        "subjectCode": "2211",
+        "digest": "支付工资",
+        "direction": "DEBIT",
+        "amountRatio": 100
+      },
+      {
+        "subjectCode": "1001",
+        "digest": "支付工资",
+        "direction": "CREDIT",
+        "amountRatio": 100
+      }
+    ]
+  },
+  {
+    "code": "daily-rent-utilities",
+    "name": "支付房租水电费",
+    "category": "DAILY_EXPENSE",
+    "sort": 50,
+    "entries": [
+      {
+        "subjectCode": "560102",
+        "digest": "支付房租水电费",
+        "direction": "DEBIT",
+        "amountRatio": 100
+      },
+      {
+        "subjectCode": "1001",
+        "digest": "支付房租水电费",
+        "direction": "CREDIT",
+        "amountRatio": 100
+      }
+    ]
+  },
+  {
+    "code": "daily-local-tax-payment",
+    "name": "缴纳地税款",
+    "category": "DAILY_EXPENSE",
+    "sort": 60,
+    "entries": [
+      {
+        "subjectCode": "222117",
+        "digest": "缴纳地税款",
+        "direction": "DEBIT",
+        "amountRatio": 100
+      },
+      {
+        "subjectCode": "1002",
+        "digest": "缴纳地税款",
+        "direction": "CREDIT",
+        "amountRatio": 100
+      }
+    ]
+  },
+  {
+    "code": "daily-income-tax-payment",
+    "name": "缴纳所得税",
+    "category": "DAILY_EXPENSE",
+    "sort": 70,
+    "entries": [
+      {
+        "subjectCode": "222111",
+        "digest": "缴纳所得税",
+        "direction": "DEBIT",
+        "amountRatio": 100
+      },
+      {
+        "subjectCode": "1002",
+        "digest": "缴纳所得税",
+        "direction": "CREDIT",
+        "amountRatio": 100
+      }
+    ]
+  },
+  {
+    "code": "daily-vat-payment",
+    "name": "缴纳增值税",
+    "category": "DAILY_EXPENSE",
+    "sort": 80,
+    "entries": [
+      {
+        "subjectCode": "222102",
+        "digest": "缴纳增值税",
+        "direction": "DEBIT",
+        "amountRatio": 100
+      },
+      {
+        "subjectCode": "1002",
+        "digest": "缴纳增值税",
+        "direction": "CREDIT",
+        "amountRatio": 100
+      }
+    ]
+  },
+  {
+    "code": "daily-interest-income",
+    "name": "利息收入",
+    "category": "DAILY_EXPENSE",
+    "sort": 90,
+    "entries": [
+      {
+        "subjectCode": "1002",
+        "digest": "利息收入",
+        "direction": "DEBIT",
+        "amountRatio": 100
+      },
+      {
+        "subjectCode": "560302",
+        "digest": "利息收入",
+        "direction": "CREDIT",
+        "amountRatio": 100
+      }
+    ]
+  },
+  {
+    "code": "daily-cash-withdrawal",
+    "name": "提现金",
+    "category": "DAILY_EXPENSE",
+    "sort": 100,
+    "entries": [
+      {
+        "subjectCode": "1002",
+        "digest": "提现金",
+        "direction": "DEBIT",
+        "amountRatio": 100
+      },
+      {
+        "subjectCode": "560302",
+        "digest": "提现金",
+        "direction": "CREDIT",
+        "amountRatio": 100
+      }
+    ]
+  },
+  {
+    "code": "daily-business-entertainment",
+    "name": "报销业务招待费用",
+    "category": "DAILY_EXPENSE",
+    "sort": 110,
+    "entries": [
+      {
+        "subjectCode": "1001",
+        "digest": "报销业务招待费用",
+        "direction": "DEBIT",
+        "amountRatio": 100
+      },
+      {
+        "subjectCode": "1002",
+        "digest": "报销业务招待费用",
+        "direction": "CREDIT",
+        "amountRatio": 100
+      }
+    ]
+  },
+  {
+    "code": "purchase-bank-payment",
+    "name": "采购商品（银行付款）",
+    "category": "PURCHASE_SALE",
+    "sort": 10,
+    "entries": [
+      {
+        "subjectCode": "1405",
+        "digest": "采购商品（银行付款）",
+        "direction": "DEBIT",
+        "amountRatio": 86
+      },
+      {
+        "subjectCode": "22210101",
+        "digest": "采购商品（银行付款）",
+        "direction": "DEBIT",
+        "amountRatio": 14
+      },
+      {
+        "subjectCode": "1002",
+        "digest": "采购商品（银行付款）",
+        "direction": "CREDIT",
+        "amountRatio": 100
+      }
+    ]
+  },
+  {
+    "code": "purchase-payable",
+    "name": "采购商品（应付款）",
+    "category": "PURCHASE_SALE",
+    "sort": 20,
+    "entries": [
+      {
+        "subjectCode": "1405",
+        "digest": "采购商品（应付款）",
+        "direction": "DEBIT",
+        "amountRatio": 86
+      },
+      {
+        "subjectCode": "22210101",
+        "digest": "采购商品（应付款）",
+        "direction": "DEBIT",
+        "amountRatio": 14
+      },
+      {
+        "subjectCode": "2202",
+        "digest": "采购商品（应付款）",
+        "direction": "CREDIT",
+        "amountRatio": 100
+      }
+    ]
+  },
+  {
+    "code": "sale-bank-receipt",
+    "name": "销售商品（银行收款）",
+    "category": "PURCHASE_SALE",
+    "sort": 30,
+    "entries": [
+      {
+        "subjectCode": "1002",
+        "digest": "销售商品（银行收款）",
+        "direction": "DEBIT",
+        "amountRatio": 100
+      },
+      {
+        "subjectCode": "5001",
+        "digest": "销售商品（银行收款）",
+        "direction": "CREDIT",
+        "amountRatio": 86
+      },
+      {
+        "subjectCode": "22210107",
+        "digest": "销售商品（银行收款）",
+        "direction": "CREDIT",
+        "amountRatio": 14
+      }
+    ]
+  },
+  {
+    "code": "sale-cash-receipt",
+    "name": "销售商品（现金收款）",
+    "category": "PURCHASE_SALE",
+    "sort": 40,
+    "entries": [
+      {
+        "subjectCode": "1001",
+        "digest": "销售商品（现金收款）",
+        "direction": "DEBIT",
+        "amountRatio": 100
+      },
+      {
+        "subjectCode": "5001",
+        "digest": "销售商品（现金收款）",
+        "direction": "CREDIT",
+        "amountRatio": 86
+      },
+      {
+        "subjectCode": "22210107",
+        "digest": "销售商品（现金收款）",
+        "direction": "CREDIT",
+        "amountRatio": 14
+      }
+    ]
+  },
+  {
+    "code": "sale-receivable",
+    "name": "销售商品（应收）",
+    "category": "PURCHASE_SALE",
+    "sort": 50,
+    "entries": [
+      {
+        "subjectCode": "1122",
+        "digest": "销售商品（应收）",
+        "direction": "DEBIT",
+        "amountRatio": 100
+      },
+      {
+        "subjectCode": "5001",
+        "digest": "销售商品（应收）",
+        "direction": "CREDIT",
+        "amountRatio": 86
+      },
+      {
+        "subjectCode": "22210107",
+        "digest": "销售商品（应收）",
+        "direction": "CREDIT",
+        "amountRatio": 14
+      }
+    ]
+  },
+  {
+    "code": "current-personal-loan",
+    "name": "个人借款",
+    "category": "CURRENT_ACCOUNT",
+    "sort": 10,
+    "entries": [
+      {
+        "subjectCode": "1221",
+        "digest": "个人借款",
+        "direction": "DEBIT",
+        "amountRatio": 100
+      },
+      {
+        "subjectCode": "1001",
+        "digest": "个人借款",
+        "direction": "CREDIT",
+        "amountRatio": 100
+      }
+    ]
+  },
+  {
+    "code": "current-personal-repayment",
+    "name": "个人还款",
+    "category": "CURRENT_ACCOUNT",
+    "sort": 20,
+    "entries": [
+      {
+        "subjectCode": "1001",
+        "digest": "个人还款",
+        "direction": "DEBIT",
+        "amountRatio": 100
+      },
+      {
+        "subjectCode": "1221",
+        "digest": "个人还款",
+        "direction": "CREDIT",
+        "amountRatio": 100
+      }
+    ]
+  },
+  {
+    "code": "current-receive-payment",
+    "name": "收货款",
+    "category": "CURRENT_ACCOUNT",
+    "sort": 30,
+    "entries": [
+      {
+        "subjectCode": "1002",
+        "digest": "收货款",
+        "direction": "DEBIT",
+        "amountRatio": 100
+      },
+      {
+        "subjectCode": "1122",
+        "digest": "收货款",
+        "direction": "CREDIT",
+        "amountRatio": 100
+      }
+    ]
+  },
+  {
+    "code": "current-pay-supplier",
+    "name": "支付货款",
+    "category": "CURRENT_ACCOUNT",
+    "sort": 40,
+    "entries": [
+      {
+        "subjectCode": "2202",
+        "digest": "支付货款",
+        "direction": "DEBIT",
+        "amountRatio": 100
+      },
+      {
+        "subjectCode": "1002",
+        "digest": "支付货款",
+        "direction": "CREDIT",
+        "amountRatio": 100
+      }
+    ]
+  },
+  {
+    "code": "transfer-accrue-payroll",
+    "name": "计提工资",
+    "category": "TRANSFER_BUSINESS",
+    "sort": 10,
+    "entries": [
+      {
+        "subjectCode": "560110",
+        "digest": "计提工资",
+        "direction": "DEBIT",
+        "amountRatio": 15
+      },
+      {
+        "subjectCode": "560209",
+        "digest": "计提工资",
+        "direction": "DEBIT",
+        "amountRatio": 85
+      },
+      {
+        "subjectCode": "2211",
+        "digest": "计提工资",
+        "direction": "CREDIT",
+        "amountRatio": 100
+      }
+    ]
+  }
+]

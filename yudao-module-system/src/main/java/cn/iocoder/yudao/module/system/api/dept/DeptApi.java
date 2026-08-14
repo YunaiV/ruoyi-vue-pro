@@ -1,9 +1,11 @@
 package cn.iocoder.yudao.module.system.api.dept;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -46,6 +48,9 @@ public interface DeptApi {
      * @return 部门 Map
      */
     default Map<Long, DeptRespDTO> getDeptMap(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyMap();
+        }
         List<DeptRespDTO> list = getDeptList(ids);
         return CollectionUtils.convertMap(list, DeptRespDTO::getId);
     }
@@ -56,6 +61,26 @@ public interface DeptApi {
      * @param id 部门编号
      * @return 子部门列表
      */
-    List<DeptRespDTO> getChildDeptList(Long id);
+    default List<DeptRespDTO> getChildDeptList(Long id) {
+        return getChildDeptList(Collections.singleton(id));
+    }
+
+    /**
+     * 获得指定部门的所有子部门
+     *
+     * @param ids 部门编号数组
+     * @return 子部门列表
+     */
+    List<DeptRespDTO> getChildDeptList(Collection<Long> ids);
+
+    /**
+     * 获得指定部门的所有父部门
+     *
+     * 按直属父部门到根部门的顺序返回，不包含指定部门自身。
+     *
+     * @param id 部门编号
+     * @return 父部门列表
+     */
+    List<DeptRespDTO> getParentDeptList(Long id);
 
 }

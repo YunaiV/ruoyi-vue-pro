@@ -2,10 +2,12 @@ package cn.iocoder.yudao.framework.common.util.number;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.NumberUtil;
+import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * 数字的工具类，补全 {@link cn.hutool.core.util.NumberUtil} 的功能
@@ -14,12 +16,43 @@ import java.util.List;
  */
 public class NumberUtils {
 
+    private static final Pattern FIRST_BIG_DECIMAL_PATTERN = Pattern.compile("-?\\d+(?:\\.\\d+)?");
+
+    /**
+     * 一百，用于百分数和比例计算
+     */
+    public static final BigDecimal ONE_HUNDRED = new BigDecimal("100");
+
     public static Long parseLong(String str) {
         return StrUtil.isNotEmpty(str) ? Long.valueOf(str) : null;
     }
 
     public static Integer parseInt(String str) {
         return StrUtil.isNotEmpty(str) ? Integer.valueOf(str) : null;
+    }
+
+    /**
+     * 获得数字，为 null 时返回 {@link BigDecimal#ZERO}
+     *
+     * @param value 数字
+     * @return 数字
+     */
+    public static BigDecimal zeroIfNull(BigDecimal value) {
+        return value == null ? BigDecimal.ZERO : value;
+    }
+
+    /**
+     * 从文本中解析首个数字
+     *
+     * @param text 文本
+     * @return 数字；不存在时返回 {@link BigDecimal#ZERO}
+     */
+    public static BigDecimal parseFirstBigDecimal(String text) {
+        if (StrUtil.isEmpty(text)) {
+            return BigDecimal.ZERO;
+        }
+        String number = ReUtil.getGroup0(FIRST_BIG_DECIMAL_PATTERN, text.replace(",", ""));
+        return NumberUtil.toBigDecimal(number);
     }
 
     public static boolean isAllNumber(List<String> values) {
