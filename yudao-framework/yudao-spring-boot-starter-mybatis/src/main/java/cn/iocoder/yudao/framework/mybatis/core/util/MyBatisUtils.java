@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * MyBatis 工具类
@@ -177,6 +179,28 @@ public class MyBatisUtils {
      */
     public static String findInSetWithParamIndex(String columnName, int paramIndex) {
         return findInSet(columnName, paramIndex);
+    }
+
+    /**
+     * 跨数据库的 find_in_set 实现，适用于同一字段匹配多个参数的场景
+     *
+     * 每个参数生成一个 find_in_set 条件，并使用 OR 连接。
+     *
+     * @param columnName 字段名称
+     * @param values 参数集合
+     * @return sql
+     */
+    public static String findInSet(String columnName, Collection<?> values) {
+        return findInSet(JdbcUtils.getDbType(), columnName, values);
+    }
+
+    static String findInSet(DbType dbType, String columnName, Collection<?> values) {
+        if (CollUtil.isEmpty(values)) {
+            throw new IllegalArgumentException("Values cannot be empty");
+        }
+        return IntStream.range(0, values.size())
+                .mapToObj(index -> findInSet(dbType, columnName, index))
+                .collect(Collectors.joining(" OR "));
     }
 
     private static String findInSet(String columnName, int paramIndex) {

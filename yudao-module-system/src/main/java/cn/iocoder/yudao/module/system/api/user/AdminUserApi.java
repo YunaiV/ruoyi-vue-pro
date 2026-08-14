@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.system.api.user;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 
@@ -22,6 +23,14 @@ public interface AdminUserApi {
      * @return 用户对象信息
      */
     AdminUserRespDTO getUser(Long id);
+
+    /**
+     * 通过手机号查询用户
+     *
+     * @param mobile 手机号
+     * @return 用户对象信息
+     */
+    AdminUserRespDTO getUserByMobile(String mobile);
 
     /**
      * 通过用户 ID 查询用户下属
@@ -70,6 +79,9 @@ public interface AdminUserApi {
      * @return 用户 Map
      */
     default Map<Long, AdminUserRespDTO> getUserMap(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyMap();
+        }
         List<AdminUserRespDTO> users = getUserList(ids);
         return CollectionUtils.convertMap(users, AdminUserRespDTO::getId);
     }

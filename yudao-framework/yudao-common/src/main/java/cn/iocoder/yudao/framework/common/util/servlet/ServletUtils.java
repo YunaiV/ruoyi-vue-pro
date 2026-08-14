@@ -2,6 +2,7 @@ package cn.iocoder.yudao.framework.common.util.servlet;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.servlet.JakartaServletUtil;
+import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,6 +12,7 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -100,6 +102,13 @@ public class ServletUtils {
 
     public static Map<String, String> getHeaderMap(HttpServletRequest request) {
         return JakartaServletUtil.getHeaderMap(request);
+    }
+
+    public static void writeAttachment(HttpServletResponse response, String filename, byte[] content)
+            throws IOException {
+        response.getOutputStream().write(content);
+        response.addHeader("Content-Disposition", "attachment;filename=" + HttpUtils.encodeUtf8(filename));
+        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
     }
 
 }
