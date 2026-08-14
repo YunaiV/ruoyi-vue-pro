@@ -584,7 +584,7 @@ CREATE TABLE IF NOT EXISTS "fms_closing_template" (
 );
 
 ALTER TABLE "fms_closing_template"
-    ADD "unique_active" int GENERATED ALWAYS AS (CASE WHEN "deleted" = FALSE THEN 1 ELSE NULL END);
+    ADD IF NOT EXISTS "unique_active" int GENERATED ALWAYS AS (CASE WHEN "deleted" = FALSE THEN 1 ELSE NULL END);
 CREATE UNIQUE INDEX IF NOT EXISTS "uk_fms_closing_template_active"
     ON "fms_closing_template" ("account_set_id", "preset_code", "unique_active", "tenant_id");
 

@@ -8,7 +8,11 @@ import cn.iocoder.yudao.module.fms.controller.admin.report.vo.FmsReportListReqVO
 import cn.iocoder.yudao.module.fms.dal.dataobject.config.FmsAccountSetDO;
 import cn.iocoder.yudao.module.fms.service.closing.FmsClosingPeriodService;
 import cn.iocoder.yudao.module.fms.service.config.FmsAccountSetService;
+import cn.iocoder.yudao.module.fms.service.config.FmsFinanceIndicatorService;
+import cn.iocoder.yudao.module.fms.service.config.FmsSubjectService;
+import cn.iocoder.yudao.module.fms.service.report.FmsBalanceSheetService;
 import cn.iocoder.yudao.module.fms.service.report.FmsIncomeStatementService;
+import cn.iocoder.yudao.module.fms.service.report.FmsReportCommonService;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
@@ -26,6 +30,7 @@ import static cn.iocoder.yudao.module.fms.enums.ErrorCodeConstants.ACCOUNT_SET_N
 import static cn.iocoder.yudao.module.fms.enums.ErrorCodeConstants.HOME_METRIC_INVALID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -42,6 +47,14 @@ public class FmsHomeServiceImplTest extends BaseDbUnitTest {
     private FmsClosingPeriodService closingPeriodService;
     @MockitoBean
     private FmsIncomeStatementService incomeStatementService;
+    @MockitoBean
+    private FmsBalanceSheetService balanceSheetService;
+    @MockitoBean
+    private FmsReportCommonService reportCommonService;
+    @MockitoBean
+    private FmsSubjectService subjectService;
+    @MockitoBean
+    private FmsFinanceIndicatorService financeIndicatorService;
 
     @Test
     public void testGetHome_success() {
@@ -52,6 +65,8 @@ public class FmsHomeServiceImplTest extends BaseDbUnitTest {
                 .thenReturn(accountSet);
         when(closingPeriodService.getCurrentMonth(1L, accountSet.getStartTime()))
                 .thenReturn(YearMonth.of(2026, 8));
+        when(reportCommonService.isLineFormula(anyString()))
+                .thenAnswer(invocation -> invocation.getArgument(0, String.class).contains("L"));
         when(incomeStatementService.getIncomeStatement(any(FmsReportListReqVO.class), eq(10L)))
                 .thenAnswer(invocation -> buildIncomeStatement(
                         invocation.<FmsReportListReqVO>getArgument(0).getStartMonth()));
@@ -82,6 +97,8 @@ public class FmsHomeServiceImplTest extends BaseDbUnitTest {
                 .thenReturn(accountSet);
         when(closingPeriodService.getCurrentMonth(1L, accountSet.getStartTime()))
                 .thenReturn(YearMonth.of(2026, 8));
+        when(reportCommonService.isLineFormula(anyString()))
+                .thenAnswer(invocation -> invocation.getArgument(0, String.class).contains("L"));
         when(incomeStatementService.getIncomeStatement(any(FmsReportListReqVO.class), eq(10L)))
                 .thenAnswer(invocation -> buildMetricIncomeStatement(
                         invocation.<FmsReportListReqVO>getArgument(0).getStartMonth()));
@@ -99,7 +116,7 @@ public class FmsHomeServiceImplTest extends BaseDbUnitTest {
         assertEquals(new BigDecimal("80.00"), result.getStructure().get(0).getAmount());
         assertEquals("5051", result.getStructure().get(1).getSubjectCode());
         assertEquals(new BigDecimal("20.00"), result.getStructure().get(1).getAmount());
-        verify(incomeStatementService, times(8)).getIncomeStatement(any(FmsReportListReqVO.class), eq(10L));
+        verify(incomeStatementService, times(9)).getIncomeStatement(any(FmsReportListReqVO.class), eq(10L));
     }
 
     @Test
@@ -133,6 +150,8 @@ public class FmsHomeServiceImplTest extends BaseDbUnitTest {
         when(accountSetService.validateAccountSetReadPermission(1L, 10L)).thenReturn(accountSet);
         when(closingPeriodService.getCurrentMonth(1L, accountSet.getStartTime()))
                 .thenReturn(YearMonth.of(2026, 8));
+        when(reportCommonService.isLineFormula(anyString()))
+                .thenAnswer(invocation -> invocation.getArgument(0, String.class).contains("L"));
         when(incomeStatementService.getIncomeStatement(any(FmsReportListReqVO.class), eq(10L)))
                 .thenReturn(Arrays.asList(
                         new FmsReportItemRespVO().setRowNo(1).setCurrentAmount(new BigDecimal("100.00"))
