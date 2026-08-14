@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -126,6 +127,14 @@ public class MyBatisUtilsTest {
     public void testFindInSet_invalidParamIndex() {
         assertThrows(IllegalArgumentException.class,
                 () -> MyBatisUtils.findInSet(DbType.MYSQL, "websites", -1));
+    }
+
+    @Test
+    public void testFindInSet_multipleValues() {
+        assertEquals("FIND_IN_SET({0}, tag_ids) <> 0 OR FIND_IN_SET({1}, tag_ids) <> 0",
+                MyBatisUtils.findInSet(DbType.MYSQL, "tag_ids", Arrays.asList(1L, 2L)));
+        assertThrows(IllegalArgumentException.class,
+                () -> MyBatisUtils.findInSet(DbType.MYSQL, "tag_ids", Collections.emptyList()));
     }
 
     @Test

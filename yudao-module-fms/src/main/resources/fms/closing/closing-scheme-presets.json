@@ -1,0 +1,114 @@
+[
+  {
+    "code": "profit-loss",
+    "name": "结转损益",
+    "closingType": "PROFIT_LOSS",
+    "digest": "结转本期损益",
+    "periodEnd": true,
+    "closingDay": 31,
+    "voucherType": "COMBINED_GAIN_AND_LOSS",
+    "reverseBalance": true,
+    "priorYearAdjustmentSubject": "PRIOR_YEAR_ADJUSTMENT",
+    "adjustmentClosingSubject": "PRIOR_YEAR_ADJUSTMENT_CLOSING",
+    "otherClosingSubject": "CURRENT_YEAR_PROFIT",
+    "entries": []
+  },
+  {
+    "code": "unpaid-vat",
+    "name": "转出未交增值税",
+    "closingType": "UNPAID_VAT",
+    "digest": "转出未交增值税",
+    "periodEnd": true,
+    "closingDay": 31,
+    "calculationSubjects": [
+      "VAT_PAYABLE"
+    ],
+    "entries": [
+      {
+        "subject": "UNPAID_VAT",
+        "digest": "转出未交增值税",
+        "direction": "DEBIT",
+        "amountRatio": 100
+      },
+      {
+        "subject": "OUTPUT_VAT",
+        "digest": "转出未交增值税",
+        "direction": "CREDIT",
+        "amountRatio": 100
+      }
+    ]
+  },
+  {
+    "code": "local-tax",
+    "name": "计提地税",
+    "closingType": "LOCAL_TAX",
+    "digest": "计提地税",
+    "periodEnd": true,
+    "closingDay": 31,
+    "calculationSubjects": [
+      "VAT_PAYABLE",
+      "CONSUMPTION_TAX"
+    ],
+    "entries": [
+      {
+        "subject": "EDUCATION_SURCHARGE",
+        "digest": "计提教育费附加",
+        "direction": "DEBIT",
+        "amountRatio": 3
+      },
+      {
+        "subject": "EDUCATION_SURCHARGE_PAYABLE",
+        "digest": "计提教育费附加",
+        "direction": "CREDIT",
+        "amountRatio": 3
+      },
+      {
+        "subject": "CITY_MAINTENANCE_TAX",
+        "digest": "计提城建费",
+        "direction": "DEBIT",
+        "amountRatio": 7
+      },
+      {
+        "subject": "CITY_MAINTENANCE_TAX_PAYABLE",
+        "digest": "计提城建费",
+        "direction": "CREDIT",
+        "amountRatio": 7
+      },
+      {
+        "subject": "LOCAL_EDUCATION_SURCHARGE",
+        "digest": "计提地方教育费附加",
+        "direction": "DEBIT",
+        "amountRatio": 2
+      },
+      {
+        "subject": "LOCAL_EDUCATION_SURCHARGE_PAYABLE",
+        "digest": "计提地方教育费附加",
+        "direction": "CREDIT",
+        "amountRatio": 2
+      }
+    ]
+  },
+  {
+    "code": "income-tax",
+    "name": "计提所得税",
+    "closingType": "INCOME_TAX",
+    "digest": "计提所得税",
+    "periodEnd": true,
+    "closingDay": 31,
+    "calculationSubjects": [],
+    "entries": [
+      {
+        "subject": "INCOME_TAX_EXPENSE",
+        "digest": "计提所得税",
+        "direction": "DEBIT",
+        "amountRatio": 25
+      },
+      {
+        "subject": "INCOME_TAX_PAYABLE",
+        "digest": "计提所得税",
+        "direction": "CREDIT",
+        "amountRatio": 25
+      }
+    ]
+  }
+]

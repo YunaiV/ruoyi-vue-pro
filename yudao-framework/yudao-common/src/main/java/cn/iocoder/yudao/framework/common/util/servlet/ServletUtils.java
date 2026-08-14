@@ -120,4 +120,11 @@ public class ServletUtils {
         return ServletUtil.getHeaderMap(request);
     }
 
+    public static void writeAttachment(HttpServletResponse response, String filename, byte[] content)
+            throws IOException {
+        response.getOutputStream().write(content);
+        response.addHeader("Content-Disposition", "attachment;filename=" + HttpUtils.encodeUtf8(filename));
+        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+    }
+
 }

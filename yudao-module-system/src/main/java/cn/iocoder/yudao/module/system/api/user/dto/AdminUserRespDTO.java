@@ -41,6 +41,14 @@ public class AdminUserRespDTO {
      */
     private String mobile;
     /**
+     * 用户邮箱
+     */
+    private String email;
+    /**
+     * 用户性别
+     */
+    private Integer sex;
+    /**
      * 用户头像
      */
     private String avatar;

@@ -41,6 +41,13 @@ public class AdminUserApiImpl implements AdminUserApi {
     }
 
     @Override
+    @DataPermission(enable = false) // 忽略数据权限，指定手机号的 API 查询用于跨模块数据拼接
+    public AdminUserRespDTO getUserByMobile(String mobile) {
+        AdminUserDO user = userService.getUserByMobile(mobile);
+        return BeanUtils.toBean(user, AdminUserRespDTO.class);
+    }
+
+    @Override
     public List<AdminUserRespDTO> getUserListBySubordinate(Long id) {
         // 1.1 获取用户负责的部门
         List<DeptDO> depts = deptService.getDeptListByLeaderUserId(id);

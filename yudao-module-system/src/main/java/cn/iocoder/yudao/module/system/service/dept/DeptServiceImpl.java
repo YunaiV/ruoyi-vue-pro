@@ -204,6 +204,29 @@ public class DeptServiceImpl implements DeptService {
     }
 
     @Override
+    public List<DeptDO> getParentDeptList(Long id) {
+        List<DeptDO> parents = new ArrayList<>();
+        Set<Long> visitedDeptIds = new HashSet<>();
+        visitedDeptIds.add(id);
+        DeptDO dept = getDept(id);
+        // TODO DONE @AI：使用 Short.MAX_VALUE 限制父链遍历次数，并通过已访问集合提前结束脏数据环路。
+        for (int i = 0; i < Short.MAX_VALUE; i++) {
+            if (dept == null || dept.getParentId() == null
+                    || ObjectUtil.equal(dept.getParentId(), DeptDO.PARENT_ID_ROOT)
+                    || visitedDeptIds.contains(dept.getParentId())) {
+                break;
+            }
+            visitedDeptIds.add(dept.getParentId());
+            dept = getDept(dept.getParentId());
+            if (dept == null) {
+                break;
+            }
+            parents.add(dept);
+        }
+        return parents;
+    }
+
+    @Override
     public List<DeptDO> getDeptListByLeaderUserId(Long id) {
         return deptMapper.selectListByLeaderUserId(id);
     }
