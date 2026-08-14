@@ -35,11 +35,11 @@ import cn.iocoder.yudao.module.fms.service.config.FmsSubjectService;
 import cn.iocoder.yudao.module.fms.service.config.FmsVoucherWordService;
 import cn.iocoder.yudao.module.fms.controller.admin.voucher.vo.FmsVoucherImportRespVO;
 import cn.iocoder.yudao.module.fms.controller.admin.voucher.vo.FmsVoucherImportExcelVO;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -68,21 +68,21 @@ public class FmsVoucherServiceImplTest extends BaseDbUnitTest {
     @Resource
     private FmsVoucherEntryMapper voucherEntryMapper;
 
-    @MockitoBean
+    @MockBean
     private FmsAccountSetService accountSetService;
-    @MockitoBean
+    @MockBean
     private FmsClosingPeriodService closingPeriodService;
-    @MockitoBean
+    @MockBean
     private FmsClosingVoucherService closingVoucherService;
-    @MockitoBean
+    @MockBean
     private FmsVoucherWordService voucherWordService;
-    @MockitoBean
+    @MockBean
     private FmsSubjectService subjectService;
-    @MockitoBean
+    @MockBean
     private FmsAuxiliaryItemService auxiliaryItemService;
-    @MockitoBean
+    @MockBean
     private FmsAuxiliaryTypeService auxiliaryTypeService;
-    @MockitoBean
+    @MockBean
     private FmsAuxiliaryCombinationService auxiliaryCombinationService;
 
     private FmsSubjectDO cashSubject;

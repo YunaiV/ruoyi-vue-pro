@@ -11,11 +11,11 @@ import cn.iocoder.yudao.module.hrm.enums.employee.config.HrmEmployeeCreateFieldE
 import cn.iocoder.yudao.module.hrm.enums.employee.info.HrmEmployeeEntryStatusEnum;
 import cn.iocoder.yudao.module.hrm.service.config.HrmConfigService;
 import cn.iocoder.yudao.module.hrm.enums.config.HrmConfigTypeEnum;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -43,7 +43,7 @@ public class HrmEmployeeFieldConfigServiceImplTest extends BaseDbUnitTest {
     @Resource
     private HrmEmployeeFieldConfigServiceImpl employeeFieldConfigService;
 
-    @MockitoBean
+    @MockBean
     private HrmConfigService configService;
 
     @Test

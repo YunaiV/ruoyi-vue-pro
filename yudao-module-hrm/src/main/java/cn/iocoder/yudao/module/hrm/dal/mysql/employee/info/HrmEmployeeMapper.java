@@ -238,7 +238,7 @@ public interface HrmEmployeeMapper extends BaseMapperX<HrmEmployeeDO> {
      * 追加员工状态筛选条件。状态页签包含入职状态与员工状态的组合语义；
      * 未选择页签时，使用请求中的原始入职状态和员工状态条件。
      */
-    private void appendStatusCategory(MPJLambdaWrapperX<HrmEmployeeDO> queryWrapper, HrmEmployeePageReqVO reqVO) {
+    default void appendStatusCategory(MPJLambdaWrapperX<HrmEmployeeDO> queryWrapper, HrmEmployeePageReqVO reqVO) {
         Integer statusCategory = reqVO.getStatusCategory();
         if (statusCategory == null) {
             queryWrapper.eqIfPresent(HrmEmployeeDO::getEntryStatus, reqVO.getEntryStatus())
@@ -266,7 +266,7 @@ public interface HrmEmployeeMapper extends BaseMapperX<HrmEmployeeDO> {
     /**
      * 追加当月员工待办筛选条件。
      */
-    private void appendTodoType(MPJLambdaWrapperX<HrmEmployeeDO> query, HrmEmployeePageReqVO reqVO) {
+    default void appendTodoType(MPJLambdaWrapperX<HrmEmployeeDO> query, HrmEmployeePageReqVO reqVO) {
         Integer todoType = reqVO.getTodoType();
         if (todoType == null) {
             return;
@@ -298,7 +298,7 @@ public interface HrmEmployeeMapper extends BaseMapperX<HrmEmployeeDO> {
     /**
      * 追加当月首页员工概览筛选条件。
      */
-    private void appendSurveyType(MPJLambdaWrapperX<HrmEmployeeDO> query, HrmEmployeePageReqVO reqVO) {
+    default void appendSurveyType(MPJLambdaWrapperX<HrmEmployeeDO> query, HrmEmployeePageReqVO reqVO) {
         Integer surveyType = reqVO.getSurveyType();
         if (surveyType == null) {
             return;
@@ -328,7 +328,7 @@ public interface HrmEmployeeMapper extends BaseMapperX<HrmEmployeeDO> {
     /**
      * 根据当月生效的指定异动记录筛选员工。
      */
-    private void appendChangeRecordSurvey(MPJLambdaWrapperX<HrmEmployeeDO> query, Integer changeType,
+    default void appendChangeRecordSurvey(MPJLambdaWrapperX<HrmEmployeeDO> query, Integer changeType,
                                           LocalDateTime[] monthTimes) {
         query.innerJoin(HrmEmployeeChangeRecordDO.class, HrmEmployeeChangeRecordDO::getEmployeeId,
                         HrmEmployeeDO::getId)
@@ -337,7 +337,7 @@ public interface HrmEmployeeMapper extends BaseMapperX<HrmEmployeeDO> {
         query.betweenIfPresent(HrmEmployeeChangeRecordDO::getEffectTime, monthTimes);
     }
 
-    private MPJLambdaWrapperX<HrmEmployeeDO> buildQueryWrapper(HrmEmployeePageReqVO reqVO) {
+    default MPJLambdaWrapperX<HrmEmployeeDO> buildQueryWrapper(HrmEmployeePageReqVO reqVO) {
         MPJLambdaWrapperX<HrmEmployeeDO> query = new MPJLambdaWrapperX<HrmEmployeeDO>()
                 .inIfPresent(HrmEmployeeDO::getId, reqVO.getIds())
                 .likeIfPresent(HrmEmployeeDO::getName, reqVO.getName())

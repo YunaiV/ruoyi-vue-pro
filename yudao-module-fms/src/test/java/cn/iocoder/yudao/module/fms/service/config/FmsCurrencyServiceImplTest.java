@@ -9,10 +9,10 @@ import cn.iocoder.yudao.module.fms.dal.mysql.config.FmsCurrencyMapper;
 import cn.iocoder.yudao.module.fms.enums.config.FmsCurrencyPresetEnum;
 import cn.iocoder.yudao.module.fms.service.config.FmsAccountSetService;
 import cn.iocoder.yudao.module.fms.service.config.FmsSubjectService;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -38,9 +38,9 @@ public class FmsCurrencyServiceImplTest extends BaseDbUnitTest {
     @Resource
     private FmsCurrencyMapper currencyMapper;
 
-    @MockitoBean
+    @MockBean
     private FmsAccountSetService accountSetService;
-    @MockitoBean
+    @MockBean
     private FmsSubjectService subjectService;
 
     @Test

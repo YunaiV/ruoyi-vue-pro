@@ -35,7 +35,7 @@ import cn.iocoder.yudao.module.hrm.enums.attendance.config.HrmAttendanceLateEarl
 import cn.iocoder.yudao.module.hrm.enums.attendance.statistics.HrmAttendanceResultEnum;
 import cn.iocoder.yudao.module.hrm.service.employee.info.HrmEmployeeService;
 import com.google.common.annotations.VisibleForTesting;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.stereotype.Service;

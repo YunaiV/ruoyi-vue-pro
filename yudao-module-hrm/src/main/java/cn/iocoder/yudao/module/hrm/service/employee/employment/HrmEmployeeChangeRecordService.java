@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.hrm.service.employee.employment;
 
 import cn.iocoder.yudao.module.hrm.controller.admin.employee.vo.changerecord.HrmEmployeeChangeRecordCreateReqVO;
 import cn.iocoder.yudao.module.hrm.dal.dataobject.employee.employment.HrmEmployeeChangeRecordDO;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 
 import java.time.LocalDateTime;
 import java.util.Collection;

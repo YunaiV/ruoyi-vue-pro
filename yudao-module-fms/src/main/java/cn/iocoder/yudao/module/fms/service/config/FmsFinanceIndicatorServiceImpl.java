@@ -12,7 +12,7 @@ import cn.iocoder.yudao.module.fms.dal.dataobject.config.FmsFinanceIndicatorDO;
 import cn.iocoder.yudao.module.fms.dal.dataobject.config.FmsSubjectDO;
 import cn.iocoder.yudao.module.fms.dal.mysql.config.FmsFinanceIndicatorMapper;
 import cn.iocoder.yudao.module.fms.service.report.FmsReportCommonService;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import lombok.Data;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;

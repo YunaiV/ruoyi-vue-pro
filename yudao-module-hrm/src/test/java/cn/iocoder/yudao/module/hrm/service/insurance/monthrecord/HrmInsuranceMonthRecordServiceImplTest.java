@@ -7,10 +7,10 @@ import cn.iocoder.yudao.module.hrm.dal.dataobject.insurance.monthrecord.HrmInsur
 import cn.iocoder.yudao.module.hrm.dal.mysql.insurance.monthrecord.HrmInsuranceMonthRecordMapper;
 import cn.iocoder.yudao.module.hrm.enums.insurance.employee.HrmInsuranceEmployeeStatusEnum;
 import cn.iocoder.yudao.module.hrm.enums.insurance.monthrecord.HrmInsuranceMonthStatusEnum;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -42,7 +42,7 @@ public class HrmInsuranceMonthRecordServiceImplTest extends BaseDbUnitTest {
     @Resource
     private HrmInsuranceMonthRecordMapper monthRecordMapper;
 
-    @MockitoBean
+    @MockBean
     private HrmInsuranceMonthEmployeeRecordService monthEmployeeRecordService;
 
     @Test

@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.hrm.controller.admin.salary.vo.slip.template;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import lombok.Data;
 
 import java.util.List;

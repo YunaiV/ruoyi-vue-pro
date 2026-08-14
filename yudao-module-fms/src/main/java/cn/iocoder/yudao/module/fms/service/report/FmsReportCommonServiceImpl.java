@@ -25,7 +25,7 @@ import cn.iocoder.yudao.module.fms.service.closing.FmsClosingVoucherService;
 import cn.iocoder.yudao.module.fms.service.config.FmsSubjectService;
 import cn.iocoder.yudao.module.fms.service.ledger.FmsLedgerService;
 import cn.iocoder.yudao.module.fms.service.voucher.FmsVoucherService;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;

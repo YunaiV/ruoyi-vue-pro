@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.hrm.controller.admin.performance.vo.resulttemplat
 import cn.iocoder.yudao.module.hrm.controller.admin.performance.vo.resulttemplate.HrmPerformanceResultTemplateSaveReqVO;
 import cn.iocoder.yudao.module.hrm.dal.dataobject.performance.config.HrmPerformanceResultTemplateDO;
 import cn.iocoder.yudao.module.hrm.dal.mysql.performance.config.HrmPerformanceResultTemplateMapper;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

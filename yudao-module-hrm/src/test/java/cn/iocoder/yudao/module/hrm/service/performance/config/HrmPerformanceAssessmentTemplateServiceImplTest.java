@@ -9,10 +9,10 @@ import cn.iocoder.yudao.module.hrm.controller.admin.performance.vo.assessmenttem
 import cn.iocoder.yudao.module.hrm.dal.dataobject.performance.config.HrmPerformanceAssessmentTemplateDO;
 import cn.iocoder.yudao.module.hrm.dal.mysql.performance.config.HrmPerformanceAssessmentTemplateMapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -46,7 +46,7 @@ public class HrmPerformanceAssessmentTemplateServiceImplTest extends BaseDbUnitT
     @Resource
     private HrmPerformanceAssessmentTemplateMapper assessmentTemplateMapper;
 
-    @MockitoBean
+    @MockBean
     private HrmPerformancePlanService performancePlanService;
 
     @Test

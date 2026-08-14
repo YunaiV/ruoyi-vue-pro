@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.hrm.controller.admin.insurance.vo.standard;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 @Schema(description = "管理后台 - HRM 标准参保类型列表 Request VO")

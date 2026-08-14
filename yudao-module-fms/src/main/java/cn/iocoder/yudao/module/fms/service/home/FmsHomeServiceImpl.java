@@ -23,7 +23,7 @@ import cn.iocoder.yudao.module.fms.service.config.FmsSubjectService;
 import cn.iocoder.yudao.module.fms.service.report.FmsBalanceSheetService;
 import cn.iocoder.yudao.module.fms.service.report.FmsIncomeStatementService;
 import cn.iocoder.yudao.module.fms.service.report.FmsReportCommonService;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 

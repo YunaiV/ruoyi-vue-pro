@@ -9,10 +9,10 @@ import cn.iocoder.yudao.module.hrm.dal.mysql.employee.employment.HrmEmployeeCont
 import cn.iocoder.yudao.module.hrm.dal.mysql.employee.info.HrmEmployeeMapper;
 import cn.iocoder.yudao.module.hrm.enums.employee.employment.HrmEmployeeContractStatusEnum;
 import cn.iocoder.yudao.module.hrm.enums.employee.info.HrmEmployeeEntryStatusEnum;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -44,7 +44,7 @@ public class HrmEmployeeContractServiceImplTest extends BaseDbUnitTest {
     @Resource
     private HrmEmployeeMapper employeeMapper;
 
-    @MockitoBean
+    @MockBean
     private HrmEmployeeService employeeService;
 
     @Test

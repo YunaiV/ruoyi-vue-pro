@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.hrm.dal.dataobject.salary.employee.HrmSalaryChang
 import cn.iocoder.yudao.module.hrm.dal.mysql.salary.employee.HrmSalaryChangeRecordMapper;
 import cn.iocoder.yudao.module.hrm.enums.salary.employee.HrmSalaryChangeRecordStatusEnum;
 import cn.iocoder.yudao.module.hrm.enums.salary.employee.HrmSalaryChangeRecordTypeEnum;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 

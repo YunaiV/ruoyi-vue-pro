@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.fms.service.config;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.fms.dal.dataobject.config.FmsAuxiliaryCombinationDO;
 import cn.iocoder.yudao.module.fms.dal.mysql.config.FmsAuxiliaryCombinationMapper;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 

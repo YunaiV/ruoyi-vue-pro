@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.hrm.controller.admin.attendance.vo.group.HrmAtten
 import cn.iocoder.yudao.module.hrm.controller.admin.attendance.vo.group.HrmAttendanceGroupSaveReqVO;
 import cn.iocoder.yudao.module.hrm.dal.dataobject.attendance.config.HrmAttendanceGroupDO;
 import cn.iocoder.yudao.module.hrm.dal.dataobject.attendance.config.HrmAttendanceHolidayDO;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

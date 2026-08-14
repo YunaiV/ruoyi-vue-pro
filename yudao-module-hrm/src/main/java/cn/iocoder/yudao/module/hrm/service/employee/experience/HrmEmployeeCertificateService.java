@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.hrm.service.employee.experience;
 
 import cn.iocoder.yudao.module.hrm.controller.admin.employee.vo.certificate.HrmEmployeeCertificateSaveReqVO;
 import cn.iocoder.yudao.module.hrm.dal.dataobject.employee.experience.HrmEmployeeCertificateDO;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 
 import java.util.List;
 

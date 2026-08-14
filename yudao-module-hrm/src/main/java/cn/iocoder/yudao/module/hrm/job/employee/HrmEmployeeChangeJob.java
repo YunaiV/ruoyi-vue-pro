@@ -10,7 +10,7 @@ import cn.iocoder.yudao.module.hrm.dal.dataobject.employee.employment.HrmEmploye
 import cn.iocoder.yudao.module.hrm.service.employee.employment.HrmEmployeeChangeRecordService;
 import cn.iocoder.yudao.module.hrm.service.employee.employment.HrmEmployeeQuitInfoService;
 import cn.iocoder.yudao.module.hrm.service.employee.info.HrmEmployeeService;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.hrm.controller.admin.insurance.vo.monthrecord;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 @Schema(description = "管理后台 - HRM 月度社保表创建 Request VO")

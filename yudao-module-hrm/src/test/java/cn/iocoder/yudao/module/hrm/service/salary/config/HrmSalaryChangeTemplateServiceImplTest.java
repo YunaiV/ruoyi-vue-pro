@@ -7,10 +7,10 @@ import cn.iocoder.yudao.module.hrm.controller.admin.salary.vo.changetemplate.Hrm
 import cn.iocoder.yudao.module.hrm.dal.dataobject.salary.config.HrmSalaryChangeTemplateDO;
 import cn.iocoder.yudao.module.hrm.dal.dataobject.salary.config.HrmSalaryOptionDO;
 import cn.iocoder.yudao.module.hrm.dal.mysql.salary.config.HrmSalaryChangeTemplateMapper;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -35,7 +35,7 @@ public class HrmSalaryChangeTemplateServiceImplTest extends BaseDbUnitTest {
     private HrmSalaryChangeTemplateServiceImpl salaryChangeTemplateService;
     @Resource
     private HrmSalaryChangeTemplateMapper salaryChangeTemplateMapper;
-    @MockitoBean
+    @MockBean
     private HrmSalaryOptionService salaryOptionService;
 
     @Test

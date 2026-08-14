@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.hrm.service.salary.config;
 
 import cn.iocoder.yudao.module.hrm.controller.admin.salary.vo.taxrule.HrmSalaryTaxRuleSaveReqVO;
 import cn.iocoder.yudao.module.hrm.dal.dataobject.salary.config.HrmSalaryTaxRuleDO;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 
 import java.util.Collection;
 import java.util.List;

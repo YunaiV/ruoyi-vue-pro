@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.hrm.controller.admin.salary.vo.slip.sendrecord.Hr
 import cn.iocoder.yudao.module.hrm.controller.admin.salary.vo.slip.sendrecord.HrmSalarySlipSendReqVO;
 import cn.iocoder.yudao.module.hrm.dal.dataobject.salary.monthrecord.HrmSalaryMonthEmployeeRecordDO;
 import cn.iocoder.yudao.module.hrm.dal.dataobject.salary.slip.HrmSalarySlipSendRecordDO;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 
 /**
  * HRM 工资条发放记录 Service 接口

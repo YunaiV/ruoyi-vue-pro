@@ -26,7 +26,7 @@ import cn.iocoder.yudao.module.fms.enums.report.FmsFormulaRuleEnum;
 import cn.iocoder.yudao.module.fms.enums.report.FmsReportTypeEnum;
 import cn.iocoder.yudao.module.fms.service.config.FmsAccountSetService;
 import cn.iocoder.yudao.module.fms.service.config.FmsSubjectService;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;

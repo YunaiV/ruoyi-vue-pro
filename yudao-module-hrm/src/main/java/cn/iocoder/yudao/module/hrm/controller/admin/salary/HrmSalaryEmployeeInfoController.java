@@ -30,9 +30,9 @@ import cn.iocoder.yudao.module.hrm.enums.salary.employee.HrmSalaryEmployeeInfoCh
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.hrm.service.employee.info;
 
 import cn.iocoder.yudao.module.hrm.controller.admin.employee.vo.contact.HrmEmployeeContactSaveReqVO;
 import cn.iocoder.yudao.module.hrm.dal.dataobject.employee.info.HrmEmployeeContactDO;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 
 import java.util.List;
 

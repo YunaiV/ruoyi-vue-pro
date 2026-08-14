@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.fms.controller.admin.report.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import lombok.Data;
 
 @Schema(description = "管理后台 - FMS 财务报表查询 Request VO")

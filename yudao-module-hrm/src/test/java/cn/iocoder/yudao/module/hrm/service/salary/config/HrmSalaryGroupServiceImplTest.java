@@ -12,10 +12,10 @@ import cn.iocoder.yudao.module.hrm.dal.mysql.salary.config.HrmSalaryGroupMapper;
 import cn.iocoder.yudao.module.hrm.service.employee.info.HrmEmployeeService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -47,11 +47,11 @@ public class HrmSalaryGroupServiceImplTest extends BaseDbUnitTest {
     @Resource
     private HrmSalaryGroupMapper salaryGroupMapper;
 
-    @MockitoBean
+    @MockBean
     private HrmSalaryTaxRuleService salaryTaxRuleService;
-    @MockitoBean
+    @MockBean
     private HrmEmployeeService employeeService;
-    @MockitoBean
+    @MockBean
     private DeptApi deptApi;
 
     @Test

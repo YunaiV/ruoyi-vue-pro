@@ -6,10 +6,10 @@ import cn.iocoder.yudao.module.fms.dal.dataobject.config.FmsVoucherWordDO;
 import cn.iocoder.yudao.module.fms.dal.mysql.config.FmsVoucherWordMapper;
 import cn.iocoder.yudao.module.fms.service.closing.FmsClosingSchemeService;
 import cn.iocoder.yudao.module.fms.service.voucher.FmsVoucherService;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.List;
 
@@ -27,11 +27,11 @@ public class FmsVoucherWordServiceImplTest extends BaseDbUnitTest {
     private FmsVoucherWordServiceImpl voucherWordService;
     @Resource
     private FmsVoucherWordMapper voucherWordMapper;
-    @MockitoBean
+    @MockBean
     private FmsAccountSetService accountSetService;
-    @MockitoBean
+    @MockBean
     private FmsVoucherService voucherService;
-    @MockitoBean
+    @MockBean
     private FmsClosingSchemeService closingSchemeService;
 
     @Test

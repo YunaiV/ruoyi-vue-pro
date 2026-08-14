@@ -4,10 +4,10 @@ import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.hrm.controller.admin.employee.vo.personalnote.HrmEmployeePersonalNoteCreateReqVO;
 import cn.iocoder.yudao.module.hrm.dal.dataobject.employee.info.HrmEmployeePersonalNoteDO;
 import cn.iocoder.yudao.module.hrm.dal.mysql.employee.info.HrmEmployeePersonalNoteMapper;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -35,7 +35,7 @@ public class HrmEmployeePersonalNoteServiceImplTest extends BaseDbUnitTest {
     @Resource
     private HrmEmployeePersonalNoteMapper personalNoteMapper;
 
-    @MockitoBean
+    @MockBean
     private HrmEmployeeService employeeService;
 
     @Test

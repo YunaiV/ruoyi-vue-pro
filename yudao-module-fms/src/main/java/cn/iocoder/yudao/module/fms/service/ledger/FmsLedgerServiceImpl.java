@@ -30,7 +30,7 @@ import cn.iocoder.yudao.module.fms.service.config.FmsAccountSetService;
 import cn.iocoder.yudao.module.fms.service.config.FmsAuxiliaryItemService;
 import cn.iocoder.yudao.module.fms.service.config.FmsFinanceParameterService;
 import cn.iocoder.yudao.module.fms.service.config.FmsSubjectService;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;

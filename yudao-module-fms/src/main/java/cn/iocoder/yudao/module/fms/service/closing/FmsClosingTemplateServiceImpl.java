@@ -17,7 +17,7 @@ import cn.iocoder.yudao.module.fms.service.config.FmsFinanceParameterService;
 import cn.iocoder.yudao.module.fms.service.config.FmsSubjectService;
 import com.mzt.logapi.context.LogRecordContext;
 import com.mzt.logapi.starter.annotation.LogRecord;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import lombok.Data;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;

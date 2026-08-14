@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.hrm.controller.admin.portal.salary.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Pattern;
+import javax.validation.constraints.Pattern;
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 

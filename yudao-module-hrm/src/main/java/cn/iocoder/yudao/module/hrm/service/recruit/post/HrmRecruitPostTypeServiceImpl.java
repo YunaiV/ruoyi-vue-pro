@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.hrm.service.recruit.post;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.module.hrm.dal.dataobject.recruit.post.HrmRecruitPostTypeDO;
 import cn.iocoder.yudao.module.hrm.dal.mysql.recruit.post.HrmRecruitPostTypeMapper;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 

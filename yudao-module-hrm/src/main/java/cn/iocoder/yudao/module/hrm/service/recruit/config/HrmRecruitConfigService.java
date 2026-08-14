@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.hrm.service.recruit.config;
 
 import cn.iocoder.yudao.module.hrm.controller.admin.recruit.vo.config.HrmRecruitEliminateReasonSaveReqVO;
 
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 import java.util.List;
 
 /**

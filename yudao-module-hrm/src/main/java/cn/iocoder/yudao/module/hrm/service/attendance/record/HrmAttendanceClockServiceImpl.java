@@ -24,7 +24,7 @@ import cn.iocoder.yudao.module.hrm.enums.attendance.record.HrmAttendanceClockSta
 import cn.iocoder.yudao.module.hrm.enums.attendance.record.HrmAttendanceClockTypeEnum;
 import cn.iocoder.yudao.module.hrm.service.attendance.config.HrmAttendanceGroupService;
 import cn.iocoder.yudao.module.hrm.service.employee.info.HrmEmployeeService;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;

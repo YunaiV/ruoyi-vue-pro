@@ -13,7 +13,7 @@ import cn.iocoder.yudao.module.hrm.dal.mysql.salary.slip.HrmSalarySlipTemplateMa
 import cn.iocoder.yudao.module.hrm.enums.salary.config.HrmSalaryOptionCodeEnum;
 import cn.iocoder.yudao.module.hrm.enums.salary.slip.HrmSalarySlipTemplateCategoryEnum;
 import cn.iocoder.yudao.module.hrm.enums.salary.slip.HrmSalarySlipTemplateOptionTypeEnum;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;

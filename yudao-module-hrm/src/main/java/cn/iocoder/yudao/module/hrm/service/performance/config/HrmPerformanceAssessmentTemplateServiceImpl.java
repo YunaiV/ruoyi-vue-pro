@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.hrm.controller.admin.performance.vo.assessmenttem
 import cn.iocoder.yudao.module.hrm.controller.admin.performance.vo.assessmenttemplate.HrmPerformanceAssessmentTemplateSaveReqVO;
 import cn.iocoder.yudao.module.hrm.dal.dataobject.performance.config.HrmPerformanceAssessmentTemplateDO;
 import cn.iocoder.yudao.module.hrm.dal.mysql.performance.config.HrmPerformanceAssessmentTemplateMapper;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;

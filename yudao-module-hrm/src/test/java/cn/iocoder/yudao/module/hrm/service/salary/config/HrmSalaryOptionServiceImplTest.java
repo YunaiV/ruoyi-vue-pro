@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.hrm.dal.dataobject.salary.config.HrmSalaryOptionD
 import cn.iocoder.yudao.module.hrm.dal.dataobject.salary.config.HrmSalaryOptionTemplateDO;
 import cn.iocoder.yudao.module.hrm.dal.mysql.salary.config.HrmSalaryOptionMapper;
 import cn.iocoder.yudao.module.hrm.dal.mysql.salary.config.HrmSalaryOptionTemplateMapper;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 

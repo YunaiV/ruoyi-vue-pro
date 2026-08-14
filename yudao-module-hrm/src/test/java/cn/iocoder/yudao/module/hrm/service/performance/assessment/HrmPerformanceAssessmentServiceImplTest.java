@@ -21,10 +21,10 @@ import cn.iocoder.yudao.module.hrm.enums.performance.assessment.HrmPerformanceAs
 import cn.iocoder.yudao.module.hrm.enums.performance.plan.HrmPerformancePlanStatusEnum;
 import cn.iocoder.yudao.module.hrm.enums.performance.plan.HrmPerformanceStageTypeEnum;
 import cn.iocoder.yudao.module.hrm.service.employee.info.HrmEmployeeService;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -57,13 +57,13 @@ public class HrmPerformanceAssessmentServiceImplTest extends BaseDbUnitTest {
     @Resource
     private HrmEmployeeMapper employeeMapper;
 
-    @MockitoBean
+    @MockBean
     private HrmEmployeeService employeeService;
-    @MockitoBean
+    @MockBean
     private HrmPerformanceAssessmentProcessService assessmentProcessService;
-    @MockitoBean
+    @MockBean
     private HrmPerformanceAssessmentReviewService assessmentReviewService;
-    @MockitoBean
+    @MockBean
     private HrmPerformanceAssessmentActionRecordService assessmentActionRecordService;
 
     @Test

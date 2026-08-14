@@ -5,7 +5,7 @@ import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.module.fms.dal.dataobject.config.FmsAuxiliaryCombinationDO;
 import cn.iocoder.yudao.module.fms.dal.dataobject.voucher.FmsVoucherEntryDO;
 import cn.iocoder.yudao.module.fms.dal.mysql.config.FmsAuxiliaryCombinationMapper;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 

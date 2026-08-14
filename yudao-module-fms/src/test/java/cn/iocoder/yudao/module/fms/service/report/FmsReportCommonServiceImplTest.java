@@ -14,10 +14,10 @@ import cn.iocoder.yudao.module.fms.service.closing.FmsClosingVoucherService;
 import cn.iocoder.yudao.module.fms.service.config.FmsSubjectService;
 import cn.iocoder.yudao.module.fms.service.ledger.FmsLedgerService;
 import cn.iocoder.yudao.module.fms.service.voucher.FmsVoucherService;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -40,15 +40,15 @@ public class FmsReportCommonServiceImplTest extends BaseDbUnitTest {
     @Resource
     private FmsReportCommonServiceImpl reportCommonService;
 
-    @MockitoBean
+    @MockBean
     private FmsSubjectService subjectService;
-    @MockitoBean
+    @MockBean
     private FmsLedgerService ledgerService;
-    @MockitoBean
+    @MockBean
     private FmsClosingVoucherService closingVoucherService;
-    @MockitoBean
+    @MockBean
     private FmsClosingSchemeService closingSchemeService;
-    @MockitoBean
+    @MockBean
     private FmsVoucherService voucherService;
 
     @Test

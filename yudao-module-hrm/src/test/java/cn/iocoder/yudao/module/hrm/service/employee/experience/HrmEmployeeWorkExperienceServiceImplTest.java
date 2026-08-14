@@ -5,10 +5,10 @@ import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.hrm.controller.admin.employee.vo.workexperience.HrmEmployeeWorkExperienceSaveReqVO;
 import cn.iocoder.yudao.module.hrm.dal.dataobject.employee.experience.HrmEmployeeWorkExperienceDO;
 import cn.iocoder.yudao.module.hrm.dal.mysql.employee.experience.HrmEmployeeWorkExperienceMapper;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -37,7 +37,7 @@ public class HrmEmployeeWorkExperienceServiceImplTest extends BaseDbUnitTest {
     @Resource
     private HrmEmployeeWorkExperienceMapper workExperienceMapper;
 
-    @MockitoBean
+    @MockBean
     private HrmEmployeeService employeeService;
 
     @Test

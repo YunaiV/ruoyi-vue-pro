@@ -38,7 +38,7 @@ import cn.iocoder.yudao.module.hrm.enums.salary.config.HrmSalaryTaxRateEnum;
 import cn.iocoder.yudao.module.hrm.enums.salary.config.HrmSalaryTaxTypeEnum;
 import com.mzt.logapi.context.LogRecordContext;
 import com.mzt.logapi.starter.annotation.LogRecord;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.context.annotation.Lazy;

@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.hrm.controller.admin.performance.vo.assessment.Hr
 import cn.iocoder.yudao.module.hrm.controller.admin.performance.vo.plan.HrmPerformancePlanPageReqVO;
 import cn.iocoder.yudao.module.hrm.controller.admin.performance.vo.plan.HrmPerformancePlanSaveReqVO;
 import cn.iocoder.yudao.module.hrm.dal.dataobject.performance.plan.HrmPerformancePlanDO;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 
 import java.util.Collection;
 import java.util.List;

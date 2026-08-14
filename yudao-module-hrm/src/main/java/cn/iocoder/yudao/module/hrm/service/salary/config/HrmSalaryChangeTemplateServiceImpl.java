@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.hrm.dal.dataobject.salary.config.HrmSalaryChangeT
 import cn.iocoder.yudao.module.hrm.dal.dataobject.salary.config.HrmSalaryChangeTemplateDO.Option;
 import cn.iocoder.yudao.module.hrm.dal.dataobject.salary.config.HrmSalaryOptionDO;
 import cn.iocoder.yudao.module.hrm.dal.mysql.salary.config.HrmSalaryChangeTemplateMapper;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;

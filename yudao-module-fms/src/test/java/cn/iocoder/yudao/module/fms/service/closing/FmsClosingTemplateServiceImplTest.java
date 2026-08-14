@@ -14,11 +14,11 @@ import cn.iocoder.yudao.module.fms.enums.report.FmsFormulaRuleEnum;
 import cn.iocoder.yudao.module.fms.service.config.FmsAccountSetService;
 import cn.iocoder.yudao.module.fms.service.config.FmsFinanceParameterService;
 import cn.iocoder.yudao.module.fms.service.config.FmsSubjectService;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -43,11 +43,11 @@ public class FmsClosingTemplateServiceImplTest extends BaseDbUnitTest {
     @Resource
     private FmsClosingTemplateMapper closingTemplateMapper;
 
-    @MockitoBean
+    @MockBean
     private FmsAccountSetService accountSetService;
-    @MockitoBean
+    @MockBean
     private FmsSubjectService subjectService;
-    @MockitoBean
+    @MockBean
     private FmsFinanceParameterService financeParameterService;
 
     @BeforeEach

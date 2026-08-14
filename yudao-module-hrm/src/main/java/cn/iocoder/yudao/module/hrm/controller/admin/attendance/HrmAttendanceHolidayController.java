@@ -11,8 +11,8 @@ import cn.iocoder.yudao.module.hrm.service.attendance.config.HrmAttendanceHolida
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
-import jakarta.validation.Valid;
+import javax.annotation.Resource;
+import javax.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;

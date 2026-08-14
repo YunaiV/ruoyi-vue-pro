@@ -13,10 +13,10 @@ import cn.iocoder.yudao.module.hrm.service.employee.info.HrmEmployeeService;
 import cn.iocoder.yudao.module.system.api.notify.NotifyMessageSendApi;
 import cn.iocoder.yudao.module.hrm.enums.salary.slip.HrmSalarySlipReadStatusEnum;
 import cn.iocoder.yudao.module.hrm.enums.salary.slip.HrmSalarySlipTemplateOptionTypeEnum;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
 import java.time.YearMonth;
@@ -51,9 +51,9 @@ public class HrmSalarySlipServiceImplTest extends BaseDbUnitTest {
     @Resource
     private HrmSalarySlipMapper salarySlipMapper;
 
-    @MockitoBean
+    @MockBean
     private HrmEmployeeService employeeService;
-    @MockitoBean
+    @MockBean
     private NotifyMessageSendApi notifyMessageSendApi;
 
     @Test

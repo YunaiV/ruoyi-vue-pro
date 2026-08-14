@@ -6,10 +6,10 @@ import cn.iocoder.yudao.module.fms.controller.admin.config.vo.digest.FmsDigestSa
 import cn.iocoder.yudao.module.fms.dal.dataobject.config.FmsDigestDO;
 import cn.iocoder.yudao.module.fms.dal.mysql.config.FmsDigestMapper;
 import cn.iocoder.yudao.module.fms.service.config.FmsAccountSetService;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.List;
 
@@ -28,7 +28,7 @@ public class FmsDigestServiceImplTest extends BaseDbUnitTest {
     @Resource
     private FmsDigestMapper digestMapper;
 
-    @MockitoBean
+    @MockBean
     private FmsAccountSetService accountSetService;
 
     @Test

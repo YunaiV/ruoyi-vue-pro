@@ -40,7 +40,7 @@ import cn.iocoder.yudao.module.fms.service.report.FmsIncomeStatementService;
 import cn.iocoder.yudao.module.fms.service.config.FmsVoucherWordService;
 import cn.iocoder.yudao.module.fms.util.FmsPeriodUtils;
 import com.mzt.logapi.starter.annotation.LogRecord;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import lombok.Data;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;

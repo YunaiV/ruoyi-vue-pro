@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.hrm.service.employee.info;
 
 import cn.iocoder.yudao.module.hrm.controller.admin.employee.vo.personalnote.HrmEmployeePersonalNoteCreateReqVO;
 import cn.iocoder.yudao.module.hrm.dal.dataobject.employee.info.HrmEmployeePersonalNoteDO;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 
 import java.time.LocalDateTime;
 import java.util.List;

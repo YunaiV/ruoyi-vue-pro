@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.hrm.controller.admin.salary.vo.employeeinfo.HrmSa
 import cn.iocoder.yudao.module.hrm.dal.dataobject.employee.info.HrmEmployeeDO;
 import cn.iocoder.yudao.module.hrm.dal.dataobject.salary.employee.HrmSalaryEmployeeInfoDO;
 import cn.iocoder.yudao.module.hrm.dal.dataobject.salary.config.HrmSalaryOptionDO;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

@@ -83,7 +83,7 @@ public interface HrmSalaryMonthEmployeeRecordMapper extends BaseMapperX<HrmSalar
      * @param query 查询条件
      * @param salarySlipSent 是否已发送工资条
      */
-    private void appendSalarySlipSentCondition(
+    default void appendSalarySlipSentCondition(
             MPJLambdaWrapperX<HrmSalaryMonthEmployeeRecordDO> query, Boolean salarySlipSent) {
         if (Boolean.TRUE.equals(salarySlipSent)) {
             query.innerJoin(HrmSalarySlipDO.class, HrmSalarySlipDO::getMonthEmployeeRecordId,

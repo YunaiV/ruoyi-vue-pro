@@ -14,11 +14,11 @@ import cn.iocoder.yudao.module.hrm.enums.recruit.candidate.HrmRecruitInterviewRe
 import cn.iocoder.yudao.module.hrm.service.employee.info.HrmEmployeeService;
 import cn.iocoder.yudao.module.system.api.notify.NotifyMessageSendApi;
 import cn.iocoder.yudao.module.system.api.notify.dto.NotifySendSingleToUserReqDTO;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -61,11 +61,11 @@ public class HrmRecruitInterviewServiceImplTest extends BaseDbUnitTest {
     @Resource
     private HrmRecruitInterviewMapper recruitInterviewMapper;
 
-    @MockitoBean
+    @MockBean
     private HrmRecruitCandidateService recruitCandidateService;
-    @MockitoBean
+    @MockBean
     private HrmEmployeeService employeeService;
-    @MockitoBean
+    @MockBean
     private NotifyMessageSendApi notifyMessageSendApi;
 
     @Test

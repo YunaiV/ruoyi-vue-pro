@@ -21,7 +21,7 @@ import cn.iocoder.yudao.module.hrm.controller.admin.portal.employee.vo.employee.
 import cn.iocoder.yudao.module.hrm.dal.dataobject.employee.employment.HrmEmployeeChangeRecordDO;
 import cn.iocoder.yudao.module.hrm.dal.dataobject.employee.info.HrmEmployeeDO;
 import cn.iocoder.yudao.module.hrm.dal.dataobject.employee.employment.HrmEmployeeQuitInfoDO;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 
 import java.time.LocalDateTime;
 import java.util.Collection;

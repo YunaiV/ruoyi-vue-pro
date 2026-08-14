@@ -2,8 +2,8 @@ package cn.iocoder.yudao.module.hrm.controller.admin.recruit.vo.config;
 
 import com.mzt.logapi.starter.annotation.DiffLogField;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.util.List;

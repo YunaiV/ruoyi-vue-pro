@@ -4,7 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.excel.core.function.ExcelColumnSelectFunction;
 import cn.iocoder.yudao.module.hrm.dal.dataobject.recruit.config.HrmRecruitChannelDO;
 import cn.iocoder.yudao.module.hrm.service.recruit.config.HrmRecruitChannelService;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

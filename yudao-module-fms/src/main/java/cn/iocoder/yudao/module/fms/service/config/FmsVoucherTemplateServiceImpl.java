@@ -17,7 +17,7 @@ import cn.iocoder.yudao.module.fms.dal.mysql.config.FmsVoucherTemplateCategoryMa
 import cn.iocoder.yudao.module.fms.dal.mysql.config.FmsVoucherTemplateMapper;
 import com.mzt.logapi.context.LogRecordContext;
 import com.mzt.logapi.starter.annotation.LogRecord;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 

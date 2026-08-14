@@ -6,10 +6,10 @@ import cn.iocoder.yudao.module.hrm.controller.admin.employee.vo.salarycard.HrmEm
 import cn.iocoder.yudao.module.hrm.dal.dataobject.employee.info.HrmEmployeeDO;
 import cn.iocoder.yudao.module.hrm.dal.dataobject.employee.employment.HrmEmployeeSalaryCardDO;
 import cn.iocoder.yudao.module.hrm.dal.mysql.employee.employment.HrmEmployeeSalaryCardMapper;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.Collections;
 import java.util.Map;
@@ -40,7 +40,7 @@ public class HrmEmployeeSalaryCardServiceImplTest extends BaseDbUnitTest {
     @Resource
     private HrmEmployeeSalaryCardMapper salaryCardMapper;
 
-    @MockitoBean
+    @MockBean
     private HrmEmployeeService employeeService;
 
     @Test

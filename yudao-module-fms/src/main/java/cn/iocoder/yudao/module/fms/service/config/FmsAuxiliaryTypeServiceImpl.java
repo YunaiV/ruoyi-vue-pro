@@ -14,7 +14,7 @@ import cn.iocoder.yudao.module.fms.service.voucher.FmsVoucherService;
 import cn.iocoder.yudao.module.fms.service.config.FmsVoucherTemplateService;
 import com.mzt.logapi.context.LogRecordContext;
 import com.mzt.logapi.starter.annotation.LogRecord;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

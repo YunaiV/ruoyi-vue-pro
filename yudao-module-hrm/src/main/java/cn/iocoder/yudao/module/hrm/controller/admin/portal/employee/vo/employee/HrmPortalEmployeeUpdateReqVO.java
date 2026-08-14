@@ -9,10 +9,10 @@ import cn.iocoder.yudao.module.hrm.enums.employee.experience.HrmEmployeeEducatio
 import cn.iocoder.yudao.module.hrm.enums.employee.info.HrmEmployeeIdTypeEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.AssertTrue;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.PastOrPresent;
-import jakarta.validation.constraints.Size;
+import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.PastOrPresent;
+import javax.validation.constraints.Size;
 import lombok.Data;
 
 import java.time.LocalDateTime;

@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.hrm.controller.admin.salary.vo.slip.HrmSalarySlip
 import cn.iocoder.yudao.module.hrm.dal.dataobject.salary.monthrecord.HrmSalaryMonthEmployeeRecordDO;
 import cn.iocoder.yudao.module.hrm.dal.dataobject.salary.slip.HrmSalarySlipDO;
 import cn.iocoder.yudao.module.hrm.dal.dataobject.salary.slip.HrmSalarySlipTemplateDO;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 
 import java.time.YearMonth;
 import java.util.Collection;

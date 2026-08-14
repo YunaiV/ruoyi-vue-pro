@@ -26,11 +26,11 @@ import cn.iocoder.yudao.module.hrm.enums.recruit.candidate.HrmRecruitCandidateSt
 import cn.iocoder.yudao.module.hrm.enums.recruit.candidate.HrmRecruitInterviewResultEnum;
 import cn.iocoder.yudao.module.hrm.enums.recruit.post.HrmRecruitPostStatusEnum;
 import cn.iocoder.yudao.module.hrm.service.employee.info.HrmEmployeeService;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -74,13 +74,13 @@ public class HrmRecruitCandidateServiceImplTest extends BaseDbUnitTest {
     @Resource
     private HrmRecruitInterviewMapper recruitInterviewMapper;
 
-    @MockitoBean
+    @MockBean
     private HrmRecruitPostService recruitPostService;
-    @MockitoBean
+    @MockBean
     private HrmRecruitChannelService recruitChannelService;
-    @MockitoBean
+    @MockBean
     private HrmRecruitInterviewService recruitInterviewService;
-    @MockitoBean
+    @MockBean
     private HrmEmployeeService employeeService;
 
     @Test

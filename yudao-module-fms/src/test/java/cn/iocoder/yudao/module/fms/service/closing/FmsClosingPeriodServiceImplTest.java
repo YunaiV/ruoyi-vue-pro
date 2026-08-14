@@ -25,10 +25,10 @@ import cn.iocoder.yudao.module.fms.service.ledger.FmsLedgerService;
 import cn.iocoder.yudao.module.fms.service.report.FmsBalanceSheetService;
 import cn.iocoder.yudao.module.fms.service.report.FmsIncomeStatementService;
 import cn.iocoder.yudao.module.fms.service.voucher.FmsVoucherService;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -54,25 +54,25 @@ public class FmsClosingPeriodServiceImplTest extends BaseDbUnitTest {
     private FmsClosingPeriodServiceImpl closingPeriodService;
     @Resource
     private FmsClosingPeriodMapper closingPeriodMapper;
-    @MockitoBean
+    @MockBean
     private FmsAccountSetService accountSetService;
-    @MockitoBean
+    @MockBean
     private FmsClosingSchemeService closingSchemeService;
-    @MockitoBean
+    @MockBean
     private FmsClosingVoucherService closingVoucherService;
-    @MockitoBean
+    @MockBean
     private FmsFinanceParameterService financeParameterService;
-    @MockitoBean
+    @MockBean
     private FmsInitialBalanceService initialBalanceService;
-    @MockitoBean
+    @MockBean
     private FmsSubjectService subjectService;
-    @MockitoBean
+    @MockBean
     private FmsLedgerService ledgerService;
-    @MockitoBean
+    @MockBean
     private FmsVoucherService voucherService;
-    @MockitoBean
+    @MockBean
     private FmsBalanceSheetService balanceSheetService;
-    @MockitoBean
+    @MockBean
     private FmsIncomeStatementService incomeStatementService;
 
     @Test

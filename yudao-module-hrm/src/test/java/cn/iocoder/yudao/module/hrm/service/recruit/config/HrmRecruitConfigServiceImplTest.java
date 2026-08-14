@@ -4,10 +4,10 @@ import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.hrm.controller.admin.recruit.vo.config.HrmRecruitEliminateReasonSaveReqVO;
 import cn.iocoder.yudao.module.hrm.service.config.HrmConfigService;
 import cn.iocoder.yudao.module.hrm.enums.config.HrmConfigTypeEnum;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.Arrays;
 import java.util.List;
@@ -26,7 +26,7 @@ public class HrmRecruitConfigServiceImplTest extends BaseDbUnitTest {
 
     @Resource
     private HrmRecruitConfigServiceImpl recruitConfigService;
-    @MockitoBean
+    @MockBean
     private HrmConfigService configService;
 
     @Test

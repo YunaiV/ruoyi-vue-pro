@@ -32,7 +32,7 @@ import cn.iocoder.yudao.module.hrm.enums.performance.plan.HrmPerformanceStageTyp
 import cn.iocoder.yudao.module.hrm.service.employee.info.HrmEmployeeService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

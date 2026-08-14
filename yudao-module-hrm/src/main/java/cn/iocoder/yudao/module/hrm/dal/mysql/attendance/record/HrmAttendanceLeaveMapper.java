@@ -26,7 +26,7 @@ public interface HrmAttendanceLeaveMapper extends BaseMapperX<HrmAttendanceLeave
         return selectList(queryWrapper);
     }
 
-    private LambdaQueryWrapperX<HrmAttendanceLeaveDO> buildQueryWrapper(HrmAttendanceLeavePageReqVO reqVO) {
+    default LambdaQueryWrapperX<HrmAttendanceLeaveDO> buildQueryWrapper(HrmAttendanceLeavePageReqVO reqVO) {
         return new LambdaQueryWrapperX<HrmAttendanceLeaveDO>()
                 .inIfPresent(HrmAttendanceLeaveDO::getEmployeeId, reqVO.getEmployeeIds())
                 .inIfPresent(HrmAttendanceLeaveDO::getType, reqVO.getTypes())

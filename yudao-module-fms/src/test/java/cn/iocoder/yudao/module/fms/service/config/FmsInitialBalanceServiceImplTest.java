@@ -21,10 +21,10 @@ import cn.iocoder.yudao.module.fms.service.config.FmsAuxiliaryCombinationService
 import cn.iocoder.yudao.module.fms.service.config.FmsAuxiliaryItemService;
 import cn.iocoder.yudao.module.fms.service.config.FmsAuxiliaryTypeService;
 import cn.iocoder.yudao.module.fms.service.config.FmsSubjectService;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -54,17 +54,17 @@ public class FmsInitialBalanceServiceImplTest extends BaseDbUnitTest {
     @Resource
     private FmsInitialBalanceMapper initialBalanceMapper;
 
-    @MockitoBean
+    @MockBean
     private FmsAccountSetService accountSetService;
-    @MockitoBean
+    @MockBean
     private FmsSubjectService subjectService;
-    @MockitoBean
+    @MockBean
     private FmsAuxiliaryItemService auxiliaryItemService;
-    @MockitoBean
+    @MockBean
     private FmsAuxiliaryTypeService auxiliaryTypeService;
-    @MockitoBean
+    @MockBean
     private FmsAuxiliaryCombinationService auxiliaryCombinationService;
-    @MockitoBean
+    @MockBean
     private FmsClosingPeriodService closingPeriodService;
 
     @Test

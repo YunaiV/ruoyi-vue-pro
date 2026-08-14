@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.hrm.service.employee.employment;
 
 import cn.iocoder.yudao.module.hrm.controller.admin.employee.vo.salarycard.HrmEmployeeSalaryCardSaveReqVO;
 import cn.iocoder.yudao.module.hrm.dal.dataobject.employee.employment.HrmEmployeeSalaryCardDO;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 
 import java.util.Collection;
 import java.util.List;

@@ -6,10 +6,10 @@ import cn.iocoder.yudao.module.hrm.dal.dataobject.salary.config.HrmSalaryTaxRule
 import cn.iocoder.yudao.module.hrm.dal.mysql.salary.config.HrmSalaryTaxRuleMapper;
 import cn.iocoder.yudao.module.hrm.enums.salary.config.HrmSalaryTaxCycleTypeEnum;
 import cn.iocoder.yudao.module.hrm.enums.salary.config.HrmSalaryTaxTypeEnum;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -44,7 +44,7 @@ public class HrmSalaryTaxRuleServiceImplTest extends BaseDbUnitTest {
     @Resource
     private HrmSalaryTaxRuleMapper salaryTaxRuleMapper;
 
-    @MockitoBean
+    @MockBean
     private HrmSalaryGroupService salaryGroupService;
 
     @Test

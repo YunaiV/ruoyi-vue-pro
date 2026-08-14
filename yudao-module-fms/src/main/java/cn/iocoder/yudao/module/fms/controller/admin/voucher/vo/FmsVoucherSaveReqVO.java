@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.fms.controller.admin.voucher.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
-import jakarta.validation.constraints.Min;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import javax.validation.constraints.Min;
 import lombok.Data;
 
 import java.time.LocalDateTime;

@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.hrm.service.config;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.module.hrm.dal.dataobject.config.HrmConfigDO;
 import cn.iocoder.yudao.module.hrm.dal.mysql.config.HrmConfigMapper;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;

@@ -6,9 +6,9 @@ import cn.iocoder.yudao.module.fms.controller.admin.closing.vo.FmsClosingQueryRe
 import cn.iocoder.yudao.module.fms.service.closing.FmsClosingPeriodService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
+import javax.annotation.Resource;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;

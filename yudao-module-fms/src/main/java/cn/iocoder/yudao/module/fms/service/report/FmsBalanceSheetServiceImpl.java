@@ -34,7 +34,7 @@ import cn.iocoder.yudao.module.fms.service.config.FmsFinanceParameterService;
 import cn.iocoder.yudao.module.fms.service.config.FmsInitialBalanceService;
 import cn.iocoder.yudao.module.fms.service.config.FmsSubjectService;
 import cn.iocoder.yudao.module.fms.util.FmsPeriodUtils;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

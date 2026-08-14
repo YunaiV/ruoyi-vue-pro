@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.hrm.enums.salary.config.HrmSalarySocialSecurityMo
 import cn.iocoder.yudao.module.hrm.framework.operatelog.core.HrmSalarySocialSecurityMonthTypeParseFunction;
 import com.mzt.logapi.starter.annotation.DiffLogField;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 @Schema(description = "管理后台 - HRM 计薪配置更新 Request VO")

@@ -32,7 +32,7 @@ import cn.iocoder.yudao.module.hrm.enums.performance.plan.HrmPerformanceQuotaSet
 import cn.iocoder.yudao.module.hrm.enums.performance.assessment.HrmPerformanceResultAuditStatusEnum;
 import cn.iocoder.yudao.module.hrm.enums.performance.plan.HrmPerformanceStageTypeEnum;
 import cn.iocoder.yudao.module.hrm.service.employee.info.HrmEmployeeService;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

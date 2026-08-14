@@ -44,7 +44,7 @@ public interface HrmAttendanceClockMapper extends BaseMapperX<HrmAttendanceClock
                 .orderByAsc(HrmAttendanceClockDO::getClockTime));
     }
 
-    private LambdaQueryWrapperX<HrmAttendanceClockDO> buildQueryWrapper(HrmAttendanceClockPageReqVO reqVO) {
+    default LambdaQueryWrapperX<HrmAttendanceClockDO> buildQueryWrapper(HrmAttendanceClockPageReqVO reqVO) {
         return new LambdaQueryWrapperX<HrmAttendanceClockDO>()
                 .eqIfPresent(HrmAttendanceClockDO::getEmployeeId, reqVO.getEmployeeId())
                 .inIfPresent(HrmAttendanceClockDO::getEmployeeId, reqVO.getEmployeeIds())

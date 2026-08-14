@@ -17,10 +17,10 @@ import cn.iocoder.yudao.module.hrm.dal.dataobject.salary.slip.HrmSalarySlipTempl
 import cn.iocoder.yudao.module.hrm.dal.mysql.salary.slip.HrmSalarySlipSendRecordMapper;
 import cn.iocoder.yudao.module.hrm.service.employee.info.HrmEmployeeService;
 import cn.iocoder.yudao.module.hrm.enums.salary.monthrecord.HrmSalaryMonthRecordStatusEnum;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -49,15 +49,15 @@ public class HrmSalarySlipSendRecordServiceImplTest extends BaseDbUnitTest {
     @Resource
     private HrmSalarySlipSendRecordMapper salarySlipSendRecordMapper;
 
-    @MockitoBean
+    @MockBean
     private HrmSalaryMonthRecordService monthRecordService;
-    @MockitoBean
+    @MockBean
     private HrmSalaryMonthEmployeeRecordService monthEmployeeRecordService;
-    @MockitoBean
+    @MockBean
     private HrmSalarySlipTemplateService salarySlipTemplateService;
-    @MockitoBean
+    @MockBean
     private HrmSalarySlipService salarySlipService;
-    @MockitoBean
+    @MockBean
     private HrmEmployeeService employeeService;
 
     @Test

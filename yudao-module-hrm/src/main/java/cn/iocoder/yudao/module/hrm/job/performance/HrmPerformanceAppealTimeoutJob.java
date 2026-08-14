@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.quartz.core.handler.JobHandler;
 import cn.iocoder.yudao.framework.tenant.core.job.TenantJob;
 import cn.iocoder.yudao.module.hrm.dal.dataobject.performance.assessment.HrmPerformanceAssessmentStageDO;
 import cn.iocoder.yudao.module.hrm.service.performance.assessment.HrmPerformanceAssessmentProcessService;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;

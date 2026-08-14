@@ -28,11 +28,11 @@ import cn.iocoder.yudao.module.fms.service.config.FmsSubjectService;
 import cn.iocoder.yudao.module.fms.service.config.FmsVoucherWordService;
 import cn.iocoder.yudao.module.fms.service.ledger.FmsLedgerService;
 import cn.iocoder.yudao.module.fms.service.report.FmsIncomeStatementService;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -58,19 +58,19 @@ public class FmsClosingSchemeServiceImplTest extends BaseDbUnitTest {
     @Resource
     private FmsClosingSchemeMapper closingSchemeMapper;
 
-    @MockitoBean
+    @MockBean
     private FmsAccountSetService accountSetService;
-    @MockitoBean
+    @MockBean
     private FmsClosingVoucherService closingVoucherService;
-    @MockitoBean
+    @MockBean
     private FmsSubjectService subjectService;
-    @MockitoBean
+    @MockBean
     private FmsFinanceParameterService financeParameterService;
-    @MockitoBean
+    @MockBean
     private FmsLedgerService ledgerService;
-    @MockitoBean
+    @MockBean
     private FmsVoucherWordService voucherWordService;
-    @MockitoBean
+    @MockBean
     private FmsIncomeStatementService incomeStatementService;
 
     @BeforeEach

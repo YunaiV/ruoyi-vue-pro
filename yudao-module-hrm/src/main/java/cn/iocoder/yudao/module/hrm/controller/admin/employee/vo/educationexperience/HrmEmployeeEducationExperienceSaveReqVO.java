@@ -3,10 +3,10 @@ package cn.iocoder.yudao.module.hrm.controller.admin.employee.vo.educationexperi
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mzt.logapi.starter.annotation.DiffLogField;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.AssertTrue;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import lombok.Data;
 
 import java.time.LocalDateTime;

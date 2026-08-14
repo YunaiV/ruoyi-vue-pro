@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.hrm.service.salary.config;
 import cn.iocoder.yudao.module.hrm.controller.admin.salary.vo.changetemplate.HrmSalaryChangeTemplateSaveReqVO;
 import cn.iocoder.yudao.module.hrm.dal.dataobject.salary.config.HrmSalaryChangeTemplateDO;
 
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 
 import java.util.List;
 

@@ -10,10 +10,10 @@ import cn.iocoder.yudao.module.hrm.dal.dataobject.employee.info.HrmEmployeeDO;
 import cn.iocoder.yudao.module.hrm.dal.mysql.attendance.record.HrmAttendanceLeaveMapper;
 import cn.iocoder.yudao.module.hrm.service.employee.info.HrmEmployeeService;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceStatusEnum;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -44,9 +44,9 @@ public class HrmAttendanceLeaveServiceImplTest extends BaseDbUnitTest {
     private HrmAttendanceLeaveServiceImpl attendanceLeaveService;
     @Resource
     private HrmAttendanceLeaveMapper attendanceLeaveMapper;
-    @MockitoBean
+    @MockBean
     private HrmEmployeeService employeeService;
-    @MockitoBean
+    @MockBean
     private BpmProcessInstanceApi processInstanceApi;
 
     @Test

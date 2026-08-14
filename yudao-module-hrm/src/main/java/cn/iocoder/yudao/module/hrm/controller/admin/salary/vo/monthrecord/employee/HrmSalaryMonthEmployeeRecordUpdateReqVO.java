@@ -2,8 +2,8 @@ package cn.iocoder.yudao.module.hrm.controller.admin.salary.vo.monthrecord.emplo
 
 import cn.iocoder.yudao.module.hrm.controller.admin.salary.vo.option.HrmSalaryOptionValueVO;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.util.List;

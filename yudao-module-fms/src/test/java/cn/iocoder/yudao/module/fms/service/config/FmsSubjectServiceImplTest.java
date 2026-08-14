@@ -31,10 +31,10 @@ import cn.iocoder.yudao.module.fms.service.config.FmsInitialBalanceService;
 import cn.iocoder.yudao.module.fms.service.config.FmsFinanceParameterService;
 import cn.iocoder.yudao.module.fms.service.voucher.FmsVoucherService;
 import cn.iocoder.yudao.module.fms.service.config.FmsVoucherTemplateService;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -65,27 +65,27 @@ public class FmsSubjectServiceImplTest extends BaseDbUnitTest {
     @Resource
     private FmsSubjectTemplateMapper subjectTemplateMapper;
 
-    @MockitoBean
+    @MockBean
     private FmsAccountSetService accountSetService;
-    @MockitoBean
+    @MockBean
     private FmsFinanceParameterService financeParameterService;
-    @MockitoBean
+    @MockBean
     private FmsAuxiliaryTypeService auxiliaryTypeService;
-    @MockitoBean
+    @MockBean
     private FmsAuxiliaryItemService auxiliaryItemService;
-    @MockitoBean
+    @MockBean
     private FmsCurrencyService currencyService;
-    @MockitoBean
+    @MockBean
     private FmsVoucherService voucherService;
-    @MockitoBean
+    @MockBean
     private FmsVoucherTemplateService voucherTemplateService;
-    @MockitoBean
+    @MockBean
     private FmsInitialBalanceService initialBalanceService;
-    @MockitoBean
+    @MockBean
     private FmsAuxiliaryCombinationService auxiliaryCombinationService;
-    @MockitoBean
+    @MockBean
     private FmsClosingSchemeService closingSchemeService;
-    @MockitoBean
+    @MockBean
     private FmsClosingTemplateService closingTemplateService;
 
     @Test

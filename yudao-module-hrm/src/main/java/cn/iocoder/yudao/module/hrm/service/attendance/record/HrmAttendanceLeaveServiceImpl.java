@@ -16,7 +16,7 @@ import cn.iocoder.yudao.module.hrm.dal.dataobject.attendance.record.HrmAttendanc
 import cn.iocoder.yudao.module.hrm.dal.dataobject.employee.info.HrmEmployeeDO;
 import cn.iocoder.yudao.module.hrm.dal.mysql.attendance.record.HrmAttendanceLeaveMapper;
 import cn.iocoder.yudao.module.hrm.service.employee.info.HrmEmployeeService;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;

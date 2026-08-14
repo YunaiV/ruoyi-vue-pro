@@ -60,7 +60,7 @@ public interface HrmRecruitPostMapper extends BaseMapperX<HrmRecruitPostDO> {
                 .set(updateObj.getPostTypeId() == null, HrmRecruitPostDO::getPostTypeId, null));
     }
 
-    private QueryWrapperX<HrmRecruitPostDO> buildQueryWrapper(HrmRecruitPostPageReqVO reqVO) {
+    default QueryWrapperX<HrmRecruitPostDO> buildQueryWrapper(HrmRecruitPostPageReqVO reqVO) {
         return new QueryWrapperX<HrmRecruitPostDO>()
                 .likeIfPresent("post_name", reqVO.getPostName())
                 .eqIfPresent("job_nature", reqVO.getJobNature())
