@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.hrm.controller.admin.recruit.vo.post;
 
-import cn.iocoder.yudao.module.system.framework.operatelog.core.AreaParseFunction;
+import cn.iocoder.yudao.module.hrm.framework.operatelog.core.HrmAreaParseFunction;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mzt.logapi.starter.annotation.DiffLogField;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -43,7 +43,7 @@ public class HrmRecruitPostSaveReqVO {
     private Integer jobNature;
 
     @Schema(description = "工作城市地区编号", example = "310115")
-    @DiffLogField(name = "工作城市", function = AreaParseFunction.NAME)
+    @DiffLogField(name = "工作城市", function = HrmAreaParseFunction.NAME)
     private Integer areaId;
 
     @Schema(description = "招聘人数", example = "3")
