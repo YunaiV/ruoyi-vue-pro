@@ -157,13 +157,17 @@ public abstract class CodegenEngineAbstractTest extends BaseMockitoUnitTest {
             String lastFilePath = StrUtil.subAfter(filePath, '/', true);
             String ext = StrUtil.subAfter(lastFilePath, '.', true);
             String name = StrUtil.subBefore(lastFilePath, '.', true);
-            String contentPath = ext + '/' + name;
-            // 同名文件（如 index.vue 同时出现在 列表/form/detail）会撞名，撞名时前缀补上级目录区分；仍撞则加序号兜底，避免快照互相覆盖
+            String parentPath = StrUtil.subBefore(filePath, '/' + lastFilePath, true);
+            String parentDir = StrUtil.subAfter(parentPath, '/', true);
+            // index.vue 按页面语义稳定归档，避免结果迭代顺序导致列表页和表单页的快照路径互换
+            String contentPath = "index".equals(name) && ("form".equals(parentDir) || "detail".equals(parentDir))
+                    ? ext + '/' + parentDir + '/' + name : ext + '/' + name;
+            // ERP 多个子表的 form/index.vue 仍可能撞名，继续补充祖父目录区分
             if (usedContentPaths.contains(contentPath)) {
-                String parentDir = StrUtil.subAfter(StrUtil.subBefore(filePath, '/' + lastFilePath, true), '/', true);
-                contentPath = ext + '/' + parentDir + '/' + name;
+                String grandParentDir = StrUtil.subAfter(StrUtil.subBefore(parentPath, '/' + parentDir, true), '/', true);
+                contentPath = ext + '/' + grandParentDir + '/' + parentDir + '/' + name;
                 for (int i = 2; usedContentPaths.contains(contentPath); i++) {
-                    contentPath = ext + '/' + parentDir + '/' + name + '-' + i;
+                    contentPath = ext + '/' + grandParentDir + '/' + parentDir + '/' + name + '-' + i;
                 }
             }
             usedContentPaths.add(contentPath);

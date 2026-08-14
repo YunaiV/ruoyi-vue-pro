@@ -208,17 +208,21 @@ public class LiveKitClient {
     /**
      * 签发管理 Token；用于调 Server API（DeleteRoom / ListParticipants / RemoveParticipant 等）
      *
+     * @param room 房间名；LiveKit 的 roomAdmin 权限必须限定到具体房间
      * @return JWT 字符串
      */
-    private String signAdminToken() {
+    private String signAdminToken(String room) {
         ImProperties.Rtc cfg = imProperties.getRtc();
         // roomAdmin claim 给管理类 API 必备
+        Map<String, Object> video = new HashMap<>();
+        video.put("roomAdmin", true);
+        video.put("room", room);
         long nowSec = Instant.now().getEpochSecond();
         return JWT.create()
                 .setIssuer(cfg.getApiKey())
                 .setNotBefore(new Date(nowSec * 1000))
                 .setExpiresAt(new Date((nowSec + ADMIN_TOKEN_TTL.getSeconds()) * 1000))
-                .setPayload("video", MapUtil.of("roomAdmin", true))
+                .setPayload("video", video)
                 .setSigner(JWTSignerUtil.hs256(cfg.getApiSecret().getBytes(StandardCharsets.UTF_8)))
                 .sign();
     }
@@ -232,7 +236,7 @@ public class LiveKitClient {
      */
     private HttpResponse postTwirp(String path, String room) {
         Assert.notBlank(room, "room 不可为空");
-        String token = signAdminToken();
+        String token = signAdminToken(room);
         return HttpRequest.post(HttpUtils.wsUrlToHttp(imProperties.getRtc().getLivekitUrl()) + path)
                 .header("Authorization", "Bearer " + token)
                 .header("Content-Type", "application/json")

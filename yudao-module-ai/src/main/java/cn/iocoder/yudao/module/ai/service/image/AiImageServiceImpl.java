@@ -29,14 +29,12 @@ import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import com.alibaba.cloud.ai.dashscope.image.DashScopeImageOptions;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springaicommunity.qianfan.QianFanImageOptions;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.image.ImageOptions;
 import org.springframework.ai.image.ImagePrompt;
 import org.springframework.ai.image.ImageResponse;
 import org.springframework.ai.openai.OpenAiImageOptions;
 import org.springframework.ai.stabilityai.api.StabilityAiImageOptions;
-import org.springframework.ai.zhipuai.ZhiPuAiImageOptions;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -167,15 +165,6 @@ public class AiImageServiceImpl implements AiImageService {
             return DashScopeImageOptions.builder()
                     .model(model.getModel()).n(1)
                     .height(draw.getHeight()).width(draw.getWidth())
-                    .build();
-        } else if (ObjUtil.equal(model.getPlatform(), AiPlatformEnum.YI_YAN.getPlatform())) {
-            return QianFanImageOptions.builder()
-                    .model(model.getModel()).N(1)
-                    .height(draw.getHeight()).width(draw.getWidth())
-                    .build();
-        } else if (ObjUtil.equal(model.getPlatform(), AiPlatformEnum.ZHI_PU.getPlatform())) {
-            return ZhiPuAiImageOptions.builder()
-                    .model(model.getModel())
                     .build();
         }
         throw new IllegalArgumentException("不支持的 AI 平台：" + model.getPlatform());

@@ -23,6 +23,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -62,19 +64,42 @@ public class ImChannelMessageManagerController {
     @PreAuthorize("@ss.hasPermission('im:manager:channel-message:query')")
     public CommonResult<PageResult<ImChannelMessageRespVO>> getMessagePage(@Valid ImChannelMessagePageReqVO pageReqVO) {
         PageResult<ImChannelMessageDO> pageResult = channelMessageService.getMessagePage(pageReqVO);
-        if (CollUtil.isEmpty(pageResult.getList())) {
-            return success(PageResult.empty(pageResult.getTotal()));
+        return success(new PageResult<>(buildMessageRespVOList(pageResult.getList()), pageResult.getTotal()));
+    }
+
+    @GetMapping("/get")
+    @Operation(summary = "获得频道消息详情")
+    @Parameter(name = "id", description = "消息编号", required = true, example = "1024")
+    @PreAuthorize("@ss.hasPermission('im:manager:channel-message:query')")
+    public CommonResult<ImChannelMessageRespVO> getMessage(@RequestParam("id") Long id) {
+        ImChannelMessageDO message = channelMessageService.getMessage(id);
+        return success(buildMessageRespVO(message));
+    }
+
+    // ==================== 拼接 VO ====================
+
+    private ImChannelMessageRespVO buildMessageRespVO(ImChannelMessageDO message) {
+        if (message == null) {
+            return null;
         }
-        // 批量查询频道和素材，并回填频道名 / 素材标题
+        return CollUtil.getFirst(buildMessageRespVOList(Collections.singletonList(message)));
+    }
+
+    private List<ImChannelMessageRespVO> buildMessageRespVOList(List<ImChannelMessageDO> messages) {
+        if (CollUtil.isEmpty(messages)) {
+            return Collections.emptyList();
+        }
+        // 1. 查询关联数据
         Map<Long, ImChannelDO> channelMap = channelService.getChannelMap(
-                convertSet(pageResult.getList(), ImChannelMessageDO::getChannelId));
+                convertSet(messages, ImChannelMessageDO::getChannelId));
         Map<Long, ImChannelMaterialDO> materialMap = channelMaterialService.getMaterialMap(
-                convertSet(pageResult.getList(), ImChannelMessageDO::getMaterialId));
-        return success(BeanUtils.toBean(pageResult, ImChannelMessageRespVO.class, vo -> {
-            MapUtils.findAndThen(channelMap, vo.getChannelId(), c -> vo.setChannelName(c.getName()));
+                convertSet(messages, ImChannelMessageDO::getMaterialId));
+        // 2. 拼接 VO
+        return BeanUtils.toBean(messages, ImChannelMessageRespVO.class, vo -> {
+            MapUtils.findAndThen(channelMap, vo.getChannelId(), channel -> vo.setChannelName(channel.getName()));
             MapUtils.findAndThen(materialMap, vo.getMaterialId(),
                     material -> vo.setMaterialTitle(material.getTitle()).setMaterialCoverUrl(material.getCoverUrl()));
-        }));
+        });
     }
 
 }

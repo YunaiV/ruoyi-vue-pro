@@ -44,6 +44,36 @@ public class YudaoAiProperties {
     private BaiChuan baichuan;
 
     /**
+     * 文心一言
+     */
+    private YiYan yiyan;
+
+    /**
+     * 智谱
+     */
+    private ZhiPu zhipu;
+
+    /**
+     * MiniMax
+     */
+    private MiniMax minimax;
+
+    /**
+     * 月之暗面
+     */
+    private Moonshot moonshot;
+
+    /**
+     * 阶跃星辰
+     */
+    private StepFun stepfun;
+
+    /**
+     * Grok
+     */
+    private Grok grok;
+
+    /**
      * Midjourney 绘图
      */
     private Midjourney midjourney;
@@ -116,9 +146,7 @@ public class YudaoAiProperties {
     public static class XingHuo {
 
         private String enable;
-        private String appId;
-        private String appKey;
-        private String secretKey;
+        private String apiKey;
 
         private String model;
         private Double temperature;
@@ -132,6 +160,76 @@ public class YudaoAiProperties {
 
         private String enable;
         private String apiKey;
+
+        private String model;
+        private Double temperature;
+        private Integer maxTokens;
+        private Double topP;
+
+    }
+
+    @Data
+    public static class YiYan {
+
+        private String enable;
+        private String baseUrl;
+        private String apiKey;
+
+        private String model;
+        private Double temperature;
+        private Integer maxTokens;
+        private Double topP;
+
+    }
+
+    @Data
+    public static class ZhiPu {
+
+        private String enable;
+        private String baseUrl;
+        private String apiKey;
+
+        private String model;
+        private Double temperature;
+        private Integer maxTokens;
+        private Double topP;
+
+    }
+
+    @Data
+    public static class MiniMax {
+
+        private String enable;
+        private String baseUrl;
+        private String apiKey;
+
+        private String model;
+        private Double temperature;
+        private Integer maxTokens;
+        private Double topP;
+
+    }
+
+    @Data
+    public static class Moonshot {
+
+        private String enable;
+        private String baseUrl;
+        private String apiKey;
+
+        private String model;
+        private Double temperature;
+        private Integer maxTokens;
+        private Double topP;
+
+    }
+
+    @Data
+    public static class StepFun {
+
+        private String enable;
+        private String apiKey;
+        private String baseUrl;
 
         private String model;
         private Double temperature;

@@ -1,0 +1,34 @@
+import { http } from '@/http/http'
+
+/** 分类信息 */
+export interface Category {
+  id?: number
+  name: string
+  parentId: number
+  children?: Category[]
+}
+
+/** 获取分类列表 */
+export function getCategoryList(params?: Record<string, any>) {
+  return http.get<Category[]>('/infra/category/list', params)
+}
+
+/** 获取分类详情 */
+export function getCategory(id: number) {
+  return http.get<Category>(`/infra/category/get?id=${id}`)
+}
+
+/** 创建分类 */
+export function createCategory(data: Category) {
+  return http.post<number>('/infra/category/create', data)
+}
+
+/** 更新分类 */
+export function updateCategory(data: Category) {
+  return http.put<boolean>('/infra/category/update', data)
+}
+
+/** 删除分类 */
+export function deleteCategory(id: number) {
+  return http.delete<boolean>(`/infra/category/delete?id=${id}`)
+}

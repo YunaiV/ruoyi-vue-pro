@@ -1,7 +1,10 @@
 package cn.iocoder.yudao.module.bpm.controller.admin.definition;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.*;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelUpdateReqVO;
@@ -18,6 +21,7 @@ import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
@@ -27,16 +31,20 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
+import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.MODEL_IMPORT_FAIL_INVALID;
 
 @Tag(name = "管理后台 - 流程模型")
 @RestController
@@ -112,11 +120,49 @@ public class BpmModelController {
         return success(BpmModelConvert.INSTANCE.buildModel(model, bpmnBytes, simpleModel));
     }
 
+    @GetMapping("/export")
+    @Operation(summary = "导出模型")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @PreAuthorize("@ss.hasPermission('bpm:model:export')")
+    public CommonResult<BpmModelSaveReqVO> exportModel(@RequestParam("id") String id) {
+        return success(modelService.exportModel(id));
+    }
+
     @PostMapping("/create")
     @Operation(summary = "新建模型")
     @PreAuthorize("@ss.hasPermission('bpm:model:create')")
     public CommonResult<String> createModel(@Valid @RequestBody BpmModelSaveReqVO createRetVO) {
         return success(modelService.createModel(createRetVO));
+    }
+
+    @PostMapping("/import")
+    @Operation(summary = "导入模型")
+    @Parameters({
+            @Parameter(name = "file", description = "流程模型 JSON 文件", required = true),
+            @Parameter(name = "key", description = "流程标识，替换导入文件中的标识", example = "process_yudao"),
+            @Parameter(name = "name", description = "流程名称，替换导入文件中的名称", example = "芋道")
+    })
+    @PreAuthorize("@ss.hasPermission('bpm:model:import')")
+    public CommonResult<String> importModel(@RequestParam("file") MultipartFile file,
+                                            @RequestParam(value = "key", required = false) String key,
+                                            @RequestParam(value = "name", required = false) String name) throws IOException {
+        BpmModelSaveReqVO reqVO;
+        try {
+            reqVO = JsonUtils.parseObject(file.getBytes(), BpmModelSaveReqVO.class);
+        } catch (RuntimeException ex) {
+            throw exception(MODEL_IMPORT_FAIL_INVALID);
+        }
+        if (reqVO == null) {
+            throw exception(MODEL_IMPORT_FAIL_INVALID);
+        }
+        if (StrUtil.isNotEmpty(key)) {
+            reqVO.setKey(key);
+        }
+        if (StrUtil.isNotEmpty(name)) {
+            reqVO.setName(name);
+        }
+        ValidationUtils.validate(reqVO);
+        return success(modelService.importModel(reqVO));
     }
 
     @PutMapping("/update")

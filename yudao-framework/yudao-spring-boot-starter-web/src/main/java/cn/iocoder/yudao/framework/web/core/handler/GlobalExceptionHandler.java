@@ -23,6 +23,7 @@ import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.ValidationException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.util.Assert;
@@ -53,6 +54,7 @@ import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeC
  * @author 芋道源码
  */
 @RestControllerAdvice
+@Order(0) // 优先于三方库默认的全局异常处理器，例如 JimuReport
 @AllArgsConstructor
 @Slf4j
 public class GlobalExceptionHandler {

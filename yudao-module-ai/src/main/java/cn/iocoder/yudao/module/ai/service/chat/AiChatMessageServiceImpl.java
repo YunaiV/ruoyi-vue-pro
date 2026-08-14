@@ -525,6 +525,11 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
     }
 
     @Override
+    public AiChatMessageDO getChatMessage(Long id) {
+        return chatMessageMapper.selectById(id);
+    }
+
+    @Override
     public void deleteChatMessage(Long id, Long userId) {
         // 1. 校验消息存在
         AiChatMessageDO message = chatMessageMapper.selectById(id);
@@ -555,6 +560,11 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
         }
         // 2. 执行删除
         chatMessageMapper.deleteById(id);
+    }
+
+    @Override
+    public Integer getChatMessageCount(Long conversationId) {
+        return chatMessageMapper.selectCount(AiChatMessageDO::getConversationId, conversationId).intValue();
     }
 
     @Override

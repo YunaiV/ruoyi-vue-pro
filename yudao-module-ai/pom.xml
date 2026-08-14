@@ -19,11 +19,23 @@
           国外：OpenAI、Ollama、Midjourney、StableDiffusion、Suno
     </description>
     <properties>
-        <spring-ai.version>1.1.5</spring-ai.version>
+        <spring-ai.version>1.1.8</spring-ai.version>
         <!-- https://mvnrepository.com/artifact/com.alibaba.cloud.ai/spring-ai-alibaba -->
         <alibaba-ai.version>1.1.2.2</alibaba-ai.version>
         <tinyflow.version>1.2.6</tinyflow.version>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-bom</artifactId>
+                <version>${spring-ai.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
@@ -112,37 +124,11 @@
             <version>${spring-ai.version}</version>
         </dependency>
         <dependency>
-            <!-- 智谱 GLM -->
-            <groupId>org.springframework.ai</groupId>
-            <artifactId>spring-ai-starter-model-zhipuai</artifactId>
-            <version>${spring-ai.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.ai</groupId>
-            <artifactId>spring-ai-starter-model-minimax</artifactId>
-            <version>${spring-ai.version}</version>
-        </dependency>
-
-        <dependency>
             <!-- 通义千问 -->
             <groupId>com.alibaba.cloud.ai</groupId>
             <artifactId>spring-ai-alibaba-starter-dashscope</artifactId>
             <version>${alibaba-ai.version}</version>
         </dependency>
-
-        <dependency>
-            <!-- 文心一言 -->
-            <groupId>org.springaicommunity</groupId>
-            <artifactId>qianfan-spring-boot-starter</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-        <dependency>
-            <!-- 月之暗面 -->
-            <groupId>org.springaicommunity</groupId>
-            <artifactId>moonshot-spring-boot-starter</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-
         <!-- 向量存储：https://db-engines.com/en/ranking/vector+dbms -->
         <dependency>
             <!-- Qdrant：https://qdrant.tech/ -->
@@ -255,6 +241,10 @@
                 <exclusion>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-reload4j</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.alibaba</groupId>
+                    <artifactId>fastjson</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

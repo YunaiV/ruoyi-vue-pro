@@ -38,7 +38,7 @@
         </wd-button>
         <wd-button
           v-if="hasAccessByCodes(['infra:student:delete'])"
-          class="flex-1" type="error" :loading="deleting" @click="handleDelete"
+          class="flex-1" type="danger" :loading="deleting" @click="handleDelete"
         >
           删除
         </wd-button>
@@ -51,6 +51,7 @@
 import type { Student } from '@/api/infra/demo'
 import { onUnload } from '@dcloudio/uni-app'
 import { onMounted, ref } from 'vue'
+import { useDialog } from '@wot-ui/ui/components/wd-dialog'
 import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { deleteStudent, getStudent } from '@/api/infra/demo'
 import { useAccess } from '@/hooks/useAccess'
@@ -59,7 +60,7 @@ import { DICT_TYPE } from '@/utils/constants'
 import { formatDateTime } from '@/utils/date'
 
 const props = defineProps<{
-  id?: number | any
+  id?: number
 }>()
 
 definePage({
@@ -70,6 +71,7 @@ definePage({
 })
 
 const { hasAccessByCodes } = useAccess()
+const dialog = useDialog()
 const toast = useToast()
 const formData = ref<Student>() // 详情数据
 const deleting = ref(false) // 删除状态
@@ -100,28 +102,27 @@ function handleEdit() {
 }
 
 /** 删除学生 */
-function handleDelete() {
+async function handleDelete() {
   if (!props.id) {
     return
   }
-  uni.showModal({
-    title: '提示',
-    content: '确定要删除该学生吗？',
-    success: async (res) => {
-      if (!res.confirm) {
-        return
-      }
-      deleting.value = true
-      try {
-        await deleteStudent(props.id)
-        toast.success('删除成功')
-        uni.$emit('infra:demo:reload')
-        delay(handleBack)
-      } finally {
-        deleting.value = false
-      }
-    },
-  })
+  try {
+    await dialog.confirm({
+      title: '提示',
+      msg: '确定要删除该学生吗？',
+    })
+  } catch {
+    return
+  }
+  deleting.value = true
+  try {
+    await deleteStudent(props.id)
+    toast.success('删除成功')
+    uni.$emit('infra:demo:reload')
+    delay(handleBack)
+  } finally {
+    deleting.value = false
+  }
 }
 
 /** 初始化 */

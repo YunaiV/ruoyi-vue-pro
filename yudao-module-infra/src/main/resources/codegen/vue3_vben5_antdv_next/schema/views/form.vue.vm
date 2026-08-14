@@ -6,7 +6,7 @@ import { computed, ref } from 'vue';
 
 import { useVbenModal } from '@vben/common-ui';
 
-import { message#if ($table.templateType == 11), Tabs#end } from 'antdv-next';
+import { message#if ($table.templateType == 10 || $table.templateType == 12), TabPane, Tabs#end } from 'antdv-next';
 
 import { useVbenForm } from '#/adapter/form';
 import { create${simpleClassName}, get${simpleClassName}, update${simpleClassName} } from '#/api/${table.moduleName}/${table.businessName}';

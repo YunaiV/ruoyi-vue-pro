@@ -7,6 +7,8 @@ import cn.iocoder.yudao.module.mes.dal.dataobject.dv.repair.MesDvRepairLineDO;
 
 import jakarta.validation.Valid;
 
+import java.util.List;
+
 /**
  * MES 维修工单行 Service 接口
  *
@@ -51,6 +53,14 @@ public interface MesDvRepairLineService {
      * @return 维修工单行分页
      */
     PageResult<MesDvRepairLineDO> getRepairLinePage(MesDvRepairLinePageReqVO pageReqVO);
+
+    /**
+     * 获得指定维修工单的明细列表
+     *
+     * @param repairId 维修工单编号
+     * @return 明细列表
+     */
+    List<MesDvRepairLineDO> getRepairLineListByRepairId(Long repairId);
 
     /**
      * 根据维修工单编号删除所有行

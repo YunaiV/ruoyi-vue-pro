@@ -164,36 +164,28 @@ spring:
         client:
           host: 127.0.0.1
           port: 19530
-    qianfan: # 文心一言
-      api-key: x0cuLZ7XsaTCU08vuJWO87Lg
-      secret-key: R9mYF9dl9KASgi5RUq0FQt3wRisSnOcK
-    zhipuai: # 智谱 AI
-      api-key: 32f84543e54eee31f8d56b2bd6020573.3vh9idLJZ2ZhxDEs
     openai: # OpenAI 官方
-      api-key: sk-aN6nWn3fILjrgLFT0fC4Aa60B72e4253826c77B29dC94f17
-      base-url: https://api.gptsapi.net
+      base-url: ${OPENAI_BASE_URL:https://api.openai.com}
+      api-key: ${OPENAI_API_KEY:sk-xxxx}
     azure: # OpenAI 微软
       openai:
         endpoint: https://eastusprejade.openai.azure.com
     anthropic: # Anthropic Claude
-      api-key: sk-muubv7cXeLw0Etgs743f365cD5Ea44429946Fa7e672d8942
+      base-url: ${ANTHROPIC_BASE_URL:https://api.anthropic.com}
+      api-key: ${ANTHROPIC_API_KEY:sk-xxxx}
     ollama:
       base-url: http://127.0.0.1:11434
       chat:
         model: llama3
     stabilityai:
-      api-key: sk-e53UqbboF8QJCscYvzJscJxJXoFcFg4iJjl1oqgE7baJETmx
+      api-key: ${STABILITYAI_API_KEY:sk-xxxx}
     dashscope: # 通义千问
-      api-key: sk-47aa124781be4bfb95244cc62f6xxxx
-    minimax: # Minimax：https://www.minimaxi.com/
-      api-key: xxxx
-    moonshot: # 月之暗面（KIMI）
-      api-key: sk-abc
+      api-key: ${DASHSCOPE_API_KEY:sk-xxxx}
     deepseek: # DeepSeek
-      api-key: sk-e94db327cc7d457d99a8de8810fc6b12
+      api-key: ${DEEPSEEK_API_KEY:sk-xxxx}
       chat:
         options:
-          model: deepseek-chat
+          model: deepseek-v4-flash
     model:
       rerank: false # 是否开启“通义千问”的 Rerank 模型，填写 dashscope 开启
     mcp:
@@ -218,34 +210,57 @@ yudao:
   ai:
     gemini: # 谷歌 Gemini
       enable: true
-      api-key: AIzaSyAVoBxgoFvvte820vEQMma2LKBnC98bqMQ
+      api-key: ${GEMINI_API_KEY:sk-xxxx}
       model: gemini-2.5-flash
     doubao: # 字节豆包
       enable: true
-      api-key: 5c1b5747-26d2-4ebd-a4e0-dd0e8d8b4272
-      model: doubao-1-5-lite-32k-250115
+      api-key: ${DOUBAO_API_KEY:sk-xxxx}
+      model: doubao-seed-2-1-turbo-260628
     hunyuan: # 腾讯混元
       enable: true
-      api-key: sk-abc
-      model: hunyuan-turbo
+      api-key: ${HUNYUAN_API_KEY:sk-xxxx}
+      model: hy3-preview
     siliconflow: # 硅基流动
       enable: true
-      api-key: sk-epsakfenqnyzoxhmbucsxlhkdqlcbnimslqoivkshalvdozz
-      model: deepseek-ai/DeepSeek-R1-Distill-Qwen-7B
+      api-key: ${SILICONFLOW_API_KEY:sk-xxxx}
+      model: deepseek-ai/DeepSeek-V4-Pro
     xinghuo: # 讯飞星火
       enable: true
-      appKey: 75b161ed2aef4719b275d6e7f2a4d4cd
-      secretKey: YWYxYWI2MTA4ODI2NGZlYTQyNjAzZTcz
-      model: x1
+      api-key: ${XINGHUO_API_KEY:sk-xxxx}
+      model: x2-flash
     baichuan: # 百川智能
       enable: true
-      api-key: sk-abc
-      model: Baichuan4-Turbo
+      api-key: ${BAICHUAN_API_KEY:sk-xxxx}
+      model: Baichuan-M3
+    yiyan: # 文心一言
+      enable: false
+      api-key: ${YIYAN_API_KEY:sk-xxxx}
+      model: ernie-5.1
+    zhipu: # 智谱 AI（GLM）
+      enable: false
+      api-key: ${ZHIPU_API_KEY:sk-xxxx}
+      model: glm-5.2
+    minimax: # MiniMax
+      enable: false
+      api-key: ${MINIMAX_API_KEY:sk-xxxx}
+      model: MiniMax-M3
+    moonshot: # 月之暗面（KIMI）
+      enable: false
+      api-key: ${MOONSHOT_API_KEY:sk-xxxx}
+      model: kimi-k2.6
+    stepfun: # 阶跃星辰
+      enable: false
+      api-key: ${STEPFUN_API_KEY:sk-xxxx}
+      model: step-3.7-flash
+    grok: # Grok
+      enable: false
+      api-key: ${GROK_API_KEY:sk-xxxx}
+      model: grok-4.3
     midjourney:
       enable: true
   #    base-url: https://api.holdai.top/mj-relax/mj
       base-url: https://api.holdai.top/mj
-      api-key: sk-dZEPiVaNcT3FHhef51996bAa0bC74806BeAb620dA5Da10Bf
+      api-key: ${MIDJOURNEY_API_KEY:sk-xxxx}
       notify-url: http://java.nat300.top/admin-api/ai/image/midjourney/notify
     suno:
       enable: true
@@ -253,7 +268,7 @@ yudao:
       base-url: http://127.0.0.1:3001
     web-search:
       enable: true
-      api-key: sk-40500e52840f4d24b956d0b1d80d9abe
+      api-key: ${WEB_SEARCH_API_KEY:sk-xxxx}
 
 --- #################### 芋道相关配置 ####################
 

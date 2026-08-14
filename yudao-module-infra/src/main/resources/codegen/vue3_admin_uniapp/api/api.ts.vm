@@ -1,36 +1,80 @@
+#if ($table.templateType != 2)
 import type { PageParam, PageResult } from '@/http/types'
+#end
 import { http } from '@/http/http'
 
 #set ($primaryJavaType = $primaryColumn.javaType.toLowerCase())
-#if(${primaryJavaType} == "long" || ${primaryJavaType} == "integer" || ${primaryJavaType} == "short" || ${primaryJavaType} == "double" || ${primaryJavaType} == "bigdecimal" || ${primaryJavaType} == "byte")
+#if(${primaryJavaType} == "long" || ${primaryJavaType} == "integer" || ${primaryJavaType} == "short" || ${primaryJavaType} == "float" || ${primaryJavaType} == "double" || ${primaryJavaType} == "bigdecimal" || ${primaryJavaType} == "byte")
 #set ($primaryTsType = "number")
 #else
 #set ($primaryTsType = "string")
 #end
-/** ${table.classComment}信息 */
-export interface ${simpleClassName} {
-#foreach ($column in $columns)
-  #if ($column.primaryKey || $column.createOperation || $column.updateOperation || $column.listOperationResult)
-    #set ($javaType = $column.javaType.toLowerCase())
-    #set ($javaFieldLower = $column.javaField.toLowerCase())
-    #set ($optional = $column.nullable || $column.primaryKey || $javaFieldLower == "createtime" || $javaFieldLower == "updatetime")
-    #if(${javaType} == "long" || ${javaType} == "integer" || ${javaType} == "short" || ${javaType} == "double" || ${javaType} == "bigdecimal" || ${javaType} == "byte")
+#foreach ($subTable in $subTables)
+#set ($index = $foreach.count - 1)
+#set ($subSimpleClassName = $subSimpleClassNames.get($index))
+#set ($subColumns = $subColumnsList.get($index))
+#set ($subJoinColumn = $subJoinColumns.get($index))
+/** ${subTable.classComment}信息 */
+export interface ${subSimpleClassName} {
+#foreach ($column in $subColumns)
+#if ($column.primaryKey || $column.createOperation || $column.updateOperation || $column.listOperationResult)
+#set ($javaType = $column.javaType.toLowerCase())
+#set ($optional = $column.nullable || $column.primaryKey || ($table.templateType != 11 && $column.id == $subJoinColumn.id))
+#if(${javaType} == "long" || ${javaType} == "integer" || ${javaType} == "short" || ${javaType} == "float" || ${javaType} == "double" || ${javaType} == "bigdecimal" || ${javaType} == "byte")
   ${column.javaField}#if($optional)?#end: number
-    #elseif(${javaType} == "date" || ${javaType} == "localdate" || ${javaType} == "localdatetime")
-  ${column.javaField}#if($optional)?#end: Date
-    #elseif(${javaType} == "boolean")
+#elseif(${javaType} == "date" || ${javaType} == "localdate" || ${javaType} == "localdatetime")
+  ${column.javaField}#if($optional)?#end: number
+#elseif(${javaType} == "boolean")
   ${column.javaField}#if($optional)?#end: boolean
-    #else
+#else
   ${column.javaField}#if($optional)?#end: string
-    #end
-  #end
+#end
+#end
 #end
 }
 
+#end
+/** ${table.classComment}信息 */
+export interface ${simpleClassName} {
+#foreach ($column in $columns)
+#if ($column.primaryKey || $column.createOperation || $column.updateOperation || $column.listOperationResult)
+#set ($javaType = $column.javaType.toLowerCase())
+#set ($optional = $column.nullable || $column.primaryKey)
+#if(${javaType} == "long" || ${javaType} == "integer" || ${javaType} == "short" || ${javaType} == "float" || ${javaType} == "double" || ${javaType} == "bigdecimal" || ${javaType} == "byte")
+  ${column.javaField}#if($optional)?#end: number
+#elseif(${javaType} == "date" || ${javaType} == "localdate" || ${javaType} == "localdatetime")
+  ${column.javaField}#if($optional)?#end: number
+#elseif(${javaType} == "boolean")
+  ${column.javaField}#if($optional)?#end: boolean
+#else
+  ${column.javaField}#if($optional)?#end: string
+#end
+#end
+#end
+#if ($table.templateType == 2)
+  children?: ${simpleClassName}[]
+#end
+#if ($table.templateType == 10 || $table.templateType == 12)
+#foreach ($subTable in $subTables)
+#set ($index = $foreach.count - 1)
+#set ($subSimpleClassName = $subSimpleClassNames.get($index))
+#set ($subClassNameVar = $subClassNameVars.get($index))
+  ${subClassNameVar}#if($subTable.subJoinMany)s#end?: ${subSimpleClassName}#if($subTable.subJoinMany)[]#else | null#end
+#end
+#end
+}
+
+#if ($table.templateType == 2)
+/** 获取${table.classComment}列表 */
+export function get${simpleClassName}List(params?: Record<string, any>) {
+  return http.get<${simpleClassName}[]>('/${table.moduleName}/${simpleClassName_strikeCase}/list', params)
+}
+#else
 /** 获取${table.classComment}分页列表 */
 export function get${simpleClassName}Page(params: PageParam) {
   return http.get<PageResult<${simpleClassName}>>('/${table.moduleName}/${simpleClassName_strikeCase}/page', params)
 }
+#end
 
 /** 获取${table.classComment}详情 */
 export function get${simpleClassName}(id: ${primaryTsType}) {
@@ -39,7 +83,7 @@ export function get${simpleClassName}(id: ${primaryTsType}) {
 
 /** 创建${table.classComment} */
 export function create${simpleClassName}(data: ${simpleClassName}) {
-  return http.post<number>('/${table.moduleName}/${simpleClassName_strikeCase}/create', data)
+  return http.post<${primaryTsType}>('/${table.moduleName}/${simpleClassName_strikeCase}/create', data)
 }
 
 /** 更新${table.classComment} */
@@ -51,3 +95,65 @@ export function update${simpleClassName}(data: ${simpleClassName}) {
 export function delete${simpleClassName}(id: ${primaryTsType}) {
   return http.delete<boolean>(`/${table.moduleName}/${simpleClassName_strikeCase}/delete?id=${id}`)
 }
+#foreach ($subTable in $subTables)
+#set ($index = $foreach.count - 1)
+#set ($subSimpleClassName = $subSimpleClassNames.get($index))
+#set ($subPrimaryColumn = $subPrimaryColumns.get($index))
+#set ($subJoinColumn = $subJoinColumns.get($index))
+#set ($subPrimaryJavaType = $subPrimaryColumn.javaType.toLowerCase())
+#if(${subPrimaryJavaType} == "long" || ${subPrimaryJavaType} == "integer" || ${subPrimaryJavaType} == "short" || ${subPrimaryJavaType} == "float" || ${subPrimaryJavaType} == "double" || ${subPrimaryJavaType} == "bigdecimal" || ${subPrimaryJavaType} == "byte")
+#set ($subPrimaryTsType = "number")
+#else
+#set ($subPrimaryTsType = "string")
+#end
+#set ($subJoinJavaType = $subJoinColumn.javaType.toLowerCase())
+#if(${subJoinJavaType} == "long" || ${subJoinJavaType} == "integer" || ${subJoinJavaType} == "short" || ${subJoinJavaType} == "float" || ${subJoinJavaType} == "double" || ${subJoinJavaType} == "bigdecimal" || ${subJoinJavaType} == "byte")
+#set ($subJoinTsType = "number")
+#else
+#set ($subJoinTsType = "string")
+#end
+#set ($SubJoinColumnName = $subJoinColumn.javaField.substring(0,1).toUpperCase() + $subJoinColumn.javaField.substring(1))
+#set ($subSimpleClassName_strikeCase = $subSimpleClassName_strikeCases.get($index))
+#set ($subJoinColumn_strikeCase = $subJoinColumn_strikeCases.get($index))
+
+// ==================== 子表：${subTable.classComment} ====================
+#if ($table.templateType == 11)
+
+/** 获取${subTable.classComment}分页列表 */
+export function get${subSimpleClassName}Page(params: PageParam & { ${subJoinColumn.javaField}: ${subJoinTsType} }) {
+  return http.get<PageResult<${subSimpleClassName}>>('/${table.moduleName}/${simpleClassName_strikeCase}/${subSimpleClassName_strikeCase}/page', params)
+}
+
+/** 获取${subTable.classComment}详情 */
+export function get${subSimpleClassName}(id: ${subPrimaryTsType}) {
+  return http.get<${subSimpleClassName}>(`/${table.moduleName}/${simpleClassName_strikeCase}/${subSimpleClassName_strikeCase}/get?id=${id}`)
+}
+
+/** 创建${subTable.classComment} */
+export function create${subSimpleClassName}(data: ${subSimpleClassName}) {
+  return http.post<${subPrimaryTsType}>('/${table.moduleName}/${simpleClassName_strikeCase}/${subSimpleClassName_strikeCase}/create', data)
+}
+
+/** 更新${subTable.classComment} */
+export function update${subSimpleClassName}(data: ${subSimpleClassName}) {
+  return http.put<boolean>('/${table.moduleName}/${simpleClassName_strikeCase}/${subSimpleClassName_strikeCase}/update', data)
+}
+
+/** 删除${subTable.classComment} */
+export function delete${subSimpleClassName}(id: ${subPrimaryTsType}) {
+  return http.delete<boolean>(`/${table.moduleName}/${simpleClassName_strikeCase}/${subSimpleClassName_strikeCase}/delete?id=${id}`)
+}
+#elseif ($subTable.subJoinMany)
+
+/** 获取${subTable.classComment}列表 */
+export function get${subSimpleClassName}ListBy${SubJoinColumnName}(${subJoinColumn.javaField}: ${subJoinTsType}) {
+  return http.get<${subSimpleClassName}[]>(`/${table.moduleName}/${simpleClassName_strikeCase}/${subSimpleClassName_strikeCase}/list-by-${subJoinColumn_strikeCase}?${subJoinColumn.javaField}=#[[${]]#${subJoinColumn.javaField}#[[}]]#`)
+}
+#else
+
+/** 获取${subTable.classComment} */
+export function get${subSimpleClassName}By${SubJoinColumnName}(${subJoinColumn.javaField}: ${subJoinTsType}) {
+  return http.get<${subSimpleClassName} | null>(`/${table.moduleName}/${simpleClassName_strikeCase}/${subSimpleClassName_strikeCase}/get-by-${subJoinColumn_strikeCase}?${subJoinColumn.javaField}=#[[${]]#${subJoinColumn.javaField}#[[}]]#`)
+}
+#end
+#end

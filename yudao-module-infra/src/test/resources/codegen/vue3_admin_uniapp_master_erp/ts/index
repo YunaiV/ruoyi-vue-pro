@@ -1,0 +1,125 @@
+import type { PageParam, PageResult } from '@/http/types'
+import { http } from '@/http/http'
+
+/** 学生联系人信息 */
+export interface StudentContact {
+  id?: number
+  studentId: number
+  name: string
+  description: string
+  birthday: number
+  sex: number
+  enabled: boolean
+  avatar: string
+  video?: string
+  memo: string
+  createTime?: number
+}
+
+/** 学生班主任信息 */
+export interface StudentTeacher {
+  id?: number
+  studentId: number
+  name: string
+  description: string
+  birthday: number
+  sex: number
+  enabled: boolean
+  avatar: string
+  video?: string
+  memo: string
+  createTime?: number
+}
+
+/** 学生信息 */
+export interface Student {
+  id?: number
+  name: string
+  description: string
+  birthday: number
+  sex: number
+  enabled: boolean
+  avatar: string
+  video: string
+  memo: string
+  createTime?: number
+}
+
+/** 获取学生分页列表 */
+export function getStudentPage(params: PageParam) {
+  return http.get<PageResult<Student>>('/infra/student/page', params)
+}
+
+/** 获取学生详情 */
+export function getStudent(id: number) {
+  return http.get<Student>(`/infra/student/get?id=${id}`)
+}
+
+/** 创建学生 */
+export function createStudent(data: Student) {
+  return http.post<number>('/infra/student/create', data)
+}
+
+/** 更新学生 */
+export function updateStudent(data: Student) {
+  return http.put<boolean>('/infra/student/update', data)
+}
+
+/** 删除学生 */
+export function deleteStudent(id: number) {
+  return http.delete<boolean>(`/infra/student/delete?id=${id}`)
+}
+
+// ==================== 子表：学生联系人 ====================
+
+/** 获取学生联系人分页列表 */
+export function getStudentContactPage(params: PageParam & { studentId: number }) {
+  return http.get<PageResult<StudentContact>>('/infra/student/student-contact/page', params)
+}
+
+/** 获取学生联系人详情 */
+export function getStudentContact(id: number) {
+  return http.get<StudentContact>(`/infra/student/student-contact/get?id=${id}`)
+}
+
+/** 创建学生联系人 */
+export function createStudentContact(data: StudentContact) {
+  return http.post<number>('/infra/student/student-contact/create', data)
+}
+
+/** 更新学生联系人 */
+export function updateStudentContact(data: StudentContact) {
+  return http.put<boolean>('/infra/student/student-contact/update', data)
+}
+
+/** 删除学生联系人 */
+export function deleteStudentContact(id: number) {
+  return http.delete<boolean>(`/infra/student/student-contact/delete?id=${id}`)
+}
+
+// ==================== 子表：学生班主任 ====================
+
+/** 获取学生班主任分页列表 */
+export function getStudentTeacherPage(params: PageParam & { studentId: number }) {
+  return http.get<PageResult<StudentTeacher>>('/infra/student/student-teacher/page', params)
+}
+
+/** 获取学生班主任详情 */
+export function getStudentTeacher(id: number) {
+  return http.get<StudentTeacher>(`/infra/student/student-teacher/get?id=${id}`)
+}
+
+/** 创建学生班主任 */
+export function createStudentTeacher(data: StudentTeacher) {
+  return http.post<number>('/infra/student/student-teacher/create', data)
+}
+
+/** 更新学生班主任 */
+export function updateStudentTeacher(data: StudentTeacher) {
+  return http.put<boolean>('/infra/student/student-teacher/update', data)
+}
+
+/** 删除学生班主任 */
+export function deleteStudentTeacher(id: number) {
+  return http.delete<boolean>(`/infra/student/student-teacher/delete?id=${id}`)
+}

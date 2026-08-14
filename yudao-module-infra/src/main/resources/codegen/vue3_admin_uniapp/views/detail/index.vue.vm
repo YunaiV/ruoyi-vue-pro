@@ -39,7 +39,7 @@
         </wd-button>
         <wd-button
           v-if="hasAccessByCodes(['${permissionPrefix}:delete'])"
-          class="flex-1" type="error" :loading="deleting" @click="handleDelete"
+          class="flex-1" type="danger" :loading="deleting" @click="handleDelete"
         >
           删除
         </wd-button>
@@ -49,6 +49,12 @@
 </template>
 
 <script lang="ts" setup>
+#set ($primaryJavaType = $primaryColumn.javaType.toLowerCase())
+#if(${primaryJavaType} == "long" || ${primaryJavaType} == "integer" || ${primaryJavaType} == "short" || ${primaryJavaType} == "float" || ${primaryJavaType} == "double" || ${primaryJavaType} == "bigdecimal" || ${primaryJavaType} == "byte")
+#set ($primaryTsType = "number")
+#else
+#set ($primaryTsType = "string")
+#end
 #set ($hasDict = 0)
 #foreach($column in $columns)
   #if ($hasDict == 0 && $column.dictType && "" != $column.dictType)
@@ -64,6 +70,7 @@
 import type { ${simpleClassName} } from '@/api/${table.moduleName}/${table.businessName}'
 import { onUnload } from '@dcloudio/uni-app'
 import { onMounted, ref } from 'vue'
+import { useDialog } from '@wot-ui/ui/components/wd-dialog'
 import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { delete${simpleClassName}, get${simpleClassName} } from '@/api/${table.moduleName}/${table.businessName}'
 import { useAccess } from '@/hooks/useAccess'
@@ -76,7 +83,7 @@ import { formatDateTime } from '@/utils/date'
 #end
 
 const props = defineProps<{
-  id?: number | any
+  id?: ${primaryTsType}
 }>()
 
 definePage({
@@ -87,6 +94,7 @@ definePage({
 })
 
 const { hasAccessByCodes } = useAccess()
+const dialog = useDialog()
 const toast = useToast()
 const formData = ref<${simpleClassName}>() // 详情数据
 const deleting = ref(false) // 删除状态
@@ -117,28 +125,27 @@ function handleEdit() {
 }
 
 /** 删除${table.classComment} */
-function handleDelete() {
+async function handleDelete() {
   if (!props.id) {
     return
   }
-  uni.showModal({
-    title: '提示',
-    content: '确定要删除该${table.classComment}吗？',
-    success: async (res) => {
-      if (!res.confirm) {
-        return
-      }
-      deleting.value = true
-      try {
-        await delete${simpleClassName}(props.id)
-        toast.success('删除成功')
-        uni.$emit('${table.moduleName}:${table.businessName}:reload')
-        delay(handleBack)
-      } finally {
-        deleting.value = false
-      }
-    },
-  })
+  try {
+    await dialog.confirm({
+      title: '提示',
+      msg: '确定要删除该${table.classComment}吗？',
+    })
+  } catch {
+    return
+  }
+  deleting.value = true
+  try {
+    await delete${simpleClassName}(props.id)
+    toast.success('删除成功')
+    uni.$emit('${table.moduleName}:${table.businessName}:reload')
+    delay(handleBack)
+  } finally {
+    deleting.value = false
+  }
 }
 
 /** 初始化 */

@@ -131,7 +131,7 @@ public class AiChatMessageController {
 
     @GetMapping("/page")
     @Operation(summary = "获得消息分页", description = "用于【对话管理】菜单")
-    @PreAuthorize("@ss.hasPermission('ai:chat-conversation:query')")
+    @PreAuthorize("@ss.hasPermission('ai:chat-message:query')")
     public CommonResult<PageResult<AiChatMessageRespVO>> getChatMessagePage(AiChatMessagePageReqVO pageReqVO) {
         PageResult<AiChatMessageDO> pageResult = chatMessageService.getChatMessagePage(pageReqVO);
         if (CollUtil.isEmpty(pageResult.getList())) {
@@ -143,6 +143,20 @@ public class AiChatMessageController {
         return success(BeanUtils.toBean(pageResult, AiChatMessageRespVO.class,
                 respVO -> MapUtils.findAndThen(roleMap, respVO.getRoleId(),
                         role -> respVO.setRoleName(role.getName()))));
+    }
+
+    @GetMapping("/get")
+    @Operation(summary = "获得消息", description = "用于【对话管理】菜单")
+    @Parameter(name = "id", required = true, description = "消息编号", example = "1024")
+    @PreAuthorize("@ss.hasPermission('ai:chat-message:query')")
+    public CommonResult<AiChatMessageRespVO> getChatMessage(@RequestParam("id") Long id) {
+        AiChatMessageDO message = chatMessageService.getChatMessage(id);
+        AiChatMessageRespVO respVO = BeanUtils.toBean(message, AiChatMessageRespVO.class);
+        if (respVO != null && respVO.getRoleId() != null) {
+            AiChatRoleDO role = chatRoleService.getChatRole(respVO.getRoleId());
+            respVO.setRoleName(role != null ? role.getName() : null);
+        }
+        return success(respVO);
     }
 
     @Operation(summary = "管理员删除消息")

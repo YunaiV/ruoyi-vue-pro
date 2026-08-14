@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.*;
+import cn.iocoder.yudao.framework.common.biz.system.oauth2.OAuth2TokenCommonApi;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -54,9 +55,10 @@ public class MemberUserServiceImpl implements MemberUserService {
 
     @Resource
     private SmsCodeApi smsCodeApi;
-
     @Resource
     private SocialClientApi socialClientApi;
+    @Resource
+    private OAuth2TokenCommonApi oauth2TokenApi;
 
     @Resource
     private PasswordEncoder passwordEncoder;
@@ -250,6 +252,11 @@ public class MemberUserServiceImpl implements MemberUserService {
         // 更新
         MemberUserDO updateObj = MemberUserConvert.INSTANCE.convert(updateReqVO);
         memberUserMapper.updateById(updateObj);
+
+        // 如果是禁用用户，则删除其 Token 信息
+        if (CommonStatusEnum.isDisable(updateObj.getStatus())) {
+            oauth2TokenApi.removeAccessToken(updateObj.getId(), UserTypeEnum.MEMBER.getValue());
+        }
     }
 
     @VisibleForTesting
