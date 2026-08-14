@@ -102,16 +102,9 @@ public class QueryWrapperX<T> extends QueryWrapper<T> {
     }
 
     public QueryWrapperX<T> betweenIfPresent(String column, Object[] values) {
-        if (values != null && values.length != 0 && values[0] != null && values[1] != null) {
-            return (QueryWrapperX<T>) super.between(column, values[0], values[1]);
-        }
-        if (values != null && values.length != 0 && values[0] != null) {
-            return (QueryWrapperX<T>) ge(column, values[0]);
-        }
-        if (values != null && values.length != 0 && values[1] != null) {
-            return (QueryWrapperX<T>) le(column, values[1]);
-        }
-        return this;
+        Object val1 = values != null && values.length > 0 ? values[0] : null;
+        Object val2 = values != null && values.length > 1 ? values[1] : null;
+        return betweenIfPresent(column, val1, val2);
     }
 
     // ========== 重写父类方法，方便链式调用 ==========

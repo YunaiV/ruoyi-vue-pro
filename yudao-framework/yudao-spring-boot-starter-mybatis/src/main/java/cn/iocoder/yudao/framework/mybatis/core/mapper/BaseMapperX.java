@@ -145,6 +145,18 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
     }
 
     /**
+     * 获得满足条件的第 1 条记录，并使用 FOR UPDATE 锁定。
+     *
+     * 注意：需要在事务中调用，否则锁会立即释放。
+     *
+     * @param queryWrapper 查询条件
+     * @return 实体
+     */
+    default T selectFirstOneForUpdate(LambdaQueryWrapper<T> queryWrapper) {
+        return selectOne(queryWrapper.last("LIMIT 1 FOR UPDATE"));
+    }
+
+    /**
      * 获取满足条件的第 1 条记录
      *
      * 目的：解决并发场景下，插入多条记录后，使用 selectOne 会报错的问题

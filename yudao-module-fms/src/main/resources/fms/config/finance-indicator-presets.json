@@ -1,0 +1,114 @@
+[
+  {
+    "code": "income",
+    "name": "收入",
+    "type": 2,
+    "formula": "L1",
+    "sort": 10
+  },
+  {
+    "code": "operatingCost",
+    "name": "成本",
+    "type": 2,
+    "formula": "L2+L3",
+    "sort": 20
+  },
+  {
+    "code": "profit",
+    "name": "利润",
+    "type": 2,
+    "formula": "L30",
+    "sort": 30
+  },
+  {
+    "code": "expense",
+    "name": "费用",
+    "type": 2,
+    "formula": "L11+L14+L18",
+    "sort": 40
+  },
+  {
+    "code": "other",
+    "name": "其他",
+    "type": 2,
+    "formula": "L30+L11+L14+L18+L2+L3-L1",
+    "sort": 50
+  },
+  {
+    "code": "cash",
+    "name": "现金",
+    "type": 1,
+    "formula": "[{\"operator\":\"+\",\"rules\":0,\"subjectNumber\":\"1001\"},{\"operator\":\"+\",\"rules\":0,\"subjectNumber\":\"1012\"}]",
+    "sort": 60
+  },
+  {
+    "code": "bank",
+    "name": "银行存款",
+    "type": 1,
+    "formula": "[{\"operator\":\"+\",\"rules\":0,\"subjectNumber\":\"1002\"}]",
+    "sort": 70
+  },
+  {
+    "code": "inventory",
+    "name": "存货",
+    "type": 1,
+    "formula": "L9",
+    "sort": 80
+  },
+  {
+    "code": "liabilityTotal",
+    "name": "负债总额",
+    "type": 1,
+    "formula": "L47",
+    "sort": 90
+  },
+  {
+    "code": "loan",
+    "name": "贷款总额",
+    "type": 1,
+    "formula": "L31+L42",
+    "sort": 100
+  },
+  {
+    "code": "receivable",
+    "name": "应收账款",
+    "type": 1,
+    "formula": "[{\"operator\":\"+\",\"rules\":0,\"subjectNumber\":\"1122\"}]",
+    "sort": 110
+  },
+  {
+    "code": "payable",
+    "name": "应付账款",
+    "type": 1,
+    "formula": "[{\"operator\":\"+\",\"rules\":0,\"subjectNumber\":\"2202\"}]",
+    "sort": 120
+  },
+  {
+    "code": "taxPayable",
+    "name": "应交税费",
+    "type": 1,
+    "formula": "[{\"operator\":\"+\",\"rules\":0,\"subjectNumber\":\"2221\"}]",
+    "sort": 130
+  },
+  {
+    "code": "mainIncome",
+    "name": "主营业务收入",
+    "type": 2,
+    "formula": "[{\"operator\":\"+\",\"rules\":6,\"subjectNumber\":\"5001\"}]",
+    "sort": 140
+  },
+  {
+    "code": "otherIncome",
+    "name": "营业外收入",
+    "type": 2,
+    "formula": "[{\"operator\":\"+\",\"rules\":6,\"subjectNumber\":\"5301\"}]",
+    "sort": 150
+  },
+  {
+    "code": "fixedAssets",
+    "name": "固定资产",
+    "type": 1,
+    "formula": "L20",
+    "sort": 160
+  }
+]
