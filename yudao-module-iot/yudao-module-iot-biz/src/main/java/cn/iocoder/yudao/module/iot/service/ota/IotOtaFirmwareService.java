@@ -36,6 +36,13 @@ public interface IotOtaFirmwareService {
     void updateOtaFirmware(@Valid IotOtaFirmwareUpdateReqVO updateReqVO);
 
     /**
+     * 删除 OTA 固件信息
+     *
+     * @param id 固件编号
+     */
+    void deleteOtaFirmware(Long id);
+
+    /**
      * 获取 OTA 固件信息
      *
      * @param id 固件编号

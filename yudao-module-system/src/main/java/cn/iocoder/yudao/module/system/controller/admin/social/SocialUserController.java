@@ -1,14 +1,14 @@
-package cn.iocoder.yudao.module.system.controller.admin.socail;
+package cn.iocoder.yudao.module.system.controller.admin.social;
 
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserBindReqDTO;
-import cn.iocoder.yudao.module.system.controller.admin.socail.vo.user.SocialUserBindReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.socail.vo.user.SocialUserPageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.socail.vo.user.SocialUserRespVO;
-import cn.iocoder.yudao.module.system.controller.admin.socail.vo.user.SocialUserUnbindReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.social.vo.user.SocialUserBindReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.social.vo.user.SocialUserPageReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.social.vo.user.SocialUserRespVO;
+import cn.iocoder.yudao.module.system.controller.admin.social.vo.user.SocialUserUnbindReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialUserDO;
 import cn.iocoder.yudao.module.system.service.social.SocialUserService;
 import io.swagger.v3.oas.annotations.Operation;

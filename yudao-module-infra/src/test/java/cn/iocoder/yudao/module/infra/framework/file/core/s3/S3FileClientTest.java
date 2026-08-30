@@ -70,6 +70,42 @@ public class S3FileClientTest {
     }
 
     @Test
+    public void testPresignPutUrl_aliyunUsesEndpointInsteadOfCustomDomain() {
+        S3FileClientConfig config = new S3FileClientConfig();
+        config.setAccessKey("access-key");
+        config.setAccessSecret("access-secret");
+        config.setBucket("test-bucket");
+        config.setDomain("https://custom.example.com");
+        config.setEndpoint("oss-cn-beijing.aliyuncs.com");
+        config.setEnablePathStyleAccess(false);
+        config.setEnablePublicAccess(false);
+        S3FileClient client = new S3FileClient(0L, config);
+        client.init();
+
+        String result = client.presignPutUrl("avatar.jpg");
+
+        assertTrue(result.startsWith("https://test-bucket.oss-cn-beijing.aliyuncs.com/"));
+    }
+
+    @Test
+    public void testPresignPutUrl_qiniuUsesEndpointInsteadOfCustomDomain() {
+        S3FileClientConfig config = new S3FileClientConfig();
+        config.setAccessKey("access-key");
+        config.setAccessSecret("access-secret");
+        config.setBucket("test-bucket");
+        config.setDomain("https://custom.example.com");
+        config.setEndpoint("s3-cn-south-1.qiniucs.com");
+        config.setEnablePathStyleAccess(false);
+        config.setEnablePublicAccess(false);
+        S3FileClient client = new S3FileClient(0L, config);
+        client.init();
+
+        String result = client.presignPutUrl("avatar.jpg");
+
+        assertTrue(result.startsWith("https://test-bucket.s3-cn-south-1.qiniucs.com/"));
+    }
+
+    @Test
     @Disabled // MinIO，如果要集成测试，可以注释本行
     public void testMinIO() throws Exception {
         S3FileClientConfig config = new S3FileClientConfig();

@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.mes.controller.admin.cal.plan.vo.MesCalPlanSaveRe
 import cn.iocoder.yudao.module.mes.dal.dataobject.cal.plan.MesCalPlanDO;
 import cn.iocoder.yudao.module.mes.dal.mysql.cal.plan.MesCalPlanMapper;
 import cn.iocoder.yudao.module.mes.enums.cal.MesCalPlanStatusEnum;
+import cn.iocoder.yudao.module.mes.enums.cal.MesCalShiftMethodEnum;
 import cn.iocoder.yudao.module.mes.enums.cal.MesCalShiftTypeEnum;
 import cn.iocoder.yudao.module.mes.service.cal.team.MesCalTeamShiftService;
 import cn.hutool.core.util.ObjUtil;
@@ -76,10 +77,20 @@ public class MesCalPlanServiceImpl implements MesCalPlanService {
         // 1.3 校验编码唯一
         validatePlanCodeUnique(updateReqVO.getId(), updateReqVO.getCode());
 
-        // 2. 更新
+        // 2.1 倒班字段联动清理：单白班不倒班，倒班方式非按天时不需要倒班天数
         updateReqVO.setStatus(null); // 不允许通过 update 修改状态，状态变更走专用接口
+        boolean clearShiftMethod = MesCalShiftTypeEnum.SINGLE.getType().equals(updateReqVO.getShiftType());
+        boolean clearShiftCount = clearShiftMethod || updateReqVO.getShiftMethod() == null
+                || !MesCalShiftMethodEnum.DAY.getMethod().equals(updateReqVO.getShiftMethod());
+        if (clearShiftMethod) {
+            updateReqVO.setShiftMethod(null);
+        }
+        if (clearShiftCount) {
+            updateReqVO.setShiftCount(null);
+        }
+        // 2.2 更新
         MesCalPlanDO updateObj = BeanUtils.toBean(updateReqVO, MesCalPlanDO.class);
-        planMapper.updateById(updateObj);
+        planMapper.updateWithShiftFieldCleanup(updateObj, clearShiftMethod, clearShiftCount);
     }
 
     @Override
