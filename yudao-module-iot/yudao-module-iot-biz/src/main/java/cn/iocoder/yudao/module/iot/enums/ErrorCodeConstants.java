@@ -66,6 +66,8 @@ public interface ErrorCodeConstants {
 
     ErrorCode OTA_FIRMWARE_NOT_EXISTS = new ErrorCode(1_050_008_000, "固件信息不存在");
     ErrorCode OTA_FIRMWARE_PRODUCT_VERSION_DUPLICATE = new ErrorCode(1_050_008_001, "产品版本号重复");
+    ErrorCode OTA_FIRMWARE_DELETE_FAIL_TASK_IN_PROGRESS = new ErrorCode(1_050_008_002,
+            "删除 OTA 固件失败，原因：存在进行中的升级任务");
 
     // ========== OTA 升级任务相关 1-050-008-100 ==========
 

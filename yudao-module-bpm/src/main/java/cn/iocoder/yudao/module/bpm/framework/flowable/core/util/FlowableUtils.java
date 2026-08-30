@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.util;
 
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
@@ -131,6 +132,17 @@ public class FlowableUtils {
      */
     private static Integer getProcessInstanceStatus(Map<String, Object> processVariables) {
         return (Integer) processVariables.get(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_STATUS);
+    }
+
+    /**
+     * 获得流程实例的发起用户 ID
+     *
+     * @param processVariables 流程实例的 variables
+     * @return 发起用户 ID
+     */
+    public static Long getProcessInstanceStartUserId(Map<String, Object> processVariables) {
+        return processVariables == null ? null : Convert.toLong(
+                processVariables.get(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_START_USER_ID));
     }
 
     /**

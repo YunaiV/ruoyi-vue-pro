@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.system.controller.admin.socail.vo.client;
+package cn.iocoder.yudao.module.system.controller.admin.social.vo.client;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;

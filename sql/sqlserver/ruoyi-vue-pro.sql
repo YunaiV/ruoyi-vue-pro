@@ -2258,6 +2258,7 @@ GO
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (118, 12, N'支付宝 App 支付', N'alipay_app', N'pay_channel_code', 0, N'primary', N'', N'支付宝 App 支付', N'1', N'2021-12-03 10:42:55', N'1', N'2023-07-19 20:09:20', N'0')
 GO
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (119, 14, N'支付宝扫码支付', N'alipay_qr', N'pay_channel_code', 0, N'primary', N'', N'支付宝扫码支付', N'1', N'2021-12-03 10:43:10', N'1', N'2023-07-19 20:09:28', N'0')
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3449, 15, N'支付宝小程序支付', N'alipay_lite', N'pay_channel_code', 0, N'primary', N'', N'支付宝小程序支付', N'1', N'2026-08-18 00:00:00', N'1', N'2026-08-18 00:00:00', N'0')
 GO
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (120, 10, N'通知成功', N'10', N'pay_notify_status', 0, N'success', N'', N'通知成功', N'1', N'2021-12-03 11:02:41', N'1', N'2023-07-19 10:08:19', N'0')
 GO

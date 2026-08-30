@@ -1,13 +1,13 @@
-package cn.iocoder.yudao.module.system.controller.admin.socail;
+package cn.iocoder.yudao.module.system.controller.admin.social;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.system.api.social.SocialClientApi;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialWxaSubscribeMessageSendReqDTO;
-import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientPageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientRespVO;
-import cn.iocoder.yudao.module.system.controller.admin.socail.vo.client.SocialClientSaveReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.social.vo.client.SocialClientPageReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.social.vo.client.SocialClientRespVO;
+import cn.iocoder.yudao.module.system.controller.admin.social.vo.client.SocialClientSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialClientDO;
 import cn.iocoder.yudao.module.system.service.social.SocialClientService;
 import io.swagger.v3.oas.annotations.Operation;
