@@ -14,6 +14,7 @@ import org.springframework.beans.factory.config.MethodInvokingFactoryBean;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -71,6 +72,19 @@ public class YudaoSecurityAutoConfiguration {
     public TokenAuthenticationFilter authenticationTokenFilter(GlobalExceptionHandler globalExceptionHandler,
                                                                OAuth2TokenCommonApi oauth2TokenApi) {
         return new TokenAuthenticationFilter(securityProperties, globalExceptionHandler, oauth2TokenApi);
+    }
+
+    /**
+     * Token 过滤器由 Spring Security FilterChain 管理，禁止 Spring Boot 再注册为 Servlet 全局 Filter
+     *
+     * @see <a href="https://github.com/YunaiV/ruoyi-vue-pro/issues/1198">Issue #1198</a>
+     */
+    @Bean
+    public FilterRegistrationBean<TokenAuthenticationFilter> tokenAuthenticationFilterRegistration(
+            TokenAuthenticationFilter filter) {
+        FilterRegistrationBean<TokenAuthenticationFilter> registration = new FilterRegistrationBean<>(filter);
+        registration.setEnabled(false);
+        return registration;
     }
 
     @Bean("ss") // 使用 Spring Security 的缩写，方便使用
