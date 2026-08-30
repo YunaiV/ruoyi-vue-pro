@@ -17,7 +17,7 @@
         <revision>2026.07-jdk25-SNAPSHOT</revision>
         <flatten-maven-plugin.version>1.7.2</flatten-maven-plugin.version>
         <!-- 统一依赖管理 -->
-        <spring.boot.version>4.1.0</spring.boot.version>
+        <spring.boot.version>4.1.1</spring.boot.version>
         <!-- Web 相关 -->
         <springdoc.version>3.0.3</springdoc.version>
         <knife4j.version>4.5.0</knife4j.version>
@@ -39,7 +39,7 @@
         <lock4j.version>2.2.7</lock4j.version>
         <!-- 监控相关 -->
         <skywalking.version>9.6.0</skywalking.version>
-        <spring-boot-admin.version>4.0.4</spring-boot-admin.version>
+        <spring-boot-admin.version>4.1.2</spring-boot-admin.version>
         <opentelemetry.version>1.65.0</opentelemetry.version>
         <!-- Test 测试相关 -->
         <h2.version>2.3.232</h2.version>
