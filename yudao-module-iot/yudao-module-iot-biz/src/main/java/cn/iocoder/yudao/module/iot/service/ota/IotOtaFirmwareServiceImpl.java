@@ -10,6 +10,8 @@ import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.firmware.IotOtaFirmwa
 import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.firmware.IotOtaFirmwareUpdateReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaFirmwareDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.ota.IotOtaFirmwareMapper;
+import cn.iocoder.yudao.module.iot.dal.mysql.ota.IotOtaTaskMapper;
+import cn.iocoder.yudao.module.iot.enums.ota.IotOtaTaskStatusEnum;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +25,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.OTA_FIRMWARE_DELETE_FAIL_TASK_IN_PROGRESS;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.OTA_FIRMWARE_NOT_EXISTS;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.OTA_FIRMWARE_PRODUCT_VERSION_DUPLICATE;
 
@@ -38,6 +41,8 @@ public class IotOtaFirmwareServiceImpl implements IotOtaFirmwareService {
 
     @Resource
     private IotOtaFirmwareMapper otaFirmwareMapper;
+    @Resource
+    private IotOtaTaskMapper otaTaskMapper;
     @Lazy
     @Resource
     private IotProductService productService;
@@ -72,6 +77,19 @@ public class IotOtaFirmwareServiceImpl implements IotOtaFirmwareService {
         // 2. 更新数据
         IotOtaFirmwareDO updateObj = BeanUtils.toBean(updateReqVO, IotOtaFirmwareDO.class);
         otaFirmwareMapper.updateById(updateObj);
+    }
+
+    @Override
+    public void deleteOtaFirmware(Long id) {
+        // 1.1 校验存在
+        validateFirmwareExists(id);
+        // 1.2 校验是否有进行中的升级任务
+        if (otaTaskMapper.selectCountByFirmwareIdAndStatus(id, IotOtaTaskStatusEnum.IN_PROGRESS.getStatus()) > 0) {
+            throw exception(OTA_FIRMWARE_DELETE_FAIL_TASK_IN_PROGRESS);
+        }
+
+        // 2. 删除
+        otaFirmwareMapper.deleteById(id);
     }
 
     @Override
