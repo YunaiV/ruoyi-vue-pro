@@ -83,7 +83,7 @@ public class IotDeviceMessageController {
 
     @PostMapping("/send")
     @Operation(summary = "发送消息", description = "可用于设备模拟")
-    @PreAuthorize("@ss.hasPermission('iot:device:message-end')")
+    @PreAuthorize("@ss.hasPermission('iot:device:message-send')")
     public CommonResult<Boolean> sendDeviceMessage(@Valid @RequestBody IotDeviceMessageSendReqVO sendReqVO) {
         deviceMessageService.sendDeviceMessage(BeanUtils.toBean(sendReqVO, IotDeviceMessage.class));
         return success(true);
