@@ -20,6 +20,8 @@ import static cn.iocoder.yudao.module.pay.framework.pay.core.client.impl.alipay.
  * 支付宝【小程序】的 PayClient 实现类
  *
  * 文档：<a href="https://opendocs.alipay.com/mini/6039ed0c_alipay.trade.create">统一收单交易创建</a>
+ *
+ * @author graypxl
  */
 public class AlipayLitePayClient extends AbstractAlipayPayClient {
 
