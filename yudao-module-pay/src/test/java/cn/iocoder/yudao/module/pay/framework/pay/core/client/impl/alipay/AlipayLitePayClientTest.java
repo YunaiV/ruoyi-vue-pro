@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
 import org.mockito.InjectMocks;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,7 +57,7 @@ public class AlipayLitePayClientTest extends AbstractAlipayClientTest {
         when(defaultAlipayClient.execute(argThat(assertRequest(config.getAppId(), null, buyerOpenId))))
                 .thenReturn(response);
         PayOrderUnifiedReqDTO reqDTO = buildOrderUnifiedReqDTO(randomURL(), randomString(), randomInteger());
-        reqDTO.setChannelExtras(Map.of(AlipayLitePayClient.BUYER_OPEN_ID_KEY, buyerOpenId));
+        reqDTO.setChannelExtras(Collections.singletonMap(AlipayLitePayClient.BUYER_OPEN_ID_KEY, buyerOpenId));
 
         PayOrderRespDTO resp = client.unifiedOrder(reqDTO);
 
@@ -80,7 +81,7 @@ public class AlipayLitePayClientTest extends AbstractAlipayClientTest {
         when(defaultAlipayClient.execute(argThat(assertRequest(config.getAppId(), buyerId, null))))
                 .thenReturn(response);
         PayOrderUnifiedReqDTO reqDTO = buildOrderUnifiedReqDTO(randomURL(), randomString(), randomInteger());
-        reqDTO.setChannelExtras(Map.of(AlipayLitePayClient.BUYER_ID_KEY, buyerId));
+        reqDTO.setChannelExtras(Collections.singletonMap(AlipayLitePayClient.BUYER_ID_KEY, buyerId));
 
         PayOrderRespDTO resp = client.unifiedOrder(reqDTO);
 
@@ -98,7 +99,7 @@ public class AlipayLitePayClientTest extends AbstractAlipayClientTest {
         when(defaultAlipayClient.execute(argThat(assertRequest(config.getAppId(), null, buyerOpenId))))
                 .thenReturn(response);
         PayOrderUnifiedReqDTO reqDTO = buildOrderUnifiedReqDTO(randomURL(), randomString(), randomInteger());
-        reqDTO.setChannelExtras(Map.of("openid", buyerOpenId));
+        reqDTO.setChannelExtras(Collections.singletonMap("openid", buyerOpenId));
 
         PayOrderRespDTO resp = client.unifiedOrder(reqDTO);
 
@@ -117,7 +118,7 @@ public class AlipayLitePayClientTest extends AbstractAlipayClientTest {
         when(defaultAlipayClient.certificateExecute(argThat(assertRequest(config.getAppId(), null, buyerOpenId))))
                 .thenReturn(response);
         PayOrderUnifiedReqDTO reqDTO = buildOrderUnifiedReqDTO(randomURL(), randomString(), randomInteger());
-        reqDTO.setChannelExtras(Map.of(AlipayLitePayClient.BUYER_OPEN_ID_KEY, buyerOpenId));
+        reqDTO.setChannelExtras(Collections.singletonMap(AlipayLitePayClient.BUYER_OPEN_ID_KEY, buyerOpenId));
 
         PayOrderRespDTO resp = client.unifiedOrder(reqDTO);
 
@@ -139,7 +140,7 @@ public class AlipayLitePayClientTest extends AbstractAlipayClientTest {
         when(defaultAlipayClient.execute(argThat((ArgumentMatcher<AlipayTradeCreateRequest>) request -> true)))
                 .thenReturn(response);
         PayOrderUnifiedReqDTO reqDTO = buildOrderUnifiedReqDTO(randomURL(), randomString(), randomInteger());
-        reqDTO.setChannelExtras(Map.of(AlipayLitePayClient.BUYER_OPEN_ID_KEY, randomString()));
+        reqDTO.setChannelExtras(Collections.singletonMap(AlipayLitePayClient.BUYER_OPEN_ID_KEY, randomString()));
 
         PayOrderRespDTO resp = client.unifiedOrder(reqDTO);
 
@@ -170,7 +171,7 @@ public class AlipayLitePayClientTest extends AbstractAlipayClientTest {
         when(defaultAlipayClient.execute(argThat((ArgumentMatcher<AlipayTradeCreateRequest>) request -> true)))
                 .thenThrow(ServiceExceptionUtil.exception(GlobalErrorCodeConstants.INTERNAL_SERVER_ERROR));
         PayOrderUnifiedReqDTO reqDTO = buildOrderUnifiedReqDTO(randomURL(), randomString(), randomInteger());
-        reqDTO.setChannelExtras(Map.of(AlipayLitePayClient.BUYER_OPEN_ID_KEY, randomString()));
+        reqDTO.setChannelExtras(Collections.singletonMap(AlipayLitePayClient.BUYER_OPEN_ID_KEY, randomString()));
 
         assertThrows(ServiceException.class, () -> client.unifiedOrder(reqDTO));
     }
@@ -181,7 +182,7 @@ public class AlipayLitePayClientTest extends AbstractAlipayClientTest {
         when(defaultAlipayClient.execute(argThat((ArgumentMatcher<AlipayTradeCreateRequest>) request -> true)))
                 .thenThrow(new RuntimeException("系统异常"));
         PayOrderUnifiedReqDTO reqDTO = buildOrderUnifiedReqDTO(randomURL(), randomString(), randomInteger());
-        reqDTO.setChannelExtras(Map.of(AlipayLitePayClient.BUYER_OPEN_ID_KEY, randomString()));
+        reqDTO.setChannelExtras(Collections.singletonMap(AlipayLitePayClient.BUYER_OPEN_ID_KEY, randomString()));
 
         assertThrows(PayClientException.class, () -> client.unifiedOrder(reqDTO));
     }
