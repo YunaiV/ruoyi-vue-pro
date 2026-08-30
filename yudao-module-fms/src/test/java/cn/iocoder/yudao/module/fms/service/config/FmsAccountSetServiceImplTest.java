@@ -17,6 +17,7 @@ import cn.iocoder.yudao.module.fms.service.closing.FmsClosingTemplateService;
 import cn.iocoder.yudao.module.fms.service.config.FmsAuxiliaryTypeService;
 import cn.iocoder.yudao.module.fms.service.config.FmsCurrencyService;
 import cn.iocoder.yudao.module.fms.service.config.FmsFinanceParameterService;
+import cn.iocoder.yudao.module.fms.service.config.FmsFinanceIndicatorService;
 import cn.iocoder.yudao.module.fms.service.config.FmsSubjectService;
 import cn.iocoder.yudao.module.fms.service.config.FmsVoucherWordService;
 import jakarta.annotation.Resource;
@@ -67,6 +68,8 @@ public class FmsAccountSetServiceImplTest extends BaseDbUnitTest {
     private FmsClosingSchemeService closingSchemeService;
     @MockitoBean
     private FmsClosingTemplateService closingTemplateService;
+    @MockitoBean
+    private FmsFinanceIndicatorService financeIndicatorService;
 
     @Test
     public void testCreateAccountSet_success() {

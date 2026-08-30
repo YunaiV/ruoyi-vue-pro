@@ -55,8 +55,8 @@ public interface FmsAuxiliaryItemMapper extends BaseMapperX<FmsAuxiliaryItemDO> 
         return selectList(new LambdaQueryWrapperX<FmsAuxiliaryItemDO>()
                 .eq(FmsAuxiliaryItemDO::getAccountSetId, accountSetId)
                 .eq(FmsAuxiliaryItemDO::getAuxiliaryTypeId, auxiliaryTypeId)
-                .orderByDesc(FmsAuxiliaryItemDO::getCode)
-                .orderByDesc(FmsAuxiliaryItemDO::getId));
+                .orderByAsc(FmsAuxiliaryItemDO::getCode)
+                .orderByAsc(FmsAuxiliaryItemDO::getId));
     }
 
     default List<FmsAuxiliaryItemDO> selectListByAccountSetIdAndAuxiliaryTypeIdAndStatus(
@@ -65,8 +65,8 @@ public interface FmsAuxiliaryItemMapper extends BaseMapperX<FmsAuxiliaryItemDO> 
                 .eq(FmsAuxiliaryItemDO::getAccountSetId, accountSetId)
                 .eq(FmsAuxiliaryItemDO::getAuxiliaryTypeId, auxiliaryTypeId)
                 .eq(FmsAuxiliaryItemDO::getStatus, status)
-                .orderByDesc(FmsAuxiliaryItemDO::getCode)
-                .orderByDesc(FmsAuxiliaryItemDO::getId));
+                .orderByAsc(FmsAuxiliaryItemDO::getCode)
+                .orderByAsc(FmsAuxiliaryItemDO::getId));
     }
 
     default List<FmsAuxiliaryItemDO> selectListByAccountSetId(Long accountSetId) {
