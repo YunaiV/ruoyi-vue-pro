@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelMetaInfoVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionInfoDO;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelFormTypeEnum;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -21,6 +22,29 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  * @author 芋道源码
  */
 class FlowableUtilsTest {
+
+    @Test
+    public void testGetProcessInstanceStartUserId() {
+        // 准备参数
+        Map<String, Object> processVariables = new HashMap<>();
+        processVariables.put(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_START_USER_ID, "1");
+
+        // 调用
+        Long startUserId = FlowableUtils.getProcessInstanceStartUserId(processVariables);
+
+        // 断言
+        assertEquals(1L, startUserId);
+    }
+
+    @Test
+    public void testGetProcessInstanceStartUserId_empty() {
+        // 准备参数
+        Map<String, Object> processVariables = new HashMap<>();
+
+        // 调用 & 断言
+        assertNull(FlowableUtils.getProcessInstanceStartUserId(processVariables));
+        assertNull(FlowableUtils.getProcessInstanceStartUserId(null));
+    }
 
     @Test
     public void testGetSummary_customSummary_parseDbFormFields() {
