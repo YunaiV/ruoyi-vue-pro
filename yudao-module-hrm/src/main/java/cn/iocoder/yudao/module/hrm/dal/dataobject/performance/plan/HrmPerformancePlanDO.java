@@ -22,7 +22,7 @@ import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import com.baomidou.mybatisplus.extension.handlers.Jackson3TypeHandler;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -114,7 +114,7 @@ public class HrmPerformancePlanDO extends BaseDO {
     /**
      * 考评范围列表
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(typeHandler = Jackson3TypeHandler.class)
     private List<Scope> scopes;
 
     // ==================== 2. 指标设置 ====================
@@ -128,7 +128,7 @@ public class HrmPerformancePlanDO extends BaseDO {
     /**
      * 考核配置快照
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(typeHandler = Jackson3TypeHandler.class)
     private HrmPerformanceAssessmentTemplateDO.AssessmentConfig assessmentConfig;
 
     // ==================== 3. 流程设置 ====================
@@ -146,12 +146,12 @@ public class HrmPerformancePlanDO extends BaseDO {
     /**
      * 目标确认节点
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(typeHandler = Jackson3TypeHandler.class)
     private HandlerStage targetConfirmationStage;
     /**
      * 评分阶段列表
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(typeHandler = Jackson3TypeHandler.class)
     private List<ReviewStage> reviewStages;
     /**
      * 是否开启结果审核
@@ -160,7 +160,7 @@ public class HrmPerformancePlanDO extends BaseDO {
     /**
      * 结果审核节点列表
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(typeHandler = Jackson3TypeHandler.class)
     private List<HandlerStage> resultAuditStages;
     /**
      * 是否开启结果确认
@@ -169,7 +169,7 @@ public class HrmPerformancePlanDO extends BaseDO {
     /**
      * 申诉处理节点列表
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(typeHandler = Jackson3TypeHandler.class)
     private List<HandlerStage> appealStages;
     /**
      * 申诉超期天数
@@ -193,7 +193,7 @@ public class HrmPerformancePlanDO extends BaseDO {
     /**
      * 结果配置快照
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(typeHandler = Jackson3TypeHandler.class)
     private ResultConfig resultConfig;
     /**
      * 是否同步到薪资
