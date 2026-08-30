@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.system.controller.admin.socail.vo.user;
+package cn.iocoder.yudao.module.system.controller.admin.social.vo.user;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import io.swagger.v3.oas.annotations.media.Schema;
