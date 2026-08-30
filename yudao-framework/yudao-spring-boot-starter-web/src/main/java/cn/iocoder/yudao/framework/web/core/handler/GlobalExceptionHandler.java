@@ -313,6 +313,11 @@ public class GlobalExceptionHandler {
                 // 忽略日志，避免影响主流程
             }
         }
+        // ServiceException 的错误码可能为成功码，直接调用 CommonResult.error 会抛出异常，此处统一按系统异常处理。
+        // 详见 Issue #1196：https://github.com/YunaiV/ruoyi-vue-pro/issues/1196
+        if (CommonResult.isSuccess(ex.getCode())) {
+            return CommonResult.error(INTERNAL_SERVER_ERROR.getCode(), INTERNAL_SERVER_ERROR.getMsg());
+        }
         return CommonResult.error(ex.getCode(), ex.getMessage());
     }
 
