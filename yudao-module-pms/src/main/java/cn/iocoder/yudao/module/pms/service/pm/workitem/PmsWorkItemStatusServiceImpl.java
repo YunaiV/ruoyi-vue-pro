@@ -18,7 +18,7 @@ import cn.iocoder.yudao.module.pms.enums.pm.project.PmsProjectTypeEnum;
 import cn.iocoder.yudao.module.pms.enums.pm.workitem.PmsWorkItemStatusTypeEnum;
 import cn.iocoder.yudao.module.pms.enums.pm.workitem.PmsWorkItemTypeEnum;
 import cn.iocoder.yudao.module.pms.service.pm.project.PmsProjectMemberService;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;

@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.pms.controller.admin.pm.workitem.vo.label.PmsWorkItemLabelSaveReqVO;
 import cn.iocoder.yudao.module.pms.dal.dataobject.pm.workitem.PmsWorkItemLabelDO;
 import cn.iocoder.yudao.module.pms.dal.mysql.pm.workitem.PmsWorkItemLabelMapper;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 

@@ -11,7 +11,7 @@ import cn.iocoder.yudao.module.pms.dal.dataobject.kb.library.PmsKnowledgeGroupRe
 import cn.iocoder.yudao.module.pms.dal.mysql.kb.library.PmsKnowledgeGroupMapper;
 import cn.iocoder.yudao.module.pms.dal.mysql.kb.library.PmsKnowledgeGroupRelationMapper;
 import cn.iocoder.yudao.module.pms.enums.kb.library.PmsKnowledgeGroupTypeEnum;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;

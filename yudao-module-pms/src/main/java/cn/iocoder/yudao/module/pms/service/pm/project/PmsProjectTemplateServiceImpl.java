@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.pms.controller.admin.pm.project.vo.template.PmsPr
 import cn.iocoder.yudao.module.pms.dal.dataobject.pm.project.PmsProjectTemplateDO;
 import cn.iocoder.yudao.module.pms.dal.mysql.pm.project.PmsProjectTemplateMapper;
 import cn.iocoder.yudao.module.pms.enums.pm.workitem.PmsWorkItemTypeEnum;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 

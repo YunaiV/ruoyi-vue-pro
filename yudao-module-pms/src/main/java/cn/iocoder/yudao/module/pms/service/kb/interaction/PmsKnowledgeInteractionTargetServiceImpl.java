@@ -12,7 +12,7 @@ import cn.iocoder.yudao.module.pms.service.kb.content.PmsKnowledgeContentPermiss
 import cn.iocoder.yudao.module.pms.service.kb.content.PmsKnowledgeDocumentService;
 import cn.iocoder.yudao.module.pms.service.kb.library.PmsKnowledgeLibraryMemberService;
 import cn.iocoder.yudao.module.pms.service.kb.library.PmsKnowledgeLibraryService;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;

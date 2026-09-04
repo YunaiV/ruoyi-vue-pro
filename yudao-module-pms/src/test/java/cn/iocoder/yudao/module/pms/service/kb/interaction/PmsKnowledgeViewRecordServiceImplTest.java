@@ -8,10 +8,10 @@ import cn.iocoder.yudao.module.pms.dal.dataobject.kb.interaction.PmsKnowledgeVie
 import cn.iocoder.yudao.module.pms.dal.mysql.kb.interaction.PmsKnowledgeViewRecordMapper;
 import cn.iocoder.yudao.module.pms.enums.kb.PmsKnowledgeObjectTypeEnum;
 import cn.iocoder.yudao.module.pms.service.kb.library.PmsKnowledgeLibraryMemberService;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -40,9 +40,9 @@ public class PmsKnowledgeViewRecordServiceImplTest extends BaseDbUnitTest {
     @Resource
     private PmsKnowledgeViewRecordMapper viewRecordMapper;
 
-    @MockitoBean
+    @MockBean
     private PmsKnowledgeInteractionTargetService interactionTargetService;
-    @MockitoBean
+    @MockBean
     private PmsKnowledgeLibraryMemberService libraryMemberService;
 
     @Test

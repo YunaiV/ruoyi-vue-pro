@@ -3,9 +3,9 @@ package cn.iocoder.yudao.module.pms.controller.admin.pm.project.vo.member;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.pms.enums.pm.project.PmsProjectMemberLevelEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.util.List;

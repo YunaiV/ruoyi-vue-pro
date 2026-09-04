@@ -9,10 +9,10 @@ import cn.iocoder.yudao.module.pms.dal.dataobject.kb.library.PmsKnowledgeLibrary
 import cn.iocoder.yudao.module.pms.dal.mysql.kb.library.PmsKnowledgeGroupMapper;
 import cn.iocoder.yudao.module.pms.dal.mysql.kb.library.PmsKnowledgeGroupRelationMapper;
 import cn.iocoder.yudao.module.pms.enums.kb.library.PmsKnowledgeGroupTypeEnum;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -44,7 +44,7 @@ public class PmsKnowledgeGroupServiceImplTest extends BaseDbUnitTest {
     @Resource
     private PmsKnowledgeGroupRelationMapper relationMapper;
 
-    @MockitoBean
+    @MockBean
     private PmsKnowledgeLibraryMemberService libraryMemberService;
 
     @Test

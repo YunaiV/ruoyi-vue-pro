@@ -11,7 +11,7 @@ import cn.iocoder.yudao.module.pms.dal.dataobject.pm.project.PmsProjectGroupRela
 import cn.iocoder.yudao.module.pms.dal.mysql.pm.project.PmsProjectGroupMapper;
 import cn.iocoder.yudao.module.pms.dal.mysql.pm.project.PmsProjectGroupRelationMapper;
 import cn.iocoder.yudao.module.pms.enums.pm.project.PmsProjectGroupTypeEnum;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;

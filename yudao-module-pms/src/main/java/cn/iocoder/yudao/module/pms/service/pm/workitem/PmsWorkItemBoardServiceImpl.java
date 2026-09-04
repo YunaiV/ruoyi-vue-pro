@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.pms.service.pm.workitem;
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.module.pms.dal.dataobject.pm.workitem.PmsWorkItemBoardDO;
 import cn.iocoder.yudao.module.pms.dal.mysql.pm.workitem.PmsWorkItemBoardMapper;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 

@@ -11,10 +11,10 @@ import cn.iocoder.yudao.module.pms.enums.pm.workitem.PmsWorkItemTypeEnum;
 import cn.iocoder.yudao.module.pms.service.pm.iteration.PmsIterationService;
 import cn.iocoder.yudao.module.pms.service.pm.project.PmsProjectMemberService;
 import cn.iocoder.yudao.module.pms.service.pm.workitem.PmsWorkItemService;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -35,11 +35,11 @@ public class PmsWorkbenchServiceImplTest extends BaseDbUnitTest {
 
     @Resource
     private PmsWorkbenchServiceImpl workbenchService;
-    @MockitoBean
+    @MockBean
     private PmsProjectMemberService projectMemberService;
-    @MockitoBean
+    @MockBean
     private PmsWorkItemService workItemService;
-    @MockitoBean
+    @MockBean
     private PmsIterationService iterationService;
 
     @Test

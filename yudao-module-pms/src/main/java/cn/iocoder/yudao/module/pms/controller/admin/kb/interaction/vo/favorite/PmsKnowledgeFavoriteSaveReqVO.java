@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.pms.controller.admin.kb.interaction.vo.favorite;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.pms.enums.kb.PmsKnowledgeObjectTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 @Schema(description = "管理后台 - PMS 知识收藏（关注）保存 Request VO")

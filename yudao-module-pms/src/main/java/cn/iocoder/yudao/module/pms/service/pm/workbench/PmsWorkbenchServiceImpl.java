@@ -10,7 +10,7 @@ import cn.iocoder.yudao.module.pms.enums.pm.workitem.PmsWorkItemTypeEnum;
 import cn.iocoder.yudao.module.pms.service.pm.iteration.PmsIterationService;
 import cn.iocoder.yudao.module.pms.service.pm.project.PmsProjectMemberService;
 import cn.iocoder.yudao.module.pms.service.pm.workitem.PmsWorkItemService;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 

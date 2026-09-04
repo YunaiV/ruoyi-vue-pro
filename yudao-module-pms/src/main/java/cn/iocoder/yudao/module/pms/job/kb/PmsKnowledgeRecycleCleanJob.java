@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.pms.job.kb;
 import cn.iocoder.yudao.framework.quartz.core.handler.JobHandler;
 import cn.iocoder.yudao.framework.tenant.core.job.TenantJob;
 import cn.iocoder.yudao.module.pms.service.kb.recycle.PmsKnowledgeRecycleService;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

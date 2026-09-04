@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.pms.controller.admin.kb.interaction.vo.favorite.P
 import cn.iocoder.yudao.module.pms.dal.dataobject.kb.interaction.PmsKnowledgeFavoriteDO;
 import cn.iocoder.yudao.module.pms.dal.mysql.kb.interaction.PmsKnowledgeFavoriteMapper;
 import cn.iocoder.yudao.module.pms.enums.kb.PmsKnowledgeObjectTypeEnum;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 

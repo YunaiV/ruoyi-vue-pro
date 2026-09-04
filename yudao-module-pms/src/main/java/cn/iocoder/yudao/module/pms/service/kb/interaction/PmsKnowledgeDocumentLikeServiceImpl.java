@@ -4,7 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.module.pms.dal.dataobject.kb.interaction.PmsKnowledgeDocumentLikeDO;
 import cn.iocoder.yudao.module.pms.dal.mysql.kb.interaction.PmsKnowledgeDocumentLikeMapper;
 import cn.iocoder.yudao.module.pms.enums.kb.PmsKnowledgeObjectTypeEnum;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;

@@ -14,7 +14,7 @@ import cn.iocoder.yudao.module.pms.dal.dataobject.kb.library.PmsKnowledgeLibrary
 import cn.iocoder.yudao.module.pms.dal.mysql.kb.library.PmsKnowledgeLibraryTemplateMapper;
 import cn.iocoder.yudao.module.pms.enums.kb.content.PmsKnowledgeDocumentTypeEnum;
 import cn.iocoder.yudao.module.pms.service.kb.content.PmsKnowledgeDocumentService;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;

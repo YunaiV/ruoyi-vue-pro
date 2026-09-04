@@ -23,10 +23,10 @@ import cn.iocoder.yudao.module.pms.service.pm.iteration.PmsIterationService;
 import cn.iocoder.yudao.module.pms.service.pm.project.PmsProjectMemberService;
 import cn.iocoder.yudao.module.system.api.notify.NotifyMessageSendApi;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -62,23 +62,23 @@ public class PmsWorkItemStatusServiceImplTest extends BaseDbUnitTest {
     @Resource
     private PmsWorkItemMapper workItemMapper;
 
-    @MockitoBean
+    @MockBean
     private PmsProjectMemberService projectMemberService;
-    @MockitoBean
+    @MockBean
     private PmsIterationService iterationService;
-    @MockitoBean
+    @MockBean
     private PmsWorkItemCommentService workItemCommentService;
-    @MockitoBean
+    @MockBean
     private PmsWorkItemWorkLogService workItemWorkLogService;
-    @MockitoBean
+    @MockBean
     private PmsWorkItemUserSortService workItemUserSortService;
-    @MockitoBean
+    @MockBean
     private PmsWorkItemLabelService workItemLabelService;
-    @MockitoBean
+    @MockBean
     private PmsWorkItemActivityService workItemActivityService;
-    @MockitoBean
+    @MockBean
     private NotifyMessageSendApi notifyMessageSendApi;
-    @MockitoBean
+    @MockBean
     private AdminUserApi adminUserApi;
 
     @Test

@@ -16,10 +16,10 @@ import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.permission.PermissionApi;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -61,17 +61,17 @@ public class PmsKnowledgeContentPermissionServiceImplTest extends BaseDbUnitTest
     @Resource
     private PmsKnowledgeLibraryMemberMapper libraryMemberMapper;
 
-    @MockitoBean
+    @MockBean
     private PmsKnowledgeLibraryMemberService libraryMemberService;
-    @MockitoBean
+    @MockBean
     private PmsKnowledgeFolderService folderService;
-    @MockitoBean
+    @MockBean
     private PmsKnowledgeDocumentService documentService;
-    @MockitoBean
+    @MockBean
     private AdminUserApi adminUserApi;
-    @MockitoBean
+    @MockBean
     private DeptApi deptApi;
-    @MockitoBean
+    @MockBean
     private PermissionApi permissionApi;
 
     @Test

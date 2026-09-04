@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.pms.controller.admin.kb.content.vo.document;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 @Schema(description = "管理后台 - PMS 知识库文档移动 Request VO")

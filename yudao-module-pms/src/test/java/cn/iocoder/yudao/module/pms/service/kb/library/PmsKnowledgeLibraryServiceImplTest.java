@@ -9,10 +9,10 @@ import cn.iocoder.yudao.module.pms.dal.mysql.kb.library.PmsKnowledgeLibraryMappe
 import cn.iocoder.yudao.module.pms.enums.kb.content.PmsKnowledgeDocumentStatusEnum;
 import cn.iocoder.yudao.module.pms.service.kb.recycle.PmsKnowledgeRecycleService;
 import cn.iocoder.yudao.module.system.api.permission.PermissionApi;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -41,15 +41,15 @@ public class PmsKnowledgeLibraryServiceImplTest extends BaseDbUnitTest {
     @Resource
     private PmsKnowledgeLibraryMapper libraryMapper;
 
-    @MockitoBean
+    @MockBean
     private PmsKnowledgeLibraryMemberService memberService;
-    @MockitoBean
+    @MockBean
     private PmsKnowledgeGroupService knowledgeGroupService;
-    @MockitoBean
+    @MockBean
     private PmsKnowledgeRecycleService recycleService;
-    @MockitoBean
+    @MockBean
     private PmsKnowledgeLibraryTemplateService libraryTemplateService;
-    @MockitoBean
+    @MockBean
     private PermissionApi permissionApi;
 
     @Test

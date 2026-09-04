@@ -16,7 +16,7 @@ import cn.iocoder.yudao.module.pms.dal.dataobject.pm.workitem.PmsWorkItemWorkLog
 import cn.iocoder.yudao.module.pms.dal.mysql.pm.workitem.PmsWorkItemWorkLogMapper;
 import cn.iocoder.yudao.module.pms.service.pm.iteration.PmsIterationService;
 import cn.iocoder.yudao.module.pms.service.pm.project.PmsProjectMemberService;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;

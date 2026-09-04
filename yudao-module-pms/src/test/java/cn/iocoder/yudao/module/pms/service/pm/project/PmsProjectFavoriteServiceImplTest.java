@@ -4,10 +4,10 @@ import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.pms.dal.dataobject.pm.project.PmsProjectDO;
 import cn.iocoder.yudao.module.pms.dal.mysql.pm.project.PmsProjectFavoriteMapper;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -29,7 +29,7 @@ public class PmsProjectFavoriteServiceImplTest extends BaseDbUnitTest {
     @Resource
     private PmsProjectFavoriteMapper favoriteMapper;
 
-    @MockitoBean
+    @MockBean
     private PmsProjectMemberService projectMemberService;
 
     @Test

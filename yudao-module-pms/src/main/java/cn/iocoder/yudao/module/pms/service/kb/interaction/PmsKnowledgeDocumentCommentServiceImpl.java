@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.pms.dal.dataobject.kb.interaction.PmsKnowledgeDoc
 import cn.iocoder.yudao.module.pms.dal.mysql.kb.interaction.PmsKnowledgeDocumentCommentMapper;
 import cn.iocoder.yudao.module.pms.enums.kb.content.PmsKnowledgeDocumentTypeEnum;
 import cn.iocoder.yudao.module.pms.service.kb.content.PmsKnowledgeDocumentService;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

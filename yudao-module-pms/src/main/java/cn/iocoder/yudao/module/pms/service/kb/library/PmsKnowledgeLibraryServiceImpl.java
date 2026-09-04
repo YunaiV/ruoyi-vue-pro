@@ -11,7 +11,7 @@ import cn.iocoder.yudao.module.pms.enums.kb.content.PmsKnowledgeDocumentStatusEn
 import cn.iocoder.yudao.module.pms.service.kb.recycle.PmsKnowledgeRecycleService;
 import cn.iocoder.yudao.module.system.api.permission.PermissionApi;
 import cn.iocoder.yudao.module.system.enums.permission.RoleCodeEnum;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

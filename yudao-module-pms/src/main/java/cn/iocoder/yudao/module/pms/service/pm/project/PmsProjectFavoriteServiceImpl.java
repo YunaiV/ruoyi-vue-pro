@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.pms.service.pm.project;
 
 import cn.iocoder.yudao.module.pms.dal.dataobject.pm.project.PmsProjectFavoriteDO;
 import cn.iocoder.yudao.module.pms.dal.mysql.pm.project.PmsProjectFavoriteMapper;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 

@@ -5,10 +5,10 @@ import cn.iocoder.yudao.module.pms.controller.admin.pm.workitem.vo.comment.PmsWo
 import cn.iocoder.yudao.module.pms.dal.dataobject.pm.workitem.PmsWorkItemCommentDO;
 import cn.iocoder.yudao.module.pms.dal.dataobject.pm.workitem.PmsWorkItemDO;
 import cn.iocoder.yudao.module.pms.dal.mysql.pm.workitem.PmsWorkItemCommentMapper;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
@@ -35,9 +35,9 @@ public class PmsWorkItemCommentServiceImplTest extends BaseDbUnitTest {
     @Resource
     private PmsWorkItemCommentMapper commentMapper;
 
-    @MockitoBean
+    @MockBean
     private PmsWorkItemService workItemService;
-    @MockitoBean
+    @MockBean
     private PmsWorkItemActivityService workItemActivityService;
 
     @Test

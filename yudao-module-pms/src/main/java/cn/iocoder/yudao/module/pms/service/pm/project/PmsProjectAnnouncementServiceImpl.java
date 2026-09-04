@@ -5,7 +5,7 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.pms.controller.admin.pm.project.vo.announcement.PmsProjectAnnouncementSaveReqVO;
 import cn.iocoder.yudao.module.pms.dal.dataobject.pm.project.PmsProjectAnnouncementDO;
 import cn.iocoder.yudao.module.pms.dal.mysql.pm.project.PmsProjectAnnouncementMapper;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 

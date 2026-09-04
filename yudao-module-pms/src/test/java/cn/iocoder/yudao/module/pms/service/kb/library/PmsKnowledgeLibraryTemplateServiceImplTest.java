@@ -8,11 +8,11 @@ import cn.iocoder.yudao.module.pms.controller.admin.kb.library.vo.template.PmsKn
 import cn.iocoder.yudao.module.pms.dal.dataobject.kb.library.PmsKnowledgeLibraryTemplateDO;
 import cn.iocoder.yudao.module.pms.dal.mysql.kb.library.PmsKnowledgeLibraryTemplateMapper;
 import cn.iocoder.yudao.module.pms.service.kb.content.PmsKnowledgeDocumentService;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,7 +47,7 @@ public class PmsKnowledgeLibraryTemplateServiceImplTest extends BaseDbUnitTest {
     @Resource
     private PmsKnowledgeLibraryTemplateMapper templateMapper;
 
-    @MockitoBean
+    @MockBean
     private PmsKnowledgeDocumentService documentService;
 
     @org.junit.jupiter.api.BeforeEach

@@ -6,10 +6,10 @@ import cn.iocoder.yudao.module.pms.controller.admin.pm.project.vo.announcement.P
 import cn.iocoder.yudao.module.pms.dal.dataobject.pm.project.PmsProjectAnnouncementDO;
 import cn.iocoder.yudao.module.pms.dal.dataobject.pm.project.PmsProjectDO;
 import cn.iocoder.yudao.module.pms.dal.mysql.pm.project.PmsProjectAnnouncementMapper;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.Collections;
 
@@ -33,7 +33,7 @@ public class PmsProjectAnnouncementServiceImplTest extends BaseDbUnitTest {
     @Resource
     private PmsProjectAnnouncementMapper announcementMapper;
 
-    @MockitoBean
+    @MockBean
     private PmsProjectMemberService projectMemberService;
 
     @Test

@@ -21,7 +21,7 @@ import cn.iocoder.yudao.module.pms.service.pm.project.PmsProjectMemberService;
 import cn.iocoder.yudao.module.pms.service.pm.workitem.PmsWorkItemActivityService;
 import cn.iocoder.yudao.module.pms.service.pm.workitem.PmsWorkItemService;
 import cn.iocoder.yudao.module.pms.service.pm.workitem.PmsWorkItemWorkLogService;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

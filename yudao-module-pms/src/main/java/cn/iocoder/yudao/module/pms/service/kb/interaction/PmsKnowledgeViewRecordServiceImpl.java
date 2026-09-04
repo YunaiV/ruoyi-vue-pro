@@ -8,7 +8,7 @@ import cn.iocoder.yudao.module.pms.dal.dataobject.kb.interaction.PmsKnowledgeVie
 import cn.iocoder.yudao.module.pms.dal.mysql.kb.interaction.PmsKnowledgeViewRecordMapper;
 import cn.iocoder.yudao.module.pms.enums.kb.PmsKnowledgeObjectTypeEnum;
 import cn.iocoder.yudao.module.pms.service.kb.library.PmsKnowledgeLibraryMemberService;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
