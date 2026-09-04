@@ -50,6 +50,10 @@ public class BannerApplicationRunner implements ApplicationRunner {
             if (isNotPresent("cn.iocoder.yudao.module.wms.framework.web.config.WmsWebConfiguration")) {
                 System.out.println("[WMS 仓库管理系统 yudao-module-wms - 已禁用][参考 https://doc.iocoder.cn/wms/build/ 开启]");
             }
+            // PMS 系统
+            if (isNotPresent("cn.iocoder.yudao.module.pms.framework.web.config.PmsWebConfiguration")) {
+                System.out.println("[PMS 项目管理系统 yudao-module-pms - 已禁用][请在 yudao-server 中开启]");
+            }
             // CRM 系统
             if (isNotPresent("cn.iocoder.yudao.module.crm.framework.web.config.CrmWebConfiguration")) {
                 System.out.println("[CRM 系统 yudao-module-crm - 已禁用][参考 https://doc.iocoder.cn/crm/build/ 开启]");
