@@ -4,9 +4,12 @@ import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.pms.dal.dataobject.pm.workitem.PmsWorkItemActivityDO;
 import cn.iocoder.yudao.module.pms.dal.mysql.pm.workitem.PmsWorkItemActivityMapper;
+import cn.iocoder.yudao.module.pms.service.pm.iteration.PmsIterationService;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.util.List;
 
@@ -27,6 +30,15 @@ public class PmsWorkItemActivityServiceImplTest extends BaseDbUnitTest {
 
     @Resource
     private PmsWorkItemActivityMapper activityMapper;
+
+    @MockitoBean
+    private PmsWorkItemLabelService workItemLabelService;
+    @MockitoBean
+    private PmsWorkItemService workItemService;
+    @MockitoBean
+    private PmsIterationService iterationService;
+    @MockitoBean
+    private AdminUserApi adminUserApi;
 
     @Test
     public void testRecordAndGetActivity_success() {
