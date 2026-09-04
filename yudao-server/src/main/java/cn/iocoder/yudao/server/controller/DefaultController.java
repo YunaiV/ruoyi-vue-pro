@@ -52,6 +52,12 @@ public class DefaultController {
                 "[WMS 仓库管理系统 yudao-module-wms - 已禁用][参考 https://doc.iocoder.cn/wms/build/ 开启]");
     }
 
+    @RequestMapping("/admin-api/pms/**")
+    public CommonResult<Boolean> pms404() {
+        return CommonResult.error(NOT_IMPLEMENTED.getCode(),
+                "[PMS 项目管理系统 yudao-module-pms - 已禁用][请在 yudao-server 中开启]");
+    }
+
     @RequestMapping("/admin-api/crm/**")
     public CommonResult<Boolean> crm404() {
         return CommonResult.error(NOT_IMPLEMENTED.getCode(),
