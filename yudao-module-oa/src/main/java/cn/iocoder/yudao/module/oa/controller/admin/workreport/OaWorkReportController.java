@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.oa.controller.admin.workreport.vo.OaWorkReportSav
 import cn.iocoder.yudao.module.oa.controller.admin.workreport.vo.OaWorkReportStatisticsReqVO;
 import cn.iocoder.yudao.module.oa.controller.admin.workreport.vo.OaWorkReportStatisticsRespVO;
 import cn.iocoder.yudao.module.oa.dal.dataobject.workreport.OaWorkReportDO;
+import cn.iocoder.yudao.module.oa.enums.workreport.OaWorkReportTypeEnum;
 import cn.iocoder.yudao.module.oa.service.workreport.OaWorkReportService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
@@ -20,8 +21,6 @@ import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
-import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -33,7 +32,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import cn.iocoder.yudao.module.oa.enums.workreport.OaWorkReportTypeEnum;
+import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;

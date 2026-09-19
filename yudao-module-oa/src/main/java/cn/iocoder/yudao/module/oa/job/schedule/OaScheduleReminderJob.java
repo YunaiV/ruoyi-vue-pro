@@ -4,8 +4,9 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.quartz.core.handler.JobHandler;
 import cn.iocoder.yudao.framework.tenant.core.job.TenantJob;
 import cn.iocoder.yudao.module.oa.service.schedule.OaScheduleService;
-import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
 
 /**
  * OA 日程提醒 Job

@@ -1,12 +1,12 @@
 package cn.iocoder.yudao.module.oa.service.contact;
 
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.oa.controller.admin.contact.vo.category.OaContactCategorySaveReqVO;
 import cn.iocoder.yudao.module.oa.dal.dataobject.contact.OaContactCategoryDO;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
-import java.util.Collection;
 
 /**
  * OA 联系人分类 Service 接口

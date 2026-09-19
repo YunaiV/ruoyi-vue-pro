@@ -4,8 +4,8 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.oa.controller.admin.supply.vo.apply.*;
 import cn.iocoder.yudao.module.oa.controller.admin.supply.vo.issue.*;
 import cn.iocoder.yudao.module.oa.dal.dataobject.supply.*;
-import jakarta.validation.Valid;
 
+import javax.validation.Valid;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;

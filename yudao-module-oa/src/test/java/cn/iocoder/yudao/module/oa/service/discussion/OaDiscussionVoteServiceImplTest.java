@@ -6,11 +6,11 @@ import cn.iocoder.yudao.module.oa.dal.dataobject.discussion.OaVoteOptionDO;
 import cn.iocoder.yudao.module.oa.dal.mysql.discussion.OaVoteOptionMapper;
 import cn.iocoder.yudao.module.oa.dal.mysql.discussion.OaVoteRecordMapper;
 import cn.iocoder.yudao.module.oa.enums.discussion.OaDiscussionTypeEnum;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
@@ -37,7 +37,7 @@ public class OaDiscussionVoteServiceImplTest extends BaseDbUnitTest {
     @Resource
     private OaVoteRecordMapper voteRecordMapper;
 
-    @MockitoBean
+    @MockBean
     private OaDiscussionService discussionService;
 
     @Test

@@ -5,10 +5,11 @@ import cn.iocoder.yudao.module.oa.dal.dataobject.discussion.OaDiscussionDO;
 import cn.iocoder.yudao.module.oa.dal.mysql.discussion.OaDiscussionMapper;
 import cn.iocoder.yudao.module.oa.enums.discussion.OaDiscussionTypeEnum;
 import cn.iocoder.yudao.module.system.api.permission.PermissionApi;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+
+import javax.annotation.Resource;
 
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
@@ -30,13 +31,13 @@ public class OaDiscussionServiceImplTest extends BaseDbUnitTest {
     @Resource
     private OaDiscussionMapper discussionMapper;
 
-    @MockitoBean
+    @MockBean
     private OaDiscussionReplyService discussionReplyService;
-    @MockitoBean
+    @MockBean
     private OaDiscussionLikeService discussionLikeService;
-    @MockitoBean
+    @MockBean
     private OaDiscussionVoteService discussionVoteService;
-    @MockitoBean
+    @MockBean
     private PermissionApi permissionApi;
 
     @Test

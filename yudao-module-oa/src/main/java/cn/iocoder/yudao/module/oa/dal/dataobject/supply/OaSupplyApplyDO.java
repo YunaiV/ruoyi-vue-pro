@@ -1,16 +1,16 @@
 package cn.iocoder.yudao.module.oa.dal.dataobject.supply;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.module.oa.enums.supply.*;
+import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceStatusEnum;
 import cn.iocoder.yudao.module.oa.enums.DictTypeConstants;
+import cn.iocoder.yudao.module.oa.enums.supply.*;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceStatusEnum;
-import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import org.flowable.engine.history.HistoricProcessInstance;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 
 import java.time.LocalDateTime;
 import java.util.List;

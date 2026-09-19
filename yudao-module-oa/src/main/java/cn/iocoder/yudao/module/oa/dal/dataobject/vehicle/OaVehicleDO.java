@@ -1,12 +1,12 @@
 package cn.iocoder.yudao.module.oa.dal.dataobject.vehicle;
 
-import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
-import cn.iocoder.yudao.module.oa.enums.vehicle.OaVehicleStatusEnum;
 import cn.iocoder.yudao.module.oa.enums.DictTypeConstants;
+import cn.iocoder.yudao.module.oa.enums.vehicle.OaVehicleStatusEnum;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -46,6 +46,7 @@ public class OaVehicleDO extends BaseDO {
      *
      * 关联 {@link DeptRespDTO#getId()}
      */
+    @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private Long deptId;
     /**
      * 车型

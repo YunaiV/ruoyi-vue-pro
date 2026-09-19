@@ -2,8 +2,9 @@ package cn.iocoder.yudao.module.oa.controller.admin.discussion.vo.like;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.AssertTrue;
 import lombok.Data;
+
+import javax.validation.constraints.AssertTrue;
 
 @Schema(description = "管理后台 - OA 讨论点赞 Request VO")
 @Data

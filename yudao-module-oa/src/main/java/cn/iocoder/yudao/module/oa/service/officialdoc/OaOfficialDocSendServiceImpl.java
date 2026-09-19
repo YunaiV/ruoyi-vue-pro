@@ -15,12 +15,12 @@ import cn.iocoder.yudao.module.oa.dal.mysql.officialdoc.OaOfficialDocSendMapper;
 import cn.iocoder.yudao.module.oa.dal.redis.no.OaNoRedisDAO;
 import cn.iocoder.yudao.module.oa.enums.BpmModelConstants;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
-import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;

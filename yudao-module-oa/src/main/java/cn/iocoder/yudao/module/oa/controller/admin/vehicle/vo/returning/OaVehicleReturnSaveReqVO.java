@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.oa.controller.admin.vehicle.vo.returning;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.*;
 import lombok.Data;
 
+import javax.validation.constraints.*;
 import java.time.LocalDateTime;
 import java.util.List;
 

@@ -10,16 +10,16 @@ import cn.iocoder.yudao.module.oa.dal.dataobject.meetingroom.OaMeetingRoomDO;
 import cn.iocoder.yudao.module.oa.dal.mysql.meetingroom.OaMeetingRoomMapper;
 import cn.iocoder.yudao.module.system.api.dict.DictDataApi;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import javax.annotation.Resource;
+import javax.sql.DataSource;
 import java.util.Arrays;
 import java.util.Collections;
-import javax.sql.DataSource;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
@@ -44,11 +44,11 @@ public class OaMeetingRoomServiceImplTest extends BaseDbUnitTest {
     @Resource
     private DataSource dataSource;
 
-    @MockitoBean
+    @MockBean
     private OaMeetingRoomBookingService meetingRoomBookingService;
-    @MockitoBean
+    @MockBean
     private AdminUserApi adminUserApi;
-    @MockitoBean
+    @MockBean
     private DictDataApi dictDataApi;
 
     @BeforeEach

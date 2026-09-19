@@ -12,15 +12,15 @@ import cn.iocoder.yudao.module.oa.controller.admin.overtime.vo.OaOvertimeApplySa
 import cn.iocoder.yudao.module.oa.controller.admin.overtime.vo.OaOvertimeApplySubmitReqVO;
 import cn.iocoder.yudao.module.oa.dal.dataobject.overtime.OaOvertimeApplyDO;
 import cn.iocoder.yudao.module.oa.dal.mysql.overtime.OaOvertimeApplyMapper;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -45,7 +45,7 @@ public class OaOvertimeApplyServiceImplTest extends BaseDbUnitTest {
     @Resource
     private OaOvertimeApplyMapper overtimeApplyMapper;
 
-    @MockitoBean
+    @MockBean
     private BpmProcessInstanceApi processInstanceApi;
 
     @BeforeEach

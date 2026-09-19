@@ -1,14 +1,15 @@
 package cn.iocoder.yudao.module.oa.controller.admin.mail.vo.message;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.*;
-import lombok.Data;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.springframework.web.multipart.MultipartFile;
-import cn.iocoder.yudao.module.oa.dal.dataobject.mail.OaMailMessageDO;
-import java.util.List;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
+import cn.iocoder.yudao.module.oa.dal.dataobject.mail.OaMailMessageDO;
 import cn.iocoder.yudao.module.oa.enums.mail.OaMailComposeModeEnum;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.validation.constraints.*;
+import java.util.List;
 
 @Schema(description = "管理后台 - 写信及草稿 Request VO")
 @Data

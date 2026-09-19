@@ -1,14 +1,15 @@
 package cn.iocoder.yudao.module.oa.controller.admin.officialdoc.vo.receive;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
-import java.time.LocalDateTime;
-import java.util.List;
-import jakarta.validation.constraints.*;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.framework.dict.validation.InDict;
 import cn.iocoder.yudao.module.oa.enums.DictTypeConstants;
 import cn.iocoder.yudao.module.oa.enums.officialdoc.OaOfficialDocReceiveTypeEnum;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+
+import javax.validation.constraints.*;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Schema(description = "管理后台 - 公文收文新增/修改 Request VO")
 @Data

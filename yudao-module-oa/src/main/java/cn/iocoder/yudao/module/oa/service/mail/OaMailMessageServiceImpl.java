@@ -1,44 +1,44 @@
 package cn.iocoder.yudao.module.oa.service.mail;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Pair;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.map.MapUtil;
-import cn.iocoder.yudao.module.oa.enums.mail.OaMailFolderTypeEnum;
-import cn.iocoder.yudao.module.oa.enums.mail.OaMailFolderKeyEnum;
-import cn.iocoder.yudao.module.oa.enums.mail.OaMailComposeModeEnum;
-import cn.iocoder.yudao.module.oa.enums.mail.OaMailCapabilityEnum;
-import lombok.extern.slf4j.Slf4j;
-import cn.hutool.core.lang.Pair;
-import org.springframework.validation.annotation.Validated;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.oa.controller.admin.mail.vo.message.*;
 import cn.iocoder.yudao.module.oa.dal.dataobject.mail.*;
 import cn.iocoder.yudao.module.oa.dal.mysql.mail.*;
-import jakarta.annotation.Resource;
-import jakarta.mail.*;
-import jakarta.mail.internet.InternetAddress;
-import jakarta.mail.internet.MimeMessage;
-import jakarta.mail.search.HeaderTerm;
-import org.eclipse.angus.mail.imap.AppendUID;
-import org.eclipse.angus.mail.imap.IMAPFolder;
-import org.eclipse.angus.mail.imap.IMAPStore;
+import cn.iocoder.yudao.module.oa.enums.mail.OaMailCapabilityEnum;
+import cn.iocoder.yudao.module.oa.enums.mail.OaMailComposeModeEnum;
+import cn.iocoder.yudao.module.oa.enums.mail.OaMailFolderKeyEnum;
+import cn.iocoder.yudao.module.oa.enums.mail.OaMailFolderTypeEnum;
+import com.sun.mail.imap.AppendUID;
+import com.sun.mail.imap.IMAPFolder;
+import com.sun.mail.imap.IMAPStore;
+import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Entities;
 import org.jsoup.safety.Safelist;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
+import javax.mail.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import javax.mail.search.HeaderTerm;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.module.oa.enums.ErrorCodeConstants.*;
 
 /**

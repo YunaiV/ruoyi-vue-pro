@@ -4,11 +4,11 @@ import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.module.oa.dal.dataobject.file.OaFileFavoriteDO;
 import cn.iocoder.yudao.module.oa.dal.mysql.file.OaFileFavoriteMapper;
 import cn.iocoder.yudao.module.oa.enums.file.OaFilePermissionLevelEnum;
-import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;

@@ -12,15 +12,15 @@ import cn.iocoder.yudao.module.oa.controller.admin.regular.vo.OaRegularApplySave
 import cn.iocoder.yudao.module.oa.controller.admin.regular.vo.OaRegularApplySubmitReqVO;
 import cn.iocoder.yudao.module.oa.dal.dataobject.regular.OaRegularApplyDO;
 import cn.iocoder.yudao.module.oa.dal.mysql.regular.OaRegularApplyMapper;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
@@ -44,7 +44,7 @@ public class OaRegularApplyServiceImplTest extends BaseDbUnitTest {
     @Resource
     private OaRegularApplyMapper regularApplyMapper;
 
-    @MockitoBean
+    @MockBean
     private BpmProcessInstanceApi processInstanceApi;
 
     @BeforeEach

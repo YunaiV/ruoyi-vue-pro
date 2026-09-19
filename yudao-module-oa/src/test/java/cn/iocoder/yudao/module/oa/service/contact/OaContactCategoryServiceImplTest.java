@@ -4,10 +4,11 @@ import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.oa.controller.admin.contact.vo.category.OaContactCategorySaveReqVO;
 import cn.iocoder.yudao.module.oa.dal.dataobject.contact.OaContactCategoryDO;
 import cn.iocoder.yudao.module.oa.dal.mysql.contact.OaContactCategoryMapper;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+
+import javax.annotation.Resource;
 
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
@@ -31,7 +32,7 @@ public class OaContactCategoryServiceImplTest extends BaseDbUnitTest {
     @Resource
     private OaContactCategoryMapper contactCategoryMapper;
 
-    @MockitoBean
+    @MockBean
     private OaContactService contactService;
 
     @Test

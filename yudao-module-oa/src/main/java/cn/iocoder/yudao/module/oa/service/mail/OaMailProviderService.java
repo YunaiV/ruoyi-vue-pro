@@ -2,8 +2,7 @@ package cn.iocoder.yudao.module.oa.service.mail;
 import cn.iocoder.yudao.module.oa.controller.admin.mail.vo.provider.OaMailProviderSaveReqVO;
 import cn.iocoder.yudao.module.oa.dal.dataobject.mail.OaMailProviderDO;
 
-import jakarta.validation.Valid;
-
+import javax.validation.Valid;
 import java.util.List;
 
 /**

@@ -4,8 +4,9 @@ import cn.iocoder.yudao.module.bpm.api.event.BpmProcessInstanceStatusEvent;
 import cn.iocoder.yudao.module.bpm.api.event.BpmProcessInstanceStatusEventListener;
 import cn.iocoder.yudao.module.oa.enums.BpmModelConstants;
 import cn.iocoder.yudao.module.oa.service.meetingroom.OaMeetingRoomBookingService;
-import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
 
 /**
  * 会议室预定审批结果监听器

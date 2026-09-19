@@ -7,14 +7,14 @@ import cn.iocoder.yudao.module.oa.controller.admin.mail.vo.account.OaMailAccount
 import cn.iocoder.yudao.module.oa.dal.dataobject.mail.OaMailAccountDO;
 import cn.iocoder.yudao.module.oa.dal.dataobject.mail.OaMailProviderDO;
 import cn.iocoder.yudao.module.oa.dal.mysql.mail.OaMailAccountMapper;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.List;
 
@@ -39,9 +39,9 @@ public class OaMailAccountServiceImplTest extends BaseDbUnitTest {
     @Resource(name = "oaMailAccountMapper") // 区分 System 模块的同名 Mapper
     private OaMailAccountMapper mailAccountMapper;
 
-    @MockitoBean
+    @MockBean
     private OaMailProviderService mailProviderService;
-    @MockitoBean
+    @MockBean
     private OaMailMessageClient mailMessageClient;
 
     @AfterEach

@@ -13,13 +13,13 @@ import cn.iocoder.yudao.module.oa.dal.mysql.file.OaFileNodeMapper;
 import cn.iocoder.yudao.module.oa.framework.config.OaProperties;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
@@ -52,13 +52,13 @@ public class OaFileNodeServiceImplTest extends BaseDbUnitTest {
     @Resource
     private OaProperties properties;
 
-    @MockitoBean
+    @MockBean
     private OaFilePermissionService filePermissionService;
-    @MockitoBean
+    @MockBean
     private OaFileFavoriteService fileFavoriteService;
-    @MockitoBean
+    @MockBean
     private FileApi fileApi;
-    @MockitoBean
+    @MockBean
     private AdminUserApi adminUserApi;
 
     @BeforeEach

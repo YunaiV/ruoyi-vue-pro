@@ -3,10 +3,10 @@ package cn.iocoder.yudao.module.oa.controller.admin.reimbursement.vo;
 import cn.iocoder.yudao.framework.dict.validation.InDict;
 import cn.iocoder.yudao.module.oa.enums.DictTypeConstants;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
 import lombok.Data;
 
+import javax.validation.Valid;
+import javax.validation.constraints.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;

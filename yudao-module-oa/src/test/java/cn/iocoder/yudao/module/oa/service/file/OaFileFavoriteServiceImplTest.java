@@ -4,11 +4,11 @@ import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.oa.dal.dataobject.file.OaFileFavoriteDO;
 import cn.iocoder.yudao.module.oa.dal.mysql.file.OaFileFavoriteMapper;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -31,7 +31,7 @@ public class OaFileFavoriteServiceImplTest extends BaseDbUnitTest {
     @Resource
     private OaFileFavoriteMapper fileFavoriteMapper;
 
-    @MockitoBean
+    @MockBean
     private OaFileNodeService fileNodeService;
 
     @Test

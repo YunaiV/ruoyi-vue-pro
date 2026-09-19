@@ -1,13 +1,13 @@
 package cn.iocoder.yudao.module.oa.service.mail;
 
+import cn.hutool.core.lang.Pair;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.oa.controller.admin.mail.vo.message.*;
 import cn.iocoder.yudao.module.oa.dal.dataobject.mail.*;
+import cn.iocoder.yudao.module.oa.enums.mail.OaMailComposeModeEnum;
 
 import java.util.List;
-import cn.hutool.core.lang.Pair;
-import cn.iocoder.yudao.framework.common.validation.InEnum;
-import cn.iocoder.yudao.module.oa.enums.mail.OaMailComposeModeEnum;
 
 /**
  * 企业邮箱邮件 Service 接口

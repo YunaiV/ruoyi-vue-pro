@@ -4,8 +4,9 @@ import cn.iocoder.yudao.module.bpm.api.event.BpmProcessInstanceStatusEvent;
 import cn.iocoder.yudao.module.bpm.api.event.BpmProcessInstanceStatusEventListener;
 import cn.iocoder.yudao.module.oa.enums.BpmModelConstants;
 import cn.iocoder.yudao.module.oa.service.travel.OaTravelReimbursementService;
-import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
 
 /**
  * 出差报销审批结果监听器

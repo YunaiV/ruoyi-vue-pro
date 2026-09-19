@@ -3,9 +3,9 @@ package cn.iocoder.yudao.module.oa.controller.admin.seal.vo;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.oa.enums.seal.OaSealStatusEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.*;
 import lombok.Data;
 
+import javax.validation.constraints.*;
 import java.time.LocalDateTime;
 
 @Schema(description = "管理后台 - 印章新增/修改 Request VO")

@@ -3,7 +3,8 @@ package cn.iocoder.yudao.module.oa.service.seal;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.oa.controller.admin.seal.vo.*;
 import cn.iocoder.yudao.module.oa.dal.dataobject.seal.OaSealDO;
-import jakarta.validation.Valid;
+
+import javax.validation.Valid;
 
 /**
  * 印章 Service 接口

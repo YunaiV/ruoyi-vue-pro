@@ -10,11 +10,11 @@ import cn.iocoder.yudao.module.oa.dal.mysql.seal.OaSealMapper;
 import cn.iocoder.yudao.module.oa.dal.redis.no.OaNoRedisDAO;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
@@ -40,13 +40,13 @@ public class OaSealServiceImplTest extends BaseDbUnitTest {
     @Resource
     private OaSealMapper sealMapper;
 
-    @MockitoBean
+    @MockBean
     private OaNoRedisDAO noRedisDAO;
-    @MockitoBean
+    @MockBean
     private AdminUserApi adminUserApi;
-    @MockitoBean
+    @MockBean
     private DeptApi deptApi;
-    @MockitoBean
+    @MockBean
     private OaSealApplyService sealApplyService;
 
     @Test

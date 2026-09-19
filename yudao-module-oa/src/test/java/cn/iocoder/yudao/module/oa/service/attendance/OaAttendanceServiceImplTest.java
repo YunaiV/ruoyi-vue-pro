@@ -18,16 +18,16 @@ import cn.iocoder.yudao.module.oa.service.leave.OaLeaveApplyService;
 import cn.iocoder.yudao.module.oa.service.travel.OaTravelApplyService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.MockedStatic;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import javax.annotation.Resource;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -67,11 +67,11 @@ public class OaAttendanceServiceImplTest extends BaseDbUnitTest {
     @Resource
     private OaProperties properties;
 
-    @MockitoBean
+    @MockBean
     private AdminUserApi adminUserApi;
-    @MockitoBean
+    @MockBean
     private OaLeaveApplyService leaveApplyService;
-    @MockitoBean
+    @MockBean
     private OaTravelApplyService travelApplyService;
 
     private MockedStatic<LocalDateTime> dateTimeMock;

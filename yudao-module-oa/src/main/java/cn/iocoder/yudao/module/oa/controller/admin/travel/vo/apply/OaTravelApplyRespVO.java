@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.oa.controller.admin.travel.vo.apply;
 import cn.iocoder.yudao.module.oa.dal.dataobject.travel.OaTravelApplyDO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;

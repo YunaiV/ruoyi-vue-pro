@@ -1,11 +1,11 @@
 package cn.iocoder.yudao.module.oa.controller.admin.supply.vo.apply;
 
-import cn.iocoder.yudao.module.oa.enums.supply.*;
 import cn.iocoder.yudao.module.oa.controller.admin.supply.vo.issue.OaSupplyIssueRespVO;
+import cn.iocoder.yudao.module.oa.enums.supply.*;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.*;
 import lombok.Data;
 
+import javax.validation.constraints.*;
 import java.time.LocalDateTime;
 import java.util.List;
 

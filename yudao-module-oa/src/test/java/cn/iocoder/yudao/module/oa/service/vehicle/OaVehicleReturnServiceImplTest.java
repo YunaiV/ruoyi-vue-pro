@@ -13,12 +13,12 @@ import cn.iocoder.yudao.module.oa.dal.mysql.vehicle.OaVehicleReturnMapper;
 import cn.iocoder.yudao.module.oa.dal.redis.no.OaNoRedisDAO;
 import cn.iocoder.yudao.module.oa.enums.BpmModelConstants;
 import cn.iocoder.yudao.module.oa.service.vehicle.listener.OaVehicleReturnStatusListener;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
@@ -52,11 +52,11 @@ public class OaVehicleReturnServiceImplTest extends BaseDbUnitTest {
     @Resource
     private ApplicationEventPublisher eventPublisher;
 
-    @MockitoBean
+    @MockBean
     private OaNoRedisDAO noRedisDAO;
-    @MockitoBean
+    @MockBean
     private OaVehicleApplyService vehicleApplyService;
-    @MockitoBean
+    @MockBean
     private BpmProcessInstanceApi processInstanceApi;
 
     @Test

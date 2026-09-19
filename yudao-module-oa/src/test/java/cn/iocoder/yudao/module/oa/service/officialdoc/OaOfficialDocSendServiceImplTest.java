@@ -9,13 +9,13 @@ import cn.iocoder.yudao.module.oa.dal.dataobject.officialdoc.*;
 import cn.iocoder.yudao.module.oa.dal.mysql.officialdoc.*;
 import cn.iocoder.yudao.module.oa.dal.redis.no.OaNoRedisDAO;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import javax.annotation.Resource;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -40,15 +40,15 @@ public class OaOfficialDocSendServiceImplTest extends BaseDbUnitTest {
     @Resource
     private OaOfficialDocSendMapper officialDocSendMapper;
 
-    @MockitoBean
+    @MockBean
     private BpmProcessInstanceApi processInstanceApi;
-    @MockitoBean
+    @MockBean
     private OaNoRedisDAO noRedisDAO;
-    @MockitoBean
+    @MockBean
     private DeptApi deptApi;
-    @MockitoBean
+    @MockBean
     private OaOfficialDocTemplateService officialDocTemplateService;
-    @MockitoBean
+    @MockBean
     private OaOfficialDocReceiveService officialDocReceiveService;
 
 

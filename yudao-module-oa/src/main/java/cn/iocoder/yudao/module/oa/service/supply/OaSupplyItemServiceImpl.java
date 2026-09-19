@@ -9,11 +9,11 @@ import cn.iocoder.yudao.module.oa.controller.admin.supply.vo.item.*;
 import cn.iocoder.yudao.module.oa.dal.dataobject.supply.*;
 import cn.iocoder.yudao.module.oa.dal.mysql.supply.*;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
-import jakarta.annotation.Resource;
-import org.springframework.stereotype.Service;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;

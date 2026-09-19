@@ -2,9 +2,10 @@ package cn.iocoder.yudao.module.oa.controller.admin.discussion.vo.reply;
 
 import cn.iocoder.yudao.framework.common.pojo.SortablePageParam;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import javax.validation.constraints.NotNull;
 
 @Schema(description = "管理后台 - OA 讨论回复分页 Request VO")
 @Data

@@ -3,9 +3,9 @@ package cn.iocoder.yudao.module.oa.controller.admin.resign.vo;
 import cn.iocoder.yudao.framework.dict.validation.InDict;
 import cn.iocoder.yudao.module.oa.enums.DictTypeConstants;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.*;
 import lombok.Data;
 
+import javax.validation.constraints.*;
 import java.util.List;
 
 @Schema(description = "管理后台 - 离职申请新增/修改 Request VO")

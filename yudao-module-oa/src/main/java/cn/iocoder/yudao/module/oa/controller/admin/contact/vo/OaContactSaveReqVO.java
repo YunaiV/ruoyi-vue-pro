@@ -2,10 +2,11 @@ package cn.iocoder.yudao.module.oa.controller.admin.contact.vo;
 
 import cn.iocoder.yudao.framework.common.validation.Mobile;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.Data;
+
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 @Schema(description = "管理后台 - OA 外部联系人新增/修改 Request VO")
 @Data

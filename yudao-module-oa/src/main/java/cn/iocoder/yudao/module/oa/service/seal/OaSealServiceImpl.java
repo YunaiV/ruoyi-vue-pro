@@ -5,14 +5,15 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.oa.controller.admin.seal.vo.*;
 import cn.iocoder.yudao.module.oa.dal.dataobject.seal.OaSealDO;
 import cn.iocoder.yudao.module.oa.dal.mysql.seal.OaSealMapper;
+import cn.iocoder.yudao.module.oa.dal.redis.no.OaNoRedisDAO;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import cn.iocoder.yudao.module.oa.dal.redis.no.OaNoRedisDAO;
-import jakarta.annotation.Resource;
-import org.springframework.stereotype.Service;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
+
+import javax.annotation.Resource;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.oa.enums.ErrorCodeConstants.*;

@@ -1,19 +1,19 @@
 package cn.iocoder.yudao.module.oa.service.mail;
 
-import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.ObjUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.oa.controller.admin.mail.vo.account.OaMailAccountSaveReqVO;
 import cn.iocoder.yudao.module.oa.dal.dataobject.mail.OaMailAccountDO;
 import cn.iocoder.yudao.module.oa.dal.dataobject.mail.OaMailProviderDO;
 import cn.iocoder.yudao.module.oa.dal.mysql.mail.OaMailAccountMapper;
-import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;

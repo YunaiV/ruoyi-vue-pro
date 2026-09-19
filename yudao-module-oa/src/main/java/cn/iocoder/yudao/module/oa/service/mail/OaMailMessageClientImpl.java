@@ -1,42 +1,42 @@
 package cn.iocoder.yudao.module.oa.service.mail;
 
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.core.lang.Pair;
-import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
-import jakarta.activation.DataHandler;
-import jakarta.mail.util.ByteArrayDataSource;
-import org.springframework.web.multipart.MultipartFile;
+import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.lang.Pair;
+import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.http.ContentType;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.oa.controller.admin.mail.vo.message.*;
 import cn.iocoder.yudao.module.oa.dal.dataobject.mail.*;
-import jakarta.annotation.Resource;
-import jakarta.mail.*;
-import jakarta.mail.internet.*;
-import org.eclipse.angus.mail.imap.IMAPFolder;
-import org.eclipse.angus.mail.imap.IMAPStore;
+import cn.iocoder.yudao.module.oa.enums.mail.OaMailCapabilityEnum;
+import cn.iocoder.yudao.module.oa.enums.mail.OaMailFolderTypeEnum;
+import com.sun.mail.imap.IMAPFolder;
+import com.sun.mail.imap.IMAPStore;
+import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Entities;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Entities;
 import org.jsoup.safety.Safelist;
-import org.springframework.stereotype.Component;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.activation.DataHandler;
+import javax.annotation.Resource;
+import javax.mail.*;
+import javax.mail.internet.*;
+import javax.mail.util.ByteArrayDataSource;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.http.ContentType;
-import cn.iocoder.yudao.framework.common.util.date.DateUtils;
-import cn.iocoder.yudao.module.oa.enums.mail.OaMailFolderTypeEnum;
-import cn.iocoder.yudao.module.oa.enums.mail.OaMailCapabilityEnum;
-import lombok.extern.slf4j.Slf4j;
 import java.util.*;
 
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.module.oa.enums.ErrorCodeConstants.*;
 
 /**
@@ -282,7 +282,7 @@ public class OaMailMessageClientImpl implements OaMailMessageClient {
         if (ArrayUtil.isNotEmpty(contentIds) && (part.isMimeType("image/png") || part.isMimeType("image/jpeg")
                 || part.isMimeType("image/gif") || part.isMimeType("image/webp"))) {
             String contentId = StrUtil.strip(contentIds[0].trim(), "<", ">");
-            String mimeType = new jakarta.mail.internet.ContentType(part.getContentType()).getBaseType();
+            String mimeType = new javax.mail.internet.ContentType(part.getContentType()).getBaseType();
             try (InputStream input = part.getInputStream()) {
                 inlineImages.put(contentId, "data:" + mimeType + ";base64," + Base64.getEncoder().encodeToString(IoUtil.readBytes(input)));
             }

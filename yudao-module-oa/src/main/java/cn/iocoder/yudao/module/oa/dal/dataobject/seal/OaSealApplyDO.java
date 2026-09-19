@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.oa.dal.dataobject.seal;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceStatusEnum;
-import org.flowable.engine.history.HistoricProcessInstance;
 import cn.iocoder.yudao.module.oa.enums.DictTypeConstants;
 import cn.iocoder.yudao.module.oa.enums.seal.OaSealApplyTypeEnum;
 import cn.iocoder.yudao.module.oa.enums.seal.OaSealUseModeEnum;
@@ -17,6 +16,7 @@ import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.flowable.engine.history.HistoricProcessInstance;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

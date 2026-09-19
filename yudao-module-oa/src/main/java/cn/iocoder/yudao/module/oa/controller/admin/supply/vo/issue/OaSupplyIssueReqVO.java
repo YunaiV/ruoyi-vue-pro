@@ -1,8 +1,9 @@
 package cn.iocoder.yudao.module.oa.controller.admin.supply.vo.issue;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.*;
 import lombok.Data;
+
+import javax.validation.constraints.*;
 
 @Schema(description = "管理后台 - 用品发放 Request VO")
 @Data

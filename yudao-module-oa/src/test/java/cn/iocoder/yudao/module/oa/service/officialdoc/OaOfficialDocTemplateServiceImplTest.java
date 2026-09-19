@@ -6,10 +6,11 @@ import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.oa.controller.admin.officialdoc.vo.template.*;
 import cn.iocoder.yudao.module.oa.dal.dataobject.officialdoc.*;
 import cn.iocoder.yudao.module.oa.dal.mysql.officialdoc.*;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+
+import javax.annotation.Resource;
 
 import static cn.iocoder.yudao.framework.common.util.object.BeanUtils.toBean;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
@@ -32,7 +33,7 @@ public class OaOfficialDocTemplateServiceImplTest extends BaseDbUnitTest {
     @Resource
     private OaOfficialDocTemplateMapper officialDocTemplateMapper;
 
-    @MockitoBean
+    @MockBean
     private OaOfficialDocSendService officialDocSendService;
 
     @Test

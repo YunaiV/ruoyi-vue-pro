@@ -1,12 +1,12 @@
 package cn.iocoder.yudao.module.oa.service.mail;
 
+import cn.hutool.core.lang.Pair;
 import cn.iocoder.yudao.module.oa.controller.admin.mail.vo.message.*;
 import cn.iocoder.yudao.module.oa.dal.dataobject.mail.*;
-import jakarta.mail.*;
-import jakarta.mail.internet.*;
 
+import javax.mail.*;
+import javax.mail.internet.*;
 import java.io.IOException;
-import cn.hutool.core.lang.Pair;
 import java.util.List;
 import java.util.Map;
 

@@ -3,9 +3,10 @@ package cn.iocoder.yudao.module.oa.controller.admin.attendance.vo;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.oa.enums.attendance.OaAttendanceStatusEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.Data;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 @Schema(description = "管理后台 - OA 考勤修改 Request VO")
 @Data

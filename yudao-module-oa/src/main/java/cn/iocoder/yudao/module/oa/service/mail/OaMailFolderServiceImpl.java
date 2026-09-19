@@ -3,9 +3,9 @@ package cn.iocoder.yudao.module.oa.service.mail;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.module.oa.dal.dataobject.mail.OaMailFolderDO;
 import cn.iocoder.yudao.module.oa.dal.mysql.mail.OaMailFolderMapper;
-import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;

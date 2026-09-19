@@ -3,8 +3,8 @@ package cn.iocoder.yudao.module.oa.controller.admin.workreport.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import java.util.List;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Schema(description = "管理后台 - OA 工作汇报统计 Response VO")
 @Data

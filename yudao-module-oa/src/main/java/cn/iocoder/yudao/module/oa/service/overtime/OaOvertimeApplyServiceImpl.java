@@ -13,11 +13,11 @@ import cn.iocoder.yudao.module.oa.controller.admin.overtime.vo.OaOvertimeApplySu
 import cn.iocoder.yudao.module.oa.dal.dataobject.overtime.OaOvertimeApplyDO;
 import cn.iocoder.yudao.module.oa.dal.mysql.overtime.OaOvertimeApplyMapper;
 import cn.iocoder.yudao.module.oa.enums.BpmModelConstants;
-import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
 

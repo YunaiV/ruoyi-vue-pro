@@ -7,18 +7,18 @@ import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.oa.controller.admin.mail.vo.message.*;
 import cn.iocoder.yudao.module.oa.dal.dataobject.mail.*;
 import cn.iocoder.yudao.module.oa.dal.mysql.mail.*;
-import jakarta.annotation.Resource;
-import jakarta.mail.*;
-import jakarta.mail.internet.MimeMessage;
-import org.eclipse.angus.mail.imap.AppendUID;
-import org.eclipse.angus.mail.imap.IMAPFolder;
-import org.eclipse.angus.mail.imap.IMAPStore;
+import com.sun.mail.imap.AppendUID;
+import com.sun.mail.imap.IMAPFolder;
+import com.sun.mail.imap.IMAPStore;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import javax.annotation.Resource;
+import javax.mail.*;
+import javax.mail.internet.MimeMessage;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -45,9 +45,9 @@ public class OaMailMessageServiceImplTest extends BaseDbUnitTest {
     @Resource
     private OaMailFolderMapper mailFolderMapper;
 
-    @MockitoBean
+    @MockBean
     private OaMailAccountService mailAccountService;
-    @MockitoBean
+    @MockBean
     private OaMailMessageClient mailMessageClient;
 
     @Test

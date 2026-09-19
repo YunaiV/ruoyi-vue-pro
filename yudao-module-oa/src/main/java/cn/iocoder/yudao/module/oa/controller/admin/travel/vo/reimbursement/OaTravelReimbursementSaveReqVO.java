@@ -1,16 +1,17 @@
 package cn.iocoder.yudao.module.oa.controller.admin.travel.vo.reimbursement;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import cn.iocoder.yudao.framework.dict.validation.InDict;
 import cn.iocoder.yudao.module.oa.enums.DictTypeConstants;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.AssertTrue;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
+
+import javax.validation.Valid;
+import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;

@@ -15,14 +15,14 @@ import cn.iocoder.yudao.module.oa.enums.vehicle.OaVehicleStatusEnum;
 import cn.iocoder.yudao.module.oa.service.vehicle.listener.OaVehicleApplyStatusListener;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
@@ -51,13 +51,13 @@ public class OaVehicleApplyServiceImplTest extends BaseDbUnitTest {
     @Resource
     private ApplicationEventPublisher eventPublisher;
 
-    @MockitoBean
+    @MockBean
     private OaNoRedisDAO noRedisDAO;
-    @MockitoBean
+    @MockBean
     private OaVehicleService vehicleService;
-    @MockitoBean
+    @MockBean
     private AdminUserApi adminUserApi;
-    @MockitoBean
+    @MockBean
     private BpmProcessInstanceApi processInstanceApi;
 
     @Test

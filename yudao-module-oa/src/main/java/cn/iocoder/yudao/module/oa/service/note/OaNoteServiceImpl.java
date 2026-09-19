@@ -13,12 +13,12 @@ import cn.iocoder.yudao.module.oa.dal.mysql.note.OaNoteMapper;
 import cn.iocoder.yudao.module.oa.dal.mysql.note.OaNoteReceiverMapper;
 import cn.iocoder.yudao.module.oa.enums.note.OaNoteTypeEnum;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -27,8 +27,8 @@ import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.diffList;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.diffList;
 import static cn.iocoder.yudao.module.oa.enums.ErrorCodeConstants.NOTE_ACCESS_DENIED;
 import static cn.iocoder.yudao.module.oa.enums.ErrorCodeConstants.NOTE_NOT_EXISTS;
 

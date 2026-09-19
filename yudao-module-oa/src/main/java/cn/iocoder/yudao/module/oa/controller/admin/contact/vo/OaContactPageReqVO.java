@@ -2,9 +2,10 @@ package cn.iocoder.yudao.module.oa.controller.admin.contact.vo;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import javax.validation.constraints.Pattern;
 
 @Schema(description = "管理后台 - OA 外部联系人分页 Request VO")
 @Data

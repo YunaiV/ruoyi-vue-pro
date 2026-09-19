@@ -13,11 +13,11 @@ import cn.iocoder.yudao.module.oa.dal.dataobject.vehicle.OaVehicleReturnDO;
 import cn.iocoder.yudao.module.oa.dal.mysql.vehicle.OaVehicleReturnMapper;
 import cn.iocoder.yudao.module.oa.dal.redis.no.OaNoRedisDAO;
 import cn.iocoder.yudao.module.oa.enums.vehicle.OaVehicleReturnStatusEnum;
-import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 

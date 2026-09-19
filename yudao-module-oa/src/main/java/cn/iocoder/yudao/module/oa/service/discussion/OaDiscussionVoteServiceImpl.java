@@ -11,12 +11,12 @@ import cn.iocoder.yudao.module.oa.dal.dataobject.discussion.OaVoteRecordDO;
 import cn.iocoder.yudao.module.oa.dal.mysql.discussion.OaVoteOptionMapper;
 import cn.iocoder.yudao.module.oa.dal.mysql.discussion.OaVoteRecordMapper;
 import cn.iocoder.yudao.module.oa.enums.discussion.OaDiscussionTypeEnum;
-import jakarta.annotation.Resource;
-import org.springframework.stereotype.Service;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;

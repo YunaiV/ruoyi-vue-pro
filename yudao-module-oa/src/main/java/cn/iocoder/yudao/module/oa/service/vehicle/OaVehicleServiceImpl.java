@@ -6,12 +6,12 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.oa.controller.admin.vehicle.vo.*;
 import cn.iocoder.yudao.module.oa.dal.dataobject.vehicle.OaVehicleDO;
 import cn.iocoder.yudao.module.oa.dal.mysql.vehicle.OaVehicleMapper;
-import jakarta.annotation.Resource;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
-import org.springframework.stereotype.Service;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.util.Collections;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;

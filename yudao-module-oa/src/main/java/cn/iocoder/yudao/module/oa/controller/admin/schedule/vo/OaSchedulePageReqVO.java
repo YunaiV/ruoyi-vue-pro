@@ -6,10 +6,10 @@ import cn.iocoder.yudao.module.oa.enums.schedule.OaPriorityEnum;
 import cn.iocoder.yudao.module.oa.enums.schedule.OaScheduleTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import jakarta.validation.constraints.Size;
 import lombok.EqualsAndHashCode;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;

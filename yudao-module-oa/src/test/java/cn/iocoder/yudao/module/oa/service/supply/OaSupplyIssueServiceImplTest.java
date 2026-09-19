@@ -10,13 +10,13 @@ import cn.iocoder.yudao.module.oa.dal.mysql.supply.OaSupplyApplyItemMapper;
 import cn.iocoder.yudao.module.oa.dal.mysql.supply.OaSupplyApplyMapper;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import javax.annotation.Resource;
 import java.util.Collections;
 
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
@@ -44,11 +44,11 @@ public class OaSupplyIssueServiceImplTest extends BaseDbUnitTest {
     @Resource
     private PlatformTransactionManager transactionManager;
 
-    @MockitoBean
+    @MockBean
     private OaSupplyApplyService supplyApplyService;
-    @MockitoBean
+    @MockBean
     private OaSupplyItemService supplyItemService;
-    @MockitoBean
+    @MockBean
     private AdminUserApi adminUserApi;
 
     @Test

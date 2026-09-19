@@ -13,11 +13,11 @@ import cn.iocoder.yudao.module.oa.dal.dataobject.resign.OaResignApplyDO;
 import cn.iocoder.yudao.module.oa.dal.mysql.resign.OaResignApplyMapper;
 import cn.iocoder.yudao.module.oa.enums.BpmModelConstants;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
 

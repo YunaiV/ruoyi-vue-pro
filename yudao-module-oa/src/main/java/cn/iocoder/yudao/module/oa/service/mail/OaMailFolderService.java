@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.oa.service.mail;
 
 import cn.iocoder.yudao.module.oa.dal.dataobject.mail.OaMailFolderDO;
+
 import java.util.List;
 
 /**

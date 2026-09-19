@@ -21,12 +21,12 @@ import cn.iocoder.yudao.module.oa.enums.file.OaFileScopeEnum;
 import cn.iocoder.yudao.module.oa.enums.file.OaFileSubjectTypeEnum;
 import cn.iocoder.yudao.module.oa.framework.config.OaProperties;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.*;
 

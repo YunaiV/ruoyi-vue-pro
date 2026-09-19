@@ -1,11 +1,11 @@
 package cn.iocoder.yudao.module.oa.service.note;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.module.oa.controller.admin.note.vo.OaNotePageReqVO;
 import cn.iocoder.yudao.module.oa.controller.admin.note.vo.OaNoteSaveReqVO;
 import cn.iocoder.yudao.module.oa.dal.dataobject.note.OaNoteDO;
 import cn.iocoder.yudao.module.oa.dal.dataobject.note.OaNoteReceiverDO;
-import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 
 import java.util.Collection;
 import java.util.List;

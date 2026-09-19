@@ -3,15 +3,14 @@ package cn.iocoder.yudao.module.oa.dal.mysql.seal;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceStatusEnum;
 import cn.iocoder.yudao.module.oa.controller.admin.seal.vo.apply.OaSealApplyPageReqVO;
 import cn.iocoder.yudao.module.oa.dal.dataobject.seal.OaSealApplyDO;
+import cn.iocoder.yudao.module.oa.enums.seal.OaSealUseModeEnum;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
-import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceStatusEnum;
-import cn.iocoder.yudao.module.oa.enums.seal.OaSealUseModeEnum;
 
 /**
  * OA 用印申请 Mapper

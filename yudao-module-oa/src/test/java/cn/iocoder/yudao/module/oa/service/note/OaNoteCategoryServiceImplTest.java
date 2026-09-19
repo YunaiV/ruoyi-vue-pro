@@ -4,10 +4,11 @@ import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.oa.controller.admin.note.vo.category.OaNoteCategorySaveReqVO;
 import cn.iocoder.yudao.module.oa.dal.dataobject.note.OaNoteCategoryDO;
 import cn.iocoder.yudao.module.oa.dal.mysql.note.OaNoteCategoryMapper;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+
+import javax.annotation.Resource;
 
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
@@ -33,7 +34,7 @@ public class OaNoteCategoryServiceImplTest extends BaseDbUnitTest {
     @Resource
     private OaNoteCategoryMapper noteCategoryMapper;
 
-    @MockitoBean
+    @MockBean
     private OaNoteService noteService;
 
     @Test

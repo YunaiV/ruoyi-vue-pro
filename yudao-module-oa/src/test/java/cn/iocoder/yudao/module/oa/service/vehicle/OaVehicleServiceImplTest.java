@@ -7,11 +7,11 @@ import cn.iocoder.yudao.module.oa.controller.admin.vehicle.vo.OaVehicleSaveReqVO
 import cn.iocoder.yudao.module.oa.dal.dataobject.vehicle.OaVehicleDO;
 import cn.iocoder.yudao.module.oa.dal.mysql.vehicle.OaVehicleMapper;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -36,9 +36,9 @@ public class OaVehicleServiceImplTest extends BaseDbUnitTest {
     @Resource
     private OaVehicleMapper vehicleMapper;
 
-    @MockitoBean
+    @MockBean
     private DeptApi deptApi;
-    @MockitoBean
+    @MockBean
     private OaVehicleApplyService vehicleApplyService;
 
     @Test

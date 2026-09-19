@@ -2,11 +2,11 @@ package cn.iocoder.yudao.module.oa.dal.dataobject.supply;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.oa.enums.supply.*;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 
 import java.time.LocalDateTime;
 

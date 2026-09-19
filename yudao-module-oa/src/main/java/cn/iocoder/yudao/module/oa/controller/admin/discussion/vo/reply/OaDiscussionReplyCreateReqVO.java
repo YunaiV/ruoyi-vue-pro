@@ -1,11 +1,12 @@
 package cn.iocoder.yudao.module.oa.controller.admin.discussion.vo.reply;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.AssertTrue;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+
+import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Schema(description = "管理后台 - OA 讨论回复新增 Request VO")
 @Data

@@ -1,20 +1,20 @@
 package cn.iocoder.yudao.module.oa.service.contact;
 
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.oa.controller.admin.contact.vo.category.OaContactCategorySaveReqVO;
 import cn.iocoder.yudao.module.oa.dal.dataobject.contact.OaContactCategoryDO;
 import cn.iocoder.yudao.module.oa.dal.mysql.contact.OaContactCategoryMapper;
-import jakarta.annotation.Resource;
-import org.springframework.stereotype.Service;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.List;
+import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.oa.enums.ErrorCodeConstants.CONTACT_CATEGORY_NAME_DUPLICATE;

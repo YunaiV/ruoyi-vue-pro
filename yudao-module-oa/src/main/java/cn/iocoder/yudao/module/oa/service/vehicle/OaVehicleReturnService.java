@@ -4,7 +4,8 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.oa.controller.admin.vehicle.vo.returning.OaVehicleReturnPageReqVO;
 import cn.iocoder.yudao.module.oa.controller.admin.vehicle.vo.returning.OaVehicleReturnSaveReqVO;
 import cn.iocoder.yudao.module.oa.dal.dataobject.vehicle.OaVehicleReturnDO;
-import jakarta.validation.Valid;
+
+import javax.validation.Valid;
 
 /**
  * 还车申请 Service 接口

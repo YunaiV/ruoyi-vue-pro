@@ -70,6 +70,13 @@
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-spring-boot-starter-process</artifactId>
+            <exclusions>
+                <!-- 排除旧版 JavaMail，统一使用 Spring Boot 管理的邮件依赖 -->
+                <exclusion>
+                    <groupId>com.sun.mail</groupId>
+                    <artifactId>javax.mail</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>

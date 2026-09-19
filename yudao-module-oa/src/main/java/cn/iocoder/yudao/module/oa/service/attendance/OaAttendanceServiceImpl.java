@@ -20,11 +20,11 @@ import cn.iocoder.yudao.module.oa.service.leave.OaLeaveApplyService;
 import cn.iocoder.yudao.module.oa.service.travel.OaTravelApplyService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
-import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -36,8 +36,8 @@ import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMultiMap;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMultiMap;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.count;
 import static cn.iocoder.yudao.module.oa.enums.ErrorCodeConstants.ATTENDANCE_CLOCK_TIME_INVALID;
 import static cn.iocoder.yudao.module.oa.enums.ErrorCodeConstants.ATTENDANCE_NOT_EXISTS;

@@ -13,11 +13,11 @@ import cn.iocoder.yudao.module.oa.dal.dataobject.reimbursement.OaReimbursementDO
 import cn.iocoder.yudao.module.oa.dal.mysql.reimbursement.OaReimbursementMapper;
 import cn.iocoder.yudao.module.oa.enums.BpmModelConstants;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;

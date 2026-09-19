@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.oa.service.meetingroom;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.oa.controller.admin.meetingroom.vo.room.*;
@@ -11,13 +10,14 @@ import cn.iocoder.yudao.module.oa.dal.dataobject.meetingroom.OaMeetingRoomDO;
 import cn.iocoder.yudao.module.oa.dal.mysql.meetingroom.OaMeetingRoomMapper;
 import cn.iocoder.yudao.module.oa.enums.DictTypeConstants;
 import cn.iocoder.yudao.module.oa.enums.meetingroom.*;
-import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.dict.DictDataApi;
-import jakarta.annotation.Resource;
+import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;

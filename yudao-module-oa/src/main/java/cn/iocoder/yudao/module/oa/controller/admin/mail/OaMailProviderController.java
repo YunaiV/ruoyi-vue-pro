@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.oa.controller.admin.mail;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.oa.controller.admin.mail.vo.provider.OaMailProviderRespVO;
@@ -9,14 +10,13 @@ import cn.iocoder.yudao.module.oa.service.mail.OaMailProviderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
-import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.List;
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;

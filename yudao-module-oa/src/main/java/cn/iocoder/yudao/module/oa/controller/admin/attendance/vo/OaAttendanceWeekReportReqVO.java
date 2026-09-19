@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.oa.controller.admin.attendance.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 @Schema(description = "管理后台 - OA 考勤周报 Request VO")

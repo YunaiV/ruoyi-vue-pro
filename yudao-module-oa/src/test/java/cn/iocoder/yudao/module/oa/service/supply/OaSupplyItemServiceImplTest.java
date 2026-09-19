@@ -8,12 +8,12 @@ import cn.iocoder.yudao.module.oa.controller.admin.supply.vo.item.*;
 import cn.iocoder.yudao.module.oa.dal.dataobject.supply.OaSupplyItemDO;
 import cn.iocoder.yudao.module.oa.dal.mysql.supply.OaSupplyItemMapper;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Map;
@@ -37,9 +37,9 @@ public class OaSupplyItemServiceImplTest extends BaseDbUnitTest {
     @Resource
     private OaSupplyItemMapper supplyItemMapper;
 
-    @MockitoBean
+    @MockBean
     private OaSupplyApplyService supplyApplyService;
-    @MockitoBean
+    @MockBean
     private DeptApi deptApi;
 
     @Test

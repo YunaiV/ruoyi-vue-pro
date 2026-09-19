@@ -7,11 +7,11 @@ import cn.iocoder.yudao.module.oa.dal.dataobject.file.OaFilePermissionDO;
 import cn.iocoder.yudao.module.oa.dal.mysql.file.OaFilePermissionMapper;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
@@ -35,11 +35,11 @@ public class OaFilePermissionServiceImplTest extends BaseDbUnitTest {
     @Resource
     private OaFilePermissionMapper filePermissionMapper;
 
-    @MockitoBean
+    @MockBean
     private OaFileNodeService fileNodeService;
-    @MockitoBean
+    @MockBean
     private AdminUserApi adminUserApi;
-    @MockitoBean
+    @MockBean
     private DeptApi deptApi;
 
     @Test

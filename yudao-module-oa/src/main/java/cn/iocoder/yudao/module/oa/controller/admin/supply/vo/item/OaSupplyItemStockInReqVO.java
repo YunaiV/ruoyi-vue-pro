@@ -1,9 +1,10 @@
 package cn.iocoder.yudao.module.oa.controller.admin.supply.vo.item;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
 @Schema(description = "管理后台 - 办公用品入库 Request VO")
 @Data

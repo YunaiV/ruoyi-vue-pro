@@ -2,11 +2,12 @@ package cn.iocoder.yudao.module.oa.controller.admin.mail.vo.provider;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
-import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
-import lombok.Data;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+
+import javax.validation.Valid;
+import javax.validation.constraints.*;
 
 @Data
 @Schema(description = "管理后台 - 企业邮箱服务配置新增/修改 Request VO")

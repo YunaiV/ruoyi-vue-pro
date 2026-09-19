@@ -2,8 +2,8 @@ package cn.iocoder.yudao.module.oa.service.regular;
 
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.bpm.api.task.BpmProcessInstanceApi;
 import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceStatusEnum;
@@ -13,11 +13,11 @@ import cn.iocoder.yudao.module.oa.controller.admin.regular.vo.OaRegularApplySubm
 import cn.iocoder.yudao.module.oa.dal.dataobject.regular.OaRegularApplyDO;
 import cn.iocoder.yudao.module.oa.dal.mysql.regular.OaRegularApplyMapper;
 import cn.iocoder.yudao.module.oa.enums.BpmModelConstants;
-import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
 

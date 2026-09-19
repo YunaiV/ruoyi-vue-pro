@@ -2,8 +2,8 @@ package cn.iocoder.yudao.module.oa.service.contact;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.common.util.string.StrUtils;
 import cn.iocoder.yudao.module.oa.controller.admin.contact.vo.OaContactPageReqVO;
@@ -13,12 +13,12 @@ import cn.iocoder.yudao.module.oa.dal.dataobject.contact.OaContactShareDO;
 import cn.iocoder.yudao.module.oa.dal.mysql.contact.OaContactMapper;
 import cn.iocoder.yudao.module.oa.dal.mysql.contact.OaContactShareMapper;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import jakarta.annotation.Resource;
-import org.springframework.stereotype.Service;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;

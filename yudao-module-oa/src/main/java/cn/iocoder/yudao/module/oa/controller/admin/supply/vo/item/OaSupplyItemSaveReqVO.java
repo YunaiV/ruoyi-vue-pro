@@ -1,12 +1,12 @@
 package cn.iocoder.yudao.module.oa.controller.admin.supply.vo.item;
 
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.oa.enums.supply.*;
-import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.*;
 import lombok.Data;
 
+import javax.validation.constraints.*;
 import java.math.BigDecimal;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;

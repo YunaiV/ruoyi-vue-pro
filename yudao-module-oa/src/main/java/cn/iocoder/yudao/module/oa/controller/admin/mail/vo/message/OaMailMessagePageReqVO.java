@@ -1,14 +1,15 @@
 package cn.iocoder.yudao.module.oa.controller.admin.mail.vo.message;
 
-import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.module.oa.enums.mail.OaMailFolderKeyEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import javax.validation.constraints.*;
 
 @Schema(description = "管理后台 - 邮件分页 Request VO")
 @Data

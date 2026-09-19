@@ -4,12 +4,12 @@ import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.oa.enums.note.OaNoteTypeEnum;
 import cn.iocoder.yudao.module.oa.enums.schedule.OaPriorityEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.List;
 
 @Schema(description = "管理后台 - OA 笔记新增/修改 Request VO")

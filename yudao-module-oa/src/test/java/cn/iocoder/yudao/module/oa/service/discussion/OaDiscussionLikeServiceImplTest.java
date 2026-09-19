@@ -4,14 +4,14 @@ import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.oa.dal.dataobject.discussion.OaDiscussionLikeDO;
 import cn.iocoder.yudao.module.oa.dal.dataobject.discussion.OaDiscussionReplyDO;
 import cn.iocoder.yudao.module.oa.dal.mysql.discussion.OaDiscussionLikeMapper;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-import java.util.Collections;
+import javax.annotation.Resource;
 import javax.sql.DataSource;
+import java.util.Collections;
 
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
@@ -35,9 +35,9 @@ public class OaDiscussionLikeServiceImplTest extends BaseDbUnitTest {
     @Resource
     private DataSource dataSource;
 
-    @MockitoBean
+    @MockBean
     private OaDiscussionService discussionService;
-    @MockitoBean
+    @MockBean
     private OaDiscussionReplyService discussionReplyService;
 
     @Test

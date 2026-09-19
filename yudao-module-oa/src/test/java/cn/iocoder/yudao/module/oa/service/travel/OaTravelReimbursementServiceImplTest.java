@@ -16,8 +16,6 @@ import cn.iocoder.yudao.module.oa.dal.redis.no.OaNoRedisDAO;
 import cn.iocoder.yudao.module.system.api.dict.DictDataApi;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
-import jakarta.annotation.Resource;
-import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,11 +23,13 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import javax.annotation.Resource;
+import javax.validation.ConstraintViolationException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -58,15 +58,15 @@ public class OaTravelReimbursementServiceImplTest extends BaseDbUnitTest {
     @Resource
     private OaTravelReimbursementMapper travelReimbursementMapper;
 
-    @MockitoBean
+    @MockBean
     private OaNoRedisDAO noRedisDAO;
-    @MockitoBean
+    @MockBean
     private AdminUserApi adminUserApi;
-    @MockitoBean
+    @MockBean
     private DictDataApi dictDataApi;
-    @MockitoBean
+    @MockBean
     private BpmProcessInstanceApi processInstanceApi;
-    @MockitoBean
+    @MockBean
     private OaTravelApplyService travelApplyService;
 
     @BeforeEach

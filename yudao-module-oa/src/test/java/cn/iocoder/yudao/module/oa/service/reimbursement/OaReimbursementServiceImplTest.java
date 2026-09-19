@@ -16,16 +16,16 @@ import cn.iocoder.yudao.module.oa.dal.mysql.reimbursement.OaReimbursementMapper;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -54,9 +54,9 @@ public class OaReimbursementServiceImplTest extends BaseDbUnitTest {
     @Resource
     private ObjectMapper objectMapper;
 
-    @MockitoBean
+    @MockBean
     private AdminUserApi adminUserApi;
-    @MockitoBean
+    @MockBean
     private BpmProcessInstanceApi processInstanceApi;
 
     @BeforeEach

@@ -17,14 +17,14 @@ import cn.iocoder.yudao.module.oa.dal.mysql.task.OaTaskReceiverMapper;
 import cn.iocoder.yudao.module.oa.enums.task.OaTaskStatusEnum;
 import cn.iocoder.yudao.module.oa.enums.task.OaTaskTypeEnum;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,7 +62,7 @@ public class OaTaskServiceImplTest extends BaseDbUnitTest {
     @Resource
     private OaTaskLogMapper taskLogMapper;
 
-    @MockitoBean
+    @MockBean
     private AdminUserApi adminUserApi;
 
     @AfterEach

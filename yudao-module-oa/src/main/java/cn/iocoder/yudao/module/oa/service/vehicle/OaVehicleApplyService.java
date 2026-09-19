@@ -4,8 +4,8 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.oa.controller.admin.vehicle.vo.apply.OaVehicleApplyPageReqVO;
 import cn.iocoder.yudao.module.oa.controller.admin.vehicle.vo.apply.OaVehicleApplySaveReqVO;
 import cn.iocoder.yudao.module.oa.dal.dataobject.vehicle.OaVehicleApplyDO;
-import jakarta.validation.Valid;
 
+import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;

@@ -4,8 +4,9 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.quartz.core.handler.JobHandler;
 import cn.iocoder.yudao.framework.tenant.core.job.TenantJob;
 import cn.iocoder.yudao.module.oa.service.meetingroom.OaMeetingRoomBookingService;
-import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
 
 // TODO @AI：是不是分开 job 噢？因为毕竟是 remind；
 /**

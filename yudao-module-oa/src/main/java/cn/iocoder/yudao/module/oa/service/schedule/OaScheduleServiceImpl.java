@@ -1,12 +1,12 @@
 package cn.iocoder.yudao.module.oa.service.schedule;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.extra.spring.SpringUtil;
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.LocalDateTimeUtil;
-import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.oa.controller.admin.schedule.vo.OaSchedulePageReqVO;
 import cn.iocoder.yudao.module.oa.controller.admin.schedule.vo.OaScheduleSaveReqVO;
@@ -19,12 +19,12 @@ import cn.iocoder.yudao.module.system.api.notify.NotifyMessageSendApi;
 import cn.iocoder.yudao.module.system.api.notify.dto.NotifySendSingleToUserReqDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import com.google.common.collect.Maps;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;

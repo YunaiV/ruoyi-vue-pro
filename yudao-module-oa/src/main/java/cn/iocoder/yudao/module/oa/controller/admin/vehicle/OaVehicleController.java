@@ -1,27 +1,28 @@
 package cn.iocoder.yudao.module.oa.controller.admin.vehicle;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.oa.controller.admin.vehicle.vo.*;
 import cn.iocoder.yudao.module.oa.dal.dataobject.vehicle.OaVehicleDO;
 import cn.iocoder.yudao.module.oa.service.vehicle.OaVehicleService;
+import cn.iocoder.yudao.module.system.api.dept.DeptApi;
+import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
-import cn.iocoder.yudao.module.system.api.dept.DeptApi;
-import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
-import cn.hutool.core.collection.CollUtil;
-import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
-import java.util.*;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
-import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
+import javax.validation.Valid;
+import java.util.*;
+
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 
 @Tag(name = "管理后台 - 车辆")
 @RestController

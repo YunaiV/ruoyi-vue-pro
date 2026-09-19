@@ -4,8 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.oa.controller.admin.file.vo.node.*;
 import cn.iocoder.yudao.module.oa.dal.dataobject.file.OaFileNodeDO;
 
-import jakarta.validation.Valid;
-
+import javax.validation.Valid;
 import java.util.List;
 
 /**

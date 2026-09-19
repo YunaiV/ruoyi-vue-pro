@@ -7,11 +7,11 @@ import cn.iocoder.yudao.module.oa.dal.dataobject.discussion.OaDiscussionDO;
 import cn.iocoder.yudao.module.oa.dal.dataobject.discussion.OaDiscussionReplyDO;
 import cn.iocoder.yudao.module.oa.dal.mysql.discussion.OaDiscussionReplyMapper;
 import cn.iocoder.yudao.module.system.api.permission.PermissionApi;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import javax.annotation.Resource;
 import java.util.Collections;
 
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
@@ -34,11 +34,11 @@ public class OaDiscussionReplyServiceImplTest extends BaseDbUnitTest {
     @Resource
     private OaDiscussionReplyMapper discussionReplyMapper;
 
-    @MockitoBean
+    @MockBean
     private OaDiscussionService discussionService;
-    @MockitoBean
+    @MockBean
     private OaDiscussionLikeService discussionLikeService;
-    @MockitoBean
+    @MockBean
     private PermissionApi permissionApi;
 
     @Test

@@ -17,11 +17,11 @@ import cn.iocoder.yudao.module.oa.enums.vehicle.OaVehicleReturnStatusEnum;
 import cn.iocoder.yudao.module.oa.enums.vehicle.OaVehicleStatusEnum;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
-import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;

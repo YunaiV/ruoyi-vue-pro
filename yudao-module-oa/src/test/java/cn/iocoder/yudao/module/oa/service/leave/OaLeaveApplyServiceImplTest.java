@@ -15,17 +15,17 @@ import cn.iocoder.yudao.module.oa.dal.mysql.leave.OaLeaveApplyMapper;
 import cn.iocoder.yudao.module.oa.enums.attendance.OaAttendanceTypeEnum;
 import cn.iocoder.yudao.module.oa.enums.leave.OaLeaveTypeEnum;
 import cn.iocoder.yudao.module.oa.service.attendance.OaAttendanceService;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
@@ -53,9 +53,9 @@ public class OaLeaveApplyServiceImplTest extends BaseDbUnitTest {
     @Resource
     private OaLeaveApplyMapper leaveApplyMapper;
 
-    @MockitoBean
+    @MockBean
     private OaAttendanceService attendanceService;
-    @MockitoBean
+    @MockBean
     private BpmProcessInstanceApi processInstanceApi;
 
     @BeforeEach

@@ -15,11 +15,11 @@ import cn.iocoder.yudao.module.oa.dal.mysql.task.OaTaskMapper;
 import cn.iocoder.yudao.module.oa.dal.mysql.task.OaTaskReceiverMapper;
 import cn.iocoder.yudao.module.oa.enums.task.OaTaskStatusEnum;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
-import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
@@ -32,8 +32,8 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.diffList;
 import static cn.iocoder.yudao.module.oa.enums.ErrorCodeConstants.TASK_ACCESS_DENIED;
 import static cn.iocoder.yudao.module.oa.enums.ErrorCodeConstants.TASK_NOT_EXISTS;
-import static cn.iocoder.yudao.module.oa.enums.ErrorCodeConstants.TASK_RECEIVER_NOT_EXISTS;
 import static cn.iocoder.yudao.module.oa.enums.ErrorCodeConstants.TASK_RECEIVED_DELETE_DENIED;
+import static cn.iocoder.yudao.module.oa.enums.ErrorCodeConstants.TASK_RECEIVER_NOT_EXISTS;
 import static cn.iocoder.yudao.module.oa.enums.ErrorCodeConstants.TASK_STATUS_TRANSITION_INVALID;
 
 /**

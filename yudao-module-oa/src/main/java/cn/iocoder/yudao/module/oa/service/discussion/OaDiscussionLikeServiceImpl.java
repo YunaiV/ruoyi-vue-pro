@@ -5,12 +5,12 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.module.oa.dal.dataobject.discussion.OaDiscussionLikeDO;
 import cn.iocoder.yudao.module.oa.dal.dataobject.discussion.OaDiscussionReplyDO;
 import cn.iocoder.yudao.module.oa.dal.mysql.discussion.OaDiscussionLikeMapper;
-import jakarta.annotation.Resource;
-import org.springframework.stereotype.Service;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;

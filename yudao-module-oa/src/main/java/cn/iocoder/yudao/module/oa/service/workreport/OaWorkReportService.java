@@ -6,7 +6,8 @@ import cn.iocoder.yudao.module.oa.controller.admin.workreport.vo.OaWorkReportSav
 import cn.iocoder.yudao.module.oa.controller.admin.workreport.vo.OaWorkReportStatisticsReqVO;
 import cn.iocoder.yudao.module.oa.controller.admin.workreport.vo.OaWorkReportStatisticsRespVO;
 import cn.iocoder.yudao.module.oa.dal.dataobject.workreport.OaWorkReportDO;
-import jakarta.validation.Valid;
+
+import javax.validation.Valid;
 
 /**
  * OA 工作汇报 Service 接口

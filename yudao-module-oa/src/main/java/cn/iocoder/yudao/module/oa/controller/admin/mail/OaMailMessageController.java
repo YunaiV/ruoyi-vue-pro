@@ -1,27 +1,27 @@
 package cn.iocoder.yudao.module.oa.controller.admin.mail;
 
+import cn.hutool.core.lang.Pair;
 import cn.iocoder.yudao.framework.common.pojo.*;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
+import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.oa.controller.admin.mail.vo.message.*;
 import cn.iocoder.yudao.module.oa.dal.dataobject.mail.*;
+import cn.iocoder.yudao.module.oa.enums.mail.OaMailComposeModeEnum;
 import cn.iocoder.yudao.module.oa.service.mail.OaMailMessageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
-import cn.hutool.core.lang.Pair;
-import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
-import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.web.multipart.MultipartFile;
-import java.io.IOException;
-import java.util.List;
-import cn.iocoder.yudao.framework.common.validation.InEnum;
-import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.oa.enums.mail.OaMailComposeModeEnum;
-import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.io.IOException;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;

@@ -3,9 +3,9 @@ package cn.iocoder.yudao.module.oa.dal.mysql.vehicle;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
+import cn.iocoder.yudao.module.oa.controller.admin.vehicle.vo.returning.OaVehicleReturnPageReqVO;
 import cn.iocoder.yudao.module.oa.dal.dataobject.vehicle.OaVehicleApplyDO;
 import cn.iocoder.yudao.module.oa.dal.dataobject.vehicle.OaVehicleDO;
-import cn.iocoder.yudao.module.oa.controller.admin.vehicle.vo.returning.OaVehicleReturnPageReqVO;
 import cn.iocoder.yudao.module.oa.dal.dataobject.vehicle.OaVehicleReturnDO;
 import org.apache.ibatis.annotations.Mapper;
 
