@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.oa.dal.dataobject.mail;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import com.baomidou.mybatisplus.annotation.*;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import com.baomidou.mybatisplus.extension.handlers.Jackson3TypeHandler;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -57,12 +57,12 @@ public class OaMailMessageDO extends BaseDO {
     /**
      * 回复地址
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(typeHandler = Jackson3TypeHandler.class)
     private List<String> replyTos;
     /**
      * 附件目录缓存，附件文件仍从远端读取
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(typeHandler = Jackson3TypeHandler.class)
     private List<Attachment> attachments;
     /**
      * 发件人
@@ -71,12 +71,12 @@ public class OaMailMessageDO extends BaseDO {
     /**
      * 收件人
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(typeHandler = Jackson3TypeHandler.class)
     private List<String> recipients;
     /**
      * 抄送人
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(typeHandler = Jackson3TypeHandler.class)
     private List<String> ccs;
     /**
      * 接收时间

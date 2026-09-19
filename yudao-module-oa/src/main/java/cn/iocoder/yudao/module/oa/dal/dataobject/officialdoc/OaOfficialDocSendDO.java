@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import com.baomidou.mybatisplus.extension.handlers.Jackson3TypeHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -104,14 +104,14 @@ public class OaOfficialDocSendDO extends BaseDO {
      *
      * 关联 {@link DeptRespDTO#getId()}
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(typeHandler = Jackson3TypeHandler.class)
     private List<Long> mainDeptIds;
     /**
      * 抄送部门编号列表
      *
      * 关联 {@link DeptRespDTO#getId()}
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(typeHandler = Jackson3TypeHandler.class)
     private List<Long> copyDeptIds;
     /**
      * 签发人用户编号
@@ -126,7 +126,7 @@ public class OaOfficialDocSendDO extends BaseDO {
     /**
      * 附件地址列表
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(typeHandler = Jackson3TypeHandler.class)
     private List<String> fileUrls;
     /**
      * 正式公文地址
