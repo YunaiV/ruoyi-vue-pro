@@ -360,6 +360,18 @@ public class AdminUserServiceImpl implements AdminUserService {
 
 
     @Override
+    public AdminUserDO validateUser(Long id) {
+        AdminUserDO user = userMapper.selectById(id);
+        if (user == null) {
+            throw exception(USER_NOT_EXISTS);
+        }
+        if (!CommonStatusEnum.ENABLE.getStatus().equals(user.getStatus())) {
+            throw exception(USER_IS_DISABLE, user.getNickname());
+        }
+        return user;
+    }
+
+    @Override
     public void validateUserList(Collection<Long> ids) {
         if (CollUtil.isEmpty(ids)) {
             return;

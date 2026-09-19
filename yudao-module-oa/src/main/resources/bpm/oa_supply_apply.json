@@ -1,0 +1,49 @@
+{
+  "key": "oa_supply_apply",
+  "name": "用品领用申请",
+  "description": "本人发起，由发起人部门负责人审批，使用 BPM 内置候选人策略。",
+  "type": 20,
+  "formType": 20,
+  "formCustomCreatePath": "/oa/supply/apply",
+  "formCustomViewPath": "/oa/supply/apply/detail/index.vue",
+  "visible": false,
+  "managerUserIds": [],
+  "startUserIds": [],
+  "startDeptIds": [],
+  "allowCancelRunningProcess": true,
+  "allowWithdrawTask": false,
+  "autoApprovalType": 0,
+  "simpleModel": {
+    "id": "StartUserNode",
+    "type": 10,
+    "name": "申请人",
+    "childNode": {
+      "id": "SuperiorApprove",
+      "type": 11,
+      "name": "上级审批",
+      "showText": "发起人部门负责人",
+      "candidateStrategy": 37,
+      "candidateParam": "1",
+      "approveType": 1,
+      "approveMethod": 1,
+      "signEnable": false,
+      "reasonRequire": true,
+      "rejectHandler": {
+        "type": 1
+      },
+      "assignStartUserHandlerType": 1,
+      "assignEmptyHandler": {
+        "type": 2
+      },
+      "timeoutHandler": {
+        "enable": false
+      },
+      "childNode": {
+        "id": "EndEvent",
+        "type": 1,
+        "name": "结束"
+      }
+    }
+  },
+  "category": "OA"
+}

@@ -135,7 +135,7 @@ public class HrmAttendanceStatisticsServiceImpl implements HrmAttendanceStatisti
                 buildMonthSummaryList(reqVO.getYear(), reqVO.getMonth(), employeeList);
         List<HrmAttendanceMonthRecordRespVO> filteredMonthSummaryList = filterList(monthSummaryList,
                 record -> Objects.equals(record.getFullAttendance(), reqVO.getFullAttendance()));
-        return PageUtils.buildPageResult(filteredMonthSummaryList, reqVO);
+        return PageUtils.buildPageResult(reqVO, filteredMonthSummaryList);
     }
 
     @Override

@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.TimeRange;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -24,6 +25,56 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author 芋道源码
  */
 public class LocalDateTimeUtilsTest {
+
+    @Test
+    public void testGetDaysBetween() {
+        // 准备参数
+        LocalDateTime beginTime = LocalDateTime.of(2026, 12, 31, 23, 0);
+
+        // 调用，并断言：按时长四舍五入，跨日不改变计算规则
+        assertEquals(new BigDecimal("0.0"), LocalDateTimeUtils.getDaysBetween(beginTime, beginTime, 1));
+        assertEquals(new BigDecimal("0.5"), LocalDateTimeUtils.getDaysBetween(beginTime, beginTime.plusHours(12), 1));
+        assertEquals(new BigDecimal("0.1"), LocalDateTimeUtils.getDaysBetween(beginTime, beginTime.plusMinutes(72), 1));
+        assertEquals(new BigDecimal("0.0"), LocalDateTimeUtils.getDaysBetween(beginTime, beginTime.plusMinutes(71), 1));
+        assertEquals(new BigDecimal("1.1"), LocalDateTimeUtils.getDaysBetween(beginTime, beginTime.plusHours(26), 1));
+        assertEquals(new BigDecimal("-0.5"), LocalDateTimeUtils.getDaysBetween(beginTime, beginTime.minusHours(12), 1));
+        assertEquals(new BigDecimal("0.50"), LocalDateTimeUtils.getDaysBetween(beginTime, beginTime.plusHours(12), 2));
+        assertNull(LocalDateTimeUtils.getDaysBetween(null, beginTime, 1));
+        assertNull(LocalDateTimeUtils.getDaysBetween(beginTime, null, 1));
+    }
+
+    @Test
+    public void testGetDaysBetweenCeiling() {
+        // 准备参数
+        LocalDateTime beginTime = LocalDateTime.of(2026, 12, 31, 23, 0);
+
+        // 调用，并断言：按时长取整，不因跨午夜额外增加一天
+        assertEquals(0, LocalDateTimeUtils.getDaysBetweenCeiling(beginTime, beginTime));
+        assertEquals(1, LocalDateTimeUtils.getDaysBetweenCeiling(beginTime, beginTime.plusHours(2)));
+        assertEquals(1, LocalDateTimeUtils.getDaysBetweenCeiling(beginTime, beginTime.plusDays(1)));
+        assertEquals(2, LocalDateTimeUtils.getDaysBetweenCeiling(beginTime, beginTime.plusDays(1).plusNanos(1_000_000)));
+        assertEquals(2, LocalDateTimeUtils.getDaysBetweenCeiling(beginTime, beginTime.plusHours(26)));
+        assertEquals(0, LocalDateTimeUtils.getDaysBetweenCeiling(beginTime, beginTime.minusHours(2)));
+        assertEquals(-1, LocalDateTimeUtils.getDaysBetweenCeiling(beginTime, beginTime.minusHours(26)));
+        assertNull(LocalDateTimeUtils.getDaysBetweenCeiling(null, beginTime));
+        assertNull(LocalDateTimeUtils.getDaysBetweenCeiling(beginTime, null));
+    }
+
+    @Test
+    public void testGetDaysBetweenInclusive() {
+        // 准备参数
+        LocalDateTime beginTime = LocalDateTime.of(2026, 12, 31, 23, 0);
+        LocalDateTime endTime = LocalDateTime.of(2027, 1, 2, 1, 0);
+
+        // 调用，并断言：按自然日计算，包含首尾日期
+        assertEquals(3, LocalDateTimeUtils.getDaysBetweenInclusive(beginTime, endTime));
+        assertEquals(1, LocalDateTimeUtils.getDaysBetweenInclusive(beginTime, beginTime.minusHours(1)));
+        assertEquals(-1, LocalDateTimeUtils.getDaysBetweenInclusive(endTime, beginTime));
+        assertNull(LocalDateTimeUtils.getDaysBetweenInclusive(null, endTime));
+        assertNull(LocalDateTimeUtils.getDaysBetweenInclusive(beginTime, null));
+        assertEquals(3, LocalDateTimeUtils.getDaysBetweenInclusive(
+                LocalDateTime.of(2024, 2, 28, 0, 0), LocalDateTime.of(2024, 3, 1, 0, 0)));
+    }
 
     @Test
     public void testDateCompare() {
@@ -99,6 +150,10 @@ public class LocalDateTimeUtilsTest {
         assertNull(LocalDateTimeUtils.getDayBeginTime((LocalDateTime) null));
         assertEquals(LocalDateTime.of(date, LocalTime.MAX),
                 LocalDateTimeUtils.getDayEndTime(date));
+        assertEquals(LocalDateTime.of(date, LocalTime.MAX),
+                LocalDateTimeUtils.getDayEndTime(time));
+        assertNull(LocalDateTimeUtils.getDayEndTime((LocalDateTime) null));
+        assertNull(LocalDateTimeUtils.getDayEndTime((LocalDate) null));
     }
 
     @Test
