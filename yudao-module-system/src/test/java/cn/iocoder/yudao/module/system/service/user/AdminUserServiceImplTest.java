@@ -741,6 +741,35 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
+    public void testValidateUser_success() {
+        // mock 数据
+        AdminUserDO user = randomAdminUserDO().setStatus(CommonStatusEnum.ENABLE.getStatus());
+        userMapper.insert(user);
+
+        // 调用
+        AdminUserDO result = userService.validateUser(user.getId());
+
+        // 断言
+        assertEquals(user, result);
+    }
+
+    @Test
+    public void testValidateUser_notFound() {
+        // 调用，并断言异常
+        assertServiceException(() -> userService.validateUser(randomLongId()), USER_NOT_EXISTS);
+    }
+
+    @Test
+    public void testValidateUser_notEnable() {
+        // mock 数据
+        AdminUserDO user = randomAdminUserDO().setStatus(CommonStatusEnum.DISABLE.getStatus());
+        userMapper.insert(user);
+
+        // 调用，并断言异常
+        assertServiceException(() -> userService.validateUser(user.getId()), USER_IS_DISABLE, user.getNickname());
+    }
+
+    @Test
     public void testValidateUserList_success() {
         // mock 数据
         AdminUserDO userDO = randomAdminUserDO().setStatus(CommonStatusEnum.ENABLE.getStatus());

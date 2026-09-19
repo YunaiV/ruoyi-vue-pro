@@ -10,6 +10,8 @@ import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Timestamp;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
@@ -31,6 +33,54 @@ import static cn.hutool.core.date.DatePattern.*;
  * @author 芋道源码
  */
 public class LocalDateTimeUtils {
+
+    /**
+     * 按经过的时长计算天数，以 24 小时为一天，按指定精度四舍五入
+     *
+     * @param beginTime 开始时间
+     * @param endTime 结束时间
+     * @param scale 保留的小数位数
+     * @return 按毫秒精度计算的天数，时间缺失时返回 null
+     */
+    public static BigDecimal getDaysBetween(LocalDateTime beginTime, LocalDateTime endTime, int scale) {
+        if (beginTime == null || endTime == null) {
+            return null;
+        }
+        return BigDecimal.valueOf(Duration.between(beginTime, endTime).toMillis())
+                .divide(BigDecimal.valueOf(Duration.ofDays(1).toMillis()), scale, RoundingMode.HALF_UP);
+    }
+
+    /**
+     * 按经过的时长计算天数，以 24 小时为一天，结果向上取整
+     *
+     * 与 {@link #getDaysBetweenInclusive(LocalDateTime, LocalDateTime)} 不同，本方法不按自然日期计数。
+     * 例如跨午夜的 2 小时为 1 天，恰好 24 小时为 1 天，相同时刻为 0 天。
+     *
+     * @param beginTime 开始时间
+     * @param endTime 结束时间
+     * @return 按毫秒精度计算的天数，时间缺失时返回 null；反向区间按相同规则向上取整
+     */
+    public static Integer getDaysBetweenCeiling(LocalDateTime beginTime, LocalDateTime endTime) {
+        if (beginTime == null || endTime == null) {
+            return null;
+        }
+        return BigDecimal.valueOf(Duration.between(beginTime, endTime).toMillis())
+                .divide(BigDecimal.valueOf(Duration.ofDays(1).toMillis()), 0, RoundingMode.CEILING).intValueExact();
+    }
+
+    /**
+     * 计算包含首尾日期的自然日数，不足一天按对应自然日期计算
+     *
+     * @param beginTime 开始时间
+     * @param endTime 结束时间
+     * @return 自然日数，时间缺失时返回 null；结束日期早于开始日期时返回非正数
+     */
+    public static Integer getDaysBetweenInclusive(LocalDateTime beginTime, LocalDateTime endTime) {
+        if (beginTime == null || endTime == null) {
+            return null;
+        }
+        return Math.toIntExact(ChronoUnit.DAYS.between(beginTime.toLocalDate(), endTime.toLocalDate()) + 1);
+    }
 
     /**
      * 空的 LocalDateTime 对象，主要用于 DB 唯一索引的默认值
@@ -541,6 +591,16 @@ public class LocalDateTimeUtils {
      */
     public static LocalDateTime getDayEndTime(LocalDate date) {
         return date == null ? null : date.atTime(LocalTime.MAX);
+    }
+
+    /**
+     * 获得指定时间所在日期的结束时间
+     *
+     * @param time 时间
+     * @return 当日结束时间；时间为空时返回 {@code null}
+     */
+    public static LocalDateTime getDayEndTime(LocalDateTime time) {
+        return time == null ? null : getDayEndTime(time.toLocalDate());
     }
 
     /**

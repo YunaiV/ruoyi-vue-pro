@@ -73,6 +73,14 @@ public interface AdminUserApi {
     List<AdminUserRespDTO> getUserListByNickname(String nickname);
 
     /**
+     * 获得指定状态的用户列表
+     *
+     * @param status 用户状态
+     * @return 用户列表
+     */
+    List<AdminUserRespDTO> getUserListByStatus(Integer status);
+
+    /**
      * 获得用户 Map
      *
      * @param ids 用户编号数组
@@ -92,10 +100,9 @@ public interface AdminUserApi {
      * 2. 用户被禁用
      *
      * @param id 用户编号
+     * @return 有效的用户对象信息
      */
-    default void validateUser(Long id) {
-        validateUserList(Collections.singleton(id));
-    }
+    AdminUserRespDTO validateUser(Long id);
 
     /**
      * 校验用户们是否有效。如下情况，视为无效：
