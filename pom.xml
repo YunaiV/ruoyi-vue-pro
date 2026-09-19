@@ -29,6 +29,7 @@
 <!--        <module>yudao-module-hrm</module>-->
 <!--        <module>yudao-module-fms</module>-->
 <!--        <module>yudao-module-pms</module>-->
+<!--        <module>yudao-module-oa</module>-->
 <!--        <module>yudao-module-im</module>-->
 <!-- 请参考 https://doc.iocoder.cn/ai/build/ 文档，完成 AI 模块的启动！！！ -->
 <!--        <module>yudao-module-ai</module>-->
