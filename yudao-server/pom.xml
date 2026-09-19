@@ -150,6 +150,13 @@
 <!--            <version>${revision}</version>-->
 <!--        </dependency>-->
 
+        <!-- OA 办公自动化模块。默认注释，保证编译速度 -->
+<!--        <dependency>-->
+<!--            <groupId>cn.iocoder.boot</groupId>-->
+<!--            <artifactId>yudao-module-oa</artifactId>-->
+<!--            <version>${revision}</version>-->
+<!--        </dependency>-->
+
         <!-- IM 相关模块。默认注释，保证编译速度 -->
 <!--        <dependency>-->
 <!--            <groupId>cn.iocoder.boot</groupId>-->

@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.pojo.SortablePageParam;
 import cn.iocoder.yudao.framework.common.pojo.SortingField;
+import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import cn.iocoder.yudao.framework.mybatis.core.util.MyBatisUtils;
 import com.baomidou.mybatisplus.annotation.DbType;
@@ -44,7 +45,7 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
         if (PageParam.PAGE_SIZE_NONE.equals(pageParam.getPageSize())) {
             MyBatisUtils.addOrder(queryWrapper, sortingFields);
             List<T> list = selectList(queryWrapper);
-            return new PageResult<>(list, (long) list.size());
+            return PageUtils.buildPageResult(pageParam, list);
         }
 
         // MyBatis Plus 查询
@@ -58,7 +59,7 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
         // 特殊：不分页，直接查询全部
         if (PageParam.PAGE_SIZE_NONE.equals(pageParam.getPageSize())) {
             List<D> list = selectJoinList(clazz, lambdaWrapper);
-            return new PageResult<>(list, (long) list.size());
+            return PageUtils.buildPageResult(pageParam, list);
         }
 
         // MyBatis Plus Join 查询
@@ -81,7 +82,7 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
         // 特殊：不分页，直接查询全部
         if (PageParam.PAGE_SIZE_NONE.equals(pageParam.getPageSize())) {
             List<D> list = selectJoinList(clazz, lambdaWrapper);
-            return new PageResult<>(list, (long) list.size());
+            return PageUtils.buildPageResult(pageParam, list);
         }
 
         // MyBatis Plus Join 查询

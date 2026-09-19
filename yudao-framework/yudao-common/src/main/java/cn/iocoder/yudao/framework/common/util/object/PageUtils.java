@@ -28,14 +28,14 @@ public class PageUtils {
     }
 
     /**
-     * 对内存列表进行分页
+     * 对内存列表分页，不改变列表顺序
      *
-     * @param list 数据列表
-     * @param pageParam 分页参数
+     * @param pageParam 分页参数，支持 {@link PageParam#PAGE_SIZE_NONE} 返回全部数据
+     * @param list 已排序的完整列表
      * @param <T> 数据类型
-     * @return 分页结果
+     * @return 分页结果，超出末页时保留总数并返回空列表
      */
-    public static <T> PageResult<T> buildPageResult(List<T> list, PageParam pageParam) {
+    public static <T> PageResult<T> buildPageResult(PageParam pageParam, List<T> list) {
         if (CollUtil.isEmpty(list)) {
             return PageResult.empty();
         }
@@ -43,8 +43,9 @@ public class PageUtils {
         if (PageParam.PAGE_SIZE_NONE.equals(pageParam.getPageSize())) {
             return new PageResult<>(list, total);
         }
-        int fromIndex = Math.toIntExact(Math.min(getStart(pageParam), total));
-        int toIndex = Math.toIntExact(Math.min((long) fromIndex + pageParam.getPageSize(), total));
+        long offset = (long) (pageParam.getPageNo() - 1) * pageParam.getPageSize();
+        int fromIndex = (int) Math.min(offset, total);
+        int toIndex = (int) Math.min((long) fromIndex + pageParam.getPageSize(), total);
         return new PageResult<>(list.subList(fromIndex, toIndex), total);
     }
 

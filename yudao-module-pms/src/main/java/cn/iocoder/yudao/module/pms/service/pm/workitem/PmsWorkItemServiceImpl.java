@@ -6,6 +6,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import cn.iocoder.yudao.module.pms.controller.admin.pm.workbench.vo.PmsWorkbenchPageReqVO;
 import cn.iocoder.yudao.module.pms.controller.admin.pm.workitem.vo.status.PmsWorkItemStatusRespVO;
@@ -579,9 +580,7 @@ public class PmsWorkItemServiceImpl implements PmsWorkItemService {
         if (Boolean.TRUE.equals(pageReqVO.getPlanningOnly()) && Boolean.TRUE.equals(pageReqVO.getUnplannedOnly())) {
             List<PmsWorkItemDO> workItems = workItemMapper.selectListByPlanning(pageReqVO);
             workItemUserSortService.sortWorkItemList(workItems, pageReqVO.getProjectId(), userId);
-            int fromIndex = Math.min((pageReqVO.getPageNo() - 1) * pageReqVO.getPageSize(), workItems.size());
-            int toIndex = Math.min(fromIndex + pageReqVO.getPageSize(), workItems.size());
-            return new PageResult<>(new ArrayList<>(workItems.subList(fromIndex, toIndex)), (long) workItems.size());
+            return PageUtils.buildPageResult(pageReqVO, workItems);
         }
 
         // 3. 查询其他工作项分页
