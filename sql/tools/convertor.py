@@ -341,6 +341,12 @@ class Convertor(ABC):
             table_ddl = ddl[0]
             table_name = table_ddl["table_name"]
 
+            # simple-ddl-parser 1.9+ 将字符串默认值中的等号解析为 ``\\03d``。
+            # 还原为原始字符，避免导出的目标库脚本出现错误默认值。
+            for column in table_ddl["columns"]:
+                if isinstance(column.get("default"), str):
+                    column["default"] = column["default"].replace(r"\03d", "=")
+
             # 忽略 quartz 的内容
             if table_name.lower().startswith("qrtz"):
                 continue
@@ -385,7 +391,7 @@ class Convertor(ABC):
             # 清理
             script = re.sub("\n{3,}", "\n\n", script).strip() + "\n"
 
-            print(script)
+            print(script, end="")
 
         # 将parse失败的脚本打印出来
         if error_scripts:
