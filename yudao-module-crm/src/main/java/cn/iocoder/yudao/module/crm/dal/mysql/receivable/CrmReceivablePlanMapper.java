@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.crm.dal.mysql.receivable;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
 import cn.iocoder.yudao.module.crm.controller.admin.receivable.vo.plan.CrmReceivablePlanPageReqVO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractDO;
@@ -24,7 +25,9 @@ import java.util.Objects;
 public interface CrmReceivablePlanMapper extends BaseMapperX<CrmReceivablePlanDO> {
 
     default CrmReceivablePlanDO selectMaxPeriodByContractId(Long contractId) {
-        return selectOne(new MPJLambdaWrapperX<CrmReceivablePlanDO>()
+        // 单表查询不能用 MPJLambdaWrapperX：它会给列拼接表别名前缀（t.contract_id），
+        // 但 selectOne 生成的 FROM 不带别名，导致 Unknown column 't.contract_id'。
+        return selectOne(new LambdaQueryWrapperX<CrmReceivablePlanDO>()
                 .eq(CrmReceivablePlanDO::getContractId, contractId)
                 .orderByDesc(CrmReceivablePlanDO::getPeriod)
                 .last("LIMIT 1"));
