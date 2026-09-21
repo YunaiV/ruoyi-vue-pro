@@ -106,7 +106,11 @@ public class HrmEmployeeFieldConfigServiceImpl implements HrmEmployeeFieldConfig
     public void validateEmployeeCreateFields(HrmEmployeeSaveReqVO reqVO, Integer entryStatus) {
         for (HrmEmployeeFieldConfigRespVO field : getEmployeeCreateFieldConfigList(entryStatus)) {
             if (Boolean.TRUE.equals(field.getVisible())
-                    || HrmEmployeeCreateFieldEnum.CANDIDATE_ID.getName().equals(field.getName())) {
+                    || HrmEmployeeCreateFieldEnum.CANDIDATE_ID.getName().equals(field.getName())
+                    // 候选人转员工（convert 来源，请求携带 candidateId）：channelId 由服务端从候选人记录回填，
+                    // 与 candidateId 同属服务端赋值字段，默认隐藏时同样放行（渠道存在性仍由 createEmployee 校验兜底）
+                    || (reqVO.getCandidateId() != null
+                        && HrmEmployeeCreateFieldEnum.CHANNEL_ID.getName().equals(field.getName()))) {
                 continue;
             }
             if (ObjectUtil.isNotEmpty(BeanUtil.getFieldValue(reqVO, field.getName()))) {
