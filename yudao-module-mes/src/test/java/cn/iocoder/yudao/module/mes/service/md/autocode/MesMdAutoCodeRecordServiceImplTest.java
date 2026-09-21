@@ -84,7 +84,7 @@ public class MesMdAutoCodeRecordServiceImplTest {
             context.setSerialNo(1L);
             return "0001";
         });
-        when(recordMapper.selectByResult("ITEM_0001")).thenReturn(null);
+        when(recordMapper.selectByResult(1L, "ITEM_0001")).thenReturn(null);
 
         // 调用
         String result = recordService.generateAutoCode(ruleCode, null);
@@ -118,9 +118,9 @@ public class MesMdAutoCodeRecordServiceImplTest {
             context.setSerialNo(serialNo);
             return String.format("%05d", serialNo);
         });
-        when(recordMapper.selectByResult("M00001")).thenReturn(new MesMdAutoCodeRecordDO());
-        when(recordMapper.selectByResult("M00002")).thenReturn(new MesMdAutoCodeRecordDO());
-        when(recordMapper.selectByResult("M00003")).thenReturn(null);
+        when(recordMapper.selectByResult(5L, "M00001")).thenReturn(new MesMdAutoCodeRecordDO());
+        when(recordMapper.selectByResult(5L, "M00002")).thenReturn(new MesMdAutoCodeRecordDO());
+        when(recordMapper.selectByResult(5L, "M00003")).thenReturn(null);
 
         // 调用
         String result = recordService.generateAutoCode(ruleCode, null);
@@ -149,7 +149,7 @@ public class MesMdAutoCodeRecordServiceImplTest {
         when(partService.getAutoCodePartListByRuleId(2L)).thenReturn(Arrays.asList(part1, part2));
         when(inputCharStrategy.generate(eq(part1), any(MesMdAutoCodeContext.class))).thenReturn("A");
         when(serialNumberStrategy.generate(eq(part2), any(MesMdAutoCodeContext.class))).thenReturn("0001");
-        when(recordMapper.selectByResult("A0001")).thenReturn(null);
+        when(recordMapper.selectByResult(2L, "A0001")).thenReturn(null);
 
         // 调用
         String result = recordService.generateAutoCode(ruleCode, inputChar);
@@ -174,7 +174,7 @@ public class MesMdAutoCodeRecordServiceImplTest {
         when(ruleService.getAutoCodeRuleByCode(ruleCode)).thenReturn(rule);
         when(partService.getAutoCodePartListByRuleId(3L)).thenReturn(Arrays.asList(part1));
         when(fixedCharStrategy.generate(eq(part1), any(MesMdAutoCodeContext.class))).thenReturn("IT");
-        when(recordMapper.selectByResult("00000000IT")).thenReturn(null);
+        when(recordMapper.selectByResult(3L, "00000000IT")).thenReturn(null);
 
         // 调用
         String result = recordService.generateAutoCode(ruleCode, null);
@@ -198,7 +198,7 @@ public class MesMdAutoCodeRecordServiceImplTest {
         when(partService.getAutoCodePartListByRuleId(4L)).thenReturn(Arrays.asList(part1, part2));
         when(dateStrategy.generate(eq(part1), any(MesMdAutoCodeContext.class))).thenReturn("20260304");
         when(serialNumberStrategy.generate(eq(part2), any(MesMdAutoCodeContext.class))).thenReturn("0001");
-        when(recordMapper.selectByResult("202603040001")).thenReturn(null);
+        when(recordMapper.selectByResult(4L, "202603040001")).thenReturn(null);
 
         // 调用
         String result = recordService.generateAutoCode(ruleCode, null);

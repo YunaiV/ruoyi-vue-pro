@@ -12,8 +12,10 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface MesMdAutoCodeRecordMapper extends BaseMapperX<MesMdAutoCodeRecordDO> {
 
-    default MesMdAutoCodeRecordDO selectByResult(String result) {
-        return selectOne(MesMdAutoCodeRecordDO::getResult, result);
+    default MesMdAutoCodeRecordDO selectByResult(Long ruleId, String result) {
+        // 查重限定在本规则内（带 rule_id 维度）：他规则生成的同值编码不再误判为本规则重复
+        return selectOne(MesMdAutoCodeRecordDO::getRuleId, ruleId,
+                MesMdAutoCodeRecordDO::getResult, result);
     }
 
 }

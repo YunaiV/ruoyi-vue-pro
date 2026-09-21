@@ -71,8 +71,8 @@ public class MesMdAutoCodeRecordServiceImpl implements MesMdAutoCodeRecordServic
             MesMdAutoCodeContext context = new MesMdAutoCodeContext()
                     .setRule(rule).setParts(parts).setInputChar(inputChar);
             String result = generateCode(rule, parts, context);
-            // 2.2 二次校验（防止重复）
-            MesMdAutoCodeRecordDO existRecord = recordMapper.selectByResult(result);
+            // 2.2 二次校验（防止重复）：只在本规则内查重，他规则的同值编码不占用本规则流水
+            MesMdAutoCodeRecordDO existRecord = recordMapper.selectByResult(rule.getId(), result);
             if (existRecord != null) {
                 continue;
             }
