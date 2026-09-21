@@ -185,6 +185,9 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
                     purchaseInItem.getProductId(), purchaseInItem.getWarehouseId(), count,
                     bizType, purchaseInItem.getInId(), purchaseInItem.getId(), purchaseIn.getNo()));
         });
+
+        // 4. 状态变更后重算采购订单入库进度（反审核的入库单不再计入，inCount 自然回退）
+        updatePurchaseOrderInCount(purchaseIn.getOrderId());
     }
 
     @Override

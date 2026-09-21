@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.in.ErpPurchaseIn
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseInDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseInItemDO;
 import cn.iocoder.yudao.module.erp.enums.ErpAuditStatus;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -64,7 +65,10 @@ public interface ErpPurchaseInMapper extends BaseMapperX<ErpPurchaseInDO> {
     }
 
     default List<ErpPurchaseInDO> selectListByOrderId(Long orderId) {
-        return selectList(ErpPurchaseInDO::getOrderId, orderId);
+        // 入库进度只统计「已审核」的入库单：未审核/已反审核的入库单不计入订单 inCount（反审核后自然回退）
+        return selectList(new LambdaQueryWrapper<ErpPurchaseInDO>()
+                .eq(ErpPurchaseInDO::getOrderId, orderId)
+                .eq(ErpPurchaseInDO::getStatus, ErpAuditStatus.APPROVE.getStatus()));
     }
 
 }
