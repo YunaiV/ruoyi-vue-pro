@@ -106,7 +106,7 @@ public class FmsAccountSetServiceImpl implements FmsAccountSetService {
         initializeReqVO.setAccountSetId(accountSet.getId());
         initializeReqVO.setCurrencyCode(FmsCurrencyPresetEnum.RMB.getCode());
         initializeReqVO.setStartTime(LocalDateTimeUtils.beginOfMonth(LocalDateTime.now()));
-        initializeReqVO.setStandard(FmsAccountingStandardEnum.SMALL_BUSINESS_2013.getType());
+        initializeReqVO.setStandard(FmsAccountingStandardEnum.SMALL_BUSINESS_2013.getStandard());
         initializeReqVO.setLevel(FmsFinanceParameterDO.DEFAULT_LEVEL);
         initializeReqVO.setSubjectCodeRule(FmsFinanceParameterDO.DEFAULT_SUBJECT_CODE_RULE);
         initializeReqVO.setLedgerBalanceMode(FmsFinanceParameterDO.DEFAULT_LEDGER_BALANCE_MODE);
