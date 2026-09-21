@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.product.controller.admin.spu.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -17,12 +18,15 @@ public class ProductSkuSaveReqVO {
 
     @Schema(description = "销售价格，单位：分", requiredMode = Schema.RequiredMode.REQUIRED, example = "1999")
     @NotNull(message = "销售价格，单位：分不能为空")
+    @Min(value = 0, message = "销售价格，单位：分不能小于 0")
     private Integer price;
 
     @Schema(description = "市场价", example = "2999")
+    @Min(value = 0, message = "市场价不能小于 0")
     private Integer marketPrice;
 
     @Schema(description = "成本价", example = "19")
+    @Min(value = 0, message = "成本价不能小于 0")
     private Integer costPrice;
 
     @Schema(description = "条形码", example = "15156165456")
@@ -43,9 +47,11 @@ public class ProductSkuSaveReqVO {
     private Double volume;
 
     @Schema(description = "一级分销的佣金，单位：分", example = "199")
+    @Min(value = 0, message = "一级分销的佣金，单位：分不能小于 0")
     private Integer firstBrokeragePrice;
 
     @Schema(description = "二级分销的佣金，单位：分", example = "19")
+    @Min(value = 0, message = "二级分销的佣金，单位：分不能小于 0")
     private Integer secondBrokeragePrice;
 
     @Schema(description = "属性数组")
