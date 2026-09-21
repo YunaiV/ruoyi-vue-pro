@@ -71,4 +71,10 @@ public interface ErpPurchaseInMapper extends BaseMapperX<ErpPurchaseInDO> {
                 .eq(ErpPurchaseInDO::getStatus, ErpAuditStatus.APPROVE.getStatus()));
     }
 
+    default List<ErpPurchaseInDO> selectListAllByOrderId(Long orderId) {
+        // 超订单数量校验需要统计「全部」入库单（含未审核）：未审核入库单同样占用订单可入库额度
+        return selectList(new LambdaQueryWrapper<ErpPurchaseInDO>()
+                .eq(ErpPurchaseInDO::getOrderId, orderId));
+    }
+
 }
