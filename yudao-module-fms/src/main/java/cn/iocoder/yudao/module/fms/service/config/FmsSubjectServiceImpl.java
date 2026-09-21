@@ -53,6 +53,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
+import static cn.iocoder.yudao.module.fms.enums.ErrorCodeConstants.ACCOUNT_SET_NOT_INITIALIZED;
 import static cn.iocoder.yudao.module.fms.enums.ErrorCodeConstants.SUBJECT_CODE_DUPLICATE;
 import static cn.iocoder.yudao.module.fms.enums.ErrorCodeConstants.SUBJECT_CODE_RULE_INVALID;
 import static cn.iocoder.yudao.module.fms.enums.ErrorCodeConstants.SUBJECT_CURRENCY_INVALID;
@@ -159,8 +160,11 @@ public class FmsSubjectServiceImpl implements FmsSubjectService {
     public Long createSubject(FmsSubjectSaveReqVO createReqVO, Long userId) {
         // 1.1 校验账套写权限
         accountSetService.validateAccountSetWritePermission(createReqVO.getAccountSetId(), userId);
-        // 1.2 查询财务参数
+        // 1.2 查询财务参数（未初始化账套无财务参数行，空判转为明确业务错误，避免编码规则校验 NPE 500）
         FmsFinanceParameterDO financeParameter = financeParameterService.getFinanceParameter(createReqVO.getAccountSetId());
+        if (financeParameter == null) {
+            throw exception(ACCOUNT_SET_NOT_INITIALIZED);
+        }
         // 1.3 校验科目编码唯一
         validateSubjectCodeUnique(null, createReqVO.getAccountSetId(), createReqVO.getCode());
         // 1.4 校验上级科目和科目编码规则
@@ -206,9 +210,12 @@ public class FmsSubjectServiceImpl implements FmsSubjectService {
     public void updateSubject(FmsSubjectSaveReqVO updateReqVO, Long userId) {
         // 1.1 校验账套写权限
         accountSetService.validateAccountSetWritePermission(updateReqVO.getAccountSetId(), userId);
-        // 1.2 查询财务参数
+        // 1.2 查询财务参数（未初始化账套无财务参数行，空判转为明确业务错误，避免编码规则校验 NPE 500）
         FmsFinanceParameterDO financeParameter = financeParameterService.getFinanceParameter(
                 updateReqVO.getAccountSetId());
+        if (financeParameter == null) {
+            throw exception(ACCOUNT_SET_NOT_INITIALIZED);
+        }
         // 1.3 校验科目存在
         FmsSubjectDO subject = validateSubjectExists(updateReqVO.getAccountSetId(), updateReqVO.getId());
         if (ObjUtil.notEqual(subject.getParentId(), updateReqVO.getParentId())) {
@@ -414,8 +421,11 @@ public class FmsSubjectServiceImpl implements FmsSubjectService {
         }
         // 1.2 校验账套写权限
         accountSetService.validateAccountSetWritePermission(accountSetId, userId);
-        // 1.3 加载导入依赖
+        // 1.3 加载导入依赖（未初始化账套无财务参数行，空判转为明确业务错误，避免编码规则校验 NPE 500）
         FmsFinanceParameterDO financeParameter = financeParameterService.getFinanceParameter(accountSetId);
+        if (financeParameter == null) {
+            throw exception(ACCOUNT_SET_NOT_INITIALIZED);
+        }
         Map<String, FmsSubjectDO> subjectMap = convertMap(
                 subjectMapper.selectListByAccountSetIdAndType(accountSetId, null), FmsSubjectDO::getCode);
         Map<String, Long> auxiliaryTypeIdMap = auxiliaryTypeService.getAuxiliaryTypeIdMap(accountSetId);

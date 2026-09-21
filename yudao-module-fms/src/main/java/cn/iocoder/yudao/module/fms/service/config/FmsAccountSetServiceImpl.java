@@ -9,7 +9,9 @@ import cn.iocoder.yudao.module.fms.controller.admin.config.vo.accountset.FmsAcco
 import cn.iocoder.yudao.module.fms.dal.dataobject.config.FmsAccountSetDO;
 import cn.iocoder.yudao.module.fms.dal.dataobject.config.FmsAccountUserDO;
 import cn.iocoder.yudao.module.fms.dal.dataobject.config.FmsCurrencyDO;
+import cn.iocoder.yudao.module.fms.dal.dataobject.config.FmsFinanceParameterDO;
 import cn.iocoder.yudao.module.fms.dal.mysql.config.FmsAccountSetMapper;
+import cn.iocoder.yudao.module.fms.enums.config.FmsAccountingStandardEnum;
 import cn.iocoder.yudao.module.fms.enums.config.FmsAccountUserLevelEnum;
 import cn.iocoder.yudao.module.fms.enums.config.FmsCurrencyPresetEnum;
 import cn.iocoder.yudao.module.fms.service.closing.FmsClosingSchemeService;
@@ -23,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -88,7 +91,7 @@ public class FmsAccountSetServiceImpl implements FmsAccountSetService {
         // 1. 校验公司编码唯一
         validateAccountSetCompanyCodeUnique(null, createReqVO.getCompanyCode());
 
-        // 2. 创建未初始化账套
+        // 2. 创建账套
         FmsAccountSetDO accountSet = BeanUtils.toBean(createReqVO, FmsAccountSetDO.class)
                 .setId(null).setInitialized(false);
         accountSetMapper.insert(accountSet);
@@ -96,7 +99,25 @@ public class FmsAccountSetServiceImpl implements FmsAccountSetService {
         // 3. 将创建人加入账套
         accountUserService.createAccountOwner(accountSet.getId(), userId);
 
-        // 4. 记录操作日志上下文
+        // 4. 按默认参数级联初始化基础资料（本位币/财务参数/凭证字/辅助类别/科目/结账模板/方案/指标），
+        //    新账套创建后即可直接使用，无需再单独调用 initialize（否则财务参数/科目缺失，
+        //    建科目 NPE、报表恒空——A13/A16/A26 同根因）
+        FmsAccountSetInitializeReqVO initializeReqVO = new FmsAccountSetInitializeReqVO();
+        initializeReqVO.setAccountSetId(accountSet.getId());
+        initializeReqVO.setCurrencyCode(FmsCurrencyPresetEnum.RMB.getCode());
+        initializeReqVO.setStartTime(LocalDateTimeUtils.beginOfMonth(LocalDateTime.now()));
+        initializeReqVO.setStandard(FmsAccountingStandardEnum.SMALL_BUSINESS_2013.getType());
+        initializeReqVO.setLevel(FmsFinanceParameterDO.DEFAULT_LEVEL);
+        initializeReqVO.setSubjectCodeRule(FmsFinanceParameterDO.DEFAULT_SUBJECT_CODE_RULE);
+        initializeReqVO.setLedgerBalanceMode(FmsFinanceParameterDO.DEFAULT_LEDGER_BALANCE_MODE);
+        FmsCurrencyDO currency = doInitialize(accountSet.getId(), initializeReqVO, userId);
+
+        // 5. 回写账套初始化信息和本位币
+        accountSetMapper.updateById(new FmsAccountSetDO().setId(accountSet.getId())
+                .setInitialized(true).setStandard(initializeReqVO.getStandard())
+                .setStartTime(initializeReqVO.getStartTime()).setCurrencyId(currency.getId()));
+
+        // 6. 记录操作日志上下文
         LogRecordContext.putVariable("accountSetId", accountSet.getId());
         return accountSet.getId();
     }
@@ -140,15 +161,8 @@ public class FmsAccountSetServiceImpl implements FmsAccountSetService {
             throw exception(ACCOUNT_SET_ALREADY_INITIALIZED);
         }
 
-        // 2. 初始化账套基础数据
-        FmsCurrencyDO currency = currencyService.initializeStandardCurrency(accountSet.getId(), presetCurrency);
-        financeParameterService.initializeFinanceParameter(accountSet.getId(), initializeReqVO);
-        voucherWordService.initializeDefaultVoucherWords(accountSet.getId());
-        auxiliaryTypeService.initializeDefaultTypes(accountSet.getId());
-        subjectService.initializeDefaultSubjects(accountSet.getId());
-        closingTemplateService.initializeClosingTemplates(accountSet.getId(), userId);
-        closingSchemeService.initializeDefaultClosingSchemes(accountSet.getId(), userId);
-        financeIndicatorService.initializeDefaultFinanceIndicators(accountSet.getId(), userId);
+        // 2. 级联初始化账套基础数据
+        FmsCurrencyDO currency = doInitialize(accountSet.getId(), initializeReqVO, userId);
 
         // 3. 回写账套初始化信息和本位币
         accountSetMapper.updateById(new FmsAccountSetDO().setId(accountSet.getId())
@@ -158,6 +172,29 @@ public class FmsAccountSetServiceImpl implements FmsAccountSetService {
 
         // 4. 记录操作日志上下文
         LogRecordContext.putVariable("accountSet", accountSet);
+    }
+
+    /**
+     * 级联初始化账套基础数据（本位币/财务参数/凭证字/辅助类别/科目/结账模板/方案/指标）
+     *
+     * @param accountSetId 账套编号
+     * @param initializeReqVO 初始化参数
+     * @param userId 用户编号
+     * @return 初始化生成的本位币
+     */
+    private FmsCurrencyDO doInitialize(Long accountSetId, FmsAccountSetInitializeReqVO initializeReqVO,
+            Long userId) {
+        FmsCurrencyPresetEnum presetCurrency = FmsCurrencyPresetEnum.valueOfCode(
+                initializeReqVO.getCurrencyCode());
+        FmsCurrencyDO currency = currencyService.initializeStandardCurrency(accountSetId, presetCurrency);
+        financeParameterService.initializeFinanceParameter(accountSetId, initializeReqVO);
+        voucherWordService.initializeDefaultVoucherWords(accountSetId);
+        auxiliaryTypeService.initializeDefaultTypes(accountSetId);
+        subjectService.initializeDefaultSubjects(accountSetId);
+        closingTemplateService.initializeClosingTemplates(accountSetId, userId);
+        closingSchemeService.initializeDefaultClosingSchemes(accountSetId, userId);
+        financeIndicatorService.initializeDefaultFinanceIndicators(accountSetId, userId);
+        return currency;
     }
 
     @Override
