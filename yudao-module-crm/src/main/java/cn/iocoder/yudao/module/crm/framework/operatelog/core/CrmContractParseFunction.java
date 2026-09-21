@@ -24,7 +24,10 @@ public class CrmContractParseFunction implements IParseFunction {
 
     @Override
     public boolean executeBefore() {
-        return true; // 先转换值后对比
+        // 必须在方法执行后（后置相）取值：模板引用的是 LogRecordContext 变量
+        // （如 #receivablePlan.contractId），这些变量在方法内部末尾才绑定，
+        // 创建前（前置相）取值为 null，会抛 SpelEvaluationException EL1007E
+        return false;
     }
 
     @Override
