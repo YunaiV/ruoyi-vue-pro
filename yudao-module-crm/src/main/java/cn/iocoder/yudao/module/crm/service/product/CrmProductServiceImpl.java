@@ -5,8 +5,12 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.product.vo.product.CrmProductPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.product.vo.product.CrmProductSaveReqVO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessProductDO;
+import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractProductDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductCategoryDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductDO;
+import cn.iocoder.yudao.module.crm.dal.mysql.business.CrmBusinessProductMapper;
+import cn.iocoder.yudao.module.crm.dal.mysql.contract.CrmContractProductMapper;
 import cn.iocoder.yudao.module.crm.dal.mysql.product.CrmProductMapper;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
@@ -48,6 +52,10 @@ public class CrmProductServiceImpl implements CrmProductService {
 
     @Resource
     private CrmProductCategoryService productCategoryService;
+    @Resource
+    private CrmContractProductMapper contractProductMapper;
+    @Resource
+    private CrmBusinessProductMapper businessProductMapper;
     @Resource
     private CrmPermissionService permissionService;
 
@@ -128,6 +136,13 @@ public class CrmProductServiceImpl implements CrmProductService {
     public void deleteProduct(Long id) {
         // 校验存在
         validateProductExists(id);
+        // 校验未被合同/商机引用，避免删除后产生悬空引用
+        if (contractProductMapper.selectCount(CrmContractProductDO::getProductId, id) > 0) {
+            throw exception(PRODUCT_DELETE_FAIL_CONTRACT_EXISTS);
+        }
+        if (businessProductMapper.selectCount(CrmBusinessProductDO::getProductId, id) > 0) {
+            throw exception(PRODUCT_DELETE_FAIL_BUSINESS_EXISTS);
+        }
         // 删除
         productMapper.deleteById(id);
     }
