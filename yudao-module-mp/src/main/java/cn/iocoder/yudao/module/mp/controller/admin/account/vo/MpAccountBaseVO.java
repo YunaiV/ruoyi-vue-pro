@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.mp.controller.admin.account.vo;
 
+import cn.iocoder.yudao.framework.desensitize.core.slider.annotation.PasswordDesensitize;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -28,13 +29,16 @@ public class MpAccountBaseVO {
 
     @Schema(description = "公众号密钥", requiredMode = Schema.RequiredMode.REQUIRED, example = "3a7b3b20c537e52e74afd395eb85f61f")
     @NotEmpty(message = "公众号密钥不能为空")
+    @PasswordDesensitize // 读面脱敏：密钥不回显明文（写面入参走反序列化不受影响）
     private String appSecret;
 
     @Schema(description = "公众号 token", requiredMode = Schema.RequiredMode.REQUIRED, example = "kangdayuzhen")
     @NotEmpty(message = "公众号 token 不能为空")
+    @PasswordDesensitize // 读面脱敏：token 不回显明文
     private String token;
 
     @Schema(description = "加密密钥", example = "gjN+Ksei")
+    @PasswordDesensitize // 读面脱敏：加密密钥不回显明文
     private String aesKey;
 
     @Schema(description = "备注", example = "请关注芋道源码，学习技术")
