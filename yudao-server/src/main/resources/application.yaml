@@ -136,6 +136,9 @@ spring:
 
 spring:
   ai:
+    chat:
+      client:
+        enabled: false # 关闭 ChatClient.Builder 自动配置：它要求唯一的 ChatModel Bean，而项目会创建多个，导致 ai + report 模块同时引入时启动报错
     vectorstore: # 向量存储
       redis:
         initialize-schema: true
