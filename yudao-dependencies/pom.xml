@@ -35,19 +35,19 @@
         <dm8.jdbc.version>8.1.3.140</dm8.jdbc.version>
         <kingbase.jdbc.version>9.0.1.jre7</kingbase.jdbc.version>
         <opengauss.jdbc.version>7.0.0-RC3-og</opengauss.jdbc.version>
-        <taos.version>3.9.0</taos.version>
+        <taos.version>3.9.2</taos.version>
         <!-- 消息队列 -->
         <rocketmq-spring.version>2.3.6</rocketmq-spring.version>
         <!-- 服务保障相关 -->
         <lock4j.version>2.2.7</lock4j.version>
         <!-- 监控相关 -->
-        <skywalking.version>9.6.0</skywalking.version>
+        <skywalking.version>9.7.0</skywalking.version>
         <spring-boot-admin.version>2.7.15</spring-boot-admin.version>
-        <opentelemetry.version>1.65.0</opentelemetry.version>
+        <opentelemetry.version>1.66.0</opentelemetry.version>
         <!-- Test 测试相关 -->
         <h2.version>2.1.214</h2.version>
         <podam.version>7.2.11.RELEASE</podam.version> <!-- Spring Boot 2.X 最多使用 7.2.11 版本 -->
-        <jedis-mock.version>1.1.18</jedis-mock.version>
+        <jedis-mock.version>1.1.19</jedis-mock.version>
         <mockito-inline.version>4.11.0</mockito-inline.version>
         <!-- Bpm 工作流相关 -->
         <flowable.version>6.8.0</flowable.version> <!-- 不要升级 6.8.1：退回有 bug https://github.com/flowable/flowable-engine/issues/3944 -->
@@ -56,13 +56,13 @@
         <jsoup.version>1.23.2</jsoup.version>
         <sensitive-word.version>0.29.5</sensitive-word.version>
         <pinyin4j.version>2.5.1</pinyin4j.version>
-        <lombok.version>1.18.46</lombok.version>
-        <mapstruct.version>1.6.3</mapstruct.version>
+        <lombok.version>1.18.48</lombok.version>
+        <mapstruct.version>1.7.0.Beta2</mapstruct.version>
         <hutool-5.version>5.8.47</hutool-5.version>
         <fastexcel.version>1.3.0</fastexcel.version>
         <aviator.version>5.4.4</aviator.version>
         <velocity.version>2.4</velocity.version> <!-- JDK8 不能从 2.4 升级到 2.4.1，会报包不存在！！！！ -->
-        <fastjson2.version>2.0.64</fastjson2.version>
+        <fastjson2.version>2.0.65</fastjson2.version>
         <guava.version>33.7.1-jre</guava.version>
         <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
         <commons-net.version>3.13.0</commons-net.version>
@@ -71,23 +71,23 @@
         <tika-core.version>2.9.3</tika-core.version> <!-- JDK8 不能从 2.9.3 升级到 3.X，会报 JDK8 不支持 -->
         <ip2region.version>2.7.0</ip2region.version>
         <bizlog-sdk.version>3.0.6</bizlog-sdk.version>
-        <netty.version>4.2.17.Final</netty.version>
+        <netty.version>4.2.18.Final</netty.version>
         <mqtt.version>1.2.5</mqtt.version>
         <vertx.version>4.5.26</vertx.version>
         <okhttp.version>4.12.0</okhttp.version>
         <californium.version>3.14.0</californium.version>
-        <j2mod.version>3.3.0</j2mod.version>
+        <j2mod.version>3.4.0</j2mod.version>
         <httpclient5.version>5.5.1</httpclient5.version> <!-- WxJava 4.8.x 需要 HttpClient5 5.4+，Spring Boot 2.7 默认 5.1.4 不兼容；JDK8 兼容不能升级到 5.5.2+ -->
         <httpcore5.version>5.3.6</httpcore5.version> <!-- 配套 httpclient5 5.5.1，Spring Boot 2.7 默认 5.1.5 不兼容 -->
         <!-- 三方云服务相关 -->
-        <awssdk.version>2.54.7</awssdk.version>
+        <awssdk.version>2.55.5</awssdk.version>
         <justauth.version>1.16.7</justauth.version>
         <justauth-starter.version>1.4.0</justauth-starter.version>
-        <jimureport.version>2.3.4</jimureport.version>
+        <jimureport.version>2.3.4</jimureport.version> <!-- JimuBI 2.3.2 依赖此版本中的 JimuAiConfigBean，升级到 2.5.4 会导致启动失败 -->
         <jimubi.version>2.3.2</jimubi.version>
-        <weixin-java.version>4.8.6-20260825.155844</weixin-java.version>
+        <weixin-java.version>4.8.6-20260919.232150</weixin-java.version>
         <bouncycastle.version>1.80</bouncycastle.version>
-        <alipay-sdk-java.version>4.40.978.ALL</alipay-sdk-java.version>
+        <alipay-sdk-java.version>4.40.1014.ALL</alipay-sdk-java.version>
         <!-- 专属于 JDK8 安全漏洞升级 -->
         <logback.version>1.2.13</logback.version> <!-- 无法使用 1.3.X 版本，启动会报错 -->
     </properties>
