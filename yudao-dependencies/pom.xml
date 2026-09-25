@@ -734,6 +734,10 @@
                 <version>${jimureport.version}</version>
                 <exclusions>
                     <exclusion>
+                        <groupId>io.swagger.core.v3</groupId>
+                        <artifactId>swagger-annotations-jakarta</artifactId>
+                    </exclusion>
+                    <exclusion>
                         <groupId>com.alibaba</groupId>
                         <artifactId>fastjson</artifactId>
                     </exclusion>
