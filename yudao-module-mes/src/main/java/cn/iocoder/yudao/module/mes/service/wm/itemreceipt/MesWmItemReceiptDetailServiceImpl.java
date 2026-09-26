@@ -8,6 +8,8 @@ import cn.iocoder.yudao.module.mes.dal.dataobject.wm.itemreceipt.MesWmItemReceip
 import cn.iocoder.yudao.module.mes.dal.mysql.wm.itemreceipt.MesWmItemReceiptDetailMapper;
 import cn.iocoder.yudao.module.mes.service.wm.materialstock.MesWmMaterialStockService;
 import cn.iocoder.yudao.module.mes.service.wm.warehouse.MesWmWarehouseAreaService;
+import cn.iocoder.yudao.module.mes.service.md.item.MesMdItemService;
+import cn.iocoder.yudao.module.mes.service.wm.batch.MesWmBatchService;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,7 @@ import org.springframework.validation.annotation.Validated;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.mes.enums.ErrorCodeConstants.*;
@@ -25,6 +28,11 @@ import static cn.iocoder.yudao.module.mes.enums.ErrorCodeConstants.*;
 @Service
 @Validated
 public class MesWmItemReceiptDetailServiceImpl implements MesWmItemReceiptDetailService {
+
+    @Resource
+    private MesMdItemService itemService;
+    @Resource
+    private MesWmBatchService batchService;
 
     @Resource
     private MesWmItemReceiptDetailMapper itemReceiptDetailMapper;
@@ -62,6 +70,8 @@ public class MesWmItemReceiptDetailServiceImpl implements MesWmItemReceiptDetail
         MesWmItemReceiptDetailDO detail = validateItemReceiptDetailExists(updateReqVO.getId());
         // 1.2 校验数据
         updateReqVO.setReceiptId(detail.getReceiptId());
+        updateReqVO.setLineId(detail.getLineId());
+        updateReqVO.setItemId(detail.getItemId());
         validateItemReceiptDetailSaveData(updateReqVO);
 
         // 2. 更新
@@ -75,6 +85,23 @@ public class MesWmItemReceiptDetailServiceImpl implements MesWmItemReceiptDetail
     private void validateItemReceiptDetailSaveData(MesWmItemReceiptDetailSaveReqVO reqVO) {
         // 校验父单据存在且为可编辑状态
         itemReceiptService.validateItemReceiptEditable(reqVO.getReceiptId());
+        // 上架明细沿用入库单行的物料和批次，避免客户端漏传或传错批次。
+        MesWmItemReceiptLineDO line = itemReceiptLineService.getItemReceiptLine(reqVO.getLineId());
+        if (line == null) {
+            throw exception(WM_ITEM_RECEIPT_LINE_NOT_EXISTS);
+        }
+        if (!Objects.equals(line.getReceiptId(), reqVO.getReceiptId())
+                || !Objects.equals(line.getItemId(), reqVO.getItemId())) {
+            throw exception(WM_ITEM_RECEIPT_DETAIL_LINE_MISMATCH);
+        }
+        reqVO.setBatchId(line.getBatchId());
+        if (Boolean.TRUE.equals(itemService.validateItemExists(reqVO.getItemId()).getBatchFlag())
+                && reqVO.getBatchId() == null) {
+            throw exception(MD_ITEM_BATCH_REQUIRED);
+        }
+        if (reqVO.getBatchId() != null) {
+            batchService.validateBatchExists(reqVO.getBatchId(), reqVO.getItemId());
+        }
         // 校验库区关系
         warehouseAreaService.validateWarehouseAreaExists(reqVO.getWarehouseId(), reqVO.getLocationId(), reqVO.getAreaId());
         // 校验库位物料/批次混放规则
