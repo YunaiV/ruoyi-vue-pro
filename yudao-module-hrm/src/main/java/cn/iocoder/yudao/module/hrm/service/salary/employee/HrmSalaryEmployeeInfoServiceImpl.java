@@ -265,7 +265,7 @@ public class HrmSalaryEmployeeInfoServiceImpl implements HrmSalaryEmployeeInfoSe
 
     @Override
     public List<HrmSalaryOptionDO> getSalaryImportOptionList() {
-        List<HrmSalaryOptionDO> options = salaryOptionService.getSalaryOptionList(false);
+        List<HrmSalaryOptionDO> options = salaryOptionService.getSalaryOptionList(true);
         return filterList(options, option -> ObjectUtil.notEqual(option.getParentCode(), ROOT_PARENT_CODE)
                 && Boolean.TRUE.equals(option.getCalculateEnabled())
                 && !HrmSalaryOptionCodeEnum.EMPLOYEE_INFO_IMPORT_EXCLUDED_PARENT_CODES.contains(option.getParentCode()));
@@ -762,7 +762,7 @@ public class HrmSalaryEmployeeInfoServiceImpl implements HrmSalaryEmployeeInfoSe
     }
 
     private Map<Integer, HrmSalaryOptionDO> getSalaryOptionMap() {
-        return convertMap(salaryOptionService.getSalaryOptionList(false), HrmSalaryOptionDO::getCode);
+        return convertMap(salaryOptionService.getSalaryOptionList(true), HrmSalaryOptionDO::getCode);
     }
 
     private HrmSalaryOptionValueVO buildSalaryOptionValueVO(HrmSalaryEmployeeInfoDO.SalaryOption optionDO) {
