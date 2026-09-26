@@ -61,9 +61,6 @@ public interface FmsClosingPeriodService {
     /**
      * 获得指定会计期间的损益结转余额（末级损益科目本期借贷差额绝对值之和）
      *
-     * 供报表勾稽逐月检查损益是否结转使用：直接查账簿余额，
-     * 不重入 getClosingOverview（后者内部会回调报表 check，构成无限递归）。
-     *
      * @param accountSetId 账套编号
      * @param month 会计期间
      * @param userId 用户编号

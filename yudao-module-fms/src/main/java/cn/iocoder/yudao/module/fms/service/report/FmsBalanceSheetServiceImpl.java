@@ -7,8 +7,6 @@ import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.fms.controller.admin.closing.vo.FmsClosingOverviewRespVO;
-import cn.iocoder.yudao.module.fms.controller.admin.closing.vo.FmsClosingQueryReqVO;
 import cn.iocoder.yudao.module.fms.controller.admin.ledger.vo.subjectbalance.FmsLedgerSubjectBalanceRespVO;
 import cn.iocoder.yudao.module.fms.controller.admin.report.vo.balance.FmsBalanceSheetCheckRespVO;
 import cn.iocoder.yudao.module.fms.controller.admin.report.vo.balance.FmsBalanceSheetRowRespVO;
@@ -292,7 +290,7 @@ public class FmsBalanceSheetServiceImpl implements FmsBalanceSheetService {
     }
 
     /**
-     * 判断查询期间内各月的损益是否均已结转，逐月检查结账概览的损益余额
+     * 判断查询期间内各月的损益是否均已结转
      *
      * @param listReqVO 查询条件
      * @param userId 用户编号
@@ -302,8 +300,7 @@ public class FmsBalanceSheetServiceImpl implements FmsBalanceSheetService {
         YearMonth endMonth = LocalDateTimeUtils.parseYearMonth(listReqVO.getEndMonth());
         for (YearMonth currentMonth = LocalDateTimeUtils.parseYearMonth(listReqVO.getStartMonth());
                 !currentMonth.isAfter(endMonth); currentMonth = currentMonth.plusMonths(1)) {
-            // 直接查当月损益余额，不再重入 getClosingOverview
-            //（其内部会回调本类 checkBalanceSheet → 本方法，对同月构成无界自递归，栈溢出）
+            // 直接查询损益余额，避免报表校验与结账概况循环调用
             BigDecimal profitLossBalance = closingPeriodService.getProfitLossBalance(
                     listReqVO.getAccountSetId(), currentMonth.toString(), userId);
             // 当月损益余额不为零时，说明存在尚未结转的损益
