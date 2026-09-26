@@ -467,6 +467,7 @@ public interface ErrorCodeConstants {
     ErrorCode WM_ITEM_RECEIPT_LINE_ARRIVAL_NOTICE_LINE_NOT_ALLOWED = new ErrorCode(1_040_705_102,
             "入库单未关联到货通知单，不能选择到货通知单行");
     ErrorCode WM_ITEM_RECEIPT_DETAIL_NOT_EXISTS = new ErrorCode(1_040_705_200, "采购入库明细不存在");
+    ErrorCode WM_ITEM_RECEIPT_DETAIL_LINE_MISMATCH = new ErrorCode(1_040_705_201, "入库单行与上架明细的单据或物料不一致");
     ErrorCode WM_ITEM_RECEIPT_DETAIL_QUANTITY_EXCEED = new ErrorCode(1_040_705_202, "上架明细总数量不能超过行入库数量");
 
     // ========== MES 仓库管理-领料申请单（1-040-706-000） ==========
