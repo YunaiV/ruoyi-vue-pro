@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS "infra_file" (
     "name" varchar(256),
     "path" varchar(512),
     "url" varchar(1024),
-    "type" varchar(63) DEFAULT NULL,
+    "type" varchar(128) DEFAULT NULL,
     "size" bigint NOT NULL,
     "creator" varchar(64) DEFAULT '',
     "create_time" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,

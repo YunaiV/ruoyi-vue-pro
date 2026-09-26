@@ -7,23 +7,31 @@ import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.framework.test.core.util.AssertUtils;
 import cn.iocoder.yudao.module.infra.controller.admin.file.vo.file.FileCreateReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.file.vo.file.FilePageReqVO;
+import cn.iocoder.yudao.module.infra.controller.admin.file.vo.file.FilePresignedUrlRespVO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.file.FileDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.file.FileMapper;
 import cn.iocoder.yudao.module.infra.framework.file.core.client.FileClient;
 import jakarta.annotation.Resource;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
-import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.FILE_NOT_EXISTS;
-import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.FILE_PATH_INVALID;
+import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.*;
@@ -147,6 +155,198 @@ public class FileServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
+    public void testCreateFile_success_image() throws Exception {
+        for (String extension : new String[]{"jpg", "png", "gif", "bmp"}) {
+            // 准备参数
+            String type = "jpg".equals(extension) ? "image/jpeg" : "image/" + extension;
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            assertTrue(ImageIO.write(new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB), extension, outputStream));
+            byte[] content = outputStream.toByteArray();
+            String name = "头像." + extension.toUpperCase(Locale.ROOT);
+            // mock 方法
+            FileClient client = mock(FileClient.class);
+            when(fileConfigService.getMasterFileClient()).thenReturn(client);
+            String url = randomString();
+            when(client.upload(same(content), anyString(), eq(type))).thenReturn(url);
+
+            // 调用
+            String result = fileService.createFile(content, name, null, "application/octet-stream");
+            // 断言
+            assertEquals(url, result);
+            FileDO file = fileMapper.selectOne(FileDO::getUrl, url);
+            assertEquals(name, file.getName());
+            assertEquals(type, file.getType());
+        }
+    }
+
+    @Test
+    public void testCreateFile_success_excel() throws Exception {
+        for (String extension : new String[]{"xls", "xlsx"}) {
+            // 准备参数
+            String type = "xls".equals(extension) ? "application/vnd.ms-excel"
+                    : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            byte[] content;
+            try (Workbook workbook = "xls".equals(extension) ? new HSSFWorkbook() : new XSSFWorkbook();
+                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+                workbook.createSheet("用户").createRow(0).createCell(0).setCellValue("芋道源码");
+                workbook.write(outputStream);
+                content = outputStream.toByteArray();
+            }
+            // mock 方法
+            FileClient client = mock(FileClient.class);
+            when(fileConfigService.getMasterFileClient()).thenReturn(client);
+            String url = randomString();
+            when(client.upload(same(content), anyString(), eq(type))).thenReturn(url);
+
+            // 调用
+            String result = fileService.createFile(content, "用户." + extension, null, null);
+            // 断言
+            assertEquals(url, result);
+            assertEquals(type, fileMapper.selectOne(FileDO::getUrl, url).getType());
+        }
+    }
+
+    @Test
+    public void testCreateFile_success_detectType() throws Exception {
+        for (String declaredType : new String[]{null, "", "image/jpg", "text/html", "application/octet-stream"}) {
+            // 准备参数
+            byte[] content = ResourceUtil.readBytes("file/erweima.jpg");
+            // mock 方法
+            FileClient client = mock(FileClient.class);
+            when(fileConfigService.getMasterFileClient()).thenReturn(client);
+            String url = randomString();
+            when(client.upload(same(content), anyString(), eq("image/jpeg"))).thenReturn(url);
+
+            // 调用
+            String result = fileService.createFile(content, "头像.jpg", null, declaredType);
+            // 断言
+            assertEquals(url, result);
+            assertEquals("image/jpeg", fileMapper.selectOne(FileDO::getUrl, url).getType());
+        }
+    }
+
+    @Test
+    public void testCreateFile_success_document() throws Exception {
+        for (String[] document : new String[][]{
+                {"test.svg", "<svg xmlns=\"http://www.w3.org/2000/svg\"><script>alert(1)</script></svg>", "image/svg+xml"},
+                {"test.html", "<html><script>alert(1)</script></html>", "text/html"},
+                {"test.xml", "<?xml version=\"1.0\"?><root>test</root>", "application/xml"},
+                {"test.markdown", "# test\n\nhello", "text/markdown"},
+                {"test.eml", "From: a@example.com\r\nTo: b@example.com\r\nSubject: test\r\n\r\nhello", "message/rfc822"}}) {
+            // 准备参数
+            String name = document[0];
+            byte[] content = document[1].getBytes(StandardCharsets.UTF_8);
+            String type = document[2];
+            // mock 方法
+            FileClient client = mock(FileClient.class);
+            when(fileConfigService.getMasterFileClient()).thenReturn(client);
+            String url = randomString();
+            when(client.upload(same(content), anyString(), eq(type))).thenReturn(url);
+
+            // 调用
+            String result = fileService.createFile(content, name, null, "application/octet-stream");
+            // 断言
+            assertEquals(url, result);
+            assertEquals(type, fileMapper.selectOne(FileDO::getUrl, url).getType());
+        }
+    }
+
+    @Test
+    public void testCreateFile_success_opus() throws Exception {
+        // 准备参数
+        byte[] content = new byte[64];
+        System.arraycopy("OggS".getBytes(StandardCharsets.US_ASCII), 0, content, 0, 4);
+        System.arraycopy("OpusHead".getBytes(StandardCharsets.US_ASCII), 0, content, 28, 8);
+        // mock 方法
+        FileClient client = mock(FileClient.class);
+        when(fileConfigService.getMasterFileClient()).thenReturn(client);
+        String url = randomString();
+        when(client.upload(same(content), anyString(), eq("audio/opus"))).thenReturn(url);
+
+        // 调用
+        String result = fileService.createFile(content, "voice.ogg", null, "audio/ogg;codecs=opus");
+        // 断言
+        assertEquals(url, result);
+        assertEquals("audio/opus", fileMapper.selectOne(FileDO::getUrl, url).getType());
+    }
+
+    @Test
+    public void testCreateFile_typeNotAllowed_fakeImage() {
+        for (String text : new String[]{"<html><script>alert(1)</script></html>",
+                "<svg xmlns=\"http://www.w3.org/2000/svg\"><script>alert(1)</script></svg>", "普通文本"}) {
+            // 准备参数
+            byte[] content = text.getBytes(StandardCharsets.UTF_8);
+
+            // 调用，并断言异常
+            assertServiceException(() -> fileService.createFile(content, "头像.jpg", null, "image/jpeg"),
+                    FILE_TYPE_NOT_ALLOWED);
+            // 断言未上传文件、未保存记录
+            verifyNoInteractions(fileConfigService);
+            assertEquals(0L, fileMapper.selectCount());
+        }
+    }
+
+    @Test
+    public void testCreateFile_typeNotAllowed_extension() {
+        for (String name : new String[]{"头像.svg", "头像.js", "头像.exe", "头像.unknown", "头像.png"}) {
+            // 准备参数
+            byte[] content = ResourceUtil.readBytes("file/erweima.jpg");
+
+            // 调用，并断言异常
+            assertServiceException(() -> fileService.createFile(content, name, null, "image/jpeg"), FILE_TYPE_NOT_ALLOWED);
+            // 校验调用
+            verifyNoInteractions(fileConfigService);
+        }
+    }
+
+    @Test
+    public void testCreateFile_fileIsEmpty() {
+        // 准备参数
+        byte[] content = new byte[0];
+
+        // 调用，并断言异常
+        assertServiceException(() -> fileService.createFile(content, "头像.jpg", null, null), FILE_IS_EMPTY);
+        // 校验调用
+        verifyNoInteractions(fileConfigService);
+    }
+
+    @Test
+    public void testPresignPutUrl_success() {
+        for (String extension : new String[]{"jpg", "JPEG", "jfif", "png", "gif", "webp", "bmp", "ico", "tiff",
+                "avif", "heic", "heif", "pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "txt", "csv", "md",
+                "zip", "rar", "mp3", "mp4", "svg", "html", "htm", "xml", "markdown", "eml", "msg", "epub",
+                "json", "opus", "ogg", "m4a", "webm", "amr", "wma", "wmv", "flv", "mkv"}) {
+            // 准备参数
+            String name = "测试文件." + extension;
+            // mock 方法
+            FileClient client = mock(FileClient.class);
+            when(fileConfigService.getMasterFileClient()).thenReturn(client);
+            when(client.getId()).thenReturn(10L);
+            when(client.presignPutUrl(anyString())).thenReturn("upload-url");
+            when(client.presignGetUrl(anyString(), isNull())).thenReturn("visit-url");
+
+            // 调用
+            FilePresignedUrlRespVO result = fileService.presignPutUrl(name, "avatar");
+            // 断言
+            assertEquals(10L, result.getConfigId());
+            assertTrue(result.getPath().endsWith("/" + name));
+            assertEquals("upload-url", result.getUploadUrl());
+            assertEquals("visit-url", result.getUrl());
+        }
+    }
+
+    @Test
+    public void testPresignPutUrl_typeNotAllowed() {
+        // 准备参数
+        for (String name : new String[]{"test.php", "test.jsp", "test.js", "test.exe", "test.unknown", "test"}) {
+            // 调用，并断言异常
+            assertServiceException(() -> fileService.presignPutUrl(name, null), FILE_TYPE_NOT_ALLOWED);
+            // 校验调用
+            verifyNoInteractions(fileConfigService);
+        }
+    }
+
+    @Test
     public void testDeleteFile_success() throws Exception {
         // mock 数据
         FileDO dbFile = randomPojo(FileDO.class, o -> o.setConfigId(10L).setPath("tudou.jpg"));
@@ -245,6 +445,27 @@ public class FileServiceImplTest extends BaseDbUnitTest {
         assertEquals("avatar/test.jpg", file.getPath());
         assertEquals("test.jpg", file.getName());
         assertEquals("https://www.iocoder.cn/test.jpg", file.getUrl());
+        assertEquals("image/jpeg", file.getType());
+    }
+
+    @Test
+    public void testCreateFileByPresignedPath_typeNotAllowed() {
+        for (String[] file : new String[][]{{"test.js", "avatar/test.js"}, {"test.jpg", "avatar/test.html"},
+                {"test.html", "avatar/test.jpg"}, {"test.jpg", "avatar/test.png"}}) {
+            // 准备参数
+            String name = file[0];
+            String path = file[1];
+            FileCreateReqVO reqVO = randomPojo(FileCreateReqVO.class, o -> {
+                o.setName(name);
+                o.setPath(path);
+                o.setType("image/jpeg");
+            });
+
+            // 调用，并断言异常
+            assertServiceException(() -> fileService.createFile(reqVO), FILE_TYPE_NOT_ALLOWED);
+            // 断言未保存记录
+            assertEquals(0L, fileMapper.selectCount());
+        }
     }
 
     @Test
