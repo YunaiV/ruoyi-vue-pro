@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.oa.controller.admin.mail.vo.provider;
 
+import cn.hutool.core.lang.Validator;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -67,6 +69,24 @@ public class OaMailProviderSaveReqVO {
         @JsonIgnore
         public boolean isEncryptionValid() {
             return sslEnable == null || !sslEnable.equals(starttlsEnable);
+        }
+
+        /**
+         * 校验服务器主机名或 IP，不包含协议、路径和端口
+         */
+        @AssertTrue(message = "请输入有效的服务器域名或 IP 地址")
+        @JsonIgnore
+        public boolean isHostValid() {
+            if (StrUtil.isEmpty(host)) {
+                return true;
+            }
+            if (host.contains(":")) {
+                return Validator.isIpv6(host);
+            }
+            if (host.matches("\\d+(?:\\.\\d+){3}")) {
+                return host.matches("(?:25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d)(?:\\.(?:25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d)){3}");
+            }
+            return host.matches("(?i)[a-z\\d](?:[a-z\\d-]{0,61}[a-z\\d])?(?:\\.[a-z\\d](?:[a-z\\d-]{0,61}[a-z\\d])?)*\\.?");
         }
 
     }
