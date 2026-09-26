@@ -45,6 +45,7 @@ public class CrmPermissionAspect {
 
     @Before("@annotation(crmPermission)")
     public void doBefore(JoinPoint joinPoint, CrmPermission crmPermission) {
+        // 对应 issue：https://github.com/YunaiV/ruoyi-vue-pro/pull/1221
         // 0. 系统调用（定时任务/异步线程等，无登录用户）不走数据权限校验，直接放行。
         //    数据权限是“按登录用户”的访问控制；/admin-api 外部请求必然有登录用户，
         //    故登录用户为 null 只可能是系统内部调用（如公海自动掉落定时任务），属可信进程。
