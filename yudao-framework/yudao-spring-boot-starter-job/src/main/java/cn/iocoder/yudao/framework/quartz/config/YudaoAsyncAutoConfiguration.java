@@ -13,7 +13,7 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
  * 异步任务 Configuration
  */
 @AutoConfiguration
-@EnableAsync
+@EnableAsync(proxyTargetClass = true) // proxyTargetClass=true：与 @EnableTransactionManagement(proxyTargetClass = true) 保持一致
 public class YudaoAsyncAutoConfiguration {
 
     @Bean
