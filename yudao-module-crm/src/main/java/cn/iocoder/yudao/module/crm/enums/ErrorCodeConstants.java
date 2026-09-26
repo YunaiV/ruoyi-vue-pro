@@ -81,6 +81,8 @@ public interface ErrorCodeConstants {
     ErrorCode PRODUCT_NOT_EXISTS = new ErrorCode(1_020_008_000, "产品不存在");
     ErrorCode PRODUCT_NO_EXISTS = new ErrorCode(1_020_008_001, "产品编号已存在");
     ErrorCode PRODUCT_NOT_ENABLE = new ErrorCode(1_020_008_002, "产品【{}】已禁用");
+    ErrorCode PRODUCT_DELETE_FAIL_CONTRACT_EXISTS = new ErrorCode(1_020_008_003, "产品已被合同引用，无法删除");
+    ErrorCode PRODUCT_DELETE_FAIL_BUSINESS_EXISTS = new ErrorCode(1_020_008_004, "产品已被商机引用，无法删除");
 
     // ========== 产品分类 1_020_009_000 ==========
     ErrorCode PRODUCT_CATEGORY_NOT_EXISTS = new ErrorCode(1_020_009_000, "产品分类不存在");

@@ -11,7 +11,19 @@ import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ProductSa
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductCategoryDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductUnitDO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseInItemDO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderItemDO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseReturnItemDO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.sale.ErpSaleOrderItemDO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.sale.ErpSaleOutItemDO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.sale.ErpSaleReturnItemDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.product.ErpProductMapper;
+import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseInItemMapper;
+import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseOrderItemMapper;
+import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseReturnItemMapper;
+import cn.iocoder.yudao.module.erp.dal.mysql.sale.ErpSaleOrderItemMapper;
+import cn.iocoder.yudao.module.erp.dal.mysql.sale.ErpSaleOutItemMapper;
+import cn.iocoder.yudao.module.erp.dal.mysql.sale.ErpSaleReturnItemMapper;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -38,6 +50,18 @@ public class ErpProductServiceImpl implements ErpProductService {
     private ErpProductCategoryService productCategoryService;
     @Resource
     private ErpProductUnitService productUnitService;
+    @Resource
+    private ErpPurchaseOrderItemMapper purchaseOrderItemMapper;
+    @Resource
+    private ErpPurchaseInItemMapper purchaseInItemMapper;
+    @Resource
+    private ErpPurchaseReturnItemMapper purchaseReturnItemMapper;
+    @Resource
+    private ErpSaleOrderItemMapper saleOrderItemMapper;
+    @Resource
+    private ErpSaleOutItemMapper saleOutItemMapper;
+    @Resource
+    private ErpSaleReturnItemMapper saleReturnItemMapper;
 
     @Override
     public Long createProduct(ProductSaveReqVO createReqVO) {
@@ -63,6 +87,25 @@ public class ErpProductServiceImpl implements ErpProductService {
     public void deleteProduct(Long id) {
         // 校验存在
         validateProductExists(id);
+        // 校验未被任何业务单据明细引用，避免删除后产生悬空引用
+        if (purchaseOrderItemMapper.selectCount(ErpPurchaseOrderItemDO::getProductId, id) > 0) {
+            throw exception(PRODUCT_DELETE_FAIL_PURCHASE_ORDER_EXISTS);
+        }
+        if (purchaseInItemMapper.selectCount(ErpPurchaseInItemDO::getProductId, id) > 0) {
+            throw exception(PRODUCT_DELETE_FAIL_PURCHASE_IN_EXISTS);
+        }
+        if (purchaseReturnItemMapper.selectCount(ErpPurchaseReturnItemDO::getProductId, id) > 0) {
+            throw exception(PRODUCT_DELETE_FAIL_PURCHASE_RETURN_EXISTS);
+        }
+        if (saleOrderItemMapper.selectCount(ErpSaleOrderItemDO::getProductId, id) > 0) {
+            throw exception(PRODUCT_DELETE_FAIL_SALE_ORDER_EXISTS);
+        }
+        if (saleOutItemMapper.selectCount(ErpSaleOutItemDO::getProductId, id) > 0) {
+            throw exception(PRODUCT_DELETE_FAIL_SALE_OUT_EXISTS);
+        }
+        if (saleReturnItemMapper.selectCount(ErpSaleReturnItemDO::getProductId, id) > 0) {
+            throw exception(PRODUCT_DELETE_FAIL_SALE_RETURN_EXISTS);
+        }
         // 删除
         productMapper.deleteById(id);
     }
