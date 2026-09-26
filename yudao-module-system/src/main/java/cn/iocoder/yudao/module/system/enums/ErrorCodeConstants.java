@@ -46,6 +46,8 @@ public interface ErrorCodeConstants {
     ErrorCode USER_IMPORT_INIT_PASSWORD = new ErrorCode(1_002_003_009, "初始密码不能为空");
     ErrorCode USER_MOBILE_NOT_EXISTS = new ErrorCode(1_002_003_010, "该手机号尚未注册");
     ErrorCode USER_REGISTER_DISABLED = new ErrorCode(1_002_003_011, "注册功能已关闭");
+    ErrorCode USER_ADMIN_NOT_ALLOW_DISABLE = new ErrorCode(1_002_003_012, "超级管理员或租户管理员账号不能禁用");
+    ErrorCode USER_ADMIN_NOT_ALLOW_DELETE = new ErrorCode(1_002_003_013, "超级管理员或租户管理员账号不能删除");
 
     // ========== 部门模块 1-002-004-000 ==========
     ErrorCode DEPT_NAME_DUPLICATE = new ErrorCode(1_002_004_000, "已经存在该名字的部门");
