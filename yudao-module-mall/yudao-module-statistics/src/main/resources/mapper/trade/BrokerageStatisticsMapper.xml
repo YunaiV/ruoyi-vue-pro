@@ -9,6 +9,9 @@
           AND status = #{status}
           AND unfreeze_time BETWEEN #{beginTime} AND #{endTime}
           AND deleted = FALSE
+        <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
+            AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
+        </if>
     </select>
 
     <select id="selectWithdrawCountByStatus" resultType="java.lang.Long">
@@ -16,6 +19,9 @@
         FROM trade_brokerage_withdraw
         WHERE status = #{status}
           AND deleted = FALSE
+        <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
+            AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
+        </if>
     </select>
 
 </mapper>

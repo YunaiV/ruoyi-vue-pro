@@ -128,6 +128,27 @@ public class HrmSalaryMonthRecordServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
+    public void testCreateMonthRecord_emptyOptionCategory() {
+        // mock 数据：加班工资明细已隐藏，基本工资明细仍可见
+        when(salaryOptionService.getSalaryOptionList(false, true)).thenReturn(Arrays.asList(
+                HrmSalaryOptionDO.builder().code(10).parentCode(0).name("基本工资").build(),
+                HrmSalaryOptionDO.builder().code(10101).parentCode(10).name("岗位工资").build(),
+                HrmSalaryOptionDO.builder().code(180).parentCode(0).name("加班工资").build()));
+        HrmSalaryMonthRecordCreateReqVO reqVO =
+                new HrmSalaryMonthRecordCreateReqVO().setYear(2026).setMonth(7);
+
+        // 调用
+        Long id = monthRecordService.createMonthRecord(reqVO);
+
+        // 断言：不生成空分类，避免前端把分类当成工资项
+        List<HrmSalaryMonthRecordDO.OptionHeader> headers = monthRecordMapper.selectById(id).getOptionHeaders();
+        assertEquals(1, headers.size());
+        assertEquals(Integer.valueOf(10), headers.get(0).getCode());
+        assertEquals(1, headers.get(0).getChildren().size());
+        assertEquals(Integer.valueOf(10101), headers.get(0).getChildren().get(0).getCode());
+    }
+
+    @Test
     public void testCreateMonthRecord_salaryConfigCycle() {
         // mock 数据
         when(salaryConfigService.getSalaryConfig()).thenReturn(
