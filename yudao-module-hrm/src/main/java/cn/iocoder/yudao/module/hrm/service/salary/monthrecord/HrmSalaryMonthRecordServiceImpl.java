@@ -711,6 +711,8 @@ public class HrmSalaryMonthRecordServiceImpl implements HrmSalaryMonthRecordServ
                 convertMultiMap(options, HrmSalaryOptionDO::getParentCode);
         List<HrmSalaryOptionDO> categories =
                 childrenMap.getOrDefault(ROOT_PARENT_CODE, Collections.emptyList());
+        // 分类下没有可见明细时，不生成空表头
+        categories = filterList(categories, category -> CollUtil.isNotEmpty(childrenMap.get(category.getCode())));
         return convertList(categories, category -> {
             List<HrmSalaryMonthRecordDO.OptionHeader> children = convertList(
                     childrenMap.getOrDefault(category.getCode(), Collections.emptyList()),
