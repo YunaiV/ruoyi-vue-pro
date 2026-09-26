@@ -16,6 +16,7 @@ public interface ErrorCodeConstants {
     ErrorCode CATEGORY_EXISTS_CHILDREN = new ErrorCode(1_008_001_003, "存在子分类，无法删除");
     ErrorCode CATEGORY_DISABLED = new ErrorCode(1_008_001_004, "商品分类({})已禁用，无法使用");
     ErrorCode CATEGORY_HAVE_BIND_SPU = new ErrorCode(1_008_001_005, "类别下存在商品，无法删除");
+    ErrorCode CATEGORY_PARENT_IS_SELF = new ErrorCode(1_008_001_006, "父分类不能设置为分类自身");
 
     // ========== 商品品牌相关编号 1-008-002-000 ==========
     ErrorCode BRAND_NOT_EXISTS = new ErrorCode(1_008_002_000, "品牌不存在");
