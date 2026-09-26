@@ -11,6 +11,7 @@ import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseInDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseInItemDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderDO;
+import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderItemDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseInItemMapper;
 import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseInMapper;
 import cn.iocoder.yudao.module.erp.dal.redis.no.ErpNoRedisDAO;
@@ -144,13 +145,25 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
     }
 
     private void updatePurchaseOrderInCount(Long orderId) {
-        // 1.1 查询采购订单对应的采购入库单列表
-        List<ErpPurchaseInDO> purchaseIns = purchaseInMapper.selectListByOrderId(orderId);
-        // 1.2 查询对应的采购订单项的入库数量
-        Map<Long, BigDecimal> returnCountMap = purchaseInItemMapper.selectOrderItemCountSumMapByInIds(
-                convertList(purchaseIns, ErpPurchaseInDO::getId));
-        // 2. 更新采购订单的入库数量
-        purchaseOrderService.updatePurchaseOrderInCount(orderId, returnCountMap);
+        // 1.1 查询「已审核」采购入库单：入库进度（inCount 展示）只统计已审核的入库单，反审核后自然回退
+        List<ErpPurchaseInDO> approvedIns = purchaseInMapper.selectListByOrderId(orderId);
+        Map<Long, BigDecimal> inCountMap = purchaseInItemMapper.selectOrderItemCountSumMapByInIds(
+                convertList(approvedIns, ErpPurchaseInDO::getId));
+        // 1.2 查询「全部」采购入库单（含未审核）：超订单数量校验需统计全部入库单，未审核入库单同样占用可入库额度
+        List<ErpPurchaseInDO> allIns = purchaseInMapper.selectListAllByOrderId(orderId);
+        Map<Long, BigDecimal> allCountMap = purchaseInItemMapper.selectOrderItemCountSumMapByInIds(
+                convertList(allIns, ErpPurchaseInDO::getId));
+        // 2. 超订单数量校验：全部入库单（含未审核）数量之和不得超过采购订单项数量
+        List<ErpPurchaseOrderItemDO> orderItems = purchaseOrderService.getPurchaseOrderItemListByOrderId(orderId);
+        for (ErpPurchaseOrderItemDO item : orderItems) {
+            BigDecimal allCount = allCountMap.getOrDefault(item.getId(), BigDecimal.ZERO);
+            if (allCount.compareTo(item.getCount()) > 0) {
+                throw exception(PURCHASE_ORDER_ITEM_IN_FAIL_PRODUCT_EXCEED,
+                        productService.getProduct(item.getProductId()).getName(), item.getCount());
+            }
+        }
+        // 3. 更新采购订单的入库数量（inCount 展示 = 已审核）
+        purchaseOrderService.updatePurchaseOrderInCount(orderId, inCountMap);
     }
 
     @Override
@@ -185,6 +198,9 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
                     purchaseInItem.getProductId(), purchaseInItem.getWarehouseId(), count,
                     bizType, purchaseInItem.getInId(), purchaseInItem.getId(), purchaseIn.getNo()));
         });
+
+        // 4. 状态变更后重算采购订单入库进度（反审核的入库单不再计入，inCount 自然回退）
+        updatePurchaseOrderInCount(purchaseIn.getOrderId());
     }
 
     @Override
