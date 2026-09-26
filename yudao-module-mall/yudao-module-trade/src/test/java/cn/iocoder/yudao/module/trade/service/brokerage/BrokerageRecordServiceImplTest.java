@@ -11,10 +11,12 @@ import cn.iocoder.yudao.module.product.api.spu.dto.ProductSpuRespDTO;
 import cn.iocoder.yudao.module.trade.controller.admin.brokerage.vo.record.BrokerageRecordPageReqVO;
 import cn.iocoder.yudao.module.trade.controller.app.brokerage.vo.record.AppBrokerageProductPriceRespVO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageRecordDO;
+import cn.iocoder.yudao.module.trade.dal.dataobject.brokerage.BrokerageUserDO;
 import cn.iocoder.yudao.module.trade.dal.dataobject.config.TradeConfigDO;
 import cn.iocoder.yudao.module.trade.dal.mysql.brokerage.BrokerageRecordMapper;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordBizTypeEnum;
 import cn.iocoder.yudao.module.trade.enums.brokerage.BrokerageRecordStatusEnum;
+import cn.iocoder.yudao.module.trade.service.brokerage.bo.BrokerageAddReqBO;
 import cn.iocoder.yudao.module.trade.service.config.TradeConfigService;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
@@ -22,6 +24,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.math.RoundingMode;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildBetweenTime;
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
@@ -30,6 +33,7 @@ import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEq
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -94,6 +98,26 @@ public class BrokerageRecordServiceImplTest extends BaseDbUnitTest {
         assertEquals(1, pageResult.getTotal());
         assertEquals(1, pageResult.getList().size());
         assertPojoEquals(dbBrokerageRecord, pageResult.getList().get(0));
+    }
+
+    @Test
+    public void testAddBrokerage_usesOrderBrokerageUser() {
+        TradeConfigDO tradeConfig = new TradeConfigDO();
+        tradeConfig.setBrokerageEnabled(true);
+        tradeConfig.setBrokerageFirstPercent(10);
+        when(tradeConfigService.getTradeConfig()).thenReturn(tradeConfig);
+        BrokerageUserDO orderBrokerageUser = new BrokerageUserDO().setId(200L).setBrokerageEnabled(true)
+                .setBrokeragePrice(0);
+        when(brokerageUserService.getBrokerageUser(200L)).thenReturn(orderBrokerageUser);
+
+        brokerageRecordService.addBrokerage(100L, 200L, BrokerageRecordBizTypeEnum.ORDER,
+                ListUtil.of(new BrokerageAddReqBO("1", 1000, null, null, 100L, "订单商品")));
+
+        List<BrokerageRecordDO> records = brokerageRecordMapper.selectList(null);
+        assertEquals(1, records.size());
+        assertEquals(200L, records.get(0).getUserId());
+        assertEquals(100, records.get(0).getPrice());
+        verify(brokerageUserService).updateUserPrice(200L, 100);
     }
 
     @Test
