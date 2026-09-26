@@ -40,6 +40,7 @@ import java.util.Map;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.module.hrm.enums.ErrorCodeConstants.SALARY_CHANGE_EFFECT_DATE_INVALID;
 import static cn.iocoder.yudao.module.hrm.enums.ErrorCodeConstants.SALARY_CHANGE_RECORD_STATUS_INVALID;
+import static cn.iocoder.yudao.module.hrm.enums.ErrorCodeConstants.SALARY_DATA_ILLEGAL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -163,6 +164,50 @@ public class HrmSalaryEmployeeInfoServiceImplTest extends BaseDbUnitTest {
         assertEquals(HrmSalaryChangeRecordStatusEnum.EFFECTIVE.getStatus(), changeRecord.getStatus());
         assertAmount("0", changeRecord.getBeforeTotal());
         assertAmount("10000.00", changeRecord.getAfterTotal());
+    }
+
+    @Test
+    public void testUpdateSalaryEmployeeInfo_salaryOptionInvalid() {
+        // mock 数据
+        mockSalaryOptions();
+        HrmEmployeeDO employee = mockEmployee(1L, HrmEmployeeStatusEnum.REGULAR.getStatus());
+        // 准备参数
+        HrmSalaryEmployeeInfoUpdateReqVO reqVO = buildSetSalaryReqVO(employee.getId(),
+                new BigDecimal("8000"), new BigDecimal("2000"), new BigDecimal("6000"));
+
+        // 调用，并断言加班工资、考勤扣款不能作为定薪项
+        for (Integer code : Arrays.asList(180101, 190101, 190102, 190103, 190104, 190105, 190106)) {
+            reqVO.setSalaryOptions(Collections.singletonList(
+                    optionValue(code, "系统计算项", new BigDecimal("100"))));
+            assertServiceException(() -> salaryEmployeeInfoService.updateSalaryEmployeeInfo(reqVO),
+                    SALARY_DATA_ILLEGAL);
+        }
+
+        // 断言未写入薪资档案和调薪记录
+        assertEquals(0L, salaryEmployeeInfoMapper.selectCount());
+        verify(salaryChangeRecordService, never()).createSalaryChangeRecord(any());
+    }
+
+    @Test
+    public void testUpdateSalaryEmployeeInfo_probationSalaryOptionInvalid() {
+        // mock 数据
+        mockSalaryOptions();
+        HrmEmployeeDO employee = mockEmployee(1L, HrmEmployeeStatusEnum.REGULAR.getStatus());
+        // 准备参数
+        HrmSalaryEmployeeInfoUpdateReqVO reqVO = buildSetSalaryReqVO(employee.getId(),
+                new BigDecimal("8000"), new BigDecimal("2000"), new BigDecimal("6000"));
+
+        // 调用，并断言加班工资、考勤扣款不能作为定薪项
+        for (Integer code : Arrays.asList(180101, 190101, 190102, 190103, 190104, 190105, 190106)) {
+            reqVO.setProbationSalaryOptions(Collections.singletonList(
+                    optionValue(code, "系统计算项", new BigDecimal("100"))));
+            assertServiceException(() -> salaryEmployeeInfoService.updateSalaryEmployeeInfo(reqVO),
+                    SALARY_DATA_ILLEGAL);
+        }
+
+        // 断言未写入薪资档案和调薪记录
+        assertEquals(0L, salaryEmployeeInfoMapper.selectCount());
+        verify(salaryChangeRecordService, never()).createSalaryChangeRecord(any());
     }
 
     @Test
@@ -317,7 +362,7 @@ public class HrmSalaryEmployeeInfoServiceImplTest extends BaseDbUnitTest {
     public void testGetSalaryImportOptionList() {
         // mock 数据
         List<HrmSalaryOptionDO> options = buildSalaryOptions();
-        when(salaryOptionService.getSalaryOptionList(false)).thenReturn(options);
+        when(salaryOptionService.getSalaryOptionList(true)).thenReturn(options);
 
         // 调用
         List<HrmSalaryOptionDO> result =
@@ -435,7 +480,7 @@ public class HrmSalaryEmployeeInfoServiceImplTest extends BaseDbUnitTest {
     }
 
     private void mockSalaryOptions() {
-        when(salaryOptionService.getSalaryOptionList(false))
+        when(salaryOptionService.getSalaryOptionList(true))
                 .thenReturn(buildSalaryOptions());
     }
 
