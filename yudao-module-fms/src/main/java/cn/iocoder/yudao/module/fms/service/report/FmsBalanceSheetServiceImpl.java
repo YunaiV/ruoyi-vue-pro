@@ -302,12 +302,12 @@ public class FmsBalanceSheetServiceImpl implements FmsBalanceSheetService {
         YearMonth endMonth = LocalDateTimeUtils.parseYearMonth(listReqVO.getEndMonth());
         for (YearMonth currentMonth = LocalDateTimeUtils.parseYearMonth(listReqVO.getStartMonth());
                 !currentMonth.isAfter(endMonth); currentMonth = currentMonth.plusMonths(1)) {
-            FmsClosingQueryReqVO closingQueryReqVO = new FmsClosingQueryReqVO();
-            closingQueryReqVO.setAccountSetId(listReqVO.getAccountSetId());
-            closingQueryReqVO.setMonth(currentMonth.toString());
-            FmsClosingOverviewRespVO overview = closingPeriodService.getClosingOverview(closingQueryReqVO, userId);
+            // 直接查当月损益余额，不再重入 getClosingOverview
+            //（其内部会回调本类 checkBalanceSheet → 本方法，对同月构成无界自递归，栈溢出）
+            BigDecimal profitLossBalance = closingPeriodService.getProfitLossBalance(
+                    listReqVO.getAccountSetId(), currentMonth.toString(), userId);
             // 当月损益余额不为零时，说明存在尚未结转的损益
-            if (NumberUtils.zeroIfNull(overview.getProfitLossBalance()).signum() != 0) {
+            if (NumberUtils.zeroIfNull(profitLossBalance).signum() != 0) {
                 return false;
             }
         }
