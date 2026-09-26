@@ -144,7 +144,7 @@ public interface LogRecordConstants {
     String CRM_RECEIVABLE_CREATE_SUB_TYPE = "创建回款";
     String CRM_RECEIVABLE_CREATE_SUCCESS = "创建了合同【{getContractById{#receivable.contractId}}】的{{#period != null ? '【第'+ #period +'期】' : '编号为【'+ #receivable.no +'】的'}}回款";
     String CRM_RECEIVABLE_UPDATE_SUB_TYPE = "更新回款";
-    String CRM_RECEIVABLE_UPDATE_SUCCESS = "更新了合同【{getContractById{#receivable.contractId}}】的{{#period != null ? '【第'+ #period +'期】' : '编号为【'+ #receivable.no +'】的'}}回款: {_DIFF{#updateReqVO}}";
+    String CRM_RECEIVABLE_UPDATE_SUCCESS = "更新了合同【{getContractById{#oldReceivable.contractId}}】的{{#period != null ? '【第'+ #period +'期】' : '编号为【'+ #oldReceivable.no +'】的'}}回款: {_DIFF{#updateReqVO}}";
     String CRM_RECEIVABLE_DELETE_SUB_TYPE = "删除回款";
     String CRM_RECEIVABLE_DELETE_SUCCESS = "删除了合同【{getContractById{#receivable.contractId}}】的{{#period != null ? '【第'+ #period +'期】' : '编号为【'+ #receivable.no +'】的'}}回款";
     String CRM_RECEIVABLE_SUBMIT_SUB_TYPE = "提交回款审批";

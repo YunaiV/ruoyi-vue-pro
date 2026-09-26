@@ -313,4 +313,9 @@ public class ErpSaleReturnServiceImpl implements ErpSaleReturnService {
         return saleReturnItemMapper.selectListByReturnIds(returnIds);
     }
 
+    @Override
+    public Long getSaleReturnItemCountByProductId(Long productId) {
+        return saleReturnItemMapper.selectCount(ErpSaleReturnItemDO::getProductId, productId);
+    }
+
 }

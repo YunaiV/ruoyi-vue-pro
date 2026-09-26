@@ -116,7 +116,7 @@ public class CrmReceivablePlanServiceImpl implements CrmReceivablePlanService {
         }
         // 校验合同存在
         if (reqVO.getContractId() != null) {
-            CrmContractDO contract = contractService.getContract(reqVO.getContractId());
+            CrmContractDO contract = contractService.validateContract(reqVO.getContractId());
             reqVO.setCustomerId(contract.getCustomerId());
         }
     }

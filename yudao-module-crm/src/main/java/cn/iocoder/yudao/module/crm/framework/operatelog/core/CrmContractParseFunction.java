@@ -24,7 +24,8 @@ public class CrmContractParseFunction implements IParseFunction {
 
     @Override
     public boolean executeBefore() {
-        return true; // 先转换值后对比
+        // 可见 https://github.com/YunaiV/ruoyi-vue-pro/pull/1247 描述
+        return false;
     }
 
     @Override

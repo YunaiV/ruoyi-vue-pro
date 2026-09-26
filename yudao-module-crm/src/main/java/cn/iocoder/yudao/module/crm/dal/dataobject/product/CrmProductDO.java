@@ -43,7 +43,7 @@ public class CrmProductDO extends BaseDO {
      *
      * 字典 {@link DictTypeConstants#CRM_PRODUCT_UNIT}
      */
-    private Integer unit;
+    private int unit;
     /**
      * 价格，单位：元
      */

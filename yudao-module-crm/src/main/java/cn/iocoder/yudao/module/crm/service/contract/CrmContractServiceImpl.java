@@ -217,6 +217,10 @@ public class CrmContractServiceImpl implements CrmContractService {
 
     private void calculateTotalPrice(CrmContractDO contract, List<CrmContractProductDO> contractProducts) {
         contract.setTotalProductPrice(getSumValue(contractProducts, CrmContractProductDO::getTotalPrice, BigDecimal::add, BigDecimal.ZERO));
+        // 无产品明细的合同，合同金额以传入值为准（支持手工填写合同金额），不做重算覆盖
+        if (CollUtil.isEmpty(contractProducts)) {
+            return;
+        }
         BigDecimal discountPrice = MoneyUtils.priceMultiplyPercent(contract.getTotalProductPrice(), contract.getDiscountPercent());
         contract.setTotalPrice(contract.getTotalProductPrice().subtract(discountPrice));
     }
@@ -392,6 +396,11 @@ public class CrmContractServiceImpl implements CrmContractService {
     @Override
     public List<CrmContractProductDO> getContractProductListByContractId(Long contactId) {
         return contractProductMapper.selectListByContractId(contactId);
+    }
+
+    @Override
+    public Long getContractProductCountByProductId(Long productId) {
+        return contractProductMapper.selectCount(CrmContractProductDO::getProductId, productId);
     }
 
     @Override
