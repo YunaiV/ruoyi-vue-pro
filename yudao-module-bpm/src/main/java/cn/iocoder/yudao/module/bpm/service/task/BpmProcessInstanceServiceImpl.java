@@ -772,10 +772,9 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
     }
 
     /**
-     * 校验动态表单（formType=10 流程表单）的必填字段
+     * 校验动态表单的必填字段
      *
-     * 注意：仅校验接口发起（VO 路径）入口。内部业务链路（DTO 路径，例如 OA 请假）
-     * 由业务代码自行组装变量，不经过本校验，避免误伤。
+     * @see <a href="https://github.com/YunaiV/ruoyi-vue-pro/pull/1245">相关 issue</a>
      */
     private void validateDynamicFormRequiredFields(ProcessDefinition definition, Map<String, Object> variables) {
         BpmProcessDefinitionInfoDO processDefinitionInfo = processDefinitionService
@@ -806,8 +805,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             }
             Object value = variables == null ? null : variables.get(fieldId);
             if (value == null || (value instanceof String && StrUtil.isBlank((String) value))) {
-                throw exception(PROCESS_INSTANCE_START_FORM_FIELD_REQUIRED,
-                        Convert.toStr(field.get("title"), fieldId));
+                throw exception(PROCESS_INSTANCE_START_FORM_FIELD_REQUIRED, Convert.toStr(field.get("title"), fieldId));
             }
         }
     }
