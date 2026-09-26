@@ -323,4 +323,9 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
         return purchaseInItemMapper.selectListByInIds(inIds);
     }
 
+    @Override
+    public Long getPurchaseInItemCountByProductId(Long productId) {
+        return purchaseInItemMapper.selectCount(ErpPurchaseInItemDO::getProductId, productId);
+    }
+
 }

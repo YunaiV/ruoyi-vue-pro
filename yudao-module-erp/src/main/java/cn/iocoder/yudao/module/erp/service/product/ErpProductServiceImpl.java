@@ -11,20 +11,15 @@ import cn.iocoder.yudao.module.erp.controller.admin.product.vo.product.ProductSa
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductCategoryDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductUnitDO;
-import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseInItemDO;
-import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseOrderItemDO;
-import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseReturnItemDO;
-import cn.iocoder.yudao.module.erp.dal.dataobject.sale.ErpSaleOrderItemDO;
-import cn.iocoder.yudao.module.erp.dal.dataobject.sale.ErpSaleOutItemDO;
-import cn.iocoder.yudao.module.erp.dal.dataobject.sale.ErpSaleReturnItemDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.product.ErpProductMapper;
-import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseInItemMapper;
-import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseOrderItemMapper;
-import cn.iocoder.yudao.module.erp.dal.mysql.purchase.ErpPurchaseReturnItemMapper;
-import cn.iocoder.yudao.module.erp.dal.mysql.sale.ErpSaleOrderItemMapper;
-import cn.iocoder.yudao.module.erp.dal.mysql.sale.ErpSaleOutItemMapper;
-import cn.iocoder.yudao.module.erp.dal.mysql.sale.ErpSaleReturnItemMapper;
+import cn.iocoder.yudao.module.erp.service.purchase.ErpPurchaseInService;
+import cn.iocoder.yudao.module.erp.service.purchase.ErpPurchaseOrderService;
+import cn.iocoder.yudao.module.erp.service.purchase.ErpPurchaseReturnService;
+import cn.iocoder.yudao.module.erp.service.sale.ErpSaleOrderService;
+import cn.iocoder.yudao.module.erp.service.sale.ErpSaleOutService;
+import cn.iocoder.yudao.module.erp.service.sale.ErpSaleReturnService;
 import jakarta.annotation.Resource;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -51,17 +46,23 @@ public class ErpProductServiceImpl implements ErpProductService {
     @Resource
     private ErpProductUnitService productUnitService;
     @Resource
-    private ErpPurchaseOrderItemMapper purchaseOrderItemMapper;
+    @Lazy // 延迟加载，避免循环依赖
+    private ErpPurchaseOrderService purchaseOrderService;
     @Resource
-    private ErpPurchaseInItemMapper purchaseInItemMapper;
+    @Lazy // 延迟加载，避免循环依赖
+    private ErpPurchaseInService purchaseInService;
     @Resource
-    private ErpPurchaseReturnItemMapper purchaseReturnItemMapper;
+    @Lazy // 延迟加载，避免循环依赖
+    private ErpPurchaseReturnService purchaseReturnService;
     @Resource
-    private ErpSaleOrderItemMapper saleOrderItemMapper;
+    @Lazy // 延迟加载，避免循环依赖
+    private ErpSaleOrderService saleOrderService;
     @Resource
-    private ErpSaleOutItemMapper saleOutItemMapper;
+    @Lazy // 延迟加载，避免循环依赖
+    private ErpSaleOutService saleOutService;
     @Resource
-    private ErpSaleReturnItemMapper saleReturnItemMapper;
+    @Lazy // 延迟加载，避免循环依赖
+    private ErpSaleReturnService saleReturnService;
 
     @Override
     public Long createProduct(ProductSaveReqVO createReqVO) {
@@ -88,22 +89,22 @@ public class ErpProductServiceImpl implements ErpProductService {
         // 校验存在
         validateProductExists(id);
         // 校验未被任何业务单据明细引用，避免删除后产生悬空引用
-        if (purchaseOrderItemMapper.selectCount(ErpPurchaseOrderItemDO::getProductId, id) > 0) {
+        if (purchaseOrderService.getPurchaseOrderItemCountByProductId(id) > 0) {
             throw exception(PRODUCT_DELETE_FAIL_PURCHASE_ORDER_EXISTS);
         }
-        if (purchaseInItemMapper.selectCount(ErpPurchaseInItemDO::getProductId, id) > 0) {
+        if (purchaseInService.getPurchaseInItemCountByProductId(id) > 0) {
             throw exception(PRODUCT_DELETE_FAIL_PURCHASE_IN_EXISTS);
         }
-        if (purchaseReturnItemMapper.selectCount(ErpPurchaseReturnItemDO::getProductId, id) > 0) {
+        if (purchaseReturnService.getPurchaseReturnItemCountByProductId(id) > 0) {
             throw exception(PRODUCT_DELETE_FAIL_PURCHASE_RETURN_EXISTS);
         }
-        if (saleOrderItemMapper.selectCount(ErpSaleOrderItemDO::getProductId, id) > 0) {
+        if (saleOrderService.getSaleOrderItemCountByProductId(id) > 0) {
             throw exception(PRODUCT_DELETE_FAIL_SALE_ORDER_EXISTS);
         }
-        if (saleOutItemMapper.selectCount(ErpSaleOutItemDO::getProductId, id) > 0) {
+        if (saleOutService.getSaleOutItemCountByProductId(id) > 0) {
             throw exception(PRODUCT_DELETE_FAIL_SALE_OUT_EXISTS);
         }
-        if (saleReturnItemMapper.selectCount(ErpSaleReturnItemDO::getProductId, id) > 0) {
+        if (saleReturnService.getSaleReturnItemCountByProductId(id) > 0) {
             throw exception(PRODUCT_DELETE_FAIL_SALE_RETURN_EXISTS);
         }
         // 删除

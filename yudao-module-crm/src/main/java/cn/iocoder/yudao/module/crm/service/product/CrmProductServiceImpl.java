@@ -5,17 +5,15 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.crm.controller.admin.product.vo.product.CrmProductPageReqVO;
 import cn.iocoder.yudao.module.crm.controller.admin.product.vo.product.CrmProductSaveReqVO;
-import cn.iocoder.yudao.module.crm.dal.dataobject.business.CrmBusinessProductDO;
-import cn.iocoder.yudao.module.crm.dal.dataobject.contract.CrmContractProductDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductCategoryDO;
 import cn.iocoder.yudao.module.crm.dal.dataobject.product.CrmProductDO;
-import cn.iocoder.yudao.module.crm.dal.mysql.business.CrmBusinessProductMapper;
-import cn.iocoder.yudao.module.crm.dal.mysql.contract.CrmContractProductMapper;
 import cn.iocoder.yudao.module.crm.dal.mysql.product.CrmProductMapper;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
 import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
 import cn.iocoder.yudao.module.crm.enums.product.CrmProductStatusEnum;
 import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPermission;
+import cn.iocoder.yudao.module.crm.service.business.CrmBusinessService;
+import cn.iocoder.yudao.module.crm.service.contract.CrmContractService;
 import cn.iocoder.yudao.module.crm.service.permission.CrmPermissionService;
 import cn.iocoder.yudao.module.crm.service.permission.bo.CrmPermissionCreateReqBO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -23,6 +21,7 @@ import com.mzt.logapi.context.LogRecordContext;
 import com.mzt.logapi.service.impl.DiffParseFunction;
 import com.mzt.logapi.starter.annotation.LogRecord;
 import jakarta.annotation.Resource;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -53,9 +52,11 @@ public class CrmProductServiceImpl implements CrmProductService {
     @Resource
     private CrmProductCategoryService productCategoryService;
     @Resource
-    private CrmContractProductMapper contractProductMapper;
+    @Lazy // 延迟加载，避免循环依赖
+    private CrmContractService contractService;
     @Resource
-    private CrmBusinessProductMapper businessProductMapper;
+    @Lazy // 延迟加载，避免循环依赖
+    private CrmBusinessService businessService;
     @Resource
     private CrmPermissionService permissionService;
 
@@ -137,12 +138,13 @@ public class CrmProductServiceImpl implements CrmProductService {
         // 校验存在
         validateProductExists(id);
         // 校验未被合同/商机引用，避免删除后产生悬空引用
-        if (contractProductMapper.selectCount(CrmContractProductDO::getProductId, id) > 0) {
+        if (contractService.getContractProductCountByProductId(id) > 0) {
             throw exception(PRODUCT_DELETE_FAIL_CONTRACT_EXISTS);
         }
-        if (businessProductMapper.selectCount(CrmBusinessProductDO::getProductId, id) > 0) {
+        if (businessService.getBusinessProductCountByProductId(id) > 0) {
             throw exception(PRODUCT_DELETE_FAIL_BUSINESS_EXISTS);
         }
+
         // 删除
         productMapper.deleteById(id);
     }

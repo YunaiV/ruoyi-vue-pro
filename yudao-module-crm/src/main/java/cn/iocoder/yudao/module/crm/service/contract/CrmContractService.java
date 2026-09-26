@@ -178,6 +178,14 @@ public interface CrmContractService {
     List<CrmContractProductDO> getContractProductListByContractId(Long contactId);
 
     /**
+     * 获得引用指定产品的合同产品数量
+     *
+     * @param productId 产品编号
+     * @return 数量
+     */
+    Long getContractProductCountByProductId(Long productId);
+
+    /**
      * 获得待审核合同数量
      *
      * @param userId 用户编号

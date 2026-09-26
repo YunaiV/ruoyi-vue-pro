@@ -395,6 +395,11 @@ public class CrmContractServiceImpl implements CrmContractService {
     }
 
     @Override
+    public Long getContractProductCountByProductId(Long productId) {
+        return contractProductMapper.selectCount(CrmContractProductDO::getProductId, productId);
+    }
+
+    @Override
     public Long getAuditContractCount(Long userId) {
         return contractMapper.selectCountByAudit(userId);
     }
