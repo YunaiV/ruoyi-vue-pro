@@ -65,16 +65,13 @@ public interface ErpPurchaseInMapper extends BaseMapperX<ErpPurchaseInDO> {
     }
 
     default List<ErpPurchaseInDO> selectListByOrderId(Long orderId) {
-        // 入库进度只统计「已审核」的入库单：未审核/已反审核的入库单不计入订单 inCount（反审核后自然回退）
-        return selectList(new LambdaQueryWrapper<ErpPurchaseInDO>()
-                .eq(ErpPurchaseInDO::getOrderId, orderId)
-                .eq(ErpPurchaseInDO::getStatus, ErpAuditStatus.APPROVE.getStatus()));
+        return selectList(ErpPurchaseInDO::getOrderId, orderId);
     }
 
-    default List<ErpPurchaseInDO> selectListAllByOrderId(Long orderId) {
-        // 超订单数量校验需要统计「全部」入库单（含未审核）：未审核入库单同样占用订单可入库额度
+    default List<ErpPurchaseInDO> selectListByOrderIdAndStatus(Long orderId, Integer status) {
         return selectList(new LambdaQueryWrapper<ErpPurchaseInDO>()
-                .eq(ErpPurchaseInDO::getOrderId, orderId));
+                .eq(ErpPurchaseInDO::getOrderId, orderId)
+                .eq(ErpPurchaseInDO::getStatus, status));
     }
 
 }

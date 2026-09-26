@@ -145,15 +145,16 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
     }
 
     private void updatePurchaseOrderInCount(Long orderId) {
-        // 1.1 查询「已审核」采购入库单：入库进度（inCount 展示）只统计已审核的入库单，反审核后自然回退
-        List<ErpPurchaseInDO> approvedIns = purchaseInMapper.selectListByOrderId(orderId);
+        // 1.1 查询已审核入库单，计算入库进度
+        List<ErpPurchaseInDO> approvedIns = purchaseInMapper.selectListByOrderIdAndStatus(
+                orderId, ErpAuditStatus.APPROVE.getStatus());
         Map<Long, BigDecimal> inCountMap = purchaseInItemMapper.selectOrderItemCountSumMapByInIds(
                 convertList(approvedIns, ErpPurchaseInDO::getId));
-        // 1.2 查询「全部」采购入库单（含未审核）：超订单数量校验需统计全部入库单，未审核入库单同样占用可入库额度
-        List<ErpPurchaseInDO> allIns = purchaseInMapper.selectListAllByOrderId(orderId);
+        // 1.2 查询全部入库单，计算占用数量
+        List<ErpPurchaseInDO> allIns = purchaseInMapper.selectListByOrderId(orderId);
         Map<Long, BigDecimal> allCountMap = purchaseInItemMapper.selectOrderItemCountSumMapByInIds(
                 convertList(allIns, ErpPurchaseInDO::getId));
-        // 2. 超订单数量校验：全部入库单（含未审核）数量之和不得超过采购订单项数量
+        // 1.3 校验全部入库数量未超过采购订单项数量
         List<ErpPurchaseOrderItemDO> orderItems = purchaseOrderService.getPurchaseOrderItemListByOrderId(orderId);
         for (ErpPurchaseOrderItemDO item : orderItems) {
             BigDecimal allCount = allCountMap.getOrDefault(item.getId(), BigDecimal.ZERO);
@@ -162,7 +163,8 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
                         productService.getProduct(item.getProductId()).getName(), item.getCount());
             }
         }
-        // 3. 更新采购订单的入库数量（inCount 展示 = 已审核）
+
+        // 2. 更新采购订单的入库数量
         purchaseOrderService.updatePurchaseOrderInCount(orderId, inCountMap);
     }
 
@@ -199,7 +201,7 @@ public class ErpPurchaseInServiceImpl implements ErpPurchaseInService {
                     bizType, purchaseInItem.getInId(), purchaseInItem.getId(), purchaseIn.getNo()));
         });
 
-        // 4. 状态变更后重算采购订单入库进度（反审核的入库单不再计入，inCount 自然回退）
+        // 4. 更新采购订单的入库数量
         updatePurchaseOrderInCount(purchaseIn.getOrderId());
     }
 
