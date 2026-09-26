@@ -23,7 +23,6 @@ import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServic
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.MESSAGE_SENSITIVE_WORD_BLOCKED;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.SENSITIVE_WORD_DUPLICATED;
 import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.SENSITIVE_WORD_NOT_EXISTS;
-import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -107,7 +106,7 @@ public class ImSensitiveWordServiceImplTest extends BaseMockitoUnitTest {
     public void testValidateText_tenantIsolation() {
         // mock 不同租户的词库
         when(imSensitiveWordMapper.selectListByStatus(CommonStatusEnum.ENABLE.getStatus()))
-                .thenAnswer(invocation -> List.of(ImSensitiveWordDO.builder()
+                .thenAnswer(invocation -> ListUtil.of(ImSensitiveWordDO.builder()
                         .word(TenantContextHolder.getRequiredTenantId().equals(TENANT_ID) ? "firstbad" : "secondbad")
                         .build()));
 
@@ -137,7 +136,7 @@ public class ImSensitiveWordServiceImplTest extends BaseMockitoUnitTest {
         sensitiveWordService.validateText("hello world");
         verify(imSensitiveWordMapper).selectListByStatus(CommonStatusEnum.ENABLE.getStatus());
         // mock 删除后的词库
-        when(imSensitiveWordMapper.selectListByStatus(CommonStatusEnum.ENABLE.getStatus())).thenReturn(List.of());
+        when(imSensitiveWordMapper.selectListByStatus(CommonStatusEnum.ENABLE.getStatus())).thenReturn(ListUtil.of());
 
         // 调用
         sensitiveWordService.deleteSensitiveWordList(ListUtil.of(1L, 2L));
@@ -164,16 +163,21 @@ public class ImSensitiveWordServiceImplTest extends BaseMockitoUnitTest {
             return LocalDateTime.of(2026, 9, 2, 0, 0);
         });
         when(imSensitiveWordMapper.selectListByStatus(CommonStatusEnum.ENABLE.getStatus()))
-                .thenReturn(List.of(ImSensitiveWordDO.builder().word("newbad").build()));
+                .thenReturn(ListUtil.of(ImSensitiveWordDO.builder().word("newbad").build()));
 
         // 调用
         LoadingCache<Long, ?> cache = (LoadingCache<Long, ?>) ReflectionTestUtils.getField(
                 sensitiveWordService, "sensitiveWordBsCaches");
+        Object oldCache = cache.getUnchecked(0L);
         cache.refresh(0L);
 
         // 断言缓存异步刷新
-        await().atMost(Duration.ofSeconds(5)).untilAsserted(() ->
-                assertServiceException(() -> sensitiveWordService.validateText("newbad"), MESSAGE_SENSITIVE_WORD_BLOCKED));
+        assertTimeoutPreemptively(Duration.ofSeconds(5), () -> {
+            while (cache.getUnchecked(0L) == oldCache) {
+                Thread.sleep(10);
+            }
+        });
+        assertServiceException(() -> sensitiveWordService.validateText("newbad"), MESSAGE_SENSITIVE_WORD_BLOCKED);
         assertDoesNotThrow(() -> sensitiveWordService.validateText("badword"));
     }
 

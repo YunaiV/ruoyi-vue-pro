@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.in;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.Valid;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.math.BigDecimal;

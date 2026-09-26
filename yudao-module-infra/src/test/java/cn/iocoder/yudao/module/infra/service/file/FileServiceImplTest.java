@@ -11,14 +11,14 @@ import cn.iocoder.yudao.module.infra.controller.admin.file.vo.file.FilePresigned
 import cn.iocoder.yudao.module.infra.dal.dataobject.file.FileDO;
 import cn.iocoder.yudao.module.infra.dal.mysql.file.FileMapper;
 import cn.iocoder.yudao.module.infra.framework.file.core.client.FileClient;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -45,7 +45,7 @@ public class FileServiceImplTest extends BaseDbUnitTest {
     @Resource
     private FileMapper fileMapper;
 
-    @MockitoBean
+    @MockBean
     private FileConfigService fileConfigService;
 
     @BeforeEach

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.infra.service.file;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.Assert;
@@ -24,6 +25,7 @@ import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -42,7 +44,7 @@ public class FileServiceImpl implements FileService {
     /**
      * 允许上传的文件类型，可按业务需要调整
      */
-    private static final Set<String> ALLOWED_FILE_TYPES = Set.of(
+    private static final Set<String> ALLOWED_FILE_TYPES = Collections.unmodifiableSet(CollUtil.newHashSet(
             // 图片
             "image/jpeg", "image/png", "image/gif", "image/webp", "image/bmp",
             "image/vnd.microsoft.icon", "image/tiff", "image/avif", "image/heic", "image/heif", "image/svg+xml",
@@ -60,7 +62,7 @@ public class FileServiceImpl implements FileService {
             "audio/x-aac", "audio/x-flac", "audio/amr", "audio/x-ms-wma",
             "video/mp4", "video/quicktime", "video/x-msvideo", "video/webm", "video/x-ms-wmv", "video/x-flv",
             "application/x-matroska", "video/x-matroska"
-    );
+    ));
 
     /**
      * 上传文件的前缀，是否包含日期（yyyyMMdd）
