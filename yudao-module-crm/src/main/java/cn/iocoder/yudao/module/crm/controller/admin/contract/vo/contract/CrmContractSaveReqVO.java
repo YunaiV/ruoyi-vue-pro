@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.crm.framework.operatelog.core.CrmCustomerParseFun
 import cn.iocoder.yudao.module.crm.framework.operatelog.core.SysAdminUserParseFunction;
 import com.mzt.logapi.starter.annotation.DiffLogField;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -67,6 +68,7 @@ public class CrmContractSaveReqVO {
 
     @Schema(description = "合同金额", example = "5617")
     @DiffLogField(name = "合同金额")
+    @DecimalMin(value = "0", message = "合同金额不能小于 0")
     private BigDecimal totalPrice;
 
     @Schema(description = "客户签约人编号", example = "18546")
