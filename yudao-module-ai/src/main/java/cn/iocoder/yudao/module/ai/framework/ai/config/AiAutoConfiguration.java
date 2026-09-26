@@ -100,6 +100,7 @@ public class AiAutoConfiguration {
                         .temperature(properties.getTemperature())
                         .maxTokens(properties.getMaxTokens())
                         .topP(properties.getTopP())
+                        .streamUsage(true)
                         .build())
                 .toolCallingManager(getToolCallingManager())
                 .build();
@@ -128,6 +129,7 @@ public class AiAutoConfiguration {
                         .temperature(properties.getTemperature())
                         .maxTokens(properties.getMaxTokens())
                         .topP(properties.getTopP())
+                        .streamUsage(true)
                         .build())
                 .toolCallingManager(getToolCallingManager())
                 .build();
@@ -211,6 +213,7 @@ public class AiAutoConfiguration {
                         .temperature(properties.getTemperature())
                         .maxTokens(properties.getMaxTokens())
                         .topP(properties.getTopP())
+                        .streamUsage(true)
                         .build())
                 .build();
     }
@@ -237,6 +240,7 @@ public class AiAutoConfiguration {
                         .temperature(properties.getTemperature())
                         .maxTokens(properties.getMaxTokens())
                         .topP(properties.getTopP())
+                        .streamUsage(true)
                         .build())
                 .toolCallingManager(getToolCallingManager())
                 .build();
@@ -394,6 +398,7 @@ public class AiAutoConfiguration {
                         .temperature(properties.getTemperature())
                         .maxTokens(properties.getMaxTokens())
                         .topP(properties.getTopP())
+                        .streamUsage(true)
                         .build())
                 .toolCallingManager(getToolCallingManager())
                 .build();

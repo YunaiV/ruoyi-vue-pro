@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.ai.controller.admin.write;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.module.ai.controller.admin.write.vo.AiWriteGenerateReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.write.vo.AiWritePageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.write.vo.AiWriteRespVO;
@@ -32,7 +33,12 @@ public class AiWriteController {
     @PostMapping(value = "/generate-stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @Operation(summary = "写作生成（流式）", description = "流式返回，响应较快")
     public Flux<CommonResult<String>> generateWriteContent(@RequestBody @Valid AiWriteGenerateReqVO generateReqVO) {
-        return writeService.generateWriteContent(generateReqVO, getLoginUserId());
+        try {
+            return writeService.generateWriteContent(generateReqVO, getLoginUserId());
+        } catch (ServiceException e) {
+            // 预算超限等业务异常，以 SSE 事件返回给前端，避免非预期 HTTP 错误
+            return Flux.just(CommonResult.error(e.getCode(), e.getMessage()));
+        }
     }
 
     // ================ 写作管理 ================
