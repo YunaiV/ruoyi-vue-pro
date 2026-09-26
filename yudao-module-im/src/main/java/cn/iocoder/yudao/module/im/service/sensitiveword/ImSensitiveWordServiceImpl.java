@@ -22,6 +22,7 @@ import jakarta.annotation.Resource;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -48,6 +49,14 @@ import static cn.iocoder.yudao.module.im.enums.ErrorCodeConstants.SENSITIVE_WORD
 @Slf4j
 public class ImSensitiveWordServiceImpl implements ImSensitiveWordService {
 
+    /**
+     * 关闭多租户时的统一缓存键，仅用于缓存，不作为查询的租户编号
+     */
+    private static final Long SINGLE_TENANT_CACHE_KEY = 0L;
+
+    @Value("${yudao.tenant.enable:true}")
+    private boolean tenantEnable = true;
+
     @Resource
     private ImSensitiveWordMapper sensitiveWordMapper;
 
@@ -70,7 +79,7 @@ public class ImSensitiveWordServiceImpl implements ImSensitiveWordService {
     }
 
     /**
-     * 租户 → SensitiveWordBs 实例的本地缓存
+     * 租户 → SensitiveWordBs 实例的本地缓存；关闭多租户时共用一个缓存
      * <p>
      * 每分钟触发一次异步 reload，先读 max(update_time)，没变就复用旧实例（避免 trie 重建），变了才重新读词库 + 重建。
      * 单实例 CRUD 后另外通过 {@link #invalidateSensitiveWordBsCaches()} 立即让本机失效，多实例靠定时刷新最长 1 分钟内收敛。
@@ -87,8 +96,8 @@ public class ImSensitiveWordServiceImpl implements ImSensitiveWordService {
 
                 @Override
                 public ListenableFuture<SensitiveWordBsCache> reload(Long tenantId, SensitiveWordBsCache oldValue) {
-                    // 异步刷新线程独立于业务线程，没有租户上下文；必须显式 TenantUtils.execute 设置，否则租户拦截器会按当前线程的空上下文拼 SQL
-                    return Futures.immediateFuture(TenantUtils.execute(tenantId, () -> {
+                    // 异步刷新时恢复租户上下文；关闭多租户时不设置租户编号
+                    return Futures.immediateFuture(TenantUtils.execute(tenantEnable ? tenantId : null, () -> {
                         LocalDateTime currentMax = sensitiveWordMapper.selectMaxUpdateTime(tenantId);
                         // 没变 → 复用旧实例，避免无谓地重建 trie
                         if (Objects.equals(oldValue.getMaxUpdateTime(), currentMax)) {
@@ -102,7 +111,7 @@ public class ImSensitiveWordServiceImpl implements ImSensitiveWordService {
             });
 
     private SensitiveWordBsCache loadFresh(Long tenantId) {
-        return TenantUtils.execute(tenantId, () -> {
+        return TenantUtils.execute(tenantEnable ? tenantId : null, () -> {
             // 先取基线时间再读词库：反过来在两次查询之间出现的新插入会被漏感知
             LocalDateTime maxUpdateTime = sensitiveWordMapper.selectMaxUpdateTime(tenantId);
             List<ImSensitiveWordDO> words = sensitiveWordMapper.selectListByStatus(CommonStatusEnum.ENABLE.getStatus());
@@ -122,9 +131,16 @@ public class ImSensitiveWordServiceImpl implements ImSensitiveWordService {
     /**
      * 强制让敏感词缓存失效，下次访问按最新 DB 重建
      * <p>
-     * 有租户上下文：仅失效该租户。无租户上下文（如系统级 / 跨租户清理）：兜底失效所有租户。
+     * 关闭多租户时失效统一缓存；开启时仅失效当前租户，无租户上下文则失效所有租户。
      */
     private void invalidateSensitiveWordBsCaches() {
+        // 情况一：租户未开启的清理
+        if (!tenantEnable) {
+            sensitiveWordBsCaches.invalidate(SINGLE_TENANT_CACHE_KEY);
+            return;
+        }
+
+        // 情况二：租户已开启的清理
         Long tenantId = TenantContextHolder.getTenantId();
         if (tenantId != null) {
             sensitiveWordBsCaches.invalidate(tenantId);
@@ -138,7 +154,8 @@ public class ImSensitiveWordServiceImpl implements ImSensitiveWordService {
         if (StrUtil.isBlank(text)) {
             return;
         }
-        SensitiveWordBs bs = sensitiveWordBsCaches.getUnchecked(TenantContextHolder.getRequiredTenantId()).getBs();
+        Long cacheKey = tenantEnable ? TenantContextHolder.getRequiredTenantId() : SINGLE_TENANT_CACHE_KEY;
+        SensitiveWordBs bs = sensitiveWordBsCaches.getUnchecked(cacheKey).getBs();
         if (bs.contains(text)) {
             throw exception(MESSAGE_SENSITIVE_WORD_BLOCKED);
         }
