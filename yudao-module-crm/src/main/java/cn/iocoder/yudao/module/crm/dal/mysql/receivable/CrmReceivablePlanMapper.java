@@ -25,8 +25,6 @@ import java.util.Objects;
 public interface CrmReceivablePlanMapper extends BaseMapperX<CrmReceivablePlanDO> {
 
     default CrmReceivablePlanDO selectMaxPeriodByContractId(Long contractId) {
-        // 单表查询不能用 MPJLambdaWrapperX：它会给列拼接表别名前缀（t.contract_id），
-        // 但 selectOne 生成的 FROM 不带别名，导致 Unknown column 't.contract_id'。
         return selectOne(new LambdaQueryWrapperX<CrmReceivablePlanDO>()
                 .eq(CrmReceivablePlanDO::getContractId, contractId)
                 .orderByDesc(CrmReceivablePlanDO::getPeriod)
