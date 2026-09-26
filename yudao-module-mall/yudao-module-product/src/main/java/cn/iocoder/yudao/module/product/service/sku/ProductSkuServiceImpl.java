@@ -106,9 +106,13 @@ public class ProductSkuServiceImpl implements ProductSkuService {
         Set<Long> propertyIds = skus.stream().filter(p -> p.getProperties() != null)
                 // 遍历多个 Property 属性
                 .flatMap(p -> p.getProperties().stream())
-                // 将每个 Property 转换成对应的 propertyId，最后形成集合
-                .map(ProductSkuSaveReqVO.Property::getPropertyId)
-                .collect(Collectors.toSet());
+        // 将每个 Property 转换成对应的 propertyId，最后形成集合
+        .map(ProductSkuSaveReqVO.Property::getPropertyId)
+        .collect(Collectors.toSet());
+        // 多规格下，属性组合不能为空：空集合会让后续按 id 批量查询生成非法 SQL（IN()）而 500，这里明确拒绝
+        if (CollUtil.isEmpty(propertyIds)) {
+            throw exception(SKU_PROPERTIES_EMPTY);
+        }
         List<ProductPropertyDO> propertyList = productPropertyService.getPropertyList(propertyIds);
         if (propertyList.size() != propertyIds.size()) {
             throw exception(PROPERTY_NOT_EXISTS);
