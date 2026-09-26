@@ -130,6 +130,12 @@ ErrorCode PURCHASE_ORDER_ITEM_RETURN_FAIL_IN_EXCEED = new ErrorCode(1_030_101_00
     // ========== ERP 产品 1-030-500-000 ==========
     ErrorCode PRODUCT_NOT_EXISTS = new ErrorCode(1_030_500_000, "产品不存在");
     ErrorCode PRODUCT_NOT_ENABLE = new ErrorCode(1_030_500_001, "产品({})未启用");
+    ErrorCode PRODUCT_DELETE_FAIL_PURCHASE_ORDER_EXISTS = new ErrorCode(1_030_500_002, "产品已被采购订单引用，无法删除");
+    ErrorCode PRODUCT_DELETE_FAIL_PURCHASE_IN_EXISTS = new ErrorCode(1_030_500_003, "产品已被采购入库单引用，无法删除");
+    ErrorCode PRODUCT_DELETE_FAIL_PURCHASE_RETURN_EXISTS = new ErrorCode(1_030_500_004, "产品已被采购退货单引用，无法删除");
+    ErrorCode PRODUCT_DELETE_FAIL_SALE_ORDER_EXISTS = new ErrorCode(1_030_500_005, "产品已被销售订单引用，无法删除");
+    ErrorCode PRODUCT_DELETE_FAIL_SALE_OUT_EXISTS = new ErrorCode(1_030_500_006, "产品已被销售出库单引用，无法删除");
+    ErrorCode PRODUCT_DELETE_FAIL_SALE_RETURN_EXISTS = new ErrorCode(1_030_500_007, "产品已被销售退货单引用，无法删除");
 
     // ========== ERP 产品分类 1-030-501-000 ==========
     ErrorCode PRODUCT_CATEGORY_NOT_EXISTS = new ErrorCode(1_030_501_000, "产品分类不存在");
