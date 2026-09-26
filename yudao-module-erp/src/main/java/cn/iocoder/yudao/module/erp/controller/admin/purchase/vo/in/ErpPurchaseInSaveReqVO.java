@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.in;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -39,6 +41,7 @@ public class ErpPurchaseInSaveReqVO {
     private String remark;
 
     @Schema(description = "入库清单列表")
+    @Valid
     private List<Item> items;
 
     @Data
@@ -68,6 +71,7 @@ public class ErpPurchaseInSaveReqVO {
 
         @Schema(description = "产品数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "100.00")
         @NotNull(message = "产品数量不能为空")
+        @DecimalMin(value = "0", inclusive = false, message = "产品数量必须大于 0")
         private BigDecimal count;
 
         @Schema(description = "税率，百分比", example = "99.88")

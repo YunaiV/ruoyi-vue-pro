@@ -36,6 +36,10 @@ public interface ErpStockMapper extends BaseMapperX<ErpStockDO> {
     }
 
     default int updateCountIncrement(Long id, BigDecimal count, boolean negativeEnable) {
+        // 数量为 0 无库存增量（历史脏数据防护）：直接跳过，避免生成空 SET 的 UPDATE 抛异常 500
+        if (count.compareTo(BigDecimal.ZERO) == 0) {
+            return 0;
+        }
         LambdaUpdateWrapper<ErpStockDO> updateWrapper = new LambdaUpdateWrapper<ErpStockDO>()
                 .eq(ErpStockDO::getId, id);
         if (count.compareTo(BigDecimal.ZERO) > 0) {
