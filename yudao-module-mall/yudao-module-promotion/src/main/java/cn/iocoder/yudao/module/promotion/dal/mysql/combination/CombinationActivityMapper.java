@@ -31,8 +31,11 @@ public interface CombinationActivityMapper extends BaseMapperX<CombinationActivi
     }
 
     default PageResult<CombinationActivityDO> selectPage(PageParam pageParam, Integer status) {
+        // C 端列表与 admin 面 selectPage 对齐按 id 倒序（最新在前）：
+        // 原缺 orderBy 时 MyBatis-Plus 按主键升序=最旧在前，新上架活动被挤后页，C 端首页不可见（A56）
         return selectPage(pageParam, new LambdaQueryWrapperX<CombinationActivityDO>()
-                .eq(CombinationActivityDO::getStatus, status));
+                .eq(CombinationActivityDO::getStatus, status)
+                .orderByDesc(CombinationActivityDO::getId));
     }
 
     default CombinationActivityDO selectBySpuIdAndStatusAndNow(Long spuId, Integer status) {
