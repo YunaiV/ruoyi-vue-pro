@@ -46,22 +46,6 @@ public class OaMailProviderSaveReqVO {
         @Size(max = 253, message = "服务器域名长度不能超过 253 个字符")
         private String host;
 
-        /** 校验服务器主机名或 IP，不包含协议、路径和端口 */
-        @AssertTrue(message = "请输入有效的服务器域名或 IP 地址")
-        @JsonIgnore
-        public boolean isHostValid() {
-            if (StrUtil.isEmpty(host)) {
-                return true; // 空值由必填校验处理
-            }
-            if (host.contains(":")) {
-                return Validator.isIpv6(host);
-            }
-            if (host.matches("\\d+(?:\\.\\d+){3}")) {
-                return host.matches("(?:25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d)(?:\\.(?:25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d)){3}");
-            }
-            return host.matches("(?i)[a-z\\d](?:[a-z\\d-]{0,61}[a-z\\d])?(?:\\.[a-z\\d](?:[a-z\\d-]{0,61}[a-z\\d])?)*\\.?");
-        }
-
         @Schema(description = "服务器端口", requiredMode = Schema.RequiredMode.REQUIRED, example = "993")
         @NotNull(message = "服务器端口不能为空")
         @Min(value = 1, message = "服务器端口不能小于 1")
