@@ -6,7 +6,7 @@
 
 ## 1. 测试数据库的快速启动
 
-基于 Docker Compose，快速启动 MySQL、Oracle、PostgreSQL、SQL Server 等数据库。
+基于 Docker Compose，快速启动 MySQL、Oracle、PostgreSQL、SQL Server、OceanBase 等数据库。
 
 注意！使用 Docker Compose 启动完测试数据后，因为会自动导入项目的 SQL 脚本，所以可能需要等待 1-2 分钟。
 
@@ -111,6 +111,32 @@ docker compose up -d highgo
 
 ③ 启动完成后，需要手动导入 Quartz 和项目 SQL。瀚高兼容 PostgreSQL，具体客户端命令以当前镜像为准，可使用 `psql` 或瀚高镜像内置的兼容客户端执行 `/tmp/quartz.sql`、`/tmp/schema.sql`。
 
+### 1.9 OceanBase
+
+使用 OceanBase 社区版的 MySQL 模式，支持 x86_64 和 MacBook Apple Silicon。Docker 建议至少分配 8 GB 内存；同时运行 MySQL、Elasticsearch 等服务时，建议分配 12 GB 或更多，确保 OceanBase 启动检查所需的 6 GB 可用内存。首次启动需要等待几分钟。
+
+① 启动数据库，等待租户连接健康检查通过：
+
+```Bash
+docker compose up -d --wait --wait-timeout 300 oceanbase
+```
+
+② 手动导入项目和 Quartz SQL（脚本会重建同名表，仅用于初始化测试数据库）：
+
+```Bash
+docker compose exec oceanbase bash /tmp/create_schema.sh
+```
+
+③ 项目继续使用 MySQL JDBC 驱动，将数据源配置中的地址、账号和密码修改为：
+
+```yaml
+url: jdbc:mysql://127.0.0.1:2881/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true&rewriteBatchedStatements=true
+username: root@test
+password: 123456
+```
+
+> 注意：`root@test` 连接的是 MySQL 模式的 `test` 租户。配置了多个数据源时，需要同步修改对应配置。数据和部署配置分别保存在 `oceanbase`、`oceanbase_config` 数据卷中，重启不需要重新导入 SQL。镜像说明见 [OceanBase 官方文档](https://github.com/oceanbase/docker-images/blob/main/oceanbase-ce/README_CN.md)。
+
 ## 1.X 容器的销毁重建
 
 开发测试过程中，有时候需要创建全新干净的数据库。由于测试数据 Docker 容器采用数据卷 Volume 挂载数据库实例的数据目录，因此销毁数据需要停止容器后，删除数据卷，然后再重新创建容器。
@@ -124,7 +150,7 @@ docker volume rm ruoyi-vue-pro_postgres
 
 ## 2. MySQL 转换其它数据库
 
-项目提供了 `sql/tools/convertor.py` 脚本，支持将 MySQL 转换为 Oracle、PostgreSQL、SQL Server、达梦、人大金仓、OpenGauss、瀚高等数据库的脚本。
+项目提供了 `sql/tools/convertor.py` 脚本，支持将 MySQL 转换为 Oracle、PostgreSQL、SQL Server、达梦、人大金仓、OpenGauss、瀚高、OceanBase 等数据库的脚本。
 
 ### 2.1 实现原理
 
@@ -139,7 +165,7 @@ pip install simple-ddl-parser
 # pip3 install simple-ddl-parser
 ```
 
-② 在 `sql/tools/` 目录下，执行如下命令打印生成 postgres 的脚本内容，其他可选参数有：`oracle`、`sqlserver`、`dm8`、`kingbase`、`opengauss`、`highgo`：
+② 在 `sql/tools/` 目录下，执行如下命令打印生成 postgres 的脚本内容，其他可选参数有：`oracle`、`sqlserver`、`dm8`、`kingbase`、`opengauss`、`highgo`、`oceanbase`：
 
 ```Bash
 python3 convertor.py postgres
@@ -150,3 +176,12 @@ python3 convertor.py postgres
 程序将 SQL 脚本打印到终端，可以重定向到临时文件 `tmp.sql`。
 
 确认无误后，可以利用 IDEA 进行格式化。当然，也可以直接导入到数据库中。
+
+### 2.3 OceanBase MySQL 模式
+
+OceanBase MySQL 模式保留原始 MySQL SQL，不经过其它数据库的字段类型和索引转换。更新 MySQL 脚本后，可通过以下命令同步生成：
+
+```Bash
+python3 convertor.py oceanbase ../mysql/ruoyi-vue-pro.sql > ../oceanbase/ruoyi-vue-pro.sql
+python3 convertor.py oceanbase ../mysql/quartz.sql > ../oceanbase/quartz.sql
+```

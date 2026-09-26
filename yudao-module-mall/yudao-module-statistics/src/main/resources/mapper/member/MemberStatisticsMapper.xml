@@ -7,6 +7,9 @@
         SELECT area_id, COUNT(1) AS userCount
         FROM member_user
         WHERE deleted = FALSE
+        <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
+            AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
+        </if>
         GROUP BY area_id
     </select>
 
@@ -15,6 +18,9 @@
         SELECT sex, COUNT(1) AS userCount
         FROM member_user
         WHERE deleted = FALSE
+        <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
+            AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
+        </if>
         GROUP BY sex
     </select>
 
@@ -23,6 +29,9 @@
         SELECT register_terminal as terminal, COUNT(1) AS userCount
         FROM member_user
         WHERE deleted = FALSE
+        <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
+            AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
+        </if>
         GROUP BY register_terminal
     </select>
 
@@ -36,6 +45,9 @@
         <if test="endTime != null">
             AND create_time &lt;= #{endTime}
         </if>
+        <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
+            AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
+        </if>
     </select>
 
     <select id="selectListByCreateTimeBetween"
@@ -45,6 +57,9 @@
         FROM member_user
         WHERE create_time BETWEEN #{beginTime} AND #{endTime}
           AND deleted = FALSE
+        <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
+            AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
+        </if>
         GROUP BY date
     </select>
 
