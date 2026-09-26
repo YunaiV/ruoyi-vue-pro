@@ -45,11 +45,13 @@ public interface BrokerageRecordService {
     /**
      * 增加佣金【多级分佣】
      *
-     * @param userId  会员编号
+     * @param userId  会员编号（下单人）
+     * @param brokerageUserId 订单推广人
      * @param bizType 业务类型
      * @param list    请求参数列表
      */
-    void addBrokerage(Long userId, BrokerageRecordBizTypeEnum bizType, @Valid List<BrokerageAddReqBO> list);
+    void addBrokerage(Long userId, Long brokerageUserId, BrokerageRecordBizTypeEnum bizType,
+                      @Valid List<BrokerageAddReqBO> list);
 
     /**
      * 增加佣金【只针对自己】

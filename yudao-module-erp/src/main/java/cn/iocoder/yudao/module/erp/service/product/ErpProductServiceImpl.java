@@ -12,20 +12,22 @@ import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductCategoryDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.product.ErpProductUnitDO;
 import cn.iocoder.yudao.module.erp.dal.mysql.product.ErpProductMapper;
+import cn.iocoder.yudao.module.erp.service.purchase.ErpPurchaseInService;
+import cn.iocoder.yudao.module.erp.service.purchase.ErpPurchaseOrderService;
+import cn.iocoder.yudao.module.erp.service.purchase.ErpPurchaseReturnService;
+import cn.iocoder.yudao.module.erp.service.sale.ErpSaleOrderService;
+import cn.iocoder.yudao.module.erp.service.sale.ErpSaleOutService;
+import cn.iocoder.yudao.module.erp.service.sale.ErpSaleReturnService;
+import jakarta.annotation.Resource;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
-import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.PRODUCT_NOT_ENABLE;
-import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.PRODUCT_NOT_EXISTS;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
+import static cn.iocoder.yudao.module.erp.enums.ErrorCodeConstants.*;
 
 /**
  * ERP 产品 Service 实现类
@@ -43,6 +45,24 @@ public class ErpProductServiceImpl implements ErpProductService {
     private ErpProductCategoryService productCategoryService;
     @Resource
     private ErpProductUnitService productUnitService;
+    @Resource
+    @Lazy // 延迟加载，避免循环依赖
+    private ErpPurchaseOrderService purchaseOrderService;
+    @Resource
+    @Lazy // 延迟加载，避免循环依赖
+    private ErpPurchaseInService purchaseInService;
+    @Resource
+    @Lazy // 延迟加载，避免循环依赖
+    private ErpPurchaseReturnService purchaseReturnService;
+    @Resource
+    @Lazy // 延迟加载，避免循环依赖
+    private ErpSaleOrderService saleOrderService;
+    @Resource
+    @Lazy // 延迟加载，避免循环依赖
+    private ErpSaleOutService saleOutService;
+    @Resource
+    @Lazy // 延迟加载，避免循环依赖
+    private ErpSaleReturnService saleReturnService;
 
     @Override
     public Long createProduct(ProductSaveReqVO createReqVO) {
@@ -68,6 +88,25 @@ public class ErpProductServiceImpl implements ErpProductService {
     public void deleteProduct(Long id) {
         // 校验存在
         validateProductExists(id);
+        // 校验未被任何业务单据明细引用，避免删除后产生悬空引用
+        if (purchaseOrderService.getPurchaseOrderItemCountByProductId(id) > 0) {
+            throw exception(PRODUCT_DELETE_FAIL_PURCHASE_ORDER_EXISTS);
+        }
+        if (purchaseInService.getPurchaseInItemCountByProductId(id) > 0) {
+            throw exception(PRODUCT_DELETE_FAIL_PURCHASE_IN_EXISTS);
+        }
+        if (purchaseReturnService.getPurchaseReturnItemCountByProductId(id) > 0) {
+            throw exception(PRODUCT_DELETE_FAIL_PURCHASE_RETURN_EXISTS);
+        }
+        if (saleOrderService.getSaleOrderItemCountByProductId(id) > 0) {
+            throw exception(PRODUCT_DELETE_FAIL_SALE_ORDER_EXISTS);
+        }
+        if (saleOutService.getSaleOutItemCountByProductId(id) > 0) {
+            throw exception(PRODUCT_DELETE_FAIL_SALE_OUT_EXISTS);
+        }
+        if (saleReturnService.getSaleReturnItemCountByProductId(id) > 0) {
+            throw exception(PRODUCT_DELETE_FAIL_SALE_RETURN_EXISTS);
+        }
         // 删除
         productMapper.deleteById(id);
     }

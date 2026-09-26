@@ -133,6 +133,12 @@ public class SelectSheetWriteHandler implements SheetWriteHandler {
         DataValidationHelper helper = writeSheetHolder.getSheet().getDataValidationHelper(); // 需要设置下拉框的 sheet 页的数据验证助手
         Workbook workbook = writeWorkbookHolder.getWorkbook(); // 获得工作簿
         List<KeyValue<Integer, List<String>>> keyValues = convertList(selectMap.entrySet(), entry -> new KeyValue<>(entry.getKey(), entry.getValue()));
+        // 对应 issue：https://github.com/YunaiV/ruoyi-vue-pro/pull/1217
+        // 空字典/空选项源：跳过该列下拉，避免拼出 $F$1:$F$0 非法区间致 POI FormulaParseException（该列退化为普通文本列）
+        keyValues.removeIf(item -> CollUtil.isEmpty(item.getValue()));
+        if (CollUtil.isEmpty(keyValues)) {
+            return; // 全部为空时连「字典sheet」都不创建
+        }
         keyValues.sort(Comparator.comparing(item -> item.getValue().size())); // 升序不然创建下拉会报错
 
         // 2. 创建数据字典的 sheet 页

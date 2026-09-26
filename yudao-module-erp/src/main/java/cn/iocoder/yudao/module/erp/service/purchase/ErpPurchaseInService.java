@@ -98,4 +98,12 @@ public interface ErpPurchaseInService {
      */
     List<ErpPurchaseInItemDO> getPurchaseInItemListByInIds(Collection<Long> inIds);
 
+    /**
+     * 获得引用指定产品的采购入库项数量
+     *
+     * @param productId 产品编号
+     * @return 数量
+     */
+    Long getPurchaseInItemCountByProductId(Long productId);
+
 }

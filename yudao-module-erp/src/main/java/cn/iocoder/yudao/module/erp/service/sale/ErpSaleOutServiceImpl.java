@@ -313,4 +313,9 @@ public class ErpSaleOutServiceImpl implements ErpSaleOutService {
         return saleOutItemMapper.selectListByOutIds(outIds);
     }
 
+    @Override
+    public Long getSaleOutItemCountByProductId(Long productId) {
+        return saleOutItemMapper.selectCount(ErpSaleOutItemDO::getProductId, productId);
+    }
+
 }

@@ -96,6 +96,30 @@ public class MesCalTeamShiftServiceImplTest extends BaseDbUnitTest {
         assertRecord(records.get(8), LocalDateTime.of(2026, 4, 3, 0, 0), 3, 101L, 13L);
     }
 
+    @Test
+    public void testGenerateTeamShiftRecords_singleWithoutRotation() {
+        Long planId = 3002L;
+        LocalDateTime start = LocalDateTime.of(2026, 9, 21, 0, 0);
+        when(planService.getPlan(planId)).thenReturn(MesCalPlanDO.builder()
+                .id(planId).code("SINGLE-001").name("单白班")
+                .calendarType(1).startDate(start).endDate(start.plusDays(1))
+                .shiftType(MesCalShiftTypeEnum.SINGLE.getType())
+                .shiftMethod(null).shiftCount(null).build());
+        when(planShiftService.getPlanShiftListByPlanId(planId)).thenReturn(ListUtil.of(
+                MesCalPlanShiftDO.builder().id(11L).planId(planId).sort(1).name("白班")
+                        .startTime("08:00").endTime("16:00").build()));
+        when(planTeamService.getPlanTeamListByPlanId(planId)).thenReturn(ListUtil.of(
+                MesCalPlanTeamDO.builder().id(21L).planId(planId).teamId(101L).build()));
+
+        teamShiftService.generateTeamShiftRecords(planId);
+
+        List<MesCalTeamShiftDO> records = teamShiftMapper.selectListByPlanId(planId);
+        records.sort(Comparator.comparing(MesCalTeamShiftDO::getDay));
+        assertEquals(2, records.size());
+        assertRecord(records.get(0), start, 1, 101L, 11L);
+        assertRecord(records.get(1), start.plusDays(1), 1, 101L, 11L);
+    }
+
     private static void assertRecord(MesCalTeamShiftDO actual, LocalDateTime day, Integer sort,
                                      Long teamId, Long shiftId) {
         assertEquals(day, actual.getDay());

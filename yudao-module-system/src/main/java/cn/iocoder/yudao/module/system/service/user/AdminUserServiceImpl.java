@@ -6,10 +6,12 @@ import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
+import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import cn.iocoder.yudao.framework.datapermission.core.util.DataPermissionUtils;
 import cn.iocoder.yudao.module.infra.api.config.ConfigApi;
@@ -22,14 +24,17 @@ import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserPageReqV
 import cn.iocoder.yudao.module.system.controller.admin.user.vo.user.UserSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.UserPostDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.permission.RoleDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.dal.mysql.dept.UserPostMapper;
 import cn.iocoder.yudao.module.system.dal.mysql.user.AdminUserMapper;
+import cn.iocoder.yudao.module.system.enums.permission.RoleCodeEnum;
 import cn.iocoder.yudao.module.system.mq.producer.user.AdminUserProducer;
 import cn.iocoder.yudao.module.system.service.dept.DeptService;
 import cn.iocoder.yudao.module.system.service.dept.PostService;
 import cn.iocoder.yudao.module.system.service.oauth2.OAuth2TokenService;
 import cn.iocoder.yudao.module.system.service.permission.PermissionService;
+import cn.iocoder.yudao.module.system.service.permission.RoleService;
 import cn.iocoder.yudao.module.system.service.tenant.TenantService;
 import com.google.common.annotations.VisibleForTesting;
 import com.mzt.logapi.context.LogRecordContext;
@@ -74,6 +79,8 @@ public class AdminUserServiceImpl implements AdminUserService {
     private PostService postService;
     @Resource
     private PermissionService permissionService;
+    @Resource
+    private RoleService roleService;
     @Resource
     private PasswordEncoder passwordEncoder;
     @Resource
@@ -250,15 +257,20 @@ public class AdminUserServiceImpl implements AdminUserService {
 
     @Override
     public void updateUserStatus(Long id, Integer status) {
-        // 校验用户存在
+        // 1.1 校验用户存在
         validateUserExists(id);
-        // 更新状态
+        // 1.2 管理员不能禁用
+        if (CommonStatusEnum.isDisable(status)) {
+            validateUserNotAdmin(id, USER_ADMIN_NOT_ALLOW_DISABLE);
+        }
+
+        // 2. 更新状态
         AdminUserDO updateObj = new AdminUserDO();
         updateObj.setId(id);
         updateObj.setStatus(status);
         userMapper.updateById(updateObj);
 
-        // 如果是禁用用户，则删除其 Token 信息
+        // 3. 如果是禁用用户，则删除其 Token 信息
         if (CommonStatusEnum.isDisable(status)) {
             oauth2TokenService.removeAccessToken(id, UserTypeEnum.ADMIN.getValue());
         }
@@ -269,8 +281,10 @@ public class AdminUserServiceImpl implements AdminUserService {
     @LogRecord(type = SYSTEM_USER_TYPE, subType = SYSTEM_USER_DELETE_SUB_TYPE, bizNo = "{{#id}}",
             success = SYSTEM_USER_DELETE_SUCCESS)
     public void deleteUser(Long id) {
-        // 1. 校验用户存在
+        // 1.1 校验用户存在
         AdminUserDO user = validateUserExists(id);
+        // 1.2 管理员不能删除
+        validateUserNotAdmin(id, USER_ADMIN_NOT_ALLOW_DELETE);
 
         // 2.1 删除用户
         userMapper.deleteById(id);
@@ -286,14 +300,30 @@ public class AdminUserServiceImpl implements AdminUserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteUserList(List<Long> ids) {
-        // 1. 批量删除用户
+        // 1. 校验不能删除管理员
+        ids.forEach(id -> validateUserNotAdmin(id, USER_ADMIN_NOT_ALLOW_DELETE));
+
+        // 2. 批量删除用户
         userMapper.deleteByIds(ids);
 
-        // 2. 批量删除用户关联数据
+        // 3. 批量删除用户关联数据
         ids.forEach(id -> {
             permissionService.processUserDeleted(id);
             userPostMapper.deleteByUserId(id);
         });
+    }
+
+    private void validateUserNotAdmin(Long id, ErrorCode errorCode) {
+        Set<Long> roleIds = permissionService.getUserRoleIdListByUserId(id);
+        if (CollUtil.isEmpty(roleIds)) {
+            return;
+        }
+        for (RoleDO role : roleService.getRoleList(roleIds)) {
+            if (ObjectUtils.equalsAny(role.getCode(),
+                    RoleCodeEnum.SUPER_ADMIN.getCode(), RoleCodeEnum.TENANT_ADMIN.getCode())) {
+                throw exception(errorCode);
+            }
+        }
     }
 
     @Override
@@ -562,6 +592,16 @@ public class AdminUserServiceImpl implements AdminUserService {
                 respVO.getFailureUsernames().put(importUser.getUsername(), USER_USERNAME_EXISTS.getMsg());
                 return;
             }
+            // 2.2.3 校验管理员不能禁用
+            if (CommonStatusEnum.isDisable(importUser.getStatus())) {
+                try {
+                    validateUserNotAdmin(existUser.getId(), USER_ADMIN_NOT_ALLOW_DISABLE);
+                } catch (ServiceException ex) {
+                    respVO.getFailureUsernames().put(importUser.getUsername(), ex.getMessage());
+                    return;
+                }
+            }
+            // 2.2.4 更新用户
             AdminUserDO updateUser = BeanUtils.toBean(importUser, AdminUserDO.class);
             updateUser.setId(existUser.getId());
             userMapper.updateById(updateUser);

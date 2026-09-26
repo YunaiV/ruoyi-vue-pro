@@ -58,7 +58,7 @@ public class TradeBrokerageOrderHandler implements TradeOrderHandler {
         if (order.getBrokerageUserId() == null) {
             return;
         }
-        addBrokerage(order.getUserId(), orderItems);
+        addBrokerage(order.getUserId(), order.getBrokerageUserId(), orderItems);
     }
 
     @Override
@@ -97,9 +97,10 @@ public class TradeBrokerageOrderHandler implements TradeOrderHandler {
      * 2. 支付 or 下单成功时，创建分销记录（冻结），确认收货解冻或者 n 天后解冻
      *
      * @param userId  用户编号
+     * @param brokerageUserId 订单推广人
      * @param orderItems 订单项
      */
-    protected void addBrokerage(Long userId, List<TradeOrderItemDO> orderItems) {
+    protected void addBrokerage(Long userId, Long brokerageUserId, List<TradeOrderItemDO> orderItems) {
         MemberUserRespDTO user = memberUserApi.getUser(userId);
         Assert.notNull(user);
         Map<Long, ProductSpuRespDTO> spusMap = productSpuApi.getSpuMap(convertList(orderItems, TradeOrderItemDO::getSpuId));
@@ -113,7 +114,7 @@ public class TradeBrokerageOrderHandler implements TradeOrderHandler {
             Assert.notNull(sku);
             return TradeOrderConvert.INSTANCE.convert(user, item, spu, sku);
         });
-        brokerageRecordService.addBrokerage(userId, BrokerageRecordBizTypeEnum.ORDER, addList);
+        brokerageRecordService.addBrokerage(userId, brokerageUserId, BrokerageRecordBizTypeEnum.ORDER, addList);
     }
 
 }

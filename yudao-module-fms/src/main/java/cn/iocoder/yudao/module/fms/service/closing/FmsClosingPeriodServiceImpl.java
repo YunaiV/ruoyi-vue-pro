@@ -199,6 +199,11 @@ public class FmsClosingPeriodServiceImpl implements FmsClosingPeriodService {
     }
 
     @Override
+    public BigDecimal getProfitLossBalance(Long accountSetId, String month, Long userId) {
+        return calculateProfitLossBalance(accountSetId, LocalDateTimeUtils.parseYearMonth(month), userId);
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     @LogRecord(type = FMS_CLOSING_TYPE, subType = FMS_CLOSING_PERIOD_CLOSE_SUB_TYPE,
             bizNo = "{{#queryReqVO.accountSetId}}", success = FMS_CLOSING_PERIOD_CLOSE_SUCCESS)

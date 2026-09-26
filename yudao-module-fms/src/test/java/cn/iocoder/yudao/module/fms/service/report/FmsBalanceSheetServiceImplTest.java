@@ -21,7 +21,6 @@ import cn.iocoder.yudao.module.fms.dal.mysql.report.balance.FmsBalanceSheetConfi
 import cn.iocoder.yudao.module.fms.dal.mysql.report.balance.FmsBalanceSheetReportMapper;
 import cn.iocoder.yudao.module.fms.enums.config.FmsSubjectTypeEnum;
 import cn.iocoder.yudao.module.fms.enums.report.FmsReportTypeEnum;
-import cn.iocoder.yudao.module.fms.controller.admin.closing.vo.FmsClosingOverviewRespVO;
 import cn.iocoder.yudao.module.fms.service.closing.FmsClosingPeriodService;
 import cn.iocoder.yudao.module.fms.service.closing.FmsClosingSchemeService;
 import cn.iocoder.yudao.module.fms.service.closing.FmsClosingVoucherService;
@@ -46,6 +45,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -206,8 +206,8 @@ public class FmsBalanceSheetServiceImplTest extends BaseDbUnitTest {
         FmsTrialBalanceRespVO trialBalance = new FmsTrialBalanceRespVO();
         trialBalance.setBalanced(false);
         when(initialBalanceService.getTrialBalance(1L, 10L)).thenReturn(trialBalance);
-        when(closingPeriodService.getClosingOverview(any(), eq(10L)))
-                .thenReturn(new FmsClosingOverviewRespVO().setProfitLossBalance(new BigDecimal("20.00")));
+        when(closingPeriodService.getProfitLossBalance(1L, "2026-08", 10L))
+                .thenReturn(new BigDecimal("20.00"));
 
         // 调用
         FmsBalanceSheetCheckRespVO result = balanceSheetService.checkBalanceSheet(buildQueryReqVO(), 10L);
@@ -241,14 +241,15 @@ public class FmsBalanceSheetServiceImplTest extends BaseDbUnitTest {
                         .setChildren(Collections.emptyList())));
         when(initialBalanceService.getTrialBalance(1L, 10L))
                 .thenReturn(new FmsTrialBalanceRespVO().setBalanced(true));
-        when(closingPeriodService.getClosingOverview(any(), eq(10L)))
-                .thenReturn(new FmsClosingOverviewRespVO().setProfitLossBalance(BigDecimal.ZERO));
+        when(closingPeriodService.getProfitLossBalance(1L, "2026-08", 10L))
+                .thenReturn(BigDecimal.ZERO);
 
         // 调用
         FmsBalanceSheetCheckRespVO result = balanceSheetService.checkBalanceSheet(buildQueryReqVO(), 10L);
 
         // 断言
         assertEquals(0, result.getUnmappedSubjects().size());
+        assertTrue(result.getProfitLossTransferred());
     }
 
     // ========== 随机对象 ==========

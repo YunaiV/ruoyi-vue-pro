@@ -32,7 +32,8 @@ public interface CombinationActivityMapper extends BaseMapperX<CombinationActivi
 
     default PageResult<CombinationActivityDO> selectPage(PageParam pageParam, Integer status) {
         return selectPage(pageParam, new LambdaQueryWrapperX<CombinationActivityDO>()
-                .eq(CombinationActivityDO::getStatus, status));
+                .eq(CombinationActivityDO::getStatus, status)
+                .orderByDesc(CombinationActivityDO::getId));
     }
 
     default CombinationActivityDO selectBySpuIdAndStatusAndNow(Long spuId, Integer status) {
