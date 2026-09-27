@@ -215,9 +215,32 @@ public class CouponServiceImpl implements CouponService {
     @Transactional(rollbackFor = Exception.class)
     public void takeCouponByRegister(Long userId) {
         List<CouponTemplateDO> templates = couponTemplateService.getCouponTemplateListByTakeType(CouponTakeTypeEnum.REGISTER);
-        for (CouponTemplateDO template : templates) {
-            takeCoupon(template, CollUtil.newHashSet(userId), CouponTakeTypeEnum.REGISTER);
+        // 1. 过滤不可领取（如已过期）的模板，避免单张异常中断整批
+        List<CouponTemplateDO> takeableTemplates = templates.stream()
+                .filter(this::isCouponTemplateNotExpired)
+                .collect(Collectors.toList());
+        if (takeableTemplates.size() < templates.size()) {
+            log.info("[takeCouponByRegister][用户({}) 过滤 {} 张不可领取的模板]", userId, templates.size() - takeableTemplates.size());
         }
+        // 2. 逐个发放，单张失败不影响其余
+        int successCount = 0;
+        for (CouponTemplateDO template : takeableTemplates) {
+            try {
+                takeCoupon(template, CollUtil.newHashSet(userId), CouponTakeTypeEnum.REGISTER);
+                successCount++;
+            } catch (Exception e) {
+                log.error("[takeCouponByRegister][用户({}) 模板({}) 发放失败]", userId, template.getId(), e);
+            }
+        }
+        // 3. 应发全失败时留一条 ERROR 标记，供监控告警
+        if (CollUtil.isNotEmpty(takeableTemplates) && successCount == 0) {
+            log.error("[takeCouponByRegister][用户({}) 全部 {} 张新人券发放失败]", userId, takeableTemplates.size());
+        }
+    }
+
+    private boolean isCouponTemplateNotExpired(CouponTemplateDO template) {
+        return !CouponTemplateValidityTypeEnum.DATE.getType().equals(template.getValidityType())
+                || !LocalDateTimeUtils.beforeNow(template.getValidEndTime());
     }
 
     @Override
