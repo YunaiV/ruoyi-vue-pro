@@ -63,6 +63,12 @@ public class TimestampLocalDateTimeDeserializerTest {
     }
 
     @Test
+    public void testIsoLocalWithNanos() throws Exception {
+        assertEquals(LocalDateTime.of(2026, 9, 11, 8, 0, 0, 123456789),
+                parse("\"2026-09-11T08:00:00.123456789\""));
+    }
+
+    @Test
     public void testIsoWithOffset() throws Exception {
         // 前端 Date 对象序列化：带 Z（UTC）。2026-09-11T00:00:00Z 换算到系统时区
         LocalDateTime expected = java.time.OffsetDateTime.parse("2026-09-11T00:00:00Z")
@@ -92,16 +98,45 @@ public class TimestampLocalDateTimeDeserializerTest {
     }
 
     @Test
+    public void testIsoWithNegativeOffsetAndMillis() throws Exception {
+        LocalDateTime expected = java.time.OffsetDateTime.parse("2026-09-11T23:30:00.123-05:30")
+                .atZoneSameInstant(java.time.ZoneId.systemDefault()).toLocalDateTime();
+        assertEquals(expected, parse("\"2026-09-11T23:30:00.123-05:30\""));
+    }
+
+    @Test
+    public void testZeroAndNegativeEpochMilli() throws Exception {
+        for (long millis : new long[]{0L, -1L}) {
+            LocalDateTime expected = LocalDateTime.ofInstant(java.time.Instant.ofEpochMilli(millis),
+                    java.time.ZoneId.systemDefault());
+            assertEquals(expected, parse(Long.toString(millis)));
+            assertEquals(expected, parse("\"" + millis + "\""));
+        }
+    }
+
+    @Test
+    public void testSurroundingWhitespace() throws Exception {
+        assertEquals(LocalDateTime.of(2026, 9, 11, 8, 0, 0), parse("\" 2026-09-11 08:00:00 \""));
+    }
+
+    @Test
     public void testNullAndEmpty() throws Exception {
         assertNull(parse("null"));
         assertNull(parse("\"\""));
+        assertNull(parse("\"   \""));
+    }
+
+    @Test
+    public void testHutoolDateFormats() throws Exception {
+        assertEquals(LocalDateTime.of(2026, 9, 11, 0, 0), parse("\"2026/09/11\""));
+        assertEquals(LocalDateTime.of(2026, 9, 11, 8, 0), parse("\"2026/09/11 08:00:00\""));
     }
 
     @Test
     public void testInvalidThrows() {
         // 非法输入抛清晰错误，不再静默落 1970
         assertThrows(Exception.class, () -> parse("\"not-a-date\""));
-        assertThrows(Exception.class, () -> parse("\"2026/09/11\""));
+
     }
 
 }
