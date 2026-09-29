@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.ai1.service.home;
 
+import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.iocoder.yudao.module.ai1.controller.admin.home.vo.Ai1HomeMessageSummaryByAgentRespVO;
 import cn.iocoder.yudao.module.ai1.controller.admin.home.vo.Ai1HomeMessageSummaryByDateRespVO;
 import cn.iocoder.yudao.module.ai1.controller.admin.home.vo.Ai1HomeSummaryRespVO;
@@ -9,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -26,9 +27,6 @@ import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.get
 @Service
 @Validated
 public class Ai1HomeServiceImpl implements Ai1HomeService {
-
-    // TODO @AI：hutool 应该有可替代的，直接使用，减少枚举；
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @Resource
     private Ai1HomeMapper homeMapper;
@@ -50,7 +48,7 @@ public class Ai1HomeServiceImpl implements Ai1HomeService {
         // 2. 生成连续日期序列，没有消息的日期补 0，保证折线不断点
         List<Ai1HomeMessageSummaryByDateRespVO> result = new ArrayList<>(days);
         for (int i = 0; i < days; i++) {
-            String date = beginTime.plusDays(i).format(DATE_FORMATTER);
+            String date = LocalDateTimeUtil.format(beginTime.plusDays(i), DatePattern.NORM_DATE_FORMATTER);
             result.add(new Ai1HomeMessageSummaryByDateRespVO().setDate(date).setCount(countMap.getOrDefault(date, 0L)));
         }
         return result;

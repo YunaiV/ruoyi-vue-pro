@@ -10,7 +10,6 @@ import cn.iocoder.yudao.module.ai1.controller.admin.mcp.vo.Ai1McpRespVO;
 import cn.iocoder.yudao.module.ai1.controller.admin.mcp.vo.Ai1McpSaveReqVO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.mcp.Ai1McpDO;
 import cn.iocoder.yudao.module.ai1.service.mcp.Ai1McpService;
-import cn.iocoder.yudao.module.ai1.tool.mcp.Ai1McpClientTool;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -97,8 +96,7 @@ public class Ai1McpController {
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('ai1:mcp:test')")
     public CommonResult<Ai1McpConnectRespVO> testMcp(@RequestParam("id") Long id) {
-        Ai1McpClientTool.McpConnectResult result = mcpService.testMcpConnect(id);
-        return success(BeanUtils.toBean(result, Ai1McpConnectRespVO.class));
+        return success(mcpService.testMcpConnect(id));
     }
 
 }

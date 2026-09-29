@@ -114,11 +114,10 @@ public interface Ai1AgentService {
      */
     Long getAgentCountByModelIds(Collection<Long> modelIds);
 
-    // TODO @AI：应该是修改 xxx 状态这种？按照项目的风格？注释？其它类似的也处理下；
     /**
-     * 修改状态
+     * 修改 Agent 状态
      *
-     * @param id     编号
+     * @param id     Agent 编号
      * @param status 状态
      */
     void updateAgentStatus(Long id, Integer status);

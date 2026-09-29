@@ -11,11 +11,11 @@ import cn.iocoder.yudao.module.ai1.controller.admin.agent.vo.Ai1AgentRespVO;
 import cn.iocoder.yudao.module.ai1.controller.admin.agent.vo.Ai1AgentSaveReqVO;
 import cn.iocoder.yudao.module.ai1.controller.admin.agent.vo.Ai1AgentUpdateStatusReqVO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.agent.Ai1AgentDO;
-import cn.iocoder.yudao.module.ai1.dal.dataobject.provider.Ai1ModelDO;
-import cn.iocoder.yudao.module.ai1.dal.dataobject.provider.Ai1ProviderDO;
+import cn.iocoder.yudao.module.ai1.dal.dataobject.model.Ai1ModelDO;
+import cn.iocoder.yudao.module.ai1.dal.dataobject.model.Ai1ProviderDO;
 import cn.iocoder.yudao.module.ai1.service.agent.Ai1AgentService;
-import cn.iocoder.yudao.module.ai1.service.provider.Ai1ModelService;
-import cn.iocoder.yudao.module.ai1.service.provider.Ai1ProviderService;
+import cn.iocoder.yudao.module.ai1.service.model.Ai1ModelService;
+import cn.iocoder.yudao.module.ai1.service.model.Ai1ProviderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -98,9 +98,8 @@ public class Ai1AgentController {
 
     @GetMapping("/simple-list")
     @Operation(summary = "获得已开启的 Agent 精简列表", description = "用于对话页选择 Agent，仅返回已开启的 Agent")
-    @PreAuthorize("@ss.hasPermission('ai1:chat:query')")
-    // TODO NOT_FIX @AI【不修复：该接口只被「Agent 对话」页面（views/ai01/chat）调用来选择 Agent，对话菜单只分配 ai1:chat:query，改成 ai1:agent:query 会导致只有对话权限的用户无法加载 Agent；其他 simple-list（供应商、模型、知识库、MCP、SKILL）与 System 模块一致不校验权限，无需调整】：simple-list 不用 ai1:chat:query 把？别的也检查下；
-    // TODO @AI：这个按照项目的习惯，是不需要的噢。对齐下噢；
+    // TODO DONE @AI：simple-list 不用 ai1:chat:query 把？别的也检查下；这个按照项目的习惯，是不需要的噢。对齐下噢；
+    // 精简列表对齐 System 部门、用户等 simple-list，不做权限校验；ai1:chat:query 仍用于对话、消息接口，菜单无需调整
     public CommonResult<List<Ai1AgentRespVO>> getAgentSimpleList() {
         List<Ai1AgentDO> list = agentService.getAgentListByStatus(CommonStatusEnum.ENABLE.getStatus());
         Map<Long, Ai1ModelDO> modelMap = modelService.getModelMap(convertSet(list, Ai1AgentDO::getModelId));

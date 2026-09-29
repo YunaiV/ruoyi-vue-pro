@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.ai1.framework.ai.core.llm;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.module.ai1.service.provider.bo.Ai1ProviderRuntime;
+import cn.iocoder.yudao.module.ai1.service.model.bo.Ai1ProviderRuntime;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import lombok.extern.slf4j.Slf4j;
@@ -36,15 +36,12 @@ import java.util.function.Predicate;
 @Slf4j
 public class Ai1LlmModelFactory {
 
+    // TODO DONE @AI：这个是不是不用噢？直接 id 是不是就 ok 了？
+    // 已去掉「ai1-conversation-」前缀，占位符直接替换为对话编号；占位符同步由 {session} 改名为 {session}
     /**
-     * 附属 Header 会话占位符：构建模型时按当前对话替换
+     * 附属 Header 对话占位符：构建模型时替换为当前对话编号
      */
     public static final String SESSION_PLACEHOLDER = "{session}";
-    // TODO @AI：这个是不是不用噢？直接 id 是不是就 ok 了？
-    /**
-     * 会话占位符替换值的前缀，完整值为「前缀 + 对话编号」
-     */
-    private static final String SESSION_VALUE_PREFIX = "ai1-conversation-";
     /**
      * 缓存上限，达到后逐出最久未访问的模型
      */
@@ -81,8 +78,6 @@ public class Ai1LlmModelFactory {
      * @return 嵌入模型
      */
     public EmbeddingModel getOrCreateEmbeddingModel(Ai1ProviderRuntime runtime) {
-        // TODO DONE @AI：key 是不是抽个方法出来？
-        // 缓存 key 统一由 buildCacheKey 构建
         return embeddingModelCache.asMap().computeIfAbsent(buildCacheKey(runtime), key -> {
             OpenAiEmbeddingOptions options = OpenAiEmbeddingOptions.builder()
                     .baseUrl(normalizeBaseUrl(runtime.getBaseUrl()))
@@ -153,20 +148,15 @@ public class Ai1LlmModelFactory {
     }
 
     /**
-     * 构建模型缓存 key：providerId:modelId:providerUpdateTime:modelUpdateTime
-     *
-     * 带上供应商、模型的更新时间：其他节点修改配置后，本节点拿到的运行时快照更新时间变化，自然命中不到旧缓存，无需广播失效
+     * 构建模型缓存 key：providerId:modelId
      *
      * @param runtime 模型运行时快照
      * @return 缓存 key
      */
     private static String buildCacheKey(Ai1ProviderRuntime runtime) {
-        return runtime.getProviderId() + KEY_SEPARATOR + runtime.getModelId()
-                + KEY_SEPARATOR + runtime.getProviderUpdateTime()
-                + KEY_SEPARATOR + runtime.getModelUpdateTime();
+        return runtime.getProviderId() + KEY_SEPARATOR + runtime.getModelId();
     }
 
-    // TODO DONE @AI： http://host:11434 注释风格；
     /**
      * 归一化接口地址：去掉结尾斜杠；裸地址（无路径）自动补 /v1，
      * 保证连通测试、模型拉取与实际对话访问同一个 OpenAI 兼容端点
@@ -194,13 +184,11 @@ public class Ai1LlmModelFactory {
      * 附属 Header 是否使用 {session} 占位符
      */
     private static boolean usesSessionHeader(List<Map<String, String>> headers) {
-        // TODO DONE @AI：findone 是不是就行了，不用判空了？
-        // CollUtil.findOne 对空集合返回 null，无需额外判空
         return CollUtil.findOne(headers, header -> StrUtil.contains(header.get("value"), SESSION_PLACEHOLDER)) != null;
     }
 
     /**
-     * 构建请求 Header：{session} 占位符替换为「ai1-conversation-对话编号」；对话编号为空时，跳过带占位符的 Header
+     * 构建请求 Header：{session} 占位符替换为对话编号；对话编号为空时，跳过带占位符的 Header
      */
     private static Map<String, String> buildHeaders(List<Map<String, String>> headers, Long conversationId) {
         Map<String, String> result = new LinkedHashMap<>();
@@ -217,7 +205,7 @@ public class Ai1LlmModelFactory {
                 if (conversationId == null) {
                     continue;
                 }
-                value = value.replace(SESSION_PLACEHOLDER, SESSION_VALUE_PREFIX + conversationId);
+                value = value.replace(SESSION_PLACEHOLDER, String.valueOf(conversationId));
             }
             result.put(key.trim(), StrUtil.nullToEmpty(value));
         }

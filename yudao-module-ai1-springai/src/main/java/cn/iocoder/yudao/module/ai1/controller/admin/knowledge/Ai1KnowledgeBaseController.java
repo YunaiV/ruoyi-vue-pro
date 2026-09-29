@@ -12,13 +12,12 @@ import cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.base.Ai1Knowled
 import cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.base.Ai1KnowledgeSearchRespVO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.knowledge.Ai1KnowledgeBaseDO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.knowledge.Ai1KnowledgeDocumentDO;
-import cn.iocoder.yudao.module.ai1.dal.dataobject.provider.Ai1ModelDO;
-import cn.iocoder.yudao.module.ai1.dal.dataobject.provider.Ai1ProviderDO;
+import cn.iocoder.yudao.module.ai1.dal.dataobject.model.Ai1ModelDO;
+import cn.iocoder.yudao.module.ai1.dal.dataobject.model.Ai1ProviderDO;
 import cn.iocoder.yudao.module.ai1.service.knowledge.Ai1KnowledgeBaseService;
 import cn.iocoder.yudao.module.ai1.service.knowledge.Ai1KnowledgeDocumentService;
-import cn.iocoder.yudao.module.ai1.service.provider.Ai1ModelService;
-import cn.iocoder.yudao.module.ai1.service.provider.Ai1ProviderService;
-import cn.iocoder.yudao.module.ai1.tool.rag.Ai1RagTool;
+import cn.iocoder.yudao.module.ai1.service.model.Ai1ModelService;
+import cn.iocoder.yudao.module.ai1.service.model.Ai1ProviderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -119,8 +118,8 @@ public class Ai1KnowledgeBaseController {
             @RequestParam("id") Long id,
             @RequestParam("query") @NotEmpty(message = "检索内容不能为空") String query,
             @RequestParam(value = "topK", required = false) Integer topK) {
-        List<Ai1RagTool.SearchHit> hits = knowledgeBaseService.searchKnowledgeBase(id, query, topK);
-        return success(buildKnowledgeSearchRespVOList(hits));
+        List<Ai1KnowledgeSearchRespVO> list = knowledgeBaseService.searchKnowledgeBase(id, query, topK);
+        return success(buildKnowledgeSearchRespVOList(list));
     }
 
     // ==================== 拼接 VO ====================
@@ -145,12 +144,12 @@ public class Ai1KnowledgeBaseController {
         });
     }
 
-    private List<Ai1KnowledgeSearchRespVO> buildKnowledgeSearchRespVOList(List<Ai1RagTool.SearchHit> hits) {
+    private List<Ai1KnowledgeSearchRespVO> buildKnowledgeSearchRespVOList(List<Ai1KnowledgeSearchRespVO> list) {
         Map<Long, Ai1KnowledgeDocumentDO> documentMap = knowledgeDocumentService.getKnowledgeDocumentMap(
-                convertSet(hits, Ai1RagTool.SearchHit::getDocumentId));
-        return BeanUtils.toBean(hits, Ai1KnowledgeSearchRespVO.class, respVO ->
-                MapUtils.findAndThen(documentMap, respVO.getDocumentId(),
-                        document -> respVO.setDocumentName(document.getName())));
+                convertSet(list, Ai1KnowledgeSearchRespVO::getDocumentId));
+        list.forEach(respVO -> MapUtils.findAndThen(documentMap, respVO.getDocumentId(),
+                document -> respVO.setDocumentName(document.getName())));
+        return list;
     }
 
 }

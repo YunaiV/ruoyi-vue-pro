@@ -6,12 +6,13 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.ai1.controller.admin.mcp.vo.Ai1McpConnectRespVO;
 import cn.iocoder.yudao.module.ai1.controller.admin.mcp.vo.Ai1McpPageReqVO;
 import cn.iocoder.yudao.module.ai1.controller.admin.mcp.vo.Ai1McpSaveReqVO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.mcp.Ai1McpDO;
 import cn.iocoder.yudao.module.ai1.dal.mysql.mcp.Ai1McpMapper;
 import cn.iocoder.yudao.module.ai1.enums.mcp.Ai1McpTransportEnum;
-import cn.iocoder.yudao.module.ai1.tool.mcp.Ai1McpClientTool;
+import cn.iocoder.yudao.module.ai1.harness.mcp.Ai1McpClientTool;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -98,7 +99,7 @@ public class Ai1McpServiceImpl implements Ai1McpService {
     }
 
     @Override
-    public Ai1McpClientTool.McpConnectResult testMcpConnect(Long id) {
+    public Ai1McpConnectRespVO testMcpConnect(Long id) {
         Ai1McpDO mcp = validateMcpExists(id);
         return mcpClientTool.testConnect(mcp);
     }

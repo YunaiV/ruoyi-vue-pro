@@ -14,7 +14,7 @@ import cn.iocoder.yudao.module.ai1.dal.dataobject.knowledge.Ai1KnowledgeBaseDO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.knowledge.Ai1KnowledgeDocumentDO;
 import cn.iocoder.yudao.module.ai1.dal.mysql.knowledge.Ai1KnowledgeDocumentMapper;
 import cn.iocoder.yudao.module.ai1.enums.knowledge.Ai1KnowledgeDocumentStatusEnum;
-import cn.iocoder.yudao.module.ai1.tool.rag.Ai1RagTool;
+import cn.iocoder.yudao.module.ai1.harness.rag.Ai1RagTool;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

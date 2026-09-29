@@ -2,18 +2,18 @@ package cn.iocoder.yudao.module.ai1.service.knowledge;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.base.Ai1KnowledgeBasePageReqVO;
 import cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.base.Ai1KnowledgeBaseSaveReqVO;
+import cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.base.Ai1KnowledgeSearchRespVO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.knowledge.Ai1KnowledgeBaseDO;
 import cn.iocoder.yudao.module.ai1.dal.mysql.knowledge.Ai1KnowledgeBaseMapper;
-import cn.iocoder.yudao.module.ai1.enums.provider.Ai1ModelTypeEnum;
-import cn.iocoder.yudao.module.ai1.service.provider.Ai1ProviderService;
-import cn.iocoder.yudao.module.ai1.service.provider.bo.Ai1ProviderRuntime;
-import cn.iocoder.yudao.module.ai1.tool.rag.Ai1RagTool;
+import cn.iocoder.yudao.module.ai1.enums.model.Ai1ModelTypeEnum;
+import cn.iocoder.yudao.module.ai1.service.model.Ai1ProviderService;
+import cn.iocoder.yudao.module.ai1.service.model.bo.Ai1ProviderRuntime;
+import cn.iocoder.yudao.module.ai1.harness.rag.Ai1RagTool;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
@@ -128,7 +128,7 @@ public class Ai1KnowledgeBaseServiceImpl implements Ai1KnowledgeBaseService {
     }
 
     @Override
-    public List<Ai1RagTool.SearchHit> searchKnowledgeBase(Long id, String query, Integer topK) {
+    public List<Ai1KnowledgeSearchRespVO> searchKnowledgeBase(Long id, String query, Integer topK) {
         // 1. 校验存在（当前租户下），再访问其向量集合
         Ai1KnowledgeBaseDO knowledgeBase = validateKnowledgeBaseExists(id);
 
@@ -138,9 +138,9 @@ public class Ai1KnowledgeBaseServiceImpl implements Ai1KnowledgeBaseService {
         } catch (ServiceException e) {
             throw e;
         } catch (Exception e) {
-            log.warn("[searchKnowledgeBase][知识库({}) query({}) topK({}) 向量检索失败]",
-                    // TODO @AI：query 还是完整的打印吧
-                    id, StrUtil.maxLength(query, 200), topK, e);
+            // TODO DONE @AI：query 还是完整的打印吧
+            // 检索失败时打印完整查询文本，便于复现问题
+            log.warn("[searchKnowledgeBase][知识库({}) query({}) topK({}) 向量检索失败]", id, query, topK, e);
             throw exception(KNOWLEDGE_BASE_SEARCH_FAIL, e.getMessage());
         }
     }

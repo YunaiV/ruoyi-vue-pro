@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.ai1.controller.admin.mcp.vo.Ai1McpSaveReqVO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.mcp.Ai1McpDO;
 import cn.iocoder.yudao.module.ai1.dal.mysql.mcp.Ai1McpMapper;
 import cn.iocoder.yudao.module.ai1.enums.mcp.Ai1McpTransportEnum;
-import cn.iocoder.yudao.module.ai1.tool.mcp.Ai1McpClientTool;
+import cn.iocoder.yudao.module.ai1.harness.mcp.Ai1McpClientTool;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;

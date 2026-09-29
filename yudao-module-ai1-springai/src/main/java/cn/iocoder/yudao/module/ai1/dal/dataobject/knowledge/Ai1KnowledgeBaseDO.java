@@ -2,8 +2,8 @@ package cn.iocoder.yudao.module.ai1.dal.dataobject.knowledge;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
-import cn.iocoder.yudao.module.ai1.dal.dataobject.provider.Ai1ModelDO;
-import cn.iocoder.yudao.module.ai1.dal.dataobject.provider.Ai1ProviderDO;
+import cn.iocoder.yudao.module.ai1.dal.dataobject.model.Ai1ModelDO;
+import cn.iocoder.yudao.module.ai1.dal.dataobject.model.Ai1ProviderDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;

@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.ai1.dal.mysql.chat.Ai1ChatMessageMapper;
 import cn.iocoder.yudao.module.ai1.enums.chat.Ai1ChatMessageRoleEnum;
 import cn.iocoder.yudao.module.ai1.enums.chat.Ai1ChatMessageStatusEnum;
 import cn.iocoder.yudao.module.ai1.service.agent.Ai1AgentService;
-import cn.iocoder.yudao.module.ai1.tool.chat.Ai1ChatStreamTool;
+import cn.iocoder.yudao.module.ai1.harness.chat.Ai1ChatStreamTool;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

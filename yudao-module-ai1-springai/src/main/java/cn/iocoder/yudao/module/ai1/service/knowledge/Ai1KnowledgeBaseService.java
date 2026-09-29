@@ -3,8 +3,8 @@ package cn.iocoder.yudao.module.ai1.service.knowledge;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.base.Ai1KnowledgeBasePageReqVO;
 import cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.base.Ai1KnowledgeBaseSaveReqVO;
+import cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.base.Ai1KnowledgeSearchRespVO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.knowledge.Ai1KnowledgeBaseDO;
-import cn.iocoder.yudao.module.ai1.tool.rag.Ai1RagTool;
 import jakarta.validation.Valid;
 
 import java.util.Collection;
@@ -94,6 +94,6 @@ public interface Ai1KnowledgeBaseService {
      * @param topK  检索数量，为空时使用知识库配置
      * @return 命中分片
      */
-    List<Ai1RagTool.SearchHit> searchKnowledgeBase(Long id, String query, Integer topK);
+    List<Ai1KnowledgeSearchRespVO> searchKnowledgeBase(Long id, String query, Integer topK);
 
 }

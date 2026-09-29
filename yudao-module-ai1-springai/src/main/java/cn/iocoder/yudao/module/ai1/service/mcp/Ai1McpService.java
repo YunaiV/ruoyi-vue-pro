@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.ai1.service.mcp;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.module.ai1.controller.admin.mcp.vo.Ai1McpConnectRespVO;
 import cn.iocoder.yudao.module.ai1.controller.admin.mcp.vo.Ai1McpPageReqVO;
 import cn.iocoder.yudao.module.ai1.controller.admin.mcp.vo.Ai1McpSaveReqVO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.mcp.Ai1McpDO;
-import cn.iocoder.yudao.module.ai1.tool.mcp.Ai1McpClientTool;
 import jakarta.validation.Valid;
 
 import java.util.Collection;
@@ -84,6 +84,6 @@ public interface Ai1McpService {
      * @param id 编号
      * @return 测试结果
      */
-    Ai1McpClientTool.McpConnectResult testMcpConnect(Long id);
+    Ai1McpConnectRespVO testMcpConnect(Long id);
 
 }

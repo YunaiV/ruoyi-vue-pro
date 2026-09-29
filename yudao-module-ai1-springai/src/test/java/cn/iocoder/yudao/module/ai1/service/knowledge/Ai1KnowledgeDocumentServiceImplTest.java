@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.ai1.dal.dataobject.knowledge.Ai1KnowledgeBaseDO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.knowledge.Ai1KnowledgeDocumentDO;
 import cn.iocoder.yudao.module.ai1.dal.mysql.knowledge.Ai1KnowledgeDocumentMapper;
 import cn.iocoder.yudao.module.ai1.enums.knowledge.Ai1KnowledgeDocumentStatusEnum;
-import cn.iocoder.yudao.module.ai1.tool.rag.Ai1RagTool;
+import cn.iocoder.yudao.module.ai1.harness.rag.Ai1RagTool;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
