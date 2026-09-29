@@ -11,7 +11,7 @@ import cn.hutool.http.HttpStatus;
 import cn.hutool.http.Method;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.ai1.controller.admin.model.vo.provider.Ai1ProviderConnectRespVO;
-import cn.iocoder.yudao.module.ai1.framework.ai.core.llm.Ai1LlmModelFactory;
+import cn.iocoder.yudao.module.ai1.harness.llm.Ai1LlmModelFactory;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +24,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.module.ai1.enums.Ai1ErrorCodeConstants.PROVIDER_REMOTE_MODEL_EMPTY;
 import static cn.iocoder.yudao.module.ai1.enums.Ai1ErrorCodeConstants.PROVIDER_REMOTE_MODEL_LOAD_FAIL;
-import static cn.iocoder.yudao.module.ai1.framework.ai.core.llm.Ai1LlmModelFactory.normalizeBaseUrl;
+import static cn.iocoder.yudao.module.ai1.harness.llm.Ai1LlmModelFactory.normalizeBaseUrl;
 
 /**
  * AI1 供应商工具：面向 OpenAI 兼容接口的原始 HTTP 探测

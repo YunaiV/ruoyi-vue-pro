@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.ai1.harness.llm;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.ai1.enums.chat.Ai1ChatMessageRoleEnum;
-import cn.iocoder.yudao.module.ai1.framework.ai.core.llm.Ai1LlmModelFactory;
+import cn.iocoder.yudao.module.ai1.harness.llm.Ai1LlmModelFactory;
 import cn.iocoder.yudao.module.ai1.service.model.bo.Ai1ModelRespBO;
 import jakarta.annotation.Resource;
 import lombok.AllArgsConstructor;

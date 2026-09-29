@@ -10,7 +10,7 @@ import cn.iocoder.yudao.module.ai1.dal.dataobject.model.Ai1ModelDO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.model.Ai1ProviderDO;
 import cn.iocoder.yudao.module.ai1.dal.mysql.model.Ai1ModelMapper;
 import cn.iocoder.yudao.module.ai1.enums.model.Ai1ModelTypeEnum;
-import cn.iocoder.yudao.module.ai1.framework.ai.core.llm.Ai1LlmModelFactory;
+import cn.iocoder.yudao.module.ai1.harness.llm.Ai1LlmModelFactory;
 import cn.iocoder.yudao.module.ai1.harness.model.Ai1ProviderTool;
 import cn.iocoder.yudao.module.ai1.service.model.bo.Ai1ModelRespBO;
 import cn.iocoder.yudao.module.ai1.service.agent.Ai1AgentService;

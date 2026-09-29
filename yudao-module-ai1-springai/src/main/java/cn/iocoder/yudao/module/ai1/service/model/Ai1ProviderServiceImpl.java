@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.ai1.controller.admin.model.vo.provider.Ai1Provide
 import cn.iocoder.yudao.module.ai1.controller.admin.model.vo.provider.Ai1ProviderSaveReqVO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.model.Ai1ProviderDO;
 import cn.iocoder.yudao.module.ai1.dal.mysql.model.Ai1ProviderMapper;
-import cn.iocoder.yudao.module.ai1.framework.ai.core.llm.Ai1LlmModelFactory;
+import cn.iocoder.yudao.module.ai1.harness.llm.Ai1LlmModelFactory;
 import cn.iocoder.yudao.module.ai1.harness.model.Ai1ProviderTool;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;

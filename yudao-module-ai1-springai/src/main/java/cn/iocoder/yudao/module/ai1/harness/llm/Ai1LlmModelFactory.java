@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai1.framework.ai.core.llm;
+package cn.iocoder.yudao.module.ai1.harness.llm;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;

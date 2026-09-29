@@ -13,7 +13,7 @@ import cn.iocoder.yudao.module.ai1.dal.dataobject.model.Ai1ModelDO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.model.Ai1ProviderDO;
 import cn.iocoder.yudao.module.ai1.dal.mysql.model.Ai1ModelMapper;
 import cn.iocoder.yudao.module.ai1.enums.model.Ai1ModelTypeEnum;
-import cn.iocoder.yudao.module.ai1.framework.ai.core.llm.Ai1LlmModelFactory;
+import cn.iocoder.yudao.module.ai1.harness.llm.Ai1LlmModelFactory;
 import cn.iocoder.yudao.module.ai1.harness.model.Ai1ProviderTool;
 import cn.iocoder.yudao.module.ai1.service.model.bo.Ai1ModelRespBO;
 import cn.iocoder.yudao.module.ai1.service.agent.Ai1AgentService;
@@ -160,28 +160,6 @@ public class Ai1ModelServiceImpl implements Ai1ModelService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public Integer importRemoteModelList(Ai1ModelImportReqVO importReqVO) {
-        // 1.1 校验供应商存在
-        providerService.validateProviderExists(importReqVO.getProviderId());
-        // 1.2 过滤空白与已存在的模型标识（同时对入参去重，保持入参顺序）
-        List<Ai1ModelDO> existModelList = modelMapper.selectListByProviderId(importReqVO.getProviderId());
-        Set<String> existModels = convertSet(existModelList, Ai1ModelDO::getModel);
-        Set<String> importModels = convertSetBySupplier(importReqVO.getModels(), StrUtil::trim, LinkedHashSet::new);
-        importModels.removeIf(model -> StrUtil.isBlank(model) || existModels.contains(model));
-        if (CollUtil.isEmpty(importModels)) {
-            throw exception(MODEL_IMPORT_ALL_EXISTS);
-        }
-
-        // 2. 批量插入：展示名称默认同模型标识，类型默认对话，状态默认开启
-        List<Ai1ModelDO> models = convertList(importModels, model -> Ai1ModelDO.builder()
-                .providerId(importReqVO.getProviderId()).name(StrUtil.maxLength(model, 47)).model(model)
-                .type(Ai1ModelTypeEnum.CHAT.getType()).status(CommonStatusEnum.ENABLE.getStatus()).build());
-        modelMapper.insertBatch(models);
-        return models.size();
-    }
-
-    @Override
     public Ai1ModelRespBO getModelRespBO(Long providerId, Long modelId) {
         // 1.1 校验供应商存在且开启
         Ai1ProviderDO provider = providerService.validateProviderExists(providerId);
@@ -203,6 +181,28 @@ public class Ai1ModelServiceImpl implements Ai1ModelService {
                 .setBaseUrl(resolveSpringPlaceholders(provider.getBaseUrl()))
                 .setApiKey(resolveSpringPlaceholders(provider.getApiKey()))
                 .setHeaders(parseHeaders(resolveSpringPlaceholders(provider.getHeaders())));
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Integer importRemoteModelList(Ai1ModelImportReqVO importReqVO) {
+        // 1.1 校验供应商存在
+        providerService.validateProviderExists(importReqVO.getProviderId());
+        // 1.2 过滤空白与已存在的模型标识（同时对入参去重，保持入参顺序）
+        List<Ai1ModelDO> existModelList = modelMapper.selectListByProviderId(importReqVO.getProviderId());
+        Set<String> existModels = convertSet(existModelList, Ai1ModelDO::getModel);
+        Set<String> importModels = convertSetBySupplier(importReqVO.getModels(), StrUtil::trim, LinkedHashSet::new);
+        importModels.removeIf(model -> StrUtil.isBlank(model) || existModels.contains(model));
+        if (CollUtil.isEmpty(importModels)) {
+            throw exception(MODEL_IMPORT_ALL_EXISTS);
+        }
+
+        // 2. 批量插入：展示名称默认同模型标识，类型默认对话，状态默认开启
+        List<Ai1ModelDO> models = convertList(importModels, model -> Ai1ModelDO.builder()
+                .providerId(importReqVO.getProviderId()).name(StrUtil.maxLength(model, 47)).model(model)
+                .type(Ai1ModelTypeEnum.CHAT.getType()).status(CommonStatusEnum.ENABLE.getStatus()).build());
+        modelMapper.insertBatch(models);
+        return models.size();
     }
 
     /**

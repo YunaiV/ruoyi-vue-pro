@@ -128,7 +128,7 @@ public class YudaoAi1Properties {
         /**
          * 附加给模型的最近历史消息条数上限
          */
-        private Integer limit = 50;
+        private Integer limit = 20;
 
     }
 

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai1.framework.ai.core.skill;
+package cn.iocoder.yudao.module.ai1.harness.skill;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;

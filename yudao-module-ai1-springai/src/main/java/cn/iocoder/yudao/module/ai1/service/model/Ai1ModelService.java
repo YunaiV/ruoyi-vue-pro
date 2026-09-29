@@ -127,14 +127,6 @@ public interface Ai1ModelService {
     List<String> getRemoteModelList(Long providerId);
 
     /**
-     * 批量导入远程模型
-     *
-     * @param importReqVO 导入信息
-     * @return 实际导入数量
-     */
-    Integer importRemoteModelList(@Valid Ai1ModelImportReqVO importReqVO);
-
-    /**
      * 获得模型调用参数
      *
      * @param providerId 供应商编号
@@ -142,5 +134,13 @@ public interface Ai1ModelService {
      * @return 模型调用参数
      */
     Ai1ModelRespBO getModelRespBO(Long providerId, Long modelId);
+
+    /**
+     * 批量导入远程模型
+     *
+     * @param importReqVO 导入信息
+     * @return 实际导入数量
+     */
+    Integer importRemoteModelList(@Valid Ai1ModelImportReqVO importReqVO);
 
 }

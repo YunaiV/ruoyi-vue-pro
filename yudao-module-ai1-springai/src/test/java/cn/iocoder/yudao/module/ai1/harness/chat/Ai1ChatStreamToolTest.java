@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.ai1.dal.dataobject.chat.Ai1ChatMessageDO;
 import cn.iocoder.yudao.module.ai1.enums.chat.Ai1ChatMessageStatusEnum;
 import cn.iocoder.yudao.module.ai1.enums.model.Ai1ModelTypeEnum;
 import cn.iocoder.yudao.module.ai1.framework.ai.config.YudaoAi1Properties;
-import cn.iocoder.yudao.module.ai1.framework.ai.core.skill.Ai1SkillToolFactory;
+import cn.iocoder.yudao.module.ai1.harness.skill.Ai1SkillToolFactory;
 import cn.iocoder.yudao.module.ai1.service.agent.Ai1AgentService;
 import cn.iocoder.yudao.module.ai1.service.chat.Ai1ChatConversationService;
 import cn.iocoder.yudao.module.ai1.service.chat.Ai1ChatMessageService;
