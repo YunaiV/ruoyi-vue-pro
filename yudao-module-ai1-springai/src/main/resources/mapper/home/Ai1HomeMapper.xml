@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.iocoder.yudao.module.ai1.dal.mysql.home.Ai1HomeMapper">
+
+    <!-- TODO @AI：可以 mybatis plus join 或者 mybatis plus 内敛掉，整个 xml 么？ -->
+
+    <select id="selectSummary"
+            resultType="cn.iocoder.yudao.module.ai1.controller.admin.home.vo.Ai1HomeSummaryRespVO">
+        SELECT (SELECT COUNT(1) FROM ai1_agent WHERE deleted = FALSE)          AS agentCount,
+               (SELECT COUNT(1) FROM ai1_skill WHERE deleted = FALSE)          AS skillCount,
+               (SELECT COUNT(1) FROM ai1_mcp WHERE deleted = FALSE)            AS mcpCount,
+               (SELECT COUNT(1) FROM ai1_provider_model WHERE deleted = FALSE) AS modelCount
+    </select>
+
+    <select id="selectMessageTrendListByCreateTimeBetween"
+            resultType="cn.iocoder.yudao.module.ai1.controller.admin.home.vo.Ai1HomeMessageTrendRespVO">
+        SELECT CAST(create_time AS DATE) AS `date`,
+               COUNT(1)                  AS `count`
+        FROM ai1_chat_message
+        WHERE create_time BETWEEN #{beginTime} AND #{endTime}
+          AND deleted = FALSE
+        GROUP BY CAST(create_time AS DATE)
+        ORDER BY `date`
+    </select>
+
+    <select id="selectMessageShareListByCreateTimeBetween"
+            resultType="cn.iocoder.yudao.module.ai1.controller.admin.home.vo.Ai1HomeMessageShareRespVO">
+        SELECT c.agent_id AS agentId,
+               COUNT(1)   AS `count`
+        FROM ai1_chat_message m
+                 INNER JOIN ai1_chat_conversation c ON m.conversation_id = c.id AND c.deleted = FALSE
+        WHERE m.create_time BETWEEN #{beginTime} AND #{endTime}
+          AND m.deleted = FALSE
+        GROUP BY c.agent_id
+        ORDER BY `count` DESC, c.agent_id
+    </select>
+
+</mapper>

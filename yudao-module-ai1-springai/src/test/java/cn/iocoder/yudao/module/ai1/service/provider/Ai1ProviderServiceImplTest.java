@@ -1,0 +1,198 @@
+package cn.iocoder.yudao.module.ai1.service.provider;
+
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
+import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
+import cn.iocoder.yudao.module.ai1.controller.admin.provider.vo.provider.Ai1ProviderSaveReqVO;
+import cn.iocoder.yudao.module.ai1.dal.dataobject.provider.Ai1ModelDO;
+import cn.iocoder.yudao.module.ai1.dal.dataobject.provider.Ai1ProviderDO;
+import cn.iocoder.yudao.module.ai1.dal.mysql.provider.Ai1ProviderMapper;
+import cn.iocoder.yudao.module.ai1.enums.provider.Ai1ModelTypeEnum;
+import cn.iocoder.yudao.module.ai1.framework.ai.core.llm.Ai1LlmModelFactory;
+import cn.iocoder.yudao.module.ai1.service.provider.bo.Ai1ProviderRuntime;
+import cn.iocoder.yudao.module.ai1.tool.provider.Ai1ProviderTool;
+import jakarta.annotation.Resource;
+import org.junit.jupiter.api.Test;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+
+import java.util.Collections;
+import java.util.function.Consumer;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
+import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
+import static cn.iocoder.yudao.module.ai1.enums.Ai1ErrorCodeConstants.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.*;
+
+/**
+ * {@link Ai1ProviderServiceImpl} 的单元测试
+ *
+ * @author 芋道源码
+ */
+@Import(Ai1ProviderServiceImpl.class)
+public class Ai1ProviderServiceImplTest extends BaseDbUnitTest {
+
+    @Resource
+    private Ai1ProviderServiceImpl providerService;
+
+    @Resource
+    private Ai1ProviderMapper providerMapper;
+
+    @MockitoBean
+    private Ai1ModelService modelService;
+    @MockitoBean
+    private Ai1ProviderTool providerTool;
+    @MockitoBean
+    private Ai1LlmModelFactory llmModelFactory;
+
+    @Test
+    public void testCreateProvider_headersInvalid() {
+        // 准备参数：附属 Header 不是 [{key,value}] 数组
+        Ai1ProviderSaveReqVO reqVO = randomProviderSaveReqVO(o -> o.setHeaders("{\"key\":\"X\"}"));
+
+        // 调用，并断言异常
+        assertServiceException(() -> providerService.createProvider(reqVO), PROVIDER_HEADERS_INVALID);
+    }
+
+    @Test
+    public void testCreateProvider_success() {
+        // 准备参数
+        Ai1ProviderSaveReqVO reqVO = randomProviderSaveReqVO(o -> o.setHeaders("[{\"key\":\"X-Session\",\"value\":\"{session}\"}]"));
+
+        // 调用
+        Long id = providerService.createProvider(reqVO);
+
+        // 断言
+        Ai1ProviderDO provider = providerMapper.selectById(id);
+        assertEquals(reqVO.getName(), provider.getName());
+        assertEquals(reqVO.getApiKey(), provider.getApiKey());
+    }
+
+    @Test
+    public void testUpdateProvider_blankApiKeyKeepsOriginal() {
+        // mock 数据
+        Ai1ProviderDO dbProvider = randomProviderDO();
+        providerMapper.insert(dbProvider);
+        // 准备参数：密钥留空
+        Ai1ProviderSaveReqVO reqVO = randomProviderSaveReqVO(o -> o.setId(dbProvider.getId()).setApiKey(""));
+
+        // 调用
+        providerService.updateProvider(reqVO);
+
+        // 断言：密钥保持不变，其他字段更新；并失效模型缓存
+        Ai1ProviderDO provider = providerMapper.selectById(dbProvider.getId());
+        assertEquals(dbProvider.getApiKey(), provider.getApiKey());
+        assertEquals(reqVO.getBaseUrl(), provider.getBaseUrl());
+        verify(llmModelFactory).evictByProviderId(dbProvider.getId());
+    }
+
+    @Test
+    public void testDeleteProvider_hasModel() {
+        // mock 数据
+        Ai1ProviderDO dbProvider = randomProviderDO();
+        providerMapper.insert(dbProvider);
+        // mock 方法：其下存在模型
+        when(modelService.getModelCountByProviderIds(anyList())).thenReturn(1L);
+
+        // 调用，并断言异常
+        assertServiceException(() -> providerService.deleteProvider(dbProvider.getId()), PROVIDER_HAS_MODEL);
+        assertNotNull(providerMapper.selectById(dbProvider.getId()));
+    }
+
+    @Test
+    public void testDeleteProvider_success() {
+        // mock 数据
+        Ai1ProviderDO dbProvider = randomProviderDO();
+        providerMapper.insert(dbProvider);
+        // mock 方法
+        when(modelService.getModelCountByProviderIds(anyList())).thenReturn(0L);
+
+        // 调用
+        providerService.deleteProvider(dbProvider.getId());
+
+        // 断言
+        assertNull(providerMapper.selectById(dbProvider.getId()));
+        verify(llmModelFactory).evictByProviderId(dbProvider.getId());
+    }
+
+    @Test
+    public void testGetProviderRuntime_providerDisable() {
+        // mock 数据
+        Ai1ProviderDO dbProvider = randomProviderDO(o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus()));
+        providerMapper.insert(dbProvider);
+
+        // 调用，并断言异常
+        assertServiceException(() -> providerService.getProviderRuntime(dbProvider.getId(), randomLongId()),
+                PROVIDER_DISABLE, dbProvider.getName());
+    }
+
+    @Test
+    public void testGetProviderRuntime_modelNotBelong() {
+        // mock 数据
+        Ai1ProviderDO dbProvider = randomProviderDO();
+        providerMapper.insert(dbProvider);
+        // mock 方法：模型属于其他 Provider
+        Ai1ModelDO model = randomModelDO(o -> o.setProviderId(dbProvider.getId() + 1));
+        when(modelService.validateModelExists(model.getId())).thenReturn(model);
+
+        // 调用，并断言异常
+        assertServiceException(() -> providerService.getProviderRuntime(dbProvider.getId(), model.getId()),
+                MODEL_NOT_BELONG_PROVIDER);
+    }
+
+    @Test
+    public void testGetProviderRuntime_success() {
+        // mock 数据
+        Ai1ProviderDO dbProvider = randomProviderDO(o -> o.setHeaders("[{\"key\":\"X-App\",\"value\":\"yudao\"}]"));
+        providerMapper.insert(dbProvider);
+        // mock 方法
+        Ai1ModelDO model = randomModelDO(o -> o.setProviderId(dbProvider.getId()));
+        when(modelService.validateModelExists(model.getId())).thenReturn(model);
+
+        // 调用
+        Ai1ProviderRuntime runtime = providerService.getProviderRuntime(dbProvider.getId(), model.getId());
+
+        // 断言
+        assertEquals(dbProvider.getBaseUrl(), runtime.getBaseUrl());
+        assertEquals(model.getModel(), runtime.getModel());
+        assertEquals(model.getType(), runtime.getModelType());
+        assertEquals(Collections.singletonList("X-App"), convertList(runtime.getHeaders(), header -> header.get("key")));
+    }
+
+    @Test
+    public void testGetRemoteModelList_loadFail() {
+        // mock 数据
+        Ai1ProviderDO dbProvider = randomProviderDO();
+        providerMapper.insert(dbProvider);
+        // mock 方法：拉取失败
+        when(providerTool.listModels(dbProvider.getBaseUrl(), dbProvider.getApiKey(), dbProvider.getHeaders())).thenReturn(null);
+
+        // 调用，并断言异常
+        assertServiceException(() -> providerService.getRemoteModelList(dbProvider.getId()), PROVIDER_REMOTE_MODEL_LOAD_FAIL);
+    }
+
+    // ========== 随机对象 ==========
+
+    @SafeVarargs
+    private static Ai1ProviderDO randomProviderDO(Consumer<Ai1ProviderDO>... consumers) {
+        Consumer<Ai1ProviderDO> consumer = o -> o.setId(null).setHeaders(null).setStatus(CommonStatusEnum.ENABLE.getStatus());
+        return randomPojo(Ai1ProviderDO.class, ArrayUtils.append(consumer, consumers));
+    }
+
+    @SafeVarargs
+    private static Ai1ModelDO randomModelDO(Consumer<Ai1ModelDO>... consumers) {
+        Consumer<Ai1ModelDO> consumer = o -> o.setType(Ai1ModelTypeEnum.CHAT.getType()).setStatus(CommonStatusEnum.ENABLE.getStatus());
+        return randomPojo(Ai1ModelDO.class, ArrayUtils.append(consumer, consumers));
+    }
+
+    @SafeVarargs
+    private static Ai1ProviderSaveReqVO randomProviderSaveReqVO(Consumer<Ai1ProviderSaveReqVO>... consumers) {
+        Consumer<Ai1ProviderSaveReqVO> consumer = o -> o.setId(null).setHeaders(null).setStatus(CommonStatusEnum.ENABLE.getStatus());
+        return randomPojo(Ai1ProviderSaveReqVO.class, ArrayUtils.append(consumer, consumers));
+    }
+
+}
