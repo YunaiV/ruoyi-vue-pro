@@ -98,8 +98,6 @@ public class Ai1AgentController {
 
     @GetMapping("/simple-list")
     @Operation(summary = "获得已开启的 Agent 精简列表", description = "用于对话页选择 Agent，仅返回已开启的 Agent")
-    // TODO DONE @AI：simple-list 不用 ai1:chat:query 把？别的也检查下；这个按照项目的习惯，是不需要的噢。对齐下噢；
-    // 精简列表对齐 System 部门、用户等 simple-list，不做权限校验；ai1:chat:query 仍用于对话、消息接口，菜单无需调整
     public CommonResult<List<Ai1AgentRespVO>> getAgentSimpleList() {
         List<Ai1AgentDO> list = agentService.getAgentListByStatus(CommonStatusEnum.ENABLE.getStatus());
         Map<Long, Ai1ModelDO> modelMap = modelService.getModelMap(convertSet(list, Ai1AgentDO::getModelId));

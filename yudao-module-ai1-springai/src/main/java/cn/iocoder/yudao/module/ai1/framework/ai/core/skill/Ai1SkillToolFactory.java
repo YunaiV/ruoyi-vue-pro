@@ -210,7 +210,6 @@ public class Ai1SkillToolFactory {
      */
     private boolean materializeSkill(Path skillDirectory, Long skillId) {
         // 1. 查询 SKILL 的全部节点，构建编号映射，用于沿 parentId 解析相对路径
-        // TODO DONE @AI：拿到后，就是 map；
         List<Ai1SkillFileDO> files = skillFileService.getSkillFileListBySkillId(skillId);
         Map<Long, Ai1SkillFileDO> fileMap = convertMap(files, Ai1SkillFileDO::getId);
 

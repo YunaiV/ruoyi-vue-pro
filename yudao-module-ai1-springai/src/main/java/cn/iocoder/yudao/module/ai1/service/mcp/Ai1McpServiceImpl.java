@@ -53,8 +53,6 @@ public class Ai1McpServiceImpl implements Ai1McpService {
         mcpMapper.updateForSave(buildMcp(updateReqVO));
 
         // 3. 释放本节点的旧连接，下次使用时按新配置重建
-        // TODO DONE @AI：集群情况下；
-        // 其他节点：客户端缓存按配置指纹比对，加载到新配置时自动重建并关闭旧连接；闲置连接按访问过期自动释放
         mcpClientTool.evict(updateReqVO.getId());
     }
 

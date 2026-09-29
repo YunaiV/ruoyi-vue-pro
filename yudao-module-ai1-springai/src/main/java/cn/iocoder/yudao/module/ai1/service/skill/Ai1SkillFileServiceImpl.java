@@ -34,7 +34,6 @@ import static cn.iocoder.yudao.module.ai1.enums.Ai1ErrorCodeConstants.*;
 @Validated
 public class Ai1SkillFileServiceImpl implements Ai1SkillFileService {
 
-    // TODO NOT_FIX @AI【不修复：固定节点只是 SKILL.md、scripts、reference 三个名称常量，不承载状态或分支语义，不构成枚举；SKILL.md 名称统一放在 Ai1SkillFileDO#NAME_SKILL，供物化复用】：这个是不是枚举下噢？放到枚举类里？
     /**
      * 固定目录：scripts，存放可执行脚本
      */

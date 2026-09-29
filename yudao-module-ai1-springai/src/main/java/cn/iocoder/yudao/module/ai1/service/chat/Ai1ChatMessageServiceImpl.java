@@ -37,9 +37,6 @@ import static cn.iocoder.yudao.module.ai1.enums.Ai1ErrorCodeConstants.CHAT_MESSA
 @Slf4j
 public class Ai1ChatMessageServiceImpl implements Ai1ChatMessageService {
 
-    // TODO DONE @AI：这个放到 DO 里？conversationdo 里？
-    // 对话标题最大长度定义在 Ai1ChatConversationDO#TITLE_MAX_LENGTH
-
     @Resource
     private Ai1ChatMessageMapper chatMessageMapper;
 
@@ -72,9 +69,6 @@ public class Ai1ChatMessageServiceImpl implements Ai1ChatMessageService {
             Long messageId = getSelf().createRoundMessages(conversation, sendReqVO.getContent());
 
             // 3. 投递生成任务，并打开 SSE 连接
-            // TODO DONE @AI：是不是租户 id 在 submit 里处理哈？
-            // TODO DONE @AI：然后里面 TenantContextHolder.getRequiredTenantId() 非绝对的，不然关闭租户不好兼容噢；
-            // 租户由 submit 从当前上下文可选获取，关闭多租户时同样可用
             chatStreamTool.submit(messageId, conversation.getAgentId(), conversation.getId(), sendReqVO.getContent());
             return chatStreamTool.open(messageId, null);
         } catch (ServiceException e) {
@@ -95,7 +89,6 @@ public class Ai1ChatMessageServiceImpl implements Ai1ChatMessageService {
             }
             chatConversationService.validateChatConversationMy(userId, message.getConversationId());
 
-            // TODO DONE @AI：这里写个方法注释；ps：不要“通过后才读取 Redis 结果流”里的 Redis，这样注释和实现太耦合了。。。后续不好替换 redis 呀；
             // 2. 校验通过后，从 lastEventId 之后续传结果流，不重新生成
             return chatStreamTool.open(messageId, lastEventId);
         } catch (ServiceException e) {

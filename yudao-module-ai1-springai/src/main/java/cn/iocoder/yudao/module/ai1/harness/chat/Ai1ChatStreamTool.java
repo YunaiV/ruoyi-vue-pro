@@ -196,7 +196,6 @@ public class Ai1ChatStreamTool implements SmartLifecycle {
      * 实例标识，消费者名按「实例 + 序号」隔离
      */
     private final String instanceId = UUID.randomUUID().toString().substring(0, 8);
-    // TODO DONE @AI：变量注释
     /**
      * 生成 worker 消费线程列表，停止时逐个等待退出
      */

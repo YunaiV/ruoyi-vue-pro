@@ -29,7 +29,6 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMultiMap;
 import static cn.iocoder.yudao.module.ai1.enums.Ai1ErrorCodeConstants.*;
 
-// TODO DONE @AI：“文档向量化在请求线程内同步执行，登录上下文中的租户天然存在”，这里是不是去掉噢；
 /**
  * AI1 知识文档 Service 实现类
  *

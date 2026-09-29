@@ -219,7 +219,6 @@ public class Ai1RagTool {
             return cached.getVectorStore();
         }
 
-        // TODO DONE @AI：方法内注释；
         // 2.1 构建向量存储：集合不存在时自动创建
         String collectionName = buildCollectionName(knowledgeBase.getId());
         MilvusVectorStore vectorStore = MilvusVectorStore.builder(milvusClientLoader.get(), embeddingModel)

@@ -33,8 +33,6 @@ import java.util.*;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.module.ai1.util.Ai1Utils.resolveSpringPlaceholders;
 
-// TODO DONE @AI：jdk8 兼容噢；
-// 不使用 record、instanceof 模式匹配、StringBuilder#isEmpty 等高版本语法
 /**
  * AI1 MCP 客户端工具（官方 Java MCP SDK）：连接、列举工具、调用工具、连通测试
  *

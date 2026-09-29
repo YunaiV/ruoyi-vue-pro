@@ -138,8 +138,6 @@ public class Ai1KnowledgeBaseServiceImpl implements Ai1KnowledgeBaseService {
         } catch (ServiceException e) {
             throw e;
         } catch (Exception e) {
-            // TODO DONE @AI：query 还是完整的打印吧
-            // 检索失败时打印完整查询文本，便于复现问题
             log.warn("[searchKnowledgeBase][知识库({}) query({}) topK({}) 向量检索失败]", id, query, topK, e);
             throw exception(KNOWLEDGE_BASE_SEARCH_FAIL, e.getMessage());
         }

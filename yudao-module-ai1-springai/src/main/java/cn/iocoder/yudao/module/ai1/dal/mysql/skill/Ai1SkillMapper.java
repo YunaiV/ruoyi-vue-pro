@@ -34,6 +34,4 @@ public interface Ai1SkillMapper extends BaseMapperX<Ai1SkillDO> {
                 .orderByAsc(Ai1SkillDO::getId));
     }
 
-    // TODO DONE @AI：可以清理掉了；
-
 }

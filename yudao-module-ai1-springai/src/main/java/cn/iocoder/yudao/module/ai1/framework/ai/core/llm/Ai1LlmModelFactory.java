@@ -36,8 +36,6 @@ import java.util.function.Predicate;
 @Slf4j
 public class Ai1LlmModelFactory {
 
-    // TODO DONE @AI：这个是不是不用噢？直接 id 是不是就 ok 了？
-    // 已去掉「ai1-conversation-」前缀，占位符直接替换为对话编号；占位符同步由 {session} 改名为 {session}
     /**
      * 附属 Header 对话占位符：构建模型时替换为当前对话编号
      */
@@ -110,7 +108,6 @@ public class Ai1LlmModelFactory {
         evict(key -> modelIdText.equals(StrUtil.split(key, KEY_SEPARATOR).get(1)));
     }
 
-    // TODO DONE @AI：java.util.function. 多了？
     /**
      * 按 key 条件失效对话模型、嵌入模型缓存
      *
@@ -127,7 +124,6 @@ public class Ai1LlmModelFactory {
      * 仅当附属 Header 使用 {session} 占位符（需按对话隔离）时，才把对话编号纳入缓存 key；
      * 否则同一模型跨对话复用，避免每个对话都构建一个模型实例
      */
-    // TODO DONE @AI：方法内注释，这样更好理解；1. 2. 这种；
     private OpenAiChatModel getOrCreateChatModel(Ai1ProviderRuntime runtime, Long conversationId) {
         // 1. 计算缓存 key：Header 含 {session} 占位符时按对话隔离，否则跨对话共享
         String conversationKey = usesSessionHeader(runtime.getHeaders()) && conversationId != null
