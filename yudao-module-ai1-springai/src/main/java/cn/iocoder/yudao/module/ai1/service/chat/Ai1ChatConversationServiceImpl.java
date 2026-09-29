@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -57,9 +56,10 @@ public class Ai1ChatConversationServiceImpl implements Ai1ChatConversationServic
 
     @Override
     public void updateChatConversationMy(Long userId, Ai1ChatConversationUpdateMyReqVO updateReqVO) {
-        // TODO @AI：方法内注释
+        // 1. 校验归属
         validateChatConversationMy(userId, updateReqVO.getId());
-        // TODO @AI：方法内注释
+
+        // 2. 更新标题
         updateChatConversationTitle(updateReqVO.getId(), updateReqVO.getTitle().trim());
     }
 
@@ -94,27 +94,19 @@ public class Ai1ChatConversationServiceImpl implements Ai1ChatConversationServic
     }
 
     @Override
-    public Ai1ChatConversationDO getChatConversation(Long id) {
-        return chatConversationMapper.selectById(id);
-    }
-
-    @Override
     public void updateChatConversationTitle(Long id, String title) {
         chatConversationMapper.updateById(new Ai1ChatConversationDO().setId(id).setTitle(title));
     }
 
     @Override
     public void touchChatConversation(Long id) {
-        // TODO @AI：inline 掉，参考 updateChatConversationTitle 风格呀；
-        Ai1ChatConversationDO updateObj = new Ai1ChatConversationDO().setId(id);
-        updateObj.setUpdateTime(LocalDateTime.now());
-        chatConversationMapper.updateById(updateObj);
+        chatConversationMapper.updateById(new Ai1ChatConversationDO().setId(id));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteChatConversationListByAgentIds(Collection<Long> agentIds) {
-        // TODO @AI：方法内注释；
+        // 1. 查询 Agent 下的全部对话编号
         if (CollUtil.isEmpty(agentIds)) {
             return;
         }
@@ -123,7 +115,7 @@ public class Ai1ChatConversationServiceImpl implements Ai1ChatConversationServic
             return;
         }
 
-        // TODO @AI：方法内注释；
+        // 2. 删除对话与消息
         chatConversationMapper.deleteByIds(conversationIds);
         chatMessageService.deleteChatMessageListByConversationIds(conversationIds);
     }

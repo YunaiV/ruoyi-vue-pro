@@ -14,20 +14,16 @@ import java.util.List;
 /**
  * AI1 SKILL 内容文件 Service 接口
  *
- * 任何内容变更都会刷新所属 SKILL 的更新时间，供本地物化做变更检测 TODO @AI：这个注释是必须的么？还是？
- *
  * @author 芋道源码
  */
 public interface Ai1SkillFileService {
 
-    // TODO @AI“seed”会不会有点奇怪？这个是专有名词么？
-    // TODO @AI：方法名，不以 s 结尾，使用 List；
     /**
-     * 播种 SKILL 的固定文件：SKILL.md（含 frontmatter）、scripts/、reference/，均为锁定节点
+     * 创建 SKILL 的默认文件：SKILL.md（含 frontmatter）、scripts/、reference/，均为固定节点
      *
      * @param skill SKILL
      */
-    void createSkillSeedFiles(Ai1SkillDO skill);
+    void createDefaultSkillFileList(Ai1SkillDO skill);
 
     /**
      * 创建目录或文件；文件按扩展名推断类型，并填充默认内容

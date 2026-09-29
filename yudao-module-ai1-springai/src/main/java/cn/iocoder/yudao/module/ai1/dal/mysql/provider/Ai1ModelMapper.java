@@ -11,7 +11,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * AI1 Provider 模型 Mapper
+ * AI1 模型 Mapper
  *
  * @author 芋道源码
  */

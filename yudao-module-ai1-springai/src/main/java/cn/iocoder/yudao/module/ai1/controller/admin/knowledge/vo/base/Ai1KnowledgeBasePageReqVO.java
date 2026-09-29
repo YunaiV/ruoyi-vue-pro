@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.knowledgebase;
+package cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.base;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-// TODO @AI：base、document 这样的包？感觉更合适呀；
 @Schema(description = "管理后台 - AI1 知识库分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)

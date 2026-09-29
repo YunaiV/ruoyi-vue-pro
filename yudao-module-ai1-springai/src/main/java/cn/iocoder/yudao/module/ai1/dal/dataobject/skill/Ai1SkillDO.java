@@ -7,8 +7,6 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
-import java.time.LocalDateTime;
-
 /**
  * AI1 SKILL DO
  *
@@ -49,13 +47,5 @@ public class Ai1SkillDO extends TenantBaseDO {
      * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;
-    // TODO @AI：不新建唯一索引，所以这个字段可以删除掉噢；
-    /**
-     * 删除时间
-     *
-     * 唯一键 (tenant_id, name, deleted_at) 的组成部分：未删除时为数据库默认的纪元值，逻辑删除前写入当前时间，
-     * 使同名 SKILL 删除后可重建
-     */
-    private LocalDateTime deletedAt;
 
 }

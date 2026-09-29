@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.ai1.service.mcp;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
@@ -47,11 +48,12 @@ public class Ai1McpServiceImpl implements Ai1McpService {
         // 1. 校验存在
         validateMcpExists(updateReqVO.getId());
 
-        // 2. 更新
-        mcpMapper.updateById(buildMcp(updateReqVO));
+        // 2. 更新：切换为本地时服务地址为空，由 updateForSave 主动置空
+        mcpMapper.updateForSave(buildMcp(updateReqVO));
 
-        // 3. 释放旧连接，下次使用时按新配置重建
-        // TODO @AI：集群情况下；
+        // 3. 释放本节点的旧连接，下次使用时按新配置重建
+        // TODO DONE @AI：集群情况下；
+        // 其他节点：客户端缓存按配置指纹比对，加载到新配置时自动重建并关闭旧连接；闲置连接按访问过期自动释放
         mcpClientTool.evict(updateReqVO.getId());
     }
 
@@ -65,8 +67,10 @@ public class Ai1McpServiceImpl implements Ai1McpService {
         // 1. 校验存在
         ids.forEach(this::validateMcpExists);
 
-        // 2. 删除，并释放连接与子进程
+        // 2. 删除
         mcpMapper.deleteByIds(ids);
+
+        // 3. 释放本节点的连接与子进程；其他节点的闲置连接按访问过期自动释放
         ids.forEach(mcpClientTool::evict);
     }
 
@@ -94,8 +98,9 @@ public class Ai1McpServiceImpl implements Ai1McpService {
     }
 
     @Override
-    public Ai1McpClientTool.McpConnectResult testMcp(Long id) {
-        return mcpClientTool.test(validateMcpExists(id));
+    public Ai1McpClientTool.McpConnectResult testMcpConnect(Long id) {
+        Ai1McpDO mcp = validateMcpExists(id);
+        return mcpClientTool.testConnect(mcp);
     }
 
     private Ai1McpDO validateMcpExists(Long id) {
@@ -113,7 +118,7 @@ public class Ai1McpServiceImpl implements Ai1McpService {
      * 3. 本地：config 必须包含 command，服务地址置空
      */
     private Ai1McpDO buildMcp(Ai1McpSaveReqVO reqVO) {
-        // 1.1 解析 config、headers
+        // 1.1 解析 config
         Map<String, Object> config = new LinkedHashMap<>();
         if (StrUtil.isNotBlank(reqVO.getConfig())) {
             Map<String, Object> configMap = JsonUtils.parseMap(reqVO.getConfig());
@@ -122,21 +127,13 @@ public class Ai1McpServiceImpl implements Ai1McpService {
             }
             config.putAll(configMap);
         }
-        Map<String, Object> headers = null;
-        if (StrUtil.isNotBlank(reqVO.getHeaders())) {
-            headers = JsonUtils.parseMap(reqVO.getHeaders());
-            if (headers == null) {
-                throw exception(MCP_HEADERS_INVALID);
-            }
-        }
         // 1.2 传输方式以列为准
         config.put("transport", reqVO.getTransport());
 
         // 2. 按传输方式校验必填项
-        // TODO @AI：jdk8 的兼容性代码，需要优化下；
-        String url = StrUtil.blankToDefault(reqVO.getUrl(), config.get("url") instanceof String value ? value : null);
+        String url = StrUtil.blankToDefault(reqVO.getUrl(), MapUtil.getStr(config, "url"));
         if (Ai1McpTransportEnum.isStdio(reqVO.getTransport())) {
-            if (!(config.get("command") instanceof String command) || StrUtil.isBlank(command)) {
+            if (StrUtil.isBlank(MapUtil.getStr(config, "command"))) {
                 throw exception(MCP_COMMAND_REQUIRED);
             }
             url = null;
@@ -145,8 +142,8 @@ public class Ai1McpServiceImpl implements Ai1McpService {
                 throw exception(MCP_URL_REQUIRED);
             }
             config.putIfAbsent("url", url);
-            if (headers != null) {
-                config.putIfAbsent("headers", headers);
+            if (MapUtil.isNotEmpty(reqVO.getHeaders())) {
+                config.putIfAbsent("headers", reqVO.getHeaders());
             }
         }
 

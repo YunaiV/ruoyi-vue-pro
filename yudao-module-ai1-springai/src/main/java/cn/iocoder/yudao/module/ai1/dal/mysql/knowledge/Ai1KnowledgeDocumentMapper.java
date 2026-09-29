@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.ai1.dal.mysql.knowledge;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.knowledgedocument.Ai1KnowledgeDocumentPageReqVO;
+import cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.document.Ai1KnowledgeDocumentPageReqVO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.knowledge.Ai1KnowledgeDocumentDO;
 import org.apache.ibatis.annotations.Mapper;
 

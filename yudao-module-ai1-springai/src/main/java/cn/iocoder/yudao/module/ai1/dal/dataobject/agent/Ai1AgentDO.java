@@ -81,18 +81,11 @@ public class Ai1AgentDO extends TenantBaseDO {
      */
     @TableField(typeHandler = LongListTypeHandler.class)
     private List<Long> skillIds;
-    // TODO @AI：uuid 可以去掉，暂时不考虑开启时；
     /**
      * 状态
      *
-     * 枚举 {@link CommonStatusEnum}；开启后才可在「Agent 对话」中使用，首次开启时生成访问 UUID
+     * 枚举 {@link CommonStatusEnum}；开启后才可在「Agent 对话」中使用
      */
     private Integer status;
-    /**
-     * 访问 UUID，首次开启时生成
-     *
-     * 为后续开放免登录访问预留，管理后台对话只依赖开启状态
-     */
-    private String uuid;
 
 }

@@ -4,7 +4,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
-import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.module.ai1.controller.admin.chat.vo.message.Ai1ChatMessageSendReqVO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.chat.Ai1ChatConversationDO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.chat.Ai1ChatMessageDO;
@@ -38,11 +37,8 @@ import static cn.iocoder.yudao.module.ai1.enums.Ai1ErrorCodeConstants.CHAT_MESSA
 @Slf4j
 public class Ai1ChatMessageServiceImpl implements Ai1ChatMessageService {
 
-    // TODO @AI：这个放到 DO 里？conversationdo 里？
-    /**
-     * 自动生成的对话标题最大长度
-     */
-    private static final int TITLE_MAX_LENGTH = 50;
+    // TODO DONE @AI：这个放到 DO 里？conversationdo 里？
+    // 对话标题最大长度定义在 Ai1ChatConversationDO#TITLE_MAX_LENGTH
 
     @Resource
     private Ai1ChatMessageMapper chatMessageMapper;
@@ -75,11 +71,11 @@ public class Ai1ChatMessageServiceImpl implements Ai1ChatMessageService {
             // 2. 同一事务内落库用户消息与助手占位
             Long messageId = getSelf().createRoundMessages(conversation, sendReqVO.getContent());
 
-            // 3. 投递生成任务（携带租户），并打开 SSE 连接
-            // TODO @AI：是不是租户 id 在 submit 里处理哈？
-            // TODO @AI：然后里面 TenantContextHolder.getRequiredTenantId() 非绝对的，不然关闭租户不好兼容噢；
-            chatStreamTool.submit(TenantContextHolder.getRequiredTenantId(), messageId, conversation.getAgentId(),
-                    conversation.getId(), sendReqVO.getContent());
+            // 3. 投递生成任务，并打开 SSE 连接
+            // TODO DONE @AI：是不是租户 id 在 submit 里处理哈？
+            // TODO DONE @AI：然后里面 TenantContextHolder.getRequiredTenantId() 非绝对的，不然关闭租户不好兼容噢；
+            // 租户由 submit 从当前上下文可选获取，关闭多租户时同样可用
+            chatStreamTool.submit(messageId, conversation.getAgentId(), conversation.getId(), sendReqVO.getContent());
             return chatStreamTool.open(messageId, null);
         } catch (ServiceException e) {
             return chatStreamTool.error(e.getMessage());
@@ -92,14 +88,15 @@ public class Ai1ChatMessageServiceImpl implements Ai1ChatMessageService {
     @Override
     public SseEmitter resumeChatMessageStream(Long userId, Long messageId, String lastEventId) {
         try {
-            // 校验链路：消息存在（租户过滤）→ 为助手消息 → 所属对话归属当前用户；通过后才读取 Redis 结果流
+            // 1. 校验消息存在、为助手消息，且所属对话归属当前用户
             Ai1ChatMessageDO message = chatMessageMapper.selectById(messageId);
             if (message == null || !Ai1ChatMessageRoleEnum.isAssistant(message.getRole())) {
                 throw exception(CHAT_MESSAGE_NOT_EXISTS);
             }
             chatConversationService.validateChatConversationMy(userId, message.getConversationId());
 
-            // TODO @AI：这里写个方法注释；ps：不要“通过后才读取 Redis 结果流”里的 Redis，这样注释和实现太耦合了。。。后续不好替换 redis 呀；
+            // TODO DONE @AI：这里写个方法注释；ps：不要“通过后才读取 Redis 结果流”里的 Redis，这样注释和实现太耦合了。。。后续不好替换 redis 呀；
+            // 2. 校验通过后，从 lastEventId 之后续传结果流，不重新生成
             return chatStreamTool.open(messageId, lastEventId);
         } catch (ServiceException e) {
             return chatStreamTool.error(e.getMessage());
@@ -119,7 +116,7 @@ public class Ai1ChatMessageServiceImpl implements Ai1ChatMessageService {
         if (Ai1ChatConversationDO.TITLE_DEFAULT.equals(conversation.getTitle())
                 && chatMessageMapper.selectCountByConversationId(conversation.getId()) == 0) {
             chatConversationService.updateChatConversationTitle(conversation.getId(),
-                    StrUtil.maxLength(content.trim(), TITLE_MAX_LENGTH - 3));
+                    StrUtil.maxLength(content.trim(), Ai1ChatConversationDO.TITLE_MAX_LENGTH - 3));
         }
 
         // 2. 用户消息 + 助手占位；刷新页面后，前端按生成中的助手消息编号续传

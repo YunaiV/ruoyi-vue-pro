@@ -15,12 +15,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 @Tag(name = "管理后台 - AI1 SKILL 内容文件")
 @RestController
@@ -33,14 +30,14 @@ public class Ai1SkillFileController {
     @Resource
     private Ai1SkillService skillService;
 
-    @GetMapping("/tree")
-    @Operation(summary = "获得 SKILL 文件树", description = "不返回文件内容，编辑时通过获取接口加载")
+    @GetMapping("/list")
+    @Operation(summary = "获得 SKILL 文件列表", description = "平铺返回，不返回文件内容，编辑时通过获取接口加载")
     @Parameter(name = "skillId", description = "SKILL 编号", required = true, example = "1")
     @PreAuthorize("@ss.hasPermission('ai1:skill:query')")
-    public CommonResult<List<Ai1SkillFileRespVO>> getSkillFileTree(@RequestParam("skillId") Long skillId) {
+    public CommonResult<List<Ai1SkillFileRespVO>> getSkillFileList(@RequestParam("skillId") Long skillId) {
         skillService.validateSkillExists(skillId);
         List<Ai1SkillFileDO> list = skillFileService.getSkillFileListBySkillId(skillId);
-        return success(buildSkillFileTree(list));
+        return success(BeanUtils.toBean(list, Ai1SkillFileRespVO.class, skillFile -> skillFile.setContent(null)));
     }
 
     @GetMapping("/get")
@@ -90,30 +87,6 @@ public class Ai1SkillFileController {
     public CommonResult<Boolean> deleteSkillFile(@RequestParam("id") Long id) {
         skillFileService.deleteSkillFile(id);
         return success(true);
-    }
-
-    // ==================== 拼接 VO ====================
-
-    // TODO @AI：父子的拼接，是不是可以交给前端噢？
-    /**
-     * 扁平节点列表组装为树：返回根级节点，子节点挂在 children；父节点缺失的孤儿节点按根级展示
-     */
-    private List<Ai1SkillFileRespVO> buildSkillFileTree(List<Ai1SkillFileDO> list) {
-        List<Ai1SkillFileRespVO> nodes = BeanUtils.toBean(list, Ai1SkillFileRespVO.class, node -> node.setContent(null));
-        Map<Long, Ai1SkillFileRespVO> nodeMap = convertMap(nodes, Ai1SkillFileRespVO::getId);
-        List<Ai1SkillFileRespVO> roots = new ArrayList<>();
-        for (Ai1SkillFileRespVO node : nodes) {
-            Ai1SkillFileRespVO parent = nodeMap.get(node.getParentId());
-            if (parent == null) {
-                roots.add(node);
-                continue;
-            }
-            if (parent.getChildren() == null) {
-                parent.setChildren(new ArrayList<>());
-            }
-            parent.getChildren().add(node);
-        }
-        return roots;
     }
 
 }

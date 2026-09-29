@@ -14,7 +14,7 @@ public class Ai1ModelRemoteRespVO {
     @Schema(description = "模型标识", requiredMode = Schema.RequiredMode.REQUIRED, example = "deepseek-chat")
     private String model;
 
-    @Schema(description = "是否已导入当前 Provider", requiredMode = Schema.RequiredMode.REQUIRED, example = "false")
+    @Schema(description = "是否已导入当前供应商", requiredMode = Schema.RequiredMode.REQUIRED, example = "false")
     private Boolean imported;
 
 }

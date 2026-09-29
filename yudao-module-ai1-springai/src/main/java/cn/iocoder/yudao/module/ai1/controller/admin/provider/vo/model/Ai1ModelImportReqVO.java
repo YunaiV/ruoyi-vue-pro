@@ -11,8 +11,8 @@ import java.util.List;
 @Data
 public class Ai1ModelImportReqVO {
 
-    @Schema(description = "Provider 编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    @NotNull(message = "Provider 编号不能为空")
+    @Schema(description = "供应商编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @NotNull(message = "供应商编号不能为空")
     private Long providerId;
 
     @Schema(description = "模型标识列表", requiredMode = Schema.RequiredMode.REQUIRED, example = "[\"deepseek-chat\"]")

@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.ai1.service.skill;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
-import cn.hutool.core.util.ReUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.ai1.controller.admin.skill.vo.skill.Ai1SkillPageReqVO;
@@ -11,37 +10,26 @@ import cn.iocoder.yudao.module.ai1.dal.dataobject.skill.Ai1SkillDO;
 import cn.iocoder.yudao.module.ai1.dal.mysql.skill.Ai1SkillMapper;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.ai1.enums.Ai1ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.ai1.enums.Ai1ErrorCodeConstants.SKILL_NAME_DUPLICATE;
+import static cn.iocoder.yudao.module.ai1.enums.Ai1ErrorCodeConstants.SKILL_NOT_EXISTS;
 
 /**
  * AI1 SKILL Service 实现类
- *
- * // TODO @AI：“名称唯一性由应用层校验 + 数据库唯一键 (tenant_id, name, deleted_at) 共同保证”类似这种公主是，可以去掉；
- * 名称唯一性由应用层校验 + 数据库唯一键 (tenant_id, name, deleted_at) 共同保证：
- * 前者给出友好提示，后者兜底并发创建
  *
  * @author 芋道源码
  */
 @Service
 @Validated
 public class Ai1SkillServiceImpl implements Ai1SkillService {
-
-    /**
-     * 名称格式：同时作为物化目录名，仅支持字母、数字、中划线
-     */
-    private static final Pattern NAME_PATTERN = Pattern.compile("^[A-Za-z0-9-]+$");
 
     @Resource
     private Ai1SkillMapper skillMapper;
@@ -53,39 +41,27 @@ public class Ai1SkillServiceImpl implements Ai1SkillService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createSkill(Ai1SkillSaveReqVO createReqVO) {
-        // 1. 校验名称
-        String name = createReqVO.getName().trim();
-        validateSkillNameUnique(null, name);
+        // 1. 校验名称唯一
+        validateSkillNameUnique(null, createReqVO.getName());
 
         // 2. 插入
-        Ai1SkillDO skill = BeanUtils.toBean(createReqVO, Ai1SkillDO.class).setName(name);
-        try {
-            skillMapper.insert(skill);
-        } catch (DuplicateKeyException e) {
-            // TODO @AI：不用考虑这个，直接抛出异常就好了；
-            throw exception(SKILL_NAME_DUPLICATE, name);
-        }
+        Ai1SkillDO skill = BeanUtils.toBean(createReqVO, Ai1SkillDO.class);
+        skillMapper.insert(skill);
 
-        // 3. 播种固定文件：SKILL.md + scripts/ + reference/
-        skillFileService.createSkillSeedFiles(skill);
+        // 3. 创建默认文件：SKILL.md + scripts/ + reference/
+        skillFileService.createDefaultSkillFileList(skill);
         return skill.getId();
     }
 
     @Override
     public void updateSkill(Ai1SkillSaveReqVO updateReqVO) {
-        // 1. 校验存在、名称
+        // 1. 校验存在、名称唯一
         validateSkillExists(updateReqVO.getId());
-        String name = updateReqVO.getName().trim();
-        validateSkillNameUnique(updateReqVO.getId(), name);
+        validateSkillNameUnique(updateReqVO.getId(), updateReqVO.getName());
 
         // 2. 更新
-        Ai1SkillDO updateObj = BeanUtils.toBean(updateReqVO, Ai1SkillDO.class).setName(name);
-        try {
-            skillMapper.updateById(updateObj);
-        } catch (DuplicateKeyException e) {
-            // TODO @AI：不用考虑这个，直接抛出异常就好了；
-            throw exception(SKILL_NAME_DUPLICATE, name);
-        }
+        Ai1SkillDO updateObj = BeanUtils.toBean(updateReqVO, Ai1SkillDO.class);
+        skillMapper.updateById(updateObj);
     }
 
     @Override
@@ -100,8 +76,7 @@ public class Ai1SkillServiceImpl implements Ai1SkillService {
         // 1. 校验存在
         ids.forEach(this::validateSkillExists);
 
-        // 2. 写入删除时间后逻辑删除，释放名称唯一键；级联删除内容文件
-        skillMapper.updateDeletedAtByIds(ids, LocalDateTime.now());
+        // 2. 删除 SKILL，并级联删除内容文件
         skillMapper.deleteByIds(ids);
         skillFileService.deleteSkillFileListBySkillIds(ids);
     }
@@ -140,20 +115,13 @@ public class Ai1SkillServiceImpl implements Ai1SkillService {
 
     @Override
     public void touchSkill(Long id) {
-        // TODO @AI：直接 inline 掉，简化点。
-        Ai1SkillDO updateObj = new Ai1SkillDO().setId(id);
-        updateObj.setUpdateTime(LocalDateTime.now());
-        skillMapper.updateById(updateObj);
+        skillMapper.updateById(new Ai1SkillDO().setId(id));
     }
 
     /**
-     * 校验名称格式与租户内唯一
+     * 校验名称租户内唯一
      */
     private void validateSkillNameUnique(Long id, String name) {
-        // TODO @AI：这个是不是参数校验，vo 里面搞掉噢；
-        if (!ReUtil.isMatch(NAME_PATTERN, name)) {
-            throw exception(SKILL_NAME_INVALID);
-        }
         Ai1SkillDO skill = skillMapper.selectByName(name);
         if (skill != null && ObjUtil.notEqual(skill.getId(), id)) {
             throw exception(SKILL_NAME_DUPLICATE, name);

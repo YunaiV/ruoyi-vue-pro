@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.ai1.service.home;
 
-import cn.iocoder.yudao.module.ai1.controller.admin.home.vo.Ai1HomeMessageShareRespVO;
-import cn.iocoder.yudao.module.ai1.controller.admin.home.vo.Ai1HomeMessageTrendRespVO;
+import cn.iocoder.yudao.module.ai1.controller.admin.home.vo.Ai1HomeMessageSummaryByAgentRespVO;
+import cn.iocoder.yudao.module.ai1.controller.admin.home.vo.Ai1HomeMessageSummaryByDateRespVO;
 import cn.iocoder.yudao.module.ai1.controller.admin.home.vo.Ai1HomeSummaryRespVO;
 import cn.iocoder.yudao.module.ai1.dal.mysql.home.Ai1HomeMapper;
 import jakarta.annotation.Resource;
@@ -27,10 +27,7 @@ import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.get
 @Validated
 public class Ai1HomeServiceImpl implements Ai1HomeService {
 
-    // TODO @AI：必须传递值，且不需要 DAYS_DEFAULT、DAYS_MAX 变量；
-    private static final int DAYS_DEFAULT = 30;
-    private static final int DAYS_MAX = 30;
-
+    // TODO @AI：hutool 应该有可替代的，直接使用，减少枚举；
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @Resource
@@ -42,37 +39,28 @@ public class Ai1HomeServiceImpl implements Ai1HomeService {
     }
 
     @Override
-    public List<Ai1HomeMessageTrendRespVO> getMessageTrend(Integer days) {
+    public List<Ai1HomeMessageSummaryByDateRespVO> getMessageSummaryByDate(Integer days) {
         // 1. 查询区间内有消息的日期
-        int dayCount = normalizeDays(days);
         LocalDateTime endTime = getDayEndTime(LocalDateTime.now());
-        LocalDateTime beginTime = getDayBeginTime(endTime.minusDays(dayCount - 1L));
-        // TODO @AI：先查询；查询后，再去 convertmap；
-        Map<String, Long> countMap = convertMap(homeMapper.selectMessageTrendListByCreateTimeBetween(beginTime, endTime),
-                Ai1HomeMessageTrendRespVO::getDate, Ai1HomeMessageTrendRespVO::getCount);
+        LocalDateTime beginTime = getDayBeginTime(endTime.minusDays(days - 1L));
+        // 先查询按日聚合结果，再转换为“日期 -> 消息数量”的 Map，便于补齐没有消息的日期
+        List<Ai1HomeMessageSummaryByDateRespVO> list = homeMapper.selectMessageSummaryListByCreateTimeBetweenGroupByDate(beginTime, endTime);
+        Map<String, Long> countMap = convertMap(list, Ai1HomeMessageSummaryByDateRespVO::getDate, Ai1HomeMessageSummaryByDateRespVO::getCount);
 
         // 2. 生成连续日期序列，没有消息的日期补 0，保证折线不断点
-        List<Ai1HomeMessageTrendRespVO> result = new ArrayList<>(dayCount);
-        for (int i = 0; i < dayCount; i++) {
+        List<Ai1HomeMessageSummaryByDateRespVO> result = new ArrayList<>(days);
+        for (int i = 0; i < days; i++) {
             String date = beginTime.plusDays(i).format(DATE_FORMATTER);
-            result.add(new Ai1HomeMessageTrendRespVO().setDate(date).setCount(countMap.getOrDefault(date, 0L)));
+            result.add(new Ai1HomeMessageSummaryByDateRespVO().setDate(date).setCount(countMap.getOrDefault(date, 0L)));
         }
         return result;
     }
 
     @Override
-    public List<Ai1HomeMessageShareRespVO> getMessageShare(Integer days) {
+    public List<Ai1HomeMessageSummaryByAgentRespVO> getMessageSummaryByAgent(Integer days) {
         LocalDateTime endTime = getDayEndTime(LocalDateTime.now());
-        LocalDateTime beginTime = getDayBeginTime(endTime.minusDays(normalizeDays(days) - 1L));
-        return homeMapper.selectMessageShareListByCreateTimeBetween(beginTime, endTime);
-    }
-
-    // TODO @AI：不用考虑这个归一化；
-    /**
-     * 归一化统计天数：为空或超出 1~30 时按 30 处理
-     */
-    private static int normalizeDays(Integer days) {
-        return days == null || days < 1 || days > DAYS_MAX ? DAYS_DEFAULT : days;
+        LocalDateTime beginTime = getDayBeginTime(endTime.minusDays(days - 1L));
+        return homeMapper.selectMessageSummaryListByCreateTimeBetweenGroupByAgentId(beginTime, endTime);
     }
 
 }

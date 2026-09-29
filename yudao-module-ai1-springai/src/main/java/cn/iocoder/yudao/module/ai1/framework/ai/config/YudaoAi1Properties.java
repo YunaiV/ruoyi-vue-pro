@@ -46,12 +46,29 @@ public class YudaoAi1Properties {
          * 数据库
          */
         private String database = "default";
+        /**
+         * 知识库集合名前缀，实际集合名为 {collectionPrefix}{知识库编号}
+         */
+        private String collectionPrefix = "knowledge_base_";
+        /**
+         * 默认检索数量，知识库未配置检索数量时使用
+         */
+        private Integer defaultTopK = 5;
 
     }
 
     @Data
     public static class Chat {
 
+        /**
+         * 默认系统指令中的 Agent 名称占位符
+         */
+        public static final String AGENT_NAME_PLACEHOLDER = "{agentName}";
+
+        /**
+         * 默认系统指令：Agent 未配置系统指令时使用，{agentName} 占位符替换为 Agent 名称
+         */
+        private String defaultSystemPrompt = "你是 " + AGENT_NAME_PLACEHOLDER + " 的智能助手。";
         /**
          * 结果流
          */
@@ -108,11 +125,10 @@ public class YudaoAi1Properties {
     @Data
     public static class History {
 
-        // TODO @AI：如果历史 20 条，会不会频繁的缓存刷新？
         /**
          * 附加给模型的最近历史消息条数上限
          */
-        private Integer limit = 20;
+        private Integer limit = 50;
 
     }
 
@@ -120,10 +136,10 @@ public class YudaoAi1Properties {
     public static class Skill {
 
         /**
-         * 技能物化根目录，实际目录为 {root}/{tenantId}/agent_{agentId}；集群部署建议挂载共享持久卷
+         * 技能物化根目录，实际目录为 {root}/agent_{agentId}（Agent 编号全局唯一，无需按租户分层）；
+         * 默认放在用户目录下，集群部署建议挂载共享持久卷
          */
-        // TODO @AI：按照项目的风格，放在哪里好点？感觉 /data/applogs/不一定合适噢。
-        private String root = "/data/applogs/yudao-ai1/skills/";
+        private String root = System.getProperty("user.home") + "/yudao-ai1/skills";
 
     }
 

@@ -10,7 +10,7 @@ import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
 
 /**
- * AI1 Provider Mapper
+ * AI1 供应商 Mapper
  *
  * @author 芋道源码
  */

@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.ai1.service.knowledge;
 
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.knowledgedocument.Ai1KnowledgeDocumentSaveReqVO;
-import cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.knowledgedocument.Ai1KnowledgeDocumentVectorizeRespVO;
+import cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.document.Ai1KnowledgeDocumentSaveReqVO;
+import cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.document.Ai1KnowledgeDocumentVectorizeRespVO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.knowledge.Ai1KnowledgeBaseDO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.knowledge.Ai1KnowledgeDocumentDO;
 import cn.iocoder.yudao.module.ai1.dal.mysql.knowledge.Ai1KnowledgeDocumentMapper;

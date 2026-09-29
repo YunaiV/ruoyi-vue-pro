@@ -70,15 +70,6 @@ public interface Ai1ChatConversationService {
      */
     PageResult<Ai1ChatConversationDO> getChatConversationPage(Ai1ChatConversationPageReqVO pageReqVO);
 
-    // TODO @AI：没用到，可以去掉；
-    /**
-     * 获得对话
-     *
-     * @param id 编号
-     * @return 对话
-     */
-    Ai1ChatConversationDO getChatConversation(Long id);
-
     /**
      * 修改对话标题（首条消息发送时自动命名）
      *

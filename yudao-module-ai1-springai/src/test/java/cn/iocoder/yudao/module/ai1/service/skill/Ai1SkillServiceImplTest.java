@@ -37,26 +37,17 @@ public class Ai1SkillServiceImplTest extends BaseDbUnitTest {
     private Ai1SkillFileService skillFileService;
 
     @Test
-    public void testCreateSkill_nameInvalid() {
-        // 准备参数：名称包含路径分隔符
-        Ai1SkillSaveReqVO reqVO = buildSkillSaveReqVO("pdf/reader");
-
-        // 调用，并断言异常
-        assertServiceException(() -> skillService.createSkill(reqVO), SKILL_NAME_INVALID);
-    }
-
-    @Test
     public void testCreateSkill_success() {
-        // 准备参数：名称带首尾空白
-        Ai1SkillSaveReqVO reqVO = buildSkillSaveReqVO(" pdf-reader ");
+        // 准备参数
+        Ai1SkillSaveReqVO reqVO = buildSkillSaveReqVO("pdf-reader");
 
         // 调用
         Long id = skillService.createSkill(reqVO);
 
-        // 断言：名称去空白后落库，并播种固定文件
+        // 断言：落库，并创建默认文件
         Ai1SkillDO skill = skillMapper.selectById(id);
         assertEquals("pdf-reader", skill.getName());
-        verify(skillFileService).createSkillSeedFiles(any(Ai1SkillDO.class));
+        verify(skillFileService).createDefaultSkillFileList(any(Ai1SkillDO.class));
     }
 
     @Test
@@ -74,7 +65,7 @@ public class Ai1SkillServiceImplTest extends BaseDbUnitTest {
         // mock 数据
         Long id = skillService.createSkill(buildSkillSaveReqVO("pdf-reader"));
 
-        // 调用：删除后，同名 SKILL 可以重建（删除时写入 deleted_at，退出唯一键的未删除区间）
+        // 调用：删除后，同名 SKILL 可以重建
         skillService.deleteSkill(id);
         Long newId = skillService.createSkill(buildSkillSaveReqVO("pdf-reader"));
 

@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.ai1.controller.admin.home;
 
-import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
-import cn.iocoder.yudao.module.ai1.controller.admin.home.vo.Ai1HomeMessageShareRespVO;
-import cn.iocoder.yudao.module.ai1.controller.admin.home.vo.Ai1HomeMessageTrendRespVO;
+import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
+import cn.iocoder.yudao.module.ai1.controller.admin.home.vo.Ai1HomeMessageSummaryByAgentRespVO;
+import cn.iocoder.yudao.module.ai1.controller.admin.home.vo.Ai1HomeMessageSummaryByDateRespVO;
 import cn.iocoder.yudao.module.ai1.controller.admin.home.vo.Ai1HomeSummaryRespVO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.agent.Ai1AgentDO;
 import cn.iocoder.yudao.module.ai1.service.agent.Ai1AgentService;
@@ -12,6 +12,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
 @Tag(name = "管理后台 - AI1 首页")
@@ -44,33 +45,30 @@ public class Ai1HomeController {
         return success(homeService.getSummary());
     }
 
-    @GetMapping("/message-trend")
-    @Operation(summary = "获得消息趋势", description = "近 days 个自然日（含今天）每日消息数量，没有消息的日期补 0")
-    @Parameter(name = "days", description = "天数，1~30，默认 30", example = "30")
+    @GetMapping("/message-summary-by-date")
+    @Operation(summary = "获得按日消息统计", description = "近 days 个自然日（含今天）每日消息数量，没有消息的日期补 0")
+    @Parameter(name = "days", description = "天数", required = true, example = "30")
     @PreAuthorize("@ss.hasPermission('ai1:home:query')")
-    public CommonResult<List<Ai1HomeMessageTrendRespVO>> getMessageTrend(
-            @RequestParam(value = "days", required = false) Integer days) {
-        return success(homeService.getMessageTrend(days));
+    public CommonResult<List<Ai1HomeMessageSummaryByDateRespVO>> getMessageSummaryByDate(
+            @RequestParam("days") @NotNull(message = "天数不能为空") @Min(value = 1, message = "天数不能小于 1") Integer days) {
+        return success(homeService.getMessageSummaryByDate(days));
     }
 
-    // TODO @AI：message-summary？相关的类，方法名，是不是都处理下？
-    @GetMapping("/message-share")
-    @Operation(summary = "获得 Agent 消息占比", description = "近 days 个自然日（含今天）各 Agent 的消息数量")
-    @Parameter(name = "days", description = "天数，1~30，默认 30", example = "30")
+    @GetMapping("/message-summary-by-agent")
+    @Operation(summary = "获得按 Agent 消息统计", description = "近 days 个自然日（含今天）各 Agent 的消息数量")
+    @Parameter(name = "days", description = "天数", required = true, example = "30")
     @PreAuthorize("@ss.hasPermission('ai1:home:query')")
-    public CommonResult<List<Ai1HomeMessageShareRespVO>> getMessageShare(
-            @RequestParam(value = "days", required = false) Integer days) {
-        return success(buildMessageShareRespVOList(homeService.getMessageShare(days)));
+    public CommonResult<List<Ai1HomeMessageSummaryByAgentRespVO>> getMessageSummaryByAgent(
+            @RequestParam("days") @NotNull(message = "天数不能为空") @Min(value = 1, message = "天数不能小于 1") Integer days) {
+        return success(buildMessageSummaryByAgentRespVOList(homeService.getMessageSummaryByAgent(days)));
     }
 
     // ==================== 拼接 VO ====================
 
-    private List<Ai1HomeMessageShareRespVO> buildMessageShareRespVOList(List<Ai1HomeMessageShareRespVO> list) {
-        // TODO @AI：是不是 getAgentList map，有个 default 方法；
-        Map<Long, Ai1AgentDO> agentMap = convertMap(agentService.getAgentList(convertSet(list, Ai1HomeMessageShareRespVO::getAgentId)), Ai1AgentDO::getId);
-        // TODO @AI：前端处理 agentName 的兜底把？后端只返回就行了把。
-        list.forEach(item -> item.setAgentName(agentMap.containsKey(item.getAgentId())
-                ? agentMap.get(item.getAgentId()).getName() : StrUtil.format("Agent#{}", item.getAgentId())));
+    private List<Ai1HomeMessageSummaryByAgentRespVO> buildMessageSummaryByAgentRespVOList(List<Ai1HomeMessageSummaryByAgentRespVO> list) {
+        Map<Long, Ai1AgentDO> agentMap = agentService.getAgentMap(convertSet(list, Ai1HomeMessageSummaryByAgentRespVO::getAgentId));
+        list.forEach(item ->
+                MapUtils.findAndThen(agentMap, item.getAgentId(), agent -> item.setAgentName(agent.getName())));
         return list;
     }
 

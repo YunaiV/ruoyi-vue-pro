@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.knowledgebase;
+package cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.base;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;

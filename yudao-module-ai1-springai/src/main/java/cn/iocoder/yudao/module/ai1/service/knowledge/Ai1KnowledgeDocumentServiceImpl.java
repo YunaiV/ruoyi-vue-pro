@@ -7,9 +7,9 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.knowledgedocument.Ai1KnowledgeDocumentPageReqVO;
-import cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.knowledgedocument.Ai1KnowledgeDocumentSaveReqVO;
-import cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.knowledgedocument.Ai1KnowledgeDocumentVectorizeRespVO;
+import cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.document.Ai1KnowledgeDocumentPageReqVO;
+import cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.document.Ai1KnowledgeDocumentSaveReqVO;
+import cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.document.Ai1KnowledgeDocumentVectorizeRespVO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.knowledge.Ai1KnowledgeBaseDO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.knowledge.Ai1KnowledgeDocumentDO;
 import cn.iocoder.yudao.module.ai1.dal.mysql.knowledge.Ai1KnowledgeDocumentMapper;
@@ -22,7 +22,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -30,11 +29,9 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMultiMap;
 import static cn.iocoder.yudao.module.ai1.enums.Ai1ErrorCodeConstants.*;
 
-// TODO @AI：“文档向量化在请求线程内同步执行，登录上下文中的租户天然存在”，这里是不是去掉噢；
+// TODO DONE @AI：“文档向量化在请求线程内同步执行，登录上下文中的租户天然存在”，这里是不是去掉噢；
 /**
  * AI1 知识文档 Service 实现类
- *
- * 文档向量化在请求线程内同步执行，登录上下文中的租户天然存在
  *
  * @author 芋道源码
  */
@@ -43,6 +40,7 @@ import static cn.iocoder.yudao.module.ai1.enums.Ai1ErrorCodeConstants.*;
 @Slf4j
 public class Ai1KnowledgeDocumentServiceImpl implements Ai1KnowledgeDocumentService {
 
+    // TODO @芋艿：【优化】后续可以考虑支持更多文件类型；
     /**
      * 允许上传的文本文件扩展名
      */
@@ -71,19 +69,15 @@ public class Ai1KnowledgeDocumentServiceImpl implements Ai1KnowledgeDocumentServ
 
     @Override
     public Long uploadKnowledgeDocument(Long knowledgeBaseId, MultipartFile file) {
-        // 1. 校验文件类型
+        // 1.1 校验文件类型
         String filename = file.getOriginalFilename();
-        // TODO @AI：要不要支持更多的类型噢？
         if (StrUtil.isBlank(filename) || !StrUtil.endWithAnyIgnoreCase(filename, UPLOAD_FILE_SUFFIXES.toArray(new String[0]))) {
             throw exception(KNOWLEDGE_DOCUMENT_FILE_TYPE_INVALID);
         }
-
-        // TODO @AI：1.1 1.2 ；他们再做类的事情哈；
-        // 2. 读取文本内容（UTF-8）
+        // 1.2 读取文本内容（UTF-8），并校验非空
         String content;
         try (InputStream inputStream = file.getInputStream()) {
-            // TODO @AI：IoUtil 支持 readUtf8 的呀；
-            content = IoUtil.read(inputStream, StandardCharsets.UTF_8);
+            content = IoUtil.readUtf8(inputStream);
         } catch (Exception e) {
             log.warn("[uploadKnowledgeDocument][知识库({}) 文件({}) 读取失败]", knowledgeBaseId, filename, e);
             throw exception(KNOWLEDGE_DOCUMENT_FILE_READ_FAIL, e.getMessage());
@@ -92,10 +86,10 @@ public class Ai1KnowledgeDocumentServiceImpl implements Ai1KnowledgeDocumentServ
             throw exception(KNOWLEDGE_DOCUMENT_FILE_EMPTY);
         }
 
-        // 3. 创建文档
-        // TODO @AI：name 的长度放开吧，简化点；先 new 再创建；
-        return createKnowledgeDocument(new Ai1KnowledgeDocumentSaveReqVO().setKnowledgeBaseId(knowledgeBaseId)
-                .setName(StrUtil.maxLength(filename, 197)).setContent(content));
+        // 2. 创建文档
+        Ai1KnowledgeDocumentSaveReqVO createReqVO = new Ai1KnowledgeDocumentSaveReqVO()
+                .setKnowledgeBaseId(knowledgeBaseId).setName(filename).setContent(content);
+        return createKnowledgeDocument(createReqVO);
     }
 
     @Override
@@ -168,11 +162,13 @@ public class Ai1KnowledgeDocumentServiceImpl implements Ai1KnowledgeDocumentServ
         return knowledgeDocumentMapper.selectByIds(ids);
     }
 
-    // TODO @AI：方法内注释；现在有点粘合在一起
     @Override
     public Integer vectorizeKnowledgeDocument(Long id) {
+        // 1. 校验文档、所属知识库存在
         Ai1KnowledgeDocumentDO document = validateKnowledgeDocumentExists(id);
         Ai1KnowledgeBaseDO knowledgeBase = knowledgeBaseService.validateKnowledgeBaseExists(document.getKnowledgeBaseId());
+
+        // 2. 向量化，并回写状态与分片数
         return vectorizeKnowledgeDocument(knowledgeBase, document);
     }
 
@@ -220,9 +216,8 @@ public class Ai1KnowledgeDocumentServiceImpl implements Ai1KnowledgeDocumentServ
             log.warn("[vectorizeKnowledgeDocument][文档({}) 向量化失败]", document.getId(), e);
             knowledgeDocumentMapper.updateById(new Ai1KnowledgeDocumentDO().setId(document.getId())
                     .setStatus(Ai1KnowledgeDocumentStatusEnum.FAILED.getStatus()));
-            // TODO @AI：jdk8 兼容性；
-            if (e instanceof ServiceException serviceException) {
-                throw serviceException;
+            if (e instanceof ServiceException) {
+                throw (ServiceException) e;
             }
             throw exception(KNOWLEDGE_DOCUMENT_VECTORIZE_FAIL, e.getMessage());
         }

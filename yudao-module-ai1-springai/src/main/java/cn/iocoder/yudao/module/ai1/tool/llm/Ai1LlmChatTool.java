@@ -44,22 +44,22 @@ public class Ai1LlmChatTool {
     /**
      * 流式对话：装配消息 → 附加工具、Advisor → 增量输出
      *
-     * @param runtime      模型运行时快照（需为对话模型）
-     * @param systemPrompt 系统指令，可为空
-     * @param histories    历史消息，按时间升序；每项为 [role, content]
-     * @param content      当前用户消息
-     * @param tools        工具（ToolCallback 或 @Tool 对象），可为空
-     * @param advisors     对话 Advisor，可为空
-     * @param sessionId    会话标识，用于替换附属 Header 中的 {session} 占位符
-     * @param onThinking   思考过程增量回调，可为空
-     * @param onContent    回复内容增量回调，可为空
+     * @param runtime        模型运行时快照（需为对话模型）
+     * @param systemPrompt   系统指令，可为空
+     * @param histories      历史消息，按时间升序；每项为 [role, content]
+     * @param content        当前用户消息
+     * @param tools          工具（ToolCallback 或 @Tool 对象），可为空
+     * @param advisors       对话 Advisor，可为空
+     * @param conversationId 对话编号，用于替换附属 Header 中的 {session} 占位符
+     * @param onThinking     思考过程增量回调，可为空
+     * @param onContent      回复内容增量回调，可为空
      * @return 完整回复（内容 + 思考过程）
      */
     public ChatText chat(Ai1ProviderRuntime runtime, String systemPrompt, List<String[]> histories, String content,
-                         List<Object> tools, List<Advisor> advisors, String sessionId,
+                         List<Object> tools, List<Advisor> advisors, Long conversationId,
                          Consumer<String> onThinking, Consumer<String> onContent) {
         // 1. 装配对话请求：消息（系统指令 + 历史 + 当前）+ 工具 + Advisor
-        ChatClient.ChatClientRequestSpec spec = llmModelFactory.buildChatClient(runtime, sessionId).prompt()
+        ChatClient.ChatClientRequestSpec spec = llmModelFactory.buildChatClient(runtime, conversationId).prompt()
                 .messages(buildMessages(systemPrompt, histories, content));
         if (CollUtil.isNotEmpty(tools)) {
             spec = spec.tools(tools.toArray());

@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import java.util.Collections;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
@@ -41,13 +42,15 @@ public class Ai1McpServiceImplTest extends BaseDbUnitTest {
     public void testCreateMcp_httpGenerateConfig() {
         // 准备参数：远程，未提供 config
         Ai1McpSaveReqVO reqVO = buildMcpSaveReqVO(Ai1McpTransportEnum.HTTP.getTransport())
-                .setUrl("http://127.0.0.1:8081/mcp").setHeaders("{\"Authorization\":\"Bearer x\"}");
+                .setUrl("http://127.0.0.1:8081/mcp").setHeaders(Collections.singletonMap("Authorization", "Bearer x"));
 
         // 调用
         Long id = mcpService.createMcp(reqVO);
 
-        // 断言：按平铺列生成 config
-        Map<String, Object> config = JsonUtils.parseMap(mcpMapper.selectById(id).getConfig());
+        // 断言：按平铺列生成 config，请求头按 JSON 保存
+        Ai1McpDO mcp = mcpMapper.selectById(id);
+        assertEquals("Bearer x", mcp.getHeaders().get("Authorization"));
+        Map<String, Object> config = JsonUtils.parseMap(mcp.getConfig());
         assertEquals("http", config.get("transport"));
         assertEquals("http://127.0.0.1:8081/mcp", config.get("url"));
         assertEquals("Bearer x", ((Map<?, ?>) config.get("headers")).get("Authorization"));

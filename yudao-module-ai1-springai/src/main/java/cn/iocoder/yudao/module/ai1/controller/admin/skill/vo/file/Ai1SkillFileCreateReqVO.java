@@ -23,7 +23,7 @@ public class Ai1SkillFileCreateReqVO {
     @NotEmpty(message = "名称不能为空")
     private String name;
 
-    @Schema(description = "类型：0-目录、1-文件", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "类型不能为空")
     @InEnum(Ai1SkillFileTypeEnum.class)
     private Integer type;

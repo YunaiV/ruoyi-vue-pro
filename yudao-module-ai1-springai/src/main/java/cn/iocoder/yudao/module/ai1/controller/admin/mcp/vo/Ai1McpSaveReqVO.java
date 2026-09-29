@@ -1,13 +1,19 @@
 package cn.iocoder.yudao.module.ai1.controller.admin.mcp.vo;
 
+import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.ai1.enums.mcp.Ai1McpTransportEnum;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+
+import java.util.Map;
 
 @Schema(description = "管理后台 - AI1 MCP 新增/修改 Request VO")
 @Data
@@ -30,9 +36,8 @@ public class Ai1McpSaveReqVO {
     @Size(max = 200, message = "服务地址长度不能超过 200 个字符")
     private String url;
 
-    @Schema(description = "请求头，JSON 对象", example = "{\"Authorization\":\"Bearer xxx\"}")
-    @Size(max = 500, message = "请求头长度不能超过 500 个字符")
-    private String headers;
+    @Schema(description = "请求头", example = "{\"Authorization\":\"Bearer xxx\"}")
+    private Map<String, String> headers;
 
     @Schema(description = "完整 MCP 配置，JSON 对象；本地必填 command", example = "{\"transport\":\"stdio\",\"command\":\"npx\",\"args\":[\"-y\",\"xxx\"]}")
     private String config;
@@ -45,5 +50,11 @@ public class Ai1McpSaveReqVO {
     @Schema(description = "备注", example = "查询城市天气")
     @Size(max = 500, message = "备注长度不能超过 500 个字符")
     private String remark;
+
+    @AssertTrue(message = "请求头长度不能超过 500 个字符")
+    @JsonIgnore
+    public boolean isHeadersValid() {
+        return MapUtil.isEmpty(headers) || JsonUtils.toJsonString(headers).length() <= 500;
+    }
 
 }

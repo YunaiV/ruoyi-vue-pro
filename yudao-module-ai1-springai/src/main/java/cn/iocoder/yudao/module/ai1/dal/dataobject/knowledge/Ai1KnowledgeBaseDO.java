@@ -12,7 +12,7 @@ import lombok.*;
 /**
  * AI1 知识库 DO
  *
- * 向量存储在 Milvus 集合 kb_base_{id} 中，按知识库隔离
+ * 向量存储在 Milvus 集合 {collectionPrefix}{id}（默认 knowledge_base_{id}）中，按知识库隔离
  *
  * @author 芋道源码
  */

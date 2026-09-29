@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
 @Tag(name = "管理后台 - AI1 Agent")
@@ -85,11 +85,7 @@ public class Ai1AgentController {
     @PreAuthorize("@ss.hasPermission('ai1:agent:query')")
     public CommonResult<Ai1AgentRespVO> getAgent(@RequestParam("id") Long id) {
         Ai1AgentDO agent = agentService.getAgent(id);
-        // TODO @AI：抽个方法？参考别下别的模块；
-        if (agent == null) {
-            return success(null);
-        }
-        return success(CollUtil.getFirst(buildAgentRespVOList(Collections.singletonList(agent))));
+        return success(buildAgentRespVO(agent));
     }
 
     @GetMapping("/page")
@@ -103,17 +99,21 @@ public class Ai1AgentController {
     @GetMapping("/simple-list")
     @Operation(summary = "获得已开启的 Agent 精简列表", description = "用于对话页选择 Agent，仅返回已开启的 Agent")
     @PreAuthorize("@ss.hasPermission('ai1:chat:query')")
-    // TODO @AI：simple-list 不用 ai1:chat:query 把？别的也检查下；
+    // TODO NOT_FIX @AI【不修复：该接口只被「Agent 对话」页面（views/ai01/chat）调用来选择 Agent，对话菜单只分配 ai1:chat:query，改成 ai1:agent:query 会导致只有对话权限的用户无法加载 Agent；其他 simple-list（供应商、模型、知识库、MCP、SKILL）与 System 模块一致不校验权限，无需调整】：simple-list 不用 ai1:chat:query 把？别的也检查下；
+    // TODO @AI：这个按照项目的习惯，是不需要的噢。对齐下噢；
     public CommonResult<List<Ai1AgentRespVO>> getAgentSimpleList() {
-        List<Ai1AgentRespVO> list = buildAgentRespVOList(agentService.getAgentListByStatus(CommonStatusEnum.ENABLE.getStatus()));
-        // TODO @AI：你看看，还有哪些字段要去掉的
-        list.forEach(agent -> agent.setSystemPrompt(null));
-        return success(list);
+        List<Ai1AgentDO> list = agentService.getAgentListByStatus(CommonStatusEnum.ENABLE.getStatus());
+        Map<Long, Ai1ModelDO> modelMap = modelService.getModelMap(convertSet(list, Ai1AgentDO::getModelId));
+        return success(convertList(list, agent -> {
+            Ai1AgentRespVO respVO = new Ai1AgentRespVO().setId(agent.getId()).setName(agent.getName())
+                    .setIntroduction(agent.getIntroduction()).setModelId(agent.getModelId());
+            MapUtils.findAndThen(modelMap, agent.getModelId(), model -> respVO.setModelName(model.getName()));
+            return respVO;
+        }));
     }
 
-    // TODO @AI：不用生成 uuid 噢。
     @PutMapping("/update-status")
-    @Operation(summary = "修改 Agent 状态", description = "首次开启时生成访问 UUID")
+    @Operation(summary = "修改 Agent 状态")
     @PreAuthorize("@ss.hasPermission('ai1:agent:update')")
     public CommonResult<Boolean> updateAgentStatus(@Valid @RequestBody Ai1AgentUpdateStatusReqVO reqVO) {
         agentService.updateAgentStatus(reqVO.getId(), reqVO.getStatus());
@@ -122,12 +122,16 @@ public class Ai1AgentController {
 
     // ==================== 拼接 VO ====================
 
+    private Ai1AgentRespVO buildAgentRespVO(Ai1AgentDO agent) {
+        if (agent == null) {
+            return null;
+        }
+        return CollUtil.getFirst(buildAgentRespVOList(Collections.singletonList(agent)));
+    }
+
     private List<Ai1AgentRespVO> buildAgentRespVOList(List<Ai1AgentDO> list) {
-        // TODO @AI：default map；都搞搞；
-        Map<Long, Ai1ProviderDO> providerMap = convertMap(providerService.getProviderList(
-                convertSet(list, Ai1AgentDO::getProviderId)), Ai1ProviderDO::getId);
-        Map<Long, Ai1ModelDO> modelMap = convertMap(modelService.getModelList(
-                convertSet(list, Ai1AgentDO::getModelId)), Ai1ModelDO::getId);
+        Map<Long, Ai1ProviderDO> providerMap = providerService.getProviderMap(convertSet(list, Ai1AgentDO::getProviderId));
+        Map<Long, Ai1ModelDO> modelMap = modelService.getModelMap(convertSet(list, Ai1AgentDO::getModelId));
         return BeanUtils.toBean(list, Ai1AgentRespVO.class, respVO -> {
             MapUtils.findAndThen(providerMap, respVO.getProviderId(), provider -> respVO.setProviderName(provider.getName()));
             MapUtils.findAndThen(modelMap, respVO.getModelId(), model -> respVO.setModelName(model.getName()));

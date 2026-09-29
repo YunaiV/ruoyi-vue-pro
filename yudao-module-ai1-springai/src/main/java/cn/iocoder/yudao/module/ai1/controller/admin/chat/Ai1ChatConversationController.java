@@ -40,7 +40,7 @@ public class Ai1ChatConversationController {
     @Resource
     private AdminUserApi adminUserApi;
 
-    // TODO @AI：分块下，哪些是 我的；哪些是管理的。类似 === === 这种噢；
+    // ==================== 我的 ====================
 
     @PostMapping("/create-my")
     @Operation(summary = "创建【我的】对话")
@@ -74,6 +74,8 @@ public class Ai1ChatConversationController {
         List<Ai1ChatConversationDO> list = chatConversationService.getChatConversationListByAgentIdAndUserId(agentId, getLoginUserId());
         return success(BeanUtils.toBean(list, Ai1ChatConversationRespVO.class));
     }
+
+    // ==================== 管理 ====================
 
     @GetMapping("/page")
     @Operation(summary = "获得对话分页", description = "管理端查看 Agent 下全部用户的对话")

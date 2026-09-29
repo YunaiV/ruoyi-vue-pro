@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.ai1.controller.admin.provider.vo.provider;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-@Schema(description = "管理后台 - AI1 Provider 连通测试 Response VO")
+@Schema(description = "管理后台 - AI1 供应商连通测试 Response VO")
 @Data
 public class Ai1ProviderConnectRespVO {
 

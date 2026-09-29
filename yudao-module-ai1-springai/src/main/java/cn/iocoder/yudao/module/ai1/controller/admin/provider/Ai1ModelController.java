@@ -7,7 +7,6 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.ai1.controller.admin.provider.vo.model.*;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.provider.Ai1ModelDO;
 import cn.iocoder.yudao.module.ai1.service.provider.Ai1ModelService;
-import cn.iocoder.yudao.module.ai1.service.provider.Ai1ProviderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -32,8 +31,6 @@ public class Ai1ModelController {
 
     @Resource
     private Ai1ModelService modelService;
-    @Resource
-    private Ai1ProviderService providerService;
 
     @PostMapping("/create")
     @Operation(summary = "创建模型")
@@ -87,7 +84,7 @@ public class Ai1ModelController {
 
     @GetMapping("/simple-list")
     @Operation(summary = "获得模型精简列表", description = "只包含开启状态，用于 Agent 模型、知识库向量化模型的下拉选择")
-    @Parameter(name = "providerId", description = "Provider 编号", example = "1")
+    @Parameter(name = "providerId", description = "供应商编号", example = "1")
     @Parameter(name = "type", description = "类型", example = "0")
     public CommonResult<List<Ai1ModelRespVO>> getModelSimpleList(@RequestParam(value = "providerId", required = false) Long providerId,
                                                                  @RequestParam(value = "type", required = false) Integer type) {
@@ -99,12 +96,13 @@ public class Ai1ModelController {
     }
 
     @GetMapping("/remote-list")
-    @Operation(summary = "拉取 Provider 远程可用模型", description = "并标注是否已导入")
-    @Parameter(name = "providerId", description = "Provider 编号", required = true, example = "1")
+    @Operation(summary = "拉取供应商远程可用模型", description = "并标注是否已导入")
+    @Parameter(name = "providerId", description = "供应商编号", required = true, example = "1")
     @PreAuthorize("@ss.hasPermission('ai1:model:import')")
     public CommonResult<List<Ai1ModelRemoteRespVO>> getRemoteModelList(@RequestParam("providerId") Long providerId) {
-        List<String> remoteModels = providerService.getRemoteModelList(providerId);
-        Set<String> existModels = convertSet(modelService.getModelListByProviderId(providerId), Ai1ModelDO::getModel);
+        List<String> remoteModels = modelService.getRemoteModelList(providerId);
+        List<Ai1ModelDO> existModelList = modelService.getModelListByProviderId(providerId);
+        Set<String> existModels = convertSet(existModelList, Ai1ModelDO::getModel);
         return success(convertList(remoteModels, model -> new Ai1ModelRemoteRespVO(model, existModels.contains(model))));
     }
 

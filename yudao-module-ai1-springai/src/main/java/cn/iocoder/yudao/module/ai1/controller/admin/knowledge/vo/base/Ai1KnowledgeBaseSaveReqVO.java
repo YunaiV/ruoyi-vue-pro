@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.knowledgebase;
+package cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.base;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.validation.InEnum;

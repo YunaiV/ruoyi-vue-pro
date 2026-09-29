@@ -84,10 +84,10 @@ public class Ai1ChatMessageServiceImplTest extends BaseDbUnitTest {
         Ai1ChatMessageDO assistant = messages.get(1);
         assertEquals(Ai1ChatMessageRoleEnum.ASSISTANT.getRole(), assistant.getRole());
         assertEquals(Ai1ChatMessageStatusEnum.GENERATING.getStatus(), assistant.getStatus());
-        // 断言：首条消息自动命名（截断到 50 字符），任务携带租户，并按助手消息编号打开连接
+        // 断言：首条消息自动命名（截断到 50 字符），投递任务，并按助手消息编号打开连接
         verify(chatConversationService).updateChatConversationTitle(eq(10L),
-                argThat(title -> title.length() == 50 && title.endsWith("...")));
-        verify(chatStreamTool).submit(TENANT_ID, assistant.getId(), 1L, 10L, content);
+                argThat(title -> title.length() == Ai1ChatConversationDO.TITLE_MAX_LENGTH && title.endsWith("...")));
+        verify(chatStreamTool).submit(assistant.getId(), 1L, 10L, content);
         verify(chatStreamTool).open(assistant.getId(), null);
     }
 
@@ -101,7 +101,7 @@ public class Ai1ChatMessageServiceImplTest extends BaseDbUnitTest {
 
         // 断言：返回 error 事件，不落库、不投递
         verify(chatStreamTool).error("对话不存在");
-        verify(chatStreamTool, never()).submit(anyLong(), anyLong(), anyLong(), anyLong(), anyString());
+        verify(chatStreamTool, never()).submit(anyLong(), anyLong(), anyLong(), anyString());
         assertTrue(chatMessageMapper.selectListByConversationId(10L).isEmpty());
     }
 

@@ -8,9 +8,9 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 /**
- * AI1 Provider DO
+ * AI1 供应商 DO
  *
- * Provider 即模型提供方（OpenAI 兼容端点），维护接口地址与密钥
+ * 供应商即模型提供方（OpenAI 兼容端点），维护接口地址与密钥
  *
  * @author 芋道源码
  */
@@ -41,7 +41,6 @@ public class Ai1ProviderDO extends TenantBaseDO {
      * API 密钥
      */
     private String apiKey;
-    // TODO @AI：使用 map 会不会更好？
     /**
      * 请求附属 Header
      *

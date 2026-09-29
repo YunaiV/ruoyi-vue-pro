@@ -11,6 +11,7 @@ import cn.iocoder.yudao.module.ai1.controller.admin.provider.vo.provider.Ai1Prov
 import cn.iocoder.yudao.module.ai1.controller.admin.provider.vo.provider.Ai1ProviderSaveReqVO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.provider.Ai1ProviderDO;
 import cn.iocoder.yudao.module.ai1.service.provider.Ai1ProviderService;
+import cn.iocoder.yudao.module.ai1.service.provider.bo.Ai1ProviderConnectResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,7 +26,7 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
-@Tag(name = "管理后台 - AI1 Provider")
+@Tag(name = "管理后台 - AI1 供应商")
 @RestController
 @RequestMapping("/ai1/provider")
 @Validated
@@ -35,14 +36,14 @@ public class Ai1ProviderController {
     private Ai1ProviderService providerService;
 
     @PostMapping("/create")
-    @Operation(summary = "创建 Provider")
+    @Operation(summary = "创建供应商")
     @PreAuthorize("@ss.hasPermission('ai1:provider:create')")
     public CommonResult<Long> createProvider(@Valid @RequestBody Ai1ProviderSaveReqVO createReqVO) {
         return success(providerService.createProvider(createReqVO));
     }
 
     @PutMapping("/update")
-    @Operation(summary = "更新 Provider")
+    @Operation(summary = "更新供应商")
     @PreAuthorize("@ss.hasPermission('ai1:provider:update')")
     public CommonResult<Boolean> updateProvider(@Valid @RequestBody Ai1ProviderSaveReqVO updateReqVO) {
         providerService.updateProvider(updateReqVO);
@@ -50,7 +51,7 @@ public class Ai1ProviderController {
     }
 
     @DeleteMapping("/delete")
-    @Operation(summary = "删除 Provider")
+    @Operation(summary = "删除供应商")
     @Parameter(name = "id", description = "编号", required = true)
     @PreAuthorize("@ss.hasPermission('ai1:provider:delete')")
     public CommonResult<Boolean> deleteProvider(@RequestParam("id") Long id) {
@@ -59,7 +60,7 @@ public class Ai1ProviderController {
     }
 
     @DeleteMapping("/delete-list")
-    @Operation(summary = "批量删除 Provider")
+    @Operation(summary = "批量删除供应商")
     @Parameter(name = "ids", description = "编号列表", required = true)
     @PreAuthorize("@ss.hasPermission('ai1:provider:delete')")
     public CommonResult<Boolean> deleteProviderList(@RequestParam("ids") List<Long> ids) {
@@ -68,7 +69,7 @@ public class Ai1ProviderController {
     }
 
     @GetMapping("/get")
-    @Operation(summary = "获得 Provider")
+    @Operation(summary = "获得供应商")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('ai1:provider:query')")
     public CommonResult<Ai1ProviderRespVO> getProvider(@RequestParam("id") Long id) {
@@ -77,7 +78,7 @@ public class Ai1ProviderController {
     }
 
     @GetMapping("/page")
-    @Operation(summary = "获得 Provider 分页")
+    @Operation(summary = "获得供应商分页")
     @PreAuthorize("@ss.hasPermission('ai1:provider:query')")
     public CommonResult<PageResult<Ai1ProviderRespVO>> getProviderPage(@Valid Ai1ProviderPageReqVO pageReqVO) {
         PageResult<Ai1ProviderDO> pageResult = providerService.getProviderPage(pageReqVO);
@@ -85,25 +86,25 @@ public class Ai1ProviderController {
     }
 
     @GetMapping("/simple-list")
-    @Operation(summary = "获得 Provider 精简列表", description = "只包含开启状态，用于 Agent 模型、知识库向量化模型的下拉选择")
+    @Operation(summary = "获得供应商精简列表", description = "只包含开启状态，用于 Agent 模型、知识库向量化模型的下拉选择")
     public CommonResult<List<Ai1ProviderRespVO>> getProviderSimpleList() {
         List<Ai1ProviderDO> list = providerService.getProviderListByStatus(CommonStatusEnum.ENABLE.getStatus());
         return success(convertList(list, provider -> new Ai1ProviderRespVO().setId(provider.getId()).setName(provider.getName())));
     }
 
     @PostMapping("/test")
-    @Operation(summary = "Provider 连通测试", description = "GET /models 优先，失败时回退 POST /chat/completions")
+    @Operation(summary = "供应商连通测试", description = "GET /models 优先，失败时回退 POST /chat/completions")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('ai1:provider:test')")
     public CommonResult<Ai1ProviderConnectRespVO> testProvider(@RequestParam("id") Long id) {
-        // TODO @AI：先查询后，再进行转换噢，不要混在一起；
-        return success(BeanUtils.toBean(providerService.testConnect(id), Ai1ProviderConnectRespVO.class));
+        Ai1ProviderConnectResult result = providerService.testProviderConnect(id);
+        return success(BeanUtils.toBean(result, Ai1ProviderConnectRespVO.class));
     }
 
     // ==================== 拼接 VO ====================
 
     /**
-     * 构建 Provider 响应：API 密钥脱敏返回，避免查询权限直接获取完整密钥
+     * 构建供应商响应：API 密钥脱敏返回，避免查询权限直接获取完整密钥
      */
     private Ai1ProviderRespVO buildProviderRespVO(Ai1ProviderDO provider) {
         if (provider == null) {
@@ -115,7 +116,6 @@ public class Ai1ProviderController {
             // 环境变量占位符不是密钥本身，原样返回，便于确认引用了哪个变量
             respVO.setApiKey(apiKey);
         } else if (StrUtil.isNotEmpty(apiKey)) {
-            // TODO @AI：hutool 有可以进一步简化的方法么？
             respVO.setApiKey(apiKey.length() <= 8 ? "****"
                     : StrUtil.hide(apiKey, 3, apiKey.length() - 4));
         }

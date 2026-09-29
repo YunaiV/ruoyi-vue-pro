@@ -1,14 +1,18 @@
 package cn.iocoder.yudao.module.ai1.controller.admin.provider.vo.provider;
 
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
+import cn.iocoder.yudao.module.ai1.util.Ai1Utils;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
-@Schema(description = "管理后台 - AI1 Provider 新增/修改 Request VO")
+@Schema(description = "管理后台 - AI1 供应商新增/修改 Request VO")
 @Data
 public class Ai1ProviderSaveReqVO {
 
@@ -41,5 +45,11 @@ public class Ai1ProviderSaveReqVO {
     @Schema(description = "备注", example = "官方接口")
     @Size(max = 255, message = "备注长度不能超过 255 个字符")
     private String remark;
+
+    @AssertTrue(message = "请求附属 Header 格式不正确，应为 JSON 数组：[{\"key\":\"...\",\"value\":\"...\"}]")
+    @JsonIgnore
+    public boolean isHeadersValid() {
+        return StrUtil.isBlank(headers) || Ai1Utils.parseHeaders(headers) != null;
+    }
 
 }

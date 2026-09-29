@@ -5,7 +5,7 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
-@Schema(description = "管理后台 - AI1 Provider Response VO")
+@Schema(description = "管理后台 - AI1 供应商 Response VO")
 @Data
 public class Ai1ProviderRespVO {
 

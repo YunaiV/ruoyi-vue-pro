@@ -43,11 +43,8 @@ public class Ai1AgentRespVO {
     @Schema(description = "SKILL 编号集合", example = "[1]")
     private List<Long> skillIds;
 
-    @Schema(description = "状态，参见 CommonStatusEnum 枚举", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
+    @Schema(description = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
     private Integer status;
-
-    @Schema(description = "访问 UUID，首次开启时生成", example = "2f1c8a6e9b3d4e5f")
-    private String uuid;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;

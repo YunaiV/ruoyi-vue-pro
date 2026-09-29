@@ -1,6 +1,9 @@
 package cn.iocoder.yudao.module.ai1.tool.rag;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.lang.loader.LazyFunLoader;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.knowledge.Ai1KnowledgeBaseDO;
 import cn.iocoder.yudao.module.ai1.enums.provider.Ai1ModelTypeEnum;
@@ -8,6 +11,8 @@ import cn.iocoder.yudao.module.ai1.framework.ai.config.YudaoAi1Properties;
 import cn.iocoder.yudao.module.ai1.framework.ai.core.llm.Ai1LlmModelFactory;
 import cn.iocoder.yudao.module.ai1.service.provider.Ai1ProviderService;
 import cn.iocoder.yudao.module.ai1.service.provider.bo.Ai1ProviderRuntime;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import io.milvus.client.MilvusServiceClient;
 import io.milvus.param.ConnectParam;
 import io.milvus.param.IndexType;
@@ -38,12 +43,12 @@ import static cn.iocoder.yudao.module.ai1.enums.Ai1ErrorCodeConstants.MODEL_TYPE
  * AI1 RAG 工具（Spring AI + Milvus）
  *
  * 知识库的向量化、检索、清理与 Advisor 装配：
- * 1. 向量化：分片 → Document（含 docId、chunkIndex 元数据）→ VectorStore.add（先清理旧向量）
+ * 1. 向量化：分片 → Document（含 documentId、chunkIndex 元数据）→ VectorStore.add（先清理旧向量）
  * 2. 检索：VectorStore.similaritySearch
- * 3. 清理：按 docId 元数据删除向量；知识库删除时 drop 整个集合
+ * 3. 清理：按 documentId 元数据删除向量；知识库删除时 drop 整个集合
  * 4. Advisor：为对话装配 QuestionAnswerAdvisor，检索上下文自动注入
  *
- * 集合名为 kb_base_{知识库编号}（编号全局唯一，无需租户前缀）；调用方必须先在当前租户下查出知识库，再传入本工具，
+ * 集合名为 {collectionPrefix}{知识库编号}（编号全局唯一，无需租户前缀）；调用方必须先在当前租户下查出知识库，再传入本工具，
  * 以此保证不会越权访问其他租户的集合
  *
  * @author 芋道源码
@@ -57,15 +62,9 @@ public class Ai1RagTool {
      */
     private static final int CACHE_MAX = 128;
     /**
-     * 默认检索数量
+     * 向量元数据：文档编号
      */
-    private static final int DEFAULT_TOP_K = 5;
-    // TODO @AI：为什么不使用 documentId？
-    // TODO @AI：“（沿用源工程的字段名，兼容已有向量数据）”注释可以去掉噢。
-    /**
-     * 向量元数据：文档编号（沿用源工程的字段名，兼容已有向量数据）
-     */
-    private static final String METADATA_DOCUMENT_ID = "docId";
+    private static final String METADATA_DOCUMENT_ID = "documentId";
     /**
      * 向量元数据：分片序号
      */
@@ -81,21 +80,14 @@ public class Ai1RagTool {
     private Ai1LlmModelFactory llmModelFactory;
 
     /**
-     * 向量存储缓存：知识库编号 → 向量存储；嵌入模型实例变化（配置变更后重建）时自动重建
+     * 向量存储缓存：知识库编号 → 向量存储；按访问顺序淘汰，嵌入模型实例变化（配置变更后重建）时自动重建
      */
-    // TODO @AI：guava 简化下？
-    private final Map<Long, CachedVectorStore> vectorStoreCache = Collections.synchronizedMap(new LinkedHashMap<>(16, 0.75f, true) {
-
-        @Override
-        protected boolean removeEldestEntry(Map.Entry<Long, CachedVectorStore> eldest) {
-            return size() > CACHE_MAX;
-        }
-
-    });
+    private final Cache<Long, CachedVectorStore> vectorStoreCache = CacheBuilder.newBuilder()
+            .maximumSize(CACHE_MAX).build();
     /**
-     * Milvus 客户端（懒加载单例）
+     * Milvus 客户端：首次使用时创建，全局复用一个连接
      */
-    private volatile MilvusServiceClient milvusClient;
+    private final LazyFunLoader<MilvusServiceClient> milvusClientLoader = LazyFunLoader.on(this::createMilvusClient);
 
     /**
      * 文档向量化：分片 → 嵌入 → 写入 Milvus；先清理旧向量再写入，支持重复向量化
@@ -135,15 +127,16 @@ public class Ai1RagTool {
      * @return 命中分片
      */
     public List<SearchHit> search(Ai1KnowledgeBaseDO knowledgeBase, String query, Integer topK) {
-        // TODO @AI：方法内注释
+        // 1. 相似度检索：未指定检索数量时，使用知识库配置
         MilvusVectorStore vectorStore = getOrCreateVectorStore(knowledgeBase);
         List<Document> documents = vectorStore.similaritySearch(SearchRequest.builder()
                 .query(query).topK(topK != null && topK > 0 ? topK : getDefaultTopK(knowledgeBase)).build());
-        // TODO @AI：方法内注释
+
+        // 2. 转换为命中分片：从向量元数据中还原文档编号、分片序号
         return convertList(documents, document -> new SearchHit().setText(document.getText())
-                .setDocumentId(toLong(document.getMetadata().get(METADATA_DOCUMENT_ID)))
-                .setChunkIndex(toInteger(document.getMetadata().get(METADATA_CHUNK_INDEX)))
-                .setScore(document.getScore() != null ? document.getScore() : 0D));
+                .setDocumentId(Convert.toLong(document.getMetadata().get(METADATA_DOCUMENT_ID)))
+                .setChunkIndex(Convert.toInt(document.getMetadata().get(METADATA_CHUNK_INDEX)))
+                .setScore(ObjUtil.defaultIfNull(document.getScore(), 0D)));
     }
 
     /**
@@ -157,17 +150,13 @@ public class Ai1RagTool {
             return;
         }
         try {
-            MilvusVectorStore vectorStore = getOrCreateVectorStore(knowledgeBase);
-            for (Long documentId : documentIds) {
-                vectorStore.delete(new FilterExpressionBuilder().eq(METADATA_DOCUMENT_ID, documentId).build());
-            }
-            // TODO @AI：vectorStore.delete 数组，会不会更好？
+            getOrCreateVectorStore(knowledgeBase).delete(new FilterExpressionBuilder()
+                    .in(METADATA_DOCUMENT_ID, documentIds.toArray()).build());
         } catch (Exception e) {
             log.warn("[deleteByDocumentIds][知识库({}) 文档({}) 向量清理失败]", knowledgeBase.getId(), documentIds, e);
         }
     }
 
-    // TODO @AI：目前是一个知识库，一个 collection 么？会不会太多噢？
     /**
      * 删除知识库的整个向量集合（知识库删除时调用，避免遗留孤儿集合）；失败时仅记录日志
      *
@@ -176,7 +165,7 @@ public class Ai1RagTool {
     public void dropCollection(Long knowledgeBaseId) {
         evict(knowledgeBaseId);
         try {
-            R<RpcStatus> result = getMilvusClient().dropCollection(DropCollectionParam.newBuilder()
+            R<RpcStatus> result = milvusClientLoader.get().dropCollection(DropCollectionParam.newBuilder()
                     .withDatabaseName(ai1Properties.getMilvus().getDatabase())
                     .withCollectionName(buildCollectionName(knowledgeBaseId))
                     .build());
@@ -195,26 +184,25 @@ public class Ai1RagTool {
      * @return RAG Advisor
      */
     public Advisor buildAdvisor(Ai1KnowledgeBaseDO knowledgeBase) {
-        // TODO @AI：是不是创建变量，然后最后 builder 返回噢？
-        return QuestionAnswerAdvisor.builder(getOrCreateVectorStore(knowledgeBase))
-                .searchRequest(SearchRequest.builder().topK(getDefaultTopK(knowledgeBase)).build())
-                .build();
+        MilvusVectorStore vectorStore = getOrCreateVectorStore(knowledgeBase);
+        SearchRequest searchRequest = SearchRequest.builder().topK(getDefaultTopK(knowledgeBase)).build();
+        return QuestionAnswerAdvisor.builder(vectorStore).searchRequest(searchRequest).build();
     }
 
     /**
      * 失效知识库的向量存储缓存
      *
+     * 只作用于当前节点；其他节点在嵌入模型变更后，会因嵌入模型实例不一致自然重建
+     *
      * @param knowledgeBaseId 知识库编号
      */
     public void evict(Long knowledgeBaseId) {
-        vectorStoreCache.remove(knowledgeBaseId);
+        vectorStoreCache.invalidate(knowledgeBaseId);
     }
 
     @PreDestroy
     public void destroy() {
-        if (milvusClient != null) {
-            milvusClient.close();
-        }
+        milvusClientLoader.ifInitialized(MilvusServiceClient::close);
     }
 
     // ==================== 内部实现：嵌入模型 / 向量存储 / 分片 ====================
@@ -223,29 +211,32 @@ public class Ai1RagTool {
      * 获取（或构建）知识库向量存储：嵌入模型实例不变时复用；Provider、模型配置变更后模型工厂会重建实例，此处随之重建
      */
     private MilvusVectorStore getOrCreateVectorStore(Ai1KnowledgeBaseDO knowledgeBase) {
-        // TODO @AI：方法内注释；
+        // 1. 缓存命中、且嵌入模型实例未变化时，直接复用
         EmbeddingModel embeddingModel = getEmbeddingModel(knowledgeBase);
-        CachedVectorStore cached = vectorStoreCache.get(knowledgeBase.getId());
-        if (cached != null && cached.embeddingModel() == embeddingModel) {
-            return cached.vectorStore();
+        CachedVectorStore cached = vectorStoreCache.getIfPresent(knowledgeBase.getId());
+        if (cached != null && cached.getEmbeddingModel() == embeddingModel) {
+            return cached.getVectorStore();
         }
 
-        // TODO @AI：方法内注释；
+        // TODO DONE @AI：方法内注释；
+        // 2.1 构建向量存储：集合不存在时自动创建
         String collectionName = buildCollectionName(knowledgeBase.getId());
-        MilvusVectorStore vectorStore = MilvusVectorStore.builder(getMilvusClient(), embeddingModel)
+        MilvusVectorStore vectorStore = MilvusVectorStore.builder(milvusClientLoader.get(), embeddingModel)
                 .databaseName(ai1Properties.getMilvus().getDatabase())
                 .collectionName(collectionName)
                 .metricType(MetricType.COSINE)
                 .indexType(IndexType.FLAT)
                 .initializeSchema(true)
                 .build();
-        // 手动构建的实例不会触发 Spring 生命周期回调，需主动初始化：建集合、建索引、加载
+        // 2.2 手动构建的实例不会触发 Spring 生命周期回调，需主动初始化：建集合、建索引、加载
         try {
             vectorStore.afterPropertiesSet();
         } catch (Exception e) {
             throw new IllegalStateException("向量集合(" + collectionName + ") 初始化失败：" + e.getMessage(), e);
         }
-        vectorStoreCache.put(knowledgeBase.getId(), new CachedVectorStore(embeddingModel, vectorStore));
+        // 2.3 放入缓存
+        vectorStoreCache.put(knowledgeBase.getId(), new CachedVectorStore()
+                .setEmbeddingModel(embeddingModel).setVectorStore(vectorStore));
         log.debug("[getOrCreateVectorStore][知识库({}) 向量存储构建完成]", knowledgeBase.getId());
         return vectorStore;
     }
@@ -262,31 +253,35 @@ public class Ai1RagTool {
         return llmModelFactory.getOrCreateEmbeddingModel(runtime);
     }
 
-    private MilvusServiceClient getMilvusClient() {
-        if (milvusClient == null) {
-            synchronized (this) {
-                if (milvusClient == null) {
-                    YudaoAi1Properties.Milvus milvus = ai1Properties.getMilvus();
-                    ConnectParam.Builder builder = ConnectParam.newBuilder()
-                            .withUri(milvus.getUri())
-                            .withDatabaseName(milvus.getDatabase());
-                    if (StrUtil.isNotBlank(milvus.getUsername())) {
-                        builder.withAuthorization(milvus.getUsername(), milvus.getPassword());
-                    }
-                    milvusClient = new MilvusServiceClient(builder.build());
-                }
-            }
+    /**
+     * 创建 Milvus 客户端：配置了用户名时，开启鉴权
+     */
+    private MilvusServiceClient createMilvusClient() {
+        YudaoAi1Properties.Milvus milvus = ai1Properties.getMilvus();
+        ConnectParam.Builder builder = ConnectParam.newBuilder()
+                .withUri(milvus.getUri())
+                .withDatabaseName(milvus.getDatabase());
+        if (StrUtil.isNotBlank(milvus.getUsername())) {
+            builder.withAuthorization(milvus.getUsername(), milvus.getPassword());
         }
-        return milvusClient;
+        return new MilvusServiceClient(builder.build());
     }
 
-    // TODO @AI：每个 CollectionName 搞个知识库，是合理的设计么？还是后续可以优化噢？
-    private static String buildCollectionName(Long knowledgeBaseId) {
-        return "kb_base_" + knowledgeBaseId;
+    /**
+     * 构建知识库的向量集合名：一个知识库对应一个集合
+     *
+     * 不同知识库可能使用不同的嵌入模型，向量维度不同，无法共用一个集合；后续也可能落到不同的向量库，按知识库隔离更便于迁移和整体删除
+     */
+    private String buildCollectionName(Long knowledgeBaseId) {
+        return ai1Properties.getMilvus().getCollectionPrefix() + knowledgeBaseId;
     }
 
-    private static int getDefaultTopK(Ai1KnowledgeBaseDO knowledgeBase) {
-        return knowledgeBase.getTopK() != null && knowledgeBase.getTopK() > 0 ? knowledgeBase.getTopK() : DEFAULT_TOP_K;
+    /**
+     * 获得知识库的检索数量：知识库未配置时，使用 yudao.ai1.milvus.default-top-k 配置
+     */
+    private int getDefaultTopK(Ai1KnowledgeBaseDO knowledgeBase) {
+        return knowledgeBase.getTopK() != null && knowledgeBase.getTopK() > 0 ? knowledgeBase.getTopK()
+                : ai1Properties.getMilvus().getDefaultTopK();
     }
 
     /**
@@ -297,14 +292,14 @@ public class Ai1RagTool {
      * @param chunkOverlap 分片重叠，限制在 [0, chunkSize - 1]
      * @return 分片列表
      */
+    @SuppressWarnings("MathClampMigration")
     static List<String> split(String content, Integer chunkSize, Integer chunkOverlap) {
         List<String> chunks = new ArrayList<>();
         if (StrUtil.isEmpty(content)) {
             return chunks;
         }
-        int size = Math.max(chunkSize != null ? chunkSize : 0, 1);
-        // TODO @AI：jdk21 有 Math.clamp()；hutool 有可以替代的方法么？
-        int overlap = Math.min(Math.max(chunkOverlap != null ? chunkOverlap : 0, 0), size - 1);
+        int size = Math.max(ObjUtil.defaultIfNull(chunkSize, 0), 1);
+        int overlap = Math.min(Math.max(ObjUtil.defaultIfNull(chunkOverlap, 0), 0), size - 1);
         int length = content.length();
         int start = 0;
         while (start < length) {
@@ -318,22 +313,21 @@ public class Ai1RagTool {
         return chunks;
     }
 
-    // TODO @AI：使用 hutool 的 convert tolong；
-    private static Long toLong(Object value) {
-        return value instanceof Number number ? number.longValue() : null;
-    }
-
-    // TODO @AI：使用 hutool 的 convert toint；
-    private static Integer toInteger(Object value) {
-        return value instanceof Number number ? number.intValue() : null;
-    }
-
-    // TODO @AI：@data 替代下噢。
-    // TODO @AI：是不是应该抽象下：MilvusVectorStore =》VectorStore 支持更多种存储器噢
     /**
      * 向量存储缓存项
      */
-    private record CachedVectorStore(EmbeddingModel embeddingModel, MilvusVectorStore vectorStore) {
+    @Data
+    private static class CachedVectorStore {
+
+        /**
+         * 构建时使用的嵌入模型实例，用于判断是否需要重建
+         */
+        private EmbeddingModel embeddingModel;
+        /**
+         * 向量存储
+         */
+        private MilvusVectorStore vectorStore;
+
     }
 
     /**

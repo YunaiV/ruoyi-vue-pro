@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.ai1.service.knowledge;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.knowledgebase.Ai1KnowledgeBasePageReqVO;
-import cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.knowledgebase.Ai1KnowledgeBaseSaveReqVO;
+import cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.base.Ai1KnowledgeBasePageReqVO;
+import cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.base.Ai1KnowledgeBaseSaveReqVO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.knowledge.Ai1KnowledgeBaseDO;
 import cn.iocoder.yudao.module.ai1.tool.rag.Ai1RagTool;
 import jakarta.validation.Valid;

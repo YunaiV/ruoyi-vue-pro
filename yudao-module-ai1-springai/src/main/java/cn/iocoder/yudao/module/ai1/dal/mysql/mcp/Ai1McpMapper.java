@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.ai1.controller.admin.mcp.vo.Ai1McpPageReqVO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.mcp.Ai1McpDO;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -28,6 +29,11 @@ public interface Ai1McpMapper extends BaseMapperX<Ai1McpDO> {
         return selectList(new LambdaQueryWrapperX<Ai1McpDO>()
                 .eq(Ai1McpDO::getStatus, status)
                 .orderByAsc(Ai1McpDO::getId));
+    }
+
+    default void updateForSave(Ai1McpDO mcp) {
+        update(mcp, new LambdaUpdateWrapper<Ai1McpDO>().eq(Ai1McpDO::getId, mcp.getId())
+                .set(mcp.getUrl() == null, Ai1McpDO::getUrl, null));
     }
 
 }

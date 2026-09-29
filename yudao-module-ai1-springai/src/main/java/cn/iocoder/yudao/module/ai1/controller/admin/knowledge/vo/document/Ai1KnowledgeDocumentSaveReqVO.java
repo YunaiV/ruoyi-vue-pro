@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.knowledgedocument;
+package cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.document;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
@@ -19,7 +19,7 @@ public class Ai1KnowledgeDocumentSaveReqVO {
 
     @Schema(description = "名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "三体.txt")
     @NotEmpty(message = "名称不能为空")
-    @Size(max = 200, message = "名称长度不能超过 200 个字符")
+    @Size(max = 255, message = "名称长度不能超过 255 个字符")
     private String name;
 
     @Schema(description = "内容", requiredMode = Schema.RequiredMode.REQUIRED, example = "三体舰队距离地球还有四光年")

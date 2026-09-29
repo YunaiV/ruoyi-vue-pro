@@ -1,15 +1,18 @@
 package cn.iocoder.yudao.module.ai1.service.knowledge;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.knowledgedocument.Ai1KnowledgeDocumentPageReqVO;
-import cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.knowledgedocument.Ai1KnowledgeDocumentSaveReqVO;
-import cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.knowledgedocument.Ai1KnowledgeDocumentVectorizeRespVO;
+import cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.document.Ai1KnowledgeDocumentPageReqVO;
+import cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.document.Ai1KnowledgeDocumentSaveReqVO;
+import cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.document.Ai1KnowledgeDocumentVectorizeRespVO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.knowledge.Ai1KnowledgeDocumentDO;
 import jakarta.validation.Valid;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
  * AI1 知识文档 Service 接口
@@ -86,6 +89,16 @@ public interface Ai1KnowledgeDocumentService {
      * @return 文档列表
      */
     List<Ai1KnowledgeDocumentDO> getKnowledgeDocumentList(Collection<Long> ids);
+
+    /**
+     * 获得指定编号的文档 Map
+     *
+     * @param ids 编号集合
+     * @return 文档 Map
+     */
+    default Map<Long, Ai1KnowledgeDocumentDO> getKnowledgeDocumentMap(Collection<Long> ids) {
+        return convertMap(getKnowledgeDocumentList(ids), Ai1KnowledgeDocumentDO::getId);
+    }
 
     /**
      * 文档向量化：分片 → 嵌入 → 写入 Milvus，并回写状态与分片数；失败时回写失败状态并抛出异常

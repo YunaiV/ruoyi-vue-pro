@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.knowledgedocument;
+package cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.document;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import io.swagger.v3.oas.annotations.media.Schema;

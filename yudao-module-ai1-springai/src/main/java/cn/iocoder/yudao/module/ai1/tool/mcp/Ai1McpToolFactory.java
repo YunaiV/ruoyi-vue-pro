@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.ai1.tool.mcp;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
@@ -16,6 +17,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.function.Function;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
 /**
  * AI1 MCP 工具工厂：把 Agent 绑定的 MCP 服务暴露的工具，桥接为 Spring AI ToolCallback
@@ -59,16 +62,25 @@ public class Ai1McpToolFactory {
             if (CommonStatusEnum.isDisable(mcp.getStatus())) {
                 continue;
             }
-            try {
-                // TODO @AI：mcpClientTool.listTools(mcp) 抽个方法出来；
-                for (Ai1McpClientTool.McpToolInfo toolInfo : mcpClientTool.listTools(mcp)) {
-                    tools.add(buildToolCallback(mcp, toolInfo));
-                }
-            } catch (Exception e) {
-                log.warn("[buildTools][Agent({}) 加载 MCP({}) 工具失败]", agent.getId(), mcp.getName(), e);
-            }
+            tools.addAll(convertList(listTools(agent, mcp), toolInfo -> buildToolCallback(mcp, toolInfo)));
         }
         return tools;
+    }
+
+    /**
+     * 列举 MCP 服务暴露的工具；失败时记录日志并返回空列表
+     *
+     * @param agent Agent
+     * @param mcp   MCP 服务
+     * @return 工具列表
+     */
+    private List<Ai1McpClientTool.McpToolInfo> listTools(Ai1AgentDO agent, Ai1McpDO mcp) {
+        try {
+            return mcpClientTool.listTools(mcp);
+        } catch (Exception e) {
+            log.warn("[listTools][Agent({}) 加载 MCP({}) 工具失败]", agent.getId(), mcp.getName(), e);
+            return Collections.emptyList();
+        }
     }
 
     /**
@@ -83,8 +95,7 @@ public class Ai1McpToolFactory {
             inputSchema.put("type", "object");
             inputSchema.put("properties", new HashMap<>());
         }
-        // TODO @AI：是不是搞个 slugify(mcp.getName()) + NAME_SEPARATOR + toolInfo.getName() 构建名字的方法？
-        return FunctionToolCallback.builder(slugify(mcp.getName()) + NAME_SEPARATOR + toolInfo.getName(), function)
+        return FunctionToolCallback.builder(buildToolName(mcp, toolInfo), function)
                 .description(StrUtil.nullToEmpty(toolInfo.getDescription()))
                 .inputType(Map.class)
                 .inputSchema(JsonUtils.toJsonString(inputSchema))
@@ -92,19 +103,24 @@ public class Ai1McpToolFactory {
     }
 
     /**
+     * 构建工具名：MCP 名称净化 + "__" + 原始工具名，避免多个服务的同名工具冲突
+     *
+     * @param mcp      MCP 服务
+     * @param toolInfo 工具信息
+     * @return 工具名
+     */
+    private static String buildToolName(Ai1McpDO mcp, Ai1McpClientTool.McpToolInfo toolInfo) {
+        return slugify(mcp.getName()) + NAME_SEPARATOR + toolInfo.getName();
+    }
+
+    /**
      * 名称净化：只保留小写字母、数字、下划线（工具名需匹配 ^[a-zA-Z0-9_-]+$）
      */
-    // TODO @AI：hutool 有没可以替代的方法么？
     static String slugify(String name) {
         if (StrUtil.isEmpty(name)) {
             return "mcp";
         }
-        StringBuilder result = new StringBuilder();
-        for (char c : name.toLowerCase(Locale.ROOT).toCharArray()) {
-            boolean valid = (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '_';
-            result.append(valid ? c : '_');
-        }
-        return result.toString();
+        return ReUtil.replaceAll(name.toLowerCase(Locale.ROOT), "[^a-z0-9_]", "_");
     }
 
 }

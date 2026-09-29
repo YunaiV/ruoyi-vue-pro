@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Schema(description = "管理后台 - AI1 MCP Response VO")
 @Data
@@ -21,8 +22,8 @@ public class Ai1McpRespVO {
     @Schema(description = "服务地址", example = "http://127.0.0.1:8081/mcp")
     private String url;
 
-    @Schema(description = "请求头，JSON 对象", example = "{\"Authorization\":\"Bearer xxx\"}")
-    private String headers;
+    @Schema(description = "请求头", example = "{\"Authorization\":\"Bearer xxx\"}")
+    private Map<String, String> headers;
 
     @Schema(description = "完整 MCP 配置，JSON 对象", example = "{\"transport\":\"http\",\"url\":\"http://127.0.0.1:8081/mcp\"}")
     private String config;

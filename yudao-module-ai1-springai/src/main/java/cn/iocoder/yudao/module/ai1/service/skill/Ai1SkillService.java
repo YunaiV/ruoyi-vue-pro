@@ -16,9 +16,8 @@ import java.util.List;
  */
 public interface Ai1SkillService {
 
-    // TODO @AI：“名称租户内唯一，并播种固定文件 SKILL.md、scripts/、reference/”类似这种注释，可以忽略掉
     /**
-     * 创建 SKILL：名称租户内唯一，并播种固定文件 SKILL.md、scripts/、reference/
+     * 创建 SKILL
      *
      * @param createReqVO 创建信息
      * @return 编号
@@ -26,7 +25,7 @@ public interface Ai1SkillService {
     Long createSkill(@Valid Ai1SkillSaveReqVO createReqVO);
 
     /**
-     * 更新 SKILL：名称租户内唯一
+     * 更新 SKILL
      *
      * @param updateReqVO 更新信息
      */

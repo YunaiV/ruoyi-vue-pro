@@ -12,7 +12,7 @@ public class Ai1ModelRespVO {
     @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
-    @Schema(description = "Provider 编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "供应商编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long providerId;
 
     @Schema(description = "展示名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "DeepSeek Chat")

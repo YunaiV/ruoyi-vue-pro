@@ -9,8 +9,8 @@ import cn.iocoder.yudao.module.ai1.dal.dataobject.provider.Ai1ProviderDO;
 import cn.iocoder.yudao.module.ai1.dal.mysql.provider.Ai1ProviderMapper;
 import cn.iocoder.yudao.module.ai1.enums.provider.Ai1ModelTypeEnum;
 import cn.iocoder.yudao.module.ai1.framework.ai.core.llm.Ai1LlmModelFactory;
+import cn.iocoder.yudao.module.ai1.service.provider.bo.Ai1ProviderConnectResult;
 import cn.iocoder.yudao.module.ai1.service.provider.bo.Ai1ProviderRuntime;
-import cn.iocoder.yudao.module.ai1.tool.provider.Ai1ProviderTool;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
@@ -45,18 +45,7 @@ public class Ai1ProviderServiceImplTest extends BaseDbUnitTest {
     @MockitoBean
     private Ai1ModelService modelService;
     @MockitoBean
-    private Ai1ProviderTool providerTool;
-    @MockitoBean
     private Ai1LlmModelFactory llmModelFactory;
-
-    @Test
-    public void testCreateProvider_headersInvalid() {
-        // 准备参数：附属 Header 不是 [{key,value}] 数组
-        Ai1ProviderSaveReqVO reqVO = randomProviderSaveReqVO(o -> o.setHeaders("{\"key\":\"X\"}"));
-
-        // 调用，并断言异常
-        assertServiceException(() -> providerService.createProvider(reqVO), PROVIDER_HEADERS_INVALID);
-    }
 
     @Test
     public void testCreateProvider_success() {
@@ -160,19 +149,24 @@ public class Ai1ProviderServiceImplTest extends BaseDbUnitTest {
         assertEquals(dbProvider.getBaseUrl(), runtime.getBaseUrl());
         assertEquals(model.getModel(), runtime.getModel());
         assertEquals(model.getType(), runtime.getModelType());
+        assertEquals(model.getUpdateTime(), runtime.getModelUpdateTime());
+        assertNotNull(runtime.getProviderUpdateTime());
         assertEquals(Collections.singletonList("X-App"), convertList(runtime.getHeaders(), header -> header.get("key")));
     }
 
     @Test
-    public void testGetRemoteModelList_loadFail() {
-        // mock 数据
-        Ai1ProviderDO dbProvider = randomProviderDO();
+    public void testTestProviderConnect_unreachable() {
+        // mock 数据：接口地址不可达
+        Ai1ProviderDO dbProvider = randomProviderDO(o -> o.setBaseUrl("http://127.0.0.1:1/v1").setApiKey(null));
         providerMapper.insert(dbProvider);
-        // mock 方法：拉取失败
-        when(providerTool.listModels(dbProvider.getBaseUrl(), dbProvider.getApiKey(), dbProvider.getHeaders())).thenReturn(null);
 
-        // 调用，并断言异常
-        assertServiceException(() -> providerService.getRemoteModelList(dbProvider.getId()), PROVIDER_REMOTE_MODEL_LOAD_FAIL);
+        // 调用
+        Ai1ProviderConnectResult result = providerService.testProviderConnect(dbProvider.getId());
+
+        // 断言：两次请求均网络异常，合并报告
+        assertFalse(result.getConnectable());
+        assertEquals(0, result.getHttpCode());
+        assertTrue(result.getMessage().startsWith("连接失败："));
     }
 
     // ========== 随机对象 ==========

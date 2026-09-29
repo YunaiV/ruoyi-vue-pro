@@ -12,7 +12,7 @@ import lombok.ToString;
 @ToString(callSuper = true)
 public class Ai1ModelPageReqVO extends PageParam {
 
-    @Schema(description = "Provider 编号", example = "1")
+    @Schema(description = "供应商编号", example = "1")
     private Long providerId;
 
     @Schema(description = "展示名称，模糊匹配", example = "DeepSeek")

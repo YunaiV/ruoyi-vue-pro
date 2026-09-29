@@ -7,8 +7,6 @@ import cn.iocoder.yudao.module.ai1.controller.admin.skill.vo.skill.Ai1SkillPageR
 import cn.iocoder.yudao.module.ai1.dal.dataobject.skill.Ai1SkillDO;
 import org.apache.ibatis.annotations.Mapper;
 
-import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -36,12 +34,6 @@ public interface Ai1SkillMapper extends BaseMapperX<Ai1SkillDO> {
                 .orderByAsc(Ai1SkillDO::getId));
     }
 
-    // TODO @AI：可以清理掉了；
-    /**
-     * 逻辑删除前写入删除时间，使其退出 (tenant_id, name, deleted_at) 唯一键的未删除区间
-     */
-    default void updateDeletedAtByIds(Collection<Long> ids, LocalDateTime deletedAt) {
-        update(new Ai1SkillDO().setDeletedAt(deletedAt), new LambdaQueryWrapperX<Ai1SkillDO>().in(Ai1SkillDO::getId, ids));
-    }
+    // TODO DONE @AI：可以清理掉了；
 
 }

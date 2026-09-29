@@ -15,7 +15,7 @@ public class Ai1ChatMessageRespVO {
     @Schema(description = "对话编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long conversationId;
 
-    @Schema(description = "角色：user、assistant", requiredMode = Schema.RequiredMode.REQUIRED, example = "assistant")
+    @Schema(description = "角色", requiredMode = Schema.RequiredMode.REQUIRED, example = "assistant")
     private String role;
 
     @Schema(description = "思考过程", example = "用户想了解……")
@@ -24,8 +24,7 @@ public class Ai1ChatMessageRespVO {
     @Schema(description = "内容", requiredMode = Schema.RequiredMode.REQUIRED, example = "四光年")
     private String content;
 
-    // TODO @AI：“：0-生成中、1-完成、2-失败”；类似这种；
-    @Schema(description = "生成状态：0-生成中、1-完成、2-失败", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "生成状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer status;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)

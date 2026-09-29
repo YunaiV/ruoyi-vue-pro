@@ -33,7 +33,7 @@ public class Ai1ChatMessageController {
     @Resource
     private Ai1ChatConversationService chatConversationService;
 
-    // TODO @AI：分块下，哪些是 我的；哪些是管理的。类似 === === 这种噢；
+    // ==================== 我的 ====================
 
     @GetMapping("/my-list")
     @Operation(summary = "获得【我的】对话消息列表")
@@ -41,15 +41,6 @@ public class Ai1ChatMessageController {
     @PreAuthorize("@ss.hasPermission('ai1:chat:query')")
     public CommonResult<List<Ai1ChatMessageRespVO>> getChatMessageMyList(@RequestParam("conversationId") Long conversationId) {
         chatConversationService.validateChatConversationMy(getLoginUserId(), conversationId);
-        return success(BeanUtils.toBean(chatMessageService.getChatMessageListByConversationId(conversationId),
-                Ai1ChatMessageRespVO.class));
-    }
-
-    @GetMapping("/list")
-    @Operation(summary = "获得对话消息列表", description = "管理端查看任意用户的对话明细")
-    @Parameter(name = "conversationId", description = "对话编号", required = true, example = "1024")
-    @PreAuthorize("@ss.hasPermission('ai1:chat-conversation:query')")
-    public CommonResult<List<Ai1ChatMessageRespVO>> getChatMessageList(@RequestParam("conversationId") Long conversationId) {
         return success(BeanUtils.toBean(chatMessageService.getChatMessageListByConversationId(conversationId),
                 Ai1ChatMessageRespVO.class));
     }
@@ -70,6 +61,17 @@ public class Ai1ChatMessageController {
     public SseEmitter resumeChatMessageStream(@RequestParam("messageId") Long messageId,
                                               @RequestParam(value = "lastEventId", required = false) String lastEventId) {
         return chatMessageService.resumeChatMessageStream(getLoginUserId(), messageId, lastEventId);
+    }
+
+    // ==================== 管理 ====================
+
+    @GetMapping("/list")
+    @Operation(summary = "获得对话消息列表", description = "管理端查看任意用户的对话明细")
+    @Parameter(name = "conversationId", description = "对话编号", required = true, example = "1024")
+    @PreAuthorize("@ss.hasPermission('ai1:chat-conversation:query')")
+    public CommonResult<List<Ai1ChatMessageRespVO>> getChatMessageList(@RequestParam("conversationId") Long conversationId) {
+        return success(BeanUtils.toBean(chatMessageService.getChatMessageListByConversationId(conversationId),
+                Ai1ChatMessageRespVO.class));
     }
 
 }

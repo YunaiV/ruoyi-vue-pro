@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.ai1.service.skill;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.ai1.controller.admin.skill.vo.file.Ai1SkillFileContentReqVO;
 import cn.iocoder.yudao.module.ai1.controller.admin.skill.vo.file.Ai1SkillFileCreateReqVO;
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
@@ -42,16 +44,17 @@ public class Ai1SkillFileServiceImplTest extends BaseDbUnitTest {
     private Ai1SkillService skillService;
 
     @Test
-    public void testCreateSkillSeedFiles() {
+    public void testCreateDefaultSkillFileList() {
         // 调用
-        skillFileService.createSkillSeedFiles(new Ai1SkillDO().setId(SKILL_ID).setName("pdf-reader").setDescription("读取 PDF"));
+        skillFileService.createDefaultSkillFileList(new Ai1SkillDO().setId(SKILL_ID).setName("pdf-reader").setDescription("读取 PDF"));
 
         // 断言：SKILL.md、scripts/、reference/ 均为根级锁定节点；SKILL.md 含 frontmatter
         List<Ai1SkillFileDO> files = skillFileMapper.selectListBySkillId(SKILL_ID);
         assertEquals(3, files.size());
         assertTrue(files.stream().allMatch(file -> Boolean.TRUE.equals(file.getLocked())
                 && Ai1SkillFileDO.PARENT_ID_ROOT.equals(file.getParentId())));
-        Ai1SkillFileDO skillFile = files.stream().filter(file -> "SKILL.md".equals(file.getName())).findFirst().orElseThrow();
+        Ai1SkillFileDO skillFile = CollUtil.findOne(files, file -> Ai1SkillFileDO.NAME_SKILL.equals(file.getName()));
+        assertNotNull(skillFile);
         assertTrue(skillFile.getContent().startsWith("---\nname: pdf-reader\ndescription: 读取 PDF\n---"));
     }
 
@@ -160,7 +163,7 @@ public class Ai1SkillFileServiceImplTest extends BaseDbUnitTest {
         // 断言：a 及全部后代已删除，d.txt 保留；同名目录可重建
         List<Ai1SkillFileDO> files = skillFileMapper.selectListBySkillId(SKILL_ID);
         assertEquals(2, files.size());
-        assertTrue(convertList(files, Ai1SkillFileDO::getId).containsAll(List.of(d.getId(), newId)));
+        assertTrue(convertList(files, Ai1SkillFileDO::getId).containsAll(Arrays.asList(d.getId(), newId)));
     }
 
     // ========== 随机对象 ==========

@@ -16,8 +16,8 @@ public class Ai1ModelSaveReqVO {
     @Schema(description = "编号", example = "1024")
     private Long id;
 
-    @Schema(description = "Provider 编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    @NotNull(message = "Provider 编号不能为空")
+    @Schema(description = "供应商编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @NotNull(message = "供应商编号不能为空")
     private Long providerId;
 
     @Schema(description = "展示名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "DeepSeek Chat")

@@ -2,11 +2,12 @@ package cn.iocoder.yudao.module.ai1.service.knowledge;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.knowledgebase.Ai1KnowledgeBasePageReqVO;
-import cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.knowledgebase.Ai1KnowledgeBaseSaveReqVO;
+import cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.base.Ai1KnowledgeBasePageReqVO;
+import cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.base.Ai1KnowledgeBaseSaveReqVO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.knowledge.Ai1KnowledgeBaseDO;
 import cn.iocoder.yudao.module.ai1.dal.mysql.knowledge.Ai1KnowledgeBaseMapper;
 import cn.iocoder.yudao.module.ai1.enums.provider.Ai1ModelTypeEnum;
@@ -137,8 +138,9 @@ public class Ai1KnowledgeBaseServiceImpl implements Ai1KnowledgeBaseService {
         } catch (ServiceException e) {
             throw e;
         } catch (Exception e) {
-            // TODO @AI：query、topK 是不是也打印出来噢？
-            log.warn("[searchKnowledgeBase][知识库({}) 向量检索失败]", id, e);
+            log.warn("[searchKnowledgeBase][知识库({}) query({}) topK({}) 向量检索失败]",
+                    // TODO @AI：query 还是完整的打印吧
+                    id, StrUtil.maxLength(query, 200), topK, e);
             throw exception(KNOWLEDGE_BASE_SEARCH_FAIL, e.getMessage());
         }
     }

@@ -41,7 +41,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 /**
- * {@link Ai1ChatStreamTool} 的单元测试：覆盖 worker 的租户恢复、缺失租户拒绝、失败回填
+ * {@link Ai1ChatStreamTool} 的单元测试：覆盖 worker 的租户恢复、无租户执行、失败回填
  *
  * @author 芋道源码
  */
@@ -91,17 +91,31 @@ public class Ai1ChatStreamToolTest extends BaseMockitoUnitTest {
     }
 
     @Test
-    public void testHandleTask_missingTenantRejected() {
-        // 准备参数：任务缺少 tenantId
+    public void testHandleTask_withoutTenant() {
+        // mock 方法：记录生成时的租户上下文，并返回生成结果
+        AtomicReference<Long> tenantIdInGenerate = new AtomicReference<>(-1L);
+        when(agentService.validateAgentExists(AGENT_ID)).thenAnswer(invocation -> {
+            tenantIdInGenerate.set(TenantContextHolder.getTenantId());
+            return new Ai1AgentDO().setId(AGENT_ID).setName("客服").setProviderId(1L).setModelId(2L);
+        });
+        when(providerService.getProviderRuntime(1L, 2L)).thenReturn(new Ai1ProviderRuntime().setModelType(Ai1ModelTypeEnum.CHAT.getType()));
+        when(chatMessageService.getChatMessageListByConversationIdAndIdLessThan(eq(CONVERSATION_ID), eq(MESSAGE_ID), anyInt()))
+                .thenReturn(new ArrayList<>());
+        when(llmChatTool.chat(any(), eq("你是 客服 的智能助手。"), anyList(), eq("你好"), anyList(), anyList(), eq(CONVERSATION_ID), any(), any()))
+                .thenReturn(new Ai1LlmChatTool.ChatText("您好", ""));
+        // 准备参数：关闭多租户时，任务不携带 tenantId
         Map<String, String> fields = buildTaskFields();
         fields.remove("tenantId");
 
         // 调用
         chatStreamTool.handleTask(RECORD_ID, fields);
 
-        // 断言：不读取任何配置、不回填消息，只写 error + done 终态并确认
-        verifyNoInteractions(agentService, chatMessageService);
-        assertEquals(List.of("error", "done"), captureResultTypes());
+        // 断言：无租户上下文直接生成，回填完成状态，写 done 终态并确认
+        assertNull(tenantIdInGenerate.get());
+        ArgumentCaptor<Ai1ChatMessageDO> messageCaptor = ArgumentCaptor.forClass(Ai1ChatMessageDO.class);
+        verify(chatMessageService).updateChatMessage(messageCaptor.capture());
+        assertEquals(Ai1ChatMessageStatusEnum.SUCCESS.getStatus(), messageCaptor.getValue().getStatus());
+        assertEquals(List.of("done"), captureResultTypes());
         verify(taskStream).ack("ai1-chat-workers", RECORD_ID);
     }
 
@@ -116,7 +130,7 @@ public class Ai1ChatStreamToolTest extends BaseMockitoUnitTest {
         when(providerService.getProviderRuntime(1L, 2L)).thenReturn(new Ai1ProviderRuntime().setModelType(Ai1ModelTypeEnum.CHAT.getType()));
         when(chatMessageService.getChatMessageListByConversationIdAndIdLessThan(eq(CONVERSATION_ID), eq(MESSAGE_ID), anyInt()))
                 .thenReturn(new ArrayList<>());
-        when(llmChatTool.chat(any(), anyString(), anyList(), eq("你好"), anyList(), anyList(), anyString(), any(), any()))
+        when(llmChatTool.chat(any(), anyString(), anyList(), eq("你好"), anyList(), anyList(), eq(CONVERSATION_ID), any(), any()))
                 .thenAnswer(invocation -> {
                     Consumer<String> onContent = invocation.getArgument(8);
                     onContent.accept("您好");

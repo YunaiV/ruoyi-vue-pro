@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.ai1.service.home;
 
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.module.ai1.controller.admin.home.vo.Ai1HomeMessageShareRespVO;
-import cn.iocoder.yudao.module.ai1.controller.admin.home.vo.Ai1HomeMessageTrendRespVO;
+import cn.iocoder.yudao.module.ai1.controller.admin.home.vo.Ai1HomeMessageSummaryByAgentRespVO;
+import cn.iocoder.yudao.module.ai1.controller.admin.home.vo.Ai1HomeMessageSummaryByDateRespVO;
 import cn.iocoder.yudao.module.ai1.controller.admin.home.vo.Ai1HomeSummaryRespVO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.agent.Ai1AgentDO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.chat.Ai1ChatConversationDO;
@@ -66,7 +66,7 @@ public class Ai1HomeServiceImplTest extends BaseDbUnitTest {
         agentMapper.insert(deletedAgent);
         agentMapper.deleteById(deletedAgent.getId());
         agentMapper.insert(randomAgent());
-        skillMapper.insert(randomPojo(Ai1SkillDO.class, o -> o.setStatus(0).setDeletedAt(LocalDateTime.of(1970, 1, 1, 0, 0))));
+        skillMapper.insert(randomPojo(Ai1SkillDO.class, o -> o.setStatus(0)));
         mcpMapper.insert(randomPojo(Ai1McpDO.class, o -> o.setStatus(0)));
         for (int i = 0; i < 3; i++) {
             modelMapper.insert(randomPojo(Ai1ModelDO.class, o -> o.setType(0).setStatus(0)));
@@ -83,7 +83,7 @@ public class Ai1HomeServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testGetMessageTrend() {
+    public void testGetMessageSummaryByDate() {
         // mock 数据：今天 2 条、前天 1 条、区间外（8 天前）1 条、今天已删除 1 条
         LocalDateTime now = LocalDateTime.now();
         Long conversationId = insertConversation(1L);
@@ -95,28 +95,29 @@ public class Ai1HomeServiceImplTest extends BaseDbUnitTest {
         messageMapper.deleteById(deletedMessageId);
 
         // 调用：近 7 天
-        List<Ai1HomeMessageTrendRespVO> trend = homeService.getMessageTrend(7);
+        List<Ai1HomeMessageSummaryByDateRespVO> list = homeService.getMessageSummaryByDate(7);
 
         // 断言：连续 7 天，无消息的日期补 0，区间外和已删除不计入
-        assertEquals(7, trend.size());
-        assertEquals(getDayBeginTime(now.minusDays(6)).format(DATE_FORMATTER), trend.get(0).getDate());
-        assertEquals(now.format(DATE_FORMATTER), trend.get(6).getDate());
-        assertEquals(2L, trend.get(6).getCount());
-        assertEquals(0L, trend.get(5).getCount());
-        assertEquals(1L, trend.get(4).getCount());
-        assertEquals(3L, trend.stream().mapToLong(Ai1HomeMessageTrendRespVO::getCount).sum());
+        assertEquals(7, list.size());
+        assertEquals(getDayBeginTime(now.minusDays(6)).format(DATE_FORMATTER), list.get(0).getDate());
+        assertEquals(now.format(DATE_FORMATTER), list.get(6).getDate());
+        assertEquals(2L, list.get(6).getCount());
+        assertEquals(0L, list.get(5).getCount());
+        assertEquals(1L, list.get(4).getCount());
+        assertEquals(3L, list.stream().mapToLong(Ai1HomeMessageSummaryByDateRespVO::getCount).sum());
     }
 
     @Test
-    public void testGetMessageTrend_daysInvalid() {
-        // 调用：为空、超出范围时按 30 天处理
-        assertEquals(30, homeService.getMessageTrend(null).size());
-        assertEquals(30, homeService.getMessageTrend(0).size());
-        assertEquals(30, homeService.getMessageTrend(31).size());
+    public void testGetMessageSummaryByDate_daysGreaterThan30() {
+        // 调用：超过 30 天时按实际天数统计
+        List<Ai1HomeMessageSummaryByDateRespVO> list = homeService.getMessageSummaryByDate(60);
+
+        // 断言
+        assertEquals(60, list.size());
     }
 
     @Test
-    public void testGetMessageShare() {
+    public void testGetMessageSummaryByAgent() {
         // mock 数据：Agent 1 有 3 条、Agent 2 有 1 条、区间外 1 条（Agent 2）、已删除对话下 5 条（Agent 3）
         LocalDateTime now = LocalDateTime.now();
         Long conversation1 = insertConversation(1L);
@@ -133,14 +134,14 @@ public class Ai1HomeServiceImplTest extends BaseDbUnitTest {
         conversationMapper.deleteById(deletedConversation);
 
         // 调用：近 7 天
-        List<Ai1HomeMessageShareRespVO> share = homeService.getMessageShare(7);
+        List<Ai1HomeMessageSummaryByAgentRespVO> list = homeService.getMessageSummaryByAgent(7);
 
         // 断言：按消息数量倒序，区间外和已删除对话不计入
-        assertEquals(2, share.size());
-        assertEquals(1L, share.get(0).getAgentId());
-        assertEquals(3L, share.get(0).getCount());
-        assertEquals(2L, share.get(1).getAgentId());
-        assertEquals(1L, share.get(1).getCount());
+        assertEquals(2, list.size());
+        assertEquals(1L, list.get(0).getAgentId());
+        assertEquals(3L, list.get(0).getCount());
+        assertEquals(2L, list.get(1).getAgentId());
+        assertEquals(1L, list.get(1).getCount());
     }
 
     // ========== 随机对象 ==========

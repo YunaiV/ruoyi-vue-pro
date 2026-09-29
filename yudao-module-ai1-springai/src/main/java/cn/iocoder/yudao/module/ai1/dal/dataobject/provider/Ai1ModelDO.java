@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 /**
- * AI1 Provider 模型 DO
+ * AI1 模型 DO
  *
  * @author 芋道源码
  */
@@ -29,7 +29,7 @@ public class Ai1ModelDO extends TenantBaseDO {
     @TableId
     private Long id;
     /**
-     * Provider 编号
+     * 供应商编号
      *
      * 关联 {@link Ai1ProviderDO#getId()}
      */

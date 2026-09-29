@@ -65,10 +65,9 @@ public class Ai1AgentServiceImplTest extends BaseDbUnitTest {
         // 调用
         Long id = agentService.createAgent(buildAgentSaveReqVO().setKnowledgeBaseIds(Arrays.asList(1L, 2L)));
 
-        // 断言：初始关闭、无 UUID；绑定集合按逗号分隔存储并正确读回
+        // 断言：初始关闭；绑定集合按逗号分隔存储并正确读回
         Ai1AgentDO agent = agentMapper.selectById(id);
         assertEquals(CommonStatusEnum.DISABLE.getStatus(), agent.getStatus());
-        assertNull(agent.getUuid());
         assertEquals(Arrays.asList(1L, 2L), agent.getKnowledgeBaseIds());
         assertTrue(agent.getMcpIds().isEmpty());
     }
@@ -79,7 +78,7 @@ public class Ai1AgentServiceImplTest extends BaseDbUnitTest {
         mockChatModel();
         Long id = agentService.createAgent(buildAgentSaveReqVO().setSkillIds(Arrays.asList(3L)));
 
-        // 调用：不传绑定集合，视为清空
+        // 调用：绑定集合传空数组，视为清空
         agentService.updateAgent(buildAgentSaveReqVO().setId(id));
 
         // 断言
@@ -87,25 +86,18 @@ public class Ai1AgentServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testUpdateAgentStatus_reuseUuid() {
+    public void testUpdateAgentStatus_success() {
         // mock 数据
         mockChatModel();
         Long id = agentService.createAgent(buildAgentSaveReqVO());
 
-        // 调用：开启 → 关闭 → 再开启
-        agentService.updateAgentStatus(id, CommonStatusEnum.ENABLE.getStatus());
-        String uuid = agentMapper.selectById(id).getUuid();
-        agentService.updateAgentStatus(id, CommonStatusEnum.DISABLE.getStatus());
-        Ai1AgentDO disabled = agentMapper.selectById(id);
+        // 调用
         agentService.updateAgentStatus(id, CommonStatusEnum.ENABLE.getStatus());
 
-        // 断言：UUID 首次开启时生成，关闭后保留，再开启复用，已分享的地址不失效
-        assertEquals(32, uuid.length());
-        assertEquals(CommonStatusEnum.DISABLE.getStatus(), disabled.getStatus());
-        assertEquals(uuid, disabled.getUuid());
-        Ai1AgentDO enabled = agentMapper.selectById(id);
-        assertEquals(CommonStatusEnum.ENABLE.getStatus(), enabled.getStatus());
-        assertEquals(uuid, enabled.getUuid());
+        // 断言：只修改状态
+        Ai1AgentDO agent = agentMapper.selectById(id);
+        assertEquals(CommonStatusEnum.ENABLE.getStatus(), agent.getStatus());
+        assertEquals("客服助手", agent.getName());
     }
 
     @Test
@@ -139,7 +131,6 @@ public class Ai1AgentServiceImplTest extends BaseDbUnitTest {
         // mock 数据
         mockChatModel();
         Long id = agentService.createAgent(buildAgentSaveReqVO());
-        Ai1AgentDO agent = agentMapper.selectById(id);
 
         // 调用
         agentService.deleteAgent(id);
@@ -147,7 +138,7 @@ public class Ai1AgentServiceImplTest extends BaseDbUnitTest {
         // 断言：删除 Agent，级联删除对话，并清理 SKILL 沙箱
         assertNull(agentMapper.selectById(id));
         verify(chatConversationService).deleteChatConversationListByAgentIds(Collections.singletonList(id));
-        verify(skillToolFactory).evict(agent.getTenantId(), id);
+        verify(skillToolFactory).evict(id);
     }
 
     // ========== 随机对象 ==========
@@ -158,7 +149,8 @@ public class Ai1AgentServiceImplTest extends BaseDbUnitTest {
     }
 
     private static Ai1AgentSaveReqVO buildAgentSaveReqVO() {
-        return new Ai1AgentSaveReqVO().setName("客服助手").setProviderId(1L).setModelId(2L).setSystemPrompt("你是客服");
+        return new Ai1AgentSaveReqVO().setName("客服助手").setProviderId(1L).setModelId(2L).setSystemPrompt("你是客服")
+                .setKnowledgeBaseIds(Collections.emptyList()).setMcpIds(Collections.emptyList()).setSkillIds(Collections.emptyList());
     }
 
 }

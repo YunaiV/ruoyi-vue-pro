@@ -6,10 +6,10 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.MapUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.knowledgebase.Ai1KnowledgeBasePageReqVO;
-import cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.knowledgebase.Ai1KnowledgeBaseRespVO;
-import cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.knowledgebase.Ai1KnowledgeBaseSaveReqVO;
-import cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.knowledgebase.Ai1KnowledgeSearchRespVO;
+import cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.base.Ai1KnowledgeBasePageReqVO;
+import cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.base.Ai1KnowledgeBaseRespVO;
+import cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.base.Ai1KnowledgeBaseSaveReqVO;
+import cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.base.Ai1KnowledgeSearchRespVO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.knowledge.Ai1KnowledgeBaseDO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.knowledge.Ai1KnowledgeDocumentDO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.provider.Ai1ModelDO;
@@ -90,11 +90,7 @@ public class Ai1KnowledgeBaseController {
     @PreAuthorize("@ss.hasPermission('ai1:knowledge:query')")
     public CommonResult<Ai1KnowledgeBaseRespVO> getKnowledgeBase(@RequestParam("id") Long id) {
         Ai1KnowledgeBaseDO knowledgeBase = knowledgeBaseService.getKnowledgeBase(id);
-        // TODO @AI：对齐别的 build vo 的风格；都检查下；别的 controller 也是噢；
-        if (knowledgeBase == null) {
-            return success(null);
-        }
-        return success(CollUtil.getFirst(buildKnowledgeBaseRespVOList(Collections.singletonList(knowledgeBase))));
+        return success(buildKnowledgeBaseRespVO(knowledgeBase));
     }
 
     @GetMapping("/page")
@@ -124,28 +120,37 @@ public class Ai1KnowledgeBaseController {
             @RequestParam("query") @NotEmpty(message = "检索内容不能为空") String query,
             @RequestParam(value = "topK", required = false) Integer topK) {
         List<Ai1RagTool.SearchHit> hits = knowledgeBaseService.searchKnowledgeBase(id, query, topK);
-        // 拼接文档名称
-        Map<Long, Ai1KnowledgeDocumentDO> documentMap = convertMap(knowledgeDocumentService.getKnowledgeDocumentList(
-                convertSet(hits, Ai1RagTool.SearchHit::getDocumentId)), Ai1KnowledgeDocumentDO::getId);
-        return success(convertList(hits, hit -> BeanUtils.toBean(hit, Ai1KnowledgeSearchRespVO.class,
-                respVO -> MapUtils.findAndThen(documentMap, hit.getDocumentId(),
-                        document -> respVO.setDocumentName(document.getName())))));
+        return success(buildKnowledgeSearchRespVOList(hits));
     }
 
     // ==================== 拼接 VO ====================
 
+    private Ai1KnowledgeBaseRespVO buildKnowledgeBaseRespVO(Ai1KnowledgeBaseDO knowledgeBase) {
+        if (knowledgeBase == null) {
+            return null;
+        }
+        return CollUtil.getFirst(buildKnowledgeBaseRespVOList(Collections.singletonList(knowledgeBase)));
+    }
+
     private List<Ai1KnowledgeBaseRespVO> buildKnowledgeBaseRespVOList(List<Ai1KnowledgeBaseDO> list) {
-        // TODO @AI：是不是 default map；逻辑更干净点；
-        Map<Long, Ai1ProviderDO> providerMap = convertMap(providerService.getProviderList(
-                convertSet(list, Ai1KnowledgeBaseDO::getEmbeddingProviderId)), Ai1ProviderDO::getId);
-        Map<Long, Ai1ModelDO> modelMap = convertMap(modelService.getModelList(
-                convertSet(list, Ai1KnowledgeBaseDO::getEmbeddingModelId)), Ai1ModelDO::getId);
+        Map<Long, Ai1ProviderDO> providerMap = providerService.getProviderMap(
+                convertSet(list, Ai1KnowledgeBaseDO::getEmbeddingProviderId));
+        Map<Long, Ai1ModelDO> modelMap = modelService.getModelMap(
+                convertSet(list, Ai1KnowledgeBaseDO::getEmbeddingModelId));
         return BeanUtils.toBean(list, Ai1KnowledgeBaseRespVO.class, respVO -> {
             MapUtils.findAndThen(providerMap, respVO.getEmbeddingProviderId(),
                     provider -> respVO.setEmbeddingProviderName(provider.getName()));
             MapUtils.findAndThen(modelMap, respVO.getEmbeddingModelId(),
                     model -> respVO.setEmbeddingModelName(model.getName()));
         });
+    }
+
+    private List<Ai1KnowledgeSearchRespVO> buildKnowledgeSearchRespVOList(List<Ai1RagTool.SearchHit> hits) {
+        Map<Long, Ai1KnowledgeDocumentDO> documentMap = knowledgeDocumentService.getKnowledgeDocumentMap(
+                convertSet(hits, Ai1RagTool.SearchHit::getDocumentId));
+        return BeanUtils.toBean(hits, Ai1KnowledgeSearchRespVO.class, respVO ->
+                MapUtils.findAndThen(documentMap, respVO.getDocumentId(),
+                        document -> respVO.setDocumentName(document.getName())));
     }
 
 }

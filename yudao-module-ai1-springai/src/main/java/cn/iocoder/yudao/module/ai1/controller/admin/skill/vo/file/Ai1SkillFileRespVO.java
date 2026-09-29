@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Schema(description = "管理后台 - AI1 SKILL 内容文件 Response VO")
 @Data
@@ -22,8 +21,7 @@ public class Ai1SkillFileRespVO {
     @Schema(description = "名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "SKILL.md")
     private String name;
 
-    // TODO @AI：类似这种“：0-目录、1-文件”可以去掉。不然好多地方要维护枚举噢；
-    @Schema(description = "类型：0-目录、1-文件", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer type;
 
     @Schema(description = "文件类型，即扩展名；目录为空", example = "md")
@@ -43,8 +41,5 @@ public class Ai1SkillFileRespVO {
 
     @Schema(description = "更新时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime updateTime;
-
-    @Schema(description = "子节点")
-    private List<Ai1SkillFileRespVO> children;
 
 }

@@ -5,7 +5,6 @@ import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.skill.Ai1SkillFileDO;
 import org.apache.ibatis.annotations.Mapper;
 
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -39,20 +38,6 @@ public interface Ai1SkillFileMapper extends BaseMapperX<Ai1SkillFileDO> {
                 .eq(Ai1SkillFileDO::getSkillId, skillId)
                 .eq(Ai1SkillFileDO::getParentId, parentId)
                 .eq(Ai1SkillFileDO::getName, name));
-    }
-
-    // TODO @AI：可以清理掉了；
-    /**
-     * 逻辑删除前写入删除时间，使其退出 (skill_id, parent_id, name, deleted_at) 唯一键的未删除区间
-     */
-    default void updateDeletedAtByIds(Collection<Long> ids, LocalDateTime deletedAt) {
-        update(new Ai1SkillFileDO().setDeletedAt(deletedAt),
-                new LambdaQueryWrapperX<Ai1SkillFileDO>().in(Ai1SkillFileDO::getId, ids));
-    }
-
-    default void updateDeletedAtBySkillIds(Collection<Long> skillIds, LocalDateTime deletedAt) {
-        update(new Ai1SkillFileDO().setDeletedAt(deletedAt),
-                new LambdaQueryWrapperX<Ai1SkillFileDO>().in(Ai1SkillFileDO::getSkillId, skillIds));
     }
 
     default int deleteBySkillIds(Collection<Long> skillIds) {

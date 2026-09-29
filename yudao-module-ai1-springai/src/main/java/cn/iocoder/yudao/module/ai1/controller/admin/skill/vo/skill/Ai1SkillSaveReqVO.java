@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.validation.InEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -18,6 +19,7 @@ public class Ai1SkillSaveReqVO {
     @Schema(description = "名称，同时作为物化目录名，仅支持字母、数字、中划线", requiredMode = Schema.RequiredMode.REQUIRED, example = "pdf-reader")
     @NotEmpty(message = "名称不能为空")
     @Size(max = 100, message = "名称长度不能超过 100 个字符")
+    @Pattern(regexp = "^[A-Za-z0-9-]+$", message = "名称仅支持字母、数字、中划线")
     private String name;
 
     @Schema(description = "描述", example = "读取并总结 PDF 文件")

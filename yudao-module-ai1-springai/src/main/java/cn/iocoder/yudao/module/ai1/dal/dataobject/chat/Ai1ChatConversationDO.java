@@ -28,6 +28,10 @@ public class Ai1ChatConversationDO extends TenantBaseDO {
      * 默认标题：首条消息发送后，自动替换为提问内容
      */
     public static final String TITLE_DEFAULT = "新对话";
+    /**
+     * 自动生成的对话标题最大长度：首条提问内容超出时截断
+     */
+    public static final int TITLE_MAX_LENGTH = 50;
 
     /**
      * 编号

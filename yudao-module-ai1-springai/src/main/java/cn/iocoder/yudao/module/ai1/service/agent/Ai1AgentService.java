@@ -8,6 +8,9 @@ import jakarta.validation.Valid;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 
 /**
  * AI1 Agent Service 接口
@@ -25,7 +28,7 @@ public interface Ai1AgentService {
     Long createAgent(@Valid Ai1AgentSaveReqVO createReqVO);
 
     /**
-     * 更新 Agent；状态、访问 UUID 不在此修改
+     * 更新 Agent；状态不在此修改
      *
      * @param updateReqVO 更新信息
      */
@@ -80,7 +83,7 @@ public interface Ai1AgentService {
     /**
      * 获得指定状态的 Agent 列表，用于对话页选择 Agent
      *
-     * @param status 状态，参见 CommonStatusEnum
+     * @param status 状态
      * @return Agent 列表
      */
     List<Ai1AgentDO> getAgentListByStatus(Integer status);
@@ -94,6 +97,16 @@ public interface Ai1AgentService {
     List<Ai1AgentDO> getAgentList(Collection<Long> ids);
 
     /**
+     * 获得 Agent Map
+     *
+     * @param ids 编号集合
+     * @return Agent Map
+     */
+    default Map<Long, Ai1AgentDO> getAgentMap(Collection<Long> ids) {
+        return convertMap(getAgentList(ids), Ai1AgentDO::getId);
+    }
+
+    /**
      * 获得使用指定模型的 Agent 数量
      *
      * @param modelIds 模型编号集合
@@ -101,12 +114,12 @@ public interface Ai1AgentService {
      */
     Long getAgentCountByModelIds(Collection<Long> modelIds);
 
-    // TODO @AI：“首次开启时生成访问 UUID，之后复用，已分享的地址不失效”去掉；
+    // TODO @AI：应该是修改 xxx 状态这种？按照项目的风格？注释？其它类似的也处理下；
     /**
-     * 修改状态：首次开启时生成访问 UUID，之后复用，已分享的地址不失效
+     * 修改状态
      *
      * @param id     编号
-     * @param status 状态，参见 CommonStatusEnum
+     * @param status 状态
      */
     void updateAgentStatus(Long id, Integer status);
 

@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.ai1.controller.admin.provider.vo.model.Ai1ModelImportReqVO;
 import cn.iocoder.yudao.module.ai1.controller.admin.provider.vo.model.Ai1ModelSaveReqVO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.provider.Ai1ModelDO;
+import cn.iocoder.yudao.module.ai1.dal.dataobject.provider.Ai1ProviderDO;
 import cn.iocoder.yudao.module.ai1.dal.mysql.provider.Ai1ModelMapper;
 import cn.iocoder.yudao.module.ai1.enums.provider.Ai1ModelTypeEnum;
 import cn.iocoder.yudao.module.ai1.framework.ai.core.llm.Ai1LlmModelFactory;
@@ -138,6 +139,18 @@ public class Ai1ModelServiceImplTest extends BaseDbUnitTest {
 
         // 调用，并断言异常
         assertServiceException(() -> modelService.importRemoteModelList(reqVO), MODEL_IMPORT_ALL_EXISTS);
+    }
+
+    @Test
+    public void testGetRemoteModelList_loadFail() {
+        // mock 方法：供应商接口地址不可达
+        Long providerId = randomLongId();
+        Ai1ProviderDO provider = randomPojo(Ai1ProviderDO.class, o -> o.setId(providerId)
+                .setBaseUrl("http://127.0.0.1:1/v1").setApiKey(null).setHeaders(null));
+        when(providerService.validateProviderExists(providerId)).thenReturn(provider);
+
+        // 调用，并断言异常
+        assertServiceException(() -> modelService.getRemoteModelList(providerId), PROVIDER_REMOTE_MODEL_LOAD_FAIL);
     }
 
     // ========== 随机对象 ==========

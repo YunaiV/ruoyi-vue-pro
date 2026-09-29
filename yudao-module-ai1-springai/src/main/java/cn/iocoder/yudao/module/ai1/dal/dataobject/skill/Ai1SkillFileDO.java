@@ -7,8 +7,6 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
-import java.time.LocalDateTime;
-
 /**
  * AI1 SKILL 内容文件 DO
  *
@@ -30,6 +28,11 @@ public class Ai1SkillFileDO extends TenantBaseDO {
      * 父目录编号：根级
      */
     public static final Long PARENT_ID_ROOT = 0L;
+
+    /**
+     * 固定文件名：SKILL 入口文件
+     */
+    public static final String NAME_SKILL = "SKILL.md";
 
     /**
      * 编号
@@ -76,12 +79,5 @@ public class Ai1SkillFileDO extends TenantBaseDO {
      * 排序
      */
     private Integer sort;
-    // TODO @AI：不新建唯一索引，所以这个字段可以删除掉噢；
-    /**
-     * 删除时间
-     *
-     * 唯一键 (skill_id, parent_id, name, deleted_at) 的组成部分，语义同 {@link Ai1SkillDO#getDeletedAt()}
-     */
-    private LocalDateTime deletedAt;
 
 }
