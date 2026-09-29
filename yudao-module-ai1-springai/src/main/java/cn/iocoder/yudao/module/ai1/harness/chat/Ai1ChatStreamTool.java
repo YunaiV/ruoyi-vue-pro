@@ -23,8 +23,8 @@ import cn.iocoder.yudao.module.ai1.service.agent.Ai1AgentService;
 import cn.iocoder.yudao.module.ai1.service.chat.Ai1ChatConversationService;
 import cn.iocoder.yudao.module.ai1.service.chat.Ai1ChatMessageService;
 import cn.iocoder.yudao.module.ai1.service.knowledge.Ai1KnowledgeBaseService;
-import cn.iocoder.yudao.module.ai1.service.model.Ai1ProviderService;
-import cn.iocoder.yudao.module.ai1.service.model.bo.Ai1ProviderRuntime;
+import cn.iocoder.yudao.module.ai1.service.model.Ai1ModelService;
+import cn.iocoder.yudao.module.ai1.service.model.bo.Ai1ModelRespBO;
 import cn.iocoder.yudao.module.ai1.harness.llm.Ai1LlmChatTool;
 import cn.iocoder.yudao.module.ai1.harness.mcp.Ai1McpToolFactory;
 import cn.iocoder.yudao.module.ai1.harness.rag.Ai1RagTool;
@@ -174,7 +174,7 @@ public class Ai1ChatStreamTool implements SmartLifecycle {
     @Resource
     private Ai1AgentService agentService;
     @Resource
-    private Ai1ProviderService providerService;
+    private Ai1ModelService modelService;
     @Resource
     private Ai1KnowledgeBaseService knowledgeBaseService;
 
@@ -482,8 +482,8 @@ public class Ai1ChatStreamTool implements SmartLifecycle {
                                              Consumer<String> onThinking, Consumer<String> onContent) {
         // 1. 生成可能发生在其他节点，重新校验 Agent 与模型；后台对话不要求 Agent 已发布
         Ai1AgentDO agent = agentService.validateAgentExists(agentId);
-        Ai1ProviderRuntime runtime = providerService.getProviderRuntime(agent.getProviderId(), agent.getModelId());
-        if (!Ai1ModelTypeEnum.isChat(runtime.getModelType())) {
+        Ai1ModelRespBO model = modelService.getModelRespBO(agent.getProviderId(), agent.getModelId());
+        if (!Ai1ModelTypeEnum.isChat(model.getModelType())) {
             throw exception(MODEL_TYPE_NOT_CHAT);
         }
 
@@ -532,7 +532,7 @@ public class Ai1ChatStreamTool implements SmartLifecycle {
         }
 
         // 5. 流式对话；降级提示并入最终思考文本，保证刷新后内容一致
-        Ai1LlmChatTool.ChatText chatText = llmChatTool.chat(runtime, systemPrompt, histories, content, tools, advisors,
+        Ai1LlmChatTool.ChatText chatText = llmChatTool.chat(model, systemPrompt, histories, content, tools, advisors,
                 conversationId, onThinking, onContent);
         if (!noticeText.isEmpty()) {
             chatText.setThinking(noticeText + StrUtil.nullToEmpty(chatText.getThinking()));

@@ -5,13 +5,10 @@ import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.ai1.controller.admin.model.vo.provider.Ai1ProviderConnectRespVO;
 import cn.iocoder.yudao.module.ai1.controller.admin.model.vo.provider.Ai1ProviderSaveReqVO;
-import cn.iocoder.yudao.module.ai1.dal.dataobject.model.Ai1ModelDO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.model.Ai1ProviderDO;
 import cn.iocoder.yudao.module.ai1.dal.mysql.model.Ai1ProviderMapper;
-import cn.iocoder.yudao.module.ai1.enums.model.Ai1ModelTypeEnum;
 import cn.iocoder.yudao.module.ai1.framework.ai.core.llm.Ai1LlmModelFactory;
 import cn.iocoder.yudao.module.ai1.harness.model.Ai1ProviderTool;
-import cn.iocoder.yudao.module.ai1.service.model.bo.Ai1ProviderRuntime;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
@@ -114,50 +111,6 @@ public class Ai1ProviderServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testGetProviderRuntime_providerDisable() {
-        // mock 数据
-        Ai1ProviderDO dbProvider = randomProviderDO(o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus()));
-        providerMapper.insert(dbProvider);
-
-        // 调用，并断言异常
-        assertServiceException(() -> providerService.getProviderRuntime(dbProvider.getId(), randomLongId()),
-                PROVIDER_DISABLE, dbProvider.getName());
-    }
-
-    @Test
-    public void testGetProviderRuntime_modelNotBelong() {
-        // mock 数据
-        Ai1ProviderDO dbProvider = randomProviderDO();
-        providerMapper.insert(dbProvider);
-        // mock 方法：模型属于其他 Provider
-        Ai1ModelDO model = randomModelDO(o -> o.setProviderId(dbProvider.getId() + 1));
-        when(modelService.validateModelExists(model.getId())).thenReturn(model);
-
-        // 调用，并断言异常
-        assertServiceException(() -> providerService.getProviderRuntime(dbProvider.getId(), model.getId()),
-                MODEL_NOT_BELONG_PROVIDER);
-    }
-
-    @Test
-    public void testGetProviderRuntime_success() {
-        // mock 数据
-        Ai1ProviderDO dbProvider = randomProviderDO(o -> o.setHeaders("[{\"key\":\"X-App\",\"value\":\"yudao\"}]"));
-        providerMapper.insert(dbProvider);
-        // mock 方法
-        Ai1ModelDO model = randomModelDO(o -> o.setProviderId(dbProvider.getId()));
-        when(modelService.validateModelExists(model.getId())).thenReturn(model);
-
-        // 调用
-        Ai1ProviderRuntime runtime = providerService.getProviderRuntime(dbProvider.getId(), model.getId());
-
-        // 断言
-        assertEquals(dbProvider.getBaseUrl(), runtime.getBaseUrl());
-        assertEquals(model.getModel(), runtime.getModel());
-        assertEquals(model.getType(), runtime.getModelType());
-        assertEquals(Collections.singletonList("X-App"), convertList(runtime.getHeaders(), header -> header.get("key")));
-    }
-
-    @Test
     public void testTestProviderConnect_notExists() {
         // 调用，并断言异常
         assertServiceException(() -> providerService.testProviderConnect(randomLongId()), PROVIDER_NOT_EXISTS);
@@ -187,12 +140,6 @@ public class Ai1ProviderServiceImplTest extends BaseDbUnitTest {
     private static Ai1ProviderDO randomProviderDO(Consumer<Ai1ProviderDO>... consumers) {
         Consumer<Ai1ProviderDO> consumer = o -> o.setId(null).setHeaders(null).setStatus(CommonStatusEnum.ENABLE.getStatus());
         return randomPojo(Ai1ProviderDO.class, ArrayUtils.append(consumer, consumers));
-    }
-
-    @SafeVarargs
-    private static Ai1ModelDO randomModelDO(Consumer<Ai1ModelDO>... consumers) {
-        Consumer<Ai1ModelDO> consumer = o -> o.setType(Ai1ModelTypeEnum.CHAT.getType()).setStatus(CommonStatusEnum.ENABLE.getStatus());
-        return randomPojo(Ai1ModelDO.class, ArrayUtils.append(consumer, consumers));
     }
 
     @SafeVarargs

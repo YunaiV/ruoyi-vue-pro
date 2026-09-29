@@ -11,8 +11,8 @@ import cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.base.Ai1Knowled
 import cn.iocoder.yudao.module.ai1.dal.dataobject.knowledge.Ai1KnowledgeBaseDO;
 import cn.iocoder.yudao.module.ai1.dal.mysql.knowledge.Ai1KnowledgeBaseMapper;
 import cn.iocoder.yudao.module.ai1.enums.model.Ai1ModelTypeEnum;
-import cn.iocoder.yudao.module.ai1.service.model.Ai1ProviderService;
-import cn.iocoder.yudao.module.ai1.service.model.bo.Ai1ProviderRuntime;
+import cn.iocoder.yudao.module.ai1.service.model.Ai1ModelService;
+import cn.iocoder.yudao.module.ai1.service.model.bo.Ai1ModelRespBO;
 import cn.iocoder.yudao.module.ai1.harness.rag.Ai1RagTool;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +44,7 @@ public class Ai1KnowledgeBaseServiceImpl implements Ai1KnowledgeBaseService {
     @Lazy // 延迟加载，避免循环依赖
     private Ai1KnowledgeDocumentService knowledgeDocumentService;
     @Resource
-    private Ai1ProviderService providerService;
+    private Ai1ModelService modelService;
 
     @Resource
     private Ai1RagTool ragTool;
@@ -147,8 +147,8 @@ public class Ai1KnowledgeBaseServiceImpl implements Ai1KnowledgeBaseService {
      * 校验向量化模型：Provider、模型存在且开启，模型归属于该 Provider，且为嵌入模型
      */
     private void validateEmbeddingModel(Long providerId, Long modelId) {
-        Ai1ProviderRuntime runtime = providerService.getProviderRuntime(providerId, modelId);
-        if (!Ai1ModelTypeEnum.isEmbedding(runtime.getModelType())) {
+        Ai1ModelRespBO model = modelService.getModelRespBO(providerId, modelId);
+        if (!Ai1ModelTypeEnum.isEmbedding(model.getModelType())) {
             throw exception(MODEL_TYPE_NOT_EMBEDDING);
         }
     }

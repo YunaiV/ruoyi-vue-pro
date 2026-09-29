@@ -12,8 +12,8 @@ import cn.iocoder.yudao.module.ai1.service.agent.Ai1AgentService;
 import cn.iocoder.yudao.module.ai1.service.chat.Ai1ChatConversationService;
 import cn.iocoder.yudao.module.ai1.service.chat.Ai1ChatMessageService;
 import cn.iocoder.yudao.module.ai1.service.knowledge.Ai1KnowledgeBaseService;
-import cn.iocoder.yudao.module.ai1.service.model.Ai1ProviderService;
-import cn.iocoder.yudao.module.ai1.service.model.bo.Ai1ProviderRuntime;
+import cn.iocoder.yudao.module.ai1.service.model.Ai1ModelService;
+import cn.iocoder.yudao.module.ai1.service.model.bo.Ai1ModelRespBO;
 import cn.iocoder.yudao.module.ai1.harness.llm.Ai1LlmChatTool;
 import cn.iocoder.yudao.module.ai1.harness.mcp.Ai1McpToolFactory;
 import cn.iocoder.yudao.module.ai1.harness.rag.Ai1RagTool;
@@ -72,7 +72,7 @@ public class Ai1ChatStreamToolTest extends BaseMockitoUnitTest {
     @Mock
     private Ai1AgentService agentService;
     @Mock
-    private Ai1ProviderService providerService;
+    private Ai1ModelService modelService;
     @Mock
     private Ai1KnowledgeBaseService knowledgeBaseService;
     @Mock
@@ -98,7 +98,7 @@ public class Ai1ChatStreamToolTest extends BaseMockitoUnitTest {
             tenantIdInGenerate.set(TenantContextHolder.getTenantId());
             return new Ai1AgentDO().setId(AGENT_ID).setName("客服").setProviderId(1L).setModelId(2L);
         });
-        when(providerService.getProviderRuntime(1L, 2L)).thenReturn(new Ai1ProviderRuntime().setModelType(Ai1ModelTypeEnum.CHAT.getType()));
+        when(modelService.getModelRespBO(1L, 2L)).thenReturn(new Ai1ModelRespBO().setModelType(Ai1ModelTypeEnum.CHAT.getType()));
         when(chatMessageService.getChatMessageListByConversationIdAndIdLessThan(eq(CONVERSATION_ID), eq(MESSAGE_ID), anyInt()))
                 .thenReturn(new ArrayList<>());
         when(llmChatTool.chat(any(), eq("你是 客服 的智能助手。"), anyList(), eq("你好"), anyList(), anyList(), eq(CONVERSATION_ID), any(), any()))
@@ -127,7 +127,7 @@ public class Ai1ChatStreamToolTest extends BaseMockitoUnitTest {
             tenantIdInGenerate.set(TenantContextHolder.getTenantId());
             return new Ai1AgentDO().setId(AGENT_ID).setName("客服").setProviderId(1L).setModelId(2L);
         });
-        when(providerService.getProviderRuntime(1L, 2L)).thenReturn(new Ai1ProviderRuntime().setModelType(Ai1ModelTypeEnum.CHAT.getType()));
+        when(modelService.getModelRespBO(1L, 2L)).thenReturn(new Ai1ModelRespBO().setModelType(Ai1ModelTypeEnum.CHAT.getType()));
         when(chatMessageService.getChatMessageListByConversationIdAndIdLessThan(eq(CONVERSATION_ID), eq(MESSAGE_ID), anyInt()))
                 .thenReturn(new ArrayList<>());
         when(llmChatTool.chat(any(), anyString(), anyList(), eq("你好"), anyList(), anyList(), eq(CONVERSATION_ID), any(), any()))

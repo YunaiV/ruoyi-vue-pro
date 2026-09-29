@@ -4,7 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.ai1.enums.chat.Ai1ChatMessageRoleEnum;
 import cn.iocoder.yudao.module.ai1.framework.ai.core.llm.Ai1LlmModelFactory;
-import cn.iocoder.yudao.module.ai1.service.model.bo.Ai1ProviderRuntime;
+import cn.iocoder.yudao.module.ai1.service.model.bo.Ai1ModelRespBO;
 import jakarta.annotation.Resource;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -44,7 +44,7 @@ public class Ai1LlmChatTool {
     /**
      * 流式对话：装配消息 → 附加工具、Advisor → 增量输出
      *
-     * @param runtime        模型运行时快照（需为对话模型）
+     * @param model        模型运行时快照（需为对话模型）
      * @param systemPrompt   系统指令，可为空
      * @param histories      历史消息，按时间升序；每项为 [role, content]
      * @param content        当前用户消息
@@ -55,11 +55,11 @@ public class Ai1LlmChatTool {
      * @param onContent      回复内容增量回调，可为空
      * @return 完整回复（内容 + 思考过程）
      */
-    public ChatText chat(Ai1ProviderRuntime runtime, String systemPrompt, List<String[]> histories, String content,
+    public ChatText chat(Ai1ModelRespBO model, String systemPrompt, List<String[]> histories, String content,
                          List<Object> tools, List<Advisor> advisors, Long conversationId,
                          Consumer<String> onThinking, Consumer<String> onContent) {
         // 1. 装配对话请求：消息（系统指令 + 历史 + 当前）+ 工具 + Advisor
-        ChatClient.ChatClientRequestSpec spec = llmModelFactory.buildChatClient(runtime, conversationId).prompt()
+        ChatClient.ChatClientRequestSpec spec = llmModelFactory.buildChatClient(model, conversationId).prompt()
                 .messages(buildMessages(systemPrompt, histories, content));
         if (CollUtil.isNotEmpty(tools)) {
             spec = spec.tools(tools.toArray());

@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.ai1.controller.admin.model.vo.model.Ai1ModelImpor
 import cn.iocoder.yudao.module.ai1.controller.admin.model.vo.model.Ai1ModelPageReqVO;
 import cn.iocoder.yudao.module.ai1.controller.admin.model.vo.model.Ai1ModelSaveReqVO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.model.Ai1ModelDO;
+import cn.iocoder.yudao.module.ai1.service.model.bo.Ai1ModelRespBO;
 import jakarta.validation.Valid;
 
 import java.util.Collection;
@@ -132,5 +133,14 @@ public interface Ai1ModelService {
      * @return 实际导入数量
      */
     Integer importRemoteModelList(@Valid Ai1ModelImportReqVO importReqVO);
+
+    /**
+     * 获得模型调用参数
+     *
+     * @param providerId 供应商编号
+     * @param modelId    模型编号
+     * @return 模型调用参数
+     */
+    Ai1ModelRespBO getModelRespBO(Long providerId, Long modelId);
 
 }

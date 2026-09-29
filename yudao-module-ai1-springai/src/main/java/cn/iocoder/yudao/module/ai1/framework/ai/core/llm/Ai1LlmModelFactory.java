@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.ai1.framework.ai.core.llm;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.module.ai1.service.model.bo.Ai1ProviderRuntime;
+import cn.iocoder.yudao.module.ai1.service.model.bo.Ai1ModelRespBO;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +23,7 @@ import java.util.function.Predicate;
 /**
  * AI1 LLM 模型工厂
  *
- * 按 {@link Ai1ProviderRuntime} 程序化构建 Spring AI 模型：
+ * 按 {@link Ai1ModelRespBO} 程序化构建 Spring AI 模型：
  * 1. 对话模型：OpenAiChatModel（OpenAI 兼容协议，覆盖 DeepSeek、GLM、Ollama(/v1) 等）
  * 2. 嵌入模型：OpenAiEmbeddingModel（向量化）
  *
@@ -61,29 +61,29 @@ public class Ai1LlmModelFactory {
     /**
      * 获取（或构建）对话模型，并包装为 ChatClient
      *
-     * @param runtime        模型运行时快照
+     * @param model        模型运行时快照
      * @param conversationId 对话编号，用于替换附属 Header 中的 {session} 占位符，可为空
      * @return ChatClient
      */
-    public ChatClient buildChatClient(Ai1ProviderRuntime runtime, Long conversationId) {
-        return ChatClient.builder(getOrCreateChatModel(runtime, conversationId)).build();
+    public ChatClient buildChatClient(Ai1ModelRespBO model, Long conversationId) {
+        return ChatClient.builder(getOrCreateChatModel(model, conversationId)).build();
     }
 
     /**
      * 获取（或构建）嵌入模型
      *
-     * @param runtime 模型运行时快照
+     * @param model 模型运行时快照
      * @return 嵌入模型
      */
-    public EmbeddingModel getOrCreateEmbeddingModel(Ai1ProviderRuntime runtime) {
-        return embeddingModelCache.asMap().computeIfAbsent(buildCacheKey(runtime), key -> {
+    public EmbeddingModel getOrCreateEmbeddingModel(Ai1ModelRespBO model) {
+        return embeddingModelCache.asMap().computeIfAbsent(buildCacheKey(model), key -> {
             OpenAiEmbeddingOptions options = OpenAiEmbeddingOptions.builder()
-                    .baseUrl(normalizeBaseUrl(runtime.getBaseUrl()))
-                    .apiKey(runtime.getApiKey())
-                    .model(runtime.getModel())
-                    .customHeaders(buildHeaders(runtime.getHeaders(), null))
+                    .baseUrl(normalizeBaseUrl(model.getBaseUrl()))
+                    .apiKey(model.getApiKey())
+                    .model(model.getModel())
+                    .customHeaders(buildHeaders(model.getHeaders(), null))
                     .build();
-            log.debug("[getOrCreateEmbeddingModel][providerId({}) modelId({}) 嵌入模型构建完成]", runtime.getProviderId(), runtime.getModelId());
+            log.debug("[getOrCreateEmbeddingModel][providerId({}) modelId({}) 嵌入模型构建完成]", model.getProviderId(), model.getModelId());
             return OpenAiEmbeddingModel.builder().options(options).build();
         });
     }
@@ -124,21 +124,21 @@ public class Ai1LlmModelFactory {
      * 仅当附属 Header 使用 {session} 占位符（需按对话隔离）时，才把对话编号纳入缓存 key；
      * 否则同一模型跨对话复用，避免每个对话都构建一个模型实例
      */
-    private OpenAiChatModel getOrCreateChatModel(Ai1ProviderRuntime runtime, Long conversationId) {
+    private OpenAiChatModel getOrCreateChatModel(Ai1ModelRespBO model, Long conversationId) {
         // 1. 计算缓存 key：Header 含 {session} 占位符时按对话隔离，否则跨对话共享
-        String conversationKey = usesSessionHeader(runtime.getHeaders()) && conversationId != null
+        String conversationKey = usesSessionHeader(model.getHeaders()) && conversationId != null
                 ? String.valueOf(conversationId) : "";
-        String cacheKey = buildCacheKey(runtime) + KEY_SEPARATOR + conversationKey;
+        String cacheKey = buildCacheKey(model) + KEY_SEPARATOR + conversationKey;
 
         // 2. 命中缓存直接复用；未命中时按运行时快照构建 OpenAI 兼容对话模型并缓存
         return chatModelCache.asMap().computeIfAbsent(cacheKey, key -> {
             OpenAiChatOptions options = OpenAiChatOptions.builder()
-                    .baseUrl(normalizeBaseUrl(runtime.getBaseUrl()))
-                    .apiKey(runtime.getApiKey())
-                    .model(runtime.getModel())
-                    .customHeaders(buildHeaders(runtime.getHeaders(), conversationId))
+                    .baseUrl(normalizeBaseUrl(model.getBaseUrl()))
+                    .apiKey(model.getApiKey())
+                    .model(model.getModel())
+                    .customHeaders(buildHeaders(model.getHeaders(), conversationId))
                     .build();
-            log.debug("[getOrCreateChatModel][providerId({}) modelId({}) 对话模型构建完成]", runtime.getProviderId(), runtime.getModelId());
+            log.debug("[getOrCreateChatModel][providerId({}) modelId({}) 对话模型构建完成]", model.getProviderId(), model.getModelId());
             return OpenAiChatModel.builder().options(options).build();
         });
     }
@@ -146,18 +146,19 @@ public class Ai1LlmModelFactory {
     /**
      * 构建模型缓存 key：providerId:modelId
      *
-     * @param runtime 模型运行时快照
+     * @param model 模型运行时快照
      * @return 缓存 key
      */
-    private static String buildCacheKey(Ai1ProviderRuntime runtime) {
-        return runtime.getProviderId() + KEY_SEPARATOR + runtime.getModelId();
+    private static String buildCacheKey(Ai1ModelRespBO model) {
+        return model.getProviderId() + KEY_SEPARATOR + model.getModelId();
     }
 
     /**
      * 归一化接口地址：去掉结尾斜杠；裸地址（无路径）自动补 /v1，
      * 保证连通测试、模型拉取与实际对话访问同一个 OpenAI 兼容端点
      *
-     * 例如说：Ollama 的 <code>http://127.0.0.1:11434</code> 归一化为 <code>http://127.0.0.1:11434/v1</code>
+     * 例如说：Ollama 的 <a href="http://127.0.0.1:11434">http://127.0.0.1:11434</a>
+     * 归一化为 <a href="http://127.0.0.1:11434/v1">http://127.0.0.1:11434/v1</a>
      *
      * @param baseUrl 接口地址
      * @return 归一化后的地址

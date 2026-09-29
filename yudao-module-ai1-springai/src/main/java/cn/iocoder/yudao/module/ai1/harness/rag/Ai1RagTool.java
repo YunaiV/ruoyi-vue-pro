@@ -10,8 +10,8 @@ import cn.iocoder.yudao.module.ai1.dal.dataobject.knowledge.Ai1KnowledgeBaseDO;
 import cn.iocoder.yudao.module.ai1.enums.model.Ai1ModelTypeEnum;
 import cn.iocoder.yudao.module.ai1.framework.ai.config.YudaoAi1Properties;
 import cn.iocoder.yudao.module.ai1.framework.ai.core.llm.Ai1LlmModelFactory;
-import cn.iocoder.yudao.module.ai1.service.model.Ai1ProviderService;
-import cn.iocoder.yudao.module.ai1.service.model.bo.Ai1ProviderRuntime;
+import cn.iocoder.yudao.module.ai1.service.model.Ai1ModelService;
+import cn.iocoder.yudao.module.ai1.service.model.bo.Ai1ModelRespBO;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import io.milvus.client.MilvusServiceClient;
@@ -75,7 +75,7 @@ public class Ai1RagTool {
     private YudaoAi1Properties ai1Properties;
 
     @Resource
-    private Ai1ProviderService providerService;
+    private Ai1ModelService modelService;
 
     @Resource
     private Ai1LlmModelFactory llmModelFactory;
@@ -245,12 +245,12 @@ public class Ai1RagTool {
      * 解析知识库的嵌入模型：Provider、模型不存在或被禁用时抛出业务异常
      */
     private EmbeddingModel getEmbeddingModel(Ai1KnowledgeBaseDO knowledgeBase) {
-        Ai1ProviderRuntime runtime = providerService.getProviderRuntime(
+        Ai1ModelRespBO model = modelService.getModelRespBO(
                 knowledgeBase.getEmbeddingProviderId(), knowledgeBase.getEmbeddingModelId());
-        if (!Ai1ModelTypeEnum.isEmbedding(runtime.getModelType())) {
+        if (!Ai1ModelTypeEnum.isEmbedding(model.getModelType())) {
             throw exception(MODEL_TYPE_NOT_EMBEDDING);
         }
-        return llmModelFactory.getOrCreateEmbeddingModel(runtime);
+        return llmModelFactory.getOrCreateEmbeddingModel(model);
     }
 
     /**

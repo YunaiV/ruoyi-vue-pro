@@ -11,8 +11,8 @@ import cn.iocoder.yudao.module.ai1.dal.mysql.agent.Ai1AgentMapper;
 import cn.iocoder.yudao.module.ai1.enums.model.Ai1ModelTypeEnum;
 import cn.iocoder.yudao.module.ai1.framework.ai.core.skill.Ai1SkillToolFactory;
 import cn.iocoder.yudao.module.ai1.service.chat.Ai1ChatConversationService;
-import cn.iocoder.yudao.module.ai1.service.model.Ai1ProviderService;
-import cn.iocoder.yudao.module.ai1.service.model.bo.Ai1ProviderRuntime;
+import cn.iocoder.yudao.module.ai1.service.model.Ai1ModelService;
+import cn.iocoder.yudao.module.ai1.service.model.bo.Ai1ModelRespBO;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -41,7 +41,7 @@ public class Ai1AgentServiceImpl implements Ai1AgentService {
     private Ai1AgentMapper agentMapper;
 
     @Resource
-    private Ai1ProviderService providerService;
+    private Ai1ModelService modelService;
     @Resource
     @Lazy // 延迟加载，避免循环依赖
     private Ai1ChatConversationService chatConversationService;
@@ -152,8 +152,8 @@ public class Ai1AgentServiceImpl implements Ai1AgentService {
      * 校验对话模型：Provider、模型存在且开启，模型归属于该 Provider，且为对话模型
      */
     private void validateChatModel(Long providerId, Long modelId) {
-        Ai1ProviderRuntime runtime = providerService.getProviderRuntime(providerId, modelId);
-        if (!Ai1ModelTypeEnum.isChat(runtime.getModelType())) {
+        Ai1ModelRespBO model = modelService.getModelRespBO(providerId, modelId);
+        if (!Ai1ModelTypeEnum.isChat(model.getModelType())) {
             throw exception(MODEL_TYPE_NOT_CHAT);
         }
     }

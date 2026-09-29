@@ -15,6 +15,7 @@ import cn.iocoder.yudao.module.ai1.dal.mysql.model.Ai1ModelMapper;
 import cn.iocoder.yudao.module.ai1.enums.model.Ai1ModelTypeEnum;
 import cn.iocoder.yudao.module.ai1.framework.ai.core.llm.Ai1LlmModelFactory;
 import cn.iocoder.yudao.module.ai1.harness.model.Ai1ProviderTool;
+import cn.iocoder.yudao.module.ai1.service.model.bo.Ai1ModelRespBO;
 import cn.iocoder.yudao.module.ai1.service.agent.Ai1AgentService;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
@@ -178,6 +179,30 @@ public class Ai1ModelServiceImpl implements Ai1ModelService {
                 .type(Ai1ModelTypeEnum.CHAT.getType()).status(CommonStatusEnum.ENABLE.getStatus()).build());
         modelMapper.insertBatch(models);
         return models.size();
+    }
+
+    @Override
+    public Ai1ModelRespBO getModelRespBO(Long providerId, Long modelId) {
+        // 1.1 校验供应商存在且开启
+        Ai1ProviderDO provider = providerService.validateProviderExists(providerId);
+        if (CommonStatusEnum.isDisable(provider.getStatus())) {
+            throw exception(PROVIDER_DISABLE, provider.getName());
+        }
+        // 1.2 校验模型存在、开启，且归属于该供应商
+        Ai1ModelDO model = validateModelExists(modelId);
+        if (ObjUtil.notEqual(model.getProviderId(), providerId)) {
+            throw exception(MODEL_NOT_BELONG_PROVIDER);
+        }
+        if (CommonStatusEnum.isDisable(model.getStatus())) {
+            throw exception(MODEL_DISABLE, model.getName());
+        }
+
+        // 2. 组装调用参数：解析 ${ENV} 占位符，库中的原文不改，响应也不返回解析结果
+        return new Ai1ModelRespBO().setProviderId(provider.getId())
+                .setModelId(model.getId()).setModel(model.getModel()).setModelType(model.getType())
+                .setBaseUrl(resolveSpringPlaceholders(provider.getBaseUrl()))
+                .setApiKey(resolveSpringPlaceholders(provider.getApiKey()))
+                .setHeaders(parseHeaders(resolveSpringPlaceholders(provider.getHeaders())));
     }
 
     /**

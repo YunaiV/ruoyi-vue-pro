@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.ai1.dal.mysql.model.Ai1ModelMapper;
 import cn.iocoder.yudao.module.ai1.enums.model.Ai1ModelTypeEnum;
 import cn.iocoder.yudao.module.ai1.framework.ai.core.llm.Ai1LlmModelFactory;
 import cn.iocoder.yudao.module.ai1.harness.model.Ai1ProviderTool;
+import cn.iocoder.yudao.module.ai1.service.model.bo.Ai1ModelRespBO;
 import cn.iocoder.yudao.module.ai1.service.agent.Ai1AgentService;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
@@ -19,6 +20,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -159,6 +161,50 @@ public class Ai1ModelServiceImplTest extends BaseDbUnitTest {
 
         // 断言
         assertEquals(remoteModels, models);
+    }
+
+    @Test
+    public void testGetModelRespBO_providerDisable() {
+        // mock 方法：供应商已关闭
+        Ai1ProviderDO provider = randomPojo(Ai1ProviderDO.class, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus()));
+        when(providerService.validateProviderExists(provider.getId())).thenReturn(provider);
+
+        // 调用，并断言异常
+        assertServiceException(() -> modelService.getModelRespBO(provider.getId(), randomLongId()),
+                PROVIDER_DISABLE, provider.getName());
+    }
+
+    @Test
+    public void testGetModelRespBO_modelNotBelong() {
+        // mock 方法：供应商已开启
+        Ai1ProviderDO provider = randomPojo(Ai1ProviderDO.class, o -> o.setStatus(CommonStatusEnum.ENABLE.getStatus()));
+        when(providerService.validateProviderExists(provider.getId())).thenReturn(provider);
+        // mock 数据：模型属于其他供应商
+        Ai1ModelDO model = randomModelDO(o -> o.setProviderId(provider.getId() + 1));
+        modelMapper.insert(model);
+
+        // 调用，并断言异常
+        assertServiceException(() -> modelService.getModelRespBO(provider.getId(), model.getId()), MODEL_NOT_BELONG_PROVIDER);
+    }
+
+    @Test
+    public void testGetModelRespBO_success() {
+        // mock 方法：供应商已开启，并带上请求头
+        Ai1ProviderDO provider = randomPojo(Ai1ProviderDO.class, o -> o.setStatus(CommonStatusEnum.ENABLE.getStatus())
+                .setHeaders("[{\"key\":\"X-App\",\"value\":\"yudao\"}]"));
+        when(providerService.validateProviderExists(provider.getId())).thenReturn(provider);
+        // mock 数据
+        Ai1ModelDO model = randomModelDO(o -> o.setProviderId(provider.getId()));
+        modelMapper.insert(model);
+
+        // 调用
+        Ai1ModelRespBO respBO = modelService.getModelRespBO(provider.getId(), model.getId());
+
+        // 断言
+        assertEquals(provider.getBaseUrl(), respBO.getBaseUrl());
+        assertEquals(model.getModel(), respBO.getModel());
+        assertEquals(model.getType(), respBO.getModelType());
+        assertEquals(Collections.singletonList("X-App"), convertList(respBO.getHeaders(), header -> header.get("key")));
     }
 
     // ========== 随机对象 ==========

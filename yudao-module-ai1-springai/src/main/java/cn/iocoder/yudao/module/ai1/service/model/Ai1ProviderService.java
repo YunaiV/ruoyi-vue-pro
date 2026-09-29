@@ -5,7 +5,6 @@ import cn.iocoder.yudao.module.ai1.controller.admin.model.vo.provider.Ai1Provide
 import cn.iocoder.yudao.module.ai1.controller.admin.model.vo.provider.Ai1ProviderPageReqVO;
 import cn.iocoder.yudao.module.ai1.controller.admin.model.vo.provider.Ai1ProviderSaveReqVO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.model.Ai1ProviderDO;
-import cn.iocoder.yudao.module.ai1.service.model.bo.Ai1ProviderRuntime;
 import jakarta.validation.Valid;
 
 import java.util.Collection;
@@ -107,15 +106,5 @@ public interface Ai1ProviderService {
      * @return 测试结果
      */
     Ai1ProviderConnectRespVO testProviderConnect(Long id);
-
-    // TODO NOT_FIX @AI【不修复：运行时快照的方法归属，与 Ai1ProviderRuntime 的类名、bo/dto 命名一并待与用户讨论；且被 Agent、知识库、RAG、对话 4 处调用。本质属于模型的“拉取远程模型列表”已迁移为 Ai1ModelService#getRemoteModelList】：这个是不是应该放到 AiModelService 里呀？因为它本质是模型噢
-    /**
-     * 解析模型运行时快照
-     *
-     * @param providerId 供应商编号
-     * @param modelId    模型编号
-     * @return 运行时快照
-     */
-    Ai1ProviderRuntime getProviderRuntime(Long providerId, Long modelId);
 
 }

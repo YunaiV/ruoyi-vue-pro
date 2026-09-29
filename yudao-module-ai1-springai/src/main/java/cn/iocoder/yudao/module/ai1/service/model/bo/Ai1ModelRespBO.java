@@ -1,33 +1,21 @@
-package cn.iocoder.yudao.module.ai1.service.provider.bo;
+package cn.iocoder.yudao.module.ai1.service.model.bo;
 
-import cn.iocoder.yudao.module.ai1.enums.provider.Ai1ModelTypeEnum;
+import cn.iocoder.yudao.module.ai1.enums.model.Ai1ModelTypeEnum;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.util.List;
 import java.util.Map;
 
-// TODO @AI：项目里，一般是 bo 还是 dto 呢？
-// TODO @AI：这个类名，感觉还是体现 model 还是啥会不会好点？就是按照项目的风格；（不要直接改，我们先讨论；）
 /**
- * AI1 Provider 模型运行时快照
- *
- * 供 Agent 对话、知识库向量化构建 Spring AI 模型使用
+ * AI1 模型调用参数
  *
  * @author 芋道源码
  */
 @Data
 @Accessors(chain = true)
-public class Ai1ProviderRuntime {
+public class Ai1ModelRespBO {
 
-    /**
-     * Provider 编号
-     */
-    private Long providerId;
-    /**
-     * Provider 名称
-     */
-    private String providerName;
     /**
      * 模型编号
      */
@@ -42,6 +30,13 @@ public class Ai1ProviderRuntime {
      * 枚举 {@link Ai1ModelTypeEnum}
      */
     private Integer modelType;
+
+    // ==================== 供应商 ====================
+
+    /**
+     * 供应商编号
+     */
+    private Long providerId;
     /**
      * 接口地址
      */

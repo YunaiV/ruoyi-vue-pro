@@ -8,8 +8,8 @@ import cn.iocoder.yudao.module.ai1.dal.mysql.agent.Ai1AgentMapper;
 import cn.iocoder.yudao.module.ai1.enums.model.Ai1ModelTypeEnum;
 import cn.iocoder.yudao.module.ai1.framework.ai.core.skill.Ai1SkillToolFactory;
 import cn.iocoder.yudao.module.ai1.service.chat.Ai1ChatConversationService;
-import cn.iocoder.yudao.module.ai1.service.model.Ai1ProviderService;
-import cn.iocoder.yudao.module.ai1.service.model.bo.Ai1ProviderRuntime;
+import cn.iocoder.yudao.module.ai1.service.model.Ai1ModelService;
+import cn.iocoder.yudao.module.ai1.service.model.bo.Ai1ModelRespBO;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
@@ -41,7 +41,7 @@ public class Ai1AgentServiceImplTest extends BaseDbUnitTest {
     private Ai1AgentMapper agentMapper;
 
     @MockitoBean
-    private Ai1ProviderService providerService;
+    private Ai1ModelService modelService;
     @MockitoBean
     private Ai1ChatConversationService chatConversationService;
     @MockitoBean
@@ -50,7 +50,7 @@ public class Ai1AgentServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testCreateAgent_modelNotChat() {
         // mock 方法：绑定的是嵌入模型
-        when(providerService.getProviderRuntime(1L, 2L)).thenReturn(new Ai1ProviderRuntime()
+        when(modelService.getModelRespBO(1L, 2L)).thenReturn(new Ai1ModelRespBO()
                 .setModelType(Ai1ModelTypeEnum.EMBEDDING.getType()));
 
         // 调用，并断言异常
@@ -144,7 +144,7 @@ public class Ai1AgentServiceImplTest extends BaseDbUnitTest {
     // ========== 随机对象 ==========
 
     private void mockChatModel() {
-        when(providerService.getProviderRuntime(1L, 2L)).thenReturn(new Ai1ProviderRuntime()
+        when(modelService.getModelRespBO(1L, 2L)).thenReturn(new Ai1ModelRespBO()
                 .setModelType(Ai1ModelTypeEnum.CHAT.getType()));
     }
 
