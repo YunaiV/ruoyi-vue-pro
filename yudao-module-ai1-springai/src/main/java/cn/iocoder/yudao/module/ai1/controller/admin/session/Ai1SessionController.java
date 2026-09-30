@@ -43,33 +43,33 @@ public class Ai1SessionController {
     // ==================== 我的 ====================
 
     @PostMapping("/create-my")
-    @Operation(summary = "创建【我的】对话")
-    @PreAuthorize("@ss.hasPermission('ai1:session:chat')")
+    @Operation(summary = "创建【我的】会话")
+    @PreAuthorize("@ss.hasPermission('ai1:session:my')")
     public CommonResult<Long> createSessionMy(@Valid @RequestBody Ai1SessionCreateMyReqVO createReqVO) {
         return success(sessionService.createSessionMy(getLoginUserId(), createReqVO));
     }
 
     @PutMapping("/update-my")
-    @Operation(summary = "修改【我的】对话标题")
-    @PreAuthorize("@ss.hasPermission('ai1:session:chat')")
+    @Operation(summary = "修改【我的】会话标题")
+    @PreAuthorize("@ss.hasPermission('ai1:session:my')")
     public CommonResult<Boolean> updateSessionMy(@Valid @RequestBody Ai1SessionUpdateMyReqVO updateReqVO) {
         sessionService.updateSessionMy(getLoginUserId(), updateReqVO);
         return success(true);
     }
 
     @DeleteMapping("/delete-my")
-    @Operation(summary = "删除【我的】对话", description = "连带删除消息")
+    @Operation(summary = "删除【我的】会话", description = "连带删除消息")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
-    @PreAuthorize("@ss.hasPermission('ai1:session:chat')")
+    @PreAuthorize("@ss.hasPermission('ai1:session:my')")
     public CommonResult<Boolean> deleteSessionMy(@RequestParam("id") Long id) {
         sessionService.deleteSessionMy(getLoginUserId(), id);
         return success(true);
     }
 
     @GetMapping("/my-list")
-    @Operation(summary = "获得【我的】对话列表", description = "指定 Agent 下，按创建时间倒序")
+    @Operation(summary = "获得【我的】会话列表", description = "指定 Agent 下，按创建时间倒序")
     @Parameter(name = "agentId", description = "Agent 编号", required = true, example = "1")
-    @PreAuthorize("@ss.hasPermission('ai1:session:chat')")
+    @PreAuthorize("@ss.hasPermission('ai1:session:my')")
     public CommonResult<List<Ai1SessionRespVO>> getSessionMyList(@RequestParam("agentId") Long agentId) {
         List<Ai1SessionDO> list = sessionService.getSessionListByAgentIdAndUserId(agentId, getLoginUserId());
         return success(BeanUtils.toBean(list, Ai1SessionRespVO.class));
@@ -78,7 +78,7 @@ public class Ai1SessionController {
     // ==================== 管理 ====================
 
     @GetMapping("/page")
-    @Operation(summary = "获得对话分页", description = "管理端查看 Agent 下全部用户的对话")
+    @Operation(summary = "获得会话分页", description = "管理端查看 Agent 下全部用户的会话")
     @PreAuthorize("@ss.hasPermission('ai1:session:query')")
     public CommonResult<PageResult<Ai1SessionRespVO>> getSessionPage(@Valid Ai1SessionPageReqVO pageReqVO) {
         PageResult<Ai1SessionDO> pageResult = sessionService.getSessionPage(pageReqVO);

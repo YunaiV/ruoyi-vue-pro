@@ -100,7 +100,7 @@ public class Ai1SessionMessageServiceImplTest extends BaseDbUnitTest {
         sessionMessageService.sendSessionMessageStream(USER_ID, new Ai1SessionMessageSendReqVO().setSessionId(10L).setContent("你好"));
 
         // 断言：返回 error 事件，不落库、不投递
-        verify(sessionStreamTool).error("对话不存在");
+        verify(sessionStreamTool).error("会话不存在");
         verify(sessionStreamTool, never()).submit(anyLong(), anyLong(), anyLong(), anyString());
         assertTrue(sessionMessageMapper.selectListBySessionId(10L).isEmpty());
     }
@@ -115,7 +115,7 @@ public class Ai1SessionMessageServiceImplTest extends BaseDbUnitTest {
         sessionMessageService.resumeSessionMessageStream(USER_ID, message.getId(), null);
 
         // 断言：拒绝续传，不读取结果流
-        verify(sessionStreamTool).error("对话不存在");
+        verify(sessionStreamTool).error("会话不存在");
         verify(sessionStreamTool, never()).open(anyLong(), any());
     }
 
@@ -128,7 +128,7 @@ public class Ai1SessionMessageServiceImplTest extends BaseDbUnitTest {
         sessionMessageService.resumeSessionMessageStream(USER_ID, message.getId(), null);
 
         // 断言
-        verify(sessionStreamTool).error("消息不存在");
+        verify(sessionStreamTool).error("会话消息不存在");
         verify(sessionStreamTool, never()).open(anyLong(), any());
     }
 

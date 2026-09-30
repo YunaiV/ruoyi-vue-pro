@@ -36,9 +36,9 @@ public class Ai1SessionMessageController {
     // ==================== 我的 ====================
 
     @GetMapping("/my-list")
-    @Operation(summary = "获得【我的】对话消息列表")
-    @Parameter(name = "sessionId", description = "对话编号", required = true, example = "1024")
-    @PreAuthorize("@ss.hasPermission('ai1:session:chat')")
+    @Operation(summary = "获得【我的】会话消息列表")
+    @Parameter(name = "sessionId", description = "会话编号", required = true, example = "1024")
+    @PreAuthorize("@ss.hasPermission('ai1:session:my')")
     public CommonResult<List<Ai1SessionMessageRespVO>> getSessionMessageMyList(@RequestParam("sessionId") Long sessionId) {
         sessionService.validateSessionMy(getLoginUserId(), sessionId);
         return success(BeanUtils.toBean(sessionMessageService.getSessionMessageListBySessionId(sessionId),
@@ -48,7 +48,7 @@ public class Ai1SessionMessageController {
     @PostMapping(value = "/send-stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @Operation(summary = "发送消息（流式）", description = "SSE 事件：stream（助手消息编号）、thinking、message、ping、done、error；"
             + "事件 data 均为 JSON 字符串，事件 id 为结果流条目编号，可用于续传")
-    @PreAuthorize("@ss.hasPermission('ai1:session:chat')")
+    @PreAuthorize("@ss.hasPermission('ai1:session:my')")
     public SseEmitter sendSessionMessageStream(@Valid @RequestBody Ai1SessionMessageSendReqVO sendReqVO) {
         return sessionMessageService.sendSessionMessageStream(getLoginUserId(), sendReqVO);
     }
@@ -57,7 +57,7 @@ public class Ai1SessionMessageController {
     @Operation(summary = "断线续传（流式）", description = "从结果流 lastEventId 之后继续转发，不重新生成；事件格式同发送消息")
     @Parameter(name = "messageId", description = "助手消息编号", required = true, example = "1024")
     @Parameter(name = "lastEventId", description = "已收到的最后一个事件编号，为空时从头重放", example = "1727541234567-0")
-    @PreAuthorize("@ss.hasPermission('ai1:session:chat')")
+    @PreAuthorize("@ss.hasPermission('ai1:session:my')")
     public SseEmitter resumeSessionMessageStream(@RequestParam("messageId") Long messageId,
                                               @RequestParam(value = "lastEventId", required = false) String lastEventId) {
         return sessionMessageService.resumeSessionMessageStream(getLoginUserId(), messageId, lastEventId);
@@ -66,8 +66,8 @@ public class Ai1SessionMessageController {
     // ==================== 管理 ====================
 
     @GetMapping("/list")
-    @Operation(summary = "获得对话消息列表", description = "管理端查看任意用户的对话明细")
-    @Parameter(name = "sessionId", description = "对话编号", required = true, example = "1024")
+    @Operation(summary = "获得会话消息列表", description = "管理端查看任意用户的会话明细")
+    @Parameter(name = "sessionId", description = "会话编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('ai1:session:query')")
     public CommonResult<List<Ai1SessionMessageRespVO>> getSessionMessageList(@RequestParam("sessionId") Long sessionId) {
         return success(BeanUtils.toBean(sessionMessageService.getSessionMessageListBySessionId(sessionId),
