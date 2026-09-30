@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai1.controller.admin.chat.vo.message;
+package cn.iocoder.yudao.module.ai1.controller.admin.session.vo.message;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -7,13 +7,13 @@ import java.time.LocalDateTime;
 
 @Schema(description = "管理后台 - AI1 对话消息 Response VO")
 @Data
-public class Ai1ChatMessageRespVO {
+public class Ai1MessageRespVO {
 
     @Schema(description = "编号；助手消息的编号同时作为续传的结果流标识", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
     @Schema(description = "对话编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    private Long conversationId;
+    private Long sessionId;
 
     @Schema(description = "角色", requiredMode = Schema.RequiredMode.REQUIRED, example = "assistant")
     private String role;

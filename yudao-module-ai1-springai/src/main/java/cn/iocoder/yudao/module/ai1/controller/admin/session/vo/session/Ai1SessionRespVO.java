@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai1.controller.admin.chat.vo.conversation;
+package cn.iocoder.yudao.module.ai1.controller.admin.session.vo.session;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Schema(description = "管理后台 - AI1 对话 Response VO")
 @Data
-public class Ai1ChatConversationRespVO {
+public class Ai1SessionRespVO {
 
     @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;

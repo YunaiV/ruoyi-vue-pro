@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai1.controller.admin.chat.vo.conversation;
+package cn.iocoder.yudao.module.ai1.controller.admin.session.vo.session;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -11,7 +11,7 @@ import lombok.ToString;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class Ai1ChatConversationPageReqVO extends PageParam {
+public class Ai1SessionPageReqVO extends PageParam {
 
     @Schema(description = "Agent 编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "Agent 编号不能为空")

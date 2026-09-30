@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai1.controller.admin.chat.vo.message;
+package cn.iocoder.yudao.module.ai1.controller.admin.session.vo.message;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -7,11 +7,11 @@ import lombok.Data;
 
 @Schema(description = "管理后台 - AI1 对话消息发送 Request VO")
 @Data
-public class Ai1ChatMessageSendReqVO {
+public class Ai1MessageSendReqVO {
 
     @Schema(description = "对话编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "对话编号不能为空")
-    private Long conversationId;
+    private Long sessionId;
 
     @Schema(description = "提问内容", requiredMode = Schema.RequiredMode.REQUIRED, example = "三体舰队还有多久到达地球？")
     @NotBlank(message = "请输入内容")

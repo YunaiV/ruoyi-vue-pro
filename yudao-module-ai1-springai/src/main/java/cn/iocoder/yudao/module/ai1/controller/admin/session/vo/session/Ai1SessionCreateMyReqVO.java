@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai1.controller.admin.chat.vo.conversation;
+package cn.iocoder.yudao.module.ai1.controller.admin.session.vo.session;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Schema(description = "管理后台 - AI1 我的对话创建 Request VO")
 @Data
-public class Ai1ChatConversationCreateMyReqVO {
+public class Ai1SessionCreateMyReqVO {
 
     @Schema(description = "Agent 编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "Agent 编号不能为空")
