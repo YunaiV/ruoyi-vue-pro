@@ -84,7 +84,7 @@ public class Ai1AgentDO extends TenantBaseDO {
     /**
      * 状态
      *
-     * 枚举 {@link CommonStatusEnum}；开启后才可在「Agent 对话」中使用
+     * 枚举 {@link CommonStatusEnum}；开启后才可在「Agent 会话」中使用
      */
     private Integer status;
 

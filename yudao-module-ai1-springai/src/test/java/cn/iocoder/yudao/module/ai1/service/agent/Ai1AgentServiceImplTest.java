@@ -135,7 +135,7 @@ public class Ai1AgentServiceImplTest extends BaseDbUnitTest {
         // 调用
         agentService.deleteAgent(id);
 
-        // 断言：删除 Agent，级联删除对话，并清理 SKILL 沙箱
+        // 断言：删除 Agent，级联删除会话，并清理 SKILL 沙箱
         assertNull(agentMapper.selectById(id));
         verify(sessionService).deleteSessionListByAgentIds(Collections.singletonList(id));
         verify(skillToolFactory).evict(id);

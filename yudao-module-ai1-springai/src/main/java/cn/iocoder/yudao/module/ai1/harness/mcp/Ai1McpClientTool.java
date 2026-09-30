@@ -106,7 +106,7 @@ public class Ai1McpClientTool {
             log.warn("[listTools][MCP({}/{}) tools/list 失败]", mcp.getId(), mcp.getName(), e);
         }
 
-        // 3. 写入缓存（失败的空列表也缓存，避免每次对话都重试；配置变化后指纹不同会重新拉取）
+        // 3. 写入缓存（失败的空列表也缓存，避免每次会话都重试；配置变化后指纹不同会重新拉取）
         toolsCache.put(cacheKey, tools);
         return tools;
     }

@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 /**
- * AI1 对话 DO
+ * AI1 会话 DO
  *
  * 管理后台登录用户与 Agent 的一次会话
  *
@@ -27,9 +27,9 @@ public class Ai1SessionDO extends TenantBaseDO {
     /**
      * 默认标题：首条消息发送后，自动替换为提问内容
      */
-    public static final String TITLE_DEFAULT = "新对话";
+    public static final String TITLE_DEFAULT = "新会话";
     /**
-     * 自动生成的对话标题最大长度：首条提问内容超出时截断
+     * 自动生成的会话标题最大长度：首条提问内容超出时截断
      */
     public static final int TITLE_MAX_LENGTH = 50;
 

@@ -36,7 +36,7 @@ public interface Ai1HomeMapper {
             @Param("beginTime") LocalDateTime beginTime, @Param("endTime") LocalDateTime endTime);
 
     /**
-     * 按 Agent 统计消息数量，按数量倒序，数量相同按 Agent 编号升序；已删除对话下的消息不计入
+     * 按 Agent 统计消息数量，按数量倒序，数量相同按 Agent 编号升序；已删除会话下的消息不计入
      */
     @Select("SELECT c.agent_id AS agentId, COUNT(1) AS `count` " +
             "FROM ai1_session_message m " +

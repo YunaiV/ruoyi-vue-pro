@@ -125,7 +125,7 @@ public class Ai1ModelServiceImplTest extends BaseDbUnitTest {
         // 调用
         Integer count = modelService.importRemoteModelList(reqVO);
 
-        // 断言：只导入 deepseek-reasoner，默认对话类型、开启状态
+        // 断言：只导入 deepseek-reasoner，默认会话类型、开启状态
         assertEquals(1, count);
         List<Ai1ModelDO> models = modelMapper.selectListByProviderId(providerId);
         assertEquals(Arrays.asList("deepseek-chat", "deepseek-reasoner"), convertList(models, Ai1ModelDO::getModel));

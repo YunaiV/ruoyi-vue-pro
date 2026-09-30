@@ -82,7 +82,7 @@ public class Ai1AgentServiceImpl implements Ai1AgentService {
         // 1. 校验存在
         ids.forEach(this::validateAgentExists);
 
-        // 2. 删除 Agent，同一事务内级联删除对话与消息
+        // 2. 删除 Agent，同一事务内级联删除会话与消息
         agentMapper.deleteByIds(ids);
         sessionService.deleteSessionListByAgentIds(ids);
 

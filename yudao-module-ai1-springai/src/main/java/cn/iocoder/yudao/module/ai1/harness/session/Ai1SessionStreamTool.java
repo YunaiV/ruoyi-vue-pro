@@ -54,7 +54,7 @@ import static cn.iocoder.yudao.module.ai1.dal.redis.Ai1RedisKeyConstants.*;
 import static cn.iocoder.yudao.module.ai1.enums.Ai1ErrorCodeConstants.MODEL_TYPE_NOT_CHAT;
 
 /**
- * AI1 对话流工具：对话流的「投递 / 续传入口 + 生成 worker + 结果流 + SSE 转发」一体
+ * AI1 会话流工具：会话流的「投递 / 续传入口 + 生成 worker + 结果流 + SSE 转发」一体
  *
  * 【完整流程】
  * 1. 发送（请求侧，由 Ai1SessionMessageService 调用）：{@link #submit} 投递任务（XADD 任务队列）→ {@link #open} 打开 SSE 连接
@@ -299,7 +299,7 @@ public class Ai1SessionStreamTool implements SmartLifecycle {
      *
      * @param messageId      助手消息编号，即结果流标识
      * @param agentId        Agent 编号
-     * @param sessionId 对话编号
+     * @param sessionId 会话编号
      * @param content        用户提问内容
      */
     public void submit(Long messageId, Long agentId, Long sessionId, String content) {
@@ -313,7 +313,7 @@ public class Ai1SessionStreamTool implements SmartLifecycle {
         // 1.2 生成所需的业务字段
         fields.put(FIELD_MESSAGE_ID, String.valueOf(messageId));
         fields.put(FIELD_AGENT_ID, String.valueOf(agentId));
-        // 生成时，附属 Header 中的 {session} 占位符替换为此处的对话编号
+        // 生成时，附属 Header 中的 {session} 占位符替换为此处的会话编号
         fields.put(FIELD_SESSION_ID, String.valueOf(sessionId));
         fields.put(FIELD_CONTENT, content);
 
@@ -336,12 +336,12 @@ public class Ai1SessionStreamTool implements SmartLifecycle {
                     streamResult(emitter, messageId, lastEventId);
                     emitter.complete();
                 } catch (Exception e) {
-                    log.warn("[open][助手消息({}) 对话流转发异常]", messageId, e);
+                    log.warn("[open][助手消息({}) 会话流转发异常]", messageId, e);
                     sendErrorAndComplete(emitter, e.getMessage());
                 }
             });
         } catch (RejectedExecutionException e) {
-            log.warn("[open][对话流转发并发已满，助手消息({})]", messageId);
+            log.warn("[open][会话流转发并发已满，助手消息({})]", messageId);
             sendErrorAndComplete(emitter, "服务繁忙，请稍后重试");
         }
         return emitter;
@@ -473,21 +473,21 @@ public class Ai1SessionStreamTool implements SmartLifecycle {
     // ==================== 生成编排 ====================
 
     /**
-     * 执行一次生成：校验 Agent → 解析模型 → 装配历史、工具、RAG → 流式对话
+     * 执行一次生成：校验 Agent → 解析模型 → 装配历史、工具、RAG → 流式会话
      *
      * 历史只取当前助手占位之前最近 historyLimit 条，跳过未完成的助手占位，并移除末尾的当前提问（由 LLM 工具另行追加）
      */
     @SuppressWarnings("SequencedCollectionMethodCanBeUsed")
     private Ai1LlmChatTool.ChatText generate(Long messageId, Long agentId, Long sessionId, String content,
                                              Consumer<String> onThinking, Consumer<String> onContent) {
-        // 1. 生成可能发生在其他节点，重新校验 Agent 与模型；后台对话不要求 Agent 已发布
+        // 1. 生成可能发生在其他节点，重新校验 Agent 与模型；后台会话不要求 Agent 已发布
         Ai1AgentDO agent = agentService.validateAgentExists(agentId);
         Ai1ModelRespBO model = modelService.getModelRespBO(agent.getProviderId(), agent.getModelId());
         if (!Ai1ModelTypeEnum.isChat(model.getModelType())) {
             throw exception(MODEL_TYPE_NOT_CHAT);
         }
 
-        // 2. 历史消息：按编号倒序取最近 N 条，再升序还原为对话顺序
+        // 2. 历史消息：按编号倒序取最近 N 条，再升序还原为会话顺序
         // TODO @芋艿：【优化点】截取历史的 limit 会导致 prompt cache 频繁失效。后续需要改成 prompt 压缩
         List<Ai1SessionMessageDO> recentMessages = new ArrayList<>(sessionMessageService.getSessionMessageListBySessionIdAndIdLessThan(
                 sessionId, messageId, ai1Properties.getSession().getHistory().getLimit()));
@@ -525,13 +525,13 @@ public class Ai1SessionStreamTool implements SmartLifecycle {
                 advisors.add(ragTool.buildAdvisor(knowledgeBase));
             } catch (Exception e) {
                 log.warn("[generate][Agent({}) 知识库({}) RAG 装配失败，已降级跳过]", agent.getId(), knowledgeBase.getId(), e);
-                String notice = "【知识库降级】「" + knowledgeBase.getName() + "」检索服务不可用，本次对话已跳过 RAG 上下文。\n";
+                String notice = "【知识库降级】「" + knowledgeBase.getName() + "」检索服务不可用，本次会话已跳过 RAG 上下文。\n";
                 onThinking.accept(notice);
                 noticeText.append(notice);
             }
         }
 
-        // 5. 流式对话；降级提示并入最终思考文本，保证刷新后内容一致
+        // 5. 流式会话；降级提示并入最终思考文本，保证刷新后内容一致
         Ai1LlmChatTool.ChatText chatText = llmChatTool.chat(model, systemPrompt, histories, content, tools, advisors,
                 sessionId, onThinking, onContent);
         if (!noticeText.isEmpty()) {
@@ -541,7 +541,7 @@ public class Ai1SessionStreamTool implements SmartLifecycle {
     }
 
     /**
-     * 回填助手消息（占位记录）的内容、思考过程与生成状态，并刷新对话活跃时间
+     * 回填助手消息（占位记录）的内容、思考过程与生成状态，并刷新会话活跃时间
      */
     private void saveAssistantMessage(Long messageId, Long sessionId, Ai1LlmChatTool.ChatText chatText, Integer status) {
         sessionMessageService.updateSessionMessage(new Ai1SessionMessageDO().setId(messageId)
@@ -601,7 +601,7 @@ public class Ai1SessionStreamTool implements SmartLifecycle {
         while (!cancelled.get()) {
             // 3.1 超过单连接最长时长，结束转发
             if (System.currentTimeMillis() > deadline) {
-                log.warn("[streamResult][助手消息({}) 对话流转发超时]", messageId);
+                log.warn("[streamResult][助手消息({}) 会话流转发超时]", messageId);
                 return;
             }
             // 3.2 从上次位置之后阻塞读取；读取失败时容错重试，连续失败达到阈值才中断，客户端可再续传
@@ -610,7 +610,7 @@ public class Ai1SessionStreamTool implements SmartLifecycle {
                 records = getResultStream(messageId).read(StreamReadArgs.greaterThan(fromId)
                         .count(READ_BATCH_SIZE).timeout(Duration.ofMillis(READ_BLOCK_MILLIS)));
             } catch (Exception e) {
-                log.warn("[streamResult][助手消息({}) 对话流读取异常]", messageId, e);
+                log.warn("[streamResult][助手消息({}) 会话流读取异常]", messageId, e);
                 if (++errorCount >= READ_ERROR_MAX_COUNT) {
                     return;
                 }

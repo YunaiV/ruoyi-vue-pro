@@ -24,7 +24,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 import static cn.iocoder.yudao.module.ai1.enums.Ai1ErrorCodeConstants.SESSION_NOT_EXISTS;
 
 /**
- * AI1 对话 Service 实现类
+ * AI1 会话 Service 实现类
  *
  * @author 芋道源码
  */
@@ -69,7 +69,7 @@ public class Ai1SessionServiceImpl implements Ai1SessionService {
         // 1. 校验归属
         validateSessionMy(userId, id);
 
-        // 2. 删除对话与消息
+        // 2. 删除会话与消息
         sessionMapper.deleteById(id);
         sessionMessageService.deleteSessionMessageListBySessionIds(Collections.singletonList(id));
     }
@@ -106,7 +106,7 @@ public class Ai1SessionServiceImpl implements Ai1SessionService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteSessionListByAgentIds(Collection<Long> agentIds) {
-        // 1. 查询 Agent 下的全部对话编号
+        // 1. 查询 Agent 下的全部会话编号
         if (CollUtil.isEmpty(agentIds)) {
             return;
         }
@@ -115,7 +115,7 @@ public class Ai1SessionServiceImpl implements Ai1SessionService {
             return;
         }
 
-        // 2. 删除对话与消息
+        // 2. 删除会话与消息
         sessionMapper.deleteByIds(sessionIds);
         sessionMessageService.deleteSessionMessageListBySessionIds(sessionIds);
     }

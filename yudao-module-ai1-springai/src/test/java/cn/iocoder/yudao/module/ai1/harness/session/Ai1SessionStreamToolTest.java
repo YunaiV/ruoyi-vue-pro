@@ -140,7 +140,7 @@ public class Ai1SessionStreamToolTest extends BaseMockitoUnitTest {
         // 调用
         sessionStreamTool.handleTask(RECORD_ID, buildTaskFields());
 
-        // 断言：生成在任务租户下执行，结束后恢复；回填完成状态并刷新对话
+        // 断言：生成在任务租户下执行，结束后恢复；回填完成状态并刷新会话
         assertEquals(TENANT_ID, tenantIdInGenerate.get());
         assertNull(TenantContextHolder.getTenantId());
         ArgumentCaptor<Ai1SessionMessageDO> messageCaptor = ArgumentCaptor.forClass(Ai1SessionMessageDO.class);

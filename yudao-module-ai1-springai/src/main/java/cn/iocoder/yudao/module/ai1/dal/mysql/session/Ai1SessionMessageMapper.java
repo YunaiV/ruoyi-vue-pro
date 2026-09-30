@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * AI1 对话消息 Mapper
+ * AI1 会话消息 Mapper
  *
  * @author 芋道源码
  */

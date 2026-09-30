@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * AI1 对话消息角色的枚举
+ * AI1 会话消息角色的枚举
  *
  * @author 芋道源码
  */

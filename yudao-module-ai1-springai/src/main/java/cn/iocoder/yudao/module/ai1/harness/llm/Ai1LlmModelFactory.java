@@ -37,7 +37,7 @@ import java.util.function.Predicate;
 public class Ai1LlmModelFactory {
 
     /**
-     * 附属 Header 对话占位符：构建模型时替换为当前对话编号
+     * 附属 Header 会话占位符：构建模型时替换为当前会话编号
      */
     public static final String SESSION_PLACEHOLDER = "{session}";
     /**
@@ -62,7 +62,7 @@ public class Ai1LlmModelFactory {
      * 获取（或构建）对话模型，并包装为 ChatClient
      *
      * @param model        模型运行时快照
-     * @param sessionId 对话编号，用于替换附属 Header 中的 {session} 占位符，可为空
+     * @param sessionId 会话编号，用于替换附属 Header 中的 {session} 占位符，可为空
      * @return ChatClient
      */
     public ChatClient buildChatClient(Ai1ModelRespBO model, Long sessionId) {
@@ -121,11 +121,11 @@ public class Ai1LlmModelFactory {
     /**
      * 获取（或构建）对话模型
      *
-     * 仅当附属 Header 使用 {session} 占位符（需按对话隔离）时，才把对话编号纳入缓存 key；
-     * 否则同一模型跨对话复用，避免每个对话都构建一个模型实例
+     * 仅当附属 Header 使用 {session} 占位符（需按会话隔离）时，才把会话编号纳入缓存 key；
+     * 否则同一模型跨会话复用，避免每个会话都构建一个模型实例
      */
     private OpenAiChatModel getOrCreateChatModel(Ai1ModelRespBO model, Long sessionId) {
-        // 1. 计算缓存 key：Header 含 {session} 占位符时按对话隔离，否则跨对话共享
+        // 1. 计算缓存 key：Header 含 {session} 占位符时按会话隔离，否则跨会话共享
         String sessionKey = usesSessionHeader(model.getHeaders()) && sessionId != null
                 ? String.valueOf(sessionId) : "";
         String cacheKey = buildCacheKey(model) + KEY_SEPARATOR + sessionKey;
@@ -155,7 +155,7 @@ public class Ai1LlmModelFactory {
 
     /**
      * 归一化接口地址：去掉结尾斜杠；裸地址（无路径）自动补 /v1，
-     * 保证连通测试、模型拉取与实际对话访问同一个 OpenAI 兼容端点
+     * 保证连通测试、模型拉取与实际会话访问同一个 OpenAI 兼容端点
      *
      * 例如说：Ollama 的 <a href="http://127.0.0.1:11434">http://127.0.0.1:11434</a>
      * 归一化为 <a href="http://127.0.0.1:11434/v1">http://127.0.0.1:11434/v1</a>
@@ -185,7 +185,7 @@ public class Ai1LlmModelFactory {
     }
 
     /**
-     * 构建请求 Header：{session} 占位符替换为对话编号；对话编号为空时，跳过带占位符的 Header
+     * 构建请求 Header：{session} 占位符替换为会话编号；会话编号为空时，跳过带占位符的 Header
      */
     private static Map<String, String> buildHeaders(List<Map<String, String>> headers, Long sessionId) {
         Map<String, String> result = new LinkedHashMap<>();

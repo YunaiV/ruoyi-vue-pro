@@ -22,10 +22,10 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * AI1 LLM 对话工具
+ * AI1 LLM 会话工具
  *
- * 只负责「按给定模型与消息执行一次流式对话」：接收已装配好的系统指令、历史消息、工具与 Advisor，
- * 经 ChatClient 流式对话，增量通过回调输出；传输方式（SSE、Redis Stream）由调用方决定
+ * 只负责「按给定模型与消息执行一次流式会话」：接收已装配好的系统指令、历史消息、工具与 Advisor，
+ * 经 ChatClient 流式会话，增量通过回调输出；传输方式（SSE、Redis Stream）由调用方决定
  *
  * @author 芋道源码
  */
@@ -41,15 +41,15 @@ public class Ai1LlmChatTool {
     private Ai1LlmModelFactory llmModelFactory;
 
     /**
-     * 流式对话：装配消息 → 附加工具、Advisor → 增量输出
+     * 流式会话：装配消息 → 附加工具、Advisor → 增量输出
      *
      * @param model        模型运行时快照（需为对话模型）
      * @param systemPrompt   系统指令，可为空
      * @param histories      历史消息，按时间升序；每项为 [role, content]
      * @param content        当前用户消息
      * @param tools          工具（ToolCallback 或 @Tool 对象），可为空
-     * @param advisors       对话 Advisor，可为空
-     * @param sessionId 对话编号，用于替换附属 Header 中的 {session} 占位符
+     * @param advisors       会话 Advisor，可为空
+     * @param sessionId 会话编号，用于替换附属 Header 中的 {session} 占位符
      * @param onThinking     思考过程增量回调，可为空
      * @param onContent      回复内容增量回调，可为空
      * @return 完整回复（内容 + 思考过程）
@@ -57,7 +57,7 @@ public class Ai1LlmChatTool {
     public ChatText chat(Ai1ModelRespBO model, String systemPrompt, List<String[]> histories, String content,
                          List<Object> tools, List<Advisor> advisors, Long sessionId,
                          Consumer<String> onThinking, Consumer<String> onContent) {
-        // 1. 装配对话请求：消息（系统指令 + 历史 + 当前）+ 工具 + Advisor
+        // 1. 装配会话请求：消息（系统指令 + 历史 + 当前）+ 工具 + Advisor
         ChatClient.ChatClientRequestSpec spec = llmModelFactory.buildChatClient(model, sessionId).prompt()
                 .messages(buildMessages(systemPrompt, histories, content));
         if (CollUtil.isNotEmpty(tools)) {
@@ -132,7 +132,7 @@ public class Ai1LlmChatTool {
     }
 
     /**
-     * LLM 对话结果
+     * LLM 会话结果
      */
     @Data
     @AllArgsConstructor

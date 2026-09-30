@@ -62,7 +62,7 @@ public class Ai1SessionMessageServiceImplTest extends BaseDbUnitTest {
 
     @Test
     public void testSendSessionMessageStream_success() {
-        // mock 方法：对话归属当前用户，首条消息
+        // mock 方法：会话归属当前用户，首条消息
         Ai1SessionDO session = new Ai1SessionDO().setId(10L).setAgentId(1L).setUserId(USER_ID)
                 .setTitle(Ai1SessionDO.TITLE_DEFAULT);
         when(sessionService.validateSessionMy(USER_ID, 10L)).thenReturn(session);
@@ -93,7 +93,7 @@ public class Ai1SessionMessageServiceImplTest extends BaseDbUnitTest {
 
     @Test
     public void testSendSessionMessageStream_notOwner() {
-        // mock 方法：对话不属于当前用户
+        // mock 方法：会话不属于当前用户
         when(sessionService.validateSessionMy(USER_ID, 10L)).thenThrow(exception(SESSION_NOT_EXISTS));
 
         // 调用
@@ -107,7 +107,7 @@ public class Ai1SessionMessageServiceImplTest extends BaseDbUnitTest {
 
     @Test
     public void testResumeSessionMessageStream_otherUser() {
-        // mock 数据：他人对话中的助手消息
+        // mock 数据：他人会话中的助手消息
         Ai1SessionMessageDO message = insertSessionMessage(10L, Ai1SessionMessageRoleEnum.ASSISTANT.getRole());
         when(sessionService.validateSessionMy(USER_ID, 10L)).thenThrow(exception(SESSION_NOT_EXISTS));
 
@@ -147,7 +147,7 @@ public class Ai1SessionMessageServiceImplTest extends BaseDbUnitTest {
 
     @Test
     public void testGetSessionMessageListBySessionIdAndIdLessThan() {
-        // mock 数据：同一对话 4 条消息
+        // mock 数据：同一会话 4 条消息
         Ai1SessionMessageDO message1 = insertSessionMessage(10L, Ai1SessionMessageRoleEnum.USER.getRole());
         Ai1SessionMessageDO message2 = insertSessionMessage(10L, Ai1SessionMessageRoleEnum.ASSISTANT.getRole());
         Ai1SessionMessageDO message3 = insertSessionMessage(10L, Ai1SessionMessageRoleEnum.USER.getRole());

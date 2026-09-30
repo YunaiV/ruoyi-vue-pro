@@ -8,7 +8,7 @@ import lombok.Getter;
 import java.util.Arrays;
 
 /**
- * AI1 对话消息生成状态的枚举
+ * AI1 会话消息生成状态的枚举
  *
  * @author 芋道源码
  */

@@ -118,7 +118,7 @@ public class Ai1HomeServiceImplTest extends BaseDbUnitTest {
 
     @Test
     public void testGetMessageSummaryByAgent() {
-        // mock 数据：Agent 1 有 3 条、Agent 2 有 1 条、区间外 1 条（Agent 2）、已删除对话下 5 条（Agent 3）
+        // mock 数据：Agent 1 有 3 条、Agent 2 有 1 条、区间外 1 条（Agent 2）、已删除会话下 5 条（Agent 3）
         LocalDateTime now = LocalDateTime.now();
         Long session1 = insertSession(1L);
         Long session2 = insertSession(2L);
@@ -136,7 +136,7 @@ public class Ai1HomeServiceImplTest extends BaseDbUnitTest {
         // 调用：近 7 天
         List<Ai1HomeMessageSummaryByAgentRespVO> list = homeService.getMessageSummaryByAgent(7);
 
-        // 断言：按消息数量倒序，区间外和已删除对话不计入
+        // 断言：按消息数量倒序，区间外和已删除会话不计入
         assertEquals(2, list.size());
         assertEquals(1L, list.get(0).getAgentId());
         assertEquals(3L, list.get(0).getCount());

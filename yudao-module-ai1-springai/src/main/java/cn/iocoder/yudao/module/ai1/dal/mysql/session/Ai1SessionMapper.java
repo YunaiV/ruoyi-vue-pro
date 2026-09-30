@@ -11,7 +11,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * AI1 对话 Mapper
+ * AI1 会话 Mapper
  *
  * @author 芋道源码
  */

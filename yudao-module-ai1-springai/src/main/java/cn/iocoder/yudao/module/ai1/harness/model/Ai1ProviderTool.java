@@ -49,7 +49,7 @@ public class Ai1ProviderTool {
      */
     private static final int READ_TIMEOUT = 8000;
     /**
-     * 连通测试回退时的最小对话请求体：仅探测服务可达与鉴权，不做真实对话
+     * 连通测试回退时的最小会话请求体：仅探测服务可达与鉴权，不做真实会话
      */
     private static final String CONNECT_CHAT_BODY = "{\"model\":\"test\",\"messages\":[{\"role\":\"user\",\"content\":\"hi\"}]}";
 
@@ -75,7 +75,7 @@ public class Ai1ProviderTool {
                     "认证失败：GET /models 返回 HTTP " + models.getHttpCode() + "，请检查 API 密钥", startTime);
         }
 
-        // 2. 回退：POST /chat/completions 最小请求（仅探测服务可达与鉴权，不做真实对话）
+        // 2. 回退：POST /chat/completions 最小请求（仅探测服务可达与鉴权，不做真实会话）
         HttpOutcome chat = executeRequest(Method.POST, url + "/chat/completions", apiKey, headers, CONNECT_CHAT_BODY);
         if (chat.getHttpCode() == HttpStatus.HTTP_OK) {
             return buildConnectResult(true, HttpStatus.HTTP_OK, "GET /models 不可用（HTTP " + models.getHttpCode()

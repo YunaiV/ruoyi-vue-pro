@@ -35,14 +35,14 @@ public interface Ai1AgentService {
     void updateAgent(@Valid Ai1AgentSaveReqVO updateReqVO);
 
     /**
-     * 删除 Agent，级联删除对话与消息，并清理 SKILL 物化沙箱
+     * 删除 Agent，级联删除会话与消息，并清理 SKILL 物化沙箱
      *
      * @param id 编号
      */
     void deleteAgent(Long id);
 
     /**
-     * 批量删除 Agent，级联删除对话与消息，并清理 SKILL 物化沙箱
+     * 批量删除 Agent，级联删除会话与消息，并清理 SKILL 物化沙箱
      *
      * @param ids 编号列表
      */
@@ -81,7 +81,7 @@ public interface Ai1AgentService {
     Ai1AgentDO validateAgentEnabled(Long id);
 
     /**
-     * 获得指定状态的 Agent 列表，用于对话页选择 Agent
+     * 获得指定状态的 Agent 列表，用于会话页选择 Agent
      *
      * @param status 状态
      * @return Agent 列表

@@ -44,7 +44,7 @@ public class Ai1ProviderDO extends TenantBaseDO {
     /**
      * 请求附属 Header
      *
-     * JSON 数组，格式为 [{"key":"...","value":"..."}]；value 可包含 {session} 占位符，请求时替换为对话编号
+     * JSON 数组，格式为 [{"key":"...","value":"..."}]；value 可包含 {session} 占位符，请求时替换为会话编号
      */
     private String headers;
     /**

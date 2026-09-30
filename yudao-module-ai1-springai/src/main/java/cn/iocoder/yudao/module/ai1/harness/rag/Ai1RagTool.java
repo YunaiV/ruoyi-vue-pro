@@ -47,7 +47,7 @@ import static cn.iocoder.yudao.module.ai1.enums.Ai1ErrorCodeConstants.MODEL_TYPE
  * 1. 向量化：分片 → Document（含 documentId、chunkIndex 元数据）→ VectorStore.add（先清理旧向量）
  * 2. 检索：VectorStore.similaritySearch
  * 3. 清理：按 documentId 元数据删除向量；知识库删除时 drop 整个集合
- * 4. Advisor：为对话装配 QuestionAnswerAdvisor，检索上下文自动注入
+ * 4. Advisor：为会话装配 QuestionAnswerAdvisor，检索上下文自动注入
  *
  * 集合名为 {collectionPrefix}{知识库编号}（编号全局唯一，无需租户前缀）；调用方必须先在当前租户下查出知识库，再传入本工具，
  * 以此保证不会越权访问其他租户的集合
@@ -179,7 +179,7 @@ public class Ai1RagTool {
     }
 
     /**
-     * 为知识库构建 RAG Advisor：检索上下文自动注入对话
+     * 为知识库构建 RAG Advisor：检索上下文自动注入会话
      *
      * @param knowledgeBase 知识库
      * @return RAG Advisor

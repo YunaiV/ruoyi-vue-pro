@@ -18,7 +18,7 @@ public class YudaoAi1Properties {
     private Milvus milvus = new Milvus();
 
     /**
-     * 对话流
+     * 会话流
      */
     private Session session = new Session();
 

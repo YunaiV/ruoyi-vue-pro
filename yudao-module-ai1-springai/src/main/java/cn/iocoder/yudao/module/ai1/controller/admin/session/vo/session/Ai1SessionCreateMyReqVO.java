@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-@Schema(description = "管理后台 - AI1 我的对话创建 Request VO")
+@Schema(description = "管理后台 - AI1 我的会话创建 Request VO")
 @Data
 public class Ai1SessionCreateMyReqVO {
 

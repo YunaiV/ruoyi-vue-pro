@@ -62,7 +62,7 @@ public class Ai1AgentController {
     }
 
     @DeleteMapping("/delete")
-    @Operation(summary = "删除 Agent", description = "级联删除对话与消息")
+    @Operation(summary = "删除 Agent", description = "级联删除会话与消息")
     @Parameter(name = "id", description = "编号", required = true)
     @PreAuthorize("@ss.hasPermission('ai1:agent:delete')")
     public CommonResult<Boolean> deleteAgent(@RequestParam("id") Long id) {
@@ -71,7 +71,7 @@ public class Ai1AgentController {
     }
 
     @DeleteMapping("/delete-list")
-    @Operation(summary = "批量删除 Agent", description = "级联删除对话与消息")
+    @Operation(summary = "批量删除 Agent", description = "级联删除会话与消息")
     @Parameter(name = "ids", description = "编号列表", required = true)
     @PreAuthorize("@ss.hasPermission('ai1:agent:delete')")
     public CommonResult<Boolean> deleteAgentList(@RequestParam("ids") List<Long> ids) {
@@ -97,7 +97,7 @@ public class Ai1AgentController {
     }
 
     @GetMapping("/simple-list")
-    @Operation(summary = "获得已开启的 Agent 精简列表", description = "用于对话页选择 Agent，仅返回已开启的 Agent")
+    @Operation(summary = "获得已开启的 Agent 精简列表", description = "用于会话页选择 Agent，仅返回已开启的 Agent")
     public CommonResult<List<Ai1AgentRespVO>> getAgentSimpleList() {
         List<Ai1AgentDO> list = agentService.getAgentListByStatus(CommonStatusEnum.ENABLE.getStatus());
         Map<Long, Ai1ModelDO> modelMap = modelService.getModelMap(convertSet(list, Ai1AgentDO::getModelId));

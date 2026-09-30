@@ -197,7 +197,7 @@ public class Ai1ModelServiceImpl implements Ai1ModelService {
             throw exception(MODEL_IMPORT_ALL_EXISTS);
         }
 
-        // 2. 批量插入：展示名称默认同模型标识，类型默认对话，状态默认开启
+        // 2. 批量插入：展示名称默认同模型标识，类型默认会话，状态默认开启
         List<Ai1ModelDO> models = convertList(importModels, model -> Ai1ModelDO.builder()
                 .providerId(importReqVO.getProviderId()).name(StrUtil.maxLength(model, 47)).model(model)
                 .type(Ai1ModelTypeEnum.CHAT.getType()).status(CommonStatusEnum.ENABLE.getStatus()).build());

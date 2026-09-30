@@ -54,10 +54,10 @@ public class Ai1SessionServiceImplTest extends BaseDbUnitTest {
 
     @Test
     public void testUpdateSessionMy_otherUser() {
-        // mock 数据：他人的对话
+        // mock 数据：他人的会话
         Long id = sessionService.createSessionMy(100L, new Ai1SessionCreateMyReqVO().setAgentId(1L));
 
-        // 调用，并断言异常：不能改他人对话，且与不存在同样处理
+        // 调用，并断言异常：不能改他人会话，且与不存在同样处理
         assertServiceException(() -> sessionService.updateSessionMy(200L,
                 new Ai1SessionUpdateMyReqVO().setId(id).setTitle("改标题")), SESSION_NOT_EXISTS);
         assertEquals(Ai1SessionDO.TITLE_DEFAULT, sessionMapper.selectById(id).getTitle());
@@ -65,7 +65,7 @@ public class Ai1SessionServiceImplTest extends BaseDbUnitTest {
 
     @Test
     public void testDeleteSessionMy_otherUser() {
-        // mock 数据：他人的对话
+        // mock 数据：他人的会话
         Long id = sessionService.createSessionMy(100L, new Ai1SessionCreateMyReqVO().setAgentId(1L));
 
         // 调用，并断言异常
@@ -98,7 +98,7 @@ public class Ai1SessionServiceImplTest extends BaseDbUnitTest {
         // 调用
         List<Ai1SessionDO> list = sessionService.getSessionListByAgentIdAndUserId(1L, 100L);
 
-        // 断言：只返回当前用户在该 Agent 下的对话，按编号倒序
+        // 断言：只返回当前用户在该 Agent 下的会话，按编号倒序
         assertEquals(Arrays.asList(id2, id1), list.stream().map(Ai1SessionDO::getId).toList());
     }
 

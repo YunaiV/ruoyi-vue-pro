@@ -47,7 +47,7 @@ public class Ai1McpToolFactory {
     private Ai1McpClientTool mcpClientTool;
 
     /**
-     * 构建 Agent 绑定的 MCP 工具集合；单个服务失败时跳过，不影响对话
+     * 构建 Agent 绑定的 MCP 工具集合；单个服务失败时跳过，不影响会话
      *
      * tools/list 结果已由 {@link Ai1McpClientTool} 按配置指纹缓存，这里只做 ToolCallback 包装
      *

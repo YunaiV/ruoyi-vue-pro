@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
 /**
- * AI1 对话消息 DO
+ * AI1 会话消息 DO
  *
  * 助手消息的编号同时作为 Redis 结果流标识，用于断线续传
  *
@@ -31,7 +31,7 @@ public class Ai1SessionMessageDO extends TenantBaseDO {
     @TableId
     private Long id;
     /**
-     * 对话编号
+     * 会话编号
      *
      * 关联 {@link Ai1SessionDO#getId()}
      */

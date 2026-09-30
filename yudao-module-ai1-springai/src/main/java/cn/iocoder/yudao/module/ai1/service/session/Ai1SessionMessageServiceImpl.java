@@ -26,7 +26,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.module.ai1.enums.Ai1ErrorCodeConstants.SESSION_MESSAGE_NOT_EXISTS;
 
 /**
- * AI1 对话消息 Service 实现类
+ * AI1 会话消息 Service 实现类
  *
  * 流式生成与下发委托 {@link Ai1SessionStreamTool}；本类只负责会话校验与消息落库
  *
@@ -61,7 +61,7 @@ public class Ai1SessionMessageServiceImpl implements Ai1SessionMessageService {
     @Override
     public SseEmitter sendSessionMessageStream(Long userId, Ai1SessionMessageSendReqVO sendReqVO) {
         try {
-            // 1. 校验对话归属、Agent 存在且已开启
+            // 1. 校验会话归属、Agent 存在且已开启
             Ai1SessionDO session = sessionService.validateSessionMy(userId, sendReqVO.getSessionId());
             agentService.validateAgentEnabled(session.getAgentId());
 
@@ -74,15 +74,15 @@ public class Ai1SessionMessageServiceImpl implements Ai1SessionMessageService {
         } catch (ServiceException e) {
             return sessionStreamTool.error(e.getMessage());
         } catch (Exception e) {
-            log.warn("[sendSessionMessageStream][用户({}) 对话({}) 提交失败]", userId, sendReqVO.getSessionId(), e);
-            return sessionStreamTool.error("对话提交失败，请稍后重试");
+            log.warn("[sendSessionMessageStream][用户({}) 会话({}) 提交失败]", userId, sendReqVO.getSessionId(), e);
+            return sessionStreamTool.error("会话提交失败，请稍后重试");
         }
     }
 
     @Override
     public SseEmitter resumeSessionMessageStream(Long userId, Long messageId, String lastEventId) {
         try {
-            // 1. 校验消息存在、为助手消息，且所属对话归属当前用户
+            // 1. 校验消息存在、为助手消息，且所属会话归属当前用户
             Ai1SessionMessageDO message = sessionMessageMapper.selectById(messageId);
             if (message == null || !Ai1SessionMessageRoleEnum.isAssistant(message.getRole())) {
                 throw exception(SESSION_MESSAGE_NOT_EXISTS);
@@ -97,9 +97,9 @@ public class Ai1SessionMessageServiceImpl implements Ai1SessionMessageService {
     }
 
     /**
-     * 开启一轮对话：首条消息自动生成标题 → 落库用户消息（完成）与助手占位（生成中）→ 刷新对话活跃时间
+     * 开启一轮会话：首条消息自动生成标题 → 落库用户消息（完成）与助手占位（生成中）→ 刷新会话活跃时间
      *
-     * @param session 已校验归属的对话
+     * @param session 已校验归属的会话
      * @param content 提问内容
      * @return 助手消息编号，即结果流标识
      */
@@ -121,7 +121,7 @@ public class Ai1SessionMessageServiceImpl implements Ai1SessionMessageService {
                 .setStatus(Ai1SessionMessageStatusEnum.GENERATING.getStatus());
         sessionMessageMapper.insert(assistantMessage);
 
-        // 3. 刷新对话活跃时间
+        // 3. 刷新会话活跃时间
         sessionService.touchSession(session.getId());
         return assistantMessage.getId();
     }

@@ -9,24 +9,24 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * AI1 对话消息 Service 接口
+ * AI1 会话消息 Service 接口
  *
  * @author 芋道源码
  */
 public interface Ai1SessionMessageService {
 
     /**
-     * 获得对话的消息列表，按编号升序
+     * 获得会话的消息列表，按编号升序
      *
-     * @param sessionId 对话编号
+     * @param sessionId 会话编号
      * @return 消息列表
      */
     List<Ai1SessionMessageDO> getSessionMessageListBySessionId(Long sessionId);
 
     /**
-     * 获得对话中指定消息之前最近的若干条消息，按编号倒序
+     * 获得会话中指定消息之前最近的若干条消息，按编号倒序
      *
-     * @param sessionId 对话编号
+     * @param sessionId 会话编号
      * @param id             消息编号（不含）
      * @param limit          数量上限
      * @return 消息列表
@@ -34,7 +34,7 @@ public interface Ai1SessionMessageService {
     List<Ai1SessionMessageDO> getSessionMessageListBySessionIdAndIdLessThan(Long sessionId, Long id, Integer limit);
 
     /**
-     * 发送消息（SSE 流式）：校验对话归属 → 落库用户消息与助手占位 → 投递生成任务 → 打开 SSE 连接
+     * 发送消息（SSE 流式）：校验会话归属 → 落库用户消息与助手占位 → 投递生成任务 → 打开 SSE 连接
      *
      * 校验、落库失败时不抛出异常，而是返回只包含 error 事件的 SSE 连接
      *
@@ -45,7 +45,7 @@ public interface Ai1SessionMessageService {
     SseEmitter sendSessionMessageStream(Long userId, @Valid Ai1SessionMessageSendReqVO sendReqVO);
 
     /**
-     * 断线续传（SSE 流式）：校验消息 → 对话 → 用户归属后，从结果流 lastEventId 之后继续转发，不重新生成
+     * 断线续传（SSE 流式）：校验消息 → 会话 → 用户归属后，从结果流 lastEventId 之后继续转发，不重新生成
      *
      * @param userId      用户编号
      * @param messageId   助手消息编号，即结果流标识
@@ -62,9 +62,9 @@ public interface Ai1SessionMessageService {
     void updateSessionMessage(Ai1SessionMessageDO updateObj);
 
     /**
-     * 删除对话下的全部消息
+     * 删除会话下的全部消息
      *
-     * @param sessionIds 对话编号集合
+     * @param sessionIds 会话编号集合
      */
     void deleteSessionMessageListBySessionIds(Collection<Long> sessionIds);
 
