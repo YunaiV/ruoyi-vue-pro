@@ -6,13 +6,13 @@ import cn.iocoder.yudao.module.ai1.controller.admin.home.vo.Ai1HomeMessageSummar
 import cn.iocoder.yudao.module.ai1.controller.admin.home.vo.Ai1HomeSummaryRespVO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.agent.Ai1AgentDO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.session.Ai1SessionDO;
-import cn.iocoder.yudao.module.ai1.dal.dataobject.session.Ai1MessageDO;
+import cn.iocoder.yudao.module.ai1.dal.dataobject.session.Ai1SessionMessageDO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.mcp.Ai1McpDO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.model.Ai1ModelDO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.skill.Ai1SkillDO;
 import cn.iocoder.yudao.module.ai1.dal.mysql.agent.Ai1AgentMapper;
 import cn.iocoder.yudao.module.ai1.dal.mysql.session.Ai1SessionMapper;
-import cn.iocoder.yudao.module.ai1.dal.mysql.session.Ai1MessageMapper;
+import cn.iocoder.yudao.module.ai1.dal.mysql.session.Ai1SessionMessageMapper;
 import cn.iocoder.yudao.module.ai1.dal.mysql.home.Ai1HomeMapper;
 import cn.iocoder.yudao.module.ai1.dal.mysql.mcp.Ai1McpMapper;
 import cn.iocoder.yudao.module.ai1.dal.mysql.model.Ai1ModelMapper;
@@ -56,7 +56,7 @@ public class Ai1HomeServiceImplTest extends BaseDbUnitTest {
     @Resource
     private Ai1SessionMapper sessionMapper;
     @Resource
-    private Ai1MessageMapper messageMapper;
+    private Ai1SessionMessageMapper sessionMessageMapper;
 
     @Test
     public void testGetSummary() {
@@ -87,12 +87,12 @@ public class Ai1HomeServiceImplTest extends BaseDbUnitTest {
         // mock 数据：今天 2 条、前天 1 条、区间外（8 天前）1 条、今天已删除 1 条
         LocalDateTime now = LocalDateTime.now();
         Long sessionId = insertSession(1L);
-        insertMessage(sessionId, now);
-        insertMessage(sessionId, now);
-        insertMessage(sessionId, now.minusDays(2));
-        insertMessage(sessionId, now.minusDays(8));
-        Long deletedMessageId = insertMessage(sessionId, now);
-        messageMapper.deleteById(deletedMessageId);
+        insertSessionMessage(sessionId, now);
+        insertSessionMessage(sessionId, now);
+        insertSessionMessage(sessionId, now.minusDays(2));
+        insertSessionMessage(sessionId, now.minusDays(8));
+        Long deletedMessageId = insertSessionMessage(sessionId, now);
+        sessionMessageMapper.deleteById(deletedMessageId);
 
         // 调用：近 7 天
         List<Ai1HomeMessageSummaryByDateRespVO> list = homeService.getMessageSummaryByDate(7);
@@ -123,13 +123,13 @@ public class Ai1HomeServiceImplTest extends BaseDbUnitTest {
         Long session1 = insertSession(1L);
         Long session2 = insertSession(2L);
         Long deletedSession = insertSession(3L);
-        insertMessage(session1, now);
-        insertMessage(session1, now.minusDays(1));
-        insertMessage(session1, now.minusDays(3));
-        insertMessage(session2, now);
-        insertMessage(session2, now.minusDays(10));
+        insertSessionMessage(session1, now);
+        insertSessionMessage(session1, now.minusDays(1));
+        insertSessionMessage(session1, now.minusDays(3));
+        insertSessionMessage(session2, now);
+        insertSessionMessage(session2, now.minusDays(10));
         for (int i = 0; i < 5; i++) {
-            insertMessage(deletedSession, now);
+            insertSessionMessage(deletedSession, now);
         }
         sessionMapper.deleteById(deletedSession);
 
@@ -159,12 +159,12 @@ public class Ai1HomeServiceImplTest extends BaseDbUnitTest {
         return session.getId();
     }
 
-    private Long insertMessage(Long sessionId, LocalDateTime createTime) {
-        Ai1MessageDO message = randomPojo(Ai1MessageDO.class, o -> {
+    private Long insertSessionMessage(Long sessionId, LocalDateTime createTime) {
+        Ai1SessionMessageDO message = randomPojo(Ai1SessionMessageDO.class, o -> {
             o.setSessionId(sessionId).setRole("user").setStatus(1);
             o.setCreateTime(createTime);
         });
-        messageMapper.insert(message);
+        sessionMessageMapper.insert(message);
         return message.getId();
     }
 

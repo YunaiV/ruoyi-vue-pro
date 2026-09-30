@@ -40,7 +40,7 @@ public class Ai1SessionServiceImpl implements Ai1SessionService {
     private Ai1AgentService agentService;
     @Resource
     @Lazy // 延迟加载，避免循环依赖
-    private Ai1MessageService messageService;
+    private Ai1SessionMessageService sessionMessageService;
 
     @Override
     public Long createSessionMy(Long userId, Ai1SessionCreateMyReqVO createReqVO) {
@@ -71,7 +71,7 @@ public class Ai1SessionServiceImpl implements Ai1SessionService {
 
         // 2. 删除对话与消息
         sessionMapper.deleteById(id);
-        messageService.deleteMessageListBySessionIds(Collections.singletonList(id));
+        sessionMessageService.deleteSessionMessageListBySessionIds(Collections.singletonList(id));
     }
 
     @Override
@@ -117,7 +117,7 @@ public class Ai1SessionServiceImpl implements Ai1SessionService {
 
         // 2. 删除对话与消息
         sessionMapper.deleteByIds(sessionIds);
-        messageService.deleteMessageListBySessionIds(sessionIds);
+        sessionMessageService.deleteSessionMessageListBySessionIds(sessionIds);
     }
 
 }

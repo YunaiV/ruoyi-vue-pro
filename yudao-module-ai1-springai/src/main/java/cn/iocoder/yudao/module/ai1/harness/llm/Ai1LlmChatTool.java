@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.ai1.harness.llm;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.module.ai1.enums.session.Ai1MessageRoleEnum;
+import cn.iocoder.yudao.module.ai1.enums.session.Ai1SessionMessageRoleEnum;
 import cn.iocoder.yudao.module.ai1.service.model.bo.Ai1ModelRespBO;
 import jakarta.annotation.Resource;
 import lombok.AllArgsConstructor;
@@ -110,9 +110,9 @@ public class Ai1LlmChatTool {
         if (CollUtil.isNotEmpty(histories)) {
             for (String[] history : histories) {
                 String text = StrUtil.nullToEmpty(history[1]);
-                if (Ai1MessageRoleEnum.isUser(history[0])) {
+                if (Ai1SessionMessageRoleEnum.isUser(history[0])) {
                     messages.add(new UserMessage(text));
-                } else if (Ai1MessageRoleEnum.isAssistant(history[0])) {
+                } else if (Ai1SessionMessageRoleEnum.isAssistant(history[0])) {
                     messages.add(new AssistantMessage(text));
                 }
             }

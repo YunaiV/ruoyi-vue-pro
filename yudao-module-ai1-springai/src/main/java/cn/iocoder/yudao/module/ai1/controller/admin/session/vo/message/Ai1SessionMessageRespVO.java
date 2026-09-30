@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Schema(description = "管理后台 - AI1 对话消息 Response VO")
 @Data
-public class Ai1MessageRespVO {
+public class Ai1SessionMessageRespVO {
 
     @Schema(description = "编号；助手消息的编号同时作为续传的结果流标识", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;

@@ -28,7 +28,7 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
-@Tag(name = "管理后台 - AI1 对话")
+@Tag(name = "管理后台 - AI1 会话")
 @RestController
 @RequestMapping("/ai1/session")
 @Validated
@@ -44,14 +44,14 @@ public class Ai1SessionController {
 
     @PostMapping("/create-my")
     @Operation(summary = "创建【我的】对话")
-    @PreAuthorize("@ss.hasPermission('ai1:chat:query')")
+    @PreAuthorize("@ss.hasPermission('ai1:session:chat')")
     public CommonResult<Long> createSessionMy(@Valid @RequestBody Ai1SessionCreateMyReqVO createReqVO) {
         return success(sessionService.createSessionMy(getLoginUserId(), createReqVO));
     }
 
     @PutMapping("/update-my")
     @Operation(summary = "修改【我的】对话标题")
-    @PreAuthorize("@ss.hasPermission('ai1:chat:query')")
+    @PreAuthorize("@ss.hasPermission('ai1:session:chat')")
     public CommonResult<Boolean> updateSessionMy(@Valid @RequestBody Ai1SessionUpdateMyReqVO updateReqVO) {
         sessionService.updateSessionMy(getLoginUserId(), updateReqVO);
         return success(true);
@@ -60,7 +60,7 @@ public class Ai1SessionController {
     @DeleteMapping("/delete-my")
     @Operation(summary = "删除【我的】对话", description = "连带删除消息")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
-    @PreAuthorize("@ss.hasPermission('ai1:chat:query')")
+    @PreAuthorize("@ss.hasPermission('ai1:session:chat')")
     public CommonResult<Boolean> deleteSessionMy(@RequestParam("id") Long id) {
         sessionService.deleteSessionMy(getLoginUserId(), id);
         return success(true);
@@ -69,7 +69,7 @@ public class Ai1SessionController {
     @GetMapping("/my-list")
     @Operation(summary = "获得【我的】对话列表", description = "指定 Agent 下，按创建时间倒序")
     @Parameter(name = "agentId", description = "Agent 编号", required = true, example = "1")
-    @PreAuthorize("@ss.hasPermission('ai1:chat:query')")
+    @PreAuthorize("@ss.hasPermission('ai1:session:chat')")
     public CommonResult<List<Ai1SessionRespVO>> getSessionMyList(@RequestParam("agentId") Long agentId) {
         List<Ai1SessionDO> list = sessionService.getSessionListByAgentIdAndUserId(agentId, getLoginUserId());
         return success(BeanUtils.toBean(list, Ai1SessionRespVO.class));

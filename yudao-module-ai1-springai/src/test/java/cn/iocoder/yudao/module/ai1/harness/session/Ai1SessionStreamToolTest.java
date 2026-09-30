@@ -1,16 +1,16 @@
-package cn.iocoder.yudao.module.ai1.harness.chat;
+package cn.iocoder.yudao.module.ai1.harness.session;
 
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.agent.Ai1AgentDO;
-import cn.iocoder.yudao.module.ai1.dal.dataobject.session.Ai1MessageDO;
-import cn.iocoder.yudao.module.ai1.enums.session.Ai1MessageStatusEnum;
+import cn.iocoder.yudao.module.ai1.dal.dataobject.session.Ai1SessionMessageDO;
+import cn.iocoder.yudao.module.ai1.enums.session.Ai1SessionMessageStatusEnum;
 import cn.iocoder.yudao.module.ai1.enums.model.Ai1ModelTypeEnum;
 import cn.iocoder.yudao.module.ai1.framework.ai.config.YudaoAi1Properties;
 import cn.iocoder.yudao.module.ai1.harness.skill.Ai1SkillToolFactory;
 import cn.iocoder.yudao.module.ai1.service.agent.Ai1AgentService;
 import cn.iocoder.yudao.module.ai1.service.session.Ai1SessionService;
-import cn.iocoder.yudao.module.ai1.service.session.Ai1MessageService;
+import cn.iocoder.yudao.module.ai1.service.session.Ai1SessionMessageService;
 import cn.iocoder.yudao.module.ai1.service.knowledge.Ai1KnowledgeBaseService;
 import cn.iocoder.yudao.module.ai1.service.model.Ai1ModelService;
 import cn.iocoder.yudao.module.ai1.service.model.bo.Ai1ModelRespBO;
@@ -41,11 +41,11 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 /**
- * {@link Ai1ChatStreamTool} 的单元测试：覆盖 worker 的租户恢复、无租户执行、失败回填
+ * {@link Ai1SessionStreamTool} 的单元测试：覆盖 worker 的租户恢复、无租户执行、失败回填
  *
  * @author 芋道源码
  */
-public class Ai1ChatStreamToolTest extends BaseMockitoUnitTest {
+public class Ai1SessionStreamToolTest extends BaseMockitoUnitTest {
 
     private static final Long TENANT_ID = 1L;
     private static final Long MESSAGE_ID = 1024L;
@@ -54,7 +54,7 @@ public class Ai1ChatStreamToolTest extends BaseMockitoUnitTest {
     private static final StreamMessageId RECORD_ID = new StreamMessageId(1, 0);
 
     @InjectMocks
-    private Ai1ChatStreamTool chatStreamTool;
+    private Ai1SessionStreamTool sessionStreamTool;
 
     @Mock
     private RedissonClient redissonClient;
@@ -66,7 +66,7 @@ public class Ai1ChatStreamToolTest extends BaseMockitoUnitTest {
     private YudaoAi1Properties ai1Properties = new YudaoAi1Properties();
 
     @Mock
-    private Ai1MessageService messageService;
+    private Ai1SessionMessageService sessionMessageService;
     @Mock
     private Ai1SessionService sessionService;
     @Mock
@@ -86,8 +86,8 @@ public class Ai1ChatStreamToolTest extends BaseMockitoUnitTest {
 
     @BeforeEach
     public void setUp() {
-        doReturn(taskStream).when(redissonClient).getStream(eq("ai1:chat:tasks"), any(Codec.class));
-        doReturn(resultStream).when(redissonClient).getStream(eq("ai1:chat:result:" + MESSAGE_ID), any(Codec.class));
+        doReturn(taskStream).when(redissonClient).getStream(eq("ai1:session:tasks"), any(Codec.class));
+        doReturn(resultStream).when(redissonClient).getStream(eq("ai1:session:result:" + MESSAGE_ID), any(Codec.class));
     }
 
     @Test
@@ -99,7 +99,7 @@ public class Ai1ChatStreamToolTest extends BaseMockitoUnitTest {
             return new Ai1AgentDO().setId(AGENT_ID).setName("客服").setProviderId(1L).setModelId(2L);
         });
         when(modelService.getModelRespBO(1L, 2L)).thenReturn(new Ai1ModelRespBO().setModelType(Ai1ModelTypeEnum.CHAT.getType()));
-        when(messageService.getMessageListBySessionIdAndIdLessThan(eq(SESSION_ID), eq(MESSAGE_ID), anyInt()))
+        when(sessionMessageService.getSessionMessageListBySessionIdAndIdLessThan(eq(SESSION_ID), eq(MESSAGE_ID), anyInt()))
                 .thenReturn(new ArrayList<>());
         when(llmChatTool.chat(any(), eq("你是 客服 的智能助手。"), anyList(), eq("你好"), anyList(), anyList(), eq(SESSION_ID), any(), any()))
                 .thenReturn(new Ai1LlmChatTool.ChatText("您好", ""));
@@ -108,15 +108,15 @@ public class Ai1ChatStreamToolTest extends BaseMockitoUnitTest {
         fields.remove("tenantId");
 
         // 调用
-        chatStreamTool.handleTask(RECORD_ID, fields);
+        sessionStreamTool.handleTask(RECORD_ID, fields);
 
         // 断言：无租户上下文直接生成，回填完成状态，写 done 终态并确认
         assertNull(tenantIdInGenerate.get());
-        ArgumentCaptor<Ai1MessageDO> messageCaptor = ArgumentCaptor.forClass(Ai1MessageDO.class);
-        verify(messageService).updateMessage(messageCaptor.capture());
-        assertEquals(Ai1MessageStatusEnum.SUCCESS.getStatus(), messageCaptor.getValue().getStatus());
+        ArgumentCaptor<Ai1SessionMessageDO> messageCaptor = ArgumentCaptor.forClass(Ai1SessionMessageDO.class);
+        verify(sessionMessageService).updateSessionMessage(messageCaptor.capture());
+        assertEquals(Ai1SessionMessageStatusEnum.SUCCESS.getStatus(), messageCaptor.getValue().getStatus());
         assertEquals(List.of("done"), captureResultTypes());
-        verify(taskStream).ack("ai1-chat-workers", RECORD_ID);
+        verify(taskStream).ack("ai1-session-workers", RECORD_ID);
     }
 
     @Test
@@ -128,7 +128,7 @@ public class Ai1ChatStreamToolTest extends BaseMockitoUnitTest {
             return new Ai1AgentDO().setId(AGENT_ID).setName("客服").setProviderId(1L).setModelId(2L);
         });
         when(modelService.getModelRespBO(1L, 2L)).thenReturn(new Ai1ModelRespBO().setModelType(Ai1ModelTypeEnum.CHAT.getType()));
-        when(messageService.getMessageListBySessionIdAndIdLessThan(eq(SESSION_ID), eq(MESSAGE_ID), anyInt()))
+        when(sessionMessageService.getSessionMessageListBySessionIdAndIdLessThan(eq(SESSION_ID), eq(MESSAGE_ID), anyInt()))
                 .thenReturn(new ArrayList<>());
         when(llmChatTool.chat(any(), anyString(), anyList(), eq("你好"), anyList(), anyList(), eq(SESSION_ID), any(), any()))
                 .thenAnswer(invocation -> {
@@ -138,17 +138,17 @@ public class Ai1ChatStreamToolTest extends BaseMockitoUnitTest {
                 });
 
         // 调用
-        chatStreamTool.handleTask(RECORD_ID, buildTaskFields());
+        sessionStreamTool.handleTask(RECORD_ID, buildTaskFields());
 
         // 断言：生成在任务租户下执行，结束后恢复；回填完成状态并刷新对话
         assertEquals(TENANT_ID, tenantIdInGenerate.get());
         assertNull(TenantContextHolder.getTenantId());
-        ArgumentCaptor<Ai1MessageDO> messageCaptor = ArgumentCaptor.forClass(Ai1MessageDO.class);
-        verify(messageService).updateMessage(messageCaptor.capture());
+        ArgumentCaptor<Ai1SessionMessageDO> messageCaptor = ArgumentCaptor.forClass(Ai1SessionMessageDO.class);
+        verify(sessionMessageService).updateSessionMessage(messageCaptor.capture());
         assertEquals(MESSAGE_ID, messageCaptor.getValue().getId());
         assertEquals("您好", messageCaptor.getValue().getContent());
         assertNull(messageCaptor.getValue().getReasoning());
-        assertEquals(Ai1MessageStatusEnum.SUCCESS.getStatus(), messageCaptor.getValue().getStatus());
+        assertEquals(Ai1SessionMessageStatusEnum.SUCCESS.getStatus(), messageCaptor.getValue().getStatus());
         verify(sessionService).touchSession(SESSION_ID);
         assertEquals(List.of("message", "done"), captureResultTypes());
     }
@@ -159,12 +159,12 @@ public class Ai1ChatStreamToolTest extends BaseMockitoUnitTest {
         when(agentService.validateAgentExists(AGENT_ID)).thenThrow(new IllegalStateException("Agent 不存在"));
 
         // 调用
-        chatStreamTool.handleTask(RECORD_ID, buildTaskFields());
+        sessionStreamTool.handleTask(RECORD_ID, buildTaskFields());
 
         // 断言：回填失败状态，写 error + done 终态
-        ArgumentCaptor<Ai1MessageDO> messageCaptor = ArgumentCaptor.forClass(Ai1MessageDO.class);
-        verify(messageService).updateMessage(messageCaptor.capture());
-        assertEquals(Ai1MessageStatusEnum.FAILED.getStatus(), messageCaptor.getValue().getStatus());
+        ArgumentCaptor<Ai1SessionMessageDO> messageCaptor = ArgumentCaptor.forClass(Ai1SessionMessageDO.class);
+        verify(sessionMessageService).updateSessionMessage(messageCaptor.capture());
+        assertEquals(Ai1SessionMessageStatusEnum.FAILED.getStatus(), messageCaptor.getValue().getStatus());
         assertEquals(List.of("error", "done"), captureResultTypes());
     }
 

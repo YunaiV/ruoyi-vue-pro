@@ -67,6 +67,6 @@ public interface Ai1ErrorCodeConstants {
     ErrorCode SESSION_NOT_EXISTS = new ErrorCode(1_041_008_000, "对话不存在");
 
     // ========== 消息 1-041-009-000 ==========
-    ErrorCode MESSAGE_NOT_EXISTS = new ErrorCode(1_041_009_000, "消息不存在");
+    ErrorCode SESSION_MESSAGE_NOT_EXISTS = new ErrorCode(1_041_009_000, "消息不存在");
 
 }

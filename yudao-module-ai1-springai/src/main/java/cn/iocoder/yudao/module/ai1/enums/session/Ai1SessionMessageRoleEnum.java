@@ -11,7 +11,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public enum Ai1MessageRoleEnum {
+public enum Ai1SessionMessageRoleEnum {
 
     USER("user", "用户"),
     ASSISTANT("assistant", "助手");

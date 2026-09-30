@@ -20,7 +20,7 @@ public class YudaoAi1Properties {
     /**
      * 对话流
      */
-    private Chat chat = new Chat();
+    private Session session = new Session();
 
     /**
      * SKILL 技能
@@ -58,7 +58,7 @@ public class YudaoAi1Properties {
     }
 
     @Data
-    public static class Chat {
+    public static class Session {
 
         /**
          * 默认系统指令中的 Agent 名称占位符

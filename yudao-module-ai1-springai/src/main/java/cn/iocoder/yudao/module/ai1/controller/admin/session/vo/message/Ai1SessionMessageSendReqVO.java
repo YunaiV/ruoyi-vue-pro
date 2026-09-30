@@ -7,7 +7,7 @@ import lombok.Data;
 
 @Schema(description = "管理后台 - AI1 对话消息发送 Request VO")
 @Data
-public class Ai1MessageSendReqVO {
+public class Ai1SessionMessageSendReqVO {
 
     @Schema(description = "对话编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     @NotNull(message = "对话编号不能为空")

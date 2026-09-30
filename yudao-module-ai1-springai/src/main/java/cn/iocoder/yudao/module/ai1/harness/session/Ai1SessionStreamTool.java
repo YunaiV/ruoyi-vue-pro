@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai1.harness.chat;
+package cn.iocoder.yudao.module.ai1.harness.session;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
@@ -12,16 +12,16 @@ import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.agent.Ai1AgentDO;
-import cn.iocoder.yudao.module.ai1.dal.dataobject.session.Ai1MessageDO;
+import cn.iocoder.yudao.module.ai1.dal.dataobject.session.Ai1SessionMessageDO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.knowledge.Ai1KnowledgeBaseDO;
-import cn.iocoder.yudao.module.ai1.enums.session.Ai1MessageRoleEnum;
-import cn.iocoder.yudao.module.ai1.enums.session.Ai1MessageStatusEnum;
+import cn.iocoder.yudao.module.ai1.enums.session.Ai1SessionMessageRoleEnum;
+import cn.iocoder.yudao.module.ai1.enums.session.Ai1SessionMessageStatusEnum;
 import cn.iocoder.yudao.module.ai1.enums.model.Ai1ModelTypeEnum;
 import cn.iocoder.yudao.module.ai1.framework.ai.config.YudaoAi1Properties;
 import cn.iocoder.yudao.module.ai1.harness.skill.Ai1SkillToolFactory;
 import cn.iocoder.yudao.module.ai1.service.agent.Ai1AgentService;
 import cn.iocoder.yudao.module.ai1.service.session.Ai1SessionService;
-import cn.iocoder.yudao.module.ai1.service.session.Ai1MessageService;
+import cn.iocoder.yudao.module.ai1.service.session.Ai1SessionMessageService;
 import cn.iocoder.yudao.module.ai1.service.knowledge.Ai1KnowledgeBaseService;
 import cn.iocoder.yudao.module.ai1.service.model.Ai1ModelService;
 import cn.iocoder.yudao.module.ai1.service.model.bo.Ai1ModelRespBO;
@@ -57,7 +57,7 @@ import static cn.iocoder.yudao.module.ai1.enums.Ai1ErrorCodeConstants.MODEL_TYPE
  * AI1 对话流工具：对话流的「投递 / 续传入口 + 生成 worker + 结果流 + SSE 转发」一体
  *
  * 【完整流程】
- * 1. 发送（请求侧，由 Ai1MessageService 调用）：{@link #submit} 投递任务（XADD 任务队列）→ {@link #open} 打开 SSE 连接
+ * 1. 发送（请求侧，由 Ai1SessionMessageService 调用）：{@link #submit} 投递任务（XADD 任务队列）→ {@link #open} 打开 SSE 连接
  * 2. 生成（worker 侧，{@link #start} 拉起的消费线程）：{@link #consumeLoop} → {@link #handleTask} → {@link #generate}；
  *    增量写入结果流，结束后回填助手消息并 XACK
  * 3. 下发与续传（连接侧）：{@link #streamResult} 从结果流 XREAD 转发为 SSE；携带 lastEventId 时从断点之后重放，不重新生成
@@ -75,7 +75,7 @@ import static cn.iocoder.yudao.module.ai1.enums.Ai1ErrorCodeConstants.MODEL_TYPE
  */
 @Component
 @Slf4j
-public class Ai1ChatStreamTool implements SmartLifecycle {
+public class Ai1SessionStreamTool implements SmartLifecycle {
 
     /**
      * 事件：结果流标识（连接建立即下发，data 为助手消息编号）
@@ -105,11 +105,11 @@ public class Ai1ChatStreamTool implements SmartLifecycle {
     /**
      * SSE 转发线程名前缀
      */
-    private static final String SSE_THREAD_NAME_PREFIX = "ai1-chat-sse-";
+    private static final String SSE_THREAD_NAME_PREFIX = "ai1-session-sse-";
     /**
      * 生成 worker 线程名前缀，完整线程名为「前缀 + 消费者名」
      */
-    private static final String WORKER_THREAD_NAME_PREFIX = "ai1-chat-";
+    private static final String WORKER_THREAD_NAME_PREFIX = "ai1-session-";
 
     /**
      * 任务队列最大长度（近似裁剪）
@@ -167,7 +167,7 @@ public class Ai1ChatStreamTool implements SmartLifecycle {
 
     @Resource
     @Lazy // 延迟加载，避免循环依赖
-    private Ai1MessageService messageService;
+    private Ai1SessionMessageService sessionMessageService;
     @Resource
     @Lazy // 延迟加载，避免循环依赖
     private Ai1SessionService sessionService;
@@ -222,7 +222,7 @@ public class Ai1ChatStreamTool implements SmartLifecycle {
         // 使用 SynchronousQueue（队列容量为 0）：否则线程池在队列未满前不会扩容到 maxPoolSize，且长连接排队同样不可接受；
         // 并发已满时直接拒绝（AbortPolicy），由 open 返回“服务繁忙”
         // 使用 Hutool ExecutorBuilder 构建线程池
-        int maxConnections = ai1Properties.getChat().getSse().getMaxConnections();
+        int maxConnections = ai1Properties.getSession().getSse().getMaxConnections();
         // 线程名前缀见 SSE_THREAD_NAME_PREFIX
         sseExecutor = ExecutorBuilder.create()
                 .setCorePoolSize(Math.max(1, maxConnections / 8)).setMaxPoolSize(maxConnections)
@@ -235,7 +235,7 @@ public class Ai1ChatStreamTool implements SmartLifecycle {
 
         // 3. 拉起 worker 消费线程，消费者名按「实例 + 序号」隔离
         running = true;
-        int workerCount = ai1Properties.getChat().getWorker().getCount();
+        int workerCount = ai1Properties.getSession().getWorker().getCount();
         for (int i = 0; i < workerCount; i++) {
             String consumer = "worker-" + instanceId + "-" + i;
             Thread thread = ThreadUtil.newThread(() -> consumeLoop(consumer), WORKER_THREAD_NAME_PREFIX + consumer, true);
@@ -275,7 +275,7 @@ public class Ai1ChatStreamTool implements SmartLifecycle {
      */
     private void initTaskGroup() {
         try {
-            getTaskStream().createGroup(StreamCreateGroupArgs.name(CHAT_TASK_GROUP).id(StreamMessageId.ALL).makeStream());
+            getTaskStream().createGroup(StreamCreateGroupArgs.name(SESSION_TASK_GROUP).id(StreamMessageId.ALL).makeStream());
         } catch (Exception e) {
             if (!isBusyGroup(e)) {
                 log.warn("[initTaskGroup][Chat 任务消费组初始化失败]", e);
@@ -329,7 +329,7 @@ public class Ai1ChatStreamTool implements SmartLifecycle {
      * @return SSE 连接
      */
     public SseEmitter open(Long messageId, String lastEventId) {
-        SseEmitter emitter = new SseEmitter(ai1Properties.getChat().getStream().getTimeoutMs());
+        SseEmitter emitter = new SseEmitter(ai1Properties.getSession().getStream().getTimeoutMs());
         try {
             sseExecutor.execute(() -> {
                 try {
@@ -354,7 +354,7 @@ public class Ai1ChatStreamTool implements SmartLifecycle {
      * @return SSE 连接
      */
     public SseEmitter error(String message) {
-        SseEmitter emitter = new SseEmitter(ai1Properties.getChat().getStream().getTimeoutMs());
+        SseEmitter emitter = new SseEmitter(ai1Properties.getSession().getStream().getTimeoutMs());
         sendErrorAndComplete(emitter, message);
         return emitter;
     }
@@ -376,7 +376,7 @@ public class Ai1ChatStreamTool implements SmartLifecycle {
                 }
 
                 // 2. 阻塞读取从未投递过的新任务，每次一条，处理完再读取下一条
-                Map<StreamMessageId, Map<String, String>> records = getTaskStream().readGroup(CHAT_TASK_GROUP, consumer,
+                Map<StreamMessageId, Map<String, String>> records = getTaskStream().readGroup(SESSION_TASK_GROUP, consumer,
                         StreamReadGroupArgs.neverDelivered().count(1).timeout(Duration.ofMillis(READ_BLOCK_MILLIS)));
                 if (records != null) {
                     records.forEach(this::handleTask);
@@ -396,11 +396,11 @@ public class Ai1ChatStreamTool implements SmartLifecycle {
      * 认领长时间未确认的任务（worker 宕机后由其他节点接管）；空闲阈值为生成最长时长 + 缓冲时长，不会误抢在途任务
      */
     private Map<StreamMessageId, Map<String, String>> reclaimTasks(String consumer) {
-        Duration minIdle = Duration.ofMillis(ai1Properties.getChat().getStream().getTimeoutMs() + RECLAIM_IDLE_BUFFER_MILLIS);
+        Duration minIdle = Duration.ofMillis(ai1Properties.getSession().getStream().getTimeoutMs() + RECLAIM_IDLE_BUFFER_MILLIS);
         try {
             // 1. 查询空闲超过阈值的待确认任务
             RStream<String, String> taskStream = getTaskStream();
-            List<PendingEntry> pendingEntries = taskStream.listPending(StreamPendingRangeArgs.groupName(CHAT_TASK_GROUP)
+            List<PendingEntry> pendingEntries = taskStream.listPending(StreamPendingRangeArgs.groupName(SESSION_TASK_GROUP)
                     .startId(StreamMessageId.MIN).endId(StreamMessageId.MAX).count(RECLAIM_BATCH_SIZE).idleTime(minIdle));
             if (CollUtil.isEmpty(pendingEntries)) {
                 return Collections.emptyMap();
@@ -408,7 +408,7 @@ public class Ai1ChatStreamTool implements SmartLifecycle {
 
             // 2. 认领到当前消费者：认领时再次校验空闲时长，避免与其他节点重复认领
             StreamMessageId[] ids = pendingEntries.stream().map(PendingEntry::getId).toArray(StreamMessageId[]::new);
-            return taskStream.claim(CHAT_TASK_GROUP, consumer, minIdle.toMillis(), TimeUnit.MILLISECONDS, ids);
+            return taskStream.claim(SESSION_TASK_GROUP, consumer, minIdle.toMillis(), TimeUnit.MILLISECONDS, ids);
         } catch (Exception e) {
             log.warn("[reclaimTasks][Chat 任务认领失败]", e);
             return Collections.emptyMap();
@@ -446,13 +446,13 @@ public class Ai1ChatStreamTool implements SmartLifecycle {
         Runnable task = () -> {
             try {
                 Ai1LlmChatTool.ChatText chatText = generate(messageId, agentId, sessionId, content, onThinking, onContent);
-                saveAssistantMessage(messageId, sessionId, chatText, Ai1MessageStatusEnum.SUCCESS.getStatus());
+                saveAssistantMessage(messageId, sessionId, chatText, Ai1SessionMessageStatusEnum.SUCCESS.getStatus());
             } catch (Exception e) {
                 log.warn("[handleTask][助手消息({}) 生成失败]", messageId, e);
                 appendResult(messageId, EVENT_ERROR, StrUtil.blankToDefault(e.getMessage(), "生成失败"));
                 // 失败时回填已生成的部分内容，避免产出丢失
                 saveAssistantMessage(messageId, sessionId, new Ai1LlmChatTool.ChatText(contentText.toString(),
-                        thinkingText.toString()), Ai1MessageStatusEnum.FAILED.getStatus());
+                        thinkingText.toString()), Ai1SessionMessageStatusEnum.FAILED.getStatus());
             }
         };
         try {
@@ -467,7 +467,7 @@ public class Ai1ChatStreamTool implements SmartLifecycle {
     }
 
     private void ackTask(StreamMessageId recordId) {
-        getTaskStream().ack(CHAT_TASK_GROUP, recordId);
+        getTaskStream().ack(SESSION_TASK_GROUP, recordId);
     }
 
     // ==================== 生成编排 ====================
@@ -489,28 +489,28 @@ public class Ai1ChatStreamTool implements SmartLifecycle {
 
         // 2. 历史消息：按编号倒序取最近 N 条，再升序还原为对话顺序
         // TODO @芋艿：【优化点】截取历史的 limit 会导致 prompt cache 频繁失效。后续需要改成 prompt 压缩
-        List<Ai1MessageDO> recentMessages = new ArrayList<>(messageService.getMessageListBySessionIdAndIdLessThan(
-                sessionId, messageId, ai1Properties.getChat().getHistory().getLimit()));
-        recentMessages.sort(Comparator.comparing(Ai1MessageDO::getId));
+        List<Ai1SessionMessageDO> recentMessages = new ArrayList<>(sessionMessageService.getSessionMessageListBySessionIdAndIdLessThan(
+                sessionId, messageId, ai1Properties.getSession().getHistory().getLimit()));
+        recentMessages.sort(Comparator.comparing(Ai1SessionMessageDO::getId));
         List<String[]> histories = new ArrayList<>();
-        for (Ai1MessageDO message : recentMessages) {
+        for (Ai1SessionMessageDO message : recentMessages) {
             // 跳过未完成的助手占位（如异常残留），避免把半截回复带入上下文
-            if (Ai1MessageRoleEnum.isAssistant(message.getRole())
-                    && Ai1MessageStatusEnum.isGenerating(message.getStatus())) {
+            if (Ai1SessionMessageRoleEnum.isAssistant(message.getRole())
+                    && Ai1SessionMessageStatusEnum.isGenerating(message.getStatus())) {
                 continue;
             }
             histories.add(new String[]{message.getRole(), message.getContent()});
         }
         // 末尾为本次刚落库的当前提问，移除以免重复注入
         String[] lastHistory = CollUtil.getLast(histories);
-        if (lastHistory != null && Ai1MessageRoleEnum.isUser(lastHistory[0])) {
+        if (lastHistory != null && Ai1SessionMessageRoleEnum.isUser(lastHistory[0])) {
             histories.remove(histories.size() - 1);
         }
 
         // 3. 系统指令：未配置时使用默认引导文案
         String systemPrompt = StrUtil.isNotBlank(agent.getSystemPrompt()) ? agent.getSystemPrompt().trim()
-                : StrUtil.replace(ai1Properties.getChat().getDefaultSystemPrompt(),
-                YudaoAi1Properties.Chat.AGENT_NAME_PLACEHOLDER, agent.getName());
+                : StrUtil.replace(ai1Properties.getSession().getDefaultSystemPrompt(),
+                YudaoAi1Properties.Session.AGENT_NAME_PLACEHOLDER, agent.getName());
 
         // 4. 工具（MCP + SKILL）与 RAG Advisor；知识库不可用时降级跳过，并把提示写入思考流
         List<Object> tools = new ArrayList<>(mcpToolFactory.buildTools(agent));
@@ -544,7 +544,7 @@ public class Ai1ChatStreamTool implements SmartLifecycle {
      * 回填助手消息（占位记录）的内容、思考过程与生成状态，并刷新对话活跃时间
      */
     private void saveAssistantMessage(Long messageId, Long sessionId, Ai1LlmChatTool.ChatText chatText, Integer status) {
-        messageService.updateMessage(new Ai1MessageDO().setId(messageId)
+        sessionMessageService.updateSessionMessage(new Ai1SessionMessageDO().setId(messageId)
                 .setContent(StrUtil.nullToEmpty(chatText.getContent()))
                 .setReasoning(StrUtil.emptyToNull(chatText.getThinking()))
                 .setStatus(status));
@@ -562,7 +562,7 @@ public class Ai1ChatStreamTool implements SmartLifecycle {
         resultStream.add(StreamAddArgs.entries(FIELD_TYPE, type, FIELD_DATA, StrUtil.nullToEmpty(data)));
 
         // 2. 终态：续期一次完整 TTL，保证续传时间窗从结束时刻起算，并清理节流状态
-        Duration ttl = Duration.ofSeconds(ai1Properties.getChat().getStream().getTtlSeconds());
+        Duration ttl = Duration.ofSeconds(ai1Properties.getSession().getStream().getTtlSeconds());
         if (EVENT_DONE.equals(type) || EVENT_ERROR.equals(type)) {
             resultStream.expire(ttl);
             resultExpireTimes.remove(messageId);
@@ -593,7 +593,7 @@ public class Ai1ChatStreamTool implements SmartLifecycle {
 
         // 2. 先下发 stream 事件，告知前端结果流标识（助手消息编号），用于断线续传
         StreamMessageId fromId = parseStreamMessageId(lastEventId);
-        long deadline = System.currentTimeMillis() + ai1Properties.getChat().getStream().getTimeoutMs();
+        long deadline = System.currentTimeMillis() + ai1Properties.getSession().getStream().getTimeoutMs();
         int errorCount = 0;
         sendEvent(emitter, EVENT_STREAM, String.valueOf(messageId), null, cancelled);
 
@@ -665,11 +665,11 @@ public class Ai1ChatStreamTool implements SmartLifecycle {
     // ==================== 通用方法 ====================
 
     private RStream<String, String> getTaskStream() {
-        return redissonClient.getStream(CHAT_TASK_STREAM, StringCodec.INSTANCE);
+        return redissonClient.getStream(SESSION_TASK_STREAM, StringCodec.INSTANCE);
     }
 
     private RStream<String, String> getResultStream(Long messageId) {
-        return redissonClient.getStream(String.format(CHAT_RESULT_STREAM, messageId), StringCodec.INSTANCE);
+        return redissonClient.getStream(String.format(SESSION_RESULT_STREAM, messageId), StringCodec.INSTANCE);
     }
 
     /**

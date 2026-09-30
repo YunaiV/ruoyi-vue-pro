@@ -38,7 +38,7 @@ public class Ai1SessionServiceImplTest extends BaseDbUnitTest {
     @MockitoBean
     private Ai1AgentService agentService;
     @MockitoBean
-    private Ai1MessageService messageService;
+    private Ai1SessionMessageService sessionMessageService;
 
     @Test
     public void testCreateSessionMy_success() {
@@ -71,7 +71,7 @@ public class Ai1SessionServiceImplTest extends BaseDbUnitTest {
         // 调用，并断言异常
         assertServiceException(() -> sessionService.deleteSessionMy(200L, id), SESSION_NOT_EXISTS);
         assertNotNull(sessionMapper.selectById(id));
-        verifyNoInteractions(messageService);
+        verifyNoInteractions(sessionMessageService);
     }
 
     @Test
@@ -84,7 +84,7 @@ public class Ai1SessionServiceImplTest extends BaseDbUnitTest {
 
         // 断言：连带删除消息
         assertNull(sessionMapper.selectById(id));
-        verify(messageService).deleteMessageListBySessionIds(Collections.singletonList(id));
+        verify(sessionMessageService).deleteSessionMessageListBySessionIds(Collections.singletonList(id));
     }
 
     @Test

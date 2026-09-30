@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.ai1.dal.dataobject.session;
 
 import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
-import cn.iocoder.yudao.module.ai1.enums.session.Ai1MessageRoleEnum;
-import cn.iocoder.yudao.module.ai1.enums.session.Ai1MessageStatusEnum;
+import cn.iocoder.yudao.module.ai1.enums.session.Ai1SessionMessageRoleEnum;
+import cn.iocoder.yudao.module.ai1.enums.session.Ai1SessionMessageStatusEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -15,15 +15,15 @@ import lombok.*;
  *
  * @author 芋道源码
  */
-@TableName("ai1_message")
-@KeySequence("ai1_message_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+@TableName("ai1_session_message")
+@KeySequence("ai1_session_message_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Ai1MessageDO extends TenantBaseDO {
+public class Ai1SessionMessageDO extends TenantBaseDO {
 
     /**
      * 编号
@@ -39,7 +39,7 @@ public class Ai1MessageDO extends TenantBaseDO {
     /**
      * 角色
      *
-     * 枚举 {@link Ai1MessageRoleEnum}
+     * 枚举 {@link Ai1SessionMessageRoleEnum}
      */
     private String role;
     /**
@@ -53,7 +53,7 @@ public class Ai1MessageDO extends TenantBaseDO {
     /**
      * 生成状态
      *
-     * 枚举 {@link Ai1MessageStatusEnum}
+     * 枚举 {@link Ai1SessionMessageStatusEnum}
      */
     private Integer status;
 
