@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai1.dal.dataobject.chat;
+package cn.iocoder.yudao.module.ai1.dal.dataobject.session;
 
 import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.agent.Ai1AgentDO;
@@ -14,15 +14,15 @@ import lombok.*;
  *
  * @author 芋道源码
  */
-@TableName("ai1_chat_conversation")
-@KeySequence("ai1_chat_conversation_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+@TableName("ai1_session")
+@KeySequence("ai1_session_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Ai1ChatConversationDO extends TenantBaseDO {
+public class Ai1SessionDO extends TenantBaseDO {
 
     /**
      * 默认标题：首条消息发送后，自动替换为提问内容

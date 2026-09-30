@@ -7,11 +7,12 @@ package cn.iocoder.yudao.module.ai1.dal.redis;
  */
 public interface Ai1RedisKeyConstants {
 
+    // TODO @AI：tenantId 不用把？
     /**
      * 对话生成任务队列
      * <p>
      * KEY 格式：ai1:chat:tasks
-     * VALUE 数据类型：Stream 生成任务，字段为 tenantId、messageId、agentId、conversationId、content
+     * VALUE 数据类型：Stream 生成任务，字段为 tenantId、messageId、agentId、sessionId、content
      */
     String CHAT_TASK_STREAM = "ai1:chat:tasks";
 

@@ -50,7 +50,7 @@ public class Ai1LlmModelFactory {
     private static final String KEY_SEPARATOR = ":";
 
     /**
-     * 对话模型缓存：providerId:modelId:conversationKey → ChatModel
+     * 对话模型缓存：providerId:modelId:sessionKey → ChatModel
      */
     private final Cache<String, OpenAiChatModel> chatModelCache = CacheBuilder.newBuilder().maximumSize(CACHE_MAX).build();
     /**
@@ -62,11 +62,11 @@ public class Ai1LlmModelFactory {
      * 获取（或构建）对话模型，并包装为 ChatClient
      *
      * @param model        模型运行时快照
-     * @param conversationId 对话编号，用于替换附属 Header 中的 {session} 占位符，可为空
+     * @param sessionId 对话编号，用于替换附属 Header 中的 {session} 占位符，可为空
      * @return ChatClient
      */
-    public ChatClient buildChatClient(Ai1ModelRespBO model, Long conversationId) {
-        return ChatClient.builder(getOrCreateChatModel(model, conversationId)).build();
+    public ChatClient buildChatClient(Ai1ModelRespBO model, Long sessionId) {
+        return ChatClient.builder(getOrCreateChatModel(model, sessionId)).build();
     }
 
     /**
@@ -124,11 +124,11 @@ public class Ai1LlmModelFactory {
      * 仅当附属 Header 使用 {session} 占位符（需按对话隔离）时，才把对话编号纳入缓存 key；
      * 否则同一模型跨对话复用，避免每个对话都构建一个模型实例
      */
-    private OpenAiChatModel getOrCreateChatModel(Ai1ModelRespBO model, Long conversationId) {
+    private OpenAiChatModel getOrCreateChatModel(Ai1ModelRespBO model, Long sessionId) {
         // 1. 计算缓存 key：Header 含 {session} 占位符时按对话隔离，否则跨对话共享
-        String conversationKey = usesSessionHeader(model.getHeaders()) && conversationId != null
-                ? String.valueOf(conversationId) : "";
-        String cacheKey = buildCacheKey(model) + KEY_SEPARATOR + conversationKey;
+        String sessionKey = usesSessionHeader(model.getHeaders()) && sessionId != null
+                ? String.valueOf(sessionId) : "";
+        String cacheKey = buildCacheKey(model) + KEY_SEPARATOR + sessionKey;
 
         // 2. 命中缓存直接复用；未命中时按运行时快照构建 OpenAI 兼容对话模型并缓存
         return chatModelCache.asMap().computeIfAbsent(cacheKey, key -> {
@@ -136,7 +136,7 @@ public class Ai1LlmModelFactory {
                     .baseUrl(normalizeBaseUrl(model.getBaseUrl()))
                     .apiKey(model.getApiKey())
                     .model(model.getModel())
-                    .customHeaders(buildHeaders(model.getHeaders(), conversationId))
+                    .customHeaders(buildHeaders(model.getHeaders(), sessionId))
                     .build();
             log.debug("[getOrCreateChatModel][providerId({}) modelId({}) 对话模型构建完成]", model.getProviderId(), model.getModelId());
             return OpenAiChatModel.builder().options(options).build();
@@ -187,7 +187,7 @@ public class Ai1LlmModelFactory {
     /**
      * 构建请求 Header：{session} 占位符替换为对话编号；对话编号为空时，跳过带占位符的 Header
      */
-    private static Map<String, String> buildHeaders(List<Map<String, String>> headers, Long conversationId) {
+    private static Map<String, String> buildHeaders(List<Map<String, String>> headers, Long sessionId) {
         Map<String, String> result = new LinkedHashMap<>();
         if (CollUtil.isEmpty(headers)) {
             return result;
@@ -199,10 +199,10 @@ public class Ai1LlmModelFactory {
                 continue;
             }
             if (StrUtil.contains(value, SESSION_PLACEHOLDER)) {
-                if (conversationId == null) {
+                if (sessionId == null) {
                     continue;
                 }
-                value = value.replace(SESSION_PLACEHOLDER, String.valueOf(conversationId));
+                value = value.replace(SESSION_PLACEHOLDER, String.valueOf(sessionId));
             }
             result.put(key.trim(), StrUtil.nullToEmpty(value));
         }

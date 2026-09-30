@@ -1,10 +1,10 @@
 DELETE FROM "ai1_provider";
-DELETE FROM "ai1_provider_model";
+DELETE FROM "ai1_model";
 DELETE FROM "ai1_mcp";
 DELETE FROM "ai1_skill";
 DELETE FROM "ai1_skill_file";
 DELETE FROM "ai1_knowledge_base";
 DELETE FROM "ai1_knowledge_document";
 DELETE FROM "ai1_agent";
-DELETE FROM "ai1_chat_conversation";
-DELETE FROM "ai1_chat_message";
+DELETE FROM "ai1_session";
+DELETE FROM "ai1_message";

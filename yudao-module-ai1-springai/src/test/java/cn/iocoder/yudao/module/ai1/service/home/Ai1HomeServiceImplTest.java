@@ -5,14 +5,14 @@ import cn.iocoder.yudao.module.ai1.controller.admin.home.vo.Ai1HomeMessageSummar
 import cn.iocoder.yudao.module.ai1.controller.admin.home.vo.Ai1HomeMessageSummaryByDateRespVO;
 import cn.iocoder.yudao.module.ai1.controller.admin.home.vo.Ai1HomeSummaryRespVO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.agent.Ai1AgentDO;
-import cn.iocoder.yudao.module.ai1.dal.dataobject.chat.Ai1ChatConversationDO;
-import cn.iocoder.yudao.module.ai1.dal.dataobject.chat.Ai1ChatMessageDO;
+import cn.iocoder.yudao.module.ai1.dal.dataobject.session.Ai1SessionDO;
+import cn.iocoder.yudao.module.ai1.dal.dataobject.session.Ai1MessageDO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.mcp.Ai1McpDO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.model.Ai1ModelDO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.skill.Ai1SkillDO;
 import cn.iocoder.yudao.module.ai1.dal.mysql.agent.Ai1AgentMapper;
-import cn.iocoder.yudao.module.ai1.dal.mysql.chat.Ai1ChatConversationMapper;
-import cn.iocoder.yudao.module.ai1.dal.mysql.chat.Ai1ChatMessageMapper;
+import cn.iocoder.yudao.module.ai1.dal.mysql.session.Ai1SessionMapper;
+import cn.iocoder.yudao.module.ai1.dal.mysql.session.Ai1MessageMapper;
 import cn.iocoder.yudao.module.ai1.dal.mysql.home.Ai1HomeMapper;
 import cn.iocoder.yudao.module.ai1.dal.mysql.mcp.Ai1McpMapper;
 import cn.iocoder.yudao.module.ai1.dal.mysql.model.Ai1ModelMapper;
@@ -54,9 +54,9 @@ public class Ai1HomeServiceImplTest extends BaseDbUnitTest {
     @Resource
     private Ai1ModelMapper modelMapper;
     @Resource
-    private Ai1ChatConversationMapper conversationMapper;
+    private Ai1SessionMapper sessionMapper;
     @Resource
-    private Ai1ChatMessageMapper messageMapper;
+    private Ai1MessageMapper messageMapper;
 
     @Test
     public void testGetSummary() {
@@ -86,12 +86,12 @@ public class Ai1HomeServiceImplTest extends BaseDbUnitTest {
     public void testGetMessageSummaryByDate() {
         // mock 数据：今天 2 条、前天 1 条、区间外（8 天前）1 条、今天已删除 1 条
         LocalDateTime now = LocalDateTime.now();
-        Long conversationId = insertConversation(1L);
-        insertMessage(conversationId, now);
-        insertMessage(conversationId, now);
-        insertMessage(conversationId, now.minusDays(2));
-        insertMessage(conversationId, now.minusDays(8));
-        Long deletedMessageId = insertMessage(conversationId, now);
+        Long sessionId = insertSession(1L);
+        insertMessage(sessionId, now);
+        insertMessage(sessionId, now);
+        insertMessage(sessionId, now.minusDays(2));
+        insertMessage(sessionId, now.minusDays(8));
+        Long deletedMessageId = insertMessage(sessionId, now);
         messageMapper.deleteById(deletedMessageId);
 
         // 调用：近 7 天
@@ -120,18 +120,18 @@ public class Ai1HomeServiceImplTest extends BaseDbUnitTest {
     public void testGetMessageSummaryByAgent() {
         // mock 数据：Agent 1 有 3 条、Agent 2 有 1 条、区间外 1 条（Agent 2）、已删除对话下 5 条（Agent 3）
         LocalDateTime now = LocalDateTime.now();
-        Long conversation1 = insertConversation(1L);
-        Long conversation2 = insertConversation(2L);
-        Long deletedConversation = insertConversation(3L);
-        insertMessage(conversation1, now);
-        insertMessage(conversation1, now.minusDays(1));
-        insertMessage(conversation1, now.minusDays(3));
-        insertMessage(conversation2, now);
-        insertMessage(conversation2, now.minusDays(10));
+        Long session1 = insertSession(1L);
+        Long session2 = insertSession(2L);
+        Long deletedSession = insertSession(3L);
+        insertMessage(session1, now);
+        insertMessage(session1, now.minusDays(1));
+        insertMessage(session1, now.minusDays(3));
+        insertMessage(session2, now);
+        insertMessage(session2, now.minusDays(10));
         for (int i = 0; i < 5; i++) {
-            insertMessage(deletedConversation, now);
+            insertMessage(deletedSession, now);
         }
-        conversationMapper.deleteById(deletedConversation);
+        sessionMapper.deleteById(deletedSession);
 
         // 调用：近 7 天
         List<Ai1HomeMessageSummaryByAgentRespVO> list = homeService.getMessageSummaryByAgent(7);
@@ -153,15 +153,15 @@ public class Ai1HomeServiceImplTest extends BaseDbUnitTest {
         });
     }
 
-    private Long insertConversation(Long agentId) {
-        Ai1ChatConversationDO conversation = randomPojo(Ai1ChatConversationDO.class, o -> o.setAgentId(agentId));
-        conversationMapper.insert(conversation);
-        return conversation.getId();
+    private Long insertSession(Long agentId) {
+        Ai1SessionDO session = randomPojo(Ai1SessionDO.class, o -> o.setAgentId(agentId));
+        sessionMapper.insert(session);
+        return session.getId();
     }
 
-    private Long insertMessage(Long conversationId, LocalDateTime createTime) {
-        Ai1ChatMessageDO message = randomPojo(Ai1ChatMessageDO.class, o -> {
-            o.setConversationId(conversationId).setRole("user").setStatus(1);
+    private Long insertMessage(Long sessionId, LocalDateTime createTime) {
+        Ai1MessageDO message = randomPojo(Ai1MessageDO.class, o -> {
+            o.setSessionId(sessionId).setRole("user").setStatus(1);
             o.setCreateTime(createTime);
         });
         messageMapper.insert(message);

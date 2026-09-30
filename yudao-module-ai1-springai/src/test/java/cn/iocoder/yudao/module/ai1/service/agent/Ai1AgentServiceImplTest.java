@@ -7,7 +7,7 @@ import cn.iocoder.yudao.module.ai1.dal.dataobject.agent.Ai1AgentDO;
 import cn.iocoder.yudao.module.ai1.dal.mysql.agent.Ai1AgentMapper;
 import cn.iocoder.yudao.module.ai1.enums.model.Ai1ModelTypeEnum;
 import cn.iocoder.yudao.module.ai1.harness.skill.Ai1SkillToolFactory;
-import cn.iocoder.yudao.module.ai1.service.chat.Ai1ChatConversationService;
+import cn.iocoder.yudao.module.ai1.service.session.Ai1SessionService;
 import cn.iocoder.yudao.module.ai1.service.model.Ai1ModelService;
 import cn.iocoder.yudao.module.ai1.service.model.bo.Ai1ModelRespBO;
 import jakarta.annotation.Resource;
@@ -43,7 +43,7 @@ public class Ai1AgentServiceImplTest extends BaseDbUnitTest {
     @MockitoBean
     private Ai1ModelService modelService;
     @MockitoBean
-    private Ai1ChatConversationService chatConversationService;
+    private Ai1SessionService sessionService;
     @MockitoBean
     private Ai1SkillToolFactory skillToolFactory;
 
@@ -137,7 +137,7 @@ public class Ai1AgentServiceImplTest extends BaseDbUnitTest {
 
         // 断言：删除 Agent，级联删除对话，并清理 SKILL 沙箱
         assertNull(agentMapper.selectById(id));
-        verify(chatConversationService).deleteChatConversationListByAgentIds(Collections.singletonList(id));
+        verify(sessionService).deleteSessionListByAgentIds(Collections.singletonList(id));
         verify(skillToolFactory).evict(id);
     }
 

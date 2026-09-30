@@ -2,8 +2,7 @@ package cn.iocoder.yudao.module.ai1.harness.llm;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.module.ai1.enums.chat.Ai1ChatMessageRoleEnum;
-import cn.iocoder.yudao.module.ai1.harness.llm.Ai1LlmModelFactory;
+import cn.iocoder.yudao.module.ai1.enums.session.Ai1MessageRoleEnum;
 import cn.iocoder.yudao.module.ai1.service.model.bo.Ai1ModelRespBO;
 import jakarta.annotation.Resource;
 import lombok.AllArgsConstructor;
@@ -50,16 +49,16 @@ public class Ai1LlmChatTool {
      * @param content        当前用户消息
      * @param tools          工具（ToolCallback 或 @Tool 对象），可为空
      * @param advisors       对话 Advisor，可为空
-     * @param conversationId 对话编号，用于替换附属 Header 中的 {session} 占位符
+     * @param sessionId 对话编号，用于替换附属 Header 中的 {session} 占位符
      * @param onThinking     思考过程增量回调，可为空
      * @param onContent      回复内容增量回调，可为空
      * @return 完整回复（内容 + 思考过程）
      */
     public ChatText chat(Ai1ModelRespBO model, String systemPrompt, List<String[]> histories, String content,
-                         List<Object> tools, List<Advisor> advisors, Long conversationId,
+                         List<Object> tools, List<Advisor> advisors, Long sessionId,
                          Consumer<String> onThinking, Consumer<String> onContent) {
         // 1. 装配对话请求：消息（系统指令 + 历史 + 当前）+ 工具 + Advisor
-        ChatClient.ChatClientRequestSpec spec = llmModelFactory.buildChatClient(model, conversationId).prompt()
+        ChatClient.ChatClientRequestSpec spec = llmModelFactory.buildChatClient(model, sessionId).prompt()
                 .messages(buildMessages(systemPrompt, histories, content));
         if (CollUtil.isNotEmpty(tools)) {
             spec = spec.tools(tools.toArray());
@@ -111,9 +110,9 @@ public class Ai1LlmChatTool {
         if (CollUtil.isNotEmpty(histories)) {
             for (String[] history : histories) {
                 String text = StrUtil.nullToEmpty(history[1]);
-                if (Ai1ChatMessageRoleEnum.isUser(history[0])) {
+                if (Ai1MessageRoleEnum.isUser(history[0])) {
                     messages.add(new UserMessage(text));
-                } else if (Ai1ChatMessageRoleEnum.isAssistant(history[0])) {
+                } else if (Ai1MessageRoleEnum.isAssistant(history[0])) {
                     messages.add(new AssistantMessage(text));
                 }
             }

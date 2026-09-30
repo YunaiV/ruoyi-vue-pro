@@ -3,14 +3,14 @@ package cn.iocoder.yudao.module.ai1.harness.chat;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.agent.Ai1AgentDO;
-import cn.iocoder.yudao.module.ai1.dal.dataobject.chat.Ai1ChatMessageDO;
-import cn.iocoder.yudao.module.ai1.enums.chat.Ai1ChatMessageStatusEnum;
+import cn.iocoder.yudao.module.ai1.dal.dataobject.session.Ai1MessageDO;
+import cn.iocoder.yudao.module.ai1.enums.session.Ai1MessageStatusEnum;
 import cn.iocoder.yudao.module.ai1.enums.model.Ai1ModelTypeEnum;
 import cn.iocoder.yudao.module.ai1.framework.ai.config.YudaoAi1Properties;
 import cn.iocoder.yudao.module.ai1.harness.skill.Ai1SkillToolFactory;
 import cn.iocoder.yudao.module.ai1.service.agent.Ai1AgentService;
-import cn.iocoder.yudao.module.ai1.service.chat.Ai1ChatConversationService;
-import cn.iocoder.yudao.module.ai1.service.chat.Ai1ChatMessageService;
+import cn.iocoder.yudao.module.ai1.service.session.Ai1SessionService;
+import cn.iocoder.yudao.module.ai1.service.session.Ai1MessageService;
 import cn.iocoder.yudao.module.ai1.service.knowledge.Ai1KnowledgeBaseService;
 import cn.iocoder.yudao.module.ai1.service.model.Ai1ModelService;
 import cn.iocoder.yudao.module.ai1.service.model.bo.Ai1ModelRespBO;
@@ -50,7 +50,7 @@ public class Ai1ChatStreamToolTest extends BaseMockitoUnitTest {
     private static final Long TENANT_ID = 1L;
     private static final Long MESSAGE_ID = 1024L;
     private static final Long AGENT_ID = 1L;
-    private static final Long CONVERSATION_ID = 10L;
+    private static final Long SESSION_ID = 10L;
     private static final StreamMessageId RECORD_ID = new StreamMessageId(1, 0);
 
     @InjectMocks
@@ -66,9 +66,9 @@ public class Ai1ChatStreamToolTest extends BaseMockitoUnitTest {
     private YudaoAi1Properties ai1Properties = new YudaoAi1Properties();
 
     @Mock
-    private Ai1ChatMessageService chatMessageService;
+    private Ai1MessageService messageService;
     @Mock
-    private Ai1ChatConversationService chatConversationService;
+    private Ai1SessionService sessionService;
     @Mock
     private Ai1AgentService agentService;
     @Mock
@@ -99,9 +99,9 @@ public class Ai1ChatStreamToolTest extends BaseMockitoUnitTest {
             return new Ai1AgentDO().setId(AGENT_ID).setName("客服").setProviderId(1L).setModelId(2L);
         });
         when(modelService.getModelRespBO(1L, 2L)).thenReturn(new Ai1ModelRespBO().setModelType(Ai1ModelTypeEnum.CHAT.getType()));
-        when(chatMessageService.getChatMessageListByConversationIdAndIdLessThan(eq(CONVERSATION_ID), eq(MESSAGE_ID), anyInt()))
+        when(messageService.getMessageListBySessionIdAndIdLessThan(eq(SESSION_ID), eq(MESSAGE_ID), anyInt()))
                 .thenReturn(new ArrayList<>());
-        when(llmChatTool.chat(any(), eq("你是 客服 的智能助手。"), anyList(), eq("你好"), anyList(), anyList(), eq(CONVERSATION_ID), any(), any()))
+        when(llmChatTool.chat(any(), eq("你是 客服 的智能助手。"), anyList(), eq("你好"), anyList(), anyList(), eq(SESSION_ID), any(), any()))
                 .thenReturn(new Ai1LlmChatTool.ChatText("您好", ""));
         // 准备参数：关闭多租户时，任务不携带 tenantId
         Map<String, String> fields = buildTaskFields();
@@ -112,9 +112,9 @@ public class Ai1ChatStreamToolTest extends BaseMockitoUnitTest {
 
         // 断言：无租户上下文直接生成，回填完成状态，写 done 终态并确认
         assertNull(tenantIdInGenerate.get());
-        ArgumentCaptor<Ai1ChatMessageDO> messageCaptor = ArgumentCaptor.forClass(Ai1ChatMessageDO.class);
-        verify(chatMessageService).updateChatMessage(messageCaptor.capture());
-        assertEquals(Ai1ChatMessageStatusEnum.SUCCESS.getStatus(), messageCaptor.getValue().getStatus());
+        ArgumentCaptor<Ai1MessageDO> messageCaptor = ArgumentCaptor.forClass(Ai1MessageDO.class);
+        verify(messageService).updateMessage(messageCaptor.capture());
+        assertEquals(Ai1MessageStatusEnum.SUCCESS.getStatus(), messageCaptor.getValue().getStatus());
         assertEquals(List.of("done"), captureResultTypes());
         verify(taskStream).ack("ai1-chat-workers", RECORD_ID);
     }
@@ -128,9 +128,9 @@ public class Ai1ChatStreamToolTest extends BaseMockitoUnitTest {
             return new Ai1AgentDO().setId(AGENT_ID).setName("客服").setProviderId(1L).setModelId(2L);
         });
         when(modelService.getModelRespBO(1L, 2L)).thenReturn(new Ai1ModelRespBO().setModelType(Ai1ModelTypeEnum.CHAT.getType()));
-        when(chatMessageService.getChatMessageListByConversationIdAndIdLessThan(eq(CONVERSATION_ID), eq(MESSAGE_ID), anyInt()))
+        when(messageService.getMessageListBySessionIdAndIdLessThan(eq(SESSION_ID), eq(MESSAGE_ID), anyInt()))
                 .thenReturn(new ArrayList<>());
-        when(llmChatTool.chat(any(), anyString(), anyList(), eq("你好"), anyList(), anyList(), eq(CONVERSATION_ID), any(), any()))
+        when(llmChatTool.chat(any(), anyString(), anyList(), eq("你好"), anyList(), anyList(), eq(SESSION_ID), any(), any()))
                 .thenAnswer(invocation -> {
                     Consumer<String> onContent = invocation.getArgument(8);
                     onContent.accept("您好");
@@ -143,13 +143,13 @@ public class Ai1ChatStreamToolTest extends BaseMockitoUnitTest {
         // 断言：生成在任务租户下执行，结束后恢复；回填完成状态并刷新对话
         assertEquals(TENANT_ID, tenantIdInGenerate.get());
         assertNull(TenantContextHolder.getTenantId());
-        ArgumentCaptor<Ai1ChatMessageDO> messageCaptor = ArgumentCaptor.forClass(Ai1ChatMessageDO.class);
-        verify(chatMessageService).updateChatMessage(messageCaptor.capture());
+        ArgumentCaptor<Ai1MessageDO> messageCaptor = ArgumentCaptor.forClass(Ai1MessageDO.class);
+        verify(messageService).updateMessage(messageCaptor.capture());
         assertEquals(MESSAGE_ID, messageCaptor.getValue().getId());
         assertEquals("您好", messageCaptor.getValue().getContent());
         assertNull(messageCaptor.getValue().getReasoning());
-        assertEquals(Ai1ChatMessageStatusEnum.SUCCESS.getStatus(), messageCaptor.getValue().getStatus());
-        verify(chatConversationService).touchChatConversation(CONVERSATION_ID);
+        assertEquals(Ai1MessageStatusEnum.SUCCESS.getStatus(), messageCaptor.getValue().getStatus());
+        verify(sessionService).touchSession(SESSION_ID);
         assertEquals(List.of("message", "done"), captureResultTypes());
     }
 
@@ -162,9 +162,9 @@ public class Ai1ChatStreamToolTest extends BaseMockitoUnitTest {
         chatStreamTool.handleTask(RECORD_ID, buildTaskFields());
 
         // 断言：回填失败状态，写 error + done 终态
-        ArgumentCaptor<Ai1ChatMessageDO> messageCaptor = ArgumentCaptor.forClass(Ai1ChatMessageDO.class);
-        verify(chatMessageService).updateChatMessage(messageCaptor.capture());
-        assertEquals(Ai1ChatMessageStatusEnum.FAILED.getStatus(), messageCaptor.getValue().getStatus());
+        ArgumentCaptor<Ai1MessageDO> messageCaptor = ArgumentCaptor.forClass(Ai1MessageDO.class);
+        verify(messageService).updateMessage(messageCaptor.capture());
+        assertEquals(Ai1MessageStatusEnum.FAILED.getStatus(), messageCaptor.getValue().getStatus());
         assertEquals(List.of("error", "done"), captureResultTypes());
     }
 
@@ -175,7 +175,7 @@ public class Ai1ChatStreamToolTest extends BaseMockitoUnitTest {
         fields.put("tenantId", String.valueOf(TENANT_ID));
         fields.put("messageId", String.valueOf(MESSAGE_ID));
         fields.put("agentId", String.valueOf(AGENT_ID));
-        fields.put("conversationId", String.valueOf(CONVERSATION_ID));
+        fields.put("sessionId", String.valueOf(SESSION_ID));
         fields.put("content", "你好");
         return fields;
     }

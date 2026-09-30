@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.ai1.enums.chat;
+package cn.iocoder.yudao.module.ai1.enums.session;
 
 import cn.hutool.core.util.ObjUtil;
 import lombok.AllArgsConstructor;
@@ -11,7 +11,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public enum Ai1ChatMessageRoleEnum {
+public enum Ai1MessageRoleEnum {
 
     USER("user", "用户"),
     ASSISTANT("assistant", "助手");
