@@ -15,9 +15,11 @@ import org.springframework.ai.openai.OpenAiEmbeddingOptions;
 import org.springframework.stereotype.Component;
 
 import java.net.URI;
+import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 /**
@@ -44,6 +46,12 @@ public class Ai1LlmModelFactory {
      * 缓存上限，达到后逐出最久未访问的模型
      */
     private static final int CACHE_MAX = 128;
+
+    /**
+     * 缓存写入后的过期时间：修改 Provider / 模型时只能失效本节点，其他节点最迟在该时间后按新配置重建
+     */
+    private static final Duration CACHE_EXPIRE = Duration.ofMinutes(10);
+
     /**
      * 缓存 key 分隔符
      */
@@ -52,11 +60,13 @@ public class Ai1LlmModelFactory {
     /**
      * 对话模型缓存：providerId:modelId:sessionKey → ChatModel
      */
-    private final Cache<String, OpenAiChatModel> chatModelCache = CacheBuilder.newBuilder().maximumSize(CACHE_MAX).build();
+    private final Cache<String, OpenAiChatModel> chatModelCache = CacheBuilder.newBuilder()
+            .maximumSize(CACHE_MAX).expireAfterWrite(CACHE_EXPIRE).build();
     /**
      * 嵌入模型缓存：providerId:modelId → EmbeddingModel
      */
-    private final Cache<String, OpenAiEmbeddingModel> embeddingModelCache = CacheBuilder.newBuilder().maximumSize(CACHE_MAX).build();
+    private final Cache<String, OpenAiEmbeddingModel> embeddingModelCache = CacheBuilder.newBuilder()
+            .maximumSize(CACHE_MAX).expireAfterWrite(CACHE_EXPIRE).build();
 
     /**
      * 获取（或构建）对话模型，并包装为 ChatClient
@@ -144,13 +154,16 @@ public class Ai1LlmModelFactory {
     }
 
     /**
-     * 构建模型缓存 key：providerId:modelId
+     * 构建模型缓存 key：providerId:modelId:配置指纹
+     *
+     * 带上配置指纹：配置变化后新请求自然命中新 key；并发下按旧快照构建的实例只会写入旧 key，不会再被读到
      *
      * @param model 模型运行时快照
      * @return 缓存 key
      */
     private static String buildCacheKey(Ai1ModelRespBO model) {
-        return model.getProviderId() + KEY_SEPARATOR + model.getModelId();
+        return model.getProviderId() + KEY_SEPARATOR + model.getModelId() + KEY_SEPARATOR
+                + Objects.hash(model.getBaseUrl(), model.getApiKey(), model.getModel(), model.getModelType(), model.getHeaders());
     }
 
     /**

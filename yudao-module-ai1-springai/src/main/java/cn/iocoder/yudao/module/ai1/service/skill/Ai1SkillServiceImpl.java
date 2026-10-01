@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.ai1.controller.admin.skill.vo.skill.Ai1SkillPageR
 import cn.iocoder.yudao.module.ai1.controller.admin.skill.vo.skill.Ai1SkillSaveReqVO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.skill.Ai1SkillDO;
 import cn.iocoder.yudao.module.ai1.dal.mysql.skill.Ai1SkillMapper;
+import cn.iocoder.yudao.module.ai1.service.agent.Ai1AgentService;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -19,8 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.ai1.enums.Ai1ErrorCodeConstants.SKILL_NAME_DUPLICATE;
-import static cn.iocoder.yudao.module.ai1.enums.Ai1ErrorCodeConstants.SKILL_NOT_EXISTS;
+import static cn.iocoder.yudao.module.ai1.enums.Ai1ErrorCodeConstants.*;
 
 /**
  * AI1 SKILL Service 实现类
@@ -37,6 +37,9 @@ public class Ai1SkillServiceImpl implements Ai1SkillService {
     @Resource
     @Lazy // 延迟加载，避免循环依赖
     private Ai1SkillFileService skillFileService;
+    @Resource
+    @Lazy // 延迟加载，避免循环依赖
+    private Ai1AgentService agentService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -59,7 +62,7 @@ public class Ai1SkillServiceImpl implements Ai1SkillService {
         validateSkillExists(updateReqVO.getId());
         validateSkillNameUnique(updateReqVO.getId(), updateReqVO.getName());
 
-        // 2. 更新
+        // 2. 更新管理信息；SKILL.md 中面向模型的名称、描述由文件编辑器独立维护
         Ai1SkillDO updateObj = BeanUtils.toBean(updateReqVO, Ai1SkillDO.class);
         skillMapper.updateById(updateObj);
     }
@@ -73,8 +76,12 @@ public class Ai1SkillServiceImpl implements Ai1SkillService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteSkillListByIds(List<Long> ids) {
-        // 1. 校验存在
+        // 1.1 校验存在
         ids.forEach(this::validateSkillExists);
+        // 1.2 校验未被 Agent 绑定
+        if (agentService.getAgentCountBySkillIds(ids) > 0) {
+            throw exception(SKILL_USED_BY_AGENT);
+        }
 
         // 2. 删除 SKILL，并级联删除内容文件
         skillMapper.deleteByIds(ids);

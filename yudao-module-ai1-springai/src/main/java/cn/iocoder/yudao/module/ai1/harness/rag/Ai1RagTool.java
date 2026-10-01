@@ -35,6 +35,7 @@ import org.springframework.ai.vectorstore.milvus.MilvusVectorStore;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
@@ -85,6 +86,10 @@ public class Ai1RagTool {
      */
     private final Cache<Long, CachedVectorStore> vectorStoreCache = CacheBuilder.newBuilder()
             .maximumSize(CACHE_MAX).build();
+    /**
+     * 按知识库串行初始化的锁，避免并发首访重复创建集合和索引
+     */
+    private final Map<Long, Object> vectorStoreLocks = new ConcurrentHashMap<>();
     /**
      * Milvus 客户端：首次使用时创建，全局复用一个连接
      */
@@ -219,26 +224,33 @@ public class Ai1RagTool {
             return cached.getVectorStore();
         }
 
-        // 2.1 构建向量存储：集合不存在时自动创建
-        String collectionName = buildCollectionName(knowledgeBase.getId());
-        MilvusVectorStore vectorStore = MilvusVectorStore.builder(milvusClientLoader.get(), embeddingModel)
-                .databaseName(ai1Properties.getMilvus().getDatabase())
-                .collectionName(collectionName)
-                .metricType(MetricType.COSINE)
-                .indexType(IndexType.FLAT)
-                .initializeSchema(true)
-                .build();
-        // 2.2 手动构建的实例不会触发 Spring 生命周期回调，需主动初始化：建集合、建索引、加载
-        try {
-            vectorStore.afterPropertiesSet();
-        } catch (Exception e) {
-            throw new IllegalStateException("向量集合(" + collectionName + ") 初始化失败：" + e.getMessage(), e);
+        // 2. 缓存未命中或嵌入模型实例变化时，构建新的向量存储；按知识库串行初始化，避免并发首访重复创建集合和索引
+        synchronized (vectorStoreLocks.computeIfAbsent(knowledgeBase.getId(), key -> new Object())) {
+            cached = vectorStoreCache.getIfPresent(knowledgeBase.getId());
+            if (cached != null && cached.getEmbeddingModel() == embeddingModel) {
+                return cached.getVectorStore();
+            }
+            // 2.1 构建向量存储：集合不存在时自动创建
+            String collectionName = buildCollectionName(knowledgeBase.getId());
+            MilvusVectorStore vectorStore = MilvusVectorStore.builder(milvusClientLoader.get(), embeddingModel)
+                    .databaseName(ai1Properties.getMilvus().getDatabase())
+                    .collectionName(collectionName)
+                    .metricType(MetricType.COSINE)
+                    .indexType(IndexType.FLAT)
+                    .initializeSchema(true)
+                    .build();
+            // 2.2 手动构建的实例不会触发 Spring 生命周期回调，需主动初始化：建集合、建索引、加载
+            try {
+                vectorStore.afterPropertiesSet();
+            } catch (Exception e) {
+                throw new IllegalStateException("向量集合(" + collectionName + ") 初始化失败：" + e.getMessage(), e);
+            }
+            // 2.3 放入缓存
+            vectorStoreCache.put(knowledgeBase.getId(), new CachedVectorStore()
+                    .setEmbeddingModel(embeddingModel).setVectorStore(vectorStore));
+            log.debug("[getOrCreateVectorStore][知识库({}) 向量存储构建完成]", knowledgeBase.getId());
+            return vectorStore;
         }
-        // 2.3 放入缓存
-        vectorStoreCache.put(knowledgeBase.getId(), new CachedVectorStore()
-                .setEmbeddingModel(embeddingModel).setVectorStore(vectorStore));
-        log.debug("[getOrCreateVectorStore][知识库({}) 向量存储构建完成]", knowledgeBase.getId());
-        return vectorStore;
     }
 
     /**

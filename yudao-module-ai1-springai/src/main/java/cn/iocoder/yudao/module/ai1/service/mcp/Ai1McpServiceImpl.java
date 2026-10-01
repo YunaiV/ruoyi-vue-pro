@@ -113,7 +113,7 @@ public class Ai1McpServiceImpl implements Ai1McpService {
     /**
      * 校验并归一化 MCP 配置，保证传输方式、config、平铺列一致：
      * 1. 传输方式以 transport 列为准，写回 config 的 transport 字段
-     * 2. 远程：必须有服务地址（平铺列或 config.url）；config 缺失时按平铺列生成
+     * 2. 远程：服务地址优先取平铺列，为空时取 config.url；请求头以平铺列为准，统一写回 config
      * 3. 本地：config 必须包含 command，服务地址置空
      */
     private Ai1McpDO buildMcp(Ai1McpSaveReqVO reqVO) {
@@ -131,6 +131,7 @@ public class Ai1McpServiceImpl implements Ai1McpService {
 
         // 2. 按传输方式校验必填项
         String url = StrUtil.blankToDefault(reqVO.getUrl(), MapUtil.getStr(config, "url"));
+        Map<String, String> headers = reqVO.getHeaders();
         if (Ai1McpTransportEnum.isStdio(reqVO.getTransport())) {
             if (StrUtil.isBlank(MapUtil.getStr(config, "command"))) {
                 throw exception(MCP_COMMAND_REQUIRED);
@@ -140,14 +141,19 @@ public class Ai1McpServiceImpl implements Ai1McpService {
             if (StrUtil.isBlank(url)) {
                 throw exception(MCP_URL_REQUIRED);
             }
-            config.putIfAbsent("url", url);
-            if (MapUtil.isNotEmpty(reqVO.getHeaders())) {
-                config.putIfAbsent("headers", reqVO.getHeaders());
+            config.put("url", url);
+            // 空请求头统一保存为空集合，避免更新时跳过 null 后残留旧鉴权
+            headers = MapUtil.emptyIfNull(headers);
+            if (MapUtil.isNotEmpty(headers)) {
+                config.put("headers", headers);
+            } else {
+                config.remove("headers");
             }
         }
 
         // 3. 构建
-        return BeanUtils.toBean(reqVO, Ai1McpDO.class).setUrl(url).setConfig(JsonUtils.toJsonString(config));
+        return BeanUtils.toBean(reqVO, Ai1McpDO.class).setUrl(url).setHeaders(headers)
+                .setConfig(JsonUtils.toJsonString(config));
     }
 
 }

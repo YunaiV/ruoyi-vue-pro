@@ -23,6 +23,13 @@ public interface Ai1RedisKeyConstants {
     String SESSION_TASK_GROUP = "ai1-session-workers";
 
     /**
+     * 会话生成任务执行锁，按助手消息编号隔离；使用 Redisson 看门狗续期
+     * <p>
+     * KEY 格式：ai1:session:task-lock:{messageId}
+     */
+    String SESSION_TASK_LOCK = "ai1:session:task-lock:%d";
+
+    /**
      * 会话结果流，按助手消息编号隔离
      * <p>
      * KEY 格式：ai1:session:result:{messageId}

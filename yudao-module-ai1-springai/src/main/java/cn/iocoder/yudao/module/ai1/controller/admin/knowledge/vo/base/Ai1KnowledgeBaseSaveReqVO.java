@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.base;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import lombok.Data;
@@ -32,7 +33,7 @@ public class Ai1KnowledgeBaseSaveReqVO {
 
     @Schema(description = "分片大小，单位：字符", requiredMode = Schema.RequiredMode.REQUIRED, example = "500")
     @NotNull(message = "分片大小不能为空")
-    @Min(value = 1, message = "分片大小必须大于 0")
+    @Min(value = 100, message = "分片大小不能小于 100")
     private Integer chunkSize;
 
     @Schema(description = "分片重叠，单位：字符", requiredMode = Schema.RequiredMode.REQUIRED, example = "50")
@@ -49,5 +50,11 @@ public class Ai1KnowledgeBaseSaveReqVO {
     @NotNull(message = "状态不能为空")
     @InEnum(CommonStatusEnum.class)
     private Integer status;
+
+    @AssertTrue(message = "分片重叠必须小于分片大小")
+    @JsonIgnore
+    public boolean isChunkOverlapValid() {
+        return chunkSize == null || chunkOverlap == null || chunkOverlap < chunkSize;
+    }
 
 }

@@ -60,7 +60,7 @@ public class Ai1HomeServiceImplTest extends BaseDbUnitTest {
 
     @Test
     public void testGetSummary() {
-        // mock 数据：2 个 Agent、1 个 SKILL、1 个 MCP、3 个模型，其中 1 个 Agent 已删除
+        // mock 数据
         agentMapper.insert(randomAgent());
         Ai1AgentDO deletedAgent = randomAgent();
         agentMapper.insert(deletedAgent);
@@ -74,8 +74,7 @@ public class Ai1HomeServiceImplTest extends BaseDbUnitTest {
 
         // 调用
         Ai1HomeSummaryRespVO summary = homeService.getSummary();
-
-        // 断言：已删除的不计入
+        // 断言
         assertEquals(2L, summary.getAgentCount());
         assertEquals(1L, summary.getSkillCount());
         assertEquals(1L, summary.getMcpCount());
@@ -84,7 +83,7 @@ public class Ai1HomeServiceImplTest extends BaseDbUnitTest {
 
     @Test
     public void testGetMessageSummaryByDate() {
-        // mock 数据：今天 2 条、前天 1 条、区间外（8 天前）1 条、今天已删除 1 条
+        // mock 数据
         LocalDateTime now = LocalDateTime.now();
         Long sessionId = insertSession(1L);
         insertSessionMessage(sessionId, now);
@@ -94,10 +93,9 @@ public class Ai1HomeServiceImplTest extends BaseDbUnitTest {
         Long deletedMessageId = insertSessionMessage(sessionId, now);
         sessionMessageMapper.deleteById(deletedMessageId);
 
-        // 调用：近 7 天
+        // 调用
         List<Ai1HomeMessageSummaryByDateRespVO> list = homeService.getMessageSummaryByDate(7);
-
-        // 断言：连续 7 天，无消息的日期补 0，区间外和已删除不计入
+        // 断言
         assertEquals(7, list.size());
         assertEquals(getDayBeginTime(now.minusDays(6)).format(DATE_FORMATTER), list.get(0).getDate());
         assertEquals(now.format(DATE_FORMATTER), list.get(6).getDate());
@@ -109,16 +107,15 @@ public class Ai1HomeServiceImplTest extends BaseDbUnitTest {
 
     @Test
     public void testGetMessageSummaryByDate_daysGreaterThan30() {
-        // 调用：超过 30 天时按实际天数统计
+        // 调用
         List<Ai1HomeMessageSummaryByDateRespVO> list = homeService.getMessageSummaryByDate(60);
-
         // 断言
         assertEquals(60, list.size());
     }
 
     @Test
     public void testGetMessageSummaryByAgent() {
-        // mock 数据：Agent 1 有 3 条、Agent 2 有 1 条、区间外 1 条（Agent 2）、已删除会话下 5 条（Agent 3）
+        // mock 数据
         LocalDateTime now = LocalDateTime.now();
         Long session1 = insertSession(1L);
         Long session2 = insertSession(2L);
@@ -133,10 +130,9 @@ public class Ai1HomeServiceImplTest extends BaseDbUnitTest {
         }
         sessionMapper.deleteById(deletedSession);
 
-        // 调用：近 7 天
+        // 调用
         List<Ai1HomeMessageSummaryByAgentRespVO> list = homeService.getMessageSummaryByAgent(7);
-
-        // 断言：按消息数量倒序，区间外和已删除会话不计入
+        // 断言
         assertEquals(2, list.size());
         assertEquals(1L, list.get(0).getAgentId());
         assertEquals(3L, list.get(0).getCount());

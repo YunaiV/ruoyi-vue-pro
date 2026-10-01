@@ -140,6 +140,22 @@ public class Ai1AgentServiceImpl implements Ai1AgentService {
     }
 
     @Override
+    public Long getAgentCountByKnowledgeBaseIds(Collection<Long> knowledgeBaseIds) {
+        if (CollUtil.isEmpty(knowledgeBaseIds)) {
+            return 0L;
+        }
+        return agentMapper.selectCountByKnowledgeBaseIds(knowledgeBaseIds);
+    }
+
+    @Override
+    public Long getAgentCountBySkillIds(Collection<Long> skillIds) {
+        if (CollUtil.isEmpty(skillIds)) {
+            return 0L;
+        }
+        return agentMapper.selectCountBySkillIds(skillIds);
+    }
+
+    @Override
     public void updateAgentStatus(Long id, Integer status) {
         // 1. 校验存在
         validateAgentExists(id);

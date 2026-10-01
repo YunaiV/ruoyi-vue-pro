@@ -73,7 +73,8 @@ public class Ai1LlmChatTool {
         String previousReasoning = "";
         for (ChatResponse chatResponse : spec.stream().chatResponse().toIterable()) {
             Generation generation = chatResponse.getResult();
-            if (generation == null) {
+            // 部分供应商在流末尾下发只含 usage、没有输出的分片，跳过避免 NPE
+            if (generation == null || generation.getOutput() == null) {
                 continue;
             }
             // 2.1 思考过程：推理模型的 reasoning_content 按流累积下发，取变化增量转发，重复值去重

@@ -36,7 +36,7 @@ public class Ai1McpSaveReqVO {
     @Size(max = 200, message = "服务地址长度不能超过 200 个字符")
     private String url;
 
-    @Schema(description = "请求头", example = "{\"Authorization\":\"Bearer xxx\"}")
+    @Schema(description = "请求头，远程配置以此字段为准；为空时清空请求头", example = "{\"Authorization\":\"Bearer xxx\"}")
     private Map<String, String> headers;
 
     @Schema(description = "完整 MCP 配置，JSON 对象；本地必填 command", example = "{\"transport\":\"stdio\",\"command\":\"npx\",\"args\":[\"-y\",\"xxx\"]}")

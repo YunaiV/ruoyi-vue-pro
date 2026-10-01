@@ -87,6 +87,14 @@ public interface Ai1KnowledgeBaseService {
     List<Ai1KnowledgeBaseDO> getKnowledgeBaseList(Collection<Long> ids);
 
     /**
+     * 获得引用指定嵌入模型的知识库数量
+     *
+     * @param modelIds 模型编号集合
+     * @return 知识库数量
+     */
+    Long getKnowledgeBaseCountByEmbeddingModelIds(Collection<Long> modelIds);
+
+    /**
      * 向量检索：按查询文本召回知识库相关分片
      *
      * @param id    编号

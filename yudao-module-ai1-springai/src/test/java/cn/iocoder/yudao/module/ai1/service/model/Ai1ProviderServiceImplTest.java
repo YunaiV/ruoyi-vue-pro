@@ -56,7 +56,6 @@ public class Ai1ProviderServiceImplTest extends BaseDbUnitTest {
 
         // 调用
         Long id = providerService.createProvider(reqVO);
-
         // 断言
         Ai1ProviderDO provider = providerMapper.selectById(id);
         assertEquals(reqVO.getName(), provider.getName());
@@ -68,13 +67,12 @@ public class Ai1ProviderServiceImplTest extends BaseDbUnitTest {
         // mock 数据
         Ai1ProviderDO dbProvider = randomProviderDO();
         providerMapper.insert(dbProvider);
-        // 准备参数：密钥留空
+        // 准备参数
         Ai1ProviderSaveReqVO reqVO = randomProviderSaveReqVO(o -> o.setId(dbProvider.getId()).setApiKey(""));
 
         // 调用
         providerService.updateProvider(reqVO);
-
-        // 断言：密钥保持不变，其他字段更新；并失效模型缓存
+        // 断言
         Ai1ProviderDO provider = providerMapper.selectById(dbProvider.getId());
         assertEquals(dbProvider.getApiKey(), provider.getApiKey());
         assertEquals(reqVO.getBaseUrl(), provider.getBaseUrl());
@@ -86,11 +84,12 @@ public class Ai1ProviderServiceImplTest extends BaseDbUnitTest {
         // mock 数据
         Ai1ProviderDO dbProvider = randomProviderDO();
         providerMapper.insert(dbProvider);
-        // mock 方法：其下存在模型
+        // mock modelService 的方法
         when(modelService.getModelCountByProviderIds(anyList())).thenReturn(1L);
 
         // 调用，并断言异常
         assertServiceException(() -> providerService.deleteProvider(dbProvider.getId()), PROVIDER_HAS_MODEL);
+        // 断言
         assertNotNull(providerMapper.selectById(dbProvider.getId()));
     }
 
@@ -99,12 +98,11 @@ public class Ai1ProviderServiceImplTest extends BaseDbUnitTest {
         // mock 数据
         Ai1ProviderDO dbProvider = randomProviderDO();
         providerMapper.insert(dbProvider);
-        // mock 方法
+        // mock modelService 的方法
         when(modelService.getModelCountByProviderIds(anyList())).thenReturn(0L);
 
         // 调用
         providerService.deleteProvider(dbProvider.getId());
-
         // 断言
         assertNull(providerMapper.selectById(dbProvider.getId()));
         verify(llmModelFactory).evictByProviderId(dbProvider.getId());
@@ -121,7 +119,7 @@ public class Ai1ProviderServiceImplTest extends BaseDbUnitTest {
         // mock 数据
         Ai1ProviderDO dbProvider = randomProviderDO(o -> o.setHeaders("[{\"key\":\"X-App\",\"value\":\"yudao\"}]"));
         providerMapper.insert(dbProvider);
-        // mock 方法：透传地址、密钥与解析后的 Header
+        // mock 方法
         Ai1ProviderConnectRespVO result = randomPojo(Ai1ProviderConnectRespVO.class);
         when(providerTool.testConnect(eq(dbProvider.getBaseUrl()), eq(dbProvider.getApiKey()),
                 argThat(headers -> Collections.singletonList("X-App").equals(convertList(headers, header -> header.get("key"))))))
@@ -129,7 +127,6 @@ public class Ai1ProviderServiceImplTest extends BaseDbUnitTest {
 
         // 调用
         Ai1ProviderConnectRespVO connectResult = providerService.testProviderConnect(dbProvider.getId());
-
         // 断言
         assertSame(result, connectResult);
     }

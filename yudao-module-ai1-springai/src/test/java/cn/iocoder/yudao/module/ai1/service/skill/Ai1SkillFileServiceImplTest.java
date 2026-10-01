@@ -12,11 +12,13 @@ import cn.iocoder.yudao.module.ai1.dal.mysql.skill.Ai1SkillFileMapper;
 import cn.iocoder.yudao.module.ai1.enums.skill.Ai1SkillFileTypeEnum;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
+import org.springaicommunity.agent.utils.MarkdownParser;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
@@ -45,10 +47,12 @@ public class Ai1SkillFileServiceImplTest extends BaseDbUnitTest {
 
     @Test
     public void testCreateDefaultSkillFileList() {
-        // 调用
-        skillFileService.createDefaultSkillFileList(new Ai1SkillDO().setId(SKILL_ID).setName("pdf-reader").setDescription("读取 PDF"));
+        // 准备参数
+        Ai1SkillDO skill = new Ai1SkillDO().setId(SKILL_ID).setName("pdf-reader").setDescription("读取 PDF");
 
-        // 断言：SKILL.md、scripts/、reference/ 均为根级锁定节点；SKILL.md 含 frontmatter
+        // 调用
+        skillFileService.createDefaultSkillFileList(skill);
+        // 断言
         List<Ai1SkillFileDO> files = skillFileMapper.selectListBySkillId(SKILL_ID);
         assertEquals(3, files.size());
         assertTrue(files.stream().allMatch(file -> Boolean.TRUE.equals(file.getLocked())
@@ -59,12 +63,30 @@ public class Ai1SkillFileServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testCreateSkillFile_success() {
-        // 调用：根级新建 md 文件
-        Long id = skillFileService.createSkillFile(buildCreateReqVO(Ai1SkillFileDO.PARENT_ID_ROOT, " guide.MD ",
-                Ai1SkillFileTypeEnum.FILE.getType()));
+    public void testCreateDefaultSkillFileList_descriptionWithNewlines() {
+        // 准备参数
+        Ai1SkillDO skill = new Ai1SkillDO().setId(SKILL_ID).setName("pdf-reader")
+                .setDescription("读取 PDF\r\nversion: 2");
 
-        // 断言：名称去空白、扩展名小写、默认内容；并刷新 SKILL 更新时间
+        // 调用
+        skillFileService.createDefaultSkillFileList(skill);
+        // 断言
+        Ai1SkillFileDO skillFile = skillFileMapper.selectBySkillIdAndParentIdAndName(
+                SKILL_ID, Ai1SkillFileDO.PARENT_ID_ROOT, Ai1SkillFileDO.NAME_SKILL);
+        MarkdownParser parser = new MarkdownParser(skillFile.getContent());
+        assertEquals(Map.of("name", "pdf-reader", "description", "读取 PDF  version: 2"), parser.getFrontMatter());
+        assertTrue(parser.getContent().startsWith("# pdf-reader\n\n"));
+    }
+
+    @Test
+    public void testCreateSkillFile_success() {
+        // 准备参数
+        Ai1SkillFileCreateReqVO reqVO = buildCreateReqVO(Ai1SkillFileDO.PARENT_ID_ROOT, " guide.MD ",
+                Ai1SkillFileTypeEnum.FILE.getType());
+
+        // 调用
+        Long id = skillFileService.createSkillFile(reqVO);
+        // 断言
         Ai1SkillFileDO file = skillFileMapper.selectById(id);
         assertEquals("guide.MD", file.getName());
         assertEquals("md", file.getFileType());
@@ -75,6 +97,7 @@ public class Ai1SkillFileServiceImplTest extends BaseDbUnitTest {
 
     @Test
     public void testCreateSkillFile_nameInvalid() {
+        // 调用，并断言异常
         assertServiceException(() -> skillFileService.createSkillFile(buildCreateReqVO(Ai1SkillFileDO.PARENT_ID_ROOT, "..",
                 Ai1SkillFileTypeEnum.FILE.getType())), SKILL_FILE_NAME_INVALID);
         assertServiceException(() -> skillFileService.createSkillFile(buildCreateReqVO(Ai1SkillFileDO.PARENT_ID_ROOT, "a/b",
@@ -83,7 +106,7 @@ public class Ai1SkillFileServiceImplTest extends BaseDbUnitTest {
 
     @Test
     public void testCreateSkillFile_parentIsFile() {
-        // mock 数据：父节点是文件
+        // mock 数据
         Ai1SkillFileDO parent = insertSkillFile(Ai1SkillFileDO.PARENT_ID_ROOT, "a.txt", Ai1SkillFileTypeEnum.FILE.getType(), false);
 
         // 调用，并断言异常
@@ -102,6 +125,13 @@ public class Ai1SkillFileServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
+    public void testCreateSkillFile_parentNotExists() {
+        // 调用，并断言异常
+        assertServiceException(() -> skillFileService.createSkillFile(buildCreateReqVO(99999L, "b.txt",
+                Ai1SkillFileTypeEnum.FILE.getType())), SKILL_FILE_PARENT_NOT_EXISTS);
+    }
+
+    @Test
     public void testRenameSkillFile_locked() {
         // mock 数据
         Ai1SkillFileDO file = insertSkillFile(Ai1SkillFileDO.PARENT_ID_ROOT, "SKILL.md", Ai1SkillFileTypeEnum.FILE.getType(), true);
@@ -113,26 +143,25 @@ public class Ai1SkillFileServiceImplTest extends BaseDbUnitTest {
 
     @Test
     public void testMoveSkillFile_intoDescendant() {
-        // mock 数据：a/ → a/b/
+        // mock 数据
         Ai1SkillFileDO a = insertSkillFile(Ai1SkillFileDO.PARENT_ID_ROOT, "a", Ai1SkillFileTypeEnum.DIRECTORY.getType(), false);
         Ai1SkillFileDO b = insertSkillFile(a.getId(), "b", Ai1SkillFileTypeEnum.DIRECTORY.getType(), false);
 
-        // 调用，并断言异常：不能把 a 移入 a/b
+        // 调用，并断言异常
         assertServiceException(() -> skillFileService.moveSkillFile(new Ai1SkillFileMoveReqVO().setId(a.getId())
-                .setParentId(b.getId())), SKILL_FILE_MOVE_TO_SELF);
+                .setParentId(b.getId())), SKILL_FILE_MOVE_TO_DESCENDANT);
         assertServiceException(() -> skillFileService.moveSkillFile(new Ai1SkillFileMoveReqVO().setId(a.getId())
                 .setParentId(a.getId())), SKILL_FILE_MOVE_TO_SELF);
     }
 
     @Test
     public void testMoveSkillFile_success() {
-        // mock 数据：a/、c.txt
+        // mock 数据
         Ai1SkillFileDO a = insertSkillFile(Ai1SkillFileDO.PARENT_ID_ROOT, "a", Ai1SkillFileTypeEnum.DIRECTORY.getType(), false);
         Ai1SkillFileDO c = insertSkillFile(Ai1SkillFileDO.PARENT_ID_ROOT, "c.txt", Ai1SkillFileTypeEnum.FILE.getType(), false);
 
         // 调用
         skillFileService.moveSkillFile(new Ai1SkillFileMoveReqVO().setId(c.getId()).setParentId(a.getId()));
-
         // 断言
         assertEquals(a.getId(), skillFileMapper.selectById(c.getId()).getParentId());
     }
@@ -149,24 +178,23 @@ public class Ai1SkillFileServiceImplTest extends BaseDbUnitTest {
 
     @Test
     public void testDeleteSkillFile_cascadeAndRecreate() {
-        // mock 数据：a/b/c.txt，以及同级的 d.txt
+        // mock 数据
         Ai1SkillFileDO a = insertSkillFile(Ai1SkillFileDO.PARENT_ID_ROOT, "a", Ai1SkillFileTypeEnum.DIRECTORY.getType(), false);
         Ai1SkillFileDO b = insertSkillFile(a.getId(), "b", Ai1SkillFileTypeEnum.DIRECTORY.getType(), false);
         insertSkillFile(b.getId(), "c.txt", Ai1SkillFileTypeEnum.FILE.getType(), false);
         Ai1SkillFileDO d = insertSkillFile(Ai1SkillFileDO.PARENT_ID_ROOT, "d.txt", Ai1SkillFileTypeEnum.FILE.getType(), false);
 
-        // 调用：删除 a，再在根级重建同名目录
+        // 调用
         skillFileService.deleteSkillFile(a.getId());
         Long newId = skillFileService.createSkillFile(buildCreateReqVO(Ai1SkillFileDO.PARENT_ID_ROOT, "a",
                 Ai1SkillFileTypeEnum.DIRECTORY.getType()));
-
-        // 断言：a 及全部后代已删除，d.txt 保留；同名目录可重建
+        // 断言
         List<Ai1SkillFileDO> files = skillFileMapper.selectListBySkillId(SKILL_ID);
         assertEquals(2, files.size());
         assertTrue(convertList(files, Ai1SkillFileDO::getId).containsAll(Arrays.asList(d.getId(), newId)));
     }
 
-    // ========== 随机对象 ==========
+    // ========== 测试数据 ==========
 
     private static Ai1SkillFileCreateReqVO buildCreateReqVO(Long parentId, String name, Integer type) {
         return new Ai1SkillFileCreateReqVO().setSkillId(SKILL_ID).setParentId(parentId).setName(name).setType(type);

@@ -11,6 +11,7 @@ import cn.iocoder.yudao.module.ai1.controller.admin.knowledge.vo.base.Ai1Knowled
 import cn.iocoder.yudao.module.ai1.dal.dataobject.knowledge.Ai1KnowledgeBaseDO;
 import cn.iocoder.yudao.module.ai1.dal.mysql.knowledge.Ai1KnowledgeBaseMapper;
 import cn.iocoder.yudao.module.ai1.enums.model.Ai1ModelTypeEnum;
+import cn.iocoder.yudao.module.ai1.service.agent.Ai1AgentService;
 import cn.iocoder.yudao.module.ai1.service.model.Ai1ModelService;
 import cn.iocoder.yudao.module.ai1.service.model.bo.Ai1ModelRespBO;
 import cn.iocoder.yudao.module.ai1.harness.rag.Ai1RagTool;
@@ -18,6 +19,9 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.Collection;
@@ -48,6 +52,9 @@ public class Ai1KnowledgeBaseServiceImpl implements Ai1KnowledgeBaseService {
 
     @Resource
     private Ai1RagTool ragTool;
+    @Resource
+    @Lazy // 延迟加载，避免循环依赖
+    private Ai1AgentService agentService;
 
     @Override
     public Long createKnowledgeBase(Ai1KnowledgeBaseSaveReqVO createReqVO) {
@@ -78,21 +85,32 @@ public class Ai1KnowledgeBaseServiceImpl implements Ai1KnowledgeBaseService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteKnowledgeBase(Long id) {
         deleteKnowledgeBaseListByIds(Collections.singletonList(id));
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteKnowledgeBaseListByIds(List<Long> ids) {
-        // 1. 校验存在
+        // 1.1 校验存在
         ids.forEach(this::validateKnowledgeBaseExists);
+        // 1.2 校验未被 Agent 绑定
+        if (agentService.getAgentCountByKnowledgeBaseIds(ids) > 0) {
+            throw exception(KNOWLEDGE_BASE_USED_BY_AGENT);
+        }
 
         // 2. 删除知识库与其下文档
         knowledgeBaseMapper.deleteByIds(ids);
         knowledgeDocumentService.deleteKnowledgeDocumentListByKnowledgeBaseIds(ids);
 
-        // 3. 删除 Milvus 向量集合（外部资源，放在数据库删除之后，失败仅记录日志）
-        ids.forEach(ragTool::dropCollection);
+        // 3. 删除 Milvus 向量集合：外部资源无法回滚，事务提交后再执行，失败仅记录日志
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                ids.forEach(ragTool::dropCollection);
+            }
+        });
     }
 
     @Override
@@ -125,6 +143,14 @@ public class Ai1KnowledgeBaseServiceImpl implements Ai1KnowledgeBaseService {
             return Collections.emptyList();
         }
         return knowledgeBaseMapper.selectByIds(ids);
+    }
+
+    @Override
+    public Long getKnowledgeBaseCountByEmbeddingModelIds(Collection<Long> modelIds) {
+        if (CollUtil.isEmpty(modelIds)) {
+            return 0L;
+        }
+        return knowledgeBaseMapper.selectCountByEmbeddingModelIds(modelIds);
     }
 
     @Override

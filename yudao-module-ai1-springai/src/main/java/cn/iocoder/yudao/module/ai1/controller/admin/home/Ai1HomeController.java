@@ -12,8 +12,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -47,19 +47,21 @@ public class Ai1HomeController {
 
     @GetMapping("/message-summary-by-date")
     @Operation(summary = "获得按日消息统计", description = "近 days 个自然日（含今天）每日消息数量，没有消息的日期补 0")
-    @Parameter(name = "days", description = "天数", required = true, example = "30")
+    @Parameter(name = "days", description = "天数，1 ~ 30，默认 30", example = "30")
     @PreAuthorize("@ss.hasPermission('ai1:home:query')")
     public CommonResult<List<Ai1HomeMessageSummaryByDateRespVO>> getMessageSummaryByDate(
-            @RequestParam("days") @NotNull(message = "天数不能为空") @Min(value = 1, message = "天数不能小于 1") Integer days) {
+            @RequestParam(value = "days", defaultValue = "30") @Min(value = 1, message = "天数不能小于 1")
+            @Max(value = 30, message = "天数不能大于 30") Integer days) {
         return success(homeService.getMessageSummaryByDate(days));
     }
 
     @GetMapping("/message-summary-by-agent")
     @Operation(summary = "获得按 Agent 消息统计", description = "近 days 个自然日（含今天）各 Agent 的消息数量")
-    @Parameter(name = "days", description = "天数", required = true, example = "30")
+    @Parameter(name = "days", description = "天数，1 ~ 30，默认 30", example = "30")
     @PreAuthorize("@ss.hasPermission('ai1:home:query')")
     public CommonResult<List<Ai1HomeMessageSummaryByAgentRespVO>> getMessageSummaryByAgent(
-            @RequestParam("days") @NotNull(message = "天数不能为空") @Min(value = 1, message = "天数不能小于 1") Integer days) {
+            @RequestParam(value = "days", defaultValue = "30") @Min(value = 1, message = "天数不能小于 1")
+            @Max(value = 30, message = "天数不能大于 30") Integer days) {
         return success(buildMessageSummaryByAgentRespVOList(homeService.getMessageSummaryByAgent(days)));
     }
 

@@ -115,6 +115,22 @@ public interface Ai1AgentService {
     Long getAgentCountByModelIds(Collection<Long> modelIds);
 
     /**
+     * 获得绑定指定知识库的 Agent 数量
+     *
+     * @param knowledgeBaseIds 知识库编号集合
+     * @return Agent 数量
+     */
+    Long getAgentCountByKnowledgeBaseIds(Collection<Long> knowledgeBaseIds);
+
+    /**
+     * 获得绑定指定 SKILL 的 Agent 数量
+     *
+     * @param skillIds SKILL 编号集合
+     * @return Agent 数量
+     */
+    Long getAgentCountBySkillIds(Collection<Long> skillIds);
+
+    /**
      * 修改 Agent 状态
      *
      * @param id     Agent 编号

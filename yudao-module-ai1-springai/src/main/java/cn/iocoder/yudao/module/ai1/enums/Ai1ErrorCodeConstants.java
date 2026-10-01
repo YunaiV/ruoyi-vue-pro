@@ -13,7 +13,7 @@ public interface Ai1ErrorCodeConstants {
     ErrorCode PROVIDER_NOT_EXISTS = new ErrorCode(1_041_000_000, "供应商不存在");
     ErrorCode PROVIDER_DISABLE = new ErrorCode(1_041_000_001, "供应商({}) 已禁用");
     ErrorCode PROVIDER_HAS_MODEL = new ErrorCode(1_041_000_003, "供应商下存在模型，禁止删除");
-    ErrorCode PROVIDER_REMOTE_MODEL_LOAD_FAIL = new ErrorCode(1_041_000_004, "模型拉取失败：请检查供应商接口地址与 API 密钥");
+    ErrorCode PROVIDER_REMOTE_MODEL_LOAD_FAIL = new ErrorCode(1_041_000_004, "模型拉取失败：请检查供应商地址与 API 密钥");
     ErrorCode PROVIDER_REMOTE_MODEL_EMPTY = new ErrorCode(1_041_000_005, "远程未返回可用模型");
     ErrorCode CONFIG_PLACEHOLDER_NOT_RESOLVED = new ErrorCode(1_041_000_006, "配置({})无法解析，请检查环境变量或配置项");
 
@@ -26,11 +26,15 @@ public interface Ai1ErrorCodeConstants {
     ErrorCode MODEL_TYPE_NOT_CHAT = new ErrorCode(1_041_001_005, "所选模型不是对话模型");
     ErrorCode MODEL_TYPE_NOT_EMBEDDING = new ErrorCode(1_041_001_006, "所选模型不是嵌入模型");
     ErrorCode MODEL_IMPORT_ALL_EXISTS = new ErrorCode(1_041_001_007, "所选模型均已导入，无需重复导入");
+    ErrorCode MODEL_USED_BY_KNOWLEDGE_BASE = new ErrorCode(1_041_001_008, "模型已被知识库使用，禁止删除");
+    ErrorCode MODEL_TYPE_USED_BY_AGENT = new ErrorCode(1_041_001_009, "模型已被 Agent 使用，禁止修改类型");
+    ErrorCode MODEL_TYPE_USED_BY_KNOWLEDGE_BASE = new ErrorCode(1_041_001_010, "模型已被知识库使用，禁止修改类型");
 
     // ========== 知识库 1-041-002-000 ==========
     ErrorCode KNOWLEDGE_BASE_NOT_EXISTS = new ErrorCode(1_041_002_000, "知识库不存在");
     ErrorCode KNOWLEDGE_BASE_DOCUMENT_EMPTY = new ErrorCode(1_041_002_001, "知识库下暂无文档");
     ErrorCode KNOWLEDGE_BASE_SEARCH_FAIL = new ErrorCode(1_041_002_002, "向量检索失败：{}");
+    ErrorCode KNOWLEDGE_BASE_USED_BY_AGENT = new ErrorCode(1_041_002_003, "知识库已被 Agent 使用，禁止删除");
 
     // ========== 知识文档 1-041-003-000 ==========
     ErrorCode KNOWLEDGE_DOCUMENT_NOT_EXISTS = new ErrorCode(1_041_003_000, "文档不存在");
@@ -48,6 +52,7 @@ public interface Ai1ErrorCodeConstants {
 
     // ========== SKILL 1-041-005-000 ==========
     ErrorCode SKILL_NOT_EXISTS = new ErrorCode(1_041_005_000, "SKILL 不存在");
+    ErrorCode SKILL_USED_BY_AGENT = new ErrorCode(1_041_005_001, "SKILL 已被 Agent 使用，禁止删除");
     ErrorCode SKILL_NAME_DUPLICATE = new ErrorCode(1_041_005_002, "SKILL 名称({}) 已存在");
 
     // ========== SKILL 内容文件 1-041-006-000 ==========
@@ -56,8 +61,10 @@ public interface Ai1ErrorCodeConstants {
     ErrorCode SKILL_FILE_NAME_DUPLICATE = new ErrorCode(1_041_006_002, "同级下已存在同名节点({})");
     ErrorCode SKILL_FILE_PARENT_INVALID = new ErrorCode(1_041_006_003, "父节点必须是同一 SKILL 下的目录");
     ErrorCode SKILL_FILE_LOCKED = new ErrorCode(1_041_006_004, "固定文件或目录禁止{}");
-    ErrorCode SKILL_FILE_MOVE_TO_SELF = new ErrorCode(1_041_006_005, "不能移入自身或其子目录");
+    ErrorCode SKILL_FILE_MOVE_TO_SELF = new ErrorCode(1_041_006_005, "不能移入自身");
     ErrorCode SKILL_FILE_NOT_FILE = new ErrorCode(1_041_006_006, "目录不支持保存内容");
+    ErrorCode SKILL_FILE_MOVE_TO_DESCENDANT = new ErrorCode(1_041_006_007, "不能移入自身的子目录");
+    ErrorCode SKILL_FILE_PARENT_NOT_EXISTS = new ErrorCode(1_041_006_008, "父目录不存在");
 
     // ========== Agent 1-041-007-000 ==========
     ErrorCode AGENT_NOT_EXISTS = new ErrorCode(1_041_007_000, "Agent 不存在");

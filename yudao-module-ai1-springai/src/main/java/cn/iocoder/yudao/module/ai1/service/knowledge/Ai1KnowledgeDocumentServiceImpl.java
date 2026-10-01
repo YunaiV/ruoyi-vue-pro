@@ -14,7 +14,10 @@ import cn.iocoder.yudao.module.ai1.dal.dataobject.knowledge.Ai1KnowledgeBaseDO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.knowledge.Ai1KnowledgeDocumentDO;
 import cn.iocoder.yudao.module.ai1.dal.mysql.knowledge.Ai1KnowledgeDocumentMapper;
 import cn.iocoder.yudao.module.ai1.enums.knowledge.Ai1KnowledgeDocumentStatusEnum;
+import cn.iocoder.yudao.module.ai1.enums.model.Ai1ModelTypeEnum;
 import cn.iocoder.yudao.module.ai1.harness.rag.Ai1RagTool;
+import cn.iocoder.yudao.module.ai1.service.model.Ai1ModelService;
+import cn.iocoder.yudao.module.ai1.service.model.bo.Ai1ModelRespBO;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -50,6 +53,8 @@ public class Ai1KnowledgeDocumentServiceImpl implements Ai1KnowledgeDocumentServ
 
     @Resource
     private Ai1KnowledgeBaseService knowledgeBaseService;
+    @Resource
+    private Ai1ModelService modelService;
 
     @Resource
     private Ai1RagTool ragTool;
@@ -178,6 +183,12 @@ public class Ai1KnowledgeDocumentServiceImpl implements Ai1KnowledgeDocumentServ
         List<Ai1KnowledgeDocumentDO> documents = knowledgeDocumentMapper.selectListByKnowledgeBaseId(knowledgeBaseId);
         if (CollUtil.isEmpty(documents)) {
             throw exception(KNOWLEDGE_BASE_DOCUMENT_EMPTY);
+        }
+        // 1.2 校验嵌入模型可用：配置有误时直接提示，避免逐篇失败把整库文档刷成失败状态
+        Ai1ModelRespBO embeddingModel = modelService.getModelRespBO(
+                knowledgeBase.getEmbeddingProviderId(), knowledgeBase.getEmbeddingModelId());
+        if (!Ai1ModelTypeEnum.isEmbedding(embeddingModel.getModelType())) {
+            throw exception(MODEL_TYPE_NOT_EMBEDDING);
         }
 
         // 2. 逐个向量化：跳过空内容文档，单个失败不中断

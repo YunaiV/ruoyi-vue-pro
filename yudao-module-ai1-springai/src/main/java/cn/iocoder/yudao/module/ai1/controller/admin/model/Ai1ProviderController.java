@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.ai1.controller.admin.model;
 
+import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
@@ -110,8 +111,8 @@ public class Ai1ProviderController {
         }
         Ai1ProviderRespVO respVO = BeanUtils.toBean(provider, Ai1ProviderRespVO.class);
         String apiKey = provider.getApiKey();
-        if (StrUtil.contains(apiKey, "${")) {
-            // 环境变量占位符不是密钥本身，原样返回，便于确认引用了哪个变量
+        if (ReUtil.isMatch("^\\$\\{[a-zA-Z_][a-zA-Z0-9_.-]*\\}$", apiKey)) {
+            // 【安全性】仅完整的变量占位符原样返回；带默认值或拼接内容的密钥仍需脱敏
             respVO.setApiKey(apiKey);
         } else if (StrUtil.isNotEmpty(apiKey)) {
             respVO.setApiKey(apiKey.length() <= 8 ? "****"

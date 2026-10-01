@@ -42,10 +42,12 @@ public class Ai1SessionServiceImplTest extends BaseDbUnitTest {
 
     @Test
     public void testCreateSessionMy_success() {
-        // 调用
-        Long id = sessionService.createSessionMy(100L, new Ai1SessionCreateMyReqVO().setAgentId(1L));
+        // 准备参数
+        Ai1SessionCreateMyReqVO reqVO = new Ai1SessionCreateMyReqVO().setAgentId(1L);
 
-        // 断言：归属当前用户，使用默认标题
+        // 调用
+        Long id = sessionService.createSessionMy(100L, reqVO);
+        // 断言
         Ai1SessionDO session = sessionMapper.selectById(id);
         assertEquals(100L, session.getUserId());
         assertEquals(Ai1SessionDO.TITLE_DEFAULT, session.getTitle());
@@ -54,22 +56,24 @@ public class Ai1SessionServiceImplTest extends BaseDbUnitTest {
 
     @Test
     public void testUpdateSessionMy_otherUser() {
-        // mock 数据：他人的会话
+        // mock 数据
         Long id = sessionService.createSessionMy(100L, new Ai1SessionCreateMyReqVO().setAgentId(1L));
 
-        // 调用，并断言异常：不能改他人会话，且与不存在同样处理
+        // 调用，并断言异常
         assertServiceException(() -> sessionService.updateSessionMy(200L,
                 new Ai1SessionUpdateMyReqVO().setId(id).setTitle("改标题")), SESSION_NOT_EXISTS);
+        // 断言
         assertEquals(Ai1SessionDO.TITLE_DEFAULT, sessionMapper.selectById(id).getTitle());
     }
 
     @Test
     public void testDeleteSessionMy_otherUser() {
-        // mock 数据：他人的会话
+        // mock 数据
         Long id = sessionService.createSessionMy(100L, new Ai1SessionCreateMyReqVO().setAgentId(1L));
 
         // 调用，并断言异常
         assertServiceException(() -> sessionService.deleteSessionMy(200L, id), SESSION_NOT_EXISTS);
+        // 断言
         assertNotNull(sessionMapper.selectById(id));
         verifyNoInteractions(sessionMessageService);
     }
@@ -81,15 +85,14 @@ public class Ai1SessionServiceImplTest extends BaseDbUnitTest {
 
         // 调用
         sessionService.deleteSessionMy(100L, id);
-
-        // 断言：连带删除消息
+        // 断言
         assertNull(sessionMapper.selectById(id));
         verify(sessionMessageService).deleteSessionMessageListBySessionIds(Collections.singletonList(id));
     }
 
     @Test
     public void testGetSessionListByAgentIdAndUserId() {
-        // mock 数据：当前用户 2 个、他人 1 个、其他 Agent 1 个
+        // mock 数据
         Long id1 = sessionService.createSessionMy(100L, new Ai1SessionCreateMyReqVO().setAgentId(1L));
         Long id2 = sessionService.createSessionMy(100L, new Ai1SessionCreateMyReqVO().setAgentId(1L));
         sessionService.createSessionMy(200L, new Ai1SessionCreateMyReqVO().setAgentId(1L));
@@ -97,8 +100,7 @@ public class Ai1SessionServiceImplTest extends BaseDbUnitTest {
 
         // 调用
         List<Ai1SessionDO> list = sessionService.getSessionListByAgentIdAndUserId(1L, 100L);
-
-        // 断言：只返回当前用户在该 Agent 下的会话，按编号倒序
+        // 断言
         assertEquals(Arrays.asList(id2, id1), list.stream().map(Ai1SessionDO::getId).toList());
     }
 

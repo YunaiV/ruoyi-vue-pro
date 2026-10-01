@@ -115,18 +115,36 @@ public class Ai1ProviderTool {
         }
 
         // 2. 解析 data[].id：解析失败时，提示检查配置；解析结果为空时，提示无可用模型
-        Map<String, Object> root = JsonUtils.parseMap(outcome.getBody());
-        if (root == null) {
+        List<String> models = parseModels(outcome.getBody());
+        if (models == null) {
             log.warn("[listModels][地址({}) 模型数据解析失败，body({})]", url, StrUtil.maxLength(outcome.getBody(), 200));
             throw exception(PROVIDER_REMOTE_MODEL_LOAD_FAIL);
         }
-        List<?> data = MapUtil.get(root, "data", List.class);
-        List<String> models = convertList(data, item -> item instanceof Map
-                ? StrUtil.blankToDefault(MapUtil.getStr((Map<?, ?>) item, "id"), null) : null);
         if (CollUtil.isEmpty(models)) {
             throw exception(PROVIDER_REMOTE_MODEL_EMPTY);
         }
         return models;
+    }
+
+    /**
+     * 解析 GET /models 响应的 data[].id
+     *
+     * 响应不是 JSON 对象、或 data 存在但不是数组时，视为解析失败（与源码一致）
+     *
+     * @param body 响应体
+     * @return 模型标识列表；解析失败返回 null
+     */
+    static List<String> parseModels(String body) {
+        Map<String, Object> root = JsonUtils.parseMap(body);
+        if (root == null) {
+            return null;
+        }
+        Object data = root.get("data");
+        if (data != null && !(data instanceof List)) {
+            return null;
+        }
+        return convertList((List<?>) data, item -> item instanceof Map
+                ? StrUtil.blankToDefault(MapUtil.getStr((Map<?, ?>) item, "id"), null) : null);
     }
 
     /**

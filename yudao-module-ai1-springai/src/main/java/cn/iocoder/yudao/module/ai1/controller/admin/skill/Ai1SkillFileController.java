@@ -83,7 +83,7 @@ public class Ai1SkillFileController {
     @DeleteMapping("/delete")
     @Operation(summary = "删除 SKILL 目录或文件", description = "目录递归删除后代")
     @Parameter(name = "id", description = "编号", required = true)
-    @PreAuthorize("@ss.hasPermission('ai1:skill:update')")
+    @PreAuthorize("@ss.hasPermission('ai1:skill:delete')")
     public CommonResult<Boolean> deleteSkillFile(@RequestParam("id") Long id) {
         skillFileService.deleteSkillFile(id);
         return success(true);

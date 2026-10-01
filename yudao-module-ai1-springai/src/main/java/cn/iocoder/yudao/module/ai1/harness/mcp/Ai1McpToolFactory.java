@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.crypto.digest.DigestUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.agent.Ai1AgentDO;
@@ -24,10 +25,10 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 /**
  * AI1 MCP 工具工厂：把 Agent 绑定的 MCP 服务暴露的工具，桥接为 Spring AI ToolCallback
  *
- * 1. 工具名：MCP 名称净化 + "__" + 原始工具名，避免多个服务的同名工具冲突
+ * 1. 工具名：MCP 名称净化 + "__" + 原始工具名；无有效名称时使用 MCP 编号，超长时保留摘要
  * 2. 入参：透传 MCP 工具的 JSON Schema，调用落地仍走 {@link Ai1McpClientTool}
  *
- * 工具挂到 ChatClient 后，由 Spring AI 的工具调用机制统一驱动；与 {@link Ai1McpClientTool} 同包，保持 tool 层内依赖
+ * 工具挂到 ChatClient 后，由 Spring AI 的工具调用机制统一驱动；与 {@link Ai1McpClientTool} 同包
  *
  * @author 芋道源码
  */
@@ -104,24 +105,37 @@ public class Ai1McpToolFactory {
     }
 
     /**
-     * 构建工具名：MCP 名称净化 + "__" + 原始工具名，避免多个服务的同名工具冲突
+     * 构建工具名：无有效 MCP 名称时使用编号；超过 64 字符时截短并追加摘要，避免截断后重名
      *
      * @param mcp  MCP 服务
      * @param tool MCP 工具
      * @return 工具名
      */
     private static String buildToolName(Ai1McpDO mcp, McpSchema.Tool tool) {
-        return slugify(mcp.getName()) + NAME_SEPARATOR + tool.name();
+        String prefix = slugify(mcp.getName());
+        if (StrUtil.isEmpty(prefix)) {
+            prefix = "mcp_" + mcp.getId();
+        }
+        String name = prefix + NAME_SEPARATOR + tool.name();
+        // OpenAI 兼容接口的工具名最多 64 字符，保留 47 字符前缀 + "_" + 16 位摘要。
+        // 摘要由 MCP 编号和原始工具名生成，避免不同服务或工具截断后重名。
+        if (name.length() > 64) {
+            String suffix = DigestUtil.sha256Hex(mcp.getId() + ":" + tool.name()).substring(0, 16);
+            name = name.substring(0, 47) + "_" + suffix;
+        }
+        return name;
     }
 
     /**
      * 名称净化：只保留小写字母、数字、下划线（工具名需匹配 ^[a-zA-Z0-9_-]+$）
      */
     static String slugify(String name) {
-        if (StrUtil.isEmpty(name)) {
-            return "mcp";
+        if (StrUtil.isBlank(name)) {
+            return "";
         }
-        return ReUtil.replaceAll(name.toLowerCase(Locale.ROOT), "[^a-z0-9_]", "_");
+        String slug = ReUtil.replaceAll(name.toLowerCase(Locale.ROOT), "[^a-z0-9_]+", "_");
+        slug = ReUtil.replaceAll(slug, "_+", "_");
+        return ReUtil.replaceAll(slug, "^_+|_+$", "");
     }
 
 }

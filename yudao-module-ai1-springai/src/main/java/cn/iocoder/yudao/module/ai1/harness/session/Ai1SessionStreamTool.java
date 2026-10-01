@@ -8,12 +8,16 @@ import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.agent.Ai1AgentDO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.session.Ai1SessionMessageDO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.knowledge.Ai1KnowledgeBaseDO;
+import cn.iocoder.yudao.module.ai1.dal.redis.Ai1RedisKeyConstants;
+import cn.iocoder.yudao.module.ai1.enums.Ai1ErrorCodeConstants;
+import cn.iocoder.yudao.module.ai1.enums.session.Ai1SessionStreamEventEnum;
 import cn.iocoder.yudao.module.ai1.enums.session.Ai1SessionMessageRoleEnum;
 import cn.iocoder.yudao.module.ai1.enums.session.Ai1SessionMessageStatusEnum;
 import cn.iocoder.yudao.module.ai1.enums.model.Ai1ModelTypeEnum;
@@ -34,6 +38,7 @@ import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.context.annotation.Lazy;
 import org.redisson.api.RStream;
+import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.redisson.api.stream.*;
 import org.redisson.client.codec.StringCodec;
@@ -48,10 +53,6 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
-
-import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.module.ai1.dal.redis.Ai1RedisKeyConstants.*;
-import static cn.iocoder.yudao.module.ai1.enums.Ai1ErrorCodeConstants.MODEL_TYPE_NOT_CHAT;
 
 /**
  * AI1 会话流工具：会话流的「投递 / 续传入口 + 生成 worker + 结果流 + SSE 转发」一体
@@ -76,31 +77,6 @@ import static cn.iocoder.yudao.module.ai1.enums.Ai1ErrorCodeConstants.MODEL_TYPE
 @Component
 @Slf4j
 public class Ai1SessionStreamTool implements SmartLifecycle {
-
-    /**
-     * 事件：结果流标识（连接建立即下发，data 为助手消息编号）
-     */
-    public static final String EVENT_STREAM = "stream";
-    /**
-     * 事件：思考过程增量
-     */
-    public static final String EVENT_THINKING = "thinking";
-    /**
-     * 事件：回复内容增量
-     */
-    public static final String EVENT_MESSAGE = "message";
-    /**
-     * 事件：空闲心跳
-     */
-    public static final String EVENT_PING = "ping";
-    /**
-     * 事件：终态，生成结束
-     */
-    public static final String EVENT_DONE = "done";
-    /**
-     * 事件：终态，生成失败（data 为错误提示）
-     */
-    public static final String EVENT_ERROR = "error";
 
     /**
      * SSE 转发线程名前缀
@@ -128,7 +104,7 @@ public class Ai1SessionStreamTool implements SmartLifecycle {
      */
     private static final long RECLAIM_INTERVAL_MILLIS = 60_000;
     /**
-     * 超时任务认领的空闲阈值缓冲，单位：毫秒；空闲阈值 = 生成最长时长 + 缓冲，避免误抢在途任务
+     * 超时任务认领的空闲阈值缓冲，单位：毫秒；空闲阈值 = SSE 连接超时 + 缓冲，执行锁另行保护在途任务
      */
     private static final long RECLAIM_IDLE_BUFFER_MILLIS = 60_000;
     /**
@@ -151,6 +127,21 @@ public class Ai1SessionStreamTool implements SmartLifecycle {
      * 结果流读取失败后的重试间隔，单位：毫秒
      */
     private static final long READ_ERROR_BACKOFF_MILLIS = 500;
+
+    /**
+     * 结果流丢失判定：转发到连接超时前该时长，结果流仍不存在时，判定任务丢失（预留两个阻塞读窗口，保证 error 能在连接超时前送达）
+     */
+    private static final long LOST_CHECK_ADVANCE_MILLIS = READ_BLOCK_MILLIS * 2;
+
+    /**
+     * 结果流丢失时的错误提示
+     */
+    static final String LOST_MESSAGE = "生成任务已丢失，请重新发送";
+
+    /**
+     * worker 中断后的错误提示；保留部分内容，不重新生成以免输出或工具调用重复
+     */
+    static final String INTERRUPTED_MESSAGE = "生成任务已中断，请重新发送";
 
     private static final String FIELD_MESSAGE_ID = "messageId";
     private static final String FIELD_AGENT_ID = "agentId";
@@ -275,7 +266,7 @@ public class Ai1SessionStreamTool implements SmartLifecycle {
      */
     private void initTaskGroup() {
         try {
-            getTaskStream().createGroup(StreamCreateGroupArgs.name(SESSION_TASK_GROUP).id(StreamMessageId.ALL).makeStream());
+            getTaskStream().createGroup(StreamCreateGroupArgs.name(Ai1RedisKeyConstants.SESSION_TASK_GROUP).id(StreamMessageId.ALL).makeStream());
         } catch (Exception e) {
             if (!isBusyGroup(e)) {
                 log.warn("[initTaskGroup][Chat 任务消费组初始化失败]", e);
@@ -330,10 +321,12 @@ public class Ai1SessionStreamTool implements SmartLifecycle {
      */
     public SseEmitter open(Long messageId, String lastEventId) {
         SseEmitter emitter = new SseEmitter(ai1Properties.getSession().getStream().getTimeoutMs());
+        // 转发线程没有租户上下文，判定任务丢失后回写消息时使用
+        Long tenantId = TenantContextHolder.getTenantId();
         try {
             sseExecutor.execute(() -> {
                 try {
-                    streamResult(emitter, messageId, lastEventId);
+                    streamResult(emitter, messageId, lastEventId, tenantId);
                     emitter.complete();
                 } catch (Exception e) {
                     log.warn("[open][助手消息({}) 会话流转发异常]", messageId, e);
@@ -372,11 +365,11 @@ public class Ai1SessionStreamTool implements SmartLifecycle {
                 long now = System.currentTimeMillis();
                 if (now - lastReclaimTime >= RECLAIM_INTERVAL_MILLIS) {
                     lastReclaimTime = now;
-                    reclaimTasks(consumer).forEach(this::handleTask);
+                    reclaimTasks(consumer).forEach((recordId, fields) -> handleTask(recordId, fields, true));
                 }
 
                 // 2. 阻塞读取从未投递过的新任务，每次一条，处理完再读取下一条
-                Map<StreamMessageId, Map<String, String>> records = getTaskStream().readGroup(SESSION_TASK_GROUP, consumer,
+                Map<StreamMessageId, Map<String, String>> records = getTaskStream().readGroup(Ai1RedisKeyConstants.SESSION_TASK_GROUP, consumer,
                         StreamReadGroupArgs.neverDelivered().count(1).timeout(Duration.ofMillis(READ_BLOCK_MILLIS)));
                 if (records != null) {
                     records.forEach(this::handleTask);
@@ -393,14 +386,14 @@ public class Ai1SessionStreamTool implements SmartLifecycle {
     }
 
     /**
-     * 认领长时间未确认的任务（worker 宕机后由其他节点接管）；空闲阈值为生成最长时长 + 缓冲时长，不会误抢在途任务
+     * 认领长时间未确认的任务；PEL 空闲时长不代表生成已停止，接管后仍需获取消息执行锁
      */
     private Map<StreamMessageId, Map<String, String>> reclaimTasks(String consumer) {
         Duration minIdle = Duration.ofMillis(ai1Properties.getSession().getStream().getTimeoutMs() + RECLAIM_IDLE_BUFFER_MILLIS);
         try {
             // 1. 查询空闲超过阈值的待确认任务
             RStream<String, String> taskStream = getTaskStream();
-            List<PendingEntry> pendingEntries = taskStream.listPending(StreamPendingRangeArgs.groupName(SESSION_TASK_GROUP)
+            List<PendingEntry> pendingEntries = taskStream.listPending(StreamPendingRangeArgs.groupName(Ai1RedisKeyConstants.SESSION_TASK_GROUP)
                     .startId(StreamMessageId.MIN).endId(StreamMessageId.MAX).count(RECLAIM_BATCH_SIZE).idleTime(minIdle));
             if (CollUtil.isEmpty(pendingEntries)) {
                 return Collections.emptyMap();
@@ -408,7 +401,7 @@ public class Ai1SessionStreamTool implements SmartLifecycle {
 
             // 2. 认领到当前消费者：认领时再次校验空闲时长，避免与其他节点重复认领
             StreamMessageId[] ids = pendingEntries.stream().map(PendingEntry::getId).toArray(StreamMessageId[]::new);
-            return taskStream.claim(SESSION_TASK_GROUP, consumer, minIdle.toMillis(), TimeUnit.MILLISECONDS, ids);
+            return taskStream.claim(Ai1RedisKeyConstants.SESSION_TASK_GROUP, consumer, minIdle.toMillis(), TimeUnit.MILLISECONDS, ids);
         } catch (Exception e) {
             log.warn("[reclaimTasks][Chat 任务认领失败]", e);
             return Collections.emptyMap();
@@ -416,58 +409,183 @@ public class Ai1SessionStreamTool implements SmartLifecycle {
     }
 
     /**
-     * 消费单条任务：解析 → 在任务租户下生成（增量写结果流）→ 回填助手消息 → 写终态 → 确认
-     *
-     * 成功回填完成状态；失败回填失败状态（保留已生成的部分内容）并写 error 终态；无论成败都写 done 终态并 XACK
+     * 消费单条新任务
      */
     void handleTask(StreamMessageId recordId, Map<String, String> fields) {
+        handleTask(recordId, fields, false);
+    }
+
+    /**
+     * 消费任务：执行锁保护生成与回填；已完成的任务直接确认，中断的任务保留部分内容并标记失败
+     */
+    void handleTask(StreamMessageId recordId, Map<String, String> fields, boolean reclaimed) {
         // 1. 解析任务：没有消息编号的异常记录，直接确认丢弃
         Long messageId = Convert.toLong(fields.get(FIELD_MESSAGE_ID));
         if (messageId == null) {
             ackTask(recordId);
             return;
         }
-        Long tenantId = Convert.toLong(fields.get(FIELD_TENANT_ID));
-        Long agentId = Convert.toLong(fields.get(FIELD_AGENT_ID));
-        Long sessionId = Convert.toLong(fields.get(FIELD_SESSION_ID));
-        String content = fields.get(FIELD_CONTENT);
-
-        // 2. 生成并回填：增量同时累积到本地，失败时用于回填部分内容
-        StringBuilder contentText = new StringBuilder();
-        StringBuilder thinkingText = new StringBuilder();
-        Consumer<String> onThinking = delta -> {
-            thinkingText.append(delta);
-            appendResult(messageId, EVENT_THINKING, delta);
-        };
-        Consumer<String> onContent = delta -> {
-            contentText.append(delta);
-            appendResult(messageId, EVENT_MESSAGE, delta);
-        };
-        Runnable task = () -> {
-            try {
-                Ai1LlmChatTool.ChatText chatText = generate(messageId, agentId, sessionId, content, onThinking, onContent);
-                saveAssistantMessage(messageId, sessionId, chatText, Ai1SessionMessageStatusEnum.SUCCESS.getStatus());
-            } catch (Exception e) {
-                log.warn("[handleTask][助手消息({}) 生成失败]", messageId, e);
-                appendResult(messageId, EVENT_ERROR, StrUtil.blankToDefault(e.getMessage(), "生成失败"));
-                // 失败时回填已生成的部分内容，避免产出丢失
-                saveAssistantMessage(messageId, sessionId, new Ai1LlmChatTool.ChatText(contentText.toString(),
-                        thinkingText.toString()), Ai1SessionMessageStatusEnum.FAILED.getStatus());
-            }
-        };
+        // 2. 看门狗为长任务自动续期；认领到在途任务时跳过，不确认，交由原 worker 完成
+        RLock lock = redissonClient.getLock(String.format(Ai1RedisKeyConstants.SESSION_TASK_LOCK, messageId));
+        if (!lock.tryLock()) {
+            return;
+        }
+        long workerThreadId = Thread.currentThread().threadId();
         try {
-            TenantUtils.execute(tenantId, task);
+            Long tenantId = Convert.toLong(fields.get(FIELD_TENANT_ID));
+            TenantUtils.execute(tenantId, () -> executeTask(recordId, fields, messageId, lock, workerThreadId, reclaimed));
         } catch (Exception e) {
-            log.error("[handleTask][助手消息({}) 回填失败]", messageId, e);
+            // Redis 或回填失败时保留 pending，后续接管不会重新生成
+            log.error("[handleTask][助手消息({}) 处理失败]", messageId, e);
         } finally {
-            // 3. 无论成败，都写 done 终态并确认任务
-            appendResult(messageId, EVENT_DONE, "");
-            ackTask(recordId);
+            resultExpireTimes.remove(messageId);
+            try {
+                if (lock.isHeldByThread(workerThreadId)) {
+                    lock.unlock();
+                }
+            } catch (Exception e) {
+                log.warn("[handleTask][助手消息({}) 执行锁释放失败]", messageId, e);
+            }
         }
     }
 
+    /**
+     * 持有执行锁后处理任务：清理异常记录、补齐已完成任务、收尾中断任务，或执行新一轮生成
+     */
+    private void executeTask(StreamMessageId recordId, Map<String, String> fields, Long messageId,
+                             RLock lock, long workerThreadId, boolean reclaimed) {
+        // 1.1 查询助手消息，不存在或不是助手角色时确认丢弃
+        Ai1SessionMessageDO message = sessionMessageService.getSessionMessage(messageId);
+        if (message == null || !Ai1SessionMessageRoleEnum.isAssistant(message.getRole())) {
+            checkTaskLock(lock, workerThreadId);
+            ackTask(recordId);
+            return;
+        }
+        // 1.2 回填成功后 XACK 可能失败，补齐缺失终态后确认，不再调用模型
+        if (!Ai1SessionMessageStatusEnum.isGenerating(message.getStatus())) {
+            completeTaskResult(message, lock, workerThreadId);
+            checkTaskLock(lock, workerThreadId);
+            ackTask(recordId);
+            return;
+        }
+        // 1.3 接管任务不重跑，保留结果流中的部分输出；新任务已有结果时同样按中断处理
+        Long sessionId = Convert.toLong(fields.get(FIELD_SESSION_ID));
+        if (reclaimed || getResultStream(messageId).isExists()) {
+            // 1.3.1 按结果流顺序恢复已产生的正文和思考
+            Ai1LlmChatTool.ChatText partialText = readPartialResult(messageId);
+            // 1.3.2 回填部分结果并标记失败；每次写入前校验执行权，防止旧 worker 继续写入
+            checkTaskLock(lock, workerThreadId);
+            saveAssistantMessage(messageId, sessionId, partialText, Ai1SessionMessageStatusEnum.FAILED.getStatus());
+            // 1.3.3 写入错误提示和结束事件，续传连接可及时退出
+            checkTaskLock(lock, workerThreadId);
+            appendResult(messageId, Ai1SessionStreamEventEnum.ERROR.getEvent(), INTERRUPTED_MESSAGE);
+            checkTaskLock(lock, workerThreadId);
+            appendResult(messageId, Ai1SessionStreamEventEnum.DONE.getEvent(), "");
+            // 1.3.4 确认任务；以上任一步失败时保留 pending，交由后续接管收尾
+            checkTaskLock(lock, workerThreadId);
+            ackTask(recordId);
+            return;
+        }
+
+        // 2. 解析任务字段
+        Long agentId = Convert.toLong(fields.get(FIELD_AGENT_ID));
+        String content = fields.get(FIELD_CONTENT);
+
+        // 3. 生成并回填；增量回调可能在模型线程执行，因此按 worker 线程编号校验锁归属
+        StringBuilder contentText = new StringBuilder();
+        StringBuilder thinkingText = new StringBuilder();
+        Consumer<String> onThinking = delta -> {
+            checkTaskLock(lock, workerThreadId);
+            thinkingText.append(delta);
+            appendResult(messageId, Ai1SessionStreamEventEnum.THINKING.getEvent(), delta);
+        };
+        Consumer<String> onContent = delta -> {
+            checkTaskLock(lock, workerThreadId);
+            contentText.append(delta);
+            appendResult(messageId, Ai1SessionStreamEventEnum.MESSAGE.getEvent(), delta);
+        };
+        // 3.1 标记生成开始，再调用模型并回填完整结果
+        try {
+            checkTaskLock(lock, workerThreadId);
+            // 标记生成已开始；长思考没有增量时，续传也不会误判结果流丢失
+            appendResult(messageId, Ai1SessionStreamEventEnum.PING.getEvent(), "");
+            Ai1LlmChatTool.ChatText chatText = generate(messageId, agentId, sessionId, content, onThinking, onContent);
+            checkTaskLock(lock, workerThreadId);
+            saveAssistantMessage(messageId, sessionId, chatText, Ai1SessionMessageStatusEnum.SUCCESS.getStatus());
+        } catch (Exception e) {
+            // 失去锁的旧 worker 不得再写结果、终态或 XACK，留给新持有者处理
+            if (!lock.isHeldByThread(workerThreadId)) {
+                return;
+            }
+            // 3.2 生成失败时下发错误，保留本轮已产生的增量并回填失败状态
+            log.warn("[handleTask][助手消息({}) 生成失败]", messageId, e);
+            appendResult(messageId, Ai1SessionStreamEventEnum.ERROR.getEvent(), StrUtil.blankToDefault(e.getMessage(), "生成失败"));
+            checkTaskLock(lock, workerThreadId);
+            saveAssistantMessage(messageId, sessionId, new Ai1LlmChatTool.ChatText(contentText.toString(),
+                    thinkingText.toString()), Ai1SessionMessageStatusEnum.FAILED.getStatus());
+        }
+        // 4. 回填后写终态并确认；失败时由后续接管清理，不能在 finally 中无条件确认
+        checkTaskLock(lock, workerThreadId);
+        appendResult(messageId, Ai1SessionStreamEventEnum.DONE.getEvent(), "");
+        checkTaskLock(lock, workerThreadId);
+        ackTask(recordId);
+    }
+
+    /**
+     * 已回填任务的终态补偿：只补齐缺失的 error/done，不再次生成或回填消息
+     *
+     * 数据库回填与结果流写入不是同一事务，worker 可能在两者之间退出。
+     */
+    private void completeTaskResult(Ai1SessionMessageDO message, RLock lock, long workerThreadId) {
+        // 1. 只查询最后一条事件，已有 done 则无需再补写
+        Map<StreamMessageId, Map<String, String>> last = getResultStream(message.getId())
+                .rangeReversed(StreamRangeArgs.startId(StreamMessageId.MAX).endId(StreamMessageId.MIN).count(1));
+        String lastType = last.isEmpty() ? null : CollUtil.getFirst(last.values()).get(FIELD_TYPE);
+        if (Ai1SessionStreamEventEnum.DONE.getEvent().equals(lastType)) {
+            return;
+        }
+        // 2. 失败消息缺少 error 时补写错误提示，末尾已有 error 时不重复写入
+        if (Ai1SessionMessageStatusEnum.FAILED.getStatus().equals(message.getStatus())
+                && !Ai1SessionStreamEventEnum.ERROR.getEvent().equals(lastType)) {
+            checkTaskLock(lock, workerThreadId);
+            appendResult(message.getId(), Ai1SessionStreamEventEnum.ERROR.getEvent(), INTERRUPTED_MESSAGE);
+        }
+        // 3. 补写 done，使续传连接能够结束；调用方在补齐后再确认任务
+        checkTaskLock(lock, workerThreadId);
+        appendResult(message.getId(), Ai1SessionStreamEventEnum.DONE.getEvent(), "");
+    }
+
+    /**
+     * 校验执行锁仍属于原 worker；增量回调可能在模型线程执行，因此不能使用当前回调线程编号
+     *
+     * 失去执行权时抛出异常，中止旧 worker 的后续写入，由新持有者收尾。
+     */
+    private static void checkTaskLock(RLock lock, long workerThreadId) {
+        if (!lock.isHeldByThread(workerThreadId)) {
+            throw new IllegalStateException("生成任务执行权已失效");
+        }
+    }
+
+    /**
+     * 按结果流顺序还原中断任务的正文和思考，忽略心跳、错误提示及结束事件
+     */
+    private Ai1LlmChatTool.ChatText readPartialResult(Long messageId) {
+        StringBuilder content = new StringBuilder();
+        StringBuilder thinking = new StringBuilder();
+        // 读取完整结果流，按条目编号升序拼接各类增量
+        getResultStream(messageId).range(StreamRangeArgs.startId(StreamMessageId.MIN).endId(StreamMessageId.MAX))
+                .values().forEach(fields -> {
+                    if (Ai1SessionStreamEventEnum.MESSAGE.getEvent().equals(fields.get(FIELD_TYPE))) {
+                        content.append(StrUtil.nullToEmpty(fields.get(FIELD_DATA)));
+                    } else if (Ai1SessionStreamEventEnum.THINKING.getEvent().equals(fields.get(FIELD_TYPE))) {
+                        thinking.append(StrUtil.nullToEmpty(fields.get(FIELD_DATA)));
+                    }
+                });
+        return new Ai1LlmChatTool.ChatText(content.toString(), thinking.toString());
+    }
+
     private void ackTask(StreamMessageId recordId) {
-        getTaskStream().ack(SESSION_TASK_GROUP, recordId);
+        getTaskStream().ack(Ai1RedisKeyConstants.SESSION_TASK_GROUP, recordId);
     }
 
     // ==================== 生成编排 ====================
@@ -484,7 +602,7 @@ public class Ai1SessionStreamTool implements SmartLifecycle {
         Ai1AgentDO agent = agentService.validateAgentExists(agentId);
         Ai1ModelRespBO model = modelService.getModelRespBO(agent.getProviderId(), agent.getModelId());
         if (!Ai1ModelTypeEnum.isChat(model.getModelType())) {
-            throw exception(MODEL_TYPE_NOT_CHAT);
+            throw ServiceExceptionUtil.exception(Ai1ErrorCodeConstants.MODEL_TYPE_NOT_CHAT);
         }
 
         // 2. 历史消息：按编号倒序取最近 N 条，再升序还原为会话顺序
@@ -563,7 +681,7 @@ public class Ai1SessionStreamTool implements SmartLifecycle {
 
         // 2. 终态：续期一次完整 TTL，保证续传时间窗从结束时刻起算，并清理节流状态
         Duration ttl = Duration.ofSeconds(ai1Properties.getSession().getStream().getTtlSeconds());
-        if (EVENT_DONE.equals(type) || EVENT_ERROR.equals(type)) {
+        if (Ai1SessionStreamEventEnum.isTerminal(type)) {
             resultStream.expire(ttl);
             resultExpireTimes.remove(messageId);
             return;
@@ -584,7 +702,7 @@ public class Ai1SessionStreamTool implements SmartLifecycle {
      * SSE 转发主循环：先下发 stream 事件告知结果流标识；随后按条目实时下发，事件编号为结果流条目编号；
      * 空闲时下发 ping 心跳；遇到终态、超时、客户端断开、Redis 连续读取失败时退出
      */
-    private void streamResult(SseEmitter emitter, Long messageId, String lastEventId) {
+    private void streamResult(SseEmitter emitter, Long messageId, String lastEventId, Long tenantId) {
         // 1. 客户端断开、完成、超时时置取消标志，终止转发循环
         AtomicBoolean cancelled = new AtomicBoolean(false);
         emitter.onCompletion(() -> cancelled.set(true));
@@ -593,9 +711,13 @@ public class Ai1SessionStreamTool implements SmartLifecycle {
 
         // 2. 先下发 stream 事件，告知前端结果流标识（助手消息编号），用于断线续传
         StreamMessageId fromId = parseStreamMessageId(lastEventId);
-        long deadline = System.currentTimeMillis() + ai1Properties.getSession().getStream().getTimeoutMs();
+        long startTime = System.currentTimeMillis();
+        long timeoutMs = ai1Properties.getSession().getStream().getTimeoutMs();
+        long deadline = startTime + timeoutMs;
+        long lostCheckTime = startTime + Math.max(timeoutMs - LOST_CHECK_ADVANCE_MILLIS, 0);
+        boolean lostChecked = false;
         int errorCount = 0;
-        sendEvent(emitter, EVENT_STREAM, String.valueOf(messageId), null, cancelled);
+        sendEvent(emitter, Ai1SessionStreamEventEnum.STREAM.getEvent(), String.valueOf(messageId), null, cancelled);
 
         // 3. 循环读取结果流并转发，直到终态、超时或取消
         while (!cancelled.get()) {
@@ -620,7 +742,18 @@ public class Ai1SessionStreamTool implements SmartLifecycle {
             errorCount = 0;
             // 3.3 阻塞窗口内无新条目时，下发空闲心跳，防止网关、浏览器因长时间无数据断开
             if (MapUtil.isEmpty(records)) {
-                sendEvent(emitter, EVENT_PING, "", null, cancelled);
+                // 临近连接超时，结果流仍不存在：任务丢失（投递失败、worker 回填失败、结果流已过期等），
+                // 回写失败并下发 error 终态，避免消息永远停在生成中、前端反复续传
+                if (!lostChecked && System.currentTimeMillis() >= lostCheckTime) {
+                    lostChecked = true;
+                    if (!getResultStream(messageId).isExists()) {
+                        log.warn("[streamResult][助手消息({}) 结果流不存在，判定生成任务丢失]", messageId);
+                        failLostMessage(messageId, tenantId);
+                        sendEvent(emitter, Ai1SessionStreamEventEnum.ERROR.getEvent(), LOST_MESSAGE, null, cancelled);
+                        return;
+                    }
+                }
+                sendEvent(emitter, Ai1SessionStreamEventEnum.PING.getEvent(), "", null, cancelled);
                 continue;
             }
             // 3.4 按条目编号顺序下发（Redisson 返回的 Map 有序），事件编号为条目编号；遇到终态结束
@@ -628,10 +761,28 @@ public class Ai1SessionStreamTool implements SmartLifecycle {
                 fromId = record.getKey();
                 String type = record.getValue().get(FIELD_TYPE);
                 sendEvent(emitter, type, record.getValue().get(FIELD_DATA), fromId.toString(), cancelled);
-                if (EVENT_DONE.equals(type) || EVENT_ERROR.equals(type)) {
+                if (Ai1SessionStreamEventEnum.isTerminal(type)) {
                     return;
                 }
             }
+        }
+    }
+
+    /**
+     * 任务丢失时，把仍处于生成中的助手消息回写为失败；已完成或已失败的消息不改动
+     */
+    void failLostMessage(Long messageId, Long tenantId) {
+        try {
+            TenantUtils.execute(tenantId, () -> {
+                Ai1SessionMessageDO message = sessionMessageService.getSessionMessage(messageId);
+                if (message == null || !Ai1SessionMessageStatusEnum.isGenerating(message.getStatus())) {
+                    return;
+                }
+                sessionMessageService.updateSessionMessage(new Ai1SessionMessageDO().setId(messageId)
+                        .setStatus(Ai1SessionMessageStatusEnum.FAILED.getStatus()));
+            });
+        } catch (Exception e) {
+            log.error("[failLostMessage][助手消息({}) 回写失败状态失败]", messageId, e);
         }
     }
 
@@ -655,7 +806,8 @@ public class Ai1SessionStreamTool implements SmartLifecycle {
 
     private static void sendErrorAndComplete(SseEmitter emitter, String message) {
         try {
-            emitter.send(SseEmitter.event().name(EVENT_ERROR).data(JsonUtils.toJsonString(StrUtil.blankToDefault(message, "生成失败"))));
+            emitter.send(SseEmitter.event().name(Ai1SessionStreamEventEnum.ERROR.getEvent())
+                    .data(JsonUtils.toJsonString(StrUtil.blankToDefault(message, "生成失败"))));
         } catch (Exception ignored) {
             // 客户端已断开，忽略
         }
@@ -665,11 +817,11 @@ public class Ai1SessionStreamTool implements SmartLifecycle {
     // ==================== 通用方法 ====================
 
     private RStream<String, String> getTaskStream() {
-        return redissonClient.getStream(SESSION_TASK_STREAM, StringCodec.INSTANCE);
+        return redissonClient.getStream(Ai1RedisKeyConstants.SESSION_TASK_STREAM, StringCodec.INSTANCE);
     }
 
     private RStream<String, String> getResultStream(Long messageId) {
-        return redissonClient.getStream(String.format(SESSION_RESULT_STREAM, messageId), StringCodec.INSTANCE);
+        return redissonClient.getStream(String.format(Ai1RedisKeyConstants.SESSION_RESULT_STREAM, messageId), StringCodec.INSTANCE);
     }
 
     /**

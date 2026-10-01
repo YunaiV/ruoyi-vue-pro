@@ -17,6 +17,7 @@ import cn.iocoder.yudao.module.ai1.harness.llm.Ai1LlmModelFactory;
 import cn.iocoder.yudao.module.ai1.harness.model.Ai1ProviderTool;
 import cn.iocoder.yudao.module.ai1.service.model.bo.Ai1ModelRespBO;
 import cn.iocoder.yudao.module.ai1.service.agent.Ai1AgentService;
+import cn.iocoder.yudao.module.ai1.service.knowledge.Ai1KnowledgeBaseService;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -48,6 +49,9 @@ public class Ai1ModelServiceImpl implements Ai1ModelService {
     @Resource
     @Lazy // 延迟加载，避免循环依赖
     private Ai1AgentService agentService;
+    @Resource
+    @Lazy // 延迟加载，避免循环依赖
+    private Ai1KnowledgeBaseService knowledgeBaseService;
 
     @Resource
     private Ai1LlmModelFactory llmModelFactory;
@@ -69,10 +73,23 @@ public class Ai1ModelServiceImpl implements Ai1ModelService {
 
     @Override
     public void updateModel(Ai1ModelSaveReqVO updateReqVO) {
-        // 1. 校验存在、供应商存在、模型标识唯一
-        validateModelExists(updateReqVO.getId());
+        // 1.1 校验存在、供应商归属不可变、模型标识唯一
+        Ai1ModelDO model = validateModelExists(updateReqVO.getId());
+        if (ObjUtil.notEqual(model.getProviderId(), updateReqVO.getProviderId())) {
+            throw exception(MODEL_NOT_BELONG_PROVIDER);
+        }
         providerService.validateProviderExists(updateReqVO.getProviderId());
         validateModelUnique(updateReqVO.getId(), updateReqVO.getProviderId(), updateReqVO.getModel());
+        // 1.2 被使用的模型禁止修改类型，避免 Agent 或知识库配置失效
+        if (ObjUtil.notEqual(model.getType(), updateReqVO.getType())) {
+            List<Long> ids = Collections.singletonList(model.getId());
+            if (agentService.getAgentCountByModelIds(ids) > 0) {
+                throw exception(MODEL_TYPE_USED_BY_AGENT);
+            }
+            if (knowledgeBaseService.getKnowledgeBaseCountByEmbeddingModelIds(ids) > 0) {
+                throw exception(MODEL_TYPE_USED_BY_KNOWLEDGE_BASE);
+            }
+        }
 
         // 2. 更新
         Ai1ModelDO updateObj = BeanUtils.toBean(updateReqVO, Ai1ModelDO.class);
@@ -91,10 +108,13 @@ public class Ai1ModelServiceImpl implements Ai1ModelService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteModelListByIds(List<Long> ids) {
-        // 1. 校验存在；被 Agent 使用时禁止删除
+        // 1. 校验存在；被 Agent 或知识库使用时禁止删除
         ids.forEach(this::validateModelExists);
         if (agentService.getAgentCountByModelIds(ids) > 0) {
             throw exception(MODEL_USED_BY_AGENT);
+        }
+        if (knowledgeBaseService.getKnowledgeBaseCountByEmbeddingModelIds(ids) > 0) {
+            throw exception(MODEL_USED_BY_KNOWLEDGE_BASE);
         }
 
         // 2. 删除

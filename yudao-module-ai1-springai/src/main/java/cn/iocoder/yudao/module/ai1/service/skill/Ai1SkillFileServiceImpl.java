@@ -20,9 +20,7 @@ import org.springframework.validation.annotation.Validated;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMultiMap;
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.getMaxValue;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.ai1.enums.Ai1ErrorCodeConstants.*;
 
 /**
@@ -73,9 +71,9 @@ public class Ai1SkillFileServiceImpl implements Ai1SkillFileService {
 
     @Override
     public void createDefaultSkillFileList(Ai1SkillDO skill) {
-        // 1. 渲染 SKILL.md 默认内容
-        String content = StrUtil.format(SKILL_FILE_CONTENT_TEMPLATE, skill.getName(),
-                StrUtil.nullToEmpty(skill.getDescription()), skill.getName());
+        // 1. 新建时用管理信息初始化 SKILL.md，后续面向模型的名称、描述由文件编辑器独立维护
+        String content = StrUtil.format(SKILL_FILE_CONTENT_TEMPLATE, toFrontmatterValue(skill.getName()),
+                toFrontmatterValue(skill.getDescription()), skill.getName());
 
         // 2. 插入固定节点：SKILL.md + scripts/ + reference/
         Ai1SkillFileDO skillFile = Ai1SkillFileDO.builder().skillId(skill.getId()).parentId(Ai1SkillFileDO.PARENT_ID_ROOT)
@@ -86,6 +84,11 @@ public class Ai1SkillFileServiceImpl implements Ai1SkillFileService {
         Ai1SkillFileDO referenceDirectory = Ai1SkillFileDO.builder().skillId(skill.getId()).parentId(Ai1SkillFileDO.PARENT_ID_ROOT)
                 .name(DIRECTORY_NAME_REFERENCE).type(Ai1SkillFileTypeEnum.DIRECTORY.getType()).locked(true).sort(3).build();
         skillFileMapper.insertBatch(Arrays.asList(skillFile, scriptsDirectory, referenceDirectory));
+    }
+
+    private static String toFrontmatterValue(String value) {
+        // 元数据值保持单行，避免名称、描述中的换行被解析成额外的字段
+        return StrUtil.trim(StrUtil.replaceChars(StrUtil.nullToEmpty(value), new char[]{'\r', '\n'}, " "));
     }
 
     @Override
@@ -143,9 +146,11 @@ public class Ai1SkillFileServiceImpl implements Ai1SkillFileService {
         validateSkillFileNotLocked(skillFile, "移动");
         // 1.2 校验目标目录：不能是自身或其后代，且必须是同一 SKILL 下的目录
         Long parentId = moveReqVO.getParentId();
-        if (ObjUtil.equal(parentId, skillFile.getId())
-                || isDescendant(skillFile.getSkillId(), skillFile.getId(), parentId)) {
+        if (ObjUtil.equal(parentId, skillFile.getId())) {
             throw exception(SKILL_FILE_MOVE_TO_SELF);
+        }
+        if (isDescendant(skillFile.getSkillId(), skillFile.getId(), parentId)) {
+            throw exception(SKILL_FILE_MOVE_TO_DESCENDANT);
         }
         validateParentDirectory(skillFile.getSkillId(), parentId);
         // 1.3 校验目标目录下同名唯一
@@ -256,8 +261,10 @@ public class Ai1SkillFileServiceImpl implements Ai1SkillFileService {
             return;
         }
         Ai1SkillFileDO parent = skillFileMapper.selectById(parentId);
-        if (parent == null || ObjUtil.notEqual(parent.getSkillId(), skillId)
-                || !Ai1SkillFileTypeEnum.isDirectory(parent.getType())) {
+        if (parent == null) {
+            throw exception(SKILL_FILE_PARENT_NOT_EXISTS);
+        }
+        if (ObjUtil.notEqual(parent.getSkillId(), skillId) || !Ai1SkillFileTypeEnum.isDirectory(parent.getType())) {
             throw exception(SKILL_FILE_PARENT_INVALID);
         }
     }

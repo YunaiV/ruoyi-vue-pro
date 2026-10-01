@@ -55,6 +55,14 @@ public interface Ai1SessionMessageService {
     SseEmitter resumeSessionMessageStream(Long userId, Long messageId, String lastEventId);
 
     /**
+     * 获得消息
+     *
+     * @param id 编号
+     * @return 消息
+     */
+    Ai1SessionMessageDO getSessionMessage(Long id);
+
+    /**
      * 更新消息（worker 回填助手消息）
      *
      * @param updateObj 更新对象

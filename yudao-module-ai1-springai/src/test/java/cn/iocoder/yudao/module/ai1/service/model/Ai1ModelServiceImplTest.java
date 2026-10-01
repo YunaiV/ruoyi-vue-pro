@@ -14,8 +14,11 @@ import cn.iocoder.yudao.module.ai1.harness.llm.Ai1LlmModelFactory;
 import cn.iocoder.yudao.module.ai1.harness.model.Ai1ProviderTool;
 import cn.iocoder.yudao.module.ai1.service.model.bo.Ai1ModelRespBO;
 import cn.iocoder.yudao.module.ai1.service.agent.Ai1AgentService;
+import cn.iocoder.yudao.module.ai1.service.knowledge.Ai1KnowledgeBaseService;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
@@ -32,6 +35,7 @@ import static cn.iocoder.yudao.module.ai1.enums.Ai1ErrorCodeConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -53,13 +57,15 @@ public class Ai1ModelServiceImplTest extends BaseDbUnitTest {
     @MockitoBean
     private Ai1AgentService agentService;
     @MockitoBean
+    private Ai1KnowledgeBaseService knowledgeBaseService;
+    @MockitoBean
     private Ai1LlmModelFactory llmModelFactory;
     @MockitoBean
     private Ai1ProviderTool providerTool;
 
     @Test
     public void testCreateModel_duplicate() {
-        // mock 数据：同一 Provider 下已存在相同模型标识
+        // mock 数据
         Ai1ModelDO dbModel = randomModelDO();
         modelMapper.insert(dbModel);
         // 准备参数
@@ -71,7 +77,7 @@ public class Ai1ModelServiceImplTest extends BaseDbUnitTest {
 
     @Test
     public void testCreateModel_sameModelInOtherProvider() {
-        // mock 数据：其他 Provider 下存在相同模型标识，不冲突
+        // mock 数据
         Ai1ModelDO dbModel = randomModelDO();
         modelMapper.insert(dbModel);
         // 准备参数
@@ -79,7 +85,6 @@ public class Ai1ModelServiceImplTest extends BaseDbUnitTest {
 
         // 调用
         Long id = modelService.createModel(reqVO);
-
         // 断言
         assertEquals(reqVO.getModel(), modelMapper.selectById(id).getModel());
     }
@@ -94,10 +99,32 @@ public class Ai1ModelServiceImplTest extends BaseDbUnitTest {
 
         // 调用
         modelService.updateModel(reqVO);
-
         // 断言
         assertEquals(reqVO.getModel(), modelMapper.selectById(dbModel.getId()).getModel());
+        assertEquals(dbModel.getProviderId(), modelMapper.selectById(dbModel.getId()).getProviderId());
         verify(llmModelFactory).evictByModelId(dbModel.getId());
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {0, 1})
+    public void testUpdateModel_providerCannotChange(int type) {
+        // mock 数据
+        Ai1ModelDO dbModel = randomModelDO(o -> o.setType(type));
+        modelMapper.insert(dbModel);
+        // 准备参数：同类型模型改挂到其他供应商，并同时修改名称与标识
+        Ai1ModelSaveReqVO reqVO = randomModelSaveReqVO(o -> o.setId(dbModel.getId())
+                .setProviderId(dbModel.getProviderId() + 1).setType(type)
+                .setName("新名称").setModel("new-model"));
+
+        // 调用，并断言异常
+        assertServiceException(() -> modelService.updateModel(reqVO), MODEL_NOT_BELONG_PROVIDER);
+        // 断言归属和其他字段均未修改，也未校验新供应商或清理缓存
+        Ai1ModelDO model = modelMapper.selectById(dbModel.getId());
+        assertEquals(dbModel.getProviderId(), model.getProviderId());
+        assertEquals(dbModel.getName(), model.getName());
+        assertEquals(dbModel.getModel(), model.getModel());
+        assertEquals(dbModel.getType(), model.getType());
+        verifyNoInteractions(providerService, agentService, knowledgeBaseService, llmModelFactory);
     }
 
     @Test
@@ -105,27 +132,143 @@ public class Ai1ModelServiceImplTest extends BaseDbUnitTest {
         // mock 数据
         Ai1ModelDO dbModel = randomModelDO();
         modelMapper.insert(dbModel);
-        // mock 方法：被 Agent 使用
+        // mock agentService 的方法
         when(agentService.getAgentCountByModelIds(anyList())).thenReturn(1L);
 
         // 调用，并断言异常
         assertServiceException(() -> modelService.deleteModel(dbModel.getId()), MODEL_USED_BY_AGENT);
+        // 断言
         assertNotNull(modelMapper.selectById(dbModel.getId()));
     }
 
     @Test
+    public void testDeleteModel_usedByKnowledgeBase() {
+        // mock 数据
+        Ai1ModelDO dbModel = randomModelDO();
+        modelMapper.insert(dbModel);
+        // mock knowledgeBaseService 的方法
+        when(knowledgeBaseService.getKnowledgeBaseCountByEmbeddingModelIds(Collections.singletonList(dbModel.getId())))
+                .thenReturn(1L);
+
+        // 调用，并断言异常
+        assertServiceException(() -> modelService.deleteModel(dbModel.getId()), MODEL_USED_BY_KNOWLEDGE_BASE);
+        // 断言
+        assertNotNull(modelMapper.selectById(dbModel.getId()));
+        verifyNoInteractions(llmModelFactory);
+    }
+
+    @Test
+    public void testDeleteModelListByIds_usedByKnowledgeBase() {
+        // mock 数据
+        Ai1ModelDO first = randomModelDO();
+        Ai1ModelDO second = randomModelDO();
+        modelMapper.insert(first);
+        modelMapper.insert(second);
+        // 准备参数
+        List<Long> ids = Arrays.asList(first.getId(), second.getId());
+        when(knowledgeBaseService.getKnowledgeBaseCountByEmbeddingModelIds(ids)).thenReturn(1L);
+
+        // 调用，并断言异常
+        assertServiceException(() -> modelService.deleteModelListByIds(ids), MODEL_USED_BY_KNOWLEDGE_BASE);
+        // 断言整批未删除或清理缓存
+        assertNotNull(modelMapper.selectById(first.getId()));
+        assertNotNull(modelMapper.selectById(second.getId()));
+        verifyNoInteractions(llmModelFactory);
+    }
+
+    @Test
+    public void testDeleteModelListByIds_success() {
+        // mock 数据
+        Ai1ModelDO first = randomModelDO();
+        Ai1ModelDO second = randomModelDO();
+        modelMapper.insert(first);
+        modelMapper.insert(second);
+        List<Long> ids = Arrays.asList(first.getId(), second.getId());
+
+        // 调用
+        modelService.deleteModelListByIds(ids);
+        // 断言
+        assertNull(modelMapper.selectById(first.getId()));
+        assertNull(modelMapper.selectById(second.getId()));
+        verify(knowledgeBaseService).getKnowledgeBaseCountByEmbeddingModelIds(ids);
+        verify(llmModelFactory).evictByModelId(first.getId());
+        verify(llmModelFactory).evictByModelId(second.getId());
+    }
+
+    @Test
+    public void testUpdateModel_typeUsedByKnowledgeBase() {
+        // mock 数据
+        Ai1ModelDO dbModel = randomModelDO(o -> o.setType(Ai1ModelTypeEnum.EMBEDDING.getType()));
+        modelMapper.insert(dbModel);
+        Ai1ModelSaveReqVO reqVO = randomModelSaveReqVO(o -> o.setId(dbModel.getId())
+                .setProviderId(dbModel.getProviderId()).setType(Ai1ModelTypeEnum.CHAT.getType()));
+        when(knowledgeBaseService.getKnowledgeBaseCountByEmbeddingModelIds(Collections.singletonList(dbModel.getId())))
+                .thenReturn(1L);
+
+        // 调用，并断言异常
+        assertServiceException(() -> modelService.updateModel(reqVO), MODEL_TYPE_USED_BY_KNOWLEDGE_BASE);
+        // 断言
+        assertEquals(Ai1ModelTypeEnum.EMBEDDING.getType(), modelMapper.selectById(dbModel.getId()).getType());
+        verifyNoInteractions(llmModelFactory);
+    }
+
+    @Test
+    public void testUpdateModel_typeUsedByAgent() {
+        // mock 数据
+        Ai1ModelDO dbModel = randomModelDO(o -> o.setType(Ai1ModelTypeEnum.CHAT.getType()));
+        modelMapper.insert(dbModel);
+        Ai1ModelSaveReqVO reqVO = randomModelSaveReqVO(o -> o.setId(dbModel.getId()).setProviderId(dbModel.getProviderId()));
+        when(agentService.getAgentCountByModelIds(Collections.singletonList(dbModel.getId()))).thenReturn(1L);
+
+        // 调用，并断言异常
+        assertServiceException(() -> modelService.updateModel(reqVO), MODEL_TYPE_USED_BY_AGENT);
+        // 断言
+        assertEquals(Ai1ModelTypeEnum.CHAT.getType(), modelMapper.selectById(dbModel.getId()).getType());
+        verifyNoInteractions(llmModelFactory);
+    }
+
+    @Test
+    public void testUpdateModel_sameTypeDoesNotCheckReferences() {
+        // mock 数据
+        Ai1ModelDO dbModel = randomModelDO();
+        modelMapper.insert(dbModel);
+        Ai1ModelSaveReqVO reqVO = randomModelSaveReqVO(o -> o.setId(dbModel.getId()).setProviderId(dbModel.getProviderId()).setType(dbModel.getType()));
+
+        // 调用
+        modelService.updateModel(reqVO);
+        // 断言改名等操作不查询引用
+        assertEquals(reqVO.getName(), modelMapper.selectById(dbModel.getId()).getName());
+        verifyNoInteractions(agentService, knowledgeBaseService);
+        verify(llmModelFactory).evictByModelId(dbModel.getId());
+    }
+
+    @Test
+    public void testUpdateModel_unusedTypeCanChange() {
+        // mock 数据
+        Ai1ModelDO dbModel = randomModelDO(o -> o.setType(Ai1ModelTypeEnum.EMBEDDING.getType()));
+        modelMapper.insert(dbModel);
+        Ai1ModelSaveReqVO reqVO = randomModelSaveReqVO(o -> o.setId(dbModel.getId())
+                .setProviderId(dbModel.getProviderId()).setType(Ai1ModelTypeEnum.CHAT.getType()));
+
+        // 调用
+        modelService.updateModel(reqVO);
+        // 断言
+        assertEquals(Ai1ModelTypeEnum.CHAT.getType(), modelMapper.selectById(dbModel.getId()).getType());
+        verify(llmModelFactory).evictByModelId(dbModel.getId());
+    }
+
+    @Test
     public void testImportRemoteModelList_skipExisting() {
-        // mock 数据：已存在 deepseek-chat
+        // mock 数据
         Long providerId = randomLongId();
         modelMapper.insert(randomModelDO(o -> o.setProviderId(providerId).setModel("deepseek-chat")));
-        // 准备参数：包含已存在、重复、空白项
+        // 准备参数
         Ai1ModelImportReqVO reqVO = new Ai1ModelImportReqVO().setProviderId(providerId)
                 .setModels(Arrays.asList("deepseek-chat", "deepseek-reasoner", " deepseek-reasoner ", " "));
 
         // 调用
         Integer count = modelService.importRemoteModelList(reqVO);
-
-        // 断言：只导入 deepseek-reasoner，默认会话类型、开启状态
+        // 断言
         assertEquals(1, count);
         List<Ai1ModelDO> models = modelMapper.selectListByProviderId(providerId);
         assertEquals(Arrays.asList("deepseek-chat", "deepseek-reasoner"), convertList(models, Ai1ModelDO::getModel));
@@ -149,7 +292,7 @@ public class Ai1ModelServiceImplTest extends BaseDbUnitTest {
 
     @Test
     public void testGetRemoteModelList_success() {
-        // mock 方法：透传供应商的地址、密钥与 Header
+        // mock providerService 和 providerTool 的方法
         Long providerId = randomLongId();
         Ai1ProviderDO provider = randomPojo(Ai1ProviderDO.class, o -> o.setId(providerId).setHeaders(null));
         when(providerService.validateProviderExists(providerId)).thenReturn(provider);
@@ -158,14 +301,13 @@ public class Ai1ModelServiceImplTest extends BaseDbUnitTest {
 
         // 调用
         List<String> models = modelService.getRemoteModelList(providerId);
-
         // 断言
         assertEquals(remoteModels, models);
     }
 
     @Test
     public void testGetModelRespBO_providerDisable() {
-        // mock 方法：供应商已关闭
+        // mock 方法
         Ai1ProviderDO provider = randomPojo(Ai1ProviderDO.class, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus()));
         when(providerService.validateProviderExists(provider.getId())).thenReturn(provider);
 
@@ -176,10 +318,10 @@ public class Ai1ModelServiceImplTest extends BaseDbUnitTest {
 
     @Test
     public void testGetModelRespBO_modelNotBelong() {
-        // mock 方法：供应商已开启
+        // mock 方法
         Ai1ProviderDO provider = randomPojo(Ai1ProviderDO.class, o -> o.setStatus(CommonStatusEnum.ENABLE.getStatus()));
         when(providerService.validateProviderExists(provider.getId())).thenReturn(provider);
-        // mock 数据：模型属于其他供应商
+        // mock 数据
         Ai1ModelDO model = randomModelDO(o -> o.setProviderId(provider.getId() + 1));
         modelMapper.insert(model);
 
@@ -189,7 +331,7 @@ public class Ai1ModelServiceImplTest extends BaseDbUnitTest {
 
     @Test
     public void testGetModelRespBO_success() {
-        // mock 方法：供应商已开启，并带上请求头
+        // mock 方法
         Ai1ProviderDO provider = randomPojo(Ai1ProviderDO.class, o -> o.setStatus(CommonStatusEnum.ENABLE.getStatus())
                 .setHeaders("[{\"key\":\"X-App\",\"value\":\"yudao\"}]"));
         when(providerService.validateProviderExists(provider.getId())).thenReturn(provider);
@@ -199,7 +341,6 @@ public class Ai1ModelServiceImplTest extends BaseDbUnitTest {
 
         // 调用
         Ai1ModelRespBO respBO = modelService.getModelRespBO(provider.getId(), model.getId());
-
         // 断言
         assertEquals(provider.getBaseUrl(), respBO.getBaseUrl());
         assertEquals(model.getModel(), respBO.getModel());

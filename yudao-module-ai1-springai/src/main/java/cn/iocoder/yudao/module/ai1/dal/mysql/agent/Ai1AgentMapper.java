@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.ai1.dal.mysql.agent;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.mybatis.core.util.MyBatisUtils;
 import cn.iocoder.yudao.module.ai1.controller.admin.agent.vo.Ai1AgentPageReqVO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.agent.Ai1AgentDO;
 import org.apache.ibatis.annotations.Mapper;
@@ -33,6 +34,16 @@ public interface Ai1AgentMapper extends BaseMapperX<Ai1AgentDO> {
 
     default Long selectCountByModelIds(Collection<Long> modelIds) {
         return selectCount(new LambdaQueryWrapperX<Ai1AgentDO>().in(Ai1AgentDO::getModelId, modelIds));
+    }
+
+    default Long selectCountByKnowledgeBaseIds(Collection<Long> knowledgeBaseIds) {
+        return selectCount(new LambdaQueryWrapperX<Ai1AgentDO>()
+                .apply("(" + MyBatisUtils.findInSet("knowledge_base_ids", knowledgeBaseIds) + ")", knowledgeBaseIds.toArray()));
+    }
+
+    default Long selectCountBySkillIds(Collection<Long> skillIds) {
+        return selectCount(new LambdaQueryWrapperX<Ai1AgentDO>()
+                .apply("(" + MyBatisUtils.findInSet("skill_ids", skillIds) + ")", skillIds.toArray()));
     }
 
 }
