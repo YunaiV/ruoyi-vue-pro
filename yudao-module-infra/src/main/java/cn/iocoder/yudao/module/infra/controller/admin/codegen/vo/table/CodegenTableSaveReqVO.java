@@ -9,6 +9,7 @@ import lombok.Data;
 
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
 @Schema(description = "管理后台 - 代码生成表定义创建/修改 Response VO")
 @Data
@@ -34,14 +35,17 @@ public class CodegenTableSaveReqVO {
 
     @Schema(description = "模块名", requiredMode = Schema.RequiredMode.REQUIRED, example = "system")
     @NotNull(message = "模块名不能为空")
+    @Pattern(regexp = "^[a-z][a-z0-9]*$", message = "模块名只能由小写字母和数字组成，且不能以数字开头")
     private String moduleName;
 
     @Schema(description = "业务名", requiredMode = Schema.RequiredMode.REQUIRED, example = "codegen")
     @NotNull(message = "业务名不能为空")
+    @Pattern(regexp = "^[a-z][a-z0-9]*$", message = "业务名只能由小写字母和数字组成，且不能以数字开头")
     private String businessName;
 
     @Schema(description = "类名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "CodegenTable")
     @NotNull(message = "类名称不能为空")
+    @Pattern(regexp = "^[A-Z][A-Za-z0-9]*$", message = "类名称必须以大写字母开头，且只能由字母和数字组成")
     private String className;
 
     @Schema(description = "类描述", requiredMode = Schema.RequiredMode.REQUIRED, example = "代码生成器的表定义")
