@@ -57,7 +57,6 @@ public class OaPlanSaveReqVO {
     private LocalDateTime endTime;
 
     @Schema(description = "附件地址列表", example = "[\"https://example.com/file.pdf\"]")
-    @Size(max = 1, message = "附件最多上传 1 个")
     private List<@NotBlank(message = "附件地址不能为空") @Size(max = 512, message = "附件地址长度不能超过 512 个字符") String> fileUrls;
 
     @JsonIgnore
