@@ -46,6 +46,13 @@ public interface MesMdAutoCodeRuleService {
     MesMdAutoCodeRuleDO getAutoCodeRule(Long id);
 
     /**
+     * 获得编码规则列表
+     *
+     * @return 编码规则列表
+     */
+    List<MesMdAutoCodeRuleDO> getAutoCodeRuleList();
+
+    /**
      * 获得编码规则分页
      *
      * @param pageReqVO 分页查询

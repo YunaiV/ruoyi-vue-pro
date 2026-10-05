@@ -73,6 +73,11 @@ public class MesMdAutoCodeRuleServiceImpl implements MesMdAutoCodeRuleService {
     }
 
     @Override
+    public List<MesMdAutoCodeRuleDO> getAutoCodeRuleList() {
+        return ruleMapper.selectList();
+    }
+
+    @Override
     public PageResult<MesMdAutoCodeRuleDO> getAutoCodeRulePage(MesMdAutoCodeRulePageReqVO pageReqVO) {
         return ruleMapper.selectPage(pageReqVO);
     }

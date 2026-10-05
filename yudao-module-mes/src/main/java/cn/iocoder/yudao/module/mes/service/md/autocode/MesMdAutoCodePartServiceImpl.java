@@ -7,7 +7,6 @@ import cn.iocoder.yudao.module.mes.controller.admin.md.autocode.vo.part.MesMdAut
 import cn.iocoder.yudao.module.mes.dal.dataobject.md.autocode.MesMdAutoCodePartDO;
 import cn.iocoder.yudao.module.mes.dal.dataobject.md.autocode.MesMdAutoCodeRuleDO;
 import cn.iocoder.yudao.module.mes.dal.mysql.md.autocode.MesMdAutoCodePartMapper;
-import cn.iocoder.yudao.module.mes.dal.mysql.md.autocode.MesMdAutoCodeRuleMapper;
 import cn.iocoder.yudao.module.mes.enums.md.autocode.MesMdAutoCodePartTypeEnum;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -21,6 +20,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMultiMap;
 import static cn.iocoder.yudao.module.mes.enums.ErrorCodeConstants.AUTO_CODE_PART_FIXED_CHAR_DUPLICATE;
 import static cn.iocoder.yudao.module.mes.enums.ErrorCodeConstants.AUTO_CODE_PART_NOT_EXISTS;
 import static cn.iocoder.yudao.module.mes.enums.ErrorCodeConstants.AUTO_CODE_PART_SERIAL_NUMBER_DUPLICATE;
@@ -36,10 +36,6 @@ public class MesMdAutoCodePartServiceImpl implements MesMdAutoCodePartService {
 
     @Resource
     private MesMdAutoCodePartMapper partMapper;
-
-    @Resource
-    private MesMdAutoCodeRuleMapper ruleMapper;
-
     @Resource
     private MesMdAutoCodeRuleService ruleService;
 
@@ -125,10 +121,10 @@ public class MesMdAutoCodePartServiceImpl implements MesMdAutoCodePartService {
      * 从源头避免不同规则生成相同编码；生成编码时的全局查重仍保留，兜底存量配置的冲突。
      */
     private void validateFixedCharUnique(Long id, MesMdAutoCodePartSaveReqVO reqVO) {
-        // 1. 全租户固定字符分段，按规则分组
-        Map<Long, List<MesMdAutoCodePartDO>> fixedPartsByRuleId = partMapper.selectFixedCharPartList().stream()
-                .collect(Collectors.groupingBy(MesMdAutoCodePartDO::getRuleId));
-        // 2. 本次保存后，本规则的前缀指纹（排除正在修改的分段，加入本次保存的分段）
+        // 1.1 所有固定字符分段，按规则分组
+        Map<Long, List<MesMdAutoCodePartDO>> fixedPartsByRuleId = convertMultiMap(
+                partMapper.selectByType(MesMdAutoCodePartTypeEnum.FIXED_CHAR.getType()), MesMdAutoCodePartDO::getRuleId);
+        // 1.2 本次保存后，本规则的前缀指纹（排除正在修改的分段，加入本次保存的分段）
         List<MesMdAutoCodePartDO> myFixedParts = new ArrayList<>(
                 fixedPartsByRuleId.getOrDefault(reqVO.getRuleId(), Collections.emptyList()));
         myFixedParts.removeIf(part -> ObjUtil.equal(id, part.getId()));
@@ -136,20 +132,23 @@ public class MesMdAutoCodePartServiceImpl implements MesMdAutoCodePartService {
             myFixedParts.add(BeanUtils.toBean(reqVO, MesMdAutoCodePartDO.class));
         }
         String myFingerprint = buildFixedCharFingerprint(myFixedParts);
-        // 3. 与租户内其他未删除规则的前缀指纹逐一比对
-        for (MesMdAutoCodeRuleDO rule : ruleMapper.selectList()) {
+
+        // 2. 与租户内其他未删除规则的前缀指纹逐一比对
+        List<MesMdAutoCodeRuleDO> rules = ruleService.getAutoCodeRuleList();
+        for (MesMdAutoCodeRuleDO rule : rules) {
             if (ObjUtil.equal(rule.getId(), reqVO.getRuleId())) {
                 continue;
             }
             List<MesMdAutoCodePartDO> otherFixedParts = fixedPartsByRuleId.getOrDefault(rule.getId(), Collections.emptyList());
-            if (myFingerprint.equals(buildFixedCharFingerprint(otherFixedParts))) {
+            String otherFingerprint = buildFixedCharFingerprint(otherFixedParts);
+            if (myFingerprint.equals(otherFingerprint)) {
                 throw exception(AUTO_CODE_PART_FIXED_CHAR_DUPLICATE);
             }
         }
     }
 
     /**
-     * 构建前缀指纹：固定字符分段按分段排序，拼接截取到分段长度内的固定字符（空值按空串）
+     * 构建固定字符分段的前缀指纹：按分段排序，拼接截取到分段长度内的固定字符
      */
     private String buildFixedCharFingerprint(List<MesMdAutoCodePartDO> fixedParts) {
         return fixedParts.stream()

@@ -5,7 +5,6 @@ import cn.iocoder.yudao.module.mes.controller.admin.md.autocode.vo.part.MesMdAut
 import cn.iocoder.yudao.module.mes.dal.dataobject.md.autocode.MesMdAutoCodePartDO;
 import cn.iocoder.yudao.module.mes.dal.dataobject.md.autocode.MesMdAutoCodeRuleDO;
 import cn.iocoder.yudao.module.mes.dal.mysql.md.autocode.MesMdAutoCodePartMapper;
-import cn.iocoder.yudao.module.mes.dal.mysql.md.autocode.MesMdAutoCodeRuleMapper;
 import cn.iocoder.yudao.module.mes.enums.md.autocode.MesMdAutoCodePartTypeEnum;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,8 +36,6 @@ public class MesMdAutoCodePartServiceImplTest {
     @Mock
     private MesMdAutoCodePartMapper partMapper;
     @Mock
-    private MesMdAutoCodeRuleMapper ruleMapper;
-    @Mock
     private MesMdAutoCodeRuleService ruleService;
 
     private static MesMdAutoCodePartDO fixedPart(Long id, Long ruleId, Integer sort, String fixCharacter, Integer length) {
@@ -61,9 +58,9 @@ public class MesMdAutoCodePartServiceImplTest {
     @Test
     public void testCreateAutoCodePart_fixedCharDuplicate() {
         // 准备：其他规则已占用相同前缀 "ITEM_"
-        when(partMapper.selectFixedCharPartList()).thenReturn(Arrays.asList(
+        when(partMapper.selectByType(MesMdAutoCodePartTypeEnum.FIXED_CHAR.getType())).thenReturn(Arrays.asList(
                 fixedPart(1L, 1L, 1, "ITEM_", 5)));
-        when(ruleMapper.selectList()).thenReturn(Arrays.asList(
+        when(ruleService.getAutoCodeRuleList()).thenReturn(Arrays.asList(
                 new MesMdAutoCodeRuleDO().setId(1L), new MesMdAutoCodeRuleDO().setId(10L)));
 
         // 断言：保存被拒，且未插入
@@ -76,9 +73,9 @@ public class MesMdAutoCodePartServiceImplTest {
     @Test
     public void testCreateAutoCodePart_fixedCharUnique() {
         // 准备：其他规则前缀 "ITEM_"，本次保存 "SN_"
-        when(partMapper.selectFixedCharPartList()).thenReturn(Arrays.asList(
+        when(partMapper.selectByType(MesMdAutoCodePartTypeEnum.FIXED_CHAR.getType())).thenReturn(Arrays.asList(
                 fixedPart(1L, 1L, 1, "ITEM_", 5)));
-        when(ruleMapper.selectList()).thenReturn(Arrays.asList(
+        when(ruleService.getAutoCodeRuleList()).thenReturn(Arrays.asList(
                 new MesMdAutoCodeRuleDO().setId(1L), new MesMdAutoCodeRuleDO().setId(10L)));
 
         // 断言：保存成功
@@ -89,9 +86,9 @@ public class MesMdAutoCodePartServiceImplTest {
     @Test
     public void testCreateAutoCodePart_fixedCharTruncatedDuplicate() {
         // 准备：其他规则固定字符 "IT_X" 长度 2（生成时截断为 "IT"）
-        when(partMapper.selectFixedCharPartList()).thenReturn(Arrays.asList(
+        when(partMapper.selectByType(MesMdAutoCodePartTypeEnum.FIXED_CHAR.getType())).thenReturn(Arrays.asList(
                 fixedPart(1L, 1L, 1, "IT_X", 2)));
-        when(ruleMapper.selectList()).thenReturn(Arrays.asList(
+        when(ruleService.getAutoCodeRuleList()).thenReturn(Arrays.asList(
                 new MesMdAutoCodeRuleDO().setId(1L), new MesMdAutoCodeRuleDO().setId(10L)));
 
         // 断言：本次保存 "IT" 截断后同为 "IT"，保存被拒
@@ -104,8 +101,8 @@ public class MesMdAutoCodePartServiceImplTest {
     @Test
     public void testCreateAutoCodePart_bothRulesWithoutFixedChar() {
         // 准备：租户内另一规则无任何固定字符分段（前缀为空串），本次保存流水号分段（本规则也无固定字符）
-        when(partMapper.selectFixedCharPartList()).thenReturn(Collections.emptyList());
-        when(ruleMapper.selectList()).thenReturn(Arrays.asList(
+        when(partMapper.selectByType(MesMdAutoCodePartTypeEnum.FIXED_CHAR.getType())).thenReturn(Collections.emptyList());
+        when(ruleService.getAutoCodeRuleList()).thenReturn(Arrays.asList(
                 new MesMdAutoCodeRuleDO().setId(1L), new MesMdAutoCodeRuleDO().setId(10L)));
 
         MesMdAutoCodePartSaveReqVO reqVO = new MesMdAutoCodePartSaveReqVO();
@@ -127,9 +124,9 @@ public class MesMdAutoCodePartServiceImplTest {
         // 准备：本规则已有固定字符 "OLD_"，修改为与其他规则相同的 "ITEM_"
         MesMdAutoCodePartDO myPart = fixedPart(100L, 10L, 1, "OLD_", 4);
         when(partMapper.selectById(100L)).thenReturn(myPart);
-        when(partMapper.selectFixedCharPartList()).thenReturn(Arrays.asList(
+        when(partMapper.selectByType(MesMdAutoCodePartTypeEnum.FIXED_CHAR.getType())).thenReturn(Arrays.asList(
                 myPart, fixedPart(1L, 1L, 1, "ITEM_", 5)));
-        when(ruleMapper.selectList()).thenReturn(Arrays.asList(
+        when(ruleService.getAutoCodeRuleList()).thenReturn(Arrays.asList(
                 new MesMdAutoCodeRuleDO().setId(1L), new MesMdAutoCodeRuleDO().setId(10L)));
 
         // 断言：保存被拒，且未更新
@@ -144,9 +141,9 @@ public class MesMdAutoCodePartServiceImplTest {
         // 准备：本规则已有固定字符 "ITEM_"（与其他规则重复），修改为 "SN_"
         MesMdAutoCodePartDO myPart = fixedPart(100L, 10L, 1, "ITEM_", 5);
         when(partMapper.selectById(100L)).thenReturn(myPart);
-        when(partMapper.selectFixedCharPartList()).thenReturn(Arrays.asList(
+        when(partMapper.selectByType(MesMdAutoCodePartTypeEnum.FIXED_CHAR.getType())).thenReturn(Arrays.asList(
                 myPart, fixedPart(1L, 1L, 1, "WO_", 3)));
-        when(ruleMapper.selectList()).thenReturn(Arrays.asList(
+        when(ruleService.getAutoCodeRuleList()).thenReturn(Arrays.asList(
                 new MesMdAutoCodeRuleDO().setId(1L), new MesMdAutoCodeRuleDO().setId(10L)));
 
         // 断言：修改后前缀不再重复，保存成功
