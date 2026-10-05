@@ -23,6 +23,9 @@ public class MesWmProductSalesPageReqVO extends PageParam {
     @Schema(description = "出库单名称", example = "产品出库单")
     private String name;
 
+    @Schema(description = "销售订单编号", example = "SO202603010001")
+    private String salesOrderCode;
+
     @Schema(description = "客户编号", example = "1")
     private Long clientId;
 

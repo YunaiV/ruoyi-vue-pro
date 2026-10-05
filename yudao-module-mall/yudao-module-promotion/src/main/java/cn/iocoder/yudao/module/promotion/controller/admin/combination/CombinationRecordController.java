@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
@@ -51,7 +52,19 @@ public class CombinationRecordController {
                 convertSet(recordPage.getList(), CombinationRecordDO::getActivityId));
         List<CombinationProductDO> products = combinationActivityService.getCombinationProductListByActivityIds(
                 convertSet(recordPage.getList(), CombinationRecordDO::getActivityId));
-        return success(CombinationActivityConvert.INSTANCE.convert(recordPage, activities, products));
+        PageResult<CombinationRecordPageItemRespVO> result = CombinationActivityConvert.INSTANCE.convert(recordPage, activities, products);
+        Map<Long, CombinationRecordDO> headRecords = combinationRecordService.getCombinationRecordMapByIds(
+                convertSet(recordPage.getList(), CombinationRecordDO::getHeadId,
+                        record -> record.getHeadId() != null && record.getHeadId() > 0));
+        result.getList().forEach(item -> {
+            if (item.getHeadId() == null || CombinationRecordDO.HEAD_ID_GROUP.equals(item.getHeadId())) {
+                item.setHeadNickname(item.getNickname());
+            } else {
+                CombinationRecordDO headRecord = headRecords.get(item.getHeadId());
+                item.setHeadNickname(headRecord == null ? null : headRecord.getNickname());
+            }
+        });
+        return success(result);
     }
 
     @GetMapping("/get-summary")
