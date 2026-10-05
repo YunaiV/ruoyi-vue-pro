@@ -1,12 +1,13 @@
 package cn.iocoder.yudao.framework.translate.config;
 
 import cn.iocoder.yudao.framework.translate.core.TranslateUtils;
+import org.dromara.trans.config.TransServiceConfig;
 import org.dromara.trans.service.impl.TransService;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 
-@AutoConfiguration
+@AutoConfiguration(after = TransServiceConfig.class)
 public class YudaoTranslateAutoConfiguration {
 
     @Bean
