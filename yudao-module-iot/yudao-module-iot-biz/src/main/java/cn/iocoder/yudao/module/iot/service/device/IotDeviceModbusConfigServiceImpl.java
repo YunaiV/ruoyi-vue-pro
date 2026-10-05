@@ -17,6 +17,9 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Resource;
 import java.util.List;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.*;
+
 /**
  * IoT 设备 Modbus 连接配置 Service 实现类
  *
@@ -76,13 +79,25 @@ public class IotDeviceModbusConfigServiceImpl implements IotDeviceModbusConfigSe
             return;
         }
         if (protocolTypeEnum == IotProtocolTypeEnum.MODBUS_TCP_CLIENT) {
-            Assert.isTrue(StrUtil.isNotEmpty(saveReqVO.getIp()), "Client 模式下，IP 地址不能为空");
-            Assert.notNull(saveReqVO.getPort(), "Client 模式下，端口不能为空");
-            Assert.notNull(saveReqVO.getTimeout(), "Client 模式下，连接超时时间不能为空");
-            Assert.notNull(saveReqVO.getRetryInterval(), "Client 模式下，重试间隔不能为空");
+            if (StrUtil.isEmpty(saveReqVO.getIp())) {
+                throw exception(DEVICE_MODBUS_CONFIG_IP_REQUIRED);
+            }
+            if (saveReqVO.getPort() == null) {
+                throw exception(DEVICE_MODBUS_CONFIG_PORT_REQUIRED);
+            }
+            if (saveReqVO.getTimeout() == null) {
+                throw exception(DEVICE_MODBUS_CONFIG_TIMEOUT_REQUIRED);
+            }
+            if (saveReqVO.getRetryInterval() == null) {
+                throw exception(DEVICE_MODBUS_CONFIG_RETRY_INTERVAL_REQUIRED);
+            }
         } else if (protocolTypeEnum == IotProtocolTypeEnum.MODBUS_TCP_SERVER) {
-            Assert.notNull(saveReqVO.getMode(), "Server 模式下，工作模式不能为空");
-            Assert.notNull(saveReqVO.getFrameFormat(), "Server 模式下，数据帧格式不能为空");
+            if (saveReqVO.getMode() == null) {
+                throw exception(DEVICE_MODBUS_CONFIG_MODE_REQUIRED);
+            }
+            if (saveReqVO.getFrameFormat() == null) {
+                throw exception(DEVICE_MODBUS_CONFIG_FRAME_FORMAT_REQUIRED);
+            }
         }
     }
 
