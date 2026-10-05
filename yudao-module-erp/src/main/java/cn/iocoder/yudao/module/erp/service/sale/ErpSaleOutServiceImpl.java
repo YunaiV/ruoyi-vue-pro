@@ -148,7 +148,7 @@ public class ErpSaleOutServiceImpl implements ErpSaleOutService {
             saleOut.setDiscountPercent(BigDecimal.ZERO);
         }
         saleOut.setDiscountPrice(MoneyUtils.priceMultiplyPercent(saleOut.getTotalPrice(), saleOut.getDiscountPercent()));
-        saleOut.setTotalPrice(saleOut.getTotalPrice().subtract(saleOut.getDiscountPrice().add(saleOut.getOtherPrice())));
+        saleOut.setTotalPrice(saleOut.getTotalPrice().subtract(saleOut.getDiscountPrice()).add(saleOut.getOtherPrice()));
     }
 
     private void updateSaleOrderOutCount(Long orderId) {

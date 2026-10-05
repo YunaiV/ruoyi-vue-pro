@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.oa.service.plan;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
@@ -62,7 +63,9 @@ public class OaPlanServiceImplTest extends BaseDbUnitTest {
     public void testCreatePlan_success() {
         // 准备参数
         Long userId = randomLongId();
-        OaPlanSaveReqVO reqVO = buildPlanSaveReqVO();
+        OaPlanSaveReqVO reqVO = buildPlanSaveReqVO()
+                .setFileUrls(Arrays.asList("https://example.com/a.txt", "https://example.com/b.txt"));
+        ValidationUtils.validate(reqVO);
 
         // 调用
         SecurityFrameworkUtils.setLoginUser(new LoginUser().setId(userId), new MockHttpServletRequest());
@@ -72,6 +75,7 @@ public class OaPlanServiceImplTest extends BaseDbUnitTest {
         OaPlanDO plan = planMapper.selectById(planId);
         assertEquals(userId.toString(), plan.getCreator());
         assertEquals(reqVO.getTitle(), plan.getTitle());
+        assertEquals(reqVO.getFileUrls(), plan.getFileUrls());
     }
 
     @Test
