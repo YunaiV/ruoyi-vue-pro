@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.mes.dal.mysql.md.autocode;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.mes.dal.dataobject.md.autocode.MesMdAutoCodePartDO;
+import cn.iocoder.yudao.module.mes.enums.md.autocode.MesMdAutoCodePartTypeEnum;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -19,6 +20,10 @@ public interface MesMdAutoCodePartMapper extends BaseMapperX<MesMdAutoCodePartDO
         return selectList(new LambdaQueryWrapperX<MesMdAutoCodePartDO>()
                 .eq(MesMdAutoCodePartDO::getRuleId, ruleId)
                 .orderByAsc(MesMdAutoCodePartDO::getSort));
+    }
+
+    default List<MesMdAutoCodePartDO> selectFixedCharPartList() {
+        return selectList(MesMdAutoCodePartDO::getType, MesMdAutoCodePartTypeEnum.FIXED_CHAR.getType());
     }
 
     default void deleteByRuleId(Long ruleId) {
