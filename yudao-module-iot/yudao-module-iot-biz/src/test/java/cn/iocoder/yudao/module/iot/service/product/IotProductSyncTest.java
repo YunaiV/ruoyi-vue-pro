@@ -6,10 +6,10 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.product.IotProductMapper;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.service.device.property.IotDevicePropertyService;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
@@ -33,9 +33,9 @@ public class IotProductSyncTest extends BaseDbUnitTest {
     @Resource
     private IotProductMapper productMapper;
 
-    @MockitoBean
+    @MockBean
     private IotDeviceService deviceService;
-    @MockitoBean
+    @MockBean
     private IotDevicePropertyService devicePropertyDataService;
 
     @Test
