@@ -153,7 +153,7 @@ public class PayWalletServiceImpl implements PayWalletService {
 
         // 2. 加锁，更新钱包余额（目的：避免钱包流水的并发更新时，余额变化不连贯）
         return lockRedisDAO.lock(walletId, UPDATE_TIMEOUT_MILLIS, () -> {
-            // 2. 扣除余额
+            // 2.1 扣除余额（CAS 原子扣减，先于重读，确保重读拿到扣减后最新值）
             int updateCounts;
             switch (bizType) {
                 case PAYMENT: {
@@ -173,12 +173,14 @@ public class PayWalletServiceImpl implements PayWalletService {
                 throw exception(WALLET_BALANCE_NOT_ENOUGH);
             }
 
+            // 2.2 CAS 后重读钱包（事务内读自身更新，拿到扣减后最新余额；锁外预读的 balance 在并发时已过期，
+            //     且 @Transactional REPEATABLE READ 下 CAS 前重读仍读事务快照旧值，须 CAS 后重读）
+            PayWalletDO currentWallet = getWallet(walletId);
+
             // 3. 生成钱包流水
-            // 情况一：充值退款：balance 在冻结时已扣，updateWhenRechargeRefund 只扣 freeze_price，所以 afterBalance 不变。https://t.zsxq.com/OJk9m
-            // 情况二：消费支付：updateWhenConsumption 从 balance 扣，所以 afterBalance = balance - price
-            Integer afterBalance = bizType == PayWalletBizTypeEnum.RECHARGE_REFUND
-                    ? payWallet.getBalance()
-                    : payWallet.getBalance() - price;
+            // 情况一：充值退款：balance 在冻结时已扣，updateWhenRechargeRefund 只扣 freeze_price，balance 不变，afterBalance=当前余额
+            // 情况二：消费支付：updateWhenConsumption 从 balance 扣 price，CAS 后重读的 balance 即扣减后值，afterBalance=当前余额
+            Integer afterBalance = currentWallet.getBalance();
             WalletTransactionCreateReqBO bo = new WalletTransactionCreateReqBO().setWalletId(payWallet.getId())
                     .setPrice(-price).setBalance(afterBalance).setBizId(String.valueOf(bizId))
                     .setBizType(bizType.getType()).setTitle(bizType.getDescription());
@@ -200,7 +202,7 @@ public class PayWalletServiceImpl implements PayWalletService {
 
         // 2. 加锁，更新钱包余额（目的：避免钱包流水的并发更新时，余额变化不连贯）
         return lockRedisDAO.lock(walletId, UPDATE_TIMEOUT_MILLIS, () -> {
-            // 3. 更新钱包金额
+            // 2.1 更新钱包金额（CAS 原子加，先于重读，确保重读拿到加值后最新值）
             switch (bizType) {
                 case PAYMENT_REFUND: { // 退款更新
                     walletMapper.updateWhenConsumptionRefund(payWallet.getId(), price);
@@ -219,9 +221,13 @@ public class PayWalletServiceImpl implements PayWalletService {
                 }
             }
 
-            // 4. 生成钱包流水
+            // 2.2 CAS 后重读钱包（事务内读自身更新，拿到加值后最新余额；锁外预读的 balance 在并发时已过期，
+            //     且 @Transactional REPEATABLE READ 下 CAS 前重读仍读事务快照旧值，须 CAS 后重读）
+            PayWalletDO currentWallet = getWallet(walletId);
+
+            // 3. 生成钱包流水（afterBalance = CAS 后最新余额，无需再 +price）
             WalletTransactionCreateReqBO transactionCreateReqBO = new WalletTransactionCreateReqBO()
-                    .setWalletId(payWallet.getId()).setPrice(price).setBalance(payWallet.getBalance() + price)
+                    .setWalletId(payWallet.getId()).setPrice(price).setBalance(currentWallet.getBalance())
                     .setBizId(bizId).setBizType(bizType.getType()).setTitle(bizType.getDescription());
             return walletTransactionService.createWalletTransaction(transactionCreateReqBO);
         });
