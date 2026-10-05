@@ -60,6 +60,7 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntityImpl;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -569,6 +570,17 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
     // ========== Update 写入相关方法 ==========
 
+    /**
+     * 自动审批通过，供事务完成后的回调调用
+     *
+     * @see <a href="https://wx.zsxq.com/group/88858522214142/topic/22258281454841411">自动审批事务问题</a>
+     */
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
+    @DataPermission(enable = false)
+    public void approveTaskInternal(Long userId, BpmTaskApproveReqVO reqVO) {
+        approveTask(userId, reqVO);
+    }
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     @DataPermission(enable = false) // 关闭数据权限，避免查询不到用户数据。相关案例：https://gitee.com/zhijiantianya/yudao-cloud/issues/ID1UYA
@@ -829,6 +841,17 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         taskService.resolveTask(task.getId());
         // 2.2 更新 task 状态 + 原因
         updateTaskStatusAndReason(task.getId(), BpmTaskStatusEnum.RUNNING.getStatus(), reqVO.getReason());
+    }
+
+    /**
+     * 自动审批拒绝，供事务完成后的回调调用
+     *
+     * @see <a href="https://wx.zsxq.com/group/88858522214142/topic/22258281454841411">自动审批事务问题</a>
+     */
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
+    @DataPermission(enable = false)
+    public void rejectTaskInternal(Long userId, BpmTaskRejectReqVO reqVO) {
+        rejectTask(userId, reqVO);
     }
 
     @Override
@@ -1433,19 +1456,19 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                         return;
                     }
                     if (ObjectUtil.equal(assignEmptyHandlerType, BpmUserTaskAssignEmptyHandlerTypeEnum.APPROVE.getType())) {
-                        getSelf().approveTask(null, new BpmTaskApproveReqVO()
+                        getSelf().approveTaskInternal(null, new BpmTaskApproveReqVO()
                                 .setId(task.getId()).setReason(BpmReasonEnum.ASSIGN_EMPTY_APPROVE.getReason()));
                     } else if (ObjectUtil.equal(assignEmptyHandlerType, BpmUserTaskAssignEmptyHandlerTypeEnum.REJECT.getType())) {
-                        getSelf().rejectTask(null, new BpmTaskRejectReqVO()
+                        getSelf().rejectTaskInternal(null, new BpmTaskRejectReqVO()
                                 .setId(task.getId()).setReason(BpmReasonEnum.ASSIGN_EMPTY_REJECT.getReason()));
                     }
                     // 特殊情况二：【自动审核】审批类型为自动通过、不通过
                 } else {
                     if (ObjectUtil.equal(approveType, BpmUserTaskApproveTypeEnum.AUTO_APPROVE.getType())) {
-                        getSelf().approveTask(null, new BpmTaskApproveReqVO()
+                        getSelf().approveTaskInternal(null, new BpmTaskApproveReqVO()
                                 .setId(task.getId()).setReason(BpmReasonEnum.APPROVE_TYPE_AUTO_APPROVE.getReason()));
                     } else if (ObjectUtil.equal(approveType, BpmUserTaskApproveTypeEnum.AUTO_REJECT.getType())) {
-                        getSelf().rejectTask(null, new BpmTaskRejectReqVO()
+                        getSelf().rejectTaskInternal(null, new BpmTaskRejectReqVO()
                                 .setId(task.getId()).setReason(BpmReasonEnum.APPROVE_TYPE_AUTO_REJECT.getReason()));
                     }
                 }
@@ -1526,7 +1549,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                                 .finished();
                         if (BpmAutoApproveTypeEnum.APPROVE_ALL.getType().equals(processDefinitionInfo.getAutoApprovalType())
                                 && approvedTaskQuery.taskAssignee(task.getAssignee()).count() > 0) {
-                            getSelf().approveTask(Long.valueOf(task.getAssignee()), new BpmTaskApproveReqVO().setId(task.getId())
+                            getSelf().approveTaskInternal(Long.valueOf(task.getAssignee()), new BpmTaskApproveReqVO().setId(task.getId())
                                     .setReason(BpmAutoApproveTypeEnum.APPROVE_ALL.getName()));
                             return;
                         }
@@ -1543,7 +1566,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                             approvedTaskQuery.taskDefinitionKeys(sourceTaskIds).orderByTaskCreateTime().desc(); // 设置 taskIds, 并按创建时间倒序排序
                             HistoricTaskInstance firstHisTask = CollUtil.getFirst(approvedTaskQuery.list());
                             if (firstHisTask != null && StrUtil.equals(firstHisTask.getAssignee(), task.getAssignee())) {
-                                getSelf().approveTask(Long.valueOf(task.getAssignee()), new BpmTaskApproveReqVO().setId(task.getId())
+                                getSelf().approveTaskInternal(Long.valueOf(task.getAssignee()), new BpmTaskApproveReqVO().setId(task.getId())
                                         .setReason(BpmAutoApproveTypeEnum.APPROVE_SEQUENT.getName()));
                                 return;
                             }
@@ -1566,7 +1589,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                             && (skipStartUserNodeFlag == null // 目的：一般是“主流程”，发起人节点，自动通过审核
                             || BooleanUtil.isTrue(skipStartUserNodeFlag)) // 目的：一般是“子流程”，发起人节点，按配置自动通过审核
                             && ObjUtil.notEqual(returnTaskFlag, Boolean.TRUE)) {
-                        getSelf().approveTask(Long.valueOf(task.getAssignee()), new BpmTaskApproveReqVO().setId(task.getId())
+                        getSelf().approveTaskInternal(Long.valueOf(task.getAssignee()), new BpmTaskApproveReqVO().setId(task.getId())
                                 .setReason(BpmReasonEnum.ASSIGN_START_USER_APPROVE_WHEN_SKIP_START_USER_NODE.getReason()));
                         return;
                     }
@@ -1579,7 +1602,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                             // 情况一：自动跳过
                             if (ObjectUtils.equalsAny(assignStartUserHandlerType,
                                     BpmUserTaskAssignStartUserHandlerTypeEnum.SKIP.getType())) {
-                                getSelf().approveTask(Long.valueOf(task.getAssignee()), new BpmTaskApproveReqVO().setId(task.getId())
+                                getSelf().approveTaskInternal(Long.valueOf(task.getAssignee()), new BpmTaskApproveReqVO().setId(task.getId())
                                         .setReason(BpmReasonEnum.ASSIGN_START_USER_APPROVE_WHEN_SKIP.getReason()));
                                 return;
                             }
@@ -1593,7 +1616,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                                 // 找不到部门负责人的情况下，自动审批通过
                                 // noinspection DataFlowIssue
                                 if (dept.getLeaderUserId() == null) {
-                                    getSelf().approveTask(Long.valueOf(task.getAssignee()), new BpmTaskApproveReqVO().setId(task.getId())
+                                    getSelf().approveTaskInternal(Long.valueOf(task.getAssignee()), new BpmTaskApproveReqVO().setId(task.getId())
                                             .setReason(BpmReasonEnum.ASSIGN_START_USER_APPROVE_WHEN_DEPT_LEADER_NOT_FOUND.getReason()));
                                     return;
                                 }
