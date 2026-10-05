@@ -268,7 +268,7 @@ export function useGridColumns(): VxeTableGridOptions<InfraStudentApi.Student>['
                             minWidth: 120,
                             slots: { default: 'sex' },
                                     params: {
-                                        options: getDictOptions(DICT_TYPE.SYSTEM_USER_SEX, 'boolean'),
+                                        options: getDictOptions(DICT_TYPE.SYSTEM_USER_SEX, 'number'),
                                     },
                         },
                          {

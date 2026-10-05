@@ -77,12 +77,7 @@ const queryParams = reactive({
 #end
 #foreach ($column in $columns)
     #if ($column.listOperation)
-        #if ($column.listOperationCondition != 'BETWEEN')
-                $column.javaField: undefined,
-        #end
-        #if ($column.htmlType == "datetime" || $column.listOperationCondition == "BETWEEN")
-                $column.javaField: undefined,
-        #end
+        $column.javaField: undefined,
     #end
 #end
 })
@@ -209,7 +204,17 @@ function handleRowCheckboxChange({
 async function handleExport() {
 try {
   exportLoading.value = true;
-  const data = await export${simpleClassName}(queryParams);
+    const params = cloneDeep(queryParams) as any;
+      #foreach ($column in $columns)
+          #if ($column.listOperation)
+              #if ($column.htmlType == "datetime" || $column.listOperationCondition == "BETWEEN")
+                if (params.${column.javaField} && Array.isArray(params.${column.javaField})) {
+                  params.${column.javaField} = (params.${column.javaField} as string[]).join(',');
+                }
+              #end
+          #end
+      #end
+  const data = await export${simpleClassName}(params);
   downloadFileFromBlobPart({ fileName: '${table.classComment}.xls', source: data });
 }finally {
   exportLoading.value = false;

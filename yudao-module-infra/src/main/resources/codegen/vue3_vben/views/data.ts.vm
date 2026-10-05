@@ -78,6 +78,12 @@ export const searchFormSchema: FormSchema[] = [
     },
   #elseif($column.htmlType == "datetime")
     component: 'RangePicker',
+    componentProps: {
+      showTime: true,
+      format: 'YYYY-MM-DD HH:mm:ss',
+      valueFormat: 'YYYY-MM-DD HH:mm:ss',
+      allowClear: true,
+    },
     #end
     colProps: { span: 8 },
   },

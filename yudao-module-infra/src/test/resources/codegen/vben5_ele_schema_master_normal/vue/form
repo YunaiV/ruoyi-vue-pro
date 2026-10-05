@@ -5,7 +5,7 @@ import { computed, ref } from 'vue';
 
 import { useVbenModal } from '@vben/common-ui';
 
-import { ElMessage } from 'element-plus';
+import { ElMessage, ElTabPane, ElTabs } from 'element-plus';
 
 import { useVbenForm } from '#/adapter/form';
 import { createStudent, getStudent, updateStudent } from '#/api/infra/demo';
@@ -48,7 +48,12 @@ const [Modal, modalApi] = useVbenModal({
       return;
     }
         // 校验子表单
-                         const studentTeacherValid = await studentTeacherFormRef.value?.validate();
+            const studentContactValid = await studentContactFormRef.value?.validate();
+            if (!studentContactValid) {
+              subTabsName.value = 'studentContact';
+              return;
+            }
+            const studentTeacherValid = await studentTeacherFormRef.value?.validate();
             if (!studentTeacherValid) {
               subTabsName.value = 'studentTeacher';
               return;

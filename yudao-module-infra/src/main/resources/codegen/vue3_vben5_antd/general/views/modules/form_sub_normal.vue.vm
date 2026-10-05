@@ -46,25 +46,54 @@ async function handleDelete(row: ${simpleClassName}Api.${subSimpleClassName}) {
   await tableRef.value?.remove(row);
 }
 
-/** 提供获取表格数据的方法供父组件调用 */
-defineExpose({
-  getData: (): ${simpleClassName}Api.${subSimpleClassName}[] => {
-    const data = list.value as ${simpleClassName}Api.${subSimpleClassName}[];
-    const removeRecords = tableRef.value?.getRemoveRecords() as ${simpleClassName}Api.${subSimpleClassName}[];
-    const insertRecords = tableRef.value?.getInsertRecords() as ${simpleClassName}Api.${subSimpleClassName}[];
-    return [
-      ...data.filter(
-        (row) => !removeRecords.some((removed) => removed.id === row.id),
-      ),
-      ...insertRecords.map((row: any) => ({ ...row, id: undefined })),
-    ];
-  },
-});
+/** 获取当前子表数据，新增行不提交表格生成的临时编号 */
+function getData(): ${simpleClassName}Api.${subSimpleClassName}[] {
+  const table = tableRef.value;
+  if (!table) {
+    return [];
+  }
+  const { fullData } = table.getTableData();
+  const inserted = new Set(table.getInsertRecords());
+  return fullData.map((row) =>
+    inserted.has(row) ? { ...row, id: undefined } : { ...row },
+  );
+}
+
+#set ($hasRequiredColumn = false)
+#foreach ($column in $subColumns)
+#if (($column.createOperation || $column.updateOperation) && !$column.nullable && !$column.primaryKey && $column.id != $subJoinColumn.id)
+#set ($hasRequiredColumn = true)
+#end
+#end
+/** 校验子表必填字段 */
+function validate(): boolean {
+#if ($hasRequiredColumn)
+  for (const [index, row] of getData().entries()) {
+#foreach ($column in $subColumns)
+#if (($column.createOperation || $column.updateOperation) && !$column.nullable && !$column.primaryKey && $column.id != $subJoinColumn.id)
+    if (
+      row.${column.javaField} === null ||
+      row.${column.javaField} === undefined ||
+      (typeof row.${column.javaField} === 'string' && String(row.${column.javaField}).trim() === '') ||
+      (Array.isArray(row.${column.javaField}) && row.${column.javaField}.length === 0)
+    ) {
+      message.error(`第 #[[${index + 1}]]# 行：${column.columnComment}不能为空`);
+      return false;
+    }
+#end
+#end
+  }
+#end
+  return true;
+}
+
+defineExpose({ getData, validate });
 
 /** 监听主表的关联字段的变化，加载对应的子表数据 */
 watch(
     () => props.${subJoinColumn.javaField},
     async (val) => {
+      list.value = [];
       if (!val) {
         return;
       }
@@ -103,6 +132,17 @@ defineExpose({
 watch(
     () => props.${subJoinColumn.javaField},
     async (val) => {
+      formData.value = {
+#foreach ($column in $subColumns)
+#if ($column.createOperation || $column.updateOperation)
+#if ($column.htmlType == "checkbox")
+        $column.javaField: [],
+#else
+        $column.javaField: undefined,
+#end
+#end
+#end
+      };
       if (!val) {
         return;
       }
@@ -120,6 +160,7 @@ watch(
       #foreach($column in $subColumns)
           #if ($column.createOperation || $column.updateOperation)
               #set ($comment = $column.columnComment)
+              #set ($dictType = $column.dictType)
               #set ($javaField = $column.javaField)
               #set ($javaType = $column.javaType)
               #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")

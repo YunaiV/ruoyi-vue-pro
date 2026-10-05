@@ -35,12 +35,11 @@ const total = ref(0) // 列表的总页数
 const queryParams = reactive({
   pageNo: 1,
   pageSize: 10,
-                name: undefined,
-                birthday: undefined,
-                birthday: undefined,
-                sex: undefined,
-                enabled: undefined,
-                createTime: undefined,
+        name: undefined,
+        birthday: undefined,
+        sex: undefined,
+        enabled: undefined,
+        createTime: undefined,
 })
 const queryFormRef = ref() // 搜索的表单
 const exportLoading = ref(false) // 导出的加载中
@@ -136,7 +135,14 @@ function handleRowCheckboxChange({
 async function handleExport() {
 try {
   exportLoading.value = true;
-  const data = await exportStudent(queryParams);
+    const params = cloneDeep(queryParams) as any;
+                if (params.birthday && Array.isArray(params.birthday)) {
+                  params.birthday = (params.birthday as string[]).join(',');
+                }
+                if (params.createTime && Array.isArray(params.createTime)) {
+                  params.createTime = (params.createTime as string[]).join(',');
+                }
+  const data = await exportStudent(params);
   downloadFileFromBlobPart({ fileName: '学生.xls', source: data });
 }finally {
   exportLoading.value = false;

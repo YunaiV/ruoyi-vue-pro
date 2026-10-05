@@ -32,25 +32,96 @@ async function handleDelete(row: StudentApi.StudentContact) {
   await tableRef.value?.remove(row);
 }
 
-/** 提供获取表格数据的方法供父组件调用 */
-defineExpose({
-  getData: (): StudentApi.StudentContact[] => {
-    const data = list.value as StudentApi.StudentContact[];
-    const removeRecords = tableRef.value?.getRemoveRecords() as StudentApi.StudentContact[];
-    const insertRecords = tableRef.value?.getInsertRecords() as StudentApi.StudentContact[];
-    return [
-      ...data.filter(
-        (row) => !removeRecords.some((removed) => removed.id === row.id),
-      ),
-      ...insertRecords.map((row: any) => ({ ...row, id: undefined })),
-    ];
-  },
-});
+/** 获取当前子表数据，新增行不提交表格生成的临时编号 */
+function getData(): StudentApi.StudentContact[] {
+  const table = tableRef.value;
+  if (!table) {
+    return [];
+  }
+  const { fullData } = table.getTableData();
+  const inserted = new Set(table.getInsertRecords());
+  return fullData.map((row) =>
+    inserted.has(row) ? { ...row, id: undefined } : { ...row },
+  );
+}
+
+/** 校验子表必填字段 */
+function validate(): boolean {
+  for (const [index, row] of getData().entries()) {
+    if (
+      row.name === null ||
+      row.name === undefined ||
+      (typeof row.name === 'string' && String(row.name).trim() === '') ||
+      (Array.isArray(row.name) && row.name.length === 0)
+    ) {
+      message.error(`第 ${index + 1} 行：名字不能为空`);
+      return false;
+    }
+    if (
+      row.description === null ||
+      row.description === undefined ||
+      (typeof row.description === 'string' && String(row.description).trim() === '') ||
+      (Array.isArray(row.description) && row.description.length === 0)
+    ) {
+      message.error(`第 ${index + 1} 行：简介不能为空`);
+      return false;
+    }
+    if (
+      row.birthday === null ||
+      row.birthday === undefined ||
+      (typeof row.birthday === 'string' && String(row.birthday).trim() === '') ||
+      (Array.isArray(row.birthday) && row.birthday.length === 0)
+    ) {
+      message.error(`第 ${index + 1} 行：出生日期不能为空`);
+      return false;
+    }
+    if (
+      row.sex === null ||
+      row.sex === undefined ||
+      (typeof row.sex === 'string' && String(row.sex).trim() === '') ||
+      (Array.isArray(row.sex) && row.sex.length === 0)
+    ) {
+      message.error(`第 ${index + 1} 行：性别不能为空`);
+      return false;
+    }
+    if (
+      row.enabled === null ||
+      row.enabled === undefined ||
+      (typeof row.enabled === 'string' && String(row.enabled).trim() === '') ||
+      (Array.isArray(row.enabled) && row.enabled.length === 0)
+    ) {
+      message.error(`第 ${index + 1} 行：是否有效不能为空`);
+      return false;
+    }
+    if (
+      row.avatar === null ||
+      row.avatar === undefined ||
+      (typeof row.avatar === 'string' && String(row.avatar).trim() === '') ||
+      (Array.isArray(row.avatar) && row.avatar.length === 0)
+    ) {
+      message.error(`第 ${index + 1} 行：头像不能为空`);
+      return false;
+    }
+    if (
+      row.memo === null ||
+      row.memo === undefined ||
+      (typeof row.memo === 'string' && String(row.memo).trim() === '') ||
+      (Array.isArray(row.memo) && row.memo.length === 0)
+    ) {
+      message.error(`第 ${index + 1} 行：备注不能为空`);
+      return false;
+    }
+  }
+  return true;
+}
+
+defineExpose({ getData, validate });
 
 /** 监听主表的关联字段的变化，加载对应的子表数据 */
 watch(
     () => props.studentId,
     async (val) => {
+      list.value = [];
       if (!val) {
         return;
       }
@@ -86,7 +157,7 @@ watch(
                   <template #default="{ row }">
                     <Select v-model:value="row.sex" placeholder="请选择性别">
                           <Select.Option
-                              v-for="dict in getDictOptions(DICT_TYPE.$dictType.toUpperCase(), 'number')"
+                              v-for="dict in getDictOptions(DICT_TYPE.SYSTEM_USER_SEX, 'number')"
                               :key="dict.value"
                               :value="dict.value"
                           >
@@ -99,7 +170,7 @@ watch(
                   <template #default="{ row }">
                     <RadioGroup v-model:value="row.enabled">
                           <Radio
-                              v-for="dict in getDictOptions(DICT_TYPE.$dictType.toUpperCase(), 'boolean')"
+                              v-for="dict in getDictOptions(DICT_TYPE.INFRA_BOOLEAN_STRING, 'boolean')"
                               :key="dict.value"
                               :value="dict.value"
                           >

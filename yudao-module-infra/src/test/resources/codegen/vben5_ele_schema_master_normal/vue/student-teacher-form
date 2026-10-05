@@ -39,10 +39,11 @@ defineExpose({
 watch(
     () => props.studentId,
     async (val) => {
+      await nextTick();
+      await formApi.resetForm();
       if (!val) {
         return;
       }
-      await nextTick();
       await formApi.setValues(await getStudentTeacherByStudentId(props.studentId!));
     },
     { immediate: true },

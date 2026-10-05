@@ -6,13 +6,14 @@
 #set ($subSimpleClassName_strikeCase = $subSimpleClassName_strikeCases.get($subIndex))
 #set ($SubJoinColumnName = $subJoinColumn.javaField.substring(0,1).toUpperCase() + ${subJoinColumn.javaField.substring(1)})##首字母大写
 <script lang="ts" setup>
-  import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+  import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${table.businessName}';
   import type { VxeTableInstance } from '#/adapter/vxe-table';
 
   import { reactive,ref, h, nextTick,watch,onMounted } from 'vue';
 
   import { DICT_TYPE } from '@vben/constants';
   import { getDictOptions } from '@vben/hooks';
+import { formatDateTime } from '@vben/utils';
 
   import { DictTag } from '#/components/dict-tag';
   import { getRangePickerDefaultProps } from '#/utils';
@@ -31,13 +32,13 @@
 #end
 
 #if ($table.templateType == 11) ## erp
-    import { delete${subSimpleClassName},#if ($deleteBatchEnable) delete${subSimpleClassName}List,#end get${subSimpleClassName}Page } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
-    import { isEmpty } from '@vben/utils';
+    import { delete${subSimpleClassName},#if ($deleteBatchEnable) delete${subSimpleClassName}List,#end get${subSimpleClassName}Page } from '#/api/${table.moduleName}/${table.businessName}';
+    import { cloneDeep, isEmpty } from '@vben/utils';
   #else
   #if ($subTable.subJoinMany) ## 一对多
-  import { get${subSimpleClassName}ListBy${SubJoinColumnName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+  import { get${subSimpleClassName}ListBy${SubJoinColumnName} } from '#/api/${table.moduleName}/${table.businessName}';
   #else
-  import { get${subSimpleClassName}By${SubJoinColumnName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+  import { get${subSimpleClassName}By${SubJoinColumnName} } from '#/api/${table.moduleName}/${table.businessName}';
   #end
 #end
 
@@ -203,7 +204,7 @@ onMounted(() => {
       <div class="h-[600px]">
         <ContentWrap v-if="!hiddenSearchBar">
           <!-- 搜索工作栏 -->
-          <el-form
+          <ElForm
               :model="queryParams"
               ref="queryFormRef"
               inline
@@ -222,49 +223,49 @@ onMounted(() => {
                           #set ($dictMethod = "boolean")
                       #end
                       #if ($column.htmlType == "input")
-                        <el-form-item label="${comment}">
-                          <el-input
+                        <ElFormItem label="${comment}">
+                          <ElInput
                               v-model="queryParams.${javaField}"
                               placeholder="请输入${comment}"
                               clearable
                               @keyup.enter="handleQuery"
                               class="!w-[240px]"
                           />
-                        </el-form-item>
+                        </ElFormItem>
                       #elseif ($column.htmlType == "select" || $column.htmlType == "radio" || $column.htmlType == "checkbox")
-                        <el-form-item label="${comment}">
-                          <el-select
+                        <ElFormItem label="${comment}">
+                          <ElSelect
                               v-model="queryParams.${javaField}"
                               placeholder="请选择${comment}"
                               clearable
                               class="!w-[240px]"
                           >
                               #if ("" != $dictType)## 设置了 dictType 数据字典的情况
-                                <el-option
+                                <ElOption
                                     v-for="dict in getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod')"
                                     :key="dict.value"
                                     :value="dict.value"
                                     :label="dict.label"
                                 />
                               #else## 未设置 dictType 数据字典的情况
-                                <el-option label="请选择字典生成" value="" />
+                                <ElOption label="请选择字典生成" value="" />
                               #end
-                          </el-select>
-                        </el-form-item>
+                          </ElSelect>
+                        </ElFormItem>
                       #elseif($column.htmlType == "datetime")
                           #if ($column.listOperationCondition != "BETWEEN")## 非范围
-                            <el-form-item label="${comment}">
-                              <el-date-picker
+                            <ElFormItem label="${comment}">
+                              <ElDatePicker
                                   v-model="queryParams.${javaField}"
                                   value-format="YYYY-MM-DD"
                                   placeholder="选择${comment}"
                                   clearable
                                   class="!w-[240px]"
                               />
-                            </el-form-item>
+                            </ElFormItem>
                           #else## 范围
-                            <el-form-item label="${comment}">
-                              <el-date-picker
+                            <ElFormItem label="${comment}">
+                              <ElDatePicker
                                   v-model="queryParams.${javaField}"
                                   type="daterange"
                                   value-format="YYYY-MM-DD"
@@ -273,18 +274,18 @@ onMounted(() => {
                                   end-placeholder="结束日期"
                                   class="!w-[240px]"
                               />
-                            </el-form-item>
+                            </ElFormItem>
                           #end
                       #end
                   #end
               #end
-            <el-form-item>
-              <el-button class="ml-2" @click="resetQuery"> 重置 </el-button>
-              <el-button class="ml-2" @click="handleQuery" type="primary">
+            <ElFormItem>
+              <ElButton class="ml-2" @click="resetQuery"> 重置 </ElButton>
+              <ElButton class="ml-2" @click="handleQuery" type="primary">
                 搜索
-              </el-button>
-            </el-form-item>
-          </el-form>
+              </ElButton>
+            </ElFormItem>
+          </ElForm>
         </ContentWrap>
 
         <!-- 列表 -->
@@ -294,7 +295,7 @@ onMounted(() => {
                 ref="tableToolbarRef"
                 v-model:hidden-search="hiddenSearchBar"
             >
-              <el-button
+              <ElButton
                   class="ml-2"
                   :icon="h(Plus)"
                   type="primary"
@@ -302,9 +303,9 @@ onMounted(() => {
                   v-access:code="['${permissionPrefix}:create']"
               >
                 {{ $t('ui.actionTitle.create', ['${table.classComment}']) }}
-              </el-button>
+              </ElButton>
                 #if ($deleteBatchEnable)
-                  <el-button
+                  <ElButton
                       :icon="h(Trash2)"
                       type="danger"
                       class="ml-2"
@@ -313,11 +314,11 @@ onMounted(() => {
                       v-access:code="['${table.moduleName}:${simpleClassName_strikeCase}:delete']"
                   >
                     批量删除
-                  </el-button>
+                  </ElButton>
                 #end
-            </TableToolbar>
+            </VbenVxeTableToolbar>
           </template>
-          <vxe-table
+          <VxeTable
               ref="tableRef"
               :data="list"
               show-overflow
@@ -328,7 +329,7 @@ onMounted(() => {
               #end
           >
               #if ($deleteBatchEnable)
-                <vxe-column type="checkbox" width="40"></vxe-column>
+                <VxeColumn type="checkbox" width="40"></VxeColumn>
               #end
               #foreach($column in $subColumns)
                   #if ($column.listOperationResult)
@@ -336,27 +337,27 @@ onMounted(() => {
                       #set ($javaField = $column.javaField)
                       #set ($comment=$column.columnComment)
                       #if ($column.javaType == "LocalDateTime")## 时间类型
-                        <vxe-column field="${javaField}" title="${comment}" align="center">
+                        <VxeColumn field="${javaField}" title="${comment}" align="center">
                           <template #default="{row}">
                             {{formatDateTime(row.${javaField})}}
                           </template>
-                        </vxe-column>
+                        </VxeColumn>
                       #elseif($column.dictType && "" != $column.dictType)## 数据字典
-                        <vxe-column field="${javaField}" title="${comment}" align="center">
+                        <VxeColumn field="${javaField}" title="${comment}" align="center">
                           <template #default="{row}">
                             <dict-tag :type="DICT_TYPE.$dictType.toUpperCase()" :value="row.${javaField}" />
                           </template>
-                        </vxe-column>
+                        </VxeColumn>
                       #elseif ($table.templateType == 2 && $javaField == $treeNameColumn.javaField)
-                        <vxe-column field="${javaField}" title="${comment}" align="center"  tree-node/>
+                        <VxeColumn field="${javaField}" title="${comment}" align="center"  tree-node/>
                       #else
-                        <vxe-column field="${javaField}" title="${comment}" align="center" />
+                        <VxeColumn field="${javaField}" title="${comment}" align="center" />
                       #end
                   #end
               #end
-            <vxe-column field="operation" title="操作" align="center">
+            <VxeColumn field="operation" title="操作" align="center">
               <template #default="{row}">
-                <el-button
+                <ElButton
                     size="small"
                     type="primary"
                     link
@@ -364,8 +365,8 @@ onMounted(() => {
                     v-access:code="['${permissionPrefix}:update']"
                 >
                   {{ $t('ui.actionTitle.edit') }}
-                </el-button>
-                <el-button
+                </ElButton>
+                <ElButton
                     size="small"
                     type="danger"
                     link
@@ -374,13 +375,13 @@ onMounted(() => {
                     v-access:code="['${permissionPrefix}:delete']"
                 >
                   {{ $t('ui.actionTitle.delete') }}
-                </el-button>
+                </ElButton>
               </template>
-            </vxe-column>
-          </vxe-table>
+            </VxeColumn>
+          </VxeTable>
           <!-- 分页 -->
           <div class="mt-2 flex justify-end">
-            <el-pagination
+            <ElPagination
                 :total="total"
                 v-model:current-page="queryParams.pageNo"
                 v-model:page-size="queryParams.pageSize"
@@ -394,7 +395,7 @@ onMounted(() => {
       </div>
     #else
     <ContentWrap title="${subTable.classComment}列表">
-      <vxe-table
+      <VxeTable
           :data="list"
           show-overflow
           :loading="loading"
@@ -405,23 +406,23 @@ onMounted(() => {
                   #set ($javaField = $column.javaField)
                   #set ($comment=$column.columnComment)
                   #if ($column.javaType == "LocalDateTime")## 时间类型
-                    <vxe-column field="${javaField}" title="${comment}" align="center">
+                    <VxeColumn field="${javaField}" title="${comment}" align="center">
                       <template #default="{row}">
                         {{formatDateTime(row.${javaField})}}
                       </template>
-                    </vxe-column>
+                    </VxeColumn>
                   #elseif($column.dictType && "" != $column.dictType)## 数据字典
-                    <vxe-column field="${javaField}" title="${comment}" align="center">
+                    <VxeColumn field="${javaField}" title="${comment}" align="center">
                       <template #default="{row}">
                         <dict-tag :type="DICT_TYPE.$dictType.toUpperCase()" :value="row.${javaField}" />
                       </template>
-                    </vxe-column>
+                    </VxeColumn>
                   #else
-                    <vxe-column field="${javaField}" title="${comment}" align="center" />
+                    <VxeColumn field="${javaField}" title="${comment}" align="center" />
                   #end
               #end
           #end
-      </vxe-table>
+      </VxeTable>
     </ContentWrap>
     #end
 </template>

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${table.businessName}';
 
 import { ref, h, reactive, onMounted, nextTick } from 'vue';
 
@@ -26,10 +26,10 @@ import { VxeColumn, VxeTable } from '#/adapter/vxe-table';
 import { $t } from '#/locales';
 #if (${table.templateType} == 2)## 树表接口
 import { handleTree,isEmpty } from '@vben/utils'
-import { get${simpleClassName}List, delete${simpleClassName}, export${simpleClassName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+import { get${simpleClassName}List, delete${simpleClassName}, export${simpleClassName} } from '#/api/${table.moduleName}/${table.businessName}';
 #else## 标准表接口
 import { isEmpty } from '@vben/utils';
-import { get${simpleClassName}Page, delete${simpleClassName},#if ($deleteBatchEnable) delete${simpleClassName}List,#end export${simpleClassName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+import { get${simpleClassName}Page, delete${simpleClassName},#if ($deleteBatchEnable) delete${simpleClassName}List,#end export${simpleClassName} } from '#/api/${table.moduleName}/${table.businessName}';
 #end
 #if ($importEnable)
 import ${simpleClassName}Import from './modules/import-form.vue';
@@ -65,12 +65,7 @@ const queryParams = reactive({
 #end
 #foreach ($column in $columns)
     #if ($column.listOperation)
-        #if ($column.listOperationCondition != 'BETWEEN')
-                $column.javaField: undefined,
-        #end
-        #if ($column.htmlType == "datetime" || $column.listOperationCondition == "BETWEEN")
-                $column.javaField: undefined,
-        #end
+        $column.javaField: undefined,
     #end
 #end
 })
@@ -195,7 +190,17 @@ function handleRowCheckboxChange({
 async function handleExport() {
 try {
   exportLoading.value = true;
-  const data = await export${simpleClassName}(queryParams);
+    const params = cloneDeep(queryParams) as any;
+      #foreach ($column in $columns)
+          #if ($column.listOperation)
+              #if ($column.htmlType == "datetime" || $column.listOperationCondition == "BETWEEN")
+                if (params.${column.javaField} && Array.isArray(params.${column.javaField})) {
+                  params.${column.javaField} = (params.${column.javaField} as string[]).join(',');
+                }
+              #end
+          #end
+      #end
+  const data = await export${simpleClassName}(params);
   downloadFileFromBlobPart({ fileName: '${table.classComment}.xls', source: data });
 }finally {
   exportLoading.value = false;
@@ -228,7 +233,7 @@ onMounted(() => {
 
     <ContentWrap v-if="!hiddenSearchBar">
       <!-- 搜索工作栏 -->
-      <el-form
+      <ElForm
           :model="queryParams"
           ref="queryFormRef"
           inline
@@ -247,49 +252,49 @@ onMounted(() => {
                       #set ($dictMethod = "boolean")
                   #end
                   #if ($column.htmlType == "input")
-                    <el-form-item label="${comment}">
-                      <el-input
+                    <ElFormItem label="${comment}">
+                      <ElInput
                           v-model="queryParams.${javaField}"
                           placeholder="请输入${comment}"
                           clearable
                           @keyup.enter="handleQuery"
                            class="!w-[240px]"
                       />
-                    </el-form-item>
+                    </ElFormItem>
                   #elseif ($column.htmlType == "select" || $column.htmlType == "radio" || $column.htmlType == "checkbox")
-                    <el-form-item label="${comment}">
-                      <el-select
+                    <ElFormItem label="${comment}">
+                      <ElSelect
                           v-model="queryParams.${javaField}"
                           placeholder="请选择${comment}"
                           clearable
                            class="!w-[240px]"
                       >
                           #if ("" != $dictType)## 设置了 dictType 数据字典的情况
-                            <el-option
+                            <ElOption
                                 v-for="dict in getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod')"
                                 :key="dict.value"
                                 :value="dict.value"
                                 :label="dict.label"
                             />
                           #else## 未设置 dictType 数据字典的情况
-                            <el-option label="请选择字典生成" value="" />
+                            <ElOption label="请选择字典生成" value="" />
                           #end
-                      </el-select>
-                    </el-form-item>
+                      </ElSelect>
+                    </ElFormItem>
                   #elseif($column.htmlType == "datetime")
                       #if ($column.listOperationCondition != "BETWEEN")## 非范围
-                        <el-form-item label="${comment}">
-                          <el-date-picker
+                        <ElFormItem label="${comment}">
+                          <ElDatePicker
                               v-model="queryParams.${javaField}"
                               value-format="YYYY-MM-DD"
                               placeholder="选择${comment}"
                               clearable
                                class="!w-[240px]"
                           />
-                        </el-form-item>
+                        </ElFormItem>
                       #else## 范围
-                        <el-form-item label="${comment}">
-                          <el-date-picker
+                        <ElFormItem label="${comment}">
+                          <ElDatePicker
                               v-model="queryParams.${javaField}"
                               type="daterange"
                               value-format="YYYY-MM-DD"
@@ -298,33 +303,33 @@ onMounted(() => {
                               end-placeholder="结束日期"
                               class="!w-[240px]"
                           />
-                        </el-form-item>
+                        </ElFormItem>
                       #end
                   #end
               #end
           #end
-        <el-form-item>
-          <el-button class="ml-2" @click="resetQuery"> 重置 </el-button>
-          <el-button class="ml-2" @click="handleQuery" type="primary">
+        <ElFormItem>
+          <ElButton class="ml-2" @click="resetQuery"> 重置 </ElButton>
+          <ElButton class="ml-2" @click="handleQuery" type="primary">
             搜索
-          </el-button>
-        </el-form-item>
-      </el-form>
+          </ElButton>
+        </ElFormItem>
+      </ElForm>
     </ContentWrap>
 
     <!-- 列表 -->
     <ContentWrap title="${table.classComment}">
       <template #extra>
-        <TableToolbar
+        <VbenVxeTableToolbar
             ref="tableToolbarRef"
             v-model:hidden-search="hiddenSearchBar"
         >
         #if (${table.templateType} == 2)
-          <el-button @click="handleExpand" class="mr-2">
+          <ElButton @click="handleExpand" class="mr-2">
             {{ isExpanded ? '收缩' : '展开' }}
-          </el-button>
+          </ElButton>
         #end
-          <el-button
+          <ElButton
               class="ml-2"
               :icon="h(Plus)"
               type="primary"
@@ -332,18 +337,18 @@ onMounted(() => {
               v-access:code="['${permissionPrefix}:create']"
           >
             {{ $t('ui.actionTitle.create', ['${table.classComment}']) }}
-          </el-button>
+          </ElButton>
 #if ($importEnable)
-          <el-button
+          <ElButton
               class="ml-2"
               type="primary"
               @click="handleImport"
               v-access:code="['${permissionPrefix}:import']"
           >
             导入
-          </el-button>
+          </ElButton>
 #end
-          <el-button
+          <ElButton
               :icon="h(Download)"
               type="primary"
               class="ml-2"
@@ -352,9 +357,9 @@ onMounted(() => {
               v-access:code="['${permissionPrefix}:export']"
           >
             {{ $t('ui.actionTitle.export') }}
-          </el-button>
+          </ElButton>
         #if ($table.templateType != 2 && $deleteBatchEnable)
-          <el-button
+          <ElButton
               :icon="h(Trash2)"
               type="danger"
               class="ml-2"
@@ -363,11 +368,11 @@ onMounted(() => {
               v-access:code="['${table.moduleName}:${simpleClassName_strikeCase}:delete']"
           >
             批量删除
-          </el-button>
+          </ElButton>
         #end
-        </TableToolbar>
+        </VbenVxeTableToolbar>
       </template>
-      <vxe-table
+      <VxeTable
           ref="tableRef"
           :data="list"
         #if ( $table.templateType == 2 )
@@ -395,27 +400,27 @@ onMounted(() => {
 #end
       >
 #if ($table.templateType != 2 && $deleteBatchEnable)
-        <vxe-column type="checkbox" width="40"></vxe-column>
+        <VxeColumn type="checkbox" width="40"></VxeColumn>
 #end
           ## 特殊：主子表专属逻辑
           #if ( $table.templateType == 12 && $subTables && $subTables.size() > 0 )
             <!-- 子表的列表 -->
-            <vxe-column type="expand" width="60">
+            <VxeColumn type="expand" width="60">
               <template #content="{ row }">
                 <!-- 子表的表单 -->
-                <el-tabs v-model="subTabsName" class="mx-8">
+                <ElTabs v-model="subTabsName" class="mx-8">
                     #foreach ($subTable in $subTables)
                         #set ($index = $foreach.count - 1)
                         #set ($subClassNameVar = $subClassNameVars.get($index))
                         #set ($subSimpleClassName = $subSimpleClassNames.get($index))
                         #set ($subJoinColumn_strikeCase = $subJoinColumn_strikeCases.get($index))
-                      <el-tab-pane name="$subClassNameVar" label="${subTable.classComment}">
+                      <ElTabPane name="$subClassNameVar" label="${subTable.classComment}">
                         <${subSimpleClassName}List :${subJoinColumn_strikeCase}="row?.id" />
-                      </el-tab-pane>
+                      </ElTabPane>
                     #end
-                </el-tabs>
+                </ElTabs>
               </template>
-            </vxe-column>
+            </VxeColumn>
           #end
           #foreach($column in $columns)
               #if ($column.listOperationResult)
@@ -424,28 +429,28 @@ onMounted(() => {
                   #set ($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
                   #set ($comment=$column.columnComment)
                   #if ($column.javaType == "LocalDateTime")## 时间类型
-                    <vxe-column field="${javaField}" title="${comment}" align="center">
+                    <VxeColumn field="${javaField}" title="${comment}" align="center">
                       <template #default="{row}">
                         {{formatDateTime(row.${javaField})}}
                       </template>
-                    </vxe-column>
+                    </VxeColumn>
                   #elseif($column.dictType && "" != $column.dictType)## 数据字典
-                    <vxe-column field="${javaField}" title="${comment}" align="center">
+                    <VxeColumn field="${javaField}" title="${comment}" align="center">
                       <template #default="{row}">
                         <dict-tag :type="DICT_TYPE.$dictType.toUpperCase()" :value="row.${javaField}" />
                       </template>
-                    </vxe-column>
+                    </VxeColumn>
                   #elseif ($table.templateType == 2 && $javaField == $treeNameColumn.javaField)
-                    <vxe-column field="${javaField}" title="${comment}" align="center"  tree-node/>
+                    <VxeColumn field="${javaField}" title="${comment}" align="center"  tree-node/>
                   #else
-                    <vxe-column field="${javaField}" title="${comment}" align="center" />
+                    <VxeColumn field="${javaField}" title="${comment}" align="center" />
                   #end
               #end
           #end
-        <vxe-column field="operation" title="操作" align="center">
+        <VxeColumn field="operation" title="操作" align="center">
           <template #default="{row}">
 #if ( $table.templateType == 2 )
-  <el-button
+  <ElButton
       size="small"
       type="primary"
       link
@@ -453,9 +458,9 @@ onMounted(() => {
       v-access:code="['${permissionPrefix}:create']"
   >
     新增下级
-  </el-button>
+  </ElButton>
 #end
-            <el-button
+            <ElButton
                 size="small"
                 type="primary"
                 link
@@ -463,8 +468,8 @@ onMounted(() => {
                 v-access:code="['${permissionPrefix}:update']"
             >
               {{ $t('ui.actionTitle.edit') }}
-            </el-button>
-            <el-button
+            </ElButton>
+            <ElButton
                 size="small"
                 type="danger"
                 link
@@ -476,14 +481,14 @@ onMounted(() => {
                 v-access:code="['${permissionPrefix}:delete']"
             >
               {{ $t('ui.actionTitle.delete') }}
-            </el-button>
+            </ElButton>
           </template>
-        </vxe-column>
-      </vxe-table>
+        </VxeColumn>
+      </VxeTable>
 #if ( $table.templateType != 2 )
       <!-- 分页 -->
       <div class="mt-2 flex justify-end">
-        <el-pagination
+        <ElPagination
             :total="total"
             v-model:current-page="queryParams.pageNo"
             v-model:page-size="queryParams.pageSize"
@@ -498,17 +503,17 @@ onMounted(() => {
 #if ($table.templateType == 11) ## erp情况
   <ContentWrap>
     <!-- 子表的表单 -->
-    <el-tabs v-model="subTabsName">
+    <ElTabs v-model="subTabsName">
         #foreach ($subTable in $subTables)
             #set ($index = $foreach.count - 1)
             #set ($subClassNameVar = $subClassNameVars.get($index))
             #set ($subSimpleClassName = $subSimpleClassNames.get($index))
             #set ($subJoinColumn_strikeCase = $subJoinColumn_strikeCases.get($index))
-          <el-tab-pane name="$subClassNameVar" label="${subTable.classComment}">
+          <ElTabPane name="$subClassNameVar" label="${subTable.classComment}">
             <${subSimpleClassName}List :${subJoinColumn_strikeCase}="select${simpleClassName}?.id" />
-          </el-tab-pane>
+          </ElTabPane>
         #end
-    </el-tabs>
+    </ElTabs>
   </ContentWrap>
 #end
   </Page>

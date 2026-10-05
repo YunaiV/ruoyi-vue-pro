@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${table.businessName}';
 import type { FormRules } from 'element-plus';
 
 import { useVbenModal } from '@vben/common-ui';
@@ -9,7 +9,7 @@ import { Tinymce as RichTextarea } from '#/components/tinymce';
 import { ImageUpload, FileUpload } from "#/components/upload";
 import { ElMessage, ElTabs, ElTabPane, ElForm, ElFormItem, ElInput, ElSelect, ElOption, ElRadioGroup, ElRadio, ElCheckboxGroup, ElCheckbox, ElDatePicker, ElTreeSelect } from 'element-plus';
 #if($table.templateType == 2)## 树表需要导入这些
-import { get${simpleClassName}List } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+import { get${simpleClassName}List } from '#/api/${table.moduleName}/${table.businessName}';
 import { handleTree } from '@vben/utils'
 #end
 ## 特殊：主子表专属逻辑
@@ -23,7 +23,7 @@ import { handleTree } from '@vben/utils'
 
 import { computed, ref, reactive } from 'vue';
 import { $t } from '#/locales';
-import { get${simpleClassName}, create${simpleClassName}, update${simpleClassName} } from '#/api/${table.moduleName}/${simpleClassName_strikeCase}';
+import { get${simpleClassName}, create${simpleClassName}, update${simpleClassName} } from '#/api/${table.moduleName}/${table.businessName}';
 
 const emit = defineEmits(['success']);
 
@@ -111,7 +111,10 @@ const [Modal, modalApi] = useVbenModal({
           #set ($index = $foreach.count - 1)
           #set ($subClassNameVar = $subClassNameVars.get($index))
           #if ($subTable.subJoinMany) ## 一对多
-            ## TODO 列表值校验？
+            if (!${subClassNameVar}FormRef.value?.validate()) {
+              subTabsName.value = '${subClassNameVar}';
+              return;
+            }
           #else
             try {
               await ${subClassNameVar}FormRef.value?.validate()
@@ -180,7 +183,7 @@ const [Modal, modalApi] = useVbenModal({
 
 <template>
   <Modal :title="getTitle">
-    <el-form
+    <ElForm
       ref="formRef"
       :model="formData"
       :rules="rules"
@@ -201,8 +204,8 @@ const [Modal, modalApi] = useVbenModal({
             #set ($dictMethod = "boolean")
           #end
           #if ( $table.templateType == 2 && $column.id == $treeParentColumn.id )
-            <el-form-item label="${comment}" prop="${javaField}">
-              <el-tree-select
+            <ElFormItem label="${comment}" prop="${javaField}">
+              <ElTreeSelect
                       v-model="formData.${javaField}"
                       :data="${classNameVar}Tree"
                 #if ($treeNameColumn.javaField == "name")
@@ -222,100 +225,100 @@ const [Modal, modalApi] = useVbenModal({
                       default-expand-all
                       placeholder="请选择${comment}"
               />
-            </el-form-item>
+            </ElFormItem>
           #elseif ($column.htmlType == "input" && !$column.primaryKey)## 忽略主键，不用在表单里
-            <el-form-item label="${comment}" prop="${javaField}">
-              <el-input v-model="formData.${javaField}" placeholder="请输入${comment}" />
-            </el-form-item>
+            <ElFormItem label="${comment}" prop="${javaField}">
+              <ElInput v-model="formData.${javaField}" placeholder="请输入${comment}" />
+            </ElFormItem>
           #elseif($column.htmlType == "imageUpload")## 图片上传
-            <el-form-item label="${comment}" prop="${javaField}">
+            <ElFormItem label="${comment}" prop="${javaField}">
               <ImageUpload v-model="formData.${javaField}" />
-            </el-form-item>
+            </ElFormItem>
           #elseif($column.htmlType == "fileUpload")## 文件上传
-            <el-form-item label="${comment}" prop="${javaField}">
+            <ElFormItem label="${comment}" prop="${javaField}">
               <FileUpload v-model="formData.${javaField}" />
-            </el-form-item>
+            </ElFormItem>
           #elseif($column.htmlType == "editor")## 文本编辑器
-            <el-form-item label="${comment}" prop="${javaField}">
+            <ElFormItem label="${comment}" prop="${javaField}">
               <RichTextarea v-model="formData.${javaField}" height="500px" />
-            </el-form-item>
+            </ElFormItem>
           #elseif($column.htmlType == "select")## 下拉框
-            <el-form-item label="${comment}" prop="${javaField}">
-              <el-select v-model="formData.${javaField}" placeholder="请选择${comment}">
+            <ElFormItem label="${comment}" prop="${javaField}">
+              <ElSelect v-model="formData.${javaField}" placeholder="请选择${comment}">
                 #if ("" != $dictType)## 有数据字典
-                  <el-option
+                  <ElOption
                           v-for="dict in getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod')"
                           :key="dict.value"
                           :value="dict.value"
                           :label="dict.label"
                   />
                 #else##没数据字典
-                  <el-option label="请选择字典生成" value="" />
+                  <ElOption label="请选择字典生成" value="" />
                 #end
-              </el-select>
-            </el-form-item>
+              </ElSelect>
+            </ElFormItem>
           #elseif($column.htmlType == "checkbox")## 多选框
-            <el-form-item label="${comment}" prop="${javaField}">
-              <el-checkbox-group v-model="formData.${javaField}">
+            <ElFormItem label="${comment}" prop="${javaField}">
+              <ElCheckboxGroup v-model="formData.${javaField}">
                 #if ("" != $dictType)## 有数据字典
-                  <el-checkbox
+                  <ElCheckbox
                           v-for="dict in getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod')"
                           :key="dict.value"
-                          :label="dict.value"
+                          :value="dict.value"
                  >
                     {{ dict.label }}
-                  </el-checkbox>
+                  </ElCheckbox>
                 #else##没数据字典
-                  <el-checkbox label="请选择字典生成" />
+                  <ElCheckbox label="请选择字典生成" />
                 #end
-              </el-checkbox-group>
-            </el-form-item>
+              </ElCheckboxGroup>
+            </ElFormItem>
           #elseif($column.htmlType == "radio")## 单选框
-            <el-form-item label="${comment}" prop="${javaField}">
-              <el-radio-group v-model="formData.${javaField}">
+            <ElFormItem label="${comment}" prop="${javaField}">
+              <ElRadioGroup v-model="formData.${javaField}">
                 #if ("" != $dictType)## 有数据字典
-                  <el-radio
+                  <ElRadio
                           v-for="dict in getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod')"
                           :key="dict.value"
-                          :label="dict.value"
+                          :value="dict.value"
                   >
                     {{ dict.label }}
-                  </el-radio>
+                  </ElRadio>
                 #else##没数据字典
-                  <el-radio :label="1">请选择字典生成</el-radio>
+                  <ElRadio :label="1">请选择字典生成</ElRadio>
                 #end
-              </el-radio-group>
-            </el-form-item>
+              </ElRadioGroup>
+            </ElFormItem>
           #elseif($column.htmlType == "datetime")## 时间框
-            <el-form-item label="${comment}" prop="${javaField}">
-              <el-date-picker
+            <ElFormItem label="${comment}" prop="${javaField}">
+              <ElDatePicker
                       v-model="formData.${javaField}"
                       value-format="x"
                       placeholder="选择${comment}"
               />
-            </el-form-item>
+            </ElFormItem>
           #elseif($column.htmlType == "textarea")## 文本框
-            <el-form-item label="${comment}" prop="${javaField}">
-              <el-input v-model="formData.${javaField}" type="textarea" placeholder="请输入${comment}" />
-            </el-form-item>
+            <ElFormItem label="${comment}" prop="${javaField}">
+              <ElInput v-model="formData.${javaField}" type="textarea" placeholder="请输入${comment}" />
+            </ElFormItem>
           #end
         #end
       #end
-    </el-form>
+    </ElForm>
     ## 特殊：主子表专属逻辑
     #if ( $table.templateType == 10 || $table.templateType == 12 )
       <!-- 子表的表单 -->
-      <el-tabs v-model="subTabsName">
+      <ElTabs v-model="subTabsName">
         #foreach ($subTable in $subTables)
           #set ($index = $foreach.count - 1)
           #set ($subClassNameVar = $subClassNameVars.get($index))
           #set ($subSimpleClassName = $subSimpleClassNames.get($index))
           #set ($subJoinColumn_strikeCase = $subJoinColumn_strikeCases.get($index))
-          <el-tab-pane name="$subClassNameVar" label="${subTable.classComment}">
+          <ElTabPane name="$subClassNameVar" label="${subTable.classComment}">
             <${subSimpleClassName}Form ref="${subClassNameVar}FormRef" :${subJoinColumn_strikeCase}="formData?.id" />
-          </el-tab-pane>
+          </ElTabPane>
         #end
-      </el-tabs>
+      </ElTabs>
     #end
   </Modal>
 </template>

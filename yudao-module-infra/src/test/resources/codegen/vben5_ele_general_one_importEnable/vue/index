@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { StudentApi } from '#/api/infra/student';
+import type { StudentApi } from '#/api/infra/demo';
 
 import { ref, h, reactive, onMounted, nextTick } from 'vue';
 
@@ -17,7 +17,7 @@ import { VxeColumn, VxeTable } from '#/adapter/vxe-table';
 
 import { $t } from '#/locales';
 import { isEmpty } from '@vben/utils';
-import { getStudentPage, deleteStudent, deleteStudentList, exportStudent } from '#/api/infra/student';
+import { getStudentPage, deleteStudent, deleteStudentList, exportStudent } from '#/api/infra/demo';
 import StudentImport from './modules/import-form.vue';
 
 
@@ -28,12 +28,11 @@ const total = ref(0) // 列表的总页数
 const queryParams = reactive({
   pageNo: 1,
   pageSize: 10,
-                name: undefined,
-                birthday: undefined,
-                birthday: undefined,
-                sex: undefined,
-                enabled: undefined,
-                createTime: undefined,
+        name: undefined,
+        birthday: undefined,
+        sex: undefined,
+        enabled: undefined,
+        createTime: undefined,
 })
 const queryFormRef = ref() // 搜索的表单
 const exportLoading = ref(false) // 导出的加载中
@@ -136,7 +135,14 @@ function handleRowCheckboxChange({
 async function handleExport() {
 try {
   exportLoading.value = true;
-  const data = await exportStudent(queryParams);
+    const params = cloneDeep(queryParams) as any;
+                if (params.birthday && Array.isArray(params.birthday)) {
+                  params.birthday = (params.birthday as string[]).join(',');
+                }
+                if (params.createTime && Array.isArray(params.createTime)) {
+                  params.createTime = (params.createTime as string[]).join(',');
+                }
+  const data = await exportStudent(params);
   downloadFileFromBlobPart({ fileName: '学生.xls', source: data });
 }finally {
   exportLoading.value = false;
@@ -159,61 +165,61 @@ onMounted(() => {
 
     <ContentWrap v-if="!hiddenSearchBar">
       <!-- 搜索工作栏 -->
-      <el-form
+      <ElForm
           :model="queryParams"
           ref="queryFormRef"
           inline
       >
-                    <el-form-item label="名字">
-                      <el-input
+                    <ElFormItem label="名字">
+                      <ElInput
                           v-model="queryParams.name"
                           placeholder="请输入名字"
                           clearable
                           @keyup.enter="handleQuery"
                            class="!w-[240px]"
                       />
-                    </el-form-item>
-                        <el-form-item label="出生日期">
-                          <el-date-picker
+                    </ElFormItem>
+                        <ElFormItem label="出生日期">
+                          <ElDatePicker
                               v-model="queryParams.birthday"
                               value-format="YYYY-MM-DD"
                               placeholder="选择出生日期"
                               clearable
                                class="!w-[240px]"
                           />
-                        </el-form-item>
-                    <el-form-item label="性别">
-                      <el-select
+                        </ElFormItem>
+                    <ElFormItem label="性别">
+                      <ElSelect
                           v-model="queryParams.sex"
                           placeholder="请选择性别"
                           clearable
                            class="!w-[240px]"
                       >
-                            <el-option
+                            <ElOption
                                 v-for="dict in getDictOptions(DICT_TYPE.SYSTEM_USER_SEX, 'number')"
                                 :key="dict.value"
                                 :value="dict.value"
                                 :label="dict.label"
                             />
-                      </el-select>
-                    </el-form-item>
-                    <el-form-item label="是否有效">
-                      <el-select
+                      </ElSelect>
+                    </ElFormItem>
+                    <ElFormItem label="是否有效">
+                      <ElSelect
                           v-model="queryParams.enabled"
                           placeholder="请选择是否有效"
                           clearable
                            class="!w-[240px]"
                       >
-                            <el-option
+                            <ElOption
                                 v-for="dict in getDictOptions(DICT_TYPE.INFRA_BOOLEAN_STRING, 'boolean')"
                                 :key="dict.value"
                                 :value="dict.value"
                                 :label="dict.label"
                             />
-                      </el-select>
-                    </el-form-item>
-                        <el-form-item label="创建时间">
-                          <el-date-picker
+                      </ElSelect>
+                    </ElFormItem>
+                        <ElFormItem label="创建时间">
+                          <ElDatePicker
                               v-model="queryParams.createTime"
                               type="daterange"
                               value-format="YYYY-MM-DD"
@@ -222,24 +228,24 @@ onMounted(() => {
                               end-placeholder="结束日期"
                               class="!w-[240px]"
                           />
-                        </el-form-item>
-        <el-form-item>
-          <el-button class="ml-2" @click="resetQuery"> 重置 </el-button>
-          <el-button class="ml-2" @click="handleQuery" type="primary">
+                        </ElFormItem>
+        <ElFormItem>
+          <ElButton class="ml-2" @click="resetQuery"> 重置 </ElButton>
+          <ElButton class="ml-2" @click="handleQuery" type="primary">
             搜索
-          </el-button>
-        </el-form-item>
-      </el-form>
+          </ElButton>
+        </ElFormItem>
+      </ElForm>
     </ContentWrap>
 
     <!-- 列表 -->
     <ContentWrap title="学生">
       <template #extra>
-        <TableToolbar
+        <VbenVxeTableToolbar
             ref="tableToolbarRef"
             v-model:hidden-search="hiddenSearchBar"
         >
-          <el-button
+          <ElButton
               class="ml-2"
               :icon="h(Plus)"
               type="primary"
@@ -247,16 +253,16 @@ onMounted(() => {
               v-access:code="['infra:student:create']"
           >
             {{ $t('ui.actionTitle.create', ['学生']) }}
-          </el-button>
-          <el-button
+          </ElButton>
+          <ElButton
               class="ml-2"
               type="primary"
               @click="handleImport"
               v-access:code="['infra:student:import']"
           >
             导入
-          </el-button>
-          <el-button
+          </ElButton>
+          <ElButton
               :icon="h(Download)"
               type="primary"
               class="ml-2"
@@ -265,8 +271,8 @@ onMounted(() => {
               v-access:code="['infra:student:export']"
           >
             {{ $t('ui.actionTitle.export') }}
-          </el-button>
-          <el-button
+          </ElButton>
+          <ElButton
               :icon="h(Trash2)"
               type="danger"
               class="ml-2"
@@ -275,10 +281,10 @@ onMounted(() => {
               v-access:code="['infra:student:delete']"
           >
             批量删除
-          </el-button>
-        </TableToolbar>
+          </ElButton>
+        </VbenVxeTableToolbar>
       </template>
-      <vxe-table
+      <VxeTable
           ref="tableRef"
           :data="list"
           show-overflow
@@ -286,36 +292,36 @@ onMounted(() => {
           @checkboxAll="handleRowCheckboxChange"
           @checkboxChange="handleRowCheckboxChange"
       >
-        <vxe-column type="checkbox" width="40"></vxe-column>
-                              <vxe-column field="id" title="编号" align="center" />
-                    <vxe-column field="name" title="名字" align="center" />
-                    <vxe-column field="description" title="简介" align="center" />
-                    <vxe-column field="birthday" title="出生日期" align="center">
+        <VxeColumn type="checkbox" width="40"></VxeColumn>
+                              <VxeColumn field="id" title="编号" align="center" />
+                    <VxeColumn field="name" title="名字" align="center" />
+                    <VxeColumn field="description" title="简介" align="center" />
+                    <VxeColumn field="birthday" title="出生日期" align="center">
                       <template #default="{row}">
                         {{formatDateTime(row.birthday)}}
                       </template>
-                    </vxe-column>
-                    <vxe-column field="sex" title="性别" align="center">
+                    </VxeColumn>
+                    <VxeColumn field="sex" title="性别" align="center">
                       <template #default="{row}">
                         <dict-tag :type="DICT_TYPE.SYSTEM_USER_SEX" :value="row.sex" />
                       </template>
-                    </vxe-column>
-                    <vxe-column field="enabled" title="是否有效" align="center">
+                    </VxeColumn>
+                    <VxeColumn field="enabled" title="是否有效" align="center">
                       <template #default="{row}">
                         <dict-tag :type="DICT_TYPE.INFRA_BOOLEAN_STRING" :value="row.enabled" />
                       </template>
-                    </vxe-column>
-                    <vxe-column field="avatar" title="头像" align="center" />
-                    <vxe-column field="video" title="附件" align="center" />
-                    <vxe-column field="memo" title="备注" align="center" />
-                    <vxe-column field="createTime" title="创建时间" align="center">
+                    </VxeColumn>
+                    <VxeColumn field="avatar" title="头像" align="center" />
+                    <VxeColumn field="video" title="附件" align="center" />
+                    <VxeColumn field="memo" title="备注" align="center" />
+                    <VxeColumn field="createTime" title="创建时间" align="center">
                       <template #default="{row}">
                         {{formatDateTime(row.createTime)}}
                       </template>
-                    </vxe-column>
-        <vxe-column field="operation" title="操作" align="center">
+                    </VxeColumn>
+        <VxeColumn field="operation" title="操作" align="center">
           <template #default="{row}">
-            <el-button
+            <ElButton
                 size="small"
                 type="primary"
                 link
@@ -323,8 +329,8 @@ onMounted(() => {
                 v-access:code="['infra:student:update']"
             >
               {{ $t('ui.actionTitle.edit') }}
-            </el-button>
-            <el-button
+            </ElButton>
+            <ElButton
                 size="small"
                 type="danger"
                 link
@@ -333,13 +339,13 @@ onMounted(() => {
                 v-access:code="['infra:student:delete']"
             >
               {{ $t('ui.actionTitle.delete') }}
-            </el-button>
+            </ElButton>
           </template>
-        </vxe-column>
-      </vxe-table>
+        </VxeColumn>
+      </VxeTable>
       <!-- 分页 -->
       <div class="mt-2 flex justify-end">
-        <el-pagination
+        <ElPagination
             :total="total"
             v-model:current-page="queryParams.pageNo"
             v-model:page-size="queryParams.pageSize"
