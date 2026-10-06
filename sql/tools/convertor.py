@@ -90,7 +90,7 @@ class Convertor(ABC):
         self.original_content = open(src, encoding="utf-8").read()
         # 剥离列级 COMMENT 以避免 COMMENT 值内的分号截断 CREATE TABLE 正则
         content_no_comment = re.sub(r" COMMENT '(?:[^'\\]|\\.)*'", "", self.content)
-        self.table_script_list = re.findall(r"CREATE TABLE [^;]*;", content_no_comment)
+        self.table_script_list = re.findall(r"(?m)^CREATE TABLE [^;]*;", content_no_comment)
 
     @abstractmethod
     def translate_type(self, type: str, size: Optional[Union[int, Tuple[int]]]) -> str:
