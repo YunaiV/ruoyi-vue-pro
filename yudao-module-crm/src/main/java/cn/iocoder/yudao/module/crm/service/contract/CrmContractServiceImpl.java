@@ -240,7 +240,9 @@ public class CrmContractServiceImpl implements CrmContractService {
 
         // 2.1 删除合同
         contractMapper.deleteById(id);
-        // 2.2 删除数据权限
+        // 2.2 删除合同产品明细，避免残留明细仍计入产品引用计数、把关联产品的删除路径锁死
+        contractProductMapper.deleteByContractId(id);
+        // 2.3 删除数据权限
         crmPermissionService.deletePermission(CrmBizTypeEnum.CRM_CONTRACT.getType(), id);
 
         // 3. 记录操作日志上下文
