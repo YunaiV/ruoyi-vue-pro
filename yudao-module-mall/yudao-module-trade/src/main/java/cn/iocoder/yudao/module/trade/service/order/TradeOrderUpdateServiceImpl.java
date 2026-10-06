@@ -391,9 +391,9 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
             // 2.2 无需发货
             updateOrderObj.setLogisticsId(0L).setLogisticsNo("");
         }
-        // 执行更新
+        // 执行更新：乐观锁条件用期望状态（待发货），并发下状态已被他人变更时 updateCount=0，守卫错误码才能生效
         updateOrderObj.setStatus(TradeOrderStatusEnum.DELIVERED.getStatus()).setDeliveryTime(LocalDateTime.now());
-        int updateCount = tradeOrderMapper.updateByIdAndStatus(order.getId(), order.getStatus(), updateOrderObj);
+        int updateCount = tradeOrderMapper.updateByIdAndStatus(order.getId(), TradeOrderStatusEnum.UNDELIVERED.getStatus(), updateOrderObj);
         if (updateCount == 0) {
             throw exception(ORDER_DELIVERY_FAIL_STATUS_NOT_UNDELIVERED);
         }
@@ -441,6 +441,9 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
     private TradeOrderDO validateOrderDeliverable(Long id) {
         TradeOrderDO order = validateOrderExists(id);
         // 1. 校验订单是否未发货
+        if (ObjectUtil.notEqual(TradeOrderStatusEnum.UNDELIVERED.getStatus(), order.getStatus())) {
+            throw exception(ORDER_DELIVERY_FAIL_STATUS_NOT_UNDELIVERED);
+        }
         if (ObjectUtil.notEqual(TradeOrderRefundStatusEnum.NONE.getStatus(), order.getRefundStatus())) {
             throw exception(ORDER_DELIVERY_FAIL_REFUND_STATUS_NOT_NONE);
         }
