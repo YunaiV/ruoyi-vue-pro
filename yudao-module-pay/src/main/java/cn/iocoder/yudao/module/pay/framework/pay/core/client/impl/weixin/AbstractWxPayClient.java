@@ -216,6 +216,27 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
         }
     }
 
+    @Override
+    protected PayOrderRespDTO doCloseOrder(String outTradeNo) throws Throwable {
+        try {
+            switch (config.getApiVersion()) {
+                case API_VERSION_V2:
+                    client.closeOrder(WxPayOrderCloseRequest.newBuilder().outTradeNo(outTradeNo).build());
+                    break;
+                case API_VERSION_V3:
+                    client.closeOrderV3(new WxPayOrderCloseV3Request()
+                            .setMchid(config.getMchId()).setOutTradeNo(outTradeNo));
+                    break;
+                default:
+                    throw new IllegalArgumentException(String.format("未知的 API 版本(%s)", config.getApiVersion()));
+            }
+            return PayOrderRespDTO.closedOf(null, null, outTradeNo, null);
+        } catch (WxPayException e) {
+            // 关闭失败时查询真实支付状态，避免遗漏已支付事实
+            return doGetOrder(outTradeNo);
+        }
+    }
+
     private PayOrderRespDTO doGetOrderV2(String outTradeNo) throws WxPayException {
         // 构建 WxPayUnifiedOrderRequest 对象
         WxPayOrderQueryRequest request = WxPayOrderQueryRequest.newBuilder()

@@ -598,6 +598,72 @@ public class PayOrderServiceImpl implements PayOrderService {
         }
     }
 
+    @Override
+    public void closeOrder(Long id) {
+        PayOrderDO order = orderMapper.selectById(id);
+        if (order == null || PayOrderStatusEnum.isClosed(order.getStatus())
+                || PayOrderStatusEnum.isRefund(order.getStatus())) {
+            return;
+        }
+        if (PayOrderStatusEnum.isSuccess(order.getStatus())) {
+            log.error("[closeOrder][order({}) 已支付，订单业务可能已取消，需要人工退款]", id);
+            return;
+        }
+        try {
+            // 1. 逐个关闭支付拓展单，避免遗漏重复支付尝试
+            List<PayOrderExtensionDO> extensions = orderExtensionMapper.selectListByOrderId(id);
+            for (PayOrderExtensionDO extension : extensions) {
+                if (PayOrderStatusEnum.isClosed(extension.getStatus())) {
+                    continue;
+                }
+                if (PayOrderStatusEnum.isSuccess(extension.getStatus())) {
+                    log.error("[closeOrder][order({}) extension({}) 已支付，订单业务可能已取消，需要人工退款]",
+                            id, extension.getId());
+                    return;
+                }
+                if (!PayOrderStatusEnum.isWaiting(extension.getStatus())) {
+                    continue;
+                }
+                PayClient<?> client = channelService.getPayClient(extension.getChannelId());
+                if (client == null) {
+                    log.error("[closeOrder][order({}) extension({}) 渠道({})不存在]",
+                            id, extension.getId(), extension.getChannelId());
+                    return;
+                }
+                // 1.1 调用渠道关单，已支付结果由渠道客户端转换并保留
+                PayOrderRespDTO respDTO = client.closeOrder(extension.getNo());
+                if (PayOrderStatusEnum.isSuccess(respDTO.getStatus())) {
+                    notifyOrder(extension.getChannelId(), respDTO);
+                    log.error("[closeOrder][order({}) extension({}) 查询发现已支付]", id, extension.getId());
+                    return;
+                }
+                if (!PayOrderStatusEnum.isClosed(respDTO.getStatus())) {
+                    log.warn("[closeOrder][order({}) extension({}) 渠道状态({})，暂不关闭本地支付单]",
+                            id, extension.getId(), respDTO.getStatus());
+                    return;
+                }
+                // 1.2 更新 PayOrderExtensionDO 状态
+                PayOrderExtensionDO updateObj = new PayOrderExtensionDO()
+                        .setStatus(PayOrderStatusEnum.CLOSED.getStatus())
+                        .setChannelErrorCode(respDTO.getChannelErrorCode())
+                        .setChannelErrorMsg(respDTO.getChannelErrorMsg())
+                        .setChannelNotifyData(toJsonString(respDTO));
+                if (orderExtensionMapper.updateByIdAndStatus(extension.getId(),
+                        PayOrderStatusEnum.WAITING.getStatus(), updateObj) == 0) {
+                    log.error("[closeOrder][order({}) extension({}) 更新为支付关闭失败]", id, extension.getId());
+                    return;
+                }
+            }
+            // 2. 所有支付拓展单都关闭后，再关闭支付主单
+            if (orderMapper.updateByIdAndStatus(id, PayOrderStatusEnum.WAITING.getStatus(),
+                    new PayOrderDO().setStatus(PayOrderStatusEnum.CLOSED.getStatus())) == 0) {
+                log.error("[closeOrder][order({}) 更新为支付关闭失败]", id);
+            }
+        } catch (Throwable e) {
+            log.error("[closeOrder][order({}) 关闭支付单异常]", id, e);
+        }
+    }
+
     /**
      * 获得自身的代理对象，解决 AOP 生效问题
      *
