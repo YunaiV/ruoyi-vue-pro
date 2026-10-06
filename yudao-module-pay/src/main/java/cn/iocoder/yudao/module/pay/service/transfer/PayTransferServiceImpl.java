@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -34,8 +35,6 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.*;
-
-// TODO @jason：等彻底实现完，单测写写；
 
 /**
  * 转账 Service 实现类
@@ -96,16 +95,58 @@ public class PayTransferServiceImpl implements PayTransferService {
                     .setOutTransferNo(transfer.getNo())
                     .setNotifyUrl(genChannelTransferNotifyUrl(channel));
             unifiedTransferResp = client.unifiedTransfer(transferUnifiedReq);
-            // 4. 通知转账结果
-            getSelf().notifyTransfer(channel, unifiedTransferResp);
         } catch (Throwable e) {
             // 注意这里仅打印异常，不进行抛出。
             // 原因是：虽然调用支付渠道进行转账发生异常（网络请求超时），实际转账成功。这个结果，后续转账轮询可以拿到。
             //       或者，使用相同 no 再次发起转账请求
             log.error("[createTransfer][转账编号({}) requestDTO({}) 发生异常]", transfer.getId(), reqDTO, e);
         }
+
+        // 4. 通知转账结果
+        if (unifiedTransferResp != null) {
+            PayTransferDO latestTransfer = null;
+            try {
+                getSelf().notifyTransfer(channel, unifiedTransferResp);
+            } catch (ServiceException ex) {
+                // 由于转账回调、转账轮询可能同时更新转账单，导致存在并发更新问题，此时以最新的转账状态为准
+                latestTransfer = validateTransferNotifyConcurrent(transfer.getId(), ex);
+                log.warn("[createTransfer][transfer({}) channel({}) 转账结果({}) 通知时发生并发更新，最新状态为({})]",
+                        transfer.getId(), channel.getId(), unifiedTransferResp, latestTransfer.getStatus(), ex);
+            }
+            // 如有渠道错误码，则抛出业务异常，提示用户
+            // 特殊：如果已被并发更新为成功，则以最新状态为准，避免旧的关闭结果误报
+            if (StrUtil.isNotEmpty(unifiedTransferResp.getChannelErrorCode())
+                    && (latestTransfer == null || PayTransferStatusEnum.isClosed(latestTransfer.getStatus()))) {
+                throw exception(PAY_TRANSFER_SUBMIT_CHANNEL_ERROR, unifiedTransferResp.getChannelErrorCode(),
+                        unifiedTransferResp.getChannelErrorMsg());
+            }
+        }
         return new PayTransferCreateRespDTO().setId(transfer.getId())
                 .setChannelPackageInfo(unifiedTransferResp != null ? unifiedTransferResp.getChannelPackageInfo() : null);
+    }
+
+    /**
+     * 校验转账结果通知时的并发更新
+     *
+     * 只有状态竞争导致的通知失败，并且转账单已被并发更新为成功或关闭时，才返回最新的转账单；
+     * 否则，直接抛出原异常，避免掩盖真实的通知失败
+     *
+     * @param id 转账单编号
+     * @param ex 通知转账结果时的业务异常
+     * @return 最新的转账单
+     */
+    private PayTransferDO validateTransferNotifyConcurrent(Long id, ServiceException ex) {
+        // 1. 校验是否为状态竞争
+        if (ObjectUtil.notEqual(ex.getCode(), PAY_TRANSFER_NOTIFY_FAIL_STATUS_IS_NOT_WAITING.getCode())
+                && ObjectUtil.notEqual(ex.getCode(), PAY_TRANSFER_NOTIFY_FAIL_STATUS_NOT_WAITING_OR_PROCESSING.getCode())) {
+            throw ex;
+        }
+        // 2. 校验最新状态为成功或关闭
+        PayTransferDO latestTransfer = transferMapper.selectById(id);
+        if (latestTransfer == null || !PayTransferStatusEnum.isSuccessOrClosed(latestTransfer.getStatus())) {
+            throw ex;
+        }
+        return latestTransfer;
     }
 
     /**
