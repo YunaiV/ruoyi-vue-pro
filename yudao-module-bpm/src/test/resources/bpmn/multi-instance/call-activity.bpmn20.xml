@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="http://www.yudao.iocoder.cn/bpm">
+    <!-- 子流程多实例：与 SimpleModelUtils 生成的结构一致（子流程发起人同主流程），被调用的子流程为 multiChild -->
+    <process id="multiChild" name="子流程" isExecutable="true">
+        <startEvent id="multiChild-start"/>
+        <sequenceFlow id="multiChild-flow-start" sourceRef="multiChild-start" targetRef="multiChild-task"/>
+        <userTask id="multiChild-task" name="子流程审批">
+            <extensionElements>
+                <flowable:candidateStrategy>30</flowable:candidateStrategy>
+            </extensionElements>
+        </userTask>
+        <sequenceFlow id="multiChild-flow-task" sourceRef="multiChild-task" targetRef="multiChild-end"/>
+        <endEvent id="multiChild-end"/>
+    </process>
+    <!-- 固定数量：并行发起 2 个子流程 -->
+    <process id="multiChildFixedQuantity" name="固定数量子流程" isExecutable="true">
+        <startEvent id="multiChildFixedQuantity-start"/>
+        <sequenceFlow id="multiChildFixedQuantity-flow-start" sourceRef="multiChildFixedQuantity-start" targetRef="multiChildFixedQuantity-child"/>
+        <callActivity id="multiChildFixedQuantity-child" name="子流程" calledElement="multiChild" flowable:calledElementType="key">
+            <extensionElements>
+                <flowable:childProcessMultiInstanceSourceType>1</flowable:childProcessMultiInstanceSourceType>
+                <flowable:executionListener event="start" delegateExpression="${bpmCallActivityListener}">
+                    <flowable:field name="listenerConfig">
+                        <flowable:string><![CDATA[{"type":1,"emptyType":1}]]></flowable:string>
+                    </flowable:field>
+                </flowable:executionListener>
+            </extensionElements>
+            <multiInstanceLoopCharacteristics isSequential="false">
+                <loopCardinality>2</loopCardinality>
+                <completionCondition>${ nrOfCompletedInstances/nrOfInstances >= 1.00}</completionCondition>
+            </multiInstanceLoopCharacteristics>
+        </callActivity>
+        <sequenceFlow id="multiChildFixedQuantity-flow-child" sourceRef="multiChildFixedQuantity-child" targetRef="multiChildFixedQuantity-end"/>
+        <endEvent id="multiChildFixedQuantity-end"/>
+    </process>
+    <!-- 数字表单：并行发起 count 个子流程 -->
+    <process id="multiChildNumberForm" name="数字表单子流程" isExecutable="true">
+        <startEvent id="multiChildNumberForm-start"/>
+        <sequenceFlow id="multiChildNumberForm-flow-start" sourceRef="multiChildNumberForm-start" targetRef="multiChildNumberForm-child"/>
+        <callActivity id="multiChildNumberForm-child" name="子流程" calledElement="multiChild" flowable:calledElementType="key">
+            <extensionElements>
+                <flowable:childProcessMultiInstanceSourceType>2</flowable:childProcessMultiInstanceSourceType>
+                <flowable:executionListener event="start" delegateExpression="${bpmCallActivityListener}">
+                    <flowable:field name="listenerConfig">
+                        <flowable:string><![CDATA[{"type":1,"emptyType":1}]]></flowable:string>
+                    </flowable:field>
+                </flowable:executionListener>
+            </extensionElements>
+            <multiInstanceLoopCharacteristics isSequential="false" flowable:collection="count">
+                <completionCondition>${ nrOfCompletedInstances/nrOfInstances >= 1.00}</completionCondition>
+            </multiInstanceLoopCharacteristics>
+        </callActivity>
+        <sequenceFlow id="multiChildNumberForm-flow-child" sourceRef="multiChildNumberForm-child" targetRef="multiChildNumberForm-end"/>
+        <endEvent id="multiChildNumberForm-end"/>
+    </process>
+    <!-- 多选表单：按 users 的数量，依次发起子流程 -->
+    <process id="multiChildMultipleForm" name="多选表单子流程" isExecutable="true">
+        <startEvent id="multiChildMultipleForm-start"/>
+        <sequenceFlow id="multiChildMultipleForm-flow-start" sourceRef="multiChildMultipleForm-start" targetRef="multiChildMultipleForm-child"/>
+        <callActivity id="multiChildMultipleForm-child" name="子流程" calledElement="multiChild" flowable:calledElementType="key">
+            <extensionElements>
+                <flowable:childProcessMultiInstanceSourceType>3</flowable:childProcessMultiInstanceSourceType>
+                <flowable:executionListener event="start" delegateExpression="${bpmCallActivityListener}">
+                    <flowable:field name="listenerConfig">
+                        <flowable:string><![CDATA[{"type":1,"emptyType":1}]]></flowable:string>
+                    </flowable:field>
+                </flowable:executionListener>
+            </extensionElements>
+            <multiInstanceLoopCharacteristics isSequential="true" flowable:collection="users">
+                <completionCondition>${ nrOfCompletedInstances/nrOfInstances >= 1.00}</completionCondition>
+            </multiInstanceLoopCharacteristics>
+        </callActivity>
+        <sequenceFlow id="multiChildMultipleForm-flow-child" sourceRef="multiChildMultipleForm-child" targetRef="multiChildMultipleForm-end"/>
+        <endEvent id="multiChildMultipleForm-end"/>
+    </process>
+</definitions>

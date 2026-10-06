@@ -57,7 +57,12 @@ public class BpmProcessDefinitionServiceImpl implements BpmProcessDefinitionServ
 
     @Override
     public ProcessDefinition getProcessDefinition(String id) {
-        return repositoryService.getProcessDefinition(id);
+        // 不使用 repositoryService.getProcessDefinition(id) 的原因：流程定义不存在时，它会抛出 FlowableObjectNotFoundException，
+        // 而调用方都是通过返回 null 判断流程定义不存在
+        if (StrUtil.isEmpty(id)) {
+            return null;
+        }
+        return repositoryService.createProcessDefinitionQuery().processDefinitionId(id).singleResult();
     }
 
     @Override

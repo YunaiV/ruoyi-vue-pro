@@ -33,7 +33,6 @@ public class BpmTaskCandidateStartUserDeptLeaderMultiStrategyTest extends BaseMo
 
     @Mock
     private BpmProcessInstanceService processInstanceService;
-
     @Mock
     private AdminUserApi adminUserApi;
     @Mock

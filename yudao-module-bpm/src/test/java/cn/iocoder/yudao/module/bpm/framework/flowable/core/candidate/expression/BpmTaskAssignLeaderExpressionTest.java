@@ -30,7 +30,6 @@ public class BpmTaskAssignLeaderExpressionTest extends BaseMockitoUnitTest {
     private AdminUserApi adminUserApi;
     @Mock
     private DeptApi deptApi;
-
     @Mock
     private BpmProcessInstanceService processInstanceService;
 

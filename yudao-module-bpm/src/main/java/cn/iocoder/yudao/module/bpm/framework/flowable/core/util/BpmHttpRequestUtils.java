@@ -89,7 +89,7 @@ public class BpmHttpRequestUtils {
             BpmProcessInstanceService processInstanceService = SpringUtils.getBean(BpmProcessInstanceService.class);
             ProcessInstance processInstance = processInstanceService.getProcessInstance(event.getId());
             if (processInstance != null) {
-                headers.add(HEADER_TENANT_ID, String.valueOf(TenantContextHolder.getTenantId()));
+                headers.add(HEADER_TENANT_ID, processInstance.getTenantId());
             }
         }
         // 1.2 设置请求体

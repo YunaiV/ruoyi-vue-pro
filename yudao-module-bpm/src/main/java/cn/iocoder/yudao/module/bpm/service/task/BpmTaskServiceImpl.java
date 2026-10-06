@@ -1066,7 +1066,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         String taskId = reqVO.getId();
         // 1.1 校验任务
         Task task = validateTask(userId, reqVO.getId());
-        if (task.getAssignee().equals(reqVO.getDelegateUserId().toString())) { // 校验当前审批人和被委派人不是同一人
+        if (StrUtil.equals(task.getAssignee(), reqVO.getDelegateUserId().toString())) { // 校验当前审批人和被委派人不是同一人
             throw exception(TASK_DELEGATE_FAIL_USER_REPEAT);
         }
         // 1.2 校验目标用户存在
@@ -1097,7 +1097,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         String taskId = reqVO.getId();
         // 1.1 校验任务
         Task task = validateTask(userId, reqVO.getId());
-        if (task.getAssignee().equals(reqVO.getAssigneeUserId().toString())) { // 校验当前审批人和被转派人不是同一人
+        if (StrUtil.equals(task.getAssignee(), reqVO.getAssigneeUserId().toString())) { // 校验当前审批人和被转派人不是同一人
             throw exception(TASK_TRANSFER_FAIL_USER_REPEAT);
         }
         // 1.2 校验目标用户存在

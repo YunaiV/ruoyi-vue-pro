@@ -198,6 +198,9 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         ProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(
                 historicProcessInstance != null ? historicProcessInstance.getProcessDefinitionId()
                         : reqVO.getProcessDefinitionId());
+        if (processDefinition == null) {
+            throw exception(ErrorCodeConstants.PROCESS_DEFINITION_NOT_EXISTS);
+        }
         BpmProcessDefinitionInfoDO processDefinitionInfo = processDefinitionService
                 .getProcessDefinitionInfo(processDefinition.getId());
         BpmnModel bpmnModel = processDefinitionService.getProcessDefinitionBpmnModel(processDefinition.getId());
@@ -777,6 +780,10 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
      * @see <a href="https://github.com/YunaiV/ruoyi-vue-pro/pull/1245">相关 issue</a>
      */
     private void validateDynamicFormRequiredFields(ProcessDefinition definition, Map<String, Object> variables) {
+        // 流程定义不存在时，交给 createProcessInstance0 统一校验，避免空指针
+        if (definition == null) {
+            return;
+        }
         BpmProcessDefinitionInfoDO processDefinitionInfo = processDefinitionService
                 .getProcessDefinitionInfo(definition.getId());
         if (processDefinitionInfo == null

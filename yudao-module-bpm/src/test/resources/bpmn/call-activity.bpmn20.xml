@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="http://www.yudao.iocoder.cn/bpm">
+    <!-- 主流程：通过 callActivity 发起 twoStepApprove 子流程，子流程挂载不中断的超时边界事件 -->
+    <process id="callActivityParent" name="主流程" isExecutable="true">
+        <startEvent id="start"/>
+        <sequenceFlow id="flow-start" sourceRef="start" targetRef="child"/>
+        <callActivity id="child" name="子流程" calledElement="twoStepApprove"/>
+        <boundaryEvent id="child-timeout" attachedToRef="child" cancelActivity="false">
+            <extensionElements>
+                <flowable:boundaryEventType>3</flowable:boundaryEventType>
+            </extensionElements>
+            <timerEventDefinition>
+                <timeDuration>PT1H</timeDuration>
+            </timerEventDefinition>
+        </boundaryEvent>
+        <sequenceFlow id="flow-child" sourceRef="child" targetRef="end"/>
+        <endEvent id="end"/>
+    </process>
+</definitions>
