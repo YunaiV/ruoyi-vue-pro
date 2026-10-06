@@ -22,6 +22,7 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillProductDO
 import cn.iocoder.yudao.module.promotion.dal.mysql.seckill.seckillactivity.SeckillActivityMapper;
 import cn.iocoder.yudao.module.promotion.dal.mysql.seckill.seckillactivity.SeckillProductMapper;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -45,6 +46,7 @@ import static java.util.Collections.singletonList;
  *
  * @author halfninety
  */
+@Slf4j
 @Service
 @Validated
 public class SeckillActivityServiceImpl implements SeckillActivityService {
@@ -186,6 +188,11 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
     @Transactional(rollbackFor = Exception.class)
     public void updateSeckillStockIncr(Long id, Long skuId, Integer count) {
         SeckillProductDO product = seckillProductMapper.selectByActivityIdAndSkuId(id, skuId);
+        if (product == null) {
+            // 秒杀活动已删除时，库存已无回写对象；记日志并跳过，不阻断订单取消主流程
+            log.warn("[updateSeckillStockIncr][秒杀活动({}) sku({}) 的商品配置不存在（活动可能已删除），跳过库存回写]", id, skuId);
+            return;
+        }
         // 更新活动商品库存
         seckillProductMapper.updateStockIncr(product.getId(), count);
         // 更新活动库存
