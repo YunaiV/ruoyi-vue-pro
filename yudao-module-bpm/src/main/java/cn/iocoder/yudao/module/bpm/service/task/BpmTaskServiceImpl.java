@@ -148,7 +148,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     @Override
     public BpmTaskRespVO getTodoTask(Long userId, String taskId, String processInstanceId) {
         // 1.1 获取指定的用户待办任务
-        Task todoTask = getMyTodoTask(userId, taskId);
+        Task todoTask = getMyTodoTask(userId, taskId, processInstanceId);
         // 1.2 获取不到，则获取该流程实例下，第一个用户的待办任务
         if (todoTask == null) {
             todoTask = getMyFirstTodoTask(userId, processInstanceId);
@@ -181,16 +181,21 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     /**
      * 获得用户指定 taskId 任务编号的“待办”（未审批、且可审核）的任务
      *
-     * @param userId 用户编号
-     * @param taskId 任务编号
+     * @param userId            用户编号
+     * @param taskId            任务编号
+     * @param processInstanceId 流程编号
      * @return 任务
      */
-    private Task getMyTodoTask(Long userId, String taskId) {
+    private Task getMyTodoTask(Long userId, String taskId, String processInstanceId) {
         if (StrUtil.isEmpty(taskId)) {
             return null;
         }
         Task task = getTask(taskId);
         if (task == null) {
+            return null;
+        }
+        // 校验任务属于该流程实例，避免使用其它流程实例的任务
+        if (ObjectUtil.notEqual(task.getProcessInstanceId(), processInstanceId)) {
             return null;
         }
         if (!isAssignUserTask(userId, task) && !isAddSignUserTask(userId, task)) {

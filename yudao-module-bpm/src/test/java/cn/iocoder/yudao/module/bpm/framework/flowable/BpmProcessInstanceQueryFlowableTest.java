@@ -18,6 +18,7 @@ import jakarta.annotation.Resource;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
+import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -36,6 +37,7 @@ import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.PROCESS_INSTA
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.START_USER_NODE_ID;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
 /**
@@ -186,6 +188,120 @@ public class BpmProcessInstanceQueryFlowableTest extends BaseFlowableUnitTest {
                 new BpmApprovalDetailReqVO().setProcessDefinitionId("not-exists")), PROCESS_DEFINITION_NOT_EXISTS);
     }
 
+    // ========== getApprovalDetail 表单字段权限 ==========
+
+    @Test // 发起人从“我的流程”进入，待办属于其他审批人：使用发起人节点的权限，可编辑降级为只读
+    public void testGetApprovalDetail_formFieldsPermission_startUserWithoutTodo() {
+        // 准备参数：发起人 1，task1 待用户 2 审批
+        String processInstanceId = startFormPermissionProcessInstance();
+
+        // 调用
+        BpmApprovalDetailRespVO respVO = processInstanceService.getApprovalDetail(1L,
+                new BpmApprovalDetailReqVO().setProcessInstanceId(processInstanceId));
+        // 断言
+        assertNull(respVO.getTodoTask());
+        assertEquals(Map.of("a", "1", "b", "3", "c", "1"), respVO.getFormFieldsPermission());
+    }
+
+    @Test // 审批人有本流程的待办：使用待办所在节点的权限，保留可编辑
+    public void testGetApprovalDetail_formFieldsPermission_todoTask() {
+        // 准备参数：task1 待用户 2 审批
+        String processInstanceId = startFormPermissionProcessInstance();
+        Task task1 = getRunningTask(processInstanceId);
+
+        // 调用
+        BpmApprovalDetailRespVO respVO = processInstanceService.getApprovalDetail(2L,
+                new BpmApprovalDetailReqVO().setProcessInstanceId(processInstanceId));
+        // 断言
+        assertEquals(task1.getId(), respVO.getTodoTask().getId());
+        assertEquals(Map.of("a", "1", "b", "2", "c", "3"), respVO.getFormFieldsPermission());
+    }
+
+    @Test // 传递其它流程实例的待办 taskId：忽略该任务，使用本流程实例的待办
+    public void testGetApprovalDetail_formFieldsPermission_todoTaskOfOtherProcessInstance() {
+        // 准备参数：两个流程实例，task1 均待用户 2 审批
+        String processInstanceId = startFormPermissionProcessInstance();
+        Task task1 = getRunningTask(processInstanceId);
+        Task otherTask1 = getRunningTask(startFormPermissionProcessInstance());
+
+        // 调用
+        BpmApprovalDetailRespVO respVO = processInstanceService.getApprovalDetail(2L,
+                new BpmApprovalDetailReqVO().setProcessInstanceId(processInstanceId).setTaskId(otherTask1.getId()));
+        // 断言
+        assertEquals(task1.getId(), respVO.getTodoTask().getId());
+        assertEquals(processInstanceId, respVO.getTodoTask().getProcessInstanceId());
+        assertEquals(Map.of("a", "1", "b", "2", "c", "3"), respVO.getFormFieldsPermission());
+    }
+
+    @Test // 发起人传递其他审批人的 taskId：忽略该任务，回落发起人节点的权限
+    public void testGetApprovalDetail_formFieldsPermission_taskIdOfOtherUser() {
+        // 准备参数：task1 待用户 2 审批
+        String processInstanceId = startFormPermissionProcessInstance();
+        Task task1 = getRunningTask(processInstanceId);
+
+        // 调用
+        BpmApprovalDetailRespVO respVO = processInstanceService.getApprovalDetail(1L,
+                new BpmApprovalDetailReqVO().setProcessInstanceId(processInstanceId).setTaskId(task1.getId()));
+        // 断言
+        assertNull(respVO.getTodoTask());
+        assertEquals(Map.of("a", "1", "b", "3", "c", "1"), respVO.getFormFieldsPermission());
+    }
+
+    @Test // 流程已结束：已办使用办理节点的权限，发起人使用发起人节点的权限，均降级为只读；其他人不返回权限
+    public void testGetApprovalDetail_formFieldsPermission_processEnd() {
+        // 准备参数：用户 2 审批通过 task1，流程结束
+        String processInstanceId = startFormPermissionProcessInstance();
+        Task task1 = getRunningTask(processInstanceId);
+        taskService.approveTask(2L, new BpmTaskApproveReqVO().setId(task1.getId()).setReason("同意"));
+
+        // 调用 + 断言：用户 2 从“已办”进入
+        BpmApprovalDetailRespVO doneRespVO = processInstanceService.getApprovalDetail(2L,
+                new BpmApprovalDetailReqVO().setProcessInstanceId(processInstanceId).setTaskId(task1.getId()));
+        assertEquals(BpmProcessInstanceStatusEnum.APPROVE.getStatus(), doneRespVO.getStatus());
+        assertNull(doneRespVO.getTodoTask());
+        assertEquals(Map.of("a", "1", "b", "1", "c", "3"), doneRespVO.getFormFieldsPermission());
+        // 调用 + 断言：发起人 1 从“我的流程”进入
+        BpmApprovalDetailRespVO startUserRespVO = processInstanceService.getApprovalDetail(1L,
+                new BpmApprovalDetailReqVO().setProcessInstanceId(processInstanceId));
+        assertEquals(Map.of("a", "1", "b", "3", "c", "1"), startUserRespVO.getFormFieldsPermission());
+        // 调用 + 断言：用户 2 不传 taskId，既不是发起人也没有待办
+        BpmApprovalDetailRespVO otherRespVO = processInstanceService.getApprovalDetail(2L,
+                new BpmApprovalDetailReqVO().setProcessInstanceId(processInstanceId));
+        assertNull(otherRespVO.getFormFieldsPermission());
+    }
+
+    @Test // 传递其它流程实例的已办 taskId：忽略该任务
+    public void testGetApprovalDetail_formFieldsPermission_doneTaskOfOtherProcessInstance() {
+        // 准备参数：两个流程实例，task1 均由用户 2 审批通过
+        String processInstanceId = startFormPermissionProcessInstance();
+        taskService.approveTask(2L, new BpmTaskApproveReqVO().setId(getRunningTask(processInstanceId).getId())
+                .setReason("同意"));
+        String otherProcessInstanceId = startFormPermissionProcessInstance();
+        Task otherTask1 = getRunningTask(otherProcessInstanceId);
+        taskService.approveTask(2L, new BpmTaskApproveReqVO().setId(otherTask1.getId()).setReason("同意"));
+
+        // 调用
+        BpmApprovalDetailRespVO respVO = processInstanceService.getApprovalDetail(2L,
+                new BpmApprovalDetailReqVO().setProcessInstanceId(processInstanceId).setTaskId(otherTask1.getId()));
+        // 断言
+        assertNull(respVO.getFormFieldsPermission());
+    }
+
+    @Test // 流程未发起：使用传递的发起人节点的权限，保留可编辑
+    public void testGetApprovalDetail_formFieldsPermission_notStart() {
+        // 准备参数
+        deploy("bpmn/form-permission.bpmn20.xml");
+        String processDefinitionId = repositoryService.createProcessDefinitionQuery()
+                .processDefinitionKey("formPermission").latestVersion().singleResult().getId();
+
+        // 调用
+        BpmApprovalDetailRespVO respVO = processInstanceService.getApprovalDetail(1L, new BpmApprovalDetailReqVO()
+                .setProcessDefinitionId(processDefinitionId).setActivityId(START_USER_NODE_ID));
+        // 断言
+        assertNull(respVO.getTodoTask());
+        assertEquals(Map.of("a", "2", "b", "3", "c", "1"), respVO.getFormFieldsPermission());
+    }
+
     // ========== getProcessInstanceBpmnModelView ==========
 
     @Test
@@ -311,6 +427,21 @@ public class BpmProcessInstanceQueryFlowableTest extends BaseFlowableUnitTest {
     private String startProcessInstance(Long userId, Map<String, Object> variables) {
         return processInstanceService.createProcessInstance(userId, new BpmProcessInstanceCreateReqDTO()
                 .setProcessDefinitionKey("twoStepApprove").setVariables(variables));
+    }
+
+    /**
+     * 发起表单字段权限流程：发起人 1 的发起人节点自动通过，task1 待用户 2 审批
+     */
+    private String startFormPermissionProcessInstance() {
+        if (repositoryService.createProcessDefinitionQuery().processDefinitionKey("formPermission").count() == 0) {
+            deploy("bpmn/form-permission.bpmn20.xml");
+        }
+        doAnswer(invocation -> {
+            DelegateExecution execution = invocation.getArgument(0);
+            return START_USER_NODE_ID.equals(execution.getCurrentActivityId()) ? Set.of(1L) : Set.of(2L);
+        }).when(taskCandidateInvoker).calculateUsersByTask(any());
+        return processInstanceService.createProcessInstance(1L, new BpmProcessInstanceCreateReqDTO()
+                .setProcessDefinitionKey("formPermission"));
     }
 
     private Task getRunningTask(String processInstanceId) {

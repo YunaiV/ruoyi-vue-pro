@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="http://www.yudao.iocoder.cn/bpm">
+    <!-- 表单字段权限：1 只读、2 可编辑、3 隐藏；发起人节点、审批节点配置不同的权限，用于区分权限来源 -->
+    <process id="formPermission" name="表单字段权限" isExecutable="true">
+        <startEvent id="start"/>
+        <sequenceFlow id="flow-start" sourceRef="start" targetRef="StartUserNode"/>
+        <userTask id="StartUserNode" name="发起人">
+            <extensionElements>
+                <flowable:candidateStrategy>36</flowable:candidateStrategy>
+                <flowable:fieldsPermission field="a" permission="2"/>
+                <flowable:fieldsPermission field="b" permission="3"/>
+                <flowable:fieldsPermission field="c" permission="1"/>
+            </extensionElements>
+        </userTask>
+        <sequenceFlow id="flow-start-user" sourceRef="StartUserNode" targetRef="task1"/>
+        <userTask id="task1" name="审批">
+            <extensionElements>
+                <flowable:candidateStrategy>30</flowable:candidateStrategy>
+                <flowable:fieldsPermission field="a" permission="1"/>
+                <flowable:fieldsPermission field="b" permission="2"/>
+                <flowable:fieldsPermission field="c" permission="3"/>
+            </extensionElements>
+        </userTask>
+        <sequenceFlow id="flow-task1" sourceRef="task1" targetRef="end"/>
+        <endEvent id="end"/>
+    </process>
+</definitions>
