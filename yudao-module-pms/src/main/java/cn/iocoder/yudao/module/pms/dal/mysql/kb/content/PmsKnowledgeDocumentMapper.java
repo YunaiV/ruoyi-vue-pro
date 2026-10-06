@@ -26,6 +26,17 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 @Mapper
 public interface PmsKnowledgeDocumentMapper extends BaseMapperX<PmsKnowledgeDocumentDO> {
 
+    /**
+     * 查询 labelIds 中引用了指定标签的文档列表（标签删除时的级联清理用）
+     *
+     * @param labelId 文档标签编号
+     * @return 文档列表
+     */
+    default List<PmsKnowledgeDocumentDO> selectListByLabelId(Long labelId) {
+        return selectList(new LambdaQueryWrapperX<PmsKnowledgeDocumentDO>()
+                .apply(MyBatisUtils.findInSet("label_ids"), labelId));
+    }
+
     default Set<Long> selectExistingPermissionIdSet(Collection<Long> permissionIds) {
         return convertSet(selectList(new LambdaQueryWrapperX<PmsKnowledgeDocumentDO>()
                 .in(PmsKnowledgeDocumentDO::getPermissionId, permissionIds)

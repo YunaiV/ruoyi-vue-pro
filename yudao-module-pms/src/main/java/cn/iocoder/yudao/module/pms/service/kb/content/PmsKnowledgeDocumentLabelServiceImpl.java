@@ -14,8 +14,10 @@ import cn.iocoder.yudao.module.pms.enums.kb.content.PmsKnowledgeDocumentStatusEn
 import cn.iocoder.yudao.module.pms.service.kb.library.PmsKnowledgeLibraryMemberService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -63,12 +65,24 @@ public class PmsKnowledgeDocumentLabelServiceImpl implements PmsKnowledgeDocumen
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteDocumentLabel(Long id) {
         // 1. 校验文档标签存在
         validateDocumentLabelExists(id);
 
         // 2. 删除文档标签
         documentLabelMapper.deleteById(id);
+
+        // 3. 级联清理：把引用该标签的文档的 labelIds 中该编号移除，避免悬空引用
+        //    （文档保存侧 validateDocumentLabelList 校验标签必须存在，残留引用会让文档保存被拒）
+        documentMapper.selectListByLabelId(id).forEach(document -> {
+            List<Long> labelIds = new ArrayList<>(CollUtil.emptyIfNull(document.getLabelIds()));
+            labelIds.remove(id);
+            PmsKnowledgeDocumentDO update = new PmsKnowledgeDocumentDO();
+            update.setId(document.getId());
+            update.setLabelIds(labelIds);
+            documentMapper.updateById(update);
+        });
     }
 
     @Override
