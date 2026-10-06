@@ -40,6 +40,9 @@ public interface ErrorCodeConstants {
     ErrorCode REFUND_EXISTS = new ErrorCode(1_007_006_003, "已经存在退款单");
     ErrorCode REFUND_NOT_FOUND = new ErrorCode(1_007_006_004, "支付退款单不存在");
     ErrorCode REFUND_STATUS_IS_NOT_WAITING = new ErrorCode(1_007_006_005, "支付退款单不处于待退款");
+    ErrorCode REFUND_SUBMIT_CHANNEL_ERROR = new ErrorCode(1_007_006_006, "发起退款报错，错误码：{}，错误提示：{}");
+    ErrorCode REFUND_CREATE_FAIL_ORDER_NOT_MATCH = new ErrorCode(1_007_006_007, "发起退款失败，原因：两次相同退款请求的支付订单不匹配");
+    ErrorCode REFUND_CREATE_FAIL_PRICE_NOT_MATCH = new ErrorCode(1_007_006_008, "发起退款失败，原因：两次相同退款请求的退款金额不匹配");
 
     // ========== 钱包模块 1-007-007-000 ==========
     ErrorCode WALLET_NOT_FOUND = new ErrorCode(1_007_007_000, "用户钱包不存在");
