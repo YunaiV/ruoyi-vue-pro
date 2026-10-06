@@ -44,6 +44,15 @@ public interface RedisKeyConstants {
     String PAY_TRANSFER_LOCK = "pay_transfer:lock:%d:%s";
 
     /**
+     * 支付订单提交的分布式锁
+     *
+     * KEY 格式：pay_order:lock:%d // 参数为支付订单编号
+     * VALUE 数据格式：HASH // RLock.class：Redisson 的 Lock 锁，使用 Hash 数据结构
+     * 过期时间：不固定
+     */
+    String PAY_ORDER_LOCK = "pay_order:lock:%d";
+
+    /**
      * 支付序号的缓存
      *
      * KEY 格式：pay_no:{prefix}
