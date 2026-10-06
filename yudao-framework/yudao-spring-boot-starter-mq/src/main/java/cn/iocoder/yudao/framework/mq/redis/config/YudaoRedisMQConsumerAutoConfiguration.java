@@ -6,6 +6,7 @@ import cn.hutool.system.SystemUtil;
 import cn.iocoder.yudao.framework.common.enums.DocumentEnum;
 import cn.iocoder.yudao.framework.mq.redis.core.RedisMQTemplate;
 import cn.iocoder.yudao.framework.mq.redis.core.job.RedisPendingMessageResendJob;
+import org.springframework.beans.factory.annotation.Value;
 import cn.iocoder.yudao.framework.mq.redis.core.job.RedisStreamMessageCleanupJob;
 import cn.iocoder.yudao.framework.mq.redis.core.pubsub.AbstractRedisChannelMessageListener;
 import cn.iocoder.yudao.framework.mq.redis.core.stream.AbstractRedisStreamMessageListener;
@@ -68,9 +69,10 @@ public class YudaoRedisMQConsumerAutoConfiguration {
     @ConditionalOnBean(AbstractRedisStreamMessageListener.class) // 只有 AbstractStreamMessageListener 存在的时候，才需要注册 Redis pubsub 监听
     public RedisPendingMessageResendJob redisPendingMessageResendJob(List<AbstractRedisStreamMessageListener<?>> listeners,
                                                                      RedisMQTemplate redisTemplate,
-                                                                     RedissonClient redissonClient) {
+                                                                     RedissonClient redissonClient,
+                                                                     @Value("${yudao.mq.pending-message-max-count:" + RedisPendingMessageResendJob.DEFAULT_PENDING_MAX_COUNT + "}") long pendingMaxCount) {
         return new RedisPendingMessageResendJob(listeners, redisTemplate, redissonClient,
-                RedisPendingMessageResendJob.DEFAULT_RESEND_LOCK_KEY);
+                RedisPendingMessageResendJob.DEFAULT_RESEND_LOCK_KEY, pendingMaxCount);
     }
 
     /**

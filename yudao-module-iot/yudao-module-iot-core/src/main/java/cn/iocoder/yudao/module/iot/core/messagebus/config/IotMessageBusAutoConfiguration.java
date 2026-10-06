@@ -18,6 +18,7 @@ import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.redisson.api.RedissonClient;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -119,10 +120,11 @@ public class IotMessageBusAutoConfiguration {
         @Bean
         public RedisPendingMessageResendJob iotRedisPendingMessageResendJob(IotRedisMessageBus messageBus,
                                                                             RedisMQTemplate redisTemplate,
-                                                                            RedissonClient redissonClient) {
+                                                                            RedissonClient redissonClient,
+                                                                            @Value("${yudao.mq.pending-message-max-count:" + RedisPendingMessageResendJob.DEFAULT_PENDING_MAX_COUNT + "}") long pendingMaxCount) {
             List<AbstractRedisStreamMessageListener<?>> listeners = getListeners(messageBus);
             return new RedisPendingMessageResendJob(listeners, redisTemplate, redissonClient,
-                    RedisPendingMessageResendJob.IOT_RESEND_LOCK_KEY);
+                    RedisPendingMessageResendJob.IOT_RESEND_LOCK_KEY, pendingMaxCount);
         }
 
         /**
