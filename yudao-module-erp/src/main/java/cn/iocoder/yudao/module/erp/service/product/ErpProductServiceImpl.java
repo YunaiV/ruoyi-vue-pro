@@ -18,6 +18,9 @@ import cn.iocoder.yudao.module.erp.service.purchase.ErpPurchaseReturnService;
 import cn.iocoder.yudao.module.erp.service.sale.ErpSaleOrderService;
 import cn.iocoder.yudao.module.erp.service.sale.ErpSaleOutService;
 import cn.iocoder.yudao.module.erp.service.sale.ErpSaleReturnService;
+import cn.iocoder.yudao.module.erp.service.stock.ErpStockCheckService;
+import cn.iocoder.yudao.module.erp.service.stock.ErpStockInService;
+import cn.iocoder.yudao.module.erp.service.stock.ErpStockOutService;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -63,6 +66,15 @@ public class ErpProductServiceImpl implements ErpProductService {
     @Resource
     @Lazy // 延迟加载，避免循环依赖
     private ErpSaleReturnService saleReturnService;
+    @Resource
+    @Lazy // 延迟加载，避免循环依赖
+    private ErpStockInService stockInService;
+    @Resource
+    @Lazy // 延迟加载，避免循环依赖
+    private ErpStockOutService stockOutService;
+    @Resource
+    @Lazy // 延迟加载，避免循环依赖
+    private ErpStockCheckService stockCheckService;
 
     @Override
     public Long createProduct(ProductSaveReqVO createReqVO) {
@@ -106,6 +118,15 @@ public class ErpProductServiceImpl implements ErpProductService {
         }
         if (saleReturnService.getSaleReturnItemCountByProductId(id) > 0) {
             throw exception(PRODUCT_DELETE_FAIL_SALE_RETURN_EXISTS);
+        }
+        if (stockInService.getStockInItemCountByProductId(id) > 0) {
+            throw exception(PRODUCT_DELETE_FAIL_STOCK_IN_EXISTS);
+        }
+        if (stockOutService.getStockOutItemCountByProductId(id) > 0) {
+            throw exception(PRODUCT_DELETE_FAIL_STOCK_OUT_EXISTS);
+        }
+        if (stockCheckService.getStockCheckItemCountByProductId(id) > 0) {
+            throw exception(PRODUCT_DELETE_FAIL_STOCK_CHECK_EXISTS);
         }
         // 删除
         productMapper.deleteById(id);
