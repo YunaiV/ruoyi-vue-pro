@@ -52,6 +52,8 @@ public class CartServiceImpl implements CartService {
 
         // 情况一：存在，则进行数量更新
         if (cart != null) {
+            // 校验合并后的总量（与 updateCartCount 同口径），避免分次加购绕过库存上限
+            checkProductSku(addReqVO.getSkuId(), cart.getCount() + count);
             cartMapper.updateById(new CartDO().setId(cart.getId()).setSelected(true)
                     .setCount(cart.getCount() + count));
             return cart.getId();
