@@ -22,6 +22,7 @@ import cn.iocoder.yudao.module.pay.dal.dataobject.transfer.PayTransferDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.transfer.PayTransferMapper;
 import cn.iocoder.yudao.module.pay.dal.redis.no.PayNoRedisDAO;
 import cn.iocoder.yudao.module.pay.dal.redis.transfer.PayTransferLockRedisDAO;
+import cn.iocoder.yudao.module.pay.enums.PayChannelEnum;
 import cn.iocoder.yudao.module.pay.enums.notify.PayNotifyTypeEnum;
 import cn.iocoder.yudao.module.pay.enums.transfer.PayTransferStatusEnum;
 import cn.iocoder.yudao.module.pay.framework.pay.config.PayProperties;
@@ -90,7 +91,7 @@ public class PayTransferServiceImpl implements PayTransferService {
         // 原因是：同一商户转账单串行创建转账单，避免 select 后 insert 时，并发请求重复创建转账单，导致重复转账
         // 注意：createTransfer 不加入调用方的事务，转账单立即提交，所以释放锁后，其它请求可以查询到该转账单
         PayTransferDO transfer = transferLockRedisDAO.lock(payApp.getId(), reqDTO.getMerchantTransferId(),
-                CREATE_LOCK_TIMEOUT_MILLIS, () -> createOrRetryTransfer(reqDTO, payApp, channel));
+                CREATE_LOCK_TIMEOUT_MILLIS, () -> createOrRetryTransfer(reqDTO, payApp, channel, client));
 
         // 3.1 调用三方渠道发起转账
         PayTransferRespDTO unifiedTransferResp = null;
@@ -139,9 +140,11 @@ public class PayTransferServiceImpl implements PayTransferService {
      * @param reqDTO 转账申请信息
      * @param payApp 支付应用
      * @param channel 支付渠道
+     * @param client 支付客户端
      * @return 转账单
      */
-    private PayTransferDO createOrRetryTransfer(PayTransferCreateReqDTO reqDTO, PayAppDO payApp, PayChannelDO channel) {
+    private PayTransferDO createOrRetryTransfer(PayTransferCreateReqDTO reqDTO, PayAppDO payApp,
+                                                PayChannelDO channel, PayClient<?> client) {
         // 1. 校验转账单是否可以发起：不存在，或者之前转账关闭
         PayTransferDO transfer = validateTransferCanCreate(reqDTO, payApp.getId());
 
@@ -154,19 +157,64 @@ public class PayTransferServiceImpl implements PayTransferService {
                     .setNotifyUrl(payApp.getTransferNotifyUrl());
             transferMapper.insert(transfer);
         } else {
-            // 2.2 情况二：存在关闭的转账单，则复用原转账单（包括原转账单号）重新发起，并清空上一次转账的渠道结果
-            // 原因是：渠道通过转账单号保证幂等，避免上一次实际受理时重复转账。未校验一致的请求字段，以本次请求为准
+            // 2.2 情况二：存在关闭的转账单，微信渠道确认原单已终态关闭后生成新单号重新发起
+            // 原因是：微信已关闭的转账单不能再次发起；确认原单仍未成功后换号，也能避免重复转账
             // 特殊：渠道编号以本次按渠道编码校验的渠道为准，避免渠道删除重建后，转账轮询、转账回调仍使用旧的渠道编号
+            String no = getRetryTransferNo(channel, client, transfer);
             int updateCount = transferMapper.updateByIdAndStatusAndClearChannelResult(transfer.getId(), transfer.getStatus(),
-                    new PayTransferDO().setStatus(PayTransferStatusEnum.WAITING.getStatus()).setChannelId(channel.getId())
+                    new PayTransferDO().setNo(no).setStatus(PayTransferStatusEnum.WAITING.getStatus()).setChannelId(channel.getId())
                             .setSubject(reqDTO.getSubject()).setUserAccount(reqDTO.getUserAccount())
                             .setUserName(reqDTO.getUserName()).setChannelExtras(reqDTO.getChannelExtras())
                             .setUserIp(reqDTO.getUserIp()).setNotifyUrl(payApp.getTransferNotifyUrl()));
             if (updateCount == 0) { // 校验状态，避免并发重新发起转账
                 throw exception(PAY_TRANSFER_CREATE_FAIL_STATUS_NOT_CLOSED);
             }
+            transfer.setNo(no);
         }
         return transfer;
+    }
+
+    /**
+     * 获取重新发起转账使用的转账单号
+     *
+     * 参考 <a href="https://gitee.com/yudaocode/yudao-mall-uniapp/issues/ID0PFR">佣金提现超时后重新转账</a>
+     *
+     * @param channel 支付渠道
+     * @param client 支付客户端
+     * @param transfer 原转账单
+     * @return 转账单号
+     */
+    private String getRetryTransferNo(PayChannelDO channel, PayClient<?> client, PayTransferDO transfer) {
+        // 支付宝等渠道通过原转账单号保证幂等，继续复用；仅微信渠道需要确认关闭后更换单号
+        if (!PayChannelEnum.isWeixin(channel.getCode())) {
+            return transfer.getNo();
+        }
+        try {
+            PayTransferRespDTO queryResp = client.getTransfer(transfer.getNo());
+            if (queryResp != null && (PayTransferStatusEnum.isSuccess(queryResp.getStatus())
+                    || PayTransferStatusEnum.isProcessing(queryResp.getStatus())
+                    || (PayTransferStatusEnum.isWaiting(queryResp.getStatus())
+                        && StrUtil.isNotEmpty(queryResp.getChannelTransferNo())))) {
+                log.error("[getRetryTransferNo][transfer({}) 本地转账单已关闭，但微信渠道状态为({})，禁止重新转账]",
+                        transfer.getId(), queryResp);
+                throw exception(PAY_TRANSFER_CREATE_FAIL_STATUS_NOT_CLOSED);
+            }
+            // 只有渠道明确返回关闭且存在渠道转账单号时，才确认原单已终态关闭并更换单号
+            if (queryResp != null && PayTransferStatusEnum.isClosed(queryResp.getStatus())
+                    && StrUtil.isNotEmpty(queryResp.getChannelTransferNo())) {
+                String newNo = noRedisDAO.generate(TRANSFER_NO_PREFIX);
+                log.info("[getRetryTransferNo][transfer({}) 微信渠道转账单已关闭，转账单号由({})更新为({})]",
+                        transfer.getId(), transfer.getNo(), newNo);
+                return newNo;
+            }
+        } catch (ServiceException ex) {
+            throw ex;
+        } catch (Throwable ex) {
+            // 无法确认渠道最终状态时保留原单号，交给渠道幂等机制处理，避免贸然重复打款
+            log.warn("[getRetryTransferNo][transfer({}) 查询微信渠道转账单异常，继续使用原转账单号({})]",
+                    transfer.getId(), transfer.getNo(), ex);
+        }
+        return transfer.getNo();
     }
 
     /**

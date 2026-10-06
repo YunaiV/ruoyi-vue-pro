@@ -23,6 +23,7 @@ import cn.iocoder.yudao.module.pay.service.channel.PayChannelService;
 import cn.iocoder.yudao.module.pay.service.notify.PayNotifyService;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -773,6 +774,75 @@ public class PayTransferServiceTest extends BaseDbAndRedisUnitTest {
         assertEquals("CHANNEL_T002", dbTransfer.getChannelTransferNo());
     }
 
+    @Test // 微信转账关闭后再次发起，确认渠道已终态关闭后使用新的转账单号
+    public void testCreateTransfer_retryAfterClosed_weixinClosed() {
+        PayClient<?> client = mockWeixinPayClient();
+        when(client.getTransfer(any())).thenAnswer(invocation ->
+                PayTransferRespDTO.closedOf("CANCELLED", "用户超时未确认", invocation.getArgument(0), "closed")
+                        .setChannelTransferNo("WX_TRANSFER_001"));
+        when(client.unifiedTransfer(any())).thenAnswer(invocation -> {
+            PayTransferUnifiedReqDTO unifiedReqDTO = invocation.getArgument(0);
+            return PayTransferRespDTO.successOf("WX_TRANSFER_002", LocalDateTime.now(),
+                    unifiedReqDTO.getOutTransferNo(), "success");
+        });
+        PayTransferDO closedTransfer = insertClosedWeixinTransfer();
+
+        PayTransferCreateRespDTO respDTO = transferService.createTransfer(buildWeixinTransferCreateReqDTO());
+
+        PayTransferDO dbTransfer = transferMapper.selectById(respDTO.getId());
+        assertEquals(closedTransfer.getId(), respDTO.getId());
+        assertNotEquals(closedTransfer.getNo(), dbTransfer.getNo());
+        assertEquals(PayTransferStatusEnum.SUCCESS.getStatus(), dbTransfer.getStatus());
+        verify(client).getTransfer(eq(closedTransfer.getNo()));
+        ArgumentCaptor<PayTransferUnifiedReqDTO> captor = ArgumentCaptor.forClass(PayTransferUnifiedReqDTO.class);
+        verify(client).unifiedTransfer(captor.capture());
+        assertEquals(dbTransfer.getNo(), captor.getValue().getOutTransferNo());
+    }
+
+    @Test // 微信转账关闭后再次发起，但渠道查询仍为处理中，不允许生成新转账
+    public void testCreateTransfer_retryAfterClosed_weixinProcessing() {
+        PayClient<?> client = mockWeixinPayClient();
+        when(client.getTransfer(any())).thenAnswer(invocation ->
+                PayTransferRespDTO.processingOf("WX_TRANSFER_001", invocation.getArgument(0), "processing"));
+        PayTransferDO closedTransfer = insertClosedWeixinTransfer();
+
+        assertServiceException(() -> transferService.createTransfer(buildWeixinTransferCreateReqDTO()),
+                PAY_TRANSFER_CREATE_FAIL_STATUS_NOT_CLOSED);
+
+        assertEquals(PayTransferStatusEnum.CLOSED.getStatus(), transferMapper.selectById(closedTransfer.getId()).getStatus());
+        verify(client, never()).unifiedTransfer(any());
+    }
+
+    @Test // 微信转账关闭后再次发起，但渠道查询已成功，不允许再次转账
+    public void testCreateTransfer_retryAfterClosed_weixinSuccess() {
+        PayClient<?> client = mockWeixinPayClient();
+        when(client.getTransfer(any())).thenAnswer(invocation ->
+                PayTransferRespDTO.successOf("WX_TRANSFER_001", LocalDateTime.now(),
+                        invocation.getArgument(0), "success"));
+        PayTransferDO closedTransfer = insertClosedWeixinTransfer();
+
+        assertServiceException(() -> transferService.createTransfer(buildWeixinTransferCreateReqDTO()),
+                PAY_TRANSFER_CREATE_FAIL_STATUS_NOT_CLOSED);
+
+        assertEquals(PayTransferStatusEnum.CLOSED.getStatus(), transferMapper.selectById(closedTransfer.getId()).getStatus());
+        verify(client, never()).unifiedTransfer(any());
+    }
+
+    @Test // 微信转账关闭后再次发起，但渠道查询异常，继续复用原单号并保留待确认状态
+    public void testCreateTransfer_retryAfterClosed_weixinQueryException() {
+        PayClient<?> client = mockWeixinPayClient();
+        when(client.getTransfer(any())).thenThrow(new RuntimeException("模拟查询超时"));
+        when(client.unifiedTransfer(any())).thenThrow(new RuntimeException("模拟发起超时"));
+        PayTransferDO closedTransfer = insertClosedWeixinTransfer();
+
+        PayTransferCreateRespDTO respDTO = transferService.createTransfer(buildWeixinTransferCreateReqDTO());
+
+        PayTransferDO dbTransfer = transferMapper.selectById(respDTO.getId());
+        assertEquals(closedTransfer.getNo(), dbTransfer.getNo());
+        assertEquals(PayTransferStatusEnum.WAITING.getStatus(), dbTransfer.getStatus());
+        verify(client, times(2)).getTransfer(eq(closedTransfer.getNo()));
+    }
+
     private PayClient<?> mockPayClient() {
         // mock 方法（app）
         PayAppDO app = randomPojo(PayAppDO.class, o -> o.setId(1L).setTransferNotifyUrl("http://127.0.0.1/transfer"));
@@ -783,6 +853,18 @@ public class PayTransferServiceTest extends BaseDbAndRedisUnitTest {
         when(channelService.validPayChannel(eq(1L), eq(PayChannelEnum.ALIPAY_PC.getCode()))).thenReturn(channel);
         when(payProperties.getTransferNotifyUrl()).thenReturn("http://127.0.0.1");
         // mock 方法（client）
+        PayClient<?> client = mock(PayClient.class);
+        when(channelService.getPayClient(eq(10L))).thenReturn(client);
+        return client;
+    }
+
+    private PayClient<?> mockWeixinPayClient() {
+        PayAppDO app = randomPojo(PayAppDO.class, o -> o.setId(1L).setTransferNotifyUrl("http://127.0.0.1/transfer"));
+        when(appService.validPayApp(eq("demo"))).thenReturn(app);
+        PayChannelDO channel = randomPojo(PayChannelDO.class, o -> o.setId(10L).setAppId(1L)
+                .setCode(PayChannelEnum.WX_LITE.getCode()));
+        when(channelService.validPayChannel(eq(1L), eq(PayChannelEnum.WX_LITE.getCode()))).thenReturn(channel);
+        when(payProperties.getTransferNotifyUrl()).thenReturn("http://127.0.0.1");
         PayClient<?> client = mock(PayClient.class);
         when(channelService.getPayClient(eq(10L))).thenReturn(client);
         return client;
@@ -802,6 +884,21 @@ public class PayTransferServiceTest extends BaseDbAndRedisUnitTest {
                 .setChannelPackageInfo("package-info-001"));
         transferMapper.insert(transfer);
         return transfer;
+    }
+
+    private PayTransferDO insertClosedWeixinTransfer() {
+        PayTransferDO transfer = randomPojo(PayTransferDO.class, o -> o.setAppId(1L).setChannelId(10L)
+                .setChannelCode(PayChannelEnum.WX_LITE.getCode()).setMerchantTransferId("1001").setPrice(100)
+                .setUserName("旧的收款人").setChannelExtras(Map.of("sceneId", "1005"))
+                .setStatus(PayTransferStatusEnum.CLOSED.getStatus()).setChannelTransferNo("WX_TRANSFER_001")
+                .setChannelErrorCode("CANCELLED").setChannelErrorMsg("用户超时未确认")
+                .setChannelPackageInfo("package-info-001"));
+        transferMapper.insert(transfer);
+        return transfer;
+    }
+
+    private static PayTransferCreateReqDTO buildWeixinTransferCreateReqDTO() {
+        return buildTransferCreateReqDTO().setChannelCode(PayChannelEnum.WX_LITE.getCode());
     }
 
     private void updateTransferStatus(String no, Integer status) {
