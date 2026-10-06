@@ -323,6 +323,18 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 && ObjectUtil.notEqual(userId, NumberUtils.parseLong(task.getAssignee()))) {
             throw exception(TASK_OPERATE_FAIL_ASSIGN_NOT_SELF);
         }
+        // 为什么 assignee 为空、owner 非空时，不允许操作？
+        // 例如说：【加签】等待中（WAIT）的任务（向前加签的父任务、向后加签的子任务），只有 owner 没有 assignee，
+        // 需要等待其它任务审批后，才能恢复 assignee 继续审批。此时，任何人都不能直接审批、拒绝它
+        if (StrUtil.isBlank(task.getAssignee()) && StrUtil.isNotBlank(task.getOwner())) {
+            throw exception(TASK_OPERATE_FAIL_ASSIGN_NOT_SELF);
+        }
+        // 为什么审批通过中（APPROVING）时，不允许操作？
+        // 例如说：【向后加签】的父任务已经审批通过，需要等待加签出来的子任务审批完成后自动完成。此时，不能重复审批、拒绝、继续加签等
+        Integer status = (Integer) task.getTaskLocalVariables().get(BpmnVariableConstants.TASK_VARIABLE_STATUS);
+        if (BpmTaskStatusEnum.APPROVING.getStatus().equals(status)) {
+            throw exception(TASK_OPERATE_FAIL_APPROVING);
+        }
         return task;
     }
 
@@ -763,11 +775,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
         // 2. 激活子任务
         List<Task> childrenTaskList = getTaskListByParentTaskId(task.getId());
-        for (Task childrenTask : childrenTaskList) {
-            taskService.resolveTask(childrenTask.getId());
-            // 更新子 task 状态
-            updateTaskStatus(childrenTask.getId(), BpmTaskStatusEnum.RUNNING.getStatus());
-        }
+        childrenTaskList.forEach(childrenTask -> resolveWaitTask(childrenTask.getId()));
     }
 
     /**
@@ -789,8 +797,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         }
         // 1.2 只处理加签的父任务
         Task parentTask = validateTaskExists(parentTaskId);
-        String scopeType = parentTask.getScopeType();
-        if (BpmTaskSignTypeEnum.of(scopeType) == null) {
+        BpmTaskSignTypeEnum signType = BpmTaskSignTypeEnum.of(parentTask.getScopeType());
+        if (signType == null) {
             return;
         }
 
@@ -799,14 +807,11 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         parentTaskImpl.setScopeType(null);
         taskService.saveTask(parentTaskImpl);
 
-        // 3.1 情况一：处理向【向前】加签
-        if (BpmTaskSignTypeEnum.BEFORE.getType().equals(scopeType)) {
-            // 3.1.1 owner 重新赋值给父任务的 assignee，这样它就可以被审批
-            taskService.resolveTask(parentTaskId);
-            // 3.1.2 更新流程任务 status
-            updateTaskStatus(parentTaskId, BpmTaskStatusEnum.RUNNING.getStatus());
+        // 3.1 情况一：处理向【向前】加签，owner 重新赋值给父任务的 assignee，这样它就可以被审批
+        if (signType == BpmTaskSignTypeEnum.BEFORE) {
+            resolveWaitTask(parentTaskId);
             // 3.2 情况二：处理向【向后】加签
-        } else if (BpmTaskSignTypeEnum.AFTER.getType().equals(scopeType)) {
+        } else {
             // 只有 parentTask 处于 APPROVING 的情况下，才可以继续 complete 完成
             // 否则，一个未审批的 parentTask 任务，在加签出来的任务都被减签的情况下，就直接完成审批，这样会存在问题
             Integer status = (Integer) parentTask.getTaskLocalVariables().get(BpmnVariableConstants.TASK_VARIABLE_STATUS);
@@ -926,6 +931,31 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     private void updateTaskStatusAndReason(String id, Integer status, String reason) {
         updateTaskStatus(id, status);
         taskService.setVariableLocal(id, BpmnVariableConstants.TASK_VARIABLE_REASON, reason);
+    }
+
+    /**
+     * 保存【加签】等待中的任务：设置 owner、置空 assignee，并更新状态为 WAIT
+     * <p>
+     * 适用于向前加签的父任务、向后加签的子任务，它们需要等待其它任务审批后，再通过 {@link #resolveWaitTask(String)} 恢复审批
+     *
+     * @param task  任务
+     * @param owner 拥有人，恢复审批时成为 assignee
+     */
+    private void saveWaitTask(TaskEntityImpl task, String owner) {
+        task.setOwner(owner);
+        task.setAssignee(null);
+        taskService.saveTask(task);
+        updateTaskStatus(task.getId(), BpmTaskStatusEnum.WAIT.getStatus());
+    }
+
+    /**
+     * 恢复【加签】等待中的任务：将 owner 重新赋值给 assignee，并更新状态为 RUNNING，这样它就可以被审批
+     *
+     * @param id 任务编号
+     */
+    private void resolveWaitTask(String id) {
+        taskService.resolveTask(id);
+        updateTaskStatus(id, BpmTaskStatusEnum.RUNNING.getStatus());
     }
 
     @Override
@@ -1167,26 +1197,22 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 1. 获取和校验任务
         TaskEntityImpl taskEntity = validateTaskCanCreateSign(userId, reqVO);
         List<AdminUserRespDTO> userList = adminUserApi.getUserList(reqVO.getUserIds());
-        if (CollUtil.isEmpty(userList)) {
+        if (CollUtil.isEmpty(userList) || userList.size() != reqVO.getUserIds().size()) {
             throw exception(TASK_SIGN_CREATE_USER_NOT_EXIST);
         }
 
         // 2. 处理当前任务
         // 2.1 开启计数功能，主要用于为了让表 ACT_RU_TASK 中的 SUB_TASK_COUNT_ 字段记录下总共有多少子任务，后续可能有用
         taskEntity.setCountEnabled(true);
-        // 2.2 向前加签，设置 owner，置空 assign。等子任务都完成后，再调用 resolveTask 重新将 owner 设置为 assign
-        // 原因是：不能和向前加签的子任务一起审批，需要等前面的子任务都完成才能审批
-        if (reqVO.getType().equals(BpmTaskSignTypeEnum.BEFORE.getType())) {
-            taskEntity.setOwner(taskEntity.getAssignee());
-            taskEntity.setAssignee(null);
-        }
-        // 2.4 记录加签方式，完成任务时需要用到判断
+        // 2.2 记录加签方式，完成任务时需要用到判断
         taskEntity.setScopeType(reqVO.getType());
-        // 2.5 保存当前任务修改后的值
-        taskService.saveTask(taskEntity);
-        // 2.6 更新 task 状态为 WAIT，只有在向前加签的时候
-        if (reqVO.getType().equals(BpmTaskSignTypeEnum.BEFORE.getType())) {
-            updateTaskStatus(taskEntity.getId(), BpmTaskStatusEnum.WAIT.getStatus());
+        // 2.3 保存当前任务修改后的值
+        // 向前加签，设置 owner，置空 assignee，状态为 WAIT。等子任务都完成后，再调用 resolveWaitTask 重新将 owner 设置为 assignee
+        // 原因是：不能和向前加签的子任务一起审批，需要等前面的子任务都完成才能审批
+        if (BpmTaskSignTypeEnum.BEFORE.getType().equals(reqVO.getType())) {
+            saveWaitTask(taskEntity, taskEntity.getAssignee());
+        } else {
+            taskService.saveTask(taskEntity);
         }
 
         // 3. 创建加签任务
@@ -1202,6 +1228,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     /**
      * 校验任务是否可以加签，主要校验加签类型是否一致：
      * <p>
+     * 0. 加签类型必须存在
      * 1. 如果存在“向前加签”的任务，则不能“向后加签”
      * 2. 如果存在“向后加签”的任务，则不能“向前加签”
      *
@@ -1210,6 +1237,9 @@ public class BpmTaskServiceImpl implements BpmTaskService {
      * @return 当前任务
      */
     private TaskEntityImpl validateTaskCanCreateSign(Long userId, BpmTaskSignCreateReqVO reqVO) {
+        if (BpmTaskSignTypeEnum.of(reqVO.getType()) == null) {
+            throw exception(TASK_SIGN_CREATE_TYPE_NOT_EXISTS, reqVO.getType());
+        }
         TaskEntityImpl taskEntity = (TaskEntityImpl) validateTask(userId, reqVO.getId());
         // 向前加签和向后加签不能同时存在
         if (taskEntity.getScopeType() != null
@@ -1260,20 +1290,14 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         TaskEntityImpl task = (TaskEntityImpl) taskService.newTask(IdUtil.fastSimpleUUID());
         BpmTaskConvert.INSTANCE.copyTo(parentTask, task);
 
-        // 2.1 向前加签，设置审批人
+        // 2.1 向前加签，设置审批人，子任务可以直接审批
         if (BpmTaskSignTypeEnum.BEFORE.getType().equals(parentTask.getScopeType())) {
             task.setAssignee(assignee);
-            // 2.2 向后加签，设置 owner 不设置 assignee 是因为不能同时审批，需要等父任务完成
-        } else {
-            task.setOwner(assignee);
+            taskService.saveTask(task);
+            return;
         }
-        // 2.3 保存子任务
-        taskService.saveTask(task);
-
-        // 3. 向后前签，设置子任务的状态为 WAIT，因为需要等父任务审批完
-        if (BpmTaskSignTypeEnum.AFTER.getType().equals(parentTask.getScopeType())) {
-            updateTaskStatus(task.getId(), BpmTaskStatusEnum.WAIT.getStatus());
-        }
+        // 2.2 向后加签，设置 owner 不设置 assignee，状态为 WAIT，是因为不能同时审批，需要等父任务审批完
+        saveWaitTask(task, assignee);
     }
 
     @Override
@@ -1282,7 +1306,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     @SuppressWarnings("DataFlowIssue")
     public void deleteSignTask(Long userId, BpmTaskSignDeleteReqVO reqVO) {
         // 1.1 校验 task 可以被减签
-        Task task = validateTaskCanSignDelete(reqVO.getId());
+        Task task = validateTaskCanSignDelete(userId, reqVO.getId());
         // 1.2 校验取消人存在
         AdminUserRespDTO cancelUser = null;
         if (StrUtil.isNotBlank(task.getAssignee())) {
@@ -1376,11 +1400,15 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
     /**
      * 校验任务是否能被减签
+     * <p>
+     * 1. 被减签的任务，必须是通过加签生成的任务
+     * 2. 当前用户，必须是父任务（或祖先任务）的审批人、拥有人，即加签人
      *
-     * @param id 任务编号
+     * @param userId 当前用户编号
+     * @param id     任务编号
      * @return 任务信息
      */
-    private Task validateTaskCanSignDelete(String id) {
+    private Task validateTaskCanSignDelete(Long userId, String id) {
         Task task = validateTaskExists(id);
         if (task.getParentTaskId() == null) {
             throw exception(TASK_SIGN_DELETE_NO_PARENT);
@@ -1392,7 +1420,36 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         if (BpmTaskSignTypeEnum.of(parentTask.getScopeType()) == null) {
             throw exception(TASK_SIGN_DELETE_NO_PARENT);
         }
+        if (!isSignCreateUser(userId, parentTask)) {
+            throw exception(TASK_SIGN_DELETE_FAIL_NOT_SELF);
+        }
         return task;
+    }
+
+    /**
+     * 判断指定用户，是否为父任务（或祖先任务）的审批人、拥有人
+     * <p>
+     * 为什么包含祖先任务？多层加签时，最上层的加签人，可以减签它下面所有层级的加签任务
+     *
+     * @param userId     用户编号
+     * @param parentTask 父任务
+     * @return 是否
+     */
+    private boolean isSignCreateUser(Long userId, Task parentTask) {
+        if (userId == null) {
+            return false;
+        }
+        Task task = parentTask;
+        for (int i = 0; i < Short.MAX_VALUE && task != null; i++) {
+            if (isAssignUserTask(userId, task) || isOwnerUserTask(userId, task)) {
+                return true;
+            }
+            if (task.getParentTaskId() == null) {
+                return false;
+            }
+            task = getTask(task.getParentTaskId());
+        }
+        return false;
     }
 
     // ========== Event 事件相关方法 ==========
@@ -1671,7 +1728,10 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             log.error("[processTaskTimeout][processInstanceId({}) 没有找到流程实例]", processInstanceId);
             return;
         }
-        List<Task> taskList = getRunningTaskListByProcessInstanceId(processInstanceId, true, taskDefineKey);
+        // 过滤【向后加签】审批通过中（APPROVING）的父任务：它已经审批通过，等待加签任务审批后自动完成，无需超时处理
+        List<Task> taskList = filterList(getRunningTaskListByProcessInstanceId(processInstanceId, true, taskDefineKey),
+                task -> ObjectUtil.notEqual(task.getTaskLocalVariables().get(BpmnVariableConstants.TASK_VARIABLE_STATUS),
+                        BpmTaskStatusEnum.APPROVING.getStatus()));
         // TODO 优化：未来需要考虑加签的情况
         if (CollUtil.isEmpty(taskList)) {
             log.error("[processTaskTimeout][processInstanceId({}) 定义Key({}) 没有找到任务]", processInstanceId, taskDefineKey);

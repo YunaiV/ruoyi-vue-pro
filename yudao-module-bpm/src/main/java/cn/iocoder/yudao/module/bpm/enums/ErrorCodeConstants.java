@@ -66,6 +66,9 @@ public interface ErrorCodeConstants {
     ErrorCode TASK_WITHDRAW_FAIL_TASK_NOT_EXISTS = new ErrorCode(1_009_005_018, "撤回失败，未查询到用户已办任务！");
     ErrorCode TASK_WITHDRAW_FAIL_NOT_ALLOW = new ErrorCode(1_009_005_019, "撤回失败，此流程不允许撤回操作！");
     ErrorCode TASK_WITHDRAW_FAIL_NEXT_TASK_NOT_ALLOW = new ErrorCode(1_009_005_020, "撤回失败，下一节点不满足撤回条件！");
+    ErrorCode TASK_SIGN_DELETE_FAIL_NOT_SELF = new ErrorCode(1_009_005_021, "任务减签失败，原因：你不是该任务的加签人");
+    ErrorCode TASK_OPERATE_FAIL_APPROVING = new ErrorCode(1_009_005_022, "操作失败，原因：该任务已审批通过，等待加签任务审批完成");
+    ErrorCode TASK_SIGN_CREATE_TYPE_NOT_EXISTS = new ErrorCode(1_009_005_023, "任务加签失败，加签类型({})不存在");
 
     // ========== 动态表单模块 1-009-010-000 ==========
     ErrorCode FORM_NOT_EXISTS = new ErrorCode(1_009_010_000, "动态表单不存在");

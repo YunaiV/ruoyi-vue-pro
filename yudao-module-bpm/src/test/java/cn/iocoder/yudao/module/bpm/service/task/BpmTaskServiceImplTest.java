@@ -156,6 +156,33 @@ public class BpmTaskServiceImplTest extends BaseMockitoUnitTest {
     }
 
     @Test
+    public void testValidateTask_ownerOnly() {
+        // 准备参数：加签等待中的任务，只有 owner 没有 assignee
+        BpmTaskServiceImpl spyService = spy(taskService);
+        doReturn(task).when(spyService).validateTaskExists("task-1");
+        when(task.getAssignee()).thenReturn(null);
+        when(task.getOwner()).thenReturn("1");
+
+        // 调用，并断言异常：owner 自己、其它用户、无 userId 都不允许操作
+        assertServiceException(() -> spyService.validateTask(1L, "task-1"), TASK_OPERATE_FAIL_ASSIGN_NOT_SELF);
+        assertServiceException(() -> spyService.validateTask(2L, "task-1"), TASK_OPERATE_FAIL_ASSIGN_NOT_SELF);
+        assertServiceException(() -> spyService.validateTask(null, "task-1"), TASK_OPERATE_FAIL_ASSIGN_NOT_SELF);
+    }
+
+    @Test
+    public void testValidateTask_approving() {
+        // 准备参数：向后加签的父任务，已审批通过，等待加签任务审批
+        BpmTaskServiceImpl spyService = spy(taskService);
+        doReturn(task).when(spyService).validateTaskExists("task-1");
+        when(task.getAssignee()).thenReturn("1");
+        when(task.getTaskLocalVariables()).thenReturn(Map.of(BpmnVariableConstants.TASK_VARIABLE_STATUS,
+                BpmTaskStatusEnum.APPROVING.getStatus()));
+
+        // 调用，并断言异常
+        assertServiceException(() -> spyService.validateTask(1L, "task-1"), TASK_OPERATE_FAIL_APPROVING);
+    }
+
+    @Test
     public void testValidateTaskExists_notExists() {
         // 准备参数
         BpmTaskServiceImpl spyService = spy(taskService);
@@ -440,6 +467,14 @@ public class BpmTaskServiceImplTest extends BaseMockitoUnitTest {
         assertServiceException(() -> spyService.createSignTask(1L, new BpmTaskSignCreateReqVO().setId("task-1")
                         .setType(BpmTaskSignTypeEnum.BEFORE.getType()).setUserIds(Set.of(2L)).setReason("加签")),
                 TASK_SIGN_CREATE_USER_NOT_EXIST);
+    }
+
+    @Test
+    public void testCreateSignTask_typeNotExists() {
+        // 调用，并断言异常
+        assertServiceException(() -> taskService.createSignTask(1L, new BpmTaskSignCreateReqVO().setId("task-1")
+                        .setType("unknown").setUserIds(Set.of(2L)).setReason("加签")),
+                TASK_SIGN_CREATE_TYPE_NOT_EXISTS, "unknown");
     }
 
     @Test
