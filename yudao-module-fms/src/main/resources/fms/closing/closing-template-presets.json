@@ -6,7 +6,7 @@
     "sort": 10,
     "entries": [
       {
-        "subjectCode": "560107",
+        "subjectCode": "560201",
         "digest": "报销差旅费",
         "direction": "DEBIT",
         "amountRatio": 100
@@ -26,7 +26,7 @@
     "sort": 20,
     "entries": [
       {
-        "subjectCode": "560101",
+        "subjectCode": "560202",
         "digest": "报销电话费",
         "direction": "DEBIT",
         "amountRatio": 100
@@ -86,7 +86,7 @@
     "sort": 50,
     "entries": [
       {
-        "subjectCode": "560102",
+        "subjectCode": "560203",
         "digest": "支付房租水电费",
         "direction": "DEBIT",
         "amountRatio": 100
@@ -436,7 +436,7 @@
     "sort": 10,
     "entries": [
       {
-        "subjectCode": "560110",
+        "subjectCode": "560210",
         "digest": "计提工资",
         "direction": "DEBIT",
         "amountRatio": 15
