@@ -41,7 +41,7 @@ public interface ProductCommentConvert {
 
     default ProductCommentDO convert(ProductCommentCreateReqVO createReq, ProductSpuDO spu, ProductSkuDO sku) {
         ProductCommentDO comment = BeanUtils.toBean(createReq, ProductCommentDO.class)
-                .setVisible(true).setUserId(0L).setAnonymous(false)
+                .setVisible(true).setAnonymous(false)
                 .setScores(convertScores(createReq.getDescriptionScores(), createReq.getBenefitScores()));
         if (spu != null) {
             comment.setSpuId(spu.getId()).setSpuName(spu.getName());
