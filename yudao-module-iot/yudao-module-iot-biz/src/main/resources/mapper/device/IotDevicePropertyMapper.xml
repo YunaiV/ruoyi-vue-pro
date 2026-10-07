@@ -8,6 +8,10 @@
         DESCRIBE product_property_${productId}
     </select>
 
+    <update id="dropProductPropertySTable">
+        DROP STABLE IF EXISTS product_property_${productId}
+    </update>
+
     <update id="createProductPropertySTable">
         CREATE STABLE product_property_${productId} (
             ts TIMESTAMP,

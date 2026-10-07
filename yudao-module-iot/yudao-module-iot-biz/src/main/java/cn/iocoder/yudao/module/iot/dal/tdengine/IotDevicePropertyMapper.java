@@ -27,6 +27,8 @@ public interface IotDevicePropertyMapper {
     void createProductPropertySTable(@Param("productId") Long productId,
                                      @Param("fields") List<TDengineTableField> fields);
 
+    void dropProductPropertySTable(@Param("productId") Long productId);
+
     @SuppressWarnings("SimplifyStreamApiCallChains") // 保持 JDK8 兼容性
     default void alterProductPropertySTable(Long productId,
                                             List<TDengineTableField> oldFields,

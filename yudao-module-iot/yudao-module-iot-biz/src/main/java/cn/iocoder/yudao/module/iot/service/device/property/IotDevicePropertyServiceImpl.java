@@ -115,6 +115,11 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
         devicePropertyMapper.alterProductPropertySTable(product.getId(), oldFields, newFields);
     }
 
+    @Override
+    public void deleteDevicePropertyData(Long productId) {
+        devicePropertyMapper.dropProductPropertySTable(productId);
+    }
+
     private List<TDengineTableField> buildTableFieldList(List<IotThingModelDO> thingModels) {
         return convertList(thingModels, thingModel -> {
             TDengineTableField field = new TDengineTableField(

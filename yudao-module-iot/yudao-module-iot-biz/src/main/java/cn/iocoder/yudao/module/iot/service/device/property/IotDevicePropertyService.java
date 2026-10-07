@@ -29,6 +29,15 @@ public interface IotDevicePropertyService {
     void defineDevicePropertyData(Long productId);
 
     /**
+     * 删除产品的属性数据超级表（TDengine）
+     *
+     * 产品删除时调用，避免产品名下的时序数据表永久残留
+     *
+     * @param productId 产品编号
+     */
+    void deleteDevicePropertyData(Long productId);
+
+    /**
      * 保存设备数据
      *
      * @param device 设备

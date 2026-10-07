@@ -94,6 +94,9 @@ public class IotProductServiceImpl implements IotProductService {
 
         // 2. 删除
         productMapper.deleteById(id);
+
+        // 3. 清理产品名下的属性数据超级表（TDengine），避免产品删除后时序库孤儿表永久残留
+        devicePropertyDataService.deleteDevicePropertyData(id);
     }
 
     @Override
