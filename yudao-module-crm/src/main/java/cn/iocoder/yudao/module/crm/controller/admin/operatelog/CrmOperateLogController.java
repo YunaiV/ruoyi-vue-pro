@@ -7,6 +7,8 @@ import cn.iocoder.yudao.module.crm.controller.admin.operatelog.vo.CrmOperateLogP
 import cn.iocoder.yudao.module.crm.controller.admin.operatelog.vo.CrmOperateLogRespVO;
 import cn.iocoder.yudao.module.crm.enums.LogRecordConstants;
 import cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum;
+import cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum;
+import cn.iocoder.yudao.module.crm.framework.permission.core.annotations.CrmPermission;
 import cn.iocoder.yudao.module.system.api.logger.OperateLogApi;
 import cn.iocoder.yudao.module.system.api.logger.dto.OperateLogPageReqDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -52,6 +54,9 @@ public class CrmOperateLogController {
 
     @GetMapping("/page")
     @Operation(summary = "获得操作日志")
+    // 数据权限：操作日志暴露业务对象的完整变更留痕，须与跟进记录同级的 READ 数据权限校验，
+    // 否则任意登录用户可通过 bizType/bizId 读取他人客户/合同等载体的操作留痕
+    @CrmPermission(bizTypeValue = "#pageReqVO.bizType", bizId = "#pageReqVO.bizId", level = CrmPermissionLevelEnum.READ)
     public CommonResult<PageResult<CrmOperateLogRespVO>> getCustomerOperateLog(@Valid CrmOperateLogPageReqVO pageReqVO) {
         OperateLogPageReqDTO reqDTO = new OperateLogPageReqDTO();
         reqDTO.setPageSize(PAGE_SIZE_NONE); // 默认不分页，需要分页需注释
