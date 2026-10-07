@@ -27,7 +27,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.PAY_ORDER_NOT_FOUND;
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.getLoginUserType;
@@ -82,6 +84,14 @@ public class AppPayOrderController {
     @PostMapping("/submit")
     @Operation(summary = "提交支付订单")
     public CommonResult<AppPayOrderSubmitRespVO> submitPayOrder(@RequestBody AppPayOrderSubmitReqVO reqVO) {
+        // 重要：校验订单是否是当前用户，避免越权（与 GET 查询侧同款防线；提交侧此前不核对，
+        // 任何登录用户可把他人待支付单提交成已支付）
+        PayOrderDO order = payOrderService.getOrder(reqVO.getId());
+        if (order == null || (order.getUserId() != null // 特殊：早期订单未存储 userId，所以忽略
+                && ObjUtil.notEqual(order.getUserId(), getLoginUserId()))) {
+            throw exception(PAY_ORDER_NOT_FOUND);
+        }
+
         // 1. 钱包支付事，需要额外传 user_id 和 user_type
         if (Objects.equals(reqVO.getChannelCode(), PayChannelEnum.WALLET.getCode())) {
             if (reqVO.getChannelExtras() == null) {
