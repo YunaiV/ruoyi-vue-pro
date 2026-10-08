@@ -18,8 +18,8 @@ spring:
         enabled: true
         allow: # 设置白名单，不填则允许所有访问
         url-pattern: /druid/*
-        login-username: # 控制台管理用户名和密码
-        login-password:
+        login-username: druid # 监控页访问账号：留空则 /druid/* 无口令裸奔（未登录可读取数据源连接串、账号与全量 SQL），生产部署务必改口令
+        login-password: druid123 # 监控页访问口令：Druid 自带登录校验由此启用
       filter:
         stat:
           enabled: true
