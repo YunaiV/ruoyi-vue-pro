@@ -1,0 +1,60 @@
+package cn.iocoder.yudao.module.ai1.dal.dataobject.session;
+
+import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
+import cn.iocoder.yudao.module.ai1.enums.session.Ai1SessionMessageRoleEnum;
+import cn.iocoder.yudao.module.ai1.enums.session.Ai1SessionMessageStatusEnum;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.*;
+
+/**
+ * AI1 会话消息 DO
+ *
+ * 助手消息的编号同时作为 Redis 结果流标识，用于断线续传
+ *
+ * @author 芋道源码
+ */
+@TableName("ai1_session_message")
+@KeySequence("ai1_session_message_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+@Data
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class Ai1SessionMessageDO extends TenantBaseDO {
+
+    /**
+     * 编号
+     */
+    @TableId
+    private Long id;
+    /**
+     * 会话编号
+     *
+     * 关联 {@link Ai1SessionDO#getId()}
+     */
+    private Long sessionId;
+    /**
+     * 角色
+     *
+     * 枚举 {@link Ai1SessionMessageRoleEnum}
+     */
+    private String role;
+    /**
+     * 思考过程，即推理模型的 reasoning_content
+     */
+    private String reasoning;
+    /**
+     * 内容
+     */
+    private String content;
+    /**
+     * 生成状态
+     *
+     * 枚举 {@link Ai1SessionMessageStatusEnum}
+     */
+    private Integer status;
+
+}

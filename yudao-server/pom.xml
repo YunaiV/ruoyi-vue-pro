@@ -108,6 +108,13 @@
 <!--            <version>${revision}</version>-->
 <!--        </dependency>-->
 
+        <!-- AI1 Agent 相关模块（Spring AI）。默认注释，保证编译速度 -->
+<!--        <dependency>-->
+<!--            <groupId>cn.iocoder.boot</groupId>-->
+<!--            <artifactId>yudao-module-ai1-springai</artifactId>-->
+<!--            <version>${revision}</version>-->
+<!--        </dependency>-->
+
         <!-- IoT 物联网相关模块。默认注释，保证编译速度 -->
 <!--        <dependency>-->
 <!--            <groupId>cn.iocoder.boot</groupId>-->
