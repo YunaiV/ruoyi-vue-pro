@@ -134,6 +134,23 @@ public abstract class AbstractPayClient<Config extends PayClientConfig> implemen
     protected abstract PayOrderRespDTO doGetOrder(String outTradeNo)
             throws Throwable;
 
+    @Override
+    public final PayOrderRespDTO closeOrder(String outTradeNo) {
+        try {
+            return doCloseOrder(outTradeNo);
+        } catch (ServiceException ex) { // 业务异常，都是实现类已经翻译，所以直接抛出即可
+            throw ex;
+        } catch (Throwable ex) {
+            // 系统异常，则包装成 PayException 异常抛出
+            log.error("[closeOrder][客户端({}) outTradeNo({}) 关闭支付单异常]",
+                    getId(), outTradeNo, ex);
+            throw buildPayException(ex);
+        }
+    }
+
+    protected abstract PayOrderRespDTO doCloseOrder(String outTradeNo)
+            throws Throwable;
+
     // ============ 退款相关 ==========
 
     @Override

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="http://www.yudao.iocoder.cn/bpm">
+    <!-- 主流程：子流程（发起人同主流程，由 bpmCallActivityListener 设置） -> 后续审批 -->
+    <process id="childParent" name="主流程" isExecutable="true">
+        <startEvent id="start"/>
+        <sequenceFlow id="flow-start" sourceRef="start" targetRef="child"/>
+        <callActivity id="child" name="子流程" calledElement="lifecycleChild" flowable:calledElementType="key">
+            <extensionElements>
+                <flowable:nodeType>20</flowable:nodeType>
+                <flowable:in source="PROCESS_STATUS" target="PROCESS_STATUS"/>
+                <flowable:executionListener event="start" delegateExpression="${bpmCallActivityListener}">
+                    <flowable:field name="listenerConfig">
+                        <flowable:string><![CDATA[{"type":1,"emptyType":1}]]></flowable:string>
+                    </flowable:field>
+                </flowable:executionListener>
+            </extensionElements>
+        </callActivity>
+        <sequenceFlow id="flow-child" sourceRef="child" targetRef="afterChild"/>
+        <userTask id="afterChild" name="子流程后审批">
+            <extensionElements>
+                <flowable:candidateStrategy>30</flowable:candidateStrategy>
+            </extensionElements>
+        </userTask>
+        <sequenceFlow id="flow-after-child" sourceRef="afterChild" targetRef="end"/>
+        <endEvent id="end"/>
+    </process>
+</definitions>

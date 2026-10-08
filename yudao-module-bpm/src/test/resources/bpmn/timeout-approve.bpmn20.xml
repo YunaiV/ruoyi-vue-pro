@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="http://www.yudao.iocoder.cn/bpm">
+    <!-- 审批超时：task1 挂载不中断的定时边界事件，超时处理方式默认为自动同意 -->
+    <process id="timeoutApprove" name="超时审批" isExecutable="true">
+        <startEvent id="start"/>
+        <sequenceFlow id="flow-start" sourceRef="start" targetRef="task1"/>
+        <userTask id="task1" name="一级审批">
+            <extensionElements>
+                <flowable:candidateStrategy>30</flowable:candidateStrategy>
+            </extensionElements>
+        </userTask>
+        <boundaryEvent id="task1-timeout" attachedToRef="task1" cancelActivity="false">
+            <extensionElements>
+                <flowable:boundaryEventType>1</flowable:boundaryEventType>
+                <flowable:timeoutHandlerType>2</flowable:timeoutHandlerType>
+            </extensionElements>
+            <timerEventDefinition>
+                <timeDuration>PT1H</timeDuration>
+            </timerEventDefinition>
+        </boundaryEvent>
+        <sequenceFlow id="flow-task1" sourceRef="task1" targetRef="end"/>
+        <endEvent id="end"/>
+    </process>
+</definitions>

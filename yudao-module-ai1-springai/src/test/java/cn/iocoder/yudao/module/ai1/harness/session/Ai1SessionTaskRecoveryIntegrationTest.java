@@ -21,7 +21,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.mockito.Mock;
 import org.redisson.Redisson;
 import org.redisson.api.RScript;
@@ -57,12 +57,12 @@ import static org.mockito.Mockito.*;
 /**
  * 会话任务认领与执行锁的 Redis 集成测试
  *
- * 默认禁用，手动测试时移除 @Disabled，连接本机 127.0.0.1:6379
+ * 默认禁用，使用 -Dai1.integration.redis=true 启用；ai1.integration.redis.address 可指定独立 Redis
  * LLM 与数据库使用 mock
  *
  * @author 芋道源码
  */
-@Disabled
+@EnabledIfSystemProperty(named = "ai1.integration.redis", matches = "true")
 @Timeout(30)
 public class Ai1SessionTaskRecoveryIntegrationTest extends BaseMockitoUnitTest {
 
@@ -224,7 +224,7 @@ public class Ai1SessionTaskRecoveryIntegrationTest extends BaseMockitoUnitTest {
                 return name != null && name.startsWith(keyPrefix) ? name.substring(keyPrefix.length()) : name;
             }
         });
-        config.useSingleServer().setAddress("redis://127.0.0.1:6379");
+        config.useSingleServer().setAddress(System.getProperty("ai1.integration.redis.address", "redis://127.0.0.1:6379"));
         return Redisson.create(config);
     }
 

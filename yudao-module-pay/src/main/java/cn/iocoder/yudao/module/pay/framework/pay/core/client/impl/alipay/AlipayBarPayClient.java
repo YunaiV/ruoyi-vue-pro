@@ -72,7 +72,7 @@ public class AlipayBarPayClient extends AbstractAlipayPayClient {
         if (!response.isSuccess()) {
             return buildClosedPayOrderRespDTO(reqDTO, response);
         }
-        if ("10000".equals(response.getCode())) { // 免密支付
+        if (isSuccessResponse(response)) { // 免密支付
             LocalDateTime successTime = LocalDateTimeUtil.of(response.getGmtPayment());
             return PayOrderRespDTO.successOf(response.getTradeNo(), response.getBuyerUserId(), successTime,
                             response.getOutTradeNo(), response)

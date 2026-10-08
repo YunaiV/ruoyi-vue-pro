@@ -164,4 +164,11 @@ public interface PayOrderService {
      */
     int expireOrder();
 
+    /**
+     * 关闭支付订单
+     *
+     * @param id 支付单编号
+     */
+    void closeOrder(Long id);
+
 }

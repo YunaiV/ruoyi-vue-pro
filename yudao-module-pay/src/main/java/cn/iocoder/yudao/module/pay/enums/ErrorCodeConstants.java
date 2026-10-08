@@ -40,6 +40,9 @@ public interface ErrorCodeConstants {
     ErrorCode REFUND_EXISTS = new ErrorCode(1_007_006_003, "已经存在退款单");
     ErrorCode REFUND_NOT_FOUND = new ErrorCode(1_007_006_004, "支付退款单不存在");
     ErrorCode REFUND_STATUS_IS_NOT_WAITING = new ErrorCode(1_007_006_005, "支付退款单不处于待退款");
+    ErrorCode REFUND_SUBMIT_CHANNEL_ERROR = new ErrorCode(1_007_006_006, "发起退款报错，错误码：{}，错误提示：{}");
+    ErrorCode REFUND_CREATE_FAIL_ORDER_NOT_MATCH = new ErrorCode(1_007_006_007, "发起退款失败，原因：两次相同退款请求的支付订单不匹配");
+    ErrorCode REFUND_CREATE_FAIL_PRICE_NOT_MATCH = new ErrorCode(1_007_006_008, "发起退款失败，原因：两次相同退款请求的退款金额不匹配");
 
     // ========== 钱包模块 1-007-007-000 ==========
     ErrorCode WALLET_NOT_FOUND = new ErrorCode(1_007_007_000, "用户钱包不存在");
@@ -71,6 +74,7 @@ public interface ErrorCodeConstants {
     ErrorCode PAY_TRANSFER_CREATE_FAIL_STATUS_NOT_CLOSED = new ErrorCode(1_007_009_004, "转账发起失败，原因：已经存在相同的转账单，且状态不是已关闭");
     ErrorCode PAY_TRANSFER_NOTIFY_FAIL_STATUS_IS_NOT_WAITING = new ErrorCode(1_007_009_006, "通知转账结果失败，原因：转账单不处于待转账");
     ErrorCode PAY_TRANSFER_NOTIFY_FAIL_STATUS_NOT_WAITING_OR_PROCESSING = new ErrorCode(1_007_009_007, "通知转账结果失败，原因：转账单不处于待转账或转账中");
+    ErrorCode PAY_TRANSFER_SUBMIT_CHANNEL_ERROR = new ErrorCode(1_007_009_008, "发起转账报错，错误码：{}，错误提示：{}");
 
     // ========== 示例订单 1-007-900-000 ==========
     ErrorCode DEMO_ORDER_NOT_FOUND = new ErrorCode(1_007_900_000, "示例订单不存在");

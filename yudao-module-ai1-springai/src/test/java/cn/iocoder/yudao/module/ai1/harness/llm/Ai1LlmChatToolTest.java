@@ -76,7 +76,8 @@ public class Ai1LlmChatToolTest extends BaseMockitoUnitTest {
             assertTrue(results.stream().anyMatch(result -> result.responseData().contains("skill:hello")));
             return Flux.just(new ChatResponse(List.of(new Generation(new AssistantMessage("工具调用成功")))));
         });
-        when(llmModelFactory.buildChatClient(any(), any())).thenReturn(ChatClient.create(chatModel));
+        ChatClient chatClient = ChatClient.create(chatModel);
+        when(llmModelFactory.buildChatClient(any(), any())).thenReturn(chatClient);
 
         // 调用
         Ai1LlmChatTool.ChatText result = llmChatTool.chat(new Ai1ModelRespBO(), "", List.of(), "调用工具",

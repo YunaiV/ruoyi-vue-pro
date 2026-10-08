@@ -1,11 +1,12 @@
 <script lang="ts" setup>
-  import type { StudentApi } from '#/api/infra/student';
+  import type { StudentApi } from '#/api/infra/demo';
   import type { VxeTableInstance } from '#/adapter/vxe-table';
 
   import { reactive,ref, h, nextTick,watch,onMounted } from 'vue';
 
   import { DICT_TYPE } from '@vben/constants';
   import { getDictOptions } from '@vben/hooks';
+import { formatDateTime } from '@vben/utils';
 
   import { DictTag } from '#/components/dict-tag';
   import { getRangePickerDefaultProps } from '#/utils';
@@ -13,7 +14,7 @@
   import { ContentWrap } from '#/components/content-wrap';
 
 
-   import { getStudentContactListByStudentId } from '#/api/infra/student';
+   import { getStudentContactListByStudentId } from '#/api/infra/demo';
 
 const props = defineProps<{
       studentId?: number // 学生编号（主表的关联字段）
@@ -52,38 +53,38 @@ watch(
 
 <template>
     <ContentWrap title="学生联系人列表">
-      <vxe-table
+      <VxeTable
           :data="list"
           show-overflow
           :loading="loading"
       >
-                    <vxe-column field="id" title="编号" align="center" />
-                    <vxe-column field="studentId" title="学生编号" align="center" />
-                    <vxe-column field="name" title="名字" align="center" />
-                    <vxe-column field="description" title="简介" align="center" />
-                    <vxe-column field="birthday" title="出生日期" align="center">
+                    <VxeColumn field="id" title="编号" align="center" />
+                    <VxeColumn field="studentId" title="学生编号" align="center" />
+                    <VxeColumn field="name" title="名字" align="center" />
+                    <VxeColumn field="description" title="简介" align="center" />
+                    <VxeColumn field="birthday" title="出生日期" align="center">
                       <template #default="{row}">
                         {{formatDateTime(row.birthday)}}
                       </template>
-                    </vxe-column>
-                    <vxe-column field="sex" title="性别" align="center">
+                    </VxeColumn>
+                    <VxeColumn field="sex" title="性别" align="center">
                       <template #default="{row}">
                         <dict-tag :type="DICT_TYPE.SYSTEM_USER_SEX" :value="row.sex" />
                       </template>
-                    </vxe-column>
-                    <vxe-column field="enabled" title="是否有效" align="center">
+                    </VxeColumn>
+                    <VxeColumn field="enabled" title="是否有效" align="center">
                       <template #default="{row}">
                         <dict-tag :type="DICT_TYPE.INFRA_BOOLEAN_STRING" :value="row.enabled" />
                       </template>
-                    </vxe-column>
-                    <vxe-column field="avatar" title="头像" align="center" />
-                    <vxe-column field="video" title="附件" align="center" />
-                    <vxe-column field="memo" title="备注" align="center" />
-                    <vxe-column field="createTime" title="创建时间" align="center">
+                    </VxeColumn>
+                    <VxeColumn field="avatar" title="头像" align="center" />
+                    <VxeColumn field="video" title="附件" align="center" />
+                    <VxeColumn field="memo" title="备注" align="center" />
+                    <VxeColumn field="createTime" title="创建时间" align="center">
                       <template #default="{row}">
                         {{formatDateTime(row.createTime)}}
                       </template>
-                    </vxe-column>
-      </vxe-table>
+                    </VxeColumn>
+      </VxeTable>
     </ContentWrap>
 </template>

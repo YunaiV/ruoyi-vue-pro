@@ -32,8 +32,12 @@ import org.redisson.api.RedissonClient;
 import org.redisson.api.stream.StreamAddArgs;
 import org.redisson.api.stream.StreamMessageId;
 import org.redisson.api.stream.StreamRangeArgs;
+import org.redisson.api.stream.StreamReadArgs;
+import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.redisson.client.codec.Codec;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -103,6 +107,47 @@ public class Ai1SessionStreamToolTest extends BaseMockitoUnitTest {
         lenient().when(sessionMessageService.getSessionMessage(MESSAGE_ID)).thenReturn(new Ai1SessionMessageDO()
                 .setId(MESSAGE_ID).setRole(Ai1SessionMessageRoleEnum.ASSISTANT.getRole())
                 .setStatus(Ai1SessionMessageStatusEnum.GENERATING.getStatus()));
+    }
+
+    @Test
+    public void testStreamResult_disconnectedMustNotComplete() throws Exception {
+        SseEmitter emitter = mock(
+                SseEmitter.class);
+        doThrow(new IOException("client disconnected")).when(emitter).send(
+                any(SseEmitter.SseEventBuilder.class));
+
+        Boolean shouldComplete = ReflectionTestUtils.invokeMethod(
+                sessionStreamTool, "streamResult", emitter, MESSAGE_ID, null, TENANT_ID);
+
+        assertEquals(Boolean.FALSE, shouldComplete);
+        verifyNoInteractions(resultStream);
+        verify(emitter, never()).complete();
+    }
+
+    @Test
+    public void testStreamResult_terminalMustComplete() {
+        SseEmitter emitter = mock(
+                SseEmitter.class);
+        when(resultStream.read(any(StreamReadArgs.class)))
+                .thenReturn(Map.of(RECORD_ID, Map.of("type", "done", "data", "")));
+
+        Boolean shouldComplete = ReflectionTestUtils.invokeMethod(
+                sessionStreamTool, "streamResult", emitter, MESSAGE_ID, null, TENANT_ID);
+
+        assertEquals(Boolean.TRUE, shouldComplete);
+    }
+
+    @Test
+    public void testSendErrorAndComplete_disconnectedMustNotComplete() throws Exception {
+        SseEmitter emitter = mock(
+                SseEmitter.class);
+        doThrow(new IOException("client disconnected")).when(emitter).send(
+                any(SseEmitter.SseEventBuilder.class));
+
+        ReflectionTestUtils.invokeMethod(
+                Ai1SessionStreamTool.class, "sendErrorAndComplete", emitter, "error");
+
+        verify(emitter, never()).complete();
     }
 
     @Test

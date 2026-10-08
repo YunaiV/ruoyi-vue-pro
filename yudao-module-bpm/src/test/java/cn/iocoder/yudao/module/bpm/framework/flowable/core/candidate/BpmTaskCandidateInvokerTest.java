@@ -49,12 +49,12 @@ public class BpmTaskCandidateInvokerTest extends BaseMockitoUnitTest {
 
     @Mock
     private AdminUserApi adminUserApi;
-
     @Mock
     private BpmProcessInstanceService processInstanceService;
 
     @Spy
     private BpmTaskCandidateStrategy userStrategy;
+
     @Mock
     private BpmTaskCandidateAssignEmptyStrategy emptyStrategy;
 

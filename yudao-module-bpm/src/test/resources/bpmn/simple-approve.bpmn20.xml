@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="http://www.yudao.iocoder.cn/bpm">
+    <process id="simpleApprove" name="简单审批" isExecutable="true">
+        <startEvent id="start"/>
+        <sequenceFlow id="flow-start" sourceRef="start" targetRef="approve"/>
+        <userTask id="approve" name="审批" flowable:assignee="${startUserId}">
+            <extensionElements>
+                <flowable:candidateStrategy>36</flowable:candidateStrategy>
+            </extensionElements>
+        </userTask>
+        <sequenceFlow id="flow-end" sourceRef="approve" targetRef="end"/>
+        <endEvent id="end"/>
+    </process>
+</definitions>

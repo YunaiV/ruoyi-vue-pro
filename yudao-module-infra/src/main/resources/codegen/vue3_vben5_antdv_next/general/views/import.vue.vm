@@ -46,6 +46,11 @@ function beforeUpload(file: File) {
   return false;
 }
 
+/** 移除文件 */
+function handleRemove() {
+  fileRef.value = null;
+}
+
 /** 下载导入模板 */
 async function handleDownload() {
   const data = await import${simpleClassName}Template();
@@ -56,7 +61,8 @@ async function handleDownload() {
 <template>
   <Modal title="导入${table.classComment}" class="w-1/3">
     <div class="mx-4">
-      <Upload :max-count="1" accept=".xls,.xlsx" :before-upload="beforeUpload">
+      <Upload :max-count="1" accept=".xls,.xlsx" :before-upload="beforeUpload"
+            :on-remove="handleRemove">
         <Button type="primary"> 选择 Excel 文件 </Button>
       </Upload>
     </div>

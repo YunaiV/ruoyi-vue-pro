@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { CategoryApi } from '#/api/infra/category';
+import type { CategoryApi } from '#/api/infra/demo';
 import type { FormRules } from 'element-plus';
 
 import { useVbenModal } from '@vben/common-ui';
@@ -7,12 +7,12 @@ import { getDictOptions } from '@vben/hooks';
 import { Tinymce as RichTextarea } from '#/components/tinymce';
 import { ImageUpload, FileUpload } from "#/components/upload";
 import { ElMessage, ElTabs, ElTabPane, ElForm, ElFormItem, ElInput, ElSelect, ElOption, ElRadioGroup, ElRadio, ElCheckboxGroup, ElCheckbox, ElDatePicker, ElTreeSelect } from 'element-plus';
-import { getCategoryList } from '#/api/infra/category';
+import { getCategoryList } from '#/api/infra/demo';
 import { handleTree } from '@vben/utils'
 
 import { computed, ref, reactive } from 'vue';
 import { $t } from '#/locales';
-import { getCategory, createCategory, updateCategory } from '#/api/infra/category';
+import { getCategory, createCategory, updateCategory } from '#/api/infra/demo';
 
 const emit = defineEmits(['success']);
 
@@ -98,18 +98,18 @@ const [Modal, modalApi] = useVbenModal({
 
 <template>
   <Modal :title="getTitle">
-    <el-form
+    <ElForm
       ref="formRef"
       :model="formData"
       :rules="rules"
       label-width="120px"
       label-position="right"
     >
-            <el-form-item label="名字" prop="name">
-              <el-input v-model="formData.name" placeholder="请输入名字" />
-            </el-form-item>
-            <el-form-item label="父编号" prop="parentId">
-              <el-tree-select
+            <ElFormItem label="名字" prop="name">
+              <ElInput v-model="formData.name" placeholder="请输入名字" />
+            </ElFormItem>
+            <ElFormItem label="父编号" prop="parentId">
+              <ElTreeSelect
                       v-model="formData.parentId"
                       :data="categoryTree"
                       :props="{
@@ -121,7 +121,7 @@ const [Modal, modalApi] = useVbenModal({
                       default-expand-all
                       placeholder="请选择父编号"
               />
-            </el-form-item>
-    </el-form>
+            </ElFormItem>
+    </ElForm>
       </Modal>
 </template>

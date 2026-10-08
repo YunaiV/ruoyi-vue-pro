@@ -26,6 +26,7 @@ import {
   CheckboxGroup,
   DatePicker,
   Input,
+  message,
   RadioGroup,
   Select,
 #if ($selectOptionEnable)
@@ -77,26 +78,54 @@ const handleDelete =  async (row: ${apiName}.${subSimpleClassName}) => {
   await gridApi.grid.remove(row);
 }
 
-/** 提供获取表格数据的方法供父组件调用 */
-defineExpose({
-  getData: (): ${apiName}.${subSimpleClassName}[] => {
-    const data = gridApi.grid.getData() as ${apiName}.${subSimpleClassName}[];
-    const removeRecords = gridApi.grid.getRemoveRecords() as ${apiName}.${subSimpleClassName}[];
-    const insertRecords = gridApi.grid.getInsertRecords() as ${apiName}.${subSimpleClassName}[];
-    return data
-        .filter((row) => !removeRecords.some((removed) => removed.id === row.id))
-        .concat(insertRecords.map((row: any) => ({ ...row, id: undefined })));
-  },
-});
+/** 获取当前子表数据，新增行不提交表格生成的临时编号 */
+function getData(): ${apiName}.${subSimpleClassName}[] {
+  const { fullData } = gridApi.grid.getTableData();
+  const inserted = new Set(gridApi.grid.getInsertRecords());
+  return fullData.map((row) =>
+    inserted.has(row) ? { ...row, id: undefined } : { ...row },
+  );
+}
+
+#set ($hasRequiredColumn = false)
+#foreach ($column in $subColumns)
+#if (($column.createOperation || $column.updateOperation) && !$column.nullable && !$column.primaryKey && $column.id != $subJoinColumn.id)
+#set ($hasRequiredColumn = true)
+#end
+#end
+/** 校验子表必填字段 */
+function validate(): boolean {
+#if ($hasRequiredColumn)
+  for (const [index, row] of getData().entries()) {
+#foreach ($column in $subColumns)
+#if (($column.createOperation || $column.updateOperation) && !$column.nullable && !$column.primaryKey && $column.id != $subJoinColumn.id)
+    if (
+      row.${column.javaField} === null ||
+      row.${column.javaField} === undefined ||
+      (typeof row.${column.javaField} === 'string' && String(row.${column.javaField}).trim() === '') ||
+      (Array.isArray(row.${column.javaField}) && row.${column.javaField}.length === 0)
+    ) {
+      message.error(`第 #[[${index + 1}]]# 行：${column.columnComment}不能为空`);
+      return false;
+    }
+#end
+#end
+  }
+#end
+  return true;
+}
+
+defineExpose({ getData, validate });
 
 /** 监听主表的关联字段的变化，加载对应的子表数据 */
 watch(
     () => props.${subJoinColumn.javaField},
     async (val) => {
+      await nextTick();
       if (!val) {
+        await gridApi.grid.loadData([]);
         return;
       }
-      await nextTick();
       await gridApi.grid.loadData(await get${subSimpleClassName}ListBy${SubJoinColumnName}(props.${subJoinColumn.javaField}!));
     },
     { immediate: true },
@@ -128,10 +157,11 @@ defineExpose({
 watch(
     () => props.${subJoinColumn.javaField},
     async (val) => {
+      await nextTick();
+      await formApi.resetForm();
       if (!val) {
         return;
       }
-      await nextTick();
       await formApi.setValues(await get${subSimpleClassName}By${SubJoinColumnName}(props.${subJoinColumn.javaField}!));
     },
     { immediate: true },

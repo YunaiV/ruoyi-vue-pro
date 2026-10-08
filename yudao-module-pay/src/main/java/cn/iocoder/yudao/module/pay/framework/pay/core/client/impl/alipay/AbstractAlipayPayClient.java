@@ -51,6 +51,11 @@ import static cn.iocoder.yudao.module.pay.framework.pay.core.client.impl.alipay.
 @Slf4j
 public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPayClientConfig> {
 
+    /**
+     * 支付宝接口调用成功的响应码
+     */
+    protected static final String ALIPAY_SUCCESS_CODE = "10000";
+
     @Getter // 仅用于单测场景
     protected DefaultAlipayClient client;
 
@@ -117,9 +122,13 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
         } else {
             response = client.execute(request);
         }
-        if (!response.isSuccess()) { // 不成功，例如说订单不存在
-            return PayOrderRespDTO.closedOf(response.getSubCode(), response.getSubMsg(),
-                    outTradeNo, response);
+        if (!isSuccessResponse(response)) {
+            // 只有明确不存在时才关闭，系统异常等情况需要继续等待后续查询
+            if (ObjectUtils.equalsAny(response.getSubCode(), "TRADE_NOT_EXIST", "ACQ.TRADE_NOT_EXIST")) {
+                return PayOrderRespDTO.closedOf(response.getSubCode(), response.getSubMsg(),
+                        outTradeNo, response);
+            }
+            return PayOrderRespDTO.waitingOf(null, null, outTradeNo, response);
         }
         // 2.2 解析订单的状态
         Integer status = parseStatus(response.getTradeStatus());
@@ -128,6 +137,30 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
         });
         return PayOrderRespDTO.of(status, response.getTradeNo(), response.getBuyerUserId(), LocalDateTimeUtil.of(response.getSendPayDate()),
                 outTradeNo, response);
+    }
+
+    @Override
+    protected PayOrderRespDTO doCloseOrder(String outTradeNo) throws Throwable {
+        // 1.1 构建 AlipayTradeCloseModel 请求
+        AlipayTradeCloseModel model = new AlipayTradeCloseModel();
+        model.setOutTradeNo(outTradeNo);
+        // 1.2 构建 AlipayTradeCloseRequest 请求
+        AlipayTradeCloseRequest request = new AlipayTradeCloseRequest();
+        request.setBizModel(model);
+
+        // 2.1 执行请求
+        AlipayTradeCloseResponse response;
+        if (Objects.equals(config.getMode(), MODE_CERTIFICATE)) {
+            response = client.certificateExecute(request);
+        } else {
+            response = client.execute(request);
+        }
+        if (!isSuccessResponse(response)) {
+            // 关闭失败可能是订单已支付，重新查询保留真实支付事实
+            return doGetOrder(outTradeNo);
+        }
+        // 2.2 创建返回结果
+        return PayOrderRespDTO.closedOf(null, null, outTradeNo, response);
     }
 
     private static Integer parseStatus(String tradeStatus) {
@@ -371,6 +404,16 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
     }
 
     // ========== 各种工具方法 ==========
+
+    /**
+     * 判断支付宝接口是否调用成功
+     *
+     * @param response 响应
+     * @return 是否调用成功
+     */
+    protected static boolean isSuccessResponse(AlipayResponse response) {
+        return ALIPAY_SUCCESS_CODE.equals(response.getCode());
+    }
 
     protected String formatAmount(Integer amount) {
         return String.valueOf(amount / 100.0);

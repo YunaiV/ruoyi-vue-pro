@@ -61,7 +61,11 @@ public class IotTcpConnectionManager {
                     deviceId, oldSocket.remoteAddress());
             // 先清理映射，再关闭连接
             connectionMap.remove(oldSocket);
-            oldSocket.close();
+            try {
+                oldSocket.close();
+            } catch (Exception ignored) {
+                // 连接可能已关闭，忽略异常
+            }
         }
 
         // 注册新连接

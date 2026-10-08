@@ -116,7 +116,7 @@ public class BpmTaskEventListener extends AbstractFlowableEngineEventListener {
             log.error("[timerFired][解析 entity({}) elementId 为空，跳过处理]", entity);
             return;
         }
-        FlowElement element = BpmnModelUtils.getFlowElementById(bpmnModel, entity.getElementId());
+        FlowElement element = BpmnModelUtils.getFlowElementById(bpmnModel, elementId);
         if (!(element instanceof BoundaryEvent)) {
             return;
         }

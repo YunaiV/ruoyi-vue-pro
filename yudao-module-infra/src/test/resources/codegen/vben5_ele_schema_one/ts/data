@@ -42,7 +42,7 @@ export function useFormSchema(): VbenFormSchema[] {
       rules: 'required',
       component: 'DatePicker',
       componentProps: {
-        showTime: true,
+        type: 'datetime',
         format: 'YYYY-MM-DD HH:mm:ss',
         valueFormat: 'x',
         class: '!w-full',
@@ -65,8 +65,7 @@ export function useFormSchema(): VbenFormSchema[] {
       component: 'RadioGroup',
       componentProps: {
         options: getDictOptions(DICT_TYPE.INFRA_BOOLEAN_STRING, 'boolean'),
-        buttonStyle: 'solid',
-        optionType: 'button',
+        isButton: true,
       },
     },
     {

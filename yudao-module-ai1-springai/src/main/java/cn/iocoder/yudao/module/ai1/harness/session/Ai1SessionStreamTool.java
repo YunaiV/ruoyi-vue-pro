@@ -326,8 +326,10 @@ public class Ai1SessionStreamTool implements SmartLifecycle {
         try {
             sseExecutor.execute(() -> {
                 try {
-                    streamResult(emitter, messageId, lastEventId, tenantId);
-                    emitter.complete();
+                    // 发送失败后由 Servlet 容器清理连接，不能再次 complete，避免与请求回收竞争
+                    if (streamResult(emitter, messageId, lastEventId, tenantId)) {
+                        emitter.complete();
+                    }
                 } catch (Exception e) {
                     log.warn("[open][助手消息({}) 会话流转发异常]", messageId, e);
                     sendErrorAndComplete(emitter, e.getMessage());
@@ -701,8 +703,10 @@ public class Ai1SessionStreamTool implements SmartLifecycle {
     /**
      * SSE 转发主循环：先下发 stream 事件告知结果流标识；随后按条目实时下发，事件编号为结果流条目编号；
      * 空闲时下发 ping 心跳；遇到终态、超时、客户端断开、Redis 连续读取失败时退出
+     *
+     * @return 是否需要主动完成连接；断开、超时回调或发送失败时由 Servlet 容器完成清理
      */
-    private void streamResult(SseEmitter emitter, Long messageId, String lastEventId, Long tenantId) {
+    private boolean streamResult(SseEmitter emitter, Long messageId, String lastEventId, Long tenantId) {
         // 1. 客户端断开、完成、超时时置取消标志，终止转发循环
         AtomicBoolean cancelled = new AtomicBoolean(false);
         emitter.onCompletion(() -> cancelled.set(true));
@@ -724,7 +728,7 @@ public class Ai1SessionStreamTool implements SmartLifecycle {
             // 3.1 超过单连接最长时长，结束转发
             if (System.currentTimeMillis() > deadline) {
                 log.warn("[streamResult][助手消息({}) 会话流转发超时]", messageId);
-                return;
+                return !cancelled.get();
             }
             // 3.2 从上次位置之后阻塞读取；读取失败时容错重试，连续失败达到阈值才中断，客户端可再续传
             Map<StreamMessageId, Map<String, String>> records;
@@ -734,7 +738,7 @@ public class Ai1SessionStreamTool implements SmartLifecycle {
             } catch (Exception e) {
                 log.warn("[streamResult][助手消息({}) 会话流读取异常]", messageId, e);
                 if (++errorCount >= READ_ERROR_MAX_COUNT) {
-                    return;
+                    return !cancelled.get();
                 }
                 ThreadUtil.sleep(READ_ERROR_BACKOFF_MILLIS);
                 continue;
@@ -750,7 +754,7 @@ public class Ai1SessionStreamTool implements SmartLifecycle {
                         log.warn("[streamResult][助手消息({}) 结果流不存在，判定生成任务丢失]", messageId);
                         failLostMessage(messageId, tenantId);
                         sendEvent(emitter, Ai1SessionStreamEventEnum.ERROR.getEvent(), LOST_MESSAGE, null, cancelled);
-                        return;
+                        return !cancelled.get();
                     }
                 }
                 sendEvent(emitter, Ai1SessionStreamEventEnum.PING.getEvent(), "", null, cancelled);
@@ -762,10 +766,11 @@ public class Ai1SessionStreamTool implements SmartLifecycle {
                 String type = record.getValue().get(FIELD_TYPE);
                 sendEvent(emitter, type, record.getValue().get(FIELD_DATA), fromId.toString(), cancelled);
                 if (Ai1SessionStreamEventEnum.isTerminal(type)) {
-                    return;
+                    return !cancelled.get();
                 }
             }
         }
+        return false;
     }
 
     /**
@@ -809,7 +814,8 @@ public class Ai1SessionStreamTool implements SmartLifecycle {
             emitter.send(SseEmitter.event().name(Ai1SessionStreamEventEnum.ERROR.getEvent())
                     .data(JsonUtils.toJsonString(StrUtil.blankToDefault(message, "生成失败"))));
         } catch (Exception ignored) {
-            // 客户端已断开，忽略
+            // 客户端已断开，由 Servlet 容器清理连接
+            return;
         }
         emitter.complete();
     }

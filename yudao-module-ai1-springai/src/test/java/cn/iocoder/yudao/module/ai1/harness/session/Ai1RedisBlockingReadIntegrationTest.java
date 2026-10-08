@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.ai1.harness.session;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.redisson.Redisson;
 import org.redisson.api.RStream;
 import org.redisson.api.RedissonClient;
@@ -21,11 +21,11 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Redis Stream 阻塞读的集成测试
  *
- * 默认禁用，手动测试时移除 @Disabled，连接本机 127.0.0.1:6379
+ * 默认禁用，使用 -Dai1.integration.redis=true 启用；ai1.integration.redis.address 可指定独立 Redis
  *
  * @author 芋道源码
  */
-@Disabled
+@EnabledIfSystemProperty(named = "ai1.integration.redis", matches = "true")
 public class Ai1RedisBlockingReadIntegrationTest {
 
     @Test
@@ -33,7 +33,7 @@ public class Ai1RedisBlockingReadIntegrationTest {
     public void testIdleBlockingReads() {
         // 准备参数
         Config config = new Config();
-        config.useSingleServer().setAddress("redis://127.0.0.1:6379");
+        config.useSingleServer().setAddress(System.getProperty("ai1.integration.redis.address", "redis://127.0.0.1:6379"));
         // 断言默认命令超时
         assertEquals(3000, config.useSingleServer().getTimeout());
         RedissonClient client = Redisson.create(config);

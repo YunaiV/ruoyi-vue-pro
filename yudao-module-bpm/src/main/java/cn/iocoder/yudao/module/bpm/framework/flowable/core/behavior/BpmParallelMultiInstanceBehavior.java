@@ -17,6 +17,7 @@ import org.flowable.engine.impl.bpmn.behavior.ParallelMultiInstanceBehavior;
 import org.flowable.common.engine.api.delegate.Expression;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -37,6 +38,10 @@ public class BpmParallelMultiInstanceBehavior extends ParallelMultiInstanceBehav
         super(activity, innerActivityBehavior);
         // 关联 Pull Request：https://gitee.com/zhijiantianya/ruoyi-vue-pro/pulls/1483
         // 在解析/构造阶段基于 activityId 初始化与 activity 绑定且不变的字段，避免在运行期修改 Behavior 实例状态
+        // 注意：仅 UserTask 使用自定义变量；CallActivity 等节点，需要保留 Flowable 解析的 collection 配置（例如说，子流程多实例的表单字段）
+        if (!(activity instanceof UserTask)) {
+            return;
+        }
         super.collectionExpression = null; // collectionExpression 和 collectionVariable 是互斥的
         super.collectionVariable = FlowableUtils.formatExecutionCollectionVariable(activity.getId());
         // 从 execution.getVariable() 读取当前所有任务处理的人的 key
@@ -77,10 +82,10 @@ public class BpmParallelMultiInstanceBehavior extends ParallelMultiInstanceBehav
         if (execution.getCurrentFlowElement() instanceof CallActivity) {
             FlowElement flowElement = execution.getCurrentFlowElement();
             Integer sourceType = BpmnModelUtils.parseMultiInstanceSourceType(flowElement);
-            if (sourceType.equals(BpmChildProcessMultiInstanceSourceTypeEnum.NUMBER_FORM.getType())) {
+            if (Objects.equals(sourceType, BpmChildProcessMultiInstanceSourceTypeEnum.NUMBER_FORM.getType())) {
                 return execution.getVariable(super.collectionExpression.getExpressionText(), Integer.class);
             }
-            if (sourceType.equals(BpmChildProcessMultiInstanceSourceTypeEnum.MULTIPLE_FORM.getType())) {
+            if (Objects.equals(sourceType, BpmChildProcessMultiInstanceSourceTypeEnum.MULTIPLE_FORM.getType())) {
                 return execution.getVariable(super.collectionExpression.getExpressionText(), List.class).size();
             }
         }
@@ -92,17 +97,29 @@ public class BpmParallelMultiInstanceBehavior extends ParallelMultiInstanceBehav
 
     @Override
     public void setCollectionExpression(Expression collectionExpression) {
-        // 保持自定义变量名，忽略解析器写入的 collection 表达式
+        // UserTask 保持自定义变量名，忽略解析器写入的 collection 表达式
+        if (activity instanceof UserTask) {
+            return;
+        }
+        super.setCollectionExpression(collectionExpression);
     }
 
     @Override
     public void setCollectionVariable(String collectionVariable) {
-        // 保持自定义变量名，忽略解析器写入的 collection 变量名
+        // UserTask 保持自定义变量名，忽略解析器写入的 collection 变量名
+        if (activity instanceof UserTask) {
+            return;
+        }
+        super.setCollectionVariable(collectionVariable);
     }
 
     @Override
     public void setCollectionElementVariable(String collectionElementVariable) {
-        // 保持自定义变量名，忽略解析器写入的单元素变量名
+        // UserTask 保持自定义变量名，忽略解析器写入的单元素变量名
+        if (activity instanceof UserTask) {
+            return;
+        }
+        super.setCollectionElementVariable(collectionElementVariable);
     }
 
 }

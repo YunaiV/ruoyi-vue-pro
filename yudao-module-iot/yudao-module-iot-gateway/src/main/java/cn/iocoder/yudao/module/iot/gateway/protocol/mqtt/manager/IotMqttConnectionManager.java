@@ -86,7 +86,13 @@ public class IotMqttConnectionManager {
                     deviceId, getEndpointAddress(oldEndpoint));
             // 先清理映射，再关闭连接（避免旧连接处理器干扰）
             connectionMap.remove(oldEndpoint);
-            oldEndpoint.close();
+            try {
+                if (oldEndpoint.isConnected()) {
+                    oldEndpoint.close();
+                }
+            } catch (Exception ignored) {
+                // 连接可能已关闭，忽略异常
+            }
         }
 
         // 注册新连接
@@ -107,7 +113,8 @@ public class IotMqttConnectionManager {
             return;
         }
         Long deviceId = connectionInfo.getDeviceId();
-        deviceEndpointMap.remove(deviceId);
+        // 仅当 deviceEndpointMap 中的 endpoint 是当前 endpoint 时才移除，避免误删新连接
+        deviceEndpointMap.remove(deviceId, endpoint);
         log.info("[unregisterConnection][注销设备连接，设备 ID: {}，连接: {}]", deviceId, getEndpointAddress(endpoint));
     }
 

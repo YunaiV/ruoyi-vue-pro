@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             targetNamespace="http://www.yudao.iocoder.cn/bpm">
+    <process id="triggerTask" name="触发任务" isExecutable="true">
+        <startEvent id="start"/>
+        <sequenceFlow id="flow-start" sourceRef="start" targetRef="wait"/>
+        <receiveTask id="wait" name="等待触发"/>
+        <sequenceFlow id="flow-end" sourceRef="wait" targetRef="end"/>
+        <endEvent id="end"/>
+    </process>
+</definitions>

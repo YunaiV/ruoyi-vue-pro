@@ -125,6 +125,27 @@ public class WalletPayClient extends AbstractPayClient<NonePayClientConfig> {
     }
 
     @Override
+    protected PayOrderRespDTO doCloseOrder(String outTradeNo) {
+        if (orderService == null) {
+            orderService = SpringUtil.getBean(PayOrderService.class);
+        }
+        // 待支付状态：钱包支付为同步扣款，没有渠道侧的待支付单，所以以钱包流水判断是否已扣款
+        // 补充说明：存在扣款成功，但是 notifyOrder 更新支付拓展单失败的情况，此时不能直接关闭
+        PayOrderExtensionDO orderExtension = orderService.getOrderExtensionByNo(outTradeNo);
+        if (orderExtension != null && PayOrderStatusEnum.isWaiting(orderExtension.getStatus())) {
+            PayWalletTransactionDO walletTransaction = walletTransactionService.getWalletTransaction(
+                    String.valueOf(orderExtension.getOrderId()), PayWalletBizTypeEnum.PAYMENT);
+            if (walletTransaction == null) {
+                return PayOrderRespDTO.closedOf(null, null, outTradeNo, "");
+            }
+            return PayOrderRespDTO.successOf(walletTransaction.getNo(), walletTransaction.getCreator(),
+                    walletTransaction.getCreateTime(), outTradeNo, walletTransaction);
+        }
+        // 其它状态：以本地支付状态为准
+        return doGetOrder(outTradeNo);
+    }
+
+    @Override
     @SuppressWarnings("PatternVariableCanBeUsed")
     protected PayRefundRespDTO doUnifiedRefund(PayRefundUnifiedReqDTO reqDTO) {
         try {

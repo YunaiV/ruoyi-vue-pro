@@ -1,18 +1,27 @@
 <script lang="ts" setup>
-import type { StudentApi } from '#/api/infra/student';
+import type { VxeTableInstance } from '#/adapter/vxe-table';
+import type { StudentApi } from '#/api/infra/demo';
 
-import { computed, ref, reactive, h, onMounted,watch,nextTick } from 'vue';
+import { ref, watch } from 'vue';
 
 import { DICT_TYPE } from '@vben/constants';
 import { getDictOptions } from '@vben/hooks';
+import { Plus } from '@vben/icons';
 
-import { ElMessage, ElTabs, ElTabPane, ElForm, ElFormItem, ElInput, ElButton, ElSelect, ElOption, ElRadioGroup, ElRadio, ElCheckboxGroup, ElCheckbox, ElDatePicker } from 'element-plus';
+import {
+  ElButton,
+  ElDatePicker,
+  ElInput,
+  ElMessage,
+  ElOption,
+  ElRadio,
+  ElRadioGroup,
+  ElSelect,
+} from 'element-plus';
+
+ import { VxeColumn, VxeTable } from '#/adapter/vxe-table';
+import { getStudentContactListByStudentId } from '#/api/infra/demo';
 import { $t } from '#/locales';
-
- import type { VxeTableInstance } from '#/adapter/vxe-table';
-import { Plus } from "@vben/icons";
-import { VxeColumn, VxeTable } from '#/adapter/vxe-table';
-import { getStudentContactListByStudentId } from '#/api/infra/student';
 
 const props = defineProps<{
    studentId?: number // 学生编号（主表的关联字段）
@@ -30,24 +39,96 @@ async function onDelete(row: StudentApi.StudentContact) {
   await tableRef.value?.remove(row);
 }
 
-/** 提供获取表格数据的方法供父组件调用 */
-defineExpose({
-  getData: (): StudentApi.StudentContact[] => {
-    const data = list.value as StudentApi.StudentContact[];
-    const removeRecords = tableRef.value?.getRemoveRecords() as StudentApi.StudentContact[];
-    const insertRecords = tableRef.value?.getInsertRecords() as StudentApi.StudentContact[];
-    return [
-      ...data.filter(
-        (row) => !removeRecords.some((removed) => removed.id === row.id),
-      ),
-      ...insertRecords.map((row: any) => ({ ...row, id: undefined })),
-  },
-});
+/** 获取当前子表数据，新增行不提交表格生成的临时编号 */
+function getData(): StudentApi.StudentContact[] {
+  const table = tableRef.value;
+  if (!table) {
+    return [];
+  }
+  const { fullData } = table.getTableData();
+  const inserted = new Set(table.getInsertRecords());
+  return fullData.map((row) =>
+    inserted.has(row) ? { ...row, id: undefined } : { ...row },
+  );
+}
+
+/** 校验子表必填字段 */
+function validate(): boolean {
+  for (const [index, row] of getData().entries()) {
+    if (
+      row.name === null ||
+      row.name === undefined ||
+      (typeof row.name === 'string' && String(row.name).trim() === '') ||
+      (Array.isArray(row.name) && row.name.length === 0)
+    ) {
+      ElMessage.error(`第 ${index + 1} 行：名字不能为空`);
+      return false;
+    }
+    if (
+      row.description === null ||
+      row.description === undefined ||
+      (typeof row.description === 'string' && String(row.description).trim() === '') ||
+      (Array.isArray(row.description) && row.description.length === 0)
+    ) {
+      ElMessage.error(`第 ${index + 1} 行：简介不能为空`);
+      return false;
+    }
+    if (
+      row.birthday === null ||
+      row.birthday === undefined ||
+      (typeof row.birthday === 'string' && String(row.birthday).trim() === '') ||
+      (Array.isArray(row.birthday) && row.birthday.length === 0)
+    ) {
+      ElMessage.error(`第 ${index + 1} 行：出生日期不能为空`);
+      return false;
+    }
+    if (
+      row.sex === null ||
+      row.sex === undefined ||
+      (typeof row.sex === 'string' && String(row.sex).trim() === '') ||
+      (Array.isArray(row.sex) && row.sex.length === 0)
+    ) {
+      ElMessage.error(`第 ${index + 1} 行：性别不能为空`);
+      return false;
+    }
+    if (
+      row.enabled === null ||
+      row.enabled === undefined ||
+      (typeof row.enabled === 'string' && String(row.enabled).trim() === '') ||
+      (Array.isArray(row.enabled) && row.enabled.length === 0)
+    ) {
+      ElMessage.error(`第 ${index + 1} 行：是否有效不能为空`);
+      return false;
+    }
+    if (
+      row.avatar === null ||
+      row.avatar === undefined ||
+      (typeof row.avatar === 'string' && String(row.avatar).trim() === '') ||
+      (Array.isArray(row.avatar) && row.avatar.length === 0)
+    ) {
+      ElMessage.error(`第 ${index + 1} 行：头像不能为空`);
+      return false;
+    }
+    if (
+      row.memo === null ||
+      row.memo === undefined ||
+      (typeof row.memo === 'string' && String(row.memo).trim() === '') ||
+      (Array.isArray(row.memo) && row.memo.length === 0)
+    ) {
+      ElMessage.error(`第 ${index + 1} 行：备注不能为空`);
+      return false;
+    }
+  }
+  return true;
+}
+
+defineExpose({ getData, validate });
 
 /** 监听主表的关联字段的变化，加载对应的子表数据 */
 watch(
     () => props.studentId,
     async (val) => {
+      list.value = [];
       if (!val) {
         return;
       }
@@ -58,70 +139,70 @@ watch(
 </script>
 
 <template>
-   <vxe-table ref="tableRef" :data="list" show-overflow class="mx-4">
-                 <vxe-column field="name" title="名字" align="center">
+   <VxeTable ref="tableRef" :data="list" show-overflow class="mx-4">
+                 <VxeColumn field="name" title="名字" align="center">
                   <template #default="{row}">
-                    <el-input v-model="row.name" />
+                    <ElInput v-model="row.name" />
                   </template>
-                </vxe-column>
-                <vxe-column field="description" title="简介" align="center">
+                </VxeColumn>
+                <VxeColumn field="description" title="简介" align="center">
                   <template #default="{row}">
-                    <el-input v-model="row.description" type="textarea" />
+                    <ElInput v-model="row.description" type="textarea" />
                   </template>
-                </vxe-column>
-                <vxe-column field="birthday" title="出生日期" align="center">
+                </VxeColumn>
+                <VxeColumn field="birthday" title="出生日期" align="center">
                   <template #default="{row}">
-                    <el-date-picker
+                    <ElDatePicker
                         v-model="row.birthday"
                         type="datetime"
                         value-format="x"
                         format="YYYY-MM-DD HH:mm:ss"
                     />
                   </template>
-                </vxe-column>
-                <vxe-column field="sex" title="性别" align="center">
+                </VxeColumn>
+                <VxeColumn field="sex" title="性别" align="center">
                   <template #default="{row}">
-                    <el-select v-model="row.sex" placeholder="请选择性别">
-                          <el-option
-                              v-for="dict in getDictOptions(DICT_TYPE.$dictType.toUpperCase(), 'number')"
+                    <ElSelect v-model="row.sex" placeholder="请选择性别">
+                          <ElOption
+                              v-for="dict in getDictOptions(DICT_TYPE.SYSTEM_USER_SEX, 'number')"
                               :key="dict.value"
                               :value="dict.value"
                               :label="dict.label"
                           />
-                    </el-select>
+                    </ElSelect>
                   </template>
-                </vxe-column>
-                <vxe-column field="enabled" title="是否有效" align="center">
+                </VxeColumn>
+                <VxeColumn field="enabled" title="是否有效" align="center">
                   <template #default="{row}">
-                    <el-radio-group v-model="row.enabled">
-                          <el-radio
-                              v-for="dict in getDictOptions(DICT_TYPE.$dictType.toUpperCase(), 'boolean')"
+                    <ElRadioGroup v-model="row.enabled">
+                          <ElRadio
+                              v-for="dict in getDictOptions(DICT_TYPE.INFRA_BOOLEAN_STRING, 'boolean')"
                               :key="dict.value"
-                              :label="dict.value"
+                              :value="dict.value"
                           >
                             {{ dict.label }}
-                          </el-radio>
-                    </el-radio-group>
+                          </ElRadio>
+                    </ElRadioGroup>
                   </template>
-                </vxe-column>
-                <vxe-column field="avatar" title="头像" align="center">
+                </VxeColumn>
+                <VxeColumn field="avatar" title="头像" align="center">
                   <template #default="{row}">
                     <ImageUpload v-model="row.avatar" />
                   </template>
-                </vxe-column>
-                <vxe-column field="video" title="附件" align="center">
+                </VxeColumn>
+                <VxeColumn field="video" title="附件" align="center">
                   <template #default="{row}">
                     <FileUpload v-model="row.video" />
                   </template>
-                </vxe-column>
-                <vxe-column field="memo" title="备注" align="center">
+                </VxeColumn>
+                <VxeColumn field="memo" title="备注" align="center">
                   <template #default="{row}">
-                    <el-input v-model="row.memo" type="textarea" />
+                    <ElInput v-model="row.memo" type="textarea" />
                   </template>
-                </vxe-column>
-    <vxe-column field="operation" title="操作" align="center">
+                </VxeColumn>
+    <VxeColumn field="operation" title="操作" align="center">
       <template #default="{row}">
-        <el-button
+        <ElButton
             size="small"
             type="danger"
             link
@@ -129,13 +210,13 @@ watch(
             v-access:code="['infra:student:delete']"
         >
           {{ $t('ui.actionTitle.delete') }}
-        </el-button>
+        </ElButton>
       </template>
-    </vxe-column>
-  </vxe-table>
+    </VxeColumn>
+  </VxeTable>
   <div class="flex justify-center mt-4">
-    <el-button :icon="h(Plus)" type="primary" plain @click="handleAdd" v-access:code="['infra:student:create']">
+    <ElButton :icon="Plus" type="primary" plain @click="handleAdd" v-access:code="['infra:student:create']">
       {{ $t('ui.actionTitle.create', ['学生联系人']) }}
-    </el-button>
+    </ElButton>
   </div>
 </template>
