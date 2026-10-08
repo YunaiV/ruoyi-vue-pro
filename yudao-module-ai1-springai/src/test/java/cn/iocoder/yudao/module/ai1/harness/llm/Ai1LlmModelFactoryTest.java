@@ -22,7 +22,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Spring AI 1.x 适配回归：通过本地 HTTP 端点验证真实请求、流式分片和模型缓存。
+ * 模型调用回归：通过本地 HTTP 端点验证真实请求、流式分片和模型缓存。
  */
 public class Ai1LlmModelFactoryTest {
 

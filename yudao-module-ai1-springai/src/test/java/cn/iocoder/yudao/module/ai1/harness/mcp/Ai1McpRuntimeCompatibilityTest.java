@@ -16,7 +16,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * 验证 SDK 2.0.1 的 Jackson 2 实现在 Boot 3 下完成真实 MCP 握手及工具调用。
+ * 验证 MCP SDK 的真实 HTTP 握手及工具调用。
  */
 public class Ai1McpRuntimeCompatibilityTest {
 

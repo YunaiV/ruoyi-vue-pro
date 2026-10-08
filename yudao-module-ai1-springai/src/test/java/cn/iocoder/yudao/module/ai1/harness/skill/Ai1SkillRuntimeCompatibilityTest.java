@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * 验证 AI1 使用的 agent-utils 0.12.0 工具在 Spring AI 1.x 下的注册、JSON 入参和实际执行。
+ * 验证 AI1 使用的 agent-utils 工具的注册、JSON 入参和实际执行。
  */
 public class Ai1SkillRuntimeCompatibilityTest {
 
