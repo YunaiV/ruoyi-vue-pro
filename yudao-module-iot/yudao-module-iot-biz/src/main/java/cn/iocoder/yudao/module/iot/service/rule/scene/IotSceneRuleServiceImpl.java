@@ -200,6 +200,13 @@ public class IotSceneRuleServiceImpl implements IotSceneRuleService {
     public void executeSceneRuleByDevice(IotDeviceMessage message) {
         // 1.1 这里的 tenantId，通过设备获取；
         IotDeviceDO device = deviceService.getDeviceFromCache(message.getDeviceId());
+        if (device == null) {
+            // 设备已删除（如删除设备时消息在途）：无规则可执行，记录日志后返回。
+            // 若不判空，device.getTenantId() 抛 NullPointerException，消息消费失败滞留
+            // 未确认列表，被重投任务无限重新投递（getMatchedSceneRuleListByMessage 同型判空）
+            log.warn("[executeSceneRuleByDevice][设备({}) 不存在]", message.getDeviceId());
+            return;
+        }
         TenantUtils.execute(device.getTenantId(), () -> {
             // 1.2 获得设备匹配的规则场景
             List<IotSceneRuleDO> sceneRules = getMatchedSceneRuleListByMessage(message);

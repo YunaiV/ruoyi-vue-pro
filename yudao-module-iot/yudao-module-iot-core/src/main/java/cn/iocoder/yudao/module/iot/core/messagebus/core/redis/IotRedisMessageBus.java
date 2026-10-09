@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.iot.core.messagebus.core.redis;
 
 import cn.hutool.core.util.TypeUtil;
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageSubscriber;
@@ -88,8 +89,24 @@ public class IotRedisMessageBus implements IotMessageBus {
                 .autoAcknowledge(false) // 不自动 ack
                 .cancelOnError(throwable -> false); // 默认配置，发生异常就取消消费，显然不符合预期；因此，我们设置为 false
         redisStreamMessageListenerContainer.register(builder.build(), message -> {
-            // 消费消息
-            subscriber.onMessage(JsonUtils.parseObject(message.getValue(), type));
+            try {
+                // 消费消息
+                subscriber.onMessage(JsonUtils.parseObject(message.getValue(), type));
+            } catch (ServiceException ex) {
+                // 业务拒绝（例如设备不存在）：重试也无法成功，记录日志后 ack。
+                // 若不 ack，消息会滞留 pending 被 RedisPendingMessageResendJob 周期性重新投递，
+                // 重投的消息再次消费再次失败，形成无限循环；pending 膨胀后，
+                // 重投任务的全量 XPENDING 扫描还会拖垮 Redis
+                log.warn("[register][消息({}) 业务消费失败，已记录并确认，不再重试]", message.getId(), ex);
+                redisTemplate.opsForStream().acknowledge(subscriber.getGroup(), message);
+                return;
+            } catch (Throwable ex) {
+                // 非业务异常（例如数据库/Redis 瞬时故障）：记录日志但不 ack，保留在 pending 中，
+                // 由 RedisPendingMessageResendJob 在 5 分钟后重新投递重试；
+                // 若持续故障导致 pending 超过上限，由该任务的 pending 上限保护兜底丢弃
+                log.error("[register][消息({}) 消费失败，已记录，等待重投任务重试]", message.getId(), ex);
+                return;
+            }
             // ack 消息消费完成
             redisTemplate.opsForStream().acknowledge(subscriber.getGroup(), message);
         });
