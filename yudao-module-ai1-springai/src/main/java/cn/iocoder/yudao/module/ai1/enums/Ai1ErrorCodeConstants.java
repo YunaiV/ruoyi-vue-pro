@@ -16,6 +16,7 @@ public interface Ai1ErrorCodeConstants {
     ErrorCode PROVIDER_REMOTE_MODEL_LOAD_FAIL = new ErrorCode(1_041_000_004, "模型拉取失败：请检查供应商地址与 API 密钥");
     ErrorCode PROVIDER_REMOTE_MODEL_EMPTY = new ErrorCode(1_041_000_005, "远程未返回可用模型");
     ErrorCode CONFIG_PLACEHOLDER_NOT_RESOLVED = new ErrorCode(1_041_000_006, "配置({})无法解析，请检查环境变量或配置项");
+    ErrorCode PROVIDER_HEADERS_INVALID = new ErrorCode(1_041_000_007, "请求 Header 格式不正确或名称重复，请检查供应商配置");
 
     // ========== 模型 1-041-001-000 ==========
     ErrorCode MODEL_NOT_EXISTS = new ErrorCode(1_041_001_000, "模型不存在");

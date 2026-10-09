@@ -4,7 +4,6 @@ import cn.iocoder.yudao.module.ai1.enums.model.Ai1ModelTypeEnum;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -46,8 +45,8 @@ public class Ai1ModelRespBO {
      */
     private String apiKey;
     /**
-     * 请求附属 Header，每项包含 key、value；value 可包含 {session} 占位符
+     * 请求 Header，value 可包含 {session} 占位符
      */
-    private List<Map<String, String>> headers;
+    private Map<String, String> headers;
 
 }

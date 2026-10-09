@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.ai1.controller.admin.model.vo.provider;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.util.Map;
+
 import java.time.LocalDateTime;
 
 @Schema(description = "管理后台 - AI1 供应商 Response VO")
@@ -21,8 +23,8 @@ public class Ai1ProviderRespVO {
     @Schema(description = "API 密钥，脱敏展示", example = "sk-****abcd")
     private String apiKey;
 
-    @Schema(description = "请求附属 Header，JSON 数组", example = "[{\"key\":\"X-Session\",\"value\":\"{session}\"}]")
-    private String headers;
+    @Schema(description = "请求 Header，JSON 对象", example = "{\"X-Session\":\"{session}\"}")
+    private Map<String, String> headers;
 
     @Schema(description = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
     private Integer status;

@@ -49,7 +49,7 @@ public class Ai1LlmChatTool {
      * @param content        当前用户消息
      * @param tools          工具（ToolCallback 或 @Tool 对象），可为空
      * @param advisors       会话 Advisor，可为空
-     * @param sessionId 会话编号，用于替换附属 Header 中的 {session} 占位符
+     * @param sessionId 会话编号，用于替换请求 Header 中的 {session} 占位符
      * @param onThinking     思考过程增量回调，可为空
      * @param onContent      回复内容增量回调，可为空
      * @return 完整回复（内容 + 思考过程）

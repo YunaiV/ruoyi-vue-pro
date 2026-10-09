@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.ai1.controller.admin.model.vo.provider;
 
-import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.ai1.util.Ai1Utils;
@@ -11,6 +10,8 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+
+import java.util.Map;
 
 @Schema(description = "管理后台 - AI1 供应商新增/修改 Request VO")
 @Data
@@ -33,9 +34,8 @@ public class Ai1ProviderSaveReqVO {
     @Size(max = 200, message = "API 密钥长度不能超过 200 个字符")
     private String apiKey;
 
-    @Schema(description = "请求附属 Header，JSON 数组", example = "[{\"key\":\"X-Session\",\"value\":\"{session}\"}]")
-    @Size(max = 2000, message = "请求附属 Header 长度不能超过 2000 个字符")
-    private String headers;
+    @Schema(description = "请求 Header，JSON 对象", example = "{\"X-Session\":\"{session}\"}")
+    private Map<String, String> headers;
 
     @Schema(description = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
     @NotNull(message = "状态不能为空")
@@ -46,10 +46,10 @@ public class Ai1ProviderSaveReqVO {
     @Size(max = 255, message = "备注长度不能超过 255 个字符")
     private String remark;
 
-    @AssertTrue(message = "请求附属 Header 格式不正确，应为 JSON 数组：[{\"key\":\"...\",\"value\":\"...\"}]")
+    @AssertTrue(message = "请求 Header 名称不能为空或重复，值必须为字符串，JSON 长度不能超过 2000 个字符")
     @JsonIgnore
     public boolean isHeadersValid() {
-        return StrUtil.isBlank(headers) || Ai1Utils.parseHeaders(headers) != null;
+        return Ai1Utils.isHeadersValid(headers);
     }
 
 }

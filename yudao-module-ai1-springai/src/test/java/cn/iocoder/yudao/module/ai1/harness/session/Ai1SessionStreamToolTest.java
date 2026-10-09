@@ -4,20 +4,20 @@ import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.agent.Ai1AgentDO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.session.Ai1SessionMessageDO;
-import cn.iocoder.yudao.module.ai1.enums.session.Ai1SessionMessageStatusEnum;
-import cn.iocoder.yudao.module.ai1.enums.session.Ai1SessionMessageRoleEnum;
 import cn.iocoder.yudao.module.ai1.enums.model.Ai1ModelTypeEnum;
+import cn.iocoder.yudao.module.ai1.enums.session.Ai1SessionMessageRoleEnum;
+import cn.iocoder.yudao.module.ai1.enums.session.Ai1SessionMessageStatusEnum;
 import cn.iocoder.yudao.module.ai1.framework.ai.config.YudaoAi1Properties;
-import cn.iocoder.yudao.module.ai1.harness.skill.Ai1SkillToolFactory;
-import cn.iocoder.yudao.module.ai1.service.agent.Ai1AgentService;
-import cn.iocoder.yudao.module.ai1.service.session.Ai1SessionService;
-import cn.iocoder.yudao.module.ai1.service.session.Ai1SessionMessageService;
-import cn.iocoder.yudao.module.ai1.service.knowledge.Ai1KnowledgeBaseService;
-import cn.iocoder.yudao.module.ai1.service.model.Ai1ModelService;
-import cn.iocoder.yudao.module.ai1.service.model.bo.Ai1ModelRespBO;
 import cn.iocoder.yudao.module.ai1.harness.llm.Ai1LlmChatTool;
 import cn.iocoder.yudao.module.ai1.harness.mcp.Ai1McpToolFactory;
 import cn.iocoder.yudao.module.ai1.harness.rag.Ai1RagTool;
+import cn.iocoder.yudao.module.ai1.harness.skill.Ai1SkillToolFactory;
+import cn.iocoder.yudao.module.ai1.service.agent.Ai1AgentService;
+import cn.iocoder.yudao.module.ai1.service.knowledge.Ai1KnowledgeBaseService;
+import cn.iocoder.yudao.module.ai1.service.model.Ai1ModelService;
+import cn.iocoder.yudao.module.ai1.service.model.bo.Ai1ModelRespBO;
+import cn.iocoder.yudao.module.ai1.service.session.Ai1SessionMessageService;
+import cn.iocoder.yudao.module.ai1.service.session.Ai1SessionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -26,23 +26,23 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.redisson.api.RStream;
 import org.redisson.api.RLock;
+import org.redisson.api.RStream;
 import org.redisson.api.RedissonClient;
 import org.redisson.api.stream.StreamAddArgs;
 import org.redisson.api.stream.StreamMessageId;
 import org.redisson.api.stream.StreamRangeArgs;
 import org.redisson.api.stream.StreamReadArgs;
+import org.redisson.client.codec.Codec;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import org.redisson.client.codec.Codec;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.LinkedHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
@@ -111,14 +111,17 @@ public class Ai1SessionStreamToolTest extends BaseMockitoUnitTest {
 
     @Test
     public void testStreamResult_disconnectedMustNotComplete() throws Exception {
-        SseEmitter emitter = mock(
-                SseEmitter.class);
+        // 准备参数
+        SseEmitter emitter = mock(SseEmitter.class);
+        // mock 连接断开
         doThrow(new IOException("client disconnected")).when(emitter).send(
                 any(SseEmitter.SseEventBuilder.class));
 
+        // 调用
         Boolean shouldComplete = ReflectionTestUtils.invokeMethod(
                 sessionStreamTool, "streamResult", emitter, MESSAGE_ID, null, TENANT_ID);
 
+        // 断言
         assertEquals(Boolean.FALSE, shouldComplete);
         verifyNoInteractions(resultStream);
         verify(emitter, never()).complete();
@@ -126,27 +129,33 @@ public class Ai1SessionStreamToolTest extends BaseMockitoUnitTest {
 
     @Test
     public void testStreamResult_terminalMustComplete() {
-        SseEmitter emitter = mock(
-                SseEmitter.class);
+        // 准备参数
+        SseEmitter emitter = mock(SseEmitter.class);
+        // mock 结果流
         when(resultStream.read(any(StreamReadArgs.class)))
                 .thenReturn(Map.of(RECORD_ID, Map.of("type", "done", "data", "")));
 
+        // 调用
         Boolean shouldComplete = ReflectionTestUtils.invokeMethod(
                 sessionStreamTool, "streamResult", emitter, MESSAGE_ID, null, TENANT_ID);
 
+        // 断言
         assertEquals(Boolean.TRUE, shouldComplete);
     }
 
     @Test
     public void testSendErrorAndComplete_disconnectedMustNotComplete() throws Exception {
-        SseEmitter emitter = mock(
-                SseEmitter.class);
+        // 准备参数
+        SseEmitter emitter = mock(SseEmitter.class);
+        // mock 连接断开
         doThrow(new IOException("client disconnected")).when(emitter).send(
                 any(SseEmitter.SseEventBuilder.class));
 
+        // 调用
         ReflectionTestUtils.invokeMethod(
                 Ai1SessionStreamTool.class, "sendErrorAndComplete", emitter, "error");
 
+        // 断言
         verify(emitter, never()).complete();
     }
 

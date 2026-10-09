@@ -25,6 +25,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
@@ -333,7 +334,7 @@ public class Ai1ModelServiceImplTest extends BaseDbUnitTest {
     public void testGetModelRespBO_success() {
         // mock 方法
         Ai1ProviderDO provider = randomPojo(Ai1ProviderDO.class, o -> o.setStatus(CommonStatusEnum.ENABLE.getStatus())
-                .setHeaders("[{\"key\":\"X-App\",\"value\":\"yudao\"}]"));
+                .setHeaders(Map.of("X-App", "yudao")));
         when(providerService.validateProviderExists(provider.getId())).thenReturn(provider);
         // mock 数据
         Ai1ModelDO model = randomModelDO(o -> o.setProviderId(provider.getId()));
@@ -345,7 +346,7 @@ public class Ai1ModelServiceImplTest extends BaseDbUnitTest {
         assertEquals(provider.getBaseUrl(), respBO.getBaseUrl());
         assertEquals(model.getModel(), respBO.getModel());
         assertEquals(model.getType(), respBO.getModelType());
-        assertEquals(Collections.singletonList("X-App"), convertList(respBO.getHeaders(), header -> header.get("key")));
+        assertEquals(Map.of("X-App", "yudao"), respBO.getHeaders());
     }
 
     // ========== 随机对象 ==========

@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.ai1.harness.llm;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.ai1.service.model.bo.Ai1ModelRespBO;
 import com.google.common.cache.Cache;
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Component;
 import java.net.URI;
 import java.time.Duration;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
@@ -39,7 +37,7 @@ import java.util.function.Predicate;
 public class Ai1LlmModelFactory {
 
     /**
-     * 附属 Header 会话占位符：构建模型时替换为当前会话编号
+     * 请求 Header 会话占位符：构建模型时替换为当前会话编号
      */
     public static final String SESSION_PLACEHOLDER = "{session}";
     /**
@@ -72,7 +70,7 @@ public class Ai1LlmModelFactory {
      * 获取（或构建）对话模型，并包装为 ChatClient
      *
      * @param model        模型运行时快照
-     * @param sessionId 会话编号，用于替换附属 Header 中的 {session} 占位符，可为空
+     * @param sessionId 会话编号，用于替换请求 Header 中的 {session} 占位符，可为空
      * @return ChatClient
      */
     public ChatClient buildChatClient(Ai1ModelRespBO model, Long sessionId) {
@@ -131,7 +129,7 @@ public class Ai1LlmModelFactory {
     /**
      * 获取（或构建）对话模型
      *
-     * 仅当附属 Header 使用 {session} 占位符（需按会话隔离）时，才把会话编号纳入缓存 key；
+     * 仅当请求 Header 使用 {session} 占位符（需按会话隔离）时，才把会话编号纳入缓存 key；
      * 否则同一模型跨会话复用，避免每个会话都构建一个模型实例
      */
     private OpenAiChatModel getOrCreateChatModel(Ai1ModelRespBO model, Long sessionId) {
@@ -191,23 +189,23 @@ public class Ai1LlmModelFactory {
     }
 
     /**
-     * 附属 Header 是否使用 {session} 占位符
+     * 请求 Header 是否使用 {session} 占位符
      */
-    private static boolean usesSessionHeader(List<Map<String, String>> headers) {
-        return CollUtil.findOne(headers, header -> StrUtil.contains(header.get("value"), SESSION_PLACEHOLDER)) != null;
+    private static boolean usesSessionHeader(Map<String, String> headers) {
+        return headers != null && headers.values().stream().anyMatch(value -> StrUtil.contains(value, SESSION_PLACEHOLDER));
     }
 
     /**
      * 构建请求 Header：{session} 占位符替换为会话编号；会话编号为空时，跳过带占位符的 Header
      */
-    private static Map<String, String> buildHeaders(List<Map<String, String>> headers, Long sessionId) {
+    private static Map<String, String> buildHeaders(Map<String, String> headers, Long sessionId) {
         Map<String, String> result = new LinkedHashMap<>();
-        if (CollUtil.isEmpty(headers)) {
+        if (headers == null || headers.isEmpty()) {
             return result;
         }
-        for (Map<String, String> header : headers) {
-            String key = header.get("key");
-            String value = header.get("value");
+        for (Map.Entry<String, String> header : headers.entrySet()) {
+            String key = header.getKey();
+            String value = header.getValue();
             if (StrUtil.isBlank(key)) {
                 continue;
             }
