@@ -22,7 +22,7 @@
     <properties>
         <!-- 以下依赖不在 spring-ai-bom 中，需显式声明版本 -->
         <mcp-sdk.version>2.0.1</mcp-sdk.version>
-        <spring-ai-agent-utils.version>0.12.0</spring-ai-agent-utils.version>
+        <spring-ai-agent-utils.version>0.13.0</spring-ai-agent-utils.version>
         <milvus-sdk.version>3.0.10</milvus-sdk.version>
     </properties>
 

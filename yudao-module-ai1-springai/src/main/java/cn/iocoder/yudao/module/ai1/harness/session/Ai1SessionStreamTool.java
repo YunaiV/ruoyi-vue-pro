@@ -304,7 +304,7 @@ public class Ai1SessionStreamTool implements SmartLifecycle {
         // 1.2 生成所需的业务字段
         fields.put(FIELD_MESSAGE_ID, String.valueOf(messageId));
         fields.put(FIELD_AGENT_ID, String.valueOf(agentId));
-        // 生成时，附属 Header 中的 {session} 占位符替换为此处的会话编号
+        // 生成时，请求 Header 中的 {session} 占位符替换为此处的会话编号
         fields.put(FIELD_SESSION_ID, String.valueOf(sessionId));
         fields.put(FIELD_CONTENT, content);
 

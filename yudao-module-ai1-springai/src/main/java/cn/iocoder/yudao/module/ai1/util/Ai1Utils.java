@@ -1,20 +1,16 @@
 package cn.iocoder.yudao.module.ai1.util;
 
-import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
-import com.fasterxml.jackson.core.type.TypeReference;
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import org.springframework.core.env.Environment;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.ai1.enums.Ai1ErrorCodeConstants.CONFIG_PLACEHOLDER_NOT_RESOLVED;
+import static cn.iocoder.yudao.module.ai1.enums.Ai1ErrorCodeConstants.PROVIDER_HEADERS_INVALID;
 
 /**
  * AI1 工具类
@@ -38,7 +34,7 @@ public class Ai1Utils {
         try {
             return SpringUtil.getBean(Environment.class).resolveRequiredPlaceholders(value);
         } catch (IllegalArgumentException ex) {
-            throw exception(CONFIG_PLACEHOLDER_NOT_RESOLVED, value);
+            throw exception(CONFIG_PLACEHOLDER_NOT_RESOLVED, "动态配置项");
         }
     }
 
@@ -58,36 +54,37 @@ public class Ai1Utils {
     }
 
     /**
-     * 解析供应商的请求附属 Header：JSON 数组，格式为 [{"key":"...","value":"..."}]
-     *
-     * @param headersJson JSON 字符串
-     * @return Header 列表，每项包含 key、value；为空或格式错误时返回 null
+     * 规范化请求 Header，保留输入顺序；不解析环境占位符
      */
-    public static List<Map<String, String>> parseHeaders(String headersJson) {
-        if (StrUtil.isBlank(headersJson)) {
+    public static Map<String, String> normalizeHeaders(Map<String, String> values) {
+        if (values == null) {
             return null;
         }
-        List<Map<String, Object>> items = JsonUtils.parseObjectQuietly(headersJson, new TypeReference<List<Map<String, Object>>>() {});
-        if (items == null) {
-            return null;
-        }
-        List<Map<String, String>> headers = new ArrayList<>(items.size());
-        for (Map<String, Object> item : items) {
-            // 每项必须是对象，且 key 为标量
-            if (item == null || !isSimpleValue(item.get("key"))) {
-                return null;
+        Map<String, String> headers = new LinkedHashMap<>();
+        Set<String> names = new HashSet<>();
+        values.forEach((key, value) -> {
+            if (StrUtil.isBlank(key) || value == null) {
+                throw exception(PROVIDER_HEADERS_INVALID);
             }
-            headers.add(MapUtil.builder("key", MapUtil.getStr(item, "key"))
-                    .put("value", isSimpleValue(item.get("value")) ? MapUtil.getStr(item, "value") : "").build());
+            String name = key.trim();
+            if (!names.add(name.toLowerCase(Locale.ROOT))) {
+                throw exception(PROVIDER_HEADERS_INVALID);
+            }
+            headers.put(name, value);
+        });
+        if (JsonUtils.toJsonString(headers).length() > 2000) {
+            throw exception(PROVIDER_HEADERS_INVALID);
         }
         return headers;
     }
 
-    /**
-     * 是否为 JSON 标量值：字符串、数字、布尔
-     */
-    private static boolean isSimpleValue(Object value) {
-        return value != null && ClassUtil.isSimpleValueType(value.getClass());
+    public static boolean isHeadersValid(Map<String, String> headers) {
+        try {
+            normalizeHeaders(headers);
+            return true;
+        } catch (ServiceException ex) {
+            return false;
+        }
     }
 
 }

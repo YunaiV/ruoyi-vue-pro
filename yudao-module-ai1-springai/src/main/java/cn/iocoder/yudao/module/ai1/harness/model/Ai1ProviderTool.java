@@ -58,10 +58,10 @@ public class Ai1ProviderTool {
      *
      * @param baseUrl 接口地址
      * @param apiKey  API 密钥
-     * @param headers 请求附属 Header
+     * @param headers 请求 Header
      * @return 测试结果
      */
-    public Ai1ProviderConnectRespVO testConnect(String baseUrl, String apiKey, List<Map<String, String>> headers) {
+    public Ai1ProviderConnectRespVO testConnect(String baseUrl, String apiKey, Map<String, String> headers) {
         long startTime = System.currentTimeMillis();
         String url = normalizeBaseUrl(baseUrl);
 
@@ -102,10 +102,10 @@ public class Ai1ProviderTool {
      *
      * @param baseUrl 接口地址
      * @param apiKey  API 密钥
-     * @param headers 请求附属 Header
+     * @param headers 请求 Header
      * @return 模型标识列表
      */
-    public List<String> listModels(String baseUrl, String apiKey, List<Map<String, String>> headers) {
+    public List<String> listModels(String baseUrl, String apiKey, Map<String, String> headers) {
         // 1. 请求 GET /models：非 HTTP 200 时，提示检查配置
         String url = normalizeBaseUrl(baseUrl) + "/models";
         HttpOutcome outcome = executeRequest(Method.GET, url, apiKey, headers, null);
@@ -153,12 +153,12 @@ public class Ai1ProviderTool {
      * @param method  请求方法
      * @param url     请求地址
      * @param apiKey  API 密钥
-     * @param headers 请求附属 Header
+     * @param headers 请求 Header
      * @param body    JSON 请求体，可为空
      * @return 请求结果
      */
     private static HttpOutcome executeRequest(Method method, String url, String apiKey,
-                                              List<Map<String, String>> headers, String body) {
+                                              Map<String, String> headers, String body) {
         try {
             HttpRequest request = buildOpenAiRequest(method, url, apiKey, headers);
             if (body != null) {
@@ -168,30 +168,32 @@ public class Ai1ProviderTool {
                 return new HttpOutcome(response.getStatus(), null, response.body());
             }
         } catch (Exception e) {
-            return new HttpOutcome(0, e.getMessage(), null);
+            // HTTP 客户端异常可能包含密钥或 Header 原文，不能直接回传。
+            return new HttpOutcome(0, "请求发送失败，请检查服务地址、密钥及 Header（"
+                    + e.getClass().getSimpleName() + "）", null);
         }
     }
 
     /**
-     * 构建 OpenAI 兼容接口的 HTTP 请求：携带 API 密钥与静态附属 Header，包含 {session} 占位符的 Header 跳过
+     * 构建 OpenAI 兼容接口的 HTTP 请求：携带 API 密钥与静态 Header，包含 {session} 占位符的 Header 跳过
      *
      * @param method  请求方法
      * @param url     请求地址
      * @param apiKey  API 密钥
-     * @param headers 请求附属 Header
+     * @param headers 请求 Header
      * @return HTTP 请求
      */
-    private static HttpRequest buildOpenAiRequest(Method method, String url, String apiKey, List<Map<String, String>> headers) {
+    private static HttpRequest buildOpenAiRequest(Method method, String url, String apiKey, Map<String, String> headers) {
         HttpRequest request = HttpRequest.of(url).method(method)
                 .setConnectionTimeout(CONNECT_TIMEOUT).setReadTimeout(READ_TIMEOUT)
                 .header(Header.ACCEPT, ContentType.JSON.getValue());
         if (StrUtil.isNotBlank(apiKey)) {
             request.bearerAuth(apiKey);
         }
-        if (CollUtil.isNotEmpty(headers)) {
-            for (Map<String, String> header : headers) {
-                String key = header.get("key");
-                String value = header.get("value");
+        if (MapUtil.isNotEmpty(headers)) {
+            for (Map.Entry<String, String> header : headers.entrySet()) {
+                String key = header.getKey();
+                String value = header.getValue();
                 if (StrUtil.isBlank(key) || StrUtil.contains(value, Ai1LlmModelFactory.SESSION_PLACEHOLDER)) {
                     continue;
                 }

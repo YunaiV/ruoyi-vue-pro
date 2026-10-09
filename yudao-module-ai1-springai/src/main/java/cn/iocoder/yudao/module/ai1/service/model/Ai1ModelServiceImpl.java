@@ -29,7 +29,6 @@ import java.util.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.ai1.enums.Ai1ErrorCodeConstants.*;
-import static cn.iocoder.yudao.module.ai1.util.Ai1Utils.parseHeaders;
 import static cn.iocoder.yudao.module.ai1.util.Ai1Utils.resolveSpringPlaceholders;
 
 /**
@@ -176,7 +175,7 @@ public class Ai1ModelServiceImpl implements Ai1ModelService {
 
         // 2. 拉取远程模型：调用前解析 ${ENV} 占位符，库中的原文不改
         return providerTool.listModels(resolveSpringPlaceholders(provider.getBaseUrl()),
-                resolveSpringPlaceholders(provider.getApiKey()), parseHeaders(resolveSpringPlaceholders(provider.getHeaders())));
+                resolveSpringPlaceholders(provider.getApiKey()), resolveSpringPlaceholders(provider.getHeaders()));
     }
 
     @Override
@@ -200,7 +199,7 @@ public class Ai1ModelServiceImpl implements Ai1ModelService {
                 .setModelId(model.getId()).setModel(model.getModel()).setModelType(model.getType())
                 .setBaseUrl(resolveSpringPlaceholders(provider.getBaseUrl()))
                 .setApiKey(resolveSpringPlaceholders(provider.getApiKey()))
-                .setHeaders(parseHeaders(resolveSpringPlaceholders(provider.getHeaders())));
+                .setHeaders(resolveSpringPlaceholders(provider.getHeaders()));
     }
 
     @Override

@@ -160,6 +160,37 @@ public class Ai1SkillToolFactoryTest extends BaseMockitoUnitTest {
         verify(skillFileService, times(2)).getSkillFileListBySkillId(SKILL_ID);
     }
 
+    @Test
+    public void testBuildTools_duplicateFrontmatter() {
+        // 准备参数
+        Ai1SkillDO first = new Ai1SkillDO().setId(10L).setName("first").setStatus(CommonStatusEnum.ENABLE.getStatus());
+        Ai1SkillDO second = new Ai1SkillDO().setId(20L).setName("second").setStatus(CommonStatusEnum.ENABLE.getStatus());
+        Ai1AgentDO agent = new Ai1AgentDO().setId(AGENT_ID).setSkillIds(List.of(20L, 10L));
+        // mock skillService 和 skillFileService 的方法
+        when(skillService.getSkillList(agent.getSkillIds())).thenReturn(List.of(second, first));
+        for (Ai1SkillDO skill : List.of(first, second)) {
+            String content = "---\nname: same\ndescription: " + skill.getName() + "\n---\n" + skill.getName() + "-content\n";
+            when(skillFileService.getSkillFileListBySkillId(skill.getId())).thenReturn(List.of(
+                    Ai1SkillFileDO.builder().id(skill.getId()).skillId(skill.getId()).parentId(Ai1SkillFileDO.PARENT_ID_ROOT)
+                            .name(Ai1SkillFileDO.NAME_SKILL).type(Ai1SkillFileTypeEnum.FILE.getType()).content(content).build()));
+        }
+
+        // 调用
+        ToolCallback tool = (ToolCallback) skillToolFactory.buildTools(agent).get(0);
+        String result = tool.call("{\"command\":\"same\"}");
+        // 断言
+        assertTrue(result.contains("first-content"));
+        assertTrue(result.contains(agentRoot().resolve("first").toString()));
+        assertFalse(result.contains("second-content"));
+
+        // 调用
+        skillToolFactory.evict(AGENT_ID);
+        ToolCallback rebuiltTool = (ToolCallback) skillToolFactory.buildTools(agent).get(0);
+        String rebuiltResult = rebuiltTool.call("{\"command\":\"same\"}");
+        // 断言
+        assertEquals(result, rebuiltResult);
+    }
+
     // ========== 测试数据 ==========
 
     private Path agentRoot() {

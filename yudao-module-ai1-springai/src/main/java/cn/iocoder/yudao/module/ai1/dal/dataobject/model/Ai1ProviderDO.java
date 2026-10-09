@@ -4,8 +4,12 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.tenant.core.db.TenantBaseDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
+
+import java.util.Map;
 
 /**
  * AI1 供应商 DO
@@ -14,7 +18,7 @@ import lombok.*;
  *
  * @author 芋道源码
  */
-@TableName("ai1_provider")
+@TableName(value = "ai1_provider", autoResultMap = true)
 @KeySequence("ai1_provider_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -42,11 +46,12 @@ public class Ai1ProviderDO extends TenantBaseDO {
      */
     private String apiKey;
     /**
-     * 请求附属 Header
+     * 请求 Header
      *
-     * JSON 数组，格式为 [{"key":"...","value":"..."}]；value 可包含 {session} 占位符，请求时替换为会话编号
+     * JSON 对象，格式为 {"X-Session":"{session}"}；value 可包含 {session} 占位符，请求时替换为会话编号
      */
-    private String headers;
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private Map<String, String> headers;
     /**
      * 状态
      *

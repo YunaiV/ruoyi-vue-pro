@@ -23,7 +23,7 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.ai1.enums.Ai1ErrorCodeConstants.*;
-import static cn.iocoder.yudao.module.ai1.util.Ai1Utils.parseHeaders;
+import static cn.iocoder.yudao.module.ai1.util.Ai1Utils.normalizeHeaders;
 import static cn.iocoder.yudao.module.ai1.util.Ai1Utils.resolveSpringPlaceholders;
 
 /**
@@ -51,6 +51,7 @@ public class Ai1ProviderServiceImpl implements Ai1ProviderService {
     @Override
     public Long createProvider(Ai1ProviderSaveReqVO createReqVO) {
         Ai1ProviderDO provider = BeanUtils.toBean(createReqVO, Ai1ProviderDO.class);
+        provider.setHeaders(normalizeHeaders(createReqVO.getHeaders()));
         providerMapper.insert(provider);
         return provider.getId();
     }
@@ -62,6 +63,7 @@ public class Ai1ProviderServiceImpl implements Ai1ProviderService {
 
         // 2. 更新：API 密钥为空时置为 null，由 updateById 跳过该字段，保持原密钥
         Ai1ProviderDO updateObj = BeanUtils.toBean(updateReqVO, Ai1ProviderDO.class);
+        updateObj.setHeaders(normalizeHeaders(updateReqVO.getHeaders()));
         if (StrUtil.isBlank(updateObj.getApiKey())) {
             updateObj.setApiKey(null);
         }
@@ -132,7 +134,7 @@ public class Ai1ProviderServiceImpl implements Ai1ProviderService {
 
         // 2. 连通测试：调用前解析 ${ENV} 占位符，库中的原文不改
         return providerTool.testConnect(resolveSpringPlaceholders(provider.getBaseUrl()),
-                resolveSpringPlaceholders(provider.getApiKey()), parseHeaders(resolveSpringPlaceholders(provider.getHeaders())));
+                resolveSpringPlaceholders(provider.getApiKey()), resolveSpringPlaceholders(provider.getHeaders()));
     }
 
 }

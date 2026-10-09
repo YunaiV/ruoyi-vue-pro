@@ -157,16 +157,18 @@ public class Ai1SkillToolFactory {
                 // 2.1 清空目录后，逐个物化开启的 SKILL
                 FileUtil.del(root);
                 FileUtil.mkdir(root.toFile());
-                boolean hasSkill = false;
-                for (Ai1SkillDO skill : skills) {
+                List<String> skillDirectories = new ArrayList<>();
+                // 固定注册顺序；同名 frontmatter 按 agent-utils 的首次注册规则处理。
+                for (Ai1SkillDO skill : skills.stream().sorted(Comparator.comparing(Ai1SkillDO::getId)).toList()) {
                     if (CommonStatusEnum.isEnable(skill.getStatus())
                             && materializeSkill(root.resolve(sanitize(skill.getName())), skill.getId())) {
-                        hasSkill = true;
+                        skillDirectories.add(root.resolve(sanitize(skill.getName())).toString());
                     }
                 }
                 // 2.2 写入指纹标记，构建技能工具并缓存快照
                 FileUtil.writeUtf8String(fingerprint, root.resolve(FILE_NAME_FINGERPRINT).toFile());
-                ToolCallback skillsTool = hasSkill ? SkillsTool.builder().addSkillsDirectory(root.toString()).build() : null;
+                ToolCallback skillsTool = skillDirectories.isEmpty() ? null
+                        : SkillsTool.builder().addSkillsDirectories(skillDirectories).build();
                 SkillSnapshot snapshot = new SkillSnapshot(fingerprint, root, skillsTool);
                 snapshotCache.put(agent.getId(), snapshot);
                 log.info("[sync][Agent({}) SKILL 物化完成，目录({})]", agent.getId(), root);

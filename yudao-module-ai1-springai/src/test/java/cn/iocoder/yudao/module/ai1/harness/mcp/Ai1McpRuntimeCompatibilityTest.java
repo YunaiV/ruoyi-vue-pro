@@ -16,13 +16,14 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * 验证 MCP SDK 的真实 HTTP 握手及工具调用。
+ * {@link Ai1McpClientTool} 的运行时测试
  */
 public class Ai1McpRuntimeCompatibilityTest {
 
     @Test
     @Timeout(15)
     public void testStreamableHttp_initializeListAndCall() throws Exception {
+        // mock HTTP 服务
         List<String> methods = new CopyOnWriteArrayList<>();
         List<String> paths = new CopyOnWriteArrayList<>();
         List<String> headers = new CopyOnWriteArrayList<>();
@@ -63,13 +64,16 @@ public class Ai1McpRuntimeCompatibilityTest {
         server.start();
         Ai1McpClientTool client = new Ai1McpClientTool();
         try {
+            // 准备参数
             Ai1McpDO mcp = new Ai1McpDO().setId(1L).setName("probe").setTransport("http")
                     .setUrl("http://127.0.0.1:" + server.getAddress().getPort() + "/proxy/mcp?key=test")
                     .setHeaders(Map.of("X-Probe", "compatibility"));
 
+            // 调用，并断言工具发现和调用
             assertEquals(1, client.listTools(mcp).size());
             assertEquals("echo", client.listTools(mcp).get(0).name());
             assertEquals("hello", client.callTool(mcp, "echo", Map.of("value", "hello")));
+            // 断言 HTTP 请求
             assertTrue(methods.containsAll(List.of("initialize", "notifications/initialized", "tools/list", "tools/call")));
             assertTrue(paths.stream().allMatch("/proxy/mcp?key=test"::equals));
             assertTrue(headers.stream().allMatch("compatibility"::equals));
