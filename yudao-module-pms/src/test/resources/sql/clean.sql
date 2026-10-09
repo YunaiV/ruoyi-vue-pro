@@ -5,6 +5,7 @@ DELETE FROM "pms_work_item_comment";
 DELETE FROM "pms_work_item_label";
 DELETE FROM "pms_work_item_work_log";
 DELETE FROM "pms_work_item_member";
+DELETE FROM "pms_work_item_user_sort";
 DELETE FROM "pms_work_item";
 DELETE FROM "pms_work_item_status";
 DELETE FROM "pms_iteration";
