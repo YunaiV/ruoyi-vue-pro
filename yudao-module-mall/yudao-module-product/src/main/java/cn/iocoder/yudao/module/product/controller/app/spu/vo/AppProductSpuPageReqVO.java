@@ -45,7 +45,7 @@ public class AppProductSpuPageReqVO extends PageParam {
         if (StrUtil.isEmpty(sortField)) {
             return true;
         }
-        return StrUtil.equalsAny(sortField, SORT_FIELD_PRICE, SORT_FIELD_SALES_COUNT);
+        return StrUtil.equalsAny(sortField, SORT_FIELD_PRICE, SORT_FIELD_SALES_COUNT, SORT_FIELD_CREATE_TIME);
     }
 
 }
