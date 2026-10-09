@@ -225,4 +225,9 @@ public class ErpStockOutServiceImpl implements ErpStockOutService {
         return stockOutItemMapper.selectListByOutIds(outIds);
     }
 
+    @Override
+    public Long getStockOutItemCountByProductId(Long productId) {
+        return stockOutItemMapper.selectCount(ErpStockOutItemDO::getProductId, productId);
+    }
+
 }

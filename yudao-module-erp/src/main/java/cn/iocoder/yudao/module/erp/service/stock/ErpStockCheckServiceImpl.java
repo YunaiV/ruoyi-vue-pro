@@ -229,4 +229,9 @@ public class ErpStockCheckServiceImpl implements ErpStockCheckService {
         return stockCheckItemMapper.selectListByCheckIds(checkIds);
     }
 
+    @Override
+    public Long getStockCheckItemCountByProductId(Long productId) {
+        return stockCheckItemMapper.selectCount(ErpStockCheckItemDO::getProductId, productId);
+    }
+
 }
