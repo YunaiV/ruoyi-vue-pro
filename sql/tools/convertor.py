@@ -411,7 +411,7 @@ class PostgreSQLConvertor(Convertor):
 
         type = type.lower()
 
-        if type == "varchar":
+        if type in ("varchar", "char"):
             return f"varchar({size})"
         if type in ("int", "int unsigned", "int unsigned zerofill"):
             return "int4"
@@ -425,13 +425,15 @@ class PostgreSQLConvertor(Convertor):
             return "date"
         if type == "json":
             return "jsonb"
+        if type == "time":
+            return "time"
         if type == "double":
             return "double precision"
         if type == "timestamp":
             return f"timestamp({size})" if size else "timestamp"
         if type == "bit":
             return "bool"
-        if type in ("text", "longtext"):
+        if type in ("text", "longtext", "mediumtext"):
             return "text"
         if type in ("blob", "mediumblob", "longblob"):
             return "bytea"
