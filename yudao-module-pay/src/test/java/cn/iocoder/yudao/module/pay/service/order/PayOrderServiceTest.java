@@ -15,12 +15,15 @@ import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderExtensionDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.order.PayOrderExtensionMapper;
 import cn.iocoder.yudao.module.pay.dal.mysql.order.PayOrderMapper;
 import cn.iocoder.yudao.module.pay.dal.redis.no.PayNoRedisDAO;
+import cn.iocoder.yudao.module.pay.dal.redis.order.PayOrderLockRedisDAO;
 import cn.iocoder.yudao.module.pay.enums.PayChannelEnum;
 import cn.iocoder.yudao.module.pay.enums.notify.PayNotifyTypeEnum;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.pay.framework.pay.config.PayProperties;
 import cn.iocoder.yudao.module.pay.framework.pay.core.client.PayClient;
 import cn.iocoder.yudao.module.pay.framework.pay.core.client.dto.order.PayOrderRespDTO;
+import cn.iocoder.yudao.module.pay.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
+import cn.iocoder.yudao.module.pay.framework.pay.core.client.exception.PayClientException;
 import cn.iocoder.yudao.module.pay.framework.pay.core.enums.PayOrderDisplayModeEnum;
 import cn.iocoder.yudao.module.pay.service.app.PayAppService;
 import cn.iocoder.yudao.module.pay.service.channel.PayChannelService;
@@ -34,7 +37,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.*;
 import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString;
@@ -46,6 +51,7 @@ import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -54,7 +60,7 @@ import static org.mockito.Mockito.*;
  *
  * @author 芋艿
  */
-@Import({PayOrderServiceImpl.class, PayNoRedisDAO.class})
+@Import({PayOrderServiceImpl.class, PayNoRedisDAO.class, PayOrderLockRedisDAO.class})
 public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
 
     @Resource
@@ -440,6 +446,632 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
             // 断言，调用
             verify(payOrderServiceImpl).notifyOrder(same(channel), same(unifiedOrderResp));
         }
+    }
+
+    @Test
+    public void testSubmitOrder_wechatReuseWaitingExtension() {
+        PayOrderServiceImpl payOrderServiceImpl = mock(PayOrderServiceImpl.class);
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(PayOrderServiceImpl.class)))
+                    .thenReturn(payOrderServiceImpl);
+
+            // mock 数据（order、orderExtension）
+            Map<String, String> channelExtras = Map.of("openid", "openid");
+            PayOrderDO order = insertSubmitOrder();
+            PayOrderExtensionDO orderExtension = insertSubmitOrderExtension(order, PayChannelEnum.WX_PUB, channelExtras);
+            // 准备参数
+            PayOrderSubmitReqVO reqVO = randomPojo(PayOrderSubmitReqVO.class, o -> o.setId(order.getId())
+                    .setChannelCode(PayChannelEnum.WX_PUB.getCode()).setChannelExtras(channelExtras));
+            // mock 方法（app、channel、client）
+            PayClient<?> client = mockSubmitClient(PayChannelEnum.WX_PUB);
+            when(client.getOrder(eq(orderExtension.getNo()))).thenReturn(
+                    PayOrderRespDTO.waitingOf(null, null, orderExtension.getNo(), null));
+            PayOrderRespDTO unifiedOrderResp = PayOrderRespDTO.waitingOf(
+                    PayOrderDisplayModeEnum.APP.getMode(), "pay-content", orderExtension.getNo(), null);
+            when(client.unifiedOrder(any())).thenAnswer(invocation -> {
+                PayOrderUnifiedReqDTO request = invocation.getArgument(0);
+                assertEquals(orderExtension.getNo(), request.getOutTradeNo());
+                assertEquals(orderExtension.getUserIp(), request.getUserIp());
+                return unifiedOrderResp;
+            });
+
+            // 调用
+            PayOrderSubmitRespVO result = orderService.submitOrder(reqVO, randomString());
+            // 断言：复用原拓展单，不新增记录
+            assertThat(orderExtensionMapper.selectListByOrderId(order.getId())).hasSize(1);
+            assertEquals("pay-content", result.getDisplayContent());
+            verify(client).unifiedOrder(any());
+            verify(payOrderServiceImpl).notifyOrder(any(PayChannelDO.class), same(unifiedOrderResp));
+        }
+    }
+
+    @Test
+    public void testSubmitOrder_wechatReuseClosed_thenCreateNewExtension() {
+        PayOrderServiceImpl payOrderServiceImpl = mock(PayOrderServiceImpl.class);
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(PayOrderServiceImpl.class)))
+                    .thenReturn(payOrderServiceImpl);
+
+            // mock 数据（order、orderExtension）
+            Map<String, String> channelExtras = Map.of("openid", "openid");
+            PayOrderDO order = insertSubmitOrder();
+            PayOrderExtensionDO oldExtension = insertSubmitOrderExtension(order, PayChannelEnum.WX_PUB, channelExtras);
+            // 准备参数
+            PayOrderSubmitReqVO reqVO = randomPojo(PayOrderSubmitReqVO.class, o -> o.setId(order.getId())
+                    .setChannelCode(PayChannelEnum.WX_PUB.getCode()).setChannelExtras(channelExtras));
+            // mock 方法（app、channel、client）：原渠道订单已关闭，新渠道订单待支付
+            PayClient<?> client = mockSubmitClient(PayChannelEnum.WX_PUB);
+            when(client.getOrder(anyString())).thenAnswer(invocation ->
+                    PayOrderRespDTO.waitingOf(null, null, invocation.getArgument(0), null));
+            when(client.getOrder(eq(oldExtension.getNo()))).thenReturn(
+                    PayOrderRespDTO.closedOf(null, null, oldExtension.getNo(), null));
+            PayOrderRespDTO closedResp = PayOrderRespDTO.closedOf("ORDERCLOSED", "订单已关闭", oldExtension.getNo(), null);
+            PayOrderRespDTO waitingResp = PayOrderRespDTO.waitingOf(
+                    PayOrderDisplayModeEnum.APP.getMode(), "pay-content", null, null);
+            List<String> outTradeNos = new ArrayList<>();
+            when(client.unifiedOrder(any())).thenAnswer(invocation -> {
+                PayOrderUnifiedReqDTO request = invocation.getArgument(0);
+                outTradeNos.add(request.getOutTradeNo());
+                return oldExtension.getNo().equals(request.getOutTradeNo()) ? closedResp : waitingResp;
+            });
+
+            // 调用
+            orderService.submitOrder(reqVO, randomString());
+            // 断言：原拓展单保持待支付，并记录下单失败结果；新建拓展单发起支付
+            List<PayOrderExtensionDO> extensions = orderExtensionMapper.selectListByOrderId(order.getId());
+            assertThat(extensions).hasSize(2);
+            PayOrderExtensionDO dbOldExtension = orderExtensionMapper.selectById(oldExtension.getId());
+            assertEquals(PayOrderStatusEnum.WAITING.getStatus(), dbOldExtension.getStatus());
+            assertEquals("ORDERCLOSED", dbOldExtension.getChannelErrorCode());
+            assertEquals(toJsonString(closedResp), dbOldExtension.getChannelNotifyData());
+            PayOrderExtensionDO newExtension = extensions.stream()
+                    .filter(extension -> !extension.getId().equals(oldExtension.getId())).findFirst().orElseThrow();
+            assertThat(outTradeNos).containsExactly(oldExtension.getNo(), newExtension.getNo());
+            // 断言：只处理新拓展单的下单结果，不能用原拓展单的失败结果更新状态
+            verify(payOrderServiceImpl).notifyOrder(any(PayChannelDO.class), same(waitingResp));
+            verify(payOrderServiceImpl, never()).notifyOrder(any(PayChannelDO.class), same(closedResp));
+            verify(client, never()).closeOrder(anyString());
+
+            // 再次调用：复用新拓展单，不再使用原拓展单下单
+            orderService.submitOrder(reqVO, randomString());
+            assertThat(orderExtensionMapper.selectListByOrderId(order.getId())).hasSize(2);
+            assertThat(outTradeNos).containsExactly(oldExtension.getNo(), newExtension.getNo(), newExtension.getNo());
+        }
+    }
+
+    @Test
+    public void testSubmitOrder_wechatReuseFail_channelWaiting_closeThenCreateNewExtension() {
+        PayOrderServiceImpl payOrderServiceImpl = mock(PayOrderServiceImpl.class);
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(PayOrderServiceImpl.class)))
+                    .thenReturn(payOrderServiceImpl);
+
+            // mock 数据（order、orderExtension）
+            Map<String, String> channelExtras = Map.of("openid", "openid");
+            PayOrderDO order = insertSubmitOrder();
+            PayOrderExtensionDO oldExtension = insertSubmitOrderExtension(order, PayChannelEnum.WX_PUB, channelExtras);
+            // 准备参数
+            PayOrderSubmitReqVO reqVO = randomPojo(PayOrderSubmitReqVO.class, o -> o.setId(order.getId())
+                    .setChannelCode(PayChannelEnum.WX_PUB.getCode()).setChannelExtras(channelExtras));
+            // mock 方法（app、channel、client）：原拓展单下单失败，渠道订单仍待支付，主动关闭成功
+            PayClient<?> client = mockSubmitClient(PayChannelEnum.WX_PUB);
+            when(client.getOrder(anyString())).thenAnswer(invocation ->
+                    PayOrderRespDTO.waitingOf(null, null, invocation.getArgument(0), null));
+            when(client.closeOrder(eq(oldExtension.getNo()))).thenReturn(
+                    PayOrderRespDTO.closedOf(null, null, oldExtension.getNo(), null));
+            List<String> outTradeNos = new ArrayList<>();
+            when(client.unifiedOrder(any())).thenAnswer(invocation -> {
+                PayOrderUnifiedReqDTO request = invocation.getArgument(0);
+                outTradeNos.add(request.getOutTradeNo());
+                return oldExtension.getNo().equals(request.getOutTradeNo())
+                        ? PayOrderRespDTO.closedOf("SYSTEMERROR", "系统错误", request.getOutTradeNo(), null)
+                        : PayOrderRespDTO.waitingOf(PayOrderDisplayModeEnum.APP.getMode(), "pay-content", null, null);
+            });
+
+            // 第一次调用：先关闭原渠道订单，再新建拓展单发起支付
+            PayOrderSubmitRespVO result = orderService.submitOrder(reqVO, randomString());
+            assertEquals("pay-content", result.getDisplayContent());
+            verify(client).closeOrder(eq(oldExtension.getNo()));
+            // 断言：原拓展单保持待支付，并记录下单失败结果；新建拓展单发起支付
+            List<PayOrderExtensionDO> extensions = orderExtensionMapper.selectListByOrderId(order.getId());
+            assertThat(extensions).hasSize(2);
+            PayOrderExtensionDO dbOldExtension = orderExtensionMapper.selectById(oldExtension.getId());
+            assertEquals(PayOrderStatusEnum.WAITING.getStatus(), dbOldExtension.getStatus());
+            assertEquals("SYSTEMERROR", dbOldExtension.getChannelErrorCode());
+            assertNotNull(dbOldExtension.getChannelNotifyData());
+            PayOrderExtensionDO newExtension = extensions.stream()
+                    .filter(extension -> !extension.getId().equals(oldExtension.getId())).findFirst().orElseThrow();
+            // 第二次调用：复用新拓展单
+            orderService.submitOrder(reqVO, randomString());
+            assertThat(orderExtensionMapper.selectListByOrderId(order.getId())).hasSize(2);
+            assertThat(outTradeNos).containsExactly(oldExtension.getNo(), newExtension.getNo(), newExtension.getNo());
+            verify(client).closeOrder(anyString());
+        }
+    }
+
+    @Test
+    public void testSubmitOrder_wechatReuseFail_channelWaiting_closeFail() {
+        PayOrderServiceImpl payOrderServiceImpl = mock(PayOrderServiceImpl.class);
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(PayOrderServiceImpl.class)))
+                    .thenReturn(payOrderServiceImpl);
+
+            // mock 数据（order、orderExtension）
+            Map<String, String> channelExtras = Map.of("openid", "openid");
+            PayOrderDO order = insertSubmitOrder();
+            PayOrderExtensionDO oldExtension = insertSubmitOrderExtension(order, PayChannelEnum.WX_PUB, channelExtras);
+            // 准备参数
+            PayOrderSubmitReqVO reqVO = randomPojo(PayOrderSubmitReqVO.class, o -> o.setId(order.getId())
+                    .setChannelCode(PayChannelEnum.WX_PUB.getCode()).setChannelExtras(channelExtras));
+            // mock 方法（app、channel、client）：原拓展单下单失败，渠道订单仍待支付，第一次关闭失败（例如说：用户支付中），第二次关闭成功
+            PayClient<?> client = mockSubmitClient(PayChannelEnum.WX_PUB);
+            when(client.getOrder(anyString())).thenAnswer(invocation ->
+                    PayOrderRespDTO.waitingOf(null, null, invocation.getArgument(0), null));
+            when(client.closeOrder(eq(oldExtension.getNo())))
+                    .thenReturn(PayOrderRespDTO.waitingOf(null, null, oldExtension.getNo(), null))
+                    .thenReturn(PayOrderRespDTO.closedOf(null, null, oldExtension.getNo(), null));
+            List<String> outTradeNos = new ArrayList<>();
+            when(client.unifiedOrder(any())).thenAnswer(invocation -> {
+                PayOrderUnifiedReqDTO request = invocation.getArgument(0);
+                outTradeNos.add(request.getOutTradeNo());
+                return oldExtension.getNo().equals(request.getOutTradeNo())
+                        ? PayOrderRespDTO.closedOf("SYSTEMERROR", "系统错误", request.getOutTradeNo(), null)
+                        : PayOrderRespDTO.waitingOf(PayOrderDisplayModeEnum.APP.getMode(), "pay-content", null, null);
+            });
+
+            // 第一次调用，并断言异常
+            assertServiceException(() -> orderService.submitOrder(reqVO, randomString()),
+                    PAY_ORDER_SUBMIT_CHANNEL_ERROR, "SYSTEMERROR", "系统错误");
+            // 断言：无法确认原渠道订单已关闭，不新建拓展单，也不记录下单失败结果，避免存在两个可支付的渠道订单
+            List<PayOrderExtensionDO> extensions = orderExtensionMapper.selectListByOrderId(order.getId());
+            assertThat(extensions).hasSize(1);
+            assertEquals(PayOrderStatusEnum.WAITING.getStatus(), extensions.get(0).getStatus());
+            assertNull(extensions.get(0).getChannelNotifyData());
+            verify(payOrderServiceImpl, never()).notifyOrder(any(PayChannelDO.class), any(PayOrderRespDTO.class));
+
+            // 第二次调用：仍复用原拓展单，关闭成功后，再新建拓展单发起支付
+            PayOrderSubmitRespVO result = orderService.submitOrder(reqVO, randomString());
+            assertEquals("pay-content", result.getDisplayContent());
+            extensions = orderExtensionMapper.selectListByOrderId(order.getId());
+            assertThat(extensions).hasSize(2);
+            PayOrderExtensionDO newExtension = extensions.stream()
+                    .filter(extension -> !extension.getId().equals(oldExtension.getId())).findFirst().orElseThrow();
+            assertThat(outTradeNos).containsExactly(oldExtension.getNo(), oldExtension.getNo(), newExtension.getNo());
+            verify(client, times(2)).closeOrder(eq(oldExtension.getNo()));
+        }
+    }
+
+    @Test
+    public void testSubmitOrder_wechatReuseFail_channelWaiting_closeFoundPaid() {
+        PayOrderServiceImpl payOrderServiceImpl = mock(PayOrderServiceImpl.class);
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(PayOrderServiceImpl.class)))
+                    .thenReturn(payOrderServiceImpl);
+
+            // mock 数据（order、orderExtension）
+            Map<String, String> channelExtras = Map.of("openid", "openid");
+            PayOrderDO order = insertSubmitOrder();
+            PayOrderExtensionDO oldExtension = insertSubmitOrderExtension(order, PayChannelEnum.WX_PUB, channelExtras);
+            // 准备参数
+            PayOrderSubmitReqVO reqVO = randomPojo(PayOrderSubmitReqVO.class, o -> o.setId(order.getId())
+                    .setChannelCode(PayChannelEnum.WX_PUB.getCode()).setChannelExtras(channelExtras));
+            // mock 方法（app、channel、client）：原拓展单下单失败，查询时待支付，关闭时发现已支付
+            PayClient<?> client = mockSubmitClient(PayChannelEnum.WX_PUB);
+            when(client.getOrder(eq(oldExtension.getNo()))).thenReturn(
+                    PayOrderRespDTO.waitingOf(null, null, oldExtension.getNo(), null));
+            PayOrderRespDTO successResp = PayOrderRespDTO.successOf(randomString(), randomString(),
+                    LocalDateTime.now(), oldExtension.getNo(), null);
+            when(client.closeOrder(eq(oldExtension.getNo()))).thenReturn(successResp);
+            when(client.unifiedOrder(any())).thenReturn(
+                    PayOrderRespDTO.closedOf("SYSTEMERROR", "系统错误", oldExtension.getNo(), null));
+
+            // 调用
+            orderService.submitOrder(reqVO, randomString());
+            // 断言：不新建拓展单，按渠道已支付结果处理
+            assertThat(orderExtensionMapper.selectListByOrderId(order.getId())).hasSize(1);
+            verify(client).unifiedOrder(any());
+            verify(payOrderServiceImpl).notifyOrder(any(PayChannelDO.class), same(successResp));
+        }
+    }
+
+    @Test
+    public void testSubmitOrder_wechatReuseFail_channelSuccess() {
+        PayOrderServiceImpl payOrderServiceImpl = mock(PayOrderServiceImpl.class);
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(PayOrderServiceImpl.class)))
+                    .thenReturn(payOrderServiceImpl);
+
+            // mock 数据（order、orderExtension）
+            Map<String, String> channelExtras = Map.of("openid", "openid");
+            PayOrderDO order = insertSubmitOrder();
+            PayOrderExtensionDO orderExtension = insertSubmitOrderExtension(order, PayChannelEnum.WX_PUB, channelExtras);
+            // 准备参数
+            PayOrderSubmitReqVO reqVO = randomPojo(PayOrderSubmitReqVO.class, o -> o.setId(order.getId())
+                    .setChannelCode(PayChannelEnum.WX_PUB.getCode()).setChannelExtras(channelExtras));
+            // mock 方法（app、channel、client）：提交校验时待支付，下单时已支付（回调延迟）
+            PayClient<?> client = mockSubmitClient(PayChannelEnum.WX_PUB);
+            PayOrderRespDTO successResp = PayOrderRespDTO.successOf(randomString(), randomString(),
+                    LocalDateTime.now(), orderExtension.getNo(), null);
+            when(client.getOrder(eq(orderExtension.getNo()))).thenReturn(
+                    PayOrderRespDTO.waitingOf(null, null, orderExtension.getNo(), null), successResp);
+            when(client.unifiedOrder(any())).thenReturn(
+                    PayOrderRespDTO.closedOf("ORDERPAID", "订单已支付", orderExtension.getNo(), null));
+
+            // 调用
+            orderService.submitOrder(reqVO, randomString());
+            // 断言：不新建拓展单，按渠道已支付结果处理
+            assertThat(orderExtensionMapper.selectListByOrderId(order.getId())).hasSize(1);
+            verify(client).unifiedOrder(any());
+            verify(payOrderServiceImpl).notifyOrder(any(PayChannelDO.class), same(successResp));
+        }
+    }
+
+    @Test
+    public void testSubmitOrder_wechatOrderUpdated_notReuse() {
+        PayOrderServiceImpl payOrderServiceImpl = mock(PayOrderServiceImpl.class);
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(PayOrderServiceImpl.class)))
+                    .thenReturn(payOrderServiceImpl);
+
+            // mock 数据（order、orderExtension）：拓展单创建后，支付订单被改价
+            Map<String, String> channelExtras = Map.of("openid", "openid");
+            PayOrderDO order = insertSubmitOrder();
+            PayOrderExtensionDO oldExtension = insertSubmitOrderExtension(order, PayChannelEnum.WX_PUB, channelExtras);
+            PayOrderDO updateObj = new PayOrderDO().setId(order.getId()).setPrice(order.getPrice() + 1);
+            updateObj.setUpdateTime(LocalDateTime.now());
+            orderMapper.updateById(updateObj);
+            // 准备参数
+            PayOrderSubmitReqVO reqVO = randomPojo(PayOrderSubmitReqVO.class, o -> o.setId(order.getId())
+                    .setChannelCode(PayChannelEnum.WX_PUB.getCode()).setChannelExtras(channelExtras));
+            // mock 方法（app、channel、client）
+            PayClient<?> client = mockSubmitClient(PayChannelEnum.WX_PUB);
+            when(client.getOrder(eq(oldExtension.getNo()))).thenReturn(
+                    PayOrderRespDTO.waitingOf(null, null, oldExtension.getNo(), null));
+            when(client.unifiedOrder(argThat(request -> !oldExtension.getNo().equals(request.getOutTradeNo()))))
+                    .thenReturn(PayOrderRespDTO.waitingOf(PayOrderDisplayModeEnum.APP.getMode(), "pay-content", null, null));
+
+            // 调用
+            orderService.submitOrder(reqVO, randomString());
+            // 断言：新建拓展单
+            assertThat(orderExtensionMapper.selectListByOrderId(order.getId())).hasSize(2);
+            verify(client).unifiedOrder(any());
+        }
+    }
+
+    @Test
+    public void testSubmitOrder_wechatChannelExtrasChanged_notReuse() {
+        PayOrderServiceImpl payOrderServiceImpl = mock(PayOrderServiceImpl.class);
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(PayOrderServiceImpl.class)))
+                    .thenReturn(payOrderServiceImpl);
+
+            // mock 数据（order、orderExtension）
+            PayOrderDO order = insertSubmitOrder();
+            PayOrderExtensionDO oldExtension = insertSubmitOrderExtension(order, PayChannelEnum.WX_PUB,
+                    Map.of("openid", "old-openid"));
+            // 准备参数
+            PayOrderSubmitReqVO reqVO = randomPojo(PayOrderSubmitReqVO.class, o -> o.setId(order.getId())
+                    .setChannelCode(PayChannelEnum.WX_PUB.getCode()).setChannelExtras(Map.of("openid", "new-openid")));
+            // mock 方法（app、channel、client）
+            PayClient<?> client = mockSubmitClient(PayChannelEnum.WX_PUB);
+            when(client.getOrder(eq(oldExtension.getNo()))).thenReturn(
+                    PayOrderRespDTO.waitingOf(null, null, oldExtension.getNo(), null));
+            when(client.unifiedOrder(argThat(request -> !oldExtension.getNo().equals(request.getOutTradeNo()))))
+                    .thenReturn(PayOrderRespDTO.waitingOf(PayOrderDisplayModeEnum.APP.getMode(), "pay-content", null, null));
+
+            // 调用
+            orderService.submitOrder(reqVO, randomString());
+            // 断言：新建拓展单
+            assertThat(orderExtensionMapper.selectListByOrderId(order.getId())).hasSize(2);
+            verify(client).unifiedOrder(any());
+        }
+    }
+
+    @Test
+    public void testSubmitOrder_wechatOrderUpdatedSameSecond_notReuse() {
+        PayOrderServiceImpl payOrderServiceImpl = mock(PayOrderServiceImpl.class);
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(PayOrderServiceImpl.class)))
+                    .thenReturn(payOrderServiceImpl);
+
+            // mock 数据（order、orderExtension）：拓展单创建后，同一秒内支付订单被改价，数据库时间相等
+            Map<String, String> channelExtras = Map.of("openid", "openid");
+            LocalDateTime time = LocalDateTime.now().withNano(0).minusMinutes(1);
+            PayOrderDO order = insertSubmitOrder(time.minusMinutes(10), time);
+            PayOrderExtensionDO oldExtension = insertSubmitOrderExtension(order, PayChannelEnum.WX_PUB,
+                    channelExtras, time);
+            // 准备参数
+            PayOrderSubmitReqVO reqVO = randomPojo(PayOrderSubmitReqVO.class, o -> o.setId(order.getId())
+                    .setChannelCode(PayChannelEnum.WX_PUB.getCode()).setChannelExtras(channelExtras));
+            // mock 方法（app、channel、client）
+            PayClient<?> client = mockSubmitClient(PayChannelEnum.WX_PUB);
+            when(client.getOrder(eq(oldExtension.getNo()))).thenReturn(
+                    PayOrderRespDTO.waitingOf(null, null, oldExtension.getNo(), null));
+            when(client.unifiedOrder(argThat(request -> !oldExtension.getNo().equals(request.getOutTradeNo()))))
+                    .thenReturn(PayOrderRespDTO.waitingOf(PayOrderDisplayModeEnum.APP.getMode(), "pay-content", null, null));
+
+            // 调用
+            orderService.submitOrder(reqVO, randomString());
+            // 断言：无法区分先后，按已改价处理，新建拓展单
+            assertThat(orderExtensionMapper.selectListByOrderId(order.getId())).hasSize(2);
+            verify(client).unifiedOrder(any());
+        }
+    }
+
+    @Test
+    public void testSubmitOrder_wechatNewOrderSameSecond_notReuse() {
+        PayOrderServiceImpl payOrderServiceImpl = mock(PayOrderServiceImpl.class);
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(PayOrderServiceImpl.class)))
+                    .thenReturn(payOrderServiceImpl);
+
+            // mock 数据（order、orderExtension）：支付订单与拓展单在同一秒内创建，数据库时间相等（可能同一秒内被改价）
+            Map<String, String> channelExtras = Map.of("openid", "openid");
+            LocalDateTime time = LocalDateTime.now().withNano(0).minusMinutes(1);
+            PayOrderDO order = insertSubmitOrder(time, time);
+            PayOrderExtensionDO orderExtension = insertSubmitOrderExtension(order, PayChannelEnum.WX_PUB,
+                    channelExtras, time);
+            // 准备参数
+            PayOrderSubmitReqVO reqVO = randomPojo(PayOrderSubmitReqVO.class, o -> o.setId(order.getId())
+                    .setChannelCode(PayChannelEnum.WX_PUB.getCode()).setChannelExtras(channelExtras));
+            // mock 方法（app、channel、client）
+            PayClient<?> client = mockSubmitClient(PayChannelEnum.WX_PUB);
+            when(client.getOrder(eq(orderExtension.getNo()))).thenReturn(
+                    PayOrderRespDTO.waitingOf(null, null, orderExtension.getNo(), null));
+            when(client.unifiedOrder(argThat(request -> !orderExtension.getNo().equals(request.getOutTradeNo()))))
+                    .thenReturn(PayOrderRespDTO.waitingOf(PayOrderDisplayModeEnum.APP.getMode(), "pay-content", null, null));
+
+            // 调用
+            orderService.submitOrder(reqVO, randomString());
+            // 断言：同一秒内无法排除改价，按已修改处理，新建拓展单
+            assertThat(orderExtensionMapper.selectListByOrderId(order.getId())).hasSize(2);
+            verify(client).unifiedOrder(any());
+        }
+    }
+
+    @Test
+    public void testSubmitOrder_wechatReuseFail_queryException() {
+        PayOrderServiceImpl payOrderServiceImpl = mock(PayOrderServiceImpl.class);
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(PayOrderServiceImpl.class)))
+                    .thenReturn(payOrderServiceImpl);
+
+            // mock 数据（order、orderExtension）
+            Map<String, String> channelExtras = Map.of("openid", "openid");
+            PayOrderDO order = insertSubmitOrder();
+            PayOrderExtensionDO oldExtension = insertSubmitOrderExtension(order, PayChannelEnum.WX_PUB, channelExtras);
+            // 准备参数
+            PayOrderSubmitReqVO reqVO = randomPojo(PayOrderSubmitReqVO.class, o -> o.setId(order.getId())
+                    .setChannelCode(PayChannelEnum.WX_PUB.getCode()).setChannelExtras(channelExtras));
+            // mock 方法（app、channel、client）：提交校验时待支付，下单失败后查询、关闭渠道订单都异常，之后恢复正常
+            PayClient<?> client = mockSubmitClient(PayChannelEnum.WX_PUB);
+            when(client.getOrder(anyString())).thenAnswer(invocation ->
+                    PayOrderRespDTO.waitingOf(null, null, invocation.getArgument(0), null));
+            when(client.getOrder(eq(oldExtension.getNo())))
+                    .thenReturn(PayOrderRespDTO.waitingOf(null, null, oldExtension.getNo(), null))
+                    .thenThrow(new PayClientException(new RuntimeException("网络超时")))
+                    .thenReturn(PayOrderRespDTO.waitingOf(null, null, oldExtension.getNo(), null));
+            when(client.closeOrder(eq(oldExtension.getNo())))
+                    .thenThrow(new PayClientException(new RuntimeException("网络超时")))
+                    .thenReturn(PayOrderRespDTO.closedOf(null, null, oldExtension.getNo(), null));
+            List<String> outTradeNos = new ArrayList<>();
+            when(client.unifiedOrder(any())).thenAnswer(invocation -> {
+                PayOrderUnifiedReqDTO request = invocation.getArgument(0);
+                outTradeNos.add(request.getOutTradeNo());
+                return oldExtension.getNo().equals(request.getOutTradeNo())
+                        ? PayOrderRespDTO.closedOf("SYSTEMERROR", "系统错误", request.getOutTradeNo(), null)
+                        : PayOrderRespDTO.waitingOf(PayOrderDisplayModeEnum.APP.getMode(), "pay-content", null, null);
+            });
+
+            // 第一次调用，并断言异常：查询、关闭异常转换为业务异常
+            assertServiceException(() -> orderService.submitOrder(reqVO, randomString()),
+                    PAY_ORDER_SUBMIT_CHANNEL_ERROR, "SYSTEMERROR", "系统错误");
+            // 断言：渠道状态未知，不新建拓展单，也不记录下单失败结果
+            List<PayOrderExtensionDO> extensions = orderExtensionMapper.selectListByOrderId(order.getId());
+            assertThat(extensions).hasSize(1);
+            assertEquals(PayOrderStatusEnum.WAITING.getStatus(), extensions.get(0).getStatus());
+            assertNull(extensions.get(0).getChannelNotifyData());
+            verify(payOrderServiceImpl, never()).notifyOrder(any(PayChannelDO.class), any(PayOrderRespDTO.class));
+
+            // 第二次调用：渠道恢复后，关闭原渠道订单，再新建拓展单发起支付
+            orderService.submitOrder(reqVO, randomString());
+            extensions = orderExtensionMapper.selectListByOrderId(order.getId());
+            assertThat(extensions).hasSize(2);
+            PayOrderExtensionDO newExtension = extensions.stream()
+                    .filter(extension -> !extension.getId().equals(oldExtension.getId())).findFirst().orElseThrow();
+            assertThat(outTradeNos).containsExactly(oldExtension.getNo(), oldExtension.getNo(), newExtension.getNo());
+        }
+    }
+
+    @Test
+    public void testSubmitOrder_wechatReuseFail_extensionPaidConcurrently() {
+        PayOrderServiceImpl payOrderServiceImpl = mock(PayOrderServiceImpl.class);
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(PayOrderServiceImpl.class)))
+                    .thenReturn(payOrderServiceImpl);
+
+            // mock 数据（order、orderExtension）
+            Map<String, String> channelExtras = Map.of("openid", "openid");
+            PayOrderDO order = insertSubmitOrder();
+            PayOrderExtensionDO orderExtension = insertSubmitOrderExtension(order, PayChannelEnum.WX_PUB, channelExtras);
+            // 准备参数
+            PayOrderSubmitReqVO reqVO = randomPojo(PayOrderSubmitReqVO.class, o -> o.setId(order.getId())
+                    .setChannelCode(PayChannelEnum.WX_PUB.getCode()).setChannelExtras(channelExtras));
+            // mock 方法（app、channel、client）：下单失败后，渠道订单已关闭，但原拓展单被并发回调更新为已支付
+            PayClient<?> client = mockSubmitClient(PayChannelEnum.WX_PUB);
+            when(client.getOrder(eq(orderExtension.getNo())))
+                    .thenReturn(PayOrderRespDTO.waitingOf(null, null, orderExtension.getNo(), null))
+                    .thenAnswer(invocation -> {
+                        orderExtensionMapper.updateById(new PayOrderExtensionDO().setId(orderExtension.getId())
+                                .setStatus(PayOrderStatusEnum.SUCCESS.getStatus()));
+                        return PayOrderRespDTO.closedOf(null, null, orderExtension.getNo(), null);
+                    });
+            when(client.unifiedOrder(any())).thenReturn(
+                    PayOrderRespDTO.closedOf("ORDERCLOSED", "订单已关闭", orderExtension.getNo(), null));
+
+            // 调用，并断言异常
+            assertServiceException(() -> orderService.submitOrder(reqVO, randomString()),
+                    PAY_ORDER_EXTENSION_STATUS_IS_NOT_WAITING);
+            // 断言：不新建拓展单
+            assertThat(orderExtensionMapper.selectListByOrderId(order.getId())).hasSize(1);
+            verify(client).unifiedOrder(any());
+        }
+    }
+
+    @Test
+    public void testSubmitOrder_wechatWapUserIpChanged_notReuse() {
+        PayOrderServiceImpl payOrderServiceImpl = mock(PayOrderServiceImpl.class);
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(PayOrderServiceImpl.class)))
+                    .thenReturn(payOrderServiceImpl);
+
+            // mock 数据（order、orderExtension）
+            Map<String, String> channelExtras = Map.of("key", "value");
+            PayOrderDO order = insertSubmitOrder();
+            PayOrderExtensionDO oldExtension = insertSubmitOrderExtension(order, PayChannelEnum.WX_WAP, channelExtras);
+            // 准备参数：用户 IP 变化（例如说：切换网络）
+            String userIp = "10.0.0.1";
+            PayOrderSubmitReqVO reqVO = randomPojo(PayOrderSubmitReqVO.class, o -> o.setId(order.getId())
+                    .setChannelCode(PayChannelEnum.WX_WAP.getCode()).setChannelExtras(channelExtras));
+            // mock 方法（app、channel、client）
+            PayClient<?> client = mockSubmitClient(PayChannelEnum.WX_WAP);
+            when(client.getOrder(eq(oldExtension.getNo()))).thenReturn(
+                    PayOrderRespDTO.waitingOf(null, null, oldExtension.getNo(), null));
+            when(client.unifiedOrder(argThat(request -> !oldExtension.getNo().equals(request.getOutTradeNo())
+                    && userIp.equals(request.getUserIp()))))
+                    .thenReturn(PayOrderRespDTO.waitingOf(PayOrderDisplayModeEnum.URL.getMode(), "pay-url", null, null));
+
+            // 调用
+            orderService.submitOrder(reqVO, userIp);
+            // 断言：新建拓展单，使用新的用户 IP 下单
+            assertThat(orderExtensionMapper.selectListByOrderId(order.getId())).hasSize(2);
+            verify(client).unifiedOrder(any());
+        }
+    }
+
+    @Test
+    public void testSubmitOrder_wechatWapUserIpSame_reuse() {
+        PayOrderServiceImpl payOrderServiceImpl = mock(PayOrderServiceImpl.class);
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(PayOrderServiceImpl.class)))
+                    .thenReturn(payOrderServiceImpl);
+
+            // mock 数据（order、orderExtension）
+            Map<String, String> channelExtras = Map.of("key", "value");
+            PayOrderDO order = insertSubmitOrder();
+            PayOrderExtensionDO orderExtension = insertSubmitOrderExtension(order, PayChannelEnum.WX_WAP, channelExtras);
+            // 准备参数
+            PayOrderSubmitReqVO reqVO = randomPojo(PayOrderSubmitReqVO.class, o -> o.setId(order.getId())
+                    .setChannelCode(PayChannelEnum.WX_WAP.getCode()).setChannelExtras(channelExtras));
+            // mock 方法（app、channel、client）
+            PayClient<?> client = mockSubmitClient(PayChannelEnum.WX_WAP);
+            when(client.getOrder(eq(orderExtension.getNo()))).thenReturn(
+                    PayOrderRespDTO.waitingOf(null, null, orderExtension.getNo(), null));
+            when(client.unifiedOrder(argThat(request -> orderExtension.getNo().equals(request.getOutTradeNo()))))
+                    .thenReturn(PayOrderRespDTO.waitingOf(PayOrderDisplayModeEnum.URL.getMode(), "pay-url", null, null));
+
+            // 调用
+            orderService.submitOrder(reqVO, orderExtension.getUserIp());
+            // 断言：用户 IP 一致，复用原拓展单
+            assertThat(orderExtensionMapper.selectListByOrderId(order.getId())).hasSize(1);
+            verify(client).unifiedOrder(any());
+        }
+    }
+
+    @Test
+    public void testSubmitOrder_alipayNotReuse() {
+        PayOrderServiceImpl payOrderServiceImpl = mock(PayOrderServiceImpl.class);
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(PayOrderServiceImpl.class)))
+                    .thenReturn(payOrderServiceImpl);
+
+            // mock 数据（order、orderExtension）
+            Map<String, String> channelExtras = Map.of("key", "value");
+            PayOrderDO order = insertSubmitOrder();
+            PayOrderExtensionDO oldExtension = insertSubmitOrderExtension(order, PayChannelEnum.ALIPAY_APP, channelExtras);
+            // 准备参数
+            PayOrderSubmitReqVO reqVO = randomPojo(PayOrderSubmitReqVO.class, o -> o.setId(order.getId())
+                    .setChannelCode(PayChannelEnum.ALIPAY_APP.getCode()).setChannelExtras(channelExtras));
+            // mock 方法（app、channel、client）
+            PayClient<?> client = mockSubmitClient(PayChannelEnum.ALIPAY_APP);
+            when(client.getOrder(eq(oldExtension.getNo()))).thenReturn(
+                    PayOrderRespDTO.waitingOf(null, null, oldExtension.getNo(), null));
+            when(client.unifiedOrder(argThat(request -> !oldExtension.getNo().equals(request.getOutTradeNo()))))
+                    .thenReturn(PayOrderRespDTO.waitingOf(PayOrderDisplayModeEnum.APP.getMode(), "pay-content", null, null));
+
+            // 调用
+            orderService.submitOrder(reqVO, randomString());
+            // 断言：支付宝保持每次新建拓展单
+            assertThat(orderExtensionMapper.selectListByOrderId(order.getId())).hasSize(2);
+            verify(client).unifiedOrder(any());
+        }
+    }
+
+    @Test
+    public void testSubmitOrder_wechatBarNotReuse() {
+        PayOrderServiceImpl payOrderServiceImpl = mock(PayOrderServiceImpl.class);
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(PayOrderServiceImpl.class)))
+                    .thenReturn(payOrderServiceImpl);
+
+            // mock 数据（order、orderExtension）
+            Map<String, String> channelExtras = Map.of("authCode", "134567890123456789");
+            PayOrderDO order = insertSubmitOrder();
+            PayOrderExtensionDO oldExtension = insertSubmitOrderExtension(order, PayChannelEnum.WX_BAR, channelExtras);
+            // 准备参数
+            PayOrderSubmitReqVO reqVO = randomPojo(PayOrderSubmitReqVO.class, o -> o.setId(order.getId())
+                    .setChannelCode(PayChannelEnum.WX_BAR.getCode()).setChannelExtras(channelExtras));
+            // mock 方法（app、channel、client）
+            PayClient<?> client = mockSubmitClient(PayChannelEnum.WX_BAR);
+            when(client.getOrder(eq(oldExtension.getNo()))).thenReturn(
+                    PayOrderRespDTO.waitingOf(null, null, oldExtension.getNo(), null));
+            when(client.unifiedOrder(argThat(request -> !oldExtension.getNo().equals(request.getOutTradeNo()))))
+                    .thenReturn(PayOrderRespDTO.waitingOf(PayOrderDisplayModeEnum.BAR_CODE.getMode(), "", null, null));
+
+            // 调用
+            orderService.submitOrder(reqVO, randomString());
+            // 断言：微信付款码的 authCode 只能使用一次，保持每次新建拓展单
+            assertThat(orderExtensionMapper.selectListByOrderId(order.getId())).hasSize(2);
+            verify(client).unifiedOrder(any());
+        }
+    }
+
+    private PayOrderDO insertSubmitOrder() {
+        LocalDateTime time = LocalDateTime.now().minusMinutes(10);
+        return insertSubmitOrder(time, time);
+    }
+
+    private PayOrderDO insertSubmitOrder(LocalDateTime createTime, LocalDateTime updateTime) {
+        PayOrderDO order = randomPojo(PayOrderDO.class, o -> o.setStatus(PayOrderStatusEnum.WAITING.getStatus())
+                .setAppId(1L).setExpireTime(addTime(Duration.ofDays(1))));
+        order.setCreateTime(createTime).setUpdateTime(updateTime);
+        orderMapper.insert(order);
+        return order;
+    }
+
+    private PayOrderExtensionDO insertSubmitOrderExtension(PayOrderDO order, PayChannelEnum channelEnum,
+                                                           Map<String, String> channelExtras) {
+        return insertSubmitOrderExtension(order, channelEnum, channelExtras, LocalDateTime.now().minusMinutes(5));
+    }
+
+    private PayOrderExtensionDO insertSubmitOrderExtension(PayOrderDO order, PayChannelEnum channelEnum,
+                                                           Map<String, String> channelExtras, LocalDateTime createTime) {
+        PayOrderExtensionDO orderExtension = randomPojo(PayOrderExtensionDO.class, o -> o.setOrderId(order.getId())
+                .setChannelId(10L).setChannelCode(channelEnum.getCode())
+                .setStatus(PayOrderStatusEnum.WAITING.getStatus()).setChannelExtras(channelExtras)
+                .setChannelErrorCode(null).setChannelErrorMsg(null).setChannelNotifyData(null)
+                .setCreateTime(createTime));
+        orderExtensionMapper.insert(orderExtension);
+        return orderExtension;
+    }
+
+    private PayClient<?> mockSubmitClient(PayChannelEnum channelEnum) {
+        when(appService.validPayApp(eq(1L))).thenReturn(randomPojo(PayAppDO.class, o -> o.setId(1L)));
+        PayChannelDO channel = randomPojo(PayChannelDO.class, o -> o.setId(10L).setCode(channelEnum.getCode()));
+        when(channelService.validPayChannel(eq(1L), eq(channelEnum.getCode()))).thenReturn(channel);
+        PayClient<?> client = mock(PayClient.class);
+        when(channelService.getPayClient(eq(10L))).thenReturn(client);
+        return client;
     }
 
     @Test
@@ -1096,6 +1728,143 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
         assertEquals(count, 1);
         // 断言 extension 变化
         orderExtension.setStatus(PayOrderStatusEnum.CLOSED.getStatus())
+                .setChannelNotifyData(toJsonString(respDTO));
+        assertPojoEquals(orderExtension, orderExtensionMapper.selectOne(null),
+                "updateTime", "updater");
+        // 断言 order 变化
+        order.setStatus(PayOrderStatusEnum.CLOSED.getStatus());
+        assertPojoEquals(order, orderMapper.selectOne(null),
+                "updateTime", "updater");
+    }
+
+    @Test
+    public void testCloseOrder_orderExtension_isSuccess() {
+        // mock 数据（PayOrderDO）
+        PayOrderDO order = randomPojo(PayOrderDO.class,
+                o -> o.setStatus(PayOrderStatusEnum.WAITING.getStatus()));
+        orderMapper.insert(order);
+        // mock 数据（PayOrderExtensionDO 已支付）
+        PayOrderExtensionDO orderExtension = randomPojo(PayOrderExtensionDO.class,
+                o -> o.setStatus(PayOrderStatusEnum.SUCCESS.getStatus())
+                        .setOrderId(order.getId()));
+        orderExtensionMapper.insert(orderExtension);
+
+        // 调用
+        orderService.closeOrder(order.getId());
+        // 断言 order 没有变化，因为没更新
+        assertPojoEquals(order, orderMapper.selectOne(null));
+    }
+
+    @Test
+    public void testCloseOrder_payClient_notFound() {
+        // mock 数据（PayOrderDO）
+        PayOrderDO order = randomPojo(PayOrderDO.class,
+                o -> o.setStatus(PayOrderStatusEnum.WAITING.getStatus()));
+        orderMapper.insert(order);
+        // mock 数据（PayOrderExtensionDO 等待中）
+        PayOrderExtensionDO orderExtension = randomPojo(PayOrderExtensionDO.class,
+                o -> o.setStatus(PayOrderStatusEnum.WAITING.getStatus())
+                        .setOrderId(order.getId())
+                        .setChannelId(10L));
+        orderExtensionMapper.insert(orderExtension);
+
+        // 调用
+        orderService.closeOrder(order.getId());
+        // 断言 order、extension 没有变化，因为没更新
+        assertPojoEquals(order, orderMapper.selectOne(null));
+        assertPojoEquals(orderExtension, orderExtensionMapper.selectOne(null));
+    }
+
+    @Test
+    public void testCloseOrder_closeOrder_isWaiting() {
+        // mock 数据（PayOrderDO）
+        PayOrderDO order = randomPojo(PayOrderDO.class,
+                o -> o.setStatus(PayOrderStatusEnum.WAITING.getStatus()));
+        orderMapper.insert(order);
+        // mock 数据（PayOrderExtensionDO 等待中）
+        PayOrderExtensionDO orderExtension = randomPojo(PayOrderExtensionDO.class,
+                o -> o.setStatus(PayOrderStatusEnum.WAITING.getStatus())
+                        .setOrderId(order.getId()).setNo("P110")
+                        .setChannelId(10L));
+        orderExtensionMapper.insert(orderExtension);
+        // mock 方法（PayClient）
+        PayClient<?> client = mock(PayClient.class);
+        when(channelService.getPayClient(eq(10L))).thenReturn(client);
+        // mock 方法（PayClient 等待返回，例如说渠道系统异常）
+        PayOrderRespDTO respDTO = randomPojo(PayOrderRespDTO.class,
+                o -> o.setStatus(PayOrderStatusEnum.WAITING.getStatus()));
+        when(client.closeOrder(eq("P110"))).thenReturn(respDTO);
+
+        // 调用
+        orderService.closeOrder(order.getId());
+        // 断言 order、extension 没有变化，因为没更新
+        assertPojoEquals(order, orderMapper.selectOne(null));
+        assertPojoEquals(orderExtension, orderExtensionMapper.selectOne(null));
+    }
+
+    @Test
+    public void testCloseOrder_closeOrder_isSuccess() {
+        PayOrderServiceImpl payOrderServiceImpl = mock(PayOrderServiceImpl.class);
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(PayOrderServiceImpl.class)))
+                    .thenReturn(payOrderServiceImpl);
+
+            // mock 数据（PayOrderDO）
+            PayOrderDO order = randomPojo(PayOrderDO.class,
+                    o -> o.setStatus(PayOrderStatusEnum.WAITING.getStatus()));
+            orderMapper.insert(order);
+            // mock 数据（PayOrderExtensionDO 等待中）
+            PayOrderExtensionDO orderExtension = randomPojo(PayOrderExtensionDO.class,
+                    o -> o.setStatus(PayOrderStatusEnum.WAITING.getStatus())
+                            .setOrderId(order.getId()).setNo("P110")
+                            .setChannelId(10L));
+            orderExtensionMapper.insert(orderExtension);
+            // mock 方法（PayClient）
+            PayClient<?> client = mock(PayClient.class);
+            when(channelService.getPayClient(eq(10L))).thenReturn(client);
+            // mock 方法（PayClient 成功返回）
+            PayOrderRespDTO respDTO = randomPojo(PayOrderRespDTO.class,
+                    o -> o.setStatus(PayOrderStatusEnum.SUCCESS.getStatus()));
+            when(client.closeOrder(eq("P110"))).thenReturn(respDTO);
+            // mock 方法（PayChannelDO）
+            PayChannelDO channel = randomPojo(PayChannelDO.class, o -> o.setId(10L));
+            when(channelService.validPayChannel(eq(10L))).thenReturn(channel);
+
+            // 调用
+            orderService.closeOrder(order.getId());
+            // 断言 order、extension 没有变化，因为没更新
+            assertPojoEquals(order, orderMapper.selectOne(null));
+            assertPojoEquals(orderExtension, orderExtensionMapper.selectOne(null));
+            verify(payOrderServiceImpl).notifyOrder(same(channel), same(respDTO));
+        }
+    }
+
+    @Test
+    public void testCloseOrder_success() {
+        // mock 数据（PayOrderDO）
+        PayOrderDO order = randomPojo(PayOrderDO.class,
+                o -> o.setStatus(PayOrderStatusEnum.WAITING.getStatus()));
+        orderMapper.insert(order);
+        // mock 数据（PayOrderExtensionDO 等待中）
+        PayOrderExtensionDO orderExtension = randomPojo(PayOrderExtensionDO.class,
+                o -> o.setStatus(PayOrderStatusEnum.WAITING.getStatus())
+                        .setOrderId(order.getId()).setNo("P110")
+                        .setChannelId(10L));
+        orderExtensionMapper.insert(orderExtension);
+        // mock 方法（PayClient）
+        PayClient<?> client = mock(PayClient.class);
+        when(channelService.getPayClient(eq(10L))).thenReturn(client);
+        // mock 方法（PayClient 关闭返回）
+        PayOrderRespDTO respDTO = randomPojo(PayOrderRespDTO.class,
+                o -> o.setStatus(PayOrderStatusEnum.CLOSED.getStatus()));
+        when(client.closeOrder(eq("P110"))).thenReturn(respDTO);
+
+        // 调用
+        orderService.closeOrder(order.getId());
+        // 断言 extension 变化
+        orderExtension.setStatus(PayOrderStatusEnum.CLOSED.getStatus())
+                .setChannelErrorCode(respDTO.getChannelErrorCode())
+                .setChannelErrorMsg(respDTO.getChannelErrorMsg())
                 .setChannelNotifyData(toJsonString(respDTO));
         assertPojoEquals(orderExtension, orderExtensionMapper.selectOne(null),
                 "updateTime", "updater");

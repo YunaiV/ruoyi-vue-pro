@@ -104,6 +104,21 @@ public class IotDeviceMessageServiceImplTest extends BaseMockitoUnitTest {
     }
 
     @Test
+    public void testCreateDeviceLogAsync_idFallback_whenBlank() {
+        // 准备：构造一条 id 为空的消息，复合主键字段不能为 null
+        IotDeviceMessage message = buildMessage(IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod())
+                .setId(null);
+
+        // 调用
+        service.createDeviceLogAsync(message);
+
+        // 断言：mapper.insert 接收到的 messageDO 已补充 id
+        ArgumentCaptor<IotDeviceMessageDO> captor = ArgumentCaptor.forClass(IotDeviceMessageDO.class);
+        verify(deviceMessageMapper).insert(captor.capture());
+        assertNotNull(captor.getValue().getId(), "id 不应为空");
+    }
+
+    @Test
     public void testCreateDeviceLogAsync_swallowMapperException() {
         // 准备：mapper.insert 抛异常，验证 @Async 方法内部 try/catch 兜底，不向上抛
         IotDeviceMessage message = buildMessage(IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod());

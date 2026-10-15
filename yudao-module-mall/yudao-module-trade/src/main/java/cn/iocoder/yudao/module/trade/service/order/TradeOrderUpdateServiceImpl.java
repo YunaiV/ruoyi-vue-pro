@@ -13,6 +13,7 @@ import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.module.member.api.address.MemberAddressApi;
 import cn.iocoder.yudao.module.member.api.address.dto.MemberAddressRespDTO;
 import cn.iocoder.yudao.module.pay.api.order.PayOrderApi;
@@ -68,6 +69,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -639,6 +642,49 @@ public class TradeOrderUpdateServiceImpl implements TradeOrderUpdateService {
 
         // 3. 增加订单日志
         TradeOrderLogUtils.setOrderInfo(order.getId(), order.getStatus(), TradeOrderStatusEnum.CANCELED.getStatus());
+
+        // 4. 关闭支付单
+        closePayOrder(order.getId(), order.getPayOrderId(), cancelType);
+    }
+
+    /**
+     * 注册事务提交后的支付单关闭任务
+     *
+     * @param orderId    交易订单编号
+     * @param payOrderId 支付订单编号
+     * @param cancelType 订单取消类型
+     */
+    private void closePayOrder(Long orderId, Long payOrderId, TradeOrderCancelTypeEnum cancelType) {
+        if (!ObjectUtils.equalsAny(cancelType, TradeOrderCancelTypeEnum.MEMBER_CANCEL,
+                TradeOrderCancelTypeEnum.PAY_TIMEOUT)
+                || payOrderId == null || !TransactionSynchronizationManager.isSynchronizationActive()) {
+            return;
+        }
+        // 必须在事务提交后，再关闭支付单，避免交易事务回滚后支付单已经关闭
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+
+            @Override
+            public void afterCommit() {
+                // 异步的原因：避免阻塞当前事务，无需等待结果
+                getSelf().closePayOrderAsync(orderId, payOrderId);
+            }
+
+        });
+    }
+
+    /**
+     * 异步关闭订单关联的支付单
+     *
+     * @param orderId    交易订单编号
+     * @param payOrderId 支付订单编号
+     */
+    @Async
+    public void closePayOrderAsync(Long orderId, Long payOrderId) {
+        try {
+            payOrderApi.closeOrder(payOrderId);
+        } catch (Throwable e) {
+            log.error("[closePayOrderAsync][order({}) payOrder({}) 异步关闭支付单失败]", orderId, payOrderId, e);
+        }
     }
 
     /**

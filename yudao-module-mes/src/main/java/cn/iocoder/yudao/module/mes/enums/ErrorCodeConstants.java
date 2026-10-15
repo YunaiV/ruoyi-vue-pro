@@ -121,6 +121,7 @@ public interface ErrorCodeConstants {
     ErrorCode AUTO_CODE_REDIS_ERROR = new ErrorCode(1_040_110_003, "编码生成服务不可用，请稍后重试");
     ErrorCode AUTO_CODE_GENERATE_FAILED = new ErrorCode(1_040_110_004, "编码生成失败");
     ErrorCode AUTO_CODE_PART_SERIAL_NUMBER_DUPLICATE = new ErrorCode(1_040_110_005, "流水号分段只能存在一个");
+    ErrorCode AUTO_CODE_PART_FIXED_CHAR_DUPLICATE = new ErrorCode(1_040_110_006, "固定字符与其他编码规则相同，请修改固定字符");
 
     // ========== MES 日历排班-计划班次（1-040-200-000） ==========
     ErrorCode CAL_PLAN_SHIFT_NOT_EXISTS = new ErrorCode(1_040_200_000, "计划班次不存在");

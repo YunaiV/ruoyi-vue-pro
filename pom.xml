@@ -33,6 +33,7 @@
 <!--        <module>yudao-module-im</module>-->
 <!-- 请参考 https://doc.iocoder.cn/ai/build/ 文档，完成 AI 模块的启动！！！ -->
 <!--        <module>yudao-module-ai</module>-->
+<!--        <module>yudao-module-ai1-springai</module>-->
     </modules>
 
     <name>${project.artifactId}</name>

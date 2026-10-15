@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="http://www.yudao.iocoder.cn/bpm">
+    <!-- 子流程：单个审批 -->
+    <process id="lifecycleChild" name="子流程" isExecutable="true">
+        <startEvent id="start"/>
+        <sequenceFlow id="flow-start" sourceRef="start" targetRef="task"/>
+        <userTask id="task" name="子流程审批">
+            <extensionElements>
+                <flowable:candidateStrategy>30</flowable:candidateStrategy>
+            </extensionElements>
+        </userTask>
+        <sequenceFlow id="flow-task" sourceRef="task" targetRef="end"/>
+        <endEvent id="end"/>
+    </process>
+</definitions>

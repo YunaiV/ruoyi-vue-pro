@@ -31,7 +31,6 @@ public class BpmUserGroupServiceTest extends BaseDbUnitTest {
 
     @Resource
     private BpmUserGroupServiceImpl userGroupService;
-
     @Resource
     private BpmUserGroupMapper userGroupMapper;
 

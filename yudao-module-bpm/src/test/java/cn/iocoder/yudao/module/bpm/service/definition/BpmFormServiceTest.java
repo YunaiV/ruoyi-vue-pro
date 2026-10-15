@@ -35,7 +35,6 @@ public class BpmFormServiceTest extends BaseDbUnitTest {
 
     @Resource
     private BpmFormServiceImpl formService;
-
     @Resource
     private BpmFormMapper formMapper;
 

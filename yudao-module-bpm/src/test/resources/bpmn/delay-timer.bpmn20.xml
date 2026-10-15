@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="http://www.yudao.iocoder.cn/bpm">
+    <!-- 延迟器：receiveTask 挂载不中断的定时边界事件，到期后触发 receiveTask 继续流转 -->
+    <process id="delayTimer" name="延迟器" isExecutable="true">
+        <startEvent id="start"/>
+        <sequenceFlow id="flow-start" sourceRef="start" targetRef="wait"/>
+        <receiveTask id="wait" name="延迟器"/>
+        <boundaryEvent id="wait-timeout" attachedToRef="wait" cancelActivity="false">
+            <extensionElements>
+                <flowable:boundaryEventType>2</flowable:boundaryEventType>
+            </extensionElements>
+            <timerEventDefinition>
+                <timeDuration>PT1H</timeDuration>
+            </timerEventDefinition>
+        </boundaryEvent>
+        <sequenceFlow id="flow-wait" sourceRef="wait" targetRef="end"/>
+        <endEvent id="end"/>
+    </process>
+</definitions>

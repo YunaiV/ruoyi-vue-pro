@@ -21,6 +21,9 @@ import cn.iocoder.yudao.module.ai.framework.ai.core.model.yiyan.YiYanChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.zhipu.ZhiPuChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.webserch.AiWebSearchClient;
 import cn.iocoder.yudao.module.ai.framework.ai.core.webserch.bocha.AiBoChaWebSearchClient;
+import cn.iocoder.yudao.module.ai.tool.function.DirectoryListToolFunction;
+import cn.iocoder.yudao.module.ai.tool.function.UserProfileQueryToolFunction;
+import cn.iocoder.yudao.module.ai.tool.function.WeatherQueryToolFunction;
 import cn.iocoder.yudao.module.ai.tool.method.PersonService;
 import io.micrometer.observation.ObservationRegistry;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +41,7 @@ import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tokenizer.JTokkitTokenCountEstimator;
 import org.springframework.ai.tokenizer.TokenCountEstimator;
 import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.function.FunctionToolCallback;
 import org.springframework.ai.vectorstore.milvus.autoconfigure.MilvusServiceClientProperties;
 import org.springframework.ai.vectorstore.milvus.autoconfigure.MilvusVectorStoreProperties;
 import org.springframework.ai.vectorstore.qdrant.autoconfigure.QdrantVectorStoreProperties;
@@ -424,7 +428,7 @@ public class AiAutoConfiguration {
         return new AiBoChaWebSearchClient(yudaoAiProperties.getWebSearch().getApiKey());
     }
 
-    // ========== MCP 相关 ==========
+    // ========== MCP & 工具相关 ==========
 
     /**
      * 参考自 <a href="https://docs.spring.io/spring-ai/reference/api/mcp/mcp-client-boot-starter-docs.html">MCP Server Boot Starter</>
@@ -432,6 +436,27 @@ public class AiAutoConfiguration {
     @Bean
     public List<ToolCallback> toolCallbacks(PersonService personService) {
         return List.of(ToolCallbacks.from(personService));
+    }
+
+    @Bean
+    public ToolCallback directoryListToolCallback(DirectoryListToolFunction function) {
+        return FunctionToolCallback.builder("directory_list", function)
+                .description("列出指定目录的文件列表")
+                .inputType(DirectoryListToolFunction.Request.class).build();
+    }
+
+    @Bean
+    public ToolCallback weatherQueryToolCallback(WeatherQueryToolFunction function) {
+        return FunctionToolCallback.builder("weather_query", function)
+                .description("查询指定城市的天气信息")
+                .inputType(WeatherQueryToolFunction.Request.class).build();
+    }
+
+    @Bean
+    public ToolCallback userProfileQueryToolCallback(UserProfileQueryToolFunction function) {
+        return FunctionToolCallback.builder("user_profile_query", function)
+                .description("用户信息查询")
+                .inputType(UserProfileQueryToolFunction.Request.class).build();
     }
 
 }

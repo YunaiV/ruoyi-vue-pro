@@ -12,6 +12,9 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * BPM HTTP 回调触发器
  *
@@ -41,11 +44,13 @@ public class BpmHttpCallbackTrigger extends BpmAbstractHttpRequestTrigger {
 
         // 2. 发起请求
         ProcessInstance processInstance = processInstanceService.getProcessInstance(processInstanceId);
-        setting.getBody().add(new BpmSimpleModelNodeVO.HttpRequestParam()
+        List<BpmSimpleModelNodeVO.HttpRequestParam> body = setting.getBody() == null
+                ? new ArrayList<>() : new ArrayList<>(setting.getBody());
+        body.add(new BpmSimpleModelNodeVO.HttpRequestParam()
                 .setKey("taskDefineKey") // 重要：回调请求 taskDefineKey 需要传给被调用方，用于回调执行
                 .setType(BpmHttpRequestParamTypeEnum.FIXED_VALUE.getType()).setValue(setting.getCallbackTaskDefineKey()));
         BpmHttpRequestUtils.executeBpmHttpRequest(processInstance,
-                setting.getUrl(), setting.getHeader(), setting.getBody(), false, null);
+                setting.getUrl(), setting.getHeader(), body, false, null);
     }
 
 }

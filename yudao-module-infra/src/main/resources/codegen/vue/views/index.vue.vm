@@ -86,7 +86,7 @@
         </el-button>
       </el-col>
     #end
-      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
+      <RightToolbar :showSearch.sync="showSearch" @queryTable="getList"></RightToolbar>
     </el-row>
 #if ($importEnable)
     <input ref="importFileRef" type="file" style="display: none" accept=".xls,.xlsx" @change="handleImportFileChange" />
@@ -186,7 +186,7 @@
 ## 特殊：树表专属逻辑（树不需要分页）
 #if ( $table.templateType != 2 )
     <!-- 分页组件 -->
-    <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
+    <Pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
                 @pagination="getList"/>
 #end
     <!-- 对话框(添加 / 修改) -->

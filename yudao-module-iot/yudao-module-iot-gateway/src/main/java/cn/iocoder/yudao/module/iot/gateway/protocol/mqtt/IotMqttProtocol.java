@@ -332,12 +332,12 @@ public class IotMqttProtocol implements IotProtocol {
                 deviceMessageService.sendDeviceMessage(offlineMessage, connectionInfo.getProductKey(),
                         connectionInfo.getDeviceName(), serverId);
             }
-
-            // 2. 注销连接
-            connectionManager.unregisterConnection(endpoint);
         } catch (Exception e) {
             log.error("[cleanupConnection][清理连接失败，客户端 ID: {}，错误: {}]",
                     endpoint.clientIdentifier(), e.getMessage());
+        } finally {
+            // 2. 注销连接，避免发送离线消息失败时残留连接
+            connectionManager.unregisterConnection(endpoint);
         }
     }
 

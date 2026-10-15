@@ -117,7 +117,7 @@ public class MesWmBarcodeServiceImpl implements MesWmBarcodeService {
         if (barcode == null) {
             return;
         }
-        if (ObjUtil.notEqual(barcode, id)) {
+        if (ObjUtil.notEqual(barcode.getId(), id)) {
             throw exception(WM_BARCODE_ALREADY_EXISTS);
         }
     }

@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.pay.controller.admin.refund.vo.PayRefundExportReq
 import cn.iocoder.yudao.module.pay.controller.admin.refund.vo.PayRefundPageReqVO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.refund.PayRefundDO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -44,6 +45,24 @@ public interface PayRefundMapper extends BaseMapperX<PayRefundDO> {
     default int updateByIdAndStatus(Long id, Integer status, PayRefundDO update) {
         return update(update, new LambdaQueryWrapper<PayRefundDO>()
                 .eq(PayRefundDO::getId, id).eq(PayRefundDO::getStatus, status));
+    }
+
+    /**
+     * 更新退款单，并清空上一次退款的渠道结果
+     *
+     * 用于退款失败后重新发起退款，避免新的退款结果残留上一次的失败原因、渠道退款单号等
+     *
+     * @param id 退款单编号
+     * @param status 原状态
+     * @param update 更新对象
+     * @return 更新数量
+     */
+    default int updateByIdAndStatusAndClearChannelResult(Long id, Integer status, PayRefundDO update) {
+        return update(update, new LambdaUpdateWrapper<PayRefundDO>()
+                .eq(PayRefundDO::getId, id).eq(PayRefundDO::getStatus, status)
+                .set(PayRefundDO::getChannelRefundNo, null).set(PayRefundDO::getSuccessTime, null)
+                .set(PayRefundDO::getChannelErrorCode, null).set(PayRefundDO::getChannelErrorMsg, null)
+                .set(PayRefundDO::getChannelNotifyData, null));
     }
 
     default PageResult<PayRefundDO> selectPage(PayRefundPageReqVO reqVO) {

@@ -210,7 +210,7 @@ public class BpmModelServiceImpl implements BpmModelService {
 
         // 保存排序
         long sort = System.currentTimeMillis(); // 使用时间戳 - i 作为排序
-        for (int i = ids.size() - 1; i > 0; i--) {
+        for (int i = ids.size() - 1; i >= 0; i--) {
             Model model = modelMap.get(ids.get(i));
             // 更新模型
             BpmModelMetaInfoVO metaInfo = BpmModelConvert.INSTANCE.parseMetaInfo(model).setSort(sort);

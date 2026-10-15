@@ -118,7 +118,10 @@ const [Modal, modalApi] = useVbenModal({
           #set ($index = $foreach.count - 1)
           #set ($subClassNameVar = $subClassNameVars.get($index))
           #if ($subTable.subJoinMany) ## 一对多
-            ## TODO 列表值校验？
+            if (!${subClassNameVar}FormRef.value?.validate()) {
+              subTabsName.value = '${subClassNameVar}';
+              return;
+            }
           #else
             try {
               await ${subClassNameVar}FormRef.value?.validate()

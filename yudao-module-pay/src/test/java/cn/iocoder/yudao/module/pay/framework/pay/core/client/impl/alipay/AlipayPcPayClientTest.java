@@ -5,8 +5,12 @@ import cn.iocoder.yudao.module.pay.framework.pay.core.client.dto.order.PayOrderR
 import cn.iocoder.yudao.module.pay.framework.pay.core.client.dto.order.PayOrderUnifiedReqDTO;
 import cn.iocoder.yudao.module.pay.framework.pay.core.enums.PayOrderDisplayModeEnum;
 import com.alipay.api.AlipayApiException;
+import com.alipay.api.request.AlipayTradeCloseRequest;
 import com.alipay.api.request.AlipayTradePagePayRequest;
+import com.alipay.api.request.AlipayTradeQueryRequest;
+import com.alipay.api.response.AlipayTradeCloseResponse;
 import com.alipay.api.response.AlipayTradePagePayResponse;
+import com.alipay.api.response.AlipayTradeQueryResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,6 +22,7 @@ import static cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum.WAITING
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -126,6 +131,80 @@ public class AlipayPcPayClientTest extends AbstractAlipayClientTest {
         assertSame(response, resp.getRawData());
         assertEquals(subCode, resp.getChannelErrorCode());
         assertEquals(subMsg, resp.getChannelErrorMsg());
+    }
+
+    @Test
+    @DisplayName("支付宝 PC 网站支付：关单成功")
+    public void testCloseOrder_success() throws AlipayApiException {
+        // mock 方法
+        AlipayTradeCloseResponse response = randomPojo(AlipayTradeCloseResponse.class, o -> {
+            o.setCode(AbstractAlipayPayClient.ALIPAY_SUCCESS_CODE);
+            o.setSubCode("");
+        });
+        when(defaultAlipayClient.execute(any(AlipayTradeCloseRequest.class))).thenReturn(response);
+        // 准备请求参数
+        String outTradeNo = randomString();
+
+        // 调用
+        PayOrderRespDTO resp = client.closeOrder(outTradeNo);
+        // 断言
+        assertEquals(CLOSED.getStatus(), resp.getStatus());
+        assertEquals(outTradeNo, resp.getOutTradeNo());
+        assertSame(response, resp.getRawData());
+    }
+
+    @Test
+    @DisplayName("支付宝 PC 网站支付：关单时交易不存在，查询后关闭")
+    public void testCloseOrder_tradeNotExist() throws AlipayApiException {
+        // mock 方法（关单）
+        AlipayTradeCloseResponse closeResponse = randomPojo(AlipayTradeCloseResponse.class, o -> {
+            o.setCode("40004");
+            o.setSubCode("ACQ.TRADE_NOT_EXIST");
+        });
+        when(defaultAlipayClient.execute(any(AlipayTradeCloseRequest.class))).thenReturn(closeResponse);
+        // mock 方法（查询）
+        AlipayTradeQueryResponse queryResponse = randomPojo(AlipayTradeQueryResponse.class, o -> {
+            o.setCode("40004");
+            o.setSubCode("ACQ.TRADE_NOT_EXIST");
+        });
+        when(defaultAlipayClient.execute(any(AlipayTradeQueryRequest.class))).thenReturn(queryResponse);
+        // 准备请求参数
+        String outTradeNo = randomString();
+
+        // 调用
+        PayOrderRespDTO resp = client.closeOrder(outTradeNo);
+        // 断言
+        assertEquals(CLOSED.getStatus(), resp.getStatus());
+        assertEquals(outTradeNo, resp.getOutTradeNo());
+        assertSame(queryResponse, resp.getRawData());
+        assertEquals(queryResponse.getSubCode(), resp.getChannelErrorCode());
+        assertEquals(queryResponse.getSubMsg(), resp.getChannelErrorMsg());
+    }
+
+    @Test
+    @DisplayName("支付宝 PC 网站支付：关单系统异常，保持待支付")
+    public void testCloseOrder_systemError() throws AlipayApiException {
+        // mock 方法（关单）
+        AlipayTradeCloseResponse closeResponse = randomPojo(AlipayTradeCloseResponse.class, o -> {
+            o.setCode("40004");
+            o.setSubCode("ACQ.SYSTEM_ERROR");
+        });
+        when(defaultAlipayClient.execute(any(AlipayTradeCloseRequest.class))).thenReturn(closeResponse);
+        // mock 方法（查询）
+        AlipayTradeQueryResponse queryResponse = randomPojo(AlipayTradeQueryResponse.class, o -> {
+            o.setCode("40004");
+            o.setSubCode("ACQ.SYSTEM_ERROR");
+        });
+        when(defaultAlipayClient.execute(any(AlipayTradeQueryRequest.class))).thenReturn(queryResponse);
+        // 准备请求参数
+        String outTradeNo = randomString();
+
+        // 调用
+        PayOrderRespDTO resp = client.closeOrder(outTradeNo);
+        // 断言：系统异常时，不能误关闭支付单
+        assertEquals(WAITING.getStatus(), resp.getStatus());
+        assertEquals(outTradeNo, resp.getOutTradeNo());
+        assertSame(queryResponse, resp.getRawData());
     }
 
 }

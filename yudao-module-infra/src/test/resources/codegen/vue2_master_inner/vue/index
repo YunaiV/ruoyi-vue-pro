@@ -53,7 +53,7 @@
           批量删除
         </el-button>
       </el-col>
-      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
+      <RightToolbar :showSearch.sync="showSearch" @queryTable="getList"></RightToolbar>
     </el-row>
 
             <el-table
@@ -137,7 +137,7 @@
       </el-table-column>
     </el-table>
     <!-- 分页组件 -->
-    <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
+    <Pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
                 @pagination="getList"/>
     <!-- 对话框(添加 / 修改) -->
     <StudentForm ref="formRef" @success="getList" />

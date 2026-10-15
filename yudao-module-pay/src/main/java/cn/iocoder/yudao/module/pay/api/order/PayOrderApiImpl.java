@@ -32,6 +32,11 @@ public class PayOrderApiImpl implements PayOrderApi {
     }
 
     @Override
+    public void closeOrder(Long id) {
+        payOrderService.closeOrder(id);
+    }
+
+    @Override
     public void updatePayOrderPrice(Long id, Integer payPrice) {
         payOrderService.updatePayOrderPrice(id, payPrice);
     }

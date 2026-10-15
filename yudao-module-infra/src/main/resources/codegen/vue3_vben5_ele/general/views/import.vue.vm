@@ -47,6 +47,16 @@ function handleChange(file: any) {
   }
 }
 
+/** 移除文件 */
+function handleRemove() {
+  fileRef.value = null;
+}
+
+/** 超出文件数量 */
+function handleExceed() {
+  ElMessage.warning('只能选择一个文件，请先移除已选文件');
+}
+
 /** 下载导入模板 */
 async function handleDownload() {
   const data = await import${simpleClassName}Template();
@@ -61,6 +71,8 @@ async function handleDownload() {
         :limit="1"
         accept=".xls,.xlsx"
         :on-change="handleChange"
+            :on-remove="handleRemove"
+            :on-exceed="handleExceed"
         :auto-upload="false"
       >
         <ElButton type="primary"> 选择 Excel 文件 </ElButton>

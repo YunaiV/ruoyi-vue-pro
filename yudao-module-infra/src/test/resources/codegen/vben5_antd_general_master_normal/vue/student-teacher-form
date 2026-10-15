@@ -51,6 +51,18 @@ defineExpose({
 watch(
     () => props.studentId,
     async (val) => {
+      formData.value = {
+        id: undefined,
+        studentId: undefined,
+        name: undefined,
+        description: undefined,
+        birthday: undefined,
+        sex: undefined,
+        enabled: undefined,
+        avatar: undefined,
+        video: undefined,
+        memo: undefined,
+      };
       if (!val) {
         return;
       }

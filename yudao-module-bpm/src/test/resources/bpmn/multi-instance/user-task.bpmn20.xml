@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="http://www.yudao.iocoder.cn/bpm">
+    <!-- 多人审批：与 SimpleModelUtils 生成的结构一致，审批人由 BpmTaskCandidateInvoker 计算，collection 仅用于通过 Flowable 校验 -->
+    <!-- 或签：一人审批即可 -->
+    <process id="multiAny" name="或签" isExecutable="true">
+        <startEvent id="multiAny-start"/>
+        <sequenceFlow id="multiAny-flow-start" sourceRef="multiAny-start" targetRef="multiAny-task"/>
+        <userTask id="multiAny-task" name="或签审批">
+            <extensionElements>
+                <flowable:candidateStrategy>30</flowable:candidateStrategy>
+                <flowable:approveMethod>3</flowable:approveMethod>
+            </extensionElements>
+            <multiInstanceLoopCharacteristics isSequential="false" flowable:collection="${coll_userList}">
+                <completionCondition>${ nrOfCompletedInstances > 0 }</completionCondition>
+            </multiInstanceLoopCharacteristics>
+        </userTask>
+        <sequenceFlow id="multiAny-flow-task" sourceRef="multiAny-task" targetRef="multiAny-end"/>
+        <endEvent id="multiAny-end"/>
+    </process>
+    <!-- 会签：通过比例 100%，所有人审批通过 -->
+    <process id="multiRatio" name="会签" isExecutable="true">
+        <startEvent id="multiRatio-start"/>
+        <sequenceFlow id="multiRatio-flow-start" sourceRef="multiRatio-start" targetRef="multiRatio-task"/>
+        <userTask id="multiRatio-task" name="会签审批">
+            <extensionElements>
+                <flowable:candidateStrategy>30</flowable:candidateStrategy>
+                <flowable:approveMethod>2</flowable:approveMethod>
+            </extensionElements>
+            <multiInstanceLoopCharacteristics isSequential="false" flowable:collection="${coll_userList}">
+                <completionCondition>${ nrOfCompletedInstances/nrOfInstances >= 1.00}</completionCondition>
+            </multiInstanceLoopCharacteristics>
+        </userTask>
+        <sequenceFlow id="multiRatio-flow-task" sourceRef="multiRatio-task" targetRef="multiRatio-end"/>
+        <endEvent id="multiRatio-end"/>
+    </process>
+    <!-- 会签：通过比例 60%，部分审批人通过即可 -->
+    <process id="multiRatioPartial" name="会签（部分通过）" isExecutable="true">
+        <startEvent id="multiRatioPartial-start"/>
+        <sequenceFlow id="multiRatioPartial-flow-start" sourceRef="multiRatioPartial-start" targetRef="multiRatioPartial-task"/>
+        <userTask id="multiRatioPartial-task" name="会签审批">
+            <extensionElements>
+                <flowable:candidateStrategy>30</flowable:candidateStrategy>
+                <flowable:approveMethod>2</flowable:approveMethod>
+            </extensionElements>
+            <multiInstanceLoopCharacteristics isSequential="false" flowable:collection="${coll_userList}">
+                <completionCondition>${ nrOfCompletedInstances/nrOfInstances >= 0.60}</completionCondition>
+            </multiInstanceLoopCharacteristics>
+        </userTask>
+        <sequenceFlow id="multiRatioPartial-flow-task" sourceRef="multiRatioPartial-task" targetRef="multiRatioPartial-end"/>
+        <endEvent id="multiRatioPartial-end"/>
+    </process>
+    <!-- 会签驳回：first -> 会签（100%），会签驳回时退回到 first -->
+    <process id="multiReturn" name="会签驳回" isExecutable="true">
+        <startEvent id="multiReturn-start"/>
+        <sequenceFlow id="multiReturn-flow-start" sourceRef="multiReturn-start" targetRef="multiReturn-first"/>
+        <userTask id="multiReturn-first" name="发起审批">
+            <extensionElements>
+                <flowable:candidateStrategy>30</flowable:candidateStrategy>
+            </extensionElements>
+        </userTask>
+        <sequenceFlow id="multiReturn-flow-first" sourceRef="multiReturn-first" targetRef="multiReturn-task"/>
+        <userTask id="multiReturn-task" name="会签审批">
+            <extensionElements>
+                <flowable:candidateStrategy>30</flowable:candidateStrategy>
+                <flowable:approveMethod>2</flowable:approveMethod>
+                <flowable:rejectHandlerType>2</flowable:rejectHandlerType>
+                <flowable:rejectReturnTaskId>multiReturn-first</flowable:rejectReturnTaskId>
+            </extensionElements>
+            <multiInstanceLoopCharacteristics isSequential="false" flowable:collection="${coll_userList}">
+                <completionCondition>${ nrOfCompletedInstances/nrOfInstances >= 1.00}</completionCondition>
+            </multiInstanceLoopCharacteristics>
+        </userTask>
+        <sequenceFlow id="multiReturn-flow-task" sourceRef="multiReturn-task" targetRef="multiReturn-end"/>
+        <endEvent id="multiReturn-end"/>
+    </process>
+    <!-- 依次审批：按审批人顺序逐个审批 -->
+    <process id="multiSequential" name="依次审批" isExecutable="true">
+        <startEvent id="multiSequential-start"/>
+        <sequenceFlow id="multiSequential-flow-start" sourceRef="multiSequential-start" targetRef="multiSequential-task"/>
+        <userTask id="multiSequential-task" name="依次审批">
+            <extensionElements>
+                <flowable:candidateStrategy>30</flowable:candidateStrategy>
+                <flowable:approveMethod>4</flowable:approveMethod>
+            </extensionElements>
+            <multiInstanceLoopCharacteristics isSequential="true" flowable:collection="${coll_userList}">
+                <loopCardinality>1</loopCardinality>
+                <completionCondition>${ nrOfCompletedInstances >= nrOfInstances }</completionCondition>
+            </multiInstanceLoopCharacteristics>
+        </userTask>
+        <sequenceFlow id="multiSequential-flow-task" sourceRef="multiSequential-task" targetRef="multiSequential-end"/>
+        <endEvent id="multiSequential-end"/>
+    </process>
+</definitions>
