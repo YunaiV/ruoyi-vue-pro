@@ -1,7 +1,7 @@
 /*
  Navicat Premium Dump SQL
 
- Source Server         : localhost
+ Source Server         : Native-MySQL-3306
  Source Server Type    : MySQL
  Source Server Version : 80405 (8.4.5)
  Source Host           : localhost:3306
@@ -11,7 +11,7 @@
  Target Server Version : 80405 (8.4.5)
  File Encoding         : 65001
 
- Date: 14/09/2025 18:52:44
+ Date: 18/10/2026 02:01:37
 */
 
 SET NAMES utf8mb4;
@@ -49,7 +49,7 @@ CREATE TABLE `act_ge_bytearray`  (
   `BYTES_` longblob NULL,
   `GENERATED_` tinyint NULL DEFAULT NULL,
   PRIMARY KEY (`ID_`) USING BTREE,
-  INDEX `ACT_FK_BYTEARR_DEPL`(`DEPLOYMENT_ID_` ASC) USING BTREE,
+  INDEX `ACT_IDX_BYTEAR_DEPL`(`DEPLOYMENT_ID_` ASC) USING BTREE,
   CONSTRAINT `ACT_FK_BYTEARR_DEPL` FOREIGN KEY (`DEPLOYMENT_ID_`) REFERENCES `act_re_deployment` (`ID_`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB CHARACTER SET = utf8mb3 COLLATE = utf8mb3_bin ROW_FORMAT = Dynamic;
 
@@ -86,6 +86,7 @@ CREATE TABLE `act_hi_actinst`  (
   `DURATION_` bigint NULL DEFAULT NULL,
   `DELETE_REASON_` varchar(4000) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NULL DEFAULT NULL,
   `TENANT_ID_` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NULL DEFAULT '',
+  `COMPLETED_BY_` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NULL DEFAULT NULL,
   PRIMARY KEY (`ID_`) USING BTREE,
   INDEX `ACT_IDX_HI_ACT_INST_START`(`START_TIME_` ASC) USING BTREE,
   INDEX `ACT_IDX_HI_ACT_INST_END`(`END_TIME_` ASC) USING BTREE,
@@ -234,6 +235,8 @@ CREATE TABLE `act_hi_procinst`  (
   `REFERENCE_TYPE_` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NULL DEFAULT NULL,
   `PROPAGATED_STAGE_INST_ID_` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NULL DEFAULT NULL,
   `BUSINESS_STATUS_` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NULL DEFAULT NULL,
+  `END_USER_ID_` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NULL DEFAULT NULL,
+  `STATE_` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NULL DEFAULT NULL,
   PRIMARY KEY (`ID_`) USING BTREE,
   UNIQUE INDEX `PROC_INST_ID_`(`PROC_INST_ID_` ASC) USING BTREE,
   INDEX `ACT_IDX_HI_PRO_INST_END`(`END_TIME_` ASC) USING BTREE,
@@ -308,7 +311,8 @@ CREATE TABLE `act_hi_tsk_log`  (
   `SUB_SCOPE_ID_` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NULL DEFAULT NULL,
   `SCOPE_TYPE_` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NULL DEFAULT NULL,
   `TENANT_ID_` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NULL DEFAULT '',
-  PRIMARY KEY (`ID_`) USING BTREE
+  PRIMARY KEY (`ID_`) USING BTREE,
+  INDEX `ACT_IDX_ACT_HI_TSK_LOG_TASK`(`TASK_ID_` ASC) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb3 COLLATE = utf8mb3_bin ROW_FORMAT = Dynamic;
 
 -- ----------------------------
@@ -578,6 +582,7 @@ CREATE TABLE `act_ru_actinst`  (
   `TRANSACTION_ORDER_` int NULL DEFAULT NULL,
   `DELETE_REASON_` varchar(4000) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NULL DEFAULT NULL,
   `TENANT_ID_` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NULL DEFAULT '',
+  `COMPLETED_BY_` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NULL DEFAULT NULL,
   PRIMARY KEY (`ID_`) USING BTREE,
   INDEX `ACT_IDX_RU_ACTI_START`(`START_TIME_` ASC) USING BTREE,
   INDEX `ACT_IDX_RU_ACTI_END`(`END_TIME_` ASC) USING BTREE,
@@ -687,7 +692,8 @@ CREATE TABLE `act_ru_event_subscr`  (
   PRIMARY KEY (`ID_`) USING BTREE,
   INDEX `ACT_IDX_EVENT_SUBSCR_CONFIG_`(`CONFIGURATION_` ASC) USING BTREE,
   INDEX `ACT_IDX_EVENT_SUBSCR_SCOPEREF_`(`SCOPE_ID_` ASC, `SCOPE_TYPE_` ASC) USING BTREE,
-  INDEX `ACT_FK_EVENT_EXEC`(`EXECUTION_ID_` ASC) USING BTREE,
+  INDEX `ACT_IDX_EVENT_SUBSCR_EXEC_ID`(`EXECUTION_ID_` ASC) USING BTREE,
+  INDEX `ACT_IDX_EVENT_SUBSCR_PROC_ID`(`PROC_INST_ID_` ASC) USING BTREE,
   CONSTRAINT `ACT_FK_EVENT_EXEC` FOREIGN KEY (`EXECUTION_ID_`) REFERENCES `act_ru_execution` (`ID_`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB CHARACTER SET = utf8mb3 COLLATE = utf8mb3_bin ROW_FORMAT = Dynamic;
 
@@ -1080,6 +1086,26 @@ CREATE TABLE `act_ru_variable`  (
 ) ENGINE = InnoDB CHARACTER SET = utf8mb3 COLLATE = utf8mb3_bin ROW_FORMAT = Dynamic;
 
 -- ----------------------------
+-- Table structure for bpm_category
+-- ----------------------------
+DROP TABLE IF EXISTS `bpm_category`;
+CREATE TABLE `bpm_category`  (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `name` varchar(63) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '分类名',
+  `code` varchar(63) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '分类标志',
+  `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '分类描述',
+  `status` tinyint NOT NULL COMMENT '状态',
+  `sort` int NOT NULL COMMENT '排序',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'BPM 流程分类' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
 -- Table structure for bpm_form
 -- ----------------------------
 DROP TABLE IF EXISTS `bpm_form`;
@@ -1147,6 +1173,92 @@ CREATE TABLE `bpm_process_definition_ext`  (
 ) ENGINE = InnoDB AUTO_INCREMENT = 141 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'Bpm 流程定义的拓展表\n' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
+-- Table structure for bpm_process_definition_info
+-- ----------------------------
+DROP TABLE IF EXISTS `bpm_process_definition_info`;
+CREATE TABLE `bpm_process_definition_info`  (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `process_definition_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '流程定义的编号',
+  `model_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '流程模型的编号',
+  `model_type` int NULL DEFAULT NULL COMMENT '流程模型的类型',
+  `category` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '流程分类的编码',
+  `icon` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '图标',
+  `description` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '描述',
+  `form_type` int NULL DEFAULT NULL COMMENT '表单类型',
+  `form_id` bigint NULL DEFAULT NULL COMMENT '动态表单编号',
+  `form_conf` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '表单的配置',
+  `form_fields` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '表单项的数组',
+  `form_custom_create_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '自定义表单的提交路径',
+  `form_custom_view_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '自定义表单的查看路径',
+  `simple_model` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT 'SIMPLE 设计器模型数据',
+  `visible` bit(1) NULL DEFAULT b'1' COMMENT '是否可见',
+  `sort` bigint NULL DEFAULT NULL COMMENT '排序值',
+  `start_user_ids` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '可发起用户编号数组',
+  `start_dept_ids` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '可发起部门编号数组',
+  `manager_user_ids` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '可管理用户编号数组',
+  `allow_cancel_running_process` bit(1) NULL DEFAULT b'1' COMMENT '是否允许撤销审批中的申请',
+  `allow_withdraw_task` bit(1) NULL DEFAULT b'1' COMMENT '是否允许审批人撤回任务',
+  `process_id_rule` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '流程 ID 规则',
+  `auto_approval_type` int NULL DEFAULT NULL COMMENT '自动去重类型',
+  `title_setting` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '标题设置',
+  `summary_setting` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '摘要设置',
+  `process_before_trigger_setting` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '流程前置通知设置',
+  `process_after_trigger_setting` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '流程后置通知设置',
+  `task_before_trigger_setting` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '任务前置通知设置',
+  `task_after_trigger_setting` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '任务后置通知设置',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'BPM 流程定义拓信息' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Table structure for bpm_process_expression
+-- ----------------------------
+DROP TABLE IF EXISTS `bpm_process_expression`;
+CREATE TABLE `bpm_process_expression`  (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '表达式名字',
+  `status` int NOT NULL COMMENT '表达式状态',
+  `expression` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '表达式',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'BPM 流程表达式' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Table structure for bpm_process_instance_copy
+-- ----------------------------
+DROP TABLE IF EXISTS `bpm_process_instance_copy`;
+CREATE TABLE `bpm_process_instance_copy`  (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `start_user_id` bigint NOT NULL COMMENT '发起人 Id',
+  `process_instance_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '流程名',
+  `process_instance_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '流程实例的编号',
+  `process_definition_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '流程实例的流程定义编号',
+  `category` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '流程分类',
+  `activity_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '流程活动的编号',
+  `activity_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '流程活动的名字',
+  `task_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '流程活动的编号',
+  `user_id` bigint NOT NULL COMMENT '用户编号（被抄送的用户编号）',
+  `reason` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '抄送意见',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'BPM 流程抄送' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
 -- Table structure for bpm_process_instance_ext
 -- ----------------------------
 DROP TABLE IF EXISTS `bpm_process_instance_ext`;
@@ -1169,6 +1281,27 @@ CREATE TABLE `bpm_process_instance_ext`  (
   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 296 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '工作流的流程实例的拓展' ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Table structure for bpm_process_listener
+-- ----------------------------
+DROP TABLE IF EXISTS `bpm_process_listener`;
+CREATE TABLE `bpm_process_listener`  (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键 ID',
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '监听器名字',
+  `status` int NOT NULL COMMENT '状态',
+  `type` varchar(63) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '监听类型',
+  `event` varchar(63) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '监听事件',
+  `value_type` varchar(63) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '值类型',
+  `value` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '值',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'BPM 流程监听器' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for bpm_task_assign_rule
@@ -1464,7 +1597,7 @@ CREATE TABLE `crm_business_product`  (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'CRM 商机产品关联表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'CRM 商机产品关联表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for crm_business_status
@@ -1483,7 +1616,7 @@ CREATE TABLE `crm_business_status`  (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'CRM 商机状态' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'CRM 商机状态' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for crm_business_status_type
@@ -1500,7 +1633,7 @@ CREATE TABLE `crm_business_status_type`  (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'CRM 商机状态组' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'CRM 商机状态组' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for crm_clue
@@ -1584,7 +1717,7 @@ CREATE TABLE `crm_contact_business`  (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'CRM 联系人与商机的关联' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'CRM 联系人与商机的关联' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for crm_contract
@@ -1654,7 +1787,7 @@ CREATE TABLE `crm_contract_product`  (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'CRM 合同产品关联表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'CRM 合同产品关联表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for crm_customer
@@ -1753,7 +1886,7 @@ CREATE TABLE `crm_follow_up_record`  (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'CRM 跟进记录' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'CRM 跟进记录' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for crm_followup
@@ -1775,7 +1908,7 @@ CREATE TABLE `crm_followup`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `customer_id`(`customer_id` ASC) USING BTREE,
   INDEX `contact_id`(`contact_id` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'CRM跟进记录表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'CRM跟进记录表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for crm_opportunity
@@ -1797,7 +1930,7 @@ CREATE TABLE `crm_opportunity`  (
   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `customer_id`(`customer_id` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'CRM商机表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'CRM商机表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for crm_permission
@@ -1816,7 +1949,7 @@ CREATE TABLE `crm_permission`  (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'CRM 数据权限' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'CRM 数据权限' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for crm_product
@@ -1877,7 +2010,7 @@ CREATE TABLE `crm_quote`  (
   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `customer_id`(`customer_id` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'CRM报价单表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'CRM报价单表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for crm_receivable
@@ -1942,7 +2075,7 @@ CREATE TABLE `erp_account`  (
   `remark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '备注',
   `status` int NOT NULL COMMENT '开启状态',
   `sort` int NOT NULL COMMENT '排序',
-  `default_status` bit(1) NOT NULL COMMENT '是否默认',
+  `default_status` bit(1) NOT NULL DEFAULT b'1' COMMENT '是否默认',
   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -1950,7 +2083,7 @@ CREATE TABLE `erp_account`  (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'ERP 结算账户' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'ERP 结算账户' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for erp_customer
@@ -2027,7 +2160,7 @@ CREATE TABLE `erp_finance_payment_item`  (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'ERP 付款项' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'ERP 付款项' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for erp_finance_receipt
@@ -2075,7 +2208,7 @@ CREATE TABLE `erp_finance_receipt_item`  (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'ERP 收款项' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'ERP 收款项' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for erp_product
@@ -2102,7 +2235,7 @@ CREATE TABLE `erp_product`  (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'ERP 产品' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'ERP 产品' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for erp_product_category
@@ -2122,7 +2255,7 @@ CREATE TABLE `erp_product_category`  (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'ERP 产品分类' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'ERP 产品分类' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for erp_product_unit
@@ -2139,7 +2272,7 @@ CREATE TABLE `erp_product_unit`  (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'ERP 产品单位' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'ERP 产品单位' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for erp_purchase_in
@@ -2197,7 +2330,7 @@ CREATE TABLE `erp_purchase_in_item`  (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'ERP 采购入库项' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'ERP 采购入库项' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for erp_purchase_order
@@ -2219,8 +2352,8 @@ CREATE TABLE `erp_purchase_order`  (
   `deposit_price` decimal(10, 2) NOT NULL COMMENT '定金金额',
   `file_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '附件地址',
   `remark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '备注',
-  `in_count` decimal(10, 2) NOT NULL COMMENT '采购入库数量',
-  `return_count` decimal(10, 2) NOT NULL COMMENT '采购退货数量',
+  `in_count` decimal(10, 2) NOT NULL DEFAULT 10.00 COMMENT '采购入库数量',
+  `return_count` decimal(10, 2) NOT NULL DEFAULT 10.00 COMMENT '采购退货数量',
   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -2228,7 +2361,7 @@ CREATE TABLE `erp_purchase_order`  (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'ERP 采购订单' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'ERP 采购订单' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for erp_purchase_order_item
@@ -2254,7 +2387,33 @@ CREATE TABLE `erp_purchase_order_item`  (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'ERP 采购订单项' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'ERP 采购订单项' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Table structure for erp_purchase_order_items
+-- ----------------------------
+DROP TABLE IF EXISTS `erp_purchase_order_items`;
+CREATE TABLE `erp_purchase_order_items`  (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `order_id` bigint NOT NULL COMMENT '采购订单编号',
+  `product_id` bigint NOT NULL COMMENT '产品编号',
+  `product_unit_id` decimal(10, 2) NOT NULL COMMENT '产品单位单位',
+  `product_price` decimal(10, 2) NOT NULL COMMENT '产品单位单价，单位：元',
+  `count` decimal(10, 2) NOT NULL COMMENT '数量',
+  `total_price` decimal(10, 2) NOT NULL COMMENT '总价，单位：元',
+  `tax_percent` decimal(10, 2) NOT NULL DEFAULT 1.00 COMMENT '税率，百分比',
+  `tax_price` decimal(10, 2) NOT NULL DEFAULT 1.00 COMMENT '税额，单位：元',
+  `remark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '备注',
+  `in_count` decimal(10, 2) NOT NULL DEFAULT 10.00 COMMENT '采购入库数量',
+  `return_count` decimal(10, 2) NOT NULL DEFAULT 10.00 COMMENT '采购退货数量',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'ERP 采购订单项 ' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for erp_purchase_return
@@ -2312,7 +2471,7 @@ CREATE TABLE `erp_purchase_return_item`  (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'ERP 采购退货项' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'ERP 采购退货项' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for erp_sale_order
@@ -2369,7 +2528,7 @@ CREATE TABLE `erp_sale_order_item`  (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'ERP 销售订单项' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'ERP 销售订单项' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for erp_sale_order_items
@@ -2397,7 +2556,7 @@ CREATE TABLE `erp_sale_order_items`  (
   INDEX `idx_order_id`(`order_id` ASC) USING BTREE,
   INDEX `idx_product_id`(`product_id` ASC) USING BTREE,
   INDEX `idx_tenant_id`(`tenant_id` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = 'ERP销售订单项表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = 'ERP销售订单项表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for erp_sale_out
@@ -2455,7 +2614,7 @@ CREATE TABLE `erp_sale_out_item`  (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'ERP 销售出库项' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'ERP 销售出库项' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for erp_sale_out_items
@@ -2484,7 +2643,7 @@ CREATE TABLE `erp_sale_out_items`  (
   INDEX `idx_product_id`(`product_id` ASC) USING BTREE,
   INDEX `idx_warehouse_id`(`warehouse_id` ASC) USING BTREE,
   INDEX `idx_tenant_id`(`tenant_id` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = 'ERP销售出库项表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = 'ERP销售出库项表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for erp_sale_return
@@ -2542,7 +2701,7 @@ CREATE TABLE `erp_sale_return_item`  (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'ERP 销售退货项' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'ERP 销售退货项' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for erp_stock
@@ -2553,6 +2712,7 @@ CREATE TABLE `erp_stock`  (
   `warehouse_id` bigint NOT NULL COMMENT '仓库编号',
   `product_id` bigint NOT NULL COMMENT '产品编号',
   `stock_count` decimal(10, 2) NOT NULL COMMENT '库存数量',
+  `count` decimal(10, 2) NULL DEFAULT NULL COMMENT '库存数量',
   `lock_count` decimal(10, 2) NOT NULL COMMENT '锁定数量',
   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
@@ -2603,7 +2763,7 @@ CREATE TABLE `erp_stock_check_item`  (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'ERP 库存盘点项' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'ERP 库存盘点项' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for erp_stock_in
@@ -2650,7 +2810,7 @@ CREATE TABLE `erp_stock_in_item`  (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'ERP 库存入库项' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'ERP 库存入库项' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for erp_stock_move
@@ -2695,7 +2855,7 @@ CREATE TABLE `erp_stock_move_item`  (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'ERP 库存调拨项' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'ERP 库存调拨项' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for erp_stock_out
@@ -2742,7 +2902,7 @@ CREATE TABLE `erp_stock_out_item`  (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'ERP 库存出库项' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'ERP 库存出库项' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for erp_stock_record
@@ -2795,7 +2955,7 @@ CREATE TABLE `erp_supplier`  (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'ERP 供应商' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'ERP 供应商' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for erp_warehouse
@@ -2843,36 +3003,35 @@ CREATE TABLE `flw_channel_definition`  (
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
--- Table structure for flw_ev_databasechangelog
+-- Table structure for flw_event_definition
 -- ----------------------------
-DROP TABLE IF EXISTS `flw_ev_databasechangelog`;
-CREATE TABLE `flw_ev_databasechangelog`  (
-  `ID` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `AUTHOR` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `FILENAME` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `DATEEXECUTED` datetime NOT NULL,
-  `ORDEREXECUTED` int NOT NULL,
-  `EXECTYPE` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `MD5SUM` varchar(35) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `DESCRIPTION` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `COMMENTS` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `TAG` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `LIQUIBASE` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `CONTEXTS` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `LABELS` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `DEPLOYMENT_ID` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL
+DROP TABLE IF EXISTS `flw_event_definition`;
+CREATE TABLE `flw_event_definition`  (
+  `ID_` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `NAME_` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `VERSION_` int NULL DEFAULT NULL,
+  `KEY_` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `CATEGORY_` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `DEPLOYMENT_ID_` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `TENANT_ID_` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `RESOURCE_NAME_` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `DESCRIPTION_` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  PRIMARY KEY (`ID_`) USING BTREE,
+  UNIQUE INDEX `ACT_IDX_EVENT_DEF_UNIQ`(`KEY_` ASC, `VERSION_` ASC, `TENANT_ID_` ASC) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Table structure for flw_ev_databasechangeloglock
+-- Table structure for flw_event_deployment
 -- ----------------------------
-DROP TABLE IF EXISTS `flw_ev_databasechangeloglock`;
-CREATE TABLE `flw_ev_databasechangeloglock`  (
-  `ID` int NOT NULL,
-  `LOCKED` tinyint NOT NULL,
-  `LOCKGRANTED` datetime NULL DEFAULT NULL,
-  `LOCKEDBY` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  PRIMARY KEY (`ID`) USING BTREE
+DROP TABLE IF EXISTS `flw_event_deployment`;
+CREATE TABLE `flw_event_deployment`  (
+  `ID_` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `NAME_` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `CATEGORY_` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `DEPLOY_TIME_` datetime(3) NULL DEFAULT NULL,
+  `TENANT_ID_` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `PARENT_DEPLOYMENT_ID_` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  PRIMARY KEY (`ID_`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
@@ -2884,7 +3043,9 @@ CREATE TABLE `flw_event_resource`  (
   `NAME_` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   `DEPLOYMENT_ID_` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   `RESOURCE_BYTES_` longblob NULL,
-  PRIMARY KEY (`ID_`) USING BTREE
+  PRIMARY KEY (`ID_`) USING BTREE,
+  INDEX `FLW_IDX_EVENT_RSRC_DPL`(`DEPLOYMENT_ID_` ASC) USING BTREE,
+  CONSTRAINT `FLW_FK_EVENT_RSRC_DPL` FOREIGN KEY (`DEPLOYMENT_ID_`) REFERENCES `flw_event_deployment` (`ID_`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
@@ -2997,7 +3158,7 @@ CREATE TABLE `infra_api_error_log`  (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 21134 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '系统异常日志' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 39 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '系统异常日志' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for infra_codegen_column
@@ -3028,7 +3189,7 @@ CREATE TABLE `infra_codegen_column`  (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2497 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '代码生成表字段定义' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 2505 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '代码生成表字段定义' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for infra_codegen_table
@@ -3060,7 +3221,7 @@ CREATE TABLE `infra_codegen_table`  (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 188 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '代码生成表定义' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 189 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '代码生成表定义' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for infra_config
@@ -3119,7 +3280,7 @@ CREATE TABLE `infra_file`  (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1519 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '文件表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1521 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '文件表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for infra_file_config
@@ -3295,6 +3456,22 @@ CREATE TABLE `jimu_report`  (
   INDEX `uniq_jmreport_createby`(`create_by` ASC) USING BTREE,
   INDEX `uniq_jmreport_delflag`(`del_flag` ASC) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb3 COLLATE = utf8mb3_general_ci COMMENT = '在线excel设计器' ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Table structure for jimu_report_category
+-- ----------------------------
+DROP TABLE IF EXISTS `jimu_report_category`;
+CREATE TABLE `jimu_report_category`  (
+  `id` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '主键',
+  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '分类名称',
+  `parent_id` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '父级分类ID',
+  `create_by` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '创建人',
+  `create_time` datetime NULL DEFAULT NULL COMMENT '创建时间',
+  `update_by` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '更新人',
+  `update_time` datetime NULL DEFAULT NULL COMMENT '更新时间',
+  `del_flag` int NULL DEFAULT 0 COMMENT '删除标志（0-正常，1-删除）',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '报表分类表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for jimu_report_data_source
@@ -3741,7 +3918,7 @@ CREATE TABLE `mp_account`  (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '公众号账号表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 15 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '公众号账号表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Table structure for mp_auto_reply
@@ -4842,7 +5019,7 @@ CREATE TABLE `product_browse_history`  (
   INDEX `idx_user_id`(`user_id` ASC) USING BTREE,
   INDEX `idx_spu_id`(`spu_id` ASC) USING BTREE,
   INDEX `idx_tenant_id`(`tenant_id` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '商品浏览记录表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '商品浏览记录表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for product_category
@@ -4889,7 +5066,7 @@ CREATE TABLE `product_comment`  (
   INDEX `idx_user_id`(`user_id` ASC) USING BTREE,
   INDEX `idx_spu_id`(`spu_id` ASC) USING BTREE,
   INDEX `idx_tenant_id`(`tenant_id` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '商品评价表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '商品评价表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for product_favorite
@@ -4908,7 +5085,7 @@ CREATE TABLE `product_favorite`  (
   INDEX `idx_user_id`(`user_id` ASC) USING BTREE,
   INDEX `idx_spu_id`(`spu_id` ASC) USING BTREE,
   INDEX `idx_tenant_id`(`tenant_id` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '商品收藏表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '商品收藏表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for product_property
@@ -4925,7 +5102,7 @@ CREATE TABLE `product_property`  (
   `deleted` tinyint NULL DEFAULT 0 COMMENT '是否删除 0-未删除 1-已删除',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_tenant_id`(`tenant_id` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '商品属性表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '商品属性表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for product_property_value
@@ -4944,7 +5121,7 @@ CREATE TABLE `product_property_value`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_property_id`(`property_id` ASC) USING BTREE,
   INDEX `idx_tenant_id`(`tenant_id` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '商品属性值表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '商品属性值表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for product_sku
@@ -5054,8 +5231,15 @@ CREATE TABLE `promotion_article`  (
   `category_id` bigint NOT NULL COMMENT '分类编号',
   `spu_id` bigint NULL DEFAULT NULL COMMENT '关联商品编号',
   `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '文章标题',
+  `browse_count` int NULL DEFAULT NULL COMMENT '浏览次数',
+  `recommend_hot` bigint NULL DEFAULT NULL COMMENT '是否热门(小程序)',
+  `recommend_banner` bigint NULL DEFAULT NULL COMMENT '是否轮播图(小程序)',
+  `sort` int NULL DEFAULT NULL COMMENT '排序',
+  `status` int NULL DEFAULT NULL COMMENT '状态',
+  `content` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '文章内容',
   `author` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '文章作者',
   `pic_url` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '封面图片地址',
+  `introduction` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '文章简介',
   `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
@@ -5063,7 +5247,7 @@ CREATE TABLE `promotion_article`  (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '文章' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 11 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '文章' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for promotion_article_category
@@ -5102,7 +5286,7 @@ CREATE TABLE `promotion_banner`  (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'banner' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'banner' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for promotion_bargain_activity
@@ -5120,7 +5304,7 @@ CREATE TABLE `promotion_bargain_activity`  (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '砍价活动' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '砍价活动' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for promotion_bargain_help
@@ -5139,7 +5323,7 @@ CREATE TABLE `promotion_bargain_help`  (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '砍价助力' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '砍价助力' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for promotion_bargain_record
@@ -5158,7 +5342,7 @@ CREATE TABLE `promotion_bargain_record`  (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '砍价记录' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '砍价记录' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for promotion_combination_activity
@@ -5177,7 +5361,7 @@ CREATE TABLE `promotion_combination_activity`  (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '拼团活动' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '拼团活动' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for promotion_combination_product
@@ -5196,7 +5380,7 @@ CREATE TABLE `promotion_combination_product`  (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '拼团商品' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '拼团商品' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for promotion_combination_record
@@ -5304,7 +5488,7 @@ CREATE TABLE `promotion_discount_activity`  (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '限时折扣活动' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '限时折扣活动' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for promotion_diy_page
@@ -5397,7 +5581,7 @@ CREATE TABLE `promotion_kefu_message`  (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '客服消息' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '客服消息' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for promotion_point_activity
@@ -5416,7 +5600,7 @@ CREATE TABLE `promotion_point_activity`  (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '积分商城活动' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '积分商城活动' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for promotion_point_product
@@ -5435,7 +5619,7 @@ CREATE TABLE `promotion_point_product`  (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '积分商城商品' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '积分商城商品' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for promotion_reward_activity
@@ -5453,7 +5637,7 @@ CREATE TABLE `promotion_reward_activity`  (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '满减送活动' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '满减送活动' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for promotion_seckill_activity
@@ -5471,7 +5655,7 @@ CREATE TABLE `promotion_seckill_activity`  (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '秒杀活动' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '秒杀活动' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for promotion_seckill_config
@@ -5495,7 +5679,7 @@ CREATE TABLE `promotion_seckill_config`  (
   INDEX `idx_start_end_time`(`start_time` ASC, `end_time` ASC) USING BTREE,
   INDEX `idx_tenant_id`(`tenant_id` ASC) USING BTREE,
   INDEX `idx_deleted`(`deleted` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '秒杀配置表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '秒杀配置表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for promotion_seckill_product
@@ -5513,7 +5697,7 @@ CREATE TABLE `promotion_seckill_product`  (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '秒杀商品' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '秒杀商品' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for qrtz_blob_triggers
@@ -5798,6 +5982,64 @@ CREATE TABLE `rep_demo_jianpiao`  (
   `s_id` int NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 87 CHARACTER SET = utf8mb3 COLLATE = utf8mb3_general_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Table structure for report_ekyc_face_check
+-- ----------------------------
+DROP TABLE IF EXISTS `report_ekyc_face_check`;
+CREATE TABLE `report_ekyc_face_check`  (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `customer_id` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '用户ID',
+  `login_name` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '用户名',
+  `first_name` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '首名',
+  `middle_name` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '中间名',
+  `last_name` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '尾名',
+  `birthday` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '生日',
+  `id_front_img` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '证件证明照',
+  `ekyc_face_img` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT 'ekyc自拍照',
+  `face_img` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '自拍照',
+  `bill_no` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '业务编号',
+  `capture_transaction_id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT 'zoloz人脸识别业务编号',
+  `compare_transaction_id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT 'zoloz人脸对比业务编号',
+  `status` tinyint NOT NULL DEFAULT 0 COMMENT '0 初始化，1.人脸识别成功，2人脸识别失败，3人脸比对成功，4人脸比对失败，9失效（备用）',
+  `compare_face_score` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '人脸对比分数0-100.0',
+  `create_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `create_by` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '创建人',
+  `update_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `update_by` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '更新人',
+  `tenant` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '血缘标记（BP、AP、 GP、PG、SP）',
+  `channel` varchar(2) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '渠道(3:GLIFE, 4:GPO, 5:LAZADA,6:MAYA, 7:PERYAGAME, 91:PC, 92:H5, 93:IOS, 94:Android)',
+  `domain_name` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '域名',
+  `remark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '备注',
+  `lineage_name` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '新四级血缘名称（c66-BP-bp-web）',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id` DESC) USING BTREE,
+  INDEX `idx_loginName`(`login_name` ASC) USING BTREE,
+  INDEX `idx_updateDate_status`(`create_date` ASC, `status` ASC) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 457 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = 'eKYC 人脸比对记录' ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Table structure for report_go_view_project
+-- ----------------------------
+DROP TABLE IF EXISTS `report_go_view_project`;
+CREATE TABLE `report_go_view_project`  (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号，数据库自增',
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '项目名称',
+  `pic_url` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '预览图片 URL',
+  `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '报表内容，JSON 配置，使用字符串存储',
+  `status` tinyint NOT NULL COMMENT '发布状态：0 - 已发布，1 - 未发布',
+  `remark` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '项目备注',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '创建者',
+  `create_time` datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '更新者',
+  `update_time` datetime NULL DEFAULT NULL COMMENT '更新时间',
+  `deleted` tinyint NULL DEFAULT 0 COMMENT '是否删除：0 - 正常，1 - 删除',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = 'GoView 项目表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for risk_rule_engine
@@ -6132,7 +6374,7 @@ CREATE TABLE `system_login_log`  (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 3354 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '系统访问记录' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 3378 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '系统访问记录' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for system_mail_account
@@ -6232,7 +6474,7 @@ CREATE TABLE `system_menu`  (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2814 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '菜单权限表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 2816 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '菜单权限表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for system_notice
@@ -6323,7 +6565,7 @@ CREATE TABLE `system_oauth2_access_token`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_access_token`(`access_token` ASC) USING BTREE,
   INDEX `idx_refresh_token`(`refresh_token` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 10126 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'OAuth2 访问令牌' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'OAuth2 访问令牌' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for system_oauth2_approve
@@ -6417,7 +6659,7 @@ CREATE TABLE `system_oauth2_refresh_token`  (
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1661 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'OAuth2 刷新令牌' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1673 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'OAuth2 刷新令牌' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for system_operate_log
@@ -7227,7 +7469,7 @@ CREATE TABLE `trade_order_item`  (
   INDEX `idx_spu_id`(`spu_id` ASC) USING BTREE,
   INDEX `idx_sku_id`(`sku_id` ASC) USING BTREE,
   INDEX `idx_tenant_id`(`tenant_id` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '交易订单项表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '交易订单项表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for trade_order_log
@@ -7753,5 +7995,50 @@ CREATE TABLE `yudao_demo03_student`  (
   `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 10 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '学生表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Procedure structure for insert_mock_ekyc_data
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `insert_mock_ekyc_data`;
+delimiter ;;
+CREATE PROCEDURE `insert_mock_ekyc_data`()
+BEGIN
+  DECLARE d DATE;
+  DECLARE s INT;
+  DECLARE i INT;
+  SET d = '2025-09-11';
+
+  WHILE d <= '2025-10-11' DO
+    SET s = 1;
+    WHILE s <= 4 DO
+      SET i = 1;
+      WHILE i <= FLOOR(RAND() * 10) + 1 DO
+        INSERT INTO report_ekyc_face_check (
+          customer_id, login_name, first_name, middle_name, last_name,
+          birthday, id_front_img, ekyc_face_img, face_img, bill_no,
+          capture_transaction_id, compare_transaction_id, status,
+          compare_face_score, create_date, create_by, update_date, update_by,
+          tenant, channel, domain_name, remark, lineage_name,
+          create_time, updater, update_time, deleted, tenant_id
+        ) VALUES (
+          CONCAT('CUST', FLOOR(RAND() * 10000)),
+          CONCAT('user', FLOOR(RAND() * 10000)),
+          'John', '', 'Doe',
+          '1990-01-01', '', '', '', '',
+          '', '', s,
+          '', d, '', d, '',
+          'BP', ELT(FLOOR(RAND() * 4) + 1, '91', '92', '93', '94'),
+          '', '', '',
+          d, '', d, b'0', 1
+        );
+        SET i = i + 1;
+      END WHILE;
+      SET s = s + 1;
+    END WHILE;
+    SET d = DATE_ADD(d, INTERVAL 1 DAY);
+  END WHILE;
+END
+;;
+delimiter ;
 
 SET FOREIGN_KEY_CHECKS = 1;
