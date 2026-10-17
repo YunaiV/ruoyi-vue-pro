@@ -1,5 +1,3 @@
-version: "3.4"
-
 name: yudao-system
 
 services:
@@ -11,10 +9,10 @@ services:
     ports:
       - "3309:3306"
     environment:
-      MYSQL_DATABASE: ${MYSQL_DATABASE:-ruoyi-vue-pro}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-123456}
+      MYSQL_DATABASE: ruoyi-vue-pro
+      MYSQL_ROOT_PASSWORD:
     volumes:
-      - mysql:/var/lib/mysql/
+      - mysql:/var/lib/mysql
       - ./sql/mysql/ruoyi-vue-pro.sql:/docker-entrypoint-initdb.d/ruoyi-vue-pro.sql:ro
 
   redis:
@@ -25,59 +23,35 @@ services:
       - "6379:6379"
     volumes:
       - redis:/data
+
   server:
     container_name: yudao-server
-    build:
-      context: ../..
-      dockerfile: yudao-server/Dockerfile
+    image: yudao-server:latest
     restart: unless-stopped
     ports:
       - "48080:48080"
     environment:
-      # https://github.com/polovyivan/docker-pass-configs-to-container
       SPRING_PROFILES_ACTIVE: local
-      JAVA_OPTS:
-        ${JAVA_OPTS:-
+      JAVA_OPTS: >
         -Xms512m
         -Xmx512m
         -Djava.security.egd=file:/dev/./urandom
-        }
-      ARGS:
-        --spring.datasource.dynamic.datasource.master.url=${MASTER_DATASOURCE_URL:-jdbc:mysql://yudao-mysql:3306/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true}
-        --spring.datasource.dynamic.datasource.master.username=${MASTER_DATASOURCE_USERNAME:-root}
-        --spring.datasource.dynamic.datasource.master.password=${MASTER_DATASOURCE_PASSWORD:-123456}
-        --spring.datasource.dynamic.datasource.slave.url=${SLAVE_DATASOURCE_URL:-jdbc:mysql://yudao-mysql:3306/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true}
-        --spring.datasource.dynamic.datasource.slave.username=${SLAVE_DATASOURCE_USERNAME:-root}
-        --spring.datasource.dynamic.datasource.slave.password=${SLAVE_DATASOURCE_PASSWORD:-123456}
-        --spring.data.redis.host=${REDIS_HOST:-yudao-redis}
+      ARGS: >
+        --spring.datasource.dynamic.datasource.master.url=jdbc:mysql://yudao-mysql:3306/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true
+        --spring.datasource.dynamic.datasource.master.username=root
+        --spring.datasource.dynamic.datasource.master.password=123456
+        --spring.datasource.dynamic.datasource.slave.url=jdbc:mysql://yudao-mysql:3306/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true
+        --spring.datasource.dynamic.datasource.slave.username=root
+        --spring.datasource.dynamic.datasource.slave.password=123456
+        --spring.data.redis.host=yudao-redis
+        --spring.data.redis.port=6379
     depends_on:
       - mysql
       - redis
 
-  admin:
-    container_name: yudao-admin
-    build:
-      context: ./yudao-ui-admin
-      args:
-        NODE_ENV:
-          ENV=${NODE_ENV:-production}
-          PUBLIC_PATH=${PUBLIC_PATH:-/}
-          VUE_APP_TITLE=${VUE_APP_TITLE:-芋道管理系统}
-          VUE_APP_BASE_API=${VUE_APP_BASE_API:-/prod-api}
-          VUE_APP_APP_NAME=${VUE_APP_APP_NAME:-/}
-          VUE_APP_TENANT_ENABLE=${VUE_APP_TENANT_ENABLE:-true}
-          VUE_APP_CAPTCHA_ENABLE=${VUE_APP_CAPTCHA_ENABLE:-true}
-          VUE_APP_DOC_ENABLE=${VUE_APP_DOC_ENABLE:-true}
-          VUE_APP_BAIDU_CODE=${VUE_APP_BAIDU_CODE:-fadc1bd5db1a1d6f581df60a1807f8ab}
-    image: yudao-admin
-    restart: unless-stopped
-    ports:
-      - "8080:80"
-    depends_on:
-      - server
-
 volumes:
   mysql:
     driver: local
+
   redis:
     driver: local
