@@ -21,11 +21,11 @@ services:
         -Djava.security.egd=file:/dev/./urandom
 
       ARGS: >
-        --spring.datasource.dynamic.datasource.master.url=jdbc:mysql://dev-mysql:3306/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true
+        --spring.datasource.dynamic.datasource.master.url=jdbc:mysql://dev-mysql:3309/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true
         --spring.datasource.dynamic.datasource.master.username=root
         --spring.datasource.dynamic.datasource.master.password=
 
-        --spring.datasource.dynamic.datasource.slave.url=jdbc:mysql://dev-mysql:3306/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true
+        --spring.datasource.dynamic.datasource.slave.url=jdbc:mysql://dev-mysql:3309/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true
         --spring.datasource.dynamic.datasource.slave.username=root
         --spring.datasource.dynamic.datasource.slave.password=
 
