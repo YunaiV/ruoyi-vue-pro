@@ -62,11 +62,11 @@ public class OAuth2ClientDO extends BaseDO {
     /**
      * 访问令牌的有效期
      */
-    private Integer accessTokenValiditySeconds;
+    private Long accessTokenValiditySeconds;
     /**
      * 刷新令牌的有效期
      */
-    private Integer refreshTokenValiditySeconds;
+    private Long refreshTokenValiditySeconds;
     /**
      * 可重定向的 URI 地址
      */

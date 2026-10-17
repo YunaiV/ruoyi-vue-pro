@@ -9,7 +9,7 @@ import jakarta.validation.constraints.NotEmpty;
 @Data
 public class GoViewDataGetBySqlReqVO {
 
-    @Schema(description = "SQL 语句", requiredMode = Schema.RequiredMode.REQUIRED, example = "SELECT * FROM user")
+    @Schema(description = "SQL 语句", requiredMode = Schema.RequiredMode.REQUIRED, example = "SELECT * FROM system_users")
     @NotEmpty(message = "SQL 语句不能为空")
     private String sql;
 
