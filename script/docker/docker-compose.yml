@@ -35,3 +35,4 @@ services:
 networks:
   dev-net:
     external: true
+    name: docker-env_dev-net
