@@ -1,16 +1,14 @@
 name: yudao-system
 
 services:
+
   server:
-    container_name: yudao-server
     image: yudao-server:latest
+    container_name: yudao-server
     restart: unless-stopped
 
     ports:
       - "48080:48080"
-
-    networks:
-      - dev-net
 
     environment:
       SPRING_PROFILES_ACTIVE: local
@@ -31,6 +29,9 @@ services:
 
         --spring.data.redis.host=dev-redis
         --spring.data.redis.port=6379
+
+    networks:
+      - dev-net
 
 networks:
   dev-net:
