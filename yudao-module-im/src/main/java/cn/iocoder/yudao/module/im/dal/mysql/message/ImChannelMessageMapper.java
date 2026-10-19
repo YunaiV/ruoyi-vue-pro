@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.im.controller.admin.manager.message.vo.channel.Im
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImChannelMessageDO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -32,7 +33,7 @@ public interface ImChannelMessageMapper extends BaseMapperX<ImChannelMessageDO> 
         return selectList(new LambdaQueryWrapperX<ImChannelMessageDO>()
                 .gt(ImChannelMessageDO::getId, minId)
                 .and(w -> w.isNull(ImChannelMessageDO::getReceiverUserIds)
-                        .or().eq(ImChannelMessageDO::getReceiverUserIds, "")
+                        .or().eq(ImChannelMessageDO::getReceiverUserIds, Collections.emptyList())
                         .or().apply(MyBatisUtils.findInSet("receiver_user_ids"), userId))
                 .orderByAsc(ImChannelMessageDO::getId)
                 .last("LIMIT " + size));
