@@ -304,4 +304,9 @@ public class ErpSaleOrderServiceImpl implements ErpSaleOrderService {
         return saleOrderItemMapper.selectListByOrderIds(orderIds);
     }
 
+    @Override
+    public Long getSaleOrderItemCountByProductId(Long productId) {
+        return saleOrderItemMapper.selectCount(ErpSaleOrderItemDO::getProductId, productId);
+    }
+
 }

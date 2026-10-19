@@ -117,6 +117,41 @@ public class FmsSubjectServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
+    public void testCreateSubject_accountSetNotInitialized() {
+        // 准备参数
+        FmsSubjectSaveReqVO reqVO = buildSubjectSaveReqVO(1L, "1001", "库存现金");
+
+        // 调用，并断言异常
+        assertServiceException(() -> subjectService.createSubject(reqVO, 10L), ACCOUNT_SET_NOT_INITIALIZED);
+        // 断言未写入科目
+        assertEquals(0, subjectMapper.selectCount());
+    }
+
+    @Test
+    public void testUpdateSubject_accountSetNotInitialized() {
+        // 准备参数
+        FmsSubjectSaveReqVO reqVO = buildSubjectSaveReqVO(1L, "1001", "库存现金");
+        reqVO.setId(1L);
+
+        // 调用，并断言异常
+        assertServiceException(() -> subjectService.updateSubject(reqVO, 10L), ACCOUNT_SET_NOT_INITIALIZED);
+    }
+
+    @Test
+    public void testImportSubjectList_accountSetNotInitialized() {
+        // 准备参数
+        FmsSubjectImportExcelVO importVO = new FmsSubjectImportExcelVO();
+        importVO.setCode("1001");
+        importVO.setName("库存现金");
+
+        // 调用，并断言异常
+        assertServiceException(() -> subjectService.importSubjectList(1L, Collections.singletonList(importVO), 10L),
+                ACCOUNT_SET_NOT_INITIALIZED);
+        // 断言未写入科目
+        assertEquals(0, subjectMapper.selectCount());
+    }
+
+    @Test
     public void testCreateSubject_success() {
         // 准备参数
         Long accountSetId = 1L;

@@ -15,6 +15,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
+
 /**
  * 拼团记录 Service 接口
  *
@@ -118,6 +120,24 @@ public interface CombinationRecordService {
      * @return 拼团记录列表
      */
     List<CombinationRecordDO> getCombinationRecordListByHeadId(Long headId);
+
+    /**
+     * 获得指定编号的拼团记录列表
+     *
+     * @param ids 记录编号集合
+     * @return 拼团记录列表
+     */
+    List<CombinationRecordDO> getCombinationRecordListByIds(Collection<Long> ids);
+
+    /**
+     * 获得指定编号的拼团记录 Map
+     *
+     * @param ids 记录编号集合
+     * @return 拼团记录 Map
+     */
+    default Map<Long, CombinationRecordDO> getCombinationRecordMapByIds(Collection<Long> ids) {
+        return convertMap(getCombinationRecordListByIds(ids), CombinationRecordDO::getId);
+    }
 
     /**
      * 获取拼团记录分页数据

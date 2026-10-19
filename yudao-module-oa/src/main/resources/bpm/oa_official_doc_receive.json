@@ -1,0 +1,49 @@
+{
+  "key": "oa_official_doc_receive",
+  "name": "公文收文",
+  "category": "OA",
+  "description": "申请人提交后，由部门层级中最近的有效上级负责人审批。申请人本人不可自批；未配置有效上级时阻止提交。",
+  "type": 20,
+  "formType": 20,
+  "formCustomCreatePath": "/oa/officialdoc/receive",
+  "formCustomViewPath": "/oa/officialdoc/receive/detail/index.vue",
+  "visible": false,
+  "managerUserIds": [],
+  "startUserIds": [],
+  "startDeptIds": [],
+  "allowCancelRunningProcess": true,
+  "allowWithdrawTask": false,
+  "autoApprovalType": 0,
+  "simpleModel": {
+    "id": "StartUserNode",
+    "type": 10,
+    "name": "申请人",
+    "childNode": {
+      "id": "SuperiorApprove",
+      "type": 11,
+      "name": "上级审批",
+      "showText": "部门层级中最近的非本人有效负责人",
+      "candidateStrategy": 37,
+      "candidateParam": "1",
+      "approveType": 1,
+      "approveMethod": 1,
+      "signEnable": false,
+      "reasonRequire": true,
+      "rejectHandler": {
+        "type": 1
+      },
+      "assignStartUserHandlerType": 1,
+      "assignEmptyHandler": {
+        "type": 2
+      },
+      "timeoutHandler": {
+        "enable": false
+      },
+      "childNode": {
+        "id": "EndEvent",
+        "type": 1,
+        "name": "结束"
+      }
+    }
+  }
+}

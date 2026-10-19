@@ -10,6 +10,9 @@
         WHERE pay_status = #{payStatus}
           AND pay_time BETWEEN #{beginTime} AND #{endTime}
           AND deleted = FALSE
+        <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
+            AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
+        </if>
     </select>
 
     <select id="selectRechargeSummaryByRefundTimeBetween"
@@ -20,6 +23,9 @@
         WHERE refund_status = #{refundStatus}
           AND refund_time BETWEEN #{beginTime} AND #{endTime}
           AND deleted = FALSE
+        <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
+            AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
+        </if>
     </select>
 
     <select id="selectPriceSummaryByBizTypeAndCreateTimeBetween" resultType="java.lang.Integer">
@@ -28,6 +34,9 @@
         WHERE biz_type = #{bizType}
           AND create_time BETWEEN #{beginTime} AND #{endTime}
           AND deleted = FALSE
+        <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
+            AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
+        </if>
     </select>
 
     <select id="selectRechargeSummaryGroupByWalletId"
@@ -43,6 +52,9 @@
             AND pay_time &lt;= #{endTime}
         </if>
             AND deleted = FALSE
+        <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
+            AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
+        </if>
     </select>
 
     <select id="selectRechargePriceSummary" resultType="java.lang.Integer">
@@ -50,6 +62,9 @@
         FROM pay_wallet_recharge
         WHERE pay_status = #{payStatus}
           AND deleted = FALSE
+        <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
+            AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
+        </if>
     </select>
 
 </mapper>

@@ -152,8 +152,8 @@ public interface IotProductService {
     /**
      * 同步产品的 TDengine 表结构
      *
-     * 目的：当 MySQL 和 TDengine 不同步时，强制将已发布产品的表结构同步到 TDengine 中
+     * 目的：当 MySQL 和 TDengine 不同步时，强制将指定产品的表结构同步到 TDengine 中
      */
-    void syncProductPropertyTable();
+    void syncProductPropertyTable(Long id);
 
 }

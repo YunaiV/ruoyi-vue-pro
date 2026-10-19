@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.erp.controller.admin.purchase.vo.in.ErpPurchaseIn
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseInDO;
 import cn.iocoder.yudao.module.erp.dal.dataobject.purchase.ErpPurchaseInItemDO;
 import cn.iocoder.yudao.module.erp.enums.ErpAuditStatus;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -65,6 +66,12 @@ public interface ErpPurchaseInMapper extends BaseMapperX<ErpPurchaseInDO> {
 
     default List<ErpPurchaseInDO> selectListByOrderId(Long orderId) {
         return selectList(ErpPurchaseInDO::getOrderId, orderId);
+    }
+
+    default List<ErpPurchaseInDO> selectListByOrderIdAndStatus(Long orderId, Integer status) {
+        return selectList(new LambdaQueryWrapper<ErpPurchaseInDO>()
+                .eq(ErpPurchaseInDO::getOrderId, orderId)
+                .eq(ErpPurchaseInDO::getStatus, status));
     }
 
 }

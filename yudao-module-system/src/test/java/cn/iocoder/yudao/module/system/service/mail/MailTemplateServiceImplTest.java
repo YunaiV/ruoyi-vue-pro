@@ -398,4 +398,18 @@ public class MailTemplateServiceImplTest extends BaseDbUnitTest {
         assertFalse(formattedContent.contains("{activationLink}"));
     }
 
+    @Test
+    public void testFormatMailTemplateContent_dollarInCodeBlock() {
+        // 准备参数
+        Map<String, Object> params = new HashMap<>();
+
+        // 测试代码块中包含 $ 与 \\（历史上 appendReplacement 会抛 IllegalArgumentException: Illegal group reference）
+        String content = "<pre><code>echo $HOME && ls \\root</code></pre>";
+
+        // 调用，并断言内容原样保留
+        String result = mailTemplateService.formatMailTemplateContent(content, params);
+        assertTrue(result.contains("echo $HOME && ls \\root"));
+        assertTrue(result.contains("<div><code>"));
+    }
+
 }

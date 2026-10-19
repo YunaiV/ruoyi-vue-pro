@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.system.dal.mysql.social;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.module.system.controller.admin.socail.vo.user.SocialUserPageReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.social.vo.user.SocialUserPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialUserDO;
 import org.apache.ibatis.annotations.Mapper;
 

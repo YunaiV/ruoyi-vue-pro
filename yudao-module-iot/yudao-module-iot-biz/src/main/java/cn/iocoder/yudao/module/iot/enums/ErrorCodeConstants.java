@@ -57,6 +57,12 @@ public interface ErrorCodeConstants {
     // ========== 设备 Modbus 配置 1-050-006-000 ==========
     ErrorCode DEVICE_MODBUS_CONFIG_NOT_EXISTS = new ErrorCode(1_050_006_000, "设备 Modbus 连接配置不存在");
     ErrorCode DEVICE_MODBUS_CONFIG_EXISTS = new ErrorCode(1_050_006_001, "设备 Modbus 连接配置已存在");
+    ErrorCode DEVICE_MODBUS_CONFIG_IP_REQUIRED = new ErrorCode(1_050_006_002, "Client 模式下，IP 地址不能为空");
+    ErrorCode DEVICE_MODBUS_CONFIG_PORT_REQUIRED = new ErrorCode(1_050_006_003, "Client 模式下，端口不能为空");
+    ErrorCode DEVICE_MODBUS_CONFIG_TIMEOUT_REQUIRED = new ErrorCode(1_050_006_004, "Client 模式下，连接超时时间不能为空");
+    ErrorCode DEVICE_MODBUS_CONFIG_RETRY_INTERVAL_REQUIRED = new ErrorCode(1_050_006_005, "Client 模式下，重试间隔不能为空");
+    ErrorCode DEVICE_MODBUS_CONFIG_MODE_REQUIRED = new ErrorCode(1_050_006_006, "Server 模式下，工作模式不能为空");
+    ErrorCode DEVICE_MODBUS_CONFIG_FRAME_FORMAT_REQUIRED = new ErrorCode(1_050_006_007, "Server 模式下，数据帧格式不能为空");
 
     // ========== 设备 Modbus 点位 1-050-007-000 ==========
     ErrorCode DEVICE_MODBUS_POINT_NOT_EXISTS = new ErrorCode(1_050_007_000, "设备 Modbus 点位配置不存在");
@@ -66,6 +72,8 @@ public interface ErrorCodeConstants {
 
     ErrorCode OTA_FIRMWARE_NOT_EXISTS = new ErrorCode(1_050_008_000, "固件信息不存在");
     ErrorCode OTA_FIRMWARE_PRODUCT_VERSION_DUPLICATE = new ErrorCode(1_050_008_001, "产品版本号重复");
+    ErrorCode OTA_FIRMWARE_DELETE_FAIL_TASK_IN_PROGRESS = new ErrorCode(1_050_008_002,
+            "删除 OTA 固件失败，原因：存在进行中的升级任务");
 
     // ========== OTA 升级任务相关 1-050-008-100 ==========
 

@@ -17,17 +17,19 @@ import javax.validation.constraints.NotNull;
 public class WebProperties {
 
     @NotNull(message = "APP API 不能为空")
+    @Valid
     private Api appApi = new Api("/app-api", "**.controller.app.**");
     @NotNull(message = "Admin API 不能为空")
+    @Valid
     private Api adminApi = new Api("/admin-api", "**.controller.admin.**");
 
     @NotNull(message = "Admin UI 不能为空")
+    @Valid
     private Ui adminUi;
 
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    @Valid
     public static class Api {
 
         /**
@@ -53,7 +55,6 @@ public class WebProperties {
     }
 
     @Data
-    @Valid
     public static class Ui {
 
         /**

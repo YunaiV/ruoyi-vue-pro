@@ -137,6 +137,8 @@ public interface ErrorCodeConstants {
     ErrorCode CAL_TEAM_SHIFT_NOT_EXISTS = new ErrorCode(1_040_201_200, "班组排班记录不存在");
     ErrorCode CAL_TEAM_SHIFT_GENERATE_TEAM_NOT_ENOUGH = new ErrorCode(1_040_201_201, "班组数量不满足轮班方式要求");
     ErrorCode CAL_TEAM_SHIFT_GENERATE_SHIFT_NOT_ENOUGH = new ErrorCode(1_040_201_202, "班次数量不满足轮班方式要求");
+    ErrorCode CAL_TEAM_SHIFT_GENERATE_SHIFT_COUNT_INVALID = new ErrorCode(1_040_201_203, "按天倒班必须填写合法的倒班天数");
+    ErrorCode CAL_TEAM_SHIFT_GENERATE_SHIFT_METHOD_INVALID = new ErrorCode(1_040_201_204, "不支持的倒班方式：{}");
 
     // ========== MES 日历排班-排班计划（1-040-202-000） ==========
     ErrorCode CAL_PLAN_NOT_EXISTS = new ErrorCode(1_040_202_000, "排班计划不存在");
@@ -465,6 +467,7 @@ public interface ErrorCodeConstants {
     ErrorCode WM_ITEM_RECEIPT_LINE_ARRIVAL_NOTICE_LINE_NOT_ALLOWED = new ErrorCode(1_040_705_102,
             "入库单未关联到货通知单，不能选择到货通知单行");
     ErrorCode WM_ITEM_RECEIPT_DETAIL_NOT_EXISTS = new ErrorCode(1_040_705_200, "采购入库明细不存在");
+    ErrorCode WM_ITEM_RECEIPT_DETAIL_LINE_MISMATCH = new ErrorCode(1_040_705_201, "入库单行与上架明细的单据或物料不一致");
     ErrorCode WM_ITEM_RECEIPT_DETAIL_QUANTITY_EXCEED = new ErrorCode(1_040_705_202, "上架明细总数量不能超过行入库数量");
 
     // ========== MES 仓库管理-领料申请单（1-040-706-000） ==========

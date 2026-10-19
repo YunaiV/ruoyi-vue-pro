@@ -144,8 +144,8 @@ public class IotProductController {
     @PostMapping("/sync-property-table")
     @Operation(summary = "同步产品属性表结构到 TDengine")
     @PreAuthorize("@ss.hasPermission('iot:product:update')")
-    public CommonResult<Boolean> syncProductPropertyTable() {
-        productService.syncProductPropertyTable();
+    public CommonResult<Boolean> syncProductPropertyTable(@RequestParam("id") Long id) {
+        productService.syncProductPropertyTable(id);
         return success(true);
     }
 

@@ -107,4 +107,12 @@ public interface ErpPurchaseOrderService {
      */
     List<ErpPurchaseOrderItemDO> getPurchaseOrderItemListByOrderIds(Collection<Long> orderIds);
 
+    /**
+     * 获得引用指定产品的采购订单项数量
+     *
+     * @param productId 产品编号
+     * @return 数量
+     */
+    Long getPurchaseOrderItemCountByProductId(Long productId);
+
 }

@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.iot.controller.admin.ota.vo.task.IotOtaTaskPageReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.ota.IotOtaTaskDO;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -14,6 +15,12 @@ public interface IotOtaTaskMapper extends BaseMapperX<IotOtaTaskDO> {
     default IotOtaTaskDO selectByFirmwareIdAndName(Long firmwareId, String name) {
         return selectOne(IotOtaTaskDO::getFirmwareId, firmwareId,
                 IotOtaTaskDO::getName, name);
+    }
+
+    default Long selectCountByFirmwareIdAndStatus(Long firmwareId, Integer status) {
+        return selectCount(new LambdaQueryWrapper<IotOtaTaskDO>()
+                .eq(IotOtaTaskDO::getFirmwareId, firmwareId)
+                .eq(IotOtaTaskDO::getStatus, status));
     }
 
     default PageResult<IotOtaTaskDO> selectPage(IotOtaTaskPageReqVO pageReqVO) {

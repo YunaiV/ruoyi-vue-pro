@@ -53,6 +53,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
+import static cn.iocoder.yudao.module.fms.enums.ErrorCodeConstants.ACCOUNT_SET_NOT_INITIALIZED;
 import static cn.iocoder.yudao.module.fms.enums.ErrorCodeConstants.SUBJECT_CODE_DUPLICATE;
 import static cn.iocoder.yudao.module.fms.enums.ErrorCodeConstants.SUBJECT_CODE_RULE_INVALID;
 import static cn.iocoder.yudao.module.fms.enums.ErrorCodeConstants.SUBJECT_CURRENCY_INVALID;
@@ -161,6 +162,9 @@ public class FmsSubjectServiceImpl implements FmsSubjectService {
         accountSetService.validateAccountSetWritePermission(createReqVO.getAccountSetId(), userId);
         // 1.2 查询财务参数
         FmsFinanceParameterDO financeParameter = financeParameterService.getFinanceParameter(createReqVO.getAccountSetId());
+        if (financeParameter == null) {
+            throw exception(ACCOUNT_SET_NOT_INITIALIZED);
+        }
         // 1.3 校验科目编码唯一
         validateSubjectCodeUnique(null, createReqVO.getAccountSetId(), createReqVO.getCode());
         // 1.4 校验上级科目和科目编码规则
@@ -209,6 +213,9 @@ public class FmsSubjectServiceImpl implements FmsSubjectService {
         // 1.2 查询财务参数
         FmsFinanceParameterDO financeParameter = financeParameterService.getFinanceParameter(
                 updateReqVO.getAccountSetId());
+        if (financeParameter == null) {
+            throw exception(ACCOUNT_SET_NOT_INITIALIZED);
+        }
         // 1.3 校验科目存在
         FmsSubjectDO subject = validateSubjectExists(updateReqVO.getAccountSetId(), updateReqVO.getId());
         if (ObjUtil.notEqual(subject.getParentId(), updateReqVO.getParentId())) {
@@ -416,6 +423,9 @@ public class FmsSubjectServiceImpl implements FmsSubjectService {
         accountSetService.validateAccountSetWritePermission(accountSetId, userId);
         // 1.3 加载导入依赖
         FmsFinanceParameterDO financeParameter = financeParameterService.getFinanceParameter(accountSetId);
+        if (financeParameter == null) {
+            throw exception(ACCOUNT_SET_NOT_INITIALIZED);
+        }
         Map<String, FmsSubjectDO> subjectMap = convertMap(
                 subjectMapper.selectListByAccountSetIdAndType(accountSetId, null), FmsSubjectDO::getCode);
         Map<String, Long> auxiliaryTypeIdMap = auxiliaryTypeService.getAuxiliaryTypeIdMap(accountSetId);

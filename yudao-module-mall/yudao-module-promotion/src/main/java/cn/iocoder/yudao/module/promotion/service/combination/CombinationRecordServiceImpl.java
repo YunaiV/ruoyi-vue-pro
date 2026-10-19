@@ -40,6 +40,7 @@ import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -284,6 +285,14 @@ public class CombinationRecordServiceImpl implements CombinationRecordService {
     @Override
     public List<CombinationRecordDO> getCombinationRecordListByHeadId(Long headId) {
         return combinationRecordMapper.selectList(CombinationRecordDO::getHeadId, headId);
+    }
+
+    @Override
+    public List<CombinationRecordDO> getCombinationRecordListByIds(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
+        return combinationRecordMapper.selectByIds(ids);
     }
 
     @Override

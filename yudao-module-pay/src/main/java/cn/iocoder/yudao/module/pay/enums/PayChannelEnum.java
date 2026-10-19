@@ -29,6 +29,7 @@ public enum PayChannelEnum implements ArrayValuable<String> {
     ALIPAY_APP("alipay_app", "支付宝App 支付"),
     ALIPAY_QR("alipay_qr", "支付宝扫码支付"),
     ALIPAY_BAR("alipay_bar", "支付宝条码支付"),
+    ALIPAY_LITE("alipay_lite", "支付宝小程序支付"),
 
     MOCK("mock", "模拟支付"),
 

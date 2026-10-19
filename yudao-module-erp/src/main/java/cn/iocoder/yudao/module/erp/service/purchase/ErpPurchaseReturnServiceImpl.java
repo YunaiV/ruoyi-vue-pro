@@ -301,4 +301,9 @@ public class ErpPurchaseReturnServiceImpl implements ErpPurchaseReturnService {
         return purchaseReturnItemMapper.selectListByReturnIds(returnIds);
     }
 
+    @Override
+    public Long getPurchaseReturnItemCountByProductId(Long productId) {
+        return purchaseReturnItemMapper.selectCount(ErpPurchaseReturnItemDO::getProductId, productId);
+    }
+
 }

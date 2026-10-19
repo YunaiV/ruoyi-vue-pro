@@ -13,6 +13,7 @@ uv run --with simple-ddl-parser convertor.py opengauss ../mysql/ruoyi-vue-pro.sq
 uv run --with simple-ddl-parser convertor.py highgo ../mysql/ruoyi-vue-pro.sql > ../highgo/ruoyi-vue-pro.sql
 uv run --with simple-ddl-parser convertor.py oracle ../mysql/ruoyi-vue-pro.sql > ../oracle/ruoyi-vue-pro.sql
 uv run --with simple-ddl-parser convertor.py dm8 ../mysql/ruoyi-vue-pro.sql > ../dm/ruoyi-vue-pro-dm8.sql
+uv run --with simple-ddl-parser convertor.py oceanbase ../mysql/ruoyi-vue-pro.sql > ../oceanbase/ruoyi-vue-pro.sql
 """
 
 import argparse
@@ -341,6 +342,12 @@ class Convertor(ABC):
             table_ddl = ddl[0]
             table_name = table_ddl["table_name"]
 
+            # simple-ddl-parser 1.9+ 将字符串默认值中的等号解析为 ``\\03d``。
+            # 还原为原始字符，避免导出的目标库脚本出现错误默认值。
+            for column in table_ddl["columns"]:
+                if isinstance(column.get("default"), str):
+                    column["default"] = column["default"].replace(r"\03d", "=")
+
             # 忽略 quartz 的内容
             if table_name.lower().startswith("qrtz"):
                 continue
@@ -385,7 +392,7 @@ class Convertor(ABC):
             # 清理
             script = re.sub("\n{3,}", "\n\n", script).strip() + "\n"
 
-            print(script)
+            print(script, end="")
 
         # 将parse失败的脚本打印出来
         if error_scripts:
@@ -1038,7 +1045,7 @@ def main():
         "type",
         type=str,
         help="目标数据库类型",
-        choices=["postgres", "oracle", "sqlserver", "dm8", "kingbase", "opengauss", "highgo"],
+        choices=["postgres", "oracle", "sqlserver", "dm8", "kingbase", "opengauss", "highgo", "oceanbase"],
     )
     parser.add_argument(
         "path",
@@ -1050,6 +1057,11 @@ def main():
     args = parser.parse_args()
 
     sql_file = pathlib.Path(args.path).resolve().as_posix()
+    if args.type == "oceanbase":
+        # OceanBase MySQL 模式直接使用原始 SQL，保留字段类型、索引和数据。
+        print(pathlib.Path(sql_file).read_text(encoding="utf-8"), end="")
+        return
+
     convertor = None
     if args.type == "postgres":
         convertor = PostgreSQLConvertor(sql_file)

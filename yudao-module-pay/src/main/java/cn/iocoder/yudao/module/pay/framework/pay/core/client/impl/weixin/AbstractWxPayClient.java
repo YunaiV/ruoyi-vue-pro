@@ -6,7 +6,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.date.TemporalAccessorUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.framework.common.util.io.FileUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
@@ -63,18 +62,17 @@ public abstract class AbstractWxPayClient extends AbstractPayClient<WxPayClientC
         WxPayConfig payConfig = new WxPayConfig();
         BeanUtil.copyProperties(config, payConfig, "keyContent", "privateKeyContent", "publicKeyContent");
         payConfig.setTradeType(tradeType);
-        // weixin-pay-java 无法设置内容，只允许读取文件，所以这里要创建临时文件来解决
         if (Objects.equals(config.getApiVersion(), API_VERSION_V2)) {
-            payConfig.setKeyPath(FileUtils.createTempFile(Base64.decode(config.getKeyContent())).getPath());
+            payConfig.setKeyContent(Base64.decode(config.getKeyContent()));
         } else if (Objects.equals(config.getApiVersion(), API_VERSION_V3)) {
-            payConfig.setPrivateKeyPath(FileUtils.createTempFile(config.getPrivateKeyContent()).getPath());
+            payConfig.setPrivateKeyContent(StrUtil.utf8Bytes(config.getPrivateKeyContent()));
             // 参考 https://gitee.com/yudaocode/yudao-ui-admin-vue3/issues/ICUE53 和 https://t.zsxq.com/ODR5V
             if (StrUtil.isNotBlank(config.getPublicKeyContent())) {
-                payConfig.setPublicKeyPath(FileUtils.createTempFile(config.getPublicKeyContent()).getPath());
+                payConfig.setPublicKeyContent(StrUtil.utf8Bytes(config.getPublicKeyContent()));
             }
             // 特殊：强制使用微信公钥模式，避免灰度期间的问题！！！
             payConfig.setStrictlyNeedWechatPaySerial(true);
-            // 特殊：weixin-java-pay 只有配置 publicKeyPath 后，再开启 fullPublicKeyModel，才会使用 PublicCertificateVerifier
+            // 特殊：weixin-java-pay 只有配置 publicKeyContent 后，再开启 fullPublicKeyModel，才会使用 PublicCertificateVerifier
             // 对应 https://t.zsxq.com/5Q9lO 帖子
             payConfig.setFullPublicKeyModel(true);
         }

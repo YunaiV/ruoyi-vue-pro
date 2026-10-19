@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
@@ -92,9 +93,12 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
             status = PayOrderStatusEnum.REFUND.getStatus();
         }
         Assert.notNull(status, (Supplier<Throwable>) () -> {
-            throw new IllegalArgumentException(StrUtil.format("body({}) 的 trade_status 不正确", body));
+            throw new IllegalArgumentException(CharSequenceUtil.format("body({}) 的 trade_status 不正确", body));
         });
-        return PayOrderRespDTO.of(status, bodyObj.get("trade_no"), bodyObj.get("seller_id"), parseTime(params.get("gmt_payment")),
+        // https://opendocs.alipay.com/open/00dn78?pathHash=fef00e6d#%E5%BC%82%E6%AD%A5%E9%80%9A%E7%9F%A5%E5%8F%82%E6%95%B0
+        // buyer_id（buyer_open_id）买家支付宝用户号，seller_id 卖家支付宝用户号
+        String channelUserId = CharSequenceUtil.nullToDefault(bodyObj.get("buyer_open_id"), bodyObj.get("buyer_id"));
+        return PayOrderRespDTO.of(status, bodyObj.get("trade_no"), channelUserId, parseTime(params.get("gmt_payment")),
                 bodyObj.get("out_trade_no"), body);
     }
 

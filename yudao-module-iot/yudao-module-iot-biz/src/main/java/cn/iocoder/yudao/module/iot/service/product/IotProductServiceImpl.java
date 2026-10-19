@@ -181,24 +181,12 @@ public class IotProductServiceImpl implements IotProductService {
     }
 
     @Override
-    public void syncProductPropertyTable() {
-        // 1. 获取所有已发布的产品
-        List<IotProductDO> products = productMapper.selectListByStatus(
-                IotProductStatusEnum.PUBLISHED.getStatus());
-        log.info("[syncProductPropertyTable][开始同步，已发布产品数量({})]", products.size());
+    public void syncProductPropertyTable(Long id) {
+        // 1. 校验产品存在
+        validateProductExists(id);
 
-        // 2. 遍历同步 TDengine 表结构（创建产品超级表数据模型）
-        int successCount = 0;
-        for (IotProductDO product : products) {
-            try {
-                devicePropertyDataService.defineDevicePropertyData(product.getId());
-                successCount++;
-                log.info("[syncProductPropertyTable][产品({}/{}) 同步成功]", product.getId(), product.getName());
-            } catch (Exception e) {
-                log.error("[syncProductPropertyTable][产品({}/{}) 同步失败]", product.getId(), product.getName(), e);
-            }
-        }
-        log.info("[syncProductPropertyTable][同步完成，成功({}/{})个]", successCount, products.size());
+        // 2. 同步指定产品的 TDengine 表结构
+        devicePropertyDataService.defineDevicePropertyData(id);
     }
 
     @Override

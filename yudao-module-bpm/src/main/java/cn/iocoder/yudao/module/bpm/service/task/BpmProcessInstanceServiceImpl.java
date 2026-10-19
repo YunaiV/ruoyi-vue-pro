@@ -22,6 +22,7 @@ import cn.iocoder.yudao.module.bpm.convert.task.BpmProcessInstanceConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionInfoDO;
 import cn.iocoder.yudao.module.bpm.dal.redis.BpmProcessIdRedisDAO;
 import cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelFormTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmAttachmentTypeEnum;
@@ -763,9 +764,50 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         // 获得流程定义
         ProcessDefinition definition = processDefinitionService
                 .getProcessDefinition(createReqVO.getProcessDefinitionId());
+        // 校验动态表单必填字段（前端校验可被接口直调绕过，后端必须兜底，否则必填缺失也会建成脏实例）
+        validateDynamicFormRequiredFields(definition, createReqVO.getVariables());
         // 发起流程
         return createProcessInstance0(userId, definition, createReqVO.getVariables(), null,
                 createReqVO.getStartUserSelectAssignees());
+    }
+
+    /**
+     * 校验动态表单的必填字段
+     *
+     * @see <a href="https://github.com/YunaiV/ruoyi-vue-pro/pull/1245">相关 issue</a>
+     */
+    private void validateDynamicFormRequiredFields(ProcessDefinition definition, Map<String, Object> variables) {
+        BpmProcessDefinitionInfoDO processDefinitionInfo = processDefinitionService
+                .getProcessDefinitionInfo(definition.getId());
+        if (processDefinitionInfo == null
+                || !BpmModelFormTypeEnum.NORMAL.getType().equals(processDefinitionInfo.getFormType())
+                || CollUtil.isEmpty(processDefinitionInfo.getFormFields())) {
+            return;
+        }
+        List<String> fieldStrs = processDefinitionInfo.getFormFields();
+        // formFields 是 JSON 数组，每个元素本身又是 JSON 字符串；两种表单设计器并存：
+        // 字段标识可能是 field 或 key，必填标记可能是数组 ["required"] 或对象 {"required": true}
+        for (String fieldStr : fieldStrs) {
+            Map<String, Object> field = JsonUtils.parseMap(fieldStr);
+            boolean required = false;
+            Object validate = field.get("validate");
+            if (validate instanceof List) {
+                required = ((List<?>) validate).contains("required");
+            } else if (validate instanceof Map) {
+                required = Boolean.TRUE.equals(((Map<?, ?>) validate).get("required"));
+            }
+            if (!required) {
+                continue;
+            }
+            String fieldId = Convert.toStr(field.get("field"), Convert.toStr(field.get("key")));
+            if (StrUtil.isEmpty(fieldId)) {
+                continue;
+            }
+            Object value = variables == null ? null : variables.get(fieldId);
+            if (value == null || (value instanceof String && StrUtil.isBlank((String) value))) {
+                throw exception(PROCESS_INSTANCE_START_FORM_FIELD_REQUIRED, Convert.toStr(field.get("title"), fieldId));
+            }
+        }
     }
 
     @Override

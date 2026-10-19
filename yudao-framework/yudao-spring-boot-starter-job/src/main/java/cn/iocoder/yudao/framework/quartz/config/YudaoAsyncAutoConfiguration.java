@@ -13,7 +13,7 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
  * 异步任务 Configuration
  */
 @AutoConfiguration
-@EnableAsync
+@EnableAsync(proxyTargetClass = true) // proxyTargetClass=true：与 @EnableTransactionManagement(proxyTargetClass = true) 保持一致，否则会有 https://github.com/YunaiV/ruoyi-vue-pro/pull/1223 问题
 public class YudaoAsyncAutoConfiguration {
 
     @Bean

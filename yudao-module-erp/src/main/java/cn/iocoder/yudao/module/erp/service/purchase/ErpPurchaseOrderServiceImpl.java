@@ -292,4 +292,9 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
         return purchaseOrderItemMapper.selectListByOrderIds(orderIds);
     }
 
+    @Override
+    public Long getPurchaseOrderItemCountByProductId(Long productId) {
+        return purchaseOrderItemMapper.selectCount(ErpPurchaseOrderItemDO::getProductId, productId);
+    }
+
 }

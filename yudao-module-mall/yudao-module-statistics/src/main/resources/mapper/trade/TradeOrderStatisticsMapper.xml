@@ -7,19 +7,34 @@
         SELECT receiver_area_id                                AS areaId,
                (SELECT COUNT(DISTINCT s.user_id)
                 FROM trade_order AS s
-                WHERE s.receiver_area_id = m.receiver_area_id) AS orderCreateUserCount,
+                WHERE s.receiver_area_id = m.receiver_area_id
+                <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
+                    AND s.tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
+                </if>
+                ) AS orderCreateUserCount,
                (SELECT COUNT(DISTINCT s.user_id)
                 FROM trade_order AS s
                 WHERE s.receiver_area_id = m.receiver_area_id
                   AND s.pay_status = TRUE
-                  AND s.deleted = FALSE)                       AS orderPayUserCount,
+                  AND s.deleted = FALSE
+                <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
+                    AND s.tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
+                </if>
+                ) AS orderPayUserCount,
                (SELECT SUM(s.pay_price)
                 FROM trade_order AS s
                 WHERE s.receiver_area_id = m.receiver_area_id
                   AND s.pay_status = TRUE
-                  AND s.deleted = FALSE)                       AS orderPayPrice
+                  AND s.deleted = FALSE
+                <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
+                    AND s.tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
+                </if>
+                ) AS orderPayPrice
         FROM trade_order m
         WHERE deleted = FALSE
+        <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
+            AND m.tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
+        </if>
         GROUP BY receiver_area_id
     </select>
 
@@ -28,6 +43,9 @@
         FROM trade_order
         WHERE deleted = FALSE
           AND create_time BETWEEN #{beginTime} AND #{endTime}
+        <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
+            AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
+        </if>
     </select>
 
     <select id="selectUserCountByPayTimeBetween" resultType="java.lang.Integer">
@@ -36,6 +54,9 @@
         WHERE pay_time BETWEEN #{beginTime} AND #{endTime}
           AND pay_status = TRUE
           AND deleted = FALSE
+        <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
+            AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
+        </if>
     </select>
 
     <select id="selectCountByCreateTimeBetween" resultType="java.lang.Integer">
@@ -43,6 +64,9 @@
         FROM trade_order
         WHERE create_time BETWEEN #{beginTime} AND #{endTime}
           AND deleted = FALSE
+        <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
+            AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
+        </if>
     </select>
 
     <select id="selectCountByPayTimeBetween" resultType="java.lang.Integer">
@@ -51,6 +75,9 @@
         WHERE pay_status = TRUE
           AND create_time BETWEEN #{beginTime} AND #{endTime}
           AND deleted = FALSE
+        <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
+            AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
+        </if>
     </select>
 
     <select id="selectSummaryPriceByPayTimeBetween" resultType="java.lang.Integer">
@@ -59,6 +86,9 @@
         WHERE s.pay_status = TRUE
           AND deleted = FALSE
           AND create_time BETWEEN #{beginTime} AND #{endTime}
+        <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
+            AND s.tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
+        </if>
     </select>
 
     <select id="selectListByPayTimeBetweenAndGroupByDay"
@@ -70,6 +100,9 @@
         WHERE pay_status = TRUE
           AND create_time BETWEEN #{beginTime} AND #{endTime}
           AND deleted = FALSE
+        <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
+            AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
+        </if>
         GROUP BY date
     </select>
 
@@ -82,6 +115,9 @@
         WHERE pay_status = TRUE
           AND create_time BETWEEN #{beginTime} AND #{endTime}
           AND deleted = FALSE
+        <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
+            AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
+        </if>
         GROUP BY date
     </select>
 
@@ -91,6 +127,9 @@
         WHERE status = #{status}
           ANd delivery_type = #{deliveryType}
           AND deleted = FALSE
+        <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
+            AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
+        </if>
     </select>
 
     <select id="selectPaySummaryByPayStatusAndPayTimeBetween"
@@ -101,6 +140,9 @@
         WHERE pay_status = #{payStatus}
           AND pay_time BETWEEN #{beginTime} AND #{endTime}
           AND deleted = FALSE
+        <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
+            AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
+        </if>
     </select>
 
 </mapper>

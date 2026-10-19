@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.mes.controller.admin.cal.plan.vo.MesCalPlanPageReqVO;
 import cn.iocoder.yudao.module.mes.dal.dataobject.cal.plan.MesCalPlanDO;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
@@ -29,6 +30,13 @@ public interface MesCalPlanMapper extends BaseMapperX<MesCalPlanDO> {
 
     default MesCalPlanDO selectByCode(String code) {
         return selectOne(MesCalPlanDO::getCode, code);
+    }
+
+    default void updateWithShiftFieldCleanup(MesCalPlanDO plan, boolean clearShiftMethod, boolean clearShiftCount) {
+        update(plan, Wrappers.<MesCalPlanDO>lambdaUpdate()
+                .eq(MesCalPlanDO::getId, plan.getId())
+                .set(clearShiftMethod, MesCalPlanDO::getShiftMethod, null)
+                .set(clearShiftCount, MesCalPlanDO::getShiftCount, null));
     }
 
 }

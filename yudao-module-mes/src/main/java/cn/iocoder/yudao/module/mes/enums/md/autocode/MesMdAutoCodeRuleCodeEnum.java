@@ -43,6 +43,7 @@ public enum MesMdAutoCodeRuleCodeEnum {
     DV_MACHINERY_CODE("DV_MACHINERY_CODE", "设备编码"),
     DV_MACHINERY_TYPE_CODE("DV_MACHINERY_TYPE_CODE", "设备类型编码"),
     DV_SUBJECT_CODE("DV_SUBJECT_CODE", "点检保养项目编码"),
+    DV_CHECK_PLAN_CODE("DV_CHECK_PLAN_CODE", "点检保养方案编码"),
     DV_REPAIR_CODE("DV_REPAIR_CODE", "维修单编码"),
     WM_SALES_NOTICE_CODE("WM_SALES_NOTICE_CODE", "发货通知单编码"),
     WM_RETURN_SALES_CODE("WM_RETURN_SALES_CODE", "销售退货单编码"),

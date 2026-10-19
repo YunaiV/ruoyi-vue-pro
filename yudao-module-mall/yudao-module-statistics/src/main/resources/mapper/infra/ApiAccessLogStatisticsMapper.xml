@@ -8,6 +8,9 @@
         WHERE user_type = #{userType}
         AND create_time BETWEEN #{beginTime} AND #{endTime}
         AND deleted = FALSE
+        <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
+            AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
+        </if>
     </select>
 
     <select id="selectUserCountByUserTypeAndCreateTimeBetween" resultType="java.lang.Integer">
@@ -17,6 +20,9 @@
           AND user_type = #{userType}
           AND create_time BETWEEN #{beginTime} AND #{endTime}
           AND deleted = FALSE
+        <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
+            AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
+        </if>
     </select>
 
 </mapper>

@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.mes.enums.ErrorCodeConstants.CAL_TEAM_SHIFT_GENERATE_SHIFT_COUNT_INVALID;
+import static cn.iocoder.yudao.module.mes.enums.ErrorCodeConstants.CAL_TEAM_SHIFT_GENERATE_SHIFT_METHOD_INVALID;
 import static cn.iocoder.yudao.module.mes.enums.ErrorCodeConstants.CAL_TEAM_SHIFT_GENERATE_SHIFT_NOT_ENOUGH;
 import static cn.iocoder.yudao.module.mes.enums.ErrorCodeConstants.CAL_TEAM_SHIFT_GENERATE_TEAM_NOT_ENOUGH;
 
@@ -78,8 +80,10 @@ public class MesCalTeamShiftServiceImpl implements MesCalTeamShiftService {
         for (int i = 0; i < days; i++) {
             LocalDate currentDate = startDate.plusDays(i);
             LocalDateTime currentDay = currentDate.atStartOfDay();
-            // 2.2.1 根据倒班方式计算 shiftIndex
-            shiftIndex = calculateShiftIndex(shiftIndex, i, currentDate, startDate, plan);
+            // 2.2.1 根据倒班方式计算 shiftIndex 单白班不倒班，跳过
+            if (!MesCalShiftTypeEnum.SINGLE.getType().equals(plan.getShiftType())) {
+                shiftIndex = calculateShiftIndex(shiftIndex, i, currentDate, startDate, plan);
+            }
             // 2.2.2 根据轮班方式生成排班记录，收集到列表
             buildRecordsForDay(allRecords, planId, currentDay, shiftIndex, plan.getShiftType(), teams, shifts);
         }
@@ -119,11 +123,15 @@ public class MesCalTeamShiftServiceImpl implements MesCalTeamShiftService {
             }
         } else if (MesCalShiftMethodEnum.DAY.getMethod().equals(plan.getShiftMethod())) {
             // 按天轮班：到了指定轮班天数的倍数
-            if (dayOffset % plan.getShiftCount() == 0) {
+            Integer shiftCount = plan.getShiftCount();
+            if (shiftCount == null || shiftCount <= 0) {
+                throw exception(CAL_TEAM_SHIFT_GENERATE_SHIFT_COUNT_INVALID);
+            }
+            if (dayOffset % shiftCount == 0) {
                 return shiftIndex + 1;
             }
         } else {
-            throw new IllegalArgumentException("不支持的倒班方式: " + plan.getShiftMethod());
+            throw exception(CAL_TEAM_SHIFT_GENERATE_SHIFT_METHOD_INVALID, plan.getShiftMethod());
         }
         return shiftIndex;
     }

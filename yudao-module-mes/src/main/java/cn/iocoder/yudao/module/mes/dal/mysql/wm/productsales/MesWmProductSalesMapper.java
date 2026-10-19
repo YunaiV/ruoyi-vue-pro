@@ -21,6 +21,7 @@ public interface MesWmProductSalesMapper extends BaseMapperX<MesWmProductSalesDO
         return selectPage(reqVO, new LambdaQueryWrapperX<MesWmProductSalesDO>()
                 .likeIfPresent(MesWmProductSalesDO::getCode, reqVO.getCode())
                 .likeIfPresent(MesWmProductSalesDO::getName, reqVO.getName())
+                .likeIfPresent(MesWmProductSalesDO::getSalesOrderCode, reqVO.getSalesOrderCode())
                 .eqIfPresent(MesWmProductSalesDO::getClientId, reqVO.getClientId())
                 .eqIfPresent(MesWmProductSalesDO::getStatus, reqVO.getStatus())
                 .betweenIfPresent(MesWmProductSalesDO::getSalesDate, reqVO.getShipmentDate())

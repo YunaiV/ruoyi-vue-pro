@@ -74,16 +74,18 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addBrokerage(Long userId, BrokerageRecordBizTypeEnum bizType, List<BrokerageAddReqBO> list) {
+    public void addBrokerage(Long userId, Long brokerageUserId, BrokerageRecordBizTypeEnum bizType,
+                             List<BrokerageAddReqBO> list) {
         TradeConfigDO memberConfig = tradeConfigService.getTradeConfig();
         // 0 未启用分销功能
         if (memberConfig == null || !BooleanUtil.isTrue(memberConfig.getBrokerageEnabled())) {
-            log.error("[addBrokerage][增加佣金失败：brokerageEnabled 未配置，userId({}) bizType({}) list({})", userId, bizType, list);
+            log.error("[addBrokerage][增加佣金失败：brokerageEnabled 未配置，userId({}) brokerageUserId({}) bizType({}) list({})",
+                    userId, brokerageUserId, bizType, list);
             return;
         }
 
         // 1.1 获得一级推广人
-        BrokerageUserDO firstUser = brokerageUserService.getBindBrokerageUser(userId);
+        BrokerageUserDO firstUser = brokerageUserService.getBrokerageUser(brokerageUserId);
         if (firstUser == null || !BooleanUtil.isTrue(firstUser.getBrokerageEnabled())) {
             return;
         }

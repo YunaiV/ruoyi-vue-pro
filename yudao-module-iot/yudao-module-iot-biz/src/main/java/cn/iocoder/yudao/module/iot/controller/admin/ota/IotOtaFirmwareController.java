@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.service.ota.IotOtaFirmwareService;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -45,6 +46,15 @@ public class IotOtaFirmwareController {
     @PreAuthorize("@ss.hasPermission('iot:ota-firmware:update')")
     public CommonResult<Boolean> updateOtaFirmware(@Valid @RequestBody IotOtaFirmwareUpdateReqVO updateReqVO) {
         otaFirmwareService.updateOtaFirmware(updateReqVO);
+        return success(true);
+    }
+
+    @DeleteMapping("/delete")
+    @Operation(summary = "删除 OTA 固件")
+    @Parameter(name = "id", description = "固件编号", required = true, example = "1024")
+    @PreAuthorize("@ss.hasPermission('iot:ota-firmware:delete')")
+    public CommonResult<Boolean> deleteOtaFirmware(@RequestParam("id") Long id) {
+        otaFirmwareService.deleteOtaFirmware(id);
         return success(true);
     }
 

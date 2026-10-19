@@ -173,6 +173,12 @@ public class S3FileClient extends AbstractFileClient<S3FileClientConfig> {
      * @return 节点地址
      */
     private String buildPresignerEndpoint() {
+        // 阿里云 OSS、七牛云的自定义域名仅用于文件访问，不能作为 S3 签名节点。
+        // Presigner 必须使用服务商提供的 endpoint，否则生成的签名无法用于直传。
+        if (StrUtil.contains(config.getEndpoint(), S3FileClientConfig.ENDPOINT_ALIYUN)
+                || StrUtil.contains(config.getEndpoint(), S3FileClientConfig.ENDPOINT_QINIU)) {
+            return buildEndpoint();
+        }
         // 补全 domain
         if (StrUtil.isEmpty(config.getDomain())) {
             config.setDomain(buildDomain());

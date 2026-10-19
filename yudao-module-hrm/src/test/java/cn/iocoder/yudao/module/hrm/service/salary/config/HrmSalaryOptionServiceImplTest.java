@@ -154,13 +154,37 @@ public class HrmSalaryOptionServiceImplTest extends BaseDbUnitTest {
         salaryOptionMapper.insert(createSalaryOption(100101, 100, "个人社保", false));
         salaryOptionMapper.insert(createSalaryOption(20, 0, "津贴", false).setEnabled(false));
         salaryOptionMapper.insert(createSalaryOption(20101, 20, "交通补贴", false));
+        salaryOptionMapper.insert(createSalaryOption(180, 0, "加班工资", true));
+        salaryOptionMapper.insert(createSalaryOption(180101, 180, "加班工资", true));
+        salaryOptionMapper.insert(createSalaryOption(190, 0, "考勤扣款", true));
+        for (int code = 190101; code <= 190106; code++) {
+            salaryOptionMapper.insert(createSalaryOption(code, 190, "考勤扣款", true).setVisible(false));
+        }
+        salaryOptionMapper.insert(createSalaryOption(10102, 10, "停用工资项", false).setEnabled(false));
+        salaryOptionMapper.insert(createSalaryOption(10103, 10, "隐藏工资项", false).setVisible(false));
 
         // 调用
         List<HrmSalaryOptionDO> options = salaryOptionService.getSalaryOptionList(true);
 
         // 断言
-        assertEquals(1, options.size());
+        assertEquals(2, options.size());
         assertEquals(Integer.valueOf(10101), options.get(0).getCode());
+        assertEquals(Integer.valueOf(10103), options.get(1).getCode());
+    }
+
+    @Test
+    public void testGetSalaryOptionList_adjustableCategoryDisabled() {
+        // mock 数据
+        salaryOptionMapper.insert(createSalaryOption(10, 0, "基本工资", false).setEnabled(false));
+        salaryOptionMapper.insert(createSalaryOption(10101, 10, "基本工资", false));
+        salaryOptionMapper.insert(createSalaryOption(180, 0, "加班工资", true));
+        salaryOptionMapper.insert(createSalaryOption(180101, 180, "加班工资", true));
+
+        // 调用
+        List<HrmSalaryOptionDO> options = salaryOptionService.getSalaryOptionList(true);
+
+        // 断言
+        assertTrue(options.isEmpty());
     }
 
     @Test

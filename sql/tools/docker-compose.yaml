@@ -8,6 +8,8 @@ volumes:
     kingbase: { }
     opengauss: { }
     highgo: { }
+    oceanbase: { }
+    oceanbase_config: { }
 
 services:
     mysql:
@@ -145,3 +147,29 @@ services:
             - highgo:/home/highgo/hgdb/data
             - ../highgo/quartz.sql:/tmp/quartz.sql:ro
             - ../highgo/ruoyi-vue-pro.sql:/tmp/schema.sql:ro
+
+    oceanbase:
+        image: oceanbase/oceanbase-ce:4.4.2-lts
+        restart: unless-stopped
+        environment:
+            MODE: mini
+            OB_MEMORY_LIMIT: 6G
+            OB_TENANT_MEMORY_SIZE: 3G
+            OB_TENANT_MIN_CPU: 2
+            OB_TENANT_LOG_DISK_SIZE: 2G
+            OB_TENANT_NAME: test
+            OB_TENANT_PASSWORD: "123456"
+        ports:
+            - "2881:2881"
+        volumes:
+            - oceanbase:/root/ob
+            - oceanbase_config:/root/.obd/cluster
+            - ../oceanbase/ruoyi-vue-pro.sql:/tmp/schema.sql:ro
+            - ../oceanbase/quartz.sql:/tmp/quartz.sql:ro
+            - ./oceanbase/create_schema.sh:/tmp/create_schema.sh:ro
+        healthcheck:
+            test: ["CMD-SHELL", "MYSQL_PWD=$$OB_TENANT_PASSWORD obclient -h127.0.0.1 -P2881 -uroot@$$OB_TENANT_NAME -e 'SELECT 1' >/dev/null 2>&1"]
+            interval: 10s
+            timeout: 5s
+            start_period: 120s
+            retries: 30

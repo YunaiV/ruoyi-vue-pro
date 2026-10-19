@@ -9,6 +9,7 @@ import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.function.Consumer;
 
 /**
  * 拓展 MyBatis Plus QueryWrapper 类，主要增加如下功能：
@@ -155,6 +156,42 @@ public class LambdaQueryWrapperX<T> extends LambdaQueryWrapper<T> {
     @Override
     public LambdaQueryWrapperX<T> in(SFunction<T, ?> column, Collection<?> coll) {
         super.in(column, coll);
+        return this;
+    }
+
+    @Override
+    public LambdaQueryWrapperX<T> exists(boolean condition, String existsSql, Object... values) {
+        super.exists(condition, existsSql, values);
+        return this;
+    }
+
+    @Override
+    public LambdaQueryWrapperX<T> notExists(boolean condition, String existsSql, Object... values) {
+        super.notExists(condition, existsSql, values);
+        return this;
+    }
+
+    @Override
+    public LambdaQueryWrapperX<T> and(boolean condition, Consumer<LambdaQueryWrapper<T>> consumer) {
+        super.and(condition, consumer);
+        return this;
+    }
+
+    @Override
+    public LambdaQueryWrapperX<T> or(boolean condition, Consumer<LambdaQueryWrapper<T>> consumer) {
+        super.or(condition, consumer);
+        return this;
+    }
+
+    @Override
+    public LambdaQueryWrapperX<T> nested(boolean condition, Consumer<LambdaQueryWrapper<T>> consumer) {
+        super.nested(condition, consumer);
+        return this;
+    }
+
+    @Override
+    public LambdaQueryWrapperX<T> not(boolean condition, Consumer<LambdaQueryWrapper<T>> consumer) {
+        super.not(condition, consumer);
         return this;
     }
 

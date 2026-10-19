@@ -166,7 +166,7 @@ public class MailTemplateServiceImpl implements MailTemplateService {
             // 提取 <pre> 标签内的内容
             String innerContent = matcher.group(1);
             // 返回 div 标签包裹的内容
-            matcher.appendReplacement(sb, "<div>" + innerContent + "</div>");
+            matcher.appendReplacement(sb, Matcher.quoteReplacement("<div>" + innerContent + "</div>"));
         }
         matcher.appendTail(sb);
         return sb.toString();
@@ -207,7 +207,8 @@ public class MailTemplateServiceImpl implements MailTemplateService {
             String codeBlock = matcher.group(1);
             // 为代码块添加样式
             String replacement = "<pre style=\"background-color: #f5f5f5; padding: 10px; border-radius: 5px; overflow-x: auto;\"><code>" + codeBlock + "</code></pre>";
-            matcher.appendReplacement(sb, replacement);
+            // 代码块内容可能包含 $ 或 \\，需要 quoteReplacement，否则会抛 IllegalArgumentException: Illegal group reference
+            matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement));
         }
         matcher.appendTail(sb);
         return sb.toString();

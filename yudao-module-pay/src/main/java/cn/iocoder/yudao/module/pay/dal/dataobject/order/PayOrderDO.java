@@ -136,7 +136,7 @@ public class PayOrderDO extends BaseDO {
     /**
      * 渠道用户编号
      *
-     * 例如说，微信 openid、支付宝账号
+     * 例如说，微信 openid、支付宝 buyerId(buyerOpenId)
      */
     private String channelUserId;
     /**

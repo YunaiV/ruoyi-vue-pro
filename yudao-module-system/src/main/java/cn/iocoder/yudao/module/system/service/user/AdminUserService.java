@@ -177,6 +177,14 @@ public interface AdminUserService {
     void validateUserList(Collection<Long> ids);
 
     /**
+     * 校验用户存在且未被禁用
+     *
+     * @param id 用户编号
+     * @return 有效的用户
+     */
+    AdminUserDO validateUser(Long id);
+
+    /**
      * 获得用户 Map
      *
      * @param ids 用户编号数组

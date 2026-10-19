@@ -12,6 +12,9 @@ import lombok.ToString;
 @ToString(callSuper = true)
 public class CombinationRecordPageItemRespVO extends CombinationRecordBaseVO {
 
+    @Schema(description = "团长昵称", example = "芋道源码")
+    private String headNickname;
+
     // ========== 活动相关 ==========
 
     private CombinationActivityRespVO activity;

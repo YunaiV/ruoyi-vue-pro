@@ -58,7 +58,8 @@ public class MoneyUtils {
         if (percent == null) {
             return price;
         }
-        return MoneyUtils.calculateRatePriceFloor(price, (double) (percent / 100));
+        // 注意：percent 单位为分（60.2% 传入 6020），必须先转为浮点数再除，整数除法会把 60.2% 截断成 60%
+        return MoneyUtils.calculateRatePriceFloor(price, percent / 100.0);
     }
 
     /**

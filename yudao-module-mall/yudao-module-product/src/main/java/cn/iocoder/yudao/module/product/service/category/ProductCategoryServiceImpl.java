@@ -55,6 +55,10 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
     public void updateCategory(ProductCategorySaveReqVO updateReqVO) {
         // 校验分类是否存在
         validateProductCategoryExists(updateReqVO.getId());
+        // 校验父分类不能是分类自身（环检测：父级设成自己会形成循环层级，后续按父链遍历将死循环/脏数据）
+        if (Objects.equals(updateReqVO.getParentId(), updateReqVO.getId())) {
+            throw exception(CATEGORY_PARENT_IS_SELF);
+        }
         // 校验父分类存在
         validateParentProductCategory(updateReqVO.getParentId());
 

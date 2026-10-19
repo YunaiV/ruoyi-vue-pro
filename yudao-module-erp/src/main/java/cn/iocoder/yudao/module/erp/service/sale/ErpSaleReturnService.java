@@ -98,4 +98,12 @@ public interface ErpSaleReturnService {
      */
     List<ErpSaleReturnItemDO> getSaleReturnItemListByReturnIds(Collection<Long> returnIds);
 
+    /**
+     * 获得引用指定产品的销售退货项数量
+     *
+     * @param productId 产品编号
+     * @return 数量
+     */
+    Long getSaleReturnItemCountByProductId(Long productId);
+
 }

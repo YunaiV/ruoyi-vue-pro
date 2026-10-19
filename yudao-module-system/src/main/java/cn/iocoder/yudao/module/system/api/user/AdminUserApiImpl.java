@@ -94,6 +94,18 @@ public class AdminUserApiImpl implements AdminUserApi {
     }
 
     @Override
+    public List<AdminUserRespDTO> getUserListByStatus(Integer status) {
+        List<AdminUserDO> users = userService.getUserListByStatus(status);
+        return BeanUtils.toBean(users, AdminUserRespDTO.class);
+    }
+
+    @Override
+    public AdminUserRespDTO validateUser(Long id) {
+        AdminUserDO user = userService.validateUser(id);
+        return BeanUtils.toBean(user, AdminUserRespDTO.class);
+    }
+
+    @Override
     public void validateUserList(Collection<Long> ids) {
         userService.validateUserList(ids);
     }

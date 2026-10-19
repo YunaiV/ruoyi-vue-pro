@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.strategy.dept;
 
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants;
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
@@ -14,6 +15,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.stubbing.Answer;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
@@ -42,12 +45,16 @@ public class BpmTaskCandidateStartUserDeptLeaderMultiStrategyTest extends BaseMo
         String param = "2";
         // mock 方法（获得流程发起人）
         Long startUserId = 1L;
+        Long processVariableStartUserId = 2L;
         ProcessInstance processInstance = mock(ProcessInstance.class);
         DelegateExecution execution = mock(DelegateExecution.class);
         when(processInstanceService.getProcessInstance(eq(execution.getProcessInstanceId()))).thenReturn(processInstance);
         when(processInstance.getStartUserId()).thenReturn(startUserId.toString());
+        Map<String, Object> processVariables = new HashMap<>();
+        processVariables.put(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_START_USER_ID, processVariableStartUserId);
+        when(processInstance.getProcessVariables()).thenReturn(processVariables);
         // mock 方法（获取发起人的 multi 部门负责人）
-        mockGetStartUserDept(startUserId);
+        mockGetStartUserDept(processVariableStartUserId);
 
         // 调用
         Set<Long> userIds = strategy.calculateUsersByTask(execution, param);
@@ -61,11 +68,14 @@ public class BpmTaskCandidateStartUserDeptLeaderMultiStrategyTest extends BaseMo
         String param = "2";
         // mock 方法
         Long startUserId = 1L;
-        mockGetStartUserDept(startUserId);
+        Long processVariableStartUserId = 2L;
+        Map<String, Object> processVariables = new HashMap<>();
+        processVariables.put(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_START_USER_ID, processVariableStartUserId);
+        mockGetStartUserDept(processVariableStartUserId);
 
         // 调用
         Set<Long> userIds = strategy.calculateUsersByActivity(null, null, param,
-                startUserId, null, null);
+                startUserId, null, processVariables);
         // 断言
         assertEquals(Sets.newLinkedHashSet(11L, 1001L), userIds);
     }

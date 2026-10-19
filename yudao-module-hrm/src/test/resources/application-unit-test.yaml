@@ -20,11 +20,10 @@ spring:
     init:
       schema-locations: classpath:/sql/create_tables.sql
 
-  data:
-    redis:
-      host: 127.0.0.1
-      port: 16379
-      database: 0
+  redis:
+    host: 127.0.0.1
+    port: 16379
+    database: 0
 
 mybatis:
   lazy-initialization: true

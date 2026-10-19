@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.strategy.d
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCandidateStrategy;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -12,6 +13,7 @@ import javax.annotation.Resource;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -89,6 +91,21 @@ public abstract class AbstractBpmTaskCandidateDeptLeaderStrategy implements BpmT
             return null;
         }
         return deptApi.getDept(startUser.getDeptId());
+    }
+
+    /**
+     * 获取发起人的部门（优先使用流程变量中的发起人编号）
+     *
+     * @param startUserId 发起人 Id（流程变量不存在时使用）
+     * @param processVariables 流程变量
+     * @return 发起人的部门
+     */
+    protected DeptRespDTO getStartUserDept(Long startUserId, Map<String, Object> processVariables) {
+        Long processStartUserId = FlowableUtils.getProcessInstanceStartUserId(processVariables);
+        if (processStartUserId != null && processStartUserId > 0) {
+            startUserId = processStartUserId;
+        }
+        return getStartUserDept(startUserId);
     }
 
 }
