@@ -39,13 +39,13 @@ import com.google.common.collect.Maps;
 import io.modelcontextprotocol.client.McpSyncClient;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.MessageType;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
-import org.springframework.ai.chat.model.StreamingChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.mcp.SyncMcpToolCallbackProvider;
@@ -170,7 +170,8 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
 
         // 4.2 创建 chat 需要的 Prompt
         Prompt prompt = buildPrompt(conversation, historyMessages, knowledgeSegments, webSearchResponse, model, sendReqVO);
-        ChatResponse chatResponse = chatModel.call(prompt);
+        // 通过 ChatClient 调用：Spring AI 2.x 的工具调用循环已移至 ChatClient，直接 ChatModel.call 不会执行工具。https://t.zsxq.com/QvxNn
+        ChatResponse chatResponse = ChatClient.create(chatModel).prompt(prompt).call().chatResponse();
 
         // 4.3 更新响应内容
         String newContent = AiUtils.getChatResponseContent(chatResponse);
@@ -204,7 +205,7 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
         List<AiChatMessageDO> historyMessages = chatMessageMapper.selectListByConversationId(conversation.getId());
         // 1.2 校验模型
         AiModelDO model = modalService.validateModel(conversation.getModelId());
-        StreamingChatModel chatModel = modalService.getChatModel(model.getId());
+        ChatModel chatModel = modalService.getChatModel(model.getId());
 
         // 2.1 知识库找回
         List<AiKnowledgeSegmentSearchRespBO> knowledgeSegments = recallKnowledgeSegment(
@@ -227,7 +228,8 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
 
         // 4.2 构建 Prompt，并进行调用
         Prompt prompt = buildPrompt(conversation, historyMessages, knowledgeSegments, webSearchResponse, model, sendReqVO);
-        Flux<ChatResponse> streamResponse = chatModel.stream(prompt);
+        // 通过 ChatClient 调用：Spring AI 2.x 的工具调用循环已移至 ChatClient，直接 ChatModel.stream 不会执行工具。https://t.zsxq.com/QvxNn
+        Flux<ChatResponse> streamResponse = ChatClient.create(chatModel).prompt(prompt).stream().chatResponse();
 
         // 4.3 流式返回
         StringBuffer contentBuffer = new StringBuffer();
