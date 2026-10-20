@@ -140,6 +140,9 @@ public interface ErrorCodeConstants {
     ErrorCode CAL_TEAM_SHIFT_GENERATE_SHIFT_NOT_ENOUGH = new ErrorCode(1_040_201_202, "班次数量不满足轮班方式要求");
     ErrorCode CAL_TEAM_SHIFT_GENERATE_SHIFT_COUNT_INVALID = new ErrorCode(1_040_201_203, "按天倒班必须填写合法的倒班天数");
     ErrorCode CAL_TEAM_SHIFT_GENERATE_SHIFT_METHOD_INVALID = new ErrorCode(1_040_201_204, "不支持的倒班方式：{}");
+    ErrorCode CAL_TEAM_SHIFT_GENERATE_SHIFT_TIME_INVALID = new ErrorCode(1_040_201_205, "班次【{}】的开始或结束时间格式不正确，应为 HH:mm，结束时间可为 24:00");
+    ErrorCode CAL_TEAM_SHIFT_GENERATE_REST_INVALID = new ErrorCode(1_040_201_206,
+            "班组【{}】{} {}与 {} {}的上班时间重叠或首尾相接，没有休息间隔，请调整班次时间或倒班方式");
 
     // ========== MES 日历排班-排班计划（1-040-202-000） ==========
     ErrorCode CAL_PLAN_NOT_EXISTS = new ErrorCode(1_040_202_000, "排班计划不存在");
@@ -152,6 +155,8 @@ public interface ErrorCodeConstants {
 
     // ========== MES 日历排班-假期设置（1-040-203-000） ==========
     ErrorCode CAL_HOLIDAY_NOT_EXISTS = new ErrorCode(1_040_203_000, "假期设置不存在");
+    ErrorCode CAL_HOLIDAY_PLAN_CONFIRMED = new ErrorCode(1_040_203_001,
+            "{} 在已确认的排班计划【{}】范围内，修改是否节假日会与已生成的排班不一致，不允许修改");
 
     // ========== MES 设备管理-设备类型（1-040-300-000） ==========
     ErrorCode DV_MACHINERY_TYPE_NOT_EXISTS = new ErrorCode(1_040_300_000, "设备类型不存在");
