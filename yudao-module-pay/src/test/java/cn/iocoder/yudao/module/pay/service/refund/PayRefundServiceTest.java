@@ -842,6 +842,67 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
         verify(client, never()).unifiedRefund(any());
     }
 
+    @Test // 发起退款异常、渠道查询无明确结果（结果未知），使用相同的商户退款编号再次发起，退款成功
+    public void testCreateRefund_retryAfterUnknown_success() {
+        // 准备参数：首次发起退款异常，补查无明确结果，保留 WAITING
+        PayClient<?> client = mockPayClient();
+        when(client.unifiedRefund(any(PayRefundUnifiedReqDTO.class))).thenThrow(new RuntimeException("模拟网络超时"));
+        when(client.getRefund(any(), any())).thenAnswer(invocation -> PayRefundRespDTO.waitingOf(
+                null, invocation.getArgument(1), "waiting"));
+        refundService.createRefund(buildRefundCreateReqDTO());
+        PayRefundDO unknownRefund = refundMapper.selectByAppIdAndMerchantRefundId(1L, "200");
+        assertEquals(PayRefundStatusEnum.WAITING.getStatus(), unknownRefund.getStatus());
+        // 准备参数：模拟退款单发起后超过收敛窗口，渠道一直无明确结果
+        mockRefundCreateTimeBeforeInterval(unknownRefund.getId());
+        // mock 方法（client 再次发起时，退款成功）
+        doAnswer(invocation -> PayRefundRespDTO.successOf("CHANNEL_R001", LocalDateTime.now(),
+                ((PayRefundUnifiedReqDTO) invocation.getArgument(0)).getOutRefundNo(), "success"))
+                .when(client).unifiedRefund(any(PayRefundUnifiedReqDTO.class));
+
+        // 调用
+        Long refundId = refundService.createRefund(buildRefundCreateReqDTO().setReason("再次退款"));
+        // 断言：复用原退款单及原退款单号，状态更新为退款成功
+        assertEquals(unknownRefund.getId(), refundId);
+        assertEquals(1, refundMapper.selectList().size());
+        PayRefundDO refund = refundMapper.selectById(refundId);
+        assertEquals(unknownRefund.getNo(), refund.getNo());
+        assertEquals(PayRefundStatusEnum.SUCCESS.getStatus(), refund.getStatus());
+        assertEquals("CHANNEL_R001", refund.getChannelRefundNo());
+        assertEquals("再次退款", refund.getReason());
+        // 断言：两次都使用原退款单号向渠道发起退款，并通知退款成功
+        verify(client, times(2)).unifiedRefund(argThat(unifiedReqDTO ->
+                unknownRefund.getNo().equals(unifiedReqDTO.getOutRefundNo())));
+        verify(notifyService).createPayNotifyTask(eq(PayNotifyTypeEnum.REFUND.getType()), eq(refundId));
+    }
+
+    @Test // 结果未知的退款单被渠道明确受理后（有渠道退款单号），再次发起仍被拦截，等待退款轮询收敛
+    public void testCreateRefund_retryAfterUnknown_hasChannelRefundNo() {
+        // 准备参数：已存在 WAITING 且有渠道退款单号的退款单（即使超过收敛窗口）
+        PayClient<?> client = mockPayClient();
+        PayRefundDO unknownRefund = insertWaitingRefund(9, "CHANNEL_R001");
+        mockRefundCreateTimeBeforeInterval(unknownRefund.getId());
+
+        // 调用，并断言异常
+        assertServiceException(() -> refundService.createRefund(buildRefundCreateReqDTO()),
+                REFUND_HAS_REFUNDING);
+        assertEquals(PayRefundStatusEnum.WAITING.getStatus(), refundMapper.selectById(unknownRefund.getId()).getStatus());
+        verify(client, never()).unifiedRefund(any());
+    }
+
+    @Test // 结果未知的退款单，再次发起但退款金额不一致
+    public void testCreateRefund_retryAfterUnknown_priceNotMatch() {
+        // 准备参数：已存在退款金额为 5、且超过收敛窗口的结果未知的退款单
+        PayClient<?> client = mockPayClient();
+        PayRefundDO unknownRefund = insertWaitingRefund(5, null);
+        mockRefundCreateTimeBeforeInterval(unknownRefund.getId());
+
+        // 调用，并断言异常
+        assertServiceException(() -> refundService.createRefund(buildRefundCreateReqDTO()),
+                REFUND_CREATE_FAIL_PRICE_NOT_MATCH);
+        assertEquals(PayRefundStatusEnum.WAITING.getStatus(), refundMapper.selectById(unknownRefund.getId()).getStatus());
+        verify(client, never()).unifiedRefund(any());
+    }
+
     @Test
     public void testCreateRefund_invokeSuccess() {
         PayRefundServiceImpl payRefundServiceImpl = mock(PayRefundServiceImpl.class);
@@ -1203,6 +1264,32 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
                 .setChannelErrorCode("BALANCE_NOT_ENOUGH").setChannelErrorMsg("余额不足"));
         refundMapper.insert(refund);
         return refund;
+    }
+
+    /**
+     * 插入等待退款的退款单，关联 {@link #mockPayClient()} 的支付订单
+     *
+     * @param refundPrice 退款金额
+     * @param channelRefundNo 渠道退款单号；为 null 时，表示渠道未明确受理（结果未知）
+     */
+    private PayRefundDO insertWaitingRefund(Integer refundPrice, String channelRefundNo) {
+        PayOrderDO order = orderService.getOrder(1L, "100");
+        PayRefundDO refund = randomPojo(PayRefundDO.class, o -> o.setAppId(1L).setMerchantRefundId("200")
+                .setOrderId(order.getId()).setOrderNo(order.getNo()).setRefundPrice(refundPrice)
+                .setStatus(PayRefundStatusEnum.WAITING.getStatus())
+                .setChannelRefundNo(channelRefundNo));
+        refundMapper.insert(refund);
+        return refund;
+    }
+
+    /**
+     * 将退款单的创建时间更新到收敛窗口之前，模拟发起后渠道一直无明确结果
+     */
+    private void mockRefundCreateTimeBeforeInterval(Long refundId) {
+        PayRefundDO refundUpdate = new PayRefundDO();
+        refundUpdate.setId(refundId);
+        refundUpdate.setCreateTime(LocalDateTime.now().minusMinutes(11));
+        refundMapper.updateById(refundUpdate);
     }
 
     private void assertRefundFailure(String channelErrorCode) {

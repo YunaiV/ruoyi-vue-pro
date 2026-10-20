@@ -37,6 +37,8 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -181,7 +183,7 @@ public class PayRefundServiceImpl implements PayRefundService {
     }
 
     /**
-     * 创建退款单；如果存在退款失败的退款单，则重置为待退款，用于重新发起退款
+     * 创建退款单；如果存在退款失败、或者结果未知的退款单，则重置为待退款，用于重新发起退款
      *
      * @param reqDTO 退款申请信息
      * @param app 支付应用
@@ -207,8 +209,8 @@ public class PayRefundServiceImpl implements PayRefundService {
                     .setPayPrice(order.getPrice()).setRefundPrice(reqDTO.getPrice());
             refundMapper.insert(refund);
         } else {
-            // 2.2 情况二：存在退款失败的退款单，则复用原退款单（包括原退款单号）重新发起，并清空上一次退款的渠道结果
-            // 原因是：微信、支付宝等渠道要求退款失败后重新提交时，使用原商户退款单号，避免上一次实际受理时重复退款。未校验一致的请求字段，以本次请求为准
+            // 2.2 情况二：存在退款失败、或者结果未知的退款单，则复用原退款单（包括原退款单号）重新发起，并清空上一次退款的渠道结果
+            // 原因是：微信、支付宝等渠道要求重新提交退款时，使用原商户退款单号，避免上一次实际受理时重复退款。未校验一致的请求字段，以本次请求为准
             int updateCount = refundMapper.updateByIdAndStatusAndClearChannelResult(refund.getId(), refund.getStatus(),
                     new PayRefundDO().setStatus(PayRefundStatusEnum.WAITING.getStatus())
                             .setReason(reqDTO.getReason()).setUserIp(reqDTO.getUserIp())
@@ -303,22 +305,61 @@ public class PayRefundServiceImpl implements PayRefundService {
      * @param reqDTO 退款申请信息
      * @param appId 应用编号
      * @param order 支付订单
-     * @return 退款失败、需要重新发起的退款单；为 null 时，表示需要新建退款单
+     * @return 退款失败、或者结果未知，需要重新发起的退款单；为 null 时，表示需要新建退款单
      */
     private PayRefundDO validateRefundCanCreate(PayRefundCreateReqDTO reqDTO, Long appId, PayOrderDO order) {
-        // 是否有退款中的订单。注意：需要在锁内校验，避免并发创建退款单
+        PayRefundDO refund = refundMapper.selectByAppIdAndMerchantRefundId(appId, reqDTO.getMerchantRefundId());
+        // 情况一：结果未知的退款单，复用原退款单号重新发起，避免退款单永久停留在 WAITING 无法恢复
+        if (refund != null && isRefundUnknown(refund)) {
+            return validateRefundConsistent(refund, reqDTO, order);
+        }
+        // 情况二：是否有退款中的订单。注意：需要在锁内校验，避免并发创建退款单
         if (refundMapper.selectCountByAppIdAndOrderId(appId, order.getId(),
                 PayRefundStatusEnum.WAITING.getStatus()) > 0) {
             throw exception(REFUND_HAS_REFUNDING);
         }
-        PayRefundDO refund = refundMapper.selectByAppIdAndMerchantRefundId(appId, reqDTO.getMerchantRefundId());
         if (refund == null) {
             return null;
         }
-        // 只有退款失败的退款单，才能再次发起退款
+        // 情况三：只有退款失败的退款单，才能再次发起退款
         if (!PayRefundStatusEnum.isFailure(refund.getStatus())) {
             throw exception(REFUND_EXISTS);
         }
+        return validateRefundConsistent(refund, reqDTO, order);
+    }
+
+    /**
+     * 结果未知的退款单，发起后需要等待的最小时间（毫秒），超过后才允许重新发起
+     *
+     * 目的是给渠道回调、退款轮询留出收敛窗口，同时避免并发请求被误判为结果未知
+     */
+    private static final long REFUND_UNKNOWN_RETRY_INTERVAL = 10 * 60 * 1000L;
+
+    /**
+     * 判断退款单是否为「结果未知」：等待退款中、渠道未明确受理（无渠道退款单号）、且已超过收敛窗口
+     *
+     * 例如说：发起退款发生异常、且渠道查询一直无明确结果，导致退款单停留在 WAITING，
+     * 退款轮询无法收敛，也无法再次发起退款
+     *
+     * @param refund 退款单
+     * @return 是否结果未知
+     */
+    private boolean isRefundUnknown(PayRefundDO refund) {
+        return PayRefundStatusEnum.WAITING.getStatus().equals(refund.getStatus())
+                && StrUtil.isEmpty(refund.getChannelRefundNo())
+                && refund.getCreateTime() != null
+                && Duration.between(refund.getCreateTime(), LocalDateTime.now()).toMillis() >= REFUND_UNKNOWN_RETRY_INTERVAL;
+    }
+
+    /**
+     * 校验重新发起退款时，原退款单与本次请求参数是否一致
+     *
+     * @param refund 原退款单
+     * @param reqDTO 退款申请信息
+     * @param order 支付订单
+     * @return 退款单
+     */
+    private PayRefundDO validateRefundConsistent(PayRefundDO refund, PayRefundCreateReqDTO reqDTO, PayOrderDO order) {
         // 校验参数是否一致
         if (ObjectUtil.notEqual(refund.getOrderId(), order.getId())) {
             throw exception(REFUND_CREATE_FAIL_ORDER_NOT_MATCH);
