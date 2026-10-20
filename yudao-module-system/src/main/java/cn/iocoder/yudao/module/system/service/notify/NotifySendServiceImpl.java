@@ -63,7 +63,7 @@ public class NotifySendServiceImpl implements NotifySendService {
         NotifyTemplateDO template = notifyTemplateService.getNotifyTemplateByCodeFromCache(templateCode);
         // 站内信模板不存在
         if (template == null) {
-            throw exception(NOTICE_NOT_FOUND);
+            throw exception(NOTIFY_TEMPLATE_NOT_EXISTS);
         }
         return template;
     }
