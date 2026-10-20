@@ -45,6 +45,16 @@ public interface PmsProjectService {
     PmsProjectDO getProject(Long id);
 
     /**
+     * 获得项目，并锁定项目行
+     *
+     * 需在事务中调用，锁保持至事务结束
+     *
+     * @param id 项目编号
+     * @return 项目
+     */
+    PmsProjectDO getProjectForUpdate(Long id);
+
+    /**
      * 获得项目详情并记录访问时间
      *
      * @param id 项目编号
