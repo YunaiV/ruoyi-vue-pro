@@ -34,6 +34,7 @@
         <kingbase.jdbc.version>9.0.1.jre7</kingbase.jdbc.version>
         <opengauss.jdbc.version>7.0.0-RC3-og</opengauss.jdbc.version>
         <taos.version>3.9.2</taos.version>
+        <iotdb.version>2.0.8</iotdb.version>  <!-- TODO 特殊：暂不升级 2.0.10/2.0.11，其 TablePreparedStatement.execute 不设置 ResultSet，导致 Mapper 的 SELECT 为空、COUNT 为 null -->
         <!-- 消息队列 -->
         <rocketmq-spring.version>2.3.6</rocketmq-spring.version>
         <!-- 服务保障相关 -->
@@ -310,6 +311,12 @@
                 <groupId>com.taosdata.jdbc</groupId>
                 <artifactId>taos-jdbcdriver</artifactId>
                 <version>${taos.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.iotdb</groupId>
+                <artifactId>iotdb-jdbc</artifactId>
+                <version>${iotdb.version}</version>
             </dependency>
 
             <!-- Job 定时任务相关 -->

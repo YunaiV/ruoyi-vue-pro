@@ -1,11 +1,9 @@
 package cn.iocoder.yudao.module.iot.framework.tdengine.core;
 
-import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.model.ThingModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.Locale;
 
 /**
  * TDEngine 表字段
@@ -30,9 +28,9 @@ public class TDengineTableField {
     public static final String TYPE_TIMESTAMP = "TIMESTAMP";
 
     /**
-     * 字段长度 - VARCHAR 默认长度
+     * 字段长度 - VARCHAR 默认长度，与 STRUCT、ARRAY 等 JSON 属性的长度上限保持一致
      */
-    public static final int LENGTH_VARCHAR = 1024;
+    public static final int LENGTH_VARCHAR = ThingModelProperty.LENGTH_JSON;
 
     /**
      * 注释 - TAG 字段
@@ -62,17 +60,6 @@ public class TDengineTableField {
     public TDengineTableField(String field, String type) {
         this.field = field;
         this.type = type;
-    }
-
-    /**
-     * 构建字段名：TDengine 默认会将字段名转为小写，需要和建表、写入、查询保持一致。
-     * 例如：PT -> pt，PfT -> pf_t。
-     */
-    public static String buildFieldName(String field) {
-        if (StrUtil.isBlank(field)) {
-            return field;
-        }
-        return StrUtil.toUnderlineCase(field).toLowerCase(Locale.ROOT);
     }
 
 }
