@@ -1,9 +1,11 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable;
 
+import cn.hutool.core.collection.ListUtil;
+import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskApproveReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskRejectReqVO;
-import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmChildProcessMultiInstanceSourceTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmChildProcessStartUserEmptyTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmChildProcessStartUserTypeEnum;
@@ -20,7 +22,7 @@ import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.SimpleModelUtils;
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceServiceImpl;
 import cn.iocoder.yudao.module.bpm.service.task.BpmTaskServiceImpl;
-import jakarta.annotation.Resource;
+import com.google.common.collect.ImmutableMap;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.RepositoryService;
@@ -34,13 +36,14 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static org.junit.jupiter.api.Assertions.*;
@@ -79,7 +82,7 @@ public class BpmMultiInstanceFlowableTest extends BaseFlowableUnitTest {
                 .deploy().getId());
         mockFlowableBackedServices(repositoryService);
         // 多人审批的审批人：用户 1、用户 2（有序）
-        when(taskCandidateInvoker.calculateUsersByTask(any())).thenReturn(new LinkedHashSet<>(List.of(1L, 2L)));
+        when(taskCandidateInvoker.calculateUsersByTask(any())).thenReturn(new LinkedHashSet<>(ListUtil.of(1L, 2L)));
     }
 
     @AfterEach
@@ -94,7 +97,7 @@ public class BpmMultiInstanceFlowableTest extends BaseFlowableUnitTest {
         // 准备参数
         String processInstanceId = startProcessInstance("multiAny", null);
         List<Task> tasks = getRunningTasks(processInstanceId);
-        assertEquals(List.of("1", "2"), convertList(tasks, Task::getAssignee));
+        assertEquals(ListUtil.of("1", "2"), convertList(tasks, Task::getAssignee));
 
         // 调用：用户 1 审批通过
         approveTask(tasks.get(0));
@@ -125,11 +128,11 @@ public class BpmMultiInstanceFlowableTest extends BaseFlowableUnitTest {
         // 准备参数
         String processInstanceId = startProcessInstance("multiRatio", null);
         List<Task> tasks = getRunningTasks(processInstanceId);
-        assertEquals(List.of("1", "2"), convertList(tasks, Task::getAssignee));
+        assertEquals(ListUtil.of("1", "2"), convertList(tasks, Task::getAssignee));
 
         // 调用 + 断言：用户 1 审批通过，仍需等待用户 2 审批
         approveTask(tasks.get(0));
-        assertEquals(List.of(tasks.get(1).getId()), convertList(getRunningTasks(processInstanceId), Task::getId));
+        assertEquals(ListUtil.of(tasks.get(1).getId()), convertList(getRunningTasks(processInstanceId), Task::getId));
         // 调用 + 断言：用户 2 审批通过，流程审批通过
         approveTask(tasks.get(1));
         assertProcessInstanceStatus(processInstanceId, BpmProcessInstanceStatusEnum.APPROVE.getStatus());
@@ -138,14 +141,14 @@ public class BpmMultiInstanceFlowableTest extends BaseFlowableUnitTest {
     @Test
     public void testApproveTask_ratioPartial() {
         // 准备参数：通过比例 60%，审批人为用户 1、用户 2、用户 3
-        when(taskCandidateInvoker.calculateUsersByTask(any())).thenReturn(new LinkedHashSet<>(List.of(1L, 2L, 3L)));
+        when(taskCandidateInvoker.calculateUsersByTask(any())).thenReturn(new LinkedHashSet<>(ListUtil.of(1L, 2L, 3L)));
         String processInstanceId = startProcessInstance("multiRatioPartial", null);
         List<Task> tasks = getRunningTasks(processInstanceId);
-        assertEquals(List.of("1", "2", "3"), convertList(tasks, Task::getAssignee));
+        assertEquals(ListUtil.of("1", "2", "3"), convertList(tasks, Task::getAssignee));
 
         // 调用 + 断言：用户 1 审批通过（1/3 < 60%），仍需等待其他人审批
         approveTask(tasks.get(0));
-        assertEquals(List.of(tasks.get(1).getId(), tasks.get(2).getId()),
+        assertEquals(ListUtil.of(tasks.get(1).getId(), tasks.get(2).getId()),
                 convertList(getRunningTasks(processInstanceId), Task::getId));
         // 调用 + 断言：用户 2 审批通过（2/3 >= 60%），用户 3 的任务被取消，流程审批通过
         approveTask(tasks.get(1));
@@ -174,11 +177,11 @@ public class BpmMultiInstanceFlowableTest extends BaseFlowableUnitTest {
         // 准备参数：发起审批节点由用户 1 审批，会签节点由用户 1、用户 2 审批
         when(taskCandidateInvoker.calculateUsersByTask(any())).thenAnswer(invocation ->
                 "multiReturn-task".equals(((DelegateExecution) invocation.getArgument(0)).getCurrentActivityId())
-                        ? new LinkedHashSet<>(List.of(1L, 2L)) : Set.of(1L));
+                        ? new LinkedHashSet<>(ListUtil.of(1L, 2L)) : SetUtils.asSet(1L));
         String processInstanceId = startProcessInstance("multiReturn", null);
         approveTask(getRunningTask(processInstanceId));
         List<Task> tasks = getRunningTasks(processInstanceId);
-        assertEquals(List.of("1", "2"), convertList(tasks, Task::getAssignee));
+        assertEquals(ListUtil.of("1", "2"), convertList(tasks, Task::getAssignee));
 
         // 调用：用户 2 审批不通过，按配置退回到发起审批节点
         taskService.rejectTask(2L, new BpmTaskRejectReqVO().setId(tasks.get(1).getId()).setReason("退回修改"));
@@ -192,8 +195,8 @@ public class BpmMultiInstanceFlowableTest extends BaseFlowableUnitTest {
         // 调用 + 断言：再次审批发起审批节点后，重新生成用户 1、用户 2 的会签任务
         approveTask(firstTask);
         List<Task> newTasks = getRunningTasks(processInstanceId);
-        assertEquals(List.of("1", "2"), convertList(newTasks, Task::getAssignee));
-        assertEquals(List.of("multiReturn-task", "multiReturn-task"), convertList(newTasks, Task::getTaskDefinitionKey));
+        assertEquals(ListUtil.of("1", "2"), convertList(newTasks, Task::getAssignee));
+        assertEquals(ListUtil.of("multiReturn-task", "multiReturn-task"), convertList(newTasks, Task::getTaskDefinitionKey));
         // 调用 + 断言：全部审批通过后，流程审批通过
         newTasks.forEach(this::approveTask);
         assertProcessInstanceStatus(processInstanceId, BpmProcessInstanceStatusEnum.APPROVE.getStatus());
@@ -231,7 +234,7 @@ public class BpmMultiInstanceFlowableTest extends BaseFlowableUnitTest {
     @Test
     public void testCallActivity_numberForm() {
         // 调用：表单 count = 3
-        String processInstanceId = startProcessInstance("multiChildNumberForm", new HashMap<>(Map.of("count", 3)));
+        String processInstanceId = startProcessInstance("multiChildNumberForm", new HashMap<>(ImmutableMap.of("count", 3)));
         // 断言：并行发起 3 个子流程，全部审批通过后，主流程结束
         List<ProcessInstance> children = getChildProcessInstances(processInstanceId);
         assertEquals(3, children.size());
@@ -243,7 +246,7 @@ public class BpmMultiInstanceFlowableTest extends BaseFlowableUnitTest {
     public void testCallActivity_multipleFormSequential() {
         // 调用：表单 users 选择了 2 个用户
         String processInstanceId = startProcessInstance("multiChildMultipleForm",
-                new HashMap<>(Map.of("users", List.of(1L, 2L))));
+                new HashMap<>(ImmutableMap.of("users", ListUtil.of(1L, 2L))));
         // 断言：依次发起子流程，前一个子流程结束后才发起下一个
         for (int i = 0; i < 2; i++) {
             List<ProcessInstance> children = getChildProcessInstances(processInstanceId);
@@ -286,7 +289,7 @@ public class BpmMultiInstanceFlowableTest extends BaseFlowableUnitTest {
 
         // 调用 + 断言：会签需要用户 1、用户 2 都审批通过
         List<Task> tasks = getRunningTasks(processInstanceId);
-        assertEquals(List.of("1", "2"), convertList(tasks, Task::getAssignee));
+        assertEquals(ListUtil.of("1", "2"), convertList(tasks, Task::getAssignee));
         tasks.forEach(this::approveTask);
         // 调用 + 断言：并行发起 2 个子流程，全部审批通过后，主流程结束
         List<ProcessInstance> children = getChildProcessInstances(processInstanceId);
@@ -309,7 +312,7 @@ public class BpmMultiInstanceFlowableTest extends BaseFlowableUnitTest {
     private List<Task> getRunningTasks(String processInstanceId) {
         // 按审批人排序，便于断言
         return taskService.getRunningTaskListByProcessInstanceId(processInstanceId, null, null).stream()
-                .sorted(Comparator.comparing(Task::getAssignee)).toList();
+                .sorted(Comparator.comparing(Task::getAssignee)).collect(Collectors.toList());
     }
 
     private Task getRunningTask(String processInstanceId) {

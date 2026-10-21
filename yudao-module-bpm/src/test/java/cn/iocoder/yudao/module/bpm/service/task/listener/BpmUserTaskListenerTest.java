@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.bpm.service.task.listener;
 
+import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmHttpRequestUtils;
@@ -64,9 +65,9 @@ public class BpmUserTaskListenerTest extends BaseMockitoUnitTest {
             httpRequestUtilsMockedStatic.verify(() -> BpmHttpRequestUtils.executeBpmHttpRequest(same(processInstance),
                     eq("http://127.0.0.1/listener"), isNull(), bodyCaptor.capture(), eq(false), isNull()));
             List<BpmSimpleModelNodeVO.HttpRequestParam> body = bodyCaptor.getValue();
-            assertEquals(List.of("processInstanceId", "assignee", "taskDefinitionKey", "taskId"),
+            assertEquals(ListUtil.of("processInstanceId", "assignee", "taskDefinitionKey", "taskId"),
                     convertList(body, BpmSimpleModelNodeVO.HttpRequestParam::getKey));
-            assertEquals(List.of("process-instance-1", "1", "task1", "task-1"),
+            assertEquals(ListUtil.of("process-instance-1", "1", "task1", "task-1"),
                     convertList(body, BpmSimpleModelNodeVO.HttpRequestParam::getValue));
         }
     }

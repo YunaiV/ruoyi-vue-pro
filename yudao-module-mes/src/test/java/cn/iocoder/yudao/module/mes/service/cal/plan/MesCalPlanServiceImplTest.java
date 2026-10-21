@@ -10,11 +10,10 @@ import cn.iocoder.yudao.module.mes.enums.cal.MesCalShiftMethodEnum;
 import cn.iocoder.yudao.module.mes.enums.cal.MesCalShiftTypeEnum;
 import cn.iocoder.yudao.module.mes.service.cal.team.MesCalTeamShiftService;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-import jakarta.annotation.Resource;
-
+import javax.annotation.Resource;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -43,11 +42,11 @@ public class MesCalPlanServiceImplTest extends BaseDbUnitTest {
     @Resource
     private MesCalPlanMapper planMapper;
 
-    @MockitoBean
+    @MockBean
     private MesCalPlanShiftService planShiftService;
-    @MockitoBean
+    @MockBean
     private MesCalPlanTeamService planTeamService;
-    @MockitoBean
+    @MockBean
     private MesCalTeamShiftService teamShiftService;
 
     @Test

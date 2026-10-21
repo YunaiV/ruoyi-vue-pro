@@ -3,12 +3,12 @@ package cn.iocoder.yudao.module.iot.framework.storage.config;
 import cn.iocoder.yudao.module.iot.dal.storage.IotDeviceMessageDAO;
 import cn.iocoder.yudao.module.iot.dal.storage.IotDevicePropertyDAO;
 import com.baomidou.dynamic.datasource.DynamicRoutingDataSource;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import javax.sql.DataSource;
 
 // TODO DONE @AI：按照项目的习惯，这个是不是不用写单测？已移除独立单测 IotStorageInitRunnerTest，关键的缺数据源防回落 master 断言并入实库验收

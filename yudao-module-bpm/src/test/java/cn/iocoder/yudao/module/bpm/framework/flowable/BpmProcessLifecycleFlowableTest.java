@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable;
 
+import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelMetaInfoVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionInfoDO;
@@ -14,7 +15,6 @@ import cn.iocoder.yudao.module.bpm.service.task.BpmTaskServiceImpl;
 import cn.iocoder.yudao.module.bpm.service.task.listener.BpmCallActivityListener;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
-import jakarta.annotation.Resource;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
@@ -27,9 +27,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.START_USER_NODE_ID;
 import static org.junit.jupiter.api.Assertions.*;
@@ -79,7 +79,7 @@ public class BpmProcessLifecycleFlowableTest extends BaseFlowableUnitTest {
     public void testProcessTaskCreated_assignEmptyApprove() {
         // 准备参数：人工审批，计算不到审批人时自动通过
         deploy("bpmn/lifecycle/assign-empty-approve.bpmn20.xml");
-        when(taskCandidateInvoker.calculateUsersByTask(any())).thenReturn(Set.of());
+        when(taskCandidateInvoker.calculateUsersByTask(any())).thenReturn(SetUtils.asSet());
 
         // 调用
         String processInstanceId = startProcessInstance("assignEmptyApprove", 1L);
@@ -95,7 +95,7 @@ public class BpmProcessLifecycleFlowableTest extends BaseFlowableUnitTest {
     public void testProcessTaskCreated_assignEmptyReject() {
         // 准备参数：人工审批，计算不到审批人时自动拒绝
         deploy("bpmn/lifecycle/assign-empty-reject.bpmn20.xml");
-        when(taskCandidateInvoker.calculateUsersByTask(any())).thenReturn(Set.of());
+        when(taskCandidateInvoker.calculateUsersByTask(any())).thenReturn(SetUtils.asSet());
 
         // 调用
         String processInstanceId = startProcessInstance("assignEmptyReject", 1L);

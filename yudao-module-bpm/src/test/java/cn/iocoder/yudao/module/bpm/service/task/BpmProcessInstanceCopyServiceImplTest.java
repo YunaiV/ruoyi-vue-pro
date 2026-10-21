@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.bpm.service.task;
 
+import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmProcessInstanceCopyDO;
 import cn.iocoder.yudao.module.bpm.dal.mysql.task.BpmProcessInstanceCopyMapper;
@@ -13,6 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.PROCESS_DEFINITION_NOT_EXISTS;
@@ -58,11 +60,11 @@ public class BpmProcessInstanceCopyServiceImplTest extends BaseMockitoUnitTest {
         prepareProcessInstance();
 
         // 调用
-        copyService.createProcessInstanceCopy(List.of(2L, 3L), "请知悉", "task-1");
+        copyService.createProcessInstanceCopy(ListUtil.of(2L, 3L), "请知悉", "task-1");
         // 断言
         ArgumentCaptor<List<BpmProcessInstanceCopyDO>> captor = ArgumentCaptor.forClass(List.class);
         verify(copyMapper).insertBatch(captor.capture());
-        assertEquals(List.of(2L, 3L), captor.getValue().stream().map(BpmProcessInstanceCopyDO::getUserId).toList());
+        assertEquals(ListUtil.of(2L, 3L), captor.getValue().stream().map(BpmProcessInstanceCopyDO::getUserId).collect(Collectors.toList()));
         assertEquals("process-instance-1", captor.getValue().get(0).getProcessInstanceId());
         assertEquals(1L, captor.getValue().get(0).getStartUserId());
     }
@@ -73,7 +75,7 @@ public class BpmProcessInstanceCopyServiceImplTest extends BaseMockitoUnitTest {
         when(taskService.getTask("task-1")).thenReturn(null);
 
         // 调用，并断言异常
-        assertServiceException(() -> copyService.createProcessInstanceCopy(List.of(2L), "请知悉", "task-1"),
+        assertServiceException(() -> copyService.createProcessInstanceCopy(ListUtil.of(2L), "请知悉", "task-1"),
                 TASK_NOT_EXISTS);
     }
 
@@ -83,7 +85,7 @@ public class BpmProcessInstanceCopyServiceImplTest extends BaseMockitoUnitTest {
         when(processInstanceService.getProcessInstance("process-instance-1")).thenReturn(null);
 
         // 调用，并断言异常
-        assertServiceException(() -> copyService.createProcessInstanceCopy(List.of(2L), "请知悉",
+        assertServiceException(() -> copyService.createProcessInstanceCopy(ListUtil.of(2L), "请知悉",
                         "process-instance-1", "approve", "审批", "task-1"), PROCESS_INSTANCE_NOT_EXISTS);
     }
 
@@ -95,7 +97,7 @@ public class BpmProcessInstanceCopyServiceImplTest extends BaseMockitoUnitTest {
         when(processDefinitionService.getProcessDefinition("definition-1")).thenReturn(null);
 
         // 调用，并断言异常
-        assertServiceException(() -> copyService.createProcessInstanceCopy(List.of(2L), "请知悉",
+        assertServiceException(() -> copyService.createProcessInstanceCopy(ListUtil.of(2L), "请知悉",
                         "process-instance-1", "approve", "审批", "task-1"), PROCESS_DEFINITION_NOT_EXISTS);
     }
 

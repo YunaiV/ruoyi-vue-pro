@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.bpm.service.definition;
 
+import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.process.BpmProcessDefinitionPageReqVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionInfoDO;
@@ -18,8 +20,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import java.util.Collections;
-import java.util.List;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -55,7 +55,7 @@ public class BpmProcessDefinitionServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testCanUserStartProcessDefinition_startUserIds() {
         // 准备参数
-        BpmProcessDefinitionInfoDO definition = new BpmProcessDefinitionInfoDO().setStartUserIds(List.of(1L, 2L));
+        BpmProcessDefinitionInfoDO definition = new BpmProcessDefinitionInfoDO().setStartUserIds(ListUtil.of(1L, 2L));
 
         // 调用，并断言
         assertTrue(processDefinitionService.canUserStartProcessDefinition(definition, 2L));
@@ -65,7 +65,7 @@ public class BpmProcessDefinitionServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testCanUserStartProcessDefinition_startDeptIdsMatch() {
         // 准备参数
-        BpmProcessDefinitionInfoDO definition = new BpmProcessDefinitionInfoDO().setStartDeptIds(List.of(10L));
+        BpmProcessDefinitionInfoDO definition = new BpmProcessDefinitionInfoDO().setStartDeptIds(ListUtil.of(10L));
         when(adminUserApi.getUser(1L)).thenReturn(new AdminUserRespDTO().setDeptId(10L));
 
         // 调用，并断言
@@ -75,7 +75,7 @@ public class BpmProcessDefinitionServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testCanUserStartProcessDefinition_startDeptIdsNotMatch() {
         // 准备参数
-        BpmProcessDefinitionInfoDO definition = new BpmProcessDefinitionInfoDO().setStartDeptIds(List.of(10L));
+        BpmProcessDefinitionInfoDO definition = new BpmProcessDefinitionInfoDO().setStartDeptIds(ListUtil.of(10L));
         when(adminUserApi.getUser(1L)).thenReturn(new AdminUserRespDTO().setDeptId(20L));
 
         // 调用，并断言
@@ -125,7 +125,7 @@ public class BpmProcessDefinitionServiceImplTest extends BaseMockitoUnitTest {
 
         // 调用，并断言
         assertEquals(Collections.singletonList(deployment),
-                processDefinitionService.getDeploymentList(Set.of("deployment-1", "deployment-2")));
+                processDefinitionService.getDeploymentList(SetUtils.asSet("deployment-1", "deployment-2")));
     }
 
     @Test

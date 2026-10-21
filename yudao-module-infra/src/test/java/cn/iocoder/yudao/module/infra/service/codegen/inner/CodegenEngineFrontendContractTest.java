@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.infra.service.codegen.inner;
 
+import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenColumnDO;
 import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenTableDO;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenFrontTypeEnum;
@@ -115,7 +116,7 @@ public class CodegenEngineFrontendContractTest extends CodegenEngineAbstractTest
                 .setTemplateType(CodegenTemplateTypeEnum.SUB.getType()).setSubJoinColumnId(200L).setSubJoinMany(false);
         // 调用
         Map<String, String> result = codegenEngine.execute(DbType.MYSQL, table, getColumnList("student"),
-                List.of(contact, teacher), List.of(getColumnList("contact"), getColumnList("teacher")));
+                ListUtil.of(contact, teacher), ListUtil.of(getColumnList("contact"), getColumnList("teacher")));
         // 断言：新增和删除以当前表格为准，不重复追加，新增临时编号不提交
         String form = findFile(result, "/student-contact-form.vue");
         assertTrue(form.contains("getTableData()"));
@@ -161,7 +162,7 @@ public class CodegenEngineFrontendContractTest extends CodegenEngineAbstractTest
                 .setTemplateType(CodegenTemplateTypeEnum.SUB.getType()).setSubJoinColumnId(100L).setSubJoinMany(true);
         // 调用
         Map<String, String> result = codegenEngine.execute(DbType.MYSQL, table, getColumnList("student"),
-                List.of(contact), List.of(getColumnList("contact")));
+                ListUtil.of(contact), ListUtil.of(getColumnList("contact")));
         // 断言：ERP 子表查询实际调用的工具必须导入
         String index = findFile(result, "/index.vue");
         assertTrue(index.contains("<VbenVxeTableToolbar"));
@@ -221,7 +222,7 @@ public class CodegenEngineFrontendContractTest extends CodegenEngineAbstractTest
         assertFalse(api.contains("PageReqVO"));
         String list = result.entrySet().stream()
                 .filter(entry -> entry.getKey().endsWith("/index.vue") && entry.getValue().contains("<z-paging"))
-                .findFirst().orElseThrow().getValue();
+                .findFirst().get().getValue();
         assertTrue(list.contains("completeByTotal(data.list, data.total)"));
         assertTrue(list.contains("complete(false)"));
         assertTrue(list.contains("uni.$off("));

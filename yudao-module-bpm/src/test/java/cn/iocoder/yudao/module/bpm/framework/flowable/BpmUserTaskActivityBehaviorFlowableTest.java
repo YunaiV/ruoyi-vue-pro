@@ -1,8 +1,9 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable;
 
+import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior.BpmUserTaskActivityBehavior;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
-import jakarta.annotation.Resource;
+import com.google.common.collect.ImmutableMap;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
@@ -12,8 +13,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Map;
-import java.util.Set;
+import javax.annotation.Resource;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -51,7 +51,7 @@ public class BpmUserTaskActivityBehaviorFlowableTest extends BaseFlowableUnitTes
     @Test
     public void testHandleAssignments_success() {
         // 准备参数：发起人为用户 1，审批人计算结果为用户 2
-        when(taskCandidateInvoker.calculateUsersByTask(any())).thenReturn(Set.of(2L));
+        when(taskCandidateInvoker.calculateUsersByTask(any())).thenReturn(SetUtils.asSet(2L));
 
         // 调用
         String processInstanceId = startProcessInstance();
@@ -64,7 +64,7 @@ public class BpmUserTaskActivityBehaviorFlowableTest extends BaseFlowableUnitTes
     @Test
     public void testHandleAssignments_candidateEmpty() {
         // 准备参数：计算不到审批人
-        when(taskCandidateInvoker.calculateUsersByTask(any())).thenReturn(Set.of());
+        when(taskCandidateInvoker.calculateUsersByTask(any())).thenReturn(SetUtils.asSet());
 
         // 调用
         String processInstanceId = startProcessInstance();
@@ -78,7 +78,7 @@ public class BpmUserTaskActivityBehaviorFlowableTest extends BaseFlowableUnitTes
         // 模拟 FlowableWebFilter 设置发起人，与生产发起流程的上下文一致
         ProcessInstance processInstance = FlowableUtils.executeAuthenticatedUserId(1L,
                 () -> runtimeService.startProcessInstanceByKey("simpleApprove", "business-1",
-                        Map.of("startUserId", 1L)));
+                        ImmutableMap.of("startUserId", 1L)));
         return processInstance.getId();
     }
 

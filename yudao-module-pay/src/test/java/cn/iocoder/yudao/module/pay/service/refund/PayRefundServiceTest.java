@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.pay.service.refund;
 
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -26,17 +27,17 @@ import cn.iocoder.yudao.module.pay.service.app.PayAppService;
 import cn.iocoder.yudao.module.pay.service.channel.PayChannelService;
 import cn.iocoder.yudao.module.pay.service.notify.PayNotifyService;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.util.AopTestUtils;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -76,15 +77,15 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
     @Resource
     private PlatformTransactionManager transactionManager;
 
-    @MockitoBean
+    @MockBean
     private PayProperties payProperties;
-    @MockitoBean
+    @MockBean
     private PayOrderService orderService;
-    @MockitoBean
+    @MockBean
     private PayAppService appService;
-    @MockitoBean
+    @MockBean
     private PayChannelService channelService;
-    @MockitoBean
+    @MockBean
     private PayNotifyService notifyService;
 
     @BeforeEach
@@ -577,7 +578,7 @@ public class PayRefundServiceTest extends BaseDbAndRedisUnitTest {
         List<Throwable> exceptions = new ArrayList<>();
         try {
             // 调用：两个请求并发发起退款
-            List<CompletableFuture<Long>> futures = List.of(
+            List<CompletableFuture<Long>> futures = ListUtil.of(
                     CompletableFuture.supplyAsync(() -> refundService.createRefund(buildRefundCreateReqDTO())),
                     CompletableFuture.supplyAsync(() -> refundService.createRefund(buildRefundCreateReqDTO())));
             for (CompletableFuture<Long> future : futures) {

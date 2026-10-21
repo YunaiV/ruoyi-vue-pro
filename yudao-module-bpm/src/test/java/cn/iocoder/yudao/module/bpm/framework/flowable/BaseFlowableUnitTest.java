@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable;
 
+import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionInfoDO;
 import cn.iocoder.yudao.module.bpm.dal.redis.BpmProcessIdRedisDAO;
@@ -20,7 +21,6 @@ import cn.iocoder.yudao.module.bpm.service.task.listener.BpmCallActivityListener
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
-import jakarta.annotation.Resource;
 import org.flowable.engine.RepositoryService;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration;
@@ -28,15 +28,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.autoconfigure.transaction.TransactionAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import javax.annotation.Resource;
 import java.util.Collection;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -49,7 +49,7 @@ import static org.mockito.Mockito.*;
  * <p>使用 H2 数据源，Flowable 表由测试环境的 Flowable 自动配置创建；需要业务表的测试自行导入对应 SQL。</p>
  * <p>加载真实的 {@link BpmTaskServiceImpl}、{@link BpmProcessInstanceServiceImpl} 及 Flowable 事件监听器，
  * 保证事务代理、getSelf() 自调用、任务/流程实例状态回调与生产一致；其它模块、DB 相关的 Service 统一 Mock。</p>
- * <p>注意：Mock 统一声明在基类，保证子类共享同一个 Spring 上下文（同一个 Flowable 引擎），子类不要再额外声明 {@link MockitoBean}。</p>
+ * <p>注意：Mock 统一声明在基类，保证子类共享同一个 Spring 上下文（同一个 Flowable 引擎），子类不要再额外声明 {@link MockBean}。</p>
  *
  * @author HUIHUI
  */
@@ -57,7 +57,7 @@ import static org.mockito.Mockito.*;
         classes = BaseFlowableUnitTest.Application.class)
 @ActiveProfiles("unit-test")
 @TestPropertySource(properties = {
-        // Flowable 8 的 H2 脚本使用旧式 identity 语法，LEGACY 模式兼容该语法；业务表脚本在需要时由测试显式导入。
+        // Flowable 的 H2 脚本使用旧式 identity 语法，LEGACY 模式兼容该语法；业务表脚本在需要时由测试显式导入。
         "spring.datasource.url=jdbc:h2:mem:bpm-flowable-testdb;MODE=LEGACY;DATABASE_TO_UPPER=false;NON_KEYWORDS=value",
         "spring.sql.init.mode=never",
         // 关闭异步执行器，定时器由测试显式触发，避免后台线程与测试交错执行
@@ -65,23 +65,23 @@ import static org.mockito.Mockito.*;
 })
 public abstract class BaseFlowableUnitTest {
 
-    @MockitoBean
+    @MockBean
     protected BpmProcessDefinitionService processDefinitionService;
-    @MockitoBean
+    @MockBean
     protected BpmModelService modelService;
-    @MockitoBean
+    @MockBean
     protected BpmCommentService commentService;
-    @MockitoBean
+    @MockBean
     protected BpmMessageService messageService;
-    @MockitoBean
+    @MockBean
     protected BpmFormService formService;
-    @MockitoBean
+    @MockBean
     protected BpmProcessInstanceCopyService processInstanceCopyService;
-    @MockitoBean
+    @MockBean
     protected BpmProcessIdRedisDAO processIdRedisDAO;
-    @MockitoBean
+    @MockBean
     protected AdminUserApi adminUserApi;
-    @MockitoBean
+    @MockBean
     protected DeptApi deptApi;
 
     @Import({BaseDbUnitTest.Application.class, BpmFlowableConfiguration.class,
@@ -95,7 +95,7 @@ public abstract class BaseFlowableUnitTest {
         @Primary
         public BpmTaskCandidateInvoker bpmTaskCandidateInvoker() {
             BpmTaskCandidateInvoker invoker = mock(BpmTaskCandidateInvoker.class);
-            when(invoker.calculateUsersByTask(any())).thenReturn(Set.of(1L));
+            when(invoker.calculateUsersByTask(any())).thenReturn(SetUtils.asSet(1L));
             return invoker;
         }
 
@@ -109,7 +109,7 @@ public abstract class BaseFlowableUnitTest {
     }
 
     /**
-     * 审批人计算的 Mock，属于上下文单例（非 {@link MockitoBean}），每个测试前重置，避免测试间相互影响
+     * 审批人计算的 Mock，属于上下文单例（非 {@link MockBean}），每个测试前重置，避免测试间相互影响
      */
     @Resource(name = "testBpmTaskCandidateInvoker")
     protected BpmTaskCandidateInvoker taskCandidateInvoker;
@@ -118,7 +118,7 @@ public abstract class BaseFlowableUnitTest {
     public void resetTaskCandidateInvoker() {
         // 默认：任务的审批人为用户 1
         reset(taskCandidateInvoker);
-        when(taskCandidateInvoker.calculateUsersByTask(any())).thenReturn(Set.of(1L));
+        when(taskCandidateInvoker.calculateUsersByTask(any())).thenReturn(SetUtils.asSet(1L));
     }
 
     /**
@@ -144,7 +144,7 @@ public abstract class BaseFlowableUnitTest {
                 repositoryService.getBpmnModel(invocation.getArgument(0)));
         when(adminUserApi.getUser(any())).thenAnswer(invocation -> buildUser(invocation.getArgument(0)));
         when(adminUserApi.getUserList(anyCollection())).thenAnswer(invocation ->
-                ((Collection<Long>) invocation.getArgument(0)).stream().map(BaseFlowableUnitTest::buildUser).toList());
+                ((Collection<Long>) invocation.getArgument(0)).stream().map(BaseFlowableUnitTest::buildUser).collect(Collectors.toList()));
         when(adminUserApi.getUserMap(anyCollection())).thenAnswer(invocation ->
                 ((Collection<Long>) invocation.getArgument(0)).stream()
                         .collect(Collectors.toMap(Function.identity(), BaseFlowableUnitTest::buildUser)));

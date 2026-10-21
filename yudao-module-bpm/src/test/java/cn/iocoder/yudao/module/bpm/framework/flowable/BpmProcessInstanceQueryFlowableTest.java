@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable;
 
+import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmApprovalDetailReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmApprovalDetailRespVO;
@@ -14,7 +16,7 @@ import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceStatusEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskStatusEnum;
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceServiceImpl;
 import cn.iocoder.yudao.module.bpm.service.task.BpmTaskServiceImpl;
-import jakarta.annotation.Resource;
+import com.google.common.collect.ImmutableMap;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
@@ -27,6 +29,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -69,7 +72,7 @@ public class BpmProcessInstanceQueryFlowableTest extends BaseFlowableUnitTest {
         deploy("bpmn/two-step-approve.bpmn20.xml");
         mockFlowableBackedServices(repositoryService);
         when(taskCandidateInvoker.calculateUsersByActivity(any(), any(), any(), any(), any()))
-                .thenReturn(new LinkedHashSet<>(List.of(1L)));
+                .thenReturn(new LinkedHashSet<>(ListUtil.of(1L)));
     }
 
     @AfterEach
@@ -92,8 +95,8 @@ public class BpmProcessInstanceQueryFlowableTest extends BaseFlowableUnitTest {
         // 断言：已结束（发起人、task1） + 进行中（task2） + 预测（结束节点）
         assertEquals(BpmProcessInstanceStatusEnum.RUNNING.getStatus(), respVO.getStatus());
         List<ActivityNode> nodes = respVO.getActivityNodes();
-        assertEquals(List.of(START_USER_NODE_ID, "task1", "task2", "end"), convertList(nodes, ActivityNode::getId));
-        assertEquals(List.of(BpmTaskStatusEnum.APPROVE.getStatus(), BpmTaskStatusEnum.APPROVE.getStatus(),
+        assertEquals(ListUtil.of(START_USER_NODE_ID, "task1", "task2", "end"), convertList(nodes, ActivityNode::getId));
+        assertEquals(ListUtil.of(BpmTaskStatusEnum.APPROVE.getStatus(), BpmTaskStatusEnum.APPROVE.getStatus(),
                         BpmTaskStatusEnum.RUNNING.getStatus(), BpmTaskStatusEnum.NOT_START.getStatus()),
                 convertList(nodes, ActivityNode::getStatus));
         assertEquals(BpmSimpleModelNodeTypeEnum.START_USER_NODE.getType(), nodes.get(0).getNodeType());
@@ -121,7 +124,7 @@ public class BpmProcessInstanceQueryFlowableTest extends BaseFlowableUnitTest {
         assertEquals(BpmProcessInstanceStatusEnum.APPROVE.getStatus(), respVO.getStatus());
         List<ActivityNode> nodes = respVO.getActivityNodes();
         assertEquals(4, nodes.size());
-        assertEquals(List.of(START_USER_NODE_ID, "task1", "task2"), convertList(nodes.subList(0, 3), ActivityNode::getId));
+        assertEquals(ListUtil.of(START_USER_NODE_ID, "task1", "task2"), convertList(nodes.subList(0, 3), ActivityNode::getId));
         ActivityNode endNode = nodes.get(3);
         assertEquals(BpmSimpleModelNodeTypeEnum.END_NODE.getType(), endNode.getNodeType());
         assertEquals(BpmProcessInstanceStatusEnum.APPROVE.getStatus(), endNode.getStatus());
@@ -142,7 +145,7 @@ public class BpmProcessInstanceQueryFlowableTest extends BaseFlowableUnitTest {
         // 断言：不通过时不展示结束节点
         assertEquals(BpmProcessInstanceStatusEnum.REJECT.getStatus(), respVO.getStatus());
         List<ActivityNode> nodes = respVO.getActivityNodes();
-        assertEquals(List.of(START_USER_NODE_ID, "task1"), convertList(nodes, ActivityNode::getId));
+        assertEquals(ListUtil.of(START_USER_NODE_ID, "task1"), convertList(nodes, ActivityNode::getId));
         assertEquals(BpmTaskStatusEnum.REJECT.getStatus(), nodes.get(1).getStatus());
         assertEquals("不同意", nodes.get(1).getTasks().get(0).getReason());
         assertNull(respVO.getTodoTask());
@@ -164,7 +167,7 @@ public class BpmProcessInstanceQueryFlowableTest extends BaseFlowableUnitTest {
         // 断言：进行中的子流程节点关联子流程实例（CallActivity 没有自身的任务）
         // 注意：BPMN 设计器的预测（BpmnModelUtils#simulateProcess）不会越过 CallActivity，因此不断言后续预测节点
         List<ActivityNode> nodes = respVO.getActivityNodes();
-        assertEquals(List.of(START_USER_NODE_ID, "child"), convertList(nodes.subList(0, 2), ActivityNode::getId));
+        assertEquals(ListUtil.of(START_USER_NODE_ID, "child"), convertList(nodes.subList(0, 2), ActivityNode::getId));
         ActivityNode childNode = nodes.get(1);
         assertEquals(BpmSimpleModelNodeTypeEnum.CHILD_PROCESS.getType(), childNode.getNodeType());
         assertEquals(BpmTaskStatusEnum.RUNNING.getStatus(), childNode.getStatus());
@@ -200,7 +203,7 @@ public class BpmProcessInstanceQueryFlowableTest extends BaseFlowableUnitTest {
                 new BpmApprovalDetailReqVO().setProcessInstanceId(processInstanceId));
         // 断言
         assertNull(respVO.getTodoTask());
-        assertEquals(Map.of("a", "1", "b", "3", "c", "1"), respVO.getFormFieldsPermission());
+        assertEquals(ImmutableMap.of("a", "1", "b", "3", "c", "1"), respVO.getFormFieldsPermission());
     }
 
     @Test // 审批人有本流程的待办：使用待办所在节点的权限，保留可编辑
@@ -214,7 +217,7 @@ public class BpmProcessInstanceQueryFlowableTest extends BaseFlowableUnitTest {
                 new BpmApprovalDetailReqVO().setProcessInstanceId(processInstanceId));
         // 断言
         assertEquals(task1.getId(), respVO.getTodoTask().getId());
-        assertEquals(Map.of("a", "1", "b", "2", "c", "3"), respVO.getFormFieldsPermission());
+        assertEquals(ImmutableMap.of("a", "1", "b", "2", "c", "3"), respVO.getFormFieldsPermission());
     }
 
     @Test // 传递其它流程实例的待办 taskId：忽略该任务，使用本流程实例的待办
@@ -230,7 +233,7 @@ public class BpmProcessInstanceQueryFlowableTest extends BaseFlowableUnitTest {
         // 断言
         assertEquals(task1.getId(), respVO.getTodoTask().getId());
         assertEquals(processInstanceId, respVO.getTodoTask().getProcessInstanceId());
-        assertEquals(Map.of("a", "1", "b", "2", "c", "3"), respVO.getFormFieldsPermission());
+        assertEquals(ImmutableMap.of("a", "1", "b", "2", "c", "3"), respVO.getFormFieldsPermission());
     }
 
     @Test // 发起人传递其他审批人的 taskId：忽略该任务，回落发起人节点的权限
@@ -244,7 +247,7 @@ public class BpmProcessInstanceQueryFlowableTest extends BaseFlowableUnitTest {
                 new BpmApprovalDetailReqVO().setProcessInstanceId(processInstanceId).setTaskId(task1.getId()));
         // 断言
         assertNull(respVO.getTodoTask());
-        assertEquals(Map.of("a", "1", "b", "3", "c", "1"), respVO.getFormFieldsPermission());
+        assertEquals(ImmutableMap.of("a", "1", "b", "3", "c", "1"), respVO.getFormFieldsPermission());
     }
 
     @Test // 流程已结束：已办使用办理节点的权限，发起人使用发起人节点的权限，均降级为只读；其他人不返回权限
@@ -259,11 +262,11 @@ public class BpmProcessInstanceQueryFlowableTest extends BaseFlowableUnitTest {
                 new BpmApprovalDetailReqVO().setProcessInstanceId(processInstanceId).setTaskId(task1.getId()));
         assertEquals(BpmProcessInstanceStatusEnum.APPROVE.getStatus(), doneRespVO.getStatus());
         assertNull(doneRespVO.getTodoTask());
-        assertEquals(Map.of("a", "1", "b", "1", "c", "3"), doneRespVO.getFormFieldsPermission());
+        assertEquals(ImmutableMap.of("a", "1", "b", "1", "c", "3"), doneRespVO.getFormFieldsPermission());
         // 调用 + 断言：发起人 1 从“我的流程”进入
         BpmApprovalDetailRespVO startUserRespVO = processInstanceService.getApprovalDetail(1L,
                 new BpmApprovalDetailReqVO().setProcessInstanceId(processInstanceId));
-        assertEquals(Map.of("a", "1", "b", "3", "c", "1"), startUserRespVO.getFormFieldsPermission());
+        assertEquals(ImmutableMap.of("a", "1", "b", "3", "c", "1"), startUserRespVO.getFormFieldsPermission());
         // 调用 + 断言：用户 2 不传 taskId，既不是发起人也没有待办
         BpmApprovalDetailRespVO otherRespVO = processInstanceService.getApprovalDetail(2L,
                 new BpmApprovalDetailReqVO().setProcessInstanceId(processInstanceId));
@@ -299,7 +302,7 @@ public class BpmProcessInstanceQueryFlowableTest extends BaseFlowableUnitTest {
                 .setProcessDefinitionId(processDefinitionId).setActivityId(START_USER_NODE_ID));
         // 断言
         assertNull(respVO.getTodoTask());
-        assertEquals(Map.of("a", "2", "b", "3", "c", "1"), respVO.getFormFieldsPermission());
+        assertEquals(ImmutableMap.of("a", "2", "b", "3", "c", "1"), respVO.getFormFieldsPermission());
     }
 
     // ========== getProcessInstanceBpmnModelView ==========
@@ -313,15 +316,15 @@ public class BpmProcessInstanceQueryFlowableTest extends BaseFlowableUnitTest {
         // 调用
         BpmProcessInstanceBpmnModelViewRespVO respVO = processInstanceService.getProcessInstanceBpmnModelView(processInstanceId);
         // 断言：进度信息
-        assertEquals(Set.of("task2"), respVO.getUnfinishedTaskActivityIds());
-        assertTrue(respVO.getFinishedTaskActivityIds().containsAll(Set.of("start", "task1")));
+        assertEquals(SetUtils.asSet("task2"), respVO.getUnfinishedTaskActivityIds());
+        assertTrue(respVO.getFinishedTaskActivityIds().containsAll(SetUtils.asSet("start", "task1")));
         assertFalse(respVO.getFinishedTaskActivityIds().contains("task2"));
-        assertEquals(Set.of("flow-start", "flow-task1"), respVO.getFinishedSequenceFlowActivityIds());
+        assertEquals(SetUtils.asSet("flow-start", "flow-task1"), respVO.getFinishedSequenceFlowActivityIds());
         assertTrue(respVO.getRejectedTaskActivityIds().isEmpty());
         // 断言：基础信息
         assertEquals(BpmProcessInstanceStatusEnum.RUNNING.getStatus(), respVO.getProcessInstance().getStatus());
         assertEquals("用户1", respVO.getProcessInstance().getStartUser().getNickname());
-        assertEquals(List.of(BpmTaskStatusEnum.APPROVE.getStatus(), BpmTaskStatusEnum.RUNNING.getStatus()),
+        assertEquals(ListUtil.of(BpmTaskStatusEnum.APPROVE.getStatus(), BpmTaskStatusEnum.RUNNING.getStatus()),
                 convertList(respVO.getTasks(), task -> task.getStatus()));
         assertTrue(respVO.getBpmnXml().contains("twoStepApprove"));
         assertNull(respVO.getSimpleModel());
@@ -342,7 +345,7 @@ public class BpmProcessInstanceQueryFlowableTest extends BaseFlowableUnitTest {
         BpmProcessInstanceBpmnModelViewRespVO respVO = processInstanceService.getProcessInstanceBpmnModelView(processInstanceId);
         // 断言：只取最后一个不通过的节点
         assertEquals(BpmProcessInstanceStatusEnum.REJECT.getStatus(), respVO.getProcessInstance().getStatus());
-        assertEquals(Set.of("task1"), respVO.getRejectedTaskActivityIds());
+        assertEquals(SetUtils.asSet("task1"), respVO.getRejectedTaskActivityIds());
         assertFalse(respVO.getFinishedTaskActivityIds().contains("task1"));
         assertTrue(respVO.getUnfinishedTaskActivityIds().isEmpty());
     }
@@ -360,30 +363,30 @@ public class BpmProcessInstanceQueryFlowableTest extends BaseFlowableUnitTest {
         String approvedId = startProcessInstance(1L, null);
         approveRunningTask(approvedId);
         approveRunningTask(approvedId);
-        String runningId = startProcessInstance(2L, new HashMap<>(Map.of("day", 3)));
+        String runningId = startProcessInstance(2L, new HashMap<>(ImmutableMap.of("day", 3)));
         LocalDateTime now = LocalDateTime.now();
 
         // 调用 + 断言：【我的流程】按发起人过滤
-        assertPageIds(List.of(approvedId), processInstanceService.getProcessInstancePage(1L, new BpmProcessInstancePageReqVO()));
+        assertPageIds(ListUtil.of(approvedId), processInstanceService.getProcessInstancePage(1L, new BpmProcessInstancePageReqVO()));
         // 调用 + 断言：【管理流程】按 startUserId 过滤
-        assertPageIds(List.of(runningId), processInstanceService.getProcessInstancePage(null,
+        assertPageIds(ListUtil.of(runningId), processInstanceService.getProcessInstancePage(null,
                 (BpmProcessInstancePageReqVO) new BpmProcessInstancePageReqVO().setStartUserId(2L)));
         // 调用 + 断言：名称、流程标识、发起时间，按发起时间倒序
         BpmProcessInstancePageReqVO reqVO = new BpmProcessInstancePageReqVO();
         reqVO.setName("两级").setProcessDefinitionKey("twoStepApprove")
                 .setCreateTime(new LocalDateTime[]{now.minusHours(1), now.plusHours(1)});
-        assertEquals(Set.of(approvedId, runningId),
+        assertEquals(SetUtils.asSet(approvedId, runningId),
                 new HashSet<>(convertList(processInstanceService.getProcessInstancePage(null, reqVO).getList(),
                         HistoricProcessInstance::getId)));
         // 调用 + 断言：状态、结束时间
         reqVO = new BpmProcessInstancePageReqVO();
         reqVO.setStatus(BpmProcessInstanceStatusEnum.APPROVE.getStatus())
                 .setEndTime(new LocalDateTime[]{now.minusHours(1), now.plusHours(1)});
-        assertPageIds(List.of(approvedId), processInstanceService.getProcessInstancePage(null, reqVO));
+        assertPageIds(ListUtil.of(approvedId), processInstanceService.getProcessInstancePage(null, reqVO));
         // 调用 + 断言：表单字段，空值的字段被忽略
         reqVO = new BpmProcessInstancePageReqVO();
         reqVO.setFormFieldsParams("{\"day\": 3, \"reason\": \"\"}");
-        assertPageIds(List.of(runningId), processInstanceService.getProcessInstancePage(null, reqVO));
+        assertPageIds(ListUtil.of(runningId), processInstanceService.getProcessInstancePage(null, reqVO));
         // 调用 + 断言：分类不匹配时返回空
         reqVO = new BpmProcessInstancePageReqVO();
         reqVO.setCategory("not-exists");
@@ -407,7 +410,7 @@ public class BpmProcessInstanceQueryFlowableTest extends BaseFlowableUnitTest {
         assertEquals("task2", nodes.get(0).getId());
         assertEquals(BpmSimpleModelNodeTypeEnum.APPROVE_NODE.getType(), nodes.get(0).getNodeType());
         assertEquals(BpmTaskStatusEnum.RUNNING.getStatus(), nodes.get(0).getStatus());
-        assertEquals(List.of(1L), nodes.get(0).getCandidateUserIds());
+        assertEquals(ListUtil.of(1L), nodes.get(0).getCandidateUserIds());
         assertEquals("用户1", nodes.get(0).getCandidateUsers().get(0).getNickname());
 
         // 调用 + 断言：task2 的下一个节点为结束节点，无需审批
@@ -438,7 +441,7 @@ public class BpmProcessInstanceQueryFlowableTest extends BaseFlowableUnitTest {
         }
         doAnswer(invocation -> {
             DelegateExecution execution = invocation.getArgument(0);
-            return START_USER_NODE_ID.equals(execution.getCurrentActivityId()) ? Set.of(1L) : Set.of(2L);
+            return START_USER_NODE_ID.equals(execution.getCurrentActivityId()) ? SetUtils.asSet(1L) : SetUtils.asSet(2L);
         }).when(taskCandidateInvoker).calculateUsersByTask(any());
         return processInstanceService.createProcessInstance(1L, new BpmProcessInstanceCreateReqDTO()
                 .setProcessDefinitionKey("formPermission"));

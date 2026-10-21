@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.pay.service.transfer;
 
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbAndRedisUnitTest;
@@ -21,21 +22,21 @@ import cn.iocoder.yudao.module.pay.framework.pay.core.client.dto.transfer.PayTra
 import cn.iocoder.yudao.module.pay.service.app.PayAppService;
 import cn.iocoder.yudao.module.pay.service.channel.PayChannelService;
 import cn.iocoder.yudao.module.pay.service.notify.PayNotifyService;
-import jakarta.annotation.Resource;
+import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.util.AopTestUtils;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
@@ -65,13 +66,13 @@ public class PayTransferServiceTest extends BaseDbAndRedisUnitTest {
     @Resource
     private PlatformTransactionManager transactionManager;
 
-    @MockitoBean
+    @MockBean
     private PayProperties payProperties;
-    @MockitoBean
+    @MockBean
     private PayAppService appService;
-    @MockitoBean
+    @MockBean
     private PayChannelService channelService;
-    @MockitoBean
+    @MockBean
     private PayNotifyService notifyService;
 
     @Test
@@ -260,7 +261,7 @@ public class PayTransferServiceTest extends BaseDbAndRedisUnitTest {
         List<Throwable> exceptions = new ArrayList<>();
         try {
             // 调用：两个请求并发发起转账
-            List<CompletableFuture<PayTransferCreateRespDTO>> futures = List.of(
+            List<CompletableFuture<PayTransferCreateRespDTO>> futures = ListUtil.of(
                     CompletableFuture.supplyAsync(() -> transferService.createTransfer(buildTransferCreateReqDTO())),
                     CompletableFuture.supplyAsync(() -> transferService.createTransfer(buildTransferCreateReqDTO())));
             for (CompletableFuture<PayTransferCreateRespDTO> future : futures) {
@@ -647,7 +648,7 @@ public class PayTransferServiceTest extends BaseDbAndRedisUnitTest {
         assertEquals("佣金提现", dbTransfer.getSubject());
         assertEquals("test@example.com", dbTransfer.getUserAccount());
         assertEquals("芋艿", dbTransfer.getUserName());
-        assertEquals(Map.of("sceneId", "1000"), dbTransfer.getChannelExtras());
+        assertEquals(ImmutableMap.of("sceneId", "1000"), dbTransfer.getChannelExtras());
         assertEquals("http://127.0.0.1/transfer", dbTransfer.getNotifyUrl());
         // 断言：渠道编号更新为本次按渠道编码校验的渠道
         assertEquals(10L, dbTransfer.getChannelId());
@@ -878,7 +879,7 @@ public class PayTransferServiceTest extends BaseDbAndRedisUnitTest {
     private PayTransferDO insertClosedTransfer() {
         PayTransferDO transfer = randomPojo(PayTransferDO.class, o -> o.setAppId(1L).setChannelId(9L)
                 .setChannelCode(PayChannelEnum.ALIPAY_PC.getCode()).setMerchantTransferId("1001").setPrice(100)
-                .setUserName("旧的收款人").setChannelExtras(Map.of("sceneId", "1005"))
+                .setUserName("旧的收款人").setChannelExtras(ImmutableMap.of("sceneId", "1005"))
                 .setStatus(PayTransferStatusEnum.CLOSED.getStatus())
                 .setChannelErrorCode("PAYEE_NOT_EXIST").setChannelErrorMsg("收款账号不存在")
                 .setChannelPackageInfo("package-info-001"));
@@ -889,7 +890,7 @@ public class PayTransferServiceTest extends BaseDbAndRedisUnitTest {
     private PayTransferDO insertClosedWeixinTransfer() {
         PayTransferDO transfer = randomPojo(PayTransferDO.class, o -> o.setAppId(1L).setChannelId(10L)
                 .setChannelCode(PayChannelEnum.WX_LITE.getCode()).setMerchantTransferId("1001").setPrice(100)
-                .setUserName("旧的收款人").setChannelExtras(Map.of("sceneId", "1005"))
+                .setUserName("旧的收款人").setChannelExtras(ImmutableMap.of("sceneId", "1005"))
                 .setStatus(PayTransferStatusEnum.CLOSED.getStatus()).setChannelTransferNo("WX_TRANSFER_001")
                 .setChannelErrorCode("CANCELLED").setChannelErrorMsg("用户超时未确认")
                 .setChannelPackageInfo("package-info-001"));
@@ -910,7 +911,7 @@ public class PayTransferServiceTest extends BaseDbAndRedisUnitTest {
         return new PayTransferCreateReqDTO().setAppKey("demo").setChannelCode(PayChannelEnum.ALIPAY_PC.getCode())
                 .setUserIp("127.0.0.1").setUserId(1L).setUserType(1)
                 .setMerchantTransferId("1001").setSubject("佣金提现").setPrice(100)
-                .setUserAccount("test@example.com").setUserName("芋艿").setChannelExtras(Map.of("sceneId", "1000"));
+                .setUserAccount("test@example.com").setUserName("芋艿").setChannelExtras(ImmutableMap.of("sceneId", "1000"));
     }
 
 }

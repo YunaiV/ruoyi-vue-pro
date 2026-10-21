@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.bpm.service.oa;
 
+import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.bpm.api.task.BpmProcessInstanceApi;
 import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
@@ -7,14 +8,13 @@ import cn.iocoder.yudao.module.bpm.controller.admin.oa.vo.BpmOALeaveCreateReqVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.oa.BpmOALeaveDO;
 import cn.iocoder.yudao.module.bpm.dal.mysql.oa.BpmOALeaveMapper;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskStatusEnum;
-import jakarta.annotation.Resource;
+import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-import java.util.List;
-import java.util.Map;
+import javax.annotation.Resource;
 
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
@@ -37,7 +37,7 @@ public class BpmOALeaveServiceImplTest extends BaseDbUnitTest {
     @Resource
     private BpmOALeaveMapper leaveMapper;
 
-    @MockitoBean
+    @MockBean
     private BpmProcessInstanceApi processInstanceApi;
 
     @Test
@@ -45,7 +45,7 @@ public class BpmOALeaveServiceImplTest extends BaseDbUnitTest {
         // 准备参数
         BpmOALeaveCreateReqVO reqVO = new BpmOALeaveCreateReqVO().setType(1).setReason("休假")
                 .setStartTime(buildTime(2026, 10, 1)).setEndTime(buildTime(2026, 10, 3))
-                .setStartUserSelectAssignees(Map.of("approve", List.of(2L)));
+                .setStartUserSelectAssignees(ImmutableMap.of("approve", ListUtil.of(2L)));
         when(processInstanceApi.createProcessInstance(eq(1L), any())).thenReturn("process-instance-1");
 
         // 调用

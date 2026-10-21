@@ -8,11 +8,11 @@ import cn.iocoder.yudao.module.mes.dal.mysql.cal.holiday.MesCalHolidayMapper;
 import cn.iocoder.yudao.module.mes.enums.cal.MesCalHolidayTypeEnum;
 import cn.iocoder.yudao.module.mes.enums.cal.MesCalPlanStatusEnum;
 import cn.iocoder.yudao.module.mes.service.cal.plan.MesCalPlanService;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
@@ -38,7 +38,7 @@ public class MesCalHolidayServiceImplTest extends BaseDbUnitTest {
     @Resource
     private MesCalHolidayMapper holidayMapper;
 
-    @MockitoBean
+    @MockBean
     private MesCalPlanService planService;
 
     @Test

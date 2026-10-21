@@ -1,10 +1,11 @@
 package cn.iocoder.yudao.module.iot.framework.storage.config;
 
 import cn.iocoder.yudao.module.iot.framework.storage.core.enums.IotStorageTypeEnum;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
+
+import javax.validation.constraints.NotNull;
 
 /**
  * IoT 时序数据存储的配置项

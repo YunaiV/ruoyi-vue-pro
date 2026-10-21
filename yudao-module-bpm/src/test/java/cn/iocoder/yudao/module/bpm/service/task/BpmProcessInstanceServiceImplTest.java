@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.bpm.service.task;
 
+import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
@@ -23,6 +24,7 @@ import cn.iocoder.yudao.module.bpm.service.message.BpmMessageService;
 import cn.iocoder.yudao.module.bpm.service.message.dto.BpmMessageSendWhenProcessInstanceApproveReqDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
+import com.google.common.collect.ImmutableMap;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.RuntimeService;
@@ -91,20 +93,20 @@ public class BpmProcessInstanceServiceImplTest extends BaseMockitoUnitTest {
                 .setPrefix("QJ");
         mockCreateProcessInstance(buildProcessDefinitionInfo()
                 .setFormType(BpmModelFormTypeEnum.NORMAL.getType())
-                .setFormFields(List.of(buildFormField("day", "请假天数", List.of("required"))))
+                .setFormFields(ListUtil.of(buildFormField("day", "请假天数", ListUtil.of("required"))))
                 .setProcessIdRule(processIdRule)
                 .setTitleSetting(new BpmModelMetaInfoVO.TitleSetting().setEnable(true)
                         .setTitle("{" + BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_START_USER_ID + "}的"
                                 + "{" + BpmnVariableConstants.PROCESS_DEFINITION_NAME + "}，请假{day}天")));
         mockApprovalDetail(spyService, buildActivityNode("task1", "一级审批", BpmTaskCandidateStrategyEnum.USER),
                 buildActivityNode("task2", "二级审批", BpmTaskCandidateStrategyEnum.START_USER_SELECT));
-        when(adminUserApi.getUserMap(List.of(2L))).thenReturn(Map.of(2L, new AdminUserRespDTO().setId(2L)));
+        when(adminUserApi.getUserMap(ListUtil.of(2L))).thenReturn(ImmutableMap.of(2L, new AdminUserRespDTO().setId(2L)));
         when(adminUserApi.getUser(1L)).thenReturn(new AdminUserRespDTO().setId(1L).setNickname("张三"));
         when(processIdRedisDAO.generate(processIdRule)).thenReturn("QJ-001");
         ProcessInstanceBuilder processInstanceBuilder = mockProcessInstanceBuilder();
-        Map<String, List<Long>> startUserSelectAssignees = Map.of("task2", List.of(2L));
+        Map<String, List<Long>> startUserSelectAssignees = ImmutableMap.of("task2", ListUtil.of(2L));
         BpmProcessInstanceCreateReqVO reqVO = new BpmProcessInstanceCreateReqVO().setProcessDefinitionId("definition-1")
-                .setVariables(new HashMap<>(Map.of("day", 3)))
+                .setVariables(new HashMap<>(ImmutableMap.of("day", 3)))
                 .setStartUserSelectAssignees(startUserSelectAssignees);
 
         // 调用
@@ -149,7 +151,7 @@ public class BpmProcessInstanceServiceImplTest extends BaseMockitoUnitTest {
                 .setProcessDefinitionKey("leave").setBusinessKey("business-1"));
         // 断言
         assertEquals("process-instance-1", processInstanceId);
-        assertEquals(List.of("1"), authenticatedUserIds);
+        assertEquals(ListUtil.of("1"), authenticatedUserIds);
         assertNull(Authentication.getAuthenticatedUserId());
         verify(processInstanceBuilder).businessKey("business-1");
         verify(processInstanceBuilder).name("请假");
@@ -226,7 +228,7 @@ public class BpmProcessInstanceServiceImplTest extends BaseMockitoUnitTest {
         when(processDefinition.getId()).thenReturn("definition-1");
         when(processDefinitionService.getProcessDefinitionInfo("definition-1")).thenReturn(buildProcessDefinitionInfo()
                 .setFormType(BpmModelFormTypeEnum.NORMAL.getType())
-                .setFormFields(List.of(buildFormField("day", "请假天数", List.of("required")))));
+                .setFormFields(ListUtil.of(buildFormField("day", "请假天数", ListUtil.of("required")))));
 
         // 调用，并断言异常
         assertServiceException(() -> processInstanceService.createProcessInstance(1L,
@@ -240,14 +242,14 @@ public class BpmProcessInstanceServiceImplTest extends BaseMockitoUnitTest {
         // 准备参数：字段标识为 key，必填标记为对象 {"required": true}，字段值为空白字符串
         when(processDefinitionService.getProcessDefinition("definition-1")).thenReturn(processDefinition);
         when(processDefinition.getId()).thenReturn("definition-1");
-        String formField = JsonUtils.toJsonString(Map.of("key", "reason", "validate", Map.of("required", true)));
+        String formField = JsonUtils.toJsonString(ImmutableMap.of("key", "reason", "validate", ImmutableMap.of("required", true)));
         when(processDefinitionService.getProcessDefinitionInfo("definition-1")).thenReturn(buildProcessDefinitionInfo()
-                .setFormType(BpmModelFormTypeEnum.NORMAL.getType()).setFormFields(List.of(formField)));
+                .setFormType(BpmModelFormTypeEnum.NORMAL.getType()).setFormFields(ListUtil.of(formField)));
 
         // 调用，并断言异常：没有 title 时，使用字段标识提示
         assertServiceException(() -> processInstanceService.createProcessInstance(1L,
                 new BpmProcessInstanceCreateReqVO().setProcessDefinitionId("definition-1")
-                        .setVariables(new HashMap<>(Map.of("reason", " ")))),
+                        .setVariables(new HashMap<>(ImmutableMap.of("reason", " ")))),
                 PROCESS_INSTANCE_START_FORM_FIELD_REQUIRED, "reason");
     }
 
@@ -273,12 +275,12 @@ public class BpmProcessInstanceServiceImplTest extends BaseMockitoUnitTest {
         mockCreateProcessInstance(buildProcessDefinitionInfo());
         mockApprovalDetail(spyService,
                 buildActivityNode("task2", "二级审批", BpmTaskCandidateStrategyEnum.START_USER_SELECT));
-        when(adminUserApi.getUserMap(List.of(2L))).thenReturn(Map.of());
+        when(adminUserApi.getUserMap(ListUtil.of(2L))).thenReturn(ImmutableMap.of());
 
         // 调用，并断言异常
         assertServiceException(() -> spyService.createProcessInstance(1L,
                 new BpmProcessInstanceCreateReqVO().setProcessDefinitionId("definition-1")
-                        .setStartUserSelectAssignees(Map.of("task2", List.of(2L)))),
+                        .setStartUserSelectAssignees(ImmutableMap.of("task2", ListUtil.of(2L)))),
                 PROCESS_INSTANCE_START_USER_SELECT_ASSIGNEES_NOT_EXISTS, "二级审批", 2L);
     }
 
@@ -435,7 +437,7 @@ public class BpmProcessInstanceServiceImplTest extends BaseMockitoUnitTest {
     }
 
     private static String buildFormField(String field, String title, Object validate) {
-        return JsonUtils.toJsonString(Map.of("field", field, "title", title, "validate", validate));
+        return JsonUtils.toJsonString(ImmutableMap.of("field", field, "title", title, "validate", validate));
     }
 
     private static BpmApprovalDetailRespVO.ActivityNode buildActivityNode(String id, String name,
@@ -457,7 +459,7 @@ public class BpmProcessInstanceServiceImplTest extends BaseMockitoUnitTest {
      */
     private void mockApprovalDetail(BpmProcessInstanceServiceImpl spyService,
                                     BpmApprovalDetailRespVO.ActivityNode... activityNodes) {
-        doReturn(new BpmApprovalDetailRespVO().setActivityNodes(new ArrayList<>(List.of(activityNodes))))
+        doReturn(new BpmApprovalDetailRespVO().setActivityNodes(new ArrayList<>(ListUtil.of(activityNodes))))
                 .when(spyService).getApprovalDetail(eq(1L), any());
     }
 
@@ -496,7 +498,7 @@ public class BpmProcessInstanceServiceImplTest extends BaseMockitoUnitTest {
         when(runtimeService.createExecutionQuery()).thenReturn(executionQuery);
         Execution execution = mock(Execution.class);
         when(execution.getProcessInstanceId()).thenReturn("parent-process-instance-1");
-        when(executionQuery.singleResult()).thenReturn(execution);
+        doReturn(execution).when(executionQuery).singleResult();
         ProcessInstance parentProcessInstance = mock(ProcessInstance.class);
         lenient().when(parentProcessInstance.getId()).thenReturn("parent-process-instance-1");
         when(parentProcessInstance.getProcessInstanceId()).thenReturn("parent-process-instance-1");
@@ -508,7 +510,7 @@ public class BpmProcessInstanceServiceImplTest extends BaseMockitoUnitTest {
         when(processInstance.getProcessDefinitionId()).thenReturn("definition-1");
         lenient().when(processInstance.getProcessInstanceId()).thenReturn("process-instance-1");
         when(processInstance.getStartUserId()).thenReturn("1");
-        lenient().when(processInstance.getProcessVariables()).thenReturn(Map.of("day", 3));
+        lenient().when(processInstance.getProcessVariables()).thenReturn(ImmutableMap.of("day", 3));
         when(processDefinitionService.getProcessDefinitionInfo("definition-1")).thenReturn(processDefinitionInfo);
         when(processDefinitionService.getProcessDefinition("definition-1")).thenReturn(processDefinition);
         when(processDefinition.getName()).thenReturn("请假");

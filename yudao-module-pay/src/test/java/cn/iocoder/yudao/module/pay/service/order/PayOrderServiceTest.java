@@ -28,6 +28,7 @@ import cn.iocoder.yudao.module.pay.framework.pay.core.enums.PayOrderDisplayModeE
 import cn.iocoder.yudao.module.pay.service.app.PayAppService;
 import cn.iocoder.yudao.module.pay.service.channel.PayChannelService;
 import cn.iocoder.yudao.module.pay.service.notify.PayNotifyService;
+import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -456,7 +457,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
                     .thenReturn(payOrderServiceImpl);
 
             // mock 数据（order、orderExtension）
-            Map<String, String> channelExtras = Map.of("openid", "openid");
+            Map<String, String> channelExtras = ImmutableMap.of("openid", "openid");
             PayOrderDO order = insertSubmitOrder();
             PayOrderExtensionDO orderExtension = insertSubmitOrderExtension(order, PayChannelEnum.WX_PUB, channelExtras);
             // 准备参数
@@ -493,7 +494,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
                     .thenReturn(payOrderServiceImpl);
 
             // mock 数据（order、orderExtension）
-            Map<String, String> channelExtras = Map.of("openid", "openid");
+            Map<String, String> channelExtras = ImmutableMap.of("openid", "openid");
             PayOrderDO order = insertSubmitOrder();
             PayOrderExtensionDO oldExtension = insertSubmitOrderExtension(order, PayChannelEnum.WX_PUB, channelExtras);
             // 准备参数
@@ -525,7 +526,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
             assertEquals("ORDERCLOSED", dbOldExtension.getChannelErrorCode());
             assertEquals(toJsonString(closedResp), dbOldExtension.getChannelNotifyData());
             PayOrderExtensionDO newExtension = extensions.stream()
-                    .filter(extension -> !extension.getId().equals(oldExtension.getId())).findFirst().orElseThrow();
+                    .filter(extension -> !extension.getId().equals(oldExtension.getId())).findFirst().get();
             assertThat(outTradeNos).containsExactly(oldExtension.getNo(), newExtension.getNo());
             // 断言：只处理新拓展单的下单结果，不能用原拓展单的失败结果更新状态
             verify(payOrderServiceImpl).notifyOrder(any(PayChannelDO.class), same(waitingResp));
@@ -547,7 +548,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
                     .thenReturn(payOrderServiceImpl);
 
             // mock 数据（order、orderExtension）
-            Map<String, String> channelExtras = Map.of("openid", "openid");
+            Map<String, String> channelExtras = ImmutableMap.of("openid", "openid");
             PayOrderDO order = insertSubmitOrder();
             PayOrderExtensionDO oldExtension = insertSubmitOrderExtension(order, PayChannelEnum.WX_PUB, channelExtras);
             // 准备参数
@@ -580,7 +581,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
             assertEquals("SYSTEMERROR", dbOldExtension.getChannelErrorCode());
             assertNotNull(dbOldExtension.getChannelNotifyData());
             PayOrderExtensionDO newExtension = extensions.stream()
-                    .filter(extension -> !extension.getId().equals(oldExtension.getId())).findFirst().orElseThrow();
+                    .filter(extension -> !extension.getId().equals(oldExtension.getId())).findFirst().get();
             // 第二次调用：复用新拓展单
             orderService.submitOrder(reqVO, randomString());
             assertThat(orderExtensionMapper.selectListByOrderId(order.getId())).hasSize(2);
@@ -597,7 +598,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
                     .thenReturn(payOrderServiceImpl);
 
             // mock 数据（order、orderExtension）
-            Map<String, String> channelExtras = Map.of("openid", "openid");
+            Map<String, String> channelExtras = ImmutableMap.of("openid", "openid");
             PayOrderDO order = insertSubmitOrder();
             PayOrderExtensionDO oldExtension = insertSubmitOrderExtension(order, PayChannelEnum.WX_PUB, channelExtras);
             // 准备参数
@@ -635,7 +636,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
             extensions = orderExtensionMapper.selectListByOrderId(order.getId());
             assertThat(extensions).hasSize(2);
             PayOrderExtensionDO newExtension = extensions.stream()
-                    .filter(extension -> !extension.getId().equals(oldExtension.getId())).findFirst().orElseThrow();
+                    .filter(extension -> !extension.getId().equals(oldExtension.getId())).findFirst().get();
             assertThat(outTradeNos).containsExactly(oldExtension.getNo(), oldExtension.getNo(), newExtension.getNo());
             verify(client, times(2)).closeOrder(eq(oldExtension.getNo()));
         }
@@ -649,7 +650,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
                     .thenReturn(payOrderServiceImpl);
 
             // mock 数据（order、orderExtension）
-            Map<String, String> channelExtras = Map.of("openid", "openid");
+            Map<String, String> channelExtras = ImmutableMap.of("openid", "openid");
             PayOrderDO order = insertSubmitOrder();
             PayOrderExtensionDO oldExtension = insertSubmitOrderExtension(order, PayChannelEnum.WX_PUB, channelExtras);
             // 准备参数
@@ -682,7 +683,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
                     .thenReturn(payOrderServiceImpl);
 
             // mock 数据（order、orderExtension）
-            Map<String, String> channelExtras = Map.of("openid", "openid");
+            Map<String, String> channelExtras = ImmutableMap.of("openid", "openid");
             PayOrderDO order = insertSubmitOrder();
             PayOrderExtensionDO orderExtension = insertSubmitOrderExtension(order, PayChannelEnum.WX_PUB, channelExtras);
             // 准备参数
@@ -714,7 +715,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
                     .thenReturn(payOrderServiceImpl);
 
             // mock 数据（order、orderExtension）：拓展单创建后，支付订单被改价
-            Map<String, String> channelExtras = Map.of("openid", "openid");
+            Map<String, String> channelExtras = ImmutableMap.of("openid", "openid");
             PayOrderDO order = insertSubmitOrder();
             PayOrderExtensionDO oldExtension = insertSubmitOrderExtension(order, PayChannelEnum.WX_PUB, channelExtras);
             PayOrderDO updateObj = new PayOrderDO().setId(order.getId()).setPrice(order.getPrice() + 1);
@@ -748,10 +749,10 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
             // mock 数据（order、orderExtension）
             PayOrderDO order = insertSubmitOrder();
             PayOrderExtensionDO oldExtension = insertSubmitOrderExtension(order, PayChannelEnum.WX_PUB,
-                    Map.of("openid", "old-openid"));
+                    ImmutableMap.of("openid", "old-openid"));
             // 准备参数
             PayOrderSubmitReqVO reqVO = randomPojo(PayOrderSubmitReqVO.class, o -> o.setId(order.getId())
-                    .setChannelCode(PayChannelEnum.WX_PUB.getCode()).setChannelExtras(Map.of("openid", "new-openid")));
+                    .setChannelCode(PayChannelEnum.WX_PUB.getCode()).setChannelExtras(ImmutableMap.of("openid", "new-openid")));
             // mock 方法（app、channel、client）
             PayClient<?> client = mockSubmitClient(PayChannelEnum.WX_PUB);
             when(client.getOrder(eq(oldExtension.getNo()))).thenReturn(
@@ -775,7 +776,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
                     .thenReturn(payOrderServiceImpl);
 
             // mock 数据（order、orderExtension）：拓展单创建后，同一秒内支付订单被改价，数据库时间相等
-            Map<String, String> channelExtras = Map.of("openid", "openid");
+            Map<String, String> channelExtras = ImmutableMap.of("openid", "openid");
             LocalDateTime time = LocalDateTime.now().withNano(0).minusMinutes(1);
             PayOrderDO order = insertSubmitOrder(time.minusMinutes(10), time);
             PayOrderExtensionDO oldExtension = insertSubmitOrderExtension(order, PayChannelEnum.WX_PUB,
@@ -806,7 +807,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
                     .thenReturn(payOrderServiceImpl);
 
             // mock 数据（order、orderExtension）：支付订单与拓展单在同一秒内创建，数据库时间相等（可能同一秒内被改价）
-            Map<String, String> channelExtras = Map.of("openid", "openid");
+            Map<String, String> channelExtras = ImmutableMap.of("openid", "openid");
             LocalDateTime time = LocalDateTime.now().withNano(0).minusMinutes(1);
             PayOrderDO order = insertSubmitOrder(time, time);
             PayOrderExtensionDO orderExtension = insertSubmitOrderExtension(order, PayChannelEnum.WX_PUB,
@@ -837,7 +838,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
                     .thenReturn(payOrderServiceImpl);
 
             // mock 数据（order、orderExtension）
-            Map<String, String> channelExtras = Map.of("openid", "openid");
+            Map<String, String> channelExtras = ImmutableMap.of("openid", "openid");
             PayOrderDO order = insertSubmitOrder();
             PayOrderExtensionDO oldExtension = insertSubmitOrderExtension(order, PayChannelEnum.WX_PUB, channelExtras);
             // 准备参数
@@ -878,7 +879,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
             extensions = orderExtensionMapper.selectListByOrderId(order.getId());
             assertThat(extensions).hasSize(2);
             PayOrderExtensionDO newExtension = extensions.stream()
-                    .filter(extension -> !extension.getId().equals(oldExtension.getId())).findFirst().orElseThrow();
+                    .filter(extension -> !extension.getId().equals(oldExtension.getId())).findFirst().get();
             assertThat(outTradeNos).containsExactly(oldExtension.getNo(), oldExtension.getNo(), newExtension.getNo());
         }
     }
@@ -891,7 +892,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
                     .thenReturn(payOrderServiceImpl);
 
             // mock 数据（order、orderExtension）
-            Map<String, String> channelExtras = Map.of("openid", "openid");
+            Map<String, String> channelExtras = ImmutableMap.of("openid", "openid");
             PayOrderDO order = insertSubmitOrder();
             PayOrderExtensionDO orderExtension = insertSubmitOrderExtension(order, PayChannelEnum.WX_PUB, channelExtras);
             // 准备参数
@@ -926,7 +927,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
                     .thenReturn(payOrderServiceImpl);
 
             // mock 数据（order、orderExtension）
-            Map<String, String> channelExtras = Map.of("key", "value");
+            Map<String, String> channelExtras = ImmutableMap.of("key", "value");
             PayOrderDO order = insertSubmitOrder();
             PayOrderExtensionDO oldExtension = insertSubmitOrderExtension(order, PayChannelEnum.WX_WAP, channelExtras);
             // 准备参数：用户 IP 变化（例如说：切换网络）
@@ -957,7 +958,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
                     .thenReturn(payOrderServiceImpl);
 
             // mock 数据（order、orderExtension）
-            Map<String, String> channelExtras = Map.of("key", "value");
+            Map<String, String> channelExtras = ImmutableMap.of("key", "value");
             PayOrderDO order = insertSubmitOrder();
             PayOrderExtensionDO orderExtension = insertSubmitOrderExtension(order, PayChannelEnum.WX_WAP, channelExtras);
             // 准备参数
@@ -986,7 +987,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
                     .thenReturn(payOrderServiceImpl);
 
             // mock 数据（order、orderExtension）
-            Map<String, String> channelExtras = Map.of("key", "value");
+            Map<String, String> channelExtras = ImmutableMap.of("key", "value");
             PayOrderDO order = insertSubmitOrder();
             PayOrderExtensionDO oldExtension = insertSubmitOrderExtension(order, PayChannelEnum.ALIPAY_APP, channelExtras);
             // 准备参数
@@ -1015,7 +1016,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
                     .thenReturn(payOrderServiceImpl);
 
             // mock 数据（order、orderExtension）
-            Map<String, String> channelExtras = Map.of("authCode", "134567890123456789");
+            Map<String, String> channelExtras = ImmutableMap.of("authCode", "134567890123456789");
             PayOrderDO order = insertSubmitOrder();
             PayOrderExtensionDO oldExtension = insertSubmitOrderExtension(order, PayChannelEnum.WX_BAR, channelExtras);
             // 准备参数

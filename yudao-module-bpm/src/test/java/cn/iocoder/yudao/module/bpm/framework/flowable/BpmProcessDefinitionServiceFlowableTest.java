@@ -1,13 +1,14 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable;
 
 import cn.iocoder.yudao.module.bpm.service.definition.BpmProcessDefinitionServiceImpl;
-import jakarta.annotation.Resource;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
+
+import javax.annotation.Resource;
 
 import static org.junit.jupiter.api.Assertions.*;
 

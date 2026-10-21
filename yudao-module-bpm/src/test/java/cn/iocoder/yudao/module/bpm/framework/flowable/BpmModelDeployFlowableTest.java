@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable;
 
+import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
@@ -20,13 +21,11 @@ import cn.iocoder.yudao.module.bpm.service.definition.BpmModelServiceImpl;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmProcessDefinitionServiceImpl;
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceServiceImpl;
 import cn.iocoder.yudao.module.bpm.service.task.BpmTaskServiceImpl;
-import jakarta.annotation.Resource;
 import org.flowable.common.engine.impl.db.SuspensionState;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
-import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.AfterEach;
@@ -35,6 +34,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
@@ -130,7 +130,7 @@ public class BpmModelDeployFlowableTest extends BaseFlowableUnitTest {
         BpmProcessDefinitionInfoDO definitionInfo1 = processDefinitionMapper.selectByProcessDefinitionId(definition1.getId());
         assertEquals(modelId, definitionInfo1.getModelId());
         assertEquals(BpmModelTypeEnum.SIMPLE.getType(), definitionInfo1.getModelType());
-        assertEquals(List.of(1L), definitionInfo1.getManagerUserIds());
+        assertEquals(ListUtil.of(1L), definitionInfo1.getManagerUserIds());
         assertNotNull(definitionInfo1.getSimpleModel());
         // 断言：可基于该流程定义发起流程，停留在审批节点
         String processInstanceId1 = startProcessInstance();
@@ -155,7 +155,7 @@ public class BpmModelDeployFlowableTest extends BaseFlowableUnitTest {
         assertProcessInstanceStatus(processInstanceId2, BpmProcessInstanceStatusEnum.APPROVE.getStatus());
 
         // 调用 + 断言：调整排序，同一模型的所有流程定义拓展信息同步更新
-        modelServiceImpl.updateModelSortBatch(1L, List.of(modelId));
+        modelServiceImpl.updateModelSortBatch(1L, ListUtil.of(modelId));
         Long sort = processDefinitionMapper.selectByProcessDefinitionId(definition2.getId()).getSort();
         assertEquals(sort, processDefinitionMapper.selectByProcessDefinitionId(definition1.getId()).getSort());
         assertTrue(sort > definitionInfo1.getSort());
@@ -254,7 +254,7 @@ public class BpmModelDeployFlowableTest extends BaseFlowableUnitTest {
         reqVO.setFormCustomCreatePath("/bpm/oa/leave/create");
         reqVO.setFormCustomViewPath("/bpm/oa/leave/detail");
         reqVO.setVisible(true);
-        reqVO.setManagerUserIds(List.of(1L));
+        reqVO.setManagerUserIds(ListUtil.of(1L));
         return modelServiceImpl.createModel(reqVO);
     }
 

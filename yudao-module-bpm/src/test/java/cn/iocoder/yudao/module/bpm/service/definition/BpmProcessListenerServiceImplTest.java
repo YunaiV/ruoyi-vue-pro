@@ -5,14 +5,14 @@ import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.framework.test.core.util.AssertUtils;
 import cn.iocoder.yudao.framework.test.core.util.RandomUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.listener.BpmProcessListenerSaveReqVO;
-import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessListenerDO;
 import cn.iocoder.yudao.module.bpm.dal.mysql.definition.BpmProcessListenerMapper;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmProcessListenerTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmProcessListenerValueTypeEnum;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
+
+import javax.annotation.Resource;
 
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.PROCESS_LISTENER_CLASS_IMPLEMENTS_ERROR;
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.PROCESS_LISTENER_CLASS_NOT_FOUND;

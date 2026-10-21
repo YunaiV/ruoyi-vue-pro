@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.util;
 
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmBoundaryEventTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmChildProcessStartUserEmptyTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmChildProcessStartUserTypeEnum;
-import cn.iocoder.yudao.module.bpm.enums.definition.BpmBoundaryEventTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmConditionOpCodeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmDelayTimerTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModeConditionTypeEnum;
@@ -33,6 +33,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.BOUNDARY_EVENT_TYPE;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.START_EVENT_NODE_ID;
@@ -143,7 +144,7 @@ public class SimpleModelUtilsTest extends BaseFlowableUnitTest {
         // 断言
         assertInstanceOf(CallActivity.class, process.getFlowElement("child"));
         BoundaryEvent boundaryEvent = process.getFlowElements().stream().filter(item -> item instanceof BoundaryEvent)
-                .map(item -> (BoundaryEvent) item).findFirst().orElseThrow();
+                .map(item -> (BoundaryEvent) item).findFirst().get();
         TimerEventDefinition timer = (TimerEventDefinition) boundaryEvent.getEventDefinitions().get(0);
         assertEquals("2026-10-06T12:00:00", timer.getTimeDate());
         assertNull(timer.getTimeDuration());
@@ -171,7 +172,7 @@ public class SimpleModelUtilsTest extends BaseFlowableUnitTest {
         Process process = bpmnModel.getMainProcess();
         // 断言：固定时长使用 timeDuration，且不会误设置 timeDate、timeCycle
         BoundaryEvent boundaryEvent = process.getFlowElements().stream().filter(item -> item instanceof BoundaryEvent)
-                .map(item -> (BoundaryEvent) item).findFirst().orElseThrow();
+                .map(item -> (BoundaryEvent) item).findFirst().get();
         assertEquals("child", boundaryEvent.getAttachedToRef().getId());
         assertFalse(boundaryEvent.isCancelActivity());
         TimerEventDefinition timer = (TimerEventDefinition) boundaryEvent.getEventDefinitions().get(0);
@@ -296,7 +297,7 @@ public class SimpleModelUtilsTest extends BaseFlowableUnitTest {
                 Collections.singletonMap("amount", 20));
         // 断言
         assertEquals(Arrays.asList("matched", "matched-end"), result.stream()
-                .map(BpmSimpleModelNodeVO::getId).toList());
+                .map(BpmSimpleModelNodeVO::getId).collect(Collectors.toList()));
     }
 
     @Test
@@ -325,7 +326,7 @@ public class SimpleModelUtilsTest extends BaseFlowableUnitTest {
         List<BpmSimpleModelNodeVO> result = SimpleModelUtils.simulateProcess(inclusive, variables);
         // 断言
         assertEquals(Arrays.asList("first", "first-end", "second", "second-end"), result.stream()
-                .map(BpmSimpleModelNodeVO::getId).toList());
+                .map(BpmSimpleModelNodeVO::getId).collect(Collectors.toList()));
     }
 
     @Test
@@ -361,7 +362,7 @@ public class SimpleModelUtilsTest extends BaseFlowableUnitTest {
             Process process = model.getMainProcess();
             return Arrays.asList(process.getFlowElement("approve"), process.getFlowElements().stream()
                     .filter(item -> item instanceof BoundaryEvent).map(item -> (BoundaryEvent) item)
-                    .findFirst().orElseThrow());
+                    .findFirst().get());
         }
     }
 }

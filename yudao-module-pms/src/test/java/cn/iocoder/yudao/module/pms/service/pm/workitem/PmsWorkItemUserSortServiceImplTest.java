@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.pms.service.pm.workitem;
 
+import cn.hutool.core.collection.ListUtil;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.pms.dal.dataobject.pm.project.PmsProjectDO;
 import cn.iocoder.yudao.module.pms.dal.dataobject.pm.workitem.PmsWorkItemUserSortDO;
@@ -13,11 +14,11 @@ import cn.iocoder.yudao.module.pms.service.pm.project.PmsProjectGroupService;
 import cn.iocoder.yudao.module.pms.service.pm.project.PmsProjectMemberService;
 import cn.iocoder.yudao.module.pms.service.pm.project.PmsProjectServiceImpl;
 import cn.iocoder.yudao.module.system.api.permission.PermissionApi;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -48,23 +49,23 @@ public class PmsWorkItemUserSortServiceImplTest extends BaseDbUnitTest {
     @Resource
     private PmsProjectMapper projectMapper;
 
-    @MockitoBean
+    @MockBean
     private PmsProjectMemberService projectMemberService;
-    @MockitoBean
+    @MockBean
     private PmsProjectGroupService projectGroupService;
-    @MockitoBean
+    @MockBean
     private PmsProjectFavoriteService projectFavoriteService;
-    @MockitoBean
+    @MockBean
     private PmsProjectAnnouncementService projectAnnouncementService;
-    @MockitoBean
+    @MockBean
     private PmsIterationService iterationService;
-    @MockitoBean
+    @MockBean
     private PmsWorkItemService workItemService;
-    @MockitoBean
+    @MockBean
     private PmsWorkItemStatusService workItemStatusService;
-    @MockitoBean
+    @MockBean
     private PmsWorkItemWorkLogService workItemWorkLogService;
-    @MockitoBean
+    @MockBean
     private PermissionApi permissionApi;
 
     @Test
@@ -72,19 +73,19 @@ public class PmsWorkItemUserSortServiceImplTest extends BaseDbUnitTest {
         // mock 数据
         PmsProjectDO project = new PmsProjectDO().setName("测试项目").setType(1).setLevel(1);
         projectMapper.insert(project);
-        workItemUserSortService.updateWorkItemUserSort(project.getId(), List.of(50L, 51L), 238L);
-        workItemUserSortService.updateWorkItemUserSort(project.getId(), List.of(50L, 51L), 239L);
+        workItemUserSortService.updateWorkItemUserSort(project.getId(), ListUtil.of(50L, 51L), 238L);
+        workItemUserSortService.updateWorkItemUserSort(project.getId(), ListUtil.of(50L, 51L), 239L);
 
         // 调用：连续调整个人排序，并移除不再位于待规划区域的工作项
-        workItemUserSortService.updateWorkItemUserSort(project.getId(), List.of(51L, 50L), 238L);
-        workItemUserSortService.updateWorkItemUserSort(project.getId(), List.of(50L), 238L);
+        workItemUserSortService.updateWorkItemUserSort(project.getId(), ListUtil.of(51L, 50L), 238L);
+        workItemUserSortService.updateWorkItemUserSort(project.getId(), ListUtil.of(50L), 238L);
 
         // 断言：仅保留当前顺序，不影响其他用户的个人排序
         List<PmsWorkItemUserSortDO> userSorts = workItemUserSortMapper
                 .selectListByProjectIdAndUserId(project.getId(), 238L);
-        assertEquals(List.of(50L), convertList(userSorts, PmsWorkItemUserSortDO::getWorkItemId));
+        assertEquals(ListUtil.of(50L), convertList(userSorts, PmsWorkItemUserSortDO::getWorkItemId));
         assertEquals(1, userSorts.get(0).getSort());
-        assertEquals(List.of(50L, 51L), convertList(workItemUserSortMapper
+        assertEquals(ListUtil.of(50L, 51L), convertList(workItemUserSortMapper
                 .selectListByProjectIdAndUserId(project.getId(), 239L), PmsWorkItemUserSortDO::getWorkItemId));
     }
 
@@ -92,7 +93,7 @@ public class PmsWorkItemUserSortServiceImplTest extends BaseDbUnitTest {
     public void testUpdateWorkItemUserSort_projectNotExists() {
         // 调用，并断言异常
         assertServiceException(() -> workItemUserSortService.updateWorkItemUserSort(999L,
-                List.of(50L), 238L), PROJECT_NOT_EXISTS);
+                ListUtil.of(50L), 238L), PROJECT_NOT_EXISTS);
         assertEquals(0L, workItemUserSortMapper.selectCount());
     }
 
@@ -105,7 +106,7 @@ public class PmsWorkItemUserSortServiceImplTest extends BaseDbUnitTest {
 
         // 调用，并断言异常
         assertServiceException(() -> workItemUserSortService.updateWorkItemUserSort(project.getId(),
-                List.of(50L), 238L), PROJECT_NOT_EXISTS);
+                ListUtil.of(50L), 238L), PROJECT_NOT_EXISTS);
         assertEquals(0L, workItemUserSortMapper.selectCount());
     }
 
@@ -120,9 +121,9 @@ public class PmsWorkItemUserSortServiceImplTest extends BaseDbUnitTest {
 
         // 调用，并断言异常
         assertServiceException(() -> workItemUserSortService.updateWorkItemUserSort(project.getId(),
-                List.of(51L), 238L), PROJECT_STATUS_INVALID);
+                ListUtil.of(51L), 238L), PROJECT_STATUS_INVALID);
         // 断言：拒绝更新时保留原有个人排序
-        assertEquals(List.of(50L), convertList(workItemUserSortMapper
+        assertEquals(ListUtil.of(50L), convertList(workItemUserSortMapper
                 .selectListByProjectIdAndUserId(project.getId(), 238L), PmsWorkItemUserSortDO::getWorkItemId));
     }
 
@@ -142,7 +143,7 @@ public class PmsWorkItemUserSortServiceImplTest extends BaseDbUnitTest {
                 futures.add(executor.submit(() -> {
                     startLatch.await();
                     for (int count = 0; count < 5; count++) {
-                        workItemUserSortService.updateWorkItemUserSort(project.getId(), List.of(51L, 50L), 238L);
+                        workItemUserSortService.updateWorkItemUserSort(project.getId(), ListUtil.of(51L, 50L), 238L);
                     }
                     return null;
                 }));
@@ -159,8 +160,8 @@ public class PmsWorkItemUserSortServiceImplTest extends BaseDbUnitTest {
         // 断言：没有重复的有效记录，顺序与最后一次保存一致
         List<PmsWorkItemUserSortDO> userSorts = workItemUserSortMapper
                 .selectListByProjectIdAndUserId(project.getId(), 238L);
-        assertEquals(List.of(51L, 50L), convertList(userSorts, PmsWorkItemUserSortDO::getWorkItemId));
-        assertEquals(List.of(1, 2), convertList(userSorts, PmsWorkItemUserSortDO::getSort));
+        assertEquals(ListUtil.of(51L, 50L), convertList(userSorts, PmsWorkItemUserSortDO::getWorkItemId));
+        assertEquals(ListUtil.of(1, 2), convertList(userSorts, PmsWorkItemUserSortDO::getSort));
     }
 
 }

@@ -9,12 +9,12 @@ import com.github.binarywang.wxpay.bean.transfer.TransferBillsGetResult;
 import com.github.binarywang.wxpay.exception.WxPayException;
 import com.github.binarywang.wxpay.service.TransferService;
 import com.github.binarywang.wxpay.service.WxPayService;
+import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
-import java.util.Map;
 
 import static cn.iocoder.yudao.module.pay.framework.pay.core.client.impl.weixin.WxPayClientConfig.API_VERSION_V3;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -87,7 +87,7 @@ public class AbstractWxPayClientTest extends BaseMockitoUnitTest {
         return new PayTransferUnifiedReqDTO().setUserIp("127.0.0.1").setOutTransferNo("T001")
                 .setPrice(100).setSubject("佣金提现").setUserAccount("openid")
                 .setNotifyUrl("http://127.0.0.1/transfer")
-                .setChannelExtras(Map.of("sceneId", "1000", "sceneReportInfos", "[]"));
+                .setChannelExtras(ImmutableMap.of("sceneId", "1000", "sceneReportInfos", "[]"));
     }
 
 }

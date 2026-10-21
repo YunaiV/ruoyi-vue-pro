@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable;
 
+import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmCommentTypeEnum;
@@ -9,7 +10,6 @@ import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskStatusEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants;
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceServiceImpl;
 import cn.iocoder.yudao.module.bpm.service.task.BpmTaskServiceImpl;
-import jakarta.annotation.Resource;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.repository.Deployment;
@@ -18,9 +18,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -66,7 +66,7 @@ public class BpmTaskSignFlowableTest extends BaseFlowableUnitTest {
     public void tearDown() {
         // 清理测试数据：加签子任务没有 execution，需要先删除，否则 Flowable 级联删除流程实例时会空指针
         List<String> signTaskIds = flowableTaskService.createTaskQuery().deploymentId(deployment.getId()).list()
-                .stream().filter(task -> task.getExecutionId() == null).map(Task::getId).toList();
+                .stream().filter(task -> task.getExecutionId() == null).map(Task::getId).collect(Collectors.toList());
         flowableTaskService.deleteTasks(signTaskIds);
         repositoryService.deleteDeployment(deployment.getId(), true);
     }
@@ -189,14 +189,14 @@ public class BpmTaskSignFlowableTest extends BaseFlowableUnitTest {
     @Test
     public void testApproveTask_emptyAssigneeAndOwner_withoutUserId() {
         // 准备参数：task1 计算不到审批人，没有 assignee、owner
-        when(taskCandidateInvoker.calculateUsersByTask(any())).thenReturn(Set.of());
+        when(taskCandidateInvoker.calculateUsersByTask(any())).thenReturn(SetUtils.asSet());
         String processInstanceId = startProcessInstance();
         Task task1 = getRunningTask(processInstanceId);
         assertNull(task1.getAssignee());
         assertNull(task1.getOwner());
 
         // 调用：保持自动审批的历史行为，userId 为 null 时允许审批
-        when(taskCandidateInvoker.calculateUsersByTask(any())).thenReturn(Set.of(1L));
+        when(taskCandidateInvoker.calculateUsersByTask(any())).thenReturn(SetUtils.asSet(1L));
         approveTask(null, task1.getId());
         // 断言：流程流转到 task2
         assertEquals(BpmTaskStatusEnum.APPROVE.getStatus(), getTaskStatus(task1.getId()));
@@ -386,7 +386,7 @@ public class BpmTaskSignFlowableTest extends BaseFlowableUnitTest {
 
     private List<Task> createSignTask(Long userId, String taskId, BpmTaskSignTypeEnum type, Long... userIds) {
         bpmTaskService.createSignTask(userId, new BpmTaskSignCreateReqVO().setId(taskId)
-                .setType(type.getType()).setUserIds(Set.of(userIds)).setReason("加签"));
+                .setType(type.getType()).setUserIds(SetUtils.asSet(userIds)).setReason("加签"));
         List<Task> childTasks = bpmTaskService.getTaskListByParentTaskId(taskId);
         assertEquals(userIds.length, childTasks.size());
         return childTasks;

@@ -8,13 +8,14 @@ import cn.iocoder.yudao.module.pay.dal.redis.wallet.PayWalletLockRedisDAO;
 import cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
 import cn.iocoder.yudao.module.pay.service.refund.PayRefundService;
-import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.TransactionTemplate;
+
+import javax.annotation.Resource;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -37,11 +38,11 @@ public class PayWalletServiceTest extends BaseDbAndRedisUnitTest {
     @Resource
     private PlatformTransactionManager transactionManager;
 
-    @MockitoBean
+    @MockBean
     private PayWalletTransactionService walletTransactionService;
-    @MockitoBean
+    @MockBean
     private PayOrderService orderService;
-    @MockitoBean
+    @MockBean
     private PayRefundService refundService;
 
     @Test
