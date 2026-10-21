@@ -1,13 +1,15 @@
 package cn.iocoder.yudao.framework.excel.core.util;
 
-import cn.idev.excel.FastExcelFactory;
-import cn.idev.excel.context.AnalysisContext;
-import cn.idev.excel.converters.longconverter.LongStringConverter;
-import cn.idev.excel.read.listener.ReadListener;
 import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
 import cn.iocoder.yudao.framework.excel.core.handler.ColumnWidthMatchStyleStrategy;
 import cn.iocoder.yudao.framework.excel.core.handler.SelectSheetWriteHandler;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.fesod.sheet.FesodSheet;
+import org.apache.fesod.sheet.context.AnalysisContext;
+import org.apache.fesod.sheet.converters.Converter;
+import org.apache.fesod.sheet.converters.longconverter.LongStringConverter;
+import org.apache.fesod.sheet.enums.CellDataTypeEnum;
+import org.apache.fesod.sheet.read.listener.ReadListener;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -25,6 +27,21 @@ import java.util.Map;
 public class ExcelUtils {
 
     /**
+     * Long 转 String 的转换器，避免 Long 类型丢失精度
+     *
+     * 参考 https://t.zsxq.com/a0w1V 帖子：Fesod 写入 xlsx 时，按 supportExcelTypeKey 为 null 查找全局转换器，
+     * 所以需要返回 null，否则 registerConverter 的 LongStringConverter 不生效。关联 https://github.com/apache/fesod/issues/648
+     */
+    private static final Converter<Long> LONG_STRING_CONVERTER = new LongStringConverter() {
+
+        @Override
+        public CellDataTypeEnum supportExcelTypeKey() {
+            return null;
+        }
+
+    };
+
+    /**
      * 将列表以 Excel 响应给前端
      *
      * @param response  响应
@@ -38,11 +55,11 @@ public class ExcelUtils {
     public static <T> void write(HttpServletResponse response, String filename, String sheetName,
                                  Class<T> head, List<T> data) throws IOException {
         // 输出 Excel
-        FastExcelFactory.write(response.getOutputStream(), head)
+        FesodSheet.write(response.getOutputStream(), head)
                 .autoCloseStream(false) // 不要自动关闭，交给 Servlet 自己处理
                 .registerWriteHandler(new ColumnWidthMatchStyleStrategy()) // 基于 column 长度，自动适配。最大 255 宽度
                 .registerWriteHandler(new SelectSheetWriteHandler(head)) // 基于固定 sheet 实现下拉框
-                .registerConverter(new LongStringConverter()) // 避免 Long 类型丢失精度
+                .registerConverter(LONG_STRING_CONVERTER) // 避免 Long 类型丢失精度
                 .sheet(sheetName).doWrite(data);
         // 设置 header 和 contentType。写在最后的原因是，避免报错时，响应 contentType 已经被修改了
         response.addHeader("Content-Disposition", "attachment;filename=" + HttpUtils.encodeUtf8(filename));
@@ -62,10 +79,10 @@ public class ExcelUtils {
     public static void write(HttpServletResponse response, String filename, String sheetName,
                              List<List<String>> head, List<List<Object>> data) throws IOException {
         // 输出 Excel
-        FastExcelFactory.write(response.getOutputStream())
+        FesodSheet.write(response.getOutputStream())
                 .autoCloseStream(false) // 不要自动关闭，交给 Servlet 自己处理
                 .registerWriteHandler(new ColumnWidthMatchStyleStrategy()) // 基于 column 长度，自动适配。最大 255 宽度
-                .registerConverter(new LongStringConverter()) // 避免 Long 类型丢失精度
+                .registerConverter(LONG_STRING_CONVERTER) // 避免 Long 类型丢失精度
                 .head(head).sheet(sheetName).doWrite(data);
         // 设置 header 和 contentType。写在最后的原因是，避免报错时，响应 contentType 已经被修改了
         response.addHeader("Content-Disposition", "attachment;filename=" + HttpUtils.encodeUtf8(filename));
@@ -78,7 +95,7 @@ public class ExcelUtils {
         }
         // 参考 https://t.zsxq.com/zM77F 帖子，增加 try 处理，兼容 windows 场景
         try (InputStream inputStream = file.getInputStream()) {
-            return FastExcelFactory.read(inputStream, head, null)
+            return FesodSheet.read(inputStream, head, null)
                     .autoCloseStream(false) // 不要自动关闭，交给 Servlet 自己处理
                     .doReadAllSync();
         }
@@ -101,7 +118,7 @@ public class ExcelUtils {
         }
         List<T> rows = new ArrayList<>(Math.min(maxRowCount, 1024));
         try (InputStream inputStream = file.getInputStream()) {
-            FastExcelFactory.read(inputStream, head, new ReadListener<T>() {
+            FesodSheet.read(inputStream, head, new ReadListener<T>() {
 
                 @Override
                 public void invoke(T data, AnalysisContext context) {
@@ -136,7 +153,7 @@ public class ExcelUtils {
         }
         // 参考 https://t.zsxq.com/zM77F 帖子，增加 try 处理，兼容 windows 场景
         try (InputStream inputStream = file.getInputStream()) {
-            return FastExcelFactory.read(inputStream)
+            return FesodSheet.read(inputStream)
                     .autoCloseStream(false) // 不要自动关闭，交给 Servlet 自己处理
                     .headRowNumber(1)
                     .sheet()
