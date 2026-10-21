@@ -42,8 +42,8 @@
 
         <!-- 工具类相关 -->
         <dependency>
-            <groupId>cn.idev.excel</groupId>
-            <artifactId>fastexcel</artifactId>
+            <groupId>org.apache.fesod</groupId>
+            <artifactId>fesod-sheet</artifactId>
         </dependency>
 
         <dependency>

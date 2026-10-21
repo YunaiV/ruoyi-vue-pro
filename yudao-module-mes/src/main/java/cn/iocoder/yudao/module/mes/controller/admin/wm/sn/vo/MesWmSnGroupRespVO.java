@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.mes.controller.admin.wm.sn.vo;
 
-import cn.idev.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.experimental.Accessors;
+import org.apache.fesod.sheet.annotation.ExcelProperty;
 
 import java.time.LocalDateTime;
 

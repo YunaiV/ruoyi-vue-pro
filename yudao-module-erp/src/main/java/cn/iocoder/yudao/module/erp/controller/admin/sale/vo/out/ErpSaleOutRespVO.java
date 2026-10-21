@@ -1,10 +1,10 @@
 package cn.iocoder.yudao.module.erp.controller.admin.sale.vo.out;
 
-import cn.idev.excel.annotation.ExcelIgnoreUnannotated;
-import cn.idev.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import org.apache.fesod.sheet.annotation.ExcelIgnoreUnannotated;
+import org.apache.fesod.sheet.annotation.ExcelProperty;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

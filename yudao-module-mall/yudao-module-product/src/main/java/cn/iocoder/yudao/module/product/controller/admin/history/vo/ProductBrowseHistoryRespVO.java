@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.product.controller.admin.history.vo;
 
-import cn.idev.excel.annotation.ExcelIgnoreUnannotated;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import org.apache.fesod.sheet.annotation.ExcelIgnoreUnannotated;
 
 @Schema(description = "管理后台 - 商品浏览记录 Response VO")
 @Data
