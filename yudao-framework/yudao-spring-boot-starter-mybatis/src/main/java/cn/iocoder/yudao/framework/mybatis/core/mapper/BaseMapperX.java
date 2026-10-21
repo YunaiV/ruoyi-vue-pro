@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.pojo.SortablePageParam;
 import cn.iocoder.yudao.framework.common.pojo.SortingField;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
+import cn.iocoder.yudao.framework.mybatis.core.util.CaseInsensitiveResultMap;
 import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import cn.iocoder.yudao.framework.mybatis.core.util.MyBatisUtils;
 import com.baomidou.mybatisplus.annotation.DbType;
@@ -14,6 +15,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.toolkit.Db;
 import com.github.yulichang.base.MPJBaseMapper;
@@ -23,6 +25,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 在 MyBatis Plus 的 BaseMapper 的基础上拓展，提供更多的能力
@@ -97,6 +100,24 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
         selectJoinPage(mpPage, resultTypeClass, joinQueryWrapper);
         // 转换返回
         return new PageResult<>(mpPage.getRecords(), mpPage.getTotal());
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    default Map<String, Object> selectJoinMap(@Param(Constants.WRAPPER) MPJBaseJoin<T> wrapper) {
+        return selectJoinOne(CaseInsensitiveResultMap.class, wrapper);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    default List<Map<String, Object>> selectJoinMaps(@Param(Constants.WRAPPER) MPJBaseJoin<T> wrapper) {
+        return (List<Map<String, Object>>) ((Object) selectJoinList(CaseInsensitiveResultMap.class, wrapper));
+    }
+
+    @Override
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    default <P extends IPage<Map<String, Object>>> P selectJoinMapsPage(P page, @Param(Constants.WRAPPER) MPJBaseJoin<T> wrapper) {
+        return (P) selectJoinPage((IPage) page, CaseInsensitiveResultMap.class, wrapper);
     }
 
     default T selectOne(String field, Object value) {

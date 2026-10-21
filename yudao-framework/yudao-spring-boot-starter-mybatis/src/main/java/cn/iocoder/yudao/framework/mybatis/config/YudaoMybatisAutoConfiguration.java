@@ -4,23 +4,31 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.mybatis.core.handler.DefaultDBFieldHandler;
+import cn.iocoder.yudao.framework.mybatis.core.injector.YudaoSqlInjector;
+import cn.iocoder.yudao.framework.mybatis.core.util.CaseInsensitiveResultMap;
 import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.autoconfigure.ConfigurationCustomizer;
 import com.baomidou.mybatisplus.autoconfigure.MybatisPlusAutoConfiguration;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.baomidou.mybatisplus.core.incrementer.IKeyGenerator;
 import com.baomidou.mybatisplus.extension.handlers.Jackson3TypeHandler;
+import com.baomidou.mybatisplus.core.injector.ISqlInjector;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.baomidou.mybatisplus.extension.incrementer.*;
 import com.baomidou.mybatisplus.extension.parser.JsqlParserGlobal;
 import com.baomidou.mybatisplus.extension.parser.cache.JdkSerialCaffeineJsqlParseCache;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.mapping.ResultMap;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.ConfigurableEnvironment;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import tools.jackson.databind.ObjectMapper;
@@ -55,6 +63,19 @@ public class YudaoMybatisAutoConfiguration {
     @Bean
     public MetaObjectHandler defaultMetaObjectHandler() {
         return new DefaultDBFieldHandler(); // 自动填充参数类
+    }
+
+    @Bean
+    @Primary // 特殊：使用 @Primary 的原因，避免 MyBatis Plus Join 再创建 MPJSqlInjector 包装它
+    public ISqlInjector yudaoSqlInjector() {
+        return new YudaoSqlInjector(); // selectMaps 的结果行，使用 CaseInsensitiveResultMap
+    }
+
+    @Bean
+    public ConfigurationCustomizer caseInsensitiveResultMapConfigurationCustomizer() {
+        // 注册 CaseInsensitiveResultMap 的 resultMap，用于注解 SQL 的 @ResultMap
+        return configuration -> configuration.addResultMap(new ResultMap.Builder(configuration,
+                CaseInsensitiveResultMap.RESULT_MAP_ID, CaseInsensitiveResultMap.class, new ArrayList<>()).build());
     }
 
     @Bean

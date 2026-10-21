@@ -67,6 +67,24 @@ spring:
           url: jdbc:mysql://127.0.0.1:3306/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true&rewriteBatchedStatements=true # MySQL Connector/J 8.X 连接的示例
           username: root
           password: 123456
+#        tdengine: # IoT 数据库（需要 IoT 物联网，且 yudao.iot.storage.type 为 tdengine 再开启噢！）
+#          lazy: true # 开启懒加载，保证启动速度
+#          url: jdbc:TAOS-WS://127.0.0.1:6041/ruoyi_vue_pro?varcharAsString=true&enableAutoReconnect=true # 参见：https://t.zsxq.com/qaX9c，开启 TDengine WebSocket 自动重连
+#          driver-class-name: com.taosdata.jdbc.ws.WebSocketDriver
+#          username: root
+#          password: taosdata
+#          druid:
+#            validation-query: SELECT SERVER_STATUS() # TDengine 数据源的有效性检查 SQL
+#        iotdb: # IoT 数据库（需要 IoT 物联网，且 yudao.iot.storage.type 为 iotdb 再开启噢！）
+#          lazy: true # 开启懒加载，保证启动速度
+#          type: com.zaxxer.hikari.HikariDataSource # IoTDB 不使用 Druid 连接池
+#          url: jdbc:iotdb://127.0.0.1:6667/ruoyi_vue_pro?sql_dialect=table # 表模型；数据库需要预先创建，且时间精度为 ms
+#          driver-class-name: org.apache.iotdb.jdbc.IoTDBDriver
+#          username: root
+#          password: root
+#          hikari:
+#            maximum-pool-size: 8
+#            connection-test-query: SELECT 1 # IoTDB 数据源的有效性检查 SQL
 
   # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
   data:
