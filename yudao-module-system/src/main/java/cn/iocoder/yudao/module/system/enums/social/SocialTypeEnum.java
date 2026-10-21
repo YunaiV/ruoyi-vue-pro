@@ -25,9 +25,11 @@ public enum SocialTypeEnum implements ArrayValuable<Integer> {
     /**
      * 钉钉
      *
-     * @see <a href="https://developers.dingtalk.com/document/app/obtain-identity-credentials">接入文档</a>
+     * 使用新版登录，对应 JustAuth 的 DINGTALK_V2，相关反馈：https://t.zsxq.com/QY7xI
+     *
+     * @see <a href="https://open.dingtalk.com/document/app/obtain-identity-credentials">接入文档</a>
      */
-    DINGTALK(20, "DINGTALK"),
+    DINGTALK(20, "DINGTALK_V2"),
 
     /**
      * 企业微信
