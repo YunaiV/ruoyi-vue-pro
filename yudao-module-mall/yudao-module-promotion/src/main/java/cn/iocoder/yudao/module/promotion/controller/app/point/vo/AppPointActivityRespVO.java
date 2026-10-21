@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.promotion.controller.app.point.vo;
 
-import cn.idev.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import org.apache.fesod.sheet.annotation.ExcelProperty;
 
 @Schema(description = "用户 App - 积分商城活动 Response VO")
 @Data

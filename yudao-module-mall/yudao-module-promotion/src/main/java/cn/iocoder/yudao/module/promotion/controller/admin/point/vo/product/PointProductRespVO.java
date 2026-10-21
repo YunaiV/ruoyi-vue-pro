@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.promotion.controller.admin.point.vo.product;
 
-import cn.idev.excel.annotation.ExcelIgnoreUnannotated;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import org.apache.fesod.sheet.annotation.ExcelIgnoreUnannotated;
 
 @Schema(description = "管理后台 - 积分商城商品 Response VO")
 @Data

@@ -27,7 +27,7 @@ import java.util.Collection;
 /**
  * 原生 POI 的 Excel 工具类
  *
- * 全局 {@link ExcelUtils}（FastExcel）无法表达单元格锁定、公式、动态列等复杂模板时，各模块基于本类实现自定义 Excel 读写
+ * 全局 {@link ExcelUtils}（Fesod）无法表达单元格锁定、公式、动态列等复杂模板时，各模块基于本类实现自定义 Excel 读写
  *
  * @author 芋道源码
  */

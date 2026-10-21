@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.fms.controller.admin.config.vo.auxiliaryitem;
 
-import cn.idev.excel.annotation.ExcelProperty;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import lombok.Data;
+import org.apache.fesod.sheet.annotation.ExcelProperty;
 
 /**
  * FMS 辅助核算项目 Excel 导入 VO

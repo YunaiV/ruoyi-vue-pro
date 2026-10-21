@@ -1,11 +1,11 @@
 package cn.iocoder.yudao.module.fms.controller.admin.config.vo.subject;
 
-import cn.idev.excel.annotation.ExcelProperty;
 import javax.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.fesod.sheet.annotation.ExcelProperty;
 
 /**
  * FMS 科目 Excel 导入 VO
