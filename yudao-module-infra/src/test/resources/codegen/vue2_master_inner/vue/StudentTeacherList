@@ -48,9 +48,13 @@
   import * as StudentApi from '@/api/infra/demo';
   export default {
     name: "StudentTeacherList",
-    props:[
-      'studentId'
-    ],// 学生编号（主表的关联字段）
+    props: {
+      // 学生编号（主表的关联字段）
+      studentId: {
+        type:  Number,
+        default: undefined
+      }
+    },
     data() {
       return {
         // 遮罩层

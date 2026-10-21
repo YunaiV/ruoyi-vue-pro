@@ -21,6 +21,10 @@ public interface MesMdAutoCodePartMapper extends BaseMapperX<MesMdAutoCodePartDO
                 .orderByAsc(MesMdAutoCodePartDO::getSort));
     }
 
+    default List<MesMdAutoCodePartDO> selectByType(Integer type) {
+        return selectList(MesMdAutoCodePartDO::getType, type);
+    }
+
     default void deleteByRuleId(Long ruleId) {
         delete(MesMdAutoCodePartDO::getRuleId, ruleId);
     }

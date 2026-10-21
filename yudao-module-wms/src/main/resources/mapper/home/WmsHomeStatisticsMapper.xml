@@ -3,7 +3,7 @@
 <mapper namespace="cn.iocoder.yudao.module.wms.dal.mysql.home.WmsHomeStatisticsMapper">
 
     <!-- 按单据类型和状态统计单据数量 -->
-    <select id="selectOrderCountGroupByTypeAndStatus" resultType="java.util.Map">
+    <select id="selectOrderCountGroupByTypeAndStatus" resultType="cn.iocoder.yudao.framework.mybatis.core.util.CaseInsensitiveResultMap">
         SELECT orderType, status, SUM(count) AS count
         FROM (
             SELECT ${@cn.iocoder.yudao.module.wms.enums.order.WmsOrderTypeEnum@RECEIPT.type} AS orderType,
@@ -51,7 +51,7 @@
     </select>
 
     <!-- 按天聚合单据数量 -->
-    <select id="selectDailyOrderTrend" resultType="java.util.Map">
+    <select id="selectDailyOrderTrend" resultType="cn.iocoder.yudao.framework.mybatis.core.util.CaseInsensitiveResultMap">
         SELECT date, orderType, SUM(count) AS count
         FROM (
             SELECT DATE_FORMAT(order_time, '%Y-%m-%d') AS date,
@@ -117,7 +117,7 @@
     </select>
 
     <!-- 按商品统计库存数量排行 -->
-    <select id="selectInventoryItemRank" resultType="java.util.Map">
+    <select id="selectInventoryItemRank" resultType="cn.iocoder.yudao.framework.mybatis.core.util.CaseInsensitiveResultMap">
         SELECT item.id AS id,
                item.name AS name,
                IFNULL(SUM(inventory.quantity), 0) AS quantity
@@ -135,7 +135,7 @@
     </select>
 
     <!-- 按仓库统计库存数量排行 -->
-    <select id="selectInventoryWarehouseRank" resultType="java.util.Map">
+    <select id="selectInventoryWarehouseRank" resultType="cn.iocoder.yudao.framework.mybatis.core.util.CaseInsensitiveResultMap">
         SELECT warehouse.id AS id,
                warehouse.name AS name,
                IFNULL(SUM(inventory.quantity), 0) AS quantity

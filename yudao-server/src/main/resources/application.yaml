@@ -368,5 +368,7 @@ yudao:
   iot:
     message-bus:
       type: redis # 消息总线的类型
+    storage:
+      type: tdengine # 时序存储的类型：tdengine、iotdb，需要配置同名的 spring.datasource.dynamic.datasource 数据源
 
 debug: false

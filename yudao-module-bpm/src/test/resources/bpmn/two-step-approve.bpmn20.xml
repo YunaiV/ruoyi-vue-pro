@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="http://www.yudao.iocoder.cn/bpm">
+    <process id="twoStepApprove" name="两级审批" isExecutable="true">
+        <startEvent id="start"/>
+        <sequenceFlow id="flow-start" sourceRef="start" targetRef="task1"/>
+        <userTask id="task1" name="一级审批">
+            <extensionElements>
+                <flowable:candidateStrategy>30</flowable:candidateStrategy>
+            </extensionElements>
+        </userTask>
+        <sequenceFlow id="flow-task1" sourceRef="task1" targetRef="task2"/>
+        <userTask id="task2" name="二级审批">
+            <extensionElements>
+                <flowable:candidateStrategy>30</flowable:candidateStrategy>
+                <flowable:rejectHandlerType>2</flowable:rejectHandlerType>
+                <flowable:rejectReturnTaskId>task1</flowable:rejectReturnTaskId>
+            </extensionElements>
+        </userTask>
+        <sequenceFlow id="flow-task2" sourceRef="task2" targetRef="end"/>
+        <endEvent id="end"/>
+    </process>
+</definitions>

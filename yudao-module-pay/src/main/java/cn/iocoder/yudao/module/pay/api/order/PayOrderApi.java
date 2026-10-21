@@ -30,6 +30,13 @@ public interface PayOrderApi {
     PayOrderRespDTO getOrder(Long id);
 
     /**
+     * 关闭支付单
+     *
+     * @param id 支付单编号
+     */
+    void closeOrder(Long id);
+
+    /**
      * 更新支付订单价格
      *
      * @param id 支付单编号

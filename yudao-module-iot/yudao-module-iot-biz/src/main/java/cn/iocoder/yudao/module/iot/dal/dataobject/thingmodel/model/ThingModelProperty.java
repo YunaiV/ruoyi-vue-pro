@@ -21,6 +21,16 @@ import java.util.List;
 public class ThingModelProperty {
 
     /**
+     * STRUCT、ARRAY 等 JSON 属性值的长度上限：按 UTF-8 编码后的字节数计算，不是字符数
+     *
+     * 1. 写入前：JSON 字符串超过该长度时，转换为 null，不写入该属性
+     * 2. 各存储后端共用，例如说 TDengine 的 VARCHAR 长度
+     *
+     * 注意：TDengine 一行（所有列）有总长度上限，调大该长度，会减少一个产品可以定义的 STRUCT、ARRAY 属性数量
+     */
+    public static final int LENGTH_JSON = 1024;
+
+    /**
      * 属性标识符
      */
     @NotEmpty(message = "属性标识符不能为空")

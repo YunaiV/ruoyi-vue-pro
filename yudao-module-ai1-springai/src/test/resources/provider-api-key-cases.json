@@ -1,0 +1,74 @@
+[
+  {
+    "apiKey": "${OPENAI_KEY}",
+    "placeholder": true
+  },
+  {
+    "apiKey": "${openai_key}",
+    "placeholder": true
+  },
+  {
+    "apiKey": "${openai.api-key}",
+    "placeholder": true
+  },
+  {
+    "apiKey": "${_API_KEY}",
+    "placeholder": true
+  },
+  {
+    "apiKey": "sk-secret-value",
+    "placeholder": false
+  },
+  {
+    "apiKey": "${OPENAI_KEY:sk-secret-value}",
+    "placeholder": false
+  },
+  {
+    "apiKey": "${OPENAI_KEY:}",
+    "placeholder": false
+  },
+  {
+    "apiKey": "prefix-${OPENAI_KEY}",
+    "placeholder": false
+  },
+  {
+    "apiKey": "${OPENAI_KEY}-suffix",
+    "placeholder": false
+  },
+  {
+    "apiKey": "${OPENAI_KEY}${OTHER_KEY}",
+    "placeholder": false
+  },
+  {
+    "apiKey": "${}",
+    "placeholder": false
+  },
+  {
+    "apiKey": "${ OPENAI_KEY}",
+    "placeholder": false
+  },
+  {
+    "apiKey": "${OPENAI_KEY }",
+    "placeholder": false
+  },
+  {
+    "apiKey": "${OPENAI_KEY}\n",
+    "placeholder": false
+  },
+  {
+    "apiKey": " ${OPENAI_KEY}",
+    "placeholder": false
+  },
+  {
+    "apiKey": "${OPENAI_KEY",
+    "placeholder": false
+  },
+  {
+    "apiKey": "",
+    "placeholder": false
+  },
+  {
+    "apiKey": null,
+    "placeholder": false
+  }
+]

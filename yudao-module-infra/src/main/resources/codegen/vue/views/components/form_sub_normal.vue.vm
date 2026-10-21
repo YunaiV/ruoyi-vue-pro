@@ -244,9 +244,13 @@
           Editor,
         #end
     },
-    props:[
-      '${subJoinColumn.javaField}'
-    ],// ${subJoinColumn.columnComment}（主表的关联字段）
+    props: {
+      // ${subJoinColumn.columnComment}（主表的关联字段）
+      ${subJoinColumn.javaField}: {
+        type: #if ($subJoinColumn.javaType == "String")String#else Number#end,
+        default: undefined
+      }
+    },
     data() {
       return {
         // 表单的加载中：1）修改时的数据加载；2）提交的按钮禁用

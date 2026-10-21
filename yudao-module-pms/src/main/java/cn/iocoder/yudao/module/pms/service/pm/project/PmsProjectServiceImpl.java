@@ -118,6 +118,11 @@ public class PmsProjectServiceImpl implements PmsProjectService {
     }
 
     @Override
+    public PmsProjectDO getProjectForUpdate(Long id) {
+        return projectMapper.selectOneForUpdate(PmsProjectDO::getId, id);
+    }
+
+    @Override
     public PmsProjectDO getProjectAndUpdateVisitTime(Long id, Long userId) {
         // 1. 校验当前用户可以查看项目
         PmsProjectDO project = projectMemberService.validateProjectReadable(id, userId);
@@ -307,8 +312,11 @@ public class PmsProjectServiceImpl implements PmsProjectService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteProject(Long id, Long userId) {
-        // 1.1 校验项目存在
-        PmsProjectDO project = validateProjectExists(id);
+        // 1.1 锁定项目并校验存在，与个人排序保持一致的加锁顺序（https://t.zsxq.com/V48Hl）
+        PmsProjectDO project = getProjectForUpdate(id);
+        if (project == null) {
+            throw exception(PROJECT_NOT_EXISTS);
+        }
         // 1.2 校验项目位于回收站
         if (ObjectUtil.notEqual(PmsProjectStatusEnum.RECYCLED.getStatus(), project.getStatus())) {
             throw exception(PROJECT_STATUS_INVALID);

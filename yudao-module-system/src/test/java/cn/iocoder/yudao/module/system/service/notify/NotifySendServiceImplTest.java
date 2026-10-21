@@ -17,8 +17,8 @@ import java.util.Map;
 import static cn.hutool.core.util.RandomUtil.randomEle;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
-import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.NOTICE_NOT_FOUND;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.NOTIFY_SEND_TEMPLATE_PARAM_MISS;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.NOTIFY_TEMPLATE_NOT_EXISTS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.eq;
@@ -150,14 +150,32 @@ class NotifySendServiceImplTest extends BaseMockitoUnitTest {
     }
 
     @Test
-    public void testCheckMailTemplateValid_notExists() {
+    public void testSendSingleNotifyToAdmin_templateNotExists() {
+        // 准备参数
+        Long userId = randomLongId();
+        String templateCode = randomString();
+        Map<String, Object> templateParams = MapUtil.<String, Object>builder().put("code", "1234")
+                .put("op", "login").build();
+        // mock NotifyTemplateService 的方法
+        when(notifyTemplateService.getNotifyTemplateByCodeFromCache(eq(templateCode))).thenReturn(null);
+
+        // 调用，并断言异常
+        assertServiceException(() -> notifySendService.sendSingleNotifyToAdmin(userId, templateCode, templateParams),
+                NOTIFY_TEMPLATE_NOT_EXISTS);
+        // 断言
+        verify(notifyTemplateService, never()).formatNotifyTemplateContent(anyString(), anyMap());
+        verify(notifyMessageService, never()).createNotifyMessage(anyLong(), anyInt(), any(), anyString(), anyMap());
+    }
+
+    @Test
+    public void testValidateNotifyTemplate_notExists() {
         // 准备参数
         String templateCode = randomString();
         // mock 方法
 
         // 调用，并断言异常
         assertServiceException(() -> notifySendService.validateNotifyTemplate(templateCode),
-                NOTICE_NOT_FOUND);
+                NOTIFY_TEMPLATE_NOT_EXISTS);
     }
 
     @Test

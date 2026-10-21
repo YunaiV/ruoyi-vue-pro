@@ -14,10 +14,9 @@
 
 #if ($subTable.subJoinMany) ## 一对多
 import { Plus } from "@vben/icons";
-import { ElButton, ElTabs, ElTabPane, ElCheckbox, ElInput, ElSelect, ElOption, ElRadioGroup, ElCheckboxGroup, ElDatePicker } from 'element-plus';
+import { ElButton, ElCheckbox, ElCheckboxGroup, ElDatePicker, ElInput, ElMessage, ElOption, ElRadio, ElRadioGroup, ElSelect, ElTabPane, ElTabs } from 'element-plus';
 import { ImageUpload, FileUpload } from "#/components/upload";
-import type { OnActionClickParams } from '#/adapter/vxe-table';
-import { useVbenVxeGrid } from '#/adapter/vxe-table';
+import { ACTION_ICON, TableAction, useVbenVxeGrid } from '#/adapter/vxe-table';
 import { use${subSimpleClassName}GridEditColumns } from '../data';
 import { get${subSimpleClassName}ListBy${SubJoinColumnName} } from '#/api/${table.moduleName}/${table.businessName}';
 #else
@@ -31,22 +30,9 @@ const props = defineProps<{
 }>()
 
 #if ($subTable.subJoinMany) ## 一对多
-/** 表格操作按钮的回调函数 */
-function onActionClick({
- code,
- row,
-}: OnActionClickParams<${apiName}.${subSimpleClassName}>) {
-  switch (code) {
-    case 'delete': {
-      onDelete(row);
-      break;
-    }
-  }
-}
-
 const [Grid, gridApi] = useVbenVxeGrid({
 gridOptions: {
-  columns: use${subSimpleClassName}GridEditColumns(onActionClick),
+  columns: use${subSimpleClassName}GridEditColumns(),
   border: true,
   showOverflow: true,
   autoResize: true,
@@ -65,7 +51,7 @@ gridOptions: {
 
 /** 添加${subTable.classComment} */
 const onAdd = async () => {
-  await gridApi.grid.insertAt({} as ${simpleClassName}Api.${subSimpleClassName}, -1);
+  await gridApi.grid.insertAt({} as ${apiName}.${subSimpleClassName}, -1);
 }
 
 /** 删除${subTable.classComment} */
@@ -73,26 +59,54 @@ const onDelete =  async (row: ${apiName}.${subSimpleClassName}) => {
   await gridApi.grid.remove(row);
 }
 
-/** 提供获取表格数据的方法供父组件调用 */
-defineExpose({
-  getData: (): ${apiName}.${subSimpleClassName}[] => {
-    const data = gridApi.grid.getData() as ${apiName}.${subSimpleClassName}[];
-    const removeRecords = gridApi.grid.getRemoveRecords() as ${apiName}.${subSimpleClassName}[];
-    const insertRecords = gridApi.grid.getInsertRecords() as ${apiName}.${subSimpleClassName}[];
-    return data
-        .filter((row) => !removeRecords.some((removed) => removed.id === row.id))
-        .concat(insertRecords.map((row: any) => ({ ...row, id: undefined })));
-  },
-});
+/** 获取当前子表数据，新增行不提交表格生成的临时编号 */
+function getData(): ${apiName}.${subSimpleClassName}[] {
+  const { fullData } = gridApi.grid.getTableData();
+  const inserted = new Set(gridApi.grid.getInsertRecords());
+  return fullData.map((row) =>
+    inserted.has(row) ? { ...row, id: undefined } : { ...row },
+  );
+}
+
+#set ($hasRequiredColumn = false)
+#foreach ($column in $subColumns)
+#if (($column.createOperation || $column.updateOperation) && !$column.nullable && !$column.primaryKey && $column.id != $subJoinColumn.id)
+#set ($hasRequiredColumn = true)
+#end
+#end
+/** 校验子表必填字段 */
+function validate(): boolean {
+#if ($hasRequiredColumn)
+  for (const [index, row] of getData().entries()) {
+#foreach ($column in $subColumns)
+#if (($column.createOperation || $column.updateOperation) && !$column.nullable && !$column.primaryKey && $column.id != $subJoinColumn.id)
+    if (
+      row.${column.javaField} === null ||
+      row.${column.javaField} === undefined ||
+      (typeof row.${column.javaField} === 'string' && String(row.${column.javaField}).trim() === '') ||
+      (Array.isArray(row.${column.javaField}) && row.${column.javaField}.length === 0)
+    ) {
+      ElMessage.error(`第 #[[${index + 1}]]# 行：${column.columnComment}不能为空`);
+      return false;
+    }
+#end
+#end
+  }
+#end
+  return true;
+}
+
+defineExpose({ getData, validate });
 
 /** 监听主表的关联字段的变化，加载对应的子表数据 */
 watch(
     () => props.${subJoinColumn.javaField},
     async (val) => {
+      await nextTick();
       if (!val) {
+        await gridApi.grid.loadData([]);
         return;
       }
-      await nextTick();
       await gridApi.grid.loadData(await get${subSimpleClassName}ListBy${SubJoinColumnName}(props.${subJoinColumn.javaField}!));
     },
     { immediate: true },
@@ -124,10 +138,11 @@ defineExpose({
 watch(
     () => props.${subJoinColumn.javaField},
     async (val) => {
+      await nextTick();
+      await formApi.resetForm();
       if (!val) {
         return;
       }
-      await nextTick();
       await formApi.setValues(await get${subSimpleClassName}By${SubJoinColumnName}(props.${subJoinColumn.javaField}!));
     },
     { immediate: true },
@@ -144,7 +159,7 @@ watch(
               #if ( $column.id == $subJoinColumn.id) ## 特殊：忽略主子表的 join 字段，不用填写
               #elseif ($column.htmlType == "input" && !$column.primaryKey)## 忽略主键，不用在表单里
                 <template #${javaField}="{ row }">
-                  <el-input v-model="row.${javaField}" />
+                  <ElInput v-model="row.${javaField}" />
                 </template>
               #elseif($column.htmlType == "imageUpload")## 图片上传
                 <template #${javaField}="{ row }">
@@ -156,29 +171,29 @@ watch(
                 </template>
               #elseif($column.htmlType == "select")## 下拉框
                 <template #${javaField}="{ row, column }">
-                  <el-select v-model="row.${javaField}" class="w-full">
-                    <el-option v-for="option in column.params.options" :key="option.value" :value="option.value" :label="option.label" />
-                  </el-select>
+                  <ElSelect v-model="row.${javaField}" class="w-full">
+                    <ElOption v-for="option in column.params.options" :key="option.value" :value="option.value" :label="option.label" />
+                  </ElSelect>
                 </template>
               #elseif($column.htmlType == "checkbox")## 多选框
                 <template #${javaField}="{ row, column }">
-                  <el-checkbox-group v-model="row.${javaField}">
-                    <el-checkbox v-for="option in column.params.options" :key="option.value" :label="option.value">
+                  <ElCheckboxGroup v-model="row.${javaField}">
+                    <ElCheckbox v-for="option in column.params.options" :key="option.value" :value="option.value">
                       {{ option.label }}
-                    </el-checkbox>
-                  </el-checkbox-group>
+                    </ElCheckbox>
+                  </ElCheckboxGroup>
                 </template>
               #elseif($column.htmlType == "radio")## 单选框
                 <template #${javaField}="{ row, column }">
-                  <el-radio-group v-model="row.${javaField}">
-                    <el-radio v-for="option in column.params.options" :key="option.value" :label="option.value">
+                  <ElRadioGroup v-model="row.${javaField}">
+                    <ElRadio v-for="option in column.params.options" :key="option.value" :value="option.value">
                       {{ option.label }}
-                    </el-radio>
-                  </el-radio-group>
+                    </ElRadio>
+                  </ElRadioGroup>
                 </template>
               #elseif($column.htmlType == "datetime")## 时间框
                 <template #${javaField}="{ row }">
-                  <el-date-picker
+                  <ElDatePicker
                       v-model="row.${javaField}"
                       type="datetime"
                       value-format="x"
@@ -187,16 +202,29 @@ watch(
                 </template>
               #elseif($column.htmlType == "textarea" || $column.htmlType == "editor")## 文本框
                 <template #${javaField}="{ row }">
-                  <el-input v-model="row.${javaField}" type="textarea" />
+                  <ElInput v-model="row.${javaField}" type="textarea" />
                 </template>
               #end
           #end
       #end
+    <template #actions="{ row }">
+      <TableAction
+        :actions="[
+          {
+            label: $t('common.delete'),
+            type: 'danger', link: true,
+            icon: ACTION_ICON.DELETE,
+            auth: ['${permissionPrefix}:delete'],
+            onClick: onDelete.bind(null, row),
+          },
+        ]"
+      />
+    </template>
   </Grid>
   <div class="flex justify-center -mt-4">
-    <el-button :icon="Plus" type="primary" plain @click="onAdd" v-access:code="['${subTable.moduleName}:${simpleClassName_strikeCase}:create']">
+    <ElButton :icon="Plus" type="primary" plain @click="onAdd" v-access:code="['${subTable.moduleName}:${simpleClassName_strikeCase}:create']">
       {{ $t('ui.actionTitle.create', ['${subTable.classComment}']) }}
-    </el-button>
+    </ElButton>
   </div>
 #else
   <Form class="mx-4" />

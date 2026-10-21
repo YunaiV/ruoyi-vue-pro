@@ -7,7 +7,7 @@
     <update id="createSTable">
         CREATE STABLE IF NOT EXISTS device_message (
             ts TIMESTAMP,
-            id NCHAR(50),
+            id VARCHAR(50) COMPOSITE KEY,
             report_time TIMESTAMP,
             tenant_id BIGINT,
             server_id NCHAR(50),
@@ -63,7 +63,7 @@
                 AND identifier = #{reqVO.identifier}
             </if>
         </where>
-        ORDER BY ts DESC
+        ORDER BY ts DESC, id DESC
     </select>
 
     <select id="selectListByRequestIdsAndReply" resultType="cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceMessageDO">
@@ -76,7 +76,7 @@
         <foreach collection="requestIds" item="requestId" open="(" close=")" separator=",">
             #{requestId}
         </foreach>
-        ORDER BY ts DESC
+        ORDER BY ts DESC, id DESC
     </select>
 
     <select id="selectCountByCreateTime" resultType="Long">

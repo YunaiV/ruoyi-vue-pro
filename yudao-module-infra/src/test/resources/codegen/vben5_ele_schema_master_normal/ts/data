@@ -42,7 +42,7 @@ export function useFormSchema(): VbenFormSchema[] {
       rules: 'required',
       component: 'DatePicker',
       componentProps: {
-        showTime: true,
+        type: 'datetime',
         format: 'YYYY-MM-DD HH:mm:ss',
         valueFormat: 'x',
         class: '!w-full',
@@ -65,8 +65,7 @@ export function useFormSchema(): VbenFormSchema[] {
       component: 'RadioGroup',
       componentProps: {
         options: getDictOptions(DICT_TYPE.INFRA_BOOLEAN_STRING, 'boolean'),
-        buttonStyle: 'solid',
-        optionType: 'button',
+        isButton: true,
       },
     },
     {
@@ -269,7 +268,7 @@ export function useGridColumns(): VxeTableGridOptions<InfraStudentApi.Student>['
                             minWidth: 120,
                             slots: { default: 'sex' },
                                     params: {
-                                        options: getDictOptions(DICT_TYPE.SYSTEM_USER_SEX, 'boolean'),
+                                        options: getDictOptions(DICT_TYPE.SYSTEM_USER_SEX, 'number'),
                                     },
                         },
                          {
@@ -345,7 +344,7 @@ export function useGridColumns(): VxeTableGridOptions<InfraStudentApi.Student>['
                                     rules: 'required',
                                     component: 'DatePicker',
                                     componentProps: {
-                                        showTime: true,
+                                        type: 'datetime',
                                         format: 'YYYY-MM-DD HH:mm:ss',
                                         valueFormat: 'x',
                                         class: '!w-full',
@@ -368,8 +367,7 @@ export function useGridColumns(): VxeTableGridOptions<InfraStudentApi.Student>['
                                     component: 'RadioGroup',
                                     componentProps: {
                                             options: getDictOptions(DICT_TYPE.INFRA_BOOLEAN_STRING, 'boolean'),
-                                        buttonStyle: 'solid',
-                                        optionType: 'button',
+                                        isButton: true,
                                     },
                             },
                             {

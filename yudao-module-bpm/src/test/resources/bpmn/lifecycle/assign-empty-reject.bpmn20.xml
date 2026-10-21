@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="http://www.yudao.iocoder.cn/bpm">
+    <!-- 人工审批 + 审批人为空时自动拒绝 -->
+    <process id="assignEmptyReject" name="审批人为空自动拒绝" isExecutable="true">
+        <startEvent id="start"/>
+        <sequenceFlow id="flow-start" sourceRef="start" targetRef="task"/>
+        <userTask id="task" name="审批">
+            <extensionElements>
+                <flowable:candidateStrategy>30</flowable:candidateStrategy>
+                <flowable:approveType>1</flowable:approveType>
+                <flowable:assignEmptyHandlerType>2</flowable:assignEmptyHandlerType>
+            </extensionElements>
+        </userTask>
+        <sequenceFlow id="flow-task" sourceRef="task" targetRef="end"/>
+        <endEvent id="end"/>
+    </process>
+</definitions>

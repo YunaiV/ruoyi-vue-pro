@@ -33,6 +33,7 @@ import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServic
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static cn.iocoder.yudao.module.pms.enums.ErrorCodeConstants.PROJECT_ADMIN_REQUIRED;
+import static cn.iocoder.yudao.module.pms.enums.ErrorCodeConstants.PROJECT_NOT_EXISTS;
 import static cn.iocoder.yudao.module.pms.enums.ErrorCodeConstants.PROJECT_OWNER_REQUIRED;
 import static cn.iocoder.yudao.module.pms.enums.ErrorCodeConstants.PROJECT_STATUS_INVALID;
 import static java.util.Arrays.asList;
@@ -234,6 +235,35 @@ public class PmsProjectServiceImplTest extends BaseDbUnitTest {
         assertEquals(PmsProjectStatusEnum.ACTIVE.getStatus(), restoredProject.getStatus());
         assertNull(restoredProject.getArchiveTime());
         assertNull(restoredProject.getRecycleTime());
+    }
+
+    @Test
+    public void testDeleteProject_success() {
+        // mock 数据
+        Long userId = randomLongId();
+        PmsProjectDO project = randomProjectDO(PmsProjectStatusEnum.RECYCLED.getStatus());
+        projectMapper.insert(project);
+        when(projectMemberService.hasProjectOwnerPermission(project.getId(), userId)).thenReturn(true);
+
+        // 调用
+        projectService.deleteProject(project.getId(), userId);
+
+        // 断言
+        assertNull(projectMapper.selectById(project.getId()));
+        verify(workItemWorkLogService).deleteWorkItemWorkLogListByProjectId(project.getId());
+        verify(workItemService).deleteWorkItemListByProjectId(project.getId());
+        verify(iterationService).deleteIterationListByProjectId(project.getId());
+        verify(projectMemberService).deleteProjectMemberListByProjectId(project.getId());
+    }
+
+    @Test
+    public void testDeleteProject_projectNotExists() {
+        // 准备参数
+        Long projectId = randomLongId();
+        Long userId = randomLongId();
+
+        // 调用，并断言异常
+        assertServiceException(() -> projectService.deleteProject(projectId, userId), PROJECT_NOT_EXISTS);
     }
 
     @Test

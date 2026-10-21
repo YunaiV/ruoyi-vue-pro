@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { StudentApi } from '#/api/infra/student';
+import type { StudentApi } from '#/api/infra/demo';
 import type { FormRules } from 'element-plus';
 
 import { useVbenModal } from '@vben/common-ui';
@@ -11,7 +11,7 @@ import { ElMessage, ElTabs, ElTabPane, ElForm, ElFormItem, ElInput, ElSelect, El
 
 import { computed, ref, reactive } from 'vue';
 import { $t } from '#/locales';
-import { getStudent, createStudent, updateStudent } from '#/api/infra/student';
+import { getStudent, createStudent, updateStudent } from '#/api/infra/demo';
 
 const emit = defineEmits(['success']);
 
@@ -102,56 +102,56 @@ const [Modal, modalApi] = useVbenModal({
 
 <template>
   <Modal :title="getTitle">
-    <el-form
+    <ElForm
       ref="formRef"
       :model="formData"
       :rules="rules"
       label-width="120px"
       label-position="right"
     >
-            <el-form-item label="名字" prop="name">
-              <el-input v-model="formData.name" placeholder="请输入名字" />
-            </el-form-item>
-            <el-form-item label="简介" prop="description">
-              <el-input v-model="formData.description" type="textarea" placeholder="请输入简介" />
-            </el-form-item>
-            <el-form-item label="出生日期" prop="birthday">
-              <el-date-picker
+            <ElFormItem label="名字" prop="name">
+              <ElInput v-model="formData.name" placeholder="请输入名字" />
+            </ElFormItem>
+            <ElFormItem label="简介" prop="description">
+              <ElInput v-model="formData.description" type="textarea" placeholder="请输入简介" />
+            </ElFormItem>
+            <ElFormItem label="出生日期" prop="birthday">
+              <ElDatePicker
                       v-model="formData.birthday"
                       value-format="x"
                       placeholder="选择出生日期"
               />
-            </el-form-item>
-            <el-form-item label="性别" prop="sex">
-              <el-select v-model="formData.sex" placeholder="请选择性别">
-                  <el-option
+            </ElFormItem>
+            <ElFormItem label="性别" prop="sex">
+              <ElSelect v-model="formData.sex" placeholder="请选择性别">
+                  <ElOption
                           v-for="dict in getDictOptions(DICT_TYPE.SYSTEM_USER_SEX, 'number')"
                           :key="dict.value"
                           :value="dict.value"
                           :label="dict.label"
                   />
-              </el-select>
-            </el-form-item>
-            <el-form-item label="是否有效" prop="enabled">
-              <el-radio-group v-model="formData.enabled">
-                  <el-radio
+              </ElSelect>
+            </ElFormItem>
+            <ElFormItem label="是否有效" prop="enabled">
+              <ElRadioGroup v-model="formData.enabled">
+                  <ElRadio
                           v-for="dict in getDictOptions(DICT_TYPE.INFRA_BOOLEAN_STRING, 'boolean')"
                           :key="dict.value"
-                          :label="dict.value"
+                          :value="dict.value"
                   >
                     {{ dict.label }}
-                  </el-radio>
-              </el-radio-group>
-            </el-form-item>
-            <el-form-item label="头像" prop="avatar">
+                  </ElRadio>
+              </ElRadioGroup>
+            </ElFormItem>
+            <ElFormItem label="头像" prop="avatar">
               <ImageUpload v-model="formData.avatar" />
-            </el-form-item>
-            <el-form-item label="附件" prop="video">
+            </ElFormItem>
+            <ElFormItem label="附件" prop="video">
               <FileUpload v-model="formData.video" />
-            </el-form-item>
-            <el-form-item label="备注" prop="memo">
+            </ElFormItem>
+            <ElFormItem label="备注" prop="memo">
               <RichTextarea v-model="formData.memo" height="500px" />
-            </el-form-item>
-    </el-form>
+            </ElFormItem>
+    </ElForm>
       </Modal>
 </template>

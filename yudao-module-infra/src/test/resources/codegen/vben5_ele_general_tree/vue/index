@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { CategoryApi } from '#/api/infra/category';
+import type { CategoryApi } from '#/api/infra/demo';
 
 import { ref, h, reactive, onMounted, nextTick } from 'vue';
 
@@ -16,14 +16,14 @@ import { VxeColumn, VxeTable } from '#/adapter/vxe-table';
 
 import { $t } from '#/locales';
 import { handleTree,isEmpty } from '@vben/utils'
-import { getCategoryList, deleteCategory, exportCategory } from '#/api/infra/category';
+import { getCategoryList, deleteCategory, exportCategory } from '#/api/infra/demo';
 
 
 const loading = ref(true) // 列表的加载中
 const list = ref<any[]>([]) // 树列表的数据
 
 const queryParams = reactive({
-                name: undefined,
+        name: undefined,
 })
 const queryFormRef = ref() // 搜索的表单
 const exportLoading = ref(false) // 导出的加载中
@@ -89,7 +89,8 @@ async function handleDelete(row: CategoryApi.Category) {
 async function handleExport() {
 try {
   exportLoading.value = true;
-  const data = await exportCategory(queryParams);
+    const params = cloneDeep(queryParams) as any;
+  const data = await exportCategory(params);
   downloadFileFromBlobPart({ fileName: '分类.xls', source: data });
 }finally {
   exportLoading.value = false;
@@ -117,40 +118,40 @@ onMounted(() => {
 
     <ContentWrap v-if="!hiddenSearchBar">
       <!-- 搜索工作栏 -->
-      <el-form
+      <ElForm
           :model="queryParams"
           ref="queryFormRef"
           inline
       >
-                    <el-form-item label="名字">
-                      <el-input
+                    <ElFormItem label="名字">
+                      <ElInput
                           v-model="queryParams.name"
                           placeholder="请输入名字"
                           clearable
                           @keyup.enter="handleQuery"
                            class="!w-[240px]"
                       />
-                    </el-form-item>
-        <el-form-item>
-          <el-button class="ml-2" @click="resetQuery"> 重置 </el-button>
-          <el-button class="ml-2" @click="handleQuery" type="primary">
+                    </ElFormItem>
+        <ElFormItem>
+          <ElButton class="ml-2" @click="resetQuery"> 重置 </ElButton>
+          <ElButton class="ml-2" @click="handleQuery" type="primary">
             搜索
-          </el-button>
-        </el-form-item>
-      </el-form>
+          </ElButton>
+        </ElFormItem>
+      </ElForm>
     </ContentWrap>
 
     <!-- 列表 -->
     <ContentWrap title="分类">
       <template #extra>
-        <TableToolbar
+        <VbenVxeTableToolbar
             ref="tableToolbarRef"
             v-model:hidden-search="hiddenSearchBar"
         >
-          <el-button @click="handleExpand" class="mr-2">
+          <ElButton @click="handleExpand" class="mr-2">
             {{ isExpanded ? '收缩' : '展开' }}
-          </el-button>
-          <el-button
+          </ElButton>
+          <ElButton
               class="ml-2"
               :icon="h(Plus)"
               type="primary"
@@ -158,8 +159,8 @@ onMounted(() => {
               v-access:code="['infra:category:create']"
           >
             {{ $t('ui.actionTitle.create', ['分类']) }}
-          </el-button>
-          <el-button
+          </ElButton>
+          <ElButton
               :icon="h(Download)"
               type="primary"
               class="ml-2"
@@ -168,10 +169,10 @@ onMounted(() => {
               v-access:code="['infra:category:export']"
           >
             {{ $t('ui.actionTitle.export') }}
-          </el-button>
-        </TableToolbar>
+          </ElButton>
+        </VbenVxeTableToolbar>
       </template>
-      <vxe-table
+      <VxeTable
           ref="tableRef"
           :data="list"
           :tree-config="{
@@ -184,12 +185,12 @@ onMounted(() => {
           show-overflow
           :loading="loading"
       >
-                              <vxe-column field="id" title="编号" align="center" />
-                    <vxe-column field="name" title="名字" align="center"  tree-node/>
-                    <vxe-column field="parentId" title="父编号" align="center" />
-        <vxe-column field="operation" title="操作" align="center">
+                              <VxeColumn field="id" title="编号" align="center" />
+                    <VxeColumn field="name" title="名字" align="center"  tree-node/>
+                    <VxeColumn field="parentId" title="父编号" align="center" />
+        <VxeColumn field="operation" title="操作" align="center">
           <template #default="{row}">
-  <el-button
+  <ElButton
       size="small"
       type="primary"
       link
@@ -197,8 +198,8 @@ onMounted(() => {
       v-access:code="['infra:category:create']"
   >
     新增下级
-  </el-button>
-            <el-button
+  </ElButton>
+            <ElButton
                 size="small"
                 type="primary"
                 link
@@ -206,8 +207,8 @@ onMounted(() => {
                 v-access:code="['infra:category:update']"
             >
               {{ $t('ui.actionTitle.edit') }}
-            </el-button>
-            <el-button
+            </ElButton>
+            <ElButton
                 size="small"
                 type="danger"
                 link
@@ -217,10 +218,10 @@ onMounted(() => {
                 v-access:code="['infra:category:delete']"
             >
               {{ $t('ui.actionTitle.delete') }}
-            </el-button>
+            </ElButton>
           </template>
-        </vxe-column>
-      </vxe-table>
+        </VxeColumn>
+      </VxeTable>
     </ContentWrap>
   </Page>
 </template>

@@ -58,6 +58,14 @@ public interface PayClient<Config> {
      */
     PayOrderRespDTO getOrder(String outTradeNo);
 
+    /**
+     * 关闭支付订单
+     *
+     * @param outTradeNo 外部订单号
+     * @return 关闭结果
+     */
+    PayOrderRespDTO closeOrder(String outTradeNo);
+
     // ============ 退款相关 ==========
 
     /**

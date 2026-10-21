@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="http://www.yudao.iocoder.cn/bpm">
+    <!-- 审批人与发起人相同：转交部门负责人 -->
+    <process id="startUserTransferDeptLeader" name="发起人相同转交部门负责人" isExecutable="true">
+        <startEvent id="start"/>
+        <sequenceFlow id="flow-start" sourceRef="start" targetRef="task"/>
+        <userTask id="task" name="审批">
+            <extensionElements>
+                <flowable:candidateStrategy>30</flowable:candidateStrategy>
+                <flowable:assignStartUserHandlerType>3</flowable:assignStartUserHandlerType>
+            </extensionElements>
+        </userTask>
+        <sequenceFlow id="flow-task" sourceRef="task" targetRef="end"/>
+        <endEvent id="end"/>
+    </process>
+</definitions>

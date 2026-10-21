@@ -64,7 +64,7 @@
     </el-table-column>
   </el-table>
     <!-- 分页组件 -->
-    <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
+    <Pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
                 @pagination="getList"/>
   <!-- 对话框(添加 / 修改) -->
   <StudentContactForm ref="formRef" @success="getList" />
@@ -79,9 +79,13 @@
     components: {
        StudentContactForm
     },
-    props:[
-      'studentId'
-    ],// 学生编号（主表的关联字段）
+    props: {
+      // 学生编号（主表的关联字段）
+      studentId: {
+        type:  Number,
+        default: undefined
+      }
+    },
     data() {
       return {
         // 遮罩层

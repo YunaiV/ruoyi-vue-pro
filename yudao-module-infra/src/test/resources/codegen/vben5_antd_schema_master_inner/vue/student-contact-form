@@ -6,7 +6,7 @@
   import { $t } from '#/locales';
 
  import { Plus } from "@vben/icons";
-import { Button, Tabs, Checkbox, Input, Textarea, Select,RadioGroup,CheckboxGroup, DatePicker } from 'ant-design-vue';
+import { Button, Checkbox, CheckboxGroup, DatePicker, Input, message, RadioGroup, Select, Tabs, Textarea } from 'ant-design-vue';
 import { ImageUpload, FileUpload } from "#/components/upload";
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { useStudentContactGridEditColumns } from '../data';
@@ -45,26 +45,96 @@ const handleDelete =  async (row: InfraStudentApi.StudentContact) => {
   await gridApi.grid.remove(row);
 }
 
-/** 提供获取表格数据的方法供父组件调用 */
-defineExpose({
-  getData: (): InfraStudentApi.StudentContact[] => {
-    const data = gridApi.grid.getData() as InfraStudentApi.StudentContact[];
-    const removeRecords = gridApi.grid.getRemoveRecords() as InfraStudentApi.StudentContact[];
-    const insertRecords = gridApi.grid.getInsertRecords() as InfraStudentApi.StudentContact[];
-    return data
-        .filter((row) => !removeRecords.some((removed) => removed.id === row.id))
-        .concat(insertRecords.map((row: any) => ({ ...row, id: undefined })));
-  },
-});
+/** 获取当前子表数据，新增行不提交表格生成的临时编号 */
+function getData(): InfraStudentApi.StudentContact[] {
+  const { fullData } = gridApi.grid.getTableData();
+  const inserted = new Set(gridApi.grid.getInsertRecords());
+  return fullData.map((row) =>
+    inserted.has(row) ? { ...row, id: undefined } : { ...row },
+  );
+}
+
+/** 校验子表必填字段 */
+function validate(): boolean {
+  for (const [index, row] of getData().entries()) {
+    if (
+      row.name === null ||
+      row.name === undefined ||
+      (typeof row.name === 'string' && String(row.name).trim() === '') ||
+      (Array.isArray(row.name) && row.name.length === 0)
+    ) {
+      message.error(`第 ${index + 1} 行：名字不能为空`);
+      return false;
+    }
+    if (
+      row.description === null ||
+      row.description === undefined ||
+      (typeof row.description === 'string' && String(row.description).trim() === '') ||
+      (Array.isArray(row.description) && row.description.length === 0)
+    ) {
+      message.error(`第 ${index + 1} 行：简介不能为空`);
+      return false;
+    }
+    if (
+      row.birthday === null ||
+      row.birthday === undefined ||
+      (typeof row.birthday === 'string' && String(row.birthday).trim() === '') ||
+      (Array.isArray(row.birthday) && row.birthday.length === 0)
+    ) {
+      message.error(`第 ${index + 1} 行：出生日期不能为空`);
+      return false;
+    }
+    if (
+      row.sex === null ||
+      row.sex === undefined ||
+      (typeof row.sex === 'string' && String(row.sex).trim() === '') ||
+      (Array.isArray(row.sex) && row.sex.length === 0)
+    ) {
+      message.error(`第 ${index + 1} 行：性别不能为空`);
+      return false;
+    }
+    if (
+      row.enabled === null ||
+      row.enabled === undefined ||
+      (typeof row.enabled === 'string' && String(row.enabled).trim() === '') ||
+      (Array.isArray(row.enabled) && row.enabled.length === 0)
+    ) {
+      message.error(`第 ${index + 1} 行：是否有效不能为空`);
+      return false;
+    }
+    if (
+      row.avatar === null ||
+      row.avatar === undefined ||
+      (typeof row.avatar === 'string' && String(row.avatar).trim() === '') ||
+      (Array.isArray(row.avatar) && row.avatar.length === 0)
+    ) {
+      message.error(`第 ${index + 1} 行：头像不能为空`);
+      return false;
+    }
+    if (
+      row.memo === null ||
+      row.memo === undefined ||
+      (typeof row.memo === 'string' && String(row.memo).trim() === '') ||
+      (Array.isArray(row.memo) && row.memo.length === 0)
+    ) {
+      message.error(`第 ${index + 1} 行：备注不能为空`);
+      return false;
+    }
+  }
+  return true;
+}
+
+defineExpose({ getData, validate });
 
 /** 监听主表的关联字段的变化，加载对应的子表数据 */
 watch(
     () => props.studentId,
     async (val) => {
+      await nextTick();
       if (!val) {
+        await gridApi.grid.loadData([]);
         return;
       }
-      await nextTick();
       await gridApi.grid.loadData(await getStudentContactListByStudentId(props.studentId!));
     },
     { immediate: true },

@@ -78,7 +78,7 @@
   </el-table>
 #if ($table.templateType == 11)
     <!-- 分页组件 -->
-    <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
+    <Pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize"
                 @pagination="getList"/>
   <!-- 对话框(添加 / 修改) -->
   <${subSimpleClassName}Form ref="formRef" @success="getList" />
@@ -98,9 +98,13 @@
        ${subSimpleClassName}Form
     },
 #end
-    props:[
-      '${subJoinColumn.javaField}'
-    ],// ${subJoinColumn.columnComment}（主表的关联字段）
+    props: {
+      // ${subJoinColumn.columnComment}（主表的关联字段）
+      ${subJoinColumn.javaField}: {
+        type: #if ($subJoinColumn.javaType == "String")String#else Number#end,
+        default: undefined
+      }
+    },
     data() {
       return {
         // 遮罩层

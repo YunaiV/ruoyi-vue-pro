@@ -22,6 +22,7 @@ import cn.iocoder.yudao.module.bpm.convert.task.BpmProcessInstanceConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionInfoDO;
 import cn.iocoder.yudao.module.bpm.dal.redis.BpmProcessIdRedisDAO;
 import cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmFieldPermissionEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelFormTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeTypeEnum;
@@ -152,19 +153,82 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                 .list();
     }
 
-    private Map<String, String> getFormFieldsPermission(BpmnModel bpmnModel,
-                                                        String activityId, String taskId) {
-        // 1. 获取流程活动编号。流程活动 Id 为空事，从流程任务中获取流程活动 Id
-        if (StrUtil.isEmpty(activityId) && StrUtil.isNotEmpty(taskId)) {
-            activityId = Optional.ofNullable(taskService.getHistoricTask(taskId))
-                    .map(HistoricTaskInstance::getTaskDefinitionKey).orElse(null);
+    /**
+     * 获得当前登录用户的表单字段权限
+     *
+     * @param loginUserId     当前登录用户编号
+     * @param bpmnModel       流程模型
+     * @param reqVO           审批详情请求
+     * @param processInstance 流程实例；为 null 时，表示流程未发起
+     * @param todoTask        当前登录用户的待办任务
+     * @return 表单字段权限
+     */
+    private Map<String, String> getFormFieldsPermission(Long loginUserId, BpmnModel bpmnModel,
+                                                        BpmApprovalDetailReqVO reqVO,
+                                                        HistoricProcessInstance processInstance,
+                                                        BpmTaskRespVO todoTask) {
+        // 情况一：有待办任务，以待办任务所在节点的表单权限为准，可编辑
+        if (todoTask != null) {
+            return BpmnModelUtils.parseFormFieldsPermission(bpmnModel, todoTask.getTaskDefinitionKey());
         }
-        if (StrUtil.isEmpty(activityId)) {
-            return null;
+        // 情况二：流程未发起，使用传递的流程活动（例如说，发起人节点）的表单权限，可编辑
+        if (processInstance == null) {
+            return BpmnModelUtils.parseFormFieldsPermission(bpmnModel, reqVO.getActivityId());
         }
 
-        // 2. 从 BpmnModel 中解析表单字段权限
-        return BpmnModelUtils.parseFormFieldsPermission(bpmnModel, activityId);
+        // 情况三：流程已发起，但没有待办任务，只能查看
+        // 3.1 优先，使用自己办理过的任务（已办）所在节点
+        String activityId = getMyHistoricTaskDefinitionKey(loginUserId, reqVO.getTaskId(), processInstance.getId());
+        // 3.2 其次，使用传递的流程活动（例如说，抄送节点）
+        if (StrUtil.isEmpty(activityId)) {
+            activityId = reqVO.getActivityId();
+        }
+        // 3.3 最后，如果是流程发起人（例如说，从“我的流程”进入），使用发起人节点
+        if (StrUtil.isEmpty(activityId) && ObjUtil.equal(String.valueOf(loginUserId), processInstance.getStartUserId())) {
+            activityId = START_USER_NODE_ID;
+        }
+        // 没有待办任务，无法提交表单，所以将“可编辑”降级为“只读”，避免误导
+        return downgradeWritePermission(BpmnModelUtils.parseFormFieldsPermission(bpmnModel, activityId));
+    }
+
+    /**
+     * 获得用户在指定流程实例中，办理过的 taskId 任务所在的节点编号
+     *
+     * @param userId            用户编号
+     * @param taskId            任务编号
+     * @param processInstanceId 流程实例编号
+     * @return 节点编号；任务不存在、不属于该流程实例、或者不是该用户办理的，返回 null
+     */
+    private String getMyHistoricTaskDefinitionKey(Long userId, String taskId, String processInstanceId) {
+        if (StrUtil.isEmpty(taskId)) {
+            return null;
+        }
+        HistoricTaskInstance task = taskService.getHistoricTask(taskId);
+        if (task == null || ObjUtil.notEqual(task.getProcessInstanceId(), processInstanceId)) {
+            return null;
+        }
+        // 校验是该用户办理（审批人或拥有人）的任务
+        String userIdStr = String.valueOf(userId);
+        if (ObjUtil.notEqual(userIdStr, task.getAssignee()) && ObjUtil.notEqual(userIdStr, task.getOwner())) {
+            return null;
+        }
+        return task.getTaskDefinitionKey();
+    }
+
+    /**
+     * 将表单字段权限中的“可编辑”降级为“只读”
+     *
+     * @param fieldsPermission 表单字段权限
+     * @return 表单字段权限
+     */
+    private static Map<String, String> downgradeWritePermission(Map<String, String> fieldsPermission) {
+        if (CollUtil.isEmpty(fieldsPermission)) {
+            return fieldsPermission;
+        }
+        String write = String.valueOf(BpmFieldPermissionEnum.WRITE.getPermission());
+        String read = String.valueOf(BpmFieldPermissionEnum.READ.getPermission());
+        fieldsPermission.replaceAll((field, permission) -> write.equals(permission) ? read : permission);
+        return fieldsPermission;
     }
 
     @Override
@@ -198,6 +262,9 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         ProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(
                 historicProcessInstance != null ? historicProcessInstance.getProcessDefinitionId()
                         : reqVO.getProcessDefinitionId());
+        if (processDefinition == null) {
+            throw exception(ErrorCodeConstants.PROCESS_DEFINITION_NOT_EXISTS);
+        }
         BpmProcessDefinitionInfoDO processDefinitionInfo = processDefinitionService
                 .getProcessDefinitionInfo(processDefinition.getId());
         BpmnModel bpmnModel = processDefinitionService.getProcessDefinitionBpmnModel(processDefinition.getId());
@@ -218,7 +285,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
 
         // 2.2 流程已经结束，直接 return，无需预测
         if (BpmProcessInstanceStatusEnum.isProcessEndStatus(processInstanceStatus)) {
-            return buildApprovalDetail(reqVO, bpmnModel, processDefinition, processDefinitionInfo,
+            return buildApprovalDetail(loginUserId, reqVO, bpmnModel, processDefinition, processDefinitionInfo,
                     historicProcessInstance,
                     processInstanceStatus, endActivityNodes, runActivityNodes, null, null);
         }
@@ -243,7 +310,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                 processVariables, activities, needSimulateTaskDefKeysByReturn);
 
         // 4. 拼接最终数据
-        return buildApprovalDetail(reqVO, bpmnModel, processDefinition, processDefinitionInfo, historicProcessInstance,
+        return buildApprovalDetail(loginUserId, reqVO, bpmnModel, processDefinition, processDefinitionInfo, historicProcessInstance,
                 processInstanceStatus, endActivityNodes, runActivityNodes, simulateActivityNodes, todoTask);
     }
 
@@ -368,7 +435,8 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
      * <p>
      * 主要是，拼接审批人的用户信息、部门信息
      */
-    private BpmApprovalDetailRespVO buildApprovalDetail(BpmApprovalDetailReqVO reqVO,
+    private BpmApprovalDetailRespVO buildApprovalDetail(Long loginUserId,
+                                                        BpmApprovalDetailReqVO reqVO,
                                                         BpmnModel bpmnModel,
                                                         ProcessDefinition processDefinition,
                                                         BpmProcessDefinitionInfoDO processDefinitionInfo,
@@ -386,8 +454,8 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         Map<Long, DeptRespDTO> deptMap = deptApi.getDeptMap(convertSet(userMap.values(), AdminUserRespDTO::getDeptId));
 
         // 2. 表单权限
-        String taskId = reqVO.getTaskId() == null && todoTask != null ? todoTask.getId() : reqVO.getTaskId();
-        Map<String, String> formFieldsPermission = getFormFieldsPermission(bpmnModel, reqVO.getActivityId(), taskId);
+        Map<String, String> formFieldsPermission = getFormFieldsPermission(loginUserId, bpmnModel, reqVO,
+                processInstance, todoTask);
 
         // 3. 拼接数据
         return BpmProcessInstanceConvert.INSTANCE.buildApprovalDetail(bpmnModel, processDefinition,
@@ -777,6 +845,10 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
      * @see <a href="https://github.com/YunaiV/ruoyi-vue-pro/pull/1245">相关 issue</a>
      */
     private void validateDynamicFormRequiredFields(ProcessDefinition definition, Map<String, Object> variables) {
+        // 流程定义不存在时，交给 createProcessInstance0 统一校验，避免空指针
+        if (definition == null) {
+            return;
+        }
         BpmProcessDefinitionInfoDO processDefinitionInfo = processDefinitionService
                 .getProcessDefinitionInfo(definition.getId());
         if (processDefinitionInfo == null

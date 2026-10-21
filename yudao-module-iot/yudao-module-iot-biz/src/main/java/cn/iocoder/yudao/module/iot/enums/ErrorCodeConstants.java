@@ -46,6 +46,11 @@ public interface ErrorCodeConstants {
     ErrorCode DEVICE_REGISTER_DISABLED = new ErrorCode(1_050_003_210, "该产品未开启动态注册功能");
     ErrorCode DEVICE_REGISTER_SECRET_INVALID = new ErrorCode(1_050_003_211, "产品密钥验证失败");
     ErrorCode DEVICE_REGISTER_ALREADY_EXISTS = new ErrorCode(1_050_003_212, "设备已存在，不允许重复注册");
+    // 设备属性存储相关错误码 1-050-003-300
+    ErrorCode DEVICE_PROPERTY_HISTORY_TIMES_INVALID = new ErrorCode(1_050_003_300, "设备属性历史的时间范围，必须包含开始、结束两个时间");
+    ErrorCode DEVICE_PROPERTY_FIELD_NAME_INVALID = new ErrorCode(1_050_003_301, "属性标识符({}) 不合法，无法作为存储字段");
+    ErrorCode DEVICE_PROPERTY_FIELD_NAME_RESERVED = new ErrorCode(1_050_003_302, "属性标识符({}) 与存储保留字段({}) 冲突");
+    ErrorCode DEVICE_PROPERTY_FIELD_NAME_DUPLICATE = new ErrorCode(1_050_003_303, "属性标识符({}) 与({}) 的存储字段({}) 重复");
 
     // ========== 产品分类 1-050-004-000 ==========
     ErrorCode PRODUCT_CATEGORY_NOT_EXISTS = new ErrorCode(1_050_004_000, "产品分类不存在");
