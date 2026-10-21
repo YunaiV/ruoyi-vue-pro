@@ -34,6 +34,7 @@
         <kingbase.jdbc.version>9.0.1.jre7</kingbase.jdbc.version>
         <opengauss.jdbc.version>7.0.0-RC3-og</opengauss.jdbc.version>
         <taos.version>3.9.2</taos.version>
+        <iotdb.version>2.0.8</iotdb.version>  <!-- TODO 特殊：暂不升级 2.0.10/2.0.11，其 TablePreparedStatement.execute 不设置 ResultSet，导致 Mapper 的 SELECT 为空、COUNT 为 null -->
         <!-- 消息队列 -->
         <rocketmq-spring.version>2.3.6</rocketmq-spring.version>
         <!-- 服务保障相关 -->
@@ -58,7 +59,7 @@
         <mapstruct.version>1.7.0.Beta2</mapstruct.version>
         <hutool-5.version>5.8.47</hutool-5.version>
         <hutool-6.version>6.0.0-M22</hutool-6.version>
-        <fastexcel.version>1.3.0</fastexcel.version>
+        <fesod.version>2.1.0-incubating</fesod.version>
         <aviator.version>5.4.4</aviator.version>
         <velocity.version>2.4.1</velocity.version>
         <fastjson2.version>2.0.65</fastjson2.version>
@@ -312,6 +313,12 @@
                 <version>${taos.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.apache.iotdb</groupId>
+                <artifactId>iotdb-jdbc</artifactId>
+                <version>${iotdb.version}</version>
+            </dependency>
+
             <!-- Job 定时任务相关 -->
             <dependency>
                 <groupId>cn.iocoder.boot</groupId>
@@ -509,9 +516,9 @@
             </dependency>
 
             <dependency>
-                <groupId>cn.idev.excel</groupId>
-                <artifactId>fastexcel</artifactId>
-                <version>${fastexcel.version}</version>
+                <groupId>org.apache.fesod</groupId>
+                <artifactId>fesod-sheet</artifactId>
+                <version>${fesod.version}</version>
             </dependency>
 
             <dependency>

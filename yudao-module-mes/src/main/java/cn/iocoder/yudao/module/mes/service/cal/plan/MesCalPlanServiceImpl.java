@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -143,6 +144,11 @@ public class MesCalPlanServiceImpl implements MesCalPlanService {
     }
 
     @Override
+    public List<MesCalPlanDO> getPlanListByStatusAndDay(Integer status, LocalDate day) {
+        return planMapper.selectListByStatusAndDay(status, day);
+    }
+
+    @Override
     public MesCalPlanDO validatePlanPrepare(Long planId) {
         MesCalPlanDO plan = validatePlanExists(planId);
         if (ObjUtil.notEqual(MesCalPlanStatusEnum.PREPARE.getStatus(), plan.getStatus())) {
@@ -171,11 +177,13 @@ public class MesCalPlanServiceImpl implements MesCalPlanService {
 
     /**
      * 确认排班计划时，校验班组数量是否与轮班方式匹配
+     *
+     * 排班只会使用轮班方式所需数量的班组，多出的班组不会参与轮休或替班，因此要求数量一致，避免被静默忽略 https://t.zsxq.com/XdcRW
      */
     private void validateTeamCountForConfirm(Long planId, Integer shiftType) {
         Long teamCount = planTeamService.getPlanTeamCountByPlanId(planId);
         MesCalShiftTypeEnum shiftTypeEnum = MesCalShiftTypeEnum.valueOf(shiftType);
-        if (teamCount < shiftTypeEnum.getRequiredTeamCount()) {
+        if (teamCount == null || teamCount != shiftTypeEnum.getRequiredTeamCount()) {
             throw exception(CAL_PLAN_TEAM_COUNT_NOT_MATCH);
         }
     }

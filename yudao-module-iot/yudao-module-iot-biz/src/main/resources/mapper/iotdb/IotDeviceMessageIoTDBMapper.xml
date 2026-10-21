@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.iocoder.yudao.module.iot.dal.iotdb.IotDeviceMessageIoTDBMapper">
+
+    <!--
+        一张全局表 device_message：
+        1. time：Service 写入日志时的毫秒 ts
+        2. device_id：唯一的 TAG。身份为 device_id + time：同一设备、同一毫秒再次写入时，后写的整行替换先写的，即使 id 不同
+        3. id：消息编号，FIELD。不作为 TAG，避免每条消息产生一个 IoTDB 设备，导致元数据随消息量无限增长
+        4. upstream、reply：INT32，-1/0/1
+        5. 其它 FIELD：STRING，n:/v: 编码，均为非 NULL
+    -->
+
+    <select id="selectColumnList" resultType="java.util.Map">
+        DESC device_message
+    </select>
+
+    <update id="createTable">
+        CREATE TABLE IF NOT EXISTS device_message (
+            device_id STRING TAG,
+            id STRING FIELD,
+            upstream INT32 FIELD,
+            reply INT32 FIELD,
+            method STRING FIELD,
+            identifier STRING FIELD,
+            request_id STRING FIELD,
+            server_id STRING FIELD,
+            params STRING FIELD,
+            data STRING FIELD,
+            msg STRING FIELD,
+            report_time STRING FIELD,
+            tenant_id STRING FIELD,
+            code STRING FIELD
+        )
+    </update>
+
+    <insert id="insert">
+        INSERT INTO device_message (
+            time, device_id, id, upstream, reply,
+            method, identifier, request_id, server_id, params,
+            data, msg, report_time, tenant_id, code
+        )
+        VALUES (
+            #{ts}, #{deviceId}, #{id}, #{upstream}, #{reply},
+            #{method}, #{identifier}, #{requestId}, #{serverId}, #{params},
+            #{data}, #{msg}, #{reportTime}, #{tenantId}, #{code}
+        )
+    </insert>
+
+    <sql id="selectColumns">
+        SELECT time AS ts, device_id, id, upstream, reply,
+               method, identifier, request_id, server_id, params,
+               data, msg, report_time, tenant_id, code
+        FROM device_message
+    </sql>
+
+    <sql id="pageWhere">
+        WHERE device_id = #{deviceId}
+        <if test="method != null">
+            AND method = #{method}
+        </if>
+        <if test="upstream != null">
+            AND upstream = #{upstream}
+        </if>
+        <if test="reply != null">
+            AND reply = #{reply}
+        </if>
+        <if test="identifier != null">
+            AND identifier = #{identifier}
+        </if>
+    </sql>
+
+    <select id="selectList" resultType="cn.iocoder.yudao.module.iot.dal.iotdb.IotDeviceMessageIoTDBRow">
+        <include refid="selectColumns" />
+        <include refid="pageWhere" />
+        ORDER BY time DESC
+        <if test="limit != null">
+            LIMIT #{limit} OFFSET #{offset}
+        </if>
+    </select>
+
+    <select id="selectCount" resultType="Long">
+        SELECT count(*)
+        FROM device_message
+        <include refid="pageWhere" />
+    </select>
+
+    <select id="selectListByRequestIdsAndReply" resultType="cn.iocoder.yudao.module.iot.dal.iotdb.IotDeviceMessageIoTDBRow">
+        <include refid="selectColumns" />
+        WHERE device_id = #{deviceId}
+          AND reply = #{reply}
+          AND request_id IN
+        <foreach collection="requestIds" item="requestId" open="(" close=")" separator=",">
+            #{requestId}
+        </foreach>
+        ORDER BY time DESC
+    </select>
+
+    <select id="selectCountByCreateTime" resultType="Long">
+        SELECT count(*)
+        FROM device_message
+        <where>
+            <if test="createTime != null">
+                AND time &gt;= #{createTime}
+            </if>
+        </where>
+    </select>
+
+    <!-- 按 epoch 整点分桶；upstream 为 -1 的消息不计入上行、下行 -->
+    <select id="selectCountGroupByHour" resultType="java.util.Map">
+        SELECT
+            date_bin(1h, time) AS time,
+            count_if(upstream = 1) AS upstream_count,
+            count_if(upstream = 0) AS downstream_count
+        FROM device_message
+        <where>
+            <if test="startTime != null">
+                AND time &gt;= #{startTime}
+            </if>
+            <if test="endTime != null">
+                AND time &lt;= #{endTime}
+            </if>
+        </where>
+        GROUP BY date_bin(1h, time)
+    </select>
+
+</mapper>

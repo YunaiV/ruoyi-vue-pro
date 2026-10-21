@@ -1,6 +1,10 @@
 package cn.iocoder.yudao.module.iot.service.device.property;
 
+import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.property.IotDevicePropertyHistoryListReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.device.vo.property.IotDevicePropertyRespVO;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
@@ -9,10 +13,10 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.model.ThingModelProperty;
 import cn.iocoder.yudao.module.iot.dal.redis.device.DevicePropertyRedisDAO;
-import cn.iocoder.yudao.module.iot.dal.tdengine.IotDevicePropertyMapper;
+import cn.iocoder.yudao.module.iot.dal.storage.IotDevicePropertyDAO;
 import cn.iocoder.yudao.module.iot.enums.thingmodel.IotDataSpecsDataTypeEnum;
 import cn.iocoder.yudao.module.iot.enums.thingmodel.IotThingModelTypeEnum;
-import cn.iocoder.yudao.module.iot.framework.tdengine.core.TDengineTableField;
+import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import cn.iocoder.yudao.module.iot.service.thingmodel.IotThingModelService;
 import org.junit.jupiter.api.Test;
@@ -22,12 +26,14 @@ import org.mockito.Mock;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
+import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.DEVICE_PROPERTY_HISTORY_TIMES_INVALID;
+import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.PRODUCT_NOT_EXISTS;
 import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -48,7 +54,9 @@ public class IotDevicePropertyServiceImplTest extends BaseMockitoUnitTest {
     @Mock
     private IotProductService productService;
     @Mock
-    private IotDevicePropertyMapper devicePropertyMapper;
+    private IotDeviceService deviceService;
+    @Mock
+    private IotDevicePropertyDAO devicePropertyDAO;
     @Mock
     private DevicePropertyRedisDAO deviceDataRedisDAO;
 
@@ -97,7 +105,7 @@ public class IotDevicePropertyServiceImplTest extends BaseMockitoUnitTest {
         service.saveDeviceProperty(device, message);
 
         // 断言：没有合法属性，不会写入 TDengine 与 Redis
-        verify(devicePropertyMapper, never()).insert(any(), any(), anyLong(), anyLong());
+        verify(devicePropertyDAO, never()).insert(any(), any(), anyLong(), anyLong());
         verify(deviceDataRedisDAO, never()).putAll(anyLong(), any());
     }
 
@@ -119,7 +127,7 @@ public class IotDevicePropertyServiceImplTest extends BaseMockitoUnitTest {
         assertDoesNotThrow(() -> service.saveDeviceProperty(device, message));
 
         // 断言：没有合法属性，不会写入 TDengine 与 Redis
-        verify(devicePropertyMapper, never()).insert(any(), any(), anyLong(), anyLong());
+        verify(devicePropertyDAO, never()).insert(any(), any(), anyLong(), anyLong());
         verify(deviceDataRedisDAO, never()).putAll(anyLong(), any());
     }
 
@@ -141,7 +149,7 @@ public class IotDevicePropertyServiceImplTest extends BaseMockitoUnitTest {
 
         // 断言：跳过空值，不会转换属性值，也不会写入 TDengine 与 Redis
         verify(thingModelService, never()).convertThingModelPropertyValue(any(), any());
-        verify(devicePropertyMapper, never()).insert(any(), any(), anyLong(), anyLong());
+        verify(devicePropertyDAO, never()).insert(any(), any(), anyLong(), anyLong());
         verify(deviceDataRedisDAO, never()).putAll(anyLong(), any());
     }
 
@@ -170,31 +178,149 @@ public class IotDevicePropertyServiceImplTest extends BaseMockitoUnitTest {
     }
 
     @Test
-    public void testDefineDevicePropertyData_fieldNameToLowerCase() {
-        // 准备参数：全大写缩写和驼峰缩写都需要转换为 TDengine 实际的小写字段名
+    public void testDefineDevicePropertyData_success() {
+        // 准备参数：只有属性类型的物模型，才需要定义存储结构
         Long productId = 2L;
         IotProductDO product = IotProductDO.builder().id(productId).build();
-        List<IotThingModelDO> thingModels = Arrays.asList(
-                buildThingModel("Ua", IotDataSpecsDataTypeEnum.FLOAT.getDataType()),
-                buildThingModel("PfT", IotDataSpecsDataTypeEnum.FLOAT.getDataType()),
-                buildThingModel("PT", IotDataSpecsDataTypeEnum.FLOAT.getDataType()),
-                buildThingModel("PA", IotDataSpecsDataTypeEnum.FLOAT.getDataType()));
-        thingModels.forEach(thingModel -> thingModel.setType(IotThingModelTypeEnum.PROPERTY.getType()));
+        IotThingModelDO temperature = buildThingModel("Temperature", IotDataSpecsDataTypeEnum.FLOAT.getDataType());
+        temperature.setType(IotThingModelTypeEnum.PROPERTY.getType());
+        IotThingModelDO alarm = buildThingModel("Alarm", IotDataSpecsDataTypeEnum.INT.getDataType());
+        alarm.setType(IotThingModelTypeEnum.EVENT.getType());
 
         // mock 方法
         when(productService.validateProductExists(productId)).thenReturn(product);
-        when(thingModelService.getThingModelListByProductId(productId)).thenReturn(thingModels);
-        when(devicePropertyMapper.getProductPropertySTableFieldList(productId)).thenReturn(Collections.emptyList());
+        when(thingModelService.getThingModelListByProductId(productId)).thenReturn(Arrays.asList(temperature, alarm));
 
         // 调用
         service.defineDevicePropertyData(productId);
 
-        // 断言：字段名统一为小写下划线，避免 PT 和数据库中的 pt 被误判为不同字段
-        ArgumentCaptor<List<TDengineTableField>> captor = ArgumentCaptor.forClass(List.class);
-        verify(devicePropertyMapper).createProductPropertySTable(eq(productId), captor.capture());
-        assertEquals(Arrays.asList("ua", "pf_t", "pt", "pa"), captor.getValue().stream()
-                .map(TDengineTableField::getField)
-                .collect(Collectors.toList()));
+        // 断言：只传入属性物模型，由存储 DAO 完成字段映射与差异比较
+        verify(devicePropertyDAO).defineProductPropertyTable(eq(productId), eq(singletonList(temperature)));
+    }
+
+    @Test
+    public void testDefineDevicePropertyData_productNotExists() {
+        // 准备参数
+        Long productId = 2L;
+
+        // mock 方法：产品不存在
+        when(productService.validateProductExists(productId))
+                .thenThrow(exception(PRODUCT_NOT_EXISTS));
+
+        // 调用，并断言
+        assertServiceException(() -> service.defineDevicePropertyData(productId), PRODUCT_NOT_EXISTS);
+        verify(devicePropertyDAO, never()).defineProductPropertyTable(any(), any());
+    }
+
+    @Test
+    public void testSaveDeviceProperty_success() {
+        // 准备参数
+        IotDeviceDO device = buildDevice();
+        IotThingModelDO thingModel = buildThingModel("Temperature", IotDataSpecsDataTypeEnum.INT.getDataType());
+        Map<String, Object> params = new HashMap<>();
+        params.put("Temperature", 36);
+        IotDeviceMessage message = buildMessage(params);
+
+        // mock 方法
+        when(thingModelService.getThingModelListByProductIdFromCache(device.getProductId()))
+                .thenReturn(singletonList(thingModel));
+        when(thingModelService.convertThingModelPropertyValue(thingModel, 36)).thenReturn(36);
+
+        // 调用
+        long before = System.currentTimeMillis();
+        service.saveDeviceProperty(device, message);
+        long after = System.currentTimeMillis();
+
+        // 断言：ts 为存储时间，reportTime 为上报时间
+        ArgumentCaptor<Long> tsCaptor = ArgumentCaptor.forClass(Long.class);
+        verify(devicePropertyDAO).insert(eq(device), eq(MapUtil.of("Temperature", 36)), tsCaptor.capture(),
+                eq(LocalDateTimeUtil.toEpochMilli(message.getReportTime())));
+        assertTrue(tsCaptor.getValue() >= before && tsCaptor.getValue() <= after);
+    }
+
+    // ========== getHistoryDevicePropertyList ==========
+
+    @Test
+    public void testGetHistoryDevicePropertyList_success() {
+        // 准备参数
+        IotDevicePropertyHistoryListReqVO reqVO = buildHistoryReqVO("Temperature",
+                LocalDateTime.of(2026, 1, 1, 0, 0), LocalDateTime.of(2026, 1, 2, 0, 0));
+        IotDevicePropertyRespVO respVO = new IotDevicePropertyRespVO();
+        respVO.setValue(36);
+        respVO.setUpdateTime(1L);
+
+        // mock 方法
+        when(deviceService.getDevice(eq(1L))).thenReturn(buildDevice());
+        when(devicePropertyDAO.selectHistoryList(eq(2L), same(reqVO))).thenReturn(singletonList(respVO));
+
+        // 调用
+        List<IotDevicePropertyRespVO> list = service.getHistoryDevicePropertyList(reqVO);
+
+        // 断言：按设备的产品编号查询时序库；使用按租户、逻辑删除过滤的 getDevice，而不是忽略租户的缓存查询
+        assertEquals(singletonList(respVO), list);
+        verify(deviceService, never()).getDeviceFromCache(anyLong());
+    }
+
+    @Test
+    public void testGetHistoryDevicePropertyList_timesNull() {
+        // 准备参数
+        IotDevicePropertyHistoryListReqVO reqVO = buildHistoryReqVO("Temperature");
+        reqVO.setTimes(null);
+
+        // 调用，并断言
+        assertServiceException(() -> service.getHistoryDevicePropertyList(reqVO), DEVICE_PROPERTY_HISTORY_TIMES_INVALID);
+        verifyNoInteractions(deviceService, devicePropertyDAO);
+    }
+
+    @Test
+    public void testGetHistoryDevicePropertyList_timesLengthInvalid() {
+        // 准备参数
+        IotDevicePropertyHistoryListReqVO reqVO = buildHistoryReqVO("Temperature", LocalDateTime.now());
+
+        // 调用，并断言
+        assertServiceException(() -> service.getHistoryDevicePropertyList(reqVO), DEVICE_PROPERTY_HISTORY_TIMES_INVALID);
+        verifyNoInteractions(deviceService, devicePropertyDAO);
+    }
+
+    @Test
+    public void testGetHistoryDevicePropertyList_timeNull() {
+        // 准备参数：开始时间为空、结束时间为空
+        IotDevicePropertyHistoryListReqVO reqVO1 = buildHistoryReqVO("Temperature", null, LocalDateTime.now());
+        IotDevicePropertyHistoryListReqVO reqVO2 = buildHistoryReqVO("Temperature", LocalDateTime.now(), null);
+
+        // 调用，并断言：返回空，不查询设备与时序库
+        assertTrue(service.getHistoryDevicePropertyList(reqVO1).isEmpty());
+        assertTrue(service.getHistoryDevicePropertyList(reqVO2).isEmpty());
+        verifyNoInteractions(deviceService, devicePropertyDAO);
+    }
+
+    @Test
+    public void testGetHistoryDevicePropertyList_identifierInvalid() {
+        // 准备参数：保留字段、非法格式
+        LocalDateTime now = LocalDateTime.now();
+        IotDevicePropertyHistoryListReqVO reqVO1 = buildHistoryReqVO("reportTime", now, now);
+        IotDevicePropertyHistoryListReqVO reqVO2 = buildHistoryReqVO("ts", now, now);
+        IotDevicePropertyHistoryListReqVO reqVO3 = buildHistoryReqVO("a` OR 1=1", now, now);
+
+        // 调用，并断言：返回空，不查询设备与时序库
+        assertTrue(service.getHistoryDevicePropertyList(reqVO1).isEmpty());
+        assertTrue(service.getHistoryDevicePropertyList(reqVO2).isEmpty());
+        assertTrue(service.getHistoryDevicePropertyList(reqVO3).isEmpty());
+        verifyNoInteractions(deviceService, devicePropertyDAO);
+    }
+
+    @Test
+    public void testGetHistoryDevicePropertyList_deviceNotExists() {
+        // 准备参数
+        LocalDateTime now = LocalDateTime.now();
+        IotDevicePropertyHistoryListReqVO reqVO = buildHistoryReqVO("Temperature", now, now);
+
+        // mock 方法：设备不存在、已删除，或者不属于当前租户
+        when(deviceService.getDevice(eq(1L))).thenReturn(null);
+
+        // 调用，并断言：返回空，不查询时序库
+        assertTrue(service.getHistoryDevicePropertyList(reqVO).isEmpty());
+        verifyNoInteractions(devicePropertyDAO);
     }
 
     // ========== 辅助方法 ==========
@@ -228,12 +354,23 @@ public class IotDevicePropertyServiceImplTest extends BaseMockitoUnitTest {
     }
 
     /**
-     * 抓取 mapper.insert 的 properties 入参
+     * 构造属性历史查询条件，设备编号固定为 1
+     */
+    private IotDevicePropertyHistoryListReqVO buildHistoryReqVO(String identifier, LocalDateTime... times) {
+        IotDevicePropertyHistoryListReqVO reqVO = new IotDevicePropertyHistoryListReqVO();
+        reqVO.setDeviceId(1L);
+        reqVO.setIdentifier(identifier);
+        reqVO.setTimes(times);
+        return reqVO;
+    }
+
+    /**
+     * 抓取 DAO.insert 的 properties 入参
      */
     @SuppressWarnings("unchecked")
     private Map<String, Object> captureMapperInsertProperties() {
         ArgumentCaptor<Map<String, Object>> captor = ArgumentCaptor.forClass(Map.class);
-        verify(devicePropertyMapper).insert(any(IotDeviceDO.class), captor.capture(), anyLong(), anyLong());
+        verify(devicePropertyDAO).insert(any(IotDeviceDO.class), captor.capture(), anyLong(), anyLong());
         return captor.getValue();
     }
 

@@ -8,6 +8,9 @@ import cn.iocoder.yudao.module.mes.dal.dataobject.cal.plan.MesCalPlanDO;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.time.LocalDate;
+import java.util.List;
+
 /**
  * MES 排班计划 Mapper
  *
@@ -30,6 +33,15 @@ public interface MesCalPlanMapper extends BaseMapperX<MesCalPlanDO> {
 
     default MesCalPlanDO selectByCode(String code) {
         return selectOne(MesCalPlanDO::getCode, code);
+    }
+
+    default List<MesCalPlanDO> selectListByStatusAndDay(Integer status, LocalDate day) {
+        return selectList(new LambdaQueryWrapperX<MesCalPlanDO>()
+                .eq(MesCalPlanDO::getStatus, status)
+                // TODO @AI：dayend 获取下？应该有方法，这样可以 le，更统一点；
+                .lt(MesCalPlanDO::getStartDate, day.plusDays(1).atStartOfDay())
+                .ge(MesCalPlanDO::getEndDate, day.atStartOfDay())
+                .orderByAsc(MesCalPlanDO::getId));
     }
 
     default void updateWithShiftFieldCleanup(MesCalPlanDO plan, boolean clearShiftMethod, boolean clearShiftCount) {

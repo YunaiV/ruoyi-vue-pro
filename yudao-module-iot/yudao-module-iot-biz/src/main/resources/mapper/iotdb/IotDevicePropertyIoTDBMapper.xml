@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.iocoder.yudao.module.iot.dal.iotdb.IotDevicePropertyIoTDBMapper">
+
+    <!--
+        每个产品一张表 product_property_{productId}：
+        1. time：存储时间（毫秒）
+        2. device_id：设备编号，TAG
+        3. report_time：上报时间，FIELD
+        4. p_*：用户属性，FIELD，按物模型增删、改类型
+
+        注意：${} 只用于 Long 产品编号、DAO 校验后的列名和类型，值全部使用 #{} 绑定
+    -->
+
+    <select id="selectColumnList" resultType="java.util.Map">
+        DESC product_property_${productId}
+    </select>
+
+    <update id="createTable">
+        CREATE TABLE IF NOT EXISTS product_property_${productId} (
+            device_id STRING TAG,
+            report_time TIMESTAMP FIELD
+        <foreach item="column" collection="columns">
+            , "${column.name}" ${column.type} FIELD
+        </foreach>
+        )
+    </update>
+
+    <update id="addColumn">
+        ALTER TABLE product_property_${productId}
+        ADD COLUMN IF NOT EXISTS "${column.name}" ${column.type} FIELD
+    </update>
+
+    <update id="dropColumn">
+        ALTER TABLE product_property_${productId}
+        DROP COLUMN IF EXISTS "${columnName}"
+    </update>
+
+    <insert id="insert">
+        INSERT INTO product_property_${productId} (time, device_id
+        <if test="reportTime != null">
+            , report_time
+        </if>
+        <foreach item="column" collection="columns">
+            , "${column.name}"
+        </foreach>
+        )
+        VALUES (#{ts}, #{deviceId}
+        <if test="reportTime != null">
+            , #{reportTime}
+        </if>
+        <foreach item="column" collection="columns">
+            , #{column.value}
+        </foreach>
+        )
+    </insert>
+
+    <select id="selectHistoryList"
+            resultType="cn.iocoder.yudao.module.iot.controller.admin.device.vo.property.IotDevicePropertyRespVO">
+        SELECT "${columnName}" AS "value", time AS update_time
+        FROM product_property_${productId}
+        WHERE device_id = #{deviceId}
+          AND time &gt;= #{startTime}
+          AND time &lt;= #{endTime}
+          AND "${columnName}" IS NOT NULL
+        ORDER BY time DESC
+    </select>
+
+</mapper>

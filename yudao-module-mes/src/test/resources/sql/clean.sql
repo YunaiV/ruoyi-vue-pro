@@ -2,6 +2,7 @@ DELETE FROM "mes_cal_team_shift";
 DELETE FROM "mes_cal_plan_team";
 DELETE FROM "mes_cal_plan_shift";
 DELETE FROM "mes_cal_plan";
+DELETE FROM "mes_cal_holiday";
 DELETE FROM "mes_md_auto_code_rule";
 DELETE FROM "mes_md_auto_code_part";
 DELETE FROM "mes_md_auto_code_record";

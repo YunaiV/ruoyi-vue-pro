@@ -1,13 +1,13 @@
 package cn.iocoder.yudao.framework.excel.core.handler;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.idev.excel.enums.CellDataTypeEnum;
-import cn.idev.excel.metadata.Head;
-import cn.idev.excel.metadata.data.WriteCellData;
-import cn.idev.excel.util.MapUtils;
-import cn.idev.excel.write.metadata.holder.WriteSheetHolder;
-import cn.idev.excel.write.style.column.AbstractColumnWidthStyleStrategy;
-import cn.idev.excel.write.style.column.LongestMatchColumnWidthStyleStrategy;
+import org.apache.fesod.common.util.MapUtils;
+import org.apache.fesod.sheet.enums.CellDataTypeEnum;
+import org.apache.fesod.sheet.metadata.Head;
+import org.apache.fesod.sheet.metadata.data.WriteCellData;
+import org.apache.fesod.sheet.write.metadata.holder.WriteSheetHolder;
+import org.apache.fesod.sheet.write.style.column.AbstractColumnWidthStyleStrategy;
+import org.apache.fesod.sheet.write.style.column.LongestMatchColumnWidthStyleStrategy;
 import org.apache.poi.ss.usermodel.Cell;
 
 import java.nio.charset.StandardCharsets;

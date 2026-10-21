@@ -2,9 +2,9 @@ package cn.iocoder.yudao.module.system.controller.admin.logger.vo.operatelog;
 
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
-import cn.idev.excel.annotation.ExcelIgnoreUnannotated;
-import cn.idev.excel.annotation.ExcelProperty;
 import cn.iocoder.yudao.module.system.enums.DictTypeConstants;
+import org.apache.fesod.sheet.annotation.ExcelIgnoreUnannotated;
+import org.apache.fesod.sheet.annotation.ExcelProperty;
 import org.dromara.core.trans.anno.Trans;
 import org.dromara.core.trans.constant.TransType;
 import org.dromara.core.trans.vo.VO;

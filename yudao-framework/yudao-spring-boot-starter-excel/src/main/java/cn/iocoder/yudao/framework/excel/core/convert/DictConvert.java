@@ -3,13 +3,13 @@ package cn.iocoder.yudao.framework.excel.core.convert;
 import cn.hutool.core.convert.Convert;
 import cn.iocoder.yudao.framework.dict.core.DictFrameworkUtils;
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
-import cn.idev.excel.converters.Converter;
-import cn.idev.excel.enums.CellDataTypeEnum;
-import cn.idev.excel.metadata.GlobalConfiguration;
-import cn.idev.excel.metadata.data.ReadCellData;
-import cn.idev.excel.metadata.data.WriteCellData;
-import cn.idev.excel.metadata.property.ExcelContentProperty;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.fesod.sheet.converters.Converter;
+import org.apache.fesod.sheet.enums.CellDataTypeEnum;
+import org.apache.fesod.sheet.metadata.GlobalConfiguration;
+import org.apache.fesod.sheet.metadata.data.ReadCellData;
+import org.apache.fesod.sheet.metadata.data.WriteCellData;
+import org.apache.fesod.sheet.metadata.property.ExcelContentProperty;
 
 /**
  * Excel 数据字典转换器

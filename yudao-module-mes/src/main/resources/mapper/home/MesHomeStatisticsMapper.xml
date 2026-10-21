@@ -3,7 +3,7 @@
 <mapper namespace="cn.iocoder.yudao.module.mes.dal.mysql.home.MesHomeStatisticsMapper">
 
     <!-- 按状态统计工单数量 -->
-    <select id="selectWorkOrderCountGroupByStatus" resultType="java.util.Map">
+    <select id="selectWorkOrderCountGroupByStatus" resultType="cn.iocoder.yudao.framework.mybatis.core.util.CaseInsensitiveResultMap">
         SELECT status, COUNT(*) AS count
         FROM mes_pro_work_order
         WHERE deleted = 0
@@ -11,7 +11,7 @@
     </select>
 
     <!-- 统计报工产量合计 -->
-    <select id="selectFeedbackSummary" resultType="java.util.Map">
+    <select id="selectFeedbackSummary" resultType="cn.iocoder.yudao.framework.mybatis.core.util.CaseInsensitiveResultMap">
         SELECT IFNULL(SUM(feedback_quantity), 0)     AS feedbackQuantity,
                IFNULL(SUM(qualified_quantity), 0)    AS qualifiedQuantity,
                IFNULL(SUM(unqualified_quantity), 0)  AS unqualifiedQuantity
@@ -25,7 +25,7 @@
     </select>
 
     <!-- 按设备状态统计设备台数 -->
-    <select id="selectMachineryCountGroupByStatus" resultType="java.util.Map">
+    <select id="selectMachineryCountGroupByStatus" resultType="cn.iocoder.yudao.framework.mybatis.core.util.CaseInsensitiveResultMap">
         SELECT status, COUNT(*) AS count
         FROM mes_dv_machinery
         WHERE deleted = 0
@@ -51,7 +51,7 @@
     </select>
 
     <!-- 按天聚合报工产量 -->
-    <select id="selectDailyFeedbackTrend" resultType="java.util.Map">
+    <select id="selectDailyFeedbackTrend" resultType="cn.iocoder.yudao.framework.mybatis.core.util.CaseInsensitiveResultMap">
         SELECT DATE_FORMAT(feedback_time, '%Y-%m-%d')    AS date,
                IFNULL(SUM(feedback_quantity), 0)         AS quantity,
                IFNULL(SUM(qualified_quantity), 0)        AS qualifiedQuantity,

@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.im.dal.mysql.statistics;
 
+import cn.iocoder.yudao.framework.mybatis.core.util.CaseInsensitiveResultMap;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.ResultMap;
 import org.apache.ibatis.annotations.Select;
 
 import java.time.LocalDateTime;
@@ -59,6 +61,7 @@ public interface ImStatisticsManagerMapper {
     @Select("SELECT DATE(create_time) AS date, COUNT(*) AS count FROM system_users " +
             "WHERE deleted = 0 AND create_time >= #{beginTime} AND create_time < #{endTime} " +
             "GROUP BY DATE(create_time)")
+    @ResultMap(CaseInsensitiveResultMap.RESULT_MAP_ID)
     List<Map<String, Object>> selectNewUserDailyCount(@Param("beginTime") LocalDateTime beginTime,
                                                       @Param("endTime") LocalDateTime endTime);
 
@@ -74,6 +77,7 @@ public interface ImStatisticsManagerMapper {
             "  WHERE deleted = 0 AND " + NORMAL_MESSAGE_CONDITION +
             "  AND send_time >= #{beginTime} AND send_time < #{endTime}" +
             ") t GROUP BY day")
+    @ResultMap(CaseInsensitiveResultMap.RESULT_MAP_ID)
     List<Map<String, Object>> selectActiveUserDailyCount(@Param("beginTime") LocalDateTime beginTime, @Param("endTime") LocalDateTime endTime);
 
     // ==================== 群 ====================
@@ -111,6 +115,7 @@ public interface ImStatisticsManagerMapper {
             "  GROUP BY g.id" +
             ") t " +
             "GROUP BY `range`")
+    @ResultMap(CaseInsensitiveResultMap.RESULT_MAP_ID)
     List<Map<String, Object>> selectGroupSizeDistribution();
 
     // ==================== 消息 ====================
@@ -140,6 +145,7 @@ public interface ImStatisticsManagerMapper {
             "WHERE deleted = 0 AND " + NORMAL_MESSAGE_CONDITION +
             " AND send_time >= #{beginTime} AND send_time < #{endTime} " +
             "GROUP BY DATE(send_time)")
+    @ResultMap(CaseInsensitiveResultMap.RESULT_MAP_ID)
     List<Map<String, Object>> selectPrivateMessageDailyCount(@Param("beginTime") LocalDateTime beginTime,
                                                              @Param("endTime") LocalDateTime endTime);
 
@@ -150,6 +156,7 @@ public interface ImStatisticsManagerMapper {
             "WHERE deleted = 0 AND " + NORMAL_MESSAGE_CONDITION +
             " AND send_time >= #{beginTime} AND send_time < #{endTime} " +
             "GROUP BY DATE(send_time)")
+    @ResultMap(CaseInsensitiveResultMap.RESULT_MAP_ID)
     List<Map<String, Object>> selectGroupMessageDailyCount(@Param("beginTime") LocalDateTime beginTime,
                                                            @Param("endTime") LocalDateTime endTime);
 
@@ -167,6 +174,7 @@ public interface ImStatisticsManagerMapper {
             "  WHERE deleted = 0 AND " + NORMAL_MESSAGE_CONDITION +
             "  AND send_time >= #{beginTime} AND send_time < #{endTime}" +
             ") t GROUP BY type")
+    @ResultMap(CaseInsensitiveResultMap.RESULT_MAP_ID)
     List<Map<String, Object>> selectMessageTypeDistribution(@Param("beginTime") LocalDateTime beginTime,
                                                             @Param("endTime") LocalDateTime endTime);
 
@@ -184,6 +192,7 @@ public interface ImStatisticsManagerMapper {
             "  WHERE deleted = 0 AND " + NORMAL_MESSAGE_CONDITION +
             "  AND send_time >= #{beginTime} AND send_time < #{endTime}" +
             ") t GROUP BY user_id ORDER BY messageCount DESC LIMIT #{limit}")
+    @ResultMap(CaseInsensitiveResultMap.RESULT_MAP_ID)
     List<Map<String, Object>> selectTopSenders(@Param("beginTime") LocalDateTime beginTime,
                                                @Param("endTime") LocalDateTime endTime,
                                                @Param("limit") int limit);

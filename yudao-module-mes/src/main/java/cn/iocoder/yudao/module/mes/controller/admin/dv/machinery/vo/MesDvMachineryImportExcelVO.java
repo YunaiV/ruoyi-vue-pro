@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.mes.controller.admin.dv.machinery.vo;
 
-import cn.idev.excel.annotation.ExcelProperty;
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.excel.core.convert.DictConvert;
 import cn.iocoder.yudao.module.mes.enums.DictTypeConstants;
@@ -8,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.fesod.sheet.annotation.ExcelProperty;
 
 /**
  * 设备台账 Excel 导入 VO

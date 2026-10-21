@@ -1,14 +1,14 @@
 package cn.iocoder.yudao.framework.excel.core.convert;
 
 import cn.hutool.core.collection.ListUtil;
-import cn.idev.excel.metadata.data.ReadCellData;
-import cn.idev.excel.metadata.data.WriteCellData;
-import cn.idev.excel.metadata.property.ExcelContentProperty;
 import cn.iocoder.yudao.framework.common.biz.system.dict.DictDataCommonApi;
 import cn.iocoder.yudao.framework.common.biz.system.dict.dto.DictDataRespDTO;
 import cn.iocoder.yudao.framework.dict.core.DictFrameworkUtils;
 import cn.iocoder.yudao.framework.excel.core.annotations.DictFormat;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
+import org.apache.fesod.sheet.metadata.data.ReadCellData;
+import org.apache.fesod.sheet.metadata.data.WriteCellData;
+import org.apache.fesod.sheet.metadata.property.ExcelContentProperty;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;

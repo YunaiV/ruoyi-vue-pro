@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.framework.excel.core.handler;
 
-import cn.idev.excel.FastExcelFactory;
-import cn.idev.excel.annotation.ExcelProperty;
+import org.apache.fesod.sheet.FesodSheet;
+import org.apache.fesod.sheet.annotation.ExcelProperty;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.Test;
 
@@ -59,7 +59,7 @@ public class ColumnWidthMatchStyleStrategyTest {
 
     private XSSFWorkbook write(List<TestRow> rows) throws Exception {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        FastExcelFactory.write(outputStream, TestRow.class)
+        FesodSheet.write(outputStream, TestRow.class)
                 .registerWriteHandler(new ColumnWidthMatchStyleStrategy()).sheet().doWrite(rows);
         return new XSSFWorkbook(new ByteArrayInputStream(outputStream.toByteArray()));
     }

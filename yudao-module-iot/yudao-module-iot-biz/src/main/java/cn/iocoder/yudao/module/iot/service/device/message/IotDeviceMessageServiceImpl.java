@@ -25,12 +25,10 @@ import cn.iocoder.yudao.module.iot.core.topic.property.IotDevicePropertyPostReqD
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceMessageDO;
-import cn.iocoder.yudao.module.iot.dal.tdengine.IotDeviceMessageMapper;
+import cn.iocoder.yudao.module.iot.dal.storage.IotDeviceMessageDAO;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.service.device.property.IotDevicePropertyService;
 import cn.iocoder.yudao.module.iot.service.ota.IotOtaTaskRecordService;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.base.Objects;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -67,21 +65,10 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
     private IotOtaTaskRecordService otaTaskRecordService;
 
     @Resource
-    private IotDeviceMessageMapper deviceMessageMapper;
+    private IotDeviceMessageDAO deviceMessageDAO;
 
     @Resource
     private IotDeviceMessageProducer deviceMessageProducer;
-
-    @Override
-    public void defineDeviceMessageStable() {
-        if (StrUtil.isNotEmpty(deviceMessageMapper.showSTable())) {
-            log.info("[defineDeviceMessageStable][设备消息超级表已存在，创建跳过]");
-            return;
-        }
-        log.info("[defineDeviceMessageStable][设备消息超级表不存在，创建开始...]");
-        deviceMessageMapper.createSTable();
-        log.info("[defineDeviceMessageStable][设备消息超级表不存在，创建成功]");
-    }
 
     @Async
     void createDeviceLogAsync(IotDeviceMessage message) {
@@ -102,7 +89,7 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
             messageDO.setTs(System.currentTimeMillis());
         }
         try {
-            deviceMessageMapper.insert(messageDO);
+            deviceMessageDAO.insert(messageDO);
         } catch (Exception ex) {
             // 特殊：@Async 方法的异常默认会被 handler 吞掉，这里显式记录便于排查
             log.error("[createDeviceLogAsync][消息日志写入失败 deviceId({}) messageId({}) paramsLen({}) dataLen({})]",
@@ -337,16 +324,7 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
 
     @Override
     public PageResult<IotDeviceMessageDO> getDeviceMessagePage(IotDeviceMessagePageReqVO pageReqVO) {
-        try {
-            IPage<IotDeviceMessageDO> page = deviceMessageMapper.selectPage(
-                    new Page<>(pageReqVO.getPageNo(), pageReqVO.getPageSize()), pageReqVO);
-            return new PageResult<>(page.getRecords(), page.getTotal());
-        } catch (Exception exception) {
-            if (exception.getMessage().contains("Table does not exist")) {
-                return PageResult.empty();
-            }
-            throw exception;
-        }
+        return deviceMessageDAO.selectPage(pageReqVO);
     }
 
     @Override
@@ -354,12 +332,12 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
         if (CollUtil.isEmpty(requestIds)) {
             return ListUtil.of();
         }
-        return deviceMessageMapper.selectListByRequestIdsAndReply(deviceId, requestIds, reply);
+        return deviceMessageDAO.selectListByRequestIdsAndReply(deviceId, requestIds, reply);
     }
 
     @Override
     public Long getDeviceMessageCount(LocalDateTime createTime) {
-        return deviceMessageMapper.selectCountByCreateTime(
+        return deviceMessageDAO.selectCountByCreateTime(
                 createTime != null ? LocalDateTimeUtil.toEpochMilli(createTime) : null);
     }
 
@@ -367,7 +345,7 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
     public List<IotStatisticsDeviceMessageSummaryByDateRespVO> getDeviceMessageSummaryByDate(
             IotStatisticsDeviceMessageReqVO reqVO) {
         // 1. 按小时统计，获取分项统计数据
-        List<Map<String, Object>> countList = deviceMessageMapper.selectDeviceMessageCountGroupByDate(
+        List<Map<String, Object>> countList = deviceMessageDAO.selectDeviceMessageCountGroupByDate(
                 LocalDateTimeUtil.toEpochMilli(reqVO.getTimes()[0]),
                 LocalDateTimeUtil.toEpochMilli(reqVO.getTimes()[1]));
 
