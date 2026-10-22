@@ -4,46 +4,60 @@ import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImChannelMessageDO;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.context.jdbc.Sql;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Sql(statements = "DELETE FROM im_channel_message", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+/**
+ * {@link ImChannelMessageMapper} 的单元测试
+ *
+ * @author 芋道源码
+ */
 public class ImChannelMessageMapperTest extends BaseDbUnitTest {
 
     @Resource
-    private ImChannelMessageMapper mapper;
+    private ImChannelMessageMapper channelMessageMapper;
 
     @Test
-    public void testSelectListByUserAndMinId_includesBroadcastAndMatchingRecipients() {
-        ImChannelMessageDO nullRecipients = insertMessage(null);
-        ImChannelMessageDO emptyRecipients = insertMessage(List.of());
-        ImChannelMessageDO matchingRecipients = insertMessage(List.of(1L, 2L));
-        insertMessage(List.of(2L, 11L)); // 用户 1 不应误命中用户 11
-        ImChannelMessageDO deleted = insertMessage(List.of(1L));
-        mapper.deleteById(deleted.getId());
+    public void testSelectListByUserAndMinId_broadcastAndMatched() {
+        // mock 数据：全员（null）
+        ImChannelMessageDO nullReceiverMessage = createChannelMessage(null);
+        // mock 数据：全员（空列表）
+        ImChannelMessageDO emptyReceiverMessage = createChannelMessage(Collections.emptyList());
+        // mock 数据：定向，包含用户 1
+        ImChannelMessageDO matchedMessage = createChannelMessage(Arrays.asList(1L, 2L));
+        // mock 数据：定向，不包含用户 1（用户 1 不应误命中用户 11）
+        createChannelMessage(Arrays.asList(2L, 11L));
+        // mock 数据：已删除
+        ImChannelMessageDO deletedMessage = createChannelMessage(Collections.singletonList(1L));
+        channelMessageMapper.deleteById(deletedMessage.getId());
 
-        List<ImChannelMessageDO> result = mapper.selectListByUserAndMinId(1L, 0L, 100);
-
-        assertEquals(List.of(nullRecipients.getId(), emptyRecipients.getId(), matchingRecipients.getId()),
-                result.stream().map(ImChannelMessageDO::getId).toList());
+        // 调用
+        List<ImChannelMessageDO> list = channelMessageMapper.selectListByUserAndMinId(1L, 0L, 100);
+        // 断言
+        assertEquals(Arrays.asList(nullReceiverMessage.getId(), emptyReceiverMessage.getId(), matchedMessage.getId()),
+                convertList(list, ImChannelMessageDO::getId));
     }
 
     @Test
-    public void testSelectListByUserAndMinId_respectsCursorAndLimit() {
-        ImChannelMessageDO cursor = insertMessage(null);
-        ImChannelMessageDO next = insertMessage(List.of());
-        insertMessage(List.of(1L));
+    public void testSelectListByUserAndMinId_cursorAndLimit() {
+        // mock 数据
+        ImChannelMessageDO cursorMessage = createChannelMessage(null);
+        ImChannelMessageDO nextMessage = createChannelMessage(Collections.emptyList());
+        createChannelMessage(Collections.singletonList(1L));
 
-        List<ImChannelMessageDO> result = mapper.selectListByUserAndMinId(1L, cursor.getId(), 1);
-
-        assertEquals(List.of(next.getId()), result.stream().map(ImChannelMessageDO::getId).toList());
+        // 调用：从游标之后拉取 1 条
+        List<ImChannelMessageDO> list = channelMessageMapper.selectListByUserAndMinId(1L, cursorMessage.getId(), 1);
+        // 断言
+        assertEquals(Collections.singletonList(nextMessage.getId()), convertList(list, ImChannelMessageDO::getId));
     }
 
-    private ImChannelMessageDO insertMessage(List<Long> receiverUserIds) {
+    private ImChannelMessageDO createChannelMessage(List<Long> receiverUserIds) {
         ImChannelMessageDO message = ImChannelMessageDO.builder()
                 .channelId(10L)
                 .materialId(20L)
@@ -52,7 +66,7 @@ public class ImChannelMessageMapperTest extends BaseDbUnitTest {
                 .receiverUserIds(receiverUserIds)
                 .sendTime(LocalDateTime.now())
                 .build();
-        mapper.insert(message);
+        channelMessageMapper.insert(message);
         return message;
     }
 
