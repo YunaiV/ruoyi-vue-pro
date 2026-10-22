@@ -85,6 +85,8 @@ public class TradeRewardActivityPriceCalculatorTest extends BaseMockitoUnitTest 
         assertEquals(price.getPayPrice(), 420);
         // 断言：包邮标记
         assertTrue(result.getFreeDelivery());
+        // 断言：赠送积分
+        assertEquals(result.getGivePoint(), 100);
 
         // 断言：SKU 1 优惠 50 * 200/350 = 28
         TradePriceCalculateRespBO.OrderItem orderItem01 = result.getItems().get(0);
