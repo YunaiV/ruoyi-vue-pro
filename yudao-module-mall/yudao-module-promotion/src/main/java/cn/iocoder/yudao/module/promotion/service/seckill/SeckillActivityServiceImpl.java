@@ -188,9 +188,8 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
     @Transactional(rollbackFor = Exception.class)
     public void updateSeckillStockIncr(Long id, Long skuId, Integer count) {
         SeckillProductDO product = seckillProductMapper.selectByActivityIdAndSkuId(id, skuId);
-        if (product == null) {
-            // 秒杀活动已删除时，库存已无回写对象；记日志并跳过，不阻断订单取消主流程
-            log.warn("[updateSeckillStockIncr][秒杀活动({}) sku({}) 的商品配置不存在（活动可能已删除），跳过库存回写]", id, skuId);
+        if (product == null) { // 活动已删除，或 SKU 已从活动移除，跳过秒杀库存恢复，避免阻断订单取消
+            log.warn("[updateSeckillStockIncr][活动({}) skuId({}) 对应的秒杀商品不存在，跳过库存恢复]", id, skuId);
             return;
         }
         // 更新活动商品库存
