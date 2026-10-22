@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.framework.mybatis.config;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.mybatis.core.handler.DefaultDBFieldHandler;
@@ -23,6 +22,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.mapping.ResultMap;
 import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -30,7 +31,6 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.ConfigurableEnvironment;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -49,6 +49,8 @@ public class YudaoMybatisAutoConfiguration {
                 (cache) -> cache.maximumSize(1024)
                         .expireAfterWrite(5, TimeUnit.SECONDS))
         );
+        // 特殊：JacksonTypeHandler 先使用 JsonUtils 的 ObjectMapper（支持 LocalDateTime），避免使用 MyBatis Plus 默认的 ObjectMapper
+        JacksonTypeHandler.setObjectMapper(JsonUtils.getObjectMapper());
     }
 
     @Bean
@@ -101,15 +103,11 @@ public class YudaoMybatisAutoConfiguration {
         throw new IllegalArgumentException(StrUtil.format("DbType{} 找不到合适的 IKeyGenerator 实现类", dbType));
     }
 
-    @Bean // 特殊：返回结果使用 Object 而不用 JacksonTypeHandler 的原因，避免因为 JacksonTypeHandler 被 mybatis 全局使用！
-    public Object jacksonTypeHandler(List<ObjectMapper> objectMappers) {
-        // 特殊：设置 JacksonTypeHandler 的 ObjectMapper！
-        ObjectMapper objectMapper = CollUtil.getFirst(objectMappers);
-        if (objectMapper == null) {
-            objectMapper = JsonUtils.getObjectMapper();
-        }
-        JacksonTypeHandler.setObjectMapper(objectMapper);
-        return new JacksonTypeHandler(Object.class);
+    @Bean
+    public SmartInitializingSingleton jacksonTypeHandlerInitializer(ObjectProvider<ObjectMapper> objectMappers) {
+        // 特殊：所有单例初始化后，设置 JacksonTypeHandler 的 ObjectMapper，优先唯一或 @Primary 的 ObjectMapper，否则使用 JsonUtils 的
+        // 原因：避免延迟初始化未设置、多个 ObjectMapper 时取到不支持 LocalDateTime 的，且不在创建 SqlSessionFactory 时获取 ObjectMapper。https://t.zsxq.com/KmPNU
+        return () -> JacksonTypeHandler.setObjectMapper(objectMappers.getIfUnique(JsonUtils::getObjectMapper));
     }
 
 }
