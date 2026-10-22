@@ -9,7 +9,9 @@ import cn.iocoder.yudao.module.ai1.enums.session.Ai1SessionMessageStatusEnum;
 import cn.iocoder.yudao.module.ai1.framework.ai.config.YudaoAi1Properties;
 import cn.iocoder.yudao.module.ai1.harness.llm.Ai1LlmChatTool;
 import cn.iocoder.yudao.module.ai1.harness.mcp.Ai1McpToolFactory;
+import cn.iocoder.yudao.module.ai1.harness.memory.Ai1MemoryTool;
 import cn.iocoder.yudao.module.ai1.harness.rag.Ai1RagTool;
+import cn.iocoder.yudao.module.ai1.harness.skill.Ai1SkillShellTracker;
 import cn.iocoder.yudao.module.ai1.harness.skill.Ai1SkillToolFactory;
 import cn.iocoder.yudao.module.ai1.service.agent.Ai1AgentService;
 import cn.iocoder.yudao.module.ai1.service.knowledge.Ai1KnowledgeBaseService;
@@ -26,6 +28,7 @@ import org.mockito.Mock;
 import org.redisson.Redisson;
 import org.redisson.api.RScript;
 import org.redisson.api.RStream;
+import org.redisson.api.RTopic;
 import org.redisson.api.RedissonClient;
 import org.redisson.api.stream.StreamAddArgs;
 import org.redisson.api.stream.StreamCreateGroupArgs;
@@ -87,6 +90,10 @@ public class Ai1SessionTaskRecoveryIntegrationTest extends BaseMockitoUnitTest {
     private Ai1SkillToolFactory skillToolFactory;
     @Mock
     private Ai1RagTool ragTool;
+    @Mock
+    private Ai1MemoryTool memoryTool;
+    @Mock
+    private Ai1SkillShellTracker shellTracker;
 
     private RedissonClient firstClient;
     private RedissonClient secondClient;
@@ -114,18 +121,21 @@ public class Ai1SessionTaskRecoveryIntegrationTest extends BaseMockitoUnitTest {
         message.set(new Ai1SessionMessageDO().setId(MESSAGE_ID).setRole(Ai1SessionMessageRoleEnum.ASSISTANT.getRole())
                 .setStatus(Ai1SessionMessageStatusEnum.GENERATING.getStatus()));
 
-        // mock 业务方法
+        // mock 业务方法（排队中停止的用例不调用模型）
         when(sessionMessageService.getSessionMessage(MESSAGE_ID)).thenAnswer(invocation -> message.get());
+        lenient().when(sessionMessageService.getGeneratingAssistantMessageIdList(SESSION_ID)).thenAnswer(invocation ->
+                Ai1SessionMessageStatusEnum.isGenerating(message.get().getStatus()) ? List.of(MESSAGE_ID) : List.of());
         doAnswer(invocation -> {
             message.set(invocation.getArgument(0));
             return null;
         }).when(sessionMessageService).updateSessionMessage(any());
-        when(agentService.validateAgentExists(1L)).thenReturn(new Ai1AgentDO().setId(1L).setName("客服")
+        lenient().when(skillToolFactory.newShellTracker(1L)).thenReturn(shellTracker);
+        lenient().when(agentService.validateAgentExists(1L)).thenReturn(new Ai1AgentDO().setId(1L).setName("客服")
                 .setProviderId(1L).setModelId(2L));
-        when(modelService.getModelRespBO(1L, 2L)).thenReturn(new Ai1ModelRespBO().setModelType(Ai1ModelTypeEnum.CHAT.getType()));
-        when(sessionMessageService.getSessionMessageListBySessionIdAndIdLessThan(eq(SESSION_ID), eq(MESSAGE_ID), anyInt()))
+        lenient().when(modelService.getModelRespBO(1L, 2L)).thenReturn(new Ai1ModelRespBO().setModelType(Ai1ModelTypeEnum.CHAT.getType()));
+        lenient().when(sessionMessageService.getSessionMessageListBySessionIdAndIdLessThan(eq(SESSION_ID), eq(MESSAGE_ID), anyInt()))
                 .thenReturn(new ArrayList<>());
-        when(llmChatTool.chat(any(), anyString(), anyList(), anyString(), anyList(), anyList(), anyLong(), any(), any()))
+        lenient().when(llmChatTool.chat(any(), anyString(), anyList(), anyString(), anyList(), anyList(), anyLong(), any(), any()))
                 .thenAnswer(invocation -> {
                     Consumer<String> onContent = invocation.getArgument(8);
                     onContent.accept("第一段");
@@ -143,6 +153,7 @@ public class Ai1SessionTaskRecoveryIntegrationTest extends BaseMockitoUnitTest {
         assertTrue(executor.awaitTermination(5, TimeUnit.SECONDS));
         taskStream.delete();
         resultStream.delete();
+        secondClient.getBucket(String.format(SESSION_STOP, MESSAGE_ID)).delete();
         secondClient.getLock(String.format(SESSION_TASK_LOCK, MESSAGE_ID)).forceUnlock();
         firstClient.shutdown();
         secondClient.shutdown();
@@ -195,7 +206,7 @@ public class Ai1SessionTaskRecoveryIntegrationTest extends BaseMockitoUnitTest {
         secondWorker.handleTask(recordId, reclaimed.get(recordId), true);
 
         // 断言接管只保留部分内容并标记失败，不再次调用模型
-        assertEquals("第一段", message.get().getContent());
+        assertEquals("第一段\n\n> 生成任务已中断，请重新发送", message.get().getContent());
         assertEquals(Ai1SessionMessageStatusEnum.FAILED.getStatus(), message.get().getStatus());
         assertEquals(List.of("ping", "message", "error", "done"), resultTypes());
         assertEquals(0, taskStream.getPendingInfo(SESSION_TASK_GROUP).getTotal());
@@ -204,8 +215,106 @@ public class Ai1SessionTaskRecoveryIntegrationTest extends BaseMockitoUnitTest {
         // 调用旧节点恢复，断言不追加旧增量或覆盖回填结果
         release.countDown();
         generation.get(5, TimeUnit.SECONDS);
-        assertEquals("第一段", message.get().getContent());
+        assertEquals("第一段\n\n> 生成任务已中断，请重新发送", message.get().getContent());
         assertEquals(List.of("ping", "message", "error", "done"), resultTypes());
+    }
+
+    @Test
+    public void testStop_crossNode() throws Exception {
+        // 准备任务，交给第一个节点生成；第一个节点订阅停止通知
+        startWithoutWorker(firstWorker);
+        StreamMessageId recordId = addTask();
+        Map<String, String> fields = taskStream.readGroup(SESSION_TASK_GROUP, "first",
+                StreamReadGroupArgs.neverDelivered().count(1)).get(recordId);
+        Future<?> generation = executor.submit(() -> firstWorker.handleTask(recordId, fields));
+        assertTrue(generated.await(5, TimeUnit.SECONDS));
+
+        try {
+            // 调用：请求落在第二个节点
+            secondWorker.cancel(SESSION_ID);
+            generation.get(5, TimeUnit.SECONDS);
+
+            // 断言：保留已生成内容，人工终止只写 done，并确认任务
+            assertEquals("第一段\n\n> 本条回复已被人工终止", message.get().getContent());
+            assertEquals(Ai1SessionMessageStatusEnum.FAILED.getStatus(), message.get().getStatus());
+            assertEquals(List.of("ping", "message", "done"), resultTypes());
+            assertEquals(0, taskStream.getPendingInfo(SESSION_TASK_GROUP).getTotal());
+            verify(shellTracker, atLeastOnce()).cancel();
+            // 断言：worker 线程的中断标志已清除，不影响下一轮
+            assertFalse(executor.submit(() -> Thread.currentThread().isInterrupted()).get(5, TimeUnit.SECONDS));
+        } finally {
+            firstWorker.stop();
+        }
+    }
+
+    @Test
+    public void testStop_intentWithoutSubscription() throws Exception {
+        // 准备任务，交给第一个节点生成；模拟停止通知的订阅已断开
+        startWithoutWorker(firstWorker);
+        RTopic stopTopic = firstClient.getTopic(SESSION_STOP_TOPIC, StringCodec.INSTANCE);
+        stopTopic.removeListener((Integer) ReflectionTestUtils.getField(firstWorker, "stopListenerId"));
+        StreamMessageId recordId = addTask();
+        Map<String, String> fields = taskStream.readGroup(SESSION_TASK_GROUP, "first",
+                StreamReadGroupArgs.neverDelivered().count(1)).get(recordId);
+        Future<?> generation = executor.submit(() -> firstWorker.handleTask(recordId, fields));
+        assertTrue(generated.await(5, TimeUnit.SECONDS));
+
+        try {
+            // 调用：停止通知丢失，由定时检查停止意图兜底
+            secondWorker.cancel(SESSION_ID);
+            generation.get(5, TimeUnit.SECONDS);
+
+            // 断言
+            assertEquals("第一段\n\n> 本条回复已被人工终止", message.get().getContent());
+            assertEquals(List.of("ping", "message", "done"), resultTypes());
+        } finally {
+            firstWorker.stop();
+        }
+    }
+
+    @Test
+    public void testStop_queued() {
+        // 准备任务，尚未被任何 worker 读取
+        StreamMessageId recordId = addTask();
+
+        // 调用：无人执行时由请求节点直接收尾
+        secondWorker.cancel(SESSION_ID);
+        // 断言
+        assertEquals("\n\n> 本条回复已被人工终止", message.get().getContent());
+        assertEquals(Ai1SessionMessageStatusEnum.FAILED.getStatus(), message.get().getStatus());
+        assertEquals(List.of("done"), resultTypes());
+
+        // 调用：worker 之后读到该任务
+        Map<String, String> fields = taskStream.readGroup(SESSION_TASK_GROUP, "first",
+                StreamReadGroupArgs.neverDelivered().count(1)).get(recordId);
+        firstWorker.handleTask(recordId, fields);
+        // 断言：不调用模型，补齐终态后确认
+        verifyNoInteractions(llmChatTool);
+        assertEquals(List.of("done"), resultTypes());
+        assertEquals(0, taskStream.getPendingInfo(SESSION_TASK_GROUP).getTotal());
+    }
+
+    @Test
+    public void testConsume_missingGroupRecovered() throws Exception {
+        // 准备：启动一个 worker 后删除任务队列，消费组随之丢失
+        YudaoAi1Properties properties = (YudaoAi1Properties) ReflectionTestUtils.getField(secondWorker, "ai1Properties");
+        properties.getSession().getWorker().setCount(1);
+        secondWorker.start();
+        try {
+            taskStream.delete();
+            addTask();
+            release.countDown();
+
+            // 断言：worker 重建消费组后继续消费
+            long deadline = System.currentTimeMillis() + 20_000;
+            while (Ai1SessionMessageStatusEnum.isGenerating(message.get().getStatus()) && System.currentTimeMillis() < deadline) {
+                Thread.sleep(200);
+            }
+            assertEquals(Ai1SessionMessageStatusEnum.SUCCESS.getStatus(), message.get().getStatus());
+            assertEquals("第一段第二段", message.get().getContent());
+        } finally {
+            secondWorker.stop();
+        }
     }
 
     // ========== 测试数据 ==========
@@ -241,7 +350,19 @@ public class Ai1SessionTaskRecoveryIntegrationTest extends BaseMockitoUnitTest {
         ReflectionTestUtils.setField(worker, "mcpToolFactory", mcpToolFactory);
         ReflectionTestUtils.setField(worker, "skillToolFactory", skillToolFactory);
         ReflectionTestUtils.setField(worker, "ragTool", ragTool);
+        ReflectionTestUtils.setField(worker, "memoryTool", memoryTool);
+        // 直接调用 handleTask 的用例按运行中处理，与 start 之后一致
+        ReflectionTestUtils.setField(worker, "running", true);
         return worker;
+    }
+
+    /**
+     * 启动节点但不拉起消费线程，只订阅停止通知、检查停止意图
+     */
+    private static void startWithoutWorker(Ai1SessionStreamTool worker) {
+        YudaoAi1Properties properties = (YudaoAi1Properties) ReflectionTestUtils.getField(worker, "ai1Properties");
+        properties.getSession().getWorker().setCount(0);
+        worker.start();
     }
 
     private StreamMessageId addTask() {

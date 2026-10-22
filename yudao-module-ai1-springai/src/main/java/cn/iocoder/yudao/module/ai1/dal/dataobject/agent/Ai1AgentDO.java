@@ -82,6 +82,12 @@ public class Ai1AgentDO extends TenantBaseDO {
     @TableField(typeHandler = LongListTypeHandler.class)
     private List<Long> skillIds;
     /**
+     * 是否开启长期记忆
+     *
+     * 开启后，对话时注入记忆，并由 Job 归档已完成的消息
+     */
+    private Boolean memoryEnabled;
+    /**
      * 状态
      *
      * 枚举 {@link CommonStatusEnum}；开启后才可在「Agent 会话」中使用

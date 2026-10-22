@@ -44,4 +44,7 @@ public class Ai1AgentSaveReqVO {
     @Schema(description = "SKILL 编号集合", example = "[1]")
     private List<Long> skillIds;
 
+    @Schema(description = "是否开启长期记忆", example = "false")
+    private Boolean memoryEnabled;
+
 }

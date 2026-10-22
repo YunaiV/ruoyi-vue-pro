@@ -18,7 +18,10 @@ import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.function.FunctionToolCallback;
 import reactor.core.publisher.Flux;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -87,6 +90,41 @@ public class Ai1LlmChatToolTest extends BaseMockitoUnitTest {
         assertEquals(1, annotatedTools.calls);
         assertEquals(1, mcpCalls.get());
         assertEquals(1, skillCalls.get());
+    }
+
+    @Test
+    public void testChat_whitespaceChunks() {
+        // mock chatModel 和 llmModelFactory 的方法：空格、换行分片也是有效增量，只跳过空串
+        ChatModel chatModel = mock(ChatModel.class);
+        when(chatModel.getDefaultOptions()).thenReturn(ToolCallingChatOptions.builder().build());
+        when(chatModel.stream(any(Prompt.class))).thenReturn(Flux.just(
+                buildChunk("想", "你好"), buildChunk(" ", " "), buildChunk("\n", "\n"),
+                buildChunk("", "世界"), buildChunk(null, "")));
+        ChatClient chatClient = ChatClient.create(chatModel);
+        when(llmModelFactory.buildChatClient(any(), any())).thenReturn(chatClient);
+        // 准备参数
+        List<String> thinkingDeltas = new ArrayList<>();
+        List<String> contentDeltas = new ArrayList<>();
+
+        // 调用
+        Ai1LlmChatTool.ChatText result = llmChatTool.chat(new Ai1ModelRespBO(), "", List.of(), "你好",
+                List.of(), List.of(), 1L, thinkingDeltas::add, contentDeltas::add);
+        // 断言
+        assertEquals("你好 \n世界", result.getContent());
+        assertEquals("想 \n", result.getThinking());
+        assertEquals(List.of("你好", " ", "\n", "世界"), contentDeltas);
+        assertEquals(List.of("想", " ", "\n"), thinkingDeltas);
+    }
+
+    // ========== 测试数据 ==========
+
+    private static ChatResponse buildChunk(String reasoning, String content) {
+        Map<String, Object> properties = new HashMap<>();
+        if (reasoning != null) {
+            properties.put("reasoningContent", reasoning);
+        }
+        return new ChatResponse(List.of(new Generation(AssistantMessage.builder()
+                .content(content).properties(properties).build())));
     }
 
     // ========== 测试工具 ==========

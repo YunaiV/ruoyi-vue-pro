@@ -4,11 +4,14 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.module.ai1.controller.admin.session.vo.message.Ai1SessionMessagePageReqVO;
 import cn.iocoder.yudao.module.ai1.controller.admin.session.vo.message.Ai1SessionMessageSendReqVO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.session.Ai1SessionDO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.session.Ai1SessionMessageDO;
 import cn.iocoder.yudao.module.ai1.dal.mysql.session.Ai1SessionMessageMapper;
+import cn.iocoder.yudao.module.ai1.dal.redis.memory.Ai1MemoryLockRedisDAO;
 import cn.iocoder.yudao.module.ai1.enums.session.Ai1SessionMessageRoleEnum;
 import cn.iocoder.yudao.module.ai1.enums.session.Ai1SessionMessageStatusEnum;
 import cn.iocoder.yudao.module.ai1.service.agent.Ai1AgentService;
@@ -21,6 +24,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -49,14 +53,45 @@ public class Ai1SessionMessageServiceImpl implements Ai1SessionMessageService {
     @Resource
     private Ai1SessionStreamTool sessionStreamTool;
 
+    @Resource
+    private Ai1MemoryLockRedisDAO memoryLockRedisDAO;
+
     @Override
     public List<Ai1SessionMessageDO> getSessionMessageListBySessionId(Long sessionId) {
         return sessionMessageMapper.selectListBySessionId(sessionId);
     }
 
     @Override
+    public PageResult<Ai1SessionMessageDO> getSessionMessagePage(Ai1SessionMessagePageReqVO pageReqVO) {
+        return sessionMessageMapper.selectPage(pageReqVO);
+    }
+
+    @Override
     public List<Ai1SessionMessageDO> getSessionMessageListBySessionIdAndIdLessThan(Long sessionId, Long id, Integer limit) {
         return sessionMessageMapper.selectListBySessionIdAndIdLessThan(sessionId, id, limit);
+    }
+
+    @Override
+    public List<Long> getGeneratingAssistantMessageIdList(Long sessionId) {
+        return sessionMessageMapper.selectIdListBySessionIdAndRoleAndStatus(sessionId,
+                Ai1SessionMessageRoleEnum.ASSISTANT.getRole(), Ai1SessionMessageStatusEnum.GENERATING.getStatus());
+    }
+
+    @Override
+    public Ai1SessionMessageDO getFirstSessionMessageBySessionIdsAndStatusAndIdGt(Collection<Long> sessionIds, Integer status, Long id) {
+        if (CollUtil.isEmpty(sessionIds)) {
+            return null;
+        }
+        return sessionMessageMapper.selectFirstBySessionIdsAndStatusAndIdGt(sessionIds, status, id);
+    }
+
+    @Override
+    public List<Ai1SessionMessageDO> getSessionMessageListBySessionIdsAndStatusAndIdBetween(Collection<Long> sessionIds, Integer status,
+                                                                                           Long minId, Long maxId, Integer limit) {
+        if (CollUtil.isEmpty(sessionIds)) {
+            return Collections.emptyList();
+        }
+        return sessionMessageMapper.selectListBySessionIdsAndStatusAndIdBetween(sessionIds, status, minId, maxId, limit);
     }
 
     @Override
@@ -66,8 +101,9 @@ public class Ai1SessionMessageServiceImpl implements Ai1SessionMessageService {
             Ai1SessionDO session = sessionService.validateSessionMy(userId, sendReqVO.getSessionId());
             agentService.validateAgentEnabled(session.getAgentId());
 
-            // 2. 同一事务内落库用户消息与助手占位
-            Long messageId = getSelf().createRoundMessages(session, sendReqVO.getContent());
+            // 2. 同一事务内落库用户消息与助手占位；持有记忆快照锁至事务提交
+            Long messageId = memoryLockRedisDAO.lockSnapshot(session.getAgentId(), session.getUserId(),
+                    () -> getSelf().createRoundMessages(session, sendReqVO.getContent()));
 
             // 3. 投递生成任务，并打开 SSE 连接
             try {
@@ -118,6 +154,14 @@ public class Ai1SessionMessageServiceImpl implements Ai1SessionMessageService {
             log.warn("[resumeSessionMessageStream][用户({}) 消息({}) 续传失败]", userId, messageId, e);
             return sessionStreamTool.error("会话续传失败，请稍后重试");
         }
+    }
+
+    @Override
+    public void stopSessionMessageMy(Long userId, Long sessionId) {
+        // 1. 校验会话属于当前用户
+        sessionService.validateSessionMy(userId, sessionId);
+        // 2. 取消会话中生成中的助手消息
+        sessionStreamTool.cancel(sessionId);
     }
 
     /**
