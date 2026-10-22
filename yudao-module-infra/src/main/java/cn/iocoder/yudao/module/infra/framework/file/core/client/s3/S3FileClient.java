@@ -6,6 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
 import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
 import cn.iocoder.yudao.module.infra.framework.file.core.client.AbstractFileClient;
+import cn.iocoder.yudao.module.infra.framework.file.core.utils.FileTypeUtils;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
@@ -32,6 +33,8 @@ import java.time.Duration;
 public class S3FileClient extends AbstractFileClient<S3FileClientConfig> {
 
     private static final Duration EXPIRATION_DEFAULT = Duration.ofHours(24);
+
+    private static final String CONTENT_DISPOSITION_ATTACHMENT = "attachment";
 
     private S3Client client;
     private S3Presigner presigner;
@@ -79,6 +82,8 @@ public class S3FileClient extends AbstractFileClient<S3FileClientConfig> {
                 .bucket(config.getBucket())
                 .key(path)
                 .contentType(type)
+                // SVG 等可携带脚本的文件：直链直接打开时按附件下载；页面中作为图片引用时不受影响
+                .contentDisposition(FileTypeUtils.isScriptable(type) ? CONTENT_DISPOSITION_ATTACHMENT : null)
                 .contentLength((long) content.length)
                 .build();
         // 上传文件
@@ -133,9 +138,14 @@ public class S3FileClient extends AbstractFileClient<S3FileClientConfig> {
         // 2.2 情况二：私有访问：生成 GET 预签名 URL
         String finalPath = path;
         Duration expiration = expirationSeconds != null ? Duration.ofSeconds(expirationSeconds) : EXPIRATION_DEFAULT;
+        // 新签发的私有 URL：对象 key 扩展名为 SVG 等可携带脚本的类型时，要求按附件下载
+        // 注意：不覆盖公开访问、已签发的 URL，以及扩展名与 Content-Type 不一致的直传对象
+        String contentDisposition = FileTypeUtils.isScriptable(FileTypeUtils.getMineType(finalPath))
+                ? CONTENT_DISPOSITION_ATTACHMENT : null;
         URL signedUrl = presigner.presignGetObject(GetObjectPresignRequest.builder()
                 .signatureDuration(expiration)
-                .getObjectRequest(b -> b.bucket(config.getBucket()).key(finalPath)).build())
+                .getObjectRequest(b -> b.bucket(config.getBucket()).key(finalPath)
+                        .responseContentDisposition(contentDisposition)).build())
                 .url();
         return signedUrl.toString();
     }
