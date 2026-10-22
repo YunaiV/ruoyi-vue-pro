@@ -12,6 +12,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springaicommunity.agent.tools.SkillsTool;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.function.FunctionToolCallback;
 import org.springframework.test.util.ReflectionTestUtils;
 import tools.jackson.databind.JsonNode;
 
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -36,6 +38,10 @@ public class Ai1LlmModelFactoryTest {
     private HttpServer server;
     private String baseUrl;
     private String requestedTool;
+    /**
+     * 按请求顺序返回的响应体；为空时使用默认响应
+     */
+    private List<String> scriptedResponses;
 
     @BeforeEach
     public void before() throws Exception {
@@ -49,7 +55,8 @@ public class Ai1LlmModelFactoryTest {
                     JsonUtils.parseTree(new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8))));
             boolean embedding = exchange.getRequestURI().getPath().endsWith("/embeddings");
             boolean callTool = requestedTool != null && requests.size() == 1;
-            String response = callTool ? toolCallSse(requestedTool) : embedding
+            String response = scriptedResponses != null ? scriptedResponses.get(requests.size() - 1)
+                    : callTool ? toolCallSse(requestedTool) : embedding
                     ? "{\"object\":\"list\",\"data\":[{\"object\":\"embedding\",\"index\":0,\"embedding\":[0.1,0.2]}],\"model\":\"test-model\",\"usage\":{\"prompt_tokens\":1,\"total_tokens\":1}}"
                     : sse("{\"role\":\"assistant\",\"reasoning_content\":\"想\"}")
                     + sse("{\"reasoning_content\":\"想\"}")
@@ -122,6 +129,26 @@ public class Ai1LlmModelFactoryTest {
         assertEquals("文档内容", request.body().get("input").get(0).asText());
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    public void testNullApiKey_noAuthorization(boolean embedding) {
+        // 准备参数：未配置密钥时不鉴权，不回退 OPENAI_API_KEY 环境变量
+        Ai1ModelRespBO model = model(baseUrl).setApiKey(null);
+
+        // 调用
+        if (embedding) {
+            assertArrayEquals(new float[]{0.1F, 0.2F}, factory.getOrCreateEmbeddingModel(model).embed("文档内容"));
+        } else {
+            Ai1LlmChatTool chatTool = new Ai1LlmChatTool();
+            ReflectionTestUtils.setField(chatTool, "llmModelFactory", factory);
+            assertEquals("你好", chatTool.chat(model, "", List.of(), "当前消息", List.of(), List.of(),
+                    42L, null, null).getContent());
+        }
+        // 断言：不携带 Authorization（不用 assertNull，避免失败信息输出密钥）
+        assertEquals(1, requests.size());
+        assertTrue(requests.get(0).authorization() == null, "请求不应携带 Authorization");
+    }
+
     @Test
     public void testChat_skillCallback(@TempDir Path root) throws Exception {
         // 准备参数
@@ -147,6 +174,46 @@ public class Ai1LlmModelFactoryTest {
         }
         assertTrue(hasToolResult);
         assertEquals("42", requests.get(1).session());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"想|完", "想", "想| |\n|完"})
+    public void testChat_toolLoopReasoningPerCompletion(String secondRound) {
+        // 准备参数：第一轮推理“想”后调用工具；第二轮是新的 completion，推理从头累计
+        List<String> fragments = List.of(secondRound.split("\\|", -1));
+        AtomicInteger toolCalls = new AtomicInteger();
+        ToolCallback tool = FunctionToolCallback.builder("probe_tool", (String value) -> {
+            toolCalls.incrementAndGet();
+            return "tool:" + value;
+        }).inputType(String.class).description("探针工具").build();
+        StringBuilder round2 = new StringBuilder(sse("round-2", "{\"role\":\"assistant\",\"reasoning_content\":\"\"}"));
+        for (String fragment : fragments) {
+            round2.append(sse("round-2", JsonUtils.toJsonString(Map.of("reasoning_content", fragment))));
+        }
+        // 同一 completion 内后续分片的累计推理不变，不应重复输出
+        round2.append(sse("round-2", "{\"content\":\"你好\"}"))
+                .append(sse("round-2", "{\"reasoning_content\":\"\"}"))
+                .append("data: [DONE]\n\n");
+        scriptedResponses = List.of(sse("round-1", "{\"role\":\"assistant\",\"reasoning_content\":\"想\"}")
+                + toolCallSse("round-1", tool.getToolDefinition().name(), "\"probe\""), round2.toString());
+        Ai1LlmChatTool chatTool = new Ai1LlmChatTool();
+        ReflectionTestUtils.setField(chatTool, "llmModelFactory", factory);
+        List<String> thinking = new ArrayList<>();
+        List<String> content = new ArrayList<>();
+
+        // 调用
+        Ai1LlmChatTool.ChatText result = chatTool.chat(model(baseUrl), "系统指令", List.of(), "当前消息",
+                List.of(tool), List.of(), 42L, thinking::add, content::add);
+        // 断言：两轮推理各自取增量，回调保留两轮；工具执行 1 次、请求 2 次
+        List<String> expected = new ArrayList<>(List.of("想"));
+        expected.addAll(fragments);
+        assertEquals(expected, thinking);
+        assertEquals(String.join("", expected), result.getThinking());
+        assertEquals(List.of("你好"), content);
+        assertEquals("你好", result.getContent());
+        assertEquals(1, toolCalls.get());
+        assertEquals(2, requests.size());
+        assertTrue(requests.get(1).body().get("messages").toString().contains("tool:probe"));
     }
 
     @Test
@@ -199,16 +266,24 @@ public class Ai1LlmModelFactoryTest {
     }
 
     private static String sse(String delta) {
-        return "data: {\"id\":\"test\",\"object\":\"chat.completion.chunk\",\"created\":1,\"model\":\"test-model\","
+        return sse("test", delta);
+    }
+
+    private static String sse(String id, String delta) {
+        return "data: {\"id\":\"" + id + "\",\"object\":\"chat.completion.chunk\",\"created\":1,\"model\":\"test-model\","
                 + "\"choices\":[{\"index\":0,\"delta\":" + delta + ",\"finish_reason\":null}]}\n\n";
     }
 
     private static String toolCallSse(String name) {
+        return toolCallSse("test", name, "{\"command\":\"probe\"}");
+    }
+
+    private static String toolCallSse(String id, String name, String arguments) {
         String delta = JsonUtils.toJsonString(Map.of("role", "assistant", "tool_calls", List.of(Map.of(
                 "index", 0, "id", "call-probe", "type", "function", "function", Map.of(
-                        "name", name, "arguments", "{\"command\":\"probe\"}")))));
-        return sse(delta)
-                + "data: {\"id\":\"test\",\"object\":\"chat.completion.chunk\",\"created\":1,\"model\":\"test-model\","
+                        "name", name, "arguments", arguments)))));
+        return sse(id, delta)
+                + "data: {\"id\":\"" + id + "\",\"object\":\"chat.completion.chunk\",\"created\":1,\"model\":\"test-model\","
                 + "\"choices\":[{\"index\":0,\"delta\":{},\"finish_reason\":\"tool_calls\"}]}\n\n"
                 + "data: [DONE]\n\n";
     }

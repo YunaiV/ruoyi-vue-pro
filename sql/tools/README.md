@@ -28,6 +28,8 @@ docker compose up -d oracle_m1
 
 > 注意：如果使用 MacBook Apple Silicon 版本，它的 ORACLE_SID 不是 XE，而是 FREE！！！
 
+> 注意：项目 Oracle 脚本使用 `varchar2(n char)` 保持和 MySQL `varchar(n)` 一致的字符长度语义，索引、约束、序列名不超过 30 字节（Oracle 12.2 以下或 `COMPATIBLE` < 12.2 时的标识符长度上限）。使用 `sqlplus` 手动导入时，需要先执行 `SET DEFINE OFF`，避免数据里的 `&` 被当作变量替换；建议同时执行 `WHENEVER SQLERROR EXIT SQL.SQLCODE`，遇到错误立即停止。
+
 ### 1.3 PostgreSQL
 
 ```Bash

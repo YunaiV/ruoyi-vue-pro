@@ -87,7 +87,7 @@ public class Ai1LlmModelFactory {
         return embeddingModelCache.asMap().computeIfAbsent(buildCacheKey(model), key -> {
             OpenAiEmbeddingOptions options = OpenAiEmbeddingOptions.builder()
                     .baseUrl(normalizeBaseUrl(model.getBaseUrl()))
-                    .apiKey(model.getApiKey())
+                    .apiKey(StrUtil.nullToEmpty(model.getApiKey()))
                     .model(model.getModel())
                     .customHeaders(buildHeaders(model.getHeaders(), null))
                     .build();
@@ -142,7 +142,7 @@ public class Ai1LlmModelFactory {
         return chatModelCache.asMap().computeIfAbsent(cacheKey, key -> {
             OpenAiChatOptions options = OpenAiChatOptions.builder()
                     .baseUrl(normalizeBaseUrl(model.getBaseUrl()))
-                    .apiKey(model.getApiKey())
+                    .apiKey(StrUtil.nullToEmpty(model.getApiKey()))
                     .model(model.getModel())
                     .customHeaders(buildHeaders(model.getHeaders(), sessionId))
                     .build();

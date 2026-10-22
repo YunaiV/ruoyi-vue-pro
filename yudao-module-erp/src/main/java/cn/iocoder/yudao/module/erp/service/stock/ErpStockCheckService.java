@@ -81,4 +81,12 @@ public interface ErpStockCheckService {
      */
     List<ErpStockCheckItemDO> getStockCheckItemListByCheckIds(Collection<Long> checkIds);
 
+    /**
+     * 获得引用指定产品的库存盘点项数量
+     *
+     * @param productId 产品编号
+     * @return 数量
+     */
+    Long getStockCheckItemCountByProductId(Long productId);
+
 }

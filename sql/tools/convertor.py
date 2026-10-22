@@ -17,6 +17,7 @@ uv run --with simple-ddl-parser convertor.py oceanbase ../mysql/ruoyi-vue-pro.sq
 """
 
 import argparse
+import hashlib
 import pathlib
 import re
 import sys
@@ -559,16 +560,29 @@ INSERT INTO dual VALUES (1);
 
 class OracleConvertor(Convertor):
     reserved_column_names = {"level", "size"}
+    # Oracle 12.2 以下（或 COMPATIBLE < 12.2）标识符最长 30 字节，超出会报 ORA-00972。相关案例：https://t.zsxq.com/tbf3q
+    max_identifier_length = 30
 
     def __init__(self, src):
         super().__init__(src, "Oracle")
+
+    def shorten_identifier(self, name: str) -> str:
+        """超长的索引、约束、序列名：截断后追加完整名称的哈希，保证结果稳定且不重名"""
+        if len(name.encode("utf-8")) <= self.max_identifier_length:
+            return name
+        digest = hashlib.md5(name.encode("utf-8")).hexdigest()[:6]
+        # 按字节截断，并丢弃被截断的不完整字符
+        prefix_bytes = name.encode("utf-8")[: self.max_identifier_length - len(digest) - 1]
+        prefix = prefix_bytes.decode("utf-8", errors="ignore").rstrip("_")
+        return f"{prefix}_{digest}"
 
     def translate_type(self, type: str, size: Optional[Union[int, Tuple[int]]]):
         """类型转换"""
         type = type.lower()
 
         if type == "varchar":
-            return f"varchar2({size if size < 4000 else 4000})"
+            # MySQL varchar(n) 按字符计算长度，Oracle 默认按字节，所以显式使用 CHAR 语义。相关案例：https://t.zsxq.com/tbf3q
+            return f"varchar2({size if size < 4000 else 4000} char)"
         if type in ("int", "int unsigned"):
             return "number"
         if type == "bigint" or type == "bigint unsigned":
@@ -622,9 +636,6 @@ CREATE TABLE {table_name} (
 
         return script
 
-    def gen_index(self, ddl: Dict) -> str:
-        return "\n".join(f"{script};" for script in self.index(ddl))
-
     def gen_comment(self, table_ddl: Dict) -> str:
         script = ""
         for column in table_ddl["columns"]:
@@ -644,19 +655,25 @@ CREATE TABLE {table_name} (
 
     def gen_pk(self, table_name: str) -> str:
         """生成主键定义"""
-        return f"ALTER TABLE {table_name} ADD CONSTRAINT pk_{table_name} PRIMARY KEY (id);\n"
+        pk_name = self.shorten_identifier(f"pk_{table_name}")
+        return f"ALTER TABLE {table_name} ADD CONSTRAINT {pk_name} PRIMARY KEY (id);\n"
 
     def gen_uk(self, table_ddl: Dict) -> str:
         script = ""
         uk_list = list(Convertor.unique_index(table_ddl))
         for idx, (table_name, _, uk_columns) in enumerate(uk_list, 1):
-            uk_name = f"uk_{table_name}_{idx:02d}"
+            uk_name = self.shorten_identifier(f"uk_{table_name}_{idx:02d}")
             script += f"CREATE UNIQUE INDEX {uk_name} ON {table_name} ({', '.join(uk_columns)});\n"
 
         return script
 
     def gen_index(self, ddl: Dict) -> str:
-        return "\n".join(f"{script};" for script in self.index(ddl))
+        scripts = []
+        for script in self.index(ddl):
+            # 格式为 CREATE INDEX {index_name} ON ...
+            index_name = script.split()[2]
+            scripts.append(script.replace(index_name, self.shorten_identifier(index_name), 1) + ";")
+        return "\n".join(scripts)
 
     def gen_insert(self, table_name: str) -> str:
         """拷贝 INSERT 语句"""
@@ -688,9 +705,14 @@ COMMIT;
                 last_id = int(match.group(1))
 
         # 生成 Sequence
+        seq_name = self.shorten_identifier(f"{table_name}_seq")
+        if seq_name != f"{table_name}_seq":
+            # 序列名会被 @KeySequence 引用，缩短后需要提示同步修改
+            print(f"!!! Oracle 序列名 {table_name}_seq 超过 {self.max_identifier_length} 字节，已缩短为 {seq_name}，"
+                  f"如有 @KeySequence 引用需同步修改", file=sys.stderr)
         script += f"""
 
-CREATE SEQUENCE {table_name}_seq
+CREATE SEQUENCE {seq_name}
     START WITH {last_id + 1};"""
 
         return script

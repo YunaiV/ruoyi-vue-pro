@@ -81,9 +81,9 @@ public interface Ai1AgentService {
     Ai1AgentDO validateAgentEnabled(Long id);
 
     /**
-     * 获得指定状态的 Agent 列表，用于会话页选择 Agent
+     * 获得指定状态的 Agent 列表，按编号升序，用于选择 Agent
      *
-     * @param status 状态
+     * @param status 状态；为空时返回全部状态
      * @return Agent 列表
      */
     List<Ai1AgentDO> getAgentListByStatus(Integer status);

@@ -54,6 +54,14 @@ public interface Ai1SessionService {
     Ai1SessionDO validateSessionMy(Long userId, Long id);
 
     /**
+     * 获得会话
+     *
+     * @param id 编号
+     * @return 会话
+     */
+    Ai1SessionDO getSession(Long id);
+
+    /**
      * 获得指定用户在指定 Agent 下的会话列表，按编号倒序
      *
      * @param agentId Agent 编号
@@ -61,6 +69,14 @@ public interface Ai1SessionService {
      * @return 会话列表
      */
     List<Ai1SessionDO> getSessionListByAgentIdAndUserId(Long agentId, Long userId);
+
+    /**
+     * 获得 Agent 下有会话的用户编号列表
+     *
+     * @param agentId Agent 编号
+     * @return 用户编号列表
+     */
+    List<Long> getUserIdListByAgentId(Long agentId);
 
     /**
      * 获得会话分页（管理端查看 Agent 的全部会话）

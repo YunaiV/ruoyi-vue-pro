@@ -15,6 +15,9 @@ public class Ai1SessionRespVO {
     @Schema(description = "Agent 编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long agentId;
 
+    @Schema(description = "Agent 名称", example = "客服助手")
+    private String agentName;
+
     @Schema(description = "用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long userId;
 

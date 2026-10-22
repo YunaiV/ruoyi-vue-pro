@@ -10,6 +10,7 @@ import org.apache.fesod.sheet.write.style.column.AbstractColumnWidthStyleStrateg
 import org.apache.fesod.sheet.write.style.column.LongestMatchColumnWidthStyleStrategy;
 import org.apache.poi.ss.usermodel.Cell;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +42,7 @@ public class ColumnWidthMatchStyleStrategy extends AbstractColumnWidthStyleStrat
         if (columnWidth < 0) {
             return;
         }
+        columnWidth += 2; // 留出单元格边距，避免短表头换行
         if (columnWidth > MAX_COLUMN_WIDTH) {
             columnWidth = MAX_COLUMN_WIDTH;
         }
@@ -54,7 +56,7 @@ public class ColumnWidthMatchStyleStrategy extends AbstractColumnWidthStyleStrat
     @SuppressWarnings("EnhancedSwitchMigration")
     private Integer dataLength(List<WriteCellData<?>> cellDataList, Cell cell, Boolean isHead) {
         if (isHead) {
-            return cell.getStringCellValue().getBytes().length;
+            return cell.getStringCellValue().getBytes(StandardCharsets.UTF_8).length;
         }
         WriteCellData<?> cellData = cellDataList.get(0);
         CellDataTypeEnum type = cellData.getType();
@@ -63,13 +65,13 @@ public class ColumnWidthMatchStyleStrategy extends AbstractColumnWidthStyleStrat
         }
         switch (type) {
             case STRING:
-                return cellData.getStringValue().getBytes().length;
+                return cellData.getStringValue().getBytes(StandardCharsets.UTF_8).length;
             case BOOLEAN:
-                return cellData.getBooleanValue().toString().getBytes().length;
+                return cellData.getBooleanValue().toString().getBytes(StandardCharsets.UTF_8).length;
             case NUMBER:
-                return cellData.getNumberValue().toString().getBytes().length;
+                return cellData.getNumberValue().toString().getBytes(StandardCharsets.UTF_8).length;
             case DATE:
-                return cellData.getDateValue().toString().getBytes().length;
+                return cellData.getDateValue().toString().getBytes(StandardCharsets.UTF_8).length;
             default:
                 return -1;
         }

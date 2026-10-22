@@ -70,6 +70,7 @@ public class Ai1LlmChatTool {
         // 2. 流式执行，逐段回调
         StringBuilder contentText = new StringBuilder();
         StringBuilder thinkingText = new StringBuilder();
+        String completionId = "";
         String previousReasoning = "";
         for (ChatResponse chatResponse : spec.stream().chatResponse().toIterable()) {
             Generation generation = chatResponse.getResult();
@@ -77,20 +78,26 @@ public class Ai1LlmChatTool {
             if (generation == null || generation.getOutput() == null) {
                 continue;
             }
-            // 2.1 思考过程：推理模型的 reasoning_content 按流累积下发，取变化增量转发，重复值去重
+            // 2.1 思考过程：推理模型的 reasoning_content 在同一 completion 内累积下发，取变化增量转发，重复值去重；
+            // 工具调用后的下一轮是新的 completion，从头累积，需重置比较基线（无 id 时按同一 completion 处理）
+            String responseId = chatResponse.getMetadata().getId();
+            if (StrUtil.isNotEmpty(responseId) && !responseId.equals(completionId)) {
+                completionId = responseId;
+                previousReasoning = "";
+            }
             Object reasoningValue = generation.getOutput().getMetadata().get(METADATA_REASONING);
             String reasoning = reasoningValue instanceof String value ? value : null;
             String delta = computeReasoningDelta(previousReasoning, reasoning);
-            if (StrUtil.isNotBlank(delta)) {
+            if (StrUtil.isNotEmpty(delta)) {
                 previousReasoning = reasoning;
                 thinkingText.append(delta);
                 if (onThinking != null) {
                     onThinking.accept(delta);
                 }
             }
-            // 2.2 回复内容
+            // 2.2 回复内容：只跳过空串，空格、换行分片也是有效内容
             String chunk = generation.getOutput().getText();
-            if (StrUtil.isNotBlank(chunk)) {
+            if (StrUtil.isNotEmpty(chunk)) {
                 contentText.append(chunk);
                 if (onContent != null) {
                     onContent.accept(chunk);
@@ -126,7 +133,7 @@ public class Ai1LlmChatTool {
      * 推理内容增量计算：与上轮累积内容比较，取新增部分；无变化返回 null
      */
     private static String computeReasoningDelta(String previousReasoning, String reasoning) {
-        if (StrUtil.isBlank(reasoning) || reasoning.equals(previousReasoning)) {
+        if (StrUtil.isEmpty(reasoning) || reasoning.equals(previousReasoning)) {
             return null;
         }
         return reasoning.startsWith(previousReasoning) ? reasoning.substring(previousReasoning.length()) : reasoning;

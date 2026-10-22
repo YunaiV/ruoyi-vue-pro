@@ -77,4 +77,7 @@ public interface Ai1ErrorCodeConstants {
     // ========== 会话消息 1-041-009-000 ==========
     ErrorCode SESSION_MESSAGE_NOT_EXISTS = new ErrorCode(1_041_009_000, "会话消息不存在");
 
+    // ========== 长期记忆 1-041-010-000 ==========
+    ErrorCode MEMORY_NOT_EXISTS = new ErrorCode(1_041_010_000, "长期记忆不存在");
+
 }

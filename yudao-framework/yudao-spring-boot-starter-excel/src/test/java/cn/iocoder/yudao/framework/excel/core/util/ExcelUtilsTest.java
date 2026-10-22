@@ -83,8 +83,8 @@ public class ExcelUtilsTest extends BaseMockitoUnitTest {
             // 断言下拉框
             assertNotNull(workbook.getSheet("字典sheet"));
             assertEquals(1, sheet.getDataValidations().size());
-            // 断言列宽
-            assertEquals(19 * 256, sheet.getColumnWidth(0));
+            // 断言列宽：19 位 Long 字符串，加上 2 个字符的留白
+            assertEquals((19 + 2) * 256, sheet.getColumnWidth(0));
         }
     }
 

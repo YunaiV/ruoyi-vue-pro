@@ -28,7 +28,7 @@ public interface Ai1AgentMapper extends BaseMapperX<Ai1AgentDO> {
 
     default List<Ai1AgentDO> selectListByStatusOrderById(Integer status) {
         return selectList(new LambdaQueryWrapperX<Ai1AgentDO>()
-                .eq(Ai1AgentDO::getStatus, status)
+                .eqIfPresent(Ai1AgentDO::getStatus, status)
                 .orderByAsc(Ai1AgentDO::getId));
     }
 

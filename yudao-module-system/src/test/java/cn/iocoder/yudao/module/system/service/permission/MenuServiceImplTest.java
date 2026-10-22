@@ -10,14 +10,14 @@ import cn.iocoder.yudao.module.system.enums.permission.MenuTypeEnum;
 import cn.iocoder.yudao.module.system.service.tenant.TenantService;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.common.util.collection.SetUtils.asSet;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
@@ -25,11 +25,10 @@ import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServic
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
 import static cn.iocoder.yudao.module.system.dal.dataobject.permission.MenuDO.ID_ROOT;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @Import(MenuServiceImpl.class)
 public class MenuServiceImplTest extends BaseDbUnitTest {
@@ -37,7 +36,7 @@ public class MenuServiceImplTest extends BaseDbUnitTest {
     @Resource
     private MenuServiceImpl menuService;
 
-    @Resource
+    @MockitoSpyBean
     private MenuMapper menuMapper;
 
     @MockitoBean
@@ -219,6 +218,47 @@ public class MenuServiceImplTest extends BaseDbUnitTest {
         // 断言
         assertEquals(1, list.size());
         assertPojoEquals(menu100, list.get(0));
+    }
+
+    @Test
+    public void testGetMenuList_idsEmpty() {
+        // 调用，并断言
+        assertTrue(menuService.getMenuList((Collection<Long>) null).isEmpty());
+        assertTrue(menuService.getMenuList(Collections.<Long>emptyList()).isEmpty());
+        // 断言：不查询数据库
+        verify(menuMapper, never()).selectByIds(anyCollection());
+    }
+
+    @Test
+    public void testGetMenuList_idsMoreThanBatchSize() {
+        // mock 数据（1001 个菜单，超过 Oracle IN 的 1000 个限制）
+        Set<Long> menuIds = new HashSet<>();
+        for (int i = 0; i < 1001; i++) {
+            MenuDO menu = buildMenuDO(MenuTypeEnum.MENU, "menu" + i, ID_ROOT);
+            menuMapper.insert(menu);
+            menuIds.add(menu.getId());
+        }
+        // mock 数据（已删除的菜单）
+        MenuDO deletedMenu = buildMenuDO(MenuTypeEnum.MENU, "deleted", ID_ROOT);
+        menuMapper.insert(deletedMenu);
+        menuMapper.deleteById(deletedMenu.getId());
+        // 准备参数（包含重复、不存在、已删除的编号）
+        List<Long> ids = new ArrayList<>(menuIds);
+        ids.add(ids.get(0));
+        ids.add(Long.MAX_VALUE);
+        ids.add(deletedMenu.getId());
+
+        // 调用
+        List<MenuDO> list = menuService.getMenuList(ids);
+        // 断言：结果完整，且不重复
+        assertEquals(1001, list.size());
+        assertEquals(menuIds, convertSet(list, MenuDO::getId));
+        // 断言：每批 IN 不超过 1000 个（Oracle 限制）
+        ArgumentCaptor<Collection<Long>> batchIdsCaptor = ArgumentCaptor.forClass(Collection.class);
+        verify(menuMapper, atLeastOnce()).selectByIds(batchIdsCaptor.capture());
+        for (Collection<Long> batchIds : batchIdsCaptor.getAllValues()) {
+            assertTrue(batchIds.size() <= 1000);
+        }
     }
 
     @Test
