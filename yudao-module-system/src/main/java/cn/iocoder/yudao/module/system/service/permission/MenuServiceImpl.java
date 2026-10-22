@@ -205,7 +205,11 @@ public class MenuServiceImpl implements MenuService {
         if (CollUtil.isEmpty(ids)) {
             return Lists.newArrayList();
         }
-        return menuMapper.selectByIds(ids);
+        // 分批查询，避免 Oracle 等数据库 IN 超过 1000 个时报错（ORA-01795），例如说超级管理员拥有全部菜单。相关案例：https://t.zsxq.com/tbf3q
+        // 先去重，避免同一编号落在不同批次后被重复返回
+        List<MenuDO> menus = new ArrayList<>(ids.size());
+        CollUtil.split(new LinkedHashSet<>(ids), 1000).forEach(batchIds -> menus.addAll(menuMapper.selectByIds(batchIds)));
+        return menus;
     }
 
     /**
