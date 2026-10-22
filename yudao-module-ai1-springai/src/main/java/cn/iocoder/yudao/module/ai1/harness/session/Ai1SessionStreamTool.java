@@ -529,7 +529,7 @@ public class Ai1SessionStreamTool implements SmartLifecycle {
         if (!lock.tryLock()) {
             return false;
         }
-        long ownerThreadId = Thread.currentThread().threadId();
+        long ownerThreadId = Thread.currentThread().getId();
         try {
             // 3. 锁内重新读取，期间可能已被 worker 完成
             Ai1SessionMessageDO current = sessionMessageService.getSessionMessage(messageId);
@@ -687,7 +687,7 @@ public class Ai1SessionStreamTool implements SmartLifecycle {
         if (!lock.tryLock()) {
             return;
         }
-        long workerThreadId = Thread.currentThread().threadId();
+        long workerThreadId = Thread.currentThread().getId();
         try {
             Long tenantId = Convert.toLong(fields.get(FIELD_TENANT_ID));
             TenantUtils.execute(tenantId, () -> executeTask(recordId, fields, messageId, lock, workerThreadId, reclaimed));

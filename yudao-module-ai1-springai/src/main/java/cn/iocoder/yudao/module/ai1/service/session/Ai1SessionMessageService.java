@@ -26,7 +26,7 @@ public interface Ai1SessionMessageService {
     List<Ai1SessionMessageDO> getSessionMessageListBySessionId(Long sessionId);
 
     /**
-     * 获得会话消息分页，按编号倒序
+     * 获得会话消息分页，按编号倒序取最新页，页内按时间正序
      *
      * @param pageReqVO 分页查询
      * @return 消息分页

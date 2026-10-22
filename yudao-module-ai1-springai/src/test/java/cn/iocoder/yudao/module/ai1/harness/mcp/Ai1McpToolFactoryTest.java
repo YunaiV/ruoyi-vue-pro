@@ -67,7 +67,7 @@ public class Ai1McpToolFactoryTest extends BaseMockitoUnitTest {
         // 调用
         List<ToolCallback> callbacks = buildTools(List.of(mcp), List.of("search"));
         // 断言
-        assertEquals("github__search", callbacks.getFirst().getToolDefinition().name());
+        assertEquals("github__search", callbacks.get(0).getToolDefinition().name());
     }
 
     @Test
@@ -78,8 +78,8 @@ public class Ai1McpToolFactoryTest extends BaseMockitoUnitTest {
         // 调用
         List<ToolCallback> callbacks = buildTools(List.of(mcp), List.of("search"));
         // 断言
-        assertEquals("a".repeat(56) + "__search", callbacks.getFirst().getToolDefinition().name());
-        assertEquals(64, callbacks.getFirst().getToolDefinition().name().length());
+        assertEquals("a".repeat(56) + "__search", callbacks.get(0).getToolDefinition().name());
+        assertEquals(64, callbacks.get(0).getToolDefinition().name().length());
     }
 
     @Test
@@ -127,7 +127,7 @@ public class Ai1McpToolFactoryTest extends BaseMockitoUnitTest {
         List<ToolCallback> callbacks = buildTools(List.of(mcp), List.of(toolName));
 
         // 调用
-        String result = callbacks.getFirst().call("{\"query\":\"北京\"}");
+        String result = callbacks.get(0).call("{\"query\":\"北京\"}");
         // 断言
         assertEquals("搜索结果", JsonUtils.parseObject(result, String.class));
         verify(mcpClientTool).callTool(mcp, toolName, arguments);

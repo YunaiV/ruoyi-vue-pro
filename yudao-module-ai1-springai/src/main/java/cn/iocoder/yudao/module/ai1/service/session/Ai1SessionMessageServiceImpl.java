@@ -63,7 +63,12 @@ public class Ai1SessionMessageServiceImpl implements Ai1SessionMessageService {
 
     @Override
     public PageResult<Ai1SessionMessageDO> getSessionMessagePage(Ai1SessionMessagePageReqVO pageReqVO) {
-        return sessionMessageMapper.selectPage(pageReqVO);
+        PageResult<Ai1SessionMessageDO> pageResult = sessionMessageMapper.selectPage(pageReqVO);
+        // 按编号倒序取最新页，页内反转为时间正序
+        if (CollUtil.isNotEmpty(pageResult.getList())) {
+            Collections.reverse(pageResult.getList());
+        }
+        return pageResult;
     }
 
     @Override

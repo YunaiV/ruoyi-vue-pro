@@ -77,7 +77,7 @@ public class Ai1SessionMessageController {
     // ==================== 管理 ====================
 
     @GetMapping("/page")
-    @Operation(summary = "获得会话消息分页", description = "按消息编号倒序")
+    @Operation(summary = "获得会话消息分页", description = "按消息编号倒序取最新页，页内按时间正序")
     @PreAuthorize("@ss.hasPermission('ai1:session:query')")
     public CommonResult<PageResult<Ai1SessionMessageRespVO>> getSessionMessagePage(@Valid Ai1SessionMessagePageReqVO pageReqVO) {
         return success(BeanUtils.toBean(sessionMessageService.getSessionMessagePage(pageReqVO),

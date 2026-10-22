@@ -171,11 +171,25 @@ public class Ai1SessionMessageServiceImplTest extends BaseDbUnitTest {
 
         // 调用
         PageResult<Ai1SessionMessageDO> pageResult = sessionMessageService.getSessionMessagePage(reqVO);
-        // 断言：按编号倒序
+        // 断言：取最新一页，页内按时间正序
         assertEquals(3, pageResult.getTotal());
-        assertEquals(List.of(message3.getId(), message2.getId()),
+        assertEquals(List.of(message2.getId(), message3.getId()),
                 pageResult.getList().stream().map(Ai1SessionMessageDO::getId).toList());
-        assertNotEquals(message1.getId(), pageResult.getList().get(1).getId());
+
+        // 调用：第二页
+        reqVO.setPageNo(2);
+        pageResult = sessionMessageService.getSessionMessagePage(reqVO);
+        // 断言：更早的消息
+        assertEquals(3, pageResult.getTotal());
+        assertEquals(List.of(message1.getId()),
+                pageResult.getList().stream().map(Ai1SessionMessageDO::getId).toList());
+
+        // 调用：超出范围的空页
+        reqVO.setPageNo(3);
+        pageResult = sessionMessageService.getSessionMessagePage(reqVO);
+        // 断言
+        assertEquals(3, pageResult.getTotal());
+        assertTrue(pageResult.getList().isEmpty());
     }
 
     @Test
