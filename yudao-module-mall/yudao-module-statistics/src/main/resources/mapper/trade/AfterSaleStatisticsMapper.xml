@@ -8,7 +8,7 @@
                SUM(refund_price) AS afterSaleRefundPrice
         FROM trade_after_sale
         WHERE refund_time BETWEEN #{beginTime} AND #{endTime}
-          AND deleted = FALSE
+          AND deleted = 0
         <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
             AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
         </if>
@@ -18,7 +18,7 @@
         SELECT COUNT(1)
         FROM trade_after_sale
         WHERE status = #{status}
-          AND deleted = FALSE
+          AND deleted = 0
         <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
             AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
         </if>
