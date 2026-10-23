@@ -204,8 +204,12 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
             return PayRefundRespDTO.failureOf(response.getSubCode(), response.getSubMsg(), reqDTO.getOutRefundNo(), response);
         }
         // 2.2 创建返回结果
-        // 支付宝只要退款调用返回 success，就认为退款成功，不需要回调。具体可见 parseNotify 方法的说明。
-        // 另外，支付宝没有退款单号，所以不用设置
+        // 支付宝退款没有回调，具体可见 parseNotify 方法的说明。另外，支付宝没有退款单号，所以不用设置
+        // 特殊：code=10000 只代表退款请求成功，fund_change=Y 才代表退款成功；fund_change=N 或者没有返回时，需要查询退款确认，所以返回结果未知
+        // 参见 https://aipay.alipay.com/docs/subscribe/api-list/other-basic-interfaces/alipay-trade-refund.html 注意事项
+        if (!Objects.equals(response.getFundChange(), "Y")) {
+            return PayRefundRespDTO.waitingOf(null, reqDTO.getOutRefundNo(), response);
+        }
         return PayRefundRespDTO.successOf(null, LocalDateTimeUtil.of(response.getGmtRefundPay()),
                 reqDTO.getOutRefundNo(), response);
     }
@@ -216,7 +220,7 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
         // ① 部分退款：是会有回调，但是它回调的是订单状态的同步回调，不是退款订单的回调
         // ② 全部退款：Wap 支付有订单状态的同步回调，但是 PC/扫码又没有
         // 所以，这里在解析时，即使是退款导致的订单状态同步，我们也忽略不做为“退款同步”，而是订单的回调。
-        // 实际上，支付宝退款只要发起成功，就可以认为退款成功，不需要等待回调。
+        // 实际上，支付宝退款不需要等待回调，以发起退款返回的 fund_change、或者查询退款的结果为准。
         throw new UnsupportedOperationException("支付宝无退款回调");
     }
 
@@ -239,11 +243,10 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
             response = client.execute(request);
         }
         if (!response.isSuccess()) {
-            // 明确不存在的情况，应该就是失败，可进行关闭
-            if (ObjectUtils.equalsAny(response.getSubCode(), "TRADE_NOT_EXIST", "ACQ.TRADE_NOT_EXIST")) {
-                return PayRefundRespDTO.failureOf(outRefundNo, response);
-            }
-            // 可能存在“ACQ.SYSTEM_ERROR”系统错误等情况，所以返回 WAIT 继续等待
+            // 查询失败，不代表退款失败，返回结果未知，继续等待。例如说：
+            // ① “ACQ.SYSTEM_ERROR”系统错误
+            // ② “ACQ.TRADE_NOT_EXIST”交易不存在：官方建议确认外部订单号、交易号是否正确，是交易维度的错误，不是退款单明确失败的状态
+            // 关联 https://github.com/YunaiV/ruoyi-vue-pro/issues/1290
             return PayRefundRespDTO.waitingOf(null, outRefundNo, response);
         }
         // 2.2 创建返回结果
@@ -251,6 +254,7 @@ public abstract class AbstractAlipayPayClient extends AbstractPayClient<AlipayPa
             return PayRefundRespDTO.successOf(null, LocalDateTimeUtil.of(response.getGmtRefundPay()),
                     outRefundNo, response);
         }
+        // 没有退款数据（refund_status）：可能退款请求未收到、或者尚未处理完成，返回结果未知，不能作为退款失败
         return PayRefundRespDTO.waitingOf(null, outRefundNo, response);
     }
 

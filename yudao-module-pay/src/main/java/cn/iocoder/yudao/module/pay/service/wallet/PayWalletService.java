@@ -50,6 +50,8 @@ public interface PayWalletService {
     /**
      * 钱包订单支付退款
      *
+     * 幂等：同一退款单已退款到钱包时，返回原退款流水，不会重复增加余额
+     *
      * @param outRefundNo 外部退款号
      * @param refundPrice 退款金额
      * @param reason      退款原因
