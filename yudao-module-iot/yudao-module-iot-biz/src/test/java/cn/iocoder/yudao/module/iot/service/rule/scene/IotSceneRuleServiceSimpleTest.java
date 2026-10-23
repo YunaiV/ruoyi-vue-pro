@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.iot.service.rule.scene;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.scene.IotSceneRuleSaveReqVO;
+import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
+import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.rule.IotSceneRuleMapper;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
@@ -14,6 +16,7 @@ import cn.iocoder.yudao.module.iot.service.rule.scene.timer.IotTimerConditionEva
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.dao.QueryTimeoutException;
 
 import java.util.Collections;
 import java.util.List;
@@ -22,6 +25,7 @@ import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -38,22 +42,16 @@ public class IotSceneRuleServiceSimpleTest extends BaseMockitoUnitTest {
 
     @Mock
     private IotSceneRuleMapper sceneRuleMapper;
-
     @Mock
     private List<IotSceneRuleAction> sceneRuleActions;
-
     @Mock
     private IotSceneRuleTimerHandler timerHandler;
-
     @Mock
     private IotTimerConditionEvaluator timerConditionEvaluator;
-
     @Mock
     private IotSceneRuleMatcherManager sceneRuleMatcherManager;
-
     @Mock
     private IotProductService productService;
-
     @Mock
     private IotDeviceService deviceService;
 
@@ -216,4 +214,37 @@ public class IotSceneRuleServiceSimpleTest extends BaseMockitoUnitTest {
         // 验证
         verify(sceneRuleMapper, times(1)).selectById(id);
     }
+
+    @Test
+    public void testExecuteSceneRuleByDevice_deviceNotExists() {
+        // 准备参数：设备已删除时，消息仍在途
+        IotDeviceMessage message = new IotDeviceMessage().setDeviceId(randomLongId())
+                .setMethod(IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod());
+
+        // Mock 行为
+        when(deviceService.getDeviceFromCache(message.getDeviceId())).thenReturn(null);
+
+        // 调用 - 设备不存在时跳过，不抛出异常
+        assertDoesNotThrow(() -> sceneRuleService.executeSceneRuleByDevice(message));
+
+        // 验证：不再匹配、执行场景规则
+        verify(deviceService, times(1)).getDeviceFromCache(message.getDeviceId());
+        verifyNoInteractions(sceneRuleMapper, productService, sceneRuleMatcherManager, sceneRuleActions);
+    }
+
+    @Test
+    public void testExecuteSceneRuleByDevice_queryException() {
+        // 准备参数
+        IotDeviceMessage message = new IotDeviceMessage().setDeviceId(randomLongId())
+                .setMethod(IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod());
+
+        // Mock 行为：查询设备时 Redis 超时
+        when(deviceService.getDeviceFromCache(message.getDeviceId()))
+                .thenThrow(new QueryTimeoutException("Redis 超时"));
+
+        // 调用，并断言异常：可恢复异常继续抛出，由消息重投重试
+        assertThrows(QueryTimeoutException.class, () -> sceneRuleService.executeSceneRuleByDevice(message));
+        verifyNoInteractions(sceneRuleMapper, productService, sceneRuleMatcherManager, sceneRuleActions);
+    }
+
 }

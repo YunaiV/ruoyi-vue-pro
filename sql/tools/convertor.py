@@ -23,7 +23,7 @@ import re
 import sys
 import time
 from abc import ABC, abstractmethod
-from typing import Dict, Generator, Optional, Tuple, Union
+from typing import Dict, Generator, List, Optional, Tuple, Union
 
 from simple_ddl_parser import DDLParser
 
@@ -43,6 +43,52 @@ PREAMBLE = """/*
 """
 
 
+# 依次匹配：引号字符串（支持反斜杠转义、双写引号）、注释、语句分隔符；未闭合的引号吞掉剩余内容
+SQL_TOKEN_PATTERN = re.compile(
+    r"'(?:\\[\s\S]|''|[^'\\])*'"
+    r'|"(?:\\[\s\S]|""|[^"\\])*"'
+    r"|`(?:``|[^`])*`"
+    r"|--(?=\s|\Z)[^\n]*|#[^\n]*|/\*[\s\S]*?(?:\*/|\Z)"
+    r"|['\"`][\s\S]*"
+    r"|;"
+)
+# 语句开头的空白、注释
+SQL_LEADING_PATTERN = re.compile(r"(?:\s|--(?=\s|\Z)[^\n]*|#[^\n]*|/\*[\s\S]*?(?:\*/|\Z))*")
+CREATE_TABLE_PATTERN = re.compile(r"CREATE\s+TABLE\s", flags=re.IGNORECASE)
+
+
+def split_statements(content: str) -> List[str]:
+    """按分号拆分 SQL 语句，忽略引号、注释内的分号
+
+    仅用于定位顶层语句，不是完整的 SQL 解析器。返回的语句保留原文，去掉开头的空白、注释，以分号结尾
+
+    Args:
+        content (str): sql 内容
+
+    Returns:
+        List[str]: 语句列表
+    """
+    statements = []
+    start = 0
+    for match in SQL_TOKEN_PATTERN.finditer(content):
+        if match.group() != ";":
+            continue
+        statement = content[start:match.end()]
+        start = match.end()
+        statement = statement[SQL_LEADING_PATTERN.match(statement).end():]
+        if statement != ";":
+            statements.append(statement)
+    return statements
+
+
+def table_scripts(content: str) -> List[str]:
+    """获得真实的 CREATE TABLE 语句，不包括 INSERT 数据、注释中的建表文本
+
+    相关 issue：https://github.com/YunaiV/ruoyi-vue-pro/issues/1273
+    """
+    return [statement for statement in split_statements(content) if CREATE_TABLE_PATTERN.match(statement)]
+
+
 def load_and_clean(sql_file: str) -> str:
     """加载源 SQL 文件，并清理内容方便下一步 ddl 解析
 
@@ -51,6 +97,19 @@ def load_and_clean(sql_file: str) -> str:
 
     Returns:
         str: 清理后的sql文件内容
+    """
+    # utf-8-sig：只去掉文件开头的 BOM，避免首条语句无法识别
+    return clean(open(sql_file, encoding="utf-8-sig").read())
+
+
+def clean(content: str) -> str:
+    """清理 SQL 内容方便下一步 ddl 解析
+
+    Args:
+        content (str): sql 内容
+
+    Returns:
+        str: 清理后的sql内容
     """
     REPLACE_PAIR_LIST = (
         (")\nVALUES ", ") VALUES "),
@@ -62,7 +121,6 @@ def load_and_clean(sql_file: str) -> str:
         ("b'1'", "'1'"),
     )
 
-    content = open(sql_file, encoding="utf-8").read()
     for replace_pair in REPLACE_PAIR_LIST:
         content = content.replace(*replace_pair)
     # 移除所有 CHARACTER SET / COLLATE 变体 (utf8mb3、utf8 等)
@@ -88,10 +146,14 @@ class Convertor(ABC):
         self.db_type = db_type
         self.content = load_and_clean(self.src)
         # original_content 保留原始 COMMENT 信息，用于注释提取
-        self.original_content = open(src, encoding="utf-8").read()
-        # 剥离列级 COMMENT 以避免 COMMENT 值内的分号截断 CREATE TABLE 正则
-        content_no_comment = re.sub(r" COMMENT '(?:[^'\\]|\\.)*'", "", self.content)
-        self.table_script_list = re.findall(r"CREATE TABLE [^;]*;", content_no_comment)
+        self.original_content = open(src, encoding="utf-8-sig").read()
+        # 在原始内容上扫描建表语句，避免全局清理破坏引号边界；每个建表语句再单独清理
+        self.original_table_script_list = table_scripts(self.original_content)
+        # 剥离列级 COMMENT，交给 DDLParser 解析
+        self.table_script_list = [
+            re.sub(r" COMMENT '(?:[^'\\]|\\.)*'", "", clean(table_sql))
+            for table_sql in self.original_table_script_list
+        ]
 
     @abstractmethod
     def translate_type(self, type: str, size: Optional[Union[int, Tuple[int]]]) -> str:
@@ -330,7 +392,7 @@ class Convertor(ABC):
             )
 
         error_scripts = []
-        for table_sql in self.table_script_list:
+        for table_sql, orig_table_sql in zip(self.table_script_list, self.original_table_script_list):
             # 剥离 COMMENT 子句避免 DDLParser 无法处理中文等特殊字符
             table_sql_for_parse = re.sub(r"\s+COMMENT\s+'[^']*'", "", table_sql)
             ddl = DDLParser(table_sql_for_parse.replace("`", "")).run()
@@ -354,14 +416,7 @@ class Convertor(ABC):
                 continue
 
             # 解析注释
-            # 从原始 SQL 提取注释（支持中文等 DDLParser 不能处理的内容）
-            # 按表名定位完整建表段（以「换行 + )」起始的 ENGINE 行作为终止），避免被列 COMMENT 内的分号截断
-            orig_match = re.search(
-                rf"CREATE TABLE\s+`{re.escape(table_name)}`[\s\S]*?\n\)[^;]*;",
-                self.original_content,
-                flags=re.IGNORECASE,
-            )
-            orig_table_sql = orig_match.group() if orig_match else table_sql
+            # 从原始建表语句提取注释（支持中文等 DDLParser 不能处理的内容），避免 INSERT 数据中的同名建表文本干扰
             comments_dict = dict(Convertor.filed_comments(orig_table_sql))
             for column in table_ddl["columns"]:
                 column["comment"] = comments_dict.get(column["name"], "")
@@ -412,8 +467,9 @@ class PostgreSQLConvertor(Convertor):
 
         type = type.lower()
 
-        if type == "varchar":
-            return f"varchar({size})"
+        if type in ("varchar", "char"):
+            # MySQL 中未指定长度的 char 等同于 char(1)
+            return f"varchar({size or 1})"
         if type in ("int", "int unsigned", "int unsigned zerofill"):
             return "int4"
         if type in ("bigint", "bigint unsigned"):
@@ -426,13 +482,15 @@ class PostgreSQLConvertor(Convertor):
             return "date"
         if type == "json":
             return "jsonb"
+        if type == "time":
+            return "time"
         if type == "double":
             return "double precision"
         if type == "timestamp":
             return f"timestamp({size})" if size else "timestamp"
         if type == "bit":
             return "bool"
-        if type in ("text", "longtext"):
+        if type in ("text", "longtext", "mediumtext"):
             return "text"
         if type in ("blob", "mediumblob", "longblob"):
             return "bytea"

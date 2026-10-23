@@ -33,6 +33,16 @@ public interface PayRefundService {
     PayRefundDO getRefundByNo(String no);
 
     /**
+     * 获得退款订单，并锁定（FOR UPDATE）
+     *
+     * 注意：需要在事务中调用，锁持有到事务提交
+     *
+     * @param id 编号
+     * @return 退款订单
+     */
+    PayRefundDO getRefundForUpdate(Long id);
+
+    /**
      * 获得指定应用的退款数量
      *
      * @param appId 应用编号

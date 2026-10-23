@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/"
+             id="autoRules" name="自动部署测试" namespace="http://www.iocoder.cn/dm-test">
+    <decision id="dmAutoOne" name="自动决策一">
+        <decisionTable id="tableOne" hitPolicy="FIRST">
+            <input id="inputOne"><inputExpression id="expressionOne" typeRef="number"><text>amount</text></inputExpression></input>
+            <output id="outputOne" name="result" typeRef="string"/>
+            <rule id="ruleOne">
+                <inputEntry id="conditionOne"><text>&gt;= 0</text></inputEntry>
+                <outputEntry id="valueOne"><text>"通过"</text></outputEntry>
+            </rule>
+        </decisionTable>
+    </decision>
+    <decision id="dmAutoTwo" name="自动决策二">
+        <decisionTable id="tableTwo" hitPolicy="FIRST">
+            <input id="inputTwo"><inputExpression id="expressionTwo" typeRef="number"><text>amount</text></inputExpression></input>
+            <output id="outputTwo" name="result" typeRef="string"/>
+            <rule id="ruleTwo">
+                <inputEntry id="conditionTwo"><text>&gt;= 0</text></inputEntry>
+                <outputEntry id="valueTwo"><text>"通过"</text></outputEntry>
+            </rule>
+        </decisionTable>
+    </decision>
+</definitions>

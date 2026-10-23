@@ -61,6 +61,18 @@ public interface PayWalletTransactionService {
     PayWalletTransactionDO getWalletTransaction(String bizId, PayWalletBizTypeEnum type);
 
     /**
+     * 获取钱包流水，并锁定（FOR UPDATE）
+     *
+     * 当前读：可以查询到其它事务已提交的钱包流水，不受 MySQL 可重复读下一致性视图的影响。
+     * 注意：需要在事务中调用，锁持有到事务提交
+     *
+     * @param bizId 业务编号
+     * @param type  业务类型
+     * @return 钱包流水
+     */
+    PayWalletTransactionDO getWalletTransactionForUpdate(String bizId, PayWalletBizTypeEnum type);
+
+    /**
      * 获得钱包流水统计
      *
      * @param userId 用户编号

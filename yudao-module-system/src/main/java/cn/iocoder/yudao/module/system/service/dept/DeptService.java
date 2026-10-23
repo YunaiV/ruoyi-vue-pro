@@ -40,8 +40,9 @@ public interface DeptService {
      * 批量删除部门
      *
      * @param ids 部门编号数组
+     * @param userId 操作的用户编号，用于校验数据权限
      */
-    void deleteDeptList(List<Long> ids);
+    void deleteDeptList(List<Long> ids, Long userId);
 
     /**
      * 获得部门信息

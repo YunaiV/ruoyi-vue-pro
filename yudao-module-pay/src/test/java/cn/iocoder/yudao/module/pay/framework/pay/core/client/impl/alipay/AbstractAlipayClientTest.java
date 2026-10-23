@@ -15,7 +15,9 @@ import com.alipay.api.AlipayApiException;
 import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.DefaultSigner;
 import com.alipay.api.domain.AlipayTradeRefundModel;
+import com.alipay.api.request.AlipayTradeFastpayRefundQueryRequest;
 import com.alipay.api.request.AlipayTradeRefundRequest;
+import com.alipay.api.response.AlipayTradeFastpayRefundQueryResponse;
 import com.alipay.api.response.AlipayTradeRefundResponse;
 import lombok.Setter;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,6 +32,7 @@ import java.util.Date;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
 import static cn.iocoder.yudao.module.pay.framework.pay.core.client.impl.alipay.AlipayPayClientConfig.MODE_PUBLIC_KEY;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.when;
 
@@ -86,6 +89,7 @@ public abstract class AbstractAlipayClientTest extends BaseMockitoUnitTest {
         AlipayTradeRefundResponse response = randomPojo(AlipayTradeRefundResponse.class, o -> {
             o.setSubCode("");
             o.setGmtRefundPay(refundTime);
+            o.setFundChange("Y");
         });
         when(defaultAlipayClient.execute(argThat((ArgumentMatcher<AlipayTradeRefundRequest>) request -> {
             assertInstanceOf(AlipayTradeRefundModel.class, request.getBizModel());
@@ -191,6 +195,128 @@ public abstract class AbstractAlipayClientTest extends BaseMockitoUnitTest {
 
         // 调用，并断言
         assertThrows(PayClientException.class, () -> client.unifiedRefund(refundReqDTO));
+    }
+
+    @Test
+    @DisplayName("支付宝 Client 统一退款：fund_change 为 N，结果未知")
+    public void testUnifiedRefund_fundChangeN() throws AlipayApiException {
+        testUnifiedRefund_fundChangeNotY("N");
+    }
+
+    @Test
+    @DisplayName("支付宝 Client 统一退款：没有返回 fund_change，结果未知")
+    public void testUnifiedRefund_fundChangeNull() throws AlipayApiException {
+        testUnifiedRefund_fundChangeNotY(null);
+    }
+
+    private void testUnifiedRefund_fundChangeNotY(String fundChange) throws AlipayApiException {
+        // mock 方法：code=10000（没有 sub_code），只代表退款请求成功
+        AlipayTradeRefundResponse response = new AlipayTradeRefundResponse();
+        response.setCode("10000");
+        response.setFundChange(fundChange);
+        when(defaultAlipayClient.execute(any(AlipayTradeRefundRequest.class))).thenReturn(response);
+        // 准备请求参数
+        String outRefundNo = randomString();
+        PayRefundUnifiedReqDTO refundReqDTO = randomPojo(PayRefundUnifiedReqDTO.class, o -> {
+            o.setOutRefundNo(outRefundNo);
+            o.setNotifyUrl(randomURL());
+            o.setPayPrice(100);
+            o.setRefundPrice(10);
+        });
+
+        // 调用
+        PayRefundRespDTO resp = client.unifiedRefund(refundReqDTO);
+        // 断言：返回结果未知（没有渠道退款单号），需要查询退款确认
+        assertEquals(PayRefundStatusEnum.WAITING.getStatus(), resp.getStatus());
+        assertEquals(outRefundNo, resp.getOutRefundNo());
+        assertNull(resp.getChannelRefundNo());
+        assertNull(resp.getSuccessTime());
+    }
+
+    @Test
+    @DisplayName("支付宝 Client 统一退款：系统错误，结果未知")
+    public void testUnifiedRefund_systemError() throws AlipayApiException {
+        // mock 方法
+        AlipayTradeRefundResponse response = new AlipayTradeRefundResponse();
+        response.setSubCode("ACQ.SYSTEM_ERROR");
+        when(defaultAlipayClient.execute(any(AlipayTradeRefundRequest.class))).thenReturn(response);
+        // 准备请求参数
+        PayRefundUnifiedReqDTO refundReqDTO = randomPojo(PayRefundUnifiedReqDTO.class, o -> {
+            o.setNotifyUrl(randomURL());
+            o.setPayPrice(100);
+            o.setRefundPrice(10);
+        });
+
+        // 调用
+        PayRefundRespDTO resp = client.unifiedRefund(refundReqDTO);
+        // 断言
+        assertEquals(PayRefundStatusEnum.WAITING.getStatus(), resp.getStatus());
+        assertNull(resp.getChannelRefundNo());
+    }
+
+    @Test
+    @DisplayName("支付宝 Client 查询退款：退款成功")
+    public void testGetRefund_success() throws AlipayApiException {
+        // mock 方法
+        Date refundTime = randomDate();
+        AlipayTradeFastpayRefundQueryResponse response = new AlipayTradeFastpayRefundQueryResponse();
+        response.setCode("10000");
+        response.setRefundStatus("REFUND_SUCCESS");
+        response.setGmtRefundPay(refundTime);
+        when(defaultAlipayClient.execute(any(AlipayTradeFastpayRefundQueryRequest.class))).thenReturn(response);
+
+        // 调用
+        PayRefundRespDTO resp = client.getRefund("P001", "R001");
+        // 断言
+        assertEquals(PayRefundStatusEnum.SUCCESS.getStatus(), resp.getStatus());
+        assertEquals("R001", resp.getOutRefundNo());
+        assertEquals(LocalDateTimeUtil.of(refundTime), resp.getSuccessTime());
+    }
+
+    @Test
+    @DisplayName("支付宝 Client 查询退款：没有退款数据（refund_status），结果未知")
+    public void testGetRefund_noRefundStatus() throws AlipayApiException {
+        // mock 方法：code=10000，但没有返回 refund_status
+        AlipayTradeFastpayRefundQueryResponse response = new AlipayTradeFastpayRefundQueryResponse();
+        response.setCode("10000");
+        when(defaultAlipayClient.execute(any(AlipayTradeFastpayRefundQueryRequest.class))).thenReturn(response);
+
+        // 调用
+        PayRefundRespDTO resp = client.getRefund("P001", "R001");
+        // 断言：不能作为退款失败
+        assertEquals(PayRefundStatusEnum.WAITING.getStatus(), resp.getStatus());
+        assertEquals("R001", resp.getOutRefundNo());
+        assertNull(resp.getChannelRefundNo());
+    }
+
+    @Test
+    @DisplayName("支付宝 Client 查询退款：系统错误，结果未知")
+    public void testGetRefund_systemError() throws AlipayApiException {
+        // mock 方法
+        AlipayTradeFastpayRefundQueryResponse response = new AlipayTradeFastpayRefundQueryResponse();
+        response.setSubCode("ACQ.SYSTEM_ERROR");
+        when(defaultAlipayClient.execute(any(AlipayTradeFastpayRefundQueryRequest.class))).thenReturn(response);
+
+        // 调用
+        PayRefundRespDTO resp = client.getRefund("P001", "R001");
+        // 断言
+        assertEquals(PayRefundStatusEnum.WAITING.getStatus(), resp.getStatus());
+        assertNull(resp.getChannelRefundNo());
+    }
+
+    @Test
+    @DisplayName("支付宝 Client 查询退款：交易不存在，结果未知")
+    public void testGetRefund_tradeNotExist() throws AlipayApiException {
+        // mock 方法：交易维度的错误，不是退款单明确失败的状态
+        AlipayTradeFastpayRefundQueryResponse response = new AlipayTradeFastpayRefundQueryResponse();
+        response.setSubCode("ACQ.TRADE_NOT_EXIST");
+        when(defaultAlipayClient.execute(any(AlipayTradeFastpayRefundQueryRequest.class))).thenReturn(response);
+
+        // 调用
+        PayRefundRespDTO resp = client.getRefund("P001", "R001");
+        // 断言：不能作为退款失败
+        assertEquals(PayRefundStatusEnum.WAITING.getStatus(), resp.getStatus());
+        assertNull(resp.getChannelRefundNo());
     }
 
     @Test

@@ -252,6 +252,28 @@ public class FileServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
+    public void testCreateFile_success_fakeExtensionDetectContent() throws Exception {
+        for (String name : new String[]{"图标.xml", "图标.txt"}) {
+            // 准备参数：SVG 内容伪装成其他扩展名
+            byte[] content = "<svg xmlns=\"http://www.w3.org/2000/svg\"><script>alert(1)</script></svg>"
+                    .getBytes(StandardCharsets.UTF_8);
+            // mock 方法
+            FileClient client = mock(FileClient.class);
+            when(fileConfigService.getMasterFileClient()).thenReturn(client);
+            String url = randomString();
+            when(client.upload(same(content), anyString(), eq("image/svg+xml"))).thenReturn(url);
+
+            // 调用
+            String result = fileService.createFile(content, name, null, "text/plain");
+            // 断言：以内容识别的类型上传，文件存储器据此按附件下载
+            assertEquals(url, result);
+            FileDO file = fileMapper.selectOne(FileDO::getUrl, url);
+            assertEquals(name, file.getName());
+            assertEquals("image/svg+xml", file.getType());
+        }
+    }
+
+    @Test
     public void testCreateFile_success_opus() throws Exception {
         // 准备参数
         byte[] content = new byte[64];

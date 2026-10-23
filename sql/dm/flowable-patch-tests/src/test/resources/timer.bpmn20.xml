@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             targetNamespace="http://www.iocoder.cn/dm-test">
+    <process id="dmTimer" isExecutable="true">
+        <startEvent id="start"/>
+        <intermediateCatchEvent id="wait">
+            <timerEventDefinition><timeDuration>P1D</timeDuration></timerEventDefinition>
+        </intermediateCatchEvent>
+        <userTask id="approval" name="定时后审批"/>
+        <endEvent id="end"/>
+        <sequenceFlow id="f1" sourceRef="start" targetRef="wait"/>
+        <sequenceFlow id="f2" sourceRef="wait" targetRef="approval"/>
+        <sequenceFlow id="f3" sourceRef="approval" targetRef="end"/>
+    </process>
+</definitions>
