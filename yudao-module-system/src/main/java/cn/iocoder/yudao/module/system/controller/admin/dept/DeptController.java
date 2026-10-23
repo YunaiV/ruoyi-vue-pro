@@ -21,6 +21,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 @Tag(name = "管理后台 - 部门")
 @RestController
@@ -61,7 +62,7 @@ public class DeptController {
     @Parameter(name = "ids", description = "编号列表", required = true)
     @PreAuthorize("@ss.hasPermission('system:dept:delete')")
     public CommonResult<Boolean> deleteDeptList(@RequestParam("ids") List<Long> ids) {
-        deptService.deleteDeptList(ids);
+        deptService.deleteDeptList(ids, getLoginUserId());
         return success(true);
     }
 

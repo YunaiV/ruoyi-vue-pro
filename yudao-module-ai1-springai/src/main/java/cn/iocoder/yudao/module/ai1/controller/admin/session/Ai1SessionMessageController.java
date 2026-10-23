@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.ai1.controller.admin.session;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.ai1.controller.admin.session.vo.message.Ai1SessionMessagePageReqVO;
 import cn.iocoder.yudao.module.ai1.controller.admin.session.vo.message.Ai1SessionMessageRespVO;
 import cn.iocoder.yudao.module.ai1.controller.admin.session.vo.message.Ai1SessionMessageSendReqVO;
 import cn.iocoder.yudao.module.ai1.service.session.Ai1SessionService;
@@ -9,8 +11,8 @@ import cn.iocoder.yudao.module.ai1.service.session.Ai1SessionMessageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
-import jakarta.validation.Valid;
+import javax.annotation.Resource;
+import javax.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -63,7 +65,24 @@ public class Ai1SessionMessageController {
         return sessionMessageService.resumeSessionMessageStream(getLoginUserId(), messageId, lastEventId);
     }
 
+    @PostMapping("/stop-my")
+    @Operation(summary = "停止【我的】会话生成", description = "终止会话中生成中的助手消息，保留已生成的内容")
+    @Parameter(name = "sessionId", description = "会话编号", required = true, example = "1024")
+    @PreAuthorize("@ss.hasPermission('ai1:session:my')")
+    public CommonResult<Boolean> stopSessionMessageMy(@RequestParam("sessionId") Long sessionId) {
+        sessionMessageService.stopSessionMessageMy(getLoginUserId(), sessionId);
+        return success(true);
+    }
+
     // ==================== 管理 ====================
+
+    @GetMapping("/page")
+    @Operation(summary = "获得会话消息分页", description = "按消息编号倒序取最新页，页内按时间正序")
+    @PreAuthorize("@ss.hasPermission('ai1:session:query')")
+    public CommonResult<PageResult<Ai1SessionMessageRespVO>> getSessionMessagePage(@Valid Ai1SessionMessagePageReqVO pageReqVO) {
+        return success(BeanUtils.toBean(sessionMessageService.getSessionMessagePage(pageReqVO),
+                Ai1SessionMessageRespVO.class));
+    }
 
     @GetMapping("/list")
     @Operation(summary = "获得会话消息列表", description = "管理端查看任意用户的会话明细")

@@ -1,26 +1,39 @@
 package cn.iocoder.yudao.module.system.service.dept;
 
+import cn.iocoder.yudao.framework.common.biz.system.permission.dto.DeptDataPermissionRespDTO;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
+import cn.iocoder.yudao.framework.datapermission.core.util.DataPermissionUtils;
+import cn.iocoder.yudao.framework.security.core.LoginUser;
+import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptListReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.mysql.dept.DeptMapper;
+import cn.iocoder.yudao.module.system.service.permission.PermissionService;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
+import static cn.iocoder.yudao.framework.common.util.collection.SetUtils.asSet;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 
 /**
  * {@link DeptServiceImpl} 的单元测试类
@@ -34,6 +47,9 @@ public class DeptServiceImplTest extends BaseDbUnitTest {
     private DeptServiceImpl deptService;
     @Resource
     private DeptMapper deptMapper;
+
+    @MockBean
+    private PermissionService permissionService;
 
     @Test
     public void testCreateDept() {
@@ -113,12 +129,19 @@ public class DeptServiceImplTest extends BaseDbUnitTest {
         deptMapper.insert(deptDO2);
         // 准备参数
         List<Long> ids = Arrays.asList(deptDO1.getId(), deptDO2.getId());
+        Long userId = randomLongId();
+        // mock 方法（数据权限包含全部部门）
+        DeptDataPermissionRespDTO deptDataPermission = new DeptDataPermissionRespDTO();
+        deptDataPermission.setDeptIds(asSet(deptDO1.getId(), deptDO2.getId()));
+        when(permissionService.getDeptDataPermission(eq(userId))).thenReturn(deptDataPermission);
 
         // 调用
-        deptService.deleteDeptList(ids);
+        deptService.deleteDeptList(ids, userId);
         // 校验数据不存在了
         assertNull(deptMapper.selectById(deptDO1.getId()));
         assertNull(deptMapper.selectById(deptDO2.getId()));
+        // 校验使用传入的用户编号，获取数据权限
+        verify(permissionService).getDeptDataPermission(eq(userId));
     }
 
     @Test
@@ -136,9 +159,138 @@ public class DeptServiceImplTest extends BaseDbUnitTest {
 
         // 准备参数（包含有子部门的 parentDept）
         List<Long> ids = Arrays.asList(parentDept.getId(), anotherDept.getId());
+        Long userId = randomLongId();
+        // mock 方法（数据权限为全部）
+        DeptDataPermissionRespDTO deptDataPermission = new DeptDataPermissionRespDTO();
+        deptDataPermission.setAll(true);
+        when(permissionService.getDeptDataPermission(eq(userId))).thenReturn(deptDataPermission);
 
         // 调用, 并断言异常
-        assertServiceException(() -> deptService.deleteDeptList(ids), DEPT_EXITS_CHILDREN);
+        assertServiceException(() -> deptService.deleteDeptList(ids, userId), DEPT_EXITS_CHILDREN);
+    }
+
+    @Test
+    public void testDeleteDeptList_notInScope() {
+        // mock 数据
+        DeptDO deptDO1 = randomPojo(DeptDO.class);
+        deptMapper.insert(deptDO1);
+        DeptDO deptDO2 = randomPojo(DeptDO.class);
+        deptMapper.insert(deptDO2);
+        // 准备参数
+        List<Long> ids = Arrays.asList(deptDO1.getId(), deptDO2.getId());
+        Long userId = randomLongId();
+        // mock 方法（数据权限只包含 deptDO1）
+        DeptDataPermissionRespDTO deptDataPermission = new DeptDataPermissionRespDTO();
+        deptDataPermission.setDeptIds(asSet(deptDO1.getId()));
+        when(permissionService.getDeptDataPermission(eq(userId))).thenReturn(deptDataPermission);
+
+        // 调用, 并断言异常
+        assertServiceException(() -> deptService.deleteDeptList(ids, userId), DEPT_NOT_IN_SCOPE, deptDO2.getId());
+        // 校验整体拒绝，范围内的部门也未被删除
+        assertNotNull(deptMapper.selectById(deptDO1.getId()));
+        assertNotNull(deptMapper.selectById(deptDO2.getId()));
+    }
+
+    @Test
+    public void testDeleteDeptList_selfScope() {
+        // mock 数据
+        DeptDO deptDO = randomPojo(DeptDO.class);
+        deptMapper.insert(deptDO);
+        // 准备参数
+        List<Long> ids = singletonList(deptDO.getId());
+        Long userId = randomLongId();
+        // mock 方法（数据权限为仅本人，部门表无对应的用户字段，无法操作任何部门）
+        DeptDataPermissionRespDTO deptDataPermission = new DeptDataPermissionRespDTO();
+        deptDataPermission.setSelf(true);
+        when(permissionService.getDeptDataPermission(eq(userId))).thenReturn(deptDataPermission);
+
+        // 调用, 并断言异常
+        assertServiceException(() -> deptService.deleteDeptList(ids, userId), DEPT_NOT_IN_SCOPE, deptDO.getId());
+        assertNotNull(deptMapper.selectById(deptDO.getId()));
+    }
+
+    @Test
+    public void testDeleteDeptList_allScope() {
+        // mock 数据
+        DeptDO deptDO1 = randomPojo(DeptDO.class);
+        deptMapper.insert(deptDO1);
+        DeptDO deptDO2 = randomPojo(DeptDO.class);
+        deptMapper.insert(deptDO2);
+        // 准备参数
+        List<Long> ids = Arrays.asList(deptDO1.getId(), deptDO2.getId());
+        Long userId = randomLongId();
+        // mock 方法（数据权限为全部，deptIds 为空）
+        DeptDataPermissionRespDTO deptDataPermission = new DeptDataPermissionRespDTO();
+        deptDataPermission.setAll(true);
+        when(permissionService.getDeptDataPermission(eq(userId))).thenReturn(deptDataPermission);
+
+        // 调用
+        deptService.deleteDeptList(ids, userId);
+        // 校验数据不存在了
+        assertNull(deptMapper.selectById(deptDO1.getId()));
+        assertNull(deptMapper.selectById(deptDO2.getId()));
+    }
+
+    @Test
+    public void testDeleteDeptList_duplicateIds() {
+        // mock 数据
+        DeptDO deptDO1 = randomPojo(DeptDO.class);
+        deptMapper.insert(deptDO1);
+        DeptDO deptDO2 = randomPojo(DeptDO.class);
+        deptMapper.insert(deptDO2);
+        // 准备参数（deptDO1 重复）
+        List<Long> ids = Arrays.asList(deptDO1.getId(), deptDO1.getId(), deptDO2.getId());
+        Long userId = randomLongId();
+        // mock 方法
+        DeptDataPermissionRespDTO deptDataPermission = new DeptDataPermissionRespDTO();
+        deptDataPermission.setDeptIds(asSet(deptDO1.getId(), deptDO2.getId()));
+        when(permissionService.getDeptDataPermission(eq(userId))).thenReturn(deptDataPermission);
+
+        // 调用
+        deptService.deleteDeptList(ids, userId);
+        // 校验数据不存在了
+        assertNull(deptMapper.selectById(deptDO1.getId()));
+        assertNull(deptMapper.selectById(deptDO2.getId()));
+    }
+
+    @Test
+    public void testDeleteDeptList_visitTenant() {
+        // mock 数据
+        DeptDO deptDO = randomPojo(DeptDO.class);
+        deptMapper.insert(deptDO);
+        // 准备参数
+        List<Long> ids = singletonList(deptDO.getId());
+        Long userId = randomLongId();
+        // mock 登录用户（跨租户访问）
+        LoginUser loginUser = new LoginUser().setId(userId).setUserType(UserTypeEnum.ADMIN.getValue())
+                .setTenantId(1L).setVisitTenantId(2L);
+        SecurityFrameworkUtils.setLoginUser(loginUser, new MockHttpServletRequest());
+
+        try {
+            // 调用
+            deptService.deleteDeptList(ids, userId);
+        } finally {
+            SecurityContextHolder.clearContext();
+        }
+        // 校验数据不存在了，且未获取目标租户的数据权限
+        assertNull(deptMapper.selectById(deptDO.getId()));
+        verify(permissionService, never()).getDeptDataPermission(anyLong());
+    }
+
+    @Test
+    public void testDeleteDeptList_ignoreDataPermission() {
+        // mock 数据
+        DeptDO deptDO = randomPojo(DeptDO.class);
+        deptMapper.insert(deptDO);
+        // 准备参数
+        List<Long> ids = singletonList(deptDO.getId());
+        Long userId = randomLongId();
+
+        // 调用（忽略数据权限）
+        DataPermissionUtils.executeIgnore(() -> deptService.deleteDeptList(ids, userId));
+        // 校验数据不存在了
+        assertNull(deptMapper.selectById(deptDO.getId()));
+        verify(permissionService, never()).getDeptDataPermission(anyLong());
     }
 
     @Test

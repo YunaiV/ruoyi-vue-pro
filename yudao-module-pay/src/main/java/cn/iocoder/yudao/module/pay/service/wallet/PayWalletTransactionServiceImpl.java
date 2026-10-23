@@ -85,6 +85,11 @@ public class PayWalletTransactionServiceImpl implements PayWalletTransactionServ
     }
 
     @Override
+    public PayWalletTransactionDO getWalletTransactionForUpdate(String bizId, PayWalletBizTypeEnum type) {
+        return payWalletTransactionMapper.selectByBizForUpdate(bizId, type.getType());
+    }
+
+    @Override
     public AppPayWalletTransactionSummaryRespVO getWalletTransactionSummary(Long userId, Integer userType, LocalDateTime[] createTime) {
         PayWalletDO wallet = payWalletService.getOrCreateWallet(userId, userType);
         return new AppPayWalletTransactionSummaryRespVO()

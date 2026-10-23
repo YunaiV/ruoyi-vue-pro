@@ -87,4 +87,56 @@ public class Ai1Utils {
         }
     }
 
+    /**
+     * 规范化模型生成的长期记忆 Markdown：修正标题、列表标记，并保证维度标题与内容不在同一行
+     *
+     * 只按长期记忆的固定维度标题拆行，不拆开 C#、#123、URL 锚点，不把中文破折号视为列表标记
+     *
+     * @param content  模型输出的记忆
+     * @param sections 记忆维度标题
+     * @return 规范化后的记忆；为空时原样返回
+     */
+    public static String normalizeMemoryMarkdown(String content, Collection<String> sections) {
+        if (StrUtil.isBlank(content)) {
+            return content;
+        }
+        String text = content.replace("\r\n", "\n").replace("\r", "\n").trim();
+        // 1. 行内出现的维度标题另起一行：…文字## 用户画像 → …文字\n## 用户画像
+        text = text.replaceAll("([^#\\n])(#{1,6}[ \\t]*(?:" + String.join("|", sections) + "))", "$1\n$2");
+        // 2. 标题标记后补空格：#标题 → # 标题（# 后为非 #、非空白，避免把 ## 拆成 # #）
+        text = text.replaceAll("(?m)^(#{1,6})(?=[^#\\s])", "$1 ");
+        // 3. 维度标题与紧随其后的内容拆行：## 偏好习惯-xxx → ## 偏好习惯\n-xxx
+        for (String section : sections) {
+            text = text.replaceAll("(?m)(#{1,6} " + section + ")[ \\t]*(?=\\S)", "$1\n");
+        }
+        // 4. 行内列表项另起一行，仅当前一字符为非 ASCII：…口吻-开场 → …口吻\n- 开场（不把中文破折号 —、– 视为列表标记）
+        text = text.replaceAll("([^\\x00-\\x7F])[-*+\\u2022][ \\t]*(?=\\S)", "$1\n- ");
+        // 5. 行首列表标记后补空格：-xxx → - xxx（同样不处理中文破折号）
+        text = text.replaceAll("(?m)^([-*+\\u2022])(?=\\S)", "$1 ");
+        // 6. 不同维度之间空一行
+        text = text.replaceAll("(?m)^(#{1,6} )", "\n$1");
+        // 7. 合并多余空行
+        text = text.replaceAll("\\n{3,}", "\n\n");
+        return text.trim();
+    }
+
+    /**
+     * 去除首尾空白后按字符数截断，不拆开 UTF-16 代理对
+     *
+     * @param content   内容
+     * @param maxLength 最大长度（字符），需大于 0
+     * @return 截断后的内容；为空时原样返回
+     */
+    public static String limitLength(String content, int maxLength) {
+        if (StrUtil.isBlank(content)) {
+            return content;
+        }
+        String text = content.trim();
+        if (text.length() <= maxLength) {
+            return text;
+        }
+        int end = Character.isHighSurrogate(text.charAt(maxLength - 1)) ? maxLength - 1 : maxLength;
+        return text.substring(0, end);
+    }
+
 }

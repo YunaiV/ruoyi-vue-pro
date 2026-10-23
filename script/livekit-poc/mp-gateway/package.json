@@ -1,0 +1,13 @@
+{
+  "name": "yudao-im-mp-rtc-gateway",
+  "version": "0.1.0",
+  "private": true,
+  "description": "IM 微信小程序 RTMP ↔ LiveKit 网关试验：默认关闭，秒级延迟，仅供验证",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node src/server.mjs"
+  }
+}

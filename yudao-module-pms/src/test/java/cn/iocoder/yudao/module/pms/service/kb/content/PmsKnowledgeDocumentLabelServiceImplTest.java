@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
@@ -28,6 +29,7 @@ import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static cn.iocoder.yudao.module.pms.enums.ErrorCodeConstants.KNOWLEDGE_DOCUMENT_LABEL_NOT_EXISTS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 /**
@@ -88,6 +90,68 @@ public class PmsKnowledgeDocumentLabelServiceImplTest extends BaseDbUnitTest {
 
         // 断言
         assertNull(documentLabelMapper.selectById(documentLabel.getId()));
+    }
+
+    @Test
+    public void testDeleteDocumentLabel_keepDocumentLabelIds() {
+        // mock 数据
+        PmsKnowledgeDocumentLabelDO deletedLabel = randomDocumentLabelDO();
+        documentLabelMapper.insert(deletedLabel);
+        PmsKnowledgeDocumentLabelDO otherLabel = randomDocumentLabelDO();
+        documentLabelMapper.insert(otherLabel);
+        PmsKnowledgeDocumentDO document = randomDocumentDO(randomLongId(),
+                Arrays.asList(deletedLabel.getId(), otherLabel.getId()));
+        documentMapper.insert(document);
+
+        // 调用
+        documentLabelService.deleteDocumentLabel(deletedLabel.getId());
+
+        // 断言：删除标签不改写文档，历史编号在详情读取时忽略
+        assertEquals(Arrays.asList(deletedLabel.getId(), otherLabel.getId()),
+                documentMapper.selectById(document.getId()).getLabelIds());
+    }
+
+    @Test
+    public void testGetDocumentLabelList_ignoreDeleted() {
+        // mock 数据
+        PmsKnowledgeDocumentLabelDO label = randomDocumentLabelDO();
+        documentLabelMapper.insert(label);
+        PmsKnowledgeDocumentLabelDO deletedLabel = randomDocumentLabelDO();
+        documentLabelMapper.insert(deletedLabel);
+        documentLabelMapper.deleteById(deletedLabel.getId());
+
+        // 调用
+        List<PmsKnowledgeDocumentLabelDO> list = documentLabelService.getDocumentLabelList(
+                Arrays.asList(label.getId(), deletedLabel.getId()));
+        Map<Long, PmsKnowledgeDocumentLabelDO> map = documentLabelService.getDocumentLabelMap(
+                Arrays.asList(label.getId(), deletedLabel.getId()));
+
+        // 断言
+        assertEquals(1, list.size());
+        assertEquals(label.getId(), list.get(0).getId());
+        assertEquals(Collections.singleton(label.getId()), map.keySet());
+    }
+
+    @Test
+    public void testGetDocumentLabelList_empty() {
+        // 调用，并断言
+        assertTrue(documentLabelService.getDocumentLabelList(null).isEmpty());
+        assertTrue(documentLabelService.getDocumentLabelList(Collections.emptyList()).isEmpty());
+        assertTrue(documentLabelService.getDocumentLabelMap(null).isEmpty());
+    }
+
+    @Test
+    public void testValidateDocumentLabelList_deleted() {
+        // mock 数据
+        PmsKnowledgeDocumentLabelDO label = randomDocumentLabelDO();
+        documentLabelMapper.insert(label);
+        PmsKnowledgeDocumentLabelDO deletedLabel = randomDocumentLabelDO();
+        documentLabelMapper.insert(deletedLabel);
+        documentLabelMapper.deleteById(deletedLabel.getId());
+
+        // 调用，并断言异常
+        assertServiceException(() -> documentLabelService.validateDocumentLabelList(
+                Arrays.asList(label.getId(), deletedLabel.getId())), KNOWLEDGE_DOCUMENT_LABEL_NOT_EXISTS);
     }
 
     @Test

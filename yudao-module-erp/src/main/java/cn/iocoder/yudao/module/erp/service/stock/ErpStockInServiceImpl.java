@@ -225,4 +225,9 @@ public class ErpStockInServiceImpl implements ErpStockInService {
         return stockInItemMapper.selectListByInIds(inIds);
     }
 
+    @Override
+    public Long getStockInItemCountByProductId(Long productId) {
+        return stockInItemMapper.selectCount(ErpStockInItemDO::getProductId, productId);
+    }
+
 }

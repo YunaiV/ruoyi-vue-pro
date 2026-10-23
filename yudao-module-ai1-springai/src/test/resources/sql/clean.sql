@@ -8,3 +8,4 @@ DELETE FROM "ai1_knowledge_document";
 DELETE FROM "ai1_agent";
 DELETE FROM "ai1_session";
 DELETE FROM "ai1_session_message";
+DELETE FROM "ai1_memory";

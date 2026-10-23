@@ -5,5 +5,6 @@ DELETE FROM pay_order_extension;
 DELETE FROM pay_refund;
 DELETE FROM pay_transfer;
 DELETE FROM pay_wallet;
+DELETE FROM pay_wallet_transaction;
 DELETE FROM pay_notify_task;
 DELETE FROM pay_notify_log;

@@ -27,6 +27,11 @@ public class YudaoAi1Properties {
      */
     private Skill skill = new Skill();
 
+    /**
+     * 长期记忆
+     */
+    private Memory memory = new Memory();
+
     @Data
     public static class Milvus {
 
@@ -140,6 +145,21 @@ public class YudaoAi1Properties {
          * 默认放在用户目录下，集群部署建议挂载共享持久卷
          */
         private String root = System.getProperty("user.home") + "/yudao-ai1/skills";
+
+    }
+
+    @Data
+    public static class Memory {
+
+        /**
+         * 默认记忆正文最大长度（字符）
+         */
+        public static final int DEFAULT_MAX_LENGTH = 2000;
+
+        /**
+         * 记忆正文最大长度（字符），超出时截断
+         */
+        private Integer maxLength = DEFAULT_MAX_LENGTH;
 
     }
 

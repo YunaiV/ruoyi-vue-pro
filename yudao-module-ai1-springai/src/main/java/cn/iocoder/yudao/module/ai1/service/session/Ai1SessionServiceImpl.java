@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.ai1.controller.admin.session.vo.session.Ai1Sessio
 import cn.iocoder.yudao.module.ai1.dal.dataobject.session.Ai1SessionDO;
 import cn.iocoder.yudao.module.ai1.dal.mysql.session.Ai1SessionMapper;
 import cn.iocoder.yudao.module.ai1.service.agent.Ai1AgentService;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -84,8 +84,18 @@ public class Ai1SessionServiceImpl implements Ai1SessionService {
     }
 
     @Override
+    public Ai1SessionDO getSession(Long id) {
+        return sessionMapper.selectById(id);
+    }
+
+    @Override
     public List<Ai1SessionDO> getSessionListByAgentIdAndUserId(Long agentId, Long userId) {
         return sessionMapper.selectListByAgentIdAndUserId(agentId, userId);
+    }
+
+    @Override
+    public List<Long> getUserIdListByAgentId(Long agentId) {
+        return sessionMapper.selectUserIdListByAgentId(agentId);
     }
 
     @Override

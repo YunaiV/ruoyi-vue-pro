@@ -147,6 +147,48 @@ public class SocialClientServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
+    public void testAuthSocialUser_uuidNull() {
+        // 准备参数
+        Integer socialType = SocialTypeEnum.DINGTALK.getType();
+        Integer userType = randomPojo(UserTypeEnum.class).getValue();
+        String code = randomString();
+        String state = randomString();
+        // mock 方法（AuthRequest）
+        AuthRequest authRequest = mock(AuthRequest.class);
+        when(authRequestFactory.get(eq("DINGTALK_V2"))).thenReturn(authRequest);
+        // mock 方法（AuthResponse）：获取用户信息失败时，JustAuth 仍然返回成功，但 uuid 为空
+        AuthUser authUser = randomPojo(AuthUser.class, o -> o.setUuid(null));
+        AuthResponse<AuthUser> authResponse = new AuthResponse<>(2000, null, authUser);
+        when(authRequest.login(any())).thenReturn(authResponse);
+
+        // 调用并断言
+        assertServiceException(
+                () -> socialClientService.getAuthUser(socialType, userType, code, state),
+                SOCIAL_USER_AUTH_FAILURE, "未获取到用户标识");
+    }
+
+    @Test
+    public void testAuthSocialUser_uuidBlank() {
+        // 准备参数
+        Integer socialType = SocialTypeEnum.DINGTALK.getType();
+        Integer userType = randomPojo(UserTypeEnum.class).getValue();
+        String code = randomString();
+        String state = randomString();
+        // mock 方法（AuthRequest）
+        AuthRequest authRequest = mock(AuthRequest.class);
+        when(authRequestFactory.get(eq("DINGTALK_V2"))).thenReturn(authRequest);
+        // mock 方法（AuthResponse）
+        AuthUser authUser = randomPojo(AuthUser.class, o -> o.setUuid(" "));
+        AuthResponse<AuthUser> authResponse = new AuthResponse<>(2000, null, authUser);
+        when(authRequest.login(any())).thenReturn(authResponse);
+
+        // 调用并断言
+        assertServiceException(
+                () -> socialClientService.getAuthUser(socialType, userType, code, state),
+                SOCIAL_USER_AUTH_FAILURE, "未获取到用户标识");
+    }
+
+    @Test
     public void testBuildAuthRequest_clientNull() {
         // 准备参数
         Integer socialType = SocialTypeEnum.WECHAT_MP.getType();

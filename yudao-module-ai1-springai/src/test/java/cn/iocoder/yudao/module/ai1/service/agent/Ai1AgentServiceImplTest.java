@@ -7,13 +7,14 @@ import cn.iocoder.yudao.module.ai1.dal.dataobject.agent.Ai1AgentDO;
 import cn.iocoder.yudao.module.ai1.dal.mysql.agent.Ai1AgentMapper;
 import cn.iocoder.yudao.module.ai1.enums.model.Ai1ModelTypeEnum;
 import cn.iocoder.yudao.module.ai1.harness.skill.Ai1SkillToolFactory;
+import cn.iocoder.yudao.module.ai1.service.memory.Ai1MemoryService;
 import cn.iocoder.yudao.module.ai1.service.session.Ai1SessionService;
 import cn.iocoder.yudao.module.ai1.service.model.Ai1ModelService;
 import cn.iocoder.yudao.module.ai1.service.model.bo.Ai1ModelRespBO;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -40,11 +41,13 @@ public class Ai1AgentServiceImplTest extends BaseDbUnitTest {
     @Resource
     private Ai1AgentMapper agentMapper;
 
-    @MockitoBean
+    @MockBean
     private Ai1ModelService modelService;
-    @MockitoBean
+    @MockBean
     private Ai1SessionService sessionService;
-    @MockitoBean
+    @MockBean
+    private Ai1MemoryService memoryService;
+    @MockBean
     private Ai1SkillToolFactory skillToolFactory;
 
     @Test
@@ -123,6 +126,23 @@ public class Ai1AgentServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
+    public void testGetAgentListByStatus_all() {
+        // mock 数据：开启、关闭、已删除的 Agent 各一个
+        mockChatModel();
+        Long enabledId = agentService.createAgent(buildAgentSaveReqVO());
+        agentService.updateAgentStatus(enabledId, CommonStatusEnum.ENABLE.getStatus());
+        Long disabledId = agentService.createAgent(buildAgentSaveReqVO());
+        agentMapper.deleteById(agentService.createAgent(buildAgentSaveReqVO()));
+
+        // 调用：状态为空时返回全部状态
+        List<Ai1AgentDO> list = agentService.getAgentListByStatus(null);
+        // 断言：按编号升序，不含已删除的 Agent
+        assertEquals(java.util.Arrays.asList(enabledId, disabledId), list.stream().map(Ai1AgentDO::getId).toList());
+        assertEquals(CommonStatusEnum.ENABLE.getStatus(), list.get(0).getStatus());
+        assertEquals(CommonStatusEnum.DISABLE.getStatus(), list.get(1).getStatus());
+    }
+
+    @Test
     public void testDeleteAgent_cascade() {
         // mock 数据
         mockChatModel();
@@ -133,21 +153,40 @@ public class Ai1AgentServiceImplTest extends BaseDbUnitTest {
         // 断言
         assertNull(agentMapper.selectById(id));
         verify(sessionService).deleteSessionListByAgentIds(Collections.singletonList(id));
+        verify(memoryService).deleteMemoryListByAgentIds(Collections.singletonList(id));
         verify(skillToolFactory).evict(id);
+    }
+
+    @Test
+    public void testCreateAgent_memoryEnabled() {
+        // mock 数据
+        mockChatModel();
+
+        // 调用
+        Long defaultId = agentService.createAgent(buildAgentSaveReqVO());
+        Long enabledId = agentService.createAgent(buildAgentSaveReqVO().setMemoryEnabled(true));
+        // 断言：默认关闭
+        assertFalse(agentMapper.selectById(defaultId).getMemoryEnabled());
+        assertTrue(agentMapper.selectById(enabledId).getMemoryEnabled());
+
+        // 调用：关闭
+        agentService.updateAgent(buildAgentSaveReqVO().setId(enabledId).setMemoryEnabled(false));
+        // 断言
+        assertFalse(agentMapper.selectById(enabledId).getMemoryEnabled());
     }
 
     @Test
     public void testGetAgentCountByKnowledgeBaseIdsAndSkillIds() {
         // mock 数据
         mockChatModel();
-        agentService.createAgent(buildAgentSaveReqVO().setKnowledgeBaseIds(List.of(1L, 12L)).setSkillIds(List.of(3L)));
+        agentService.createAgent(buildAgentSaveReqVO().setKnowledgeBaseIds(java.util.Arrays.asList(1L, 12L)).setSkillIds(java.util.Arrays.asList(3L)));
 
         // 调用，并断言精确匹配
-        assertEquals(1L, agentService.getAgentCountByKnowledgeBaseIds(List.of(12L)));
-        assertEquals(1L, agentService.getAgentCountByKnowledgeBaseIds(List.of(2L, 1L)));
-        assertEquals(0L, agentService.getAgentCountByKnowledgeBaseIds(List.of(2L)));
-        assertEquals(1L, agentService.getAgentCountBySkillIds(List.of(3L)));
-        assertEquals(0L, agentService.getAgentCountBySkillIds(List.of(1L)));
+        assertEquals(1L, agentService.getAgentCountByKnowledgeBaseIds(java.util.Arrays.asList(12L)));
+        assertEquals(1L, agentService.getAgentCountByKnowledgeBaseIds(java.util.Arrays.asList(2L, 1L)));
+        assertEquals(0L, agentService.getAgentCountByKnowledgeBaseIds(java.util.Arrays.asList(2L)));
+        assertEquals(1L, agentService.getAgentCountBySkillIds(java.util.Arrays.asList(3L)));
+        assertEquals(0L, agentService.getAgentCountBySkillIds(java.util.Arrays.asList(1L)));
         assertEquals(0L, agentService.getAgentCountBySkillIds(Collections.emptyList()));
     }
 

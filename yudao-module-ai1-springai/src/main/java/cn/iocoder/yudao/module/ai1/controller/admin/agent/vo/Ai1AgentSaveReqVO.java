@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.ai1.controller.admin.agent.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import lombok.Data;
 
 import java.util.List;
@@ -43,5 +43,8 @@ public class Ai1AgentSaveReqVO {
 
     @Schema(description = "SKILL 编号集合", example = "[1]")
     private List<Long> skillIds;
+
+    @Schema(description = "是否开启长期记忆", example = "false")
+    private Boolean memoryEnabled;
 
 }

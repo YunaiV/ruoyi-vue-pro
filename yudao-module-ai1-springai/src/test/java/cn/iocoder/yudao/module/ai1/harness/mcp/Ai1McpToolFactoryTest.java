@@ -41,21 +41,21 @@ public class Ai1McpToolFactoryTest extends BaseMockitoUnitTest {
         Ai1McpDO second = buildMcp(2L, "百度地图");
 
         // 调用
-        List<ToolCallback> callbacks = buildTools(List.of(first, second), List.of("search"));
+        List<ToolCallback> callbacks = buildTools(java.util.Arrays.asList(first, second), java.util.Arrays.asList("search"));
         // 断言
-        assertEquals(List.of("mcp_1__search", "mcp_2__search"), callbacks.stream()
+        assertEquals(java.util.Arrays.asList("mcp_1__search", "mcp_2__search"), callbacks.stream()
                 .map(callback -> callback.getToolDefinition().name()).toList());
     }
 
     @Test
     public void testBuildTools_emptyNames() {
         // mock 数据
-        List<Ai1McpDO> mcps = List.of(buildMcp(1L, "   "), buildMcp(2L, "___"), buildMcp(3L, "!!!"));
+        List<Ai1McpDO> mcps = java.util.Arrays.asList(buildMcp(1L, "   "), buildMcp(2L, "___"), buildMcp(3L, "!!!"));
 
         // 调用
-        List<ToolCallback> callbacks = buildTools(mcps, List.of("search"));
+        List<ToolCallback> callbacks = buildTools(mcps, java.util.Arrays.asList("search"));
         // 断言
-        assertEquals(List.of("mcp_1__search", "mcp_2__search", "mcp_3__search"), callbacks.stream()
+        assertEquals(java.util.Arrays.asList("mcp_1__search", "mcp_2__search", "mcp_3__search"), callbacks.stream()
                 .map(callback -> callback.getToolDefinition().name()).toList());
     }
 
@@ -65,9 +65,9 @@ public class Ai1McpToolFactoryTest extends BaseMockitoUnitTest {
         Ai1McpDO mcp = buildMcp(1L, "GitHub");
 
         // 调用
-        List<ToolCallback> callbacks = buildTools(List.of(mcp), List.of("search"));
+        List<ToolCallback> callbacks = buildTools(java.util.Arrays.asList(mcp), java.util.Arrays.asList("search"));
         // 断言
-        assertEquals("github__search", callbacks.getFirst().getToolDefinition().name());
+        assertEquals("github__search", callbacks.get(0).getToolDefinition().name());
     }
 
     @Test
@@ -76,10 +76,10 @@ public class Ai1McpToolFactoryTest extends BaseMockitoUnitTest {
         Ai1McpDO mcp = buildMcp(1L, "a".repeat(56));
 
         // 调用
-        List<ToolCallback> callbacks = buildTools(List.of(mcp), List.of("search"));
+        List<ToolCallback> callbacks = buildTools(java.util.Arrays.asList(mcp), java.util.Arrays.asList("search"));
         // 断言
-        assertEquals("a".repeat(56) + "__search", callbacks.getFirst().getToolDefinition().name());
-        assertEquals(64, callbacks.getFirst().getToolDefinition().name().length());
+        assertEquals("a".repeat(56) + "__search", callbacks.get(0).getToolDefinition().name());
+        assertEquals(64, callbacks.get(0).getToolDefinition().name().length());
     }
 
     @Test
@@ -89,7 +89,7 @@ public class Ai1McpToolFactoryTest extends BaseMockitoUnitTest {
         String prefix = "search_" + "a".repeat(80);
 
         // 调用
-        List<ToolCallback> callbacks = buildTools(List.of(mcp), List.of(prefix + "_first", prefix + "_second"));
+        List<ToolCallback> callbacks = buildTools(java.util.Arrays.asList(mcp), java.util.Arrays.asList(prefix + "_first", prefix + "_second"));
         // 断言
         String firstName = callbacks.get(0).getToolDefinition().name();
         String secondName = callbacks.get(1).getToolDefinition().name();
@@ -107,7 +107,7 @@ public class Ai1McpToolFactoryTest extends BaseMockitoUnitTest {
         Ai1McpDO second = buildMcp(2L, prefix + "_second");
 
         // 调用
-        List<ToolCallback> callbacks = buildTools(List.of(first, second), List.of("search"));
+        List<ToolCallback> callbacks = buildTools(java.util.Arrays.asList(first, second), java.util.Arrays.asList("search"));
         // 断言
         String firstName = callbacks.get(0).getToolDefinition().name();
         String secondName = callbacks.get(1).getToolDefinition().name();
@@ -124,10 +124,10 @@ public class Ai1McpToolFactoryTest extends BaseMockitoUnitTest {
         Map<String, Object> arguments = Map.of("query", "北京");
         // mock mcpClientTool 的方法
         when(mcpClientTool.callTool(mcp, toolName, arguments)).thenReturn("搜索结果");
-        List<ToolCallback> callbacks = buildTools(List.of(mcp), List.of(toolName));
+        List<ToolCallback> callbacks = buildTools(java.util.Arrays.asList(mcp), java.util.Arrays.asList(toolName));
 
         // 调用
-        String result = callbacks.getFirst().call("{\"query\":\"北京\"}");
+        String result = callbacks.get(0).call("{\"query\":\"北京\"}");
         // 断言
         assertEquals("搜索结果", JsonUtils.parseObject(result, String.class));
         verify(mcpClientTool).callTool(mcp, toolName, arguments);

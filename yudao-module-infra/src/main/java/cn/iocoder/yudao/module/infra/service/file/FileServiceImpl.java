@@ -49,7 +49,7 @@ public class FileServiceImpl implements FileService {
             "image/jpeg", "image/png", "image/gif", "image/webp", "image/bmp",
             "image/vnd.microsoft.icon", "image/tiff", "image/avif", "image/heic", "image/heif", "image/svg+xml",
             // 文档
-            "application/pdf", "text/plain", "text/csv", "text/markdown", "text/html", "application/xhtml+xml",
+            "application/pdf", "text/plain", "text/csv", "text/markdown", "text/x-web-markdown", "text/html", "application/xhtml+xml",
             "application/xml", "application/json", "application/epub+zip", "message/rfc822", "application/vnd.ms-outlook",
             "application/msword", "application/vnd.ms-excel", "application/vnd.ms-powerpoint",
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document",

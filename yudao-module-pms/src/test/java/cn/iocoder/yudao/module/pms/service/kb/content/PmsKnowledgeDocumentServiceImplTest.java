@@ -37,9 +37,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
+import static cn.iocoder.yudao.module.pms.enums.ErrorCodeConstants.KNOWLEDGE_DOCUMENT_LABEL_NOT_EXISTS;
 import static cn.iocoder.yudao.module.pms.enums.ErrorCodeConstants.KNOWLEDGE_DOCUMENT_MOVE_INVALID;
 import static cn.iocoder.yudao.module.pms.enums.ErrorCodeConstants.KNOWLEDGE_DOCUMENT_MOVE_TARGET_INVALID;
 import static cn.iocoder.yudao.module.pms.enums.ErrorCodeConstants.KNOWLEDGE_DOCUMENT_NOT_EXISTS;
@@ -47,6 +49,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -202,6 +205,29 @@ public class PmsKnowledgeDocumentServiceImplTest extends BaseDbUnitTest {
         PmsKnowledgeDocumentDO updatedDocument = documentMapper.selectById(document.getId());
         assertEquals("新标题", updatedDocument.getTitle());
         assertEquals("新正文", updatedDocument.getContent());
+    }
+
+    @Test
+    public void testUpdateDocument_labelNotExists() {
+        // mock 数据：文档关联的旧标签已被删除
+        Long userId = randomLongId();
+        PmsKnowledgeLibraryDO library = randomLibraryDO();
+        libraryMapper.insert(library);
+        PmsKnowledgeDocumentDO document = randomDocumentDO(library.getId(), 0L, 0L)
+                .setContent("旧正文").setLabelIds(Arrays.asList(1L, 2L));
+        documentMapper.insert(document);
+        doThrow(exception(KNOWLEDGE_DOCUMENT_LABEL_NOT_EXISTS)).when(documentLabelService)
+                .validateDocumentLabelList(eq(Arrays.asList(1L, 2L)));
+        // 准备参数：原样提交旧标签
+        PmsKnowledgeDocumentUpdateReqVO reqVO = new PmsKnowledgeDocumentUpdateReqVO()
+                .setId(document.getId()).setContent("新正文").setLabelIds(Arrays.asList(1L, 2L));
+
+        // 调用，并断言异常
+        assertServiceException(() -> documentService.updateDocument(reqVO, userId), KNOWLEDGE_DOCUMENT_LABEL_NOT_EXISTS);
+        // 断言：文档未被修改
+        PmsKnowledgeDocumentDO dbDocument = documentMapper.selectById(document.getId());
+        assertEquals("旧正文", dbDocument.getContent());
+        assertEquals(Arrays.asList(1L, 2L), dbDocument.getLabelIds());
     }
 
     @Test

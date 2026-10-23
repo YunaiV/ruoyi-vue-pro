@@ -4,7 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.ai1.enums.session.Ai1SessionMessageRoleEnum;
 import cn.iocoder.yudao.module.ai1.service.model.bo.Ai1ModelRespBO;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.ai.chat.client.ChatClient;
@@ -69,7 +69,7 @@ public class Ai1LlmChatTool {
                 if (tool instanceof ToolCallback callback) {
                     callbacks.add(callback);
                 } else {
-                    callbacks.addAll(List.of(ToolCallbacks.from(tool)));
+                    callbacks.addAll(java.util.Arrays.asList(ToolCallbacks.from(tool)));
                 }
             }
             spec = spec.toolCallbacks(callbacks);
@@ -90,15 +90,15 @@ public class Ai1LlmChatTool {
             // 2.1 思考过程：Spring AI 1.x 的 reasoning_content 是增量分片，直接转发（重复文本也可能是有效增量）
             Object reasoningValue = generation.getOutput().getMetadata().get(METADATA_REASONING);
             String delta = reasoningValue instanceof String value ? value : null;
-            if (StrUtil.isNotBlank(delta)) {
+            if (StrUtil.isNotEmpty(delta)) {
                 thinkingText.append(delta);
                 if (onThinking != null) {
                     onThinking.accept(delta);
                 }
             }
-            // 2.2 回复内容
+            // 2.2 回复内容：只跳过空串，空格、换行分片也是有效内容
             String chunk = generation.getOutput().getText();
-            if (StrUtil.isNotBlank(chunk)) {
+            if (StrUtil.isNotEmpty(chunk)) {
                 contentText.append(chunk);
                 if (onContent != null) {
                     onContent.accept(chunk);

@@ -81,4 +81,12 @@ public interface ErpStockOutService {
      */
     List<ErpStockOutItemDO> getStockOutItemListByOutIds(Collection<Long> outIds);
 
+    /**
+     * 获得引用指定产品的其它出库项数量
+     *
+     * @param productId 产品编号
+     * @return 数量
+     */
+    Long getStockOutItemCountByProductId(Long productId);
+
 }

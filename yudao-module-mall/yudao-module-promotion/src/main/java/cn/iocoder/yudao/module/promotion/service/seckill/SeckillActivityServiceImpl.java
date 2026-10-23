@@ -21,11 +21,12 @@ import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillConfigDO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.seckill.SeckillProductDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.seckill.seckillactivity.SeckillActivityMapper;
 import cn.iocoder.yudao.module.promotion.dal.mysql.seckill.seckillactivity.SeckillProductMapper;
+import javax.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -45,6 +46,7 @@ import static java.util.Collections.singletonList;
  *
  * @author halfninety
  */
+@Slf4j
 @Service
 @Validated
 public class SeckillActivityServiceImpl implements SeckillActivityService {
@@ -186,6 +188,10 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
     @Transactional(rollbackFor = Exception.class)
     public void updateSeckillStockIncr(Long id, Long skuId, Integer count) {
         SeckillProductDO product = seckillProductMapper.selectByActivityIdAndSkuId(id, skuId);
+        if (product == null) { // 活动已删除，或 SKU 已从活动移除，跳过秒杀库存恢复，避免阻断订单取消
+            log.warn("[updateSeckillStockIncr][活动({}) skuId({}) 对应的秒杀商品不存在，跳过库存恢复]", id, skuId);
+            return;
+        }
         // 更新活动商品库存
         seckillProductMapper.updateStockIncr(product.getId(), count);
         // 更新活动库存

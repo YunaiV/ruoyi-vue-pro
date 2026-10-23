@@ -12977,7 +12977,7 @@ INSERT INTO system_role (id, name, code, sort, data_scope, data_scope_dept_ids, 
 GO
 INSERT INTO system_role (id, name, code, sort, data_scope, data_scope_dept_ids, status, type, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (155, N'测试数据权限12', N'test-dp', 4, 2, N'[112,100,102,103,104,105,107,108]', 0, 2, N'1111', N'1', N'2025-03-31 14:58:06', N'1', N'2026-06-26 10:42:44', N'0', 1)
 GO
-INSERT INTO system_role (id, name, code, sort, data_scope, data_scope_dept_ids, status, type, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (162, N'HRMå›¢é˜Ÿè´Ÿè´£äºº', N'hrm_team_leader', 50, 2, N'', 0, 2, N'æœ¬åœ°å›¢é˜Ÿå·¥ä½œå°æ¼”ç¤ºè§’è‰²', N'admin', N'2026-08-01 03:52:53', N'admin', N'2026-08-01 03:52:53', N'0', 1)
+INSERT INTO system_role (id, name, code, sort, data_scope, data_scope_dept_ids, status, type, remark, creator, create_time, updater, update_time, deleted, tenant_id) VALUES (162, N'HRM团队负责人', N'hrm_team_leader', 50, 2, N'', 0, 2, N'本地团队工作台演示角色', N'admin', N'2026-08-01 03:52:53', N'admin', N'2026-08-01 03:52:53', N'0', 1)
 GO
 SET IDENTITY_INSERT system_role OFF
 GO

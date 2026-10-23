@@ -180,25 +180,29 @@ public class WalletPayClient extends AbstractPayClient<NonePayClientConfig> {
         PayRefundDO payRefund = refundService.getRefundByNo(outRefundNo);
         // 支付退款单不存在， 返回退款失败状态
         if (payRefund == null) {
-            return PayRefundRespDTO.failureOf(String.valueOf(REFUND_NOT_FOUND), REFUND_NOT_FOUND.getMsg(),
+            return PayRefundRespDTO.failureOf(String.valueOf(REFUND_NOT_FOUND.getCode()), REFUND_NOT_FOUND.getMsg(),
                     outRefundNo, "");
+        }
+        // 退款成功：以已提交的钱包退款流水为准，不依赖退款单的状态
+        // 例如说：钱包已退款入账，但更新退款单失败，退款单仍是 WAITING。关联 https://github.com/YunaiV/ruoyi-vue-pro/issues/1290
+        PayWalletTransactionDO walletTransaction = walletTransactionService.getWalletTransaction(
+                String.valueOf(payRefund.getId()), PayWalletBizTypeEnum.PAYMENT_REFUND);
+        if (walletTransaction != null) {
+            return PayRefundRespDTO.successOf(walletTransaction.getNo(), walletTransaction.getCreateTime(),
+                    outRefundNo, walletTransaction);
         }
         // 退款失败
         if (PayRefundStatusEnum.isFailure(payRefund.getStatus())) {
             return PayRefundRespDTO.failureOf(payRefund.getChannelErrorCode(), payRefund.getChannelErrorMsg(),
                     outRefundNo, "");
         }
-        // 退款成功
+        // 退款成功，但钱包流水不存在，为无效状态
         if (PayRefundStatusEnum.isSuccess(payRefund.getStatus())) {
-            PayWalletTransactionDO walletTransaction = walletTransactionService.getWalletTransaction(
-                    String.valueOf(payRefund.getId()), PayWalletBizTypeEnum.PAYMENT_REFUND);
-            Assert.notNull(walletTransaction, "支付退款单 {} 钱包流水不能为空", outRefundNo);
-            return PayRefundRespDTO.successOf(walletTransaction.getNo(), walletTransaction.getCreateTime(),
-                    outRefundNo, walletTransaction);
+            log.error("[doGetRefund] 支付退款单 {} 的钱包流水不存在", outRefundNo);
+            throw new IllegalStateException(String.format("支付退款单[%s] 钱包流水不能为空", outRefundNo));
         }
-        // 其它状态为无效状态
-        log.error("[doGetRefund] 支付退款单 {} 的状态不正确", outRefundNo);
-        throw new IllegalStateException(String.format("支付退款单[%s] 状态不正确", outRefundNo));
+        // 待退款，但钱包流水不存在：可能未退款、或者退款事务尚未提交，返回结果未知（没有渠道退款单号），不能作为退款失败
+        return PayRefundRespDTO.waitingOf(null, outRefundNo, "");
     }
 
     @Override

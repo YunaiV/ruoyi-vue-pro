@@ -245,7 +245,8 @@ CREATE TABLE IF NOT EXISTS "pms_work_item_user_sort" (
     "update_time" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "deleted" bit NOT NULL DEFAULT FALSE,
     "tenant_id" bigint NOT NULL DEFAULT 0,
-    PRIMARY KEY ("id")
+    PRIMARY KEY ("id"),
+    CONSTRAINT "uk_tenant_project_work_item_user_deleted" UNIQUE ("tenant_id", "project_id", "work_item_id", "user_id", "deleted")
 );
 
 CREATE TABLE IF NOT EXISTS "pms_work_item_work_log" (

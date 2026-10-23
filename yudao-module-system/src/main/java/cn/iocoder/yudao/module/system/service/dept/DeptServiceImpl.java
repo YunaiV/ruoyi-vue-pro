@@ -2,18 +2,22 @@ package cn.iocoder.yudao.module.system.service.dept;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.iocoder.yudao.framework.common.biz.system.permission.dto.DeptDataPermissionRespDTO;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
+import cn.iocoder.yudao.framework.datapermission.core.aop.DataPermissionContextHolder;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptListReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dept.vo.dept.DeptSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dept.DeptDO;
 import cn.iocoder.yudao.module.system.dal.mysql.dept.DeptMapper;
 import cn.iocoder.yudao.module.system.dal.redis.RedisKeyConstants;
+import cn.iocoder.yudao.module.system.service.permission.PermissionService;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -22,6 +26,7 @@ import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
+import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.skipPermissionCheck;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
 
 /**
@@ -36,6 +41,10 @@ public class DeptServiceImpl implements DeptService {
 
     @Resource
     private DeptMapper deptMapper;
+
+    @Resource
+    @Lazy // 延迟，避免循环依赖报错
+    private PermissionService permissionService;
 
     @Override
     @CacheEvict(cacheNames = RedisKeyConstants.DEPT_CHILDREN_ID_LIST,
@@ -91,7 +100,9 @@ public class DeptServiceImpl implements DeptService {
     @Override
     @CacheEvict(cacheNames = RedisKeyConstants.DEPT_CHILDREN_ID_LIST,
             allEntries = true) // allEntries 清空所有缓存，因为操作一个部门，涉及到多个缓存
-    public void deleteDeptList(List<Long> ids) {
+    public void deleteDeptList(List<Long> ids, Long userId) {
+        // 校验数据权限
+        validateDeptListDataScope(ids, userId);
         // 校验是否有子部门
         for (Long id : ids) {
             if (deptMapper.selectCountByParentId(id) > 0) {
@@ -101,6 +112,41 @@ public class DeptServiceImpl implements DeptService {
 
         // 批量删除部门
         deptMapper.deleteByIds(ids);
+    }
+
+    /**
+     * 校验部门们是否都在用户的数据权限范围内，任一不在则整体拒绝
+     *
+     * 原因：数据权限插件只会删除范围内的部门，导致批量删除时“部分成功”
+     * 相关 PR：https://gitee.com/zhijiantianya/ruoyi-vue-pro/pulls/1582
+     *
+     * @param ids 部门编号数组
+     * @param userId 用户编号
+     */
+    @VisibleForTesting
+    void validateDeptListDataScope(Collection<Long> ids, Long userId) {
+        if (CollUtil.isEmpty(ids)) {
+            return;
+        }
+        // 特殊：跨租户访问、忽略数据权限时，与数据权限插件保持一致，无需校验
+        if (skipPermissionCheck()) {
+            return;
+        }
+        DataPermission dataPermission = DataPermissionContextHolder.get();
+        if (dataPermission != null && !dataPermission.enable()) {
+            return;
+        }
+
+        // 校验每个部门：与 DeptDataPermissionRule 对部门表的过滤保持一致
+        DeptDataPermissionRespDTO deptDataPermission = permissionService.getDeptDataPermission(userId);
+        if (Boolean.TRUE.equals(deptDataPermission.getAll())) {
+            return;
+        }
+        for (Long id : ids) {
+            if (!CollUtil.contains(deptDataPermission.getDeptIds(), id)) {
+                throw exception(DEPT_NOT_IN_SCOPE, id);
+            }
+        }
     }
 
     @VisibleForTesting

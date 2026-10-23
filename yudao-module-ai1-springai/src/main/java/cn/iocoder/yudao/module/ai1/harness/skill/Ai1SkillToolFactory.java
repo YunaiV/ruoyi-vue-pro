@@ -14,10 +14,11 @@ import cn.iocoder.yudao.module.ai1.service.skill.Ai1SkillFileService;
 import cn.iocoder.yudao.module.ai1.service.skill.Ai1SkillService;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.springaicommunity.agent.exec.LocalExecBackend;
 import org.springaicommunity.agent.tools.*;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.stereotype.Component;
@@ -87,10 +88,11 @@ public class Ai1SkillToolFactory {
     /**
      * 构建 Agent 绑定 SKILL 所需的全部工具：SkillsTool（注入 SKILL.md 内容）+ 执行类工具（限定于 Agent 物化根目录）
      *
-     * @param agent Agent
+     * @param agent   Agent
+     * @param tracker Shell 进程跟踪器，Shell 命令经其执行，生成终止或结束时统一回收
      * @return 工具列表；未绑定有效 SKILL 时返回空列表
      */
-    public List<Object> buildTools(Ai1AgentDO agent) {
+    public List<Object> buildTools(Ai1AgentDO agent, Ai1SkillShellTracker tracker) {
         // 1. 同步物化快照；未绑定有效 SKILL 时，不提供任何工具
         SkillSnapshot snapshot = sync(agent);
         if (snapshot == null) {
@@ -105,12 +107,22 @@ public class Ai1SkillToolFactory {
 
         // 3. 执行类工具：ShellTools（bash）、FileSystemTools（Read/Write/Edit）、Glob、Grep、ListDirectory
         Path root = snapshot.getRoot();
-        tools.add(ShellTools.builder().workingDirectory(root).build());
+        tools.add(ShellTools.builder().execBackend(tracker).build());
         tools.add(FileSystemTools.builder().allowedDirectory(root).build());
         tools.add(GlobTool.builder().workingDirectory(root).allowedDirectory(root).build());
         tools.add(GrepTool.builder().workingDirectory(root).allowedDirectory(root).build());
         tools.add(ListDirectoryTool.builder().workingDirectory(root).allowedDirectory(root).build());
         return tools;
+    }
+
+    /**
+     * 创建 Agent 的 Shell 进程跟踪器：工作目录限定于 Agent 物化根目录
+     *
+     * @param agentId Agent 编号
+     * @return Shell 进程跟踪器
+     */
+    public Ai1SkillShellTracker newShellTracker(Long agentId) {
+        return new Ai1SkillShellTracker(LocalExecBackend.builder().workingDirectory(buildAgentRoot(agentId)).build());
     }
 
     /**

@@ -101,6 +101,8 @@ public class TradeRewardActivityPriceCalculator implements TradePriceCalculator 
                 TradePriceCalculateRespBO.OrderItem orderItem = orderItems.get(i);
                 orderItem.setGivePoint(orderItem.getGivePoint() + dividePoints.get(i));
             }
+            // 更新订单赠送积分
+            TradePriceCalculatorHelper.recountAllGivePoint(result);
         }
         // 4.2 记录订单是否包邮
         if (Boolean.TRUE.equals(rule.getFreeDelivery())) {

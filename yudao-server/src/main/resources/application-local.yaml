@@ -264,7 +264,7 @@ yudao:
 justauth:
   enabled: true
   type:
-    DINGTALK: # 钉钉
+    DINGTALK_V2: # 钉钉（新版登录）
       client-id: dingvrnreaje3yqvzhxg
       client-secret: i8E6iZyDvZj51JIb0tYsYfVQYOks9Cq1lgryEjFRqC79P3iJcrxEwT6Qk2QvLrLI
       ignore-check-redirect-uri: true

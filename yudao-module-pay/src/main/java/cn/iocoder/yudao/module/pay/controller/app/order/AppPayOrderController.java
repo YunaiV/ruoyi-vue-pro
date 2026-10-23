@@ -27,10 +27,12 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import java.util.Objects;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.servlet.ServletUtils.getClientIP;
 import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.getLoginUserId;
 import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.getLoginUserType;
+import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.PAY_ORDER_NOT_FOUND;
 
 @Tag(name = "用户 APP - 支付订单")
 @RestController
@@ -65,8 +67,7 @@ public class AppPayOrderController {
             return success(null);
         }
         // 重要：校验订单是否是当前用户，避免越权
-        if (order.getUserId() != null // 特殊：早期订单未存储 userId，所以忽略
-                && ObjUtil.notEqual(order.getUserId(), getLoginUserId())) {
+        if (!isLoginUserOrder(order)) {
             return success(null);
         }
 
@@ -82,7 +83,13 @@ public class AppPayOrderController {
     @PostMapping("/submit")
     @Operation(summary = "提交支付订单")
     public CommonResult<AppPayOrderSubmitRespVO> submitPayOrder(@RequestBody AppPayOrderSubmitReqVO reqVO) {
-        // 1. 钱包支付事，需要额外传 user_id 和 user_type
+        // 1. 重要：校验订单是否是当前用户，避免越权
+        PayOrderDO order = payOrderService.getOrder(reqVO.getId());
+        if (order == null || !isLoginUserOrder(order)) {
+            throw exception(PAY_ORDER_NOT_FOUND);
+        }
+
+        // 2. 钱包支付事，需要额外传 user_id 和 user_type
         if (Objects.equals(reqVO.getChannelCode(), PayChannelEnum.WALLET.getCode())) {
             if (reqVO.getChannelExtras() == null) {
                 reqVO.setChannelExtras(Maps.newHashMapWithExpectedSize(1));
@@ -91,9 +98,23 @@ public class AppPayOrderController {
             reqVO.getChannelExtras().put(WalletPayClient.WALLET_ID_KEY, String.valueOf(wallet.getId()));
         }
 
-        // 2. 提交支付
+        // 3. 提交支付
         PayOrderSubmitRespVO respVO = payOrderService.submitOrder(reqVO, getClientIP());
         return success(BeanUtils.toBean(respVO, AppPayOrderSubmitRespVO.class));
+    }
+
+    /**
+     * 判断订单是否属于当前登录用户，需同时匹配用户编号和用户类型
+     *
+     * 相关 issue：https://github.com/YunaiV/ruoyi-vue-pro/issues/1303
+     *
+     * @param order 支付订单
+     * @return 是否属于
+     */
+    private boolean isLoginUserOrder(PayOrderDO order) {
+        // 特殊：早期订单未存储 userId、userType，所以忽略
+        return (order.getUserId() == null || ObjUtil.equal(order.getUserId(), getLoginUserId()))
+                && (order.getUserType() == null || ObjUtil.equal(order.getUserType(), getLoginUserType()));
     }
 
 }

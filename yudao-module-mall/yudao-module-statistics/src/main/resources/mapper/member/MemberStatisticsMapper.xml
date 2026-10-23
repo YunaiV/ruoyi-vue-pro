@@ -6,7 +6,7 @@
             resultType="cn.iocoder.yudao.module.statistics.service.member.bo.MemberAreaStatisticsRespBO">
         SELECT area_id, COUNT(1) AS userCount
         FROM member_user
-        WHERE deleted = FALSE
+        WHERE deleted = 0
         <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
             AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
         </if>
@@ -17,7 +17,7 @@
             resultType="cn.iocoder.yudao.module.statistics.controller.admin.member.vo.MemberSexStatisticsRespVO">
         SELECT sex, COUNT(1) AS userCount
         FROM member_user
-        WHERE deleted = FALSE
+        WHERE deleted = 0
         <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
             AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
         </if>
@@ -28,7 +28,7 @@
                          resultType="cn.iocoder.yudao.module.statistics.controller.admin.member.vo.MemberTerminalStatisticsRespVO">
         SELECT register_terminal as terminal, COUNT(1) AS userCount
         FROM member_user
-        WHERE deleted = FALSE
+        WHERE deleted = 0
         <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
             AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
         </if>
@@ -38,7 +38,7 @@
     <select id="selectUserCount" resultType="java.lang.Integer">
         SELECT COUNT(1)
         FROM member_user
-        WHERE deleted = FALSE
+        WHERE deleted = 0
         <if test="beginTime != null">
             AND create_time >= #{beginTime}
         </if>
@@ -52,15 +52,16 @@
 
     <select id="selectListByCreateTimeBetween"
             resultType="cn.iocoder.yudao.module.statistics.controller.admin.member.vo.MemberRegisterCountRespVO">
-        SELECT DATE_FORMAT(create_time, '%Y-%m-%d') AS date,
+        SELECT CAST(create_time AS DATE) AS date,
                count(1)                             AS count
         FROM member_user
         WHERE create_time BETWEEN #{beginTime} AND #{endTime}
-          AND deleted = FALSE
+          AND deleted = 0
         <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
             AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
         </if>
         GROUP BY date
+        ORDER BY date
     </select>
 
 </mapper>

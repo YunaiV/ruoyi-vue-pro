@@ -43,6 +43,9 @@ public class Ai1AgentRespVO {
     @Schema(description = "SKILL 编号集合", example = "[1]")
     private List<Long> skillIds;
 
+    @Schema(description = "是否开启长期记忆", requiredMode = Schema.RequiredMode.REQUIRED, example = "false")
+    private Boolean memoryEnabled;
+
     @Schema(description = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
     private Integer status;
 

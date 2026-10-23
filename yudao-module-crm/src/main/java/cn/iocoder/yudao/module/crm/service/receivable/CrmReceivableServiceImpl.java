@@ -190,7 +190,8 @@ public class CrmReceivableServiceImpl implements CrmReceivableService {
             return null;
         }
         CrmReceivablePlanDO receivablePlan = receivablePlanService.getReceivablePlan(planId);
-        return receivablePlan.getPeriod();
+        // 回款计划可能已被删除
+        return receivablePlan == null ? null : receivablePlan.getPeriod();
     }
 
     @Override

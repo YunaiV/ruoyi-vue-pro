@@ -46,14 +46,14 @@ public class CartServiceImpl implements CartService {
     public Long addCart(Long userId, AppCartAddReqVO addReqVO) {
         // 查询 TradeCartDO
         CartDO cart = cartMapper.selectByUserIdAndSkuId(userId, addReqVO.getSkuId());
-        // 校验 SKU
-        Integer count = addReqVO.getCount();
+        // 校验 SKU：已存在时，按合并后的数量校验库存 https://github.com/YunaiV/ruoyi-vue-pro/issues/1267
+        Integer count = cart != null ? cart.getCount() + addReqVO.getCount() : addReqVO.getCount();
         ProductSkuRespDTO sku = checkProductSku(addReqVO.getSkuId(), count);
 
         // 情况一：存在，则进行数量更新
         if (cart != null) {
             cartMapper.updateById(new CartDO().setId(cart.getId()).setSelected(true)
-                    .setCount(cart.getCount() + count));
+                    .setCount(count));
             return cart.getId();
         // 情况二：不存在，则进行插入
         } else {

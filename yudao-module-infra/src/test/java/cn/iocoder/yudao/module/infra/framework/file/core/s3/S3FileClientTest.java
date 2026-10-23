@@ -2,15 +2,27 @@ package cn.iocoder.yudao.module.infra.framework.file.core.s3;
 
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.ReflectUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClient;
 import cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig;
+import javax.validation.Validation;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
-import javax.validation.Validation;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @SuppressWarnings("resource")
 public class S3FileClientTest {
@@ -66,6 +78,68 @@ public class S3FileClientTest {
         assertTrue(result.contains("/yudao/avatar/%E4%B8%AD%E6%96%87%20100%25"));
         assertTrue(result.contains("%E6%96%87%E4%BB%B6.jpg"));
         assertFalse(result.contains("%25E4%25B8%25AD"));
+        assertFalse(result.contains("response-content-disposition"));
+    }
+
+    @Test
+    public void testPresignUrl_privateAccess_scriptableAttachment() {
+        // 准备参数
+        S3FileClientConfig config = new S3FileClientConfig();
+        config.setAccessKey("admin");
+        config.setAccessSecret("password");
+        config.setBucket("yudao");
+        config.setDomain("http://127.0.0.1:9000/yudao");
+        config.setEndpoint("http://127.0.0.1:9000");
+        config.setEnablePathStyleAccess(true);
+        config.setEnablePublicAccess(false);
+        S3FileClient client = new S3FileClient(0L, config);
+        client.init();
+
+        // 调用：新上传的 SVG、已保存的历史签名 URL 重新签名
+        String result = client.presignGetUrl("avatar/图标.svg", 300);
+        String historyResult = client.presignGetUrl(
+                "http://127.0.0.1:9000/yudao/avatar/%E5%9B%BE%E6%A0%87.svg?X-Amz-Signature=old", 300);
+        String putResult = client.presignPutUrl("avatar/图标.svg");
+
+        // 断言：GET 签名要求按附件下载；PUT 签名不额外约束请求头，兼容前端直传
+        assertTrue(result.contains("/yudao/avatar/%E5%9B%BE%E6%A0%87.svg"));
+        assertTrue(result.contains("response-content-disposition=attachment"));
+        assertTrue(historyResult.contains("/yudao/avatar/%E5%9B%BE%E6%A0%87.svg"));
+        assertTrue(historyResult.contains("response-content-disposition=attachment"));
+        assertFalse(historyResult.contains("X-Amz-Signature=old"));
+        assertFalse(StrUtil.containsIgnoreCase(putResult, "content-disposition"));
+    }
+
+    @Test
+    public void testUpload_scriptableContentDisposition() {
+        // 准备参数
+        S3FileClientConfig config = new S3FileClientConfig();
+        config.setAccessKey("admin");
+        config.setAccessSecret("password");
+        config.setBucket("yudao");
+        config.setDomain("http://127.0.0.1:9000/yudao");
+        config.setEndpoint("http://127.0.0.1:9000");
+        config.setEnablePathStyleAccess(true);
+        config.setEnablePublicAccess(true);
+        S3FileClient client = new S3FileClient(0L, config);
+        client.init();
+        // mock S3 客户端
+        S3Client s3Client = mock(S3Client.class);
+        ReflectUtil.setFieldValue(client, "client", s3Client);
+
+        // 调用
+        client.upload(new byte[]{1}, "avatar/图标.svg", "image/svg+xml");
+        client.upload(new byte[]{1}, "avatar/页面.html", "text/html");
+        client.upload(new byte[]{1}, "avatar/头像.jpg", "image/jpeg");
+
+        // 断言：可携带脚本的对象按附件下载，普通图片不设置
+        ArgumentCaptor<PutObjectRequest> requestCaptor = ArgumentCaptor.forClass(PutObjectRequest.class);
+        verify(s3Client, times(3)).putObject(requestCaptor.capture(), any(RequestBody.class));
+        assertEquals("image/svg+xml", requestCaptor.getAllValues().get(0).contentType());
+        assertEquals("attachment", requestCaptor.getAllValues().get(0).contentDisposition());
+        assertEquals("attachment", requestCaptor.getAllValues().get(1).contentDisposition());
+        assertEquals("image/jpeg", requestCaptor.getAllValues().get(2).contentType());
+        assertNull(requestCaptor.getAllValues().get(2).contentDisposition());
     }
 
     @Test

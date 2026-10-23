@@ -32,7 +32,7 @@
         class: 'w-full',
       },
       formItemClass: 'col-span-2',
-      labelWidth: 80,
+      labelWidth: 120,
     },
     layout: 'horizontal',
     schema: use${subSimpleClassName}FormSchema(),

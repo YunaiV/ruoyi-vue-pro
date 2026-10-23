@@ -1,0 +1,147 @@
+# 小程序 RTMP ↔ LiveKit 网关试验环境（默认关闭，勿用于生产）
+# 与上级目录的 LiveKit-only PoC 二选一：两者都占用 7880 等端口，启动本环境前先 docker compose -f ../docker-compose.yml down
+#
+# 全部服务使用 host 网络：Ingress / Egress 作为 WebRTC 客户端连接 LiveKit 广播的 node_ip（127.0.0.1），
+# 端口映射模式下容器内的 127.0.0.1 不是 LiveKit；macOS 需 Docker Desktop 4.34+ 并开启 Settings → Resources → Network → Enable host networking
+#
+# 凭据通过同目录 .env 提供（参考 .env.example），必须与后端 yudao.im.rtc.api-key / api-secret 一致
+name: yudao-livekit-mp-gateway
+
+services:
+  redis:
+    image: redis:7.4-alpine
+    restart: unless-stopped
+    network_mode: host
+    # LiveKit / Ingress / Egress 共享同一 Redis 交换任务；只监听回环、不持久化
+    command: ["redis-server", "--bind", "127.0.0.1", "--port", "16379", "--save", "", "--appendonly", "no"]
+
+  livekit:
+    image: livekit/livekit-server:v1.13.10
+    restart: unless-stopped
+    network_mode: host
+    depends_on:
+      - redis
+    environment:
+      LIVEKIT_CONFIG: |
+        port: 7880
+        bind_addresses:
+          - "${MP_LIVEKIT_BIND_ADDRESS:-127.0.0.1}"
+        rtc:
+          tcp_port: 7881
+          udp_port: 7882
+          use_external_ip: false
+          node_ip: ${MP_LIVEKIT_NODE_IP:-127.0.0.1}
+        redis:
+          address: 127.0.0.1:16379
+        keys:
+          ${LIVEKIT_API_KEY:?需在 .env 配置 LIVEKIT_API_KEY}: ${LIVEKIT_API_SECRET:?需在 .env 配置 LIVEKIT_API_SECRET}
+        webhook:
+          api_key: ${LIVEKIT_API_KEY}
+          urls:
+            - ${MP_LIVEKIT_WEBHOOK_URL:-http://127.0.0.1:48080/admin-api/im/livekit/webhook}
+        ingress:
+          rtmp_base_url: rtmp://${MP_INGRESS_RTMP_PUBLIC_HOST:-127.0.0.1}:1935/x
+        room:
+          empty_timeout: 300
+          departure_timeout: 20
+        logging:
+          level: info
+
+  ingress:
+    image: livekit/ingress:v1.5.0
+    restart: unless-stopped
+    network_mode: host
+    depends_on:
+      - redis
+      - livekit
+    environment:
+      INGRESS_CONFIG_BODY: |
+        api_key: ${LIVEKIT_API_KEY}
+        api_secret: ${LIVEKIT_API_SECRET}
+        ws_url: ws://127.0.0.1:7880
+        redis:
+          address: 127.0.0.1:16379
+        rtmp_port: 1935
+        whip_port: 18080
+        http_relay_port: 19090
+        health_port: 18081
+        rtc_config:
+          udp_port: 7885
+          use_external_ip: false
+        logging:
+          level: info
+
+  egress:
+    image: livekit/egress:v1.15.0
+    restart: unless-stopped
+    network_mode: host
+    # 官方运行方式要求；Track Composite 不启动 Chrome，但保持与官方镜像文档一致
+    cap_add:
+      - SYS_ADMIN
+    depends_on:
+      - redis
+      - livekit
+    environment:
+      EGRESS_CONFIG_BODY: |
+        api_key: ${LIVEKIT_API_KEY}
+        api_secret: ${LIVEKIT_API_SECRET}
+        ws_url: ws://127.0.0.1:7880
+        redis:
+          address: 127.0.0.1:16379
+        health_port: 18082
+        template_port: 17980
+        log_level: info
+
+  srs:
+    image: ossrs/srs:6
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - ./srs.conf:/usr/local/srs/conf/mp-gateway.conf:ro
+    command: ["./objs/srs", "-c", "conf/mp-gateway.conf"]
+
+  mp-gateway:
+    image: node:22-alpine
+    # 未显式开启时网关打印说明后退出，不自动重启
+    restart: "no"
+    network_mode: host
+    depends_on:
+      - livekit
+      - ingress
+      - egress
+      - srs
+    working_dir: /app
+    volumes:
+      - ./src:/app/src:ro
+    command: ["node", "src/server.mjs"]
+    environment:
+      MP_GATEWAY_ENABLED: ${MP_GATEWAY_ENABLED:-false}
+      MP_GATEWAY_API_HOST: ${MP_GATEWAY_API_HOST:-127.0.0.1}
+      MP_GATEWAY_API_PORT: 8090
+      MP_GATEWAY_HOOK_HOST: 127.0.0.1
+      MP_GATEWAY_HOOK_PORT: 8091
+      MP_GATEWAY_LIVEKIT_HTTP_URL: http://127.0.0.1:7880
+      MP_GATEWAY_LIVEKIT_API_KEY: ${LIVEKIT_API_KEY}
+      MP_GATEWAY_LIVEKIT_API_SECRET: ${LIVEKIT_API_SECRET}
+      # SRS 主机与端口固定为本 compose 内的实例，只允许通过 MP_GATEWAY_SRS_APP 调整专用 app 后缀
+      MP_GATEWAY_SRS_PUBLISH_BASE_URL: rtmp://127.0.0.1:1936/${MP_GATEWAY_SRS_APP:-yudao-mp-gw}
+      MP_GATEWAY_SRS_PLAY_BASE_URL: rtmp://${MP_SRS_PLAY_PUBLIC_HOST:-127.0.0.1}:1936/${MP_GATEWAY_SRS_APP:-yudao-mp-gw}
+      # 以下可调参数未配置时为空串，由网关按 README 默认值处理
+      MP_GATEWAY_POLL_INTERVAL_MS: ${MP_GATEWAY_POLL_INTERVAL_MS:-}
+      MP_GATEWAY_LEASE_TTL_MS: ${MP_GATEWAY_LEASE_TTL_MS:-}
+      MP_GATEWAY_MAX_SESSION_MS: ${MP_GATEWAY_MAX_SESSION_MS:-}
+      MP_GATEWAY_MAX_SESSIONS: ${MP_GATEWAY_MAX_SESSIONS:-}
+      MP_GATEWAY_MAX_REMOTES_PER_SESSION: ${MP_GATEWAY_MAX_REMOTES_PER_SESSION:-}
+      MP_GATEWAY_MAX_EGRESS: ${MP_GATEWAY_MAX_EGRESS:-}
+      MP_GATEWAY_EGRESS_RETRY_MS: ${MP_GATEWAY_EGRESS_RETRY_MS:-}
+      MP_GATEWAY_EGRESS_PUBLISH_TIMEOUT_MS: ${MP_GATEWAY_EGRESS_PUBLISH_TIMEOUT_MS:-}
+      MP_GATEWAY_RELEASE_RETRY_MS: ${MP_GATEWAY_RELEASE_RETRY_MS:-}
+      MP_GATEWAY_CLEANUP_RETRY_MS: ${MP_GATEWAY_CLEANUP_RETRY_MS:-}
+      MP_GATEWAY_REQUEST_TIMEOUT_MS: ${MP_GATEWAY_REQUEST_TIMEOUT_MS:-}
+      MP_GATEWAY_CLOCK_SKEW_SEC: ${MP_GATEWAY_CLOCK_SKEW_SEC:-}
+      MP_GATEWAY_EGRESS_WIDTH: ${MP_GATEWAY_EGRESS_WIDTH:-}
+      MP_GATEWAY_EGRESS_HEIGHT: ${MP_GATEWAY_EGRESS_HEIGHT:-}
+      MP_GATEWAY_EGRESS_FRAMERATE: ${MP_GATEWAY_EGRESS_FRAMERATE:-}
+      MP_GATEWAY_EGRESS_VIDEO_KBPS: ${MP_GATEWAY_EGRESS_VIDEO_KBPS:-}
+      MP_GATEWAY_EGRESS_AUDIO_KBPS: ${MP_GATEWAY_EGRESS_AUDIO_KBPS:-}
+      MP_GATEWAY_EGRESS_KEYFRAME_SEC: ${MP_GATEWAY_EGRESS_KEYFRAME_SEC:-}
