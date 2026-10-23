@@ -16,7 +16,7 @@
                 FROM trade_order AS s
                 WHERE s.receiver_area_id = m.receiver_area_id
                   AND s.pay_status = TRUE
-                  AND s.deleted = FALSE
+                  AND s.deleted = 0
                 <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
                     AND s.tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
                 </if>
@@ -25,13 +25,13 @@
                 FROM trade_order AS s
                 WHERE s.receiver_area_id = m.receiver_area_id
                   AND s.pay_status = TRUE
-                  AND s.deleted = FALSE
+                  AND s.deleted = 0
                 <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
                     AND s.tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
                 </if>
                 ) AS orderPayPrice
         FROM trade_order m
-        WHERE deleted = FALSE
+        WHERE deleted = 0
         <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
             AND m.tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
         </if>
@@ -41,7 +41,7 @@
     <select id="selectUserCountByCreateTimeBetween" resultType="java.lang.Integer">
         SELECT COUNT(DISTINCT (user_id))
         FROM trade_order
-        WHERE deleted = FALSE
+        WHERE deleted = 0
           AND create_time BETWEEN #{beginTime} AND #{endTime}
         <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
             AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
@@ -53,7 +53,7 @@
         FROM trade_order
         WHERE pay_time BETWEEN #{beginTime} AND #{endTime}
           AND pay_status = TRUE
-          AND deleted = FALSE
+          AND deleted = 0
         <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
             AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
         </if>
@@ -63,7 +63,7 @@
         SELECT COUNT(1)
         FROM trade_order
         WHERE create_time BETWEEN #{beginTime} AND #{endTime}
-          AND deleted = FALSE
+          AND deleted = 0
         <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
             AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
         </if>
@@ -74,7 +74,7 @@
         FROM trade_order
         WHERE pay_status = TRUE
           AND create_time BETWEEN #{beginTime} AND #{endTime}
-          AND deleted = FALSE
+          AND deleted = 0
         <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
             AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
         </if>
@@ -84,7 +84,7 @@
         SELECT SUM(pay_price)
         FROM trade_order AS s
         WHERE s.pay_status = TRUE
-          AND deleted = FALSE
+          AND deleted = 0
           AND create_time BETWEEN #{beginTime} AND #{endTime}
         <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
             AND s.tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
@@ -93,32 +93,35 @@
 
     <select id="selectListByPayTimeBetweenAndGroupByDay"
             resultType="cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeOrderTrendRespVO">
-        SELECT DATE_FORMAT(pay_time, '%Y-%m-%d') AS date,
+        SELECT CAST(pay_time AS DATE) AS date,
                COUNT(1)                          AS orderPayCount,
                SUM(pay_price)                    AS orderPayPrice
         FROM trade_order
         WHERE pay_status = TRUE
           AND create_time BETWEEN #{beginTime} AND #{endTime}
-          AND deleted = FALSE
+          AND deleted = 0
         <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
             AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
         </if>
         GROUP BY date
+        ORDER BY date
     </select>
 
     <select id="selectListByPayTimeBetweenAndGroupByMonth"
             resultType="cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeOrderTrendRespVO">
-        SELECT DATE_FORMAT(pay_time, '%Y-%m') AS date,
+        SELECT CONCAT(EXTRACT(YEAR FROM pay_time), '-',
+                      LPAD(CONCAT(EXTRACT(MONTH FROM pay_time)), 2, '0')) AS date,
                COUNT(1)                       AS order_pay_count,
                SUM(pay_price)                 AS order_pay_price
         FROM trade_order
         WHERE pay_status = TRUE
           AND create_time BETWEEN #{beginTime} AND #{endTime}
-          AND deleted = FALSE
+          AND deleted = 0
         <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
             AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
         </if>
         GROUP BY date
+        ORDER BY date
     </select>
 
     <select id="selectCountByStatusAndDeliveryType" resultType="java.lang.Long">
@@ -126,7 +129,7 @@
         FROM trade_order
         WHERE status = #{status}
           ANd delivery_type = #{deliveryType}
-          AND deleted = FALSE
+          AND deleted = 0
         <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
             AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
         </if>
@@ -134,12 +137,12 @@
 
     <select id="selectPaySummaryByPayStatusAndPayTimeBetween"
             resultType="cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeOrderSummaryRespVO">
-        SELECT IFNULL(SUM(pay_price), 0) AS order_pay_price,
+        SELECT COALESCE(SUM(pay_price), 0) AS order_pay_price,
                COUNT(1)                  AS order_pay_count
         FROM trade_order
         WHERE pay_status = #{payStatus}
           AND pay_time BETWEEN #{beginTime} AND #{endTime}
-          AND deleted = FALSE
+          AND deleted = 0
         <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
             AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
         </if>

@@ -7,7 +7,7 @@
         FROM infra_api_access_log
         WHERE user_type = #{userType}
         AND create_time BETWEEN #{beginTime} AND #{endTime}
-        AND deleted = FALSE
+        AND deleted = 0
         <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
             AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
         </if>
@@ -19,7 +19,7 @@
         WHERE user_id > 0
           AND user_type = #{userType}
           AND create_time BETWEEN #{beginTime} AND #{endTime}
-          AND deleted = FALSE
+          AND deleted = 0
         <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
             AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
         </if>

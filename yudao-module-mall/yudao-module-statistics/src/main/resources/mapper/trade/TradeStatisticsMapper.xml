@@ -4,11 +4,11 @@
 
     <select id="selectOrderCreateCountSumAndOrderPayPriceSumByTimeBetween"
             resultType="cn.iocoder.yudao.module.statistics.service.trade.bo.TradeSummaryRespBO">
-        SELECT IFNULL(SUM(order_create_count), 0) AS count,
-               IFNULL(SUM(order_pay_price), 0) AS summary
+        SELECT COALESCE(SUM(order_create_count), 0) AS count,
+               COALESCE(SUM(order_pay_price), 0) AS summary
         FROM trade_statistics
         WHERE time BETWEEN #{beginTime} AND #{endTime}
-          AND deleted = FALSE
+          AND deleted = 0
     </select>
 
     <select id="selectVoByTimeBetween"
@@ -25,14 +25,14 @@
             SUM(after_sale_refund_price)                                                 AS afterSaleRefundPrice
         FROM trade_statistics
         WHERE time BETWEEN #{beginTime} AND #{endTime}
-          AND deleted = FALSE
+          AND deleted = 0
     </select>
 
     <select id="selectExpensePriceByTimeBetween" resultType="java.lang.Integer">
         SELECT -- 支出金额 = 余额支付金额 + 支付佣金金额 + 商品退款金额
                SUM(wallet_pay_price + brokerage_settlement_price + after_sale_refund_price) AS expensePrice
         FROM trade_statistics
-        WHERE deleted = FALSE
+        WHERE deleted = 0
         <if test="beginTime != null">
             AND time >= #{beginTime}
         </if>
