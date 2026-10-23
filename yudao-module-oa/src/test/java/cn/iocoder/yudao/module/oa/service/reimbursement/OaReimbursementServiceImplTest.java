@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.oa.service.reimbursement;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.jackson.config.YudaoJacksonAutoConfiguration;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
@@ -14,6 +15,8 @@ import cn.iocoder.yudao.module.oa.controller.admin.reimbursement.vo.OaReimbursem
 import cn.iocoder.yudao.module.oa.dal.dataobject.reimbursement.OaReimbursementDO;
 import cn.iocoder.yudao.module.oa.dal.mysql.reimbursement.OaReimbursementMapper;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
@@ -30,6 +33,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
@@ -61,8 +65,6 @@ public class OaReimbursementServiceImplTest extends BaseDbUnitTest {
 
     @BeforeEach
     public void before() {
-        // JSON 处理器为静态共享配置，每个用例恢复当前上下文的生产日期序列化配置
-        JacksonTypeHandler.setObjectMapper(objectMapper);
         SecurityFrameworkUtils.setLoginUser(new LoginUser().setId(10L).setUserType(2), new MockHttpServletRequest());
     }
 
@@ -126,6 +128,7 @@ public class OaReimbursementServiceImplTest extends BaseDbUnitTest {
         assertEquals(new BigDecimal("12.34"), application.getTotalPrice());
         assertEquals(2, application.getInvoiceCount());
         assertEquals(1, CollUtil.getFirst(application.getItems()).getExpenseType());
+        assertEquals(LocalDateTime.of(2026, 9, 13, 8, 0), CollUtil.getFirst(application.getItems()).getExpenseTime());
         verify(processInstanceApi).createProcessInstance(eq(10L), argThat(dto ->
                 "oa_reimbursement".equals(dto.getProcessDefinitionKey()) && id.toString().equals(dto.getBusinessKey())
                         && !dto.getVariables().containsKey("title")));
@@ -211,6 +214,42 @@ public class OaReimbursementServiceImplTest extends BaseDbUnitTest {
         // 断言
         assertEquals(1L, page.getTotal());
         assertEquals(application.getId(), CollUtil.getFirst(page.getList()).getId());
+    }
+
+    @Test
+    public void testGetReimbursementAndPage_itemsExpenseTime() {
+        // mock 数据
+        Long id = reimbursementService.createReimbursement(randomReimbursementSaveReqVO());
+        LocalDateTime expenseTime = LocalDateTime.of(2026, 9, 13, 8, 0);
+
+        // 调用
+        OaReimbursementDO reimbursement = reimbursementService.getReimbursement(id);
+        PageResult<OaReimbursementDO> page = reimbursementService.getReimbursementPage(10L, new OaReimbursementPageReqVO());
+
+        // 断言：使用 Spring 主 ObjectMapper，详情、列表读取明细时间，库中保持毫秒时间戳
+        assertSame(objectMapper, JacksonTypeHandler.getObjectMapper());
+        assertEquals(expenseTime, CollUtil.getFirst(reimbursement.getItems()).getExpenseTime());
+        assertEquals(1L, page.getTotal());
+        assertEquals(expenseTime, CollUtil.getFirst(CollUtil.getFirst(page.getList()).getItems()).getExpenseTime());
+        List<String> items = reimbursementMapper.selectObjs(new LambdaQueryWrapper<OaReimbursementDO>()
+                .select(OaReimbursementDO::getItems).eq(OaReimbursementDO::getId, id));
+        assertTrue(CollUtil.getFirst(items).contains("\"expenseTime\":" + LocalDateTimeUtil.toEpochMilli(expenseTime)));
+    }
+
+    @Test
+    public void testGetReimbursementPage_itemsExpenseTimeString() {
+        // mock 数据：库中明细时间为可读字符串
+        Long id = reimbursementService.createReimbursement(randomReimbursementSaveReqVO());
+        reimbursementMapper.update(new LambdaUpdateWrapper<OaReimbursementDO>().eq(OaReimbursementDO::getId, id)
+                .setSql("items = {0}", "[{\"expenseTime\":\"2026-09-13 08:00:00\",\"expenseType\":1,\"price\":12.34}]"));
+
+        // 调用
+        PageResult<OaReimbursementDO> page = reimbursementService.getReimbursementPage(10L, new OaReimbursementPageReqVO());
+
+        // 断言
+        assertEquals(1L, page.getTotal());
+        assertEquals(LocalDateTime.of(2026, 9, 13, 8, 0),
+                CollUtil.getFirst(CollUtil.getFirst(page.getList()).getItems()).getExpenseTime());
     }
 
     @Test

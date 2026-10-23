@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             targetNamespace="http://www.iocoder.cn/dm-test">
+    <process id="dmParallel" isExecutable="true">
+        <startEvent id="start"/>
+        <parallelGateway id="fork"/>
+        <userTask id="left" name="并行审批一"/>
+        <userTask id="right" name="并行审批二"/>
+        <parallelGateway id="join"/>
+        <endEvent id="end"/>
+        <sequenceFlow id="f1" sourceRef="start" targetRef="fork"/>
+        <sequenceFlow id="f2" sourceRef="fork" targetRef="left"/>
+        <sequenceFlow id="f3" sourceRef="fork" targetRef="right"/>
+        <sequenceFlow id="f4" sourceRef="left" targetRef="join"/>
+        <sequenceFlow id="f5" sourceRef="right" targetRef="join"/>
+        <sequenceFlow id="f6" sourceRef="join" targetRef="end"/>
+    </process>
+</definitions>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/"
+             id="dmRules" name="达梦决策测试" namespace="http://www.iocoder.cn/dm-test">
+    <decision id="dmAmount" name="金额审核">
+        <decisionTable id="amountTable" hitPolicy="FIRST">
+            <input id="inputAmount"><inputExpression id="amountExpression" typeRef="number"><text>amount</text></inputExpression></input>
+            <output id="outputResult" name="result" typeRef="string"/>
+            <rule id="accepted">
+                <inputEntry id="amountCondition"><text>&gt;= 0</text></inputEntry>
+                <outputEntry id="resultValue"><text>"通过"</text></outputEntry>
+            </rule>
+        </decisionTable>
+    </decision>
+</definitions>

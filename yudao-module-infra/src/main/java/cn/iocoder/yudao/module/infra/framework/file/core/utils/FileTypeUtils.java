@@ -81,13 +81,24 @@ public class FileTypeUtils {
     public static void writeAttachment(HttpServletResponse response, String filename, byte[] content) throws IOException {
         // 设置 header 和 contentType
         String mineType = getMineType(content, filename);
+        // 文件名可能伪装，按内容识别为 SVG、HTML、XML 等可携带脚本的类型时，以内容为准
+        String contentMineType = getMineType(content);
+        if (!isScriptable(mineType) && isScriptable(contentMineType)) {
+            mineType = contentMineType;
+        }
         response.setContentType(mineType);
+        response.setHeader("X-Content-Type-Options", "nosniff");
         // 设置内容显示、下载文件名：https://www.cnblogs.com/wq-9/articles/12165056.html
-        if (isImage(mineType)) {
+        if (isImage(mineType) && !isScriptable(mineType)) {
             // 参见 https://github.com/YunaiV/ruoyi-vue-pro/issues/692 讨论
             response.setHeader("Content-Disposition", buildContentDisposition("inline", filename));
         } else {
+            // SVG 等可携带脚本的文件：直接打开时按附件下载；保留原类型，页面中作为图片引用时仍可显示
             response.setHeader("Content-Disposition", buildContentDisposition("attachment", filename));
+            // 被 object、embed 等嵌入时，按沙箱执行，禁止脚本、隔离来源
+            if (isScriptable(mineType)) {
+                response.setHeader("Content-Security-Policy", "sandbox");
+            }
         }
         // 针对 video 的特殊处理，解决视频地址在移动端播放的兼容性问题
         if (StrUtil.containsIgnoreCase(mineType, "video")) {
@@ -129,6 +140,18 @@ public class FileTypeUtils {
      */
     public static boolean isImage(String mineType) {
         return StrUtil.startWith(mineType, "image/");
+    }
+
+    /**
+     * 判断是否是可携带脚本的类型，例如说 SVG、HTML、XHTML、XML，同源直接打开时会执行其中的脚本
+     *
+     * 注意：Office 的 openxmlformats 类型以 document、sheet 等结尾，不属于此类
+     *
+     * @param mineType 类型
+     * @return 是否可携带脚本
+     */
+    public static boolean isScriptable(String mineType) {
+        return StrUtil.containsAnyIgnoreCase(mineType, "svg", "html") || StrUtil.endWithIgnoreCase(mineType, "xml");
     }
 
 }
