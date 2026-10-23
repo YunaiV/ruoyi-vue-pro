@@ -8,7 +8,9 @@ import cn.iocoder.yudao.module.ai1.controller.admin.session.vo.session.Ai1Sessio
 import cn.iocoder.yudao.module.ai1.controller.admin.session.vo.session.Ai1SessionPageReqVO;
 import cn.iocoder.yudao.module.ai1.controller.admin.session.vo.session.Ai1SessionRespVO;
 import cn.iocoder.yudao.module.ai1.controller.admin.session.vo.session.Ai1SessionUpdateMyReqVO;
+import cn.iocoder.yudao.module.ai1.dal.dataobject.agent.Ai1AgentDO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.session.Ai1SessionDO;
+import cn.iocoder.yudao.module.ai1.service.agent.Ai1AgentService;
 import cn.iocoder.yudao.module.ai1.service.session.Ai1SessionService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
@@ -36,6 +38,8 @@ public class Ai1SessionController {
 
     @Resource
     private Ai1SessionService sessionService;
+    @Resource
+    private Ai1AgentService agentService;
 
     @Resource
     private AdminUserApi adminUserApi;
@@ -78,13 +82,16 @@ public class Ai1SessionController {
     // ==================== 管理 ====================
 
     @GetMapping("/page")
-    @Operation(summary = "获得会话分页", description = "管理端查看 Agent 下全部用户的会话")
+    @Operation(summary = "获得会话分页", description = "管理端查看全部用户的会话，可按 Agent 筛选")
     @PreAuthorize("@ss.hasPermission('ai1:session:query')")
     public CommonResult<PageResult<Ai1SessionRespVO>> getSessionPage(@Valid Ai1SessionPageReqVO pageReqVO) {
         PageResult<Ai1SessionDO> pageResult = sessionService.getSessionPage(pageReqVO);
+        Map<Long, Ai1AgentDO> agentMap = agentService.getAgentMap(convertSet(pageResult.getList(), Ai1SessionDO::getAgentId));
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertSet(pageResult.getList(), Ai1SessionDO::getUserId));
-        return success(BeanUtils.toBean(pageResult, Ai1SessionRespVO.class, respVO ->
-                MapUtils.findAndThen(userMap, respVO.getUserId(), user -> respVO.setUserNickname(user.getNickname()))));
+        return success(BeanUtils.toBean(pageResult, Ai1SessionRespVO.class, respVO -> {
+            MapUtils.findAndThen(agentMap, respVO.getAgentId(), agent -> respVO.setAgentName(agent.getName()));
+            MapUtils.findAndThen(userMap, respVO.getUserId(), user -> respVO.setUserNickname(user.getNickname()));
+        }));
     }
 
 }

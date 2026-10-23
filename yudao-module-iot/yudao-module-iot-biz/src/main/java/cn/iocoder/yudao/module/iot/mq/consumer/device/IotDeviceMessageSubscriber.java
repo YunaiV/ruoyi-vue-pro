@@ -64,7 +64,12 @@ public class IotDeviceMessageSubscriber implements IotMessageSubscriber<IotDevic
 
         TenantUtils.execute(message.getTenantId(), () -> {
             // 1.1 更新设备的最后时间
-            IotDeviceDO device = deviceService.validateDeviceExistsFromCache(message.getDeviceId());
+            // 设备已删除时（例如删除时消息仍在途），跳过处理，避免消息不断重投：https://github.com/YunaiV/ruoyi-vue-pro/issues/1271
+            IotDeviceDO device = deviceService.getDeviceFromCache(message.getDeviceId());
+            if (device == null) {
+                log.warn("[onMessage][message({}) 对应的设备不存在，忽略处理]", message);
+                return;
+            }
             devicePropertyService.updateDeviceReportTimeAsync(device.getId(), LocalDateTime.now());
             // 1.2 更新设备的连接 server
             devicePropertyService.updateDeviceServerIdAsync(device.getId(), message.getServerId());

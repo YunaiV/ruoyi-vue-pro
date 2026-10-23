@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.ai1.service.session;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.ai1.controller.admin.session.vo.session.Ai1SessionCreateMyReqVO;
+import cn.iocoder.yudao.module.ai1.controller.admin.session.vo.session.Ai1SessionPageReqVO;
 import cn.iocoder.yudao.module.ai1.controller.admin.session.vo.session.Ai1SessionUpdateMyReqVO;
 import cn.iocoder.yudao.module.ai1.dal.dataobject.session.Ai1SessionDO;
 import cn.iocoder.yudao.module.ai1.dal.mysql.session.Ai1SessionMapper;
@@ -102,6 +104,46 @@ public class Ai1SessionServiceImplTest extends BaseDbUnitTest {
         List<Ai1SessionDO> list = sessionService.getSessionListByAgentIdAndUserId(1L, 100L);
         // 断言
         assertEquals(Arrays.asList(id2, id1), list.stream().map(Ai1SessionDO::getId).toList());
+    }
+
+    @Test
+    public void testGetUserIdListByAgentId() {
+        // mock 数据
+        sessionService.createSessionMy(200L, new Ai1SessionCreateMyReqVO().setAgentId(1L));
+        sessionService.createSessionMy(100L, new Ai1SessionCreateMyReqVO().setAgentId(1L));
+        sessionService.createSessionMy(100L, new Ai1SessionCreateMyReqVO().setAgentId(1L));
+        sessionService.createSessionMy(300L, new Ai1SessionCreateMyReqVO().setAgentId(2L));
+
+        // 调用，并断言：去重并按用户编号升序
+        assertEquals(Arrays.asList(100L, 200L), sessionService.getUserIdListByAgentId(1L));
+    }
+
+    @Test
+    public void testGetSession() {
+        // mock 数据
+        Long id = sessionService.createSessionMy(100L, new Ai1SessionCreateMyReqVO().setAgentId(1L));
+
+        // 调用，并断言
+        assertEquals(100L, sessionService.getSession(id).getUserId());
+        assertNull(sessionService.getSession(id + 1));
+    }
+
+    @Test
+    public void testGetSessionPage_withoutAgentId() {
+        // mock 数据
+        Long id1 = sessionService.createSessionMy(100L, new Ai1SessionCreateMyReqVO().setAgentId(1L));
+        Long id2 = sessionService.createSessionMy(100L, new Ai1SessionCreateMyReqVO().setAgentId(2L));
+        Long id3 = sessionService.createSessionMy(200L, new Ai1SessionCreateMyReqVO().setAgentId(2L));
+
+        // 调用：不传 Agent 时跨 Agent 查询
+        PageResult<Ai1SessionDO> pageResult = sessionService.getSessionPage(new Ai1SessionPageReqVO());
+        // 断言
+        assertEquals(Arrays.asList(id3, id2, id1), pageResult.getList().stream().map(Ai1SessionDO::getId).toList());
+
+        // 调用：按 Agent、用户筛选
+        pageResult = sessionService.getSessionPage(new Ai1SessionPageReqVO().setAgentId(2L).setUserId(100L));
+        // 断言
+        assertEquals(Collections.singletonList(id2), pageResult.getList().stream().map(Ai1SessionDO::getId).toList());
     }
 
 }

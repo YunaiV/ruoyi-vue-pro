@@ -35,6 +35,13 @@ public class RedisPendingMessageResendJob {
      */
     private static final int EXPIRE_TIME = 5 * 60;
 
+    /**
+     * 每个消费者每轮最多扫描的 pending 消息数量
+     *
+     * 避免 pending 堆积时，单次 XPENDING 返回过多数据而长时间占用 Redis；未扫描到的消息，由后续轮次继续处理
+     */
+    private static final int PENDING_BATCH_SIZE = 1000;
+
     private final List<AbstractRedisStreamMessageListener<?>> listeners;
     private final RedisMQTemplate redisTemplate;
     private final RedissonClient redissonClient;
@@ -74,8 +81,9 @@ public class RedisPendingMessageResendJob {
             Map<String, Long> pendingMessagesPerConsumer = pendingMessagesSummary.getPendingMessagesPerConsumer();
             pendingMessagesPerConsumer.forEach((consumerName, pendingMessageCount) -> {
                 log.info("[processPendingMessage][消费者({}) 消息数量({})]", consumerName, pendingMessageCount);
-                // 每个消费者的 pending消息的详情信息
-                PendingMessages pendingMessages = ops.pending(listener.getStreamKey(), Consumer.from(listener.getGroup(), consumerName), Range.unbounded(), pendingMessageCount);
+                // 每个消费者的 pending消息的详情信息，分批扫描：https://github.com/YunaiV/ruoyi-vue-pro/issues/1271
+                PendingMessages pendingMessages = ops.pending(listener.getStreamKey(), Consumer.from(listener.getGroup(), consumerName),
+                        Range.unbounded(), Math.min(pendingMessageCount, PENDING_BATCH_SIZE));
                 if (pendingMessages.isEmpty()) {
                     return;
                 }
@@ -89,6 +97,11 @@ public class RedisPendingMessageResendJob {
                     List<MapRecord<String, Object, Object>> records = ops.range(listener.getStreamKey(),
                             Range.of(Range.Bound.inclusive(pendingMessage.getIdAsString()), Range.Bound.inclusive(pendingMessage.getIdAsString())));
                     if (CollUtil.isEmpty(records)) {
+                        // 消息体已不存在（例如被 RedisStreamMessageCleanupJob 裁剪），无法重新投递，直接 ack 避免 pending 永久滞留
+                        redisTemplate.getRedisTemplate().opsForStream().acknowledge(listener.getStreamKey(),
+                                listener.getGroup(), pendingMessage.getId());
+                        log.warn("[processPendingMessage][消息({}) 的消息体已不存在，无法重新投递，直接 ack]",
+                                pendingMessage.getIdAsString());
                         return;
                     }
                     // 重新投递消息

@@ -81,4 +81,12 @@ public interface ErpStockInService {
      */
     List<ErpStockInItemDO> getStockInItemListByInIds(Collection<Long> inIds);
 
+    /**
+     * 获得引用指定产品的其它入库项数量
+     *
+     * @param productId 产品编号
+     * @return 数量
+     */
+    Long getStockInItemCountByProductId(Long productId);
+
 }

@@ -200,6 +200,10 @@ public class IotSceneRuleServiceImpl implements IotSceneRuleService {
     public void executeSceneRuleByDevice(IotDeviceMessage message) {
         // 1.1 这里的 tenantId，通过设备获取；
         IotDeviceDO device = deviceService.getDeviceFromCache(message.getDeviceId());
+        if (device == null) { // 设备已删除时，跳过处理：https://github.com/YunaiV/ruoyi-vue-pro/issues/1271
+            log.warn("[executeSceneRuleByDevice][设备({}) 不存在]", message.getDeviceId());
+            return;
+        }
         TenantUtils.execute(device.getTenantId(), () -> {
             // 1.2 获得设备匹配的规则场景
             List<IotSceneRuleDO> sceneRules = getMatchedSceneRuleListByMessage(message);

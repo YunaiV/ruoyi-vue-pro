@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.ai1.controller.admin.session.vo.session;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -13,8 +12,7 @@ import lombok.ToString;
 @ToString(callSuper = true)
 public class Ai1SessionPageReqVO extends PageParam {
 
-    @Schema(description = "Agent 编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    @NotNull(message = "Agent 编号不能为空")
+    @Schema(description = "Agent 编号，为空时查询全部 Agent", example = "1")
     private Long agentId;
 
     @Schema(description = "标题，模糊匹配", example = "三体")

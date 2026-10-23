@@ -40,6 +40,7 @@ public interface ProductCommentConvert {
     }
 
     default ProductCommentDO convert(ProductCommentCreateReqVO createReq, ProductSpuDO spu, ProductSkuDO sku) {
+        // 管理后台添加的是虚拟评价，不关联会员和订单，userId 固定为 0：https://github.com/YunaiV/ruoyi-vue-pro/issues/1277
         ProductCommentDO comment = BeanUtils.toBean(createReq, ProductCommentDO.class)
                 .setVisible(true).setUserId(0L).setAnonymous(false)
                 .setScores(convertScores(createReq.getDescriptionScores(), createReq.getBenefitScores()));

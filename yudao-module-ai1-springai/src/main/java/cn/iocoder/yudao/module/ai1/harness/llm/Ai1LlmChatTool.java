@@ -90,15 +90,15 @@ public class Ai1LlmChatTool {
             // 2.1 思考过程：Spring AI 1.x 的 reasoning_content 是增量分片，直接转发（重复文本也可能是有效增量）
             Object reasoningValue = generation.getOutput().getMetadata().get(METADATA_REASONING);
             String delta = reasoningValue instanceof String value ? value : null;
-            if (StrUtil.isNotBlank(delta)) {
+            if (StrUtil.isNotEmpty(delta)) {
                 thinkingText.append(delta);
                 if (onThinking != null) {
                     onThinking.accept(delta);
                 }
             }
-            // 2.2 回复内容
+            // 2.2 回复内容：只跳过空串，空格、换行分片也是有效内容
             String chunk = generation.getOutput().getText();
-            if (StrUtil.isNotBlank(chunk)) {
+            if (StrUtil.isNotEmpty(chunk)) {
                 contentText.append(chunk);
                 if (onContent != null) {
                     onContent.accept(chunk);

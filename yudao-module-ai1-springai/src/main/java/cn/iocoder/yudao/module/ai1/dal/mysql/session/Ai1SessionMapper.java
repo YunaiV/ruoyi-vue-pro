@@ -10,6 +10,8 @@ import org.apache.ibatis.annotations.Mapper;
 import java.util.Collection;
 import java.util.List;
 
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+
 /**
  * AI1 会话 Mapper
  *
@@ -20,7 +22,7 @@ public interface Ai1SessionMapper extends BaseMapperX<Ai1SessionDO> {
 
     default PageResult<Ai1SessionDO> selectPage(Ai1SessionPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<Ai1SessionDO>()
-                .eq(Ai1SessionDO::getAgentId, reqVO.getAgentId())
+                .eqIfPresent(Ai1SessionDO::getAgentId, reqVO.getAgentId())
                 .likeIfPresent(Ai1SessionDO::getTitle, reqVO.getTitle())
                 .eqIfPresent(Ai1SessionDO::getUserId, reqVO.getUserId())
                 .orderByDesc(Ai1SessionDO::getId));
@@ -31,6 +33,14 @@ public interface Ai1SessionMapper extends BaseMapperX<Ai1SessionDO> {
                 .eq(Ai1SessionDO::getAgentId, agentId)
                 .eq(Ai1SessionDO::getUserId, userId)
                 .orderByDesc(Ai1SessionDO::getId));
+    }
+
+    default List<Long> selectUserIdListByAgentId(Long agentId) {
+        return convertList(selectList(new LambdaQueryWrapperX<Ai1SessionDO>()
+                .eq(Ai1SessionDO::getAgentId, agentId)
+                .select(Ai1SessionDO::getUserId)
+                .groupBy(Ai1SessionDO::getUserId)
+                .orderByAsc(Ai1SessionDO::getUserId)), Ai1SessionDO::getUserId);
     }
 
     default List<Ai1SessionDO> selectListByAgentIds(Collection<Long> agentIds) {

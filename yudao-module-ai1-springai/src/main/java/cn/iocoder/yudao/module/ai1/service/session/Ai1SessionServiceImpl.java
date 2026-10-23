@@ -84,8 +84,18 @@ public class Ai1SessionServiceImpl implements Ai1SessionService {
     }
 
     @Override
+    public Ai1SessionDO getSession(Long id) {
+        return sessionMapper.selectById(id);
+    }
+
+    @Override
     public List<Ai1SessionDO> getSessionListByAgentIdAndUserId(Long agentId, Long userId) {
         return sessionMapper.selectListByAgentIdAndUserId(agentId, userId);
+    }
+
+    @Override
+    public List<Long> getUserIdListByAgentId(Long agentId) {
+        return sessionMapper.selectUserIdListByAgentId(agentId);
     }
 
     @Override
