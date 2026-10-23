@@ -413,7 +413,8 @@ class PostgreSQLConvertor(Convertor):
         type = type.lower()
 
         if type in ("varchar", "char"):
-            return f"varchar({size})"
+            # MySQL 中未指定长度的 char 等同于 char(1)
+            return f"varchar({size or 1})"
         if type in ("int", "int unsigned", "int unsigned zerofill"):
             return "int4"
         if type in ("bigint", "bigint unsigned"):
