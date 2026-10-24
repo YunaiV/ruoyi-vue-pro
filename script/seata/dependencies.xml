@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    分布式事务（Apache Seata 2.6.0 AT 模式）的 Maven 依赖片段，不是 Maven 工程，不参与项目构建。
+
+    使用时，将下面的 <dependency> 复制到【包含 @GlobalTransactional 等 Seata 代码】的模块的 pom.xml 的 <dependencies> 中，
+    保证该模块编译时能引用 Seata 的类，运行时也能通过模块依赖传递给最终启动的模块：
+      - 单体项目：yudao-module-system/pom.xml。示例的全局事务入口 DemoSeataTradeService 在该模块中，
+        yudao-server 已经依赖 yudao-module-system，会传递获得这些依赖；只加在 yudao-server/pom.xml 时，yudao-module-system 编译失败。
+        账户示例所在的 yudao-module-infra 不直接引用 Seata 的类，不需要添加
+      - 微服务项目：参与全局事务的每个服务的 pom.xml（它们既是编译模块，也是最终启动的模块），示例是
+        yudao-module-system/yudao-module-system-server/pom.xml（发起方）、yudao-module-infra/yudao-module-infra-server/pom.xml（参与方）
+
+    三个分支（master、master-jdk17、master-jdk25）复制同样的内容，不需要按分支选择。
+    除 Seata 外的依赖都不写版本号，继续由项目的 Spring Boot BOM 管理。
+-->
+<dependencies>
+
+    <!-- ========== 1. Seata 客户端 ========== -->
+    <!--
+        必须使用 org.apache.seata 的坐标，并显式指定版本：
+          - 微服务项目的 Spring Cloud Alibaba BOM 管理的版本是 2.5.0（master-jdk17、master-jdk25）或 io.seata 的 1.6.1（master），不是本方案的 2.6.0；
+          - 不要再引入 spring-cloud-starter-alibaba-seata、io.seata:* 等旧坐标，否则会与 seata-all 2.6.0 自带的 io.seata 兼容类重复。
+        Dynamic Datasource 4.6.0 代理数据源时使用的 io.seata.rm.datasource.DataSourceProxy，由 seata-all 2.6.0 自带的兼容类提供。
+    -->
+    <dependency>
+        <groupId>org.apache.seata</groupId>
+        <artifactId>seata-spring-boot-starter</artifactId>
+        <version>2.6.0</version>
+        <exclusions>
+            <!--
+                Seata 传递依赖 druid 1.2.25，路径比项目的 Druid starter 更短时，会把项目原有的 Druid 降级。
+                排除后，Seata 的 SQL 解析继续使用项目 Druid starter 提供的 druid（版本由项目的 druid.version 管理）。
+            -->
+            <exclusion>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid</artifactId>
+            </exclusion>
+        </exclusions>
+    </dependency>
+
+    <!-- ========== 2. Jackson 2：Seata 内部的 undo_log 序列化使用 ========== -->
+    <!--
+        Seata 默认使用 Jackson 2（com.fasterxml.jackson）序列化 undo_log 的前后镜像，但没有把它声明为传递依赖。
+          - master、master-jdk17 分支：Spring Boot 2.7.18、3.5.15 已经提供，这里的声明不会改变版本；
+          - master-jdk25 分支：Spring Boot 4.1.2 默认使用 Jackson 3（tools.jackson），必须显式添加。缺少 jackson-databind 时，
+            第一次提交分支事务才报 NoClassDefFoundError: com/fasterxml/jackson/core/JsonProcessingException；
+            缺少 jackson-datatype-jsr310 时报 NoClassDefFoundError: com/fasterxml/jackson/datatype/jsr310/JavaTimeModule。
+        它们只给 Seata 内部使用，不会替换项目接口、Redis 等使用的 JSON 序列化。
+    -->
+    <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>com.fasterxml.jackson.datatype</groupId>
+        <artifactId>jackson-datatype-jsr310</artifactId> <!-- undo_log 中的 LocalDateTime 等时间类型 -->
+    </dependency>
+
+</dependencies>
