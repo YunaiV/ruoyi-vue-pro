@@ -116,7 +116,7 @@ public class IotUdpSessionManager {
         try {
             // 使用 CompletableFuture 同步等待发送结果
             CompletableFuture<Boolean> future = new CompletableFuture<>();
-            socket.send(Buffer.buffer(data), address.getPort(), address.getHostString(), result -> {
+            socket.send(Buffer.buffer(data), address.getPort(), address.getHostString()).onComplete(result -> {
                 if (result.succeeded()) {
                     log.debug("[sendToDevice][发送消息成功，设备 ID: {}，地址: {}，数据长度: {} 字节]",
                             deviceId, buildAddressKey(address), data.length);

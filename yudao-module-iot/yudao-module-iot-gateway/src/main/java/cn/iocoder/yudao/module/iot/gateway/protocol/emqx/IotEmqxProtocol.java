@@ -313,8 +313,7 @@ public class IotEmqxProtocol implements IotProtocol {
         if (will != null && will.isEnabled()) {
             Assert.notBlank(will.getTopic(), "遗嘱消息主题(emqx.will.topic)不能为空");
             Assert.notNull(will.getPayload(), "遗嘱消息内容(emqx.will.payload)不能为空");
-            options.setWillFlag(true)
-                    .setWillTopic(will.getTopic())
+            options.setWillTopic(will.getTopic())
                     .setWillMessageBytes(Buffer.buffer(will.getPayload()))
                     .setWillQoS(will.getQos())
                     .setWillRetain(will.isRetain());
@@ -325,12 +324,12 @@ public class IotEmqxProtocol implements IotProtocol {
                 && Boolean.FALSE.equals(emqxConfig.getTrustAll())
                 && sslOptions != null) {
             if (StrUtil.isNotBlank(sslOptions.getTrustStorePath())) {
-                options.setTrustStoreOptions(new JksOptions()
+                options.setTrustOptions(new JksOptions()
                         .setPath(sslOptions.getTrustStorePath())
                         .setPassword(sslOptions.getTrustStorePassword()));
             }
             if (StrUtil.isNotBlank(sslOptions.getKeyStorePath())) {
-                options.setKeyStoreOptions(new JksOptions()
+                options.setKeyCertOptions(new JksOptions()
                         .setPath(sslOptions.getKeyStorePath())
                         .setPassword(sslOptions.getKeyStorePassword()));
             }

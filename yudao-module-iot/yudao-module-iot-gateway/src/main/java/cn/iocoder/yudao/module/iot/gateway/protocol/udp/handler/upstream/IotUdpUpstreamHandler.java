@@ -361,7 +361,7 @@ public class IotUdpUpstreamHandler {
     private void writeResponse(DatagramSocket socket, InetSocketAddress address, IotDeviceMessage responseMessage) {
         try {
             byte[] serializedData = serializer.serialize(responseMessage);
-            socket.send(Buffer.buffer(serializedData), address.getPort(), address.getHostString(), result -> {
+            socket.send(Buffer.buffer(serializedData), address.getPort(), address.getHostString()).onComplete(result -> {
                 if (result.failed()) {
                     log.error("[writeResponse][发送响应失败，地址: {}]",
                             sessionManager.buildAddressKey(address), result.cause());

@@ -223,7 +223,7 @@ public class OAuth2ApproveServiceImplTest extends BaseDbUnitTest {
         String clientId = randomString();
         String scope = randomString();
         Boolean approved = randomBoolean();
-        LocalDateTime expireTime = LocalDateTime.ofInstant(randomDay(1, 30).toInstant(), ZoneId.systemDefault());
+        LocalDateTime expireTime = LocalDateTime.ofInstant(randomDay(1, 30).toInstant(), ZoneId.systemDefault()).withNano(0);
         // mock 方法
 
         // 调用
@@ -251,7 +251,7 @@ public class OAuth2ApproveServiceImplTest extends BaseDbUnitTest {
         String clientId = approve.getClientId();
         String scope = approve.getScope();
         Boolean approved = randomBoolean();
-        LocalDateTime expireTime = LocalDateTime.ofInstant(randomDay(1, 30).toInstant(), ZoneId.systemDefault());
+        LocalDateTime expireTime = LocalDateTime.ofInstant(randomDay(1, 30).toInstant(), ZoneId.systemDefault()).withNano(0);
         // mock 方法
 
         // 调用

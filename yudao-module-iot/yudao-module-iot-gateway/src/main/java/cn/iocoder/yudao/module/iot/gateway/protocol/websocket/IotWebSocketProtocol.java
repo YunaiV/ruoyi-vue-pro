@@ -127,17 +127,19 @@ public class IotWebSocketProtocol implements IotProtocol {
 
         // 1.3 创建服务器并设置 WebSocket 处理器
         httpServer = vertx.createHttpServer(options);
-        httpServer.webSocketHandler(socket -> {
+        httpServer.webSocketHandshakeHandler(handshake -> {
             // 验证路径
-            if (ObjUtil.notEqual(wsConfig.getPath(), socket.path())) {
-                log.warn("[webSocketHandler][WebSocket 路径不匹配，拒绝连接，路径: {}，期望: {}]",
-                        socket.path(), wsConfig.getPath());
-                socket.reject();
+            if (ObjUtil.notEqual(wsConfig.getPath(), handshake.path())) {
+                log.warn("[webSocketHandshakeHandler][WebSocket 路径不匹配，拒绝连接，路径: {}，期望: {}]",
+                        handshake.path(), wsConfig.getPath());
+                handshake.reject();
                 return;
             }
             // 创建上行处理器
-            IotWebSocketUpstreamHandler handler = new IotWebSocketUpstreamHandler(serverId, serializer, connectionManager);
-            handler.handle(socket);
+            handshake.accept().onSuccess(socket -> {
+                IotWebSocketUpstreamHandler handler = new IotWebSocketUpstreamHandler(serverId, serializer, connectionManager);
+                handler.handle(socket);
+            });
         });
 
         // 1.4 启动服务器
