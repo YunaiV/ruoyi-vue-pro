@@ -136,7 +136,7 @@ public class CrmProductServiceImpl implements CrmProductService {
     @CrmPermission(bizType = CrmBizTypeEnum.CRM_PRODUCT, bizId = "#id", level = CrmPermissionLevelEnum.OWNER)
     public void deleteProduct(Long id) {
         // 校验存在
-        validateProductExists(id);
+        CrmProductDO product = validateProductExists(id);
         // 校验未被合同/商机引用，避免删除后产生悬空引用
         if (contractService.getContractProductCountByProductId(id) > 0) {
             throw exception(PRODUCT_DELETE_FAIL_CONTRACT_EXISTS);
@@ -147,6 +147,9 @@ public class CrmProductServiceImpl implements CrmProductService {
 
         // 删除
         productMapper.deleteById(id);
+
+        // 记录操作日志上下文
+        LogRecordContext.putVariable("product", product);
     }
 
     @Override

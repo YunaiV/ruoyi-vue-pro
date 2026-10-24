@@ -71,10 +71,12 @@ public class CrmProductCategoryServiceImpl implements CrmProductCategoryService 
         productCategoryMapper.updateById(updateObj);
     }
 
-    private void validateProductCategoryExists(Long id) {
-        if (productCategoryMapper.selectById(id) == null) {
+    private CrmProductCategoryDO validateProductCategoryExists(Long id) {
+        CrmProductCategoryDO productCategory = productCategoryMapper.selectById(id);
+        if (productCategory == null) {
             throw exception(PRODUCT_CATEGORY_NOT_EXISTS);
         }
+        return productCategory;
     }
 
     private void validateParentProductCategory(Long id) {
@@ -107,7 +109,7 @@ public class CrmProductCategoryServiceImpl implements CrmProductCategoryService 
             success = CRM_PRODUCT_CATEGORY_DELETE_SUCCESS)
     public void deleteProductCategory(Long id) {
         // 1.1 校验存在
-        validateProductCategoryExists(id);
+        CrmProductCategoryDO productCategory = validateProductCategoryExists(id);
         // 1.2 校验是否还有子分类
         if (productCategoryMapper.selectCountByParentId(id) > 0) {
             throw exception(PRODUCT_CATEGORY_EXISTS_CHILDREN);
@@ -118,6 +120,9 @@ public class CrmProductCategoryServiceImpl implements CrmProductCategoryService 
         }
         // 2. 删除
         productCategoryMapper.deleteById(id);
+
+        // 3. 记录操作日志上下文
+        LogRecordContext.putVariable("productCategory", productCategory);
     }
 
     @Override
