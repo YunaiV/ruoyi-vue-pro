@@ -2,6 +2,8 @@ package cn.iocoder.yudao.module.product.controller.admin.spu.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
+import cn.iocoder.yudao.framework.common.validation.InEnum;
+import cn.iocoder.yudao.module.trade.enums.delivery.DeliveryTypeEnum;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -61,6 +63,7 @@ public class ProductSpuSaveReqVO {
 
     @Schema(description = "配送方式数组", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotEmpty(message = "配送方式不能为空")
+    @InEnum(value = DeliveryTypeEnum.class, message = "配送方式不正确")
     private List<Integer> deliveryTypes;
 
     @Schema(description = "物流配置模板编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "111")
