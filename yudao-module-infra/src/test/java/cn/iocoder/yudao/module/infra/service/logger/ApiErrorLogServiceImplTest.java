@@ -145,7 +145,7 @@ public class ApiErrorLogServiceImplTest extends BaseDbUnitTest {
         // mock 数据
         ApiErrorLogDO log01 = randomPojo(ApiErrorLogDO.class, o -> o.setCreateTime(addTime(Duration.ofDays(-3))));
         apiErrorLogMapper.insert(log01);
-        ApiErrorLogDO log02 = randomPojo(ApiErrorLogDO.class, o -> o.setCreateTime(addTime(Duration.ofDays(-1))));
+        ApiErrorLogDO log02 = randomPojo(ApiErrorLogDO.class, o -> o.setCreateTime(addTime(Duration.ofDays(-1)).withNano(0)));
         apiErrorLogMapper.insert(log02);
         // 准备参数
         Integer exceedDay = 2;
@@ -157,8 +157,7 @@ public class ApiErrorLogServiceImplTest extends BaseDbUnitTest {
         assertEquals(1, count);
         List<ApiErrorLogDO> logs = apiErrorLogMapper.selectList();
         assertEquals(1, logs.size());
-        // TODO @芋艿：createTime updateTime 被屏蔽，仅 win11 会复现，建议后续修复。
-        assertPojoEquals(log02, logs.get(0), "createTime", "updateTime");
+        assertPojoEquals(log02, logs.get(0));
     }
 
 }

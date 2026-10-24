@@ -340,7 +340,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
 
             // mock 数据（order）
             PayOrderDO order = randomPojo(PayOrderDO.class, o -> o.setStatus(PayOrderStatusEnum.WAITING.getStatus())
-                    .setAppId(1L).setExpireTime(addTime(Duration.ofDays(1))));
+                    .setAppId(1L).setExpireTime(addTime(Duration.ofDays(1)).withNano(0)));
             orderMapper.insert(order);
             // 准备参数
             PayOrderSubmitReqVO reqVO = randomPojo(PayOrderSubmitReqVO.class, o -> o.setId(order.getId())
@@ -363,11 +363,9 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
             when(client.unifiedOrder(argThat(payOrderUnifiedReqDTO -> {
                 assertNotNull(payOrderUnifiedReqDTO.getOutTradeNo());
                 assertThat(payOrderUnifiedReqDTO)
-//                        .extracting("subject", "body", "notifyUrl", "returnUrl", "price", "expireTime") // TODO @芋艿：win11 下，时间不太准
-                        .extracting("subject", "body", "notifyUrl", "returnUrl", "price")
+                        .extracting("subject", "body", "notifyUrl", "returnUrl", "price", "expireTime")
                         .containsExactly(order.getSubject(), order.getBody(), "http://127.0.0.1/10",
-//                                reqVO.getReturnUrl(), order.getPrice(), order.getExpireTime());
-                                reqVO.getReturnUrl(), order.getPrice());
+                                reqVO.getReturnUrl(), order.getPrice(), order.getExpireTime());
                 return true;
             }))).thenReturn(unifiedOrderResp);
 
@@ -396,7 +394,7 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
 
             // mock 数据（order）
             PayOrderDO order = randomPojo(PayOrderDO.class, o -> o.setStatus(PayOrderStatusEnum.WAITING.getStatus())
-                    .setAppId(1L).setExpireTime(addTime(Duration.ofDays(1))));
+                    .setAppId(1L).setExpireTime(addTime(Duration.ofDays(1)).withNano(0)));
             orderMapper.insert(order);
             // 准备参数
             PayOrderSubmitReqVO reqVO = randomPojo(PayOrderSubmitReqVO.class, o -> o.setId(order.getId())
@@ -419,11 +417,9 @@ public class PayOrderServiceTest extends BaseDbAndRedisUnitTest {
             when(client.unifiedOrder(argThat(payOrderUnifiedReqDTO -> {
                 assertNotNull(payOrderUnifiedReqDTO.getOutTradeNo());
                 assertThat(payOrderUnifiedReqDTO)
-//                        .extracting("subject", "body", "notifyUrl", "returnUrl", "price", "expireTime") // TODO @芋艿：win11 下，时间不太准
-                        .extracting("subject", "body", "notifyUrl", "returnUrl", "price")
+                        .extracting("subject", "body", "notifyUrl", "returnUrl", "price", "expireTime")
                         .containsExactly(order.getSubject(), order.getBody(), "http://127.0.0.1/10",
-//                                reqVO.getReturnUrl(), order.getPrice(), order.getExpireTime());
-                                reqVO.getReturnUrl(), order.getPrice());
+                                reqVO.getReturnUrl(), order.getPrice(), order.getExpireTime());
                 return true;
             }))).thenReturn(unifiedOrderResp);
 

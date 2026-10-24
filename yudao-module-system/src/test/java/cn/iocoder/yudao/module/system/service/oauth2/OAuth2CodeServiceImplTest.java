@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2CodeDO;
 import cn.iocoder.yudao.module.system.dal.mysql.oauth2.OAuth2CodeMapper;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import org.springframework.context.annotation.Import;
 
 import jakarta.annotation.Resource;
@@ -20,6 +21,8 @@ import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.OAUTH2_CODE_EXPIRE;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.OAUTH2_CODE_NOT_EXISTS;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
+import static org.mockito.Mockito.mockStatic;
 
 /**
  * {@link OAuth2CodeServiceImpl} 的单元测试类
@@ -44,20 +47,25 @@ class OAuth2CodeServiceImplTest extends BaseDbUnitTest {
         List<String> scopes = Lists.newArrayList("read", "write");
         String redirectUri = randomString();
         String state = randomString();
+        LocalDateTime now = LocalDateTime.now().withNano(0);
 
         // 调用
-        OAuth2CodeDO codeDO = oauth2CodeService.createAuthorizationCode(userId, userType, clientId,
-                scopes, redirectUri, state);
+        OAuth2CodeDO codeDO;
+        try (MockedStatic<LocalDateTime> mockedTime = mockStatic(LocalDateTime.class, CALLS_REAL_METHODS)) {
+            mockedTime.when(LocalDateTime::now).thenReturn(now);
+            codeDO = oauth2CodeService.createAuthorizationCode(userId, userType, clientId,
+                    scopes, redirectUri, state);
+        }
         // 断言
         OAuth2CodeDO dbCodeDO = oauth2CodeMapper.selectByCode(codeDO.getCode());
-        // TODO @芋艿：expiresTime 被屏蔽，仅 win11 会复现，建议后续修复。
-        assertPojoEquals(codeDO, dbCodeDO, "expiresTime", "createTime", "updateTime", "deleted");
+        assertPojoEquals(codeDO, dbCodeDO, "createTime", "updateTime", "deleted");
         assertEquals(userId, codeDO.getUserId());
         assertEquals(userType, codeDO.getUserType());
         assertEquals(clientId, codeDO.getClientId());
         assertEquals(scopes, codeDO.getScopes());
         assertEquals(redirectUri, codeDO.getRedirectUri());
         assertEquals(state, codeDO.getState());
+        assertEquals(now.plusMinutes(5), codeDO.getExpiresTime());
         assertFalse(DateUtils.isExpired(codeDO.getExpiresTime()));
     }
 
@@ -88,13 +96,12 @@ class OAuth2CodeServiceImplTest extends BaseDbUnitTest {
         String code = "test_code";
         // mock 数据
         OAuth2CodeDO codeDO = randomPojo(OAuth2CodeDO.class).setCode(code)
-                .setExpiresTime(LocalDateTime.now().plusDays(1));
+                .setExpiresTime(LocalDateTime.now().plusDays(1).withNano(0));
         oauth2CodeMapper.insert(codeDO);
 
         // 调用
         OAuth2CodeDO result = oauth2CodeService.consumeAuthorizationCode(code);
-        // TODO @芋艿：expiresTime 被屏蔽，仅 win11 会复现，建议后续修复。
-        assertPojoEquals(codeDO, result, "expiresTime");
+        assertPojoEquals(codeDO, result);
         assertNull(oauth2CodeMapper.selectByCode(code));
     }
 
