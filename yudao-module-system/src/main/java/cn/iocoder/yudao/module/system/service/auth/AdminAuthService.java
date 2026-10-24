@@ -32,6 +32,14 @@ public interface AdminAuthService {
     AuthLoginRespVO login(@Valid AuthLoginReqVO reqVO);
 
     /**
+     * 轮询二维码，确认后登录并签发电脑端令牌
+     *
+     * @param reqVO 二维码编号及领取凭证
+     * @return 二维码状态及登录结果
+     */
+    AuthQrcodePollRespVO qrcodeLogin(@Valid AuthQrcodePollReqVO reqVO);
+
+    /**
      * 基于 token 退出登录
      *
      * @param token token
