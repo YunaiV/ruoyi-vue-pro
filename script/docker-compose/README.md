@@ -30,7 +30,7 @@ script/docker-compose
 ## 前置条件
 
 - Docker Engine + Docker Compose V2.20.2 及以上（`docker compose version` 可查看）
-- JDK 17、Maven（与源码根 `pom.xml` 的 `java.version` 一致）
+- JDK 8、Maven（与源码根 `pom.xml` 的 `java.version` 一致）
 - 已按前端项目的部署说明完成打包
 
 ## 1. 打包后端
@@ -143,7 +143,7 @@ docker compose exec -T mysql sh -c 'exec mysql -uroot -p"$MYSQL_ROOT_PASSWORD" "
 
 ## 其他分支同步替换点
 
-本目录按 JDK 17 + Spring Boot 3.x 分支编写。同步到其他分支时，只需替换：
+本目录按 JDK 8 + Spring Boot 2.7 分支编写（`yudao-server/Dockerfile` 基础镜像 `eclipse-temurin:8-jre`，Redis 使用 `SPRING_REDIS_*`）。与其他分支同步时，只需替换：
 
 | 分支 | 后端 Dockerfile 基础镜像 | Redis 环境变量前缀 |
 | --- | --- | --- |
