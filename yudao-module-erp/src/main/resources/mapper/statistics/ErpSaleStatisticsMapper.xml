@@ -13,7 +13,8 @@
                <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
                    AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
                </if>
-               AND deleted = 0) -
+               AND deleted = 0
+               AND status = 20) -
             (SELECT IFNULL(SUM(total_price), 0)
                 FROM erp_sale_return
                 WHERE return_time >= #{beginTime}
@@ -23,7 +24,8 @@
                 <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
                     AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
                 </if>
-                AND deleted = 0)
+                AND deleted = 0
+                AND status = 20)
     </select>
 
 </mapper>
