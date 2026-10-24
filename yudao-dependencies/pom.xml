@@ -20,6 +20,7 @@
         <spring.framework.version>5.3.39</spring.framework.version>
         <spring.security.version>5.8.16</spring.security.version>
         <spring.boot.version>2.7.18</spring.boot.version>
+        <kotlin.version>1.9.25</kotlin.version>
         <!-- Web 相关 -->
         <springdoc.version>1.8.0</springdoc.version>
         <knife4j.version>4.5.0</knife4j.version>
@@ -29,13 +30,13 @@
         <mybatis.version>3.5.19</mybatis.version>
         <mybatis-plus.version>3.5.17</mybatis-plus.version>
         <mybatis-plus-join.version>1.5.9</mybatis-plus-join.version>
-        <dynamic-datasource.version>4.5.0</dynamic-datasource.version>
+        <dynamic-datasource.version>4.6.0</dynamic-datasource.version>
         <easy-trans.version>2.3.6</easy-trans.version> <!-- Spring Boot 2.X 最多使用 2.3.6 版本 -->
-        <redisson.version>4.7.0</redisson.version>
+        <redisson.version>4.8.0</redisson.version>
         <dm8.jdbc.version>8.1.3.140</dm8.jdbc.version>
         <kingbase.jdbc.version>9.0.1.jre7</kingbase.jdbc.version>
-        <opengauss.jdbc.version>7.0.0-RC3-og</opengauss.jdbc.version>
-        <taos.version>3.9.2</taos.version>
+        <opengauss.jdbc.version>7.0.0-og</opengauss.jdbc.version>
+        <taos.version>3.10.0</taos.version>
         <iotdb.version>2.0.8</iotdb.version>  <!-- TODO 特殊：暂不升级 2.0.10/2.0.11，其 TablePreparedStatement.execute 不设置 ResultSet，导致 Mapper 的 SELECT 为空、COUNT 为 null -->
         <!-- 消息队列 -->
         <rocketmq-spring.version>2.3.6</rocketmq-spring.version>
@@ -44,35 +45,34 @@
         <!-- 监控相关 -->
         <skywalking.version>9.7.0</skywalking.version>
         <spring-boot-admin.version>2.7.15</spring-boot-admin.version>
-        <opentelemetry.version>1.66.0</opentelemetry.version>
+        <opentelemetry.version>1.67.0</opentelemetry.version>
         <!-- Test 测试相关 -->
-        <h2.version>2.1.214</h2.version>
         <podam.version>7.2.11.RELEASE</podam.version> <!-- Spring Boot 2.X 最多使用 7.2.11 版本 -->
-        <jedis-mock.version>1.1.19</jedis-mock.version>
+        <jedis-mock.version>1.1.20</jedis-mock.version>
         <mockito-inline.version>4.11.0</mockito-inline.version>
         <!-- Bpm 工作流相关 -->
         <flowable.version>6.8.0</flowable.version> <!-- 不要升级 6.8.1：退回有 bug https://github.com/flowable/flowable-engine/issues/3944 -->
         <!-- 工具类相关 -->
-        <anji-plus-captcha.version>1.4.0</anji-plus-captcha.version>
+        <anji-plus-captcha.version>2.0.0</anji-plus-captcha.version>
         <jsoup.version>1.23.2</jsoup.version>
         <sensitive-word.version>0.29.5</sensitive-word.version>
         <pinyin4j.version>2.5.1</pinyin4j.version>
         <lombok.version>1.18.48</lombok.version>
         <mapstruct.version>1.7.0.Beta2</mapstruct.version>
-        <hutool-5.version>5.8.47</hutool-5.version>
+        <hutool-5.version>5.8.48</hutool-5.version>
         <fesod.version>2.1.0-incubating</fesod.version>
         <aviator.version>5.4.4</aviator.version>
         <velocity.version>2.4</velocity.version> <!-- JDK8 不能从 2.4 升级到 2.4.1，会报包不存在！！！！ -->
-        <fastjson2.version>2.0.65</fastjson2.version>
-        <guava.version>33.7.1-jre</guava.version>
+        <fastjson2.version>2.0.66</fastjson2.version>
+        <guava.version>33.7.2-jre</guava.version>
         <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
         <commons-net.version>3.13.0</commons-net.version>
-        <commons-lang3.version>3.20.0</commons-lang3.version>
-        <jsch.version>2.28.7</jsch.version>
+        <commons-lang3.version>3.21.0</commons-lang3.version>
+        <jsch.version>2.28.8</jsch.version>
         <tika-core.version>2.9.3</tika-core.version> <!-- JDK8 不能从 2.9.3 升级到 3.X，会报 JDK8 不支持 -->
         <ip2region.version>2.7.0</ip2region.version>
         <bizlog-sdk.version>3.0.6</bizlog-sdk.version>
-        <netty.version>4.2.18.Final</netty.version>
+        <netty.version>4.2.19.Final</netty.version>
         <mqtt.version>1.2.5</mqtt.version>
         <vertx.version>4.5.26</vertx.version>
         <okhttp.version>4.12.0</okhttp.version>
@@ -81,14 +81,13 @@
         <httpclient5.version>5.5.1</httpclient5.version> <!-- WxJava 4.8.x 需要 HttpClient5 5.4+，Spring Boot 2.7 默认 5.1.4 不兼容；JDK8 兼容不能升级到 5.5.2+ -->
         <httpcore5.version>5.3.6</httpcore5.version> <!-- 配套 httpclient5 5.5.1，Spring Boot 2.7 默认 5.1.5 不兼容 -->
         <!-- 三方云服务相关 -->
-        <awssdk.version>2.55.5</awssdk.version>
+        <awssdk.version>2.57.3</awssdk.version>
         <justauth.version>1.16.7</justauth.version>
         <justauth-starter.version>1.4.0</justauth-starter.version>
         <jimureport.version>2.3.4</jimureport.version> <!-- JimuBI 2.3.2 依赖此版本中的 JimuAiConfigBean，升级到 2.5.4 会导致启动失败 -->
         <jimubi.version>2.3.2</jimubi.version>
-        <weixin-java.version>4.8.6-20260919.232150</weixin-java.version>
-        <bouncycastle.version>1.80</bouncycastle.version>
-        <alipay-sdk-java.version>4.40.1014.ALL</alipay-sdk-java.version>
+        <weixin-java.version>4.8.6-20261010.094603</weixin-java.version>
+        <alipay-sdk-java.version>4.40.1044.ALL</alipay-sdk-java.version>
         <!-- 专属于 JDK8 安全漏洞升级 -->
         <logback.version>1.2.13</logback.version> <!-- 无法使用 1.3.X 版本，启动会报错 -->
     </properties>
@@ -114,6 +113,20 @@
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-bom</artifactId> <!-- JDK8 版本独有：保证 Spring Security 尽量高 -->
                 <version>${spring.security.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.opentelemetry</groupId>
+                <artifactId>opentelemetry-bom</artifactId>
+                <version>${opentelemetry.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-bom</artifactId>
+                <version>${kotlin.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -290,7 +303,7 @@
                     </exclusion>
                     <exclusion>
                         <groupId>org.redisson</groupId>
-                        <!-- Redisson 4.7.x 默认依赖 redisson-spring-data-41（适配 Spring Data Redis 4.x），排除后使用下方的 spring-data-27 适配 Spring Boot 2.7 -->
+                        <!-- Redisson 4.x 默认依赖 redisson-spring-data-41（适配 Spring Data Redis 4.x），排除后使用下方的 spring-data-27 适配 Spring Boot 2.7 -->
                         <artifactId>redisson-spring-data-41</artifactId>
                     </exclusion>
                 </exclusions>
@@ -448,12 +461,6 @@
                         <artifactId>mockito-core</artifactId>
                     </exclusion>
                 </exclusions>
-            </dependency>
-
-            <dependency>
-                <groupId>com.h2database</groupId>
-                <artifactId>h2</artifactId>
-                <version>${h2.version}</version>
             </dependency>
 
             <dependency>
@@ -729,24 +736,6 @@
                         <artifactId>fastjson</artifactId>
                     </exclusion>
                 </exclusions>
-            </dependency>
-
-            <!-- 锁定 weixin-java 传递依赖，避免 Maven 版本范围自动升级到 1.80.2 后 Fat Jar 启动失败。
-                 反馈：https://t.zsxq.com/pCVBo -->
-            <dependency>
-                <groupId>org.bouncycastle</groupId>
-                <artifactId>bcprov-jdk18on</artifactId>
-                <version>${bouncycastle.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.bouncycastle</groupId>
-                <artifactId>bcutil-jdk18on</artifactId>
-                <version>${bouncycastle.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.bouncycastle</groupId>
-                <artifactId>bcpkix-jdk18on</artifactId>
-                <version>${bouncycastle.version}</version>
             </dependency>
 
             <dependency>

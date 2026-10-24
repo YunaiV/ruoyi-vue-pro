@@ -64,7 +64,8 @@ public class OaVehicleReturnServiceImplTest extends BaseDbUnitTest {
         // mock 数据：实际提前出车，不能用计划时间代替事实
         OaVehicleApplyDO apply = randomVehicleApplyDO();
         OaVehicleReturnSaveReqVO reqVO = toBean(randomVehicleReturnDO(), OaVehicleReturnSaveReqVO.class)
-                .setActualStartTime(apply.getStartTime().minusHours(2)).setActualReturnTime(apply.getStartTime().minusHours(1))
+                .setActualStartTime(apply.getStartTime().minusHours(2).withNano(0))
+                .setActualReturnTime(apply.getStartTime().minusHours(1).withNano(0))
                 .setStartLocation("客户现场").setReason("现场支持").setPassenger("李四");
         // mock 方法
         when(vehicleApplyService.validateVehicleApplyExists(20L)).thenReturn(apply);
