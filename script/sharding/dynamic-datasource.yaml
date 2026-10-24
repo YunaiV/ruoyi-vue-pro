@@ -1,0 +1,16 @@
+# 分库分表的 sharding 数据源配置片段，不能直接作为配置文件使用。
+# 将 sharding 合并到已有的 spring.datasource.dynamic.datasource 下，与 master、slave 同级，其它配置保持不变：
+#   - 单体项目：yudao-server 的 application-{profile}.yaml
+#   - 微服务项目：对应服务（例如说 yudao-module-infra-server）的 application-{profile}.yaml，或者 Nacos 中该服务的配置
+spring:
+  datasource:
+    dynamic:
+      datasource:
+        sharding: # 分库分表数据源，只有 @DS("sharding") 的 Mapper、Service 使用，不影响 master 主库
+          lazy: false # 启动时初始化，规则或数据库有误时尽早失败；也避免在异步线程中首次加载 classpath 规则文件
+          type: com.zaxxer.hikari.HikariDataSource # 不使用 Druid 连接池，ShardingSphere 的逻辑 SQL 不需要 Druid 解析
+          driver-class-name: org.apache.shardingsphere.driver.ShardingSphereDriver
+          url: jdbc:shardingsphere:classpath:sharding/sharding.yaml?placeholder-type=environment # 规则文件中的 $${环境变量名::默认值}，从环境变量读取
+          hikari:
+            minimum-idle: 1
+            maximum-pool-size: 10 # 逻辑连接数，不能大于 sharding.yaml 中每个物理库的 maximumPoolSize

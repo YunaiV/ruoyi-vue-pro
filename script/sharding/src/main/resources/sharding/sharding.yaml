@@ -1,0 +1,59 @@
+# ShardingSphere-JDBC 5.5.3 分片规则，由 sharding 数据源的 JDBC URL 加载：
+#   jdbc:shardingsphere:classpath:sharding/sharding.yaml?placeholder-type=environment
+#
+# 注意：本文件由 ShardingSphere 自己解析，不支持 Spring 的 ${ENV:default} 占位符。
+# 由于 URL 带有 placeholder-type=environment 参数，可以使用 $${环境变量名::默认值} 读取环境变量：
+#   1. 名字与默认值之间的 :: 不能省略，没有默认值时写成 $${环境变量名::}
+#   2. 值会原样替换到本文件中，密码不能包含 $、\、' 字符
+#   3. 不要把真实的账号密码写入本文件、提交到 Git
+
+databaseName: sharding_db # 逻辑库名，只在 ShardingSphere 内部使用
+
+mode:
+  type: Standalone # 单机模式，规则只从本文件加载，不依赖注册中心
+  repository:
+    type: Memory # 元数据保存在内存，不额外创建 H2 等存储
+
+dataSources:
+  ds_0:
+    dataSourceClassName: com.zaxxer.hikari.HikariDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    jdbcUrl: $${YUDAO_SHARDING_DS0_URL::jdbc:mysql://127.0.0.1:3306/yudao_sharding_0?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true&rewriteBatchedStatements=true}
+    username: $${YUDAO_SHARDING_DS0_USERNAME::root}
+    password: '$${YUDAO_SHARDING_DS0_PASSWORD::}'
+    minimumIdle: 1
+    maximumPoolSize: 10 # 不能小于 sharding 数据源的 hikari.maximum-pool-size
+  ds_1:
+    dataSourceClassName: com.zaxxer.hikari.HikariDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    jdbcUrl: $${YUDAO_SHARDING_DS1_URL::jdbc:mysql://127.0.0.1:3306/yudao_sharding_1?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true&rewriteBatchedStatements=true}
+    username: $${YUDAO_SHARDING_DS1_USERNAME::root}
+    password: '$${YUDAO_SHARDING_DS1_PASSWORD::}'
+    minimumIdle: 1
+    maximumPoolSize: 10 # 不能小于 sharding 数据源的 hikari.maximum-pool-size
+
+rules:
+  - !SHARDING
+    tables:
+      demo_sharding_order: # 逻辑表，即 DO 上 @TableName 的表名
+        actualDataNodes: ds_$->{0..1}.demo_sharding_order_$->{0..1} # 2 库 × 2 表，共 4 个物理节点
+        databaseStrategy:
+          standard:
+            shardingColumn: user_id
+            shardingAlgorithmName: demo_sharding_order_database_inline
+        tableStrategy:
+          standard:
+            shardingColumn: user_id
+            shardingAlgorithmName: demo_sharding_order_table_inline
+    shardingAlgorithms:
+      demo_sharding_order_database_inline:
+        type: INLINE
+        props:
+          algorithm-expression: ds_$->{user_id % 2} # 分库：user_id 对 2 取余
+      demo_sharding_order_table_inline:
+        type: INLINE
+        props:
+          algorithm-expression: demo_sharding_order_$->{user_id.intdiv(2) % 2} # 分表：user_id 整除 2 后对 2 取余，与分库错开，4 个节点均匀分布
+
+props:
+  sql-show: false # 设置为 true 时，打印逻辑 SQL 与实际路由的 SQL（包含参数值），仅建议本地排查时开启
