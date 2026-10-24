@@ -311,7 +311,7 @@ public class OAuth2TokenServiceImplTest extends BaseDbAndRedisUnitTest {
         // 测试 userType 不匹配
         oauth2AccessTokenMapper.insert(cloneIgnoreId(dbAccessToken, o -> o.setClientId("it_client")));
         // 测试 expireTime 不匹配
-        oauth2AccessTokenMapper.insert(cloneIgnoreId(dbAccessToken, o -> o.setExpiresTime(LocalDateTimeUtil.now())));
+        oauth2AccessTokenMapper.insert(cloneIgnoreId(dbAccessToken, o -> o.setExpiresTime(LocalDateTimeUtil.now().minusDays(1))));
         // 准备参数
         OAuth2AccessTokenPageReqVO reqVO = new OAuth2AccessTokenPageReqVO();
         reqVO.setUserId(10L);
