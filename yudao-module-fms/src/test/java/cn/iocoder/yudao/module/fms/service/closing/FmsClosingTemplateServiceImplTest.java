@@ -217,8 +217,8 @@ public class FmsClosingTemplateServiceImplTest extends BaseDbUnitTest {
 
     private List<FmsSubjectDO> buildPresetSubjects() {
         List<String> subjectCodes = Arrays.asList("1001", "1002", "1122", "1221", "1405", "2202", "2211",
-                "22210101", "22210107", "222102", "222111", "222117", "5001", "560101", "560102",
-                "560107", "560110", "560209", "560302", "560303");
+                "22210101", "22210107", "222102", "222111", "222117", "5001", "560201", "560202",
+                "560203", "560209", "560210", "560302", "560303");
         List<FmsSubjectDO> subjects = new ArrayList<>();
         for (int index = 0; index < subjectCodes.size(); index++) {
             subjects.add(new FmsSubjectDO().setId((long) index + 1).setCode(subjectCodes.get(index))
