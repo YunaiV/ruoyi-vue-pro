@@ -101,7 +101,7 @@ public class JobLogServiceImplTest extends BaseDbUnitTest {
         JobLogDO log01 = randomPojo(JobLogDO.class, o -> o.setCreateTime(addTime(Duration.ofDays(-3))))
                 .setExecuteIndex(1);
         jobLogMapper.insert(log01);
-        JobLogDO log02 = randomPojo(JobLogDO.class, o -> o.setCreateTime(addTime(Duration.ofDays(-1))))
+        JobLogDO log02 = randomPojo(JobLogDO.class, o -> o.setCreateTime(addTime(Duration.ofDays(-1)).withNano(0)))
                 .setExecuteIndex(1);
         jobLogMapper.insert(log02);
         // 准备参数
@@ -114,8 +114,7 @@ public class JobLogServiceImplTest extends BaseDbUnitTest {
         assertEquals(1, count);
         List<JobLogDO> logs = jobLogMapper.selectList();
         assertEquals(1, logs.size());
-        // TODO @芋艿：createTime updateTime 被屏蔽，仅 win11 会复现，建议后续修复。
-        assertPojoEquals(log02, logs.get(0), "createTime", "updateTime");
+        assertPojoEquals(log02, logs.get(0));
     }
 
     @Test
