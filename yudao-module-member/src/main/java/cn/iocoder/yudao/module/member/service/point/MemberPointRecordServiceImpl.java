@@ -84,6 +84,7 @@ public class MemberPointRecordServiceImpl implements MemberPointRecordService {
         if (!success) {
             throw exception(USER_POINT_NOT_ENOUGH);
         }
+        totalPoint = memberUserService.getUser(userId).getPoint(); // 重新读取变动后的积分，避免并发时使用旧积分
 
         // 3. 增加积分记录
         MemberPointRecordDO record = new MemberPointRecordDO()

@@ -97,7 +97,8 @@ public interface MemberUserMapper extends BaseMapperX<MemberUserDO> {
         Assert.isTrue(incrCount < 0);
         LambdaUpdateWrapper<MemberUserDO> lambdaUpdateWrapper = new LambdaUpdateWrapper<MemberUserDO>()
                 .setSql(" point = point + " + incrCount) // 负数，所以使用 + 号
-                .eq(MemberUserDO::getId, id);
+                .eq(MemberUserDO::getId, id)
+                .ge(MemberUserDO::getPoint, -(long) incrCount); // 积分足够才扣减，避免并发扣减为负数；使用 long 避免取反溢出
         return update(null, lambdaUpdateWrapper);
     }
 
