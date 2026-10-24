@@ -16,9 +16,11 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collections;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static cn.iocoder.yudao.module.oa.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.DEPT_NOT_FOUND;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -184,6 +186,25 @@ public class OaVehicleServiceImplTest extends BaseDbUnitTest {
         assertNull(updatedVehicle.getDeptId());
         assertEquals("", updatedVehicle.getPicUrl());
         verifyNoInteractions(deptApi);
+    }
+
+    @Test
+    public void testUpdateVehicle_deptInvalid() {
+        // mock 数据
+        OaVehicleDO vehicle = randomVehicleDO().setDeptId(103L).setPicUrl("https://example.com/old.png");
+        vehicleMapper.insert(vehicle);
+        // 准备参数
+        OaVehicleSaveReqVO reqVO = BeanUtils.toBean(vehicle, OaVehicleSaveReqVO.class)
+                .setDeptId(104L).setPicUrl("https://example.com/new.png");
+        // mock 方法
+        doThrow(exception(DEPT_NOT_FOUND)).when(deptApi).validateDeptList(Collections.singleton(104L));
+
+        // 调用，并断言异常
+        assertServiceException(() -> vehicleService.updateVehicle(reqVO), DEPT_NOT_FOUND);
+        // 断言：部门校验失败时不更新车辆
+        OaVehicleDO dbVehicle = vehicleMapper.selectById(vehicle.getId());
+        assertEquals(103L, dbVehicle.getDeptId());
+        assertEquals("https://example.com/old.png", dbVehicle.getPicUrl());
     }
 
     @Test
