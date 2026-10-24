@@ -1,30 +1,40 @@
-# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
-# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
+# 打包校验：JDK 版本取自根 pom.xml 的 java.version，与当前分支保持一致
+# 参考：https://docs.github.com/actions/use-cases-and-examples/building-and-testing/building-and-testing-java-with-maven
 
 name: Java CI with Maven
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, master-jdk17, master-jdk25 ]
   # pull_request:
   #   branches: [ master ]
+  workflow_dispatch:
 
 jobs:
   build:
 
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        java: [ '8', '11', '17' ]
-
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up JDK ${{ matrix.Java }}
-      uses: actions/setup-java@v2
+    - uses: actions/checkout@v7
+    # 读取根 pom.xml 的 properties/java.version（1.8 -> 8），缺失或无效时直接失败
+    - name: Resolve JDK version
+      id: jdk
+      run: |
+        python3 -I - <<'EOF' >> "$GITHUB_OUTPUT"
+        import xml.etree.ElementTree as ET
+        ns = {'m': 'http://maven.apache.org/POM/4.0.0'}
+        v = (ET.parse('pom.xml').getroot().findtext('m:properties/m:java.version', namespaces=ns) or '').strip().removeprefix('1.')
+        if not v.isdigit():
+            raise SystemExit(f'根 pom.xml 的 properties/java.version 缺失或无效: {v!r}')
+        print(f'version={v}')
+        EOF
+    - name: Set up JDK ${{ steps.jdk.outputs.version }}
+      uses: actions/setup-java@v6
       with:
-        java-version: ${{ matrix.java }}
+        java-version: ${{ steps.jdk.outputs.version }}
         distribution: 'temurin'
         cache: maven
+        cache-dependency-path: '**/pom.xml'
     - name: Build with Maven
       run: mvn -B package --file pom.xml -Dmaven.test.skip=true
