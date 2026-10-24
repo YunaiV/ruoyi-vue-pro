@@ -10,6 +10,14 @@ import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2AccessTokenDO;
 public interface RedisKeyConstants {
 
     /**
+     * 扫码登录的临时记录
+     * <p>
+     * KEY 格式：auth_qrcode:{qrcodeId}，有租户上下文时追加 :{tenantId}
+     * VALUE 数据类型：Hash，status、userId、secretHash；固定 180 秒过期
+     */
+    String AUTH_QRCODE = "auth_qrcode:%s";
+
+    /**
      * 指定部门的所有子部门编号数组的缓存
      * <p>
      * KEY 格式：dept_children_ids:{id}

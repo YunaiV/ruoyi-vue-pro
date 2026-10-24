@@ -1,17 +1,21 @@
 package cn.iocoder.yudao.module.system.service.auth;
 
+import cn.hutool.core.lang.Pair;
 import cn.hutool.core.util.ReflectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
+import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.module.system.api.sms.SmsCodeApi;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserBindReqDTO;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialUserRespDTO;
 import cn.iocoder.yudao.module.system.controller.admin.auth.vo.*;
 import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2AccessTokenDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
+import cn.iocoder.yudao.module.system.enums.auth.AuthQrcodeStatusEnum;
 import cn.iocoder.yudao.module.system.enums.logger.LoginLogTypeEnum;
 import cn.iocoder.yudao.module.system.enums.logger.LoginResultEnum;
+import cn.iocoder.yudao.module.system.enums.oauth2.OAuth2ClientConstants;
 import cn.iocoder.yudao.module.system.enums.sms.SmsSceneEnum;
 import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
 import cn.iocoder.yudao.module.system.service.logger.LoginLogService;
@@ -21,6 +25,7 @@ import cn.iocoder.yudao.module.system.service.social.SocialUserService;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import com.anji.captcha.model.common.ResponseModel;
 import com.anji.captcha.service.CaptchaService;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -36,7 +41,7 @@ import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServic
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomString;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
@@ -48,6 +53,8 @@ public class AdminAuthServiceImplTest extends BaseDbUnitTest {
 
     @MockBean
     private AdminUserService userService;
+    @MockBean
+    private AdminAuthQrcodeService authQrcodeService;
     @MockBean
     private CaptchaService captchaService;
     @MockBean
@@ -69,6 +76,11 @@ public class AdminAuthServiceImplTest extends BaseDbUnitTest {
         // 注入一个 Validator 对象
         ReflectUtil.setFieldValue(authService, "validator",
                 Validation.buildDefaultValidatorFactory().getValidator());
+    }
+
+    @AfterEach
+    public void tearDown() {
+        TenantContextHolder.clear();
     }
 
     @Test
@@ -366,6 +378,123 @@ public class AdminAuthServiceImplTest extends BaseDbUnitTest {
                 argThat(o -> o.getLogType().equals(LoginLogTypeEnum.LOGIN_USERNAME.getType())
                         && o.getResult().equals(LoginResultEnum.CAPTCHA_CODE_ERROR.getResult()))
         );
+    }
+
+    @Test
+    public void testQrcodeLogin_success() {
+        // 准备参数与 mock
+        AuthQrcodePollReqVO reqVO = mockConfirmedQrcode();
+        AdminUserDO user = qrcodeUser();
+        when(userService.getUser(1L)).thenReturn(user);
+        OAuth2AccessTokenDO token = randomPojo(OAuth2AccessTokenDO.class, o -> o.setUserId(1L));
+        when(oauth2TokenService.createAccessToken(1L, UserTypeEnum.ADMIN.getValue(),
+                OAuth2ClientConstants.CLIENT_ID_DEFAULT, null)).thenReturn(token);
+
+        // 调用
+        AuthQrcodePollRespVO result = authService.qrcodeLogin(reqVO);
+
+        // 校验
+        assertEquals(AuthQrcodeStatusEnum.CONFIRMED.getStatus(), result.getStatus());
+        assertEquals(token.getAccessToken(), result.getLogin().getAccessToken());
+        verify(loginLogService).createLoginLog(argThat(log ->
+                log.getLogType().equals(LoginLogTypeEnum.LOGIN_QRCODE.getType())
+                        && log.getUserId().equals(1L)
+                        && log.getResult().equals(LoginResultEnum.SUCCESS.getResult())));
+    }
+
+    @Test
+    public void testQrcodeLogin_disabled() {
+        // 准备参数与 mock
+        AuthQrcodePollReqVO reqVO = mockConfirmedQrcode();
+        when(userService.getUser(1L)).thenReturn(qrcodeUser().setStatus(CommonStatusEnum.DISABLE.getStatus()));
+
+        // 调用并校验：复用普通登录的禁用校验和失败日志。
+        assertServiceException(() -> authService.qrcodeLogin(reqVO), AUTH_LOGIN_USER_DISABLED);
+        verifyNoInteractions(oauth2TokenService);
+        verify(loginLogService).createLoginLog(argThat(log ->
+                log.getLogType().equals(LoginLogTypeEnum.LOGIN_QRCODE.getType())
+                        && log.getResult().equals(LoginResultEnum.USER_DISABLED.getResult())));
+    }
+
+    @Test
+    public void testQrcodeLogin_deleted() {
+        // 准备参数与 mock
+        AuthQrcodePollReqVO reqVO = mockConfirmedQrcode();
+
+        // 调用并校验
+        assertServiceException(() -> authService.qrcodeLogin(reqVO), USER_NOT_EXISTS);
+        verifyNoInteractions(oauth2TokenService);
+    }
+
+    @Test
+    public void testQrcodeLogin_waiting() {
+        // 准备参数与 mock
+        AuthQrcodePollReqVO reqVO = qrcodeRequest();
+        when(authQrcodeService.pollAuthQrcode(reqVO)).thenReturn(Pair.of(AuthQrcodeStatusEnum.WAITING, null));
+
+        // 调用
+        AuthQrcodePollRespVO result = authService.qrcodeLogin(reqVO);
+
+        // 校验
+        assertEquals(AuthQrcodeStatusEnum.WAITING.getStatus(), result.getStatus());
+        assertNull(result.getLogin());
+        verifyNoInteractions(userService, oauth2TokenService, loginLogService);
+    }
+
+    @Test
+    public void testQrcodeLogin_currentTenant() {
+        // 准备参数与 mock：扫码登录沿用请求已确定的租户，不切换租户。
+        TenantContextHolder.setTenantId(7L);
+        AuthQrcodePollReqVO reqVO = mockConfirmedQrcode();
+        when(userService.getUser(1L)).thenReturn(qrcodeUser());
+        OAuth2AccessTokenDO token = randomPojo(OAuth2AccessTokenDO.class, o -> o.setUserId(1L));
+        when(oauth2TokenService.createAccessToken(1L, UserTypeEnum.ADMIN.getValue(),
+                OAuth2ClientConstants.CLIENT_ID_DEFAULT, null)).thenAnswer(invocation -> {
+                    assertEquals(7L, TenantContextHolder.getTenantId());
+                    assertFalse(TenantContextHolder.isIgnore());
+                    return token;
+                });
+
+        // 调用
+        AuthQrcodePollRespVO result = authService.qrcodeLogin(reqVO);
+
+        // 校验
+        assertEquals(token.getAccessToken(), result.getLogin().getAccessToken());
+        assertEquals(7L, TenantContextHolder.getTenantId());
+        assertFalse(TenantContextHolder.isIgnore());
+    }
+
+    @Test
+    public void testQrcodeLogin_issueFailure() {
+        // 准备参数与 mock
+        AuthQrcodePollReqVO reqVO = mockConfirmedQrcode();
+        when(userService.getUser(1L)).thenReturn(qrcodeUser());
+        when(oauth2TokenService.createAccessToken(any(), any(), any(), any()))
+                .thenThrow(new IllegalStateException("issue failed"));
+
+        // 调用并校验：失败不重领二维码或重签令牌。
+        assertThrows(IllegalStateException.class, () -> authService.qrcodeLogin(reqVO));
+        verify(authQrcodeService, times(1)).pollAuthQrcode(reqVO);
+        verify(oauth2TokenService, times(1)).createAccessToken(any(), any(), any(), any());
+    }
+
+    private AuthQrcodePollReqVO mockConfirmedQrcode() {
+        AuthQrcodePollReqVO reqVO = qrcodeRequest();
+        when(authQrcodeService.pollAuthQrcode(reqVO)).thenReturn(Pair.of(AuthQrcodeStatusEnum.CONFIRMED, 1L));
+        return reqVO;
+    }
+
+    private static AuthQrcodePollReqVO qrcodeRequest() {
+        AuthQrcodePollReqVO reqVO = new AuthQrcodePollReqVO().setSecret(randomString());
+        reqVO.setQrcodeId(randomString());
+        return reqVO;
+    }
+
+    private static AdminUserDO qrcodeUser() {
+        AdminUserDO user = new AdminUserDO().setId(1L).setUsername("qrcode-user")
+                .setStatus(CommonStatusEnum.ENABLE.getStatus());
+        user.setTenantId(7L);
+        return user;
     }
 
     @Test
