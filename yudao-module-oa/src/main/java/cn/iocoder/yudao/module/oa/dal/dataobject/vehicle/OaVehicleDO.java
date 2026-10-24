@@ -46,6 +46,7 @@ public class OaVehicleDO extends BaseDO {
      *
      * 关联 {@link DeptRespDTO#getId()}
      */
+    @TableField(updateStrategy = FieldStrategy.ALWAYS)
     private Long deptId;
     /**
      * 车型
