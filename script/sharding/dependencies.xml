@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    分库分表（ShardingSphere-JDBC 5.5.3）的 Maven 依赖片段，不是 Maven 工程，不参与项目构建。
+
+    使用时，将下面的 <dependency> 复制到【最终打包启动】模块的 pom.xml 的 <dependencies> 中：
+      - 单体项目：yudao-server/pom.xml
+      - 微服务项目：分库分表所在服务的 pom.xml，例如说 yudao-module-infra/yudao-module-infra-server/pom.xml
+
+    复制「1. 所有分支都需要」，再按项目所在分支，从「2.」「3.」中【只选一段】SnakeYAML，两段不能同时添加。
+
+    ShardingSphere 5.5.x 是插件化的，shardingsphere-jdbc 只包含内核，以下功能需要显式引入。
+    Groovy、Caffeine、Jackson、HikariCP 等传递依赖的版本，继续由项目的 Spring Boot BOM 管理，不要额外覆盖。
+-->
+<dependencies>
+
+    <!-- ========== 1. 所有分支都需要 ========== -->
+    <dependency>
+        <groupId>org.apache.shardingsphere</groupId>
+        <artifactId>shardingsphere-jdbc</artifactId> <!-- 内核，提供 ShardingSphereDriver -->
+        <version>5.5.3</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.shardingsphere</groupId>
+        <artifactId>shardingsphere-sharding-core</artifactId> <!-- 数据分片功能，即 !SHARDING 规则 -->
+        <version>5.5.3</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.shardingsphere</groupId>
+        <artifactId>shardingsphere-jdbc-dialect-mysql</artifactId> <!-- MySQL 的 SQL 解析、路由、改写 -->
+        <version>5.5.3</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.shardingsphere</groupId>
+        <artifactId>shardingsphere-infra-url-classpath</artifactId> <!-- 支持 jdbc:shardingsphere:classpath: 加载规则文件 -->
+        <version>5.5.3</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.shardingsphere</groupId>
+        <artifactId>shardingsphere-standalone-mode-repository-memory</artifactId> <!-- 单机模式的 Memory 存储 -->
+        <version>5.5.3</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.shardingsphere</groupId>
+        <artifactId>shardingsphere-infra-data-source-pool-hikari</artifactId> <!-- 物理库使用 HikariCP 连接池 -->
+        <version>5.5.3</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.shardingsphere</groupId>
+        <artifactId>shardingsphere-authority-simple</artifactId> <!-- 默认的 ALL_PERMITTED 权限实现，缺少时初始化报 SPI-00001 -->
+        <version>5.5.3</version>
+    </dependency>
+
+    <!-- ========== 2. 仅 master 分支（JDK 8 + Spring Boot 2.7.18）：SnakeYAML 1.33 ========== -->
+    <!--
+        Spring Boot 2.7.18 管理的 SnakeYAML 是 1.30，缺少 ShardingSphere 调用的 LoaderOptions#setCodePointLimit 方法（1.32 起提供），
+        需要显式升级。1.33 是 1.x 的最后一个版本，ShardingSphere 与 Spring Boot 2.7.18 管理的 jackson-dataformat-yaml 2.13.5 都能使用。
+        不能只把 SnakeYAML 升级到 2.x（包括 2.7）：2.x 删除了 ParserImpl(StreamReader) 构造方法，jackson-dataformat-yaml 2.13.5 解析 YAML 时
+        会报 NoSuchMethodError；jackson-dataformat-yaml 从 2.15 起才改用 SnakeYAML 2.x，这需要整体升级项目的 Jackson 版本，不在本方案内。
+        master-jdk17、master-jdk25 分支不要添加本段，使用下面的「3.」。
+    -->
+    <dependency>
+        <groupId>org.yaml</groupId>
+        <artifactId>snakeyaml</artifactId>
+        <version>1.33</version>
+    </dependency>
+
+    <!-- ========== 3. 仅 master-jdk17（Spring Boot 3.5.15）、master-jdk25（Spring Boot 4.1.2）分支：SnakeYAML 2.7 ========== -->
+    <!--
+        Spring Boot BOM 管理的 SnakeYAML 分别是 2.4、2.6，可以直接使用；这里显式升级到 2.7，ShardingSphere 规则加载、
+        Spring Boot 配置加载，以及 BOM 管理的新版 jackson-dataformat-yaml 都能使用。
+        master 分支不要添加本段，使用上面的「2.」。
+    -->
+    <dependency>
+        <groupId>org.yaml</groupId>
+        <artifactId>snakeyaml</artifactId>
+        <version>2.7</version>
+    </dependency>
+
+</dependencies>
