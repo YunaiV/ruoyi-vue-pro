@@ -1,0 +1,45 @@
+# 分布式事务（Seata AT 模式）的配置片段，不能直接作为配置文件使用。
+# 合并到 yudao-server 的 application-{profile}.yaml 中，例如说 application-local.yaml：
+#   - spring.datasource.dynamic 下的配置：逐项合并到已有的配置中，master、slave 原有的 url、username、password 等保持不变，只追加 seata: false
+#   - seata: false 只追加到当前 profile【已经存在】的数据源上。没有配置 slave 时，不要复制 slave 段，
+#     否则会新建一个没有 url 的 slave 数据源，导致启动失败
+#   - seata 下的配置：新增到配置文件的顶层
+# 数据库账号密码通过环境变量传入，不要把真实密码写入配置文件、提交到 Git。
+spring:
+  datasource:
+    dynamic:
+      seata: true # 开启 Dynamic Datasource 的 Seata 支持，由它为每个数据源包装 Seata 的 DataSourceProxy
+      seata-mode: AT # 使用 AT 模式
+      datasource:
+        master:
+          seata: false # 只追加这一行：master 主库不参与 AT，不被 Seata 代理
+        slave:
+          seata: false # 只追加这一行：slave 从库不参与 AT，不被 Seata 代理；没有配置 slave 时，删除整个 slave 段
+        seata_order: # 分布式事务示例的订单库，只有 @DS("seata_order") 的 Mapper、Service 使用
+          url: ${YUDAO_SEATA_ORDER_URL:jdbc:mysql://127.0.0.1:3306/yudao_seata_order?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true}
+          username: ${YUDAO_SEATA_DB_USERNAME:root}
+          password: ${YUDAO_SEATA_DB_PASSWORD:}
+          seata: true # 参与 AT：被 Seata 代理，本地事务提交时注册分支、写入 undo_log
+        seata_account: # 分布式事务示例的账户库，只有 @DS("seata_account") 的 Mapper、Service 使用
+          url: ${YUDAO_SEATA_ACCOUNT_URL:jdbc:mysql://127.0.0.1:3306/yudao_seata_account?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true}
+          username: ${YUDAO_SEATA_DB_USERNAME:root}
+          password: ${YUDAO_SEATA_DB_PASSWORD:}
+          seata: true # 参与 AT：被 Seata 代理，本地事务提交时注册分支、写入 undo_log
+
+seata:
+  enabled: true
+  application-id: ${spring.application.name}
+  tx-service-group: yudao_seata_demo_group # 事务分组，与下面的 vgroup-mapping 对应
+  enable-auto-data-source-proxy: false # 必须关闭：数据源已经由 Dynamic Datasource 代理，避免双重代理
+  client:
+    http:
+      interceptor-enabled: false # 单体项目不需要从 HTTP 请求头 TX_XID 接收 XID；关闭后，外部请求不能通过该请求头加入全局事务
+  service:
+    vgroup-mapping:
+      yudao_seata_demo_group: default # 事务分组 -> Seata Server 集群名
+    grouplist:
+      default: ${YUDAO_SEATA_SERVER_ADDR:127.0.0.1:18091} # Seata Server 地址，端口与启动 Seata Server 时的 SEATA_PORT 一致
+  registry:
+    type: file # 直连上面的 grouplist，仅用于本机演示
+  config:
+    type: file

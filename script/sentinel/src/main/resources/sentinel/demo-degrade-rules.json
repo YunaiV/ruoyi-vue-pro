@@ -1,0 +1,11 @@
+[
+  {
+    "resource": "demo-sentinel-degrade",
+    "grade": 0,
+    "count": 200,
+    "slowRatioThreshold": 0.5,
+    "minRequestAmount": 3,
+    "statIntervalMs": 10000,
+    "timeWindow": 10
+  }
+]
