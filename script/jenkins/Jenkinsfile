@@ -3,7 +3,7 @@
 //
 // 使用说明见《Jenkins 部署》文档：https://doc.iocoder.cn/deployment-jenkins/
 // 1. Jenkins 新建「Pipeline（流水线）」类型的 Job，选择「Pipeline script from SCM」，Script Path 填写 script/jenkins/Jenkinsfile
-// 2. Jenkins 中配置 Tools（jdk17、maven3），以及两个凭据（yudao-deploy-ssh、yudao-deploy-known-hosts）
+// 2. Jenkins 中配置 Tools（jdk25、maven3），以及两个凭据（yudao-deploy-ssh、yudao-deploy-known-hosts）
 // 3. 服务器上提前创建 <DEPLOY_BASE_DIR>/yudao-server 目录，并放入运行时配置 app.env（数据库、Redis 的地址与密码）
 
 // 在目标服务器上执行的脚本：Jenkins 通过 ssh 传入，用法为 bash -s -- <check|deploy> <部署根目录> <服务名> <默认端口>
@@ -233,7 +233,7 @@ pipeline {
 
     // 构建使用的 JDK、Maven，需要在 Jenkins 的 Tools 中配置同名工具。与 Jenkins 自身运行的 Java 版本无关
     tools {
-        jdk 'jdk17'
+        jdk 'jdk25'
         maven 'maven3'
     }
 
