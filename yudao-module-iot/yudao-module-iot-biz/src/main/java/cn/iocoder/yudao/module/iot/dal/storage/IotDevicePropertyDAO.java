@@ -33,6 +33,15 @@ public interface IotDevicePropertyDAO {
     void defineProductPropertyTable(Long productId, List<IotThingModelDO> propertyThingModels);
 
     /**
+     * 删除产品的属性表（包括其中的历史数据）
+     *
+     * 幂等：属性表不存在时，直接成功，便于删除产品失败后重试
+     *
+     * @param productId 产品编号
+     */
+    void deleteProductPropertyTable(Long productId);
+
+    /**
      * 写入设备属性。只记录本次上报的属性
      *
      * @param device     设备

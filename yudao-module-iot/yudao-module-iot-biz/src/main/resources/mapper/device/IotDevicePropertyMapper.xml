@@ -45,6 +45,10 @@
         DROP COLUMN ${field.field}
     </update>
 
+    <update id="dropProductPropertySTable">
+        DROP STABLE IF EXISTS product_property_${productId}
+    </update>
+
     <insert id="insert">
         INSERT INTO device_property_${device.id}
         USING product_property_${device.productId}

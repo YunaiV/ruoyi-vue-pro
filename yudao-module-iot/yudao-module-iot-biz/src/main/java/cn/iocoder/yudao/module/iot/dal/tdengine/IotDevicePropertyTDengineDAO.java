@@ -106,6 +106,12 @@ public class IotDevicePropertyTDengineDAO implements IotDevicePropertyDAO {
     }
 
     @Override
+    public void deleteProductPropertyTable(Long productId) {
+        // 删除超级表时，TDengine 会一并删除其下的设备子表 device_property_{deviceId}
+        devicePropertyMapper.dropProductPropertySTable(productId);
+    }
+
+    @Override
     public void insert(IotDeviceDO device, Map<String, Object> properties, Long ts, Long reportTime) {
         // 校验属性标识符：在拼接 SQL 之前，避免保留字段、归一化后重名的属性写入
         IotStorageFieldUtils.validatePropertyIdentifiers(properties.keySet());

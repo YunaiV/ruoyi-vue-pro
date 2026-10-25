@@ -164,6 +164,12 @@ public class IotDevicePropertyIoTDBDAO implements IotDevicePropertyDAO {
     }
 
     @Override
+    public void deleteProductPropertyTable(Long productId) {
+        // 设备共用产品表，删除产品表即删除该产品下所有设备的属性数据
+        devicePropertyMapper.dropTable(productId);
+    }
+
+    @Override
     public void insert(IotDeviceDO device, Map<String, Object> properties, Long ts, Long reportTime) {
         // 校验属性标识符：在拼接 SQL 之前，避免保留字段、归一化后重名的属性写入
         IotStorageFieldUtils.validatePropertyIdentifiers(properties.keySet());

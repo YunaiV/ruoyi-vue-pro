@@ -79,6 +79,8 @@ public interface IotDevicePropertyMapper {
     void alterProductPropertySTableDropField(@Param("productId") Long productId,
                                              @Param("field") TDengineTableField field);
 
+    void dropProductPropertySTable(@Param("productId") Long productId);
+
     void insert(@Param("device") IotDeviceDO device,
                 @Param("properties") Map<String, Object> properties,
                 @Param("ts") Long ts,
