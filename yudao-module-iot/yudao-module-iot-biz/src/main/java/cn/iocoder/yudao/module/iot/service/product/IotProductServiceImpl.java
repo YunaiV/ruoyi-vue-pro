@@ -92,7 +92,11 @@ public class IotProductServiceImpl implements IotProductService {
             throw exception(PRODUCT_DELETE_FAIL_HAS_DEVICE);
         }
 
-        // 2. 删除
+        // 2.1 先删除产品属性表，见 https://github.com/YunaiV/ruoyi-vue-pro/issues/1324
+        // 说明：时序库 DDL 与 MySQL 无法同一事务。属性表删除失败时直接抛出、保留产品以便重试；
+        //      属性表删除幂等，若后续 MySQL 删除失败，再次删除产品仍可成功
+        devicePropertyDataService.deleteDevicePropertyData(id);
+        // 2.2 删除产品
         productMapper.deleteById(id);
     }
 

@@ -45,6 +45,9 @@ import org.springframework.context.annotation.Import;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -53,12 +56,15 @@ import java.util.Arrays;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.collection.SetUtils.asSet;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
+import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.ORDER_DELIVERY_FAIL_REFUND_STATUS_NOT_NONE;
+import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.ORDER_DELIVERY_FAIL_STATUS_NOT_UNDELIVERED;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * {@link TradeOrderUpdateServiceImpl} 的单元测试类
@@ -77,6 +83,9 @@ public class TradeOrderUpdateServiceTest extends BaseDbUnitTest {
     private TradeOrderMapper tradeOrderMapper;
     @Resource
     private TradeOrderItemMapper tradeOrderItemMapper;
+
+    @Resource
+    private PlatformTransactionManager transactionManager;
 
     @MockitoBean
     private TradeNoRedisDAO tradeNoRedisDAO;
@@ -297,6 +306,126 @@ public class TradeOrderUpdateServiceTest extends BaseDbUnitTest {
         // 断言调用（站内信）
         verify(tradeMessageService).sendMessageWhenDeliveryOrder(argThat(reqBO ->
                 reqBO.getOrderId().equals(1L) && reqBO.getUserId().equals(order.getUserId())));
+    }
+
+    @Test // 已发货的订单，允许修改物流信息
+    public void testDeliveryOrder_delivered() {
+        // mock 数据（TradeOrder）
+        TradeOrderDO order = randomDeliveryOrder(TradeOrderStatusEnum.DELIVERED.getStatus());
+        tradeOrderMapper.insert(order);
+        // 准备参数
+        TradeOrderDeliveryReqVO deliveryReqVO = new TradeOrderDeliveryReqVO().setId(1L)
+                .setLogisticsId(20L).setLogisticsNo("200");
+        // mock 方法（物流公司）
+        when(deliveryExpressService.validateDeliveryExpress(eq(20L))).thenReturn(
+                randomPojo(DeliveryExpressDO.class, o -> o.setId(20L)));
+
+        // 调用
+        tradeOrderUpdateService.deliveryOrder(deliveryReqVO);
+        // 断言
+        TradeOrderDO dbOrder = tradeOrderMapper.selectById(1L);
+        assertEquals(TradeOrderStatusEnum.DELIVERED.getStatus(), dbOrder.getStatus());
+        assertEquals(20L, dbOrder.getLogisticsId());
+        assertEquals("200", dbOrder.getLogisticsNo());
+        assertNotNull(dbOrder.getDeliveryTime());
+        verify(tradeOrderHandler).afterDeliveryOrder(argThat(o -> o.getId().equals(1L)));
+    }
+
+    @Test
+    public void testDeliveryOrder_statusInvalid() {
+        // 准备参数：待支付、已完成、已取消、无效状态
+        List<Integer> statuses = Arrays.asList(TradeOrderStatusEnum.UNPAID.getStatus(),
+                TradeOrderStatusEnum.COMPLETED.getStatus(), TradeOrderStatusEnum.CANCELED.getStatus(), 99);
+        for (int i = 0; i < statuses.size(); i++) {
+            // mock 数据（TradeOrder）
+            Long id = i + 1L;
+            Integer status = statuses.get(i);
+            tradeOrderMapper.insert(randomDeliveryOrder(status).setId(id));
+            TradeOrderDeliveryReqVO deliveryReqVO = new TradeOrderDeliveryReqVO().setId(id)
+                    .setLogisticsId(20L).setLogisticsNo("200");
+
+            // 调用，并断言异常
+            assertServiceException(() -> tradeOrderUpdateService.deliveryOrder(deliveryReqVO),
+                    ORDER_DELIVERY_FAIL_STATUS_NOT_UNDELIVERED);
+            // 断言：订单未变更
+            assertDeliveryOrderUnchanged(id, status);
+        }
+        // 断言：前置处理、物流公司、消息都未执行
+        verifyNoInteractions(tradeOrderHandler, deliveryExpressService, tradeMessageService, socialClientApi);
+    }
+
+    @Test
+    public void testDeliveryOrder_refundStatusNotNone() {
+        // mock 数据（TradeOrder）
+        TradeOrderDO order = randomDeliveryOrder(TradeOrderStatusEnum.UNDELIVERED.getStatus())
+                .setRefundStatus(TradeOrderRefundStatusEnum.PART.getStatus());
+        tradeOrderMapper.insert(order);
+        // 准备参数
+        TradeOrderDeliveryReqVO deliveryReqVO = new TradeOrderDeliveryReqVO().setId(1L)
+                .setLogisticsId(20L).setLogisticsNo("200");
+
+        // 调用，并断言异常
+        assertServiceException(() -> tradeOrderUpdateService.deliveryOrder(deliveryReqVO),
+                ORDER_DELIVERY_FAIL_REFUND_STATUS_NOT_NONE);
+        // 断言
+        assertDeliveryOrderUnchanged(1L, TradeOrderStatusEnum.UNDELIVERED.getStatus());
+        verifyNoInteractions(tradeOrderHandler, deliveryExpressService, tradeMessageService, socialClientApi);
+    }
+
+    @Test // 读取订单后，订单被并发取消
+    public void testDeliveryOrder_concurrentCancel() {
+        assertDeliveryOrderConcurrentStatusChanged(TradeOrderStatusEnum.UNDELIVERED.getStatus(),
+                TradeOrderStatusEnum.CANCELED.getStatus());
+    }
+
+    @Test // 读取订单后，订单被并发收货
+    public void testDeliveryOrder_concurrentReceive() {
+        assertDeliveryOrderConcurrentStatusChanged(TradeOrderStatusEnum.DELIVERED.getStatus(),
+                TradeOrderStatusEnum.COMPLETED.getStatus());
+    }
+
+    private void assertDeliveryOrderConcurrentStatusChanged(Integer status, Integer newStatus) {
+        // mock 数据（TradeOrder）
+        TradeOrderDO order = randomDeliveryOrder(status);
+        tradeOrderMapper.insert(order);
+        // 准备参数
+        TradeOrderDeliveryReqVO deliveryReqVO = new TradeOrderDeliveryReqVO().setId(1L)
+                .setLogisticsId(20L).setLogisticsNo("200");
+        // mock 方法（物流公司）：校验物流公司时，订单状态被其它事务修改并提交
+        TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+        transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        when(deliveryExpressService.validateDeliveryExpress(eq(20L))).thenAnswer(invocation -> {
+            transactionTemplate.executeWithoutResult(transactionStatus ->
+                    tradeOrderMapper.updateById(new TradeOrderDO().setId(1L).setStatus(newStatus)));
+            return randomPojo(DeliveryExpressDO.class, o -> o.setId(20L));
+        });
+
+        // 调用，并断言异常
+        assertServiceException(() -> tradeOrderUpdateService.deliveryOrder(deliveryReqVO),
+                ORDER_DELIVERY_FAIL_STATUS_NOT_UNDELIVERED);
+        // 断言：保留并发修改后的状态，物流信息未被覆盖
+        assertDeliveryOrderUnchanged(1L, newStatus);
+        // 断言：发货后的消息、后置处理都未执行
+        verify(tradeMessageService, never()).sendMessageWhenDeliveryOrder(any());
+        verify(socialClientApi, never()).sendWxaSubscribeMessage(any());
+        verify(tradeOrderHandler, never()).afterDeliveryOrder(any());
+    }
+
+    private void assertDeliveryOrderUnchanged(Long id, Integer status) {
+        TradeOrderDO dbOrder = tradeOrderMapper.selectById(id);
+        assertEquals(status, dbOrder.getStatus());
+        assertEquals(10L, dbOrder.getLogisticsId());
+        assertEquals("100", dbOrder.getLogisticsNo());
+        assertEquals(buildTime(2023, 2, 10), dbOrder.getDeliveryTime());
+    }
+
+    private static TradeOrderDO randomDeliveryOrder(Integer status) {
+        return randomPojo(TradeOrderDO.class, o -> {
+            o.setId(1L).setStatus(status);
+            o.setLogisticsId(10L).setLogisticsNo("100").setDeliveryTime(buildTime(2023, 2, 10));
+            o.setRefundStatus(TradeOrderRefundStatusEnum.NONE.getStatus());
+            o.setDeliveryType(DeliveryTypeEnum.EXPRESS.getType());
+        });
     }
 
     @Test

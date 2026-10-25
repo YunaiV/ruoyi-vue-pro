@@ -49,14 +49,11 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
-// TODO @芋艿：review 下单元测试
-
 /**
  * {@link ProductSpuServiceImpl} 的单元测试类
  *
  * @author 芋道源码
  */
-// DONE 芋艿：后续 fix 补充的单测
 @Import(ProductSpuServiceImpl.class)
 public class ProductSpuServiceImplTest extends BaseDbUnitTest {
 

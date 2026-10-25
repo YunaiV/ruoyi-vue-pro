@@ -38,6 +38,10 @@
         DROP COLUMN IF EXISTS "${columnName}"
     </update>
 
+    <update id="dropTable">
+        DROP TABLE IF EXISTS product_property_${productId}
+    </update>
+
     <insert id="insert">
         INSERT INTO product_property_${productId} (time, device_id
         <if test="reportTime != null">

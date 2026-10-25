@@ -77,6 +77,12 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
     }
 
     @Override
+    public void deleteDevicePropertyData(Long productId) {
+        // 删除存储结构：TDengine、IoTDB 的 DDL 差异，由存储 DAO 实现
+        devicePropertyDAO.deleteProductPropertyTable(productId);
+    }
+
+    @Override
     @SuppressWarnings("PatternVariableCanBeUsed")
     public void saveDeviceProperty(IotDeviceDO device, IotDeviceMessage message) {
         if (!(message.getParams() instanceof Map)) {

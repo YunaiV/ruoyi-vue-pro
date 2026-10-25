@@ -29,6 +29,7 @@ import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServic
 import static cn.iocoder.yudao.module.fms.enums.ErrorCodeConstants.CLOSING_SCHEME_RATIO_INVALID;
 import static cn.iocoder.yudao.module.fms.enums.ErrorCodeConstants.CLOSING_TEMPLATE_NOT_EXISTS;
 import static cn.iocoder.yudao.module.fms.enums.ErrorCodeConstants.CLOSING_TEMPLATE_PRESET_SUBJECT_NOT_EXISTS;
+import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -99,6 +100,69 @@ public class FmsClosingTemplateServiceImplTest extends BaseDbUnitTest {
         // 调用，并断言
         assertServiceException(() -> closingTemplateService.initializeClosingTemplates(1L, 10L),
                 CLOSING_TEMPLATE_PRESET_SUBJECT_NOT_EXISTS, "daily-travel-reimbursement", "1001");
+        assertEquals(0, closingTemplateMapper.selectCount());
+    }
+
+    /**
+     * 电话费记入销售费用-通讯费，见 https://github.com/YunaiV/ruoyi-vue-pro/issues/1326
+     */
+    @Test
+    public void testInitializeClosingTemplates_presetSubjects() {
+        // mock 方法
+        List<FmsSubjectDO> subjects = buildPresetSubjects();
+        when(subjectService.getSubjectList(1L, null, 10L)).thenReturn(subjects);
+
+        // 调用
+        closingTemplateService.initializeClosingTemplates(1L, 10L);
+
+        // 断言：报销电话费，借记销售费用-通讯费，而不是办公用品、差旅费
+        List<FmsClosingTemplateDO> templates = closingTemplateMapper.selectListByAccountSetId(1L);
+        List<FmsClosingTemplateDO.SubjectRule> telephoneRules = findTemplate(templates, "daily-telephone-expense")
+                .getSubjectRules();
+        assertEquals(2, telephoneRules.size());
+        FmsSubjectDO telephoneSubject = findSubject(subjects, telephoneRules.get(0).getSubjectId());
+        assertEquals("通讯费", telephoneSubject.getName());
+        assertSubjectRule(telephoneRules.get(0), findSubject(subjects, "560109"), FmsDebitCreditDirectionEnum.DEBIT, "100");
+        assertSubjectRule(telephoneRules.get(1), findSubject(subjects, "1001"), FmsDebitCreditDirectionEnum.CREDIT, "100");
+        // 断言：报销差旅费，仍借记差旅费
+        List<FmsClosingTemplateDO.SubjectRule> travelRules = findTemplate(templates, "daily-travel-reimbursement")
+                .getSubjectRules();
+        assertEquals(2, travelRules.size());
+        assertSubjectRule(travelRules.get(0), findSubject(subjects, "560107"), FmsDebitCreditDirectionEnum.DEBIT, "100");
+        assertSubjectRule(travelRules.get(1), findSubject(subjects, "1001"), FmsDebitCreditDirectionEnum.CREDIT, "100");
+        // 断言：支付房租水电费、报销业务招待费用的科目不变
+        List<FmsClosingTemplateDO.SubjectRule> rentRules = findTemplate(templates, "daily-rent-utilities")
+                .getSubjectRules();
+        assertEquals(2, rentRules.size());
+        assertSubjectRule(rentRules.get(0), findSubject(subjects, "560102"), FmsDebitCreditDirectionEnum.DEBIT, "100");
+        assertSubjectRule(rentRules.get(1), findSubject(subjects, "1001"), FmsDebitCreditDirectionEnum.CREDIT, "100");
+        List<FmsClosingTemplateDO.SubjectRule> entertainmentRules = findTemplate(templates, "daily-business-entertainment")
+                .getSubjectRules();
+        assertEquals(2, entertainmentRules.size());
+        assertSubjectRule(entertainmentRules.get(0), findSubject(subjects, "1001"), FmsDebitCreditDirectionEnum.DEBIT, "100");
+        assertSubjectRule(entertainmentRules.get(1), findSubject(subjects, "1002"), FmsDebitCreditDirectionEnum.CREDIT, "100");
+        // 断言：计提工资，仍按销售费用-工资 15%、管理费用-工资 85% 分摊
+        List<FmsClosingTemplateDO.SubjectRule> payrollRules = findTemplate(templates, "transfer-accrue-payroll")
+                .getSubjectRules();
+        assertEquals(3, payrollRules.size());
+        assertSubjectRule(payrollRules.get(0), findSubject(subjects, "560110"), FmsDebitCreditDirectionEnum.DEBIT, "15");
+        assertSubjectRule(payrollRules.get(1), findSubject(subjects, "560209"), FmsDebitCreditDirectionEnum.DEBIT, "85");
+        assertSubjectRule(payrollRules.get(2), findSubject(subjects, "2211"), FmsDebitCreditDirectionEnum.CREDIT, "100");
+        // 断言：办公用品不再被任何预置模板引用
+        assertEquals(0L, closingTemplateService.getClosingTemplateCountBySubjectIds(1L,
+                singletonList(findSubject(subjects, "560101").getId())));
+    }
+
+    @Test
+    public void testInitializeClosingTemplates_telephoneSubjectNotExists() {
+        // mock 方法：账套缺少通讯费科目
+        List<FmsSubjectDO> subjects = buildPresetSubjects();
+        subjects.removeIf(subject -> "560109".equals(subject.getCode()));
+        when(subjectService.getSubjectList(1L, null, 10L)).thenReturn(subjects);
+
+        // 调用，并断言：不会回退到办公用品、差旅费
+        assertServiceException(() -> closingTemplateService.initializeClosingTemplates(1L, 10L),
+                CLOSING_TEMPLATE_PRESET_SUBJECT_NOT_EXISTS, "daily-telephone-expense", "560109");
         assertEquals(0, closingTemplateMapper.selectCount());
     }
 
@@ -215,16 +279,59 @@ public class FmsClosingTemplateServiceImplTest extends BaseDbUnitTest {
 
     // ========== 随机对象 ==========
 
+    /**
+     * 构建预置模板引用的科目，编号、编码、名称与系统科目模板一致
+     */
     private List<FmsSubjectDO> buildPresetSubjects() {
-        List<String> subjectCodes = Arrays.asList("1001", "1002", "1122", "1221", "1405", "2202", "2211",
-                "22210101", "22210107", "222102", "222111", "222117", "5001", "560101", "560102",
-                "560107", "560110", "560209", "560302", "560303");
-        List<FmsSubjectDO> subjects = new ArrayList<>();
-        for (int index = 0; index < subjectCodes.size(); index++) {
-            subjects.add(new FmsSubjectDO().setId((long) index + 1).setCode(subjectCodes.get(index))
-                    .setName("科目" + index));
-        }
-        return subjects;
+        return new ArrayList<>(Arrays.asList(
+                buildSubject(1331L, "1001", "库存现金"),
+                buildSubject(1332L, "1002", "银行存款"),
+                buildSubject(1340L, "1122", "应收账款"),
+                buildSubject(1344L, "1221", "其他应收款"),
+                buildSubject(1349L, "1405", "库存商品"),
+                buildSubject(1377L, "2202", "应付账款"),
+                buildSubject(1379L, "2211", "应付职工薪酬"),
+                buildSubject(1382L, "22210101", "进项税额"),
+                buildSubject(1388L, "22210107", "销项税额"),
+                buildSubject(1392L, "222102", "未交增值税"),
+                buildSubject(1401L, "222111", "应交所得税"),
+                buildSubject(1407L, "222117", "应交城市维护建设税"),
+                buildSubject(1444L, "5001", "主营业务收入"),
+                buildSubject(1469L, "560101", "办公用品"),
+                buildSubject(1470L, "560102", "房租"),
+                buildSubject(1475L, "560107", "差旅费"),
+                buildSubject(1477L, "560109", "通讯费"),
+                buildSubject(1478L, "560110", "工资"),
+                buildSubject(1495L, "560209", "工资"),
+                buildSubject(1505L, "560302", "利息"),
+                buildSubject(1506L, "560303", "手续费")));
+    }
+
+    private static FmsSubjectDO buildSubject(Long id, String code, String name) {
+        return new FmsSubjectDO().setId(id).setCode(code).setName(name);
+    }
+
+    private static FmsSubjectDO findSubject(List<FmsSubjectDO> subjects, String code) {
+        return subjects.stream().filter(subject -> code.equals(subject.getCode()))
+                .findFirst().orElseThrow(() -> new AssertionError("科目不存在：" + code));
+    }
+
+    private static FmsSubjectDO findSubject(List<FmsSubjectDO> subjects, Long id) {
+        return subjects.stream().filter(subject -> id.equals(subject.getId()))
+                .findFirst().orElseThrow(() -> new AssertionError("科目不存在：" + id));
+    }
+
+    private static FmsClosingTemplateDO findTemplate(List<FmsClosingTemplateDO> templates, String presetCode) {
+        return templates.stream().filter(template -> presetCode.equals(template.getPresetCode()))
+                .findFirst().orElseThrow(() -> new AssertionError("预置模板不存在：" + presetCode));
+    }
+
+    private static void assertSubjectRule(FmsClosingTemplateDO.SubjectRule rule, FmsSubjectDO subject,
+                                          FmsDebitCreditDirectionEnum direction, String amountRatio) {
+        assertEquals(subject.getId(), rule.getSubjectId());
+        assertEquals(subject.getCode(), rule.getSubjectCode());
+        assertEquals(direction.getType(), rule.getDirection());
+        assertEquals(0, new BigDecimal(amountRatio).compareTo(rule.getAmountRatio()));
     }
 
     private List<FmsSubjectDO> buildClosingTemplateSubjects() {
