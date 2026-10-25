@@ -7,18 +7,19 @@ import cn.iocoder.yudao.module.promotion.controller.admin.diy.vo.page.DiyPagePag
 import cn.iocoder.yudao.module.promotion.controller.admin.diy.vo.page.DiyPageUpdateReqVO;
 import cn.iocoder.yudao.module.promotion.dal.dataobject.diy.DiyPageDO;
 import cn.iocoder.yudao.module.promotion.dal.mysql.diy.DiyPageMapper;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 import jakarta.annotation.Resource;
 
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildBetweenTime;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
+import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.DIY_PAGE_NAME_USED;
 import static cn.iocoder.yudao.module.promotion.enums.ErrorCodeConstants.DIY_PAGE_NOT_EXISTS;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -27,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author owen
  */
-@Disabled // TODO 芋艿：后续 fix 补充的单测
+// DONE 芋艿：后续 fix 补充的单测
 @Import(DiyPageServiceImpl.class)
 public class DiyPageServiceImplTest extends BaseDbUnitTest {
 
@@ -49,6 +50,21 @@ public class DiyPageServiceImplTest extends BaseDbUnitTest {
         // 校验记录的属性是否正确
         DiyPageDO diyPage = diyPageMapper.selectById(diyPageId);
         assertPojoEquals(reqVO, diyPage);
+        assertEquals("{}", diyPage.getProperty());
+    }
+
+    @Test
+    public void testCreateDiyPage_nameUsed() {
+        // mock 数据（独立页面）
+        diyPageMapper.insert(randomPojo(DiyPageDO.class, o -> o.setTemplateId(null).setName("芋道首页")));
+        // 准备参数
+        DiyPageCreateReqVO reqVO = randomPojo(DiyPageCreateReqVO.class, o -> {
+            o.setTemplateId(null);
+            o.setName("芋道首页");
+        });
+
+        // 调用, 并断言异常
+        assertServiceException(() -> diyPageService.createDiyPage(reqVO), DIY_PAGE_NAME_USED, "芋道首页");
     }
 
     @Test
@@ -101,21 +117,24 @@ public class DiyPageServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
-    @Disabled  // TODO 请修改 null 为需要的值，然后删除 @Disabled 注解
+    // DONE 请修改 null 为需要的值，然后删除 @Disabled 注解
     public void testGetDiyPagePage() {
         // mock 数据
         DiyPageDO dbDiyPage = randomPojo(DiyPageDO.class, o -> { // 等会查询到
-            o.setName(null);
-            o.setCreateTime(null);
+            o.setTemplateId(null); // 独立页面
+            o.setName("芋道首页");
+            o.setCreateTime(buildTime(2023, 2, 10));
         });
         diyPageMapper.insert(dbDiyPage);
         // 测试 name 不匹配
-        diyPageMapper.insert(cloneIgnoreId(dbDiyPage, o -> o.setName(null)));
+        diyPageMapper.insert(cloneIgnoreId(dbDiyPage, o -> o.setName("土豆首页")));
         // 测试 createTime 不匹配
-        diyPageMapper.insert(cloneIgnoreId(dbDiyPage, o -> o.setCreateTime(null)));
+        diyPageMapper.insert(cloneIgnoreId(dbDiyPage, o -> o.setCreateTime(buildTime(2023, 3, 10))));
+        // 测试 templateId 不匹配（模板下的页面，不在独立页面列表）
+        diyPageMapper.insert(cloneIgnoreId(dbDiyPage, o -> o.setTemplateId(1L)));
         // 准备参数
         DiyPagePageReqVO reqVO = new DiyPagePageReqVO();
-        reqVO.setName(null);
+        reqVO.setName("芋道");
         reqVO.setCreateTime(buildBetweenTime(2023, 2, 1, 2023, 2, 28));
 
         // 调用

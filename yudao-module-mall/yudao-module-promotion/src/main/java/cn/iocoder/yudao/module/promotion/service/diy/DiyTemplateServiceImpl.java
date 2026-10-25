@@ -102,7 +102,7 @@ public class DiyTemplateServiceImpl implements DiyTemplateService {
         }
         // 删除
         diyTemplateMapper.deleteById(id);
-        // 级联删除模板下自动生成的默认页面（createDiyTemplate 的「首页/我的」），避免页面列表残留孤儿页
+        // 删除模板下的页面
         diyPageService.getDiyPageByTemplateId(id)
                 .forEach(page -> diyPageService.deleteDiyPage(page.getId()));
     }

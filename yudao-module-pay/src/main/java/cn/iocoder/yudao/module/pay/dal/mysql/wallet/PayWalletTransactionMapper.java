@@ -39,7 +39,7 @@ public interface PayWalletTransactionMapper extends BaseMapperX<PayWalletTransac
     }
 
     default Integer selectPriceSum(Long walletId, Integer type, LocalDateTime[] createTime) {
-        // SQL sum 查询；支出流水的 price 为负值，汇总取正值（与钱包 total_expense 的正值语义一致）
+        // SQL sum 查询；支出流水的 price 为负值，取反后汇总为正值
         String sumColumn = Objects.equals(type, TYPE_EXPENSE) ? "SUM(-price) AS priceSum" : "SUM(price) AS priceSum";
         List<Map<String, Object>> result = selectMaps(new QueryWrapperX<PayWalletTransactionDO>()
                 .select(sumColumn)

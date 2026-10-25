@@ -24,7 +24,7 @@
             <version>${revision}</version>
         </dependency>
 
-        <!-- trade-api：配送方式枚举 DeliveryTypeEnum 校验（A68） -->
+        <!-- trade-api：配送方式枚举 DeliveryTypeEnum 校验 -->
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-module-trade-api</artifactId>

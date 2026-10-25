@@ -118,6 +118,7 @@ public class CrmProductCategoryServiceImpl implements CrmProductCategoryService 
         if (crmProductService.getProductByCategoryId(id) > 0) {
             throw exception(PRODUCT_CATEGORY_USED);
         }
+
         // 2. 删除
         productCategoryMapper.deleteById(id);
 
