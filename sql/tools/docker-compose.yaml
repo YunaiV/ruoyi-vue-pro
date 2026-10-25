@@ -10,6 +10,8 @@ volumes:
     highgo: { }
     oceanbase: { }
     oceanbase_config: { }
+    tidb_pd: { }
+    tidb_tikv: { }
 
 services:
     mysql:
@@ -173,3 +175,79 @@ services:
             timeout: 5s
             start_period: 120s
             retries: 30
+
+    # TiDB 测试集群：PD、TiKV、TiDB 各 1 个节点，属于 tidb profile，默认不启动
+    # 启动：docker compose up -d --wait --wait-timeout 300 tidb
+    tidb-pd:
+        image: pingcap/pd:v8.5.8
+        profiles: ["tidb"]
+        restart: unless-stopped
+        command:
+            - --name=pd
+            - --client-urls=http://0.0.0.0:2379
+            - --peer-urls=http://0.0.0.0:2380
+            - --advertise-client-urls=http://tidb-pd:2379
+            - --advertise-peer-urls=http://tidb-pd:2380
+            - --initial-cluster=pd=http://tidb-pd:2380
+            - --data-dir=/data/pd
+            - --config=/pd.toml
+        volumes:
+            - tidb_pd:/data
+            - ./tidb/pd.toml:/pd.toml:ro
+
+    tidb-tikv:
+        image: pingcap/tikv:v8.5.8
+        profiles: ["tidb"]
+        restart: unless-stopped
+        command:
+            - --addr=0.0.0.0:20160
+            - --advertise-addr=tidb-tikv:20160
+            - --status-addr=0.0.0.0:20180
+            - --advertise-status-addr=tidb-tikv:20180
+            - --data-dir=/data/tikv
+            - --pd=tidb-pd:2379
+            - --config=/tikv.toml
+        volumes:
+            - tidb_tikv:/data
+            - ./tidb/tikv.toml:/tikv.toml:ro
+        depends_on:
+            - tidb-pd
+
+    tidb:
+        image: pingcap/tidb:v8.5.8
+        profiles: ["tidb"]
+        restart: unless-stopped
+        environment:
+            TZ: Asia/Shanghai
+        command:
+            - --store=tikv
+            - --path=tidb-pd:2379
+            - --advertise-address=tidb
+        ports:
+            # 只绑定本机，root 密码由 tidb-init 初始化
+            - "127.0.0.1:4000:4000"
+        depends_on:
+            - tidb-tikv
+        healthcheck:
+            test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:10080/status >/dev/null"]
+            interval: 10s
+            timeout: 5s
+            start_period: 60s
+            retries: 30
+
+    # TiDB 初始化：设置 root 密码，创建 ruoyi-vue-pro 数据库并导入 MySQL 脚本，只允许创建全新数据库
+    # 执行：docker compose run --rm tidb-init
+    tidb-init:
+        image: mysql:8.0.33
+        profiles: ["tidb-init"]
+        restart: "no"
+        environment:
+            TIDB_HOST: tidb
+            TIDB_PORT: 4000
+            TIDB_DATABASE: ruoyi-vue-pro
+            TIDB_PASSWORD: "123456"
+        entrypoint: ["bash", "/tmp/create_schema.sh"]
+        volumes:
+            - ../mysql/ruoyi-vue-pro.sql:/tmp/schema.sql:ro
+            - ../mysql/quartz.sql:/tmp/quartz.sql:ro
+            - ./tidb/create_schema.sh:/tmp/create_schema.sh:ro

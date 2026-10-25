@@ -1,0 +1,3 @@
+# 测试环境限制 TiKV 块缓存，避免默认按宿主内存比例占用过多内存
+[storage.block-cache]
+capacity = "1GB"

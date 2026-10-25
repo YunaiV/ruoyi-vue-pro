@@ -6,7 +6,7 @@
 
 ## 1. 测试数据库的快速启动
 
-基于 Docker Compose，快速启动 MySQL、Oracle、PostgreSQL、SQL Server、OceanBase 等数据库。
+基于 Docker Compose，快速启动 MySQL、Oracle、PostgreSQL、SQL Server、OceanBase、TiDB 等数据库。
 
 注意！使用 Docker Compose 启动完测试数据后，因为会自动导入项目的 SQL 脚本，所以可能需要等待 1-2 分钟。
 
@@ -138,6 +138,34 @@ password: 123456
 ```
 
 > 注意：`root@test` 连接的是 MySQL 模式的 `test` 租户。配置了多个数据源时，需要同步修改对应配置。数据和部署配置分别保存在 `oceanbase`、`oceanbase_config` 数据卷中，重启不需要重新导入 SQL。镜像说明见 [OceanBase 官方文档](https://github.com/oceanbase/docker-images/blob/main/oceanbase-ce/README_CN.md)。
+
+### 1.10 TiDB
+
+使用 TiDB v8.5.8 官方镜像，启动 PD、TiKV、TiDB 各 1 个节点的测试集群，支持 x86_64 和 MacBook Apple Silicon。相关服务属于 `tidb` profile，执行 `docker compose up -d` 时不会启动。
+
+① 启动数据库，等待 TiDB 健康检查通过：
+
+```Bash
+docker compose up -d --wait --wait-timeout 300 tidb
+```
+
+② 初始化数据库：设置 `root` 密码为 `123456`，创建 `ruoyi-vue-pro` 数据库，并依次导入 `sql/mysql/ruoyi-vue-pro.sql`、`sql/mysql/quartz.sql`：
+
+```Bash
+docker compose run --rm tidb-init
+```
+
+> 注意：TiDB 直接复用 MySQL 脚本，不需要单独的 TiDB 脚本。初始化只允许创建全新的数据库：数据库已存在（包括空库）或重复执行时，脚本拒绝导入并返回非零状态，避免重建已有的同名表；导入失败时保留数据库便于排查，重新初始化需要删除数据卷。`TIDB_PASSWORD` 只允许字母、数字和 `_ . @ # % + = -` 字符。
+
+③ 项目继续使用 MySQL JDBC 驱动，将数据源配置中的地址、账号和密码修改为：
+
+```yaml
+url: jdbc:mysql://127.0.0.1:4000/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true&rewriteBatchedStatements=true
+username: root
+password: 123456
+```
+
+> 注意：端口只绑定本机 `127.0.0.1:4000`。数据保存在 `tidb_pd`、`tidb_tikv` 数据卷中，重启不需要重新导入 SQL。如需重建，执行 `docker compose down tidb tidb-tikv tidb-pd` 后，删除 `ruoyi-vue-pro_tidb_pd`、`ruoyi-vue-pro_tidb_tikv` 数据卷。该环境仅用于开发测试，生产部署见 [TiDB 官方文档](https://docs.pingcap.com/zh/tidb/v8.5/production-deployment-using-tiup/)。
 
 ## 1.X 容器的销毁重建
 
