@@ -38,11 +38,14 @@ public class JdbcUtils {
     /**
      * 获得 URL 对应的 DB 类型
      *
+     * 特殊：瀚高 HighGo 原生驱动（jdbc:highgo:）兼容 PostgreSQL，按 PostgreSQL 处理，复用其序列主键、Quartz 等适配
+     *
      * @param url URL
      * @return DB 类型
      */
     public static DbType getDbType(String url) {
-        return com.baomidou.mybatisplus.extension.toolkit.JdbcUtils.getDbType(url);
+        DbType dbType = com.baomidou.mybatisplus.extension.toolkit.JdbcUtils.getDbType(url);
+        return dbType == DbType.HIGH_GO ? DbType.POSTGRE_SQL : dbType;
     }
 
     /**

@@ -47,7 +47,7 @@
 * 管理后台的电脑端：Vue3 提供 `element-plus`、`vben(ant-design-vue)` 两个版本，Vue2 提供 `element-ui` 版本
 * 管理后台的移动端：采用 `uni-app` 方案，一份代码多终端适配，同时支持 APP、小程序、H5！
 * 后端采用 Spring Boot 多模块架构、MySQL + MyBatis Plus、Redis + Redisson
-* 数据库可使用 MySQL、Oracle、PostgreSQL、SQL Server、MariaDB、国产达梦 DM、TiDB 等
+* 数据库可使用 MySQL、Oracle、PostgreSQL、SQL Server、MariaDB，以及达梦、人大金仓、瀚高等国产数据库，详见 [信创兼容与数据库支持](#-信创兼容与数据库支持)
 * 消息队列可使用 Event、Redis、RabbitMQ、Kafka、RocketMQ 等
 * 权限认证使用 Spring Security & Token & Redis，支持多终端、多种用户的认证系统，支持 SSO 单点登录
 * 支持加载动态权限菜单，按钮级别权限控制，Redis 缓存提升性能
@@ -58,6 +58,22 @@
 * 集成微信小程序、微信公众号、企业微信、钉钉等三方登陆，集成支付宝、微信等支付与退款
 * 集成阿里云、腾讯云等短信渠道，集成 MinIO、阿里云、腾讯云、七牛云等云存储服务
 * 集成报表设计器、大屏设计器，通过拖拽即可生成酷炫的报表与大屏
+
+## 🐲 信创兼容与数据库支持
+
+支持国产操作系统、数据库和中间件，满足信创环境的部署需要：
+
+| 类别       | 支持                                                  | 说明                                                                                                                                                         |
+|----------|-----------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 国产操作系统   | 银河麒麟、统信 UOS 等 Linux 系统                              | 参考 [《Linux 部署》](https://doc.iocoder.cn/deployment-linux/)，选择与 CPU 架构匹配的 JDK                                                                              |
+| 关系型数据库   | MySQL、MariaDB、Oracle、PostgreSQL、SQL Server          | 默认使用 MySQL                                                                                                                                                 |
+| 国产关系型数据库 | 达梦 DM、人大金仓 KingbaseES、openGauss、瀚高 HighGo、OceanBase、TiDB | 参考 [《国产信创数据库》](https://doc.iocoder.cn/xinchuang-db/)                                                                                                  |
+| 国产缓存     | 东方通 TongRDS、宝兰德 BES CacheDB                         | 替换 Redis，参考 [《国产信创数据库》](https://doc.iocoder.cn/xinchuang-db/)。BES CacheDB 提供接入说明，待介质验证                                                               |
+| 国产应用服务器  | 东方通 TongWeb、宝兰德 BES AppServer                       | 替换 Tomcat，参考 [《东方通服务器部署》](https://doc.iocoder.cn/deployment-tong/)、[《宝兰德服务器部署》](https://doc.iocoder.cn/deployment-bes/)。BES AppServer 提供接入说明，待介质验证 |
+| 国产 Web 服务器 | 东方通 TongHttpServer                                   | 替换 Nginx，提供静态资源、反向代理，参考 [《东方通服务器部署》](https://doc.iocoder.cn/deployment-tong/)                                                                       |
+
+* 数据库脚本：[`sql`](sql/) 目录提供 MySQL、Oracle、PostgreSQL、SQL Server、达梦、人大金仓、openGauss、瀚高、OceanBase 的项目初始化脚本（含 Quartz），优先使用对应目录；MariaDB、TiDB 直接使用 MySQL 脚本
+* 其它数据库、后续表结构变更，可参考 [`sql/tools`](sql/tools/README.md) 的转换工具及 [《表结构变更（版本升级）》](https://doc.iocoder.cn/sql-update/#_3-数据库转换)，转换后仍需按实际数据库调整、测试
 
 ##  🐳 项目关系
 

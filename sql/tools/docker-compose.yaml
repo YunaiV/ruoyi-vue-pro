@@ -142,6 +142,7 @@ services:
         # 使用瀚高官方提供的 Docker 镜像，加载后打成本地标签：
         # docker tag <image>:<tag> highgo:local
         image: highgo:local
+        profiles: ["highgo"]
         restart: unless-stopped
         ports:
             - "5866:5866"
@@ -149,6 +150,26 @@ services:
             - highgo:/home/highgo/hgdb/data
             - ../highgo/quartz.sql:/tmp/quartz.sql:ro
             - ../highgo/ruoyi-vue-pro.sql:/tmp/schema.sql:ro
+
+    # 瀚高初始化：使用 PostgreSQL 客户端创建 ruoyi-vue-pro 数据库并导入 sql/highgo 脚本，只允许创建全新数据库
+    # 只支持 PostgreSQL 客户端可用的认证方式（例如 md5、scram-sha-256），SM3 等专有认证请使用瀚高客户端手动导入
+    # 执行：HIGHGO_PASSWORD='数据库密码' docker compose run --rm highgo-init
+    highgo-init:
+        image: postgres:14.2
+        profiles: ["highgo-init"]
+        restart: "no"
+        environment:
+            HIGHGO_HOST: ${HIGHGO_HOST:-highgo}
+            HIGHGO_PORT: ${HIGHGO_PORT:-5866}
+            HIGHGO_USER: ${HIGHGO_USER:-highgo}
+            HIGHGO_PASSWORD: ${HIGHGO_PASSWORD:-}
+            HIGHGO_MAINTENANCE_DB: ${HIGHGO_MAINTENANCE_DB:-highgo}
+            HIGHGO_DATABASE: ruoyi-vue-pro
+        entrypoint: ["bash", "/tmp/create_schema.sh"]
+        volumes:
+            - ../highgo/quartz.sql:/tmp/quartz.sql:ro
+            - ../highgo/ruoyi-vue-pro.sql:/tmp/schema.sql:ro
+            - ./highgo/create_schema.sh:/tmp/create_schema.sh:ro
 
     oceanbase:
         image: oceanbase/oceanbase-ce:4.4.2-lts

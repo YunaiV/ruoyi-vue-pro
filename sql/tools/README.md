@@ -109,9 +109,17 @@ docker tag <image>:<tag> highgo:local
 docker compose up -d highgo
 ```
 
-> 注意：不同瀚高镜像的数据目录可能不同，如果容器无法启动，请按镜像实际 `PGDATA` 修改 `docker-compose.yaml` 中的 `highgo` 数据卷挂载目录。
+> 注意：`highgo` 服务属于 `highgo` profile，执行 `docker compose up -d` 时不会启动，需要像上面一样指定服务名。不同瀚高镜像的数据目录可能不同，如果容器无法启动，请按镜像实际 `PGDATA` 修改 `docker-compose.yaml` 中的 `highgo` 数据卷挂载目录。
 
-③ 启动完成后，需要手动导入 Quartz 和项目 SQL。瀚高兼容 PostgreSQL，具体客户端命令以当前镜像为准，可使用 `psql` 或瀚高镜像内置的兼容客户端执行 `/tmp/quartz.sql`、`/tmp/schema.sql`。
+③ 初始化数据库：使用 `postgres:14.2` 镜像中的 `psql` 客户端，创建 `ruoyi-vue-pro` 数据库，并依次导入 `sql/highgo/quartz.sql`、`sql/highgo/ruoyi-vue-pro.sql`：
+
+```Bash
+HIGHGO_PASSWORD='数据库密码' docker compose run --rm highgo-init
+```
+
+> 注意：默认使用瀚高的 `highgo` 账号连接 `highgo` 数据库执行建库，可以通过 `HIGHGO_USER`、`HIGHGO_MAINTENANCE_DB` 环境变量修改；密码以镜像或安装时的实际设置为准，脚本不会修改数据库的认证配置。初始化只允许创建全新的数据库：数据库已存在（包括空库）或重复执行时，脚本拒绝导入并返回非零状态；导入失败时保留数据库便于排查。该入口只适用于 PostgreSQL 客户端支持的认证方式（例如 md5、scram-sha-256），数据库开启 SM3 等专有认证时，请使用瀚高客户端手动执行上述两个 SQL 文件。
+
+④ 项目可以使用 PostgreSQL JDBC 驱动（`jdbc:postgresql://127.0.0.1:5866/ruoyi-vue-pro`），也可以使用瀚高 JDBC 驱动（`jdbc:highgo://127.0.0.1:5866/ruoyi-vue-pro`），两者都按 PostgreSQL 处理序列主键、Quartz 等差异，`url` 需要与 `driver-class-name` 配对。驱动需要引入到 `yudao-server/pom.xml` 的 `<dependencies>` 中：`yudao-spring-boot-starter-mybatis` 中的 `org.postgresql:postgresql` 是 `optional` 依赖，只在 `yudao-dependencies` 中声明版本也不会引入 jar 包。详见 [《国产信创数据库》](https://doc.iocoder.cn/xinchuang-db/#_4-highgo-瀚高数据库) 文档。
 
 ### 1.9 OceanBase
 
