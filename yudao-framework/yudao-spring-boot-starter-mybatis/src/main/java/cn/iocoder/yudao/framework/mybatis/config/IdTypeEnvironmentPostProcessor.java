@@ -30,7 +30,7 @@ public class IdTypeEnvironmentPostProcessor implements EnvironmentPostProcessor 
     private static final String QUARTZ_JOB_STORE_DRIVER_KEY = "spring.quartz.properties.org.quartz.jobStore.driverDelegateClass";
 
     private static final Set<DbType> INPUT_ID_TYPES = SetUtils.asSet(DbType.ORACLE, DbType.ORACLE_12C,
-            DbType.POSTGRE_SQL, DbType.KINGBASE_ES, DbType.DB2, DbType.H2);
+            DbType.POSTGRE_SQL, DbType.KINGBASE_ES, DbType.DB2, DbType.H2, DbType.OSCAR);
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
@@ -49,7 +49,7 @@ public class IdTypeEnvironmentPostProcessor implements EnvironmentPostProcessor 
         if (idType != IdType.NONE) {
             return;
         }
-        // 情况一，用户输入 ID，适合 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库
+        // 情况一，用户输入 ID，适合 Oracle、PostgreSQL、Kingbase、DB2、H2、神通数据库
         if (INPUT_ID_TYPES.contains(dbType)) {
             setIdType(environment, IdType.INPUT);
             return;

@@ -80,10 +80,24 @@ public class IdTypeEnvironmentPostProcessorTest {
     }
 
     @Test
+    public void testPostProcessEnvironment_oscarUrl() {
+        // 准备参数
+        StandardEnvironment environment = buildEnvironment("jdbc:oscar://127.0.0.1:2003/OSRDB", null);
+
+        // 调用
+        processor.postProcessEnvironment(environment, null);
+
+        // 断言：神通不按 PostgreSQL 处理，使用序列主键（复用 PostgreKeyGenerator），但不设置 Quartz Delegate
+        assertEquals("INPUT", environment.getProperty(ID_TYPE_KEY));
+        assertNull(environment.getProperty(QUARTZ_DELEGATE_KEY));
+        assertInstanceOf(PostgreKeyGenerator.class, new YudaoMybatisAutoConfiguration().keyGenerator(environment));
+    }
+
+    @Test
     public void testPostProcessEnvironment_notNormalizedNativeUrls() {
-        // 海量 Vastbase 原生驱动、神通、PolarDB（兼容 Oracle）未按 PostgreSQL 处理：保持自增主键，且不设置 Quartz Delegate
+        // 海量 Vastbase 原生驱动、PolarDB（兼容 Oracle）未按 PostgreSQL 处理：保持自增主键，且不设置 Quartz Delegate
         for (String url : Arrays.asList("jdbc:vastbase://127.0.0.1:5432/ruoyi-vue-pro",
-                "jdbc:oscar://127.0.0.1:2003/OSRDB", "jdbc:polardb://127.0.0.1:1521/ruoyi-vue-pro")) {
+                "jdbc:polardb://127.0.0.1:1521/ruoyi-vue-pro")) {
             // 准备参数
             StandardEnvironment environment = buildEnvironment(url, null);
 

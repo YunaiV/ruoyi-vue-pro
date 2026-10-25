@@ -219,6 +219,44 @@ password: Yudao@2024
 
 > 注意：端口只绑定本机 `127.0.0.1:15432`；`omm` 初始用户不允许远程连接，项目使用 `mogdb` 用户。`jdbc:opengauss:` 按 PostgreSQL 处理序列主键、Quartz 等差异，驱动需要引入到 `yudao-server/pom.xml` 的 `<dependencies>` 中。详见 [《国产信创数据库》](https://doc.iocoder.cn/xinchuang-db/#_11-云和恩墨-mogdb-数据库) 文档。
 
+### 1.13 神通数据库
+
+神通数据库需要自行安装，安装介质和授权请通过 [神通官方下载中心](http://shentongdata.com/index.php/download/list-27) 获取。项目复用 `sql/opengauss` 脚本，默认仍然使用 MySQL。
+
+① 初始化数据库：创建神通账号时，会自动创建同名的模式，项目的表创建在该模式中（`url` 中的 `currentSchema` 参数不生效）。神通已内置 `dual`，且 `varchar` 最大长度为 8000，所以先在 `sql/tools` 目录下生成临时脚本：只跳过创建 `dual` 表的一段，并将 `varchar(10240)` 改为 `text`，其余 SQL 保持不变：
+
+```Bash
+sed -e '/^-- Table structure for dual$/,/^-- @formatter:on$/d' -e 's/varchar(10240)/text/' ../opengauss/ruoyi-vue-pro.sql > /tmp/ruoyi-vue-pro-shentong.sql
+```
+
+使用神通的客户端或其它 JDBC 工具，以该账号执行 `/tmp/ruoyi-vue-pro-shentong.sql`。导入完成后，再执行如下 SQL，让 `system_menu` 的主键默认使用 `system_menu_seq` 序列（代码生成的菜单 SQL 与 Oracle、达梦相同，插入菜单时不指定主键）：
+
+```sql
+ALTER TABLE system_menu ALTER COLUMN id SET DEFAULT nextval('system_menu_seq');
+```
+
+> 注意：神通暂未适配 Quartz，不需要导入 `sql/opengauss/quartz.sql`；`application-local.yaml` 默认排除了 Quartz 的自动配置，保持不变即可。
+
+② 项目使用神通 JDBC 驱动（`com.oscar.Driver`），使用序列主键（复用 MyBatis Plus 的 `PostgreKeyGenerator`），分页使用 MyBatis Plus 内置的神通方言。将数据源配置中的地址、账号和密码修改为：
+
+```yaml
+url: jdbc:oscar://127.0.0.1:2003/OSRDB
+username: 神通账号
+password: 神通密码
+```
+
+驱动需要引入到 `yudao-server/pom.xml` 的 `<dependencies>` 中（`yudao-dependencies`、`yudao-spring-boot-starter-mybatis` 不包含该驱动）：
+
+```xml
+<dependency>
+    <groupId>com.shentongdata</groupId>
+    <artifactId>oscarJDBC8</artifactId>
+    <version>4.1.152</version>
+</dependency>
+```
+
+> 注意：该驱动是 Maven 中央仓库上 `com.shentongdata` 发布的版本，不是神通官方下载中心的配套认证版本。项目适配时使用的是神通 7.0.14，其它版本请自行验证。
+
 ## 1.X 容器的销毁重建
 
 开发测试过程中，有时候需要创建全新干净的数据库。由于测试数据 Docker 容器采用数据卷 Volume 挂载数据库实例的数据目录，因此销毁数据需要停止容器后，删除数据卷，然后再重新创建容器。

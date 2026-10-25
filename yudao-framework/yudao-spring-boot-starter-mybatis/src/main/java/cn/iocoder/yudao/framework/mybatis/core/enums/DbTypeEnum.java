@@ -77,7 +77,14 @@ public enum DbTypeEnum {
      * org.opengauss 的 openGauss JDBC 驱动（jdbc:opengauss:）使用的 ProductName 为 openGauss，连接 MogDB 时也是如此；
      * 需要使用 PG 兼容模式（DBCOMPATIBILITY = 'PG'）创建的数据库
      */
-    OPENGAUSS(DbType.OPENGAUSS, "openGauss", "POSITION(',' || CAST(#{value} AS VARCHAR) || ',' IN ',' || #{column} || ',') > 0")
+    OPENGAUSS(DbType.OPENGAUSS, "openGauss", "POSITION(',' || CAST(#{value} AS VARCHAR) || ',' IN ',' || #{column} || ',') > 0"),
+
+    /**
+     * 神通
+     *
+     * 没有 FIND_IN_SET 函数；CAST(... AS VARCHAR) 不指定长度时为 VARCHAR(1)，所以不使用 CAST
+     */
+    OSCAR(DbType.OSCAR, "OSCAR", "POSITION(',' || #{value} || ',' IN ',' || #{column} || ',') > 0")
 
     ;
 

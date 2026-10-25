@@ -50,8 +50,8 @@ VALUES (
 );
 #end
 ##
-## ======================= Oracle / 达梦 DM =======================
-#elseif ($dbType.name() == 'ORACLE' || $dbType.name() == 'DM')
+## ======================= Oracle / 达梦 DM / 神通 OSCAR =======================
+#elseif ($dbType.name() == 'ORACLE' || $dbType.name() == 'DM' || $dbType.name() == 'OSCAR')
 -- 菜单 SQL
 INSERT INTO system_menu(
     name, permission, type, sort, parent_id,
@@ -63,7 +63,10 @@ VALUES (
 );
 
 -- 按钮父菜单ID
--- 说明：Oracle/达梦 使用序列获取上一个插入的 ID
+-- 说明：Oracle/达梦/神通 使用序列获取上一个插入的 ID
+#if ($dbType.name() == 'OSCAR')
+-- 注意：神通需要 system_menu 的 id 默认使用 system_menu_seq 序列，参见 sql/tools/README.md 的神通部分
+#end
 DECLARE
     v_parent_id NUMBER;
 BEGIN
