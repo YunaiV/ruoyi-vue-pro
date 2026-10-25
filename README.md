@@ -67,12 +67,12 @@
 |----------|-----------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | 国产操作系统   | 银河麒麟、统信 UOS 等 Linux 系统                              | 参考 [《Linux 部署》](https://doc.iocoder.cn/deployment-linux/)，选择与 CPU 架构匹配的 JDK                                                                              |
 | 关系型数据库   | MySQL、MariaDB、Oracle、PostgreSQL、SQL Server          | 默认使用 MySQL                                                                                                                                                 |
-| 国产关系型数据库 | 达梦 DM、人大金仓 KingbaseES、openGauss、瀚高 HighGo、OceanBase、TiDB、华为 GaussDB、云和恩墨 MogDB、海量 Vastbase G100、PolarDB PostgreSQL 版 | 参考 [《国产信创数据库》](https://doc.iocoder.cn/xinchuang-db/)。GaussDB、MogDB、Vastbase G100 使用 PG 兼容模式；神通数据库提供实测差异说明，待专门适配 |
+| 国产关系型数据库 | 达梦 DM、人大金仓 KingbaseES、openGauss、瀚高 HighGo、OceanBase、TiDB、华为 GaussDB、云和恩墨 MogDB、海量 Vastbase G100、PolarDB、神通 | 参考 [《国产信创数据库》](https://doc.iocoder.cn/xinchuang-db/)。GaussDB、MogDB、Vastbase G100 使用 PG 兼容模式；神通已支持普通 CRUD、代码生成，详见 [神通数据库](https://doc.iocoder.cn/xinchuang-db/#_9-神通数据库) |
 | 国产缓存     | 东方通 TongRDS、宝兰德 BES CacheDB                         | 替换 Redis，参考 [《国产信创数据库》](https://doc.iocoder.cn/xinchuang-db/)。BES CacheDB 提供接入说明，待介质验证                                                               |
 | 国产应用服务器  | 东方通 TongWeb、宝兰德 BES AppServer                       | 替换 Tomcat，参考 [《东方通服务器部署》](https://doc.iocoder.cn/deployment-tong/)、[《宝兰德服务器部署》](https://doc.iocoder.cn/deployment-bes/)。BES AppServer 提供接入说明，待介质验证 |
 | 国产 Web 服务器 | 东方通 TongHttpServer                                   | 替换 Nginx，提供静态资源、反向代理，参考 [《东方通服务器部署》](https://doc.iocoder.cn/deployment-tong/)                                                                       |
 
-* 数据库脚本：[`sql`](sql/) 目录提供 MySQL、Oracle、PostgreSQL、SQL Server、达梦、人大金仓、openGauss、瀚高、OceanBase 的项目初始化脚本（含 Quartz），优先使用对应目录；MariaDB、TiDB 直接使用 MySQL 脚本；GaussDB、MogDB、Vastbase G100 基于 openGauss 脚本导入，PolarDB PostgreSQL 版直接使用 PostgreSQL 脚本
+* 数据库脚本：[`sql`](sql/) 目录提供 MySQL、Oracle、PostgreSQL、SQL Server、达梦、人大金仓、openGauss、瀚高、OceanBase 的项目初始化脚本（含 Quartz），优先使用对应目录；MariaDB、TiDB 直接使用 MySQL 脚本；GaussDB、MogDB、Vastbase G100 基于 openGauss 脚本导入，PolarDB PostgreSQL 版直接使用 PostgreSQL 脚本；神通需按 [文档](https://doc.iocoder.cn/xinchuang-db/#_9-神通数据库) 调整 openGauss 项目脚本后导入
 * 其它数据库、后续表结构变更，可参考 [`sql/tools`](sql/tools/README.md) 的转换工具及 [《表结构变更（版本升级）》](https://doc.iocoder.cn/sql-update/#_3-数据库转换)，转换后仍需按实际数据库调整、测试
 
 ##  🐳 项目关系
