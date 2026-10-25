@@ -6,7 +6,7 @@
 
 ## 1. 测试数据库的快速启动
 
-基于 Docker Compose，快速启动 MySQL、Oracle、PostgreSQL、SQL Server、OceanBase、TiDB 等数据库。
+基于 Docker Compose，快速启动 MySQL、Oracle、PostgreSQL、SQL Server、OceanBase、TiDB、MogDB 等数据库。
 
 注意！使用 Docker Compose 启动完测试数据后，因为会自动导入项目的 SQL 脚本，所以可能需要等待 1-2 分钟。
 
@@ -174,6 +174,50 @@ password: 123456
 ```
 
 > 注意：端口只绑定本机 `127.0.0.1:4000`。数据保存在 `tidb_pd`、`tidb_tikv` 数据卷中，重启不需要重新导入 SQL。如需重建，执行 `docker compose down tidb tidb-tikv tidb-pd` 后，删除 `ruoyi-vue-pro_tidb_pd`、`ruoyi-vue-pro_tidb_tikv` 数据卷。该环境仅用于开发测试，生产部署见 [TiDB 官方文档](https://docs.pingcap.com/zh/tidb/v8.5/production-deployment-using-tiup/)。
+
+### 1.11 华为 GaussDB
+
+GaussDB 没有官方 Docker 镜像，需要自行安装，例如华为云官网的 [GaussDB 混合云开发者版](https://www.huaweicloud.com/intl/zh-cn/product/gaussdb/download.html)（官方声明仅供个人学习、适配验证或测试，不得用于商业用途）。项目复用 `sql/opengauss` 脚本，导入到 PG 兼容模式的数据库中。
+
+① 初始化数据库：在安装了 GaussDB `gsql` 客户端的机器上（例如以数据库安装用户登录 GaussDB 服务器，并复制项目的 `sql` 目录），使用具有 CREATEDB 权限的账号执行：
+
+```Bash
+GAUSSDB_PORT='数据库端口' GAUSSDB_USER='数据库账号' GAUSSDB_PASSWORD='数据库密码' bash gaussdb/create_schema.sh
+```
+
+> 注意：脚本创建 PG 兼容模式（`DBCOMPATIBILITY = 'PG'`）、UTF8 编码的 `ruoyi-vue-pro` 数据库，依次导入 `sql/opengauss/quartz.sql`、`sql/opengauss/ruoyi-vue-pro.sql`。GaussDB 默认创建的是 A（Oracle）兼容模式的数据库，项目脚本需要使用 PG 兼容模式。GaussDB 已内置 `dual` 视图，原脚本开头的 `DROP TABLE IF EXISTS dual` 会报 `"dual" is not a table` 错误，所以脚本只跳过创建 `dual` 表的一段，不修改内置视图，其余 SQL 保持不变；该段格式与预期不一致，或者未检测到内置 `dual` 视图时，拒绝导入。初始化只允许创建全新的数据库：数据库已存在（包括空库）或重复执行时，脚本拒绝导入并返回非零状态；导入失败时保留数据库便于排查。
+
+> 注意：`GAUSSDB_HOST` 为空时，使用本机 Unix Socket 连接；远程连接时，需要在 `gs_hba.conf`（不是 `pg_hba.conf`）中为该账号、客户端地址配置密码认证（例如 sha256），不要使用 trust。GaussDB 的初始用户不允许远程连接，项目请使用单独创建的账号。
+
+② 项目使用 GaussDB 原生 JDBC 驱动（`com.huawei.gaussdb.jdbc.Driver`，`jdbc:gaussdb://127.0.0.1:端口/ruoyi-vue-pro`），按 PostgreSQL 处理序列主键、Quartz、工作流等差异，驱动需要引入到 `yudao-server/pom.xml` 的 `<dependencies>` 中。详见 [《国产信创数据库》](https://doc.iocoder.cn/xinchuang-db/#_7-华为-gaussdb-数据库) 文档。
+
+### 1.12 MogDB
+
+使用云和恩墨官方 MogDB 5.0.0 容器镜像（官方说明仅用于测试），支持 x86_64 和 MacBook Apple Silicon。`mogdb` 服务属于 `mogdb` profile，执行 `docker compose up -d` 时不会启动。
+
+① 启动数据库：
+
+```Bash
+docker compose up -d mogdb
+```
+
+② 初始化数据库：创建 PG 兼容模式（`DBCOMPATIBILITY = 'PG'`）、UTF8 编码的 `ruoyi-vue-pro` 数据库，所有者为 `mogdb` 用户，并依次导入 `sql/opengauss/quartz.sql`、`sql/opengauss/ruoyi-vue-pro.sql`：
+
+```Bash
+docker compose exec -u omm mogdb bash /tmp/create_schema.sh
+```
+
+> 注意：MogDB 默认创建的是 A（Oracle）兼容模式的数据库，`varchar(n)` 按字节计算长度，导入项目脚本时会在中文数据处报 `value too long for type character varying(32)` 错误，所以需要使用 PG 兼容模式。初始化只允许创建全新的数据库：数据库已存在（包括空库）或重复执行时，脚本拒绝导入并返回非零状态；导入失败时保留数据库便于排查，重新初始化需要执行 `docker compose down mogdb` 后，删除 `ruoyi-vue-pro_mogdb` 数据卷。
+
+③ 项目使用 openGauss JDBC 驱动（`org.opengauss.Driver`），将数据源配置中的地址、账号和密码修改为：
+
+```yaml
+url: jdbc:opengauss://127.0.0.1:15432/ruoyi-vue-pro
+username: mogdb
+password: Yudao@2024
+```
+
+> 注意：端口只绑定本机 `127.0.0.1:15432`；`omm` 初始用户不允许远程连接，项目使用 `mogdb` 用户。`jdbc:opengauss:` 按 PostgreSQL 处理序列主键、Quartz 等差异，驱动需要引入到 `yudao-server/pom.xml` 的 `<dependencies>` 中。详见 [《国产信创数据库》](https://doc.iocoder.cn/xinchuang-db/#_11-云和恩墨-mogdb-数据库) 文档。
 
 ## 1.X 容器的销毁重建
 

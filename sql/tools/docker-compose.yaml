@@ -12,6 +12,7 @@ volumes:
     oceanbase_config: { }
     tidb_pd: { }
     tidb_tikv: { }
+    mogdb: { }
 
 services:
     mysql:
@@ -272,3 +273,23 @@ services:
             - ../mysql/ruoyi-vue-pro.sql:/tmp/schema.sql:ro
             - ../mysql/quartz.sql:/tmp/quartz.sql:ro
             - ./tidb/create_schema.sh:/tmp/create_schema.sh:ro
+
+    # MogDB 测试库：云和恩墨官方容器镜像（仅用于测试），属于 mogdb profile，默认不启动
+    # 启动：docker compose up -d mogdb
+    # 初始化：docker compose exec -u omm mogdb bash /tmp/create_schema.sh（创建 PG 兼容模式的 ruoyi-vue-pro 数据库，并导入 sql/opengauss 脚本）
+    mogdb:
+        image: swr.cn-north-4.myhuaweicloud.com/mogdb/mogdb:5.0.0
+        profiles: ["mogdb"]
+        restart: unless-stopped
+        shm_size: 1g
+        environment:
+            # omm 超级用户、mogdb 用户的密码：至少 8 位，包含大小写字母、数字及特殊字符
+            GS_PASSWORD: Yudao@2024
+        ports:
+            # 只绑定本机，应用使用 mogdb 用户连接（omm 初始用户不允许远程连接）
+            - "127.0.0.1:15432:5432"
+        volumes:
+            - mogdb:/var/lib/mogdb
+            - ../opengauss/quartz.sql:/tmp/quartz.sql:ro
+            - ../opengauss/ruoyi-vue-pro.sql:/tmp/schema.sql:ro
+            - ./mogdb/create_schema.sh:/tmp/create_schema.sh:ro
