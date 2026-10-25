@@ -73,6 +73,21 @@ public class BpmFlowableConfigurationTest extends BaseMockitoUnitTest {
     }
 
     @Test
+    public void testBpmProcessEngineConfigurationConfigurer_oscar() throws SQLException {
+        // mock 方法：神通 JDBC 驱动（jdbc:oscar:）返回的 ProductName
+        mockDatabaseProductName("OSCAR");
+        // 准备参数
+        SpringProcessEngineConfiguration configuration = buildConfiguration(null);
+
+        // 调用
+        configure(configuration);
+
+        // 断言：按 Oracle 处理，并关闭连接
+        assertEquals(AbstractEngineConfiguration.DATABASE_TYPE_ORACLE, configuration.getDatabaseType());
+        verify(connection).close();
+    }
+
+    @Test
     public void testBpmProcessEngineConfigurationConfigurer_postgreSQL() throws SQLException {
         // mock 方法：PostgreSQL，以及 io.mogdb 的 openGauss JDBC 驱动连接 MogDB 时返回的 ProductName
         mockDatabaseProductName("PostgreSQL");

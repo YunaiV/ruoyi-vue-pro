@@ -235,7 +235,13 @@ sed -e '/^-- Table structure for dual$/,/^-- @formatter:on$/d' -e 's/varchar(102
 ALTER TABLE system_menu ALTER COLUMN id SET DEFAULT nextval('system_menu_seq');
 ```
 
-> 注意：神通暂未适配 Quartz，不需要导入 `sql/opengauss/quartz.sql`；`application-local.yaml` 默认排除了 Quartz 的自动配置，保持不变即可。
+如需使用 Quartz 定时任务，再以该账号执行 Quartz 的临时脚本：只将 `bytea` 字段改为神通的 `BLOB`（`bytea` 字段在神通上无法读取任务数据），其余 SQL 保持不变：
+
+```Bash
+sed 's/ bytea / BLOB /' ../opengauss/quartz.sql > /tmp/quartz-shentong.sql
+```
+
+> 注意：该 Quartz 脚本用于全新初始化，不支持把已有数据的 `bytea` 字段转换为 `BLOB`。Quartz 使用默认的 `StdJDBCDelegate`，不需要设置 `driverDelegateClass`，也不要开启 `useProperties`（任务参数包含 `Long` 等非字符串类型）。`application-local.yaml` 默认排除了 Quartz 的自动配置，需要使用时，从 `spring.autoconfigure.exclude` 列表中删除 `QuartzAutoConfiguration` 这一行即可；不要通过启动参数单独设置 `spring.autoconfigure.exclude`，否则会覆盖整个排除列表。
 
 ② 项目使用神通 JDBC 驱动（`com.oscar.Driver`），使用序列主键（复用 MyBatis Plus 的 `PostgreKeyGenerator`），分页使用 MyBatis Plus 内置的神通方言。将数据源配置中的地址、账号和密码修改为：
 
@@ -256,6 +262,8 @@ password: 神通密码
 ```
 
 > 注意：该驱动是 Maven 中央仓库上 `com.shentongdata` 发布的版本，不是神通官方下载中心的配套认证版本。项目适配时使用的是神通 7.0.14，其它版本请自行验证。
+
+③ 工作流：神通驱动返回的数据库产品名为 `OSCAR`，Flowable 无法自动识别，项目会在未设置 `flowable.database-type` 时，将其按 `oracle` 处理（使用 Flowable 内置的 Oracle 建表脚本，`BLOB`、`CLOB` 字段及大写的表名）。启用 BPM 模块后，Flowable 按默认的 `flowable.database-schema-update: true` 自动创建 Flowable 引擎的 `ACT_`、`FLW_` 表；BPM 模块的 `bpm_` 业务表不会自动创建，需要先按 [《工作流 · 功能开启》](https://doc.iocoder.cn/bpm/) 获取 BPM 的 SQL，转换为神通可以执行的 SQL（包括 `bpm_` 表对应的序列）后导入。如果显式设置了 `flowable.database-type`，以显式设置为准，神通需要设置为 `oracle`，不要设置为 `postgres`。
 
 ## 1.X 容器的销毁重建
 
