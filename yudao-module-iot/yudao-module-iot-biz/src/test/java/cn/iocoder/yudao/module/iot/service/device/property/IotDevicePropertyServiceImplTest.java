@@ -213,6 +213,31 @@ public class IotDevicePropertyServiceImplTest extends BaseMockitoUnitTest {
     }
 
     @Test
+    public void testDeleteDevicePropertyData_success() {
+        // 准备参数
+        Long productId = 2L;
+
+        // 调用
+        service.deleteDevicePropertyData(productId);
+
+        // 断言：委托给存储 DAO 删除属性表，不依赖 MySQL 产品是否存在
+        verify(devicePropertyDAO).deleteProductPropertyTable(eq(productId));
+        verifyNoInteractions(productService, thingModelService);
+    }
+
+    @Test
+    public void testDeleteDevicePropertyData_failed() {
+        // 准备参数
+        Long productId = 2L;
+        // mock 方法：存储 DAO 删除失败
+        RuntimeException failure = new RuntimeException("drop property table failed");
+        doThrow(failure).when(devicePropertyDAO).deleteProductPropertyTable(productId);
+
+        // 调用，并断言：异常原样抛出，由产品删除流程中止
+        assertSame(failure, assertThrows(RuntimeException.class, () -> service.deleteDevicePropertyData(productId)));
+    }
+
+    @Test
     public void testSaveDeviceProperty_success() {
         // 准备参数
         IotDeviceDO device = buildDevice();

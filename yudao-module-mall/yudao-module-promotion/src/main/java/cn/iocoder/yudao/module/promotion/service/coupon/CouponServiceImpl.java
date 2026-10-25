@@ -115,7 +115,11 @@ public class CouponServiceImpl implements CouponService {
         }
 
         // 减少优惠劵模板的领取数量 -1
-        couponTemplateService.updateCouponTemplateTakeCount(coupon.getTemplateId(), -1);
+        // 若模板已被删除则跳过：已删模板的领取计数无业务意义，
+        // 且 updateTakeCount 对逻辑删除的模板匹配 0 行，会误报「优惠券模板剩余数量不足」导致删券失败
+        if (couponTemplateService.getCouponTemplate(coupon.getTemplateId()) != null) {
+            couponTemplateService.updateCouponTemplateTakeCount(coupon.getTemplateId(), -1);
+        }
     }
 
     @Override

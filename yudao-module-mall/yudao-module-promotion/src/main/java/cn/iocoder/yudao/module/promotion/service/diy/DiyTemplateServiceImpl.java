@@ -91,6 +91,7 @@ public class DiyTemplateServiceImpl implements DiyTemplateService {
         }
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void deleteDiyTemplate(Long id) {
         // 校验存在
@@ -101,6 +102,9 @@ public class DiyTemplateServiceImpl implements DiyTemplateService {
         }
         // 删除
         diyTemplateMapper.deleteById(id);
+        // 删除模板下的页面
+        diyPageService.getDiyPageByTemplateId(id)
+                .forEach(page -> diyPageService.deleteDiyPage(page.getId()));
     }
 
     private DiyTemplateDO validateDiyTemplateExists(Long id) {

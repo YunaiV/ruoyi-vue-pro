@@ -29,6 +29,15 @@ public interface IotDevicePropertyService {
     void defineDevicePropertyData(Long productId);
 
     /**
+     * 删除设备属性数据的结构（产品属性表及其历史数据）
+     *
+     * 幂等：属性表不存在时，直接成功
+     *
+     * @param productId 产品编号
+     */
+    void deleteDevicePropertyData(Long productId);
+
+    /**
      * 保存设备数据
      *
      * @param device 设备
