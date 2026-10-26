@@ -1,13 +1,17 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.config;
 
 import cn.hutool.core.collection.ListUtil;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
+import cn.iocoder.yudao.framework.mybatis.core.enums.DbTypeEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior.BpmActivityBehaviorFactory;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCandidateInvoker;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCandidateStrategy;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.event.BpmProcessInstanceEventPublisher;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
+import lombok.extern.slf4j.Slf4j;
 import org.flowable.common.engine.api.delegate.FlowableFunctionDelegate;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.EngineConfigurationConfigurer;
 import org.springframework.beans.factory.ObjectProvider;
@@ -18,6 +22,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -26,6 +32,7 @@ import java.util.List;
  * @author jason
  */
 @Configuration(proxyBeanMethods = false)
+@Slf4j
 public class BpmFlowableConfiguration {
 
     /**
@@ -53,6 +60,7 @@ public class BpmFlowableConfiguration {
      *
      * 1. 设置各种监听器
      * 2. 设置自定义的 ActivityBehaviorFactory 实现
+     * 3. 设置华为 GaussDB、openGauss（含 MogDB）、神通的数据库类型
      */
     @Bean
     public EngineConfigurationConfigurer<SpringProcessEngineConfiguration> bpmProcessEngineConfigurationConfigurer(
@@ -66,7 +74,39 @@ public class BpmFlowableConfiguration {
             configuration.setActivityBehaviorFactory(bpmActivityBehaviorFactory);
             // 设置自定义的函数
             configuration.setCustomFlowableFunctionDelegates(ListUtil.toList(customFlowableFunctionDelegates.stream().iterator()));
+            // 设置华为 GaussDB、openGauss（含 MogDB）、神通的数据库类型
+            initDatabaseType(configuration);
         };
+    }
+
+    /**
+     * 以下原生驱动返回的 ProductName，Flowable 无法识别，启动时会报错：
+     * 1. 华为 GaussDB 的原生驱动（jdbc:gaussdb:），返回 GaussDB
+     * 2. org.opengauss 的 openGauss JDBC 驱动（jdbc:opengauss:），返回 openGauss，连接 MogDB 时也是如此
+     * 3. 神通的 JDBC 驱动（jdbc:oscar:），返回 OSCAR
+     *
+     * 因此，在未显式设置 databaseType 时：GaussDB、openGauss 按 PostgreSQL 处理（需要使用 PG 兼容模式创建的数据库）；
+     * 神通按 Oracle 处理，使用 BLOB、CLOB 字段及大写的表名。
+     * 只读取 Flowable 自身数据源的元数据，其它数据库不做处理，仍由 Flowable 自动识别
+     *
+     * @param configuration Flowable 配置
+     */
+    private static void initDatabaseType(SpringProcessEngineConfiguration configuration) {
+        if (configuration.getDatabaseType() != null || configuration.getDataSource() == null) {
+            return;
+        }
+        try (Connection connection = configuration.getDataSource().getConnection()) {
+            String productName = connection.getMetaData().getDatabaseProductName();
+            if (ObjectUtils.equalsAny(productName,
+                    DbTypeEnum.GAUSS_DB.getProductName(), DbTypeEnum.OPENGAUSS.getProductName())) {
+                configuration.setDatabaseType(AbstractEngineConfiguration.DATABASE_TYPE_POSTGRES);
+            } else if (DbTypeEnum.OSCAR.getProductName().equals(productName)) {
+                configuration.setDatabaseType(AbstractEngineConfiguration.DATABASE_TYPE_ORACLE);
+            }
+        } catch (SQLException ex) {
+            // 获取失败时，不做处理，由 Flowable 自动识别时报错
+            log.warn("[initDatabaseType][获取数据库类型失败]", ex);
+        }
     }
 
     // =========== 审批人相关的 Bean ==========

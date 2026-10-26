@@ -10,6 +10,9 @@ volumes:
     highgo: { }
     oceanbase: { }
     oceanbase_config: { }
+    tidb_pd: { }
+    tidb_tikv: { }
+    mogdb: { }
 
 services:
     mysql:
@@ -140,6 +143,7 @@ services:
         # 使用瀚高官方提供的 Docker 镜像，加载后打成本地标签：
         # docker tag <image>:<tag> highgo:local
         image: highgo:local
+        profiles: ["highgo"]
         restart: unless-stopped
         ports:
             - "5866:5866"
@@ -147,6 +151,26 @@ services:
             - highgo:/home/highgo/hgdb/data
             - ../highgo/quartz.sql:/tmp/quartz.sql:ro
             - ../highgo/ruoyi-vue-pro.sql:/tmp/schema.sql:ro
+
+    # 瀚高初始化：使用 PostgreSQL 客户端创建 ruoyi-vue-pro 数据库并导入 sql/highgo 脚本，只允许创建全新数据库
+    # 只支持 PostgreSQL 客户端可用的认证方式（例如 md5、scram-sha-256），SM3 等专有认证请使用瀚高客户端手动导入
+    # 执行：HIGHGO_PASSWORD='数据库密码' docker compose run --rm highgo-init
+    highgo-init:
+        image: postgres:14.2
+        profiles: ["highgo-init"]
+        restart: "no"
+        environment:
+            HIGHGO_HOST: ${HIGHGO_HOST:-highgo}
+            HIGHGO_PORT: ${HIGHGO_PORT:-5866}
+            HIGHGO_USER: ${HIGHGO_USER:-highgo}
+            HIGHGO_PASSWORD: ${HIGHGO_PASSWORD:-}
+            HIGHGO_MAINTENANCE_DB: ${HIGHGO_MAINTENANCE_DB:-highgo}
+            HIGHGO_DATABASE: ruoyi-vue-pro
+        entrypoint: ["bash", "/tmp/create_schema.sh"]
+        volumes:
+            - ../highgo/quartz.sql:/tmp/quartz.sql:ro
+            - ../highgo/ruoyi-vue-pro.sql:/tmp/schema.sql:ro
+            - ./highgo/create_schema.sh:/tmp/create_schema.sh:ro
 
     oceanbase:
         image: oceanbase/oceanbase-ce:4.4.2-lts
@@ -173,3 +197,99 @@ services:
             timeout: 5s
             start_period: 120s
             retries: 30
+
+    # TiDB 测试集群：PD、TiKV、TiDB 各 1 个节点，属于 tidb profile，默认不启动
+    # 启动：docker compose up -d --wait --wait-timeout 300 tidb
+    tidb-pd:
+        image: pingcap/pd:v8.5.8
+        profiles: ["tidb"]
+        restart: unless-stopped
+        command:
+            - --name=pd
+            - --client-urls=http://0.0.0.0:2379
+            - --peer-urls=http://0.0.0.0:2380
+            - --advertise-client-urls=http://tidb-pd:2379
+            - --advertise-peer-urls=http://tidb-pd:2380
+            - --initial-cluster=pd=http://tidb-pd:2380
+            - --data-dir=/data/pd
+            - --config=/pd.toml
+        volumes:
+            - tidb_pd:/data
+            - ./tidb/pd.toml:/pd.toml:ro
+
+    tidb-tikv:
+        image: pingcap/tikv:v8.5.8
+        profiles: ["tidb"]
+        restart: unless-stopped
+        command:
+            - --addr=0.0.0.0:20160
+            - --advertise-addr=tidb-tikv:20160
+            - --status-addr=0.0.0.0:20180
+            - --advertise-status-addr=tidb-tikv:20180
+            - --data-dir=/data/tikv
+            - --pd=tidb-pd:2379
+            - --config=/tikv.toml
+        volumes:
+            - tidb_tikv:/data
+            - ./tidb/tikv.toml:/tikv.toml:ro
+        depends_on:
+            - tidb-pd
+
+    tidb:
+        image: pingcap/tidb:v8.5.8
+        profiles: ["tidb"]
+        restart: unless-stopped
+        environment:
+            TZ: Asia/Shanghai
+        command:
+            - --store=tikv
+            - --path=tidb-pd:2379
+            - --advertise-address=tidb
+        ports:
+            # 只绑定本机，root 密码由 tidb-init 初始化
+            - "127.0.0.1:4000:4000"
+        depends_on:
+            - tidb-tikv
+        healthcheck:
+            test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:10080/status >/dev/null"]
+            interval: 10s
+            timeout: 5s
+            start_period: 60s
+            retries: 30
+
+    # TiDB 初始化：设置 root 密码，创建 ruoyi-vue-pro 数据库并导入 MySQL 脚本，只允许创建全新数据库
+    # 执行：docker compose run --rm tidb-init
+    tidb-init:
+        image: mysql:8.0.33
+        profiles: ["tidb-init"]
+        restart: "no"
+        environment:
+            TIDB_HOST: tidb
+            TIDB_PORT: 4000
+            TIDB_DATABASE: ruoyi-vue-pro
+            TIDB_PASSWORD: "123456"
+        entrypoint: ["bash", "/tmp/create_schema.sh"]
+        volumes:
+            - ../mysql/ruoyi-vue-pro.sql:/tmp/schema.sql:ro
+            - ../mysql/quartz.sql:/tmp/quartz.sql:ro
+            - ./tidb/create_schema.sh:/tmp/create_schema.sh:ro
+
+    # MogDB 测试库：云和恩墨官方容器镜像（仅用于测试），属于 mogdb profile，默认不启动
+    # 启动：docker compose up -d mogdb
+    # 初始化：docker compose exec -u omm mogdb bash /tmp/create_schema.sh（创建 PG 兼容模式的 ruoyi-vue-pro 数据库，并导入 sql/opengauss 脚本）
+    mogdb:
+        image: swr.cn-north-4.myhuaweicloud.com/mogdb/mogdb:5.0.0
+        profiles: ["mogdb"]
+        restart: unless-stopped
+        shm_size: 1g
+        environment:
+            # omm 超级用户、mogdb 用户的密码：至少 8 位，包含大小写字母、数字及特殊字符
+            GS_PASSWORD: Yudao@2024
+        ports:
+            # 只绑定本机，应用使用 mogdb 用户连接（omm 初始用户不允许远程连接）
+            - "127.0.0.1:15432:5432"
+        volumes:
+            - mogdb:/var/lib/mogdb
+            - ../opengauss/quartz.sql:/tmp/quartz.sql:ro
+            - ../opengauss/ruoyi-vue-pro.sql:/tmp/schema.sql:ro
+            - ./mogdb/create_schema.sh:/tmp/create_schema.sh:ro

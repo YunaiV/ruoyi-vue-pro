@@ -113,6 +113,10 @@ public class MyBatisUtilsTest {
                 MyBatisUtils.findInSet(DbType.POSTGRE_SQL, "websites", 1));
         assertEquals("CHARINDEX(',' + CAST({2} AS varchar(255)) + ',', ',' + websites + ',') > 0",
                 MyBatisUtils.findInSet(DbType.SQL_SERVER, "websites", 2));
+        assertEquals("POSITION(',' || CAST({0} AS VARCHAR) || ',' IN ',' || websites || ',') > 0",
+                MyBatisUtils.findInSet(DbType.GAUSS_DB, "websites", 0));
+        assertEquals("POSITION(',' || CAST({0} AS VARCHAR) || ',' IN ',' || websites || ',') > 0",
+                MyBatisUtils.findInSet(DbType.OPENGAUSS, "websites", 0));
     }
 
     @Test
