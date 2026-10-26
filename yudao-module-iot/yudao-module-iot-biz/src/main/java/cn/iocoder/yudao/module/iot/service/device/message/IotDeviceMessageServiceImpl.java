@@ -28,6 +28,7 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceMessageDO;
 import cn.iocoder.yudao.module.iot.dal.storage.IotDeviceMessageDAO;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.service.device.property.IotDevicePropertyService;
+import cn.iocoder.yudao.module.iot.service.device.shadow.IotDeviceShadowService;
 import cn.iocoder.yudao.module.iot.service.ota.IotOtaTaskRecordService;
 import com.google.common.base.Objects;
 import jakarta.annotation.Resource;
@@ -63,6 +64,9 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
     @Resource
     @Lazy // 延迟加载，避免循环依赖
     private IotOtaTaskRecordService otaTaskRecordService;
+    @Resource
+    @Lazy // 延迟加载，避免循环依赖
+    private IotDeviceShadowService deviceShadowService;
 
     @Resource
     private IotDeviceMessageDAO deviceMessageDAO;
@@ -110,7 +114,8 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
         return sendDeviceMessage(message, device, null);
     }
 
-    private IotDeviceMessage sendDeviceMessage(IotDeviceMessage message, IotDeviceDO device, String serverId) {
+    @Override
+    public IotDeviceMessage sendDeviceMessage(IotDeviceMessage message, IotDeviceDO device, String serverId) {
         // 1. 补充信息
         appendDeviceMessage(message, device);
 
@@ -216,6 +221,12 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
         // OTA 上报升级进度
         if (Objects.equal(message.getMethod(), IotDeviceMessageMethodEnum.OTA_PROGRESS.getMethod())) {
             otaTaskRecordService.updateOtaRecordProgress(device, message);
+            return null;
+        }
+
+        // 设备影子更新
+        if (Objects.equal(message.getMethod(), IotDeviceMessageMethodEnum.SHADOW_UPDATE.getMethod())) {
+            deviceShadowService.handleDeviceShadowUpdate(device, message);
             return null;
         }
 

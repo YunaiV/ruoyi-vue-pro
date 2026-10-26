@@ -2799,7 +2799,7 @@ CREATE TABLE `system_menu`  (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 13478 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '菜单权限表';
+) ENGINE = InnoDB AUTO_INCREMENT = 13480 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '菜单权限表';
 
 -- ----------------------------
 -- Records of system_menu
@@ -5349,6 +5349,8 @@ INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_i
 INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `component_name`, `status`, `visible`, `keep_alive`, `always_show`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (13475, '维修备件领用', 'eam:repair-order-act:maintenance', 3, 5, 13249, '', '', '', NULL, 0, b'1', b'1', b'1', '', '2026-09-26 20:50:45', '', '2026-09-26 20:50:45', b'0');
 INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `component_name`, `status`, `visible`, `keep_alive`, `always_show`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (13476, '维修执行单取消', 'eam:repair-order-act:cancel', 3, 6, 13249, '', '', '', NULL, 0, b'1', b'1', b'1', '', '2026-09-26 20:50:45', '', '2026-09-26 20:50:45', b'0');
 INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `component_name`, `status`, `visible`, `keep_alive`, `always_show`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (13477, '维修执行单修改', 'eam:repair-order-act:update', 3, 7, 13249, '', '', '', NULL, 0, b'1', b'1', b'1', '', '2026-09-26 20:50:45', '', '2026-09-26 20:50:45', b'0');
+INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `component_name`, `status`, `visible`, `keep_alive`, `always_show`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (13478, '设备影子查询', 'iot:device:shadow-query', 3, 13, 868, '', '', '', '', 0, b'1', b'1', b'1', '1', '2026-10-26 00:00:00', '1', '2026-10-26 00:00:00', b'0');
+INSERT INTO `system_menu` (`id`, `name`, `permission`, `type`, `sort`, `parent_id`, `path`, `icon`, `component`, `component_name`, `status`, `visible`, `keep_alive`, `always_show`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (13479, '设备影子更新', 'iot:device:shadow-update', 3, 14, 868, '', '', '', '', 0, b'1', b'1', b'1', '1', '2026-10-26 00:00:00', '1', '2026-10-26 00:00:00', b'0');
 COMMIT;
 
 -- ----------------------------

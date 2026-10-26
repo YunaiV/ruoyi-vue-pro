@@ -67,6 +67,10 @@ public enum IotDeviceMessageMethodEnum implements ArrayValuable<String> {
     OTA_UPGRADE("thing.ota.upgrade", "OTA 固件信息推送", false),
     OTA_PROGRESS("thing.ota.progress", "OTA 升级进度上报", true),
 
+    // ========== 设备影子 ==========
+
+    SHADOW_UPDATE("thing.shadow.update", "设备影子更新", true),
+
     ;
 
     public static final String[] ARRAYS = Arrays.stream(values()).map(IotDeviceMessageMethodEnum::getMethod)
@@ -77,7 +81,8 @@ public enum IotDeviceMessageMethodEnum implements ArrayValuable<String> {
      */
     public static final Set<String> REPLY_DISABLED = SetUtils.asSet(
             STATE_UPDATE.getMethod(),
-            OTA_PROGRESS.getMethod() // 参考阿里云，OTA 升级进度上报，不进行回复
+            OTA_PROGRESS.getMethod(), // 参考阿里云，OTA 升级进度上报，不进行回复
+            SHADOW_UPDATE.getMethod() // 设备影子由影子 Service 主动下发回复（thing/shadow/update_reply）
     );
 
     private final String method;
