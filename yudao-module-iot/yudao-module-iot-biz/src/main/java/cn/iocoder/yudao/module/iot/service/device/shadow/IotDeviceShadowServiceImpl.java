@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.iot.service.device.shadow;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
@@ -96,6 +97,14 @@ public class IotDeviceShadowServiceImpl implements IotDeviceShadowService {
         }
     }
 
+    /**
+     * 处理设备影子上行：解析 params，并按内层 method 分发到 get、update
+     * <p>
+     * 影子未启用时，直接忽略，不回复
+     *
+     * @param device  设备
+     * @param message 上行消息
+     */
     private void handleDeviceShadowUpdate0(IotDeviceDO device, IotDeviceMessage message) {
         // 1.1 解析请求：params 结构为 { method, state: { reported }, version }
         IotDeviceShadowUpdateReqDTO reqDTO = JsonUtils.convertObject(message.getParams(),
@@ -125,6 +134,14 @@ public class IotDeviceShadowServiceImpl implements IotDeviceShadowService {
                 shadow.getVersion());
     }
 
+    /**
+     * 处理设备上报的 update：version 为 -1 时清空影子，否则合并 reported，并回复新版本
+     *
+     * @param device  设备
+     * @param message 上行消息
+     * @param reqDTO  上行 params
+     * @param shadow  DB 中的当前影子，用于错误回复时携带版本
+     */
     private void handleReportedUpdate(IotDeviceDO device, IotDeviceMessage message,
                                       IotDeviceShadowUpdateReqDTO reqDTO, IotDeviceShadowDO shadow) {
         // 1. version 为 -1 时，清空影子，无需 state
@@ -269,13 +286,14 @@ public class IotDeviceShadowServiceImpl implements IotDeviceShadowService {
             }
 
             // 2.1 合并属性，并校验属性数
-            Map<String, Object> state = mergeMap(desired ? latest.getDesired() : latest.getReported(), values);
+            Map<String, Object> state = new HashMap<>(MapUtil.emptyIfNull(desired ? latest.getDesired() : latest.getReported()));
+            state.putAll(values);
             if (state.size() > MAX_PROPERTY_COUNT) {
                 throw exception(DEVICE_SHADOW_PROPERTY_COUNT_EXCEEDED);
             }
             // 2.2 记录属性的更新时间
             long now = DateUtil.currentSeconds();
-            Map<String, Object> metadata = mergeMap(latest.getMetadata(), null);
+            Map<String, Object> metadata = new HashMap<>(MapUtil.emptyIfNull(latest.getMetadata()));
             if (desired) {
                 IotDeviceShadowProtocolUtils.putDesiredTimestamps(metadata, values.keySet(), now);
             } else {
@@ -338,6 +356,9 @@ public class IotDeviceShadowServiceImpl implements IotDeviceShadowService {
         });
     }
 
+    /**
+     * 回复全量影子：设备 get 请求的回复，或 desired 更新后的主动推送（requestId 为空）
+     */
     private void sendShadowGetReply(IotDeviceDO device, String serverId, String requestId, IotDeviceShadowDO shadow) {
         sendShadowReply(device, serverId, requestId, SUCCESS.getCode(), SUCCESS.getMsg(),
                 IotDeviceShadowProtocolUtils.buildGetData(shadow.getDesired(), shadow.getReported(),
@@ -379,14 +400,6 @@ public class IotDeviceShadowServiceImpl implements IotDeviceShadowService {
         } catch (Exception ex) {
             log.error("[sendShadowReply][device({}) 下发影子回复失败]", device.getId(), ex);
         }
-    }
-
-    private static Map<String, Object> mergeMap(Map<String, Object> oldMap, Map<String, Object> newMap) {
-        Map<String, Object> result = oldMap != null ? new HashMap<>(oldMap) : new HashMap<>();
-        if (CollUtil.isNotEmpty(newMap)) {
-            result.putAll(newMap);
-        }
-        return result;
     }
 
 }

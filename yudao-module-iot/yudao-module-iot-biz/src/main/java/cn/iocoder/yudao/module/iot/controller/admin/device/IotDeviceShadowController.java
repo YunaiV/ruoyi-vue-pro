@@ -57,31 +57,23 @@ public class IotDeviceShadowController {
     public CommonResult<IotDeviceShadowRespVO> getDeviceShadow(@RequestParam("deviceId") Long deviceId) {
         IotDeviceDO device = deviceService.validateDeviceExists(deviceId);
         IotDeviceShadowDO shadow = deviceShadowService.getOrCreateShadow(device);
-
+        // 拼接 VO
         List<IotThingModelDO> thingModels = thingModelService.getThingModelListByProductIdAndType(
                 device.getProductId(), IotThingModelTypeEnum.PROPERTY.getType());
         Map<String, Object> desired = shadow.getDesired() != null ? shadow.getDesired() : MapUtil.empty();
         Map<String, Object> reported = shadow.getReported() != null ? shadow.getReported() : MapUtil.empty();
         Map<String, Object> metadata = shadow.getMetadata() != null ? shadow.getMetadata() : MapUtil.empty();
-        // 拼接 VO
         List<IotDeviceShadowPropertyRespVO> properties = convertList(thingModels, thingModel -> {
             ThingModelProperty prop = thingModel.getProperty();
             Assert.notNull(prop, "属性不能为空");
-            return new IotDeviceShadowPropertyRespVO()
-                    .setIdentifier(thingModel.getIdentifier()).setName(thingModel.getName())
-                    .setDataType(prop.getDataType()).setDataSpecs(prop.getDataSpecs())
-                    .setDataSpecsList(prop.getDataSpecsList())
-                    .setDesiredValue(desired.get(thingModel.getIdentifier()))
-                    .setReportedValue(reported.get(thingModel.getIdentifier()))
+            return new IotDeviceShadowPropertyRespVO().setIdentifier(thingModel.getIdentifier()).setName(thingModel.getName())
+                    .setDataType(prop.getDataType()).setDataSpecs(prop.getDataSpecs()).setDataSpecsList(prop.getDataSpecsList())
+                    .setDesiredValue(desired.get(thingModel.getIdentifier())).setReportedValue(reported.get(thingModel.getIdentifier()))
                     .setDesiredTime(IotDeviceShadowProtocolUtils.getDesiredTimestamp(metadata, thingModel.getIdentifier()))
                     .setReportedTime(IotDeviceShadowProtocolUtils.getReportedTimestamp(metadata, thingModel.getIdentifier()));
         });
-
         IotDeviceShadowRespVO respVO = BeanUtils.toBean(shadow, IotDeviceShadowRespVO.class)
-                .setProperties(properties)
-                .setDesired(desired)
-                .setReported(reported)
-                .setMetadata(metadata);
+                .setProperties(properties).setDesired(desired).setReported(reported).setMetadata(metadata);
         return success(respVO);
     }
 

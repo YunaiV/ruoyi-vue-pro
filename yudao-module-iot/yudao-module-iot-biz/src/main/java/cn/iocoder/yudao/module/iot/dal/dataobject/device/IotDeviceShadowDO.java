@@ -34,6 +34,8 @@ public class IotDeviceShadowDO extends TenantBaseDO {
     private Long id;
     /**
      * 设备编号
+     * <p>
+     * 关联 {@link IotDeviceDO#getId()}
      */
     private Long deviceId;
     /**

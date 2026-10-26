@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.iot.core.util;
 
 import cn.hutool.core.map.MapUtil;
+import lombok.experimental.UtilityClass;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,10 +14,8 @@ import java.util.Set;
  *
  * @author 芋道源码
  */
+@UtilityClass
 public final class IotDeviceShadowProtocolUtils {
-
-    private IotDeviceShadowProtocolUtils() {
-    }
 
     // ========== 内层 method（上行 params.method） ==========
 

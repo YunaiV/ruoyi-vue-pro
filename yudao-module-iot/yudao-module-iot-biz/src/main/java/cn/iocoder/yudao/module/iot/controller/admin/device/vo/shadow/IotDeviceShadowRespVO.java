@@ -21,7 +21,7 @@ public class IotDeviceShadowRespVO {
     @Schema(description = "最后更新时间（epoch 秒）", example = "1469564576")
     private Long shadowTime;
 
-    @Schema(description = "是否启用", example = "0")
+    @Schema(description = "影子状态", example = "0")
     private Integer status;
 
     @Schema(description = "属性对比列表")
