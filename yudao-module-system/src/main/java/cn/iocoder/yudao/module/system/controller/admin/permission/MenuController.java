@@ -67,10 +67,10 @@ public class MenuController {
     }
 
     @GetMapping("/list")
-    @Operation(summary = "获取菜单列表", description = "用于【菜单管理】界面")
+    @Operation(summary = "获取菜单列表", description = "用于【菜单管理】界面。在多租户的场景下，会只返回租户所在套餐有的菜单")
     @PreAuthorize("@ss.hasPermission('system:menu:query')")
     public CommonResult<List<MenuRespVO>> getMenuList(MenuListReqVO reqVO) {
-        List<MenuDO> list = menuService.getMenuList(reqVO);
+        List<MenuDO> list = menuService.getMenuListByTenant(reqVO);
         list.sort(Comparator.comparing(MenuDO::getSort));
         return success(BeanUtils.toBean(list, MenuRespVO.class));
     }
