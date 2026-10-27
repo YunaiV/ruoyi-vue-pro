@@ -206,41 +206,47 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void transferPermission(CrmPermissionTransferReqBO transferReqBO) {
-        // 1. 校验数据权限：是否是负责人，只有负责人才可以转移
-        CrmPermissionDO oldPermission = permissionMapper.selectByBizTypeAndBizIdByUserId(
-                transferReqBO.getBizType(), transferReqBO.getBizId(), transferReqBO.getUserId());
         String bizTypeName = CrmBizTypeEnum.getNameByType(transferReqBO.getBizType());
-        if ((oldPermission == null || !isOwner(oldPermission.getLevel()))
-                && !CrmPermissionUtils.isCrmAdmin()) { // 并且不是超管
-            throw exception(CRM_PERMISSION_DENIED, bizTypeName);
-        }
-        // 1.1 校验转移对象是否已经是该负责人
-        if (oldPermission != null && ObjUtil.equal(transferReqBO.getNewOwnerUserId(), oldPermission.getUserId())) {
-            throw exception(CRM_PERMISSION_MODEL_TRANSFER_FAIL_OWNER_USER_EXISTS, bizTypeName);
-        }
-        // 1.2 校验新负责人是否存在
-        adminUserApi.validateUserList(Collections.singletonList(transferReqBO.getNewOwnerUserId()));
-
-        // 2. 修改新负责人的权限
         List<CrmPermissionDO> permissions = permissionMapper.selectByBizTypeAndBizId(
                 transferReqBO.getBizType(), transferReqBO.getBizId()); // 获得所有数据权限
-        CrmPermissionDO permission = CollUtil.findOne(permissions,
+        // 1.1 校验数据权限：只有负责人，或者 CRM 管理员，才可以转移
+        CrmPermissionDO userPermission = CollUtil.findOne(permissions,
+                item -> ObjUtil.equal(item.getUserId(), transferReqBO.getUserId()));
+        boolean owner = userPermission != null && isOwner(userPermission.getLevel());
+        if (!owner && !CrmPermissionUtils.isCrmAdmin()) {
+            throw exception(CRM_PERMISSION_DENIED, bizTypeName);
+        }
+        // 1.2 获得老负责人的权限：操作人是负责人时，就是操作人的权限；否则（CRM 管理员），是数据实际的负责人，而不是管理员自己的团队权限
+        CrmPermissionDO oldOwnerPermission = owner ? userPermission
+                : CollUtil.findOne(permissions, item -> isOwner(item.getLevel()));
+        if (oldOwnerPermission == null) { // 数据缺少负责人时，在修改任何权限前失败，避免部分写入
+            throw exception(CRM_PERMISSION_NOT_EXISTS);
+        }
+        // 1.3 校验转移对象是否已经是该负责人
+        if (ObjUtil.equal(transferReqBO.getNewOwnerUserId(), oldOwnerPermission.getUserId())) {
+            throw exception(CRM_PERMISSION_MODEL_TRANSFER_FAIL_OWNER_USER_EXISTS, bizTypeName);
+        }
+        // 1.4 校验新负责人是否存在
+        adminUserApi.validateUserList(Collections.singletonList(transferReqBO.getNewOwnerUserId()));
+
+        // 2. 修改新负责人的权限：已在团队中时，提升为负责人，不重复新增
+        CrmPermissionDO newOwnerPermission = CollUtil.findOne(permissions,
                 item -> ObjUtil.equal(item.getUserId(), transferReqBO.getNewOwnerUserId()));
-        if (permission == null) {
+        if (newOwnerPermission == null) {
             permissionMapper.insert(new CrmPermissionDO().setBizType(transferReqBO.getBizType())
                     .setBizId(transferReqBO.getBizId()).setUserId(transferReqBO.getNewOwnerUserId())
                     .setLevel(CrmPermissionLevelEnum.OWNER.getLevel()));
         } else {
-            permissionMapper.updateById(new CrmPermissionDO().setId(permission.getId())
+            permissionMapper.updateById(new CrmPermissionDO().setId(newOwnerPermission.getId())
                     .setLevel(CrmPermissionLevelEnum.OWNER.getLevel()));
         }
 
         // 3. 修改老负责人的权限
         if (transferReqBO.getOldOwnerPermissionLevel() != null) {
-            permissionMapper.updateById(new CrmPermissionDO().setId(oldPermission.getId())
+            permissionMapper.updateById(new CrmPermissionDO().setId(oldOwnerPermission.getId())
                     .setLevel(transferReqBO.getOldOwnerPermissionLevel()));
         } else {
-            permissionMapper.deleteById(oldPermission.getId());
+            permissionMapper.deleteById(oldOwnerPermission.getId());
         }
     }
 
