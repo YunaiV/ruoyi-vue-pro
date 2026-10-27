@@ -15,9 +15,13 @@ public class DataPermissionContextHolder {
 
     /**
      * 使用 List 的原因，可能存在方法的嵌套调用
+     *
+     * 1. 直接创建子线程时，不继承，使用空 List。避免线程池中懒创建的线程，永久保留创建时的 DataPermission
+     * 2. TtlRunnable、TtlCallable 传递时，复制一份 List。避免父子线程共享同一个 List，导致子线程的入栈、出栈影响父线程
      */
     private static final ThreadLocal<LinkedList<DataPermission>> DATA_PERMISSIONS =
-            TransmittableThreadLocal.withInitial(LinkedList::new);
+            TransmittableThreadLocal.withInitialAndCopier(LinkedList::new,
+                    parentValue -> new LinkedList<>(), parentValue -> new LinkedList<>(parentValue));
 
     /**
      * 获得当前的 DataPermission 注解
