@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.mp.service.material;
 import cn.hutool.core.io.FileTypeUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ObjUtil;
+import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
@@ -16,6 +17,7 @@ import cn.iocoder.yudao.module.mp.dal.dataobject.material.MpMaterialDO;
 import cn.iocoder.yudao.module.mp.dal.mysql.material.MpMaterialMapper;
 import cn.iocoder.yudao.module.mp.framework.mp.core.MpServiceFactory;
 import cn.iocoder.yudao.module.mp.service.account.MpAccountService;
+import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.bean.result.WxMediaUploadResult;
 import me.chanjar.weixin.common.error.WxErrorException;
@@ -24,12 +26,15 @@ import me.chanjar.weixin.mp.bean.material.WxMpMaterialUploadResult;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.mp.enums.ErrorCodeConstants.*;
@@ -43,6 +48,15 @@ import static cn.iocoder.yudao.module.mp.enums.ErrorCodeConstants.*;
 @Validated
 @Slf4j
 public class MpMaterialServiceImpl implements MpMaterialService {
+
+    /**
+     * 临时文件的前缀
+     */
+    private static final String TEMP_FILE_PREFIX = "mp-material-";
+    /**
+     * 临时文件允许保留的扩展名格式
+     */
+    private static final Pattern TEMP_FILE_EXTENSION_PATTERN = Pattern.compile("^[a-zA-Z0-9]{1,16}$");
 
     @Resource
     private MpMaterialMapper mpMaterialMapper;
@@ -90,7 +104,7 @@ public class MpMaterialServiceImpl implements MpMaterialService {
         String url;
         try {
             // 写入到临时文件
-            file = FileUtil.newFile(FileUtil.getTmpDirPath() + reqVO.getFile().getOriginalFilename());
+            file = createTempFile(reqVO.getFile());
             reqVO.getFile().transferTo(file);
             // 上传到公众号
             result = mpService.getMaterialService().mediaUpload(reqVO.getType(), file);
@@ -122,7 +136,7 @@ public class MpMaterialServiceImpl implements MpMaterialService {
         String url;
         try {
             // 写入到临时文件
-            file = FileUtil.newFile(FileUtil.getTmpDirPath() + reqVO.getFile().getOriginalFilename());
+            file = createTempFile(reqVO.getFile());
             reqVO.getFile().transferTo(file);
             // 上传到公众号
             result = mpService.getMaterialService().materialFileUpload(reqVO.getType(),
@@ -150,7 +164,7 @@ public class MpMaterialServiceImpl implements MpMaterialService {
         File file = null;
         try {
             // 写入到临时文件
-            file = FileUtil.newFile(FileUtil.getTmpDirPath() + reqVO.getFile().getOriginalFilename());
+            file = createTempFile(reqVO.getFile());
             reqVO.getFile().transferTo(file);
             // 上传到公众号
             return mpService.getMaterialService().mediaImgUpload(file).getUrl();
@@ -219,6 +233,22 @@ public class MpMaterialServiceImpl implements MpMaterialService {
     private String uploadFile(String mediaId, File file) {
         String path = mediaId + "." + FileTypeUtil.getType(file);
         return fileApi.createFile(FileUtil.readBytes(file), path);
+    }
+
+    /**
+     * 创建上传到公众号的临时文件
+     *
+     * 使用随机的文件名独占创建，不拼接原始文件名，避免目录穿越覆盖、删除其它文件，以及并发同名互相影响；
+     * 仅保留合法的扩展名，用于公众号识别文件类型
+     *
+     * @param file 上传的文件
+     * @return 临时文件
+     */
+    @VisibleForTesting
+    static File createTempFile(MultipartFile file) throws IOException {
+        String extension = FileUtil.extName(file.getOriginalFilename());
+        String suffix = ReUtil.isMatch(TEMP_FILE_EXTENSION_PATTERN, extension) ? StrUtil.DOT + extension : null;
+        return Files.createTempFile(TEMP_FILE_PREFIX, suffix).toFile();
     }
 
 }
