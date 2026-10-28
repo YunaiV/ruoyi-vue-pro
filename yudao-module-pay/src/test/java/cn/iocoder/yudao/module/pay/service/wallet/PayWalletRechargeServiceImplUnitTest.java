@@ -1,17 +1,22 @@
 package cn.iocoder.yudao.module.pay.service.wallet;
 
 import cn.hutool.extra.spring.SpringUtil;
+import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.pay.api.refund.PayRefundApi;
+import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundCreateReqDTO;
 import cn.iocoder.yudao.module.pay.api.refund.dto.PayRefundRespDTO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.order.PayOrderDO;
+import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletDO;
 import cn.iocoder.yudao.module.pay.dal.dataobject.wallet.PayWalletRechargeDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.wallet.PayWalletRechargeMapper;
 import cn.iocoder.yudao.module.pay.enums.order.PayOrderStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.refund.PayRefundStatusEnum;
 import cn.iocoder.yudao.module.pay.enums.wallet.PayWalletBizTypeEnum;
+import cn.iocoder.yudao.module.pay.framework.pay.config.PayProperties;
 import cn.iocoder.yudao.module.pay.service.order.PayOrderService;
+import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,11 +31,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.module.pay.enums.ErrorCodeConstants.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -46,6 +53,9 @@ import static org.mockito.Mockito.*;
  *
  * 以及 {@link PayWalletRechargeServiceImpl#updateWalletRechargeRefunded(Long, String, Long)}：回调传入的退款单编号，
  * 必须等于充值记录绑定的退款单编号；已是退款终态的重复回调直接返回；先基于【未退款】状态更新退款字段成功，才操作一次钱包
+ *
+ * 以及 {@link PayWalletRechargeServiceImpl#refundWalletRecharge(Long, String)}：使用 FOR UPDATE 加锁读取充值记录后，
+ * 再校验、冻结余额、创建退款单，避免并发发起时重复冻结余额。注意：行锁、事务回滚的实际效果，需要在真实数据库中验证
  *
  * @author 芋道源码
  */
@@ -73,6 +83,10 @@ public class PayWalletRechargeServiceImplUnitTest extends BaseMockitoUnitTest {
      */
     private static final long OTHER_PAY_REFUND_ID = 400L;
     private static final String MERCHANT_REFUND_ID = RECHARGE_ID + "-refund";
+    private static final long USER_ID = 10L;
+    private static final Integer USER_TYPE = UserTypeEnum.MEMBER.getValue();
+    private static final String USER_IP = "127.0.0.1";
+    private static final String WALLET_PAY_APP_KEY = "wallet";
 
     @InjectMocks
     private PayWalletRechargeServiceImpl walletRechargeService;
@@ -85,6 +99,8 @@ public class PayWalletRechargeServiceImplUnitTest extends BaseMockitoUnitTest {
     private PayOrderService payOrderService;
     @Mock
     private PayRefundApi payRefundApi;
+    @Mock
+    private PayProperties payProperties;
 
     private MockedStatic<SpringUtil> springUtilMockedStatic;
 
@@ -184,6 +200,103 @@ public class PayWalletRechargeServiceImplUnitTest extends BaseMockitoUnitTest {
                         .setPrice(PAY_PRICE - 1), WALLET_RECHARGE_UPDATE_PAID_PAY_PRICE_NOT_MATCH),
                 Arguments.of("商户订单编号不一致", (UnaryOperator<PayOrderDO>) payOrder -> payOrder
                         .setMerchantOrderId(String.valueOf(RECHARGE_ID + 1)), WALLET_RECHARGE_UPDATE_PAID_PAY_ORDER_ID_ERROR));
+    }
+
+    // ========== refundWalletRecharge ==========
+
+    @Test
+    public void testRefundWalletRecharge_success() {
+        // mock 数据：已支付、未退款的充值记录；钱包余额刚好足够
+        mockRefundableRecharge(true, null);
+        when(payWalletService.getWallet(WALLET_ID)).thenReturn(buildWallet(TOTAL_PRICE));
+        // mock 方法（创建退款单）
+        when(payProperties.getWalletPayAppKey()).thenReturn(WALLET_PAY_APP_KEY);
+        when(payRefundApi.createRefund(argThat(reqDTO -> Objects.equals(reqDTO.getAppKey(), WALLET_PAY_APP_KEY)
+                && Objects.equals(reqDTO.getUserIp(), USER_IP)
+                && Objects.equals(reqDTO.getUserId(), USER_ID) && Objects.equals(reqDTO.getUserType(), USER_TYPE)
+                && Objects.equals(reqDTO.getMerchantOrderId(), String.valueOf(RECHARGE_ID))
+                && Objects.equals(reqDTO.getMerchantRefundId(), MERCHANT_REFUND_ID)
+                && Objects.equals(reqDTO.getPrice(), PAY_PRICE)))).thenReturn(PAY_REFUND_ID);
+
+        // 调用
+        walletRechargeService.refundWalletRecharge(RECHARGE_ID, USER_IP);
+        // 断言：加锁读取充值记录 -> 校验钱包 -> 冻结余额 -> 创建退款单 -> 回写退款单编号、未退款状态
+        InOrder inOrder = inOrder(walletRechargeMapper, payWalletService, payRefundApi);
+        inOrder.verify(walletRechargeMapper).selectOneForUpdate(any(SFunction.class), eq(RECHARGE_ID));
+        inOrder.verify(payWalletService).getWallet(WALLET_ID);
+        inOrder.verify(payWalletService).freezePrice(WALLET_ID, TOTAL_PRICE);
+        inOrder.verify(payRefundApi).createRefund(any(PayRefundCreateReqDTO.class));
+        inOrder.verify(walletRechargeMapper).updateById(argThat((PayWalletRechargeDO update) ->
+                Objects.equals(update.getId(), RECHARGE_ID) && Objects.equals(update.getPayRefundId(), PAY_REFUND_ID)
+                        && Objects.equals(update.getRefundStatus(), PayRefundStatusEnum.WAITING.getStatus())));
+        // 断言：没有使用普通（不加锁）的查询，也没有其它调用
+        verify(walletRechargeMapper, never()).selectById(any(Serializable.class));
+        verifyNoMoreInteractions(walletRechargeMapper, payWalletService, payRefundApi);
+    }
+
+    @Test
+    public void testRefundWalletRecharge_refunded() {
+        // mock 数据：已绑定退款单的充值记录，例如说并发发起时，前一个请求已提交
+        mockRefundableRecharge(true, PAY_REFUND_ID);
+
+        // 调用，并断言异常
+        assertServiceException(() -> walletRechargeService.refundWalletRecharge(RECHARGE_ID, USER_IP),
+                WALLET_RECHARGE_REFUND_FAIL_REFUNDED);
+        assertNoRefundWalletRechargeSideEffect();
+    }
+
+    @Test
+    public void testRefundWalletRecharge_notPaid() {
+        // mock 数据：未支付的充值记录
+        mockRefundableRecharge(false, null);
+
+        // 调用，并断言异常
+        assertServiceException(() -> walletRechargeService.refundWalletRecharge(RECHARGE_ID, USER_IP),
+                WALLET_RECHARGE_REFUND_FAIL_NOT_PAID);
+        assertNoRefundWalletRechargeSideEffect();
+    }
+
+    @Test
+    public void testRefundWalletRecharge_notFound() {
+        // 调用（充值记录不存在），并断言异常
+        assertServiceException(() -> walletRechargeService.refundWalletRecharge(RECHARGE_ID, USER_IP),
+                WALLET_RECHARGE_NOT_FOUND);
+        assertNoRefundWalletRechargeSideEffect();
+    }
+
+    @Test
+    public void testRefundWalletRecharge_balanceNotEnough() {
+        // mock 数据：已支付、未退款的充值记录；钱包余额不足
+        mockRefundableRecharge(true, null);
+        when(payWalletService.getWallet(WALLET_ID)).thenReturn(buildWallet(TOTAL_PRICE - 1));
+
+        // 调用，并断言异常
+        assertServiceException(() -> walletRechargeService.refundWalletRecharge(RECHARGE_ID, USER_IP),
+                WALLET_RECHARGE_REFUND_BALANCE_NOT_ENOUGH);
+        // 断言：不冻结余额、不创建退款单、不回写充值记录
+        verify(walletRechargeMapper).selectOneForUpdate(any(SFunction.class), eq(RECHARGE_ID));
+        verifyNoMoreInteractions(walletRechargeMapper);
+        verify(payWalletService).getWallet(WALLET_ID);
+        verifyNoMoreInteractions(payWalletService);
+        verifyNoInteractions(payRefundApi);
+    }
+
+    @Test
+    public void testRefundWalletRecharge_createRefundFail() {
+        // mock 数据：已支付、未退款的充值记录
+        mockRefundableRecharge(true, null);
+        when(payWalletService.getWallet(WALLET_ID)).thenReturn(buildWallet(TOTAL_PRICE));
+        // mock 方法（创建退款单失败）
+        when(payProperties.getWalletPayAppKey()).thenReturn(WALLET_PAY_APP_KEY);
+        when(payRefundApi.createRefund(any(PayRefundCreateReqDTO.class))).thenThrow(exception(REFUND_HAS_REFUNDING));
+
+        // 调用，并断言异常
+        assertServiceException(() -> walletRechargeService.refundWalletRecharge(RECHARGE_ID, USER_IP),
+                REFUND_HAS_REFUNDING);
+        // 断言：异常向上抛出，不回写退款单编号。注意：冻结余额的撤销依赖 @Transactional 回滚，此处 mock 环境不验证
+        verify(walletRechargeMapper).selectOneForUpdate(any(SFunction.class), eq(RECHARGE_ID));
+        verifyNoMoreInteractions(walletRechargeMapper);
+        verify(payWalletService).freezePrice(WALLET_ID, TOTAL_PRICE);
     }
 
     // ========== updateWalletRechargeRefunded ==========
@@ -360,6 +473,18 @@ public class PayWalletRechargeServiceImplUnitTest extends BaseMockitoUnitTest {
         when(walletRechargeMapper.selectById(RECHARGE_ID)).thenReturn(recharge);
     }
 
+    private void mockRefundableRecharge(boolean payStatus, Long payRefundId) {
+        PayWalletRechargeDO recharge = new PayWalletRechargeDO().setId(RECHARGE_ID).setWalletId(WALLET_ID)
+                .setPayStatus(payStatus).setPayOrderId(PAY_ORDER_ID)
+                .setPayPrice(PAY_PRICE).setBonusPrice(TOTAL_PRICE - PAY_PRICE).setTotalPrice(TOTAL_PRICE)
+                .setPayRefundId(payRefundId);
+        when(walletRechargeMapper.selectOneForUpdate(any(SFunction.class), eq(RECHARGE_ID))).thenReturn(recharge);
+    }
+
+    private static PayWalletDO buildWallet(int balance) {
+        return new PayWalletDO().setId(WALLET_ID).setUserId(USER_ID).setUserType(USER_TYPE).setBalance(balance);
+    }
+
     private static PayRefundRespDTO buildPayRefund(PayRefundStatusEnum status) {
         return new PayRefundRespDTO().setId(PAY_REFUND_ID).setStatus(status.getStatus())
                 .setRefundPrice(PAY_PRICE).setMerchantOrderId(String.valueOf(RECHARGE_ID))
@@ -374,6 +499,15 @@ public class PayWalletRechargeServiceImplUnitTest extends BaseMockitoUnitTest {
         verifyNoMoreInteractions(walletRechargeMapper);
         verifyNoInteractions(payOrderService, payWalletService);
         springUtilMockedStatic.verifyNoInteractions();
+    }
+
+    /**
+     * 断言：只加锁查询了充值记录，没有查询钱包、冻结余额、创建退款单或写入充值记录
+     */
+    private void assertNoRefundWalletRechargeSideEffect() {
+        verify(walletRechargeMapper).selectOneForUpdate(any(SFunction.class), eq(RECHARGE_ID));
+        verifyNoMoreInteractions(walletRechargeMapper);
+        verifyNoInteractions(payWalletService, payRefundApi);
     }
 
     /**

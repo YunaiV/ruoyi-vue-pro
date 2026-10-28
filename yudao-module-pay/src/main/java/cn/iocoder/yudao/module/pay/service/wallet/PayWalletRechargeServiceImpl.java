@@ -197,8 +197,10 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void refundWalletRecharge(Long id, String userIp) {
-        // 1.1 获取钱包充值记录
-        PayWalletRechargeDO walletRecharge = walletRechargeMapper.selectById(id);
+        // 1.1 获取钱包充值记录，并使用 FOR UPDATE 锁定
+        // 原因是：并发发起退款时，避免都读到未退款（payRefundId 为空）的旧记录，导致重复冻结余额。
+        // 加锁后，同一充值记录串行发起：后发起的请求等待前一个事务提交，读取到已绑定的退款单，从而拒绝重复退款
+        PayWalletRechargeDO walletRecharge = walletRechargeMapper.selectOneForUpdate(PayWalletRechargeDO::getId, id);
         if (walletRecharge == null) {
             log.error("[refundWalletRecharge][钱包充值记录不存在，钱包充值记录 id({})]", id);
             throw exception(WALLET_RECHARGE_NOT_FOUND);
