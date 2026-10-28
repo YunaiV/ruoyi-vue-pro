@@ -76,6 +76,7 @@ public interface ErrorCodeConstants {
     ErrorCode CRM_PERMISSION_DELETE_SELF_PERMISSION_FAIL_EXIST_OWNER = new ErrorCode(1_020_007_007, "删除数据权限失败，原因：不能删除负责人");
     ErrorCode CRM_PERMISSION_CREATE_FAIL = new ErrorCode(1_020_007_008, "创建数据权限失败，原因：所加用户已有权限");
     ErrorCode CRM_PERMISSION_CREATE_FAIL_EXISTS = new ErrorCode(1_020_007_009, "同时添加数据权限失败，原因：用户【{}】已有模块【{}】数据【{}】的【{}】权限");
+    ErrorCode CRM_PERMISSION_MODEL_TRANSFER_FAIL_OLD_OWNER_PERMISSION_LEVEL_ERROR = new ErrorCode(1_020_007_010, "{}操作失败，原因：老负责人的权限级别只能是只读或读写");
 
     // ========== 产品 1_020_008_000 ==========
     ErrorCode PRODUCT_NOT_EXISTS = new ErrorCode(1_020_008_000, "产品不存在");

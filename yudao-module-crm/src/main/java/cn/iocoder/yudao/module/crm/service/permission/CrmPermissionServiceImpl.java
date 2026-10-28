@@ -34,6 +34,8 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.crm.enums.ErrorCodeConstants.*;
 import static cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum.isOwner;
+import static cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum.isRead;
+import static cn.iocoder.yudao.module.crm.enums.permission.CrmPermissionLevelEnum.isWrite;
 
 /**
  * CRM 数据权限 Service 接口实现类
@@ -216,17 +218,22 @@ public class CrmPermissionServiceImpl implements CrmPermissionService {
         if (!owner && !CrmPermissionUtils.isCrmAdmin()) {
             throw exception(CRM_PERMISSION_DENIED, bizTypeName);
         }
-        // 1.2 获得老负责人的权限：操作人是负责人时，就是操作人的权限；否则（CRM 管理员），是数据实际的负责人，而不是管理员自己的团队权限
+        // 1.2 校验老负责人的权限级别：为空时表示移除，否则只能是只读或读写，避免出现多个负责人
+        Integer oldOwnerPermissionLevel = transferReqBO.getOldOwnerPermissionLevel();
+        if (oldOwnerPermissionLevel != null && !isRead(oldOwnerPermissionLevel) && !isWrite(oldOwnerPermissionLevel)) {
+            throw exception(CRM_PERMISSION_MODEL_TRANSFER_FAIL_OLD_OWNER_PERMISSION_LEVEL_ERROR, bizTypeName);
+        }
+        // 1.3 获得老负责人的权限：操作人是负责人时，就是操作人的权限；否则（CRM 管理员），是数据实际的负责人，而不是管理员自己的团队权限
         CrmPermissionDO oldOwnerPermission = owner ? userPermission
                 : CollUtil.findOne(permissions, item -> isOwner(item.getLevel()));
         if (oldOwnerPermission == null) { // 数据缺少负责人时，在修改任何权限前失败，避免部分写入
             throw exception(CRM_PERMISSION_NOT_EXISTS);
         }
-        // 1.3 校验转移对象是否已经是该负责人
+        // 1.4 校验转移对象是否已经是该负责人
         if (ObjUtil.equal(transferReqBO.getNewOwnerUserId(), oldOwnerPermission.getUserId())) {
             throw exception(CRM_PERMISSION_MODEL_TRANSFER_FAIL_OWNER_USER_EXISTS, bizTypeName);
         }
-        // 1.4 校验新负责人是否存在
+        // 1.5 校验新负责人是否存在
         adminUserApi.validateUserList(Collections.singletonList(transferReqBO.getNewOwnerUserId()));
 
         // 2. 修改新负责人的权限：已在团队中时，提升为负责人，不重复新增

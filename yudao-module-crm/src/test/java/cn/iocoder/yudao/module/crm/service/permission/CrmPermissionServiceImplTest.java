@@ -15,6 +15,8 @@ import cn.iocoder.yudao.module.system.enums.permission.RoleCodeEnum;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
@@ -244,6 +246,78 @@ public class CrmPermissionServiceImplTest extends BaseMockitoUnitTest {
         assertServiceException(() -> permissionService.transferPermission(buildTransferReqBO(NEW_OWNER_USER_ID, null)),
                 USER_NOT_EXISTS);
         assertNoPermissionWrite();
+    }
+
+    // ========== 老负责人的权限级别 ==========
+
+    @Test
+    public void testTransferPermission_ownerKeepOldOwnerRead() {
+        // mock 数据：当前用户是负责人，新负责人不在团队中
+        mockPermissions(buildPermission(LOGIN_USER_PERMISSION_ID, LOGIN_USER_ID, CrmPermissionLevelEnum.OWNER));
+
+        // 调用：老负责人保留为 READ
+        permissionService.transferPermission(buildTransferReqBO(NEW_OWNER_USER_ID, CrmPermissionLevelEnum.READ.getLevel()));
+        // 断言：新增新负责人；老负责人（当前用户）改为 READ
+        verify(permissionMapper).selectByBizTypeAndBizId(BIZ_TYPE, BIZ_ID);
+        verifyNewOwnerInserted();
+        verifyLevelUpdated(LOGIN_USER_PERMISSION_ID, CrmPermissionLevelEnum.READ);
+        verifyNoMoreInteractions(permissionMapper);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {1, 0, -1, 4, Integer.MAX_VALUE, Integer.MIN_VALUE}) // 1 是 OWNER，其它是不存在的级别
+    public void testTransferPermission_ownerInvalidOldOwnerPermissionLevel(int oldOwnerPermissionLevel) {
+        // mock 数据：当前用户是负责人
+        mockPermissions(buildPermission(LOGIN_USER_PERMISSION_ID, LOGIN_USER_ID, CrmPermissionLevelEnum.OWNER));
+
+        // 调用，并断言异常：在修改任何权限前失败
+        assertServiceException(() -> permissionService.transferPermission(buildTransferReqBO(NEW_OWNER_USER_ID, oldOwnerPermissionLevel)),
+                CRM_PERMISSION_MODEL_TRANSFER_FAIL_OLD_OWNER_PERMISSION_LEVEL_ERROR, BIZ_TYPE_NAME);
+        assertNoPermissionWrite();
+        verifyNoInteractions(adminUserApi);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {1, 0, -1, 4, Integer.MAX_VALUE, Integer.MIN_VALUE}) // 1 是 OWNER，其它是不存在的级别
+    public void testTransferPermission_crmAdminInvalidOldOwnerPermissionLevel(int oldOwnerPermissionLevel) {
+        // mock 数据：CRM 管理员没有权限，数据的负责人是其他人（修复前：老负责人被更新回 OWNER，留下两个负责人）
+        mockPermissions(buildPermission(OWNER_PERMISSION_ID, OWNER_USER_ID, CrmPermissionLevelEnum.OWNER));
+        mockCrmAdmin(true);
+
+        // 调用，并断言异常：在修改任何权限前失败
+        assertServiceException(() -> permissionService.transferPermission(buildTransferReqBO(NEW_OWNER_USER_ID, oldOwnerPermissionLevel)),
+                CRM_PERMISSION_MODEL_TRANSFER_FAIL_OLD_OWNER_PERMISSION_LEVEL_ERROR, BIZ_TYPE_NAME);
+        assertNoPermissionWrite();
+        verifyNoInteractions(adminUserApi);
+    }
+
+    @Test
+    public void testTransferPermission_teamMemberDeniedBeforeOldOwnerPermissionLevel() {
+        // mock 数据：当前用户只有 WRITE 团队权限，不是 CRM 管理员
+        mockPermissions(buildPermission(OWNER_PERMISSION_ID, OWNER_USER_ID, CrmPermissionLevelEnum.OWNER),
+                buildPermission(LOGIN_USER_PERMISSION_ID, LOGIN_USER_ID, CrmPermissionLevelEnum.WRITE));
+        mockCrmAdmin(false);
+
+        // 调用，并断言异常：先校验数据权限，再校验老负责人的权限级别
+        assertServiceException(() -> permissionService.transferPermission(buildTransferReqBO(NEW_OWNER_USER_ID,
+                        CrmPermissionLevelEnum.OWNER.getLevel())),
+                CRM_PERMISSION_DENIED, BIZ_TYPE_NAME);
+        assertNoPermissionWrite();
+        verifyNoInteractions(adminUserApi);
+    }
+
+    @Test
+    public void testTransferPermission_crmAdminOldOwnerPermissionLevelBeforeOwnerNotExists() {
+        // mock 数据：CRM 管理员有 WRITE 团队权限，但数据缺少负责人
+        mockPermissions(buildPermission(LOGIN_USER_PERMISSION_ID, LOGIN_USER_ID, CrmPermissionLevelEnum.WRITE));
+        mockCrmAdmin(true);
+
+        // 调用，并断言异常：先校验老负责人的权限级别（请求参数），再校验数据的负责人
+        assertServiceException(() -> permissionService.transferPermission(buildTransferReqBO(NEW_OWNER_USER_ID,
+                        CrmPermissionLevelEnum.OWNER.getLevel())),
+                CRM_PERMISSION_MODEL_TRANSFER_FAIL_OLD_OWNER_PERMISSION_LEVEL_ERROR, BIZ_TYPE_NAME);
+        assertNoPermissionWrite();
+        verifyNoInteractions(adminUserApi);
     }
 
     private void mockCrmAdmin(boolean crmAdmin) {
