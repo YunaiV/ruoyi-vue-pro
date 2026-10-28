@@ -33,7 +33,7 @@ public class MidjourneyApi {
     private final Predicate<HttpStatusCode> STATUS_PREDICATE = status -> !status.is2xxSuccessful();
 
     private final Function<Object, Function<ClientResponse, Mono<? extends Throwable>>> EXCEPTION_FUNCTION =
-            reqParam -> response -> response.bodyToMono(String.class).handle((responseBody, sink) -> {
+            reqParam -> response -> response.bodyToMono(String.class).defaultIfEmpty("").handle((responseBody, sink) -> {
                 HttpRequest request = response.request();
                 log.error("[midjourney-api] 调用失败！请求方式:[{}]，请求地址:[{}]，请求参数:[{}]，响应数据: [{}]",
                         request.getMethod(), request.getURI(), reqParam, responseBody);
@@ -53,6 +53,10 @@ public class MidjourneyApi {
                 .defaultHeaders(httpHeaders -> {
                     httpHeaders.setContentType(MediaType.APPLICATION_JSON);
                     httpHeaders.setBearerAuth(apiKey);
+                    // 兼容 novicezk/midjourney-proxy：开启 mj.api-secret 后，通过 mj-api-secret 请求头鉴权
+                    if (StrUtil.isNotEmpty(apiKey)) {
+                        httpHeaders.set("mj-api-secret", apiKey);
+                    }
                 })
                 .build();
         this.notifyUrl = notifyUrl;
