@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol;
 
 import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
+import io.vertx.core.Vertx;
 
 /**
  * IoT 协议接口
@@ -48,5 +49,14 @@ public interface IotProtocol {
      * @return 是否正在运行
      */
     boolean isRunning();
+
+    /**
+     * 获取协议的 Vert.x 实例：阻塞的处理（数据解析脚本、发送消息）切到它的 worker 上执行
+     *
+     * @return Vert.x 实例；没有使用 Vert.x 的协议（CoAP）返回 null
+     */
+    default Vertx getVertx() {
+        return null;
+    }
 
 }

@@ -11,6 +11,7 @@ import cn.iocoder.yudao.module.iot.core.biz.IotDeviceCommonApi;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceAuthReqDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceRespDTO;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
+import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.topic.IotDeviceIdentity;
 import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterReqDTO;
@@ -20,10 +21,14 @@ import cn.iocoder.yudao.module.iot.gateway.protocol.websocket.manager.IotWebSock
 import cn.iocoder.yudao.module.iot.gateway.serialize.IotMessageSerializer;
 import cn.iocoder.yudao.module.iot.gateway.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
+import cn.iocoder.yudao.module.iot.gateway.util.IotWorkerTaskQueue;
 import io.vertx.core.Handler;
+import io.vertx.core.Vertx;
 import io.vertx.core.http.ServerWebSocket;
 import lombok.extern.slf4j.Slf4j;
 import cn.hutool.core.lang.Assert;
+
+import java.util.concurrent.RejectedExecutionException;
 
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -77,17 +82,28 @@ public class IotWebSocketUpstreamHandler implements Handler<ServerWebSocket> {
             log.warn("[handle][连接异常，地址: {}]", remoteAddress, ex);
             socket.close();
         });
+        // 本连接的 worker 队列：业务消息（text 帧）、透传帧（binary 帧）的发送会阻塞，按收到的顺序在 worker 上执行；离线消息排在它们之后
+        IotWorkerTaskQueue queue = new IotWorkerTaskQueue(Vertx.currentContext());
         socket.closeHandler(v -> {
             log.debug("[handle][连接关闭，地址: {}]", remoteAddress);
-            cleanupConnection(socket);
+            cleanupConnection(socket, queue);
         });
 
-        // 2. 设置消息处理器（仅支持文本帧）
+        // 2. 设置 text 帧处理器：认证、注册、标准业务消息
         socket.textMessageHandler(message -> {
             try {
-                processMessage(StrUtil.utf8Bytes(message), socket);
+                processMessage(StrUtil.utf8Bytes(message), socket, queue);
             } catch (Exception e) {
                 log.error("[handle][消息解码失败，断开连接，地址: {}，错误: {}]", remoteAddress, e.getMessage());
+                socket.close();
+            }
+        });
+        // 3. 设置 binary 帧处理器：透传上报，必须先通过 text 帧认证
+        socket.binaryMessageHandler(buffer -> {
+            try {
+                processRawMessage(buffer.getBytes(), socket, remoteAddress, queue);
+            } catch (Exception e) {
+                log.error("[handle][透传消息处理失败，断开连接，地址: {}，错误: {}]", remoteAddress, e.getMessage());
                 socket.close();
             }
         });
@@ -98,8 +114,9 @@ public class IotWebSocketUpstreamHandler implements Handler<ServerWebSocket> {
      *
      * @param payload  消息负载
      * @param socket   WebSocket 连接
+     * @param queue    本连接的 worker 队列
      */
-    private void processMessage(byte[] payload, ServerWebSocket socket) {
+    private void processMessage(byte[] payload, ServerWebSocket socket, IotWorkerTaskQueue queue) {
         IotDeviceMessage message = null;
         try {
             // 1.1 基础检查
@@ -117,7 +134,7 @@ public class IotWebSocketUpstreamHandler implements Handler<ServerWebSocket> {
             } else if (IotDeviceMessageMethodEnum.DEVICE_REGISTER.getMethod().equals(message.getMethod())) {
                 handleRegisterRequest(message, socket);
             } else {
-                handleBusinessRequest(message, socket);
+                handleBusinessRequest(message, socket, queue);
             }
         } catch (ServiceException e) {
             log.warn("[processMessage][业务异常，错误: {}]", e.getMessage());
@@ -202,12 +219,13 @@ public class IotWebSocketUpstreamHandler implements Handler<ServerWebSocket> {
     }
 
     /**
-     * 处理业务请求
+     * 处理业务请求：认证检查在 event loop 上；获取设备、发送总线会阻塞，交给本连接的 worker 队列按收到的顺序执行
      *
      * @param message  消息信息
      * @param socket   WebSocket 连接
+     * @param queue    本连接的 worker 队列
      */
-    private void handleBusinessRequest(IotDeviceMessage message, ServerWebSocket socket) {
+    private void handleBusinessRequest(IotDeviceMessage message, ServerWebSocket socket, IotWorkerTaskQueue queue) {
         // 1. 获取认证信息并处理业务消息
         IotWebSocketConnectionManager.ConnectionInfo connectionInfo = connectionManager.getConnectionInfo(socket);
         if (connectionInfo == null) {
@@ -217,10 +235,81 @@ public class IotWebSocketUpstreamHandler implements Handler<ServerWebSocket> {
             return;
         }
 
-        // 2. 发送消息到消息总线
-        deviceMessageService.sendDeviceMessage(message, connectionInfo.getProductKey(),
-                connectionInfo.getDeviceName(), serverId);
-        log.info("[handleBusinessRequest][发送消息到消息总线，消息: {}]", message);
+        // 2. 发送消息到消息总线（worker）：成功不应答（与原来一致）；失败回到 event loop 应答错误
+        queue.submit(() -> {
+            deviceMessageService.sendDeviceMessage(message, connectionInfo.getProductKey(),
+                    connectionInfo.getDeviceName(), serverId);
+            return null;
+        }).onComplete(ar -> {
+            if (ar.succeeded()) {
+                log.info("[handleBusinessRequest][发送消息到消息总线，消息: {}]", message);
+                return;
+            }
+            handleBusinessFailure(message, socket, ar.cause());
+        });
+    }
+
+    /**
+     * 业务消息在 worker 上处理失败（event loop 上执行）：与同步处理时的异常应答一致
+     *
+     * @param message 消息信息
+     * @param socket  WebSocket 连接
+     * @param e       异常
+     */
+    private void handleBusinessFailure(IotDeviceMessage message, ServerWebSocket socket, Throwable e) {
+        if (e instanceof RejectedExecutionException) { // 队列已满：断开连接，由设备重连
+            log.error("[handleBusinessFailure][业务消息积压，断开连接，地址: {}，错误: {}]", socket.remoteAddress(), e.getMessage());
+            socket.close();
+            return;
+        }
+        if (e instanceof ServiceException) {
+            log.warn("[handleBusinessFailure][业务异常，错误: {}]", e.getMessage());
+            sendErrorResponse(socket, message.getRequestId(), message.getMethod(),
+                    ((ServiceException) e).getCode(), e.getMessage());
+            return;
+        }
+        if (e instanceof IllegalArgumentException) {
+            log.warn("[handleBusinessFailure][参数校验失败，错误: {}]", e.getMessage());
+            sendErrorResponse(socket, message.getRequestId(), message.getMethod(), BAD_REQUEST.getCode(), e.getMessage());
+            return;
+        }
+        // 其他异常：返回 500，并断开连接
+        log.error("[handleBusinessFailure][处理消息失败]", e);
+        sendErrorResponse(socket, message.getRequestId(), message.getMethod(), INTERNAL_SERVER_ERROR.getCode(),
+                INTERNAL_SERVER_ERROR.getMsg());
+        socket.close();
+    }
+
+    /**
+     * 处理透传上报（binary 帧）：原始字节按产品的数据解析脚本 decode 后发送；会阻塞，交给本连接的 worker 队列按顺序执行
+     *
+     * @param payload       原始字节
+     * @param socket        WebSocket 连接
+     * @param remoteAddress 远程地址
+     * @param queue         本连接的 worker 队列
+     */
+    private void processRawMessage(byte[] payload, ServerWebSocket socket, String remoteAddress,
+                                   IotWorkerTaskQueue queue) {
+        // 1. 未认证的 binary 帧：断开连接
+        IotWebSocketConnectionManager.ConnectionInfo connectionInfo = connectionManager.getConnectionInfo(socket);
+        if (connectionInfo == null) {
+            log.warn("[processRawMessage][未认证的 binary 帧，断开连接，地址: {}]", remoteAddress);
+            socket.close();
+            return;
+        }
+
+        // 2. 交给本连接的 worker 队列：截止时间从收到（入队之前）开始计算
+        long receivedNanos = System.nanoTime();
+        queue.submit(() -> deviceMessageService.sendRawMessage(payload, connectionInfo.getProductKey(),
+                connectionInfo.getDeviceName(), serverId, IotProtocolTypeEnum.WEBSOCKET, receivedNanos)).onFailure(e -> {
+            if (e instanceof RejectedExecutionException) { // 队列已满：断开连接，由设备重连
+                log.error("[processRawMessage][透传上报积压，断开连接，地址: {}，错误: {}]", remoteAddress, e.getMessage());
+                socket.close();
+                return;
+            }
+            log.warn("[processRawMessage][透传上报处理失败，地址: {}，数据长度: {} 字节，错误: {}]",
+                    remoteAddress, payload.length, e.getMessage());
+        });
     }
 
     /**
@@ -256,22 +345,30 @@ public class IotWebSocketUpstreamHandler implements Handler<ServerWebSocket> {
      * 清理连接
      *
      * @param socket WebSocket 连接
+     * @param queue  本连接的 worker 队列
      */
-    private void cleanupConnection(ServerWebSocket socket) {
-        try {
-            // 1. 发送离线消息（如果已认证）
-            IotWebSocketConnectionManager.ConnectionInfo connectionInfo = connectionManager.getConnectionInfo(socket);
-            if (connectionInfo != null) {
-                IotDeviceMessage offlineMessage = IotDeviceMessage.buildStateOffline();
-                deviceMessageService.sendDeviceMessage(offlineMessage, connectionInfo.getProductKey(),
-                        connectionInfo.getDeviceName(), serverId);
-            }
-
-            // 2. 注销连接
-            connectionManager.unregisterConnection(socket);
-        } catch (Exception e) {
-            log.error("[cleanupConnection][清理连接失败]", e);
+    private void cleanupConnection(ServerWebSocket socket, IotWorkerTaskQueue queue) {
+        // 1. 注销连接
+        IotWebSocketConnectionManager.ConnectionInfo connectionInfo = connectionManager.getConnectionInfo(socket);
+        connectionManager.unregisterConnection(socket);
+        if (connectionInfo == null) {
+            return;
         }
+
+        // 2. 发送离线消息（如果已认证）：排在本连接已收到的业务消息、透传帧之后；执行时设备已在新连接上线，则不再发送
+        queue.submitLast(() -> {
+            if (connectionManager.getConnectionInfoByDeviceId(connectionInfo.getDeviceId()) != null) {
+                return null;
+            }
+            deviceMessageService.sendDeviceMessage(IotDeviceMessage.buildStateOffline(),
+                    connectionInfo.getProductKey(), connectionInfo.getDeviceName(), serverId);
+            // 发送期间设备在新连接上线（它的上线消息可能先于离线消息）：补发上线消息，避免在线设备被标记为离线
+            if (connectionManager.getConnectionInfoByDeviceId(connectionInfo.getDeviceId()) != null) {
+                deviceMessageService.sendDeviceMessage(IotDeviceMessage.buildStateUpdateOnline(),
+                        connectionInfo.getProductKey(), connectionInfo.getDeviceName(), serverId);
+            }
+            return null;
+        }).onFailure(e -> log.error("[cleanupConnection][清理连接失败]", e));
     }
 
     // ===================== 发送响应消息 =====================

@@ -7,8 +7,12 @@ import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.manager.IotMqttConnecti
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import cn.iocoder.yudao.module.iot.gateway.util.IotMqttTopicUtils;
 import io.netty.handler.codec.mqtt.MqttQoS;
+import io.vertx.core.Future;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.iot.gateway.enums.ErrorCodeConstants.DEVICE_OFFLINE_OR_WRITE_FAILED;
 
 /**
  * IoT 网关 MQTT 协议：下行消息处理器
@@ -65,6 +69,30 @@ public class IotMqttDownstreamHandler {
             log.error("[handle][处理下行消息失败，设备 ID: {}，方法: {}，消息内容: {}]",
                     message.getDeviceId(), message.getMethod(), message, e);
         }
+    }
+
+    /**
+     * 处理透传下行（raw.push 或编码脚本的输出）：原始字节发布到 raw/push 主题
+     *
+     * @param message 下行消息
+     * @param bytes   要写出的原始字节
+     * @return 提交结果：设备离线或发送失败时失败；成功只表示 publish 已提交，晚到的写出失败由连接管理器记日志
+     */
+    public Future<Void> handleRawMessage(IotDeviceMessage message, byte[] bytes) {
+        // 1. 检查设备连接
+        IotMqttConnectionManager.ConnectionInfo connectionInfo = connectionManager.getConnectionInfoByDeviceId(
+                message.getDeviceId());
+        if (connectionInfo == null) {
+            log.warn("[handleRawMessage][连接信息不存在，设备 ID: {}，方法: {}，消息 ID: {}]",
+                    message.getDeviceId(), message.getMethod(), message.getId());
+            return Future.failedFuture(exception(DEVICE_OFFLINE_OR_WRITE_FAILED));
+        }
+
+        // 2. 发布到 raw/push 主题
+        String topic = IotMqttTopicUtils.buildRawPushTopic(connectionInfo.getProductKey(), connectionInfo.getDeviceName());
+        boolean success = connectionManager.sendToDevice(message.getDeviceId(), topic, bytes,
+                MqttQoS.AT_LEAST_ONCE.value(), false);
+        return success ? Future.succeededFuture() : Future.failedFuture(exception(DEVICE_OFFLINE_OR_WRITE_FAILED));
     }
 
 }

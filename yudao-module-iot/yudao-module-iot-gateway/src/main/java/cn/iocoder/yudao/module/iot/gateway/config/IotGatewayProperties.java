@@ -13,6 +13,7 @@ import cn.iocoder.yudao.module.iot.gateway.protocol.websocket.IotWebSocketConfig
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
@@ -33,6 +34,11 @@ public class IotGatewayProperties {
      * Token 配置
      */
     private TokenProperties token;
+    /**
+     * 数据解析脚本配置
+     */
+    @Valid
+    private ScriptProperties script = new ScriptProperties();
 
     /**
      * 协议实例列表
@@ -73,6 +79,41 @@ public class IotGatewayProperties {
          */
         @NotNull(message = "令牌有效期不能为空")
         private Duration expiration;
+
+    }
+
+    /**
+     * 数据解析脚本配置
+     */
+    @Data
+    public static class ScriptProperties {
+
+        /**
+         * 是否开启数据解析脚本功能（运维开关，默认关闭）
+         * <p>
+         * 关闭时整体绕开脚本：不执行、不预热；raw 上行纯透传，标准下行与未开启时相同，raw.push 照常写出
+         */
+        private boolean enabled = false;
+        /**
+         * 透传处理的截止时间：raw 上行（含 HTTP / CoAP 同一请求内应答）、脚本下行、透传回复，从收到（入队）开始计算，
+         * 覆盖排队与执行脚本
+         */
+        @NotNull(message = "透传处理截止时间不能为空")
+        private Duration deadline = Duration.ofMillis(2000);
+        /**
+         * 单次脚本执行的时间预算：与截止时间取较早者
+         */
+        @NotNull(message = "脚本执行时间预算不能为空")
+        private Duration execBudget = Duration.ofMillis(500);
+        /**
+         * 单次脚本执行的指令上限
+         */
+        private long maxInstructions = 1_000_000;
+        /**
+         * 每个设备最多排队的脚本下行指令数（不含执行中的一条）：超过时丢弃并记日志
+         */
+        @Positive(message = "每个设备最多排队的下行指令数必须大于 0")
+        private int maxPendingCommandsPerDevice = 256;
 
     }
 

@@ -32,7 +32,8 @@
             msg STRING FIELD,
             report_time STRING FIELD,
             tenant_id STRING FIELD,
-            code STRING FIELD
+            code STRING FIELD,
+            raw STRING FIELD
         )
     </update>
 
@@ -40,19 +41,22 @@
         INSERT INTO device_message (
             time, device_id, id, upstream, reply,
             method, identifier, request_id, server_id, params,
-            data, msg, report_time, tenant_id, code
+            data, msg, report_time, tenant_id, code,
+            raw
         )
         VALUES (
             #{ts}, #{deviceId}, #{id}, #{upstream}, #{reply},
             #{method}, #{identifier}, #{requestId}, #{serverId}, #{params},
-            #{data}, #{msg}, #{reportTime}, #{tenantId}, #{code}
+            #{data}, #{msg}, #{reportTime}, #{tenantId}, #{code},
+            #{raw}
         )
     </insert>
 
     <sql id="selectColumns">
         SELECT time AS ts, device_id, id, upstream, reply,
                method, identifier, request_id, server_id, params,
-               data, msg, report_time, tenant_id, code
+               data, msg, report_time, tenant_id, code,
+               raw
         FROM device_message
     </sql>
 
@@ -69,6 +73,13 @@
         </if>
         <if test="identifier != null">
             AND identifier = #{identifier}
+        </if>
+        <!-- 是否有原始帧：有值为 v: 开头；没有为 n: -->
+        <if test="raw != null and raw">
+            AND raw LIKE #{rawValuePattern}
+        </if>
+        <if test="raw != null and !raw">
+            AND raw = #{rawNull}
         </if>
     </sql>
 

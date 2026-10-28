@@ -13,8 +13,11 @@
 
     <name>${project.artifactId}</name>
     <description>
-        物联网 模块，主要实现 产品管理、设备管理、协议管理等功能。
-                <!-- TODO 芋艿：后续补充下 -->
+        iot 模块下，物联网的业务模块，提供管理后台与平台侧的处理。例如说：
+        1. 产品管理：产品分类、产品、物模型、数据解析脚本
+        2. 设备管理：设备、设备分组、设备消息、设备属性、设备影子、Modbus 点位，以及 OTA 升级
+        3. 规则引擎：数据流转（数据规则、数据目的）、场景联动、告警
+        4. 数据统计，以及提供给 iot-gateway 的设备 API；设备消息与属性的时序数据可存储到 TDengine、IoTDB
     </description>
 
     <dependencies>
@@ -96,11 +99,10 @@
         </dependency>
 
         <!-- 消息队列相关 -->
-        <!-- TODO @芋艿：临时打开 -->
         <dependency>
             <groupId>org.apache.rocketmq</groupId>
             <artifactId>rocketmq-spring-boot-starter</artifactId>
-<!--            <optional>true</optional>-->
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.springframework.kafka</groupId>

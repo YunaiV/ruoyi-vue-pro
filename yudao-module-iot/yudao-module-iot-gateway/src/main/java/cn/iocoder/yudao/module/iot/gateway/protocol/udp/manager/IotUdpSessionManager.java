@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.iot.gateway.protocol.udp.manager;
 import cn.hutool.core.util.ObjUtil;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import io.vertx.core.Future;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.datagram.DatagramSocket;
 import lombok.Data;
@@ -11,6 +12,9 @@ import lombok.extern.slf4j.Slf4j;
 import java.net.InetSocketAddress;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.iot.gateway.enums.ErrorCodeConstants.DEVICE_OFFLINE_OR_WRITE_FAILED;
 
 /**
  * IoT 网关 UDP 会话管理器
@@ -132,6 +136,41 @@ public class IotUdpSessionManager {
         } catch (Exception e) {
             log.error("[sendToDevice][发送消息异常，设备 ID: {}]", deviceId, e);
             return false;
+        }
+    }
+
+    /**
+     * 异步发送消息到设备：直接返回 socket.send 的结果，不等待（透传下发使用）
+     * <p>
+     * 与 {@link #sendToDevice} 不同，不会同步等待发送结果，可以在 event loop 上调用。
+     * 成功只表示数据报已交给本机发送，UDP 不保证送达；会话不存在（或已过期）、发送失败时，返回 ServiceException(DEVICE_OFFLINE_OR_WRITE_FAILED)
+     *
+     * @param deviceId 设备 ID
+     * @param data     数据
+     * @param socket   UDP Socket
+     * @return 发送结果
+     */
+    public Future<Void> sendToDeviceAsync(Long deviceId, byte[] data, DatagramSocket socket) {
+        SessionInfo sessionInfo = deviceSessionCache.getIfPresent(deviceId);
+        if (sessionInfo == null || sessionInfo.getAddress() == null) {
+            log.warn("[sendToDeviceAsync][设备会话不存在，设备 ID: {}]", deviceId);
+            return Future.failedFuture(exception(DEVICE_OFFLINE_OR_WRITE_FAILED));
+        }
+        if (socket == null) {
+            log.warn("[sendToDeviceAsync][UDP Socket 不可用，设备 ID: {}]", deviceId);
+            return Future.failedFuture(exception(DEVICE_OFFLINE_OR_WRITE_FAILED));
+        }
+        InetSocketAddress address = sessionInfo.getAddress();
+        try {
+            return socket.send(Buffer.buffer(data), address.getPort(), address.getHostString())
+                    .recover(e -> {
+                        log.warn("[sendToDeviceAsync][发送消息失败，设备 ID: {}，地址: {}，错误: {}]",
+                                deviceId, buildAddressKey(address), e.getMessage());
+                        return Future.failedFuture(exception(DEVICE_OFFLINE_OR_WRITE_FAILED));
+                    });
+        } catch (Exception e) {
+            log.error("[sendToDeviceAsync][发送消息异常，设备 ID: {}]", deviceId, e);
+            return Future.failedFuture(exception(DEVICE_OFFLINE_OR_WRITE_FAILED));
         }
     }
 

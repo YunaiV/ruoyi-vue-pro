@@ -18,8 +18,8 @@
 
     <name>${project.artifactId}</name>
     <description>
-        物联网模块
-                <!-- TODO 芋艿：需要补充下说明！ -->
+        物联网大模块，由 biz 业务、gateway 设备网关、core 核心等组成
+        例如说：产品、物模型、设备、规则引擎、OTA 升级、设备接入等等
     </description>
 
 </project>

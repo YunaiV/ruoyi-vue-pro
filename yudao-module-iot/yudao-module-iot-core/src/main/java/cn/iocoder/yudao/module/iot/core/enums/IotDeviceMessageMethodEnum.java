@@ -71,6 +71,11 @@ public enum IotDeviceMessageMethodEnum implements ArrayValuable<String> {
 
     SHADOW_UPDATE("thing.shadow.update", "设备影子更新", true),
 
+    // ========== 透传 ==========
+
+    RAW_POST("thing.raw.post", "透传上报", true), // 只能由网关的 raw 入口创建
+    RAW_PUSH("thing.raw.push", "透传下发", false),
+
     ;
 
     public static final String[] ARRAYS = Arrays.stream(values()).map(IotDeviceMessageMethodEnum::getMethod)
@@ -82,7 +87,8 @@ public enum IotDeviceMessageMethodEnum implements ArrayValuable<String> {
     public static final Set<String> REPLY_DISABLED = SetUtils.asSet(
             STATE_UPDATE.getMethod(),
             OTA_PROGRESS.getMethod(), // 参考阿里云，OTA 升级进度上报，不进行回复
-            SHADOW_UPDATE.getMethod() // 设备影子由影子 Service 主动下发回复（thing/shadow/update_reply）
+            SHADOW_UPDATE.getMethod(), // 设备影子由影子 Service 主动下发回复（thing/shadow/update_reply）
+            RAW_POST.getMethod() // 透传原始消息（未解析为业务消息）只记日志
     );
 
     private final String method;

@@ -34,6 +34,9 @@ public class IotDeviceMessagePageReqVO extends PageParam {
     @Schema(description = "标识符", example = "temperature")
     private String identifier;
 
+    @Schema(description = "是否有原始帧：true 只看带原始帧（raw 非空）的消息，false 只看没有原始帧的消息", example = "true")
+    private Boolean raw;
+
     @Schema(description = "时间范围", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     @Size(min = 2, max = 2, message = "请选择时间范围")

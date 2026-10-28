@@ -41,7 +41,8 @@ public class IotDeviceMessageIoTDBCodec {
                 .setParams(encodeString(toJsonString(message.getParams())))
                 .setData(encodeString(toJsonString(message.getData())))
                 .setMsg(encodeString(message.getMsg())).setReportTime(encodeString(message.getReportTime()))
-                .setTenantId(encodeString(message.getTenantId())).setCode(encodeString(message.getCode()));
+                .setTenantId(encodeString(message.getTenantId())).setCode(encodeString(message.getCode()))
+                .setRaw(encodeString(message.getRaw()));
     }
 
     public static IotDeviceMessageDO decode(IotDeviceMessageIoTDBRow row) {
@@ -57,7 +58,8 @@ public class IotDeviceMessageIoTDBCodec {
                 .setMsg(decodeString(row.getMsg()))
                 .setReportTime(reportTime != null ? Long.valueOf(reportTime) : null)
                 .setTenantId(tenantId != null ? Long.valueOf(tenantId) : null)
-                .setCode(code != null ? Integer.valueOf(code) : null);
+                .setCode(code != null ? Integer.valueOf(code) : null)
+                .setRaw(decodeString(row.getRaw()));
     }
 
     /**

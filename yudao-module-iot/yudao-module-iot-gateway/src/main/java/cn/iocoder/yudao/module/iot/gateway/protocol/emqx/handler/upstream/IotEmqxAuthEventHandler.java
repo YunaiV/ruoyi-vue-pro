@@ -229,7 +229,7 @@ public class IotEmqxAuthEventHandler {
                 return;
             }
 
-            // 2. 执行 ACL 校验
+            // 2. 执行 ACL 校验（透传的 raw/post 发布、raw/push 订阅同样只放行设备自己的 /sys/{productKey}/{deviceName}/ 前缀）
             boolean allowed = subscribe
                     ? IotMqttTopicUtils.isTopicSubscribeAllowed(topic, deviceInfo.getProductKey(), deviceInfo.getDeviceName())
                     : IotMqttTopicUtils.isTopicPublishAllowed(topic, deviceInfo.getProductKey(), deviceInfo.getDeviceName());

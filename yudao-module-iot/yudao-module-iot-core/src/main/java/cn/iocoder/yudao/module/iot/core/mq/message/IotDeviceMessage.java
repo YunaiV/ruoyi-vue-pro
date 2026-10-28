@@ -94,6 +94,16 @@ public class IotDeviceMessage {
      */
     private String msg;
 
+    // ========== 透传（raw）相关字段 ==========
+
+    /**
+     * 与设备之间实际收发的原始字节（Base64）
+     *
+     * 只由服务端可信赋值：网关的透传上行（解析成功的业务消息、或未解析的 thing.raw.post）、Modbus 设备的实际响应，
+     * 以及 biz 下发的 thing.raw.push；设备经标准路径上报的消息，网关会清空该字段
+     */
+    private String raw;
+
     // ========== 基础方法：只传递"serialize（序列化）相关字段" ==========
 
     public static IotDeviceMessage requestOf(String method) {

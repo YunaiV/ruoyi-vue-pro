@@ -29,6 +29,11 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 @Slf4j
 public abstract class IotHttpAbstractHandler implements Handler<RoutingContext> {
 
+    /**
+     * handle0 返回这个哨兵：表示响应已由子类异步接管（上报在 worker 上处理完成后写一次，透传上报到期先写超时），基类不再写响应
+     */
+    protected static final CommonResult<Object> ASYNC_RESPONSE = new CommonResult<>();
+
     private final IotDeviceTokenService deviceTokenService = SpringUtil.getBean(IotDeviceTokenService.class);
 
     @Override
@@ -39,6 +44,9 @@ public abstract class IotHttpAbstractHandler implements Handler<RoutingContext> 
 
             // 2. 执行逻辑
             CommonResult<Object> result = handle0(context);
+            if (result == ASYNC_RESPONSE) { // 响应由子类异步写出
+                return;
+            }
             writeResponse(context, result);
         } catch (ServiceException e) {
             // 已知异常，返回对应的错误码和错误信息

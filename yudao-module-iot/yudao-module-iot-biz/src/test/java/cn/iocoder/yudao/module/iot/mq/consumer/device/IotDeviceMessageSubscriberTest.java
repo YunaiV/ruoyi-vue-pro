@@ -85,6 +85,27 @@ public class IotDeviceMessageSubscriberTest extends BaseMockitoUnitTest {
         verifyNoInteractions(devicePropertyService, deviceMessageService);
     }
 
+    @Test
+    public void testOnMessage_replyForceOnline() {
+        // 准备参数：设备实际返回的回复（例如 Modbus 异常响应），按原逻辑作为设备活动
+        IotDeviceMessage message = new IotDeviceMessage().setDeviceId(randomLongId()).setTenantId(randomLongId())
+                .setServerId("test-server").setMethod(IotDeviceMessageMethodEnum.PROPERTY_SET.getMethod())
+                .setCode(1_051_003_111);
+        // mock 方法：设备离线
+        IotDeviceDO device = new IotDeviceDO().setId(message.getDeviceId())
+                .setState(IotDeviceStateEnum.OFFLINE.getState());
+        when(deviceService.getDeviceFromCache(eq(message.getDeviceId()))).thenReturn(device);
+
+        // 调用
+        deviceMessageSubscriber.onMessage(message);
+        // 断言：更新上报时间、连接 server，并强制上线
+        verify(devicePropertyService).updateDeviceReportTimeAsync(eq(device.getId()), any(LocalDateTime.class));
+        verify(devicePropertyService).updateDeviceServerIdAsync(eq(device.getId()), eq(message.getServerId()));
+        verify(deviceMessageService).sendDeviceMessage(argThat((IotDeviceMessage m) ->
+                IotDeviceMessageMethodEnum.STATE_UPDATE.getMethod().equals(m.getMethod())));
+        verify(deviceMessageService).handleUpstreamDeviceMessage(eq(message), eq(device));
+    }
+
     private static IotDeviceMessage buildPropertyPostMessage() {
         return new IotDeviceMessage().setDeviceId(randomLongId()).setTenantId(randomLongId())
                 .setServerId("test-server").setMethod(IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod());

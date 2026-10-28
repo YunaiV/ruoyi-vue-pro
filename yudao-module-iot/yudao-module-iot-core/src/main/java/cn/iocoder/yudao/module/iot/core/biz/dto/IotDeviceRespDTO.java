@@ -41,5 +41,13 @@ public class IotDeviceRespDTO {
      * 序列化类型
      */
     private String serializeType;
+    /**
+     * 是否启用数据解析脚本
+     */
+    private Boolean scriptEnabled;
+    /**
+     * 数据解析脚本（JS ES5）：只在启用时返回
+     */
+    private String scriptContent;
 
 }

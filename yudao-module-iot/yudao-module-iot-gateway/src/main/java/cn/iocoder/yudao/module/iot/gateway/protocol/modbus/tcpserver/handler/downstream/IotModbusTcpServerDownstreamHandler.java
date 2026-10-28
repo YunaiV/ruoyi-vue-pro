@@ -12,10 +12,10 @@ import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpserver.codec.IotMo
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpserver.manager.IotModbusTcpServerConfigCacheService;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpserver.manager.IotModbusTcpServerConnectionManager;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpserver.manager.IotModbusTcpServerConnectionManager.ConnectionInfo;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpserver.manager.IotModbusTcpServerTransactionChannel;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * IoT Modbus TCP Server 下行消息处理器
@@ -33,19 +33,12 @@ public class IotModbusTcpServerDownstreamHandler {
     private final IotModbusTcpServerConfigCacheService configCacheService;
     private final IotModbusFrameEncoder frameEncoder;
 
-    /**
-     * TCP 事务 ID 自增器（与 PollScheduler 共享）
-     */
-    private final AtomicInteger transactionIdCounter;
-
     public IotModbusTcpServerDownstreamHandler(IotModbusTcpServerConnectionManager connectionManager,
                                               IotModbusTcpServerConfigCacheService configCacheService,
-                                              IotModbusFrameEncoder frameEncoder,
-                                              AtomicInteger transactionIdCounter) {
+                                              IotModbusFrameEncoder frameEncoder) {
         this.connectionManager = connectionManager;
         this.configCacheService = configCacheService;
         this.frameEncoder = frameEncoder;
-        this.transactionIdCounter = transactionIdCounter;
     }
 
     /**
@@ -109,12 +102,11 @@ public class IotModbusTcpServerDownstreamHandler {
         // 1.1 转换属性值为原始值
         int[] rawValues = IotModbusCommonUtils.convertToRawValues(value, point);
 
-        // 1.2 确定帧格式和事务 ID
+        // 1.2 确定帧格式和事务 ID（事务号由连接的事务通道分配：跳过本连接仍占用的编号）
         IotModbusFrameFormatEnum frameFormat = connInfo.getFrameFormat();
         Assert.notNull(frameFormat, "连接帧格式不能为空");
-        Integer transactionId = frameFormat == IotModbusFrameFormatEnum.MODBUS_TCP
-                ? (transactionIdCounter.incrementAndGet() & 0xFFFF)
-                : null;
+        IotModbusTcpServerTransactionChannel channel = connInfo.getChannel();
+        Integer transactionId = channel.allocateTransactionId();
         int slaveId = connInfo.getSlaveId() != null ? connInfo.getSlaveId() : 1;
         // 1.3 编码写请求
         byte[] data;
@@ -139,8 +131,8 @@ public class IotModbusTcpServerDownstreamHandler {
             return;
         }
 
-        // 2. 发送消息
-        connectionManager.sendToDevice(deviceId, data).onSuccess(v ->
+        // 2. 发送消息（用 connInfo 对应的连接写出；socket 写出成功即记成功，不等待设备回显）
+        channel.send(data).onSuccess(v ->
                 log.info("[writeProperty][写入成功, deviceId={}, identifier={}, value={}]",
                         deviceId, point.getIdentifier(), value)
         ).onFailure(e ->

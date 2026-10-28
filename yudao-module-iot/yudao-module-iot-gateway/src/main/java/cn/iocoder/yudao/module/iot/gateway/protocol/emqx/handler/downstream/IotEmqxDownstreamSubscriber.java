@@ -2,8 +2,10 @@ package cn.iocoder.yudao.module.iot.gateway.protocol.emqx.handler.downstream;
 
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
+import cn.iocoder.yudao.module.iot.core.script.dto.IotScriptSource;
 import cn.iocoder.yudao.module.iot.gateway.protocol.AbstractIotProtocolDownstreamSubscriber;
 import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.IotEmqxProtocol;
+import io.vertx.core.Future;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -24,6 +26,16 @@ public class IotEmqxDownstreamSubscriber extends AbstractIotProtocolDownstreamSu
     @Override
     protected void handleMessage(IotDeviceMessage message) {
         downstreamHandler.handle(message);
+    }
+
+    @Override
+    public Future<Void> handleRawMessage(IotDeviceMessage message, byte[] bytes, IotScriptSource source) {
+        return downstreamHandler.handleRawMessage(message, bytes);
+    }
+
+    @Override
+    public boolean supportsRawDownstream() {
+        return true;
     }
 
 }

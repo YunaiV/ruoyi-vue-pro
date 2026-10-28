@@ -24,6 +24,8 @@ CREATE TABLE IF NOT EXISTS "iot_product" (
     "pic_url" varchar(255) DEFAULT NULL,
     "protocol_type" varchar(100) DEFAULT NULL,
     "serialize_type" varchar(100) DEFAULT NULL,
+    "script_content" text DEFAULT NULL,
+    "script_enabled" bit NOT NULL DEFAULT FALSE,
     "category_id" bigint DEFAULT NULL,
     "description" varchar(500) DEFAULT NULL,
     "data_format" tinyint NOT NULL DEFAULT '0',

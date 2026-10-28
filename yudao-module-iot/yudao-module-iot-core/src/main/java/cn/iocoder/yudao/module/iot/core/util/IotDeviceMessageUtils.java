@@ -8,8 +8,10 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.system.SystemUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
+import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 
+import java.util.Base64;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -49,6 +51,150 @@ public class IotDeviceMessageUtils {
      */
     public static boolean isReplyMessage(IotDeviceMessage message) {
         return message.getCode() != null;
+    }
+
+    /**
+     * 是否是下行指令的请求：property.set / service.invoke（数据解析脚本 encode 只处理这两种）
+     *
+     * @param message 消息
+     * @return 是否
+     */
+    public static boolean isCommandRequest(IotDeviceMessage message) {
+        return !isReplyMessage(message) && isCommandMethod(message.getMethod());
+    }
+
+    /**
+     * 是否是下行指令的方法：property.set / service.invoke
+     *
+     * @param method 消息方法
+     * @return 是否
+     */
+    public static boolean isCommandMethod(String method) {
+        return StrUtil.equalsAny(method, IotDeviceMessageMethodEnum.PROPERTY_SET.getMethod(),
+                IotDeviceMessageMethodEnum.SERVICE_INVOKE.getMethod());
+    }
+
+    // ========== 透传（raw）相关 ==========
+
+    /**
+     * 通用协议 raw 载荷的最大字节数（Modbus 另按 PDU 不超过 {@link #MODBUS_PDU_MAX_BYTES} 校验）
+     */
+    public static final int RAW_PAYLOAD_MAX_BYTES = 4096;
+
+    /**
+     * Modbus PDU 的最大字节数（不带 slaveId、CRC、MBAP）
+     */
+    public static final int MODBUS_PDU_MAX_BYTES = 253;
+
+    /**
+     * 是否是透传方法：thing.raw.post、thing.raw.push
+     *
+     * @param method 消息方法
+     * @return 是否
+     */
+    public static boolean isRawMethod(String method) {
+        return StrUtil.equalsAny(method, IotDeviceMessageMethodEnum.RAW_POST.getMethod(),
+                IotDeviceMessageMethodEnum.RAW_PUSH.getMethod());
+    }
+
+    /**
+     * 编码原始字节为 {@link IotDeviceMessage#getRaw()}（Base64）
+     *
+     * @param bytes 原始字节
+     * @return Base64
+     */
+    public static String encodeRaw(byte[] bytes) {
+        return Base64.getEncoder().encodeToString(bytes);
+    }
+
+    /**
+     * 解码 {@link IotDeviceMessage#getRaw()}（Base64）；严格 Base64（必须与 {@link #encodeRaw} 的结果一致，带 padding），
+     * 非法或超长抛 {@link IllegalArgumentException}
+     *
+     * @param raw      Base64
+     * @param maxBytes 最大字节数
+     * @return 原始字节
+     */
+    public static byte[] decodeRaw(String raw, int maxBytes) {
+        Assert.notBlank(raw, "raw 不能为空");
+        Assert.isTrue(raw.length() <= (maxBytes + 2) / 3 * 4, "raw 长度必须在 1~{} 字节之间", maxBytes); // 先按长度拦截，不解码超长串
+        byte[] bytes = Base64.getDecoder().decode(raw);
+        Assert.isTrue(bytes.length >= 1 && bytes.length <= maxBytes, "raw 长度必须在 1~{} 字节之间", maxBytes);
+        Assert.isTrue(raw.equals(encodeRaw(bytes)), "raw 必须是标准 Base64（带 padding）");
+        return bytes;
+    }
+
+    /**
+     * 从 params（{"payload": Base64}）解出透传载荷：管理后台下发 thing.raw.push 的入参格式；
+     * 标准 Base64（允许省略 padding，由调用方用 {@link #encodeRaw} 规范化），非法或超长抛 {@link IllegalArgumentException}
+     *
+     * @param params   消息参数
+     * @param maxBytes 最大字节数
+     * @return 载荷
+     */
+    public static byte[] decodeRawPayload(Object params, int maxBytes) {
+        String payload = StrUtil.toStringOrNull(readField(params, "payload"));
+        Assert.notBlank(payload, "payload 不能为空");
+        byte[] bytes = Base64.getDecoder().decode(payload);
+        Assert.isTrue(bytes.length >= 1 && bytes.length <= maxBytes, "payload 长度必须在 1~{} 字节之间", maxBytes);
+        return bytes;
+    }
+
+    /**
+     * 校验透传下行的字节：按协议的规则，Modbus 必须是合法的请求 PDU（{@link #validateModbusRequestPdu}），其它协议 1~4096 字节
+     * <p>
+     * biz 的 /send、脚本调试的 encode 输出、gateway 的 encode 输出调用同一份规则；不合法抛 {@link IllegalArgumentException}
+     *
+     * @param protocol 协议类型
+     * @param bytes    下行字节
+     */
+    public static void validateRawPayload(IotProtocolTypeEnum protocol, byte[] bytes) {
+        if (protocol != null && protocol.isModbus()) {
+            validateModbusRequestPdu(bytes);
+            return;
+        }
+        Assert.isTrue(bytes != null && bytes.length >= 1 && bytes.length <= RAW_PAYLOAD_MAX_BYTES,
+                "raw 长度必须在 1~{} 字节之间", RAW_PAYLOAD_MAX_BYTES);
+    }
+
+    /**
+     * 校验 Modbus 原始请求 PDU 的格式：功能码白名单、长度、数量范围、05 的取值、0F/10 的 byteCount
+     * <p>
+     * 透传下行的字节规则（{@link #validateRawPayload}）与 Modbus 协议写出前调用同一份规则；不合法抛 {@link IllegalArgumentException}
+     *
+     * @param pdu PDU（功能码 + 数据，不带 slaveId、CRC、MBAP）
+     */
+    public static void validateModbusRequestPdu(byte[] pdu) {
+        Assert.isTrue(pdu != null && pdu.length >= 5 && pdu.length <= MODBUS_PDU_MAX_BYTES,
+                "PDU 长度必须在 5~{} 字节之间", MODBUS_PDU_MAX_BYTES);
+        int functionCode = pdu[0] & 0xFF;
+        int quantity = ((pdu[3] & 0xFF) << 8) | (pdu[4] & 0xFF);
+        switch (functionCode) {
+            case 0x01:
+            case 0x02:
+                Assert.isTrue(pdu.length == 5 && quantity >= 1 && quantity <= 2000, "PDU 不合法：读线圈数量必须在 1~2000 之间");
+                break;
+            case 0x03:
+            case 0x04:
+                Assert.isTrue(pdu.length == 5 && quantity >= 1 && quantity <= 125, "PDU 不合法：读寄存器数量必须在 1~125 之间");
+                break;
+            case 0x05:
+                Assert.isTrue(pdu.length == 5 && (quantity == 0xFF00 || quantity == 0x0000), "PDU 不合法：写单个线圈的值只能是 FF00 或 0000");
+                break;
+            case 0x06:
+                Assert.isTrue(pdu.length == 5, "PDU 不合法：写单个寄存器必须是 5 字节");
+                break;
+            case 0x0F:
+                Assert.isTrue(quantity >= 1 && quantity <= 1968 && pdu.length >= 6 && pdu.length == 6 + (pdu[5] & 0xFF)
+                        && (pdu[5] & 0xFF) == (quantity + 7) / 8, "PDU 不合法：写多个线圈的数量或字节数不一致");
+                break;
+            case 0x10:
+                Assert.isTrue(quantity >= 1 && quantity <= 123 && pdu.length >= 6 && pdu.length == 6 + (pdu[5] & 0xFF)
+                        && (pdu[5] & 0xFF) == quantity * 2, "PDU 不合法：写多个寄存器的数量或字节数不一致");
+                break;
+            default:
+                throw new IllegalArgumentException("PDU 不合法：不支持的功能码 " + functionCode);
+        }
     }
 
     /**

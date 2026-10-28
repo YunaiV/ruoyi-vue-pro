@@ -50,6 +50,7 @@ public class IotDeviceMessageIoTDBDAO implements IotDeviceMessageDAO {
             .put("method", "STRING").put("identifier", "STRING").put("request_id", "STRING").put("server_id", "STRING")
             .put("params", "STRING").put("data", "STRING").put("msg", "STRING")
             .put("report_time", "STRING").put("tenant_id", "STRING").put("code", "STRING")
+            .put("raw", "STRING")
             .build();
 
     @Resource
@@ -152,15 +153,20 @@ public class IotDeviceMessageIoTDBDAO implements IotDeviceMessageDAO {
         Integer upstream = reqVO.getUpstream() != null ? encodeBoolean(reqVO.getUpstream()) : null;
         Integer reply = reqVO.getReply() != null ? encodeBoolean(reqVO.getReply()) : null;
         String identifier = StrUtil.isNotEmpty(reqVO.getIdentifier()) ? encodeString(reqVO.getIdentifier()) : null;
+        // 是否有原始帧：true 为 v: 开头；false 为 n:
+        Boolean raw = reqVO.getRaw();
+        String rawValuePattern = PREFIX_VALUE + "%";
         try {
             // 2.1 查询总数
-            Long total = deviceMessageMapper.selectCount(deviceId, method, upstream, reply, identifier);
+            Long total = deviceMessageMapper.selectCount(deviceId, method, upstream, reply, identifier,
+                    raw, PREFIX_NULL, rawValuePattern);
             if (total == null || total == 0) {
                 return PageResult.empty();
             }
             // 2.2 查询列表：pageSize 为 -1 时，不分页
             boolean pageable = ObjUtil.notEqual(reqVO.getPageSize(), PageParam.PAGE_SIZE_NONE);
             List<IotDeviceMessageIoTDBRow> rows = deviceMessageMapper.selectList(deviceId, method, upstream, reply, identifier,
+                    raw, PREFIX_NULL, rawValuePattern,
                     pageable ? PageUtils.getStart(reqVO) : null, pageable ? reqVO.getPageSize() : null);
             return new PageResult<>(convertList(rows, IotDeviceMessageIoTDBCodec::decode), total);
         } catch (Exception exception) {
