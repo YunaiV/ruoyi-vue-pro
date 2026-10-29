@@ -10,9 +10,11 @@
         4. 销售出库单（OQC）：单据状态=CONFIRMED(1)，行的 oqc_check_flag=1 且 oqc_id 为空
         5. 生产退料单（RQC）：单据状态=CONFIRMED(1)，行的 rqc_check_flag=1 且 rqc_id 为空 且 quality_status=0(待检)
         6. 销售退货单（RQC）：单据状态=CONFIRMED(1)，行的 rqc_check_flag=1 且 rqc_id 为空 且 quality_status=0(待检)
+        IQC、RQC 的检验标记为 bit(1) 布尔列，使用绑定的 Boolean true 比较；OQC 的 oqc_check_flag 为 tinyint(1)，保持数值 1 比较
         注意：各分支无值的 ID 列使用 CASE WHEN 1 = 0 THEN 本分支 bigint 列 END 产生“带类型的 NULL”，避免 UNION 中裸 NULL 的类型推断差异
     -->
     <select id="selectQcPendingPage" resultType="cn.iocoder.yudao.module.mes.controller.admin.qc.pendinginspect.vo.MesQcPendingInspectRespVO">
+        <bind name="trueValue" value="true"/>
         SELECT * FROM (
             <!-- 1. IQC 来源：到货通知单 -->
             SELECT
@@ -32,7 +34,7 @@
             FROM mes_wm_arrival_notice n
                 JOIN mes_wm_arrival_notice_line l ON n.id = l.notice_id
             WHERE n.status = ${@cn.iocoder.yudao.module.mes.enums.wm.MesWmArrivalNoticeStatusEnum@PENDING_QC.status}
-              AND l.iqc_check_flag = 1
+              AND l.iqc_check_flag = #{trueValue}
               AND l.iqc_id IS NULL
               AND n.deleted = 0
               AND l.deleted = 0
@@ -57,7 +59,7 @@
             FROM mes_wm_outsource_receipt r
                 JOIN mes_wm_outsource_receipt_line rl ON r.id = rl.receipt_id
             WHERE r.status = ${@cn.iocoder.yudao.module.mes.enums.wm.MesWmOutsourceReceiptStatusEnum@CONFIRMED.status}
-              AND rl.iqc_check_flag = 1
+              AND rl.iqc_check_flag = #{trueValue}
               AND rl.iqc_id IS NULL
               AND r.deleted = 0
               AND rl.deleted = 0
@@ -132,7 +134,7 @@
             FROM mes_wm_return_issue ri
                 JOIN mes_wm_return_issue_line ril ON ri.id = ril.issue_id
             WHERE ri.status = ${@cn.iocoder.yudao.module.mes.enums.wm.MesWmReturnIssueStatusEnum@CONFIRMED.status}
-              AND ril.rqc_check_flag = 1
+              AND ril.rqc_check_flag = #{trueValue}
               AND ril.rqc_id IS NULL
               AND ril.quality_status = ${@cn.iocoder.yudao.module.mes.enums.wm.MesWmQualityStatusEnum@PENDING.status}
               AND ri.deleted = 0
@@ -158,7 +160,7 @@
             FROM mes_wm_return_sales r
                 JOIN mes_wm_return_sales_line rl ON r.id = rl.return_id
             WHERE r.status = ${@cn.iocoder.yudao.module.mes.enums.wm.MesWmReturnSalesStatusEnum@CONFIRMED.status}
-              AND rl.rqc_check_flag = 1
+              AND rl.rqc_check_flag = #{trueValue}
               AND rl.rqc_id IS NULL
               AND rl.quality_status = ${@cn.iocoder.yudao.module.mes.enums.wm.MesWmQualityStatusEnum@PENDING.status}
               AND r.deleted = 0

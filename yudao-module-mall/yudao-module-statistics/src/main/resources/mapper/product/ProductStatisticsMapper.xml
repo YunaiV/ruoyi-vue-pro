@@ -4,6 +4,7 @@
 
     <select id="selectStatisticsResultPageByTimeBetween"
             resultType="cn.iocoder.yudao.module.statistics.dal.dataobject.product.ProductStatisticsDO">
+        <bind name="trueValue" value="true"/>
         SELECT spu.id                                                       AS spuId
              -- 浏览量：一个用户可以有多次
              , (SELECT COUNT(1)
@@ -55,7 +56,7 @@
                 FROM trade_order_item item
                          JOIN trade_order o ON item.order_id = o.id
                 WHERE spu_id = spu.id
-                  AND o.pay_status = TRUE
+                  AND o.pay_status = #{trueValue}
                   AND item.create_time BETWEEN #{beginTime} AND #{endTime}
                 <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
                     AND item.tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
@@ -67,7 +68,7 @@
                 FROM trade_order_item item
                          JOIN trade_order o ON item.order_id = o.id
                 WHERE spu_id = spu.id
-                  AND o.pay_status = TRUE
+                  AND o.pay_status = #{trueValue}
                   AND item.create_time BETWEEN #{beginTime} AND #{endTime}
                 <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
                     AND item.tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
