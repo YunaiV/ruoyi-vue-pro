@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 // TODO DONE @AI：方法注释；已补齐方言重载与内部辅助方法的参数、返回值及边界。
 // TODO DONE @AI：多余的方法，可以考虑去掉；当然，保留也可以。。。已核对生产 Java/XML 调用，现有方法均有用途，保留。
 /**
- * 日期统计、行数限制、分批删除 SQL 片段的方言工具类
+ * 日期统计、逗号分隔列表关联、行数限制、分批删除 SQL 片段的方言工具类
  *
  * 1. 每次生成 SQL 时，按当前执行时路由到的数据源选择方言（按数据源实例缓存），不使用启动时固定的 databaseId 或主库
  * 2. 只有明确识别的 PostgreSQL、Oracle、SQL Server 2012+ 输出新片段；其它已识别的数据库（MySQL、MariaDB、OceanBase、H2、
@@ -405,6 +405,52 @@ public class SqlDialectUtils {
         return dialect == Dialect.ORACLE ? "FROM DUAL" : "";
     }
 
+    // ========== 逗号分隔列表 ==========
+
+    /**
+     * 两列之间的 FIND_IN_SET 关联条件：数值 ID 列的值是否为逗号分隔列表列中的一个元素；原有片段为 FIND_IN_SET(valueColumn, listColumn)
+     *
+     * 1. 列表按英文逗号分隔、元素两侧不含空格，与 FIND_IN_SET 一致；元素重复时，同一行仍只匹配一次
+     * 2. 任一列为 NULL 时不匹配
+     * 3. 原有片段在 MySQL 的 ON / WHERE 中按非 0 为真；其它沿用原有片段的数据库是否支持 FIND_IN_SET，未经验收
+     *
+     * 列与参数值比较时，使用 {@link MyBatisUtils#findInSet(String, java.util.Collection)}
+     *
+     * @param valueColumn 数值类型的 ID 列名，例如 cc.id、contact_id
+     * @param listColumn  逗号分隔的列表列名，例如 cfur.contact_ids
+     * @return SQL 条件片段
+     */
+    public static String findInSetColumn(String valueColumn, String listColumn) {
+        return findInSetColumn(getDialect(), valueColumn, listColumn);
+    }
+
+    /**
+     * 按指定方言生成两列之间的 FIND_IN_SET 关联条件；两侧补充逗号，避免 1 匹配到 11、21 等相邻 ID。
+     *
+     * @param dialect 已识别的数据库方言
+     * @param valueColumn 代码中固定的数值 ID 列名，SQL Server 按 varchar(20) 转换，可容纳 bigint
+     * @param listColumn 代码中固定的逗号分隔列表列名
+     * @return SQL 条件片段
+     */
+    static String findInSetColumn(Dialect dialect, String valueColumn, String listColumn) {
+        checkIdColumn(valueColumn);
+        checkColumn(listColumn);
+        switch (dialect) {
+            case POSTGRESQL:
+                return "POSITION(',' || CAST(" + valueColumn + " AS VARCHAR) || ',' IN ',' || " + listColumn + " || ',') > 0";
+            case ORACLE:
+                // Oracle 拼接时 NULL 按空串处理，需要排除 NULL，否则会匹配到列表中的空元素
+                return "(" + valueColumn + " IS NOT NULL AND INSTR(',' || " + listColumn + " || ',', ',' || "
+                        + valueColumn + " || ',') > 0)";
+            case SQLSERVER:
+                // SQL Server 2012–2016 可关闭 CONCAT_NULL_YIELDS_NULL，显式排除 NULL ID，避免匹配列表中的空元素
+                return "(" + valueColumn + " IS NOT NULL AND CHARINDEX(',' + CAST(" + valueColumn
+                        + " AS varchar(20)) + ',', ',' + " + listColumn + " + ',') > 0)";
+            default:
+                return "FIND_IN_SET(" + valueColumn + ", " + listColumn + ")";
+        }
+    }
+
     // ========== 行数限制 ==========
 
     /**
@@ -656,6 +702,19 @@ public class SqlDialectUtils {
     private static void checkColumn(String column) {
         if (!MyBatisUtils.isSafeColumnName(column)) {
             throw new IllegalArgumentException("Invalid column name: " + column);
+        }
+    }
+
+    /**
+     * 校验代码中固定的 ID 列名：在列名校验的基础上，最后一段需要为 id 或以 _id 结尾，避免用于任意业务字符串列。
+     *
+     * @param column 待校验的列名，可带表别名前缀
+     */
+    private static void checkIdColumn(String column) {
+        checkColumn(column);
+        String name = column.substring(column.lastIndexOf('.') + 1).toLowerCase(Locale.ROOT);
+        if (!name.equals("id") && !name.endsWith("_id")) {
+            throw new IllegalArgumentException("Invalid id column name: " + column);
         }
     }
 

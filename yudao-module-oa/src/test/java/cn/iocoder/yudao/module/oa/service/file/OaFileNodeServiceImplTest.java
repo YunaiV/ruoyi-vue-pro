@@ -13,6 +13,7 @@ import cn.iocoder.yudao.module.oa.dal.mysql.file.OaFileNodeMapper;
 import cn.iocoder.yudao.module.oa.framework.config.OaProperties;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -507,6 +508,32 @@ public class OaFileNodeServiceImplTest extends BaseDbUnitTest {
         assertEquals(1L, result.getFileCount());
         assertEquals(0L, result.getSharedCount());
         assertEquals(0L, result.getReceivedCount());
+    }
+
+    @Test
+    public void testGetFileStorage_usedSizeNullAndDeleted() {
+        // mock 数据：本人文件的 size 为 NULL，已删除的文件不计入
+        OaFileNodeDO nullSize = randomFileNodeDO(1L, 0L, 0).setType(1);
+        nullSize.setCreator("1");
+        fileNodeMapper.insert(nullSize);
+        fileNodeMapper.update(null, new LambdaUpdateWrapper<OaFileNodeDO>().setSql("size = NULL")
+                .eq(OaFileNodeDO::getId, 1L));
+        OaFileNodeDO deleted = randomFileNodeDO(2L, 0L, 0).setType(1).setSize(500L);
+        deleted.setCreator("1");
+        fileNodeMapper.insert(deleted);
+        fileNodeMapper.deleteById(2L);
+        assertNull(fileNodeMapper.selectById(1L).getSize());
+        assertNull(fileNodeMapper.selectById(2L));
+
+        // 调用，并断言：size 均为 NULL 时为 0
+        assertEquals(0L, fileNodeService.getFileStorage(1L).getUsedSize());
+
+        // mock 数据：NULL 与有值的文件并存
+        OaFileNodeDO normal = randomFileNodeDO(3L, 0L, 0).setType(1).setSize(100L);
+        normal.setCreator("1");
+        fileNodeMapper.insert(normal);
+        // 调用，并断言：只累加有值的文件
+        assertEquals(100L, fileNodeService.getFileStorage(1L).getUsedSize());
     }
 
     @Test

@@ -89,7 +89,7 @@
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.rank.CrmStatisticsRankRespVO">
         SELECT COUNT(1) AS count, cc.owner_user_id
         FROM crm_follow_up_record cfur
-        LEFT JOIN crm_contact cc ON FIND_IN_SET(cc.id, cfur.contact_ids)
+        LEFT JOIN crm_contact cc ON ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@findInSetColumn('cc.id', 'cfur.contact_ids')}
         WHERE cfur.deleted = 0
         AND cc.deleted = 0
         AND cc.owner_user_id in
@@ -104,7 +104,7 @@
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.rank.CrmStatisticsRankRespVO">
         SELECT COUNT(DISTINCT cc.id) AS count, cc.owner_user_id
         FROM crm_follow_up_record cfur
-        LEFT JOIN crm_contact cc ON FIND_IN_SET(cc.id, cfur.contact_ids)
+        LEFT JOIN crm_contact cc ON ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@findInSetColumn('cc.id', 'cfur.contact_ids')}
         WHERE cfur.deleted = 0
         AND cc.deleted = 0
         AND cc.owner_user_id in

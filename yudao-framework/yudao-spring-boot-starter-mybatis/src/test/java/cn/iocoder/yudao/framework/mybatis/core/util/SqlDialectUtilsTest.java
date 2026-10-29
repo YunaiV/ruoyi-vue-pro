@@ -29,6 +29,7 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -210,6 +211,118 @@ public class SqlDialectUtilsTest {
             String summarySql = "SELECT (SELECT COUNT(1) FROM ai1_agent) AS agentCount, "
                     + "(SELECT COUNT(1) FROM ai1_model) AS modelCount " + SqlDialectUtils.fromDual(dialect);
             assertNotNull(CCJSqlParserUtil.parse(summarySql), dialect + " fromDual");
+        }
+    }
+
+    // ========== 逗号分隔列表 ==========
+
+    @Test
+    public void testFindInSetColumn() {
+        // 原有片段保持不变，不追加 <> 0
+        assertEquals("FIND_IN_SET(cc.id, cfur.contact_ids)",
+                SqlDialectUtils.findInSetColumn(Dialect.ORIGINAL, "cc.id", "cfur.contact_ids"));
+        assertEquals("POSITION(',' || CAST(cc.id AS VARCHAR) || ',' IN ',' || cfur.contact_ids || ',') > 0",
+                SqlDialectUtils.findInSetColumn(Dialect.POSTGRESQL, "cc.id", "cfur.contact_ids"));
+        assertEquals("(cc.id IS NOT NULL AND INSTR(',' || cfur.contact_ids || ',', ',' || cc.id || ',') > 0)",
+                SqlDialectUtils.findInSetColumn(Dialect.ORACLE, "cc.id", "cfur.contact_ids"));
+        assertEquals("(cc.id IS NOT NULL AND CHARINDEX(',' + CAST(cc.id AS varchar(20)) + ',', ',' + cfur.contact_ids + ',') > 0)",
+                SqlDialectUtils.findInSetColumn(Dialect.SQLSERVER, "cc.id", "cfur.contact_ids"));
+        // 不带表别名、以 _id 结尾的 ID 列
+        assertEquals("FIND_IN_SET(contact_id, contact_ids)",
+                SqlDialectUtils.findInSetColumn(Dialect.ORIGINAL, "contact_id", "contact_ids"));
+        assertEquals("(t.CONTACT_ID IS NOT NULL AND CHARINDEX(',' + CAST(t.CONTACT_ID AS varchar(20)) + ',', ',' + t.contact_ids + ',') > 0)",
+                SqlDialectUtils.findInSetColumn(Dialect.SQLSERVER, "t.CONTACT_ID", "t.contact_ids"));
+    }
+
+    @Test
+    public void testFindInSetColumn_invalidColumn() {
+        for (Dialect dialect : Dialect.values()) {
+            // 值列：只能是 ID 列名，不能是表达式、字面量或业务字符串列
+            assertThrows(IllegalArgumentException.class,
+                    () -> SqlDialectUtils.findInSetColumn(dialect, "cc.id) OR (1=1", "cfur.contact_ids"));
+            assertThrows(IllegalArgumentException.class,
+                    () -> SqlDialectUtils.findInSetColumn(dialect, "'1'", "cfur.contact_ids"));
+            assertThrows(IllegalArgumentException.class,
+                    () -> SqlDialectUtils.findInSetColumn(dialect, "1", "cfur.contact_ids"));
+            assertThrows(IllegalArgumentException.class,
+                    () -> SqlDialectUtils.findInSetColumn(dialect, "cc.name", "cfur.contact_ids"));
+            assertThrows(IllegalArgumentException.class,
+                    () -> SqlDialectUtils.findInSetColumn(dialect, "cc.idx", "cfur.contact_ids"));
+            assertThrows(IllegalArgumentException.class,
+                    () -> SqlDialectUtils.findInSetColumn(dialect, "id.name", "cfur.contact_ids"));
+            assertThrows(IllegalArgumentException.class,
+                    () -> SqlDialectUtils.findInSetColumn(dialect, "", "cfur.contact_ids"));
+            assertThrows(IllegalArgumentException.class,
+                    () -> SqlDialectUtils.findInSetColumn(dialect, null, "cfur.contact_ids"));
+            // 列表列
+            assertThrows(IllegalArgumentException.class,
+                    () -> SqlDialectUtils.findInSetColumn(dialect, "cc.id", "cfur.contact_ids) OR (1=1"));
+            assertThrows(IllegalArgumentException.class,
+                    () -> SqlDialectUtils.findInSetColumn(dialect, "cc.id", "'1,2,3'"));
+            assertThrows(IllegalArgumentException.class,
+                    () -> SqlDialectUtils.findInSetColumn(dialect, "cc.id", "cfur.contact_ids;drop table t"));
+            assertThrows(IllegalArgumentException.class,
+                    () -> SqlDialectUtils.findInSetColumn(dialect, "cc.id", ""));
+            assertThrows(IllegalArgumentException.class,
+                    () -> SqlDialectUtils.findInSetColumn(dialect, "cc.id", null));
+        }
+    }
+
+    /**
+     * 与 CRM 跟进次数排行相同的 LEFT JOIN 条件，所有方言均需可被 JSqlParser 解析
+     */
+    @Test
+    public void testFindInSetColumn_parsedByJSqlParser() throws Exception {
+        for (Dialect dialect : Dialect.values()) {
+            String sql = "SELECT COUNT(DISTINCT cc.id) AS count, cc.owner_user_id FROM crm_follow_up_record cfur"
+                    + " LEFT JOIN crm_contact cc ON " + SqlDialectUtils.findInSetColumn(dialect, "cc.id", "cfur.contact_ids")
+                    + " WHERE cfur.deleted = 0 AND cc.deleted = 0 AND cc.owner_user_id IN (?, ?)"
+                    + " AND cfur.create_time BETWEEN ? AND ? GROUP BY cc.owner_user_id";
+            assertNotNull(CCJSqlParserUtil.parse(sql), dialect + " " + sql);
+        }
+    }
+
+    @Test
+    public void testBoundSql_findInSetColumn() throws Exception {
+        FakeDataSource postgresql = new FakeDataSource("PostgreSQL", "jdbc:postgresql://127.0.0.1:5432/a", 17);
+        FakeDataSource oracle = new FakeDataSource("Oracle", "jdbc:oracle:thin:@127.0.0.1:1521:xe", 21);
+        FakeDataSource sqlServer = new FakeDataSource("Microsoft SQL Server", "jdbc:sqlserver://127.0.0.1:1433", 16);
+        FakeDataSource mysql = new FakeDataSource("MySQL", "jdbc:mysql://127.0.0.1:3306/a", 8);
+        mockDynamicRoutingDataSource(Map.of("master", postgresql, "oracle", oracle, "sqlserver", sqlServer, "mysql", mysql));
+        // 与 CrmStatisticsRankMapper.xml 的 selectFollowCustomerCountRank 相同
+        SqlSource sqlSource = new XMLLanguageDriver().createSqlSource(new Configuration(),
+                "<script>SELECT COUNT(DISTINCT cc.id) AS count, cc.owner_user_id FROM crm_follow_up_record cfur"
+                        + " LEFT JOIN crm_contact cc ON " + P + "findInSetColumn('cc.id', 'cfur.contact_ids')}"
+                        + " WHERE cfur.deleted = 0 AND cc.deleted = 0 AND cc.owner_user_id in"
+                        + " <foreach collection=\"userIds\" item=\"userId\" open=\"(\" close=\")\" separator=\",\">#{userId}</foreach>"
+                        + " AND cfur.create_time between #{times[0],javaType=java.time.LocalDateTime}"
+                        + " and #{times[1],javaType=java.time.LocalDateTime}"
+                        + " GROUP BY cc.owner_user_id</script>", Map.class);
+        Map<String, Object> params = new HashMap<>();
+        params.put("userIds", List.of(1L, 2L));
+        params.put("times", new LocalDateTime[]{LocalDateTime.of(2026, 1, 1, 0, 0),
+                LocalDateTime.of(2026, 1, 31, 23, 59, 59)});
+        // 依次切换：主库 PostgreSQL、Oracle、SQL Server、MySQL
+        Map<String, Dialect> routes = new LinkedHashMap<>();
+        routes.put("master", Dialect.POSTGRESQL);
+        routes.put("oracle", Dialect.ORACLE);
+        routes.put("sqlserver", Dialect.SQLSERVER);
+        routes.put("mysql", Dialect.ORIGINAL);
+
+        for (Map.Entry<String, Dialect> route : routes.entrySet()) {
+            DynamicDataSourceContextHolder.push(route.getKey());
+            BoundSql boundSql = sqlSource.getBoundSql(params);
+            String sql = normalize(boundSql.getSql());
+            String fragment = SqlDialectUtils.findInSetColumn(route.getValue(), "cc.id", "cfur.contact_ids");
+            assertTrue(sql.startsWith("SELECT COUNT(DISTINCT cc.id) AS count, cc.owner_user_id FROM crm_follow_up_record cfur"
+                    + " LEFT JOIN crm_contact cc ON " + fragment + " WHERE cfur.deleted = 0 AND cc.deleted = 0"), sql);
+            assertTrue(sql.endsWith("AND cfur.create_time between ? and ? GROUP BY cc.owner_user_id"), sql);
+            // 列对列的片段不引入参数：只有 2 个用户编号与 2 个时间
+            List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
+            assertEquals(4, parameterMappings.size(), sql);
+            assertEquals("times[0]", parameterMappings.get(2).getProperty());
+            assertEquals("times[1]", parameterMappings.get(3).getProperty());
+            assertNotNull(CCJSqlParserUtil.parse(sql), route.getValue() + " " + sql);
         }
     }
 
