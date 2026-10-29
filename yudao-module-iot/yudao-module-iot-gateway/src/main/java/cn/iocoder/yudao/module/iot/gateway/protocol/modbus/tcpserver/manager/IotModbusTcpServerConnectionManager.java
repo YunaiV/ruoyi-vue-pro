@@ -64,6 +64,11 @@ public class IotModbusTcpServerConnectionManager {
          */
         private IotModbusFrameFormatEnum frameFormat;
 
+        /**
+         * 本连接的事务通道：认证注册时在连接的 owner 上创建；未认证连接没有
+         */
+        private IotModbusTcpServerTransactionChannel channel;
+
     }
 
     /**
@@ -75,7 +80,8 @@ public class IotModbusTcpServerConnectionManager {
         if (oldSocket != null && oldSocket != socket) {
             log.info("[registerConnection][设备 {} 存在旧连接, 关闭旧 socket, oldRemote={}, newRemote={}]",
                     info.getDeviceId(), oldSocket.remoteAddress(), socket.remoteAddress());
-            connectionMap.remove(oldSocket);
+            // 旧 socket 的 closeHandler 之后拿不到 info（提前返回），所以在这里收尾旧通道
+            notifyChannelClosed(connectionMap.remove(oldSocket));
             try {
                 oldSocket.close();
             } catch (Exception e) {
@@ -84,8 +90,11 @@ public class IotModbusTcpServerConnectionManager {
             }
         }
 
-        // 注册新连接
-        connectionMap.put(socket, info);
+        // 注册新连接（同一个 socket 重复认证时，被替换的旧 info 的通道也要收尾）
+        ConnectionInfo previous = connectionMap.put(socket, info);
+        if (previous != null && previous.getChannel() != info.getChannel()) {
+            notifyChannelClosed(previous);
+        }
         deviceSocketMap.put(info.getDeviceId(), socket);
         log.info("[registerConnection][设备 {} 连接已注册, remoteAddress={}]",
                 info.getDeviceId(), socket.remoteAddress());
@@ -114,6 +123,19 @@ public class IotModbusTcpServerConnectionManager {
     }
 
     /**
+     * 获取所有已认证连接的事务通道
+     */
+    public List<IotModbusTcpServerTransactionChannel> getChannels() {
+        List<IotModbusTcpServerTransactionChannel> channels = new ArrayList<>();
+        for (ConnectionInfo info : connectionMap.values()) {
+            if (info.getChannel() != null) {
+                channels.add(info.getChannel());
+            }
+        }
+        return channels;
+    }
+
+    /**
      * 移除连接
      */
     public ConnectionInfo removeConnection(NetSocket socket) {
@@ -139,7 +161,9 @@ public class IotModbusTcpServerConnectionManager {
         if (socket == null) {
             return;
         }
-        connectionMap.remove(socket);
+        // 在 ConnectionInfo 还能取到时通知通道（切回 owner 收尾，幂等），然后照旧 close：
+        // 映射已移除，closeHandler 照旧提前返回，不发普通下线消息
+        notifyChannelClosed(connectionMap.remove(socket));
         try {
             socket.close();
             log.info("[closeConnection][设备 {} 连接已关闭]", deviceId);
@@ -178,6 +202,8 @@ public class IotModbusTcpServerConnectionManager {
     public void closeAll() {
         // 1. 先复制再清空，避免 closeHandler 回调时并发修改
         List<NetSocket> sockets = new ArrayList<>(connectionMap.keySet());
+        // 清空前逐个通知通道（与 closeConnection 同理：closeHandler 之后拿不到 info）
+        connectionMap.values().forEach(this::notifyChannelClosed);
         connectionMap.clear();
         deviceSocketMap.clear();
         // 2. 关闭所有 socket（closeHandler 中 removeConnection 发现 map 为空会安全跳过）
@@ -187,6 +213,15 @@ public class IotModbusTcpServerConnectionManager {
             } catch (Exception e) {
                 log.error("[closeAll][关闭连接失败]", e);
             }
+        }
+    }
+
+    /**
+     * 通知连接的事务通道已关闭（任意线程：通道内部切回自己的 owner；onClose 可以重复调用）
+     */
+    private void notifyChannelClosed(ConnectionInfo info) {
+        if (info != null && info.getChannel() != null) {
+            info.getChannel().onClose();
         }
     }
 

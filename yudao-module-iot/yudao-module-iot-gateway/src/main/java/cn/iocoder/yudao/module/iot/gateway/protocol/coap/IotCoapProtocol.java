@@ -62,6 +62,11 @@ public class IotCoapProtocol implements IotProtocol {
     private CoapServer coapServer;
 
     /**
+     * 上行处理器：停止时关闭它的透传截止计时器
+     */
+    private IotCoapUpstreamHandler upstreamHandler;
+
+    /**
      * 下行消息订阅者
      */
     private IotCoapDownstreamSubscriber downstreamSubscriber;
@@ -116,7 +121,7 @@ public class IotCoapProtocol implements IotProtocol {
                 add(registerSubResource);
             }});
             // 2.4 添加 /topic 根资源（用于上行消息）
-            IotCoapUpstreamHandler upstreamHandler = new IotCoapUpstreamHandler(serverId);
+            upstreamHandler = new IotCoapUpstreamHandler(serverId);
             IotCoapUpstreamTopicResource topicResource = new IotCoapUpstreamTopicResource(serverId, upstreamHandler);
             coapServer.add(topicResource);
 
@@ -167,6 +172,11 @@ public class IotCoapProtocol implements IotProtocol {
             } catch (Exception e) {
                 log.error("[stop][IoT CoAP 协议 {} 服务器停止失败]", getId(), e);
             }
+        }
+        // 3. 关闭上行处理器的透传截止计时器
+        if (upstreamHandler != null) {
+            upstreamHandler.stop();
+            upstreamHandler = null;
         }
         running = false;
         log.info("[stop][IoT CoAP 协议 {} 已停止]", getId());

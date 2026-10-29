@@ -77,6 +77,12 @@ public class IotProductRespVO {
     @DictFormat(DictTypeConstants.SERIALIZE_TYPE)
     private String serializeType;
 
+    @Schema(description = "数据解析脚本（JS ES5）")
+    private String scriptContent;
+
+    @Schema(description = "是否启用数据解析脚本", example = "false")
+    private Boolean scriptEnabled;
+
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;

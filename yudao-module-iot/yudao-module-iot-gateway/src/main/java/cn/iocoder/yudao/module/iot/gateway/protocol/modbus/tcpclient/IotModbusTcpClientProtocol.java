@@ -52,6 +52,7 @@ public class IotModbusTcpClientProtocol implements IotProtocol {
     /**
      * Vert.x 实例
      */
+    @Getter
     private final Vertx vertx;
     /**
      * 配置刷新定时器 ID
@@ -127,7 +128,8 @@ public class IotModbusTcpClientProtocol implements IotProtocol {
             IotMessageBus messageBus = SpringUtil.getBean(IotMessageBus.class);
             IotModbusTcpClientDownstreamHandler downstreamHandler = new IotModbusTcpClientDownstreamHandler(connectionManager,
                     configCacheService);
-            this.downstreamSubscriber = new IotModbusTcpClientDownstreamSubscriber(this, downstreamHandler, messageBus);
+            this.downstreamSubscriber = new IotModbusTcpClientDownstreamSubscriber(this, downstreamHandler,
+                    connectionManager, messageBus);
             this.downstreamSubscriber.start();
         } catch (Exception e) {
             log.error("[start][IoT Modbus TCP Client 协议 {} 启动失败]", getId(), e);

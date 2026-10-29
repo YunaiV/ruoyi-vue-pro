@@ -53,6 +53,7 @@ public class IotTcpProtocol implements IotProtocol {
     /**
      * Vert.x 实例
      */
+    @Getter
     private Vertx vertx;
     /**
      * TCP 服务器

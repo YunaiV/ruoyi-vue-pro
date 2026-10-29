@@ -51,6 +51,10 @@ public interface ErrorCodeConstants {
     ErrorCode DEVICE_PROPERTY_FIELD_NAME_INVALID = new ErrorCode(1_050_003_301, "属性标识符({}) 不合法，无法作为存储字段");
     ErrorCode DEVICE_PROPERTY_FIELD_NAME_RESERVED = new ErrorCode(1_050_003_302, "属性标识符({}) 与存储保留字段({}) 冲突");
     ErrorCode DEVICE_PROPERTY_FIELD_NAME_DUPLICATE = new ErrorCode(1_050_003_303, "属性标识符({}) 与({}) 的存储字段({}) 重复");
+    // 设备消息相关错误码 1-050-003-400
+    ErrorCode DEVICE_MESSAGE_RAW_PAYLOAD_INVALID = new ErrorCode(1_050_003_400, "透传载荷不合法：{}");
+    ErrorCode DEVICE_MESSAGE_RAW_PROTOCOL_NOT_SUPPORTED = new ErrorCode(1_050_003_401, "协议({}) 不支持透传下发");
+    ErrorCode DEVICE_MESSAGE_RAW_METHOD_RESERVED = new ErrorCode(1_050_003_402, "透传上报只能由网关创建");
 
     // ========== 产品分类 1-050-004-000 ==========
     ErrorCode PRODUCT_CATEGORY_NOT_EXISTS = new ErrorCode(1_050_004_000, "产品分类不存在");
@@ -66,6 +70,11 @@ public interface ErrorCodeConstants {
     // ========== 设备 Modbus 点位 1-050-007-000 ==========
     ErrorCode DEVICE_MODBUS_POINT_NOT_EXISTS = new ErrorCode(1_050_007_000, "设备 Modbus 点位配置不存在");
     ErrorCode DEVICE_MODBUS_POINT_EXISTS = new ErrorCode(1_050_007_001, "设备 Modbus 点位配置已存在");
+
+    // ========== 设备影子 1-050-007-100 ==========
+    ErrorCode DEVICE_SHADOW_NOT_ENABLED = new ErrorCode(1_050_007_100, "设备影子未启用");
+    ErrorCode DEVICE_SHADOW_VERSION_CONFLICT = new ErrorCode(1_050_007_101, "设备影子版本冲突");
+    ErrorCode DEVICE_SHADOW_PROPERTY_COUNT_EXCEEDED = new ErrorCode(1_050_007_102, "设备影子属性数超过限制");
 
     // ========== OTA 固件相关 1-050-008-000 ==========
 
@@ -90,6 +99,12 @@ public interface ErrorCodeConstants {
     ErrorCode OTA_TASK_RECORD_NOT_EXISTS = new ErrorCode(1_050_008_200, "升级记录不存在");
     ErrorCode OTA_TASK_RECORD_CANCEL_FAIL_STATUS_ERROR = new ErrorCode(1_050_008_201, "取消 OTA 升级记录失败，原因：记录状态不是进行中");
     ErrorCode OTA_TASK_RECORD_UPDATE_PROGRESS_FAIL_NO_EXISTS = new ErrorCode(1_050_008_202, "更新 OTA 升级记录进度失败，原因：该设备没有进行中的升级记录");
+
+    // ========== IoT 产品数据解析脚本 1-050-009-000 ==========
+    ErrorCode PRODUCT_SCRIPT_TOO_LONG = new ErrorCode(1_050_009_000, "数据解析脚本不能超过 {} 字节");
+    ErrorCode PRODUCT_SCRIPT_COMPILE_FAILED = new ErrorCode(1_050_009_001, "数据解析脚本语法错误：{}");
+    ErrorCode PRODUCT_SCRIPT_EMPTY = new ErrorCode(1_050_009_002, "启用数据解析脚本时，脚本内容不能为空");
+    ErrorCode PRODUCT_SCRIPT_DEBUG_BUSY = new ErrorCode(1_050_009_003, "脚本调试繁忙或已熔断，请稍后再试");
 
     // ========== IoT 数据流转规则 1-050-010-000 ==========
     ErrorCode DATA_RULE_NOT_EXISTS = new ErrorCode(1_050_010_000, "数据流转规则不存在");

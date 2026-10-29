@@ -1,7 +1,15 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.utils;
 
+import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.exception.ErrorCode;
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusPointRespDTO;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.manager.IotModbusTx;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpclient.handler.downstream.IotModbusRawRequest;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpclient.manager.IotModbusTcpClientConnectionManager;
+import com.ghgande.j2mod.modbus.ModbusException;
+import com.ghgande.j2mod.modbus.ModbusIOException;
+import com.ghgande.j2mod.modbus.ModbusSlaveException;
 import com.ghgande.j2mod.modbus.io.ModbusTCPTransaction;
 import com.ghgande.j2mod.modbus.msg.*;
 import com.ghgande.j2mod.modbus.procimg.InputRegister;
@@ -12,6 +20,13 @@ import io.vertx.core.Future;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.IOException;
+import java.net.SocketTimeoutException;
+
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.iot.gateway.enums.ErrorCodeConstants.DEVICE_OFFLINE_OR_WRITE_FAILED;
+import static cn.iocoder.yudao.module.iot.gateway.enums.ErrorCodeConstants.MODBUS_RESPONSE_INVALID;
+import static cn.iocoder.yudao.module.iot.gateway.enums.ErrorCodeConstants.MODBUS_TIMEOUT;
 import static cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.utils.IotModbusCommonUtils.*;
 
 /**
@@ -121,6 +136,118 @@ public class IotModbusTcpClientUtils {
                         slaveId, point.getIdentifier(), point.getRegisterAddress()), e);
             }
         });
+    }
+
+    /**
+     * 执行透传请求（raw.push / encode 输出的 PDU）
+     * <p>
+     * 设备的正常、异常响应都从 transaction.getResponse() 取真实响应，先核对事务号、unit、功能码，再还原 PDU：
+     * 异常响应还原为 [fc | 0x80, 异常码] 作为成功结果；在有序队列里排队超过截止 → 110；
+     * 身份不一致 → 在本有序任务内关闭连接再 114（下一个任务开始时重连，不会读到错位的响应）；格式与请求不一致 → 114；
+     * 传输失败由 executeRawBlocking 的守卫先断开连接再抛出（只作用于透传；标准读写超时不断开共享连接）
+     *
+     * @param connection Modbus 连接
+     * @param slaveId    从站地址
+     * @param tx         透传事务
+     * @return 响应 PDU
+     */
+    public static Future<byte[]> executeRaw(IotModbusTcpClientConnectionManager.ModbusConnection connection,
+                                            Integer slaveId, IotModbusTx tx) {
+        return connection.executeRawBlocking(tcpConnection -> {
+            // 1. 在有序队列里排得太久（超过本连接的 timeout）：不再执行
+            if (tx.isExpired()) {
+                throw exception(MODBUS_TIMEOUT);
+            }
+            // 2.1 构造事务：retries = 1 表示只尝试 1 次（0 会被 j2mod 当成默认的 5 次；写功能码重试会重复写出）
+            IotModbusRawRequest request = new IotModbusRawRequest(tx.getPdu());
+            request.setUnitID(slaveId);
+            ModbusTCPTransaction transaction = new ModbusTCPTransaction(tcpConnection);
+            transaction.setRetries(1);
+            transaction.setRequest(request);
+            // 2.2 保存发出的身份：setRequest 分配事务号，execute 结束后 j2mod 会把请求的事务号自增
+            int transactionId = request.getTransactionID();
+            int unitId = request.getUnitID();
+            int functionCode = request.getFunctionCode();
+            // 2.3 执行事务
+            try {
+                transaction.execute();
+            } catch (ModbusSlaveException e) {
+                // 设备异常响应：不在这里拼异常 PDU，下面用 transaction.getResponse() 的真实异常响应核对身份
+                log.debug("[executeRaw][设备异常响应, slaveId={}, functionCode={}]", slaveId, functionCode);
+            } catch (ModbusException e) {
+                throw new RuntimeException(String.format("Modbus 透传失败 [slaveId=%d, functionCode=%d]",
+                        slaveId, functionCode), e);
+            }
+            // 3.1 核对真实响应的身份：不一致说明读到的不是这次请求的响应，在本有序任务内关闭连接
+            ModbusResponse response = transaction.getResponse();
+            if (!IotModbusRawRequest.isResponseOf(response, transactionId, unitId, functionCode)) {
+                log.warn("[executeRaw][响应与请求不一致, 关闭连接, 请求(tid={}, unit={}, fc={}), 响应(tid={}, unit={}, fc={})]",
+                        transactionId, unitId, functionCode,
+                        response != null ? response.getTransactionID() : null,
+                        response != null ? response.getUnitID() : null,
+                        response != null ? response.getFunctionCode() : null);
+                tcpConnection.close();
+                throw exception(MODBUS_RESPONSE_INVALID);
+            }
+            // 3.2 还原响应 PDU，并核对响应格式
+            return request.buildResponsePdu(response);
+        });
+    }
+
+    /**
+     * 是否是传输失败（读超时、IO 异常）：沿 cause 链查找 ModbusIOException / IOException；
+     * 遇到 ModbusSlaveException（设备异常响应，说明链路正常）返回 false
+     *
+     * @param e 异常
+     * @return 是否传输失败
+     */
+    public static boolean isTransportFailure(Throwable e) {
+        int depth = 0;
+        for (Throwable cause = e; cause != null && depth < 16; cause = cause.getCause(), depth++) {
+            if (cause instanceof ModbusSlaveException) {
+                return false;
+            }
+            if (cause instanceof ModbusIOException || cause instanceof IOException) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 是否是读超时：j2mod 的 ModbusTCPTransport.readResponse 把 SocketTimeoutException 转为
+     * ModbusIOException("Socket timeout reading response - ...")，不保留 cause，所以同时按消息判断
+     *
+     * @param e 异常
+     * @return 是否读超时
+     */
+    public static boolean isTimeoutFailure(Throwable e) {
+        int depth = 0;
+        for (Throwable cause = e; cause != null && depth < 16; cause = cause.getCause(), depth++) {
+            if (cause instanceof SocketTimeoutException) {
+                return true;
+            }
+            if (cause instanceof ModbusIOException && StrUtil.containsIgnoreCase(cause.getMessage(), "timeout")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 把透传任务的失败转换为网关判定的错误码：ServiceException 保留其错误码（110 / 114 / 115），读超时 → 110，其它 → 106
+     *
+     * @param e 异常
+     * @return 错误码
+     */
+    public static ErrorCode toRawFailure(Throwable e) {
+        if (e instanceof ServiceException) {
+            return new ErrorCode(((ServiceException) e).getCode(), e.getMessage());
+        }
+        if (isTimeoutFailure(e)) {
+            return MODBUS_TIMEOUT;
+        }
+        return DEVICE_OFFLINE_OR_WRITE_FAILED;
     }
 
     /**

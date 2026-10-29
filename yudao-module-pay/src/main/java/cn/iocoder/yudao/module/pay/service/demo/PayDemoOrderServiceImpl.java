@@ -131,6 +131,11 @@ public class PayDemoOrderServiceImpl implements PayDemoOrderService {
                     order, payOrderId);
             throw exception(DEMO_ORDER_UPDATE_PAID_FAIL_PAY_ORDER_ID_ERROR);
         }
+        // 1.3 校验支付单号，与订单绑定的支付单号一致。避免其它支付应用中，相同商户订单编号、金额的支付单被用于串单
+        if (ObjectUtil.notEqual(order.getPayOrderId(), payOrderId)) {
+            log.error("[updateDemoOrderPaid][order({}) 支付单不匹配({})，请进行处理！]", order, payOrderId);
+            throw exception(DEMO_ORDER_UPDATE_PAID_FAIL_PAY_ORDER_ID_ERROR);
+        }
 
         // 2. 校验支付订单的合法性
         PayOrderRespDTO payOrder = validatePayOrderPaid(order, payOrderId);

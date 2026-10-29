@@ -19,6 +19,7 @@ import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.handler.upstream.IotMqt
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.manager.IotMqttConnectionManager;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import cn.iocoder.yudao.module.iot.gateway.util.IotMqttTopicUtils;
+import cn.iocoder.yudao.module.iot.gateway.util.IotWorkerTaskQueue;
 import io.netty.handler.codec.mqtt.MqttConnectReturnCode;
 import io.netty.handler.codec.mqtt.MqttQoS;
 import io.vertx.core.Vertx;
@@ -68,6 +69,7 @@ public class IotMqttProtocol implements IotProtocol {
     /**
      * Vert.x 实例
      */
+    @Getter
     private Vertx vertx;
     /**
      * MQTT 服务器
@@ -232,21 +234,22 @@ public class IotMqttProtocol implements IotProtocol {
         }
 
         // 2.1 设置异常和关闭处理器
+        IotWorkerTaskQueue queue = new IotWorkerTaskQueue(vertx.getOrCreateContext()); // 本连接的 worker 队列：阻塞的消息处理按收到的顺序执行，不同连接之间并行
         endpoint.exceptionHandler(ex -> {
             log.warn("[handleEndpoint][连接异常，客户端 ID: {}，地址: {}，异常: {}]",
                     clientId, connectionManager.getEndpointAddress(endpoint), ex.getMessage());
             endpoint.close();
         });
-        endpoint.closeHandler(v -> cleanupConnection(endpoint)); // 处理底层连接关闭（网络中断、异常等）
+        endpoint.closeHandler(v -> cleanupConnection(endpoint, queue)); // 处理底层连接关闭（网络中断、异常等）
         endpoint.disconnectHandler(v -> { // 处理 MQTT DISCONNECT 报文
             log.debug("[handleEndpoint][设备断开连接，客户端 ID: {}]", clientId);
-            cleanupConnection(endpoint);
+            cleanupConnection(endpoint, queue);
         });
         // 2.2 设置心跳处理器
         endpoint.pingHandler(v -> log.debug("[handleEndpoint][收到客户端心跳，客户端 ID: {}]", clientId));
 
         // 3.1 设置消息处理器
-        endpoint.publishHandler(message -> processMessage(endpoint, message));
+        endpoint.publishHandler(message -> processMessage(endpoint, queue, message));
         // 3.2 设置 QoS 2 消息的 PUBREL 处理器
         endpoint.publishReleaseHandler(endpoint::publishComplete);
 
@@ -282,23 +285,24 @@ public class IotMqttProtocol implements IotProtocol {
      * 处理消息（发布）
      *
      * @param endpoint MQTT 连接端点
+     * @param queue    本连接的 worker 队列
      * @param message  发布消息
      */
-    private void processMessage(MqttEndpoint endpoint, MqttPublishMessage message) {
+    private void processMessage(MqttEndpoint endpoint, IotWorkerTaskQueue queue, MqttPublishMessage message) {
         String clientId = endpoint.clientIdentifier();
-        try {
-            // 1. 处理业务消息
-            String topic = message.topicName();
-            byte[] payload = message.payload().getBytes();
-            upstreamHandler.handleBusinessRequest(endpoint, topic, payload);
-
-            // 2. 根据 QoS 级别发送相应的确认消息
+        // 1. 处理业务消息：阻塞的部分在本连接的 worker 队列上按顺序执行，完成后回到 event loop
+        String topic = message.topicName();
+        byte[] payload = message.payload().getBytes();
+        upstreamHandler.handleBusinessRequest(endpoint, queue, topic, payload).onComplete(ar -> {
+            if (ar.failed()) { // 队列已满或已关闭：不确认，断开连接，由设备重连后重发
+                log.error("[processMessage][消息处理失败，断开连接，客户端 ID: {}，地址: {}，错误: {}]",
+                        clientId, connectionManager.getEndpointAddress(endpoint), ar.cause().getMessage());
+                endpoint.close();
+                return;
+            }
+            // 2. 处理完成后，根据 QoS 级别发送相应的确认消息：同一连接按收到的顺序完成，确认也按顺序
             handleQoSAck(endpoint, message);
-        } catch (Exception e) {
-            log.error("[processMessage][消息处理失败，断开连接，客户端 ID: {}，地址: {}，错误: {}]",
-                    clientId, connectionManager.getEndpointAddress(endpoint), e.getMessage());
-            endpoint.close();
-        }
+        });
     }
 
     /**
@@ -308,6 +312,10 @@ public class IotMqttProtocol implements IotProtocol {
      * @param message  发布消息
      */
     private void handleQoSAck(MqttEndpoint endpoint, MqttPublishMessage message) {
+        // 处理期间连接已断开：无法确认，设备重连后重发
+        if (!endpoint.isConnected()) {
+            return;
+        }
         if (message.qosLevel() == MqttQoS.AT_LEAST_ONCE) {
             // QoS 1: 发送 PUBACK 确认
             endpoint.publishAcknowledge(message.messageId());
@@ -322,23 +330,33 @@ public class IotMqttProtocol implements IotProtocol {
      * 清理连接
      *
      * @param endpoint MQTT 连接端点
+     * @param queue    本连接的 worker 队列
      */
-    private void cleanupConnection(MqttEndpoint endpoint) {
-        try {
-            // 1. 发送设备离线消息
-            IotMqttConnectionManager.ConnectionInfo connectionInfo = connectionManager.getConnectionInfo(endpoint);
-            if (connectionInfo != null) {
-                IotDeviceMessage offlineMessage = IotDeviceMessage.buildStateOffline();
-                deviceMessageService.sendDeviceMessage(offlineMessage, connectionInfo.getProductKey(),
-                        connectionInfo.getDeviceName(), serverId);
-            }
-        } catch (Exception e) {
-            log.error("[cleanupConnection][清理连接失败，客户端 ID: {}，错误: {}]",
-                    endpoint.clientIdentifier(), e.getMessage());
-        } finally {
-            // 2. 注销连接，避免发送离线消息失败时残留连接
-            connectionManager.unregisterConnection(endpoint);
+    private void cleanupConnection(MqttEndpoint endpoint, IotWorkerTaskQueue queue) {
+        // 1. 注销连接：closeHandler、disconnectHandler 都会调用，第二次取不到连接信息，不再处理
+        IotMqttConnectionManager.ConnectionInfo connectionInfo = connectionManager.getConnectionInfo(endpoint);
+        connectionManager.unregisterConnection(endpoint);
+        if (connectionInfo == null) {
+            return;
         }
+
+        // 2. 发送设备离线消息：排在本连接已收到的消息之后；执行时设备已在新连接上线，则不再发送
+        queue.submitLast(() -> {
+            if (connectionManager.getDeviceEndpoint(connectionInfo.getDeviceId()) != null) {
+                log.info("[cleanupConnection][设备已在新连接上线，不发送离线消息，设备 ID: {}]", connectionInfo.getDeviceId());
+                return null;
+            }
+            IotDeviceMessage offlineMessage = IotDeviceMessage.buildStateOffline();
+            deviceMessageService.sendDeviceMessage(offlineMessage, connectionInfo.getProductKey(),
+                    connectionInfo.getDeviceName(), serverId);
+            // 发送期间设备在新连接上线（它的上线消息可能先于离线消息）：补发上线消息，避免在线设备被标记为离线
+            if (connectionManager.getDeviceEndpoint(connectionInfo.getDeviceId()) != null) {
+                deviceMessageService.sendDeviceMessage(IotDeviceMessage.buildStateUpdateOnline(),
+                        connectionInfo.getProductKey(), connectionInfo.getDeviceName(), serverId);
+            }
+            return null;
+        }).onFailure(e -> log.error("[cleanupConnection][清理连接失败，客户端 ID: {}，错误: {}]",
+                endpoint.clientIdentifier(), e.getMessage()));
     }
 
 }

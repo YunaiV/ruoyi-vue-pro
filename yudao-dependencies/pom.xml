@@ -76,6 +76,7 @@
         <okhttp.version>4.12.0</okhttp.version>
         <californium.version>3.14.0</californium.version>
         <j2mod.version>3.4.0</j2mod.version>
+        <rhino.version>1.7.15.1</rhino.version>
         <!-- 三方云服务相关 -->
         <awssdk.version>2.57.3</awssdk.version>
         <justauth.version>1.16.7</justauth.version>
@@ -659,6 +660,13 @@
                 <groupId>com.ghgande</groupId>
                 <artifactId>j2mod</artifactId>
                 <version>${j2mod.version}</version>
+            </dependency>
+
+            <!-- JS 脚本引擎 -->
+            <dependency>
+                <groupId>org.mozilla</groupId>
+                <artifactId>rhino</artifactId>
+                <version>${rhino.version}</version>
             </dependency>
 
             <!-- 三方云服务相关 -->

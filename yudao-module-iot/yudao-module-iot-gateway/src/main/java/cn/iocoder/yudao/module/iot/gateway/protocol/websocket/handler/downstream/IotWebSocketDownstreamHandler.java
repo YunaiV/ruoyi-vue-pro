@@ -4,6 +4,7 @@ import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.iot.gateway.protocol.websocket.manager.IotWebSocketConnectionManager;
 import cn.iocoder.yudao.module.iot.gateway.serialize.IotMessageSerializer;
+import io.vertx.core.Future;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -51,6 +52,19 @@ public class IotWebSocketDownstreamHandler {
             log.error("[handle][处理下行消息失败，设备 ID: {}，方法: {}，消息内容: {}]",
                     message.getDeviceId(), message.getMethod(), message, e);
         }
+    }
+
+    /**
+     * 处理透传下行（raw.push 或编码脚本的输出）：原始字节以 binary 帧写出
+     * <p>
+     * 设备未连接时，由 {@link IotWebSocketConnectionManager#sendBinaryToDeviceAsync} 返回失败
+     *
+     * @param message 下行消息
+     * @param bytes   要写出的原始字节
+     * @return 真实的写出结果
+     */
+    public Future<Void> handleRawMessage(IotDeviceMessage message, byte[] bytes) {
+        return connectionManager.sendBinaryToDeviceAsync(message.getDeviceId(), bytes);
     }
 
 }

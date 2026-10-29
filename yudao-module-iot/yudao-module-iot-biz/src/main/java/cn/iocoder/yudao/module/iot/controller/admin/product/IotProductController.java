@@ -10,6 +10,9 @@ import cn.iocoder.yudao.framework.excel.core.util.ExcelUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.product.vo.product.IotProductPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.product.vo.product.IotProductRespVO;
 import cn.iocoder.yudao.module.iot.controller.admin.product.vo.product.IotProductSaveReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.product.vo.product.IotProductScriptDebugReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.product.vo.product.IotProductScriptDebugRespVO;
+import cn.iocoder.yudao.module.iot.controller.admin.product.vo.product.IotProductScriptUpdateReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductCategoryDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.service.product.IotProductCategoryService;
@@ -67,6 +70,22 @@ public class IotProductController {
                                                      @RequestParam("status") Integer status) {
         productService.updateProductStatus(id, status);
         return success(true);
+    }
+
+    @PutMapping("/update-script")
+    @Operation(summary = "更新产品数据解析脚本", description = "部分更新：只修改本次提交的字段；保存即生效")
+    @PreAuthorize("@ss.hasPermission('iot:product:update')")
+    public CommonResult<Boolean> updateProductScript(@Valid @RequestBody IotProductScriptUpdateReqVO updateReqVO) {
+        productService.updateProductScript(updateReqVO);
+        return success(true);
+    }
+
+    @PostMapping("/debug-script")
+    @Operation(summary = "调试产品数据解析脚本", description = "执行当前编辑内容；不保存、不发消息、不改属性")
+    @PreAuthorize("@ss.hasPermission('iot:product:update')")
+    public CommonResult<IotProductScriptDebugRespVO> debugProductScript(
+            @Valid @RequestBody IotProductScriptDebugReqVO debugReqVO) {
+        return success(productService.debugProductScript(debugReqVO));
     }
 
     @DeleteMapping("/delete")

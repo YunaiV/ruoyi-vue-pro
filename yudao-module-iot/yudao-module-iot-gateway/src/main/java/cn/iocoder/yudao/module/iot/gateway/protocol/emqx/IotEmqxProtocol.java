@@ -14,6 +14,7 @@ import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.handler.upstream.IotEmq
 import cn.iocoder.yudao.module.iot.gateway.protocol.emqx.handler.upstream.IotEmqxUpstreamHandler;
 import cn.iocoder.yudao.module.iot.gateway.util.IotMqttTopicUtils;
 import io.netty.handler.codec.mqtt.MqttQoS;
+import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpServer;
@@ -31,7 +32,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
+import static cn.iocoder.yudao.module.iot.gateway.enums.ErrorCodeConstants.DEVICE_OFFLINE_OR_WRITE_FAILED;
 
 /**
  * IoT 网关 EMQX 协议实现：
@@ -67,6 +70,7 @@ public class IotEmqxProtocol implements IotProtocol {
     /**
      * Vert.x 实例
      */
+    @Getter
     private Vertx vertx;
     /**
      * HTTP Hook 服务器
@@ -515,6 +519,35 @@ public class IotEmqxProtocol implements IotProtocol {
         MqttQoS qos = MqttQoS.valueOf(emqxConfig.getMqttQos());
         mqttClient.publish(topic, Buffer.buffer(payload), qos, false, false)
                 .onFailure(e -> log.error("[publishMessage][IoT EMQX 协议 {} 发布失败, topic: {}]", getId(), topic, e));
+    }
+
+    /**
+     * 异步发布消息到 MQTT Broker：返回 publish 真实的结果（透传下发使用）
+     * <p>
+     * 成功只表示已交给 Broker，不代表设备已收到；未连接或发布失败时，返回 ServiceException(DEVICE_OFFLINE_OR_WRITE_FAILED)
+     *
+     * @param topic   主题
+     * @param payload 消息内容
+     * @return 发布结果
+     */
+    public Future<Void> publishMessageAsync(String topic, byte[] payload) {
+        MqttClient client = this.mqttClient;
+        if (client == null || !client.isConnected()) {
+            log.warn("[publishMessageAsync][IoT EMQX 协议 {} MQTT Client 未连接, 无法发布消息]", getId());
+            return Future.failedFuture(exception(DEVICE_OFFLINE_OR_WRITE_FAILED));
+        }
+        try {
+            MqttQoS qos = MqttQoS.valueOf(emqxConfig.getMqttQos());
+            return client.publish(topic, Buffer.buffer(payload), qos, false, false)
+                    .<Void>mapEmpty()
+                    .recover(e -> {
+                        log.warn("[publishMessageAsync][IoT EMQX 协议 {} 发布失败, topic: {}, 错误: {}]", getId(), topic, e.getMessage());
+                        return Future.failedFuture(exception(DEVICE_OFFLINE_OR_WRITE_FAILED));
+                    });
+        } catch (Exception e) {
+            log.error("[publishMessageAsync][IoT EMQX 协议 {} 发布异常, topic: {}]", getId(), topic, e);
+            return Future.failedFuture(exception(DEVICE_OFFLINE_OR_WRITE_FAILED));
+        }
     }
 
     /**

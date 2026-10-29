@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.iot.dal.dataobject.rule.config;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 /**
@@ -13,6 +15,13 @@ import lombok.Data;
  */
 @Data
 public class IotDataSinkDatabaseConfig extends IotAbstractDataSinkConfig {
+
+    /**
+     * 目标表名的格式：只允许字母、数字、下划线，且不以数字开头；支持可选的 schema.table 格式
+     *
+     * 目的：表名会拼接到 INSERT 语句中，保存和执行时都必须校验
+     */
+    public static final String TABLE_NAME_REGEX = "^[A-Za-z_][A-Za-z0-9_]{0,127}(\\.[A-Za-z_][A-Za-z0-9_]{0,127})?$";
 
     /**
      * JDBC 连接地址
@@ -37,6 +46,8 @@ public class IotDataSinkDatabaseConfig extends IotAbstractDataSinkConfig {
      *
      * 设备消息将以固定结构写入该表
      */
+    @NotEmpty(message = "目标表名不能为空")
+    @Pattern(regexp = TABLE_NAME_REGEX, message = "目标表名格式不正确，只允许字母、数字、下划线，或 schema.table 格式")
     private String tableName;
 
 }

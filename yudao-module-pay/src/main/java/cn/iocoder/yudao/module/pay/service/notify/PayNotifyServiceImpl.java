@@ -283,13 +283,15 @@ public class PayNotifyServiceImpl implements PayNotifyService {
 
         // 情况二：调用失败、调用异常
         // 2.1 超过最大回调次数
-        if (updateTask.getNotifyTimes() >= PayNotifyTaskDO.NOTIFY_FREQUENCY.length) {
+        // 注意：算上首次的通知，一共 1 + NOTIFY_FREQUENCY.length = 9 次（与 maxNotifyTimes 一致），所以第 9 次通知失败后，才标记为通知失败
+        if (updateTask.getNotifyTimes() >= PayNotifyTaskDO.NOTIFY_FREQUENCY.length + 1) {
             updateTask.setStatus(PayNotifyStatusEnum.FAILURE.getStatus());
             notifyTaskMapper.updateById(updateTask);
             return updateTask.getStatus();
         }
         // 2.2 未超过最大回调次数
-        updateTask.setNextNotifyTime(addTime(Duration.ofSeconds(PayNotifyTaskDO.NOTIFY_FREQUENCY[updateTask.getNotifyTimes()])));
+        // 注意：第 N 次通知失败后，使用第 N 个通知间隔（下标为 N - 1），保证 NOTIFY_FREQUENCY 的 8 个间隔从第 1 个开始依次使用
+        updateTask.setNextNotifyTime(addTime(Duration.ofSeconds(PayNotifyTaskDO.NOTIFY_FREQUENCY[updateTask.getNotifyTimes() - 1])));
         updateTask.setStatus(invokeException != null ? PayNotifyStatusEnum.REQUEST_FAILURE.getStatus()
                 : PayNotifyStatusEnum.REQUEST_SUCCESS.getStatus());
         notifyTaskMapper.updateById(updateTask);

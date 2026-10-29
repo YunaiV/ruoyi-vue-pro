@@ -32,11 +32,21 @@ public interface IotDeviceMessageIoTDBMapper {
 
     void insert(IotDeviceMessageIoTDBRow row);
 
+    /**
+     * 分页查询
+     *
+     * @param raw             是否有原始帧：true 为 raw 匹配 rawValuePattern；false 为 raw 等于 rawNull
+     * @param rawNull         raw 为 null 的存储值
+     * @param rawValuePattern raw 非 null 的存储值的 LIKE 模式
+     */
     List<IotDeviceMessageIoTDBRow> selectList(@Param("deviceId") String deviceId,
                                               @Param("method") String method,
                                               @Param("upstream") Integer upstream,
                                               @Param("reply") Integer reply,
                                               @Param("identifier") String identifier,
+                                              @Param("raw") Boolean raw,
+                                              @Param("rawNull") String rawNull,
+                                              @Param("rawValuePattern") String rawValuePattern,
                                               @Param("offset") Integer offset,
                                               @Param("limit") Integer limit);
 
@@ -44,7 +54,10 @@ public interface IotDeviceMessageIoTDBMapper {
                      @Param("method") String method,
                      @Param("upstream") Integer upstream,
                      @Param("reply") Integer reply,
-                     @Param("identifier") String identifier);
+                     @Param("identifier") String identifier,
+                     @Param("raw") Boolean raw,
+                     @Param("rawNull") String rawNull,
+                     @Param("rawValuePattern") String rawValuePattern);
 
     List<IotDeviceMessageIoTDBRow> selectListByRequestIdsAndReply(@Param("deviceId") String deviceId,
                                                                   @Param("requestIds") Collection<String> requestIds,

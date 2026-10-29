@@ -13,6 +13,7 @@ import org.mockito.MockedStatic;
 import org.springframework.context.annotation.Import;
 
 import jakarta.annotation.Resource;
+import java.util.Arrays;
 import java.util.Collections;
 
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
@@ -214,6 +215,41 @@ public class OAuth2ClientServiceImplTest extends BaseDbUnitTest {
             // 成功调用（2：只有 clientId 参数）
             result = oauth2ClientService.validOAuthClientFromCache(client.getClientId());
             assertPojoEquals(client, result);
+        }
+    }
+
+    @Test
+    public void testValidOAuthClientFromCache_redirectUriExactMatch() {
+        try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(eq(OAuth2ClientServiceImpl.class)))
+                    .thenReturn(oauth2ClientService);
+
+            // mock 方法
+            OAuth2ClientDO client = randomPojo(OAuth2ClientDO.class).setClientId("default")
+                    .setStatus(CommonStatusEnum.ENABLE.getStatus())
+                    .setRedirectUris(Arrays.asList("https://sso.iocoder.cn", "https://www.iocoder.cn/callback"));
+            oauth2ClientMapper.insert(client);
+
+            // 成功调用：与注册的回调地址完全一致
+            assertPojoEquals(client, oauth2ClientService.validOAuthClientFromCache("default",
+                    null, null, null, "https://sso.iocoder.cn"));
+            assertPojoEquals(client, oauth2ClientService.validOAuthClientFromCache("default",
+                    null, null, null, "https://www.iocoder.cn/callback"));
+            // 失败调用：host 前缀、userinfo、端口、路径、query、fragment 等混淆
+            for (String redirectUri : Arrays.asList(
+                    "https://sso.iocoder.cn.evil.com",
+                    "https://sso.iocoder.cn@evil.com",
+                    "https://sso.iocoder.cn:8443",
+                    "https://sso.iocoder.cn/",
+                    "https://sso.iocoder.cn/evil",
+                    "https://www.iocoder.cn/callback/../evil",
+                    "https://www.iocoder.cn/callbackx",
+                    "https://www.iocoder.cn/callback?next=https://evil.com",
+                    "https://www.iocoder.cn/callback#evil",
+                    "HTTPS://WWW.IOCODER.CN/callback")) {
+                assertServiceException(() -> oauth2ClientService.validOAuthClientFromCache("default",
+                        null, null, null, redirectUri), OAUTH2_CLIENT_REDIRECT_URI_NOT_MATCH, redirectUri);
+            }
         }
     }
 

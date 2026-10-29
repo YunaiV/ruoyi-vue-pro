@@ -38,15 +38,49 @@ public class IotDeviceMessageIoTDBRow {
 
     // ========== 以下字段，统一使用 n:/v: 编码 ==========
 
+    /**
+     * 请求方法
+     */
     private String method;
+    /**
+     * 标识符
+     */
     private String identifier;
+    /**
+     * 请求编号
+     */
     private String requestId;
+    /**
+     * 服务编号，该消息由哪个 server 发送
+     */
     private String serverId;
+    /**
+     * 请求参数（JSON）
+     */
     private String params;
+    /**
+     * 响应结果（JSON）
+     */
     private String data;
+    /**
+     * 响应提示
+     */
     private String msg;
+    /**
+     * 上报时间戳（毫秒）
+     */
     private String reportTime;
+    /**
+     * 租户编号
+     */
     private String tenantId;
+    /**
+     * 响应错误码
+     */
     private String code;
+    /**
+     * 原始帧（Base64）
+     */
+    private String raw;
 
 }

@@ -30,6 +30,16 @@ public interface IotDeviceMessageService {
     IotDeviceMessage sendDeviceMessage(IotDeviceMessage message, IotDeviceDO device);
 
     /**
+     * 发送设备消息（指定 serverId，用于上行回复等场景）
+     *
+     * @param message  消息
+     * @param device   设备
+     * @param serverId 网关 serverId
+     * @return 设备消息
+     */
+    IotDeviceMessage sendDeviceMessage(IotDeviceMessage message, IotDeviceDO device, String serverId);
+
+    /**
      * 发送设备消息
      *
      * @param message 消息（“codec（编解码）字段” 部分字段）

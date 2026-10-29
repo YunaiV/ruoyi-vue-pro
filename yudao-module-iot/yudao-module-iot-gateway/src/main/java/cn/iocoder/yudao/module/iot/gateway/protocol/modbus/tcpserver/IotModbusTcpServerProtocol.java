@@ -7,7 +7,6 @@ import cn.iocoder.yudao.module.iot.core.biz.IotDeviceCommonApi;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigRespDTO;
 import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
-import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties.ProtocolProperties;
 import cn.iocoder.yudao.module.iot.gateway.protocol.IotProtocol;
@@ -21,6 +20,7 @@ import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpserver.manager.Iot
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpserver.manager.IotModbusTcpServerConnectionManager.ConnectionInfo;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpserver.manager.IotModbusTcpServerPendingRequestManager;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpserver.manager.IotModbusTcpServerPollScheduler;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpserver.manager.IotModbusTcpServerTransactionChannel;
 import cn.iocoder.yudao.module.iot.gateway.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import io.vertx.core.Vertx;
@@ -67,6 +67,7 @@ public class IotModbusTcpServerProtocol implements IotProtocol {
     /**
      * Vert.x 实例
      */
+    @Getter
     private final Vertx vertx;
     /**
      * TCP Server
@@ -98,7 +99,6 @@ public class IotModbusTcpServerProtocol implements IotProtocol {
     private final IotModbusTcpServerPendingRequestManager pendingRequestManager;
     private final IotModbusTcpServerUpstreamHandler upstreamHandler;
     private final IotModbusTcpServerPollScheduler pollScheduler;
-    private final IotDeviceMessageService messageService;
 
     public IotModbusTcpServerProtocol(ProtocolProperties properties) {
         IotModbusTcpServerConfig slaveConfig = properties.getModbusTcpServer();
@@ -119,20 +119,21 @@ public class IotModbusTcpServerProtocol implements IotProtocol {
         this.frameDecoder = new IotModbusFrameDecoder(slaveConfig.getCustomFunctionCode());
         this.frameEncoder = new IotModbusFrameEncoder(slaveConfig.getCustomFunctionCode());
 
-        // 初始化共享事务 ID 自增器（PollScheduler 和 DownstreamHandler 共用，避免 transactionId 冲突）
+        // 初始化共享事务 ID 自增器（所有连接的事务通道共用：轮询、标准写、透传都从通道分配，避免 transactionId 冲突）
         AtomicInteger transactionIdCounter = new AtomicInteger(0);
         // 初始化轮询调度器
         this.pollScheduler = new IotModbusTcpServerPollScheduler(
                 vertx, connectionManager, frameEncoder, pendingRequestManager,
-                slaveConfig.getRequestTimeout(), transactionIdCounter, configCacheService);
+                slaveConfig.getRequestTimeout(), configCacheService);
 
         // 初始化 Handler
-        this.messageService = SpringUtil.getBean(IotDeviceMessageService.class);
+        IotDeviceMessageService messageService = SpringUtil.getBean(IotDeviceMessageService.class);
         IotDeviceService deviceService = SpringUtil.getBean(IotDeviceService.class);
         this.upstreamHandler = new IotModbusTcpServerUpstreamHandler(
-                deviceApi, this.messageService, frameEncoder,
+                deviceApi, messageService, frameEncoder,
                 connectionManager, configCacheService, pendingRequestManager,
-                pollScheduler, deviceService, serverId);
+                pollScheduler, deviceService, serverId,
+                transactionIdCounter, slaveConfig.getRequestTimeout());
     }
 
     @Override
@@ -165,7 +166,7 @@ public class IotModbusTcpServerProtocol implements IotProtocol {
             // 2.2 启动 PendingRequest 清理定时器
             requestCleanupTimerId = vertx.setPeriodic(
                     slaveConfig.getRequestCleanupInterval(),
-                    id -> pendingRequestManager.cleanupExpired());
+                    id -> cleanupExpiredRequests());
             running = true;
             log.info("[start][IoT Modbus TCP Server 协议 {} 启动成功, serverId={}, port={}]",
                     getId(), serverId, properties.getPort());
@@ -173,9 +174,9 @@ public class IotModbusTcpServerProtocol implements IotProtocol {
             // 3. 启动下行消息订阅
             IotMessageBus messageBus = SpringUtil.getBean(IotMessageBus.class);
             IotModbusTcpServerDownstreamHandler downstreamHandler = new IotModbusTcpServerDownstreamHandler(
-                    connectionManager, configCacheService, frameEncoder, this.pollScheduler.getTransactionIdCounter());
+                    connectionManager, configCacheService, frameEncoder);
             this.downstreamSubscriber = new IotModbusTcpServerDownstreamSubscriber(
-                    this, downstreamHandler, messageBus);
+                    this, downstreamHandler, connectionManager, messageBus);
             downstreamSubscriber.start();
         } catch (Exception e) {
             log.error("[start][IoT Modbus TCP Server 协议 {} 启动失败]", getId(), e);
@@ -281,15 +282,11 @@ public class IotModbusTcpServerProtocol implements IotProtocol {
                 return;
             }
             pollScheduler.stopPolling(info.getDeviceId());
-            pendingRequestManager.removeDevice(info.getDeviceId());
+            // 设备自己断开：排队中、在途的透传全部以 115 收尾，并只清理这条连接登记的待响应请求（不影响同一设备的新连接）
+            info.getChannel().onClose();
             configCacheService.removeConfig(info.getDeviceId());
-            // 发送设备下线消息
-            try {
-                IotDeviceMessage offlineMessage = IotDeviceMessage.buildStateOffline();
-                messageService.sendDeviceMessage(offlineMessage, info.getProductKey(), info.getDeviceName(), serverId);
-            } catch (Exception ex) {
-                log.error("[handleConnection][发送设备下线消息失败, deviceId={}]", info.getDeviceId(), ex);
-            }
+            // 发送设备下线消息：交给本连接的 worker 队列，排在已收到的轮询上报之后
+            upstreamHandler.sendOfflineMessage(info);
             log.info("[handleConnection][连接关闭, deviceId={}, remoteAddress={}]",
                     info.getDeviceId(), socket.remoteAddress());
         });
@@ -298,6 +295,16 @@ public class IotModbusTcpServerProtocol implements IotProtocol {
             log.error("[handleConnection][连接异常, remoteAddress={}]", socket.remoteAddress(), e);
             socket.close();
         });
+    }
+
+    /**
+     * 清理过期的待响应请求（定时调用）
+     */
+    private void cleanupExpiredRequests() {
+        // 1. 待响应请求：保持原逻辑，到期移除、只记日志
+        pendingRequestManager.cleanupExpired();
+        // 2. 同一个清理周期里，各连接检查透传在途是否超时、排队是否超过截止时间（切回各自的 owner 收尾，不新增定时器）
+        connectionManager.getChannels().forEach(IotModbusTcpServerTransactionChannel::onCleanup);
     }
 
     /**

@@ -14,6 +14,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
+import java.util.concurrent.RejectedExecutionException;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMultiMap;
@@ -76,10 +77,11 @@ public class IotModbusTcpClientPollScheduler extends AbstractIotModbusPollSchedu
         Integer slaveId = connectionManager.getSlaveId(deviceId);
         Assert.notNull(slaveId, "设备 {} 没有配置 slaveId", deviceId);
 
-        // 3. 执行 Modbus 批量读取
+        // 3. 执行 Modbus 批量读取：读取结果的上报交给连接的 worker 队列
         IotModbusTcpClientUtils.read(connection, slaveId, segment.getFunctionCode(),
                         segment.getStartAddress(), segment.getRegisterCount())
-                .onSuccess(rawValues -> handleSegmentReadResult(config, segment, rawValues))
+                .onSuccess(rawValues -> submitReadResult(connection, deviceId,
+                        () -> handleSegmentReadResult(config, segment, rawValues)))
                 .onFailure(e -> log.error("[pollTask][读取点位段失败, deviceId={}, segment={}]",
                         deviceId, segment.getKey(), e));
     }
@@ -112,11 +114,36 @@ public class IotModbusTcpClientPollScheduler extends AbstractIotModbusPollSchedu
         Integer slaveId = connectionManager.getSlaveId(deviceId);
         Assert.notNull(slaveId, "设备 {} 没有配置 slaveId", deviceId);
 
-        // 3. 执行 Modbus 读取
+        // 3. 执行 Modbus 读取：读取结果的上报交给连接的 worker 队列
         IotModbusTcpClientUtils.read(connection, slaveId, point)
-                .onSuccess(rawValue -> upstreamHandler.handleReadResult(config, point, rawValue))
+                .onSuccess(rawValue -> submitReadResult(connection, deviceId,
+                        () -> upstreamHandler.handleReadResult(config, point, rawValue)))
                 .onFailure(e -> log.error("[pollPoint][读取点位失败, deviceId={}, identifier={}]",
                         deviceId, point.getIdentifier(), e));
+    }
+
+    /**
+     * 提交读取结果的上报（在连接的 context 上调用：读取结果的回调就在它上面）
+     * <p>
+     * 点位翻译、发送到消息总线会阻塞，交给连接的有序 worker 队列，按读取完成的顺序执行，不占用 context 的 event loop；
+     * 读取本身、透传仍在连接原有的有序 executeBlocking 里，不受上报阻塞影响。队列已满时丢弃这次上报，下一轮轮询会再次读取
+     *
+     * @param connection Modbus 连接
+     * @param deviceId   设备 ID
+     * @param task       上报任务
+     */
+    private void submitReadResult(IotModbusTcpClientConnectionManager.ModbusConnection connection, Long deviceId,
+                                  Runnable task) {
+        connection.getUpstreamQueue().submit(() -> {
+            task.run();
+            return null;
+        }).onFailure(e -> {
+            if (e instanceof RejectedExecutionException) {
+                log.warn("[submitReadResult][设备 {} 读取结果上报积压, 丢弃本次上报: {}]", deviceId, e.getMessage());
+                return;
+            }
+            log.error("[submitReadResult][设备 {} 读取结果上报失败]", deviceId, e);
+        });
     }
 
     private void handleSegmentReadResult(IotModbusDeviceConfigRespDTO config,

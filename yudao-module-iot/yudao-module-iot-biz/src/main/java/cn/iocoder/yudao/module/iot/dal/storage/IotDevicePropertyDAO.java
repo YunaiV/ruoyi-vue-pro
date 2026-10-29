@@ -8,7 +8,6 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
 import java.util.List;
 import java.util.Map;
 
-// TODO DONE @AI：storage 包下，是不是加个 package-info.java，说明这个包的作用？已新增 package-info.java
 /**
  * IoT 设备【属性】历史数据的存储 DAO 接口
  *

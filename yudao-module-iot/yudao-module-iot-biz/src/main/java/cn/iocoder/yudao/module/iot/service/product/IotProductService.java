@@ -3,6 +3,9 @@ package cn.iocoder.yudao.module.iot.service.product;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.iot.controller.admin.product.vo.product.IotProductPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.product.vo.product.IotProductSaveReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.product.vo.product.IotProductScriptDebugReqVO;
+import cn.iocoder.yudao.module.iot.controller.admin.product.vo.product.IotProductScriptDebugRespVO;
+import cn.iocoder.yudao.module.iot.controller.admin.product.vo.product.IotProductScriptUpdateReqVO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import jakarta.validation.Valid;
 
@@ -35,6 +38,21 @@ public interface IotProductService {
      * @param updateReqVO 更新信息
      */
     void updateProduct(@Valid IotProductSaveReqVO updateReqVO);
+
+    /**
+     * 更新产品数据解析脚本：只修改非 null 的字段（脚本内容、是否启用），最后保存者生效
+     *
+     * @param updateReqVO 更新信息
+     */
+    void updateProductScript(@Valid IotProductScriptUpdateReqVO updateReqVO);
+
+    /**
+     * 调试产品数据解析脚本：执行当前编辑内容，不保存、不发消息、不改属性
+     *
+     * @param debugReqVO 调试信息
+     * @return 调试结果
+     */
+    IotProductScriptDebugRespVO debugProductScript(@Valid IotProductScriptDebugReqVO debugReqVO);
 
     /**
      * 删除产品

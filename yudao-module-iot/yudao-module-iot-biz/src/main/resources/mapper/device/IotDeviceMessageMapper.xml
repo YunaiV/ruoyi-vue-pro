@@ -19,7 +19,8 @@
             params VARCHAR(8192),
             data VARCHAR(8192),
             code INT,
-            msg NCHAR(256)
+            msg NCHAR(256),
+            raw VARCHAR(8192)
         ) TAGS (
             device_id BIGINT
         )
@@ -33,21 +34,21 @@
         INSERT INTO device_message_${deviceId} (
             ts, id, report_time, tenant_id, server_id,
             upstream, reply, identifier, request_id, method,
-            params, data, code, msg
+            params, data, code, msg, raw
         )
         USING device_message
         TAGS (#{deviceId})
         VALUES (
             #{ts}, #{id}, #{reportTime}, #{tenantId},  #{serverId},
-            #{upstream}, #{reply}, #{identifier}, #{requestId}, #{method}, 
-            #{params}, #{data}, #{code}, #{msg}
+            #{upstream}, #{reply}, #{identifier}, #{requestId}, #{method},
+            #{params}, #{data}, #{code}, #{msg}, #{raw}
         )
     </insert>
 
     <select id="selectPage" resultType="cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceMessageDO">
         SELECT ts, id, report_time, tenant_id, server_id,
-               upstream, reply, identifier, request_id, method, 
-               params, data, code, msg
+               upstream, reply, identifier, request_id, method,
+               params, data, code, msg, raw
         FROM device_message_${reqVO.deviceId}
         <where>
             <if test="reqVO.method != null and reqVO.method != ''">
@@ -62,14 +63,21 @@
             <if test="reqVO.identifier != null and reqVO.identifier != ''">
                 AND identifier = #{reqVO.identifier}
             </if>
+            <!-- 是否有原始帧：按 raw 列是否为空过滤，不再按 method 过滤 -->
+            <if test="reqVO.raw != null and reqVO.raw">
+                AND raw IS NOT NULL
+            </if>
+            <if test="reqVO.raw != null and !reqVO.raw">
+                AND raw IS NULL
+            </if>
         </where>
         ORDER BY ts DESC, id DESC
     </select>
 
     <select id="selectListByRequestIdsAndReply" resultType="cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceMessageDO">
         SELECT ts, id, report_time, tenant_id, server_id,
-               upstream, reply, identifier, request_id, method, 
-               params, data, code, msg
+               upstream, reply, identifier, request_id, method,
+               params, data, code, msg, raw
         FROM device_message_${deviceId}
         WHERE reply = #{reply}
         AND request_id IN
