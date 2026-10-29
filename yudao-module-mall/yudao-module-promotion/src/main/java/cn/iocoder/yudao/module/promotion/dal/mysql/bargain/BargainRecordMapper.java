@@ -43,11 +43,10 @@ public interface BargainRecordMapper extends BaseMapperX<BargainRecordDO> {
     }
 
     default BargainRecordDO selectLastByUserIdAndActivityId(Long userId, Long activityId) {
-        return selectOne(new LambdaQueryWrapper<>(BargainRecordDO.class)
+        return selectFirstOne(new LambdaQueryWrapper<>(BargainRecordDO.class)
                 .eq(BargainRecordDO::getUserId, userId)
                 .eq(BargainRecordDO::getActivityId, activityId)
-                .orderByDesc(BargainRecordDO::getId)
-                .last("LIMIT 1"));
+                .orderByDesc(BargainRecordDO::getId));
     }
 
     default Long selectCountByUserIdAndActivityIdAndStatus(
@@ -104,9 +103,9 @@ public interface BargainRecordMapper extends BaseMapperX<BargainRecordDO> {
     }
 
     default List<BargainRecordDO> selectListByStatusAndCount(Integer status, Integer count) {
-        return selectList(new LambdaQueryWrapper<>(BargainRecordDO.class)
+        return selectListLimitN(new LambdaQueryWrapper<>(BargainRecordDO.class)
                 .eq(BargainRecordDO::getStatus, status)
-                .last("LIMIT " + count));
+                .orderByAsc(BargainRecordDO::getId), count);
     }
 
     /**

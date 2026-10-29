@@ -57,8 +57,7 @@ public interface ImConversationReadMapper extends BaseMapperX<ImConversationRead
             query.and(w -> w.gt(ImConversationReadDO::getUpdateTime, lastTime)
                     .or(n -> n.eq(ImConversationReadDO::getUpdateTime, lastTime).gt(ImConversationReadDO::getId, lastId)));
         }
-        return selectList(query.orderByAsc(ImConversationReadDO::getUpdateTime).orderByAsc(ImConversationReadDO::getId)
-                .last("LIMIT " + limit));
+        return selectListLimitN(query.orderByAsc(ImConversationReadDO::getUpdateTime).orderByAsc(ImConversationReadDO::getId), limit);
     }
 
     /**

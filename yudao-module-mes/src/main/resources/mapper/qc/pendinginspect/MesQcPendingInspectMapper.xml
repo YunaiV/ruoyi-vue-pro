@@ -166,7 +166,8 @@
         ) t
         <where>
             <if test="sourceDocCode != null and sourceDocCode != ''">
-                AND t.sourceDocCode LIKE CONCAT('%', #{sourceDocCode}, '%')
+                <bind name="sourceDocCodeLike" value="'%' + sourceDocCode + '%'"/>
+                AND t.sourceDocCode LIKE #{sourceDocCodeLike}
             </if>
             <if test="qcType != null">
                 AND t.qcType = #{qcType}

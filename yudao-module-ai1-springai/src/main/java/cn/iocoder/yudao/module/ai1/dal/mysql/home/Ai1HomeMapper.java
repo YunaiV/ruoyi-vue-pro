@@ -23,16 +23,17 @@ public interface Ai1HomeMapper {
     @Select("SELECT (SELECT COUNT(1) FROM ai1_agent WHERE deleted = 0) AS agentCount, " +
             "(SELECT COUNT(1) FROM ai1_skill WHERE deleted = 0) AS skillCount, " +
             "(SELECT COUNT(1) FROM ai1_mcp WHERE deleted = 0) AS mcpCount, " +
-            "(SELECT COUNT(1) FROM ai1_model WHERE deleted = 0) AS modelCount")
+            "(SELECT COUNT(1) FROM ai1_model WHERE deleted = 0) AS modelCount " +
+            "${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@fromDual()}")
     Ai1HomeSummaryRespVO selectSummary();
 
     /**
-     * 按天统计消息数量，仅返回有消息的日期；使用 CAST AS DATE 兼容 MySQL 与 H2
+     * 按天统计消息数量，仅返回有消息的日期；日期按方言输出 yyyy-MM-dd，MySQL、H2 等保持 CAST AS DATE
      */
-    @Select("SELECT CAST(create_time AS DATE) AS statDate, COUNT(1) AS count " +
+    @Select("SELECT ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@castDateText('create_time')} AS statDate, COUNT(1) AS count " +
             "FROM ai1_session_message " +
             "WHERE create_time BETWEEN #{beginTime} AND #{endTime} AND deleted = 0 " +
-            "GROUP BY CAST(create_time AS DATE) " +
+            "GROUP BY ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@castDateText('create_time')} " +
             "ORDER BY statDate")
     @Results({
             @Result(column = "statDate", property = "date"),

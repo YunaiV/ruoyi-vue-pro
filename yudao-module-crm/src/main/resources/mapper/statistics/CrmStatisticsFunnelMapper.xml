@@ -86,7 +86,7 @@
     <select id="selectBusinessSummaryGroupByDate"
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.funnel.CrmStatisticsBusinessSummaryByDateRespVO">
         SELECT
-            DATE_FORMAT(create_time, '%Y-%m-%d') AS time,
+            ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@formatDate('create_time')} AS time,
             COUNT(*) AS businessCreateCount,
             COALESCE(SUM(total_price), 0) AS totalPrice
         FROM crm_business
@@ -100,13 +100,13 @@
         </foreach>
         AND create_time BETWEEN #{times[0],javaType=java.time.LocalDateTime} AND
         #{times[1],javaType=java.time.LocalDateTime}
-        GROUP BY DATE_FORMAT(create_time, '%Y-%m-%d')
+        GROUP BY ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@formatDate('create_time')}
     </select>
 
     <select id="selectBusinessInversionRateSummaryByDate"
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.funnel.CrmStatisticsBusinessInversionRateSummaryByDateRespVO">
         SELECT
-            DATE_FORMAT(create_time, '%Y-%m-%d') AS time,
+            ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@formatDate('create_time')} AS time,
             COUNT(*) AS businessCount,
             SUM(CASE WHEN end_status = 1 THEN 1 ELSE 0 END) AS businessWinCount
         FROM crm_business
@@ -120,7 +120,7 @@
         </foreach>
         AND create_time BETWEEN #{times[0],javaType=java.time.LocalDateTime} AND
         #{times[1],javaType=java.time.LocalDateTime}
-        GROUP BY DATE_FORMAT(create_time, '%Y-%m-%d')
+        GROUP BY ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@formatDate('create_time')}
     </select>
 
 </mapper>

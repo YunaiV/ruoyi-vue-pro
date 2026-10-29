@@ -60,13 +60,12 @@ public interface CouponTemplateMapper extends BaseMapperX<CouponTemplateDO> {
     default List<CouponTemplateDO> selectList(List<Integer> canTakeTypes, Integer productScope, Long productScopeValue, Integer count) {
         // 构建可领取的查询条件
         Consumer<LambdaQueryWrapper<CouponTemplateDO>> canTakeConsumer = buildCanTakeQueryConsumer(canTakeTypes);
-        return selectList(new LambdaQueryWrapperX<CouponTemplateDO>()
+        return selectListLimitN(new LambdaQueryWrapperX<CouponTemplateDO>()
                 .eqIfPresent(CouponTemplateDO::getProductScope, productScope)
                 .and(productScopeValue != null, w -> w.apply(MyBatisUtils.findInSet("product_scope_values"),
                         productScopeValue))
                 .and(canTakeConsumer != null, canTakeConsumer)
-                .last(" LIMIT " + count)
-                .orderByDesc(CouponTemplateDO::getId));
+                .orderByDesc(CouponTemplateDO::getId), count);
     }
 
     static Consumer<LambdaQueryWrapper<CouponTemplateDO>> buildCanTakeQueryConsumer(List<Integer> canTakeTypes) {

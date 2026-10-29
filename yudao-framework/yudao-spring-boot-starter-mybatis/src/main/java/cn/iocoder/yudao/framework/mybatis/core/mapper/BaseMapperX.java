@@ -216,6 +216,39 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
         return CollUtil.getLast(selectList(queryWrapper));
     }
 
+    /**
+     * 获取满足条件的第 1 条记录，见 {@link #selectListLimitN(Wrapper, int)}
+     *
+     * @param queryWrapper 查询条件
+     * @return 第 1 条；不存在返回 null
+     */
+    default T selectFirstOne(Wrapper<T> queryWrapper) {
+        return CollUtil.getFirst(selectListLimitN(queryWrapper, 1));
+    }
+
+    /**
+     * 获取满足条件的前 limit 条记录
+     *
+     * 使用 MyBatis Plus 分页插件，按执行时连接的数据库类型生成 LIMIT、ROWNUM、OFFSET FETCH 等语句，并且不执行 COUNT 查询；
+     * 保留 queryWrapper 的排序与 select 投影，不能再通过 last 追加行数限制
+     *
+     * 注意：SQL Server 的分页语句要求有 ORDER BY，queryWrapper 需要设置排序
+     *
+     * @param queryWrapper 查询条件
+     * @param limit        条数，不能为负数；为 0 时不查询，直接返回空列表
+     * @return 记录列表
+     */
+    default List<T> selectListLimitN(Wrapper<T> queryWrapper, int limit) {
+        if (limit < 0) {
+            // 分页插件会把负数的 size 视为不分页，从而查询全表
+            throw new IllegalArgumentException("limit 不能为负数：" + limit);
+        }
+        if (limit == 0) {
+            return CollUtil.newArrayList();
+        }
+        return selectPage(MyBatisUtils.<T>buildPage(0, limit, false), queryWrapper).getRecords();
+    }
+
     default Long selectCount() {
         return selectCount(new QueryWrapper<>());
     }

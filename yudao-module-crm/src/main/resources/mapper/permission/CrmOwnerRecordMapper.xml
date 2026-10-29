@@ -5,7 +5,7 @@
 
     <select id="selectPoolCustomerPutCountByDate"
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.CrmStatisticsPoolSummaryByDateRespVO">
-        SELECT DATE_FORMAT(create_time, '%Y-%m-%d') AS time,
+        SELECT ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@formatDate('create_time')} AS time,
                COUNT(*) AS customer_put_count
           FROM crm_owner_record
          WHERE deleted = 0
@@ -16,12 +16,12 @@
                 </foreach>
            AND post_owner_user_id IS NULL
            AND create_time BETWEEN #{times[0],javaType=java.time.LocalDateTime} AND #{times[1],javaType=java.time.LocalDateTime}
-         GROUP BY DATE_FORMAT(create_time, '%Y-%m-%d')
+         GROUP BY ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@formatDate('create_time')}
     </select>
 
     <select id="selectPoolCustomerTakeCountByDate"
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.CrmStatisticsPoolSummaryByDateRespVO">
-        SELECT DATE_FORMAT(create_time, '%Y-%m-%d') AS time,
+        SELECT ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@formatDate('create_time')} AS time,
                COUNT(*) AS customer_take_count
           FROM crm_owner_record
          WHERE deleted = 0
@@ -32,7 +32,7 @@
                     #{userId}
                 </foreach>
            AND create_time BETWEEN #{times[0],javaType=java.time.LocalDateTime} AND #{times[1],javaType=java.time.LocalDateTime}
-         GROUP BY DATE_FORMAT(create_time, '%Y-%m-%d')
+         GROUP BY ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@formatDate('create_time')}
     </select>
 
     <select id="selectPoolCustomerPutCountByUser"

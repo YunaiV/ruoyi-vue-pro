@@ -4,7 +4,7 @@
 
     <select id="selectCustomerCreateCountGroupByDate"
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.CrmStatisticsCustomerSummaryByDateRespVO">
-        SELECT DATE_FORMAT(create_time, '%Y-%m-%d') AS time,
+        SELECT ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@formatDate('create_time')} AS time,
                COUNT(*) AS customerCreateCount
           FROM crm_customer
          WHERE deleted = 0
@@ -13,12 +13,12 @@
                     #{userId}
                 </foreach>
            AND create_time BETWEEN #{times[0],javaType=java.time.LocalDateTime} AND #{times[1],javaType=java.time.LocalDateTime}
-         GROUP BY DATE_FORMAT(create_time, '%Y-%m-%d')
+         GROUP BY ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@formatDate('create_time')}
     </select>
 
     <select id="selectCustomerDealCountGroupByDate"
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.CrmStatisticsCustomerSummaryByDateRespVO">
-        SELECT DATE_FORMAT(customer.create_time, '%Y-%m-%d')    AS time,
+        SELECT ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@formatDate('customer.create_time')}    AS time,
                COUNT(DISTINCT customer.id)                      AS customer_deal_count
           FROM crm_customer customer
                 LEFT JOIN crm_contract contract ON contract.customer_id = customer.id
@@ -30,7 +30,7 @@
                     #{userId}
                 </foreach>
            AND customer.create_time BETWEEN #{times[0],javaType=java.time.LocalDateTime} AND #{times[1],javaType=java.time.LocalDateTime}
-         GROUP BY DATE_FORMAT(customer.create_time, '%Y-%m-%d')
+         GROUP BY ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@formatDate('customer.create_time')}
     </select>
 
     <select id="selectCustomerCreateCountGroupByUser"
@@ -96,7 +96,7 @@
 
     <select id="selectFollowUpRecordCountGroupByDate"
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.CrmStatisticsFollowUpSummaryByDateRespVO">
-        SELECT DATE_FORMAT(create_time, '%Y-%m-%d') AS time,
+        SELECT ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@formatDate('create_time')} AS time,
                COUNT(*) AS follow_up_record_count
           FROM crm_follow_up_record
          WHERE creator IN
@@ -105,12 +105,12 @@
                 </foreach>
            AND create_time BETWEEN #{times[0],javaType=java.time.LocalDateTime} AND #{times[1],javaType=java.time.LocalDateTime}
            AND biz_type = ${@cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum@CRM_CUSTOMER.type}
-         GROUP BY DATE_FORMAT(create_time, '%Y-%m-%d')
+         GROUP BY ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@formatDate('create_time')}
     </select>
 
     <select id="selectFollowUpCustomerCountGroupByDate"
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.CrmStatisticsFollowUpSummaryByDateRespVO">
-        SELECT DATE_FORMAT(create_time, '%Y-%m-%d') AS time,
+        SELECT ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@formatDate('create_time')} AS time,
                COUNT(DISTINCT biz_id) AS follow_up_customer_count
           FROM crm_follow_up_record
          WHERE creator IN
@@ -119,7 +119,7 @@
                 </foreach>
            AND create_time BETWEEN #{times[0],javaType=java.time.LocalDateTime} AND #{times[1],javaType=java.time.LocalDateTime}
            AND biz_type = ${@cn.iocoder.yudao.module.crm.enums.common.CrmBizTypeEnum@CRM_CUSTOMER.type}
-         GROUP BY DATE_FORMAT(create_time, '%Y-%m-%d')
+         GROUP BY ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@formatDate('create_time')}
     </select>
 
     <select id="selectFollowUpRecordCountGroupByUser"
@@ -189,11 +189,11 @@
            AND customer.create_time BETWEEN #{times[0],javaType=java.time.LocalDateTime} AND #{times[1],javaType=java.time.LocalDateTime}
     </select>
 
-    <!-- TIMESTAMPDIFF 用于求差值；AVG 求平均；TRUNCATE 去掉小数点、只保留整数 -->
+    <!-- 成交周期：客户创建到合同下单的完整天数（向零截断）求平均，截断保留 1 位小数，无数据时为 0；表达式按方言见 SqlDialectUtils.customerDealCycle -->
     <select id="selectCustomerDealCycleGroupByDate"
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.CrmStatisticsCustomerDealCycleByDateRespVO">
-        SELECT DATE_FORMAT(contract.order_date, '%Y-%m-%d') AS time,
-               COALESCE(TRUNCATE(AVG(TIMESTAMPDIFF(DAY, customer.create_time, contract.order_date)), 1), 0) AS customer_deal_cycle
+        SELECT ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@formatDate('contract.order_date')} AS time,
+               ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@customerDealCycle('customer.create_time', 'contract.order_date')} AS customer_deal_cycle
           FROM crm_customer customer
                 LEFT JOIN crm_contract contract ON contract.customer_id = customer.id
          WHERE customer.deleted = 0 AND contract.deleted = 0
@@ -203,13 +203,13 @@
                     #{userId}
                 </foreach>
            AND customer.create_time BETWEEN #{times[0],javaType=java.time.LocalDateTime} AND #{times[1],javaType=java.time.LocalDateTime}
-         GROUP BY DATE_FORMAT(contract.order_date, '%Y-%m-%d')
+         GROUP BY ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@formatDate('contract.order_date')}
     </select>
 
     <select id="selectCustomerDealCycleGroupByUser"
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.CrmStatisticsCustomerDealCycleByUserRespVO">
         SELECT customer.owner_user_id,
-               COALESCE(TRUNCATE(AVG(TIMESTAMPDIFF(DAY, customer.create_time, contract.order_date)), 1), 0) AS customer_deal_cycle
+               ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@customerDealCycle('customer.create_time', 'contract.order_date')} AS customer_deal_cycle
           FROM crm_customer customer
                 LEFT JOIN crm_contract contract ON contract.customer_id = customer.id
          WHERE customer.deleted = 0 AND contract.deleted = 0
@@ -225,7 +225,7 @@
     <select id="selectCustomerDealCycleGroupByAreaId"
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.CrmStatisticsCustomerDealCycleByAreaRespVO">
         SELECT customer.area_id AS area_id,
-               COALESCE(TRUNCATE(AVG(TIMESTAMPDIFF(DAY, customer.create_time, contract.order_date)), 1), 0) AS customer_deal_cycle,
+               ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@customerDealCycle('customer.create_time', 'contract.order_date')} AS customer_deal_cycle,
                COUNT(DISTINCT customer.id) AS customer_deal_count
         FROM crm_customer customer
                 LEFT JOIN crm_contract contract ON customer.id = contract.customer_id
@@ -244,7 +244,7 @@
     <select id="selectCustomerDealCycleGroupByProductId"
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.customer.CrmStatisticsCustomerDealCycleByProductRespVO">
         SELECT product.name                                                                                 AS product_name,
-               COALESCE(TRUNCATE(AVG(TIMESTAMPDIFF(DAY, customer.create_time, contract.order_date)), 1), 0)   AS customer_deal_cycle,
+               ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@customerDealCycle('customer.create_time', 'contract.order_date')}   AS customer_deal_cycle,
                COUNT(DISTINCT customer.id)                                                                  AS customer_deal_count
           FROM crm_customer customer
                 LEFT JOIN crm_contract contract ON customer.id = contract.customer_id

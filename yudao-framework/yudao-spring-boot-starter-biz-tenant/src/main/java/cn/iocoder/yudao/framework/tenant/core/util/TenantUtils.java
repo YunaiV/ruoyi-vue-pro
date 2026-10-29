@@ -15,6 +15,11 @@ import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.HEADER_
 public class TenantUtils {
 
     /**
+     * 平台共享数据的租户编号；不是未设置租户上下文时的 null
+     */
+    public static final Long GLOBAL_TENANT_ID = 0L;
+
+    /**
      * 使用指定租户，执行对应的逻辑
      *
      * 注意，如果当前是忽略租户的情况下，会被强制设置成不忽略租户

@@ -25,10 +25,9 @@ import java.util.Objects;
 public interface CrmReceivablePlanMapper extends BaseMapperX<CrmReceivablePlanDO> {
 
     default CrmReceivablePlanDO selectMaxPeriodByContractId(Long contractId) {
-        return selectOne(new LambdaQueryWrapperX<CrmReceivablePlanDO>()
+        return selectFirstOne(new LambdaQueryWrapperX<CrmReceivablePlanDO>()
                 .eq(CrmReceivablePlanDO::getContractId, contractId)
-                .orderByDesc(CrmReceivablePlanDO::getPeriod)
-                .last("LIMIT 1"));
+                .orderByDesc(CrmReceivablePlanDO::getPeriod));
     }
 
     default PageResult<CrmReceivablePlanDO> selectPageByCustomerId(CrmReceivablePlanPageReqVO reqVO) {

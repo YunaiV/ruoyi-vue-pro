@@ -54,7 +54,7 @@
     <select id="selectDailyOrderTrend" resultType="cn.iocoder.yudao.framework.mybatis.core.util.CaseInsensitiveResultMap">
         SELECT statDate, orderType, SUM(count) AS count
         FROM (
-            SELECT DATE_FORMAT(order_time, '%Y-%m-%d') AS statDate,
+            SELECT ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@formatDate('order_time')} AS statDate,
                    ${@cn.iocoder.yudao.module.wms.enums.order.WmsOrderTypeEnum@RECEIPT.type} AS orderType,
                    COUNT(*) AS count
             FROM wms_receipt_order
@@ -64,9 +64,9 @@
               <if test="warehouseId != null">
                   AND warehouse_id = #{warehouseId}
               </if>
-            GROUP BY DATE_FORMAT(order_time, '%Y-%m-%d')
+            GROUP BY ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@formatDate('order_time')}
             UNION ALL
-            SELECT DATE_FORMAT(order_time, '%Y-%m-%d') AS statDate,
+            SELECT ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@formatDate('order_time')} AS statDate,
                    ${@cn.iocoder.yudao.module.wms.enums.order.WmsOrderTypeEnum@SHIPMENT.type} AS orderType,
                    COUNT(*) AS count
             FROM wms_shipment_order
@@ -76,9 +76,9 @@
               <if test="warehouseId != null">
                   AND warehouse_id = #{warehouseId}
               </if>
-            GROUP BY DATE_FORMAT(order_time, '%Y-%m-%d')
+            GROUP BY ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@formatDate('order_time')}
             UNION ALL
-            SELECT DATE_FORMAT(order_time, '%Y-%m-%d') AS statDate,
+            SELECT ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@formatDate('order_time')} AS statDate,
                    ${@cn.iocoder.yudao.module.wms.enums.order.WmsOrderTypeEnum@MOVEMENT.type} AS orderType,
                    COUNT(*) AS count
             FROM wms_movement_order
@@ -88,9 +88,9 @@
               <if test="warehouseId != null">
                   AND (source_warehouse_id = #{warehouseId} OR target_warehouse_id = #{warehouseId})
               </if>
-            GROUP BY DATE_FORMAT(order_time, '%Y-%m-%d')
+            GROUP BY ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@formatDate('order_time')}
             UNION ALL
-            SELECT DATE_FORMAT(order_time, '%Y-%m-%d') AS statDate,
+            SELECT ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@formatDate('order_time')} AS statDate,
                    ${@cn.iocoder.yudao.module.wms.enums.order.WmsOrderTypeEnum@CHECK.type} AS orderType,
                    COUNT(*) AS count
             FROM wms_check_order
@@ -100,7 +100,7 @@
               <if test="warehouseId != null">
                   AND warehouse_id = #{warehouseId}
               </if>
-            GROUP BY DATE_FORMAT(order_time, '%Y-%m-%d')
+            GROUP BY ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@formatDate('order_time')}
         ) t
         GROUP BY statDate, orderType
         ORDER BY statDate, orderType
@@ -131,7 +131,7 @@
           </if>
         GROUP BY item.id, item.name
         ORDER BY quantity DESC, item.id ASC
-        LIMIT #{limit}
+        ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@limitParam('limit', true)}
     </select>
 
     <!-- 按仓库统计库存数量排行 -->
@@ -148,7 +148,7 @@
           </if>
         GROUP BY warehouse.id, warehouse.name
         ORDER BY quantity DESC, warehouse.id ASC
-        LIMIT #{limit}
+        ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@limitParam('limit', true)}
     </select>
 
 </mapper>

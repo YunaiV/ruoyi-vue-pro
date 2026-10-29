@@ -24,10 +24,9 @@ public interface HrmSalaryMonthRecordMapper extends BaseMapperX<HrmSalaryMonthRe
     }
 
     default HrmSalaryMonthRecordDO selectLast() {
-        return selectOne(new LambdaQueryWrapperX<HrmSalaryMonthRecordDO>()
+        return selectFirstOne(new LambdaQueryWrapperX<HrmSalaryMonthRecordDO>()
                 .orderByDesc(HrmSalaryMonthRecordDO::getYear)
-                .orderByDesc(HrmSalaryMonthRecordDO::getMonth)
-                .last("LIMIT 1"));
+                .orderByDesc(HrmSalaryMonthRecordDO::getMonth));
     }
 
     default PageResult<HrmSalaryMonthRecordDO> selectPage(HrmSalaryMonthRecordPageReqVO reqVO) {

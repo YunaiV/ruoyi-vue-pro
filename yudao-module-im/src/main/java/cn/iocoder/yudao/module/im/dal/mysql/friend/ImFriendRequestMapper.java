@@ -47,9 +47,8 @@ public interface ImFriendRequestMapper extends BaseMapperX<ImFriendRequestDO> {
                             .lt(ImFriendRequestDO::getId, maxId)));
         }
         wrapper.orderByDesc(ImFriendRequestDO::getUpdateTime)
-                .orderByDesc(ImFriendRequestDO::getId)
-                .last("LIMIT " + limit);
-        return selectList(wrapper);
+                .orderByDesc(ImFriendRequestDO::getId);
+        return selectListLimitN(wrapper, limit);
     }
 
     /**
@@ -70,8 +69,8 @@ public interface ImFriendRequestMapper extends BaseMapperX<ImFriendRequestDO> {
             query.and(w -> w.gt(ImFriendRequestDO::getUpdateTime, lastTime)
                     .or(n -> n.eq(ImFriendRequestDO::getUpdateTime, lastTime).gt(ImFriendRequestDO::getId, lastId)));
         }
-        return selectList(query.orderByAsc(ImFriendRequestDO::getUpdateTime).orderByAsc(ImFriendRequestDO::getId)
-                .last("LIMIT " + limit));
+        return selectListLimitN(query.orderByAsc(ImFriendRequestDO::getUpdateTime).orderByAsc(ImFriendRequestDO::getId),
+                limit);
     }
 
     default int updateByIdAndHandleResult(Long id, Integer handleResult, ImFriendRequestDO updateObj) {

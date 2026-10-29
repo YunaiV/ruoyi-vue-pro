@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.hrm.dal.mysql.salary.slip;
 
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
+import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.hrm.dal.dataobject.salary.slip.HrmSalarySlipTemplateDO;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -25,11 +25,10 @@ public interface HrmSalarySlipTemplateMapper extends BaseMapperX<HrmSalarySlipTe
      * @return 平台级默认工资条模板
      */
     default HrmSalarySlipTemplateDO selectGlobalDefaultTemplate() {
-        return selectOne(new QueryWrapperX<HrmSalarySlipTemplateDO>()
-                .eq("tenant_id", 0L)
-                .eq("default_status", true)
-                .orderByDesc("id")
-                .limitN(1));
+        return selectFirstOne(new LambdaQueryWrapperX<HrmSalarySlipTemplateDO>()
+                .apply("tenant_id = {0}", TenantUtils.GLOBAL_TENANT_ID)
+                .eq(HrmSalarySlipTemplateDO::getDefaultStatus, true)
+                .orderByDesc(HrmSalarySlipTemplateDO::getId));
     }
 
 }

@@ -52,7 +52,7 @@
 
     <!-- 按天聚合报工产量 -->
     <select id="selectDailyFeedbackTrend" resultType="cn.iocoder.yudao.framework.mybatis.core.util.CaseInsensitiveResultMap">
-        SELECT DATE_FORMAT(feedback_time, '%Y-%m-%d')    AS statDate,
+        SELECT ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@formatDate('feedback_time')}    AS statDate,
                COALESCE(SUM(feedback_quantity), 0)         AS quantity,
                COALESCE(SUM(qualified_quantity), 0)        AS qualifiedQuantity,
                COALESCE(SUM(unqualified_quantity), 0)      AS unqualifiedQuantity
@@ -63,7 +63,7 @@
           <if test="endTime != null">
               AND feedback_time &lt; #{endTime}
           </if>
-        GROUP BY DATE_FORMAT(feedback_time, '%Y-%m-%d')
+        GROUP BY ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@formatDate('feedback_time')}
         ORDER BY statDate
     </select>
 

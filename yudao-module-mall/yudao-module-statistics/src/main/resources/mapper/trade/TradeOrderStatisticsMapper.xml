@@ -99,7 +99,7 @@
     </resultMap>
 
     <select id="selectListByPayTimeBetweenAndGroupByDay" resultMap="TradeOrderTrendRespVOMap">
-        SELECT CAST(pay_time AS DATE) AS statDate,
+        SELECT ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@castDateText('pay_time')} AS statDate,
                COUNT(1)                          AS order_pay_count,
                SUM(pay_price)                    AS order_pay_price
         FROM trade_order
@@ -109,13 +109,12 @@
         <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
             AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
         </if>
-        GROUP BY CAST(pay_time AS DATE)
+        GROUP BY ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@castDateText('pay_time')}
         ORDER BY statDate
     </select>
 
     <select id="selectListByPayTimeBetweenAndGroupByMonth" resultMap="TradeOrderTrendRespVOMap">
-        SELECT CONCAT(EXTRACT(YEAR FROM pay_time), '-',
-                      LPAD(CONCAT(EXTRACT(MONTH FROM pay_time)), 2, '0')) AS statDate,
+        SELECT ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@formatYearDashMonth('pay_time')} AS statDate,
                COUNT(1)                       AS order_pay_count,
                SUM(pay_price)                 AS order_pay_price
         FROM trade_order
@@ -125,8 +124,7 @@
         <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
             AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
         </if>
-        GROUP BY CONCAT(EXTRACT(YEAR FROM pay_time), '-',
-                        LPAD(CONCAT(EXTRACT(MONTH FROM pay_time)), 2, '0'))
+        GROUP BY ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@formatYearDashMonth('pay_time')}
         ORDER BY statDate
     </select>
 
