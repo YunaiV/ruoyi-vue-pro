@@ -7,7 +7,6 @@ import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
-import cn.iocoder.yudao.framework.common.util.string.StrUtils;
 import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.client.OAuth2ClientPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.client.OAuth2ClientSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2ClientDO;
@@ -142,8 +141,9 @@ public class OAuth2ClientServiceImpl implements OAuth2ClientService {
         if (CollUtil.isNotEmpty(scopes) && !CollUtil.containsAll(client.getScopes(), scopes)) {
             throw exception(OAUTH2_CLIENT_SCOPE_OVER);
         }
-        // 校验回调地址
-        if (StrUtil.isNotEmpty(redirectUri) && !StrUtils.startWithAny(redirectUri, client.getRedirectUris())) {
+        // 校验回调地址：必须与注册的回调地址完全一致，不使用前缀匹配，避免 host、userinfo、路径、参数被拼接绕过
+        // 参考 RFC 9700 4.1.3 小节：https://www.rfc-editor.org/rfc/rfc9700.html#section-4.1.3
+        if (StrUtil.isNotEmpty(redirectUri) && !CollUtil.contains(client.getRedirectUris(), redirectUri)) {
             throw exception(OAUTH2_CLIENT_REDIRECT_URI_NOT_MATCH, redirectUri);
         }
         return client;

@@ -155,7 +155,7 @@ public class IotModbusFrameEncoder {
     // ==================== 帧封装 ====================
 
     /**
-     * 将 PDU 封装为完整帧
+     * 将 PDU 封装为完整帧（透传请求直接封装已校验的 PDU）
      *
      * @param slaveId       从站地址
      * @param pdu           PDU 数据（含 functionCode）
@@ -163,7 +163,7 @@ public class IotModbusFrameEncoder {
      * @param transactionId 事务 ID（TCP 模式下使用，RTU 模式可为 null）
      * @return 完整帧字节数组
      */
-    private byte[] wrapFrame(int slaveId, byte[] pdu, IotModbusFrameFormatEnum format, Integer transactionId) {
+    public byte[] wrapFrame(int slaveId, byte[] pdu, IotModbusFrameFormatEnum format, Integer transactionId) {
         if (format == IotModbusFrameFormatEnum.MODBUS_TCP) {
             return wrapTcpFrame(slaveId, pdu, transactionId != null ? transactionId : 0);
         } else {

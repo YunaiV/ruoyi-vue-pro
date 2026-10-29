@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import javax.annotation.security.PermitAll;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -74,7 +75,10 @@ public class IoTDeviceApiImpl implements IotDeviceCommonApi {
         return success(BeanUtils.toBean(device, IotDeviceRespDTO.class, deviceDTO -> {
             IotProductDO product = productService.getProductFromCache(deviceDTO.getProductId());
             if (product != null) {
-                deviceDTO.setProtocolType(product.getProtocolType()).setSerializeType(product.getSerializeType());
+                // 数据解析脚本随设备信息返回（网关按设备缓存），只在启用时返回内容
+                deviceDTO.setProtocolType(product.getProtocolType()).setSerializeType(product.getSerializeType())
+                        .setScriptEnabled(product.getScriptEnabled())
+                        .setScriptContent(Boolean.TRUE.equals(product.getScriptEnabled()) ? product.getScriptContent() : null);
             }
         }));
     }
@@ -114,10 +118,8 @@ public class IoTDeviceApiImpl implements IotDeviceCommonApi {
                 }
             }
             // 3.3 获取启用的点位列表
-            List<IotDeviceModbusPointDO> pointList = pointMap.get(config.getDeviceId());
-            if (CollUtil.isEmpty(pointList)) {
-                continue;
-            }
+            //     点位为空也返回：连接配置有效即可认证、收发透传（与脚本开关无关）；没有点位时，轮询调度器本身会跳过
+            List<IotDeviceModbusPointDO> pointList = pointMap.getOrDefault(config.getDeviceId(), Collections.emptyList());
 
             // 3.4 构建 IotModbusDeviceConfigRespDTO 对象
             IotModbusDeviceConfigRespDTO configDTO = BeanUtils.toBean(config, IotModbusDeviceConfigRespDTO.class, o ->

@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.iot.enums.rule.IotDataSinkTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -36,6 +37,7 @@ public class IotDataSinkSaveReqVO {
 
     @Schema(description = "数据目的配置")
     @NotNull(message = "数据目的配置不能为空")
+    @Valid
     private IotAbstractDataSinkConfig config;
 
 }

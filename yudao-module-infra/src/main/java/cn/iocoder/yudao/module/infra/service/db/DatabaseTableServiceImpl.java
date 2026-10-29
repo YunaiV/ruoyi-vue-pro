@@ -5,13 +5,16 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import cn.iocoder.yudao.module.infra.dal.dataobject.db.DataSourceConfigDO;
+import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.generator.config.DataSourceConfig;
 import com.baomidou.mybatisplus.generator.config.GlobalConfig;
 import com.baomidou.mybatisplus.generator.config.StrategyConfig;
 import com.baomidou.mybatisplus.generator.config.builder.ConfigBuilder;
 import com.baomidou.mybatisplus.generator.config.po.TableInfo;
 import com.baomidou.mybatisplus.generator.config.rules.DateType;
+import com.baomidou.mybatisplus.generator.config.rules.DbColumnType;
 import com.baomidou.mybatisplus.generator.query.SQLQuery;
+import com.baomidou.mybatisplus.generator.type.ITypeConvertHandler;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -26,6 +29,12 @@ import java.util.stream.Collectors;
  */
 @Service
 public class DatabaseTableServiceImpl implements DatabaseTableService {
+
+    /**
+     * 神通的字段类型转换：TEXT 类型的 JDBC 类型为 OTHER，按 String 处理；其它类型，使用 MyBatis Plus Generator 默认的转换
+     */
+    static final ITypeConvertHandler OSCAR_TYPE_CONVERT_HANDLER = (globalConfig, typeRegistry, metaInfo) ->
+            StrUtil.equalsIgnoreCase(metaInfo.getTypeName(), "TEXT") ? DbColumnType.STRING : typeRegistry.getColumnType(metaInfo);
 
     @Resource
     private DataSourceConfigService dataSourceConfigService;
@@ -53,6 +62,9 @@ public class DatabaseTableServiceImpl implements DatabaseTableService {
                 config.getPassword());
         if (JdbcUtils.isSQLServer(config.getUrl())) { // 特殊：SQLServer jdbc 非标准，参见 https://github.com/baomidou/mybatis-plus/issues/5419
             dataSourceConfigBuilder.databaseQueryClass(SQLQuery.class);
+        }
+        if (JdbcUtils.getDbType(config.getUrl()) == DbType.OSCAR) {
+            dataSourceConfigBuilder.typeConvertHandler(OSCAR_TYPE_CONVERT_HANDLER);
         }
         StrategyConfig.Builder strategyConfig = new StrategyConfig.Builder().enableSkipView(); // 忽略视图，业务上一般用不到
         if (StrUtil.isNotEmpty(name)) {

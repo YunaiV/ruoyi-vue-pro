@@ -135,6 +135,12 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
             log.error("[updateWalletRechargerPaid][recharge({}) 已支付，但是支付单号不同({})，请进行处理！]", recharge, payOrderId);
             throw exception(WALLET_RECHARGE_UPDATE_PAID_PAY_ORDER_ID_ERROR);
         }
+        // 1.3 校验支付单号，与充值记录绑定的支付单号一致。避免其它支付应用中，相同商户订单编号、金额的支付单被用于串单
+        if (ObjectUtil.notEqual(recharge.getPayOrderId(), payOrderId)) {
+            log.error("[updateWalletRechargerPaid][recharge({}) 绑定的支付单({}) 与回调的支付单({}) 不匹配，请进行处理！]",
+                    id, recharge.getPayOrderId(), payOrderId);
+            throw exception(WALLET_RECHARGE_UPDATE_PAID_PAY_ORDER_ID_ERROR);
+        }
 
         // 2. 校验支付订单的合法性
         PayOrderDO payOrderDO = validatePayOrderPaid(recharge, payOrderId);
@@ -191,8 +197,10 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void refundWalletRecharge(Long id, String userIp) {
-        // 1.1 获取钱包充值记录
-        PayWalletRechargeDO walletRecharge = walletRechargeMapper.selectById(id);
+        // 1.1 获取钱包充值记录，并使用 FOR UPDATE 锁定
+        // 原因是：并发发起退款时，避免都读到未退款（payRefundId 为空）的旧记录，导致重复冻结余额。
+        // 加锁后，同一充值记录串行发起：后发起的请求等待前一个事务提交，读取到已绑定的退款单，从而拒绝重复退款
+        PayWalletRechargeDO walletRecharge = walletRechargeMapper.selectOneForUpdate(PayWalletRechargeDO::getId, id);
         if (walletRecharge == null) {
             log.error("[refundWalletRecharge][钱包充值记录不存在，钱包充值记录 id({})]", id);
             throw exception(WALLET_RECHARGE_NOT_FOUND);
@@ -227,53 +235,73 @@ public class PayWalletRechargeServiceImpl implements PayWalletRechargeService {
             log.error("[updateWalletRechargerPaid][钱包充值记录不存在，钱包充值记录 id({})]", id);
             throw exception(WALLET_RECHARGE_NOT_FOUND);
         }
-        // 1.2 校验钱包充值是否可以更新已退款
+        // 1.2 校验退款单号，与充值记录绑定的退款单号一致
+        if (notEqual(walletRecharge.getPayRefundId(), payRefundId)) {
+            log.error("[updateWalletRechargeRefunded][钱包充值({}) 退款单不匹配({})，请进行处理！钱包充值的数据是：{}]",
+                    walletRecharge.getId(), payRefundId, toJsonString(walletRecharge));
+            throw exception(WALLET_RECHARGE_REFUND_FAIL_REFUND_ORDER_ID_ERROR);
+        }
+        // 1.3 特殊：已经是退款终态（成功、失败），且退款单号相同，直接返回，说明重复回调
+        if (PayRefundStatusEnum.isSuccess(walletRecharge.getRefundStatus())
+                || PayRefundStatusEnum.isFailure(walletRecharge.getRefundStatus())) {
+            log.warn("[updateWalletRechargeRefunded][钱包充值({}) 已是退款终态({})，且退款单号相同({})，直接返回]",
+                    id, walletRecharge.getRefundStatus(), payRefundId);
+            return;
+        }
+        // 1.4 校验钱包充值是否可以更新已退款
         PayRefundRespDTO payRefund = validateWalletRechargeCanRefunded(walletRecharge, payRefundId);
 
         // 2. 处理退款结果
         PayWalletRechargeDO updateObj = new PayWalletRechargeDO().setId(id);
+        boolean refundSuccess = PayRefundStatusEnum.isSuccess(payRefund.getStatus());
         // 情况一：退款成功
-        if (PayRefundStatusEnum.isSuccess(payRefund.getStatus())) {
-            // 2.1 更新钱包余额
-            payWalletService.reduceWalletBalance(walletRecharge.getWalletId(), id,
-                    PayWalletBizTypeEnum.RECHARGE_REFUND, walletRecharge.getTotalPrice());
-
+        if (refundSuccess) {
             updateObj.setRefundStatus(SUCCESS.getStatus()).setRefundTime(payRefund.getSuccessTime())
                     .setRefundTotalPrice(walletRecharge.getTotalPrice()).setRefundPayPrice(walletRecharge.getPayPrice())
                     .setRefundBonusPrice(walletRecharge.getBonusPrice());
         // 情况二：退款失败
         } else if (PayRefundStatusEnum.isFailure(payRefund.getStatus())) {
-            // 2.2 解冻余额
-            payWalletService.unfreezePrice(walletRecharge.getWalletId(), walletRecharge.getTotalPrice());
-
             updateObj.setRefundStatus(FAILURE.getStatus());
+        // 情况三：退款未结束，不更新退款状态，也不操作钱包
+        } else {
+            log.warn("[updateWalletRechargeRefunded][钱包充值({}) payRefund({}) 退款状态({}) 未结束，直接返回]",
+                    id, payRefundId, payRefund.getStatus());
+            return;
         }
 
-        // 3. 更新钱包充值的退款字段
-        walletRechargeMapper.updateByIdAndRefunded(id, WAITING.getStatus(), updateObj);
+        // 3. 更新钱包充值的退款字段：基于【未退款】状态的乐观锁，保证并发的重复回调，只有一次能操作钱包
+        int updateCount = walletRechargeMapper.updateByIdAndRefunded(id, WAITING.getStatus(), updateObj);
+        if (updateCount == 0) {
+            log.warn("[updateWalletRechargeRefunded][钱包充值({}) payRefund({}) 不是【未退款】状态，可能被并发处理，直接返回]",
+                    id, payRefundId);
+            return;
+        }
+
+        // 4. 操作钱包：在同一事务中，钱包操作失败时，回滚上面的退款字段
+        if (refundSuccess) {
+            // 4.1 退款成功：扣减钱包余额
+            payWalletService.reduceWalletBalance(walletRecharge.getWalletId(), id,
+                    PayWalletBizTypeEnum.RECHARGE_REFUND, walletRecharge.getTotalPrice());
+        } else {
+            // 4.2 退款失败：解冻余额
+            payWalletService.unfreezePrice(walletRecharge.getWalletId(), walletRecharge.getTotalPrice());
+        }
     }
 
     private PayRefundRespDTO validateWalletRechargeCanRefunded(PayWalletRechargeDO walletRecharge, Long payRefundId) {
-        // 1. 校验退款订单匹配
-        if (notEqual(walletRecharge.getPayRefundId(), payRefundId)) {
-            log.error("[validateWalletRechargeCanRefunded][钱包充值({}) 退款单不匹配({})，请进行处理！钱包充值的数据是：{}]",
-                    walletRecharge.getId(), payRefundId, toJsonString(walletRecharge));
-            throw exception(WALLET_RECHARGE_REFUND_FAIL_REFUND_ORDER_ID_ERROR);
-        }
-
-        // 2.1 校验退款订单
+        // 1. 校验退款订单
         PayRefundRespDTO payRefund = payRefundApi.getRefund(payRefundId);
         if (payRefund == null) {
             log.error("[validateWalletRechargeCanRefunded][payRefund({})不存在]", payRefundId);
             throw exception(WALLET_RECHARGE_REFUND_FAIL_REFUND_NOT_FOUND);
         }
-        // 2.2 校验退款金额一致
+        // 2. 校验退款金额一致
         if (notEqual(payRefund.getRefundPrice(), walletRecharge.getPayPrice())) {
             log.error("[validateWalletRechargeCanRefunded][钱包({}) payRefund({}) 退款金额不匹配，请进行处理！钱包数据是：{}，payRefund 数据是：{}]",
                     walletRecharge.getId(), payRefundId, toJsonString(walletRecharge), toJsonString(payRefund));
             throw exception(WALLET_RECHARGE_REFUND_FAIL_REFUND_PRICE_NOT_MATCH);
         }
-        // 2.3 校验退款订单商户退款单是否匹配
+        // 3. 校验退款订单商户退款单是否匹配
         if (notEqual(payRefund.getMerchantRefundId(), walletRecharge.getId() + "-refund")) {
             log.error("[validateWalletRechargeCanRefunded][钱包({}) 退款单不匹配({})，请进行处理！payRefund 数据是：{}]",
                     walletRecharge.getId(), payRefundId, toJsonString(payRefund));

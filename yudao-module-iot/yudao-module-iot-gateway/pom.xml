@@ -12,8 +12,9 @@
     <name>${project.artifactId}</name>
     <description>
         iot 模块下，设备网关：
-        ① 功能一：接收来自设备的消息，并进行解码（decode）后，发送到消息网关，提供给 iot-biz 进行处理
-        ② 功能二：接收来自消息网关的消息（由 iot-biz 发送），并进行编码（encode）后，发送给设备
+        ① 功能一：接收来自设备的消息，并进行解码（decode）后，发送到消息总线，提供给 iot-biz 进行处理
+        ② 功能二：接收来自消息总线的消息（由 iot-biz 发送），并进行编码（encode）后，发送给设备
+        目前已支持 HTTP、MQTT、EMQX、TCP、UDP、WebSocket、CoAP、Modbus 等协议
     </description>
 
     <dependencies>
@@ -69,6 +70,11 @@
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-test</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-codegen</artifactId>
+            <scope>test</scope> <!-- Vert.x 4 的 vertx-core 将其设为 optional；JDK8 下 Mockito mock RoutingContext 等时需要其 @Nullable 注解类 -->
         </dependency>
 
         <!-- 对齐 OkHttp 5 所需的 Kotlin、Okio，避免旧版依赖导致启动或 RPC 请求失败 -->

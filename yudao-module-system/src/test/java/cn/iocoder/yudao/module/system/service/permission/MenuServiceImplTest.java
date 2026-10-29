@@ -187,6 +187,45 @@ public class MenuServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
+    public void testGetMenuListByTenant_tenantDisable() {
+        // mock 数据
+        MenuDO menu100 = randomPojo(MenuDO.class, o -> o.setId(100L).setStatus(CommonStatusEnum.ENABLE.getStatus()));
+        menuMapper.insert(menu100);
+        MenuDO menu101 = randomPojo(MenuDO.class, o -> o.setId(101L).setStatus(CommonStatusEnum.ENABLE.getStatus()));
+        menuMapper.insert(menu101);
+        // mock 禁用多租户：TenantService 不执行过滤处理器
+        doNothing().when(tenantService).handleTenantMenu(any());
+        // 准备参数
+        MenuListReqVO reqVO = new MenuListReqVO().setStatus(CommonStatusEnum.ENABLE.getStatus());
+
+        // 调用
+        List<MenuDO> result = menuService.getMenuListByTenant(reqVO);
+        // 断言：返回全部菜单
+        assertEquals(asSet(100L, 101L), convertSet(result, MenuDO::getId));
+    }
+
+    @Test
+    public void testGetMenuListByTenant_systemTenant() {
+        // mock 数据
+        MenuDO menu100 = randomPojo(MenuDO.class, o -> o.setId(100L).setStatus(CommonStatusEnum.ENABLE.getStatus()));
+        menuMapper.insert(menu100);
+        MenuDO menu101 = randomPojo(MenuDO.class, o -> o.setId(101L).setStatus(CommonStatusEnum.ENABLE.getStatus()));
+        menuMapper.insert(menu101);
+        // mock 系统租户：处理器得到全量菜单编号
+        doNothing().when(tenantService).handleTenantMenu(argThat(handler -> {
+            handler.handle(asSet(100L, 101L));
+            return true;
+        }));
+        // 准备参数
+        MenuListReqVO reqVO = new MenuListReqVO();
+
+        // 调用
+        List<MenuDO> result = menuService.getMenuListByTenant(reqVO);
+        // 断言：返回全部菜单
+        assertEquals(asSet(100L, 101L), convertSet(result, MenuDO::getId));
+    }
+
+    @Test
     public void testGetMenuIdListByPermissionFromCache() {
         // mock 数据
         MenuDO menu100 = randomPojo(MenuDO.class);

@@ -10,6 +10,7 @@ import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.module.bpm.api.event.BpmProcessInstanceStatusEvent;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmHttpRequestParamTypeEnum;
+import cn.iocoder.yudao.module.bpm.framework.flowable.config.BpmHttpRequestProperties;
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.extern.slf4j.Slf4j;
@@ -19,10 +20,14 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.HEADER_TENANT_ID;
@@ -42,6 +47,8 @@ public class BpmHttpRequestUtils {
                                              List<BpmSimpleModelNodeVO.HttpRequestParam> bodyParams,
                                              Boolean handleResponse,
                                              List<KeyValue<String, String>> response) {
+        // 0. 校验请求地址的域名 / IP 黑白名单（默认关闭）
+        validateHttpRequestUrl(url);
         BpmProcessInstanceService processInstanceService = SpringUtils.getBean(BpmProcessInstanceService.class);
 
         // 1.1 设置请求头
@@ -183,6 +190,70 @@ public class BpmHttpRequestUtils {
                 params.add(item.getKey(), processVariables.get(item.getValue()).toString());
             }
         });
+    }
+
+    /**
+     * 校验流程模型配置的请求地址，是否满足 {@link BpmHttpRequestProperties} 的域名 / IP 黑白名单
+     *
+     * 1. 未开启时，不做任何校验
+     * 2. 开启时，只允许 http、https；黑名单优先，命中则拒绝；白名单非空时，必须命中
+     * 3. 只校验 URL 中填写的域名或 IP（忽略大小写，精确匹配），不解析 DNS，不能防御 DNS 重绑定、代理、重定向等场景
+     *
+     * @param url 请求地址
+     */
+    private static void validateHttpRequestUrl(String url) {
+        BpmHttpRequestProperties properties = SpringUtils.getBean(BpmHttpRequestProperties.class);
+        if (!Boolean.TRUE.equals(properties.getEnabled())) {
+            return;
+        }
+        String host = getHttpRequestHost(url);
+        if (host == null) {
+            log.warn("[validateHttpRequestUrl][请求地址({}) 不合法，拒绝请求]", url);
+            throw exception(PROCESS_INSTANCE_HTTP_CALL_ERROR);
+        }
+        if (containsHost(properties.getDenyHosts(), host)) {
+            log.warn("[validateHttpRequestUrl][请求地址的主机({}) 在黑名单中，拒绝请求]", host);
+            throw exception(PROCESS_INSTANCE_HTTP_CALL_ERROR);
+        }
+        if (CollUtil.isNotEmpty(properties.getAllowHosts()) && !containsHost(properties.getAllowHosts(), host)) {
+            log.warn("[validateHttpRequestUrl][请求地址的主机({}) 不在白名单中，拒绝请求]", host);
+            throw exception(PROCESS_INSTANCE_HTTP_CALL_ERROR);
+        }
+    }
+
+    /**
+     * 获得请求地址的主机（域名或 IP），使用与 RestTemplate 相同的 URI 解析方式
+     *
+     * @param url 请求地址
+     * @return 规范化后的主机；不是 http、https 的绝对地址时，返回 null
+     */
+    private static String getHttpRequestHost(String url) {
+        if (StrUtil.isBlank(url)) {
+            return null;
+        }
+        UriComponents uriComponents;
+        try {
+            uriComponents = UriComponentsBuilder.fromUriString(url).build();
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+        if (!StrUtil.equalsAnyIgnoreCase(uriComponents.getScheme(), "http", "https")
+                || StrUtil.isBlank(uriComponents.getHost())) {
+            return null;
+        }
+        return normalizeHost(uriComponents.getHost());
+    }
+
+    private static boolean containsHost(Set<String> hosts, String host) {
+        return CollUtil.isNotEmpty(hosts) && hosts.stream().anyMatch(item -> host.equals(normalizeHost(item)));
+    }
+
+    /**
+     * 规范化主机：去掉首尾空白、转小写，IPv6 去掉方括号
+     */
+    private static String normalizeHost(String host) {
+        String result = StrUtil.nullToEmpty(StrUtil.trim(host)).toLowerCase(Locale.ROOT);
+        return StrUtil.removeSuffix(StrUtil.removePrefix(result, "["), "]");
     }
 
 }

@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.websocket.manager;
 
+import io.vertx.core.Future;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.ServerWebSocket;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -9,6 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.iot.gateway.enums.ErrorCodeConstants.DEVICE_OFFLINE_OR_WRITE_FAILED;
 
 /**
  * IoT 网关 WebSocket 连接管理器
@@ -117,6 +122,34 @@ public class IotWebSocketConnectionManager {
             // 发送失败时清理连接
             unregisterConnection(socket);
             return false;
+        }
+    }
+
+    /**
+     * 异步发送 binary 消息到设备：返回 writeBinaryMessage 真实的写出结果（透传下发使用）
+     * <p>
+     * 成功只表示本地写出完成，不代表设备已收到或已执行；设备未连接或写出失败时，返回 ServiceException(DEVICE_OFFLINE_OR_WRITE_FAILED)
+     *
+     * @param deviceId 设备 ID
+     * @param data     原始字节
+     * @return 写出结果
+     */
+    public Future<Void> sendBinaryToDeviceAsync(Long deviceId, byte[] data) {
+        ServerWebSocket socket = deviceSocketMap.get(deviceId);
+        if (socket == null) {
+            log.warn("[sendBinaryToDeviceAsync][设备未连接，设备 ID: {}]", deviceId);
+            return Future.failedFuture(exception(DEVICE_OFFLINE_OR_WRITE_FAILED));
+        }
+
+        try {
+            return socket.writeBinaryMessage(Buffer.buffer(data))
+                    .recover(e -> {
+                        log.warn("[sendBinaryToDeviceAsync][发送消息失败，设备 ID: {}，错误: {}]", deviceId, e.getMessage());
+                        return Future.failedFuture(exception(DEVICE_OFFLINE_OR_WRITE_FAILED));
+                    });
+        } catch (Exception e) {
+            log.error("[sendBinaryToDeviceAsync][发送消息异常，设备 ID: {}]", deviceId, e);
+            return Future.failedFuture(exception(DEVICE_OFFLINE_OR_WRITE_FAILED));
         }
     }
 

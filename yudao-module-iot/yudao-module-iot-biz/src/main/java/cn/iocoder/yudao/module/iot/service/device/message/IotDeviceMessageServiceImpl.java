@@ -16,6 +16,7 @@ import cn.iocoder.yudao.module.iot.controller.admin.device.vo.message.IotDeviceM
 import cn.iocoder.yudao.module.iot.controller.admin.statistics.vo.IotStatisticsDeviceMessageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.statistics.vo.IotStatisticsDeviceMessageSummaryByDateRespVO;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
+import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.mq.producer.IotDeviceMessageProducer;
 import cn.iocoder.yudao.module.iot.core.topic.IotDeviceIdentity;
@@ -25,10 +26,13 @@ import cn.iocoder.yudao.module.iot.core.topic.property.IotDevicePropertyPostReqD
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceMessageDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.storage.IotDeviceMessageDAO;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.service.device.property.IotDevicePropertyService;
+import cn.iocoder.yudao.module.iot.service.device.shadow.IotDeviceShadowService;
 import cn.iocoder.yudao.module.iot.service.ota.IotOtaTaskRecordService;
+import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import com.google.common.base.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
@@ -45,6 +49,10 @@ import java.util.Map;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.DEVICE_DOWNSTREAM_FAILED_SERVER_ID_NULL;
+import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.DEVICE_MESSAGE_RAW_METHOD_RESERVED;
+import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.DEVICE_MESSAGE_RAW_PAYLOAD_INVALID;
+import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.DEVICE_MESSAGE_RAW_PROTOCOL_NOT_SUPPORTED;
+import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.PRODUCT_NOT_EXISTS;
 
 /**
  * IoT 设备消息 Service 实现类
@@ -63,6 +71,12 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
     @Resource
     @Lazy // 延迟加载，避免循环依赖
     private IotOtaTaskRecordService otaTaskRecordService;
+    @Resource
+    @Lazy // 延迟加载，避免循环依赖
+    private IotDeviceShadowService deviceShadowService;
+    @Resource
+    @Lazy // 延迟加载，避免循环依赖
+    private IotProductService productService;
 
     @Resource
     private IotDeviceMessageDAO deviceMessageDAO;
@@ -110,7 +124,14 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
         return sendDeviceMessage(message, device, null);
     }
 
-    private IotDeviceMessage sendDeviceMessage(IotDeviceMessage message, IotDeviceDO device, String serverId) {
+    @Override
+    public IotDeviceMessage sendDeviceMessage(IotDeviceMessage message, IotDeviceDO device, String serverId) {
+        // 0. 透传：raw.post 只能由网关创建；raw.push 校验后改写为 raw，网关从 raw 取字节；其它消息不能携带 raw
+        byte[] rawPayload = validateRawMessage(message, device);
+        message.setRaw(rawPayload != null ? IotDeviceMessageUtils.encodeRaw(rawPayload) : null);
+        if (rawPayload != null) {
+            message.setParams(null);
+        }
         // 1. 补充信息
         appendDeviceMessage(message, device);
 
@@ -139,6 +160,44 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
         // 特殊：记录消息日志。原因：上行消息，消费时，已经会记录；下行消息，因为消费在 Gateway 端，所以需要在这里记录
         getSelf().createDeviceLogAsync(message);
         return message;
+    }
+
+    /**
+     * 校验透传消息：raw.post 只能由网关创建；raw.push 校验 params.payload 与产品协议
+     *
+     * @param message 消息
+     * @param device  设备信息
+     * @return raw.push 请求的载荷；其它消息返回 null
+     */
+    private byte[] validateRawMessage(IotDeviceMessage message, IotDeviceDO device) {
+        // 1.1 raw.post 只能由网关创建
+        if (IotDeviceMessageMethodEnum.RAW_POST.getMethod().equals(message.getMethod())) {
+            throw exception(DEVICE_MESSAGE_RAW_METHOD_RESERVED);
+        }
+        // 1.2 只校验 raw.push 请求，其它消息直接跳过
+        if (!Objects.equal(message.getMethod(), IotDeviceMessageMethodEnum.RAW_PUSH.getMethod())
+                || IotDeviceMessageUtils.isReplyMessage(message)) {
+            return null;
+        }
+
+        // 2. 校验产品协议：HTTP、CoAP 没有长连接，不支持透传下发
+        IotProductDO product = productService.getProductFromCache(device.getProductId());
+        if (product == null) {
+            throw exception(PRODUCT_NOT_EXISTS);
+        }
+        IotProtocolTypeEnum protocol = IotProtocolTypeEnum.of(product.getProtocolType());
+        if (protocol == IotProtocolTypeEnum.HTTP || protocol == IotProtocolTypeEnum.COAP) {
+            throw exception(DEVICE_MESSAGE_RAW_PROTOCOL_NOT_SUPPORTED, product.getProtocolType());
+        }
+
+        // 3. 校验载荷：按产品协议的字节规则，与网关 encode 输出、脚本调试是同一份
+        try {
+            byte[] payload = IotDeviceMessageUtils.decodeRawPayload(message.getParams(), IotDeviceMessageUtils.RAW_PAYLOAD_MAX_BYTES);
+            IotDeviceMessageUtils.validateRawPayload(protocol, payload);
+            return payload;
+        } catch (IllegalArgumentException e) {
+            throw exception(DEVICE_MESSAGE_RAW_PAYLOAD_INVALID, e.getMessage());
+        }
     }
 
     /**
@@ -175,8 +234,10 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
         getSelf().createDeviceLogAsync(message);
 
         // 3. 回复消息。前提：非 _reply 消息、非禁用回复的消息
+        //    另外：带原始帧（raw）的是网关透传解析出的消息，不自动回复；设备经标准路径上报的 raw 由网关清空，不能伪造
         if (IotDeviceMessageUtils.isReplyMessage(message)
                 || IotDeviceMessageMethodEnum.isReplyDisabled(message.getMethod())
+                || message.getRaw() != null
                 || StrUtil.isEmpty(message.getServerId())) {
             return;
         }
@@ -216,6 +277,12 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
         // OTA 上报升级进度
         if (Objects.equal(message.getMethod(), IotDeviceMessageMethodEnum.OTA_PROGRESS.getMethod())) {
             otaTaskRecordService.updateOtaRecordProgress(device, message);
+            return null;
+        }
+
+        // 设备影子更新
+        if (Objects.equal(message.getMethod(), IotDeviceMessageMethodEnum.SHADOW_UPDATE.getMethod())) {
+            deviceShadowService.handleDeviceShadowUpdate(device, message);
             return null;
         }
 
@@ -324,6 +391,8 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
 
     @Override
     public PageResult<IotDeviceMessageDO> getDeviceMessagePage(IotDeviceMessagePageReqVO pageReqVO) {
+        // 先校验设备属于当前租户（MySQL 租户插件生效）；时序库查询本身只按 deviceId 限定
+        deviceService.validateDeviceExists(pageReqVO.getDeviceId());
         return deviceMessageDAO.selectPage(pageReqVO);
     }
 

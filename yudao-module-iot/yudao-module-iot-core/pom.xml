@@ -17,6 +17,7 @@
         iot 模块下，提供 iot-biz 和 iot-gateway 模块的核心功能。例如说：
         1. 消息总线：跨 iot-biz 和 iot-gateway 的设备消息。可选择使用 spring event、redis stream、rocketmq、kafka、rabbitmq 等。
         2. 查询设备信息的通用 API
+        3. 数据解析脚本：执行产品配置的 JS 脚本，供 iot-biz 和 iot-gateway 共用
     </description>
 
     <dependencies>
@@ -59,6 +60,12 @@
             <groupId>org.springframework.kafka</groupId>
             <artifactId>spring-kafka</artifactId>
             <optional>true</optional>
+        </dependency>
+
+        <!-- JS 脚本引擎 -->
+        <dependency>
+            <groupId>org.mozilla</groupId>
+            <artifactId>rhino</artifactId>
         </dependency>
 
         <!-- 测试依赖 -->

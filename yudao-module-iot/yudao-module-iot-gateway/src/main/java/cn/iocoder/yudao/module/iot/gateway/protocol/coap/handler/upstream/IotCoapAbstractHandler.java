@@ -36,6 +36,11 @@ public abstract class IotCoapAbstractHandler {
      */
     public static final int OPTION_TOKEN = 2088;
 
+    /**
+     * handle0 返回这个哨兵：表示响应由子类异步写出（透传上报：worker 处理结果与截止计时只响应一次），基类不再写响应
+     */
+    protected static final CommonResult<Object> ASYNC_RESPONSE = new CommonResult<>();
+
     private final IotDeviceTokenService deviceTokenService = SpringUtil.getBean(IotDeviceTokenService.class);
 
     /**
@@ -50,6 +55,9 @@ public abstract class IotCoapAbstractHandler {
 
             // 2. 执行业务逻辑
             CommonResult<Object> result = handle0(exchange);
+            if (result == ASYNC_RESPONSE) { // 响应由子类异步写出
+                return;
+            }
             writeResponse(exchange, result);
         } catch (ServiceException e) {
             // 业务异常，返回对应的错误码和消息

@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.iot.core.util;
 
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
+import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.topic.event.IotDeviceEventPostReqDTO;
 import org.junit.jupiter.api.Test;
@@ -346,6 +347,80 @@ public class IotDeviceMessageUtilsTest {
         assertEquals(2, identifiers.size());
         assertTrue(identifiers.contains("temperature"));
         assertTrue(identifiers.contains("humidity"));
+    }
+
+    @Test
+    public void testEncodeRaw_decodeRaw() {
+        // 标准 Base64（带 padding）往返
+        byte[] bytes = new byte[]{0x01, 0x02, (byte) 0xFF, 0x00};
+        String raw = IotDeviceMessageUtils.encodeRaw(bytes);
+        assertEquals("AQL/AA==", raw);
+        assertArrayEquals(bytes, IotDeviceMessageUtils.decodeRaw(raw, 4));
+        // 上限边界：4096 字节
+        byte[] max = new byte[IotDeviceMessageUtils.RAW_PAYLOAD_MAX_BYTES];
+        assertArrayEquals(max, IotDeviceMessageUtils.decodeRaw(IotDeviceMessageUtils.encodeRaw(max),
+                IotDeviceMessageUtils.RAW_PAYLOAD_MAX_BYTES));
+    }
+
+    @Test
+    public void testDecodeRaw_invalid() {
+        // 为空、不是 Base64
+        assertThrows(IllegalArgumentException.class, () -> IotDeviceMessageUtils.decodeRaw(null, 10));
+        assertThrows(IllegalArgumentException.class, () -> IotDeviceMessageUtils.decodeRaw("", 10));
+        assertThrows(IllegalArgumentException.class, () -> IotDeviceMessageUtils.decodeRaw("!!not-base64!!", 10));
+        // 不规范：省略 padding、末尾多余的位不为 0（与 AQI= 解出相同字节）
+        assertThrows(IllegalArgumentException.class, () -> IotDeviceMessageUtils.decodeRaw("AQI", 10));
+        assertThrows(IllegalArgumentException.class, () -> IotDeviceMessageUtils.decodeRaw("AQJ=", 10));
+        // 超过上限：Modbus PDU 253 字节
+        String tooLong = IotDeviceMessageUtils.encodeRaw(new byte[IotDeviceMessageUtils.MODBUS_PDU_MAX_BYTES + 1]);
+        assertThrows(IllegalArgumentException.class,
+                () -> IotDeviceMessageUtils.decodeRaw(tooLong, IotDeviceMessageUtils.MODBUS_PDU_MAX_BYTES));
+    }
+
+    @Test
+    public void testDecodeRawPayload_withoutPadding() {
+        // 管理后台的 payload 允许省略 padding，由调用方规范化
+        Map<String, Object> params = new HashMap<>();
+        params.put("payload", "AQI");
+        assertArrayEquals(new byte[]{0x01, 0x02}, IotDeviceMessageUtils.decodeRawPayload(params, 10));
+    }
+
+    @Test
+    public void testIsCommandRequest() {
+        // 下行指令的请求：property.set / service.invoke
+        assertTrue(IotDeviceMessageUtils.isCommandRequest(IotDeviceMessage.requestOf("thing.property.set")));
+        assertTrue(IotDeviceMessageUtils.isCommandRequest(IotDeviceMessage.requestOf("thing.service.invoke")));
+        // 其它方法、回执不是
+        assertFalse(IotDeviceMessageUtils.isCommandRequest(IotDeviceMessage.requestOf("thing.ota.upgrade")));
+        assertFalse(IotDeviceMessageUtils.isCommandRequest(
+                IotDeviceMessage.replyOf("1", "thing.property.set", null, 0, null)));
+    }
+
+    @Test
+    public void testValidateRawPayload() {
+        // 通用协议：1~4096 字节
+        IotDeviceMessageUtils.validateRawPayload(IotProtocolTypeEnum.TCP, new byte[]{0x01});
+        IotDeviceMessageUtils.validateRawPayload(IotProtocolTypeEnum.MQTT,
+                new byte[IotDeviceMessageUtils.RAW_PAYLOAD_MAX_BYTES]);
+        assertThrows(IllegalArgumentException.class,
+                () -> IotDeviceMessageUtils.validateRawPayload(IotProtocolTypeEnum.TCP, new byte[0]));
+        assertThrows(IllegalArgumentException.class, () -> IotDeviceMessageUtils.validateRawPayload(
+                IotProtocolTypeEnum.TCP, new byte[IotDeviceMessageUtils.RAW_PAYLOAD_MAX_BYTES + 1]));
+    }
+
+    @Test
+    public void testValidateRawPayload_modbus() {
+        // 合法的 03 读保持寄存器：地址 0、数量 10
+        IotDeviceMessageUtils.validateRawPayload(IotProtocolTypeEnum.MODBUS_TCP_CLIENT, new byte[]{3, 0, 0, 0, 10});
+        // 不合法：不支持的功能码、数量超限、超过 253 字节（通用协议允许的长度，Modbus 也拒绝）
+        assertThrows(IllegalArgumentException.class, () -> IotDeviceMessageUtils.validateRawPayload(
+                IotProtocolTypeEnum.MODBUS_TCP_CLIENT, new byte[]{8, 0, 0, 0, 1}));
+        assertThrows(IllegalArgumentException.class, () -> IotDeviceMessageUtils.validateRawPayload(
+                IotProtocolTypeEnum.MODBUS_TCP_SERVER, new byte[]{3, 0, 0, 0, 126}));
+        byte[] tooLong = new byte[IotDeviceMessageUtils.MODBUS_PDU_MAX_BYTES + 1];
+        tooLong[0] = 0x10;
+        assertThrows(IllegalArgumentException.class, () -> IotDeviceMessageUtils.validateRawPayload(
+                IotProtocolTypeEnum.MODBUS_TCP_CLIENT, tooLong));
     }
 
 }

@@ -80,6 +80,7 @@
         <j2mod.version>3.4.0</j2mod.version>
         <httpclient5.version>5.5.1</httpclient5.version> <!-- WxJava 4.8.x 需要 HttpClient5 5.4+，Spring Boot 2.7 默认 5.1.4 不兼容；JDK8 兼容不能升级到 5.5.2+ -->
         <httpcore5.version>5.3.6</httpcore5.version> <!-- 配套 httpclient5 5.5.1，Spring Boot 2.7 默认 5.1.5 不兼容 -->
+        <rhino.version>1.7.15.1</rhino.version>
         <!-- 三方云服务相关 -->
         <awssdk.version>2.57.3</awssdk.version>
         <justauth.version>1.16.7</justauth.version>
@@ -639,6 +640,11 @@
                 <artifactId>vertx-mqtt</artifactId>
                 <version>${vertx.version}</version>
             </dependency>
+            <dependency>
+                <groupId>io.vertx</groupId>
+                <artifactId>vertx-codegen</artifactId>
+                <version>${vertx.version}</version>
+            </dependency>
 
             <!-- MQTT -->
             <dependency>
@@ -689,6 +695,13 @@
                 <groupId>org.apache.httpcomponents.core5</groupId>
                 <artifactId>httpcore5-h2</artifactId>
                 <version>${httpcore5.version}</version>
+            </dependency>
+
+            <!-- JS 脚本引擎 -->
+            <dependency>
+                <groupId>org.mozilla</groupId>
+                <artifactId>rhino</artifactId>
+                <version>${rhino.version}</version>
             </dependency>
 
             <!-- 三方云服务相关 -->

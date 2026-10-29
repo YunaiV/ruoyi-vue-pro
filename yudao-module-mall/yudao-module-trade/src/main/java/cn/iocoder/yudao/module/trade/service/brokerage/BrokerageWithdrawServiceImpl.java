@@ -253,6 +253,12 @@ public class BrokerageWithdrawServiceImpl implements BrokerageWithdrawService {
             log.error("[updateBrokerageWithdrawTransferred][withdraw({}) 转账单不匹配({})，请进行处理！]", withdraw, payTransferId);
             throw exception(BROKERAGE_WITHDRAW_UPDATE_STATUS_FAIL_PAY_TRANSFER_ID_ERROR);
         }
+        // 1.3 校验转账单编号，与提现单绑定的转账单编号一致。避免其它支付应用中，相同商户转账编号、金额的转账单被用于更新状态
+        if (ObjectUtil.notEqual(withdraw.getPayTransferId(), payTransferId)) {
+            log.error("[updateBrokerageWithdrawTransferred][withdraw({}) 绑定的转账单({}) 与回调的转账单({}) 不匹配，请进行处理！]",
+                    id, withdraw.getPayTransferId(), payTransferId);
+            throw exception(BROKERAGE_WITHDRAW_UPDATE_STATUS_FAIL_PAY_TRANSFER_ID_ERROR);
+        }
 
         // 2. 校验转账单的合法性
         PayTransferRespDTO payTransfer = validateBrokerageTransferStatusCanUpdate(withdraw, payTransferId);

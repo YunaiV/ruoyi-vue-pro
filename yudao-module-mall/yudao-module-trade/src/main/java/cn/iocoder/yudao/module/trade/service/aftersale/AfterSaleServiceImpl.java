@@ -392,6 +392,12 @@ public class AfterSaleServiceImpl implements AfterSaleService {
         if (ObjectUtil.notEqual(afterSale.getStatus(), AfterSaleStatusEnum.WAIT_REFUND.getStatus())) {
             throw exception(AFTER_SALE_REFUND_FAIL_STATUS_NOT_WAIT_REFUND);
         }
+        // 1.2 校验退款单编号，与售后单绑定的退款单编号一致。避免其它支付应用、或重新退款前的退款单被用于更新状态
+        if (ObjectUtil.notEqual(afterSale.getPayRefundId(), payRefundId)) {
+            log.error("[updateAfterSaleRefunded][afterSale({}) 绑定的退款单({}) 与回调的退款单({}) 不匹配，请进行处理！]",
+                    id, afterSale.getPayRefundId(), payRefundId);
+            throw exception(AFTER_SALE_REFUND_FAIL_REFUND_ORDER_ID_ERROR);
+        }
 
         // 2. 校验退款单
         PayRefundRespDTO payRefund = validatePayRefund(afterSale, payRefundId);

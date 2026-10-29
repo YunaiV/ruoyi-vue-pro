@@ -26,7 +26,7 @@ import java.net.URL;
 import java.time.Duration;
 
 /**
- * 基于 S3 协议的文件客户端，实现 MinIO、阿里云、腾讯云、七牛云、华为云等云服务
+ * 基于 S3 协议的文件客户端，实现 MinIO、RustFS、阿里云、腾讯云、七牛云、华为云等云服务
  *
  * @author 芋道源码
  */
@@ -156,7 +156,7 @@ public class S3FileClient extends AbstractFileClient<S3FileClientConfig> {
      * @return Domain 地址
      */
     private String buildDomain() {
-        // 如果已经是 http 或者 https，则不进行拼接.主要适配 MinIO
+        // 如果已经是 http 或者 https，则不进行拼接.主要适配 MinIO、RustFS
         if (HttpUtil.isHttp(config.getEndpoint()) || HttpUtil.isHttps(config.getEndpoint())) {
             return StrUtil.format("{}/{}", config.getEndpoint(), config.getBucket());
         }
@@ -265,7 +265,7 @@ public class S3FileClient extends AbstractFileClient<S3FileClientConfig> {
             }
         }
 
-        // 3.4 其他情况（MinIO、七牛云等）使用默认值
+        // 3.4 其他情况（MinIO、RustFS、七牛云等）使用默认值
         return "us-east-1";
     }
 

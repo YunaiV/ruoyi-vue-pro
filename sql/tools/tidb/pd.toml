@@ -1,0 +1,3 @@
+# 单机测试环境只有 1 个 TiKV，副本数设置为 1（仅在集群首次启动时生效）
+[replication]
+max-replicas = 1

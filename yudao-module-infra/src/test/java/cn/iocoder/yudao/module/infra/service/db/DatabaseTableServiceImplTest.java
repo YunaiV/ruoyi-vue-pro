@@ -2,9 +2,11 @@ package cn.iocoder.yudao.module.infra.service.db;
 
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.infra.dal.dataobject.db.DataSourceConfigDO;
+import com.baomidou.mybatisplus.generator.config.GlobalConfig;
 import com.baomidou.mybatisplus.generator.config.po.TableField;
 import com.baomidou.mybatisplus.generator.config.po.TableInfo;
 import com.baomidou.mybatisplus.generator.config.rules.DbColumnType;
+import com.baomidou.mybatisplus.generator.type.TypeRegistry;
 import org.apache.ibatis.type.JdbcType;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -59,6 +61,26 @@ public class DatabaseTableServiceImplTest extends BaseDbUnitTest {
         TableInfo tableInfo = databaseTableService.getTable(dataSourceConfigId, "infra_config");
         // 断言
         assertTableInfo(tableInfo);
+    }
+
+    @Test
+    public void testOscarTypeConvertHandler() {
+        TypeRegistry typeRegistry = new TypeRegistry(new GlobalConfig.Builder().build());
+        // 神通的 TEXT 类型，JDBC 类型为 OTHER，按 String 处理
+        assertEquals(DbColumnType.STRING, DatabaseTableServiceImpl.OSCAR_TYPE_CONVERT_HANDLER
+                .convert(null, typeRegistry, buildMetaInfo(JdbcType.OTHER, "TEXT")));
+        // 其它 OTHER 类型，保持 MyBatis Plus Generator 默认的转换
+        assertEquals(DbColumnType.OBJECT, DatabaseTableServiceImpl.OSCAR_TYPE_CONVERT_HANDLER
+                .convert(null, typeRegistry, buildMetaInfo(JdbcType.OTHER, "JSON")));
+        assertEquals(DbColumnType.LONG, DatabaseTableServiceImpl.OSCAR_TYPE_CONVERT_HANDLER
+                .convert(null, typeRegistry, buildMetaInfo(JdbcType.BIGINT, "BIGINT")));
+    }
+
+    private static TableField.MetaInfo buildMetaInfo(JdbcType jdbcType, String typeName) {
+        TableField.MetaInfo metaInfo = new TableField.MetaInfo(null, null);
+        metaInfo.setJdbcType(jdbcType);
+        metaInfo.setTypeName(typeName);
+        return metaInfo;
     }
 
     private void assertTableInfo(TableInfo tableInfo) {

@@ -30,6 +30,7 @@ public class S3FileClientConfig implements FileClientConfig {
      * 4. 七牛云：https://developer.qiniu.com/kodo/4088/s3-access-domainname
      * 5. 华为云：https://console.huaweicloud.com/apiexplorer/#/endpoint/OBS
      * 6. 火山云：https://www.volcengine.com/docs/6349/107356
+     * 7. RustFS：https://docs.rustfs.com/en/administration/protocols/s3/ 。例如说，http://127.0.0.1:9000（S3 API 端口，不是 9001 控制台端口）
      */
     @NotNull(message = "endpoint 不能为空")
     private String endpoint;
@@ -41,6 +42,7 @@ public class S3FileClientConfig implements FileClientConfig {
      * 4. 七牛云：https://developer.qiniu.com/kodo/8556/set-the-custom-source-domain-name
      * 5. 华为云：https://support.huaweicloud.com/usermanual-obs/obs_03_0032.html
      * 6. 火山云：https://www.volcengine.com/docs/6349/128983
+     * 7. RustFS：不填写时为 endpoint/bucket；PathStyle 访问时需带上 /bucket，例如说 http://127.0.0.1:9000/ruoyi-vue-pro，且需前端可访问
      */
     @URL(message = "domain 必须是 URL 格式")
     private String domain;
@@ -58,6 +60,7 @@ public class S3FileClientConfig implements FileClientConfig {
      * 4. 七牛云：https://portal.qiniu.com/user/key
      * 5. 华为云：https://support.huaweicloud.com/qs-obs/obs_qs_0005.html
      * 6. 火山云：https://console.volcengine.com/iam/keymanage/
+     * 7. RustFS：https://docs.rustfs.com/en/installation/container/docker/ 。例如说，启动时配置的 RUSTFS_ACCESS_KEY
      */
     @NotNull(message = "accessKey 不能为空")
     private String accessKey;
@@ -69,6 +72,8 @@ public class S3FileClientConfig implements FileClientConfig {
 
     /**
      * 是否启用 PathStyle 访问
+     *
+     * MinIO、RustFS：建议 true。其中，RustFS 默认使用 PathStyle，虚拟主机风格需服务端额外配置 RUSTFS_SERVER_DOMAINS
      */
     @NotNull(message = "enablePathStyleAccess 不能为空")
     private Boolean enablePathStyleAccess;
@@ -91,6 +96,7 @@ public class S3FileClientConfig implements FileClientConfig {
      * 5. 七牛云：不需要填写，会自动识别
      * 6. 华为云：不需要填写，会自动识别
      * 7. 火山云：不需要填写，会自动识别
+     * 8. RustFS：需与服务端的 RUSTFS_REGION 一致，默认 us-east-1；不填写时，也使用 us-east-1
      */
     private String region;
 

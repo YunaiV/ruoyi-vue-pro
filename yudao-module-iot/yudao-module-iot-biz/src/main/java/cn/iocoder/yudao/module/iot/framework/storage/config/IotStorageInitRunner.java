@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import javax.sql.DataSource;
 
-// TODO DONE @AI：按照项目的习惯，这个是不是不用写单测？已移除独立单测 IotStorageInitRunnerTest，关键的缺数据源防回落 master 断言并入实库验收
 /**
  * IoT 时序存储的初始化 Runner：校验数据源、前提条件，并创建消息表
  *

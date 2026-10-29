@@ -3,12 +3,16 @@ package cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpclient.manager;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigRespDTO;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
+import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.utils.IotModbusTcpClientUtils;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
+import cn.iocoder.yudao.module.iot.gateway.util.IotWorkerTaskQueue;
 import com.ghgande.j2mod.modbus.net.TCPMasterConnection;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
@@ -18,6 +22,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
+
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.iot.gateway.enums.ErrorCodeConstants.MODBUS_DISCONNECTED;
 
 /**
  * IoT Modbus TCP 连接管理器
@@ -232,6 +241,8 @@ public class IotModbusTcpClientConnectionManager {
         if (connection == null) {
             return;
         }
+        // 先标记失效：已经排进有序队列、尚未执行的任务直接 115，不会在被关闭的连接上重新 connect()
+        connection.setRetired(true);
 
         try {
             if (connection.getTcpConnection() != null) {
@@ -288,6 +299,35 @@ public class IotModbusTcpClientConnectionManager {
          * Vert.x Context，用于 executeBlocking 执行 Modbus 操作，保证同一连接的操作串行执行
          */
         private Context context;
+        /**
+         * 本连接读取结果的上报队列（{@link #context} 上的有序有界 worker 队列，随 {@link #setContext} 创建）：
+         * 点位翻译、发送到消息总线会阻塞，交给 worker 按读取完成的顺序执行，不占用 context 的 event loop；
+         * 只在 context 线程上提交（executeBlocking 的结果回调就在它上面）
+         */
+        @Setter(AccessLevel.NONE)
+        private IotWorkerTaskQueue upstreamQueue;
+
+        /**
+         * 是否已失效：closeConnection 移出连接池时置为 true；之后开始执行的任务直接 115
+         */
+        private volatile boolean retired;
+
+        /**
+         * 透传请求的在途 + 排队计数（只计 raw；轮询和标准读写不计入）
+         */
+        private final AtomicInteger rawOutstanding = new AtomicInteger();
+
+        /**
+         * 设置执行 Modbus 操作的 Context，同时创建它上面的上报队列
+         *
+         * @param context Vert.x Context
+         * @return this
+         */
+        public ModbusConnection setContext(Context context) {
+            this.context = context;
+            this.upstreamQueue = new IotWorkerTaskQueue(context);
+            return this;
+        }
 
         public Integer addDevice(Long deviceId, Integer slaveId) {
             return deviceSlaveMap.putIfAbsent(deviceId, slaveId);
@@ -306,12 +346,75 @@ public class IotModbusTcpClientConnectionManager {
         }
 
         /**
-         * 执行 Modbus 读取操作（阻塞方式，在 Vert.x worker 线程执行）
+         * 执行标准 Modbus 操作（轮询读取、标准写入；阻塞方式，在 Vert.x worker 线程执行）
+         * <p>
+         * 与原逻辑一致：操作失败（包括读超时）只抛出，不关闭这个可能被多个从站共用的物理连接，
+         * 未连接时由 j2mod 的 ModbusTCPTransaction.execute 自己 connect。
+         * 只多一个检查：已被 closeConnection 移出连接池（retired）时，排队中的任务不再执行，直接 115，不会重新连上被关闭的连接
          */
-        public <T> Future<T> executeBlocking(java.util.function.Function<TCPMasterConnection, T> operation) {
+        public <T> Future<T> executeBlocking(Function<TCPMasterConnection, T> operation) {
             // ordered=true 保证同一 Context 的操作串行执行，不同连接之间可并行
-            return context.executeBlocking(() -> operation.apply(tcpConnection), true);
+            return context.executeBlocking(() -> {
+                if (retired) {
+                    throw exception(MODBUS_DISCONNECTED);
+                }
+                return operation.apply(tcpConnection);
+            }, true);
         }
+
+        /**
+         * 执行透传操作（阻塞方式，在 Vert.x worker 线程执行；与标准操作排在同一个有序队列里）
+         * <p>
+         * 只有透传使用的传输失效隔离，在有序边界内完成（不在结果投递或 onComplete 之后重连）：
+         * 1. 已被 closeConnection 移出连接池（retired）：排队中的任务不再执行，直接 115；
+         * 2. 之前的透传因传输失败关闭了连接：本任务开始时用现有的 connect() 恢复；
+         * 3. 传输失败（读超时、IO 异常）：在同一个有序任务里先关闭连接，再抛出异常，迟到的响应不会被下一个事务读到；
+         *    设备异常响应（ModbusSlaveException）说明链路正常，不关闭、不重连
+         */
+        public <T> Future<T> executeRawBlocking(Function<TCPMasterConnection, T> operation) {
+            return context.executeBlocking(() -> {
+                // 1. 连接已被 closeConnection 移出连接池：排队中的任务不再执行
+                if (retired) {
+                    throw exception(MODBUS_DISCONNECTED);
+                }
+                // 2. 之前的透传因传输失败关闭了连接：在本任务里用现有的 connect() 恢复
+                //    （j2mod 的 ModbusTCPTransaction.execute 也会在未连接时 connect；这里先连上，它看到已连接就不会再连一次）
+                if (!tcpConnection.isConnected()) {
+                    tcpConnection.connect();
+                }
+                // 3. 执行操作：传输失败时先让连接失效，之后的任务开始时才会重连
+                try {
+                    return operation.apply(tcpConnection);
+                } catch (RuntimeException e) {
+                    if (IotModbusTcpClientUtils.isTransportFailure(e)) {
+                        tcpConnection.close();
+                    }
+                    throw e;
+                }
+            }, true);
+        }
+
+        /**
+         * 占用一个透传名额
+         *
+         * @param max 每个连接的上限
+         * @return 是否成功；false 时调用方直接返回 113 失败，不进入 executeBlocking
+         */
+        public boolean tryAcquireRawSlot(int max) {
+            if (rawOutstanding.incrementAndGet() <= max) {
+                return true;
+            }
+            rawOutstanding.decrementAndGet();
+            return false;
+        }
+
+        /**
+         * 释放一个透传名额（透传任务到达终态时调用）
+         */
+        public void releaseRawSlot() {
+            rawOutstanding.decrementAndGet();
+        }
+
     }
 
 }

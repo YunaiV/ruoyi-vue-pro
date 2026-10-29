@@ -90,4 +90,13 @@ public class IotProductDO extends TenantBaseDO {
      */
     private String serializeType;
 
+    /**
+     * 数据解析脚本（JS ES5），UTF-8 不超过 32KB
+     */
+    private String scriptContent;
+    /**
+     * 是否启用数据解析脚本
+     */
+    private Boolean scriptEnabled;
+
 }

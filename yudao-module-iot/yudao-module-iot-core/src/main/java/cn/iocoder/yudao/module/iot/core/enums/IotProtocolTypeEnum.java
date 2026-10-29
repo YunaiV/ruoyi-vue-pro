@@ -44,4 +44,11 @@ public enum IotProtocolTypeEnum implements ArrayValuable<String> {
         return ArrayUtil.firstMatch(e -> e.getType().equals(type), values());
     }
 
+    /**
+     * @return 是否是 Modbus 协议（client、server）：透传字节按请求 PDU 校验
+     */
+    public boolean isModbus() {
+        return this == MODBUS_TCP_CLIENT || this == MODBUS_TCP_SERVER;
+    }
+
 }

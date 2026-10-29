@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.iot.gateway.util;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
+import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 
 /**
@@ -139,6 +140,55 @@ public final class IotMqttTopicUtils {
         }
         String deviceTopicPrefix = SYS_TOPIC_PREFIX + productKey + "/" + deviceName + "/";
         return topic.startsWith(deviceTopicPrefix);
+    }
+
+    // ========== 透传主题 ==========
+
+    /**
+     * 是否为透传上报主题：/sys/{productKey}/{deviceName}/thing/raw/post
+     * <p>
+     * 只判断主题格式；设备身份由调用方与已认证的连接（或 EMQX ACL）比对
+     *
+     * @param topic 主题
+     * @return 是否为透传上报主题
+     */
+    public static boolean isRawPostTopic(String topic) {
+        return isRawTopic(topic, IotDeviceMessageMethodEnum.RAW_POST);
+    }
+
+    /**
+     * 是否为透传下发主题：/sys/{productKey}/{deviceName}/thing/raw/push
+     * <p>
+     * 网关发布 raw 下行使用；EMQX 网关订阅到自己发布的该主题时需要忽略（回环）
+     *
+     * @param topic 主题
+     * @return 是否为透传下发主题
+     */
+    public static boolean isRawPushTopic(String topic) {
+        return isRawTopic(topic, IotDeviceMessageMethodEnum.RAW_PUSH);
+    }
+
+    /**
+     * 构建透传下发主题：/sys/{productKey}/{deviceName}/thing/raw/push
+     *
+     * @param productKey 产品 Key
+     * @param deviceName 设备名称
+     * @return 透传下发主题
+     */
+    public static String buildRawPushTopic(String productKey, String deviceName) {
+        return buildTopicByMethod(IotDeviceMessageMethodEnum.RAW_PUSH.getMethod(), productKey, deviceName, false);
+    }
+
+    private static boolean isRawTopic(String topic, IotDeviceMessageMethodEnum method) {
+        if (StrUtil.isBlank(topic)) {
+            return false;
+        }
+        // 格式必须是 /sys/{productKey}/{deviceName}/thing/raw/{post|push}：productKey、deviceName 各占一段且非空
+        String[] parts = topic.split("/", -1);
+        if (parts.length != 7 || StrUtil.hasBlank(parts[2], parts[3])) {
+            return false;
+        }
+        return topic.equals(buildTopicByMethod(method.getMethod(), parts[2], parts[3], false));
     }
 
 }

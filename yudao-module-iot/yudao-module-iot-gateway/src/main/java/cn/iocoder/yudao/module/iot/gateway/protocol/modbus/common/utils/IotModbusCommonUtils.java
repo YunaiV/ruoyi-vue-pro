@@ -4,11 +4,13 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigRespDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusPointRespDTO;
 import cn.iocoder.yudao.module.iot.core.enums.modbus.IotModbusByteOrderEnum;
 import cn.iocoder.yudao.module.iot.core.enums.modbus.IotModbusRawDataTypeEnum;
+import cn.iocoder.yudao.module.iot.gateway.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpserver.codec.IotModbusFrame;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +19,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Arrays;
 
 /**
  * IoT Modbus 协议工具类
@@ -522,6 +525,113 @@ public class IotModbusCommonUtils {
         }
         // FC01/02 线圈/离散输入读响应：按 bit 打包有余位，无法精确反推，返回 -1 跳过校验
         return -1;
+    }
+
+    // ==================== 事务响应：PDU 还原与格式校验 ====================
+
+    /**
+     * 构建异常响应 PDU：[fc | 0x80, 异常码]
+     *
+     * @param functionCode  原功能码
+     * @param exceptionCode 异常码
+     * @return 异常响应 PDU
+     */
+    public static byte[] buildExceptionPdu(int functionCode, int exceptionCode) {
+        return new byte[]{(byte) (functionCode | FC_EXCEPTION_MASK), (byte) exceptionCode};
+    }
+
+    /**
+     * 从解码后的响应帧还原响应 PDU（不带 slaveId、CRC、MBAP）
+     * <p>
+     * 解码器的 {@link IotModbusFrame#getPdu()} 是功能码之后的全部数据（读响应含 byteCount）；
+     * 异常响应时解码器已把功能码还原为原功能码、异常码单独存放，这里重新加上 0x80 异常位
+     *
+     * @param frame 响应帧
+     * @return 异常 → [fc | 0x80, 异常码]；正常 → [fc] + pdu
+     */
+    public static byte[] buildResponsePdu(IotModbusFrame frame) {
+        if (frame.isException()) {
+            return buildExceptionPdu(frame.getFunctionCode(), frame.getExceptionCode());
+        }
+        byte[] data = frame.getPdu() != null ? frame.getPdu() : new byte[0];
+        byte[] responsePdu = new byte[1 + data.length];
+        responsePdu[0] = (byte) frame.getFunctionCode();
+        System.arraycopy(data, 0, responsePdu, 1, data.length);
+        return responsePdu;
+    }
+
+    /**
+     * 获取透传响应对应的设备错误：用于回复 biz 时的结果码
+     *
+     * @param responsePdu 设备响应 PDU（非空）
+     * @return 异常响应 [fc | 0x80, 异常码] → {@link ErrorCodeConstants#MODBUS_EXCEPTION}（带异常码）；正常响应 → null
+     */
+    public static ErrorCode getRawResponseError(byte[] responsePdu) {
+        if (!isExceptionResponse(responsePdu[0] & 0xFF) || responsePdu.length < 2) {
+            return null;
+        }
+        ErrorCode exception = ErrorCodeConstants.MODBUS_EXCEPTION;
+        return new ErrorCode(exception.getCode(), StrUtil.format(exception.getMsg(), responsePdu[1] & 0xFF));
+    }
+
+    /**
+     * 获取请求 PDU 中的数量：FC01-04 / FC15 / FC16 取第 3-4 字节；FC05 / FC06 固定为 1
+     *
+     * @param requestPdu 请求 PDU（已通过格式校验，至少 5 字节）
+     * @return 数量
+     */
+    public static int getRequestQuantity(byte[] requestPdu) {
+        int functionCode = requestPdu[0] & 0xFF;
+        if (functionCode == FC_WRITE_SINGLE_COIL || functionCode == FC_WRITE_SINGLE_REGISTER) {
+            return 1;
+        }
+        return ((requestPdu[3] & 0xFF) << 8) | (requestPdu[4] & 0xFF);
+    }
+
+    /**
+     * 校验正常响应 PDU 的格式是否与请求一致（异常响应不经过这里）
+     * <ul>
+     *     <li>FC01 / FC02：byteCount = ceil(数量 / 8)，总长 = 2 + byteCount；</li>
+     *     <li>FC03 / FC04：byteCount = 2 × 数量，总长 = 2 + byteCount；</li>
+     *     <li>FC05 / FC06：原样回显请求；</li>
+     *     <li>FC15 / FC16：回显地址和数量。</li>
+     * </ul>
+     *
+     * @param requestPdu  请求 PDU
+     * @param responsePdu 响应 PDU
+     * @return 是否合法
+     */
+    @SuppressWarnings("EnhancedSwitchMigration")
+    public static boolean isResponseShapeValid(byte[] requestPdu, byte[] responsePdu) {
+        if (requestPdu == null || requestPdu.length < 5 || responsePdu == null || responsePdu.length < 1) {
+            return false;
+        }
+        int functionCode = requestPdu[0] & 0xFF;
+        if ((responsePdu[0] & 0xFF) != functionCode) {
+            return false;
+        }
+        int quantity = getRequestQuantity(requestPdu);
+        switch (functionCode) {
+            case FC_READ_COILS:
+            case FC_READ_DISCRETE_INPUTS:
+                return isReadResponseShapeValid(responsePdu, (quantity + 7) / 8);
+            case FC_READ_HOLDING_REGISTERS:
+            case FC_READ_INPUT_REGISTERS:
+                return isReadResponseShapeValid(responsePdu, quantity * 2);
+            case FC_WRITE_SINGLE_COIL:
+            case FC_WRITE_SINGLE_REGISTER:
+                return responsePdu.length == 5 && Arrays.equals(Arrays.copyOf(requestPdu, 5), responsePdu);
+            case FC_WRITE_MULTIPLE_COILS:
+            case FC_WRITE_MULTIPLE_REGISTERS:
+                return responsePdu.length == 5
+                        && Arrays.equals(Arrays.copyOfRange(requestPdu, 1, 5), Arrays.copyOfRange(responsePdu, 1, 5));
+            default:
+                return false;
+        }
+    }
+
+    private static boolean isReadResponseShapeValid(byte[] responsePdu, int expectedByteCount) {
+        return responsePdu.length == 2 + expectedByteCount && (responsePdu[1] & 0xFF) == expectedByteCount;
     }
 
     // ==================== 点位查找 ====================

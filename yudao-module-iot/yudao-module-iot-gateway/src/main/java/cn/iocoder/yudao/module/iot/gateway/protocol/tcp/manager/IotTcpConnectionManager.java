@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.tcp.manager;
 
+import io.vertx.core.Future;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.net.NetSocket;
 import lombok.Data;
@@ -9,6 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.iot.gateway.enums.ErrorCodeConstants.DEVICE_OFFLINE_OR_WRITE_FAILED;
 
 /**
  * IoT 网关 TCP 连接管理器
@@ -129,6 +133,42 @@ public class IotTcpConnectionManager {
     }
 
     /**
+     * 根据设备 ID 获取当前的连接
+     */
+    public NetSocket getSocketByDeviceId(Long deviceId) {
+        return deviceSocketMap.get(deviceId);
+    }
+
+    /**
+     * 异步发送消息到设备的指定连接：返回 socket.write 真实的写出结果（透传下发使用）
+     * <p>
+     * 只写调用方已检查过的连接（例如已确认是透传连接）：设备已换成其它连接时直接失败，不改写新连接，避免把原始字节写到未校验的连接上。
+     * 成功只表示本地写出完成，不代表设备已收到或已执行；设备未连接、连接已替换或写出失败时，返回 ServiceException(DEVICE_OFFLINE_OR_WRITE_FAILED)
+     *
+     * @param deviceId 设备 ID
+     * @param socket   已检查过的连接
+     * @param data     数据（已按帧编码）
+     * @return 写出结果
+     */
+    public Future<Void> sendToConnectionAsync(Long deviceId, NetSocket socket, byte[] data) {
+        if (socket == null || deviceSocketMap.get(deviceId) != socket) {
+            log.warn("[sendToConnectionAsync][设备未连接或连接已替换，设备 ID: {}]", deviceId);
+            return Future.failedFuture(exception(DEVICE_OFFLINE_OR_WRITE_FAILED));
+        }
+
+        try {
+            return socket.write(Buffer.buffer(data))
+                    .recover(e -> {
+                        log.warn("[sendToConnectionAsync][发送消息失败，设备 ID: {}，错误: {}]", deviceId, e.getMessage());
+                        return Future.failedFuture(exception(DEVICE_OFFLINE_OR_WRITE_FAILED));
+                    });
+        } catch (Exception e) {
+            log.error("[sendToConnectionAsync][发送消息异常，设备 ID: {}]", deviceId, e);
+            return Future.failedFuture(exception(DEVICE_OFFLINE_OR_WRITE_FAILED));
+        }
+    }
+
+    /**
      * 关闭所有连接
      */
     public void closeAll() {
@@ -164,6 +204,12 @@ public class IotTcpConnectionManager {
          * 设备名称
          */
         private String deviceName;
+        /**
+         * 是否为透传连接（认证时 params.mode = raw）
+         * <p>
+         * 透传连接认证之后的每一帧都是原始字节，按数据解析脚本解析；只有透传连接才支持透传下发
+         */
+        private Boolean rawMode;
 
     }
 

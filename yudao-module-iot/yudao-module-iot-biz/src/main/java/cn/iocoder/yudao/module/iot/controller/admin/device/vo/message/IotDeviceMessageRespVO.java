@@ -53,4 +53,7 @@ public class IotDeviceMessageRespVO {
     @Schema(description = "响应提示", example = "操作成功")
     private String msg;
 
+    @Schema(description = "与设备实际收发的原始字节（Base64）；为空表示没有原始帧", example = "AQMAAAAK")
+    private String raw;
+
 }

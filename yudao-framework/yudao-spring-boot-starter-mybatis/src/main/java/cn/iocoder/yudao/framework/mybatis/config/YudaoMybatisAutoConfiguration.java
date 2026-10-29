@@ -87,6 +87,7 @@ public class YudaoMybatisAutoConfiguration {
         if (dbType != null) {
             switch (dbType) {
                 case POSTGRE_SQL:
+                case OSCAR: // 神通：与 PostgreSQL 相同，使用 nextval('序列名') 获取序列值
                     return new PostgreKeyGenerator();
                 case ORACLE:
                 case ORACLE_12C:

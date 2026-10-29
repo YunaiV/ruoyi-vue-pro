@@ -30,7 +30,7 @@ public class IotModbusTcpClientUpstreamHandler {
     }
 
     /**
-     * 处理 Modbus 读取结果
+     * 处理 Modbus 读取结果：发送到消息总线会阻塞，由轮询调度器提交到连接的 worker 队列上执行
      *
      * @param config   设备配置
      * @param point    点位配置

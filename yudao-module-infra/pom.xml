@@ -104,7 +104,7 @@
             <groupId>com.github.mwiede</groupId>
             <artifactId>jsch</artifactId> <!-- 文件客户端：解决 sftp 连接 -->
         </dependency>
-        <!-- 文件客户端：解决阿里云、腾讯云、minio 等 S3 连接 -->
+        <!-- 文件客户端：解决阿里云、腾讯云、minio、rustfs 等 S3 连接 -->
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>s3</artifactId>
