@@ -73,6 +73,7 @@ import org.springframework.ai.ollama.OllamaEmbeddingModel;
 import org.springframework.ai.ollama.api.OllamaApi;
 import org.springframework.ai.ollama.api.OllamaEmbeddingOptions;
 import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.OpenAiEmbeddingModel;
 import org.springframework.ai.openai.OpenAiEmbeddingOptions;
 import org.springframework.ai.openai.OpenAiImageModel;
@@ -462,6 +463,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
         OpenAiApi openAiApi = OpenAiApi.builder().baseUrl(url).apiKey(openAiToken).build();
         return OpenAiChatModel.builder()
                 .openAiApi(openAiApi)
+                .defaultOptions(OpenAiChatOptions.builder().streamUsage(true).build())
                 .toolCallingManager(getToolCallingManager())
                 .build();
     }
