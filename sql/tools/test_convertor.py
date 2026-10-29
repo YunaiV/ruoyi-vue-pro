@@ -286,6 +286,130 @@ INSERT INTO `demo_bom` (`id`, `name`) VALUES (1, 'a\ufeffb');
         self.assertNotIn("Table structure for ghost", out)
 
 
+class SQLServerConvertorTest(unittest.TestCase):
+    # MySQL 整数取值范围：https://dev.mysql.com/doc/refman/8.4/en/integer-types.html
+    MYSQL_INTEGER_RANGES = {
+        "tinyint": (-128, 127),
+        "tinyint unsigned": (0, 255),
+        "smallint": (-32768, 32767),
+        "smallint unsigned": (0, 65535),
+    }
+    # SQL Server 整数取值范围：https://learn.microsoft.com/sql/t-sql/data-types/int-bigint-smallint-and-tinyint-transact-sql
+    SQLSERVER_INTEGER_RANGES = {
+        "tinyint": (0, 255),
+        "smallint": (-32768, 32767),
+        "int": (-2 ** 31, 2 ** 31 - 1),
+        "bigint": (-2 ** 63, 2 ** 63 - 1),
+    }
+
+    TYPE_TABLE = """
+DROP TABLE IF EXISTS `demo_type`;
+CREATE TABLE `demo_type`  (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `grade` tinyint NOT NULL DEFAULT 0 COMMENT '有符号 tinyint',
+  `sex` tinyint(1) NOT NULL DEFAULT 0 COMMENT '性别',
+  `score` smallint NOT NULL DEFAULT 0 COMMENT '有符号 smallint',
+  `ratio` tinyint unsigned NOT NULL DEFAULT 255 COMMENT '无符号 tinyint',
+  `port` smallint unsigned NOT NULL DEFAULT 65535 COMMENT '无符号 smallint',
+  `enabled` bit(1) NOT NULL DEFAULT b'1' COMMENT '是否启用',
+  `visible` bit(1) NULL DEFAULT NULL COMMENT '是否可见',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '类型表';
+
+BEGIN;
+INSERT INTO `demo_type` (`id`, `grade`, `sex`, `score`, `ratio`, `port`, `enabled`, `visible`, `deleted`) VALUES (1, -128, 1, -32768, 255, 65535, b'0', NULL, b'0');
+INSERT INTO `demo_type` (`id`, `grade`, `sex`, `score`, `ratio`, `port`, `enabled`, `visible`, `deleted`) VALUES (2, 127, 0, 32767, 0, 0, b'1', b'1', b'0');
+COMMIT;
+"""
+
+    def setUp(self):
+        directory = tempfile.TemporaryDirectory()
+        self.addCleanup(directory.cleanup)
+        self.directory = directory.name
+
+    def write_sql(self, content):
+        path = os.path.join(self.directory, "dump.sql")
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(content)
+        return path
+
+    def test_translate_type_integer_range(self):
+        convertor = SQLServerConvertor(self.write_sql(HEADER + DEMO_TABLE))
+        for mysql_type, (mysql_min, mysql_max) in self.MYSQL_INTEGER_RANGES.items():
+            with self.subTest(mysql_type):
+                target_type = convertor.translate_type(mysql_type, None)
+                target_min, target_max = self.SQLSERVER_INTEGER_RANGES[target_type]
+                # 目标类型需要容纳负数、大于 255 等全部取值
+                self.assertLessEqual(target_min, mysql_min)
+                self.assertGreaterEqual(target_max, mysql_max)
+        # tinyint(1) 的显示宽度不影响取值范围
+        self.assertEqual("smallint", convertor.translate_type("tinyint", 1))
+        # 无符号 tinyint 保持 tinyint，不扩大类型
+        self.assertEqual("tinyint", convertor.translate_type("TINYINT UNSIGNED", None))
+
+    def test_translate_type_bit(self):
+        convertor = SQLServerConvertor(self.write_sql(HEADER + DEMO_TABLE))
+        self.assertEqual("bit", convertor.translate_type("bit", 1))
+        self.assertEqual("bit", convertor.translate_type("bit", None))
+        # 多位的位串不是布尔值，不能转换为 bit
+        with self.assertRaises(ValueError):
+            convertor.translate_type("bit", 8)
+
+    def test_integer_and_bit(self):
+        out, err = convert(SQLServerConvertor(self.write_sql(HEADER + self.TYPE_TABLE)))
+        self.assertNotIn("无法正常解析", err)
+        # 有符号 tinyint、smallint：smallint
+        self.assertIn("grade smallint DEFAULT 0 NOT NULL", out)
+        self.assertIn("sex smallint DEFAULT 0 NOT NULL", out)
+        self.assertIn("score smallint DEFAULT 0 NOT NULL", out)
+        # 无符号 tinyint：tinyint；无符号 smallint：int
+        self.assertIn("ratio tinyint DEFAULT 255 NOT NULL", out)
+        self.assertIn("port int DEFAULT 65535 NOT NULL", out)
+        # bit(1)：bit，默认值为数字常量，允许 NULL
+        self.assertIn("enabled bit DEFAULT 1 NOT NULL", out)
+        self.assertIn("visible bit DEFAULT NULL NULL", out)
+        self.assertIn("deleted bit DEFAULT 0 NOT NULL", out)
+        self.assertNotIn("varchar(1)", out)
+        # INSERT 保留负数、大于 255 的取值；bit 的 '0'、'1' 由 SQL Server 隐式转换
+        self.assertIn("INSERT INTO demo_type (id, grade, sex, score, ratio, port, enabled, visible, deleted)"
+                      " VALUES (1, -128, 1, -32768, 255, 65535, N'0', NULL, N'0')\nGO", out)
+        self.assertIn("INSERT INTO demo_type (id, grade, sex, score, ratio, port, enabled, visible, deleted)"
+                      " VALUES (2, 127, 0, 32767, 0, 0, N'1', N'1', N'0')\nGO", out)
+
+    def test_bit_multiple(self):
+        sql = HEADER + """
+CREATE TABLE `demo_flags`  (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `flags` bit(8) NOT NULL COMMENT '位串',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB COMMENT = '位串表';
+"""
+        # 明确失败，不把多位的位串当成布尔值
+        with self.assertRaises(ValueError):
+            convert(SQLServerConvertor(self.write_sql(sql)))
+
+    def test_ruoyi_vue_pro(self):
+        convertor = SQLServerConvertor(os.path.join(MYSQL_DIR, "ruoyi-vue-pro.sql"))
+        source_bits, source_integers = [], []
+        for table_sql in convertor.original_table_script_list:
+            source_bits += re.findall(r"^\s*`(\w+)`\s+bit\b[^\n]*", table_sql, flags=re.MULTILINE)
+            source_integers += re.findall(r"^\s*`\w+`\s+(?:tinyint|smallint)\b[^\n]*", table_sql, flags=re.MULTILINE)
+        self.assertTrue(source_bits)
+        self.assertTrue(source_integers)
+        # 官方脚本只有 bit(1)、有符号的 tinyint / smallint
+        for table_sql in convertor.original_table_script_list:
+            self.assertFalse(re.findall(r"^\s*`\w+`\s+bit\((?!1\))", table_sql, flags=re.MULTILINE))
+        self.assertFalse([line for line in source_integers if "unsigned" in line.lower()])
+
+        out, err = convert(convertor)
+        self.assertNotIn("无法正常解析", err)
+        self.assertNotIn("varchar(1)", out)
+        self.assertEqual(len(source_bits), len(re.findall(r"^    \w+ bit\b", out, flags=re.MULTILINE)))
+        self.assertEqual(len(source_integers), len(re.findall(r"^    \w+ smallint\b", out, flags=re.MULTILINE)))
+        self.assertFalse(re.findall(r"^    \w+ tinyint\b", out, flags=re.MULTILINE))
+
+
 class ConvertorOfficialDumpTest(unittest.TestCase):
 
     def test_ruoyi_vue_pro(self):

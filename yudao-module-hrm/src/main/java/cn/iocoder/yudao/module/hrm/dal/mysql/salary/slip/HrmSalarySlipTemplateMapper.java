@@ -26,7 +26,7 @@ public interface HrmSalarySlipTemplateMapper extends BaseMapperX<HrmSalarySlipTe
      */
     default HrmSalarySlipTemplateDO selectGlobalDefaultTemplate() {
         return selectFirstOne(new LambdaQueryWrapperX<HrmSalarySlipTemplateDO>()
-                .apply("tenant_id = {0}", TenantUtils.GLOBAL_TENANT_ID)
+                .eq(HrmSalarySlipTemplateDO::getTenantId, TenantUtils.GLOBAL_TENANT_ID)
                 .eq(HrmSalarySlipTemplateDO::getDefaultStatus, true)
                 .orderByDesc(HrmSalarySlipTemplateDO::getId));
     }
