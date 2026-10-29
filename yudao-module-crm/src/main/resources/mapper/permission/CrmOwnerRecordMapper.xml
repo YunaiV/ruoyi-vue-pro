@@ -16,7 +16,7 @@
                 </foreach>
            AND post_owner_user_id IS NULL
            AND create_time BETWEEN #{times[0],javaType=java.time.LocalDateTime} AND #{times[1],javaType=java.time.LocalDateTime}
-         GROUP BY time
+         GROUP BY DATE_FORMAT(create_time, '%Y-%m-%d')
     </select>
 
     <select id="selectPoolCustomerTakeCountByDate"
@@ -32,7 +32,7 @@
                     #{userId}
                 </foreach>
            AND create_time BETWEEN #{times[0],javaType=java.time.LocalDateTime} AND #{times[1],javaType=java.time.LocalDateTime}
-         GROUP BY time
+         GROUP BY DATE_FORMAT(create_time, '%Y-%m-%d')
     </select>
 
     <select id="selectPoolCustomerPutCountByUser"

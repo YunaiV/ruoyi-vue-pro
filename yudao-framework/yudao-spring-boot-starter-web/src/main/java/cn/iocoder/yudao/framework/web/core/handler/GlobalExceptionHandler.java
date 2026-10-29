@@ -11,6 +11,7 @@ import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
+import cn.iocoder.yudao.framework.common.util.jdbc.JdbcExceptionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.monitor.TracerUtils;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
@@ -396,10 +397,10 @@ public class GlobalExceptionHandler {
      * @return 如果是 Table 不存在的异常，则返回对应的 CommonResult
      */
     private CommonResult<?> handleTableNotExists(Throwable ex) {
-        String message = ExceptionUtil.getRootCauseMessage(ex);
-        if (!message.contains("doesn't exist")) {
+        if (!JdbcExceptionUtils.isTableNotExists(ex)) {
             return null;
         }
+        String message = StrUtil.nullToEmpty(ExceptionUtil.getRootCauseMessage(ex));
         // 1. 工作流
         if (message.contains("bpm_")) {
             log.error("[工作流模块 yudao-module-bpm - 表结构未导入][参考 https://cloud.iocoder.cn/bpm/ 开启]");

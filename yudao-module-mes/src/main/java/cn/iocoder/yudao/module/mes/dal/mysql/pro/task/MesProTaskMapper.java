@@ -62,9 +62,9 @@ public interface MesProTaskMapper extends BaseMapperX<MesProTaskDO> {
                                         BigDecimal incrUnqualifyQuantity) {
         update(null, new LambdaUpdateWrapper<MesProTaskDO>()
                 .eq(MesProTaskDO::getId, id)
-                .setSql("produced_quantity = IFNULL(produced_quantity, 0) + " + incrProducedQuantity)
-                .setSql("qualify_quantity = IFNULL(qualify_quantity, 0) + " + incrQualifyQuantity)
-                .setSql("unqualify_quantity = IFNULL(unqualify_quantity, 0) + " + incrUnqualifyQuantity));
+                .setIncrBy(MesProTaskDO::getProducedQuantity, incrProducedQuantity)
+                .setIncrBy(MesProTaskDO::getQualifyQuantity, incrQualifyQuantity)
+                .setIncrBy(MesProTaskDO::getUnqualifyQuantity, incrUnqualifyQuantity));
     }
 
 }

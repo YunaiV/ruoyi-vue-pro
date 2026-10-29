@@ -4,7 +4,7 @@
 
     <select id="getPurchasePrice" resultType="java.math.BigDecimal">
         SELECT
-            (SELECT IFNULL(SUM(total_price), 0)
+            (SELECT COALESCE(SUM(total_price), 0)
              FROM erp_purchase_in
              WHERE in_time >= #{beginTime}
                <if test="endTime != null">
@@ -15,7 +15,7 @@
                </if>
                AND deleted = 0
                AND status = 20) -
-            (SELECT IFNULL(SUM(total_price), 0)
+            (SELECT COALESCE(SUM(total_price), 0)
                 FROM erp_purchase_return
                 WHERE return_time >= #{beginTime}
                 <if test="endTime != null">

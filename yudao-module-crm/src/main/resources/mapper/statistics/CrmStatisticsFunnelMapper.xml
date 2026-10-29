@@ -41,7 +41,7 @@
         SELECT
             end_status AS endStatus,
             COUNT(*) AS businessCount,
-            IFNULL(SUM(total_price), 0) AS totalPrice
+            COALESCE(SUM(total_price), 0) AS totalPrice
         FROM crm_business
         WHERE deleted = 0 AND end_status IS NOT NULL
         <if test="statusTypeId != null">
@@ -64,7 +64,7 @@
             status.percent AS statusPercent,
             status.sort AS sort,
             COUNT(business.id) AS businessCount,
-            IFNULL(SUM(business.total_price), 0) AS totalPrice
+            COALESCE(SUM(business.total_price), 0) AS totalPrice
         FROM crm_business_status status
         LEFT JOIN crm_business business ON business.status_id = status.id
             AND business.deleted = 0
@@ -88,7 +88,7 @@
         SELECT
             DATE_FORMAT(create_time, '%Y-%m-%d') AS time,
             COUNT(*) AS businessCreateCount,
-            IFNULL(SUM(total_price), 0) AS totalPrice
+            COALESCE(SUM(total_price), 0) AS totalPrice
         FROM crm_business
         WHERE deleted = 0
         <if test="statusTypeId != null">
@@ -100,7 +100,7 @@
         </foreach>
         AND create_time BETWEEN #{times[0],javaType=java.time.LocalDateTime} AND
         #{times[1],javaType=java.time.LocalDateTime}
-        GROUP BY time
+        GROUP BY DATE_FORMAT(create_time, '%Y-%m-%d')
     </select>
 
     <select id="selectBusinessInversionRateSummaryByDate"
@@ -108,7 +108,7 @@
         SELECT
             DATE_FORMAT(create_time, '%Y-%m-%d') AS time,
             COUNT(*) AS businessCount,
-            SUM(IF(end_status = 1, 1, 0)) AS businessWinCount
+            SUM(CASE WHEN end_status = 1 THEN 1 ELSE 0 END) AS businessWinCount
         FROM crm_business
         WHERE deleted = 0
         <if test="statusTypeId != null">
@@ -120,7 +120,7 @@
         </foreach>
         AND create_time BETWEEN #{times[0],javaType=java.time.LocalDateTime} AND
         #{times[1],javaType=java.time.LocalDateTime}
-        GROUP BY time
+        GROUP BY DATE_FORMAT(create_time, '%Y-%m-%d')
     </select>
 
 </mapper>

@@ -52,9 +52,9 @@
 
     <!-- 按天聚合单据数量 -->
     <select id="selectDailyOrderTrend" resultType="cn.iocoder.yudao.framework.mybatis.core.util.CaseInsensitiveResultMap">
-        SELECT date, orderType, SUM(count) AS count
+        SELECT statDate, orderType, SUM(count) AS count
         FROM (
-            SELECT DATE_FORMAT(order_time, '%Y-%m-%d') AS date,
+            SELECT DATE_FORMAT(order_time, '%Y-%m-%d') AS statDate,
                    ${@cn.iocoder.yudao.module.wms.enums.order.WmsOrderTypeEnum@RECEIPT.type} AS orderType,
                    COUNT(*) AS count
             FROM wms_receipt_order
@@ -66,7 +66,7 @@
               </if>
             GROUP BY DATE_FORMAT(order_time, '%Y-%m-%d')
             UNION ALL
-            SELECT DATE_FORMAT(order_time, '%Y-%m-%d') AS date,
+            SELECT DATE_FORMAT(order_time, '%Y-%m-%d') AS statDate,
                    ${@cn.iocoder.yudao.module.wms.enums.order.WmsOrderTypeEnum@SHIPMENT.type} AS orderType,
                    COUNT(*) AS count
             FROM wms_shipment_order
@@ -78,7 +78,7 @@
               </if>
             GROUP BY DATE_FORMAT(order_time, '%Y-%m-%d')
             UNION ALL
-            SELECT DATE_FORMAT(order_time, '%Y-%m-%d') AS date,
+            SELECT DATE_FORMAT(order_time, '%Y-%m-%d') AS statDate,
                    ${@cn.iocoder.yudao.module.wms.enums.order.WmsOrderTypeEnum@MOVEMENT.type} AS orderType,
                    COUNT(*) AS count
             FROM wms_movement_order
@@ -90,7 +90,7 @@
               </if>
             GROUP BY DATE_FORMAT(order_time, '%Y-%m-%d')
             UNION ALL
-            SELECT DATE_FORMAT(order_time, '%Y-%m-%d') AS date,
+            SELECT DATE_FORMAT(order_time, '%Y-%m-%d') AS statDate,
                    ${@cn.iocoder.yudao.module.wms.enums.order.WmsOrderTypeEnum@CHECK.type} AS orderType,
                    COUNT(*) AS count
             FROM wms_check_order
@@ -102,13 +102,13 @@
               </if>
             GROUP BY DATE_FORMAT(order_time, '%Y-%m-%d')
         ) t
-        GROUP BY date, orderType
-        ORDER BY date, orderType
+        GROUP BY statDate, orderType
+        ORDER BY statDate, orderType
     </select>
 
     <!-- 统计库存总数量 -->
     <select id="selectInventoryTotalQuantity" resultType="java.math.BigDecimal">
-        SELECT IFNULL(SUM(quantity), 0)
+        SELECT COALESCE(SUM(quantity), 0)
         FROM wms_inventory
         WHERE deleted = 0
           <if test="warehouseId != null">
@@ -120,7 +120,7 @@
     <select id="selectInventoryItemRank" resultType="cn.iocoder.yudao.framework.mybatis.core.util.CaseInsensitiveResultMap">
         SELECT item.id AS id,
                item.name AS name,
-               IFNULL(SUM(inventory.quantity), 0) AS quantity
+               COALESCE(SUM(inventory.quantity), 0) AS quantity
         FROM wms_inventory inventory
                  INNER JOIN wms_item_sku sku ON sku.id = inventory.sku_id AND sku.deleted = 0
                  INNER JOIN wms_item item ON item.id = sku.item_id AND item.deleted = 0
@@ -138,7 +138,7 @@
     <select id="selectInventoryWarehouseRank" resultType="cn.iocoder.yudao.framework.mybatis.core.util.CaseInsensitiveResultMap">
         SELECT warehouse.id AS id,
                warehouse.name AS name,
-               IFNULL(SUM(inventory.quantity), 0) AS quantity
+               COALESCE(SUM(inventory.quantity), 0) AS quantity
         FROM wms_inventory inventory
                  INNER JOIN wms_warehouse warehouse ON warehouse.id = inventory.warehouse_id AND warehouse.deleted = 0
         WHERE inventory.deleted = 0

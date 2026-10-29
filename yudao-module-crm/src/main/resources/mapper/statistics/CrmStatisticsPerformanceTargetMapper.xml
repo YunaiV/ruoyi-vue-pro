@@ -11,7 +11,7 @@
     <select id="selectContractActualByMonth"
             resultMap="CrmStatisticsPerformanceTargetActualResultMap">
         SELECT MONTH(order_date) AS month,
-               IFNULL(SUM(total_price), 0) AS current_price
+               COALESCE(SUM(total_price), 0) AS current_price
           FROM crm_contract
          WHERE deleted = 0
            AND audit_status = ${@cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum@APPROVE.status}
@@ -26,7 +26,7 @@
     <select id="selectReceivableActualByMonth"
             resultMap="CrmStatisticsPerformanceTargetActualResultMap">
         SELECT MONTH(return_time) AS month,
-               IFNULL(SUM(price), 0) AS current_price
+               COALESCE(SUM(price), 0) AS current_price
           FROM crm_receivable
          WHERE deleted = 0
            AND audit_status = ${@cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum@APPROVE.status}

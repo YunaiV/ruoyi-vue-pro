@@ -4,7 +4,7 @@
 
     <select id="selectContractPriceRank"
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.rank.CrmStatisticsRankRespVO">
-        SELECT IFNULL(SUM(total_price), 0) AS count, owner_user_id
+        SELECT COALESCE(SUM(total_price), 0) AS count, owner_user_id
         FROM crm_contract
         WHERE deleted = 0
         AND audit_status = ${@cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum@APPROVE.status}
@@ -18,7 +18,7 @@
 
     <select id="selectReceivablePriceRank"
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.rank.CrmStatisticsRankRespVO">
-        SELECT IFNULL(SUM(price), 0) AS count, owner_user_id
+        SELECT COALESCE(SUM(price), 0) AS count, owner_user_id
         FROM crm_receivable
         WHERE deleted = 0
         AND audit_status = ${@cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum@APPROVE.status}
@@ -88,8 +88,8 @@
     <select id="selectFollowCountRank"
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.rank.CrmStatisticsRankRespVO">
         SELECT COUNT(1) AS count, cc.owner_user_id
-        FROM crm_follow_up_record AS cfur
-        LEFT JOIN crm_contact AS cc ON FIND_IN_SET(cc.id, cfur.contact_ids)
+        FROM crm_follow_up_record cfur
+        LEFT JOIN crm_contact cc ON FIND_IN_SET(cc.id, cfur.contact_ids)
         WHERE cfur.deleted = 0
         AND cc.deleted = 0
         AND cc.owner_user_id in
@@ -103,8 +103,8 @@
     <select id="selectFollowCustomerCountRank"
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.rank.CrmStatisticsRankRespVO">
         SELECT COUNT(DISTINCT cc.id) AS count, cc.owner_user_id
-        FROM crm_follow_up_record AS cfur
-        LEFT JOIN crm_contact AS cc ON FIND_IN_SET(cc.id, cfur.contact_ids)
+        FROM crm_follow_up_record cfur
+        LEFT JOIN crm_contact cc ON FIND_IN_SET(cc.id, cfur.contact_ids)
         WHERE cfur.deleted = 0
         AND cc.deleted = 0
         AND cc.owner_user_id in
