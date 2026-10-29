@@ -38,14 +38,17 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static cn.iocoder.yudao.module.fms.enums.ErrorCodeConstants.LEDGER_PERIOD_BEFORE_ACCOUNT_START;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @Import(FmsLedgerServiceImpl.class)
@@ -172,6 +175,69 @@ public class FmsLedgerServiceImplTest extends BaseDbUnitTest {
         // 调用并断言
         assertServiceException(() -> ledgerService.getDetailList(reqVO, 10L),
                 LEDGER_PERIOD_BEFORE_ACCOUNT_START);
+    }
+
+    @Test
+    public void testGetDetailSubjectList_parentChain() {
+        // mock 数据：有发生额的末级科目补齐全部父级，无发生额的兄弟、其它科目不返回，且保持科目顺序
+        FmsSubjectDO root = buildSubject(201L, "2001", "一级科目", null, 1);
+        FmsSubjectDO other = buildSubject(204L, "2002", "其它科目", null, 1);
+        FmsSubjectDO middle = buildSubject(202L, "200101", "二级科目", 201L, 2);
+        FmsSubjectDO sibling = buildSubject(205L, "200102", "兄弟科目", 201L, 2);
+        FmsSubjectDO leaf = buildSubject(203L, "20010101", "三级科目", 202L, 3);
+        when(subjectService.getSubjectList(1L, null, 10L))
+                .thenReturn(Arrays.asList(root, other, middle, sibling, leaf));
+        insertVoucherEntry(leaf.getId());
+
+        // 调用
+        List<FmsSubjectDO> result = ledgerService.getDetailSubjectList(buildListReqVO(), 10L);
+
+        // 断言
+        assertEquals(Arrays.asList(201L, 202L, 203L), convertList(result, FmsSubjectDO::getId));
+    }
+
+    @Test
+    public void testGetDetailSubjectList_parentMissingOrCycle() {
+        // mock 数据：父科目不存在时停止补齐；父子成环时不重复处理
+        FmsSubjectDO orphan = buildSubject(301L, "3001", "缺父科目", 999L, 2);
+        FmsSubjectDO cycle01 = buildSubject(401L, "4001", "环形科目一", 402L, 1);
+        FmsSubjectDO cycle02 = buildSubject(402L, "4002", "环形科目二", 401L, 1);
+        when(subjectService.getSubjectList(1L, null, 10L)).thenReturn(Arrays.asList(orphan, cycle01, cycle02));
+        insertVoucherEntry(orphan.getId());
+        insertVoucherEntry(cycle01.getId());
+
+        // 调用
+        List<FmsSubjectDO> result = ledgerService.getDetailSubjectList(buildListReqVO(), 10L);
+
+        // 断言
+        assertEquals(Arrays.asList(301L, 401L, 402L), convertList(result, FmsSubjectDO::getId));
+    }
+
+    @Test
+    public void testGetDetailSubjectList_parentDepthLimit() {
+        // mock 数据：恰好 Short.MAX_VALUE 层父级，全部补齐
+        List<FmsSubjectDO> subjects = buildSubjectChain(100_000L, Short.MAX_VALUE);
+        subjects.get(0).setParentId(FmsSubjectDO.PARENT_ID_ROOT);
+        when(subjectService.getSubjectList(1L, null, 10L)).thenReturn(subjects);
+        insertVoucherEntry(100_000L);
+
+        // 调用，并断言
+        List<FmsSubjectDO> result = ledgerService.getDetailSubjectList(buildListReqVO(), 10L);
+        assertEquals(Short.MAX_VALUE + 1, result.size());
+        assertEquals(subjects.get(0).getId(), result.get(0).getId());
+
+        // 调用，并断言：空父级或缺失的根父级也按原语义退出，不把根哨兵当作额外一层
+        subjects.get(0).setParentId(null);
+        assertEquals(Short.MAX_VALUE + 1, ledgerService.getDetailSubjectList(buildListReqVO(), 10L).size());
+        subjects.get(0).setParentId(-1L);
+        assertEquals(Short.MAX_VALUE + 1, ledgerService.getDetailSubjectList(buildListReqVO(), 10L).size());
+
+        // mock 数据：超过 Short.MAX_VALUE 层父级时，明确失败而不是丢弃祖先科目
+        when(subjectService.getSubjectList(1L, null, 10L))
+                .thenReturn(buildSubjectChain(100_000L, Short.MAX_VALUE + 1));
+
+        // 调用，并断言
+        assertThrows(IllegalStateException.class, () -> ledgerService.getDetailSubjectList(buildListReqVO(), 10L));
     }
 
     @Test
@@ -719,6 +785,32 @@ public class FmsLedgerServiceImplTest extends BaseDbUnitTest {
                 .setAuxiliaries(Collections.singletonList(FmsVoucherEntryDO.AuxiliaryItem.builder()
                         .type(1).typeId(201L).itemId(customerItem.getId())
                         .name(customerItem.getName()).build())));
+    }
+
+    private void insertVoucherEntry(Long subjectId) {
+        FmsVoucherWordDO word = buildVoucherWord();
+        voucherWordMapper.insert(word);
+        FmsVoucherDO voucher = buildVoucher(word.getId(), "10.00");
+        voucherMapper.insert(voucher);
+        voucherEntryMapper.insert(new FmsVoucherEntryDO().setVoucherId(voucher.getId())
+                .setAccountSetId(1L).setSubjectId(subjectId).setSubjectCode("TEST")
+                .setSubjectName("测试科目").setDigest("测试分录").setSort(1)
+                .setDebitAmount(new BigDecimal("10.00")).setCreditAmount(BigDecimal.ZERO)
+                .setQuantity(BigDecimal.ZERO).setUnitPrice(BigDecimal.ZERO)
+                .setAuxiliaries(Collections.emptyList()));
+    }
+
+    /**
+     * 构建从根到末级的单链科目，末级科目编号为 leafId，共 parentCount 层父级
+     */
+    private static List<FmsSubjectDO> buildSubjectChain(long leafId, int parentCount) {
+        List<FmsSubjectDO> subjects = new ArrayList<>(parentCount + 1);
+        Long parentId = null;
+        for (long id = leafId - parentCount; id <= leafId; id++) {
+            subjects.add(new FmsSubjectDO().setId(id).setParentId(parentId));
+            parentId = id;
+        }
+        return subjects;
     }
 
     private FmsSubjectDO buildSubject(Long id, String code, String name, Long parentId, Integer level) {

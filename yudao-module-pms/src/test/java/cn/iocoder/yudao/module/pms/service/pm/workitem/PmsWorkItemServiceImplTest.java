@@ -1,7 +1,9 @@
 package cn.iocoder.yudao.module.pms.service.pm.workitem;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.pms.controller.admin.pm.workitem.vo.status.PmsWorkItemStatusUpdateReqVO;
 import cn.iocoder.yudao.module.pms.controller.admin.pm.workitem.vo.workitem.PmsWorkItemBoardReqVO;
@@ -76,6 +78,7 @@ import static cn.iocoder.yudao.module.pms.enums.MessageTemplateConstants.WORK_IT
 import static cn.iocoder.yudao.module.pms.enums.pm.workitem.PmsWorkItemActivityContentEnum.WORK_ITEM_CREATED;
 import static cn.iocoder.yudao.module.pms.enums.pm.workitem.PmsWorkItemActivityContentEnum.WORK_ITEM_NAME_UPDATED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -943,15 +946,22 @@ public class PmsWorkItemServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testBuildQueryWrapper_filterAnyLabel() {
         // 准备参数
+        Long labelId01 = 1872345678901234567L;
+        Long labelId02 = 1872345678901234568L;
         PmsWorkItemPageReqVO reqVO = new PmsWorkItemPageReqVO().setProjectId(randomLongId())
-                .setLabelIds(Arrays.asList(randomLongId(), randomLongId()));
+                .setLabelIds(Arrays.asList(labelId01, labelId02));
 
         // 调用
-        String sqlSegment = PmsWorkItemMapper.buildQueryWrapper(reqVO).getSqlSegment();
+        LambdaQueryWrapperX<PmsWorkItemDO> queryWrapper = PmsWorkItemMapper.buildQueryWrapper(reqVO);
+        String sqlSegment = queryWrapper.getSqlSegment();
 
-        // 断言
-        assertTrue(sqlSegment.contains("JSON_CONTAINS(label_ids, JSON_ARRAY("));
+        // 断言：H2 走原有片段，每个标签一个条件并按 OR 连接；标签编号仍以 Long 绑定，不拼接到 SQL 中
+        assertEquals(2, StrUtil.count(sqlSegment, "JSON_CONTAINS(label_ids, JSON_ARRAY("));
         assertTrue(sqlSegment.contains(" OR "));
+        assertFalse(sqlSegment.contains(labelId01.toString()));
+        assertFalse(sqlSegment.contains(labelId02.toString()));
+        assertTrue(queryWrapper.getParamNameValuePairs().containsValue(labelId01));
+        assertTrue(queryWrapper.getParamNameValuePairs().containsValue(labelId02));
     }
 
     @Test

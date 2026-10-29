@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 // TODO DONE @AI：方法注释；已补齐方言重载与内部辅助方法的参数、返回值及边界。
 // TODO DONE @AI：多余的方法，可以考虑去掉；当然，保留也可以。。。已核对生产 Java/XML 调用，现有方法均有用途，保留。
 /**
- * 日期统计、逗号分隔列表关联、行数限制、分批删除 SQL 片段的方言工具类
+ * 日期统计、逗号分隔列表关联、JSON 数组匹配、行数限制、分批删除 SQL 片段的方言工具类
  *
  * 1. 每次生成 SQL 时，按当前执行时路由到的数据源选择方言（按数据源实例缓存），不使用启动时固定的 databaseId 或主库
  * 2. 只有明确识别的 PostgreSQL、Oracle、SQL Server 2012+ 输出新片段；其它已识别的数据库（MySQL、MariaDB、OceanBase、H2、
@@ -449,6 +449,41 @@ public class SqlDialectUtils {
             default:
                 return "FIND_IN_SET(" + valueColumn + ", " + listColumn + ")";
         }
+    }
+
+    // ========== JSON 数组 ==========
+
+    /**
+     * JSON 数组列是否包含 {0} 绑定的数值 ID，供 Wrapper 的 apply 使用，ID 必须作为 apply 的参数绑定
+     *
+     * 1. 原有片段：wrapArray 为 false 时为 JSON_CONTAINS(column, {0})，参数为 ID 的数字文本；
+     *    为 true 时为 JSON_CONTAINS(column, JSON_ARRAY({0}))，参数为 Long
+     * 2. PostgreSQL：CAST(column AS jsonb) @&gt; jsonb_build_array(CAST({0} AS BIGINT))，兼容 jsonb、json 与 JSON 文本列；
+     *    按数字匹配，数组中的字符串 "1" 不匹配 1；列为 NULL 时不匹配
+     * 3. Oracle、SQL Server 及其它数据库保持原有片段，是否可用未经验收
+     *
+     * @param column    JSON 数组列名，元素为数值 ID
+     * @param wrapArray 原有片段是否使用 JSON_ARRAY 包装参数
+     * @return 包含 {0} 占位符的 SQL 条件片段
+     */
+    public static String jsonArrayContains(String column, boolean wrapArray) {
+        return jsonArrayContains(getDialect(), column, wrapArray);
+    }
+
+    /**
+     * 按指定方言生成 JSON 数组包含数值 ID 的条件；仅 PostgreSQL 输出新片段。
+     *
+     * @param dialect 已识别的数据库方言
+     * @param column 代码中固定的 JSON 数组列名
+     * @param wrapArray 原有片段是否使用 JSON_ARRAY 包装参数
+     * @return 包含 {0} 占位符的 SQL 条件片段
+     */
+    static String jsonArrayContains(Dialect dialect, String column, boolean wrapArray) {
+        checkColumn(column);
+        if (dialect == Dialect.POSTGRESQL) {
+            return "CAST(" + column + " AS jsonb) @> jsonb_build_array(CAST({0} AS BIGINT))";
+        }
+        return wrapArray ? "JSON_CONTAINS(" + column + ", JSON_ARRAY({0}))" : "JSON_CONTAINS(" + column + ", {0})";
     }
 
     // ========== 行数限制 ==========

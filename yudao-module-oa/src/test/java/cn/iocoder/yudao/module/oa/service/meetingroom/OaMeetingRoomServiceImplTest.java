@@ -173,6 +173,26 @@ public class OaMeetingRoomServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
+    public void testGetMeetingRoomPageByBookingUserId_largeIdAndNull() {
+        // mock 数据：雪花编号只匹配完全相同的编号
+        Long userId = 1872345678901234567L;
+        OaMeetingRoomDO matched = randomMeetingRoomDO().setBookingScope(1).setBookingUserIds(Arrays.asList(-1L, userId));
+        meetingRoomMapper.insert(matched);
+        meetingRoomMapper.insert(randomMeetingRoomDO().setBookingScope(1)
+                .setBookingUserIds(Collections.singletonList(userId + 1)));
+        // mock 数据：指定范围的可预定人员为 NULL 时，不可预定
+        meetingRoomMapper.insert(randomMeetingRoomDO().setBookingScope(1).setBookingUserIds(null));
+
+        // 调用
+        PageResult<OaMeetingRoomDO> page = meetingRoomService.getMeetingRoomPageByBookingUserId(
+                new OaMeetingRoomPageReqVO(), userId);
+
+        // 断言
+        assertEquals(1L, page.getTotal());
+        assertEquals(Collections.singletonList(matched.getId()), convertList(page.getList(), OaMeetingRoomDO::getId));
+    }
+
+    @Test
     public void testGetMeetingRoomPageByBookingUserId_filter() {
         // mock 数据
         OaMeetingRoomDO room = randomMeetingRoomDO().setName("项目会议室").setLocation("三楼");

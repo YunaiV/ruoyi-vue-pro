@@ -183,11 +183,16 @@ public class FmsLedgerServiceImpl implements FmsLedgerService {
             if (!subjectIds.contains(subject.getId())) {
                 continue;
             }
-            // TODO @AI：尽量不要 while true 死循环，而是有一个 for i 《 short 的上限》
+            // 逐级向上补齐父级节点，最多 Short.MAX_VALUE 层；父级已补齐（含环形数据）或缺失时结束
             Long parentId = subject.getParentId();
-            while (parentId != null && visibleSubjectIds.add(parentId)) {
+            for (int i = 0; i < Short.MAX_VALUE && parentId != null && visibleSubjectIds.add(parentId); i++) {
                 FmsSubjectDO parent = context.subjectMap.get(parentId);
                 parentId = parent == null ? null : parent.getParentId();
+            }
+            // 达到上限后仍有未补齐的真实父级，不能静默丢弃；根哨兵或缺失父级沿用原退出语义
+            if (parentId != null && !visibleSubjectIds.contains(parentId)
+                    && context.subjectMap.containsKey(parentId)) {
+                throw new IllegalStateException("科目(" + subject.getId() + ") 的父级科目超过 " + Short.MAX_VALUE + " 层");
             }
         }
         return filterList(context.subjects, subject -> visibleSubjectIds.contains(subject.getId()));

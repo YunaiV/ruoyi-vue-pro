@@ -5,6 +5,7 @@ import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils.Dialect;
 import com.baomidou.dynamic.datasource.DynamicRoutingDataSource;
 import com.baomidou.dynamic.datasource.toolkit.DynamicDataSourceContextHolder;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.ParameterMapping;
@@ -27,6 +28,7 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -322,6 +324,104 @@ public class SqlDialectUtilsTest {
             assertEquals(4, parameterMappings.size(), sql);
             assertEquals("times[0]", parameterMappings.get(2).getProperty());
             assertEquals("times[1]", parameterMappings.get(3).getProperty());
+            assertNotNull(CCJSqlParserUtil.parse(sql), route.getValue() + " " + sql);
+        }
+    }
+
+    // ========== JSON 数组 ==========
+
+    @Test
+    public void testJsonArrayContains() {
+        // 原有片段、Oracle、SQL Server：保持原有 JSON_CONTAINS
+        for (Dialect dialect : List.of(Dialect.ORIGINAL, Dialect.ORACLE, Dialect.SQLSERVER)) {
+            assertEquals("JSON_CONTAINS(booking_user_ids, {0})",
+                    SqlDialectUtils.jsonArrayContains(dialect, "booking_user_ids", false), dialect.name());
+            assertEquals("JSON_CONTAINS(t.label_ids, JSON_ARRAY({0}))",
+                    SqlDialectUtils.jsonArrayContains(dialect, "t.label_ids", true), dialect.name());
+        }
+        // PostgreSQL：两种原有片段统一为 jsonb 包含，参数按 BIGINT 匹配数字元素
+        assertEquals("CAST(booking_user_ids AS jsonb) @> jsonb_build_array(CAST({0} AS BIGINT))",
+                SqlDialectUtils.jsonArrayContains(Dialect.POSTGRESQL, "booking_user_ids", false));
+        assertEquals("CAST(t.label_ids AS jsonb) @> jsonb_build_array(CAST({0} AS BIGINT))",
+                SqlDialectUtils.jsonArrayContains(Dialect.POSTGRESQL, "t.label_ids", true));
+    }
+
+    @Test
+    public void testJsonArrayContains_invalidColumn() {
+        for (Dialect dialect : Dialect.values()) {
+            for (boolean wrapArray : new boolean[]{true, false}) {
+                assertThrows(IllegalArgumentException.class,
+                        () -> SqlDialectUtils.jsonArrayContains(dialect, "label_ids, '[1]') OR (1=1", wrapArray));
+                assertThrows(IllegalArgumentException.class,
+                        () -> SqlDialectUtils.jsonArrayContains(dialect, "'[1, 2]'", wrapArray));
+                assertThrows(IllegalArgumentException.class,
+                        () -> SqlDialectUtils.jsonArrayContains(dialect, "label_ids;drop table t", wrapArray));
+                assertThrows(IllegalArgumentException.class,
+                        () -> SqlDialectUtils.jsonArrayContains(dialect, "", wrapArray));
+                assertThrows(IllegalArgumentException.class,
+                        () -> SqlDialectUtils.jsonArrayContains(dialect, null, wrapArray));
+            }
+        }
+    }
+
+    /**
+     * 与 PMS 工作项任一标签筛选相同的 OR 条件，所有方言均需可被 JSqlParser 解析
+     */
+    @Test
+    public void testJsonArrayContains_parsedByJSqlParser() throws Exception {
+        for (Dialect dialect : Dialect.values()) {
+            for (boolean wrapArray : new boolean[]{true, false}) {
+                String condition = SqlDialectUtils.jsonArrayContains(dialect, "label_ids", wrapArray).replace("{0}", "?");
+                String sql = "SELECT id FROM pms_work_item WHERE project_id = ? AND (" + condition + " OR " + condition + ")";
+                assertNotNull(CCJSqlParserUtil.parse(sql), dialect + " " + sql);
+            }
+        }
+    }
+
+    /**
+     * 与 Mapper 相同：通过 MyBatis Plus Wrapper 的 apply 绑定参数，再由 MyBatis 生成 BoundSql
+     */
+    @Test
+    public void testBoundSql_jsonArrayContains() throws Exception {
+        FakeDataSource postgresql = new FakeDataSource("PostgreSQL", "jdbc:postgresql://127.0.0.1:5432/a", 17);
+        FakeDataSource oracle = new FakeDataSource("Oracle", "jdbc:oracle:thin:@127.0.0.1:1521:xe", 21);
+        FakeDataSource sqlServer = new FakeDataSource("Microsoft SQL Server", "jdbc:sqlserver://127.0.0.1:1433", 16);
+        FakeDataSource mysql = new FakeDataSource("MySQL", "jdbc:mysql://127.0.0.1:3306/a", 8);
+        mockDynamicRoutingDataSource(Map.of("master", postgresql, "oracle", oracle, "sqlserver", sqlServer, "mysql", mysql));
+        SqlSource sqlSource = new XMLLanguageDriver().createSqlSource(new Configuration(),
+                "<script>SELECT id FROM pms_work_item ${ew.customSqlSegment}</script>", Map.class);
+        // 依次切换：主库 PostgreSQL、Oracle、SQL Server、MySQL
+        Map<String, Dialect> routes = new LinkedHashMap<>();
+        routes.put("master", Dialect.POSTGRESQL);
+        routes.put("oracle", Dialect.ORACLE);
+        routes.put("sqlserver", Dialect.SQLSERVER);
+        routes.put("mysql", Dialect.ORIGINAL);
+
+        for (Map.Entry<String, Dialect> route : routes.entrySet()) {
+            DynamicDataSourceContextHolder.push(route.getKey());
+            // PMS：多个标签按 OR 匹配任一标签，参数为 Long
+            String labelCondition = SqlDialectUtils.jsonArrayContains("label_ids", true);
+            QueryWrapper<Object> labelWrapper = new QueryWrapper<>();
+            labelWrapper.eq("project_id", 100L).and(w -> w.or().apply(labelCondition, 1L).or().apply(labelCondition, 11L));
+            BoundSql boundSql = sqlSource.getBoundSql(Map.of("ew", labelWrapper));
+            String sql = normalize(boundSql.getSql());
+            String expected = SqlDialectUtils.jsonArrayContains(route.getValue(), "label_ids", true).replace("{0}", "?");
+            assertTrue(sql.startsWith("SELECT id FROM pms_work_item WHERE"), sql);
+            assertTrue(sql.contains(expected + " OR " + expected), sql);
+            assertFalse(sql.contains("11"), sql); // 值只通过参数绑定，不拼接到 SQL 中
+            assertEquals(List.of(100L, 1L, 11L), getParameterValues(boundSql, labelWrapper));
+            assertNotNull(CCJSqlParserUtil.parse(sql), route.getValue() + " " + sql);
+
+            // OA：参数仍为 ID 的数字文本
+            String bookingCondition = SqlDialectUtils.jsonArrayContains("booking_user_ids", false);
+            QueryWrapper<Object> bookingWrapper = new QueryWrapper<>();
+            bookingWrapper.eq("booking_scope", 1).apply(bookingCondition, "1024");
+            boundSql = sqlSource.getBoundSql(Map.of("ew", bookingWrapper));
+            sql = normalize(boundSql.getSql());
+            expected = SqlDialectUtils.jsonArrayContains(route.getValue(), "booking_user_ids", false).replace("{0}", "?");
+            assertTrue(sql.contains(expected), sql);
+            assertFalse(sql.contains("1024"), sql);
+            assertEquals(List.of(1, "1024"), getParameterValues(boundSql, bookingWrapper));
             assertNotNull(CCJSqlParserUtil.parse(sql), route.getValue() + " " + sql);
         }
     }
@@ -738,6 +838,20 @@ public class SqlDialectUtilsTest {
      */
     private static String bind(String sql) {
         return sql.replaceAll("#\\{[^}]+}", "?");
+    }
+
+    /**
+     * 按 BoundSql 的参数顺序，取得 Wrapper 中绑定的参数值
+     */
+    private static List<Object> getParameterValues(BoundSql boundSql, QueryWrapper<?> wrapper) {
+        String prefix = "ew.paramNameValuePairs.";
+        List<Object> values = new ArrayList<>();
+        for (ParameterMapping parameterMapping : boundSql.getParameterMappings()) {
+            String property = parameterMapping.getProperty();
+            assertTrue(property.startsWith(prefix), property);
+            values.add(wrapper.getParamNameValuePairs().get(property.substring(prefix.length())));
+        }
+        return values;
     }
 
     private static void assertParameters(BoundSql boundSql, String... properties) {
