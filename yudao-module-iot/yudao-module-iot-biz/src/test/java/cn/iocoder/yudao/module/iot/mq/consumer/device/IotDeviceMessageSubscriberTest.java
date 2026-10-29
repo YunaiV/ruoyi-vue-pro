@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.*;
 
 /**
@@ -90,7 +91,7 @@ public class IotDeviceMessageSubscriberTest extends BaseMockitoUnitTest {
         // 准备参数：设备实际返回的回复（例如 Modbus 异常响应），按原逻辑作为设备活动
         IotDeviceMessage message = new IotDeviceMessage().setDeviceId(randomLongId()).setTenantId(randomLongId())
                 .setServerId("test-server").setMethod(IotDeviceMessageMethodEnum.PROPERTY_SET.getMethod())
-                .setCode(1_051_003_111);
+                .setCode(1_051_003_111).setReportTime(LocalDateTime.of(2026, 10, 29, 10, 0, 0));
         // mock 方法：设备离线
         IotDeviceDO device = new IotDeviceDO().setId(message.getDeviceId())
                 .setState(IotDeviceStateEnum.OFFLINE.getState());
@@ -98,11 +99,48 @@ public class IotDeviceMessageSubscriberTest extends BaseMockitoUnitTest {
 
         // 调用
         deviceMessageSubscriber.onMessage(message);
-        // 断言：更新上报时间、连接 server，并强制上线
+        // 断言：更新上报时间、连接 server，并强制上线（事件时间沿用源消息的上报时间）
         verify(devicePropertyService).updateDeviceReportTimeAsync(eq(device.getId()), any(LocalDateTime.class));
         verify(devicePropertyService).updateDeviceServerIdAsync(eq(device.getId()), eq(message.getServerId()));
         verify(deviceMessageService).sendDeviceMessage(argThat((IotDeviceMessage m) ->
-                IotDeviceMessageMethodEnum.STATE_UPDATE.getMethod().equals(m.getMethod())));
+                IotDeviceMessageMethodEnum.STATE_UPDATE.getMethod().equals(m.getMethod())),
+                same(device), isNull(), eq(message.getReportTime()));
+        verify(deviceMessageService).handleUpstreamDeviceMessage(eq(message), eq(device));
+    }
+
+    @Test
+    public void testOnMessage_stateOffline() {
+        // 准备参数：网关连接断开的离线
+        IotDeviceMessage message = IotDeviceMessage.buildStateOffline().setDeviceId(randomLongId())
+                .setTenantId(randomLongId()).setServerId("old-server");
+        // mock 方法：设备在线
+        IotDeviceDO device = new IotDeviceDO().setId(message.getDeviceId())
+                .setState(IotDeviceStateEnum.ONLINE.getState());
+        when(deviceService.getDeviceFromCache(eq(message.getDeviceId()))).thenReturn(device);
+
+        // 调用
+        deviceMessageSubscriber.onMessage(message);
+        // 断言：离线不算活跃，也不改变连接的 server
+        verify(devicePropertyService, never()).updateDeviceReportTimeAsync(any(), any());
+        verify(devicePropertyService, never()).updateDeviceServerIdAsync(any(), any());
+        verify(deviceMessageService).handleUpstreamDeviceMessage(eq(message), eq(device));
+    }
+
+    @Test
+    public void testOnMessage_oldMessageKeepServerId() {
+        // 准备参数：早于当前上线时间的旧消息（例如说，旧连接上迟到的属性上报）
+        IotDeviceMessage message = buildPropertyPostMessage().setServerId("old-server")
+                .setReportTime(LocalDateTime.of(2026, 10, 29, 10, 0, 0));
+        // mock 方法：设备已经在新连接上线
+        IotDeviceDO device = new IotDeviceDO().setId(message.getDeviceId())
+                .setState(IotDeviceStateEnum.ONLINE.getState()).setOnlineTime(LocalDateTime.of(2026, 10, 29, 10, 1, 0));
+        when(deviceService.getDeviceFromCache(eq(message.getDeviceId()))).thenReturn(device);
+
+        // 调用
+        deviceMessageSubscriber.onMessage(message);
+        // 断言：照常记录活跃，但不改路由
+        verify(devicePropertyService).updateDeviceReportTimeAsync(eq(device.getId()), any(LocalDateTime.class));
+        verify(devicePropertyService, never()).updateDeviceServerIdAsync(any(), any());
         verify(deviceMessageService).handleUpstreamDeviceMessage(eq(message), eq(device));
     }
 

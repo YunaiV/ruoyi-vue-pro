@@ -53,6 +53,7 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -323,61 +324,54 @@ public class IotDeviceServiceImpl implements IotDeviceService {
     }
 
     @Override
-    public void updateDeviceState(IotDeviceDO device, Integer state) {
-        // 1. 更新状态和时间
-        IotDeviceDO updateObj = new IotDeviceDO().setId(device.getId()).setState(state);
-        if (device.getOnlineTime() == null
-                && Objects.equals(state, IotDeviceStateEnum.ONLINE.getState())) {
-            updateObj.setActiveTime(LocalDateTime.now());
+    public boolean updateDeviceState(IotDeviceDO device, Integer state, LocalDateTime time, boolean refresh) {
+        // 1.0 事件时间按秒比较、存储：时间字段是秒级精度（例如说 MySQL DATETIME 会把毫秒四舍五入），
+        // 否则 .600 的离线存成下一秒后，同一秒内 .800 的重连会被误判为迟到。同一秒内的先后，按处理顺序决定
+        time = time.truncatedTo(ChronoUnit.SECONDS);
+        // 1.1 条件更新状态：只有真的从“不在线”变“在线”（或反之），才算状态变化
+        boolean online = Objects.equals(state, IotDeviceStateEnum.ONLINE.getState());
+        int changed = online ? deviceMapper.updateStateOnline(device.getId(), time)
+                : deviceMapper.updateStateOffline(device.getId(), time);
+        // 1.2 状态未变化：只推进时间水位，不算状态变化（不触发规则，不联动）
+        int refreshed = 0;
+        if (changed == 0) {
+            if (online) {
+                refreshed = refresh ? deviceMapper.updateOnlineTime(device.getId(), time) : 0;
+            } else {
+                refreshed = deviceMapper.updateOfflineTime(device.getId(), time);
+            }
         }
-        if (Objects.equals(state, IotDeviceStateEnum.ONLINE.getState())) {
-            updateObj.setOnlineTime(LocalDateTime.now());
-        } else if (Objects.equals(state, IotDeviceStateEnum.OFFLINE.getState())) {
-            updateObj.setOfflineTime(LocalDateTime.now());
-        }
-        deviceMapper.updateById(updateObj);
 
-        // 2. 清空对应缓存
-        deleteDeviceCache(device);
-
-        // 3. 网关设备下线时，联动所有子设备下线
-        if (Objects.equals(state, IotDeviceStateEnum.OFFLINE.getState())
-                && IotProductDeviceTypeEnum.isGateway(device.getDeviceType())) {
-            handleGatewayOffline(device);
+        // 2. 清空对应缓存（事务内调用时，提交后生效）
+        if (changed + refreshed > 0) {
+            deleteDeviceCache(device);
         }
+        // 说明：网关下线联动子设备，不在这里执行；由状态消息的处理，在状态事务提交后调用 handleGatewayOffline
+        return changed > 0;
     }
 
-    /**
-     * 处理网关下线，联动所有子设备下线
-     *
-     * @param gatewayDevice 网关设备
-     */
-    private void handleGatewayOffline(IotDeviceDO gatewayDevice) {
+    @Override
+    public void handleGatewayOffline(IotDeviceDO gatewayDevice, LocalDateTime offlineTime) {
         List<IotDeviceDO> subDevices = deviceMapper.selectListByGatewayId(gatewayDevice.getId());
         if (CollUtil.isEmpty(subDevices)) {
             return;
         }
         for (IotDeviceDO subDevice : subDevices) {
-            if (Objects.equals(subDevice.getState(), IotDeviceStateEnum.ONLINE.getState())) {
-                try {
-                    updateDeviceState(subDevice, IotDeviceStateEnum.OFFLINE.getState());
-                    log.info("[handleGatewayOffline][网关({}/{}) 下线，子设备({}/{}) 联动下线]",
-                            gatewayDevice.getProductKey(), gatewayDevice.getDeviceName(),
-                            subDevice.getProductKey(), subDevice.getDeviceName());
-                } catch (Exception ex) {
-                    log.error("[handleGatewayOffline][子设备({}/{}) 下线失败]",
-                            subDevice.getProductKey(), subDevice.getDeviceName(), ex);
-                }
+            if (IotDeviceStateEnum.isNotOnline(subDevice.getState())) {
+                continue;
+            }
+            // 为什么不直接更新状态呢？因为通过 IotDeviceMessage 可以经过一系列的处理，例如说记录日志、规则引擎等等
+            // 事件时间使用网关离线的时间：迟到的网关离线，不会把已经重连的子设备踢下线
+            try {
+                deviceMessageService.sendDeviceMessage(IotDeviceMessage.buildStateOffline(), subDevice, null, offlineTime);
+                log.info("[handleGatewayOffline][网关({}/{}) 下线，子设备({}/{}) 联动下线]",
+                        gatewayDevice.getProductKey(), gatewayDevice.getDeviceName(),
+                        subDevice.getProductKey(), subDevice.getDeviceName());
+            } catch (Exception ex) {
+                log.error("[handleGatewayOffline][子设备({}/{}) 下线失败]",
+                        subDevice.getProductKey(), subDevice.getDeviceName(), ex);
             }
         }
-    }
-
-    @Override
-    public void updateDeviceState(Long id, Integer state) {
-        // 校验存在
-        IotDeviceDO device = validateDeviceExists(id);
-        // 执行更新
-        updateDeviceState(device, state);
     }
 
     @Override
@@ -759,9 +753,9 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         // 3. 清空对应缓存
         deleteDeviceCache(subDevice);
 
-        // 4. 子设备下线
-        if (Objects.equals(subDevice.getState(), IotDeviceStateEnum.ONLINE.getState())) {
-            updateDeviceState(subDevice, IotDeviceStateEnum.OFFLINE.getState());
+        // 4. 子设备下线：发送离线消息，经过日志、规则引擎等处理；事件时间为解绑时刻
+        if (IotDeviceStateEnum.isOnline(subDevice.getState())) {
+            deviceMessageService.sendDeviceMessage(IotDeviceMessage.buildStateOffline(), subDevice, null, LocalDateTime.now());
         }
     }
 

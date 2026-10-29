@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.gateway.config;
 
+import cn.iocoder.yudao.module.iot.core.biz.IotDeviceCommonApi;
 import cn.iocoder.yudao.module.iot.gateway.protocol.IotProtocolManager;
 import cn.iocoder.yudao.module.iot.gateway.serialize.IotMessageSerializerManager;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -21,8 +22,9 @@ public class IotGatewayConfiguration {
     }
 
     @Bean
-    public IotProtocolManager iotProtocolManager(IotGatewayProperties gatewayProperties) {
-        return new IotProtocolManager(gatewayProperties);
+    public IotProtocolManager iotProtocolManager(IotGatewayProperties gatewayProperties,
+                                                 IotDeviceCommonApi deviceApi) {
+        return new IotProtocolManager(gatewayProperties, deviceApi);
     }
 
 }

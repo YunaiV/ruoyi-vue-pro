@@ -8,13 +8,16 @@ import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotDataSinkDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.config.IotDataSinkHttpConfig;
 import cn.iocoder.yudao.module.iot.enums.rule.IotDataSinkTypeEnum;
+import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,8 +32,29 @@ import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.HEADER_
 @Slf4j
 public class IotHttpDataSinkAction implements IotDataRuleAction {
 
+    /**
+     * 连接超时时间
+     *
+     * 设备状态消息会在事务内执行数据流转（持有设备行锁和数据库连接），所以不能使用无超时的共享 RestTemplate
+     */
+    static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(3);
+    /**
+     * 读取超时时间
+     *
+     * 一般 Webhook 秒级即可响应；过长会拉长状态事务，过短容易误判慢接口，所以取 5 秒
+     */
+    static final Duration READ_TIMEOUT = Duration.ofSeconds(5);
+
     @Resource
+    private RestTemplateBuilder restTemplateBuilder;
+
     private RestTemplate restTemplate;
+
+    @PostConstruct
+    public void init() {
+        // 基于共享的 RestTemplateBuilder 构建私有实例，不影响其它模块使用的 RestTemplate
+        restTemplate = restTemplateBuilder.connectTimeout(CONNECT_TIMEOUT).readTimeout(READ_TIMEOUT).build();
+    }
 
     @Override
     public Integer getType() {

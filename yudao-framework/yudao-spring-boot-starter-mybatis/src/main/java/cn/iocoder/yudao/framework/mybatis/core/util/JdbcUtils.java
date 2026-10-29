@@ -7,6 +7,7 @@ import cn.iocoder.yudao.framework.mybatis.core.enums.DbTypeEnum;
 import com.baomidou.dynamic.datasource.DynamicRoutingDataSource;
 import com.baomidou.mybatisplus.annotation.DbType;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.datasource.ConnectionHolder;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.ConcurrentReferenceHashMap;
@@ -209,6 +210,18 @@ public class JdbcUtils {
         return ObjectUtils.equalsAny(dbType, DbType.SQL_SERVER, DbType.SQL_SERVER2005);
     }
 
-
+    /**
+     * 存在实际事务时，重新抛出数据访问异常，交给事务回滚
+     *
+     * 数据访问异常指 Spring 的 {@link DataAccessException}，包括 JDBC、Redis 等数据访问的失败。
+     * 不在实际事务中，或者不是数据访问异常时，不做处理，由调用方按原逻辑处理（例如说记录日志）
+     *
+     * @param ex 异常
+     */
+    public static void throwIfDataAccessExceptionInTransaction(Throwable ex) {
+        if (ex instanceof DataAccessException && TransactionSynchronizationManager.isActualTransactionActive()) {
+            throw (DataAccessException) ex;
+        }
+    }
 
 }

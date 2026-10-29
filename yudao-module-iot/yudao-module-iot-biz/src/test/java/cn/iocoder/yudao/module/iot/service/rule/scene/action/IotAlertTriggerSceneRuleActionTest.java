@@ -19,10 +19,13 @@ import cn.iocoder.yudao.module.system.api.notify.dto.NotifySendSingleToUserReqDT
 import cn.iocoder.yudao.module.system.api.sms.SmsSendApi;
 import cn.iocoder.yudao.module.system.api.sms.dto.send.SmsSendSingleToUserReqDTO;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
+import org.springframework.dao.QueryTimeoutException;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -31,7 +34,9 @@ import java.util.Collections;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomString;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
@@ -259,6 +264,53 @@ public class IotAlertTriggerSceneRuleActionTest extends BaseMockitoUnitTest {
         // 断言：sms 抛错时邮件依旧发送
         verify(smsSendApi, times(1)).sendSingleSmsToAdmin(any());
         verify(mailSendApi, times(1)).sendSingleMailToAdmin(any());
+    }
+
+    @Test
+    public void testExecute_smsDataAccessException() {
+        // 准备参数
+        Long userId = randomLongId();
+        IotDeviceMessage message = createDeviceMessage();
+        IotSceneRuleDO rule = randomPojo(IotSceneRuleDO.class);
+        IotSceneRuleDO.Action actionConfig = randomPojo(IotSceneRuleDO.Action.class);
+        IotAlertConfigDO config = randomPojo(IotAlertConfigDO.class, c -> {
+            c.setReceiveUserIds(Collections.singletonList(userId));
+            c.setReceiveTypes(Arrays.asList(
+                    IotAlertReceiveTypeEnum.SMS.getType(),
+                    IotAlertReceiveTypeEnum.MAIL.getType()));
+        });
+        IotDeviceDO device = randomPojo(IotDeviceDO.class);
+
+        // mock 行为：sms 写发送日志失败（单体部署下，访问的是同一个数据库）
+        when(alertConfigService.getAlertConfigListBySceneRuleIdAndStatus(rule.getId(), CommonStatusEnum.ENABLE.getStatus()))
+                .thenReturn(Collections.singletonList(config));
+        when(deviceService.getDeviceFromCache(message.getDeviceId())).thenReturn(device);
+        when(smsSendApi.sendSingleSmsToAdmin(any())).thenThrow(new QueryTimeoutException("sms log failed"));
+
+        try (MockedStatic<DictFrameworkUtils> dictMock = mockStatic(DictFrameworkUtils.class)) {
+            dictMock.when(() -> DictFrameworkUtils.parseDictDataLabel(any(), any(Integer.class)))
+                    .thenReturn("ERROR");
+            // 调用，并断言异常：状态事务内，不吞掉，后续通道不再发送
+            // 说明：只标记“存在实际事务”，验证 catch 的判断；不是真实的数据库事务，真实的回滚由 IotDeviceServiceImplTest 覆盖
+            assertThrows(QueryTimeoutException.class,
+                    () -> executeInActualTransaction(() -> action.execute(message, rule, actionConfig)));
+            verify(mailSendApi, never()).sendSingleMailToAdmin(any());
+            // 调用：非事务内，与原逻辑一致，记录日志后继续发送邮件
+            assertDoesNotThrow(() -> action.execute(message, rule, actionConfig));
+        }
+        verify(mailSendApi, times(1)).sendSingleMailToAdmin(any());
+    }
+
+    /**
+     * 标记“存在实际事务”后执行：只用于验证 catch 的判断条件，不是真实的数据库事务
+     */
+    private static void executeInActualTransaction(Executable executable) throws Throwable {
+        TransactionSynchronizationManager.setActualTransactionActive(true);
+        try {
+            executable.execute();
+        } finally {
+            TransactionSynchronizationManager.setActualTransactionActive(false);
+        }
     }
 
     /**

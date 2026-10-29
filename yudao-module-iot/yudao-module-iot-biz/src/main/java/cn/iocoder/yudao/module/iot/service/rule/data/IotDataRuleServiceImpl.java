@@ -8,6 +8,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.common.util.spring.SpringUtils;
+import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.data.rule.IotDataRulePageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.rule.vo.data.rule.IotDataRuleSaveReqVO;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
@@ -241,6 +242,8 @@ public class IotDataRuleServiceImpl implements IotDataRuleService {
             Set<Long> processedSinkIds = new HashSet<>();
             matchedRules.forEach(rule -> executeDataRule(message, rule, processedSinkIds));
         } catch (Exception e) {
+            // 状态事务内，数据访问异常不吞掉，交给事务回滚（见 IotDeviceMessageServiceImpl#handleStateUpdateMessage）
+            JdbcUtils.throwIfDataAccessExceptionInTransaction(e);
             log.error("[executeDataRule][消息({}) 执行数据流转规则异常]", message, e);
         }
     }
@@ -298,6 +301,8 @@ public class IotDataRuleServiceImpl implements IotDataRuleService {
                 // 执行数据桥接操作
                 executeDataRuleAction(message, dataSink);
             } catch (Exception e) {
+                // 状态事务内，数据访问异常不吞掉，交给事务回滚
+                JdbcUtils.throwIfDataAccessExceptionInTransaction(e);
                 log.error("[executeDataRule][规则({}) 数据目的({}) 执行异常]", rule.getId(), sinkId, e);
             }
         });
@@ -322,6 +327,8 @@ public class IotDataRuleServiceImpl implements IotDataRuleService {
                 action.execute(message, dataSink);
                 log.info("[executeDataRuleAction][消息({}) 数据目的({}) 执行成功]", message.getId(), dataSink.getId());
             } catch (Exception e) {
+                // 状态事务内，数据访问异常不吞掉，交给事务回滚；外部数据目的自身的异常，由各数据目的内部记录，不会到这里
+                JdbcUtils.throwIfDataAccessExceptionInTransaction(e);
                 log.error("[executeDataRuleAction][消息({}) 数据目的({}) 执行异常]", message.getId(), dataSink.getId(), e);
             }
         });

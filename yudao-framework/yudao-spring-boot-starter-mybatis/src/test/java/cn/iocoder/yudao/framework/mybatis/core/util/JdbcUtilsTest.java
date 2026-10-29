@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.dao.QueryTimeoutException;
 import org.springframework.jdbc.datasource.ConnectionHolder;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
@@ -165,6 +166,26 @@ public class JdbcUtilsTest {
 
         broken.setFailOnConnection(false);
         assertEquals(DbType.MYSQL, JdbcUtils.getDbType(broken.getDataSource()));
+    }
+
+    @Test
+    public void testThrowIfDataAccessExceptionInTransaction() {
+        // 准备参数
+        QueryTimeoutException dataAccessException = new QueryTimeoutException("redis read timeout");
+        IllegalStateException otherException = new IllegalStateException("other failed");
+
+        // 调用：非事务内，不抛出
+        assertDoesNotThrow(() -> JdbcUtils.throwIfDataAccessExceptionInTransaction(dataAccessException));
+        // 调用：事务内，只抛出数据访问异常
+        TransactionSynchronizationManager.setActualTransactionActive(true);
+        try {
+            assertSame(dataAccessException, assertThrows(QueryTimeoutException.class,
+                    () -> JdbcUtils.throwIfDataAccessExceptionInTransaction(dataAccessException)));
+            assertDoesNotThrow(() -> JdbcUtils.throwIfDataAccessExceptionInTransaction(otherException));
+            assertDoesNotThrow(() -> JdbcUtils.throwIfDataAccessExceptionInTransaction(null));
+        } finally {
+            TransactionSynchronizationManager.setActualTransactionActive(false);
+        }
     }
 
     private static void mockBeanFactory(String beanName, Object bean) {

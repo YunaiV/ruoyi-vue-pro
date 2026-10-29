@@ -189,8 +189,8 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
     // ========== 设备时间相关操作 ==========
 
     @Override
-    public Set<Long> getDeviceIdListByReportTime(LocalDateTime maxReportTime) {
-        return deviceReportTimeRedisDAO.range(maxReportTime);
+    public Map<Long, LocalDateTime> getDeviceReportTimeMapByReportTime(LocalDateTime maxReportTime) {
+        return deviceReportTimeRedisDAO.rangeWithScores(maxReportTime);
     }
 
     @Override
@@ -210,6 +210,16 @@ public class IotDevicePropertyServiceImpl implements IotDevicePropertyService {
     @Override
     public String getDeviceServerId(Long id) {
         return deviceServerIdRedisDAO.get(id);
+    }
+
+    @Override
+    public Long getGatewayServerStartTime(String serverId) {
+        return deviceServerIdRedisDAO.getGatewayServerStartTime(serverId);
+    }
+
+    @Override
+    public void updateGatewayServerStartTime(String serverId, Long startTime) {
+        deviceServerIdRedisDAO.updateGatewayServerStartTime(serverId, startTime);
     }
 
     // ========== 设备定位相关操作 ==========
