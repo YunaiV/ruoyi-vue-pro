@@ -66,9 +66,7 @@ public interface WmsInventoryMapper extends BaseMapperX<WmsInventoryDO> {
     }
 
     default WmsInventoryDO selectByIdForUpdate(Long id) {
-        return selectOne(new LambdaQueryWrapperX<WmsInventoryDO>()
-                .eq(WmsInventoryDO::getId, id)
-                .last("FOR UPDATE"));
+        return selectOneForUpdate(WmsInventoryDO::getId, id);
     }
 
     /**
@@ -96,12 +94,7 @@ public interface WmsInventoryMapper extends BaseMapperX<WmsInventoryDO> {
     }
 
     default List<WmsInventoryDO> selectListByIdsForUpdate(Collection<Long> ids) {
-        if (CollUtil.isEmpty(ids)) {
-            return Collections.emptyList();
-        }
-        return selectList(new LambdaQueryWrapperX<WmsInventoryDO>()
-                .in(WmsInventoryDO::getId, ids)
-                .last("FOR UPDATE"));
+        return selectListForUpdate(WmsInventoryDO::getId, ids);
     }
 
     static void appendDimensionOrder(MPJLambdaWrapperX<WmsInventoryDO> query, String type) {

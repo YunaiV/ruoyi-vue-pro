@@ -9,6 +9,7 @@ import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
+import cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils;
 import cn.iocoder.yudao.module.hrm.controller.admin.employee.vo.employee.HrmEmployeePageReqVO;
 import cn.iocoder.yudao.module.hrm.dal.dataobject.employee.employment.HrmEmployeeChangeRecordDO;
 import cn.iocoder.yudao.module.hrm.dal.dataobject.employee.info.HrmEmployeeDO;
@@ -286,11 +287,11 @@ public interface HrmEmployeeMapper extends BaseMapperX<HrmEmployeeDO> {
         } else if (HrmEmployeeTodoTypeEnum.PENDING_ENTRY.getType().equals(todoType)) {
             query.betweenIfPresent(HrmEmployeeDO::getEntryTime, monthTimes);
         } else if (HrmEmployeeTodoTypeEnum.BIRTHDAY.getType().equals(todoType)) {
-            // MySQL 和 H2 MySQL 模式均支持 MONTH，用于跨年筛选当月生日。
-            query.apply("MONTH(birthday) = {0}", now.getMonthValue());
+            // 按当前路由数据源的方言取月份，用于跨年筛选当月生日；MySQL、H2 等保持 MONTH。
+            query.apply(SqlDialectUtils.month("birthday") + " = {0}", now.getMonthValue());
             if (now.getMonthValue() == 2 && !now.isLeapYear()) {
                 // 非闰年不存在 2 月 29 日，与首页日历和年龄计算保持一致。
-                query.apply("DAYOFMONTH(birthday) <> 29");
+                query.apply(SqlDialectUtils.dayOfMonth("birthday") + " <> 29");
             }
         }
     }

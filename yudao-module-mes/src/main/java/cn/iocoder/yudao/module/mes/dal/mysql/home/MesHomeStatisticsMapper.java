@@ -59,7 +59,7 @@ public interface MesHomeStatisticsMapper {
      *
      * @param beginTime >= 开始时间
      * @param endTime   < 结束时间
-     * @return [{ "date": "2026-04-05", "quantity": 1234, "qualifiedQuantity": 1200, "unqualifiedQuantity": 34 }, ...]
+     * @return [{ "statDate": "2026-04-05", "quantity": 1234, "qualifiedQuantity": 1200, "unqualifiedQuantity": 34 }, ...]
      */
     List<Map<String, Object>> selectDailyFeedbackTrend(@Param("beginTime") LocalDateTime beginTime,
                                                        @Param("endTime") LocalDateTime endTime);

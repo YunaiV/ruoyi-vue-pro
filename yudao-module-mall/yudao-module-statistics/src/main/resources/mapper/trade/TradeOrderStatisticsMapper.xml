@@ -4,27 +4,28 @@
 
     <select id="selectSummaryListByAreaId"
             resultType="cn.iocoder.yudao.module.statistics.service.member.bo.MemberAreaStatisticsRespBO">
+        <bind name="trueValue" value="true"/>
         SELECT receiver_area_id                                AS areaId,
                (SELECT COUNT(DISTINCT s.user_id)
-                FROM trade_order AS s
+                FROM trade_order s
                 WHERE s.receiver_area_id = m.receiver_area_id
                 <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
                     AND s.tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
                 </if>
                 ) AS orderCreateUserCount,
                (SELECT COUNT(DISTINCT s.user_id)
-                FROM trade_order AS s
+                FROM trade_order s
                 WHERE s.receiver_area_id = m.receiver_area_id
-                  AND s.pay_status = TRUE
+                  AND s.pay_status = #{trueValue}
                   AND s.deleted = 0
                 <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
                     AND s.tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
                 </if>
                 ) AS orderPayUserCount,
                (SELECT SUM(s.pay_price)
-                FROM trade_order AS s
+                FROM trade_order s
                 WHERE s.receiver_area_id = m.receiver_area_id
-                  AND s.pay_status = TRUE
+                  AND s.pay_status = #{trueValue}
                   AND s.deleted = 0
                 <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
                     AND s.tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
@@ -49,10 +50,11 @@
     </select>
 
     <select id="selectUserCountByPayTimeBetween" resultType="java.lang.Integer">
+        <bind name="trueValue" value="true"/>
         SELECT COUNT(DISTINCT (user_id))
         FROM trade_order
         WHERE pay_time BETWEEN #{beginTime} AND #{endTime}
-          AND pay_status = TRUE
+          AND pay_status = #{trueValue}
           AND deleted = 0
         <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
             AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
@@ -70,9 +72,10 @@
     </select>
 
     <select id="selectCountByPayTimeBetween" resultType="java.lang.Integer">
+        <bind name="trueValue" value="true"/>
         SELECT COUNT(1)
         FROM trade_order
-        WHERE pay_status = TRUE
+        WHERE pay_status = #{trueValue}
           AND create_time BETWEEN #{beginTime} AND #{endTime}
           AND deleted = 0
         <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
@@ -81,9 +84,10 @@
     </select>
 
     <select id="selectSummaryPriceByPayTimeBetween" resultType="java.lang.Integer">
+        <bind name="trueValue" value="true"/>
         SELECT SUM(pay_price)
-        FROM trade_order AS s
-        WHERE s.pay_status = TRUE
+        FROM trade_order s
+        WHERE s.pay_status = #{trueValue}
           AND deleted = 0
           AND create_time BETWEEN #{beginTime} AND #{endTime}
         <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
@@ -91,37 +95,43 @@
         </if>
     </select>
 
-    <select id="selectListByPayTimeBetweenAndGroupByDay"
-            resultType="cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeOrderTrendRespVO">
-        SELECT CAST(pay_time AS DATE) AS date,
-               COUNT(1)                          AS orderPayCount,
-               SUM(pay_price)                    AS orderPayPrice
+    <resultMap id="TradeOrderTrendRespVOMap"
+               type="cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeOrderTrendRespVO">
+        <result column="statDate" property="date"/>
+        <result column="order_pay_count" property="orderPayCount"/>
+        <result column="order_pay_price" property="orderPayPrice"/>
+    </resultMap>
+
+    <select id="selectListByPayTimeBetweenAndGroupByDay" resultMap="TradeOrderTrendRespVOMap">
+        <bind name="trueValue" value="true"/>
+        SELECT ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@castDateText('pay_time')} AS statDate,
+               COUNT(1)                          AS order_pay_count,
+               SUM(pay_price)                    AS order_pay_price
         FROM trade_order
-        WHERE pay_status = TRUE
+        WHERE pay_status = #{trueValue}
           AND create_time BETWEEN #{beginTime} AND #{endTime}
           AND deleted = 0
         <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
             AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
         </if>
-        GROUP BY date
-        ORDER BY date
+        GROUP BY ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@castDateText('pay_time')}
+        ORDER BY statDate
     </select>
 
-    <select id="selectListByPayTimeBetweenAndGroupByMonth"
-            resultType="cn.iocoder.yudao.module.statistics.controller.admin.trade.vo.TradeOrderTrendRespVO">
-        SELECT CONCAT(EXTRACT(YEAR FROM pay_time), '-',
-                      LPAD(CONCAT(EXTRACT(MONTH FROM pay_time)), 2, '0')) AS date,
+    <select id="selectListByPayTimeBetweenAndGroupByMonth" resultMap="TradeOrderTrendRespVOMap">
+        <bind name="trueValue" value="true"/>
+        SELECT ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@formatYearDashMonth('pay_time')} AS statDate,
                COUNT(1)                       AS order_pay_count,
                SUM(pay_price)                 AS order_pay_price
         FROM trade_order
-        WHERE pay_status = TRUE
+        WHERE pay_status = #{trueValue}
           AND create_time BETWEEN #{beginTime} AND #{endTime}
           AND deleted = 0
         <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
             AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
         </if>
-        GROUP BY date
-        ORDER BY date
+        GROUP BY ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@formatYearDashMonth('pay_time')}
+        ORDER BY statDate
     </select>
 
     <select id="selectCountByStatusAndDeliveryType" resultType="java.lang.Long">

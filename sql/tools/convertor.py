@@ -800,9 +800,20 @@ class SQLServerConvertor(Convertor):
         if type in ("datetime", "timestamp"):
             return "datetime2"
         if type == "bit":
-            return "varchar(1)"
+            # MySQL bit(1) 与 SQL Server bit 均只有 0、1、NULL；多位的位串不是布尔值，暂不支持
+            if size not in (None, 1):
+                raise ValueError(f"SQL Server 转换暂不支持 bit({size})，仅支持 bit(1)")
+            return "bit"
+        # SQL Server 的 tinyint 为 0 ~ 255，smallint 为 -32768 ~ 32767，需要选择能容纳 MySQL 取值范围的类型
         if type in ("tinyint", "smallint"):
+            # 有符号：MySQL tinyint 为 -128 ~ 127，smallint 为 -32768 ~ 32767
+            return "smallint"
+        if type == "tinyint unsigned":
+            # 无符号：0 ~ 255
             return "tinyint"
+        if type == "smallint unsigned":
+            # 无符号：0 ~ 65535
+            return "int"
         if type in ("text", "longtext"):
             return "nvarchar(max)"
         if type in ("blob", "mediumblob"):
@@ -825,7 +836,11 @@ class SQLServerConvertor(Convertor):
             type = col["type"].lower()
             full_type = self.translate_type(type, col["size"])
             nullable = "NULL" if col["nullable"] else "NOT NULL"
-            default = f"DEFAULT {col['default']}" if col["default"] is not None else ""
+            default_value = col["default"]
+            # bit 的默认值使用数字常量：b'0'、b'1' 在清理后为 '0'、'1'
+            if full_type == "bit" and default_value in ("'0'", "'1'"):
+                default_value = default_value.strip("'")
+            default = f"DEFAULT {default_value}" if default_value is not None else ""
             return f"{name} {full_type} {default} {nullable}"
 
         table_name = ddl["table_name"].lower()

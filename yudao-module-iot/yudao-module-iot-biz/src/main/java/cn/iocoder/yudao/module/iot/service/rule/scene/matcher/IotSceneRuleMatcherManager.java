@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.iot.service.rule.scene.matcher;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleConditionTypeEnum;
@@ -115,6 +116,8 @@ public class IotSceneRuleMatcherManager {
         try {
             return matcher.matches(message, trigger);
         } catch (Exception e) {
+            // 状态事务内，数据访问异常不吞掉，交给事务回滚（例如说，匹配时读取设备缓存的 Redis 故障）
+            JdbcUtils.throwIfDataAccessExceptionInTransaction(e);
             log.error("[isMatched][触发器匹配异常] message: {}, trigger: {}", message, trigger, e);
             return false;
         }
@@ -149,6 +152,8 @@ public class IotSceneRuleMatcherManager {
         try {
             return matcher.matches(message, condition);
         } catch (Exception e) {
+            // 状态事务内，数据访问异常不吞掉，交给事务回滚
+            JdbcUtils.throwIfDataAccessExceptionInTransaction(e);
             log.error("[isConditionMatched][message({}) condition({}) 条件匹配异常]", message, condition, e);
             return false;
         }

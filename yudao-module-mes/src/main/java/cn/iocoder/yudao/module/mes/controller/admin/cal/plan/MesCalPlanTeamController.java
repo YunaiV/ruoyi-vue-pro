@@ -23,6 +23,7 @@ import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAndThen;
 
 @Tag(name = "管理后台 - MES 计划班组关联")
 @RestController
@@ -58,19 +59,14 @@ public class MesCalPlanTeamController {
     public CommonResult<List<MesCalPlanTeamRespVO>> getPlanTeamListByPlan(@RequestParam("planId") Long planId) {
         List<MesCalPlanTeamDO> list = planTeamService.getPlanTeamListByPlanId(planId);
         List<MesCalPlanTeamRespVO> respList = BeanUtils.toBean(list, MesCalPlanTeamRespVO.class);
-        // 拼装班组编码/名称
-        // TODO @AI：if return
-        if (CollUtil.isNotEmpty(respList)) {
-            Map<Long, MesCalTeamDO> teamMap = teamService.getTeamMap(
-                    convertList(respList, MesCalPlanTeamRespVO::getTeamId));
-            respList.forEach(resp -> {
-                // TODO @AI：findand then
-                MesCalTeamDO team = teamMap.get(resp.getTeamId());
-                if (team != null) {
-                    resp.setTeamCode(team.getCode()).setTeamName(team.getName());
-                }
-            });
+        if (CollUtil.isEmpty(respList)) {
+            return success(respList);
         }
+        // 拼装班组编码/名称
+        Map<Long, MesCalTeamDO> teamMap = teamService.getTeamMap(
+                convertList(respList, MesCalPlanTeamRespVO::getTeamId));
+        respList.forEach(resp -> findAndThen(teamMap, resp.getTeamId(),
+                team -> resp.setTeamCode(team.getCode()).setTeamName(team.getName())));
         return success(respList);
     }
 

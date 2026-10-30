@@ -6,7 +6,6 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.member.controller.admin.signin.vo.record.MemberSignInRecordPageReqVO;
 import cn.iocoder.yudao.module.member.dal.dataobject.signin.MemberSignInRecordDO;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -42,10 +41,9 @@ public interface MemberSignInRecordMapper extends BaseMapperX<MemberSignInRecord
      * @return 签到记录列表
      */
     default MemberSignInRecordDO selectLastRecordByUserId(Long userId) {
-        return selectOne(new QueryWrapper<MemberSignInRecordDO>()
-                .eq("user_id", userId)
-                .orderByDesc("create_time")
-                .last("limit 1"));
+        return selectFirstOne(new LambdaQueryWrapperX<MemberSignInRecordDO>()
+                .eq(MemberSignInRecordDO::getUserId, userId)
+                .orderByDesc(MemberSignInRecordDO::getCreateTime));
     }
 
     default Long selectCountByUserId(Long userId) {

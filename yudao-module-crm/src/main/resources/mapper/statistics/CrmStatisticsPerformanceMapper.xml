@@ -5,7 +5,7 @@
     <select id="selectContractCountPerformance"
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.performance.CrmStatisticsPerformanceRespVO">
         SELECT
-            DATE_FORMAT(order_date, '%Y%m') AS time,
+            ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@formatYearMonth('order_date')} AS time,
             COUNT(1) AS currentMonthCount
         FROM crm_contract
         WHERE deleted = 0
@@ -16,14 +16,14 @@
             </foreach>
         AND order_date between #{times[0],javaType=java.time.LocalDateTime} and
             #{times[1],javaType=java.time.LocalDateTime}
-        GROUP BY time
+        GROUP BY ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@formatYearMonth('order_date')}
     </select>
 
     <select id="selectContractPricePerformance"
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.performance.CrmStatisticsPerformanceRespVO">
         SELECT
-            DATE_FORMAT(order_date, '%Y%m') AS time,
-            IFNULL(SUM(total_price), 0) AS currentMonthCount
+            ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@formatYearMonth('order_date')} AS time,
+            COALESCE(SUM(total_price), 0) AS currentMonthCount
         FROM crm_contract
         WHERE deleted = 0
         AND audit_status = ${@cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum@APPROVE.status}
@@ -33,14 +33,14 @@
             </foreach>
         AND order_date between #{times[0],javaType=java.time.LocalDateTime} and
             #{times[1],javaType=java.time.LocalDateTime}
-        GROUP BY time
+        GROUP BY ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@formatYearMonth('order_date')}
     </select>
 
     <select id="selectReceivablePricePerformance"
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.performance.CrmStatisticsPerformanceRespVO">
         SELECT
-            DATE_FORMAT(return_time, '%Y%m') AS time,
-            IFNULL(SUM(price), 0) AS currentMonthCount
+            ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@formatYearMonth('return_time')} AS time,
+            COALESCE(SUM(price), 0) AS currentMonthCount
         FROM crm_receivable
         WHERE deleted = 0
         AND audit_status = ${@cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum@APPROVE.status}
@@ -50,25 +50,25 @@
             </foreach>
         AND return_time between #{times[0],javaType=java.time.LocalDateTime} and
             #{times[1],javaType=java.time.LocalDateTime}
-        GROUP BY time
+        GROUP BY ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@formatYearMonth('return_time')}
     </select>
 
     <select id="selectContractSummary"
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.performance.CrmStatisticsPerformanceSummaryRespVO">
-        SELECT DATE_FORMAT(contract.order_date, '%Y%m') AS time,
+        SELECT ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@formatYearMonth('contract.order_date')} AS time,
                COUNT(DISTINCT contract.id) AS contract_count,
-               IFNULL(SUM(contract.total_price), 0) AS contract_price,
-               IFNULL(SUM(receivable.receivable_price), 0) AS receivable_price,
-               IFNULL(SUM(contract.total_price), 0) - IFNULL(SUM(receivable.receivable_price), 0) AS unreceived_price
-          FROM crm_contract AS contract
+               COALESCE(SUM(contract.total_price), 0) AS contract_price,
+               COALESCE(SUM(receivable.receivable_price), 0) AS receivable_price,
+               COALESCE(SUM(contract.total_price), 0) - COALESCE(SUM(receivable.receivable_price), 0) AS unreceived_price
+          FROM crm_contract contract
                 LEFT JOIN (
                     SELECT contract_id,
-                           IFNULL(SUM(price), 0) AS receivable_price
+                           COALESCE(SUM(price), 0) AS receivable_price
                       FROM crm_receivable
                      WHERE deleted = 0
                        AND audit_status = ${@cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum@APPROVE.status}
                      GROUP BY contract_id
-                ) AS receivable ON contract.id = receivable.contract_id
+                ) receivable ON contract.id = receivable.contract_id
          WHERE contract.deleted = 0
            AND contract.audit_status = ${@cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum@APPROVE.status}
            AND contract.owner_user_id in
@@ -77,7 +77,7 @@
                 </foreach>
            AND contract.order_date between #{times[0],javaType=java.time.LocalDateTime} and
                 #{times[1],javaType=java.time.LocalDateTime}
-         GROUP BY time
+         GROUP BY ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@formatYearMonth('contract.order_date')}
     </select>
 
 </mapper>

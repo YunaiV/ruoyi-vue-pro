@@ -121,7 +121,7 @@ public class MesHomeStatisticsServiceImpl implements MesHomeStatisticsService {
         List<Map<String, Object>> dbData = homeStatisticsMapper.selectDailyFeedbackTrend(beginTime, endTime);
         Map<String, Map<String, Object>> dateMap = new LinkedHashMap<>();
         for (Map<String, Object> row : dbData) {
-            dateMap.put((String) row.get("date"), row);
+            dateMap.put((String) row.get("statDate"), row);
         }
 
         // 补全所有日期（无数据的日期填 0）

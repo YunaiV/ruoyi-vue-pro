@@ -133,8 +133,7 @@ public interface MesWmBatchMapper extends BaseMapperX<MesWmBatchDO> {
 
         // 返回 ID 最小的批次
         query.orderByAsc(MesWmBatchDO::getId);
-        query.last("LIMIT 1");
-        return selectOne(query);
+        return selectFirstOne(query);
     }
 
     /**

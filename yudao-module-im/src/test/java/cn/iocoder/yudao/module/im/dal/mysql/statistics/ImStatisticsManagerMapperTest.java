@@ -164,7 +164,7 @@ public class ImStatisticsManagerMapperTest extends BaseDbUnitTest {
 
         // 断言：分桶包含「1-9 人」和「10-49 人」
         Map<Object, Long> byRange = dist.stream().collect(java.util.stream.Collectors.toMap(
-                m -> m.get("range"), m -> ((Number) m.get("count")).longValue()));
+                m -> m.get("sizeRange"), m -> ((Number) m.get("count")).longValue()));
         assertEquals(1L, byRange.get("1-9 人"));
         assertEquals(1L, byRange.get("10-49 人"));
     }

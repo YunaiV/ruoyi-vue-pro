@@ -107,11 +107,19 @@ public enum DbTypeEnum {
      */
     private final String findInSetTemplate;
 
+    /**
+     * 根据数据库产品名获得 MyBatis Plus 类型
+     *
+     * @param databaseProductName 数据库产品名
+     * @return MyBatis Plus 类型；产品名为空或未登记时返回 null
+     */
     public static DbType find(String databaseProductName) {
         if (StrUtil.isBlank(databaseProductName)) {
             return null;
         }
-        return MAP_BY_NAME.get(databaseProductName).getMpDbType();
+        return Optional.ofNullable(MAP_BY_NAME.get(databaseProductName))
+                .map(DbTypeEnum::getMpDbType)
+                .orElse(null);
     }
 
     public static String getFindInSetTemplate(DbType dbType) {

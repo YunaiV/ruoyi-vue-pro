@@ -40,7 +40,7 @@ public interface OaAnnouncementMapper extends BaseMapperX<OaAnnouncementDO> {
                 .selectAll(OaAnnouncementDO.class)
                 .innerJoin(OaAnnouncementReceiverDO.class, OaAnnouncementReceiverDO::getAnnouncementId,OaAnnouncementDO::getId)
                 .eq(OaAnnouncementReceiverDO::getReceiverUserId, receiverUserId)
-                .eq(OaAnnouncementReceiverDO::getDeleted, false)
+                .eq(OaAnnouncementReceiverDO::getDeleted, 0)
                 .eqIfPresent(OaAnnouncementReceiverDO::getReadStatus, pageReqVO.getReadStatus())
                 .likeIfPresent(OaAnnouncementDO::getTitle, pageReqVO.getTitle())
                 .eqIfPresent(OaAnnouncementDO::getType, pageReqVO.getType())

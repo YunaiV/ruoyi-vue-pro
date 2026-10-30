@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.system.dal.mysql.notify;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.yudao.module.system.controller.admin.notify.vo.message.NotifyMessageMyPageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.notify.vo.message.NotifyMessagePageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.notify.NotifyMessageDO;
@@ -53,11 +52,11 @@ public interface NotifyMessageMapper extends BaseMapperX<NotifyMessageDO> {
     }
 
     default List<NotifyMessageDO> selectUnreadListByUserIdAndUserType(Long userId, Integer userType, Integer size) {
-        return selectList(new QueryWrapperX<NotifyMessageDO>() // 由于要使用 limitN 语句，所以只能用 QueryWrapperX
-                .eq("user_id", userId)
-                .eq("user_type", userType)
-                .eq("read_status", false)
-                .orderByDesc("id").limitN(size));
+        return selectListLimitN(new LambdaQueryWrapperX<NotifyMessageDO>()
+                .eq(NotifyMessageDO::getUserId, userId)
+                .eq(NotifyMessageDO::getUserType, userType)
+                .eq(NotifyMessageDO::getReadStatus, false)
+                .orderByDesc(NotifyMessageDO::getId), size);
     }
 
     default Long selectUnreadCountByUserIdAndUserType(Long userId, Integer userType) {

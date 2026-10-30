@@ -439,6 +439,28 @@ public class OaAnnouncementServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
+    public void testGetReceivedAnnouncementPage_excludeDeletedReceiver() {
+        // mock 数据：同一用户的两条接收关系，其中一条被逻辑删除
+        Long userId = randomLongId();
+        OaAnnouncementDO keptAnnouncement = buildAnnouncementDO(randomLongId()).setTitle("保留的公告");
+        announcementMapper.insert(keptAnnouncement);
+        announcementReceiverMapper.insert(buildReceiverDO(keptAnnouncement.getId(), userId, false));
+        OaAnnouncementDO removedAnnouncement = buildAnnouncementDO(randomLongId()).setTitle("已移除的公告");
+        announcementMapper.insert(removedAnnouncement);
+        OaAnnouncementReceiverDO removedReceiver = buildReceiverDO(removedAnnouncement.getId(), userId, true);
+        announcementReceiverMapper.insert(removedReceiver);
+        announcementReceiverMapper.deleteById(removedReceiver.getId());
+
+        // 调用
+        PageResult<OaAnnouncementDO> result = announcementService.getReceivedAnnouncementPage(
+                new OaAnnouncementPageReqVO(), userId);
+
+        // 断言：接收关系 deleted = 0 的条件以整数绑定后，仍只返回未删除的接收关系
+        assertEquals(Collections.singletonList(keptAnnouncement.getId()),
+                convertList(result.getList(), OaAnnouncementDO::getId));
+    }
+
+    @Test
     public void testUpdateAnnouncement_preserveCreateTime() {
         // mock 数据
         Long userId = randomLongId();

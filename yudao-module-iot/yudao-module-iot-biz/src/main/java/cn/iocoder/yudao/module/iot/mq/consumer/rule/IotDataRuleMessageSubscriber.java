@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.iot.mq.consumer.rule;
 
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
+import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageSubscriber;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
@@ -43,6 +44,10 @@ public class IotDataRuleMessageSubscriber implements IotMessageSubscriber<IotDev
 
     @Override
     public void onMessage(IotDeviceMessage message) {
+        // 状态消息：改由设备消费者在状态事务内触发，只有状态真的变化时才执行
+        if (IotDeviceMessageMethodEnum.STATE_UPDATE.getMethod().equals(message.getMethod())) {
+            return;
+        }
         TenantUtils.execute(message.getTenantId(), () -> dataRuleService.executeDataRule(message));
     }
 

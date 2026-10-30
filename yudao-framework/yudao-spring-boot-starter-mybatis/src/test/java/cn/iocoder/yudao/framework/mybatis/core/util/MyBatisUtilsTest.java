@@ -18,10 +18,55 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+// TODO DONE @AI：参考 system user test 的风格；统一准备参数、调用、断言分区。
 /**
  * {@link MyBatisUtils} 的单元测试
  */
 public class MyBatisUtilsTest {
+
+    @Test
+    public void testBuildPage_offset() {
+        // 准备参数
+        long offset = 3;
+        long size = 10;
+
+        // 调用
+        Page<Object> page = MyBatisUtils.buildPage(offset, size, false);
+
+        // 断言
+        assertEquals(3L, page.offset());
+        assertEquals(10L, page.getSize());
+        assertFalse(page.searchCount());
+    }
+
+    @Test
+    public void testBuildPage_negativeOffset() {
+        // 准备参数
+        long offset = -1;
+        long size = 10;
+
+        // 调用
+        Page<Object> page = MyBatisUtils.buildPage(offset, size, true);
+
+        // 断言
+        assertEquals(0L, page.offset());
+        assertEquals(10L, page.getSize());
+        assertTrue(page.searchCount());
+        assertEquals(0L, MyBatisUtils.buildPage(0, 10, false).offset());
+    }
+
+    @Test
+    public void testBuildPage_largeOffset() {
+        // 准备参数
+        long offset = (long) Integer.MAX_VALUE + 3;
+
+        // 调用
+        Page<Object> page = MyBatisUtils.buildPage(offset, 10, false);
+
+        // 断言
+        assertEquals(offset, page.offset());
+        assertEquals(Long.MAX_VALUE, MyBatisUtils.buildPage(Long.MAX_VALUE, 10, false).offset());
+    }
 
     @Test
     public void testBuildPage_sortingFields() {
@@ -94,15 +139,28 @@ public class MyBatisUtilsTest {
 
     @Test
     public void testOrderDirection() {
-        assertTrue(MyBatisUtils.isAscOrder(SortingField.ORDER_ASC));
-        assertFalse(MyBatisUtils.isAscOrder(SortingField.ORDER_DESC));
-        assertEquals("ASC", MyBatisUtils.getOrderDirection(SortingField.ORDER_ASC));
-        assertEquals("DESC", MyBatisUtils.getOrderDirection(SortingField.ORDER_DESC));
-        assertEquals("DESC", MyBatisUtils.getOrderDirection(null));
+        // 准备参数
+        String ascOrder = SortingField.ORDER_ASC;
+        String descOrder = SortingField.ORDER_DESC;
+
+        // 调用
+        boolean asc = MyBatisUtils.isAscOrder(ascOrder);
+        boolean desc = MyBatisUtils.isAscOrder(descOrder);
+        String ascDirection = MyBatisUtils.getOrderDirection(ascOrder);
+        String descDirection = MyBatisUtils.getOrderDirection(descOrder);
+        String defaultDirection = MyBatisUtils.getOrderDirection(null);
+
+        // 断言
+        assertTrue(asc);
+        assertFalse(desc);
+        assertEquals("ASC", ascDirection);
+        assertEquals("DESC", descDirection);
+        assertEquals("DESC", defaultDirection);
     }
 
     @Test
     public void testFindInSet() {
+        // 调用，并断言各数据库模板保持原有参数序号和列名
         assertEquals("FIND_IN_SET({0}, websites) <> 0",
                 MyBatisUtils.findInSet(DbType.MYSQL, "websites", 0));
         assertEquals("POSITION(',' || CAST({0} AS VARCHAR) || ',' IN ',' || websites || ',') > 0",
@@ -121,6 +179,7 @@ public class MyBatisUtilsTest {
 
     @Test
     public void testFindInSet_invalidColumnName() {
+        // 调用，并断言异常
         assertThrows(IllegalArgumentException.class,
                 () -> MyBatisUtils.findInSet(DbType.MYSQL, "websites;drop table system_tenant", 0));
         assertThrows(IllegalArgumentException.class,
@@ -129,12 +188,14 @@ public class MyBatisUtilsTest {
 
     @Test
     public void testFindInSet_invalidParamIndex() {
+        // 调用，并断言异常
         assertThrows(IllegalArgumentException.class,
                 () -> MyBatisUtils.findInSet(DbType.MYSQL, "websites", -1));
     }
 
     @Test
     public void testFindInSet_multipleValues() {
+        // 调用，并断言多个值使用独立参数序号；空集合拒绝生成条件
         assertEquals("FIND_IN_SET({0}, tag_ids) <> 0 OR FIND_IN_SET({1}, tag_ids) <> 0",
                 MyBatisUtils.findInSet(DbType.MYSQL, "tag_ids", Arrays.asList(1L, 2L)));
         assertThrows(IllegalArgumentException.class,

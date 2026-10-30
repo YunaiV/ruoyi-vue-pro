@@ -30,7 +30,7 @@ public interface WmsHomeStatisticsMapper {
      * @param beginTime >= 开始时间
      * @param endTime < 结束时间
      * @param warehouseId 仓库编号
-     * @return [{ "date": "2026-05-14", "orderType": 1, "count": 5 }, ...]
+     * @return [{ "statDate": "2026-05-14", "orderType": 1, "count": 5 }, ...]
      */
     List<Map<String, Object>> selectDailyOrderTrend(@Param("beginTime") LocalDateTime beginTime,
                                                     @Param("endTime") LocalDateTime endTime,

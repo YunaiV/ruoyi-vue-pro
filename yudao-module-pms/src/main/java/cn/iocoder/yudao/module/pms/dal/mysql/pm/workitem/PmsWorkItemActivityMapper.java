@@ -19,11 +19,10 @@ public interface PmsWorkItemActivityMapper extends BaseMapperX<PmsWorkItemActivi
     }
 
     default List<PmsWorkItemActivityDO> selectListByWorkItemIds(Collection<Long> workItemIds, int limit) {
-        return selectList(new LambdaQueryWrapperX<PmsWorkItemActivityDO>()
+        return selectListLimitN(new LambdaQueryWrapperX<PmsWorkItemActivityDO>()
                 .in(PmsWorkItemActivityDO::getWorkItemId, workItemIds)
                 .orderByDesc(PmsWorkItemActivityDO::getCreateTime)
-                .orderByDesc(PmsWorkItemActivityDO::getId)
-                .last("LIMIT " + limit));
+                .orderByDesc(PmsWorkItemActivityDO::getId), limit);
     }
 
     default void deleteByWorkItemId(Long workItemId) {

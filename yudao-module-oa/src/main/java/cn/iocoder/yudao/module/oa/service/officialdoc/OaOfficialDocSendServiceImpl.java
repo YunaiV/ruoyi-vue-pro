@@ -96,8 +96,7 @@ public class OaOfficialDocSendServiceImpl implements OaOfficialDocSendService {
         // 1.2 校验发文归属
         validateOfficialDocSendOwner(send, userId);
         // 1.3 未提交、审批不通过和已取消的单据允许删除
-        // TODO @AI：notEqualsAny
-        if (!ObjectUtils.equalsAny(send.getStatus(), BpmProcessInstanceStatusEnum.NOT_START.getStatus(),
+        if (ObjectUtils.notEqualsAny(send.getStatus(), BpmProcessInstanceStatusEnum.NOT_START.getStatus(),
                 BpmProcessInstanceStatusEnum.REJECT.getStatus(), BpmProcessInstanceStatusEnum.CANCEL.getStatus())) {
             throw exception(OFFICIAL_DOC_STATUS_INVALID);
         }

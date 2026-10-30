@@ -4,7 +4,8 @@
 
     <select id="selectSummaryListGroupByAreaId"
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.portrait.CrmStatisticCustomerAreaRespVO">
-        SELECT area_id, COUNT(*) AS customerCount, SUM(deal_status) AS dealCount
+        <bind name="trueValue" value="true"/>
+        SELECT area_id, COUNT(*) AS customerCount, SUM(CASE WHEN deal_status = #{trueValue} THEN 1 WHEN deal_status IS NULL THEN NULL ELSE 0 END) AS dealCount
         FROM crm_customer
         WHERE deleted = 0 AND area_id IS NOT NULL
         AND owner_user_id IN
@@ -18,7 +19,8 @@
 
     <select id="selectCustomerIndustryListGroupByIndustryId"
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.portrait.CrmStatisticCustomerIndustryRespVO">
-        SELECT industry_id, COUNT(*) AS customerCount, SUM(deal_status) AS dealCount
+        <bind name="trueValue" value="true"/>
+        SELECT industry_id, COUNT(*) AS customerCount, SUM(CASE WHEN deal_status = #{trueValue} THEN 1 WHEN deal_status IS NULL THEN NULL ELSE 0 END) AS dealCount
         FROM crm_customer
         WHERE deleted = 0 AND industry_id IS NOT NULL
         AND owner_user_id IN
@@ -32,7 +34,8 @@
 
     <select id="selectCustomerSourceListGroupBySource"
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.portrait.CrmStatisticCustomerSourceRespVO">
-        SELECT source, COUNT(*) AS customerCount, SUM(deal_status) AS dealCount
+        <bind name="trueValue" value="true"/>
+        SELECT source, COUNT(*) AS customerCount, SUM(CASE WHEN deal_status = #{trueValue} THEN 1 WHEN deal_status IS NULL THEN NULL ELSE 0 END) AS dealCount
         FROM crm_customer
         WHERE deleted = 0 AND source IS NOT NULL
         AND owner_user_id IN
@@ -46,7 +49,8 @@
 
     <select id="selectCustomerLevelListGroupByLevel"
             resultType="cn.iocoder.yudao.module.crm.controller.admin.statistics.vo.portrait.CrmStatisticCustomerLevelRespVO">
-        SELECT level, COUNT(*) AS customerCount, SUM(deal_status) AS dealCount
+        <bind name="trueValue" value="true"/>
+        SELECT level, COUNT(*) AS customerCount, SUM(CASE WHEN deal_status = #{trueValue} THEN 1 WHEN deal_status IS NULL THEN NULL ELSE 0 END) AS dealCount
         FROM crm_customer
         WHERE deleted = 0 AND level IS NOT NULL
         AND owner_user_id IN

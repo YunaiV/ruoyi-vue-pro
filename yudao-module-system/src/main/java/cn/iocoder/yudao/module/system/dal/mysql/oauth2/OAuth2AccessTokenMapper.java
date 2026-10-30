@@ -46,7 +46,7 @@ public interface OAuth2AccessTokenMapper extends BaseMapperX<OAuth2AccessTokenDO
      * @param limit       删除条数，防止一次删除太多
      * @return 删除条数
      */
-    @Delete("DELETE FROM system_oauth2_access_token WHERE expires_time < #{expiresTime} LIMIT #{limit}")
+    @Delete("${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@deleteBatchByLessThan('system_oauth2_access_token', 'expires_time', 'expiresTime', 'limit')}")
     Integer deleteByExpiresTimeLt(@Param("expiresTime") LocalDateTime expiresTime, @Param("limit") Integer limit);
 
 }

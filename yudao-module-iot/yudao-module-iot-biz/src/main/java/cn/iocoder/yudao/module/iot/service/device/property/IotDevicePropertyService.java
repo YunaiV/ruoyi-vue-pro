@@ -10,7 +10,6 @@ import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * IoT 设备【属性】数据 Service 接口
@@ -64,12 +63,12 @@ public interface IotDevicePropertyService {
     // ========== 设备时间相关操作 ==========
 
     /**
-     * 获得最后上报时间小于指定时间的设备编号集合
+     * 获得最后上报时间小于指定时间的设备
      *
      * @param maxReportTime 最大上报时间
-     * @return 设备编号集合
+     * @return 设备编号与最后上报时间的映射
      */
-    Set<Long> getDeviceIdListByReportTime(LocalDateTime maxReportTime);
+    Map<Long, LocalDateTime> getDeviceReportTimeMapByReportTime(LocalDateTime maxReportTime);
 
     /**
      * 更新设备上报时间
@@ -94,5 +93,21 @@ public interface IotDevicePropertyService {
      * @return 网关 serverId
      */
     String getDeviceServerId(Long id);
+
+    /**
+     * 获得网关协议实例的启动时间
+     *
+     * @param serverId 网关 serverId
+     * @return 启动时间（毫秒）；网关已停止或宕机时返回 null
+     */
+    Long getGatewayServerStartTime(String serverId);
+
+    /**
+     * 更新网关协议实例的启动时间，同时续期存活标记
+     *
+     * @param serverId  网关 serverId
+     * @param startTime 网关上报的启动时间（毫秒）
+     */
+    void updateGatewayServerStartTime(String serverId, Long startTime);
 
 }

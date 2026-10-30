@@ -40,6 +40,20 @@ public interface IotDeviceMessageService {
     IotDeviceMessage sendDeviceMessage(IotDeviceMessage message, IotDeviceDO device, String serverId);
 
     /**
+     * 发送设备消息（指定事件时间）
+     *
+     * 用于 biz 派生的消息沿用源事件的时间，例如说：强制上线、网关下线联动子设备、离线检测。仅供内部调用，不对外暴露
+     *
+     * @param message   消息
+     * @param device    设备
+     * @param serverId  网关 serverId
+     * @param eventTime 事件时间，作为消息的 reportTime；为空时使用当前时间
+     * @return 设备消息
+     */
+    IotDeviceMessage sendDeviceMessage(IotDeviceMessage message, IotDeviceDO device, String serverId,
+                                       @Nullable LocalDateTime eventTime);
+
+    /**
      * 发送设备消息
      *
      * @param message 消息（“codec（编解码）字段” 部分字段）

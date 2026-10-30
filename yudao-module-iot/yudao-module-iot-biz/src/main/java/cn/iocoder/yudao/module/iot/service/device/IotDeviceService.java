@@ -46,20 +46,27 @@ public interface IotDeviceService {
     void updateDevice(@Valid IotDeviceSaveReqVO updateReqVO);
 
     /**
-     * 更新设备状态
+     * 更新设备状态：按事件时间条件更新，迟到的旧消息、重复的状态不会覆盖较新的状态
      *
-     * @param device 设备信息
-     * @param state 状态
+     * 状态未变化时：在线可按 refresh 推进最后上线时间；离线推进最后离线时间（离线水位）。二者都不算状态变化
+     *
+     * @param device  设备信息
+     * @param state   状态，只能是在线或离线
+     * @param time    事件时间
+     * @param refresh 状态未变化的在线，是否刷新最后上线时间
+     * @return 状态是否真的发生了变化
      */
-    void updateDeviceState(IotDeviceDO device, Integer state);
+    boolean updateDeviceState(IotDeviceDO device, Integer state, LocalDateTime time, boolean refresh);
 
     /**
-     * 更新设备状态
+     * 处理网关下线：给它下面在线的子设备逐个发送离线消息
      *
-     * @param id    编号
-     * @param state 状态
+     * 注意：需在网关的状态事务提交之后调用，不能在事务内调用
+     *
+     * @param gatewayDevice 网关设备
+     * @param offlineTime   网关离线的事件时间，作为子设备离线的事件时间
      */
-    void updateDeviceState(Long id, Integer state);
+    void handleGatewayOffline(IotDeviceDO gatewayDevice, LocalDateTime offlineTime);
 
     /**
      * 更新设备分组

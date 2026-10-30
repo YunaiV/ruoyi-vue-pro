@@ -17,7 +17,8 @@ public interface HrmSalaryOptionMapper extends BaseMapperX<HrmSalaryOptionDO> {
         return selectFirstOne(HrmSalaryOptionDO::getCode, code);
     }
 
-    @Select("SELECT * FROM hrm_salary_option WHERE code = #{code} LIMIT 1")
+    @Select("SELECT * FROM hrm_salary_option WHERE code = #{code} "
+            + "${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@limitRows(1, false)}")
     HrmSalaryOptionDO selectByCodeIncludeDeleted(@Param("code") Integer code);
 
     default HrmSalaryOptionDO selectByCodeForUpdate(Integer code) {
