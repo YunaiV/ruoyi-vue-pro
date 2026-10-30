@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.iot.service.rule.scene.action;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
@@ -114,6 +115,8 @@ public class IotDeviceServiceInvokeSceneRuleAction implements IotSceneRuleAction
             log.info("[executeServiceInvokeForDevice][规则场景({}) 动作配置({}) 设备({}) 服务调用消息({}) 发送成功]",
                     rule.getId(), actionConfig, device.getId(), result.getId());
         } catch (Exception e) {
+            // 状态事务内，数据访问异常不吞掉，交给事务回滚（例如说，读取 serverId 的 Redis 故障）
+            JdbcUtils.throwIfDataAccessExceptionInTransaction(e);
             log.error("[executeServiceInvokeForDevice][规则场景({}) 动作配置({}) 设备({}) 服务调用消息发送失败]",
                     rule.getId(), actionConfig, device.getId(), e);
         }

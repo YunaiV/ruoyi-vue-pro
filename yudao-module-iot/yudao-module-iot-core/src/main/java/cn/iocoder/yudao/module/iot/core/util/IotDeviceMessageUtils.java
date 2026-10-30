@@ -9,6 +9,7 @@ import cn.hutool.system.SystemUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
+import cn.iocoder.yudao.module.iot.core.enums.device.IotDeviceStateEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 
 import java.util.Base64;
@@ -72,6 +73,17 @@ public class IotDeviceMessageUtils {
     public static boolean isCommandMethod(String method) {
         return StrUtil.equalsAny(method, IotDeviceMessageMethodEnum.PROPERTY_SET.getMethod(),
                 IotDeviceMessageMethodEnum.SERVICE_INVOKE.getMethod());
+    }
+
+    /**
+     * 是否是设备离线的状态消息：方法为 STATE_UPDATE，且状态为离线
+     *
+     * @param message 消息
+     * @return 是否
+     */
+    public static boolean isStateOffline(IotDeviceMessage message) {
+        return StrUtil.equals(message.getMethod(), IotDeviceMessageMethodEnum.STATE_UPDATE.getMethod())
+                && StrUtil.equals(getIdentifier(message), String.valueOf(IotDeviceStateEnum.OFFLINE.getState()));
     }
 
     // ========== 透传（raw）相关 ==========
@@ -446,6 +458,18 @@ public class IotDeviceMessageUtils {
 
     // ========== Topic 相关 ==========
 
+    /**
+     * 网关协议实例的存活标记，采用 STRING 结构：biz 接收网关上报（IotDeviceCommonApi#keepAliveGatewayServers）后写入，biz 离线任务读取
+     *
+     * KEY 格式：iot:gateway_server:{serverId}
+     * VALUE 数据类型：String 协议实例本次启动的时间（毫秒），由网关上报，不是 biz 的接收时间
+     * 过期：网关定期上报续期；网关宕机、停止后不再续期，自动过期
+     *
+     * 用途：只供离线检查任务（IotDeviceOfflineCheckJob）判断网关是否已停止或重启过，处理未重连的旧设备；
+     * 不参与普通上下线的状态事务
+     */
+    private static final String GATEWAY_SERVER_ALIVE_KEY = "iot:gateway_server:%s";
+
     public static String buildMessageBusGatewayDeviceMessageTopic(String serverId) {
         return String.format(IotDeviceMessage.MESSAGE_BUS_GATEWAY_DEVICE_MESSAGE_TOPIC, serverId);
     }
@@ -460,6 +484,16 @@ public class IotDeviceMessageUtils {
         String serverId = String.format("%s.%d", SystemUtil.getHostInfo().getAddress(), serverPort);
         // 避免一些场景无法使用 . 符号，例如说 RocketMQ Topic
         return serverId.replaceAll("\\.", "_");
+    }
+
+    /**
+     * 构建网关协议实例的存活标记 Key
+     *
+     * @param serverId 服务器编号
+     * @return Redis Key
+     */
+    public static String buildGatewayServerAliveKey(String serverId) {
+        return String.format(GATEWAY_SERVER_ALIVE_KEY, serverId);
     }
 
 }

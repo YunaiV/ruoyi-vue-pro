@@ -56,11 +56,11 @@ public interface ImStatisticsManagerMapper {
     /**
      * 区间内每日新增用户数（按天分组）
      *
-     * @return [{date: "yyyy-MM-dd", count: 123}, ...]
+     * @return [{statDate: "yyyy-MM-dd", count: 123}, ...]
      */
-    @Select("SELECT DATE(create_time) AS date, COUNT(*) AS count FROM system_users " +
+    @Select("SELECT ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@date('create_time')} AS statDate, COUNT(*) AS count FROM system_users " +
             "WHERE deleted = 0 AND create_time >= #{beginTime} AND create_time < #{endTime} " +
-            "GROUP BY DATE(create_time)")
+            "GROUP BY ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@date('create_time')}")
     @ResultMap(CaseInsensitiveResultMap.RESULT_MAP_ID)
     List<Map<String, Object>> selectNewUserDailyCount(@Param("beginTime") LocalDateTime beginTime,
                                                       @Param("endTime") LocalDateTime endTime);
@@ -68,12 +68,12 @@ public interface ImStatisticsManagerMapper {
     /**
      * 区间内每日活跃用户数（按天分组、跨私聊+群聊去重）
      */
-    @Select("SELECT day AS date, COUNT(DISTINCT user_id) AS count FROM (" +
-            "  SELECT DATE(send_time) AS day, sender_id AS user_id FROM im_private_message " +
+    @Select("SELECT day AS statDate, COUNT(DISTINCT user_id) AS count FROM (" +
+            "  SELECT ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@date('send_time')} AS day, sender_id AS user_id FROM im_private_message " +
             "  WHERE deleted = 0 AND " + NORMAL_MESSAGE_CONDITION +
             "  AND send_time >= #{beginTime} AND send_time < #{endTime}" +
             "  UNION ALL " +
-            "  SELECT DATE(send_time) AS day, sender_id AS user_id FROM im_group_message " +
+            "  SELECT ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@date('send_time')} AS day, sender_id AS user_id FROM im_group_message " +
             "  WHERE deleted = 0 AND " + NORMAL_MESSAGE_CONDITION +
             "  AND send_time >= #{beginTime} AND send_time < #{endTime}" +
             ") t GROUP BY day")
@@ -98,23 +98,25 @@ public interface ImStatisticsManagerMapper {
     /**
      * 群规模分布（按群成员数分桶）
      *
-     * @return [{range: "1-9 人", count: 123}, ...]
+     * @return [{sizeRange: "1-9 人", count: 123}, ...]
      */
-    @Select("SELECT " +
-            "  CASE " +
-            "    WHEN cnt < 10 THEN '1-9 人' " +
-            "    WHEN cnt < 50 THEN '10-49 人' " +
-            "    WHEN cnt < 200 THEN '50-199 人' " +
-            "    ELSE '200+ 人' " +
-            "  END AS `range`, COUNT(*) AS count " +
-            "FROM (" +
-            "  SELECT g.id, COUNT(m.id) AS cnt " +
-            "  FROM im_group g " +
-            "  LEFT JOIN im_group_member m ON m.group_id = g.id AND m.status = 0 AND m.deleted = 0 " +
-            "  WHERE g.deleted = 0 AND g.status = 0 " +
-            "  GROUP BY g.id" +
-            ") t " +
-            "GROUP BY `range`")
+    @Select("SELECT sizeRange, COUNT(*) AS count FROM (" +
+            "  SELECT " +
+            "    CASE " +
+            "      WHEN cnt < 10 THEN '1-9 人' " +
+            "      WHEN cnt < 50 THEN '10-49 人' " +
+            "      WHEN cnt < 200 THEN '50-199 人' " +
+            "      ELSE '200+ 人' " +
+            "    END AS sizeRange " +
+            "  FROM (" +
+            "    SELECT g.id, COUNT(m.id) AS cnt " +
+            "    FROM im_group g " +
+            "    LEFT JOIN im_group_member m ON m.group_id = g.id AND m.status = 0 AND m.deleted = 0 " +
+            "    WHERE g.deleted = 0 AND g.status = 0 " +
+            "    GROUP BY g.id" +
+            "  ) t0" +
+            ") t1 " +
+            "GROUP BY sizeRange")
     @ResultMap(CaseInsensitiveResultMap.RESULT_MAP_ID)
     List<Map<String, Object>> selectGroupSizeDistribution();
 
@@ -141,10 +143,10 @@ public interface ImStatisticsManagerMapper {
     /**
      * 区间内每日私聊消息数（按天分组）
      */
-    @Select("SELECT DATE(send_time) AS date, COUNT(*) AS count FROM im_private_message " +
+    @Select("SELECT ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@date('send_time')} AS statDate, COUNT(*) AS count FROM im_private_message " +
             "WHERE deleted = 0 AND " + NORMAL_MESSAGE_CONDITION +
             " AND send_time >= #{beginTime} AND send_time < #{endTime} " +
-            "GROUP BY DATE(send_time)")
+            "GROUP BY ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@date('send_time')}")
     @ResultMap(CaseInsensitiveResultMap.RESULT_MAP_ID)
     List<Map<String, Object>> selectPrivateMessageDailyCount(@Param("beginTime") LocalDateTime beginTime,
                                                              @Param("endTime") LocalDateTime endTime);
@@ -152,10 +154,10 @@ public interface ImStatisticsManagerMapper {
     /**
      * 区间内每日群聊消息数（按天分组）
      */
-    @Select("SELECT DATE(send_time) AS date, COUNT(*) AS count FROM im_group_message " +
+    @Select("SELECT ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@date('send_time')} AS statDate, COUNT(*) AS count FROM im_group_message " +
             "WHERE deleted = 0 AND " + NORMAL_MESSAGE_CONDITION +
             " AND send_time >= #{beginTime} AND send_time < #{endTime} " +
-            "GROUP BY DATE(send_time)")
+            "GROUP BY ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@date('send_time')}")
     @ResultMap(CaseInsensitiveResultMap.RESULT_MAP_ID)
     List<Map<String, Object>> selectGroupMessageDailyCount(@Param("beginTime") LocalDateTime beginTime,
                                                            @Param("endTime") LocalDateTime endTime);
@@ -191,7 +193,8 @@ public interface ImStatisticsManagerMapper {
             "  SELECT sender_id AS user_id FROM im_group_message " +
             "  WHERE deleted = 0 AND " + NORMAL_MESSAGE_CONDITION +
             "  AND send_time >= #{beginTime} AND send_time < #{endTime}" +
-            ") t GROUP BY user_id ORDER BY messageCount DESC LIMIT #{limit}")
+            ") t GROUP BY user_id ORDER BY messageCount DESC " +
+            "${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@limitParam('limit', true)}")
     @ResultMap(CaseInsensitiveResultMap.RESULT_MAP_ID)
     List<Map<String, Object>> selectTopSenders(@Param("beginTime") LocalDateTime beginTime,
                                                @Param("endTime") LocalDateTime endTime,

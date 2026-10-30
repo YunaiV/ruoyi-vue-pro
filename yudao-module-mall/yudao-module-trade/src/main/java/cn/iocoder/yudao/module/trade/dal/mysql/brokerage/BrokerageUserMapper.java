@@ -128,7 +128,7 @@ public interface BrokerageUserMapper extends BaseMapperX<BrokerageUserDO> {
     }
 
     @Select("SELECT bind_user_id AS id, COUNT(1) AS brokerageUserCount FROM trade_brokerage_user " +
-            "WHERE bind_user_id IS NOT NULL AND deleted = FALSE " +
+            "WHERE bind_user_id IS NOT NULL AND deleted = 0 " +
             "AND bind_user_time BETWEEN #{beginTime} AND #{endTime} " +
             "GROUP BY bind_user_id " +
             "ORDER BY brokerageUserCount DESC")

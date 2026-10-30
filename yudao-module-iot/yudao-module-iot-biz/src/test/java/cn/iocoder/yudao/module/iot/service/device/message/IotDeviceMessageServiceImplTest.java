@@ -10,8 +10,11 @@ import cn.iocoder.yudao.module.iot.controller.admin.device.vo.message.IotDeviceM
 import cn.iocoder.yudao.module.iot.controller.admin.statistics.vo.IotStatisticsDeviceMessageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.statistics.vo.IotStatisticsDeviceMessageSummaryByDateRespVO;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
+import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
+import cn.iocoder.yudao.module.iot.core.enums.device.IotDeviceStateEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.mq.producer.IotDeviceMessageProducer;
+import cn.iocoder.yudao.module.iot.core.topic.IotDeviceIdentity;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceMessageDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
@@ -34,10 +37,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.ArgumentMatchers.same;
@@ -441,6 +446,96 @@ public class IotDeviceMessageServiceImplTest extends BaseMockitoUnitTest {
         assertEquals("AQID", logCaptor.getValue().getRaw());
         assertNull(logCaptor.getValue().getParams());
         verify(deviceMessageProducer, never()).sendDeviceMessageToGateway(any(), any());
+    }
+
+    // ========== handleUpstreamDeviceMessage：设备状态 ==========
+
+    @Test
+    public void testHandleUpstreamDeviceMessage_stateInvalid() {
+        // 准备参数：设备自报的非法状态
+        IotDeviceDO device = buildDevice();
+        IotDeviceMessage message = buildMessage(IotDeviceMessageMethodEnum.STATE_UPDATE.getMethod());
+        message.setServerId("server-1").setParams(Collections.singletonMap("state", 5));
+
+        try (MockedStatic<SpringUtil> springUtilMock = mockStatic(SpringUtil.class)) {
+            springUtilMock.when(() -> SpringUtil.getBean(IotDeviceMessageServiceImpl.class)).thenReturn(service);
+            // 调用：参数错误属于业务异常，记录日志后结束，不抛给消息总线
+            assertDoesNotThrow(() -> service.handleUpstreamDeviceMessage(message, device));
+        }
+        // 断言：不更新状态
+        verify(deviceService, never()).updateDeviceState(any(), any(), any(), anyBoolean());
+    }
+
+    @Test
+    public void testHandleUpstreamDeviceMessage_staleServerOffline() {
+        // 准备参数：旧网关节点的离线
+        IotDeviceDO device = buildDevice();
+        IotDeviceMessage message = buildMessage(IotDeviceMessageMethodEnum.STATE_UPDATE.getMethod());
+        message.setServerId("server-old").setParams(Collections.singletonMap("state", IotDeviceStateEnum.OFFLINE.getState()));
+        // mock 方法：设备已经连接到新的网关节点
+        when(productService.getProductFromCache(eq(3L)))
+                .thenReturn(new IotProductDO().setProtocolType(IotProtocolTypeEnum.MQTT.getType()));
+        when(devicePropertyService.getDeviceServerId(eq(2L))).thenReturn("server-new");
+
+        try (MockedStatic<SpringUtil> springUtilMock = mockStatic(SpringUtil.class)) {
+            springUtilMock.when(() -> SpringUtil.getBean(IotDeviceMessageServiceImpl.class)).thenReturn(service);
+            // 调用
+            service.handleUpstreamDeviceMessage(message, device);
+        }
+        // 断言：忽略旧节点的离线
+        verify(deviceService, never()).updateDeviceState(any(), any(), any(), anyBoolean());
+    }
+
+    @Test
+    public void testHandleUpstreamDeviceMessage_emqxOfflineNotCompareServerId() {
+        // 准备参数：EMQX 设备的离线（serverId 是接收 webhook 的节点）
+        IotDeviceDO device = buildDevice();
+        LocalDateTime reportTime = LocalDateTime.of(2026, 10, 29, 10, 0, 0);
+        IotDeviceMessage message = buildMessage(IotDeviceMessageMethodEnum.STATE_UPDATE.getMethod());
+        message.setServerId("server-1").setReportTime(reportTime)
+                .setParams(Collections.singletonMap("state", IotDeviceStateEnum.OFFLINE.getState()));
+        // mock 方法
+        when(productService.getProductFromCache(eq(3L)))
+                .thenReturn(new IotProductDO().setProtocolType(IotProtocolTypeEnum.EMQX.getType()));
+
+        try (MockedStatic<SpringUtil> springUtilMock = mockStatic(SpringUtil.class)) {
+            springUtilMock.when(() -> SpringUtil.getBean(IotDeviceMessageServiceImpl.class)).thenReturn(service);
+            // 调用
+            service.handleUpstreamDeviceMessage(message, device);
+        }
+        // 断言：不比较 serverId，按消息的事件时间更新状态
+        verify(devicePropertyService, never()).getDeviceServerId(any());
+        verify(deviceService).updateDeviceState(same(device), eq(IotDeviceStateEnum.OFFLINE.getState()),
+                eq(reportTime), eq(true));
+    }
+
+    @Test
+    public void testHandleUpstreamDeviceMessage_packKeepReportTime() {
+        // 准备参数：网关的批量上报，包含一个子设备
+        IotDeviceDO gateway = buildDevice();
+        LocalDateTime reportTime = LocalDateTime.of(2026, 10, 29, 10, 0, 0);
+        HashMap<String, Object> subDevice = new HashMap<>();
+        subDevice.put("identity", new IotDeviceIdentity("sub-pk", "sub-dn"));
+        subDevice.put("properties", Collections.singletonMap("humidity", 60));
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("properties", Collections.singletonMap("temperature", 25));
+        params.put("subDevices", Collections.singletonList(subDevice));
+        IotDeviceMessage message = buildMessage(IotDeviceMessageMethodEnum.PROPERTY_PACK_POST.getMethod());
+        message.setReportTime(reportTime).setParams(params);
+        // mock 方法
+        when(deviceService.getDeviceFromCache(eq("sub-pk"), eq("sub-dn")))
+                .thenReturn(IotDeviceDO.builder().id(5L).productId(6L).build());
+
+        try (MockedStatic<SpringUtil> springUtilMock = mockStatic(SpringUtil.class)) {
+            springUtilMock.when(() -> SpringUtil.getBean(IotDeviceMessageServiceImpl.class)).thenReturn(service);
+            // 调用
+            service.handleUpstreamDeviceMessage(message, gateway);
+        }
+        // 断言：拆分出的消息，沿用 pack 的上报时间
+        ArgumentCaptor<IotDeviceMessage> captor = ArgumentCaptor.forClass(IotDeviceMessage.class);
+        verify(deviceMessageProducer, times(2)).sendDeviceMessage(captor.capture());
+        assertEquals(Arrays.asList(2L, 5L), convertList(captor.getAllValues(), IotDeviceMessage::getDeviceId));
+        captor.getAllValues().forEach(subMessage -> assertEquals(reportTime, subMessage.getReportTime()));
     }
 
     private void assertRawPayloadInvalid(IotDeviceMessage message) {

@@ -18,15 +18,15 @@ import java.util.Arrays;
 @Getter
 public enum IotProtocolTypeEnum implements ArrayValuable<String> {
 
-    TCP("tcp"),
-    UDP("udp"),
-    WEBSOCKET("websocket"),
-    HTTP("http"),
-    MQTT("mqtt"),
-    EMQX("emqx"),
-    COAP("coap"),
-    MODBUS_TCP_CLIENT("modbus_tcp_client"),
-    MODBUS_TCP_SERVER("modbus_tcp_server");
+    TCP("tcp", true),
+    UDP("udp", false),
+    WEBSOCKET("websocket", true),
+    HTTP("http", false),
+    MQTT("mqtt", true),
+    EMQX("emqx", true),
+    COAP("coap", false),
+    MODBUS_TCP_CLIENT("modbus_tcp_client", true),
+    MODBUS_TCP_SERVER("modbus_tcp_server", true);
 
     public static final String[] ARRAYS = Arrays.stream(values()).map(IotProtocolTypeEnum::getType).toArray(String[]::new);
 
@@ -34,6 +34,10 @@ public enum IotProtocolTypeEnum implements ArrayValuable<String> {
      * 类型
      */
     private final String type;
+    /**
+     * 是否是连接型协议：在线状态由连接的建立和断开决定；其它（HTTP、CoAP、UDP）为活跃型，由离线任务按最后活跃时间判断
+     */
+    private final boolean connectionBased;
 
     @Override
     public String[] array() {

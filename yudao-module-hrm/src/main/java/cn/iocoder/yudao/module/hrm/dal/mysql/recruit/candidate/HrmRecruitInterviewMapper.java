@@ -21,11 +21,10 @@ public interface HrmRecruitInterviewMapper extends BaseMapperX<HrmRecruitIntervi
     }
 
     default HrmRecruitInterviewDO selectLatestByCandidateId(Long candidateId) {
-        return selectOne(new LambdaQueryWrapperX<HrmRecruitInterviewDO>()
+        return selectFirstOne(new LambdaQueryWrapperX<HrmRecruitInterviewDO>()
                 .eq(HrmRecruitInterviewDO::getCandidateId, candidateId)
                 .orderByDesc(HrmRecruitInterviewDO::getStageNumber)
-                .orderByDesc(HrmRecruitInterviewDO::getId)
-                .last("LIMIT 1"));
+                .orderByDesc(HrmRecruitInterviewDO::getId));
     }
 
     default void deleteByCandidateId(Long candidateId) {

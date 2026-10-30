@@ -14,7 +14,8 @@ import org.apache.ibatis.annotations.Mapper;
 public interface CrmCustomerPoolConfigMapper extends BaseMapperX<CrmCustomerPoolConfigDO> {
 
     default CrmCustomerPoolConfigDO selectOne() {
-        return selectOne(new LambdaQueryWrapperX<CrmCustomerPoolConfigDO>().last("LIMIT 1"));
+        return selectFirstOne(new LambdaQueryWrapperX<CrmCustomerPoolConfigDO>()
+                .orderByAsc(CrmCustomerPoolConfigDO::getId));
     }
 
 }

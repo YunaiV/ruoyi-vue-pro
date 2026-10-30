@@ -25,6 +25,15 @@ public class DbTypeEnumTest {
         // 神通 JDBC 驱动（jdbc:oscar:）返回的 ProductName
         assertEquals(DbType.OSCAR, DbTypeEnum.find("OSCAR"));
         assertNull(DbTypeEnum.find(""));
+        assertNull(DbTypeEnum.find(null));
+    }
+
+    @Test
+    public void testFind_unregistered() {
+        // 未登记的产品名返回 null，而不是 NPE，由调用方给出明确的处理
+        assertNull(DbTypeEnum.find("HighGo"));
+        assertNull(DbTypeEnum.find("MariaDB"));
+        assertNull(DbTypeEnum.find("SQLite"));
     }
 
     @Test

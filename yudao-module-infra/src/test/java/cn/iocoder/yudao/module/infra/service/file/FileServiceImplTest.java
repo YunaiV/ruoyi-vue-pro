@@ -322,6 +322,79 @@ public class FileServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
+    public void testCreateFile_success_bin() throws Exception {
+        for (String name : new String[]{"固件.bin", "FIRMWARE.BIN", "firmware.Bin"}) {
+            // 准备参数：IoT OTA 固件，Tika 无法识别的二进制内容
+            byte[] content = buildFirmwareContent();
+            // mock 方法
+            FileClient client = mock(FileClient.class);
+            when(fileConfigService.getMasterFileClient()).thenReturn(client);
+            String url = randomString();
+            when(client.upload(same(content), anyString(), eq("application/octet-stream"))).thenReturn(url);
+
+            // 调用：不信任客户端传入的 type
+            String result = fileService.createFile(content, name, "iot/ota", "image/png");
+            // 断言
+            assertEquals(url, result);
+            FileDO file = fileMapper.selectOne(FileDO::getUrl, url);
+            assertEquals(name, file.getName());
+            assertEquals("application/octet-stream", file.getType());
+            assertEquals((long) content.length, file.getSize());
+        }
+    }
+
+    @Test
+    public void testCreateFile_typeNotAllowed_binContent() {
+        byte[] elf = buildFirmwareContent();
+        System.arraycopy(new byte[]{0x7F, 'E', 'L', 'F', 2, 1, 1}, 0, elf, 0, 7);
+        elf[16] = 2; // e_type = ET_EXEC
+        byte[] exe = buildFirmwareContent();
+        exe[0] = 'M';
+        exe[1] = 'Z';
+        for (byte[] content : new byte[][]{elf, exe,
+                "#!/bin/sh\nrm -rf /tmp/test\n".getBytes(StandardCharsets.UTF_8),
+                "<html><script>alert(1)</script></html>".getBytes(StandardCharsets.UTF_8),
+                "<svg xmlns=\"http://www.w3.org/2000/svg\"><script>alert(1)</script></svg>".getBytes(StandardCharsets.UTF_8),
+                ResourceUtil.readBytes("file/erweima.jpg")}) {
+            // 调用，并断言异常：.bin 的内容，必须是无法识别为其他类型的二进制
+            assertServiceException(() -> fileService.createFile(content, "固件.bin", null, "application/octet-stream"),
+                    FILE_TYPE_NOT_ALLOWED);
+            // 断言未上传文件、未保存记录
+            verifyNoInteractions(fileConfigService);
+            assertEquals(0L, fileMapper.selectCount());
+        }
+    }
+
+    @Test
+    public void testCreateFile_typeNotAllowed_binaryOtherExtension() {
+        for (String name : new String[]{"固件.so", "固件.dump", "固件.unknown", "固件"}) {
+            // 准备参数：同样识别为 application/octet-stream 的其它后缀，不放行
+            byte[] content = buildFirmwareContent();
+
+            // 调用，并断言异常
+            assertServiceException(() -> fileService.createFile(content, name, null, "application/octet-stream"),
+                    FILE_TYPE_NOT_ALLOWED);
+            // 断言未上传文件、未保存记录
+            verifyNoInteractions(fileConfigService);
+            assertEquals(0L, fileMapper.selectCount());
+        }
+    }
+
+    /**
+     * 构造固件内容：类似 ARM Cortex-M 的向量表开头，包含 0x00 等不可打印字节，Tika 无法识别
+     */
+    private static byte[] buildFirmwareContent() {
+        byte[] content = new byte[256];
+        byte[] header = new byte[]{0x00, 0x50, 0x00, 0x20, (byte) 0xC1, 0x01, 0x00, 0x08,
+                (byte) 0xC9, 0x01, 0x00, 0x08, (byte) 0xCB, 0x01, 0x00, 0x08};
+        System.arraycopy(header, 0, content, 0, header.length);
+        for (int i = header.length; i < content.length; i++) {
+            content[i] = (byte) (i * 7);
+        }
+        return content;
+    }
+
+    @Test
     public void testCreateFile_fileIsEmpty() {
         // 准备参数
         byte[] content = new byte[0];
@@ -337,7 +410,7 @@ public class FileServiceImplTest extends BaseDbUnitTest {
         for (String extension : new String[]{"jpg", "JPEG", "jfif", "png", "gif", "webp", "bmp", "ico", "tiff",
                 "avif", "heic", "heif", "pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "txt", "csv", "md",
                 "zip", "rar", "mp3", "mp4", "svg", "html", "htm", "xml", "markdown", "eml", "msg", "epub",
-                "json", "opus", "ogg", "m4a", "webm", "amr", "wma", "wmv", "flv", "mkv"}) {
+                "json", "opus", "ogg", "m4a", "webm", "amr", "wma", "wmv", "flv", "mkv", "bin", "BIN"}) {
             // 准备参数
             String name = "测试文件." + extension;
             // mock 方法
@@ -360,7 +433,8 @@ public class FileServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testPresignPutUrl_typeNotAllowed() {
         // 准备参数
-        for (String name : new String[]{"test.php", "test.jsp", "test.js", "test.exe", "test.unknown", "test"}) {
+        for (String name : new String[]{"test.php", "test.jsp", "test.js", "test.exe", "test.unknown", "test",
+                "test.so", "test.dump", "test.sh", "test.bin.exe"}) {
             // 调用，并断言异常
             assertServiceException(() -> fileService.presignPutUrl(name, null), FILE_TYPE_NOT_ALLOWED);
             // 校验调用
@@ -481,6 +555,47 @@ public class FileServiceImplTest extends BaseDbUnitTest {
                 o.setName(name);
                 o.setPath(path);
                 o.setType("image/jpeg");
+            });
+
+            // 调用，并断言异常
+            assertServiceException(() -> fileService.createFile(reqVO), FILE_TYPE_NOT_ALLOWED);
+            // 断言未保存记录
+            assertEquals(0L, fileMapper.selectCount());
+        }
+    }
+
+    @Test
+    public void testCreateFileByPresignedPath_success_bin() {
+        // 准备参数：IoT OTA 固件，后缀大小写不敏感
+        FileCreateReqVO reqVO = randomPojo(FileCreateReqVO.class, o -> {
+            o.setPath("iot/ota/firmware.bin");
+            o.setName("FIRMWARE.BIN");
+            o.setUrl("https://www.iocoder.cn/iot/ota/firmware.bin");
+            o.setType("text/html"); // 不信任客户端传入的 type
+        });
+
+        // 调用
+        Long fileId = fileService.createFile(reqVO);
+
+        // 断言
+        FileDO file = fileMapper.selectById(fileId);
+        assertEquals("iot/ota/firmware.bin", file.getPath());
+        assertEquals("FIRMWARE.BIN", file.getName());
+        assertEquals("application/octet-stream", file.getType());
+    }
+
+    @Test
+    public void testCreateFileByPresignedPath_typeNotAllowed_bin() {
+        for (String[] file : new String[][]{{"firmware.bin", "iot/firmware.exe"}, {"firmware.bin", "iot/firmware.so"},
+                {"firmware.so", "iot/firmware.so"}, {"firmware.exe", "iot/firmware.bin"},
+                {"firmware.bin", "iot/firmware.html"}, {"firmware", "iot/firmware.bin"}}) {
+            // 准备参数
+            String name = file[0];
+            String path = file[1];
+            FileCreateReqVO reqVO = randomPojo(FileCreateReqVO.class, o -> {
+                o.setName(name);
+                o.setPath(path);
+                o.setType("application/octet-stream");
             });
 
             // 调用，并断言异常

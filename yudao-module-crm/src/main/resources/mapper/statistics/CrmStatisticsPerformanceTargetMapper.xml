@@ -10,8 +10,8 @@
 
     <select id="selectContractActualByMonth"
             resultMap="CrmStatisticsPerformanceTargetActualResultMap">
-        SELECT MONTH(order_date) AS month,
-               IFNULL(SUM(total_price), 0) AS current_price
+        SELECT ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@month('order_date')} AS month,
+               COALESCE(SUM(total_price), 0) AS current_price
           FROM crm_contract
          WHERE deleted = 0
            AND audit_status = ${@cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum@APPROVE.status}
@@ -19,14 +19,14 @@
                 <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
                     #{userId}
                 </foreach>
-           AND YEAR(order_date) = #{year}
-         GROUP BY MONTH(order_date)
+           AND ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@year('order_date')} = #{year}
+         GROUP BY ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@month('order_date')}
     </select>
 
     <select id="selectReceivableActualByMonth"
             resultMap="CrmStatisticsPerformanceTargetActualResultMap">
-        SELECT MONTH(return_time) AS month,
-               IFNULL(SUM(price), 0) AS current_price
+        SELECT ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@month('return_time')} AS month,
+               COALESCE(SUM(price), 0) AS current_price
           FROM crm_receivable
          WHERE deleted = 0
            AND audit_status = ${@cn.iocoder.yudao.module.crm.enums.common.CrmAuditStatusEnum@APPROVE.status}
@@ -34,8 +34,8 @@
                 <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
                     #{userId}
                 </foreach>
-           AND YEAR(return_time) = #{year}
-         GROUP BY MONTH(return_time)
+           AND ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@year('return_time')} = #{year}
+         GROUP BY ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@month('return_time')}
     </select>
 
 </mapper>

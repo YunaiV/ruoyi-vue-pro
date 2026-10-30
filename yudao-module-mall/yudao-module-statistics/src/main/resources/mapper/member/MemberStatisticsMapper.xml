@@ -50,9 +50,14 @@
         </if>
     </select>
 
-    <select id="selectListByCreateTimeBetween"
-            resultType="cn.iocoder.yudao.module.statistics.controller.admin.member.vo.MemberRegisterCountRespVO">
-        SELECT CAST(create_time AS DATE) AS date,
+    <resultMap id="MemberRegisterCountRespVOMap"
+               type="cn.iocoder.yudao.module.statistics.controller.admin.member.vo.MemberRegisterCountRespVO">
+        <result column="statDate" property="date"/>
+        <result column="count" property="count"/>
+    </resultMap>
+
+    <select id="selectListByCreateTimeBetween" resultMap="MemberRegisterCountRespVOMap">
+        SELECT ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@castDate('create_time')} AS statDate,
                count(1)                             AS count
         FROM member_user
         WHERE create_time BETWEEN #{beginTime} AND #{endTime}
@@ -60,8 +65,8 @@
         <if test="@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId() != null">
             AND tenant_id = ${@cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder@getTenantId()}
         </if>
-        GROUP BY date
-        ORDER BY date
+        GROUP BY ${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@castDate('create_time')}
+        ORDER BY statDate
     </select>
 
 </mapper>

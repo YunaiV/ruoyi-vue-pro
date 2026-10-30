@@ -22,9 +22,11 @@ import cn.iocoder.yudao.module.infra.framework.file.core.utils.FileTypeUtils;
 import com.google.common.annotations.VisibleForTesting;
 import jakarta.annotation.Resource;
 import lombok.SneakyThrows;
+import org.apache.tika.mime.MimeTypes;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import static cn.hutool.core.date.DatePattern.PURE_DATE_PATTERN;
@@ -61,6 +63,14 @@ public class FileServiceImpl implements FileService {
             "video/mp4", "video/quicktime", "video/x-msvideo", "video/webm", "video/x-ms-wmv", "video/x-flv",
             "application/x-matroska", "video/x-matroska"
     );
+
+    /**
+     * 允许上传的二进制文件后缀，例如说 IoT OTA 固件的 .bin
+     *
+     * 为什么不直接放行 application/octet-stream？它也是所有未知后缀、未知内容的识别结果，放行后等于不限制类型。
+     * 所以只放行这里的后缀，并且上传内容也必须识别为 application/octet-stream（不能是可执行文件、脚本、HTML 等）
+     */
+    private static final Set<String> ALLOWED_BINARY_EXTENSIONS = Set.of("bin");
 
     /**
      * 上传文件的前缀，是否包含日期（yyyyMMdd）
@@ -106,8 +116,10 @@ public class FileServiceImpl implements FileService {
         }
         type = FileTypeUtils.getMineType(content, name);
         String nameType = StrUtil.isNotEmpty(FileUtil.extName(name)) ? validateFileType(name) : null;
-        if (!ALLOWED_FILE_TYPES.contains(type)
-                || (FileTypeUtils.isImage(nameType) && ObjectUtil.notEqual(type, nameType))) {
+        if (!isAllowedFileType(type, name)
+                // 图片、二进制文件（例如说 .bin 固件）：内容识别的类型，必须与后缀一致
+                || ((FileTypeUtils.isImage(nameType) || isAllowedBinaryFile(nameType, name))
+                    && ObjectUtil.notEqual(type, nameType))) {
             throw exception(FILE_TYPE_NOT_ALLOWED);
         }
         // 1.2.2 处理 name 为空的情况
@@ -221,10 +233,22 @@ public class FileServiceImpl implements FileService {
 
     private String validateFileType(String name) {
         String type = FileTypeUtils.getMineType(name);
-        if (!ALLOWED_FILE_TYPES.contains(type)) {
+        if (!isAllowedFileType(type, name)) {
             throw exception(FILE_TYPE_NOT_ALLOWED);
         }
         return type;
+    }
+
+    private static boolean isAllowedFileType(String type, String name) {
+        return ALLOWED_FILE_TYPES.contains(type) || isAllowedBinaryFile(type, name);
+    }
+
+    private static boolean isAllowedBinaryFile(String type, String name) {
+        if (ObjectUtil.notEqual(type, MimeTypes.OCTET_STREAM)) {
+            return false;
+        }
+        String extension = FileUtil.extName(name);
+        return StrUtil.isNotEmpty(extension) && ALLOWED_BINARY_EXTENSIONS.contains(extension.toLowerCase(Locale.ROOT));
     }
 
     @Override

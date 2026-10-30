@@ -34,6 +34,7 @@ import java.util.Objects;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static cn.iocoder.yudao.module.hrm.enums.ErrorCodeConstants.SALARY_DATA_ILLEGAL;
+import static cn.iocoder.yudao.module.hrm.enums.ErrorCodeConstants.SALARY_SLIP_TEMPLATE_NOT_EXISTS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -51,6 +52,7 @@ import static org.mockito.Mockito.when;
 public class HrmSalarySlipTemplateServiceImplTest extends BaseDbUnitTest {
 
     private static final Long TENANT_ID = 2L;
+    private static final Long OTHER_TENANT_ID = 3L;
 
     @TestConfiguration(proxyBeanMethods = false)
     static class TenantTestConfiguration {
@@ -108,6 +110,8 @@ public class HrmSalarySlipTemplateServiceImplTest extends BaseDbUnitTest {
         // 断言
         assertNotNull(templateId);
         HrmSalarySlipTemplateDO template = salarySlipTemplateService.getSalarySlipTemplate(templateId);
+        // 新增时不传租户编号，由租户拦截器按当前租户填充
+        assertEquals(TENANT_ID, template.getTenantId());
         assertEquals("研发工资条", template.getName());
         assertFalse(template.getHideEmpty());
         assertFalse(template.getDefaultStatus());
@@ -173,6 +177,7 @@ public class HrmSalarySlipTemplateServiceImplTest extends BaseDbUnitTest {
         HrmSalarySlipTemplateDO template = randomPojo(HrmSalarySlipTemplateDO.class, o -> {
             o.setId(null).setName("默认工资条模板").setHideEmpty(false).setDefaultStatus(true);
             o.setOptions(Collections.emptyList());
+            o.setTenantId(TENANT_ID);
         });
         salarySlipTemplateMapper.insert(template);
 
@@ -258,6 +263,7 @@ public class HrmSalarySlipTemplateServiceImplTest extends BaseDbUnitTest {
         HrmSalarySlipTemplateDO defaultTemplate = randomPojo(HrmSalarySlipTemplateDO.class, o -> {
             o.setId(null).setName("默认工资条模板").setHideEmpty(false).setDefaultStatus(true);
             o.setOptions(Collections.emptyList());
+            o.setTenantId(TENANT_ID);
         });
         salarySlipTemplateMapper.insert(defaultTemplate);
         when(salaryOptionService.getSalaryOptionList(false)).thenReturn(Arrays.asList(
@@ -286,11 +292,13 @@ public class HrmSalarySlipTemplateServiceImplTest extends BaseDbUnitTest {
         HrmSalarySlipTemplateDO globalDefaultTemplate = randomPojo(HrmSalarySlipTemplateDO.class, o -> {
             o.setId(null).setName("平台默认工资条模板").setHideEmpty(false).setDefaultStatus(true);
             o.setOptions(Collections.emptyList());
+            o.setTenantId(TenantUtils.GLOBAL_TENANT_ID);
         });
         TenantUtils.executeIgnore(() -> salarySlipTemplateMapper.insert(globalDefaultTemplate));
         HrmSalarySlipTemplateDO tenantTemplate = randomPojo(HrmSalarySlipTemplateDO.class, o -> {
             o.setId(null).setName("租户自定义工资条模板").setHideEmpty(false).setDefaultStatus(false);
             o.setOptions(Collections.emptyList());
+            o.setTenantId(TENANT_ID);
         });
         salarySlipTemplateMapper.insert(tenantTemplate);
         when(salaryOptionService.getSalaryOptionList(false)).thenReturn(Collections.emptyList());
@@ -301,13 +309,73 @@ public class HrmSalarySlipTemplateServiceImplTest extends BaseDbUnitTest {
 
         // 断言：普通查询被租户隔离，但 Service 可只读回退平台默认模板
         assertNull(salarySlipTemplateMapper.selectById(globalDefaultTemplate.getId()));
-        assertEquals(globalDefaultTemplate.getId(),
-                TenantUtils.executeIgnore(salarySlipTemplateMapper::selectGlobalDefaultTemplate).getId());
+        HrmSalarySlipTemplateDO dbGlobalDefaultTemplate =
+                TenantUtils.executeIgnore(salarySlipTemplateMapper::selectGlobalDefaultTemplate);
+        assertEquals(globalDefaultTemplate.getId(), dbGlobalDefaultTemplate.getId());
+        assertEquals(TenantUtils.GLOBAL_TENANT_ID, dbGlobalDefaultTemplate.getTenantId());
         assertEquals(globalDefaultTemplate.getId(), salarySlipTemplateService
                 .getSalarySlipTemplate(globalDefaultTemplate.getId()).getId());
         assertEquals(2, templates.size());
         assertEquals(globalDefaultTemplate.getId(), templates.get(0).getId());
         assertEquals(tenantTemplate.getId(), templates.get(1).getId());
+        assertEquals(TENANT_ID, templates.get(1).getTenantId());
+
+        // 调用，并断言：平台默认模板只读，租户不能修改、删除
+        HrmSalarySlipTemplateSaveReqVO updateReqVO = randomPojo(HrmSalarySlipTemplateSaveReqVO.class, o -> {
+            o.setId(globalDefaultTemplate.getId());
+            o.setName("租户改写的默认模板");
+            o.setOptions(Collections.singletonList(createTemplateOption("基本工资", 10101, 1)));
+        });
+        assertServiceException(() -> salarySlipTemplateService.updateSalarySlipTemplate(updateReqVO),
+                SALARY_DATA_ILLEGAL);
+        assertServiceException(() -> salarySlipTemplateService.deleteSalarySlipTemplate(globalDefaultTemplate.getId()),
+                SALARY_DATA_ILLEGAL);
+        HrmSalarySlipTemplateDO dbTemplate = TenantUtils.executeIgnore(
+                () -> salarySlipTemplateMapper.selectById(globalDefaultTemplate.getId()));
+        assertEquals("平台默认工资条模板", dbTemplate.getName());
+        assertEquals(TenantUtils.GLOBAL_TENANT_ID, dbTemplate.getTenantId());
+    }
+
+    @Test
+    public void testSalarySlipTemplate_otherTenantIsolated() {
+        // mock 数据：其它租户的自定义模板、默认模板，按其它租户的上下文新增
+        HrmSalarySlipTemplateDO otherTemplate = randomPojo(HrmSalarySlipTemplateDO.class, o -> {
+            o.setId(null).setName("其它租户工资条模板").setHideEmpty(false).setDefaultStatus(false);
+            o.setOptions(Collections.emptyList());
+            o.setTenantId(null);
+        });
+        HrmSalarySlipTemplateDO otherDefaultTemplate = randomPojo(HrmSalarySlipTemplateDO.class, o -> {
+            o.setId(null).setName("其它租户默认工资条模板").setHideEmpty(false).setDefaultStatus(true);
+            o.setOptions(Collections.emptyList());
+            o.setTenantId(null);
+        });
+        TenantUtils.execute(OTHER_TENANT_ID, () -> salarySlipTemplateMapper.insert(otherTemplate));
+        TenantUtils.execute(OTHER_TENANT_ID, () -> salarySlipTemplateMapper.insert(otherDefaultTemplate));
+        when(salaryOptionService.getSalaryOptionList(false)).thenReturn(Collections.emptyList());
+
+        // 调用，并断言：当前租户读不到，也不会把其它租户的默认模板当作平台默认模板
+        assertNull(salarySlipTemplateMapper.selectById(otherTemplate.getId()));
+        assertNull(salarySlipTemplateService.getSalarySlipTemplate(otherTemplate.getId()));
+        assertNull(salarySlipTemplateService.getSalarySlipTemplate(otherDefaultTemplate.getId()));
+        assertNull(TenantUtils.executeIgnore(salarySlipTemplateMapper::selectGlobalDefaultTemplate));
+        assertTrue(salarySlipTemplateService.getSalarySlipTemplateList().isEmpty());
+
+        // 调用，并断言：当前租户不能修改、删除
+        HrmSalarySlipTemplateSaveReqVO updateReqVO = randomPojo(HrmSalarySlipTemplateSaveReqVO.class, o -> {
+            o.setId(otherTemplate.getId());
+            o.setName("当前租户改写的模板");
+            o.setOptions(Collections.singletonList(createTemplateOption("基本工资", 10101, 1)));
+        });
+        assertServiceException(() -> salarySlipTemplateService.updateSalarySlipTemplate(updateReqVO),
+                SALARY_SLIP_TEMPLATE_NOT_EXISTS);
+        assertServiceException(() -> salarySlipTemplateService.deleteSalarySlipTemplate(otherTemplate.getId()),
+                SALARY_SLIP_TEMPLATE_NOT_EXISTS);
+
+        // 断言：其它租户的数据不变
+        HrmSalarySlipTemplateDO dbTemplate = TenantUtils.executeIgnore(
+                () -> salarySlipTemplateMapper.selectById(otherTemplate.getId()));
+        assertEquals("其它租户工资条模板", dbTemplate.getName());
+        assertEquals(OTHER_TENANT_ID, dbTemplate.getTenantId());
     }
 
     @Test

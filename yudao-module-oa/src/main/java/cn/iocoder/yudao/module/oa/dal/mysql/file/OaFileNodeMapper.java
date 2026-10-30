@@ -28,8 +28,8 @@ public interface OaFileNodeMapper extends BaseMapperX<OaFileNodeDO> {
     }
 
     default List<OaFileNodeDO> selectListByCreatorAndTypeForUpdate(String creator, Integer type) {
-        return selectList(new LambdaQueryWrapperX<OaFileNodeDO>().eq(OaFileNodeDO::getCreator, creator)
-                .eq(OaFileNodeDO::getType, type).orderByAsc(OaFileNodeDO::getId).last("FOR UPDATE"));
+        return selectListForUpdate(new LambdaQueryWrapperX<OaFileNodeDO>().eq(OaFileNodeDO::getCreator, creator)
+                .eq(OaFileNodeDO::getType, type).orderByAsc(OaFileNodeDO::getId));
     }
 
     default List<OaFileNodeDO> selectListByCreatorAndStatus(String creator, Integer status) {
@@ -37,9 +37,13 @@ public interface OaFileNodeMapper extends BaseMapperX<OaFileNodeDO> {
     }
 
     default Long selectSumSizeByCreatorAndType(String creator, Integer type) {
-        // TODO @AI：不要写在一条里；分成多个；看看能不能去掉 COALESCE
-        return selectOne(new QueryWrapperX<OaFileNodeDO>().select("COALESCE(SUM(size), 0) AS size")
-                .eq("creator", creator).eq("type", type)).getSize();
+        QueryWrapperX<OaFileNodeDO> query = new QueryWrapperX<>();
+        query.select("SUM(size) AS size").eq("creator", creator).eq("type", type);
+        OaFileNodeDO sum = selectOne(query);
+        if (sum == null || sum.getSize() == null) {
+            return 0L;
+        }
+        return sum.getSize();
     }
 
     default PageResult<OaFileNodeDO> selectPageByParentIdAndCreatorAndStatus(

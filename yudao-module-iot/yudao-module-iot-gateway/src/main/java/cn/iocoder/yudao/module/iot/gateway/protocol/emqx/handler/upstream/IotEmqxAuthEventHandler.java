@@ -369,6 +369,12 @@ public class IotEmqxAuthEventHandler {
     private void handleClientDisconnected(JsonObject body) {
         String username = body.getString("username");
         String reason = body.getString("reason");
+        // 同一 ClientID 的新连接接管（takenover）或丢弃（discarded）了旧会话：设备仍在线，忽略旧会话的断开
+        // 参考 https://docs.emqx.com/en/emqx/latest/data-integration/rule-sql-events-and-fields.html 中 client.disconnected 的 reason 说明
+        if (StrUtil.equalsAny(reason, "takenover", "discarded")) {
+            log.info("[handleClientDisconnected][设备({}) 旧会话被新连接接管({})，忽略]", username, reason);
+            return;
+        }
         log.info("[handleClientDisconnected][设备下线: {} ({})]", username, reason);
         handleDeviceStateChange(username, false);
     }

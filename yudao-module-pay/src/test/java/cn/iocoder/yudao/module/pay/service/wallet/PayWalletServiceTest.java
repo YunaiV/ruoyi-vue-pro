@@ -250,11 +250,11 @@ public class PayWalletServiceTest extends BaseDbAndRedisUnitTest {
         mockRefundAndWalletTransaction();
         List<Integer> declaredIsolationLevels = new ArrayList<>();
         List<Integer> connectionIsolationLevels = new ArrayList<>();
-        when(refundService.getRefundForUpdate(any())).thenAnswer(invocation -> {
+        doAnswer(invocation -> {
             declaredIsolationLevels.add(TransactionSynchronizationManager.getCurrentTransactionIsolationLevel());
             connectionIsolationLevels.add(DataSourceUtils.getConnection(dataSource).getTransactionIsolation());
             return refundMapper.selectOneForUpdate(PayRefundDO::getId, invocation.getArgument(0));
-        });
+        }).when(refundService).getRefundForUpdate(any());
 
         // 调用：不存在调用方事务，新建事务退款到钱包
         PayWalletTransactionDO transaction = walletService.orderRefund(refund.getNo(), 30, "测试退款");

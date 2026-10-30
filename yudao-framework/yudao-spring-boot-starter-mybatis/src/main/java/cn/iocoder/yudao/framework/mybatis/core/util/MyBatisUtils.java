@@ -61,6 +61,26 @@ public class MyBatisUtils {
         return page;
     }
 
+    /**
+     * 构建指定偏移量的分页对象
+     *
+     * @param offset 偏移量，负数按 0 处理，不要求是每页条数的整数倍
+     * @param size 每页条数
+     * @param searchCount 是否查询总数
+     * @param <T> 记录类型
+     * @return 分页对象
+     */
+    public static <T> Page<T> buildPage(long offset, long size, boolean searchCount) {
+        return new Page<T>(1, size, searchCount) {
+
+            @Override
+            public long offset() {
+                return Math.max(offset, 0);
+            }
+
+        };
+    }
+
     @SuppressWarnings("PatternVariableCanBeUsed")
     public static <T> void addOrder(Wrapper<T> wrapper, Collection<SortingField> sortingFields) {
         if (CollUtil.isEmpty(sortingFields)) {
@@ -220,7 +240,13 @@ public class MyBatisUtils {
                 .replace(FIND_IN_SET_VALUE_PLACEHOLDER, "{" + paramIndex + "}");
     }
 
-    private static boolean isSafeColumnName(String columnName) {
+    /**
+     * 判断表名或列名是否只包含字母、数字、下划线及层级分隔点
+     *
+     * @param columnName 表名或列名，可带表别名前缀
+     * @return 是否满足安全标识符格式
+     */
+    static boolean isSafeColumnName(String columnName) {
         return StrUtil.isNotEmpty(columnName) && SAFE_COLUMN_NAME_PATTERN.matcher(columnName).matches();
     }
 

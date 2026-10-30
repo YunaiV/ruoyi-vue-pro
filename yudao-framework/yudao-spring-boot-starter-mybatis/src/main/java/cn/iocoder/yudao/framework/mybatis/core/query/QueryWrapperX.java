@@ -1,7 +1,5 @@
 package cn.iocoder.yudao.framework.mybatis.core.query;
 
-import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
-import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.ArrayUtils;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
@@ -136,30 +134,6 @@ public class QueryWrapperX<T> extends QueryWrapper<T> {
     @Override
     public QueryWrapperX<T> in(String column, Collection<?> coll) {
         super.in(column, coll);
-        return this;
-    }
-
-    /**
-     * 设置只返回最后一条
-     *
-     * TODO 芋艿：不是完美解，需要在思考下。如果使用多数据源，并且数据源是多种类型时，可能会存在问题：实现之返回一条的语法不同
-     *
-     * @return this
-     */
-    public QueryWrapperX<T> limitN(int n) {
-        DbType dbType = JdbcUtils.getDbType();
-        switch (dbType) {
-            case ORACLE:
-            case ORACLE_12C:
-                super.le("ROWNUM", n);
-                break;
-            case SQL_SERVER:
-            case SQL_SERVER2005:
-                super.select("TOP " + n + " *"); // 由于 SQL Server 是通过 SELECT TOP 1 实现限制一条，所以只好使用 * 查询剩余字段
-                break;
-            default: // MySQL、PostgreSQL、DM 达梦、KingbaseES 大金都是采用 LIMIT 实现
-                super.last("LIMIT " + n);
-        }
         return this;
     }
 

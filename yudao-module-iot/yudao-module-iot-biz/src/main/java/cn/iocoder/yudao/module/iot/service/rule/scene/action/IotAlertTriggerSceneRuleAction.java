@@ -6,6 +6,7 @@ import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.dict.core.DictFrameworkUtils;
+import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.alert.IotAlertConfigDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
@@ -115,6 +116,8 @@ public class IotAlertTriggerSceneRuleAction implements IotSceneRuleAction {
                     break;
             }
         } catch (Exception ex) {
+            // 状态事务内，数据访问异常不吞掉，交给事务回滚（例如说，单体部署下写短信、邮件、站内信日志失败）
+            JdbcUtils.throwIfDataAccessExceptionInTransaction(ex);
             log.error("[sendAlertMessageToUser][用户({}) 模板参数({}) 发送 {} 告警失败]",
                     userId, templateParams, typeEnum, ex);
         }

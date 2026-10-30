@@ -5,16 +5,22 @@ import cn.iocoder.yudao.module.hrm.controller.admin.insurance.vo.monthrecord.Hrm
 import cn.iocoder.yudao.module.hrm.dal.dataobject.insurance.monthrecord.HrmInsuranceMonthEmployeeRecordDO;
 import cn.iocoder.yudao.module.hrm.dal.dataobject.insurance.monthrecord.HrmInsuranceMonthRecordDO;
 import cn.iocoder.yudao.module.hrm.dal.mysql.insurance.monthrecord.HrmInsuranceMonthRecordMapper;
+import cn.iocoder.yudao.module.hrm.dal.redis.insurance.HrmInsuranceMonthRecordLockRedisDAO;
 import cn.iocoder.yudao.module.hrm.enums.insurance.employee.HrmInsuranceEmployeeStatusEnum;
 import cn.iocoder.yudao.module.hrm.enums.insurance.monthrecord.HrmInsuranceMonthStatusEnum;
 import jakarta.annotation.Resource;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InOrder;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.math.BigDecimal;
 import java.util.Collections;
+import java.util.function.Supplier;
 
+import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.LOCKED;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static cn.iocoder.yudao.module.hrm.enums.ErrorCodeConstants.INSURANCE_FIRST_MONTH_RECORD_EXISTS;
@@ -25,6 +31,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -44,6 +54,19 @@ public class HrmInsuranceMonthRecordServiceImplTest extends BaseDbUnitTest {
 
     @MockitoBean
     private HrmInsuranceMonthEmployeeRecordService monthEmployeeRecordService;
+    @MockitoBean
+    private HrmInsuranceMonthRecordLockRedisDAO monthRecordLockRedisDAO;
+
+    @BeforeEach
+    public void setUp() {
+        // mock 方法：获得锁后执行逻辑
+        when(monthRecordLockRedisDAO.lock(any(Supplier.class)))
+                .thenAnswer(invocation -> invocation.<Supplier<?>>getArgument(0).get());
+        doAnswer(invocation -> {
+            invocation.<Runnable>getArgument(0).run();
+            return null;
+        }).when(monthRecordLockRedisDAO).lock(any(Runnable.class));
+    }
 
     @Test
     public void testCreateFirstMonthRecord_success() {
@@ -63,7 +86,60 @@ public class HrmInsuranceMonthRecordServiceImplTest extends BaseDbUnitTest {
         assertEquals(HrmInsuranceMonthStatusEnum.UNARCHIVED.getStatus(), monthRecord.getStatus());
         assertEquals(0, monthRecord.getInsuredEmployeeCount());
         assertEquals(0, BigDecimal.ZERO.compareTo(monthRecord.getPersonalInsuranceAmount()));
-        verify(monthEmployeeRecordService).createMonthEmployeeRecordList(any(HrmInsuranceMonthRecordDO.class));
+        InOrder inOrder = inOrder(monthRecordLockRedisDAO, monthEmployeeRecordService);
+        inOrder.verify(monthRecordLockRedisDAO).lock(any(Supplier.class));
+        inOrder.verify(monthEmployeeRecordService).createMonthEmployeeRecordList(any(HrmInsuranceMonthRecordDO.class));
+    }
+
+    @Test
+    public void testCreateFirstMonthRecord_locked() {
+        // mock 方法：其它请求持有变更锁
+        doThrow(exception(LOCKED)).when(monthRecordLockRedisDAO).lock(any(Supplier.class));
+        // 准备参数
+        HrmInsuranceMonthRecordCreateReqVO reqVO =
+                new HrmInsuranceMonthRecordCreateReqVO().setYear(2026).setMonth(7);
+
+        // 调用，并断言异常
+        assertServiceException(() -> monthRecordService.createFirstMonthRecord(reqVO), LOCKED);
+        // 断言：未创建社保表
+        assertEquals(0L, monthRecordMapper.selectCount());
+        verify(monthEmployeeRecordService, never()).createMonthEmployeeRecordList(any(HrmInsuranceMonthRecordDO.class));
+    }
+
+    @Test
+    public void testCreateNextMonthRecord_locked() {
+        // mock 数据
+        HrmInsuranceMonthRecordDO currentMonthRecord = randomMonthRecord(2026, 6,
+                HrmInsuranceMonthStatusEnum.UNARCHIVED.getStatus());
+        monthRecordMapper.insert(currentMonthRecord);
+        // mock 方法：其它请求持有变更锁
+        doThrow(exception(LOCKED)).when(monthRecordLockRedisDAO).lock(any(Supplier.class));
+
+        // 调用，并断言异常
+        assertServiceException(() -> monthRecordService.createNextMonthRecord(), LOCKED);
+        // 断言：未归档、未创建次月
+        assertEquals(HrmInsuranceMonthStatusEnum.UNARCHIVED.getStatus(),
+                monthRecordMapper.selectById(currentMonthRecord.getId()).getStatus());
+        assertEquals(1L, monthRecordMapper.selectCount());
+    }
+
+    @Test
+    public void testDeleteMonthRecord_locked() {
+        // mock 数据
+        HrmInsuranceMonthRecordDO previousMonthRecord = randomMonthRecord(2026, 6,
+                HrmInsuranceMonthStatusEnum.ARCHIVED.getStatus());
+        monthRecordMapper.insert(previousMonthRecord);
+        HrmInsuranceMonthRecordDO currentMonthRecord = randomMonthRecord(2026, 7,
+                HrmInsuranceMonthStatusEnum.UNARCHIVED.getStatus());
+        monthRecordMapper.insert(currentMonthRecord);
+        // mock 方法：其它请求持有变更锁
+        doThrow(exception(LOCKED)).when(monthRecordLockRedisDAO).lock(any(Runnable.class));
+
+        // 调用，并断言异常
+        assertServiceException(() -> monthRecordService.deleteMonthRecord(currentMonthRecord.getId()), LOCKED);
+        // 断言：未删除
+        assertNotNull(monthRecordMapper.selectById(currentMonthRecord.getId()));
+        verify(monthEmployeeRecordService, never()).deleteMonthEmployeeRecordListByMonthRecordId(anyLong());
     }
 
     @Test
@@ -123,6 +199,7 @@ public class HrmInsuranceMonthRecordServiceImplTest extends BaseDbUnitTest {
         HrmInsuranceMonthRecordDO nextMonthRecord = monthRecordMapper.selectById(nextMonthRecordId);
         assertEquals(2027, nextMonthRecord.getYear());
         assertEquals(1, nextMonthRecord.getMonth());
+        verify(monthRecordLockRedisDAO).lock(any(Supplier.class));
     }
 
     @Test
@@ -142,7 +219,9 @@ public class HrmInsuranceMonthRecordServiceImplTest extends BaseDbUnitTest {
         assertNull(monthRecordMapper.selectById(currentMonthRecord.getId()));
         assertEquals(HrmInsuranceMonthStatusEnum.UNARCHIVED.getStatus(),
                 monthRecordMapper.selectById(previousMonthRecord.getId()).getStatus());
-        verify(monthEmployeeRecordService)
+        InOrder inOrder = inOrder(monthRecordLockRedisDAO, monthEmployeeRecordService);
+        inOrder.verify(monthRecordLockRedisDAO).lock(any(Runnable.class));
+        inOrder.verify(monthEmployeeRecordService)
                 .deleteMonthEmployeeRecordListByMonthRecordId(currentMonthRecord.getId());
     }
 

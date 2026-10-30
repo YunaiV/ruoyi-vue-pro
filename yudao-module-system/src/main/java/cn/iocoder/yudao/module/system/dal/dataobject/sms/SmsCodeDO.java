@@ -1,8 +1,10 @@
 package cn.iocoder.yudao.module.system.dal.dataobject.sms;
 
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.type.IntegerBooleanTypeHandler;
 import cn.iocoder.yudao.framework.tenant.core.aop.TenantIgnore;
 import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 
@@ -15,7 +17,7 @@ import java.time.LocalDateTime;
  *
  * @author 芋道源码
  */
-@TableName("system_sms_code")
+@TableName(value = "system_sms_code", autoResultMap = true)
 @KeySequence("system_sms_code_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -54,6 +56,7 @@ public class SmsCodeDO extends BaseDO {
     /**
      * 是否使用
      */
+    @TableField(typeHandler = IntegerBooleanTypeHandler.class)
     private Boolean used;
     /**
      * 使用时间

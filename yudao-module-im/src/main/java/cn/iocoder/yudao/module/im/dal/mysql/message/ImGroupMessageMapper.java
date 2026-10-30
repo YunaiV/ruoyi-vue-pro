@@ -3,7 +3,6 @@ package cn.iocoder.yudao.module.im.dal.mysql.message;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
-import cn.iocoder.yudao.framework.mybatis.core.query.QueryWrapperX;
 import cn.iocoder.yudao.framework.mybatis.core.util.MyBatisUtils;
 import cn.iocoder.yudao.module.im.controller.admin.manager.message.vo.group.ImGroupMessageManagerPageReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImGroupMessageDO;
@@ -35,14 +34,13 @@ public interface ImGroupMessageMapper extends BaseMapperX<ImGroupMessageDO> {
      */
     default List<ImGroupMessageDO> selectListByMinId(Long userId, Collection<Long> groupIds, Long minId,
                                                      LocalDateTime minSendTime, Integer size) {
-        QueryWrapperX<ImGroupMessageDO> wrapper = new QueryWrapperX<>();
-        wrapper.in("group_id", groupIds)
-                .gt("id", minId)
-                .gt("send_time", minSendTime)
+        LambdaQueryWrapperX<ImGroupMessageDO> wrapper = new LambdaQueryWrapperX<>();
+        wrapper.in(ImGroupMessageDO::getGroupId, groupIds)
+                .gt(ImGroupMessageDO::getId, minId)
+                .gt(ImGroupMessageDO::getSendTime, minSendTime)
                 .apply(MyBatisUtils.findInSet("receiver_user_ids"), userId)
-                .orderByAsc("id");
-        wrapper.limitN(size);
-        return selectList(wrapper);
+                .orderByAsc(ImGroupMessageDO::getId);
+        return selectListLimitN(wrapper, size);
     }
 
     /**
@@ -55,13 +53,12 @@ public interface ImGroupMessageMapper extends BaseMapperX<ImGroupMessageDO> {
      * @return 消息列表（按 id 倒序）
      */
     default List<ImGroupMessageDO> selectHistoryListByUser(Long userId, Long groupId, Long maxId, Integer limit) {
-        QueryWrapperX<ImGroupMessageDO> wrapper = new QueryWrapperX<>();
-        wrapper.eq("group_id", groupId)
-                .lt(maxId != null, "id", maxId)
+        LambdaQueryWrapperX<ImGroupMessageDO> wrapper = new LambdaQueryWrapperX<>();
+        wrapper.eq(ImGroupMessageDO::getGroupId, groupId)
+                .lt(maxId != null, ImGroupMessageDO::getId, maxId)
                 .apply(MyBatisUtils.findInSet("receiver_user_ids"), userId)
-                .orderByDesc("id");
-        wrapper.limitN(limit);
-        return selectList(wrapper);
+                .orderByDesc(ImGroupMessageDO::getId);
+        return selectListLimitN(wrapper, limit);
     }
 
     default ImGroupMessageDO selectBySenderIdAndClientMessageId(Long senderId, String clientMessageId) {

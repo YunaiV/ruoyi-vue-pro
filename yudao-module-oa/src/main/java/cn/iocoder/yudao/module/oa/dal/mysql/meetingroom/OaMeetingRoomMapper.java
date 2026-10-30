@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.oa.dal.mysql.meetingroom;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils;
 import cn.iocoder.yudao.module.oa.controller.admin.meetingroom.vo.room.OaMeetingRoomPageReqVO;
 import cn.iocoder.yudao.module.oa.dal.dataobject.meetingroom.OaMeetingRoomDO;
 import cn.iocoder.yudao.module.oa.enums.meetingroom.OaMeetingRoomBookingScopeEnum;
@@ -34,7 +35,7 @@ public interface OaMeetingRoomMapper extends BaseMapperX<OaMeetingRoomDO> {
                     .eq(OaMeetingRoomDO::getStatus, OaMeetingRoomStatusEnum.NORMAL.getStatus())
                     .and(scope -> scope.eq(OaMeetingRoomDO::getBookingScope, OaMeetingRoomBookingScopeEnum.ALL.getScope())
                             .or(specified -> specified.eq(OaMeetingRoomDO::getBookingScope, OaMeetingRoomBookingScopeEnum.SPECIFIED.getScope())
-                                    .apply("JSON_CONTAINS(booking_user_ids, {0})", bookingUserId.toString())));
+                                    .apply(SqlDialectUtils.jsonArrayContains("booking_user_ids", false), bookingUserId.toString())));
         }
         return selectPage(reqVO, query);
     }

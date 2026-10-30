@@ -321,7 +321,7 @@ CREATE TABLE IF NOT EXISTS "system_sms_code" (
     "scene" bigint NOT NULL,
     "create_ip" varchar NOT NULL,
     "today_index" int NOT NULL,
-    "used" bit NOT NULL DEFAULT FALSE,
+    "used" tinyint NOT NULL DEFAULT 0,
     "used_time" timestamp DEFAULT NULL,
     "used_ip" varchar NULL,
     "creator" varchar(64) DEFAULT '',

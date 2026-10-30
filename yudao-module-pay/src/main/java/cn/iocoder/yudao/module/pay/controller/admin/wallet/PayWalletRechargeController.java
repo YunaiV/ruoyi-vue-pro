@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,6 +41,7 @@ public class PayWalletRechargeController {
     @PostMapping("/refund")
     @Operation(summary = "发起钱包充值退款")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @PreAuthorize("@ss.hasPermission('pay:wallet:update-balance')") // 退款会扣减用户钱包余额，复用「用户余额修改」权限
     public CommonResult<Boolean> refundWalletRecharge(@RequestParam("id") Long id) {
         walletRechargeService.refundWalletRecharge(id, getClientIP());
         return success(true);

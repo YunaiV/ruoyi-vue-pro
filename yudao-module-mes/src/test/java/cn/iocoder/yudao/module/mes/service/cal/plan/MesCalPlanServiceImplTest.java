@@ -179,6 +179,37 @@ public class MesCalPlanServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
+    public void testGetPlanListByStatusAndDay_boundary() {
+        Integer status = MesCalPlanStatusEnum.CONFIRMED.getStatus();
+        // mock 数据：开始时间为当天午夜前的最后时刻（H2 timestamp 精度为微秒）
+        MesCalPlanDO lastMicro = randomPlan(LocalDateTime.of(2026, 10, 19, 23, 59, 59, 999_999_000),
+                LocalDateTime.of(2026, 10, 31, 0, 0), status);
+        planMapper.insert(lastMicro);
+        MesCalPlanDO lastSecond = randomPlan(LocalDateTime.of(2026, 10, 19, 23, 59, 59),
+                LocalDateTime.of(2026, 10, 31, 0, 0), status);
+        planMapper.insert(lastSecond);
+        // mock 数据：开始时间为次日零点，不包含当天
+        planMapper.insert(randomPlan(LocalDateTime.of(2026, 10, 20, 0, 0),
+                LocalDateTime.of(2026, 10, 31, 0, 0), status));
+        // mock 数据：结束时间为当天零点，包含当天
+        MesCalPlanDO endAtStart = randomPlan(LocalDateTime.of(2026, 10, 1, 0, 0),
+                LocalDateTime.of(2026, 10, 19, 0, 0), status);
+        planMapper.insert(endAtStart);
+        // mock 数据：结束时间为当天零点之前，不包含当天
+        planMapper.insert(randomPlan(LocalDateTime.of(2026, 10, 1, 0, 0),
+                LocalDateTime.of(2026, 10, 18, 23, 59, 59, 999_999_000), status));
+
+        // 调用
+        List<MesCalPlanDO> list = planService.getPlanListByStatusAndDay(status, LocalDate.of(2026, 10, 19));
+
+        // 断言：午夜前的时刻、结束时间为当天零点均包含；次日零点、前一天均不包含；按 id 升序返回
+        assertEquals(SetUtils.asSet(lastMicro.getId(), lastSecond.getId(), endAtStart.getId()),
+                convertSet(list, MesCalPlanDO::getId));
+        List<Long> ids = list.stream().map(MesCalPlanDO::getId).toList();
+        assertEquals(ids.stream().sorted().toList(), ids);
+    }
+
+    @Test
     public void testDeletePlan_notCascadeDeleteTeamShift() {
         // mock 数据：插入一条草稿状态的排班计划
         MesCalPlanDO plan = randomPojo(MesCalPlanDO.class, o -> {

@@ -28,7 +28,7 @@ public interface OaContactShareMapper extends BaseMapperX<OaContactShareDO> {
         MPJLambdaWrapperX<OaContactShareDO> query = new MPJLambdaWrapperX<>();
         query.selectAll(OaContactShareDO.class)
                 .innerJoin(OaContactDO.class, OaContactDO::getId, OaContactShareDO::getContactId)
-                .eq(OaContactDO::getDeleted, false)
+                .eq(OaContactDO::getDeleted, 0)
                 .eq(OaContactShareDO::getCreator, userId.toString())
                 .ne(OaContactShareDO::getUserId, userId)
                 .in(OaContactShareDO::getContactId, contactIds)

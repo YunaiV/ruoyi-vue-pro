@@ -2,10 +2,12 @@ package cn.iocoder.yudao.module.iot.core.util;
 
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
+import cn.iocoder.yudao.module.iot.core.enums.device.IotDeviceStateEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.topic.event.IotDeviceEventPostReqDTO;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -394,6 +396,20 @@ public class IotDeviceMessageUtilsTest {
         assertFalse(IotDeviceMessageUtils.isCommandRequest(IotDeviceMessage.requestOf("thing.ota.upgrade")));
         assertFalse(IotDeviceMessageUtils.isCommandRequest(
                 IotDeviceMessage.replyOf("1", "thing.property.set", null, 0, null)));
+    }
+
+    @Test
+    public void testIsStateOffline() {
+        // 离线的状态消息
+        assertTrue(IotDeviceMessageUtils.isStateOffline(IotDeviceMessage.buildStateOffline()));
+        // 在线的状态消息、没有状态值的状态消息，不是
+        assertFalse(IotDeviceMessageUtils.isStateOffline(IotDeviceMessage.buildStateUpdateOnline()));
+        assertFalse(IotDeviceMessageUtils.isStateOffline(
+                IotDeviceMessage.requestOf(IotDeviceMessageMethodEnum.STATE_UPDATE.getMethod())));
+        // 其它方法的消息，即使带有离线的 state 参数，也不是
+        assertFalse(IotDeviceMessageUtils.isStateOffline(IotDeviceMessage.requestOf(
+                IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod(),
+                Collections.singletonMap("state", IotDeviceStateEnum.OFFLINE.getState()))));
     }
 
     @Test

@@ -32,8 +32,8 @@ public interface OaMailAccountMapper extends BaseMapperX<OaMailAccountDO> {
     }
 
     default List<OaMailAccountDO> selectListByCreatorForUpdate(String creator) {
-        return selectList(new LambdaQueryWrapperX<OaMailAccountDO>().eq(OaMailAccountDO::getCreator, creator)
-                .orderByAsc(OaMailAccountDO::getId).last("FOR UPDATE"));
+        return selectListForUpdate(new LambdaQueryWrapperX<OaMailAccountDO>().eq(OaMailAccountDO::getCreator, creator)
+                .orderByAsc(OaMailAccountDO::getId));
     }
 
     default Long selectCountByProviderId(Long providerId) {
