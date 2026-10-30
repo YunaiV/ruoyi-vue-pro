@@ -955,8 +955,8 @@ public class PmsWorkItemServiceImplTest extends BaseDbUnitTest {
         LambdaQueryWrapperX<PmsWorkItemDO> queryWrapper = PmsWorkItemMapper.buildQueryWrapper(reqVO);
         String sqlSegment = queryWrapper.getSqlSegment();
 
-        // 断言：H2 走原有片段，每个标签一个条件并按 OR 连接；标签编号仍以 Long 绑定，不拼接到 SQL 中
-        assertEquals(2, StrUtil.count(sqlSegment, "JSON_CONTAINS(label_ids, JSON_ARRAY("));
+        // 断言：H2 使用数值数组方言，每个标签一个条件并按 OR 连接；标签编号仍以 Long 绑定，不拼接到 SQL 中
+        assertEquals(2, StrUtil.count(sqlSegment, "LOCATE("));
         assertTrue(sqlSegment.contains(" OR "));
         assertFalse(sqlSegment.contains(labelId01.toString()));
         assertFalse(sqlSegment.contains(labelId02.toString()));
