@@ -395,7 +395,7 @@ class Convertor(ABC):
         for table_sql, orig_table_sql in zip(self.table_script_list, self.original_table_script_list):
             # 剥离 COMMENT 子句避免 DDLParser 无法处理中文等特殊字符
             table_sql_for_parse = re.sub(r"\s+COMMENT\s+'[^']*'", "", table_sql)
-            ddl = DDLParser(table_sql_for_parse.replace("`", "")).run()
+            ddl = DDLParser(table_sql_for_parse, normalize_names=True).run()
 
             # 如果parse失败, 需要跟进
             if len(ddl) == 0:
