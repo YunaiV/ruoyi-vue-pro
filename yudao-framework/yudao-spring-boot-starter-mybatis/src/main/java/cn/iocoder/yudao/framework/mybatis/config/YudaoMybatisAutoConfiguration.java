@@ -4,6 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.mybatis.core.handler.DefaultDBFieldHandler;
 import cn.iocoder.yudao.framework.mybatis.core.injector.YudaoSqlInjector;
+import cn.iocoder.yudao.framework.mybatis.core.interceptor.ForUpdateInnerInterceptor;
 import cn.iocoder.yudao.framework.mybatis.core.util.CaseInsensitiveResultMap;
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.autoconfigure.ConfigurationCustomizer;
@@ -57,6 +58,8 @@ public class YudaoMybatisAutoConfiguration {
     public MybatisPlusInterceptor mybatisPlusInterceptor() {
         MybatisPlusInterceptor mybatisPlusInterceptor = new MybatisPlusInterceptor();
         mybatisPlusInterceptor.addInnerInterceptor(new PaginationInnerInterceptor()); // 分页插件
+        // 锁定读插件：需要位于末尾，在租户、数据权限、分页等插件改写 SQL 之后，改写 SQL Server 的行锁
+        mybatisPlusInterceptor.addInnerInterceptor(new ForUpdateInnerInterceptor());
         // ↓↓↓ 按需开启，可能会影响到 updateBatch 的地方：例如说文件配置管理 ↓↓↓
         // mybatisPlusInterceptor.addInnerInterceptor(new BlockAttackInnerInterceptor()); // 拦截没有指定条件的 update 和 delete 语句
         return mybatisPlusInterceptor;

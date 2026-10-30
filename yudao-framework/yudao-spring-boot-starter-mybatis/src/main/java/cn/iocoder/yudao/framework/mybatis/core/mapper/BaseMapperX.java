@@ -1,11 +1,15 @@
 package cn.iocoder.yudao.framework.mybatis.core.mapper;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
+import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.pojo.SortablePageParam;
 import cn.iocoder.yudao.framework.common.pojo.SortingField;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
+import cn.iocoder.yudao.framework.mybatis.core.injector.SelectForUpdateMethod;
 import cn.iocoder.yudao.framework.mybatis.core.util.CaseInsensitiveResultMap;
 import cn.iocoder.yudao.framework.mybatis.core.util.JdbcUtils;
 import cn.iocoder.yudao.framework.mybatis.core.util.MyBatisUtils;
@@ -13,19 +17,25 @@ import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.metadata.MapperProxyMetadata;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
+import com.baomidou.mybatisplus.core.toolkit.MybatisUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.toolkit.Db;
 import com.github.yulichang.base.MPJBaseMapper;
 import com.github.yulichang.interfaces.MPJBaseJoin;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.binding.MapperMethod;
+import org.apache.ibatis.exceptions.TooManyResultsException;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 在 MyBatis Plus 的 BaseMapper 的基础上拓展，提供更多的能力
@@ -141,16 +151,26 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
         return selectOne(new LambdaQueryWrapper<T>().eq(field1, value1).eq(field2, value2).eq(field3, value3));
     }
 
+    // TODO DONE @AI：能不能把现有的 selectOneForUpdate、selectFirstOneForUpdate、selectListForFirstLock、 这些，做一个整合。目前感觉有点散。。。不然有点乱；包括 cms 项目里，其实也有一些 lock；/Users/yunai/Java/yudao-cms-all/ruoyi-vue-pro-jdk25/yudao-module-cms；最好有个比较万金油的方案。。。。
+    // 已整合为 selectOneForUpdate、selectListForUpdate、selectFirstOneForUpdate 三个锁定读入口（含字段重载），boot、cms 的手写 FOR UPDATE 均改为调用它们；
+    // 锁定子句由内置查询 SelectForUpdateMethod 生成（不再暴露 selectListForFirstLock 等接口方法），SQL Server 由 ForUpdateInnerInterceptor 改写，Oracle 的首行锁定在本类按数据库类型走多次查询。
+
+    // ========== 锁定读：需要在事务中调用；Wrapper 不能使用 last、groupBy、having、参数别名 ==========
+
     /**
      * 获得满足条件的一条记录，并使用 FOR UPDATE 锁定。
      *
-     * 注意：需要在事务中调用，否则锁会立即释放。
+     * 注意：需要在事务中调用，否则锁会立即释放；多于 1 条时抛出 {@link TooManyResultsException}（已锁定的记录在事务结束时释放）
      *
      * @param queryWrapper 查询条件
      * @return 实体
      */
     default T selectOneForUpdate(LambdaQueryWrapper<T> queryWrapper) {
-        return selectOne(queryWrapper.last("FOR UPDATE"));
+        List<T> list = selectListForUpdate(queryWrapper);
+        if (list.size() > 1) {
+            throw new TooManyResultsException("Expected one result (or null) to be returned by selectOneForUpdate(), but found: " + list.size());
+        }
+        return CollUtil.getFirst(list);
     }
 
     default T selectOneForUpdate(SFunction<T, ?> field, Object value) {
@@ -167,15 +187,112 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
     }
 
     /**
+     * 获得满足条件的全部记录，并使用 FOR UPDATE 锁定。
+     *
+     * 注意：需要在事务中调用，否则锁会立即释放；返回顺序为 queryWrapper 的排序，未设置时不排序
+     *
+     * @param queryWrapper 查询条件
+     * @return 实体列表
+     */
+    default List<T> selectListForUpdate(LambdaQueryWrapper<T> queryWrapper) {
+        return selectListByForUpdateMethod(SelectForUpdateMethod.Kind.LOCK, queryWrapper, null);
+    }
+
+    default List<T> selectListForUpdate(SFunction<T, ?> field, Object value) {
+        return selectListForUpdate(new LambdaQueryWrapper<T>().eq(field, value));
+    }
+
+    default List<T> selectListForUpdate(SFunction<T, ?> field, Collection<?> values) {
+        if (CollUtil.isEmpty(values)) {
+            return CollUtil.newArrayList();
+        }
+        return selectListForUpdate(new LambdaQueryWrapper<T>().in(field, values));
+    }
+
+    /**
      * 获得满足条件的第 1 条记录，并使用 FOR UPDATE 锁定。
      *
-     * 注意：需要在事务中调用，否则锁会立即释放。
+     * 注意：需要在事务中调用，否则锁会立即释放；queryWrapper 未设置排序时，为任意一条满足条件的记录（只适合判断是否存在）
+     *
+     * Oracle 不支持 LIMIT 1 FOR UPDATE（Oracle 的 FOR UPDATE 也不能与行数限制一起使用），改为多次查询：
+     * 1. 按原条件、原排序查询首行主键（候选），不加锁；不存在时返回 null
+     * 2. 按原条件、且主键等于候选主键加锁查询，不限制行数；候选已不满足条件时重试
+     * 3. 锁定后重新查询首行主键，与候选相同才返回；不同（例如其它事务已提交了排序更靠前的记录）时重试，最多
+     *    5 次后抛出 {@link GlobalErrorCodeConstants#LOCKED}
+     * 要求实际执行的连接隔离级别为 READ COMMITTED，否则锁定后无法读到其它事务已提交的记录，
+     * 由 {@link cn.iocoder.yudao.framework.mybatis.core.interceptor.ForUpdateInnerInterceptor} 校验
+     *
+     * 其它数据库为单条 LIMIT 1 FOR UPDATE（SQL Server 改写为 TOP (1) 与 WITH (UPDLOCK, ROWLOCK)）
      *
      * @param queryWrapper 查询条件
      * @return 实体
      */
     default T selectFirstOneForUpdate(LambdaQueryWrapper<T> queryWrapper) {
-        return selectOne(queryWrapper.last("LIMIT 1 FOR UPDATE"));
+        DbType dbType = JdbcUtils.getDbType();
+        if (!ObjectUtils.equalsAny(dbType, DbType.ORACLE, DbType.ORACLE_12C)) {
+            return CollUtil.getFirst(selectListByForUpdateMethod(SelectForUpdateMethod.Kind.LOCK_FIRST, queryWrapper, null));
+        }
+        int maxAttempts = 5;
+        for (int i = 0; i < maxAttempts; i++) {
+            List<Object> ids = selectListByForUpdateMethod(SelectForUpdateMethod.Kind.FIRST_IDS, queryWrapper, null);
+            if (ids.isEmpty()) {
+                return null;
+            }
+            Object id = ids.get(0);
+            // 是否锁定到候选，以列表是否为空判断：查询列均为 NULL 时，MyBatis 返回的元素为 null
+            List<T> lockRows = selectListByForUpdateMethod(SelectForUpdateMethod.Kind.LOCK, queryWrapper, id);
+            if (lockRows.isEmpty()) {
+                continue;
+            }
+            List<Object> latestIds = selectListByForUpdateMethod(SelectForUpdateMethod.Kind.FIRST_IDS, queryWrapper, null);
+            if (!latestIds.isEmpty() && Objects.equals(id, latestIds.get(0))) {
+                return lockRows.get(0);
+            }
+        }
+        throw ServiceExceptionUtil.exception(GlobalErrorCodeConstants.LOCKED);
+    }
+
+    /**
+     * 执行锁定读的内置查询，见 {@link SelectForUpdateMethod}
+     *
+     * @param kind         内置查询的类型
+     * @param queryWrapper 查询条件
+     * @param id           主键；仅 {@link SelectForUpdateMethod.Kind#LOCK} 使用，为 null 时不限制
+     * @return 实体或主键列表
+     */
+    private <E> List<E> selectListByForUpdateMethod(SelectForUpdateMethod.Kind kind, LambdaQueryWrapper<T> queryWrapper,
+                                                    Object id) {
+        checkForUpdateWrapper(queryWrapper);
+        MapperMethod.ParamMap<Object> param = new MapperMethod.ParamMap<>();
+        param.put(Constants.WRAPPER, queryWrapper);
+        param.put(SelectForUpdateMethod.PARAM_ID, id);
+        if (kind == SelectForUpdateMethod.Kind.FIRST_IDS) {
+            param.put("page", MyBatisUtils.buildPage(0, 1, false));
+        }
+        MapperProxyMetadata mapperProxyMetadata = MybatisUtils.getMapperProxy(this);
+        return mapperProxyMetadata.getSqlSession().selectList(
+                mapperProxyMetadata.getMapperInterface().getName() + Constants.DOT + kind.getMethod(), param);
+    }
+
+    /**
+     * 校验锁定读的查询条件：内置查询只使用实体条件、普通条件与排序
+     *
+     * @param queryWrapper 查询条件
+     */
+    private void checkForUpdateWrapper(LambdaQueryWrapper<T> queryWrapper) {
+        if (queryWrapper == null) {
+            throw new IllegalArgumentException("锁定读的查询条件不能为空");
+        }
+        MergeSegments expression = queryWrapper.getExpression();
+        if (!Objects.equals(queryWrapper.getSqlSegment(), expression.getSqlSegment())) {
+            throw new IllegalArgumentException("锁定读的查询条件不能使用 last");
+        }
+        if (!expression.getGroupBy().isEmpty() || !expression.getHaving().isEmpty()) {
+            throw new IllegalArgumentException("锁定读的查询条件不能使用 groupBy、having");
+        }
+        if (!Constants.WRAPPER.equals(queryWrapper.getParamAlias())) {
+            throw new IllegalArgumentException("锁定读的查询条件不能设置参数别名");
+        }
     }
 
     /**

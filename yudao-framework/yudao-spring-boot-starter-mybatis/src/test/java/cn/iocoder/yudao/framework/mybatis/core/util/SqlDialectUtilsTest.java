@@ -35,6 +35,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
+import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -147,9 +148,19 @@ public class SqlDialectUtilsTest {
         assertEquals("COALESCE(TRUNC(AVG(CAST(EXTRACT(DAY FROM (CAST(contract.order_date AS TIMESTAMP) - "
                         + "CAST(customer.create_time AS TIMESTAMP))) AS NUMERIC)), 1), 0)",
                 SqlDialectUtils.customerDealCycle(Dialect.POSTGRESQL, "customer.create_time", "contract.order_date"));
-        // Oracle、SQL Server：完整天数表达式依赖实际列类型，尚未验收，保持原有片段
-        assertEquals(original, SqlDialectUtils.customerDealCycle(Dialect.ORACLE, "customer.create_time", "contract.order_date"));
-        assertEquals(original, SqlDialectUtils.customerDealCycle(Dialect.SQLSERVER, "customer.create_time", "contract.order_date"));
+        // Oracle：升格为 TIMESTAMP(9)，DATE 与 TIMESTAMP(9) 均不丢失精度，INTERVAL 的 DAY 部分即完整天数
+        assertEquals("COALESCE(TRUNC(AVG(EXTRACT(DAY FROM (CAST(contract.order_date AS TIMESTAMP(9)) - "
+                        + "CAST(customer.create_time AS TIMESTAMP(9))))), 1), 0)",
+                SqlDialectUtils.customerDealCycle(Dialect.ORACLE, "customer.create_time", "contract.order_date"));
+        // SQL Server：DATEDIFF(DAY) 按时刻向零修正，DECIMAL 平均，ROUND(..., 1, 1) 截断
+        String beginTime = "CAST(CAST(customer.create_time AS datetime2(7)) AS time(7))";
+        String endTime = "CAST(CAST(contract.order_date AS datetime2(7)) AS time(7))";
+        String days = "DATEDIFF(DAY, customer.create_time, contract.order_date)";
+        assertEquals("COALESCE(ROUND(AVG(CAST((CASE WHEN contract.order_date >= customer.create_time THEN "
+                        + days + " - CASE WHEN " + endTime + " < " + beginTime + " THEN 1 ELSE 0 END ELSE "
+                        + days + " + CASE WHEN " + endTime + " > " + beginTime + " THEN 1 ELSE 0 END END)"
+                        + " AS DECIMAL(19, 4))), 1, 1), 0)",
+                SqlDialectUtils.customerDealCycle(Dialect.SQLSERVER, "customer.create_time", "contract.order_date"));
     }
 
     @Test
@@ -332,18 +343,210 @@ public class SqlDialectUtilsTest {
 
     @Test
     public void testJsonArrayContains() {
-        // 原有片段、Oracle、SQL Server：保持原有 JSON_CONTAINS
-        for (Dialect dialect : List.of(Dialect.ORIGINAL, Dialect.ORACLE, Dialect.SQLSERVER)) {
-            assertEquals("JSON_CONTAINS(booking_user_ids, {0})",
-                    SqlDialectUtils.jsonArrayContains(dialect, "booking_user_ids", false), dialect.name());
-            assertEquals("JSON_CONTAINS(t.label_ids, JSON_ARRAY({0}))",
-                    SqlDialectUtils.jsonArrayContains(dialect, "t.label_ids", true), dialect.name());
-        }
+        // 原有片段：保持原有 JSON_CONTAINS
+        assertEquals("JSON_CONTAINS(booking_user_ids, {0})",
+                SqlDialectUtils.jsonArrayContains(Dialect.ORIGINAL, "booking_user_ids", false));
+        assertEquals("JSON_CONTAINS(t.label_ids, JSON_ARRAY({0}))",
+                SqlDialectUtils.jsonArrayContains(Dialect.ORIGINAL, "t.label_ids", true));
         // PostgreSQL：两种原有片段统一为 jsonb 包含，参数按 BIGINT 匹配数字元素
         assertEquals("CAST(booking_user_ids AS jsonb) @> jsonb_build_array(CAST({0} AS BIGINT))",
                 SqlDialectUtils.jsonArrayContains(Dialect.POSTGRESQL, "booking_user_ids", false));
         assertEquals("CAST(t.label_ids AS jsonb) @> jsonb_build_array(CAST({0} AS BIGINT))",
                 SqlDialectUtils.jsonArrayContains(Dialect.POSTGRESQL, "t.label_ids", true));
+        // Oracle、SQL Server、H2：两种原有片段相同，{0} 只出现一次，不使用 JSON 函数
+        for (Dialect dialect : List.of(Dialect.ORACLE, Dialect.SQLSERVER, Dialect.H2)) {
+            String condition = SqlDialectUtils.jsonArrayContains(dialect, "t.label_ids", true);
+            assertEquals(condition, SqlDialectUtils.jsonArrayContains(dialect, "t.label_ids", false), dialect.name());
+            assertEquals(1, condition.split("\\{0}", -1).length - 1, condition);
+            assertFalse(condition.toUpperCase().contains("JSON"), condition);
+        }
+        String oracle = SqlDialectUtils.jsonArrayContains(Dialect.ORACLE, "t.label_ids", true);
+        // CLOB 超过 4000 字节时 TRANSLATE 报 ORA-22835，空白只能用 REPLACE 替换
+        assertTrue(oracle.contains("REGEXP_LIKE(REPLACE(REPLACE(REPLACE(t.label_ids, CHR(9), ' '), CHR(10), ' '), CHR(13), ' '), "),
+                oracle);
+        assertFalse(oracle.toUpperCase().contains("TRANSLATE"), oracle);
+        assertTrue(oracle.contains("'" + SqlDialectUtils.ORACLE_LONG_ARRAY_PATTERN + "'"), oracle);
+        assertFalse(oracle.contains(SqlDialectUtils.H2_LONG_ARRAY_PATTERN), oracle);
+        assertTrue(oracle.contains("NOT REGEXP_LIKE(t.label_ids, '" + SqlDialectUtils.LONG_OVERFLOW_PATTERN + "')"), oracle);
+        assertTrue(oracle.contains("COALESCE(TO_CHAR(CAST({0} AS NUMBER(19, 0)), 'TM9', "
+                + "'NLS_NUMERIC_CHARACTERS = ''.,'''), 'null')"), oracle);
+        // SQL Server：与原生验收的 SQL 一致；XML 用 .query('.') 物化后整体 exist 校验，再按逗号边界 CHARINDEX 匹配
+        String sqlServer = SqlDialectUtils.jsonArrayContains(Dialect.SQLSERVER, "t.label_ids", true);
+        assertEquals("EXISTS (SELECT 1"
+                + " FROM (SELECT LTRIM(RTRIM(REPLACE(REPLACE(REPLACE(CAST(t.label_ids AS nvarchar(max)),CHAR(9),N' '),CHAR(10),N' '),CHAR(13),N' '))) AS doc) yd_jd"
+                + " CROSS APPLY (SELECT CASE WHEN LEFT(yd_jd.doc,1)=N'[' AND RIGHT(yd_jd.doc,1)=N']'"
+                + " THEN SUBSTRING(yd_jd.doc,2,CASE WHEN LEN(yd_jd.doc)>=2"
+                + " THEN LEN(yd_jd.doc)-2 ELSE 0 END) ELSE NULL END AS body) yd_jb"
+                + " CROSS APPLY (SELECT CAST(CASE WHEN yd_jb.body IS NOT NULL"
+                + " AND PATINDEX(N'%[^0-9,nul -]%',COALESCE(yd_jb.body,N'') COLLATE Latin1_General_100_BIN2)=0"
+                + " AND LTRIM(RTRIM(yd_jb.body))<>N''"
+                + " THEN N'<r><i>'+REPLACE(yd_jb.body,N',',N'</i><i>')+N'</i></r>' ELSE N'<r/>' END AS XML) AS tokens) yd_jx"
+                + " CROSS APPLY (SELECT yd_jx.tokens.query('.') AS tokens) yd_jm"
+                + " WHERE yd_jm.tokens.exist('/r[i and not(i[string-length(string(xs:token(string(.)))) = 0"
+                + " or (string(xs:token(string(.))) != \"null\""
+                + " and string(xs:token(string(.))) != string((string(xs:token(string(.))) cast as xs:long?)))])]') = 1"
+                + " AND CHARINDEX(N','+COALESCE(CONVERT(nvarchar(20),CAST({0} AS BIGINT)),N'null')+N',',N','+REPLACE(yd_jb.body,N' ',N'')+N',')>0)",
+                sqlServer);
+        // SQL Server 2012~2016 不支持 OPENJSON，任何分支都不能出现；不逐个遍历节点，XQuery 中不嵌入业务列
+        assertFalse(sqlServer.toUpperCase().contains("OPENJSON"), sqlServer);
+        assertFalse(sqlServer.contains(".nodes("), sqlServer);
+        assertFalse(sqlServer.contains("sql:column"), sqlServer);
+        // H2：与原生验收的 SQL 一致，使用 H2 专用的正则（Java 正则的占有量词），不使用 Oracle 的正则
+        String h2 = SqlDialectUtils.jsonArrayContains(Dialect.H2, "t.label_ids", true);
+        assertEquals("^ *+\\[ *+(?:(?:0|-?[1-9][0-9]{0,18}|null) *+(?:, *+(?:0|-?[1-9][0-9]{0,18}|null) *+)*+)?\\] *+$",
+                SqlDialectUtils.H2_LONG_ARRAY_PATTERN);
+        assertEquals("(REGEXP_LIKE(REPLACE(REPLACE(REPLACE(t.label_ids, CHR(9), ' '), CHR(10), ' '), CHR(13), ' '), '"
+                        + SqlDialectUtils.H2_LONG_ARRAY_PATTERN + "')"
+                        + " AND NOT REGEXP_LIKE(t.label_ids, '" + SqlDialectUtils.LONG_OVERFLOW_PATTERN + "')"
+                        + " AND LOCATE(',' || COALESCE(CAST(CAST({0} AS BIGINT) AS VARCHAR), 'null') || ',',"
+                        + " REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(t.label_ids, CHR(9), ' '), CHR(10), ' '), CHR(13), ' '),"
+                        + " ' ', ''), '[', ','), ']', ',')) > 0)",
+                h2);
+        assertFalse(h2.contains(SqlDialectUtils.ORACLE_LONG_ARRAY_PATTERN), h2);
+    }
+
+    /**
+     * Oracle 片段的匹配语义：按 REGEXP_LIKE、REPLACE、INSTR 的组合在 Java 中复现，校验严格的平面 Long / null 数组契约
+     */
+    @Test
+    public void testJsonArrayContains_oracleLongArraySemantics() {
+        // 普通匹配：相邻 ID、负数、大 ID、Long 边界、空白
+        assertTrue(oracleJsonContains("[1,11]", 1L));
+        assertTrue(oracleJsonContains("[1,11]", 11L));
+        assertFalse(oracleJsonContains("[11,21]", 1L));
+        assertTrue(oracleJsonContains("[2115311103682412546,2115311103682412547]", 2115311103682412546L));
+        assertFalse(oracleJsonContains("[2115311103682412546]", 211531110368241254L));
+        assertTrue(oracleJsonContains("[-1, 1]", -1L));
+        assertFalse(oracleJsonContains("[-1]", 1L));
+        assertTrue(oracleJsonContains("[" + Long.MIN_VALUE + "," + Long.MAX_VALUE + "]", Long.MIN_VALUE));
+        assertTrue(oracleJsonContains("[" + Long.MIN_VALUE + "," + Long.MAX_VALUE + "]", Long.MAX_VALUE));
+        assertTrue(oracleJsonContains(" [ 1 ,\t2 ,\r\n 3 ] ", 2L));
+        assertTrue(oracleJsonContains("[0]", 0L));
+        // null 元素：参数为 null 时匹配 null 元素
+        assertTrue(oracleJsonContains("[null]", null));
+        assertTrue(oracleJsonContains("[1, null]", null));
+        assertTrue(oracleJsonContains("[1, null]", 1L));
+        assertFalse(oracleJsonContains("[1]", null));
+        assertFalse(oracleJsonContains("[NULL]", null));
+        // 非数组、空数组、列为 NULL
+        assertFalse(oracleJsonContains(null, 1L));
+        assertFalse(oracleJsonContains(null, null));
+        assertFalse(oracleJsonContains("null", null));
+        assertFalse(oracleJsonContains("[]", 1L));
+        assertFalse(oracleJsonContains("[ ]", null));
+        assertFalse(oracleJsonContains("1", 1L));
+        // 字符串、嵌套、对象、小数、指数、前导零、空元素、缺分隔符：整体不匹配
+        assertFalse(oracleJsonContains("[\"1\"]", 1L));
+        assertFalse(oracleJsonContains("[\"x,1,y\"]", 1L));
+        assertFalse(oracleJsonContains("[1,\"x\"]", 1L));
+        assertFalse(oracleJsonContains("[[1]]", 1L));
+        assertFalse(oracleJsonContains("[1,[2]]", 1L));
+        assertFalse(oracleJsonContains("[{\"a\":1}]", 1L));
+        assertFalse(oracleJsonContains("[1.0]", 1L));
+        assertFalse(oracleJsonContains("[1e3]", 1000L));
+        assertFalse(oracleJsonContains("[01]", 1L));
+        assertFalse(oracleJsonContains("[-0]", 0L));
+        assertFalse(oracleJsonContains("[1,,2]", 1L));
+        assertFalse(oracleJsonContains("[,1]", 1L));
+        assertFalse(oracleJsonContains("[1,]", 1L));
+        assertFalse(oracleJsonContains("[1 2]", 12L));
+        assertFalse(oracleJsonContains("[1 2]", 1L));
+        assertFalse(oracleJsonContains("[1]]", 1L));
+        // 超出 Long 范围：整个数组不匹配
+        assertFalse(oracleJsonContains("[9223372036854775808,1]", 1L));
+        assertFalse(oracleJsonContains("[-9223372036854775809,1]", 1L));
+        assertFalse(oracleJsonContains("[9999999999999999999,1]", 1L));
+        assertFalse(oracleJsonContains("[99999999999999999999,1]", 1L));
+        assertTrue(oracleJsonContains("[-9223372036854775808,1]", 1L));
+        assertTrue(oracleJsonContains("[9223372036854775807,1]", 1L));
+        assertTrue(oracleJsonContains("[1000000000000000000,1]", 1L));
+        // 长 CLOB 数组由 Oracle 实库验证；Java Pattern 的递归栈不代表 Oracle 的正则执行能力。
+        // H2 使用 Java 正则，其长数组边界由 testJsonArrayContains_h2LongArraySemantics 验证。
+    }
+
+    /**
+     * H2 片段的匹配语义：H2 的 REGEXP_LIKE 使用 Java 正则，H2 专用的正则在长数组上不能栈溢出
+     *
+     * 注意：仅校验正则与匹配规则，不代替 H2 实库验收
+     */
+    @Test
+    public void testJsonArrayContains_h2LongArraySemantics() {
+        // 普通匹配、null 元素、空白
+        assertTrue(h2JsonContains("[1,11]", 1L));
+        assertFalse(h2JsonContains("[11,21]", 1L));
+        assertTrue(h2JsonContains("[2115311103682412546,2115311103682412547]", 2115311103682412547L));
+        assertTrue(h2JsonContains("[" + Long.MIN_VALUE + "," + Long.MAX_VALUE + "]", Long.MIN_VALUE));
+        assertTrue(h2JsonContains(" [ 1 ,\t2 ,\r\n 3 ] ", 2L));
+        assertTrue(h2JsonContains("[1, null]", null));
+        assertFalse(h2JsonContains("[1]", null));
+        // 非数组、字符串、嵌套、小数、前导零、空元素、缺分隔符、超出 Long 范围：整体不匹配
+        assertFalse(h2JsonContains(null, 1L));
+        assertFalse(h2JsonContains("null", null));
+        assertFalse(h2JsonContains("[]", 1L));
+        assertFalse(h2JsonContains("[\"1\"]", 1L));
+        assertFalse(h2JsonContains("[\"x,1,y\"]", 1L));
+        assertFalse(h2JsonContains("[[1]]", 1L));
+        assertFalse(h2JsonContains("[1.0]", 1L));
+        assertFalse(h2JsonContains("[01]", 1L));
+        assertFalse(h2JsonContains("[1,,2]", 1L));
+        assertFalse(h2JsonContains("[1 2]", 1L));
+        assertFalse(h2JsonContains("[9223372036854775808,1]", 1L));
+        assertFalse(h2JsonContains("[-9223372036854775809,1]", 1L));
+        // 1400 个元素的长数组：占有量词不回溯、不递归，不能栈溢出；末尾非法元素整体不匹配
+        StringBuilder longArray = new StringBuilder("[0");
+        for (int i = 1; i < 1400; i++) {
+            longArray.append(i % 2 == 0 ? ",\n" : " , ").append(2115311103682412546L + i);
+        }
+        String longJson = longArray.append(']').toString();
+        assertTrue(h2JsonContains(longJson, 2115311103682412546L + 1399));
+        assertFalse(h2JsonContains(longJson, 2115311103682412546L + 1400));
+        assertFalse(h2JsonContains(longJson.replace("]", ",\"x\"]"), 0L));
+    }
+
+    @Test
+    public void testGreaterDigitsPattern() {
+        assertEquals("(1[9-9]|[2-9][0-9]{1})", SqlDialectUtils.greaterDigitsPattern("18"));
+        Pattern pattern = Pattern.compile(SqlDialectUtils.greaterDigitsPattern("9223372036854775808"));
+        assertTrue(pattern.matcher("9223372036854775809").matches());
+        assertTrue(pattern.matcher("9223372036854775810").matches());
+        assertTrue(pattern.matcher("9300000000000000000").matches());
+        assertTrue(pattern.matcher("9999999999999999999").matches());
+        assertFalse(pattern.matcher("9223372036854775808").matches());
+        assertFalse(pattern.matcher("9223372036854775807").matches());
+        assertFalse(pattern.matcher("8999999999999999999").matches());
+        assertFalse(pattern.matcher("1000000000000000000").matches());
+        // Oracle 正则最长 512 字节；也不能包含会被 Wrapper 当作占位符的 {0}
+        assertTrue(SqlDialectUtils.LONG_OVERFLOW_PATTERN.length() < 512);
+        assertTrue(SqlDialectUtils.ORACLE_LONG_ARRAY_PATTERN.length() < 512);
+        assertFalse(SqlDialectUtils.LONG_OVERFLOW_PATTERN.contains("{0}"));
+        assertFalse(SqlDialectUtils.H2_LONG_ARRAY_PATTERN.contains("{0}"));
+    }
+
+    @Test
+    public void testResolveJsonDialect() throws SQLException {
+        // 瀚高原生驱动：仅 JSON 片段使用 PostgreSQL 写法，其它片段仍保持原有
+        assertEquals(Dialect.POSTGRESQL, resolveJson("HighGo", "jdbc:highgo://127.0.0.1:5866/highgo", 6));
+        assertEquals(Dialect.POSTGRESQL, resolveJson("PostgreSQL", "jdbc:highgo://127.0.0.1:5866/highgo", 6));
+        assertEquals(Dialect.ORIGINAL, resolve("PostgreSQL", "jdbc:highgo://127.0.0.1:5866/highgo", 6));
+        // 人大金仓（产品名 KingbaseES）：仅 JSON 片段使用 PostgreSQL 写法，其它片段仍保持原有
+        assertEquals(Dialect.POSTGRESQL, resolveJson("KingbaseES", "jdbc:kingbase8://127.0.0.1:54321/test", 8));
+        assertEquals(Dialect.ORIGINAL, resolve("KingbaseES", "jdbc:kingbase8://127.0.0.1:54321/test", 8));
+        // H2：仅 JSON 片段使用严格的平面 Long 数组写法，其它片段仍保持原有
+        assertEquals(Dialect.H2, resolveJson("H2", "jdbc:h2:mem:testdb;MODE=MYSQL", 2));
+        assertEquals(Dialect.ORIGINAL, resolve("H2", "jdbc:h2:mem:testdb;MODE=MYSQL", 2));
+        // 其它 PostgreSQL 变种（含产品名为 PostgreSQL 的金仓 URL）、达梦、神通、MySQL：保持原有 JSON_CONTAINS
+        assertEquals(Dialect.ORIGINAL, resolveJson("PostgreSQL", "jdbc:opengauss://127.0.0.1:5432/test", 9));
+        assertEquals(Dialect.ORIGINAL, resolveJson("openGauss", "jdbc:opengauss://127.0.0.1:5432/test", 5));
+        assertEquals(Dialect.ORIGINAL, resolveJson("PostgreSQL", "jdbc:kingbase8://127.0.0.1:54321/test", 12));
+        assertEquals(Dialect.ORIGINAL, resolveJson("DM DBMS", "jdbc:dm://127.0.0.1:5236", 8));
+        assertEquals(Dialect.ORIGINAL, resolveJson("OSCAR", "jdbc:oscar://127.0.0.1:2003/osrdb", 7));
+        assertEquals(Dialect.ORIGINAL, resolveJson("MySQL", "jdbc:mysql://127.0.0.1:3306/highgo", 8));
+        assertEquals(Dialect.ORIGINAL, resolveJson("Microsoft SQL Server 2005", "jdbc:jtds:sqlserver://127.0.0.1:1433", 9));
+        // 其它与 resolveDialect 一致
+        assertEquals(Dialect.POSTGRESQL, resolveJson("PostgreSQL", "jdbc:postgresql://127.0.0.1:5432/a", 17));
+        assertEquals(Dialect.ORACLE, resolveJson("Oracle", "jdbc:oracle:thin:@127.0.0.1:1521:xe", 21));
+        assertEquals(Dialect.SQLSERVER, resolveJson("Microsoft SQL Server", "jdbc:sqlserver://127.0.0.1:1433", 11));
+        assertThrows(IllegalStateException.class, () -> resolveJson("SQLite", "jdbc:sqlite:/tmp/test.db", 3));
     }
 
     @Test
@@ -387,15 +590,20 @@ public class SqlDialectUtilsTest {
         FakeDataSource oracle = new FakeDataSource("Oracle", "jdbc:oracle:thin:@127.0.0.1:1521:xe", 21);
         FakeDataSource sqlServer = new FakeDataSource("Microsoft SQL Server", "jdbc:sqlserver://127.0.0.1:1433", 16);
         FakeDataSource mysql = new FakeDataSource("MySQL", "jdbc:mysql://127.0.0.1:3306/a", 8);
-        mockDynamicRoutingDataSource(Map.of("master", postgresql, "oracle", oracle, "sqlserver", sqlServer, "mysql", mysql));
+        FakeDataSource h2 = new FakeDataSource("H2", "jdbc:h2:mem:testdb;MODE=MYSQL", 2);
+        FakeDataSource kingbase = new FakeDataSource("KingbaseES", "jdbc:kingbase8://127.0.0.1:54321/test", 8);
+        mockDynamicRoutingDataSource(Map.of("master", postgresql, "oracle", oracle, "sqlserver", sqlServer,
+                "mysql", mysql, "h2", h2, "kingbase", kingbase));
         SqlSource sqlSource = new XMLLanguageDriver().createSqlSource(new Configuration(),
                 "<script>SELECT id FROM pms_work_item ${ew.customSqlSegment}</script>", Map.class);
-        // 依次切换：主库 PostgreSQL、Oracle、SQL Server、MySQL
+        // 依次切换：主库 PostgreSQL、Oracle、SQL Server、MySQL、H2、人大金仓
         Map<String, Dialect> routes = new LinkedHashMap<>();
         routes.put("master", Dialect.POSTGRESQL);
         routes.put("oracle", Dialect.ORACLE);
         routes.put("sqlserver", Dialect.SQLSERVER);
         routes.put("mysql", Dialect.ORIGINAL);
+        routes.put("h2", Dialect.H2);
+        routes.put("kingbase", Dialect.POSTGRESQL);
 
         for (Map.Entry<String, Dialect> route : routes.entrySet()) {
             DynamicDataSourceContextHolder.push(route.getKey());
@@ -408,7 +616,7 @@ public class SqlDialectUtilsTest {
             String expected = SqlDialectUtils.jsonArrayContains(route.getValue(), "label_ids", true).replace("{0}", "?");
             assertTrue(sql.startsWith("SELECT id FROM pms_work_item WHERE"), sql);
             assertTrue(sql.contains(expected + " OR " + expected), sql);
-            assertFalse(sql.contains("11"), sql); // 值只通过参数绑定，不拼接到 SQL 中
+            assertFalse(sql.replace(expected, "").contains("11"), sql); // 值只通过参数绑定，不拼接到 SQL 中
             assertEquals(List.of(100L, 1L, 11L), getParameterValues(boundSql, labelWrapper));
             assertNotNull(CCJSqlParserUtil.parse(sql), route.getValue() + " " + sql);
 
@@ -420,7 +628,7 @@ public class SqlDialectUtilsTest {
             sql = normalize(boundSql.getSql());
             expected = SqlDialectUtils.jsonArrayContains(route.getValue(), "booking_user_ids", false).replace("{0}", "?");
             assertTrue(sql.contains(expected), sql);
-            assertFalse(sql.contains("1024"), sql);
+            assertFalse(sql.replace(expected, "").contains("1024"), sql);
             assertEquals(List.of(1, "1024"), getParameterValues(boundSql, bookingWrapper));
             assertNotNull(CCJSqlParserUtil.parse(sql), route.getValue() + " " + sql);
         }
@@ -815,6 +1023,43 @@ public class SqlDialectUtilsTest {
     }
 
     // ========== 工具方法 ==========
+
+    private static Dialect resolveJson(String productName, String url, int majorVersion) throws SQLException {
+        return SqlDialectUtils.resolveJsonDialect(new FakeDataSource(productName, url, majorVersion).getMetaData());
+    }
+
+    /**
+     * 在 Java 中复现 Oracle 片段：REPLACE 空白、REGEXP_LIKE 整体格式与溢出、去空白后 INSTR 匹配 ,元素,
+     *
+     * @param json 列值，null 表示 SQL NULL
+     * @param value 绑定参数
+     * @return 是否匹配
+     */
+    private static boolean oracleJsonContains(String json, Long value) {
+        return jsonContains(SqlDialectUtils.ORACLE_LONG_ARRAY_PATTERN, json, value);
+    }
+
+    /**
+     * 在 Java 中复现 H2 片段，规则同 {@link #oracleJsonContains(String, Long)}，整体格式使用 H2 专用的正则
+     */
+    private static boolean h2JsonContains(String json, Long value) {
+        return jsonContains(SqlDialectUtils.H2_LONG_ARRAY_PATTERN, json, value);
+    }
+
+    private static boolean jsonContains(String arrayPattern, String json, Long value) {
+        if (json == null) {
+            return false;
+        }
+        String text = json.replace('\t', ' ').replace('\n', ' ').replace('\r', ' ');
+        if (!Pattern.compile(arrayPattern).matcher(text).find()) {
+            return false;
+        }
+        if (Pattern.compile(SqlDialectUtils.LONG_OVERFLOW_PATTERN).matcher(json).find()) {
+            return false;
+        }
+        String elements = text.replace(" ", "").replace('[', ',').replace(']', ',');
+        return elements.contains("," + (value == null ? "null" : value.toString()) + ",");
+    }
 
     private static Dialect resolve(String productName, String url, int majorVersion) throws SQLException {
         return SqlDialectUtils.resolveDialect(new FakeDataSource(productName, url, majorVersion).getMetaData());

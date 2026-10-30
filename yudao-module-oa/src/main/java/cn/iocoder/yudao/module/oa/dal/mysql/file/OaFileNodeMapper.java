@@ -28,8 +28,8 @@ public interface OaFileNodeMapper extends BaseMapperX<OaFileNodeDO> {
     }
 
     default List<OaFileNodeDO> selectListByCreatorAndTypeForUpdate(String creator, Integer type) {
-        return selectList(new LambdaQueryWrapperX<OaFileNodeDO>().eq(OaFileNodeDO::getCreator, creator)
-                .eq(OaFileNodeDO::getType, type).orderByAsc(OaFileNodeDO::getId).last("FOR UPDATE"));
+        return selectListForUpdate(new LambdaQueryWrapperX<OaFileNodeDO>().eq(OaFileNodeDO::getCreator, creator)
+                .eq(OaFileNodeDO::getType, type).orderByAsc(OaFileNodeDO::getId));
     }
 
     default List<OaFileNodeDO> selectListByCreatorAndStatus(String creator, Integer status) {

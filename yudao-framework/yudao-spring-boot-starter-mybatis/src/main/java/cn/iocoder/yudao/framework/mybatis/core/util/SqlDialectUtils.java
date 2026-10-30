@@ -22,7 +22,9 @@ import java.util.regex.Pattern;
  *
  * 1. 每次生成 SQL 时，按当前执行时路由到的数据源选择方言（按数据源实例缓存），不使用启动时固定的 databaseId 或主库
  * 2. 只有明确识别的 PostgreSQL、Oracle、SQL Server 2012+ 输出新片段；其它已识别的数据库（MySQL、MariaDB、OceanBase、H2、
- *    达梦、神通、人大金仓、openGauss、GaussDB、瀚高、MogDB 等）保持原有 SQL 片段；完全未识别的数据库抛出异常
+ *    达梦、神通、人大金仓、openGauss、GaussDB、瀚高、MogDB 等）保持原有 SQL 片段；完全未识别的数据库抛出异常。
+ *    例外：JSON 数组匹配中，瀚高原生驱动、人大金仓使用 PostgreSQL 片段，H2 使用严格的平面 Long 数组片段，
+ *    见 {@link #jsonArrayContains(String, boolean)}
  * 3. 参数只能是代码中固定的列名，经过白名单校验；格式均为常量，业务值必须继续使用 #{} 绑定
  *
  * 在 XML 或注解中使用：${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@formatDate('create_time')}
@@ -63,6 +65,50 @@ public class SqlDialectUtils {
             new ConcurrentReferenceHashMap<>(16, ConcurrentReferenceHashMap.ReferenceType.WEAK);
 
     /**
+     * 数据源与 JSON 方言的缓存；与 {@link #DIALECT_CACHE} 分开，瀚高、人大金仓、H2 仅 JSON 片段使用单独的写法
+     */
+    private static final Map<DataSource, Dialect> JSON_DIALECT_CACHE =
+            new ConcurrentReferenceHashMap<>(16, ConcurrentReferenceHashMap.ReferenceType.WEAK);
+
+    /**
+     * 瀚高原生驱动 URL 的前缀
+     */
+    private static final String HIGHGO_URL_PREFIX = "jdbc:highgo:";
+
+    /**
+     * Oracle 平面 Long / null 数组的整体格式，TAB、LF、CR 需先替换为空格：
+     * 元素为 0、不含前导零的 1~19 位整数或小写 null，元素两侧可有空格；字符串、嵌套数组、对象、小数、指数、空元素均不匹配
+     */
+    static final String ORACLE_LONG_ARRAY_PATTERN =
+            "^ *\\[ *((0|-?[1-9][0-9]{0,18}|null) *(, *(0|-?[1-9][0-9]{0,18}|null) *)*)?\\] *$";
+
+    /**
+     * H2 平面 Long / null 数组的整体格式，规则同 {@link #ORACLE_LONG_ARRAY_PATTERN}
+     *
+     * 注意：H2 的 REGEXP_LIKE 使用 Java 正则，重复的捕获组按递归匹配，长数组（例如 1400 个元素）会栈溢出，
+     * 因此使用占有量词（*+）与非捕获组；Oracle 的 POSIX 正则不支持该语法，两者不能混用
+     */
+    static final String H2_LONG_ARRAY_PATTERN =
+            "^ *+\\[ *+(?:(?:0|-?[1-9][0-9]{0,18}|null) *+(?:, *+(?:0|-?[1-9][0-9]{0,18}|null) *+)*+)?\\] *+$";
+
+    /**
+     * 超出 Long 范围的 19 位整数：负数超过 -9223372036854775808，或正数超过 9223372036854775807
+     *
+     * 只使用分组、字符类与固定次数，Oracle 的 POSIX 正则与 H2 的 Java 正则语义一致，两者共用
+     */
+    static final String LONG_OVERFLOW_PATTERN = "(^|[^0-9])" + greaterDigitsPattern("9223372036854775808")
+            + "|(^|[^-0-9])9223372036854775808";
+
+    /**
+     * SQL Server 校验整个 XML（&lt;r&gt;&lt;i&gt;元素&lt;/i&gt;...&lt;/r&gt;）为平面 Long / null 数组的 XQuery：
+     * 存在元素，且每个元素去掉两侧空白后非空，并且为 null，或转为 xs:long 再转回文本与原文完全相同（拒绝前导零、溢出等）。
+     * 转换失败时 cast as xs:long? 返回空序列，string() 后为空串，与原文不等，因此非法元素会使整体不匹配
+     */
+    private static final String SQL_SERVER_LONG_ARRAY_XQUERY = "/r[i and not(i[string-length(string(xs:token(string(.)))) = 0"
+            + " or (string(xs:token(string(.))) != \"null\""
+            + " and string(xs:token(string(.))) != string((string(xs:token(string(.))) cast as xs:long?)))])]";
+
+    /**
      * 方言
      */
     enum Dialect {
@@ -73,7 +119,11 @@ public class SqlDialectUtils {
         ORIGINAL,
         POSTGRESQL,
         ORACLE,
-        SQLSERVER
+        SQLSERVER,
+        /**
+         * H2：仅 JSON 片段使用，见 {@link #resolveJsonDialect(DatabaseMetaData)}；其它片段的 H2 仍为 {@link #ORIGINAL}
+         */
+        H2
 
     }
 
@@ -355,8 +405,11 @@ public class SqlDialectUtils {
      * 平均成交周期（天）：两个时间之间的完整天数（向零截断）求平均，保留 1 位小数（截断），无数据时为 0
      *
      * 原有片段为 COALESCE(TRUNCATE(AVG(TIMESTAMPDIFF(DAY, begin, end)), 1), 0)。
-     * 注意：仅 PostgreSQL 输出新片段；Oracle、SQL Server 的完整天数表达式依赖实际列类型（DATE / TIMESTAMP / datetime2 / date 等），
-     * 尚未依据实际 DDL 在真实数据库验收，因此保持原有片段
+     * 仅适用于不带时区的日期时间列（LocalDateTime 契约）；带时区的 TIMESTAMP WITH TIME ZONE、datetimeoffset 不在适用范围内
+     *
+     * 1. Oracle：两列均升格为 TIMESTAMP(9)，DATE、TIMESTAMP(0~9) 均不丢失小数秒，INTERVAL 的 DAY 部分即向零截断的完整天数
+     * 2. SQL Server 2012+：DATEDIFF(DAY) 按日期边界计数，按时刻修正为完整天数；先转 datetime2(7) 再取 time(7)，
+     *    兼容 date、datetime、datetime2；AVG 使用 DECIMAL 避免整数平均，ROUND(..., 1, 1) 为截断
      *
      * @param beginColumn 开始时间列名
      * @param endColumn   结束时间列名
@@ -367,7 +420,7 @@ public class SqlDialectUtils {
     }
 
     /**
-     * 按指定方言生成平均完整天数；未验收的数据库继续使用原表达式。
+     * 按指定方言生成平均完整天数；原有路径继续使用原表达式。
      *
      * @param dialect 已识别的数据库方言
      * @param beginColumn 代码中固定的开始时间列名
@@ -377,11 +430,26 @@ public class SqlDialectUtils {
     static String customerDealCycle(Dialect dialect, String beginColumn, String endColumn) {
         checkColumn(beginColumn);
         checkColumn(endColumn);
-        if (dialect == Dialect.POSTGRESQL) {
-            return "COALESCE(TRUNC(AVG(CAST(EXTRACT(DAY FROM (CAST(" + endColumn + " AS TIMESTAMP) - CAST("
-                    + beginColumn + " AS TIMESTAMP))) AS NUMERIC)), 1), 0)";
+        switch (dialect) {
+            case POSTGRESQL:
+                return "COALESCE(TRUNC(AVG(CAST(EXTRACT(DAY FROM (CAST(" + endColumn + " AS TIMESTAMP) - CAST("
+                        + beginColumn + " AS TIMESTAMP))) AS NUMERIC)), 1), 0)";
+            case ORACLE:
+                return "COALESCE(TRUNC(AVG(EXTRACT(DAY FROM (CAST(" + endColumn + " AS TIMESTAMP(9)) - CAST("
+                        + beginColumn + " AS TIMESTAMP(9))))), 1), 0)";
+            case SQLSERVER: {
+                String beginTime = "CAST(CAST(" + beginColumn + " AS datetime2(7)) AS time(7))";
+                String endTime = "CAST(CAST(" + endColumn + " AS datetime2(7)) AS time(7))";
+                String days = "DATEDIFF(DAY, " + beginColumn + ", " + endColumn + ")";
+                // 正向时，结束时刻早于开始时刻说明最后一天不完整；反向时同理，均向零修正 1 天
+                return "COALESCE(ROUND(AVG(CAST((CASE WHEN " + endColumn + " >= " + beginColumn
+                        + " THEN " + days + " - CASE WHEN " + endTime + " < " + beginTime + " THEN 1 ELSE 0 END"
+                        + " ELSE " + days + " + CASE WHEN " + endTime + " > " + beginTime + " THEN 1 ELSE 0 END END)"
+                        + " AS DECIMAL(19, 4))), 1, 1), 0)";
+            }
+            default:
+                return "COALESCE(TRUNCATE(AVG(TIMESTAMPDIFF(DAY, " + beginColumn + ", " + endColumn + ")), 1), 0)";
         }
-        return "COALESCE(TRUNCATE(AVG(TIMESTAMPDIFF(DAY, " + beginColumn + ", " + endColumn + ")), 1), 0)";
     }
 
     // ========== 其它 ==========
@@ -458,32 +526,130 @@ public class SqlDialectUtils {
      *
      * 1. 原有片段：wrapArray 为 false 时为 JSON_CONTAINS(column, {0})，参数为 ID 的数字文本；
      *    为 true 时为 JSON_CONTAINS(column, JSON_ARRAY({0}))，参数为 Long
-     * 2. PostgreSQL：CAST(column AS jsonb) @&gt; jsonb_build_array(CAST({0} AS BIGINT))，兼容 jsonb、json 与 JSON 文本列；
-     *    按数字匹配，数组中的字符串 "1" 不匹配 1；列为 NULL 时不匹配
-     * 3. Oracle、SQL Server 及其它数据库保持原有片段，是否可用未经验收
+     * 2. PostgreSQL、瀚高（原生驱动 jdbc:highgo:）、人大金仓：CAST(column AS jsonb) @&gt; jsonb_build_array(CAST({0} AS BIGINT))，
+     *    兼容 jsonb、json 与 JSON 文本列；按数字匹配，数组中的字符串 "1" 不匹配 1；列为 NULL 时不匹配
+     * 3. Oracle、SQL Server 2012+、H2：仅支持平面 Long / null 数组（应用以 List&lt;Long&gt; 写入的数据），元素两侧允许空白；
+     *    整个数组含字符串、嵌套数组、对象、小数、空元素、超出 Long 范围等非法元素时整体不匹配，不等价于通用 JSON_CONTAINS。
+     *    参数为 null 时匹配数组中的 null 元素，与原有 JSON_CONTAINS(column, JSON_ARRAY(NULL)) 一致；列为 NULL 时不匹配
+     * 4. 达梦、openGauss、神通等其它数据库保持原有片段
      *
      * @param column    JSON 数组列名，元素为数值 ID
      * @param wrapArray 原有片段是否使用 JSON_ARRAY 包装参数
      * @return 包含 {0} 占位符的 SQL 条件片段
      */
     public static String jsonArrayContains(String column, boolean wrapArray) {
-        return jsonArrayContains(getDialect(), column, wrapArray);
+        return jsonArrayContains(getJsonDialect(), column, wrapArray);
     }
 
     /**
-     * 按指定方言生成 JSON 数组包含数值 ID 的条件；仅 PostgreSQL 输出新片段。
+     * 按指定方言生成 JSON 数组包含数值 ID 的条件；原有路径保持 JSON_CONTAINS 片段，{0} 在片段中只出现一次。
      *
-     * @param dialect 已识别的数据库方言
+     * @param dialect 已识别的 JSON 方言
      * @param column 代码中固定的 JSON 数组列名
      * @param wrapArray 原有片段是否使用 JSON_ARRAY 包装参数
      * @return 包含 {0} 占位符的 SQL 条件片段
      */
     static String jsonArrayContains(Dialect dialect, String column, boolean wrapArray) {
         checkColumn(column);
-        if (dialect == Dialect.POSTGRESQL) {
-            return "CAST(" + column + " AS jsonb) @> jsonb_build_array(CAST({0} AS BIGINT))";
+        switch (dialect) {
+            case POSTGRESQL:
+                return "CAST(" + column + " AS jsonb) @> jsonb_build_array(CAST({0} AS BIGINT))";
+            case ORACLE:
+                return oracleJsonLongArrayContains(column);
+            case SQLSERVER:
+                return sqlServerJsonLongArrayContains(column);
+            case H2:
+                return h2JsonLongArrayContains(column);
+            default:
+                return wrapArray ? "JSON_CONTAINS(" + column + ", JSON_ARRAY({0}))" : "JSON_CONTAINS(" + column + ", {0})";
         }
-        return wrapArray ? "JSON_CONTAINS(" + column + ", JSON_ARRAY({0}))" : "JSON_CONTAINS(" + column + ", {0})";
+    }
+
+    /**
+     * Oracle：先用 REGEXP_LIKE 校验整个值为平面 Long / null 数组，再去掉空白、将首尾括号换为逗号，按 ,元素, 精确匹配。
+     * 数值按 TM9 格式与固定小数点字符转为文本，不受 NLS 影响；参数为 null 时匹配 null 元素，避免 Oracle 空串即 NULL 的拼接陷阱
+     *
+     * @param column 代码中固定的 JSON 数组列名
+     * @return 包含 {0} 占位符的 SQL 条件片段
+     */
+    private static String oracleJsonLongArrayContains(String column) {
+        // 注意：不能使用 TRANSLATE，CLOB 列超过 4000 字节时会报 ORA-22835；REPLACE 对 CLOB 返回 CLOB
+        String text = "REPLACE(REPLACE(REPLACE(" + column + ", CHR(9), ' '), CHR(10), ' '), CHR(13), ' ')";
+        return "(REGEXP_LIKE(" + text + ", '" + ORACLE_LONG_ARRAY_PATTERN + "')"
+                + " AND NOT REGEXP_LIKE(" + column + ", '" + LONG_OVERFLOW_PATTERN + "')"
+                + " AND INSTR(REPLACE(REPLACE(REPLACE(" + text + ", ' ', ''), '[', ','), ']', ','),"
+                + " ',' || COALESCE(TO_CHAR(CAST({0} AS NUMBER(19, 0)), 'TM9', 'NLS_NUMERIC_CHARACTERS = ''.,'''), 'null')"
+                + " || ',') > 0)";
+    }
+
+    /**
+     * H2：规则同 Oracle，整体格式使用 H2 专用的 {@link #H2_LONG_ARRAY_PATTERN}，按 LOCATE 匹配 ,元素,
+     *
+     * @param column 代码中固定的 JSON 数组列名
+     * @return 包含 {0} 占位符的 SQL 条件片段
+     */
+    private static String h2JsonLongArrayContains(String column) {
+        String text = "REPLACE(REPLACE(REPLACE(" + column + ", CHR(9), ' '), CHR(10), ' '), CHR(13), ' ')";
+        return "(REGEXP_LIKE(" + text + ", '" + H2_LONG_ARRAY_PATTERN + "')"
+                + " AND NOT REGEXP_LIKE(" + column + ", '" + LONG_OVERFLOW_PATTERN + "')"
+                + " AND LOCATE(',' || COALESCE(CAST(CAST({0} AS BIGINT) AS VARCHAR), 'null') || ',',"
+                + " REPLACE(REPLACE(REPLACE(" + text + ", ' ', ''), '[', ','), ']', ',')) > 0)";
+    }
+
+    /**
+     * SQL Server 2012+：不使用 OPENJSON（要求 2016+ 且兼容级别 130+），用 XML 校验元素
+     *
+     * 1. TAB、LF、CR 替换为空格后修剪整个值，要求首尾为 [ ]；括号内只允许数字、-、逗号、空格及 null 的小写字母（BIN2 比较），
+     *    此时不含 XML 元字符，按逗号拆成 &lt;r&gt;&lt;i&gt;...&lt;/i&gt;&lt;/r&gt;，其它值拆成空的 &lt;r/&gt;
+     * 2. 用 .query('.') 物化一份 XML 副本，再对整个文档执行一次 exist 校验（见 {@link #SQL_SERVER_LONG_ARRAY_XQUERY}）：
+     *    直接对内联 CAST 的 XML 执行时可能重复解析，本次验证中 1400 个元素的数组会明显变慢
+     * 3. 校验通过后，去掉空格、首尾补逗号，按 ,元素, 用 CHARINDEX 匹配；参数在 SQL 内转为 bigint 再转文本，
+     *    兼容 String、Long 参数；为 null 时匹配 null 元素
+     *
+     * 注意：最低按 SQL Server 2012 的语法编写，实际只在 SQL Server 2017（兼容级别 110）上验收。
+     * 表别名使用 yd_j 前缀，避免遮蔽外层查询的别名
+     *
+     * @param column 代码中固定的 JSON 数组列名
+     * @return 包含 {0} 占位符的 SQL 条件片段
+     */
+    private static String sqlServerJsonLongArrayContains(String column) {
+        return "EXISTS (SELECT 1"
+                + " FROM (SELECT LTRIM(RTRIM(REPLACE(REPLACE(REPLACE(CAST(" + column + " AS nvarchar(max)),"
+                + "CHAR(9),N' '),CHAR(10),N' '),CHAR(13),N' '))) AS doc) yd_jd"
+                + " CROSS APPLY (SELECT CASE WHEN LEFT(yd_jd.doc,1)=N'[' AND RIGHT(yd_jd.doc,1)=N']'"
+                + " THEN SUBSTRING(yd_jd.doc,2,CASE WHEN LEN(yd_jd.doc)>=2 THEN LEN(yd_jd.doc)-2 ELSE 0 END)"
+                + " ELSE NULL END AS body) yd_jb"
+                + " CROSS APPLY (SELECT CAST(CASE WHEN yd_jb.body IS NOT NULL"
+                + " AND PATINDEX(N'%[^0-9,nul -]%',COALESCE(yd_jb.body,N'') COLLATE Latin1_General_100_BIN2)=0"
+                + " AND LTRIM(RTRIM(yd_jb.body))<>N''"
+                + " THEN N'<r><i>'+REPLACE(yd_jb.body,N',',N'</i><i>')+N'</i></r>' ELSE N'<r/>' END AS XML) AS tokens) yd_jx"
+                + " CROSS APPLY (SELECT yd_jx.tokens.query('.') AS tokens) yd_jm"
+                + " WHERE yd_jm.tokens.exist('" + SQL_SERVER_LONG_ARRAY_XQUERY + "') = 1"
+                + " AND CHARINDEX(N','+COALESCE(CONVERT(nvarchar(20),CAST({0} AS BIGINT)),N'null')+N',',"
+                + "N','+REPLACE(yd_jb.body,N' ',N'')+N',')>0)";
+    }
+
+    /**
+     * 生成与 max 位数相同、数值更大的十进制数字串的正则，例如 max 为 18 时为 (1[9-9]|[2-9][0-9]{1})
+     *
+     * @param max 不含符号的十进制数字串
+     * @return 正则片段，不含 {0} 这样会被 Wrapper 当作占位符的文本
+     */
+    static String greaterDigitsPattern(String max) {
+        String pattern = null;
+        for (int i = max.length() - 1; i >= 0; i--) {
+            char digit = max.charAt(i);
+            int rest = max.length() - 1 - i;
+            String greater = digit == '9' ? null
+                    : "[" + (char) (digit + 1) + "-9]" + (rest > 0 ? "[0-9]{" + rest + "}" : "");
+            String same = pattern == null ? null : digit + pattern;
+            if (same == null) {
+                pattern = greater;
+            } else {
+                pattern = greater == null ? same : "(" + same + "|" + greater + ")";
+            }
+        }
+        return pattern;
     }
 
     // ========== 行数限制 ==========
@@ -667,6 +833,57 @@ public class SqlDialectUtils {
         } catch (SQLException e) {
             throw new IllegalStateException("获取数据库方言失败", e);
         }
+    }
+
+    /**
+     * 取得当前执行的 JSON 方言；连接与缓存规则同 {@link #getDialect()}，仅 JSON 片段使用
+     *
+     * @return JSON 方言
+     */
+    static Dialect getJsonDialect() {
+        Connection connection = JdbcUtils.getTransactionalConnection();
+        if (connection != null) {
+            try {
+                return resolveJsonDialect(connection.getMetaData());
+            } catch (SQLException e) {
+                throw new IllegalStateException("获取数据库方言失败", e);
+            }
+        }
+        return JSON_DIALECT_CACHE.computeIfAbsent(JdbcUtils.getDataSource(), dataSource -> {
+            try (Connection conn = dataSource.getConnection()) {
+                return resolveJsonDialect(conn.getMetaData());
+            } catch (SQLException e) {
+                throw new IllegalStateException("获取数据库方言失败", e);
+            }
+        });
+    }
+
+    /**
+     * 识别 JSON 方言，其它与 {@link #resolveDialect(DatabaseMetaData)} 一致；日期等其它片段仍保留原有片段：
+     * 1. 瀚高原生驱动（jdbc:highgo:）、人大金仓（产品名 KingbaseES）：已验收 jsonb 写法、且不支持 JSON_CONTAINS，按 PostgreSQL 处理
+     * 2. H2：不支持 JSON_CONTAINS，使用 {@link Dialect#H2} 的严格平面 Long 数组片段
+     *
+     * @param metaData 数据库元数据
+     * @return JSON 方言
+     * @throws SQLException 读取元数据失败
+     */
+    static Dialect resolveJsonDialect(DatabaseMetaData metaData) throws SQLException {
+        Dialect dialect = resolveDialect(metaData);
+        if (dialect != Dialect.ORIGINAL) {
+            return dialect;
+        }
+        String url = StrUtil.nullToEmpty(metaData.getURL()).toLowerCase(Locale.ROOT);
+        DbType dbType = DbTypeEnum.find(metaData.getDatabaseProductName());
+        if (url.startsWith(HIGHGO_URL_PREFIX) && (dbType == null || dbType == DbType.POSTGRE_SQL)) {
+            return Dialect.POSTGRESQL;
+        }
+        if (dbType == DbType.KINGBASE_ES) {
+            return Dialect.POSTGRESQL;
+        }
+        if (dbType == DbType.H2) {
+            return Dialect.H2;
+        }
+        return dialect;
     }
 
     /**

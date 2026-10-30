@@ -334,7 +334,7 @@ public interface PmsWorkItemMapper extends BaseMapperX<PmsWorkItemDO> {
             queryWrapper.and(wrapper -> wrapper.notIn(PmsWorkItemDO::getIterationId,
                     pageReqVO.getExcludedIterationIds()).or().isNull(PmsWorkItemDO::getIterationId));
         }
-        // label_ids 为 JSON 数组列，匹配任一标签；PostgreSQL 使用 jsonb 包含，其它数据库保持 JSON_CONTAINS
+        // label_ids 为 JSON 数组列，匹配任一标签；数据库差异由公共方言工具处理
         if (CollUtil.isNotEmpty(pageReqVO.getLabelIds())) {
             String labelCondition = SqlDialectUtils.jsonArrayContains("label_ids", true);
             queryWrapper.and(labelWrapper -> {

@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.hrm.controller.admin.insurance.vo.monthrecord.Hrm
 import cn.iocoder.yudao.module.hrm.dal.dataobject.insurance.monthrecord.HrmInsuranceMonthEmployeeRecordDO;
 import cn.iocoder.yudao.module.hrm.dal.dataobject.insurance.monthrecord.HrmInsuranceMonthRecordDO;
 import cn.iocoder.yudao.module.hrm.dal.mysql.insurance.monthrecord.HrmInsuranceMonthRecordMapper;
+import cn.iocoder.yudao.module.hrm.dal.redis.insurance.HrmInsuranceMonthRecordLockRedisDAO;
 import cn.iocoder.yudao.module.hrm.enums.insurance.employee.HrmInsuranceEmployeeStatusEnum;
 import cn.iocoder.yudao.module.hrm.enums.insurance.monthrecord.HrmInsuranceMonthStatusEnum;
 import com.mzt.logapi.context.LogRecordContext;
@@ -50,24 +51,30 @@ public class HrmInsuranceMonthRecordServiceImpl implements HrmInsuranceMonthReco
     @Resource
     private HrmInsuranceMonthEmployeeRecordService monthEmployeeRecordService;
 
+    @Resource
+    private HrmInsuranceMonthRecordLockRedisDAO monthRecordLockRedisDAO;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     @LogRecord(type = HRM_INSURANCE_MONTH_TYPE, subType = HRM_INSURANCE_MONTH_CREATE_SUB_TYPE,
             bizNo = "{{#monthRecord.id}}", success = HRM_INSURANCE_MONTH_CREATE_SUCCESS)
     public Long createFirstMonthRecord(HrmInsuranceMonthRecordCreateReqVO reqVO) {
-        // 1. 校验尚未生成社保表
-        if (monthRecordMapper.selectLastForUpdate() != null) {
-            throw exception(INSURANCE_FIRST_MONTH_RECORD_EXISTS);
-        }
+        // 加锁：尚无社保表时没有可锁定的记录，避免并发创建多个首月社保表；锁在事务完成后释放
+        return monthRecordLockRedisDAO.lock(() -> {
+            // 1. 校验尚未生成社保表
+            if (monthRecordMapper.selectLastForUpdate() != null) {
+                throw exception(INSURANCE_FIRST_MONTH_RECORD_EXISTS);
+            }
 
-        // 2.1 创建首月社保表
-        HrmInsuranceMonthRecordDO monthRecord = createMonthRecord(reqVO);
-        // 2.2 生成员工月记录并更新汇总
-        computeMonthRecord(monthRecord);
+            // 2.1 创建首月社保表
+            HrmInsuranceMonthRecordDO monthRecord = createMonthRecord(reqVO);
+            // 2.2 生成员工月记录并更新汇总
+            computeMonthRecord(monthRecord);
 
-        // 3. 记录操作日志上下文
-        LogRecordContext.putVariable("monthRecord", monthRecord);
-        return monthRecord.getId();
+            // 3. 记录操作日志上下文
+            LogRecordContext.putVariable("monthRecord", monthRecord);
+            return monthRecord.getId();
+        });
     }
 
     @Override
@@ -75,27 +82,30 @@ public class HrmInsuranceMonthRecordServiceImpl implements HrmInsuranceMonthReco
     @LogRecord(type = HRM_INSURANCE_MONTH_TYPE, subType = HRM_INSURANCE_MONTH_CREATE_SUB_TYPE,
             bizNo = "{{#monthRecord.id}}", success = HRM_INSURANCE_MONTH_CREATE_SUCCESS)
     public Long createNextMonthRecord() {
-        // 1. 校验最近月度社保表
-        HrmInsuranceMonthRecordDO lastMonthRecord = monthRecordMapper.selectLastForUpdate();
-        if (lastMonthRecord == null) {
-            throw exception(INSURANCE_MONTH_RECORD_NOT_EXISTS);
-        }
+        // 加锁：与首月创建、删除互斥；锁在事务完成后释放
+        return monthRecordLockRedisDAO.lock(() -> {
+            // 1. 校验最近月度社保表
+            HrmInsuranceMonthRecordDO lastMonthRecord = monthRecordMapper.selectLastForUpdate();
+            if (lastMonthRecord == null) {
+                throw exception(INSURANCE_MONTH_RECORD_NOT_EXISTS);
+            }
 
-        // 2. 归档最近月度社保表
-        if (Objects.equals(lastMonthRecord.getStatus(), HrmInsuranceMonthStatusEnum.UNARCHIVED.getStatus())) {
-            archiveMonthRecord(lastMonthRecord);
-        }
+            // 2. 归档最近月度社保表
+            if (Objects.equals(lastMonthRecord.getStatus(), HrmInsuranceMonthStatusEnum.UNARCHIVED.getStatus())) {
+                archiveMonthRecord(lastMonthRecord);
+            }
 
-        // 3.1 创建次月社保表
-        YearMonth nextMonth = YearMonth.of(lastMonthRecord.getYear(), lastMonthRecord.getMonth()).plusMonths(1);
-        HrmInsuranceMonthRecordDO monthRecord = createMonthRecord(new HrmInsuranceMonthRecordCreateReqVO()
-                .setYear(nextMonth.getYear()).setMonth(nextMonth.getMonthValue()));
-        // 3.2 生成员工月记录并更新汇总
-        computeMonthRecord(monthRecord);
+            // 3.1 创建次月社保表
+            YearMonth nextMonth = YearMonth.of(lastMonthRecord.getYear(), lastMonthRecord.getMonth()).plusMonths(1);
+            HrmInsuranceMonthRecordDO monthRecord = createMonthRecord(new HrmInsuranceMonthRecordCreateReqVO()
+                    .setYear(nextMonth.getYear()).setMonth(nextMonth.getMonthValue()));
+            // 3.2 生成员工月记录并更新汇总
+            computeMonthRecord(monthRecord);
 
-        // 4. 记录操作日志上下文
-        LogRecordContext.putVariable("monthRecord", monthRecord);
-        return monthRecord.getId();
+            // 4. 记录操作日志上下文
+            LogRecordContext.putVariable("monthRecord", monthRecord);
+            return monthRecord.getId();
+        });
     }
 
     @Override
@@ -103,27 +113,30 @@ public class HrmInsuranceMonthRecordServiceImpl implements HrmInsuranceMonthReco
     @LogRecord(type = HRM_INSURANCE_MONTH_TYPE, subType = HRM_INSURANCE_MONTH_DELETE_SUB_TYPE,
             bizNo = "{{#monthRecord.id}}", success = HRM_INSURANCE_MONTH_DELETE_SUCCESS)
     public void deleteMonthRecord(Long id) {
-        // 1. 校验仅删除最新社保表，并至少保留一张社保表
-        HrmInsuranceMonthRecordDO monthRecord = validateMonthRecordEditableForUpdate(id);
-        HrmInsuranceMonthRecordDO lastMonthRecord = monthRecordMapper.selectLast();
-        if (lastMonthRecord == null || ObjectUtil.notEqual(lastMonthRecord.getId(), monthRecord.getId())) {
-            throw exception(INSURANCE_MONTH_RECORD_NOT_LATEST);
-        }
-        if (monthRecordMapper.selectCount() <= 1) {
-            throw exception(INSURANCE_MONTH_RECORD_CANNOT_DELETE_ONLY);
-        }
+        // 加锁：与首月创建、次月创建互斥；锁在事务完成后释放
+        monthRecordLockRedisDAO.lock(() -> {
+            // 1. 校验仅删除最新社保表，并至少保留一张社保表
+            HrmInsuranceMonthRecordDO monthRecord = validateMonthRecordEditableForUpdate(id);
+            HrmInsuranceMonthRecordDO lastMonthRecord = monthRecordMapper.selectLast();
+            if (lastMonthRecord == null || ObjectUtil.notEqual(lastMonthRecord.getId(), monthRecord.getId())) {
+                throw exception(INSURANCE_MONTH_RECORD_NOT_LATEST);
+            }
+            if (monthRecordMapper.selectCount() <= 1) {
+                throw exception(INSURANCE_MONTH_RECORD_CANNOT_DELETE_ONLY);
+            }
 
-        // 2.1 删除当前月员工记录和月表
-        monthEmployeeRecordService.deleteMonthEmployeeRecordListByMonthRecordId(id);
-        monthRecordMapper.deleteById(id);
-        // 2.2 将上一月调整为可编辑状态
-        HrmInsuranceMonthRecordDO previousMonthRecord = monthRecordMapper.selectLast();
-        monthRecordMapper.updateById(new HrmInsuranceMonthRecordDO()
-                .setId(previousMonthRecord.getId())
-                .setStatus(HrmInsuranceMonthStatusEnum.UNARCHIVED.getStatus()));
+            // 2.1 删除当前月员工记录和月表
+            monthEmployeeRecordService.deleteMonthEmployeeRecordListByMonthRecordId(id);
+            monthRecordMapper.deleteById(id);
+            // 2.2 将上一月调整为可编辑状态
+            HrmInsuranceMonthRecordDO previousMonthRecord = monthRecordMapper.selectLast();
+            monthRecordMapper.updateById(new HrmInsuranceMonthRecordDO()
+                    .setId(previousMonthRecord.getId())
+                    .setStatus(HrmInsuranceMonthStatusEnum.UNARCHIVED.getStatus()));
 
-        // 3. 记录操作日志上下文
-        LogRecordContext.putVariable("monthRecord", monthRecord);
+            // 3. 记录操作日志上下文
+            LogRecordContext.putVariable("monthRecord", monthRecord);
+        });
     }
 
     @Override
