@@ -9,7 +9,10 @@ import cn.iocoder.yudao.module.iot.enums.rule.IotDataSinkTypeEnum;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.jdbc.core.ArgumentPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCallback;
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.stereotype.Component;
 
 /**
@@ -25,6 +28,11 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class IotDatabaseDataRuleAction extends
         IotDataRuleCacheableAction<IotDataSinkDatabaseConfig, JdbcTemplate> {
+
+    /**
+     * 不支持 NOW()、改用 CURRENT_TIMESTAMP 的数据库产品名，与 JDBC 驱动的 DatabaseMetaData#getDatabaseProductName 一致
+     */
+    private static final String[] CURRENT_TIMESTAMP_PRODUCT_NAMES = {"Oracle", "Microsoft SQL Server"};
 
     @Override
     public Integer getType() {
@@ -42,23 +50,49 @@ public class IotDatabaseDataRuleAction extends
             JdbcTemplate jdbcTemplate = getProducer(config);
 
             // 2. 构建并执行 INSERT SQL
-            String sql = StrUtil.format(
-                    "INSERT INTO {} (id, device_id, tenant_id, method, report_time, data, create_time) VALUES (?, ?, ?, ?, ?, ?, NOW())",
-                    config.getTableName());
             String messageJson = JsonUtils.toJsonString(message);
-            jdbcTemplate.update(sql,
+            ArgumentPreparedStatementSetter parameterSetter = new ArgumentPreparedStatementSetter(new Object[]{
                     message.getId(),
                     message.getDeviceId(),
                     message.getTenantId(),
                     message.getMethod(),
                     message.getReportTime(),
-                    messageJson);
+                    messageJson});
+            // 2.1 在执行 INSERT 的同一外部连接上识别数据库产品，选择 create_time 使用的数据库时间函数
+            PreparedStatementCreator statementCreator = connection -> connection.prepareStatement(
+                    buildInsertSql(config.getTableName(), connection.getMetaData().getDatabaseProductName()));
+            // 2.2 Statement 由 JdbcTemplate 创建后再绑定参数：绑定或执行失败时，由 JdbcTemplate 关闭 Statement、释放连接
+            PreparedStatementCallback<Integer> statementCallback = statement -> {
+                try {
+                    parameterSetter.setValues(statement);
+                    return statement.executeUpdate();
+                } finally {
+                    parameterSetter.cleanupParameters();
+                }
+            };
+            jdbcTemplate.execute(statementCreator, statementCallback);
             log.info("[execute][message({}) config({}) 写入数据库成功，table: {}]",
                     message.getId(), config, config.getTableName());
         } catch (Exception e) {
             log.error("[execute][message({}) config({}) 写入数据库失败]", message, config, e);
             throw e;
         }
+    }
+
+    /**
+     * 构建 INSERT SQL
+     *
+     * create_time 使用外部数据库的时间：Oracle、SQL Server 不支持 NOW()，使用 CURRENT_TIMESTAMP；其它数据库保持 NOW()
+     *
+     * @param tableName 已校验的表名
+     * @param databaseProductName 外部数据库的产品名，即 DatabaseMetaData#getDatabaseProductName
+     * @return INSERT SQL
+     */
+    private static String buildInsertSql(String tableName, String databaseProductName) {
+        String now = StrUtil.equalsAny(databaseProductName, CURRENT_TIMESTAMP_PRODUCT_NAMES) ? "CURRENT_TIMESTAMP" : "NOW()";
+        return StrUtil.format(
+                "INSERT INTO {} (id, device_id, tenant_id, method, report_time, data, create_time) VALUES (?, ?, ?, ?, ?, ?, {})",
+                tableName, now);
     }
 
     @Override

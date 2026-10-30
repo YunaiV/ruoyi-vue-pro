@@ -15,8 +15,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-// TODO DONE @AI：方法注释；已补齐方言重载与内部辅助方法的参数、返回值及边界。
-// TODO DONE @AI：多余的方法，可以考虑去掉；当然，保留也可以。。。已核对生产 Java/XML 调用，现有方法均有用途，保留。
 /**
  * 日期统计、逗号分隔列表关联、JSON 数组匹配、行数限制、分批删除 SQL 片段的方言工具类
  *
@@ -165,7 +163,6 @@ public class SqlDialectUtils {
      * @param column 列名
      * @return SQL 片段
      */
-    // TODO DONE @AI：用不到的，可以暂时先去掉噢； CRM 业绩统计使用 yyyyMM，商城交易统计使用 yyyy-MM，均需保留。
     public static String formatYearMonth(String column) {
         return formatYearMonth(getDialect(), column);
     }
@@ -196,7 +193,6 @@ public class SqlDialectUtils {
      * @param column 列名
      * @return SQL 片段
      */
-    // TODO DONE @AI：用不到的，可以暂时先去掉噢； CRM 业绩统计使用 yyyyMM，商城交易统计使用 yyyy-MM，均需保留。
     public static String formatYearDashMonth(String column) {
         return formatYearDashMonth(getDialect(), column);
     }
@@ -248,7 +244,6 @@ public class SqlDialectUtils {
         return formatDate(dialect, column);
     }
 
-    // TODO DONE @AI：用不到的，可以先清理掉噢； AI1 首页与交易统计的 String 日期消费者仍在使用，保留。
     /**
      * 按天分组；原有片段为 CAST(column AS DATE)，新方言输出 yyyy-MM-dd 字符串
      *
@@ -286,12 +281,10 @@ public class SqlDialectUtils {
      * @param column 列名
      * @return SQL 片段
      */
-    // TODO DONE @AI：多余的是不是去掉？ 会员统计的 LocalDate 消费者仍在使用，保留 DATE 类型转换。
     public static String castDate(String column) {
         return castDate(getDialect(), column);
     }
 
-    // TODO DONE @AI：方法注释；已补齐方言重载与内部辅助方法的参数、返回值及边界。
     /**
      * 生成 LocalDate 消费者所需的日期值；Oracle 用 TRUNC 去掉时分秒。
      *
@@ -337,7 +330,6 @@ public class SqlDialectUtils {
      * @param column 列名
      * @return SQL 片段
      */
-    // TODO DONE @AI：方法注释；已补齐方言重载与内部辅助方法的参数、返回值及边界。
     public static String year(String column) {
         return year(getDialect(), column);
     }
@@ -363,7 +355,6 @@ public class SqlDialectUtils {
         return dayOfMonth(getDialect(), column);
     }
 
-    // TODO DONE @AI：方法注释；已补齐方言重载与内部辅助方法的参数、返回值及边界。
     /**
      * 按指定方言提取月内日，原路径保留 DAYOFMONTH。
      *

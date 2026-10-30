@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.framework.mybatis.core.mapper;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants;
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
@@ -151,10 +152,6 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
         return selectOne(new LambdaQueryWrapper<T>().eq(field1, value1).eq(field2, value2).eq(field3, value3));
     }
 
-    // TODO DONE @AI：能不能把现有的 selectOneForUpdate、selectFirstOneForUpdate、selectListForFirstLock、 这些，做一个整合。目前感觉有点散。。。不然有点乱；包括 cms 项目里，其实也有一些 lock；/Users/yunai/Java/yudao-cms-all/ruoyi-vue-pro-jdk25/yudao-module-cms；最好有个比较万金油的方案。。。。
-    // 已整合为 selectOneForUpdate、selectListForUpdate、selectFirstOneForUpdate 三个锁定读入口（含字段重载），boot、cms 的手写 FOR UPDATE 均改为调用它们；
-    // 锁定子句由内置查询 SelectForUpdateMethod 生成（不再暴露 selectListForFirstLock 等接口方法），SQL Server 由 ForUpdateInnerInterceptor 改写，Oracle 的首行锁定在本类按数据库类型走多次查询。
-
     // ========== 锁定读：需要在事务中调用；Wrapper 不能使用 last、groupBy、having、参数别名 ==========
 
     /**
@@ -227,31 +224,40 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
      * @param queryWrapper 查询条件
      * @return 实体
      */
+    // DONE @AI：方法内注释噢；（处理：已按“情况一 非 Oracle 单条锁定、情况二 Oracle 2.1～2.3 候选、加锁、重读”补充步骤注释）
     default T selectFirstOneForUpdate(LambdaQueryWrapper<T> queryWrapper) {
+        // 情况一：非 Oracle，单条 LIMIT 1 FOR UPDATE 锁定首行（SQL Server 由 ForUpdateInnerInterceptor 改写）
         DbType dbType = JdbcUtils.getDbType();
-        if (!ObjectUtils.equalsAny(dbType, DbType.ORACLE, DbType.ORACLE_12C)) {
+        // DONE @AI：ObjectUtils notequals any；（处理：已改为 ObjectUtils.notEqualsAny，dbType 为 null 时与原取反写法一致，均走单条锁定）
+        if (ObjectUtils.notEqualsAny(dbType, DbType.ORACLE, DbType.ORACLE_12C)) {
             return CollUtil.getFirst(selectListByForUpdateMethod(SelectForUpdateMethod.Kind.LOCK_FIRST, queryWrapper, null));
         }
+
+        // 情况二：Oracle，按“查询候选主键、按主键加锁、重新读取首行主键”重试，最多 5 次
         int maxAttempts = 5;
         for (int i = 0; i < maxAttempts; i++) {
-            List<Object> ids = selectListByForUpdateMethod(SelectForUpdateMethod.Kind.FIRST_IDS, queryWrapper, null);
-            if (ids.isEmpty()) {
+            // DONE @AI：getFirst 是不是可以简化下；看看其它地方，是不是也有地方；（处理：候选、重读主键与返回的锁定行均改为 CollUtil.getFirst；是否锁定到候选仍按列表是否为空判断）
+            // 2.1 查询首行主键作为候选，不加锁；主键不为 null，取不到时即没有满足条件的记录
+            Object id = CollUtil.getFirst(selectListByForUpdateMethod(SelectForUpdateMethod.Kind.FIRST_IDS, queryWrapper, null));
+            if (id == null) {
                 return null;
             }
-            Object id = ids.get(0);
-            // 是否锁定到候选，以列表是否为空判断：查询列均为 NULL 时，MyBatis 返回的元素为 null
+            // 2.2 按原条件、且主键等于候选加锁；列表为空说明候选已不满足条件，重试
+            // 注意：以列表是否为空判断是否锁定到候选，不能以元素判断：查询列均为 NULL 时，MyBatis 返回的元素为 null
             List<T> lockRows = selectListByForUpdateMethod(SelectForUpdateMethod.Kind.LOCK, queryWrapper, id);
-            if (lockRows.isEmpty()) {
+            if (CollUtil.isEmpty(lockRows)) {
                 continue;
             }
-            List<Object> latestIds = selectListByForUpdateMethod(SelectForUpdateMethod.Kind.FIRST_IDS, queryWrapper, null);
-            if (!latestIds.isEmpty() && Objects.equals(id, latestIds.get(0))) {
-                return lockRows.get(0);
+            // 2.3 锁定后重新读取首行主键，与候选相同才返回锁定的记录（查询列均为 NULL 时为 null）；不同时重试
+            Object latestId = CollUtil.getFirst(selectListByForUpdateMethod(SelectForUpdateMethod.Kind.FIRST_IDS, queryWrapper, null));
+            if (Objects.equals(id, latestId)) {
+                return CollUtil.getFirst(lockRows);
             }
         }
         throw ServiceExceptionUtil.exception(GlobalErrorCodeConstants.LOCKED);
     }
 
+    // DONE @AI：方法内注释噢；（处理：已补充校验、构建参数、执行内置查询三步注释）
     /**
      * 执行锁定读的内置查询，见 {@link SelectForUpdateMethod}
      *
@@ -262,18 +268,23 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
      */
     private <E> List<E> selectListByForUpdateMethod(SelectForUpdateMethod.Kind kind, LambdaQueryWrapper<T> queryWrapper,
                                                     Object id) {
+        // 1. 校验查询条件
         checkForUpdateWrapper(queryWrapper);
+        // 2. 构建参数：查询条件、主键；首行主键查询由分页插件限制为 1 条，不查询总数
         MapperMethod.ParamMap<Object> param = new MapperMethod.ParamMap<>();
         param.put(Constants.WRAPPER, queryWrapper);
         param.put(SelectForUpdateMethod.PARAM_ID, id);
         if (kind == SelectForUpdateMethod.Kind.FIRST_IDS) {
             param.put("page", MyBatisUtils.buildPage(0, 1, false));
         }
+        // 3. 通过 SqlSession 执行内置查询：未在 Mapper 接口声明，MappedStatement 编号为 Mapper 接口名 + 方法名
         MapperProxyMetadata mapperProxyMetadata = MybatisUtils.getMapperProxy(this);
         return mapperProxyMetadata.getSqlSession().selectList(
                 mapperProxyMetadata.getMapperInterface().getName() + Constants.DOT + kind.getMethod(), param);
     }
 
+    // DONE @AI：方法内注释噢；（处理：已补充 last、groupBy/having、参数别名的校验注释）
+    // DONE @AI：notequals；isNotEmpty 等等，减少取反；（处理：已改为 ObjectUtil.notEqual、CollUtil.isNotEmpty）
     /**
      * 校验锁定读的查询条件：内置查询只使用实体条件、普通条件与排序
      *
@@ -283,14 +294,17 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
         if (queryWrapper == null) {
             throw new IllegalArgumentException("锁定读的查询条件不能为空");
         }
+        // 校验 last：设置 last 时，Wrapper 的 SQL 片段比条件表达式多出 last 部分
         MergeSegments expression = queryWrapper.getExpression();
-        if (!Objects.equals(queryWrapper.getSqlSegment(), expression.getSqlSegment())) {
+        if (ObjectUtil.notEqual(queryWrapper.getSqlSegment(), expression.getSqlSegment())) {
             throw new IllegalArgumentException("锁定读的查询条件不能使用 last");
         }
-        if (!expression.getGroupBy().isEmpty() || !expression.getHaving().isEmpty()) {
+        // 校验 groupBy、having：内置查询不生成这两部分
+        if (CollUtil.isNotEmpty(expression.getGroupBy()) || CollUtil.isNotEmpty(expression.getHaving())) {
             throw new IllegalArgumentException("锁定读的查询条件不能使用 groupBy、having");
         }
-        if (!Constants.WRAPPER.equals(queryWrapper.getParamAlias())) {
+        // 校验参数别名：内置查询的模板固定使用 ew 作为参数名
+        if (ObjectUtil.notEqual(Constants.WRAPPER, queryWrapper.getParamAlias())) {
             throw new IllegalArgumentException("锁定读的查询条件不能设置参数别名");
         }
     }
@@ -305,7 +319,6 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
      * @return 实体
      */
     default T selectFirstOne(SFunction<T, ?> field, Object value) {
-        // 如果明确使用 MySQL 等场景，可以考虑使用 LIMIT 1 进行优化
         List<T> list = selectList(new LambdaQueryWrapper<T>().eq(field, value));
         return CollUtil.getFirst(list);
     }
