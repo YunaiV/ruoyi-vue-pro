@@ -31,8 +31,9 @@ import java.util.function.Predicate;
  * 1. 对话模型：OpenAiChatModel（OpenAI 兼容协议，覆盖 DeepSeek、GLM、Ollama(/v1) 等）
  * 2. 嵌入模型：OpenAiEmbeddingModel（向量化）
  *
- * 模型按 providerId:modelId 缓存复用（编号全局唯一，无需再区分租户），缓存使用 Guava Cache 按容量淘汰最久未访问的模型；
- * Provider、模型的配置变更时，由对应 Service 调用 {@link #evictByProviderId}、{@link #evictByModelId} 显式失效
+ * 模型按 providerId:modelId:配置指纹 缓存复用（编号全局唯一，无需再区分租户），配置变化后自然命中新 key；
+ * 缓存使用 Guava Cache 按容量淘汰最久未访问的模型；Provider、模型的配置变更或删除时，
+ * 由对应 Service 调用 {@link #evictByProviderId}、{@link #evictByModelId} 显式失效本节点缓存
  *
  * @author 芋道源码
  */
@@ -47,10 +48,12 @@ public class Ai1LlmModelFactory {
     /**
      * 缓存上限，达到后逐出最久未访问的模型
      */
-    private static final int CACHE_MAX = 128;
+    private static final int CACHE_MAX = 500;
 
     /**
-     * 缓存写入后的过期时间：修改 Provider / 模型时只能失效本节点，其他节点最迟在该时间后按新配置重建
+     * 缓存写入后的过期时间：回收配置变化后不再命中的旧 key
+     *
+     * 每次调用都按最新配置计算 key，其他节点无需等待过期，下次调用即按新配置构建
      */
     private static final Duration CACHE_EXPIRE = Duration.ofMinutes(10);
 
@@ -60,12 +63,12 @@ public class Ai1LlmModelFactory {
     private static final String KEY_SEPARATOR = ":";
 
     /**
-     * 对话模型缓存：providerId:modelId:sessionKey → ChatModel
+     * 对话模型缓存：providerId:modelId:配置指纹:sessionKey → ChatModel
      */
     private final Cache<String, OpenAiChatModel> chatModelCache = CacheBuilder.newBuilder()
             .maximumSize(CACHE_MAX).expireAfterWrite(CACHE_EXPIRE).build();
     /**
-     * 嵌入模型缓存：providerId:modelId → EmbeddingModel
+     * 嵌入模型缓存：providerId:modelId:配置指纹 → EmbeddingModel
      */
     private final Cache<String, OpenAiEmbeddingModel> embeddingModelCache = CacheBuilder.newBuilder()
             .maximumSize(CACHE_MAX).expireAfterWrite(CACHE_EXPIRE).build();

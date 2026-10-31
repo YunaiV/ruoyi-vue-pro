@@ -15,10 +15,10 @@ import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterRespDTO;
 import cn.iocoder.yudao.module.iot.core.topic.auth.IotSubDeviceRegisterRespDTO;
 import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties;
 
-import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -35,9 +35,12 @@ import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeC
 /**
  * Iot 设备信息 Service 实现类：调用远程的 device http 接口，进行设备认证、设备获取等
  *
+ * 注意：仅配置 yudao.iot.gateway.rpc.url 时创建（独立部署）；合并部署时，使用 biz 的 IotDeviceCommonApi 实现
+ *
  * @author 芋道源码
  */
 @Service
+@ConditionalOnProperty(prefix = "yudao.iot.gateway.rpc", name = "url")
 @Slf4j
 public class IotDeviceApiImpl implements IotDeviceCommonApi {
 

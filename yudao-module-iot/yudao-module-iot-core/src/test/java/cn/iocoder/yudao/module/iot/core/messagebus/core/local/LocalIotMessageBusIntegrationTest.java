@@ -10,7 +10,12 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -173,6 +178,71 @@ public class LocalIotMessageBusIntegrationTest {
         boolean completed = latch.await(10, TimeUnit.SECONDS);
         assertTrue(completed, "消息处理超时");
         log.info("[测试] 多主题测试完成");
+    }
+
+    /**
+     * 1 topic 16 subscriber 并发注册
+     */
+    @Test
+    public void testConcurrentRegister() throws Exception {
+        // 准备参数
+        String topic = "concurrent-register-topic";
+        String testMessage = "concurrent";
+        int threadCount = 16;
+        List<AtomicInteger> receivedCounts = new ArrayList<>(threadCount);
+        List<IotMessageSubscriber<String>> subscribers = new ArrayList<>(threadCount);
+        for (int i = 0; i < threadCount; i++) {
+            AtomicInteger receivedCount = new AtomicInteger(0);
+            String group = "concurrent-group-" + i;
+            receivedCounts.add(receivedCount);
+            subscribers.add(new IotMessageSubscriber<String>() {
+
+                @Override
+                public String getTopic() {
+                    return topic;
+                }
+
+                @Override
+                public String getGroup() {
+                    return group;
+                }
+
+                @Override
+                public void onMessage(String message) {
+                    assertEquals(testMessage, message);
+                    receivedCount.incrementAndGet();
+                }
+
+            });
+        }
+
+        // 调用：16 个线程同时注册
+        ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+        try {
+            CountDownLatch startLatch = new CountDownLatch(1);
+            List<Future<?>> futures = new ArrayList<>(threadCount);
+            for (IotMessageSubscriber<String> subscriber : subscribers) {
+                futures.add(executor.submit(() -> {
+                    startLatch.await();
+                    messageBus.register(subscriber);
+                    return null;
+                }));
+            }
+            startLatch.countDown();
+            // 注册时抛出的异常（例如 ConcurrentModificationException），会在 get 时抛出
+            for (Future<?> future : futures) {
+                future.get(10, TimeUnit.SECONDS);
+            }
+        } finally {
+            executor.shutdownNow();
+        }
+        // 调用：注册完成后，发送一次消息（本地总线同步投递）
+        messageBus.post(topic, testMessage);
+
+        // 断言：每个订阅者都收到 1 条消息，没有因并发注册而丢失
+        for (int i = 0; i < threadCount; i++) {
+            assertEquals(1, receivedCounts.get(i).get(), "订阅者 " + i + " 应该收到 1 条消息");
+        }
     }
 
 }
