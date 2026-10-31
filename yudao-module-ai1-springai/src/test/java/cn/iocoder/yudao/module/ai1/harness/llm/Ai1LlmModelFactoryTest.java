@@ -254,6 +254,55 @@ public class Ai1LlmModelFactoryTest {
         assertNotSame(chat, chatModel(model, 1L));
     }
 
+    @Test
+    public void testCache_chatConfigChange() {
+        // 准备参数
+        Ai1ModelRespBO model = model(baseUrl);
+        Ai1LlmChatTool chatTool = new Ai1LlmChatTool();
+        ReflectionTestUtils.setField(chatTool, "llmModelFactory", factory);
+        Object chat = chatModel(model, 42L);
+
+        // 调用：接口地址变化
+        model.setBaseUrl(baseUrl + "/proxy/v1");
+        chatTool.chat(model, "系统指令", List.of(), "当前消息", List.of(), List.of(), 42L, null, null);
+        // 断言
+        Object changed = chatModel(model, 42L);
+        assertNotSame(chat, changed);
+        assertEquals("/proxy/v1/chat/completions", requests.get(0).path());
+
+        // 调用：请求 Header 变化
+        model.setHeaders(Map.of("X-Session", "{session}", "X-Provider", "changed"));
+        chatTool.chat(model, "系统指令", List.of(), "当前消息", List.of(), List.of(), 42L, null, null);
+        // 断言
+        assertNotSame(changed, chatModel(model, 42L));
+        assertEquals(2, requests.size());
+        assertEquals("/proxy/v1/chat/completions", requests.get(1).path());
+        assertEquals("changed", requests.get(1).provider());
+        assertEquals("42", requests.get(1).session());
+    }
+
+    @Test
+    public void testCache_embeddingConfigChange() {
+        // 准备参数
+        Ai1ModelRespBO model = model(baseUrl);
+        EmbeddingModel embedding = factory.getOrCreateEmbeddingModel(model);
+        embedding.embed("旧配置");
+
+        // 调用：接口地址、请求 Header 变化
+        model.setBaseUrl(baseUrl + "/proxy/v1").setHeaders(Map.of("X-Provider", "changed"));
+        EmbeddingModel changed = factory.getOrCreateEmbeddingModel(model);
+        changed.embed("新配置");
+        // 断言
+        assertNotSame(embedding, changed);
+        assertSame(changed, factory.getOrCreateEmbeddingModel(model));
+        assertEquals(2, requests.size());
+        assertEquals("/v1/embeddings", requests.get(0).path());
+        assertEquals("provider", requests.get(0).provider());
+        assertEquals("/proxy/v1/embeddings", requests.get(1).path());
+        assertEquals("changed", requests.get(1).provider());
+        assertEquals("新配置", requests.get(1).body().get("input").get(0).asText());
+    }
+
     // ========== 工具方法 ==========
 
     private Object chatModel(Ai1ModelRespBO model, Long sessionId) {
