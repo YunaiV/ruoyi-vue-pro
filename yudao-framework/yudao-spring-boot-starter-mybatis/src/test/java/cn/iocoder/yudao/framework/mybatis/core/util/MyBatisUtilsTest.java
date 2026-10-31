@@ -18,7 +18,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-// TODO DONE @AI：参考 system user test 的风格；统一准备参数、调用、断言分区。
 /**
  * {@link MyBatisUtils} 的单元测试
  */
