@@ -41,7 +41,7 @@
     <url>https://github.com/YunaiV/ruoyi-vue-pro</url>
 
     <properties>
-        <revision>2026.09-jdk25-SNAPSHOT</revision>
+        <revision>2026.10-jdk25-SNAPSHOT</revision>
         <!-- Maven 相关 -->
         <java.version>25</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
