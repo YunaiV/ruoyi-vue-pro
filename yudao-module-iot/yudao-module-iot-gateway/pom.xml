@@ -91,7 +91,7 @@
         <!-- 设置构建的 jar 包名 -->
         <finalName>${project.artifactId}</finalName>
         <plugins>
-            <!-- 打包 -->
+            <!-- 打包：普通 jar 供 biz 引入，-exec.jar 独立运行 -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
@@ -101,6 +101,10 @@
                         <goals>
                             <goal>repackage</goal> <!-- 将引入的 jar 打入其中 -->
                         </goals>
+                        <configuration>
+                            <!-- 可执行 jar 使用 exec 分类，主 artifact 保留为普通可依赖 jar -->
+                            <classifier>exec</classifier>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

@@ -21,7 +21,7 @@ import static cn.iocoder.yudao.framework.common.util.cache.CacheUtils.buildAsync
  *
  * @author 芋道源码
  */
-@Service
+@Service("iotGatewayDeviceServiceImpl") // 显式 bean 名：避免与 biz 的 IotDeviceServiceImpl 同名冲突
 @Slf4j
 public class IotDeviceServiceImpl implements IotDeviceService {
 

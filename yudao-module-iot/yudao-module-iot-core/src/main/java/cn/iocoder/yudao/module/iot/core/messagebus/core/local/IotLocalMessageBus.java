@@ -8,10 +8,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.EventListener;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * 本地的 {@link IotMessageBus} 实现类
@@ -30,7 +30,7 @@ public class IotLocalMessageBus implements IotMessageBus {
      * 订阅者映射表
      * Key: topic
      */
-    private final Map<String, List<IotMessageSubscriber<?>>> subscribers = new HashMap<>();
+    private final Map<String, List<IotMessageSubscriber<?>>> subscribers = new ConcurrentHashMap<>();
 
     @Override
     public void post(String topic, Object message) {
@@ -40,7 +40,7 @@ public class IotLocalMessageBus implements IotMessageBus {
     @Override
     public void register(IotMessageSubscriber<?> subscriber) {
         String topic = subscriber.getTopic();
-        List<IotMessageSubscriber<?>> topicSubscribers = subscribers.computeIfAbsent(topic, k -> new ArrayList<>());
+        List<IotMessageSubscriber<?>> topicSubscribers = subscribers.computeIfAbsent(topic, k -> new CopyOnWriteArrayList<>());
         topicSubscribers.add(subscriber);
         log.info("[register][topic({}/{}) 注册消费者({})成功]",
                 topic, subscriber.getGroup(), subscriber.getClass().getName());
