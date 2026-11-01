@@ -93,6 +93,17 @@ public class AiUtils {
 
     public static ChatOptions buildChatOptions(AiPlatformEnum platform, String model, Double temperature, Integer maxTokens,
                                                List<ToolCallback> toolCallbacks, Map<String, Object> toolContext) {
+        return buildChatOptions(platform, model, temperature, maxTokens, toolCallbacks, toolContext, false);
+    }
+
+    /**
+     * 构建 ChatOptions
+     *
+     * @param hasMedia 本次 Prompt 是否含 Media（包括选入上下文的历史消息）。通义含 Media 时必须走多模态接口
+     */
+    public static ChatOptions buildChatOptions(AiPlatformEnum platform, String model, Double temperature, Integer maxTokens,
+                                               List<ToolCallback> toolCallbacks, Map<String, Object> toolContext,
+                                               boolean hasMedia) {
         toolCallbacks = ObjUtil.defaultIfNull(toolCallbacks, Collections.emptyList());
         toolContext = ObjUtil.defaultIfNull(toolContext, Collections.emptyMap());
         // noinspection EnhancedSwitchMigration
@@ -100,7 +111,7 @@ public class AiUtils {
             case TONG_YI:
                 return DashScopeChatOptions.builder().model(model).temperature(temperature).maxToken(maxTokens)
                         .enableThinking(true) // TODO 芋艿：默认都开启 thinking 模式，后续可以让用户配置
-                        .multiModel(TONG_YI_MULTI_MODELS.contains(model)) // 是否多模态模型
+                        .multiModel(hasMedia || TONG_YI_MULTI_MODELS.contains(model)) // 含 Media 必须走多模态接口；纯文本按名单保持原通道
                         .toolCallbacks(toolCallbacks).toolContext(toolContext).build();
             case DEEP_SEEK:
             case DOU_BAO: // 复用 DeepSeek 客户端

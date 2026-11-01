@@ -20,7 +20,7 @@ public class ZhiPuChatModel implements ChatModel {
 
     public static final String BASE_URL = "https://open.bigmodel.cn/api/paas/v4";
 
-    public static final String MODEL_DEFAULT = "glm-5.2";
+    public static final String MODEL_DEFAULT = "glm-5.3-flash";
 
     /**
      * 兼容 OpenAI 接口，复用 DeepSeek 客户端

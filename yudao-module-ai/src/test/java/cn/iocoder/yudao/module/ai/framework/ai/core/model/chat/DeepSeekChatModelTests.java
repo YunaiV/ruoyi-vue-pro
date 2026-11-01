@@ -29,7 +29,7 @@ public class DeepSeekChatModelTests {
     private static final String API_KEY = SystemUtil.get("DEEPSEEK_API_KEY",
             "sk-xxxx");
     private static final String MODEL = SystemUtil.get("DEEPSEEK_MODEL",
-            "deepseek-v4-flash");
+            "deepseek-flash");
 
     private final DeepSeekChatModel chatModel = DeepSeekChatModel.builder()
             .deepSeekApi(DeepSeekApi.builder()

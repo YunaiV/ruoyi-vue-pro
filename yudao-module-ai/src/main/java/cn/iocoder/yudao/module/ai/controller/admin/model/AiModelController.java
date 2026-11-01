@@ -83,7 +83,8 @@ public class AiModelController {
         List<AiModelDO> list = modelService.getModelListByStatusAndType(
                 CommonStatusEnum.ENABLE.getStatus(), type, platform);
         return success(convertList(list, model -> new AiModelRespVO().setId(model.getId())
-                .setName(model.getName()).setModel(model.getModel()).setPlatform(model.getPlatform())));
+                .setName(model.getName()).setModel(model.getModel()).setPlatform(model.getPlatform())
+                .setInputModalities(model.getInputModalities())));
     }
 
 }

@@ -1,13 +1,18 @@
 package cn.iocoder.yudao.module.ai.dal.dataobject.model;
 
+import cn.iocoder.yudao.module.ai.enums.model.AiModelInputModalityEnum;
 import cn.iocoder.yudao.module.ai.enums.model.AiModelTypeEnum;
 import cn.iocoder.yudao.module.ai.enums.model.AiPlatformEnum;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+import cn.iocoder.yudao.framework.mybatis.core.type.StringListTypeHandler;
 import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
+
+import java.util.List;
 
 /**
  * AI 模型 DO
@@ -17,7 +22,7 @@ import lombok.*;
  * @author fansili
  * @since 2024/4/24 19:39
  */
-@TableName("ai_model")
+@TableName(value = "ai_model", autoResultMap = true)
 @KeySequence("ai_model_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @Builder
@@ -84,5 +89,12 @@ public class AiModelDO extends BaseDO {
      * 上下文的最大 Message 数量
      */
     private Integer maxContexts;
+    /**
+     * 输入模态数组
+     *
+     * 枚举 {@link AiModelInputModalityEnum}，仅 {@link AiModelTypeEnum#CHAT} 使用；为空时视为仅支持 text
+     */
+    @TableField(typeHandler = StringListTypeHandler.class)
+    private List<String> inputModalities;
 
 }
