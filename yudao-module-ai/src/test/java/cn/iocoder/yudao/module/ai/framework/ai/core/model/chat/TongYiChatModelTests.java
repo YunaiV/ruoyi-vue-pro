@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.ai.framework.ai.core.model.chat;
 
 import cn.hutool.system.SystemUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
-import cn.iocoder.yudao.module.ai.util.AiUtils;
 import com.alibaba.cloud.ai.dashscope.api.DashScopeApi;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatModel;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
@@ -39,14 +38,14 @@ public class TongYiChatModelTests {
     private static final String API_KEY = SystemUtil.get("DASHSCOPE_API_KEY",
             "sk-xxxx"); // 按需改成你的 DashScope API Key
     private static final String MODEL = SystemUtil.get("DASHSCOPE_MODEL",
-            "qwen3.7-plus");
+            "qwen3.8-max");
 
     private final DashScopeChatModel chatModel = DashScopeChatModel.builder()
             .dashScopeApi(DashScopeApi.builder()
                     .apiKey(API_KEY)
                     .build())
             .defaultOptions(DashScopeChatOptions.builder()
-                    .multiModel(AiUtils.TONG_YI_MULTI_MODELS.contains(MODEL)) // 多模态模型需要设置为 true，可见 https://help.aliyun.com/zh/model-studio/error-code#error-url
+                    .multiModel(true) // 多模态模型（如 qwen3.8-max）需要设置为 true，以选择多模态接口，可见 https://help.aliyun.com/zh/model-studio/error-code#error-url
                     .model(MODEL) // 模型
 //                    .model("deepseek-r1") // 模型（deepseek-r1）
 //                    .model("deepseek-v3") // 模型（deepseek-v3）
@@ -97,7 +96,7 @@ public class TongYiChatModelTests {
         List<Message> messages = new ArrayList<>();
         messages.add(new UserMessage("详细分析下，如何设计一个电商系统？"));
         DashScopeChatOptions options = DashScopeChatOptions.builder()
-                .model(MODEL).multiModel(AiUtils.TONG_YI_MULTI_MODELS.contains(MODEL))
+                .model(MODEL).multiModel(true)
 //                .withModel("qwen-max-2025-01-25")
                 .enableThinking(true) // 必须设置，否则会报错
                 .build();
