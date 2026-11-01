@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.ai.framework.ai.core.model.chat;
 
+import cn.hutool.system.SystemUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import com.alibaba.cloud.ai.dashscope.api.DashScopeApi;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatModel;
@@ -32,13 +33,16 @@ import static java.util.Arrays.asList;
  */
 public class TongYiChatModelTests {
 
+    private static final String API_KEY = SystemUtil.get("DASHSCOPE_API_KEY",
+            "sk-xxxx"); // 按需改成你的 DashScope API Key
+
     private final DashScopeChatModel chatModel = DashScopeChatModel.builder()
             .dashScopeApi(DashScopeApi.builder()
-                    .apiKey("sk-cd9f39e99ea54840bd1888282325f55a") // https://bailian.console.aliyun.com/cn-beijing/?tab=model#/api-key 获取密钥
+                    .apiKey(API_KEY) // https://bailian.console.aliyun.com/cn-beijing/?tab=model#/api-key 获取密钥
                     .build())
             .defaultOptions(DashScopeChatOptions.builder()
-                    .multiModel(true) // 注意：当使用 qwen3.6-plus 等多模态模型，需要设置为 true，可见 https://help.aliyun.com/zh/model-studio/error-code#error-url 链接
-                    .model("qwen3.6-plus") // 模型
+                    .multiModel(true) // 注意：当使用 qwen3.8-max 等多模态模型，需要设置为 true，可见 https://help.aliyun.com/zh/model-studio/error-code#error-url 链接
+                    .model("qwen3.8-max") // 模型
 //                    .model("deepseek-r1") // 模型（deepseek-r1）
 //                    .model("deepseek-v3") // 模型（deepseek-v3）
 //                    .model("deepseek-r1-distill-qwen-1.5b") // 模型（deepseek-r1-distill-qwen-1.5b）
@@ -85,7 +89,7 @@ public class TongYiChatModelTests {
         List<Message> messages = new ArrayList<>();
         messages.add(new UserMessage("详细分析下，如何设计一个电商系统？"));
         DashScopeChatOptions options = DashScopeChatOptions.builder()
-                .model("qwen3.6-plus").multiModel(true)
+                .model("qwen3.8-max").multiModel(true)
 //                .withModel("qwen-max-2025-01-25")
                 .enableThinking(true) // 必须设置，否则会报错
                 .build();
@@ -105,7 +109,7 @@ public class TongYiChatModelTests {
         // 准备环境
         RerankModel rerankModel = new DashScopeRerankModel(
                 DashScopeApi.builder()
-                        .apiKey("sk-47aa124781be4bfb95244cc62f63f7d0")
+                        .apiKey(API_KEY)
                         .build());
         // 准备参数
         String query = "spring";

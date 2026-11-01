@@ -31,6 +31,7 @@ public interface ErrorCodeConstants {
     // ========== API 聊天消息 1-040-004-000 ==========
     ErrorCode CHAT_MESSAGE_NOT_EXIST = new ErrorCode(1_040_004_000, "消息不存在!");
     ErrorCode CHAT_STREAM_ERROR = new ErrorCode(1_040_004_001, "对话生成异常!");
+    ErrorCode CHAT_MESSAGE_IMAGE_READ_FAIL = new ErrorCode(1_040_004_002, "读取图片附件({})失败，请重新上传后重试");
 
     // ========== API 绘画 1-040-005-000 ==========
     ErrorCode IMAGE_NOT_EXISTS = new ErrorCode(1_040_005_000, "图片不存在!");
