@@ -46,6 +46,13 @@ import java.util.Objects;
  */
 public interface BaseMapperX<T> extends MPJBaseMapper<T> {
 
+    /**
+     * Wrapper 的 set(column, null, mapping) 使用：显式声明 VARCHAR 类型
+     *
+     * 原因：未指定 jdbcType 时，null 值按 MyBatis 的 jdbcTypeForNull（默认 OTHER）传入，Oracle、达梦等数据库可能报错
+     */
+    String JDBC_TYPE_VARCHAR = "jdbcType=VARCHAR";
+
     default PageResult<T> selectPage(SortablePageParam pageParam, @Param("ew") Wrapper<T> queryWrapper) {
         return selectPage(pageParam, pageParam.getSortingFields(), queryWrapper);
     }

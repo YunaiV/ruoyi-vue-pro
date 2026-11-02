@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.ai.service.chat;
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.file.FileNameUtil;
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
@@ -26,6 +27,8 @@ import cn.iocoder.yudao.module.ai.dal.mysql.chat.AiChatMessageMapper;
 import cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.ai.enums.model.AiModelInputModalityEnum;
 import cn.iocoder.yudao.module.ai.enums.model.AiPlatformEnum;
+import cn.iocoder.yudao.module.ai.enums.requestlog.AiRequestLogBizTypeEnum;
+import cn.iocoder.yudao.module.ai.enums.requestlog.AiRequestLogStatusEnum;
 import cn.iocoder.yudao.module.ai.framework.ai.core.webserch.AiWebSearchClient;
 import cn.iocoder.yudao.module.ai.framework.ai.core.webserch.AiWebSearchRequest;
 import cn.iocoder.yudao.module.ai.framework.ai.core.webserch.AiWebSearchResponse;
@@ -36,7 +39,10 @@ import cn.iocoder.yudao.module.ai.service.knowledge.bo.AiKnowledgeSegmentSearchR
 import cn.iocoder.yudao.module.ai.service.model.AiChatRoleService;
 import cn.iocoder.yudao.module.ai.service.model.AiModelService;
 import cn.iocoder.yudao.module.ai.service.model.AiToolService;
-import cn.iocoder.yudao.module.ai.util.AiUtils;
+import cn.iocoder.yudao.module.ai.service.requestlog.AiRequestLogService;
+import cn.iocoder.yudao.module.ai.service.requestlog.dto.AiRequestLogCreateReqDTO;
+import cn.iocoder.yudao.module.ai.util.AiChatUtils;
+import cn.iocoder.yudao.module.ai.util.AiReasoningUtils;
 import cn.iocoder.yudao.module.ai.util.FileTypeUtils;
 import com.google.common.collect.Maps;
 import io.modelcontextprotocol.client.McpSyncClient;
@@ -128,6 +134,8 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
     private AiKnowledgeDocumentService knowledgeDocumentService;
     @Resource
     private AiToolService toolService;
+    @Resource
+    private AiRequestLogService requestLogService;
 
     @SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection")
     @Autowired(required = false) // 由于 yudao.ai.web-search.enable 配置项，可以关闭 AiWebSearchClient 的功能，所以这里只能不强制注入
@@ -155,8 +163,12 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
         List<AiChatMessageDO> historyMessages = chatMessageMapper.selectListByConversationId(conversation.getId());
         // 1.2 校验模型
         AiModelDO model = modalService.validateModel(conversation.getModelId());
-        ChatModel chatModel = modalService.getChatModel(model.getId());
-        // 1.3 选出上下文消息：附件按各自所属消息组装
+        // 1.3 获得工具、思考参数
+        List<ToolCallback> toolCallbacks = getToolCallbackListByRoleId(conversation.getRoleId());
+        Map<String, Object> reasoningOptions = resolveReasoningOptions(model, sendReqVO.getReasoningLevel());
+        // 1.4 获得模型客户端
+        ChatModel chatModel = modalService.getChatModel(model.getId(), reasoningOptions);
+        // 1.5 选出上下文消息
         List<AiChatMessageDO> contextMessages = filterContextMessages(historyMessages, conversation, sendReqVO);
 
         // 2.1 知识库召回
@@ -169,7 +181,8 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
                         .setSummary(true).setCount(WEB_SEARCH_COUNT)) : null;
 
         // 2.3 创建 chat 需要的 Prompt：在插入消息前构建，图片读取失败时不留下消息
-        Prompt prompt = buildPrompt(conversation, contextMessages, knowledgeSegments, webSearchResponse, model, sendReqVO);
+        Prompt prompt = buildPrompt(conversation, contextMessages, knowledgeSegments, webSearchResponse, model, sendReqVO,
+                toolCallbacks, reasoningOptions);
 
         // 3. 插入 user 发送消息
         AiChatMessageDO userMessage = createChatMessage(conversation.getId(), null, model,
@@ -177,18 +190,30 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
                 null, sendReqVO.getAttachmentUrls(), null);
 
         // 4.1 插入 assistant 接收消息
+        String requestId = IdUtil.fastUUID();
         AiChatMessageDO assistantMessage = createChatMessage(conversation.getId(), userMessage.getId(), model,
                 userId, conversation.getRoleId(), MessageType.ASSISTANT, "", sendReqVO.getUseContext(),
-                knowledgeSegments, null, webSearchResponse);
+                knowledgeSegments, null, webSearchResponse, requestId);
+        AiRequestLogCreateReqDTO requestLog = requestLogService.buildCreateReqDTO(requestId, userId,
+                AiRequestLogBizTypeEnum.CHAT, assistantMessage.getId(), model);
 
         // 4.2 调用模型
-        ChatResponse chatResponse = chatModel.call(prompt);
+        ChatResponse chatResponse;
+        try {
+            chatResponse = chatModel.call(prompt);
+        } catch (RuntimeException ex) {
+            finishChatCall(requestLog, AiRequestLogStatusEnum.FAIL, ex);
+            throw ex;
+        }
+        requestLogService.setCreateReqDTO(requestLog, chatResponse);
+        finishChatCall(requestLog, AiRequestLogStatusEnum.SUCCESS, null);
 
-        // 4.3 更新响应内容
-        String newContent = AiUtils.getChatResponseContent(chatResponse);
-        String newReasoningContent = AiUtils.getChatResponseReasoningContent(chatResponse);
+        // 4.3 更新响应内容与用量
+        String newContent = AiChatUtils.getChatResponseContent(chatResponse);
+        String newReasoningContent = AiChatUtils.getChatResponseReasoningContent(chatResponse);
         chatMessageMapper.updateById(new AiChatMessageDO().setId(assistantMessage.getId())
-                .setContent(newContent).setReasoningContent(newReasoningContent));
+                .setContent(newContent).setReasoningContent(newReasoningContent)
+                .setInputTokens(requestLog.getInputTokens()).setOutputTokens(requestLog.getOutputTokens()).setTotalTokens(requestLog.getTotalTokens()));
         // 4.4 响应结果
         Map<Long, AiKnowledgeDocumentDO> documentMap = knowledgeDocumentService.getKnowledgeDocumentMap(
                 convertSet(knowledgeSegments, AiKnowledgeSegmentSearchRespBO::getDocumentId));
@@ -201,7 +226,8 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
                 .setSend(BeanUtils.toBean(userMessage, AiChatMessageSendRespVO.Message.class))
                 .setReceive(BeanUtils.toBean(assistantMessage, AiChatMessageSendRespVO.Message.class)
                         .setContent(newContent).setSegments(segments)
-                        .setWebSearchPages(webSearchResponse != null ? webSearchResponse.getLists() : null));
+                        .setWebSearchPages(webSearchResponse != null ? webSearchResponse.getLists() : null)
+                        .setInputTokens(requestLog.getInputTokens()).setOutputTokens(requestLog.getOutputTokens()).setTotalTokens(requestLog.getTotalTokens()));
     }
 
     @Override
@@ -216,8 +242,18 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
         List<AiChatMessageDO> historyMessages = chatMessageMapper.selectListByConversationId(conversation.getId());
         // 1.2 校验模型
         AiModelDO model = modalService.validateModel(conversation.getModelId());
-        StreamingChatModel chatModel = modalService.getChatModel(model.getId());
-        // 1.3 选出上下文消息：附件按各自所属消息组装
+        // 1.3 获得工具、思考参数：校验失败返回错误帧，不调用模型、不留下消息
+        List<ToolCallback> toolCallbacks;
+        Map<String, Object> reasoningOptions;
+        try {
+            toolCallbacks = getToolCallbackListByRoleId(conversation.getRoleId());
+            reasoningOptions = resolveReasoningOptions(model, sendReqVO.getReasoningLevel());
+        } catch (ServiceException ex) {
+            return Flux.just(error(ex.getCode(), ex.getMessage()));
+        }
+        // 1.4 获得模型客户端
+        StreamingChatModel chatModel = modalService.getChatModel(model.getId(), reasoningOptions);
+        // 1.5 选出上下文消息
         List<AiChatMessageDO> contextMessages = filterContextMessages(historyMessages, conversation, sendReqVO);
 
         // 2.1 知识库找回
@@ -232,7 +268,8 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
         // 2.3 构建 Prompt：在插入消息前构建，图片读取失败时返回错误帧，不留下消息
         Prompt prompt;
         try {
-            prompt = buildPrompt(conversation, contextMessages, knowledgeSegments, webSearchResponse, model, sendReqVO);
+            prompt = buildPrompt(conversation, contextMessages, knowledgeSegments, webSearchResponse, model, sendReqVO,
+                    toolCallbacks, reasoningOptions);
         } catch (ServiceException ex) {
             return Flux.just(error(ex.getCode(), ex.getMessage()));
         }
@@ -243,12 +280,23 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
                 null, sendReqVO.getAttachmentUrls(), null);
 
         // 4.1 插入 assistant 接收消息
+        String requestId = IdUtil.fastUUID();
         AiChatMessageDO assistantMessage = createChatMessage(conversation.getId(), userMessage.getId(), model,
                 userId, conversation.getRoleId(), MessageType.ASSISTANT, "", sendReqVO.getUseContext(),
-                knowledgeSegments, null, webSearchResponse);
+                knowledgeSegments, null, webSearchResponse, requestId);
+        AiRequestLogCreateReqDTO requestLog = requestLogService.buildCreateReqDTO(requestId, userId,
+                AiRequestLogBizTypeEnum.CHAT, assistantMessage.getId(), model);
+        AtomicBoolean finished = new AtomicBoolean(false);
 
         // 4.2 调用模型
-        Flux<ChatResponse> streamResponse = chatModel.stream(prompt);
+        Flux<ChatResponse> streamResponse;
+        try {
+            streamResponse = chatModel.stream(prompt);
+        } catch (RuntimeException ex) {
+            finishChatStream(requestLog, finished, assistantMessage.getId(), "", "",
+                    AiRequestLogStatusEnum.FAIL, ex);
+            throw ex;
+        }
 
         // 4.3 流式返回
         StringBuffer contentBuffer = new StringBuffer();
@@ -259,6 +307,7 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
         AtomicReference<List<AiChatMessageRespVO.KnowledgeSegment>> cacheSegments = new AtomicReference<>();
         AtomicReference<List<AiWebSearchResponse.WebPage>> cacheWebSearchPages = new AtomicReference<>();
         return streamResponse.map(chunk -> {
+            requestLogService.setCreateReqDTO(requestLog, chunk);
             // 仅首次：返回知识库、联网搜索
             if (StrUtil.isEmpty(contentBuffer)) {
                 if (firstExecuteFlag.compareAndSet(true, false)) { // CAS 操作，确保仅执行一次
@@ -274,8 +323,8 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
                 }
             }
             // 响应结果
-            String newContent = AiUtils.getChatResponseContent(chunk);
-            String newReasoningContent = AiUtils.getChatResponseReasoningContent(chunk);
+            String newContent = AiChatUtils.getChatResponseContent(chunk);
+            String newReasoningContent = AiChatUtils.getChatResponseReasoningContent(chunk);
             if (StrUtil.isNotEmpty(newContent)) {
                 contentBuffer.append(newContent);
             }
@@ -287,39 +336,80 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
                     .setReceive(BeanUtils.toBean(assistantMessage, AiChatMessageSendRespVO.Message.class)
                             .setContent(StrUtil.nullToDefault(newContent, "")) // 避免 null 的 情况
                             .setReasoningContent(StrUtil.nullToDefault(newReasoningContent, "")) // 避免 null 的 情况
-                            .setSegments(cacheSegments.get()).setWebSearchPages(cacheWebSearchPages.get()))); // 知识库 + 联网搜索
-        }).doOnComplete(() -> {
-            // 忽略租户，因为 Flux 异步无法透传租户
-            TenantUtils.executeIgnore(() -> chatMessageMapper.updateById(
-                    new AiChatMessageDO().setId(assistantMessage.getId()).setContent(contentBuffer.toString())
-                            .setReasoningContent(reasoningContentBuffer.toString())));
-        }).doOnError(throwable -> {
+                            .setSegments(cacheSegments.get()).setWebSearchPages(cacheWebSearchPages.get()) // 知识库 + 联网搜索
+                            .setInputTokens(requestLog.getInputTokens()).setOutputTokens(requestLog.getOutputTokens()).setTotalTokens(requestLog.getTotalTokens()))); // 用量：以请求日志为准，未知时为 null
+        }).doOnComplete(() -> finishChatStream(requestLog, finished, assistantMessage.getId(),
+                contentBuffer.toString(), reasoningContentBuffer.toString(), AiRequestLogStatusEnum.SUCCESS, null)
+        ).doOnError(throwable -> {
             log.error("[sendChatMessageStream][userId({}) sendReqVO({}) 发生异常]", userId, sendReqVO, throwable);
-            // 忽略租户，因为 Flux 异步无法透传租户
-            TenantUtils.executeIgnore(() -> {
-                // 如果有内容，则更新内容
-                if (StrUtil.isNotEmpty(contentBuffer)) {
-                    chatMessageMapper.updateById(new AiChatMessageDO().setId(assistantMessage.getId())
-                            .setContent(contentBuffer.toString()).setReasoningContent(reasoningContentBuffer.toString()));
-                } else {
-                    // 否则，则进行删除
-                    chatMessageMapper.deleteById(assistantMessage.getId());
-                }
-            });
+            finishChatStream(requestLog, finished, assistantMessage.getId(), contentBuffer.toString(),
+                    reasoningContentBuffer.toString(), AiRequestLogStatusEnum.FAIL, throwable);
         }).doOnCancel(() -> {
             log.info("[sendChatMessageStream][userId({}) sendReqVO({}) 取消请求]", userId, sendReqVO);
-            // 忽略租户，因为 Flux 异步无法透传租户
-            TenantUtils.executeIgnore(() -> {
-                // 如果有内容，则更新内容
-                if (StrUtil.isNotEmpty(contentBuffer)) {
-                    chatMessageMapper.updateById(new AiChatMessageDO().setId(assistantMessage.getId())
-                            .setContent(contentBuffer.toString()).setReasoningContent(reasoningContentBuffer.toString()));
-                } else {
-                    // 否则，则进行删除
-                    chatMessageMapper.deleteById(assistantMessage.getId());
-                }
-            });
+            finishChatStream(requestLog, finished, assistantMessage.getId(), contentBuffer.toString(),
+                    reasoningContentBuffer.toString(), AiRequestLogStatusEnum.CANCEL, null);
         }).onErrorResume(error -> Flux.just(error(ErrorCodeConstants.CHAT_STREAM_ERROR)));
+    }
+
+    /**
+     * 结束同步对话：记录请求日志
+     *
+     * 请求日志在独立事务中写入，模型异常导致发送事务回滚时也会保留
+     */
+    private void finishChatCall(AiRequestLogCreateReqDTO requestLog, AiRequestLogStatusEnum status,
+                                Throwable error) {
+        requestLog.setStatus(status.getStatus()).setErrorMessage(error != null
+                ? StrUtil.blankToDefault(error.getMessage(), error.getClass().getName()) : null);
+        try {
+            requestLogService.createRequestLog(requestLog);
+        } catch (Exception ex) {
+            log.error("[finishChatCall][requestId({}) 记录请求日志失败]", requestLog.getRequestId(), ex);
+        }
+    }
+
+    /**
+     * 结束流式对话：记录请求日志，并更新 assistant 消息与用量
+     *
+     * 同一请求仅第一次调用生效；失败、取消时：有内容则保留，否则删除 assistant 消息；请求日志总是记录
+     */
+    private void finishChatStream(AiRequestLogCreateReqDTO requestLog, AtomicBoolean finished,
+                                  Long assistantMessageId, String content, String reasoningContent,
+                                  AiRequestLogStatusEnum status, Throwable error) {
+        // 1. 记录请求日志：与 chunk 的用量更新互斥，保证消息与日志的用量一致
+        AiChatMessageDO updateObj = null;
+        synchronized (requestLog) {
+            if (!finished.compareAndSet(false, true)) {
+                return;
+            }
+            requestLog.setStatus(status.getStatus()).setErrorMessage(error != null
+                    ? StrUtil.blankToDefault(error.getMessage(), error.getClass().getName()) : null);
+            try {
+                requestLogService.createRequestLog(requestLog);
+            } catch (Exception ex) {
+                log.error("[finishChatStream][requestId({}) 记录请求日志失败]", requestLog.getRequestId(), ex);
+            }
+            if (status == AiRequestLogStatusEnum.SUCCESS || StrUtil.isNotEmpty(content)) {
+                updateObj = new AiChatMessageDO().setId(assistantMessageId)
+                        .setContent(content).setReasoningContent(reasoningContent)
+                        .setInputTokens(requestLog.getInputTokens()).setOutputTokens(requestLog.getOutputTokens()).setTotalTokens(requestLog.getTotalTokens());
+                updateObj.setUpdater(StrUtil.toStringOrNull(requestLog.getUserId()));
+            }
+        }
+
+        // 2. 更新 assistant 消息：Flux 异步回调中没有租户上下文，按请求开始时的租户执行
+        AiChatMessageDO finalUpdateObj = updateObj;
+        TenantUtils.execute(requestLog.getTenantId(), () -> {
+            try {
+                if (finalUpdateObj != null) {
+                    chatMessageMapper.updateById(finalUpdateObj);
+                } else {
+                    chatMessageMapper.deleteById(assistantMessageId);
+                }
+            } catch (Exception ex) {
+                log.error("[finishChatStream][messageId({}) requestId({}) 更新消息失败]",
+                        assistantMessageId, requestLog.getRequestId(), ex);
+            }
+        });
     }
 
     private List<AiKnowledgeSegmentSearchRespBO> recallKnowledgeSegment(String content,
@@ -345,7 +435,8 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
     private Prompt buildPrompt(AiChatConversationDO conversation, List<AiChatMessageDO> contextMessages,
                                List<AiKnowledgeSegmentSearchRespBO> knowledgeSegments,
                                AiWebSearchResponse webSearchResponse,
-                               AiModelDO model, AiChatMessageSendReqVO sendReqVO) {
+                               AiModelDO model, AiChatMessageSendReqVO sendReqVO,
+                               List<ToolCallback> toolCallbacks, Map<String, Object> reasoningOptions) {
         List<Message> chatMessages = new ArrayList<>();
         // 1.1 System Context 角色设定
         if (StrUtil.isNotBlank(conversation.getSystemMessage())) {
@@ -356,7 +447,7 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
         contextMessages.forEach(message -> {
             chatMessages.add(MessageType.USER.getValue().equals(message.getType())
                     ? buildUserMessage(message.getContent(), message.getAttachmentUrls(), model)
-                    : AiUtils.buildMessage(message.getType(), message.getContent()));
+                    : AiChatUtils.buildMessage(message.getType(), message.getContent()));
             UserMessage attachmentUserMessage = buildAttachmentUserMessage(message.getAttachmentUrls(), model);
             if (attachmentUserMessage != null) {
                 chatMessages.add(attachmentUserMessage);
@@ -396,20 +487,40 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
             }
         }
 
-        // 2.1 查询 tool 工具
-        List<ToolCallback> toolCallbacks = getToolCallbackListByRoleId(conversation.getRoleId());
-        Map<String,Object> toolContext = CollUtil.isNotEmpty(toolCallbacks) ? AiUtils.buildCommonToolContext()
+        // 2.1 tool 工具：已在调用方解析
+        Map<String,Object> toolContext = CollUtil.isNotEmpty(toolCallbacks) ? AiChatUtils.buildCommonToolContext()
                 : Map.of();
-        // 2.2 构建 ChatOptions 对象
+        // 2.2 构建 ChatOptions 对象：思考参数与客户端是同一份；未配置思考时为 null，与原有行为一致
         AiPlatformEnum platform = AiPlatformEnum.validatePlatform(model.getPlatform());
         boolean hasMedia = CollUtil.anyMatch(chatMessages, message -> message instanceof UserMessage
                 && CollUtil.isNotEmpty(((UserMessage) message).getMedia()));
-        ChatOptions chatOptions = AiUtils.buildChatOptions(platform, model.getModel(),
+        ChatOptions chatOptions = AiChatUtils.buildChatOptions(platform, model.getModel(),
                 conversation.getTemperature(), conversation.getMaxTokens(),
-                toolCallbacks, toolContext, hasMedia);
+                toolCallbacks, toolContext, hasMedia, reasoningOptions);
         return new Prompt(chatMessages, chatOptions);
     }
 
+    /**
+     * 解析本次的思考参数，并完成发送前的全部思考校验
+     *
+     * 顺序：平台一致 → 生效档位 → 平台路由 → 取参数（深拷贝）
+     *
+     * @param model 模型
+     * @param requestedLevel 请求的档位，可为空
+     * @return 思考参数；模型未配置思考时为 null，保持原有行为
+     */
+    private Map<String, Object> resolveReasoningOptions(AiModelDO model, String requestedLevel) {
+        // 1. 未配置思考：不查 API 密钥、不做平台校验；请求仍带档位（页面过期）时报错
+        if (!AiReasoningUtils.isReasoningConfigured(model)) {
+            AiReasoningUtils.resolveReasoningLevel(model, requestedLevel);
+            return null;
+        }
+        // 2. 已配置思考
+        AiPlatformEnum platform = modalService.validateReasoningPlatform(model);
+        String level = AiReasoningUtils.resolveReasoningLevel(model, requestedLevel);
+        AiReasoningUtils.validateReasoningRoute(platform, model);
+        return AiReasoningUtils.getReasoningOptions(model, level);
+    }
 
     /**
      * 获得角色关联的工具回调列表
@@ -601,11 +712,21 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
                                               List<AiKnowledgeSegmentSearchRespBO> knowledgeSegments,
                                               List<String> attachmentUrls,
                                               AiWebSearchResponse webSearchResponse) {
+        return createChatMessage(conversationId, replyId, model, userId, roleId, messageType, content, useContext,
+                knowledgeSegments, attachmentUrls, webSearchResponse, null);
+    }
+
+    private AiChatMessageDO createChatMessage(Long conversationId, Long replyId,
+                                              AiModelDO model, Long userId, Long roleId,
+                                              MessageType messageType, String content, Boolean useContext,
+                                              List<AiKnowledgeSegmentSearchRespBO> knowledgeSegments,
+                                              List<String> attachmentUrls,
+                                              AiWebSearchResponse webSearchResponse, String requestId) {
         AiChatMessageDO message = new AiChatMessageDO().setConversationId(conversationId).setReplyId(replyId)
                 .setModel(model.getModel()).setModelId(model.getId()).setUserId(userId).setRoleId(roleId)
                 .setType(messageType.getValue()).setContent(content).setUseContext(useContext)
                 .setSegmentIds(convertList(knowledgeSegments, AiKnowledgeSegmentSearchRespBO::getId))
-                .setAttachmentUrls(attachmentUrls);
+                .setAttachmentUrls(attachmentUrls).setRequestId(requestId);
         if (webSearchResponse != null) {
             message.setWebSearchPages(webSearchResponse.getLists());
         }

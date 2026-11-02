@@ -19,6 +19,11 @@ public interface ErrorCodeConstants {
     ErrorCode MODEL_DISABLE = new ErrorCode(1_040_001_001, "模型({})已禁用!");
     ErrorCode MODEL_DEFAULT_NOT_EXISTS = new ErrorCode(1_040_001_002, "操作失败，找不到默认模型");
     ErrorCode MODEL_USE_TYPE_ERROR = new ErrorCode(1_040_001_003, "操作失败，该模型的模型类型不正确");
+    ErrorCode MODEL_REASONING_NOT_CONFIGURED = new ErrorCode(1_040_001_004, "该模型未配置思考档位，请刷新页面后重试");
+    ErrorCode MODEL_REASONING_LEVEL_NOT_SUPPORTED = new ErrorCode(1_040_001_005, "该模型不支持思考档位({})，请刷新页面后重试");
+    ErrorCode MODEL_REASONING_PLATFORM_NOT_SUPPORTED = new ErrorCode(1_040_001_006, "平台({})暂不支持思考配置");
+    ErrorCode MODEL_REASONING_PLATFORM_MISMATCH = new ErrorCode(1_040_001_007, "模型平台({})与 API 密钥平台({})不一致，无法使用思考配置");
+    ErrorCode MODEL_REASONING_CONFIG_INVALID = new ErrorCode(1_040_001_009, "思考配置不正确：{}");
 
     // ========== API 聊天角色 1-040-002-000 ==========
     ErrorCode CHAT_ROLE_NOT_EXISTS = new ErrorCode(1_040_002_000, "聊天角色不存在");

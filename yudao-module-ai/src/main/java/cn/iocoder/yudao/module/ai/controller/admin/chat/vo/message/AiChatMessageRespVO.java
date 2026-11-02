@@ -59,6 +59,18 @@ public class AiChatMessageRespVO {
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED, example = "2024-05-12 12:51")
     private LocalDateTime createTime;
 
+    @Schema(description = "请求编号（本地 UUID）", example = "0b4f6c0e-7d3c-4f0e-9a3c-1f2a3b4c5d6e")
+    private String requestId;
+
+    @Schema(description = "输入 Token 数，未知为空", example = "100")
+    private Long inputTokens;
+
+    @Schema(description = "输出 Token 数，未知为空", example = "20")
+    private Long outputTokens;
+
+    @Schema(description = "合计 Token 数，未知为空", example = "120")
+    private Long totalTokens;
+
     // ========== 仅在【对话管理】时加载 ==========
 
     @Schema(description = "角色名字", example = "小黄")

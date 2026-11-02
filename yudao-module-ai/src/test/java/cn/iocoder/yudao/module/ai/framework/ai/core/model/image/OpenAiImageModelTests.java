@@ -10,7 +10,7 @@ import org.springframework.ai.openai.OpenAiImageModel;
 import org.springframework.ai.openai.OpenAiImageOptions;
 import org.springframework.ai.openai.api.OpenAiImageApi;
 
-import static cn.iocoder.yudao.module.ai.util.AiUtils.validateApiKey;
+import static cn.iocoder.yudao.module.ai.framework.ai.core.model.AiModelTestUtils.validateApiKey;
 
 /**
  * {@link OpenAiImageModel} 集成测试类

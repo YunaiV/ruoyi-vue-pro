@@ -10,9 +10,11 @@ import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * AI 模型 DO
@@ -96,5 +98,59 @@ public class AiModelDO extends BaseDO {
      */
     @TableField(typeHandler = StringListTypeHandler.class)
     private List<String> inputModalities;
+
+    /**
+     * 思考配置
+     *
+     * 仅 {@link AiModelTypeEnum#CHAT} 使用；为 null 时不管理思考，保持平台原有行为
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private ReasoningConfig reasoningConfig;
+
+    /**
+     * 思考配置
+     *
+     * @author 芋道源码
+     */
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ReasoningConfig {
+
+        /**
+         * 档位数组，从低到高
+         */
+        private List<ReasoningLevel> levels;
+        /**
+         * 默认档位，必须在 {@link #levels} 中
+         */
+        private String defaultLevel;
+
+    }
+
+    /**
+     * 思考档位
+     *
+     * @author 芋道源码
+     */
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ReasoningLevel {
+
+        /**
+         * 档位值，off 表示关闭思考
+         */
+        private String level;
+        /**
+         * 思考参数，JSON 对象（任意层级都不允许 null）
+         *
+         * 只读：使用时通过 AiReasoningUtils#getReasoningOptions 深拷贝
+         */
+        private Map<String, Object> options;
+
+    }
 
 }

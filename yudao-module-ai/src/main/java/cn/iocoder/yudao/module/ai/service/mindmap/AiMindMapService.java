@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.ai.service.mindmap;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.ai.controller.admin.mindmap.vo.AiMindMapGenerateReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.mindmap.vo.AiMindMapGenerateRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.mindmap.vo.AiMindMapPageReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.mindmap.AiMindMapDO;
 import reactor.core.publisher.Flux;
@@ -19,9 +20,9 @@ public interface AiMindMapService {
      *
      * @param generateReqVO 请求参数
      * @param userId        用户编号
-     * @return 生成结果
+     * @return 生成结果：每帧为本次内容片段，以及截至当前的用量
      */
-    Flux<CommonResult<String>> generateMindMap(AiMindMapGenerateReqVO generateReqVO, Long userId);
+    Flux<CommonResult<AiMindMapGenerateRespVO>> generateMindMap(AiMindMapGenerateReqVO generateReqVO, Long userId);
 
     /**
      * 删除思维导图

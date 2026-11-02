@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.ai.framework.ai.core.model.xinghuo;
 
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.module.ai.framework.ai.core.reasoning.AiRequestBodyPatcher;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
@@ -39,16 +40,19 @@ public class XingHuoChatModel implements ChatModel {
 
     public static final String MODEL_DEFAULT = MODEL_X2_FLASH;
 
-    private static String getBaseUrl(String model) {
-        if (MODEL_X2_FLASH.equals(model)) {
-            return BASE_URL_X2_FLASH;
-        }
-        return BASE_URL_X2;
-    }
+    /**
+     * 实际传给厂商的型号：X2、X2 Flash 按接口地址区分，型号统一为 spark-x
+     */
+    private static final String API_MODEL = "spark-x";
 
     private final String apiKey;
 
     private final DeepSeekChatOptions options;
+
+    /**
+     * 思考补丁改写器，可为 null；X2、X2 Flash 两个内部客户端都装上
+     */
+    private final AiRequestBodyPatcher patcher;
 
     /**
      * 兼容 OpenAI 接口，进行复用
@@ -57,11 +61,12 @@ public class XingHuoChatModel implements ChatModel {
 
     private final ChatModel chatModelX2Flash;
 
-    private XingHuoChatModel(String apiKey, DeepSeekChatOptions options) {
+    private XingHuoChatModel(String apiKey, DeepSeekChatOptions options, AiRequestBodyPatcher patcher) {
         this.apiKey = apiKey;
         this.options = options;
-        this.chatModelX2 = buildChatModel(MODEL_X2);
-        this.chatModelX2Flash = buildChatModel(MODEL_X2_FLASH);
+        this.patcher = patcher;
+        this.chatModelX2 = buildChatModel(BASE_URL_X2);
+        this.chatModelX2Flash = buildChatModel(BASE_URL_X2_FLASH);
     }
 
     public static Builder builder() {
@@ -99,27 +104,24 @@ public class XingHuoChatModel implements ChatModel {
         return chatModelX2;
     }
 
-    private ChatModel buildChatModel(String model) {
+    private ChatModel buildChatModel(String baseUrl) {
         return DeepSeekChatModel.builder()
-                .deepSeekApi(DeepSeekApi.builder()
-                        .baseUrl(getBaseUrl(model))
-                        .apiKey(apiKey)
+                .deepSeekApi(AiRequestBodyPatcher.configure(DeepSeekApi.builder()
+                        .baseUrl(baseUrl)
+                        .apiKey(apiKey), patcher)
                         .build())
-                .defaultOptions(new DeepSeekChatOptions.Builder(options).model("spark-x").build())
+                .defaultOptions(new DeepSeekChatOptions.Builder(options).model(API_MODEL).build())
                 .build();
     }
 
     private static Prompt buildApiPrompt(Prompt prompt) {
         ChatOptions options = prompt.getOptions();
-        if (options == null) {
-            return prompt;
-        }
         if (!(options instanceof DeepSeekChatOptions)) {
             return prompt;
         }
         return Prompt.builder()
                 .messages(prompt.getInstructions())
-                .chatOptions(new DeepSeekChatOptions.Builder((DeepSeekChatOptions) options).model("spark-x").build())
+                .chatOptions(new DeepSeekChatOptions.Builder((DeepSeekChatOptions) options).model(API_MODEL).build())
                 .build();
     }
 
@@ -133,8 +135,15 @@ public class XingHuoChatModel implements ChatModel {
 
         private DeepSeekChatOptions options;
 
+        private AiRequestBodyPatcher patcher;
+
         public Builder apiKey(String apiKey) {
             this.apiKey = apiKey;
+            return this;
+        }
+
+        public Builder patcher(AiRequestBodyPatcher patcher) {
+            this.patcher = patcher;
             return this;
         }
 
@@ -148,7 +157,7 @@ public class XingHuoChatModel implements ChatModel {
             if (StrUtil.isEmpty(options.getModel())) {
                 options = new DeepSeekChatOptions.Builder(options).model(MODEL_DEFAULT).build();
             }
-            return new XingHuoChatModel(apiKey, options);
+            return new XingHuoChatModel(apiKey, options, patcher);
         }
 
     }
