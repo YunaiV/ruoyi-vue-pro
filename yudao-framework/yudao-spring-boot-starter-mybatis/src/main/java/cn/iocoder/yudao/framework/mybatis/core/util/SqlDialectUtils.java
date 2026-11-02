@@ -21,8 +21,8 @@ import java.util.regex.Pattern;
  * 1. 每次生成 SQL 时，按当前执行时路由到的数据源选择方言（按数据源实例缓存），不使用启动时固定的 databaseId 或主库
  * 2. 只有明确识别的 PostgreSQL、Oracle、SQL Server 2012+ 输出新片段；其它已识别的数据库（MySQL、MariaDB、OceanBase、H2、
  *    达梦、神通、人大金仓、openGauss、GaussDB、瀚高、MogDB 等）保持原有 SQL 片段；完全未识别的数据库抛出异常。
- *    例外：JSON 数组匹配中，瀚高原生驱动、人大金仓使用 PostgreSQL 片段，H2 使用严格的平面 Long 数组片段，
- *    见 {@link #jsonArrayContains(String, boolean)}
+ *    例外：JSON 数组匹配中，瀚高原生驱动、人大金仓、openGauss、GaussDB（含 MogDB）使用 PostgreSQL 片段，
+ *    H2 使用严格的平面 Long 数组片段，见 {@link #jsonArrayContains(String, boolean)}；普通片段的分类不变
  * 3. 参数只能是代码中固定的列名，经过白名单校验；格式均为常量，业务值必须继续使用 #{} 绑定
  *
  * 在 XML 或注解中使用：${@cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils@formatDate('create_time')}
@@ -63,7 +63,7 @@ public class SqlDialectUtils {
             new ConcurrentReferenceHashMap<>(16, ConcurrentReferenceHashMap.ReferenceType.WEAK);
 
     /**
-     * 数据源与 JSON 方言的缓存；与 {@link #DIALECT_CACHE} 分开，瀚高、人大金仓、H2 仅 JSON 片段使用单独的写法
+     * 数据源与 JSON 方言的缓存；与 {@link #DIALECT_CACHE} 分开，瀚高、人大金仓、openGauss、GaussDB、H2 仅 JSON 片段使用单独的写法
      */
     private static final Map<DataSource, Dialect> JSON_DIALECT_CACHE =
             new ConcurrentReferenceHashMap<>(16, ConcurrentReferenceHashMap.ReferenceType.WEAK);
@@ -72,6 +72,18 @@ public class SqlDialectUtils {
      * 瀚高原生驱动 URL 的前缀
      */
     private static final String HIGHGO_URL_PREFIX = "jdbc:highgo:";
+
+    /**
+     * 仅 JSON 片段按 PostgreSQL 处理的数据库类型：人大金仓，以及使用 PG 兼容模式（DBCOMPATIBILITY = 'PG'）的 openGauss、GaussDB；
+     * MogDB 使用 openGauss 原生驱动时，产品名同为 openGauss
+     */
+    private static final Set<DbType> JSON_POSTGRESQL_DB_TYPES = EnumSet.of(DbType.KINGBASE_ES,
+            DbType.OPENGAUSS, DbType.GAUSS_DB);
+
+    /**
+     * openGauss、GaussDB、MogDB 原生驱动 URL 的前缀；产品名为 PostgreSQL 或未登记时，仅 JSON 片段按 PostgreSQL 处理
+     */
+    private static final String[] OPENGAUSS_URL_PREFIXES = {"jdbc:opengauss:", "jdbc:gaussdb:", "jdbc:mogdb:"};
 
     /**
      * Oracle 平面 Long / null 数组的整体格式，TAB、LF、CR 需先替换为空格：
@@ -517,12 +529,17 @@ public class SqlDialectUtils {
      *
      * 1. 原有片段：wrapArray 为 false 时为 JSON_CONTAINS(column, {0})，参数为 ID 的数字文本；
      *    为 true 时为 JSON_CONTAINS(column, JSON_ARRAY({0}))，参数为 Long
-     * 2. PostgreSQL、瀚高（原生驱动 jdbc:highgo:）、人大金仓：CAST(column AS jsonb) @&gt; jsonb_build_array(CAST({0} AS BIGINT))，
-     *    兼容 jsonb、json 与 JSON 文本列；按数字匹配，数组中的字符串 "1" 不匹配 1；列为 NULL 时不匹配
+     * 2. PostgreSQL、瀚高（原生驱动 jdbc:highgo:）、人大金仓、openGauss、GaussDB（含 MogDB）：
+     *    CAST(column AS jsonb) @&gt; CAST(CONCAT('[', COALESCE(CAST(CAST({0} AS BIGINT) AS TEXT), 'null'), ']') AS jsonb)，
+     *    兼容 jsonb、json 与 JSON 文本列；参数先转为 BIGINT（非整数文本报错），再拼成单元素 JSON 数组，按数字匹配，
+     *    数组中的字符串 "1" 不匹配 1，超出 2^53 的相邻编号不会互相匹配；
+     *    参数为 null 时拼成 [null]，匹配数组中的 null 元素，与原有 JSON_CONTAINS(column, JSON_ARRAY(NULL)) 一致；列为 NULL 时不匹配。
+     *    不使用 jsonb_build_array：openGauss、GaussDB 没有该函数；不使用 || 拼接：openGauss 的 A、B 兼容模式下，
+     *    || 会忽略 NULL 或作为逻辑或，因此使用 CONCAT，并由 COALESCE 保证拼接的值不为 NULL
      * 3. Oracle、SQL Server 2012+、H2：仅支持平面 Long / null 数组（应用以 List&lt;Long&gt; 写入的数据），元素两侧允许空白；
      *    整个数组含字符串、嵌套数组、对象、小数、空元素、超出 Long 范围等非法元素时整体不匹配，不等价于通用 JSON_CONTAINS。
      *    参数为 null 时匹配数组中的 null 元素，与原有 JSON_CONTAINS(column, JSON_ARRAY(NULL)) 一致；列为 NULL 时不匹配
-     * 4. 达梦、openGauss、神通等其它数据库保持原有片段
+     * 4. 达梦、神通等其它数据库保持原有片段
      *
      * @param column    JSON 数组列名，元素为数值 ID
      * @param wrapArray 原有片段是否使用 JSON_ARRAY 包装参数
@@ -544,7 +561,7 @@ public class SqlDialectUtils {
         checkColumn(column);
         switch (dialect) {
             case POSTGRESQL:
-                return "CAST(" + column + " AS jsonb) @> jsonb_build_array(CAST({0} AS BIGINT))";
+                return "CAST(" + column + " AS jsonb) @> CAST(CONCAT('[', COALESCE(CAST(CAST({0} AS BIGINT) AS TEXT), 'null'), ']') AS jsonb)";
             case ORACLE:
                 return oracleJsonLongArrayContains(column);
             case SQLSERVER:
@@ -852,7 +869,11 @@ public class SqlDialectUtils {
     /**
      * 识别 JSON 方言，其它与 {@link #resolveDialect(DatabaseMetaData)} 一致；日期等其它片段仍保留原有片段：
      * 1. 瀚高原生驱动（jdbc:highgo:）、人大金仓（产品名 KingbaseES）：已验收 jsonb 写法、且不支持 JSON_CONTAINS，按 PostgreSQL 处理
-     * 2. H2：不支持 JSON_CONTAINS，使用 {@link Dialect#H2} 的严格平面 Long 数组片段
+     * 2. openGauss、GaussDB（产品名 openGauss、GaussDB，或产品名为 PostgreSQL、未登记时的原生驱动 jdbc:opengauss:、jdbc:gaussdb:、
+     *    jdbc:mogdb:）：项目要求 PG 兼容模式，原有 JSON_CONTAINS 不存在、或对超出 2^53 的相邻编号匹配不精确，按 PostgreSQL 处理
+     * 3. H2：不支持 JSON_CONTAINS，使用 {@link Dialect#H2} 的严格平面 Long 数组片段
+     *
+     * 注意：仅 JSON 片段按上述规则调整，{@link #resolveDialect(DatabaseMetaData)} 的普通片段分类保持不变
      *
      * @param metaData 数据库元数据
      * @return JSON 方言
@@ -865,10 +886,11 @@ public class SqlDialectUtils {
         }
         String url = StrUtil.nullToEmpty(metaData.getURL()).toLowerCase(Locale.ROOT);
         DbType dbType = DbTypeEnum.find(metaData.getDatabaseProductName());
-        if (url.startsWith(HIGHGO_URL_PREFIX) && (dbType == null || dbType == DbType.POSTGRE_SQL)) {
+        if ((url.startsWith(HIGHGO_URL_PREFIX) || StrUtil.startWithAny(url, OPENGAUSS_URL_PREFIXES))
+                && (dbType == null || dbType == DbType.POSTGRE_SQL)) {
             return Dialect.POSTGRESQL;
         }
-        if (dbType == DbType.KINGBASE_ES) {
+        if (JSON_POSTGRESQL_DB_TYPES.contains(dbType)) {
             return Dialect.POSTGRESQL;
         }
         if (dbType == DbType.H2) {
