@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.ai.dal.dataobject.mindmap;
 import cn.iocoder.yudao.module.ai.enums.model.AiPlatformEnum;
 import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiModelDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.requestlog.AiRequestLogDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -62,5 +63,30 @@ public class AiMindMapDO extends BaseDO {
      * 错误信息
      */
     private String errorMessage;
+
+    /**
+     * 请求编号
+     *
+     * 关联 {@link AiRequestLogDO#getRequestId()}
+     */
+    private String requestId;
+    /**
+     * 输入 Token 数
+     *
+     * 未知为 null
+     */
+    private Long inputTokens;
+    /**
+     * 输出 Token 数
+     *
+     * 未知为 null
+     */
+    private Long outputTokens;
+    /**
+     * 合计 Token 数
+     *
+     * 输入、输出都已知时才有值，否则为 null
+     */
+    private Long totalTokens;
 
 }

@@ -71,7 +71,7 @@ public class AiModelServiceImplTest extends BaseMockitoUnitTest {
         modelService.updateModel(reqVO);
         // 断言：直接采用前端数组，不合并库里旧值
         ArgumentCaptor<AiModelDO> modelCaptor = ArgumentCaptor.forClass(AiModelDO.class);
-        verify(modelMapper).updateById(modelCaptor.capture());
+        verify(modelMapper).updateForSave(modelCaptor.capture());
         assertEquals(inputModalities, modelCaptor.getValue().getInputModalities());
     }
 

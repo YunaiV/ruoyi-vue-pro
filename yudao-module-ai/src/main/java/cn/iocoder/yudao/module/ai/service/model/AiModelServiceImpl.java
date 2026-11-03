@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiModelSaveReq
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiApiKeyDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiModelDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.model.AiChatMapper;
+import cn.iocoder.yudao.module.ai.util.AiReasoningUtils;
 import com.agentsflex.llm.ollama.OllamaLlm;
 import com.agentsflex.llm.ollama.OllamaLlmConfig;
 import com.agentsflex.llm.qwen.QwenLlm;
@@ -53,11 +54,15 @@ public class AiModelServiceImpl implements AiModelService {
     @Override
     public Long createModel(AiModelSaveReqVO createReqVO) {
         // 1. 校验
-        AiPlatformEnum.validatePlatform(createReqVO.getPlatform());
-        apiKeyService.validateApiKey(createReqVO.getKeyId());
-
-        // 2. 插入
+        AiPlatformEnum platform = AiPlatformEnum.validatePlatform(createReqVO.getPlatform());
+        AiApiKeyDO apiKey = apiKeyService.validateApiKey(createReqVO.getKeyId());
         AiModelDO model = BeanUtils.toBean(createReqVO, AiModelDO.class);
+        validateReasoningConfig(platform, apiKey, model.getType(), model.getReasoningConfig());
+
+        // 2. 插入：未配置（null 或档位为空）时思考配置不写入
+        if (!AiReasoningUtils.isReasoningConfigured(model)) {
+            model.setReasoningConfig(null);
+        }
         modelMapper.insert(model);
         return model.getId();
     }
@@ -66,12 +71,30 @@ public class AiModelServiceImpl implements AiModelService {
     public void updateModel(AiModelSaveReqVO updateReqVO) {
         // 1. 校验
         validateModelExists(updateReqVO.getId());
-        AiPlatformEnum.validatePlatform(updateReqVO.getPlatform());
-        apiKeyService.validateApiKey(updateReqVO.getKeyId());
-
-        // 2. 更新
+        AiPlatformEnum platform = AiPlatformEnum.validatePlatform(updateReqVO.getPlatform());
+        AiApiKeyDO apiKey = apiKeyService.validateApiKey(updateReqVO.getKeyId());
         AiModelDO updateObj = BeanUtils.toBean(updateReqVO, AiModelDO.class);
-        modelMapper.updateById(updateObj);
+        validateReasoningConfig(platform, apiKey, updateObj.getType(), updateObj.getReasoningConfig());
+
+        // 2. 更新：未配置（null 或档位为空）时思考配置清空，由 updateForSave 与普通字段同一条 UPDATE 置空
+        // DONE @AI：类似别的模块，updateForSave，这样是不是可以把逻辑放到 mapper；这样 2.1 2.2 就可以和上面 create 一样的逻辑呀；（已新增 AiChatMapper#updateForSave，更新与创建同样先把未配置归一为 null）
+        if (!AiReasoningUtils.isReasoningConfigured(updateObj)) {
+            updateObj.setReasoningConfig(null);
+        }
+        modelMapper.updateForSave(updateObj);
+    }
+
+    /**
+     * 校验思考配置的业务规则；档位格式、判重、默认档位、思考参数 null 已由 {@link AiModelSaveReqVO} 校验
+     *
+     * 未配置或清空时，不做平台相关的校验
+     */
+    private static void validateReasoningConfig(AiPlatformEnum platform, AiApiKeyDO apiKey, Integer type,
+                                                AiModelDO.ReasoningConfig config) {
+        if (!AiReasoningUtils.isReasoningConfigured(config)) {
+            return;
+        }
+        AiReasoningUtils.validateReasoningConfig(platform, AiPlatformEnum.validatePlatform(apiKey.getPlatform()), type, config);
     }
 
     @Override
@@ -127,10 +150,30 @@ public class AiModelServiceImpl implements AiModelService {
 
     @Override
     public ChatModel getChatModel(Long id) {
+        return getChatModel(id, null);
+    }
+
+    @Override
+    public ChatModel getChatModel(Long id, Map<String, Object> reasoningOptions) {
         AiModelDO model = validateModel(id);
         AiApiKeyDO apiKey = apiKeyService.validateApiKey(model.getKeyId());
         AiPlatformEnum platform = AiPlatformEnum.validatePlatform(apiKey.getPlatform());
-        return modelFactory.getOrCreateChatModel(platform, apiKey.getApiKey(), apiKey.getUrl());
+        return modelFactory.getOrCreateChatModel(platform, apiKey.getApiKey(), apiKey.getUrl(), reasoningOptions);
+    }
+
+    @Override
+    public AiPlatformEnum validateReasoningPlatform(AiModelDO model) {
+        AiPlatformEnum platform = AiPlatformEnum.validatePlatform(model.getPlatform());
+        // 未配置思考：不查 API 密钥、不校验，与现状一致
+        if (!AiReasoningUtils.isReasoningConfigured(model)) {
+            return platform;
+        }
+        // 已配置思考：选客户端用 API 密钥的平台，路由用模型的平台，两者必须一致（库里已有的不一致数据也在这里拒绝）
+        AiApiKeyDO apiKey = apiKeyService.validateApiKey(model.getKeyId());
+        if (!platform.getPlatform().equals(apiKey.getPlatform())) {
+            throw exception(MODEL_REASONING_PLATFORM_MISMATCH, platform.getPlatform(), apiKey.getPlatform());
+        }
+        return platform;
     }
 
     @Override

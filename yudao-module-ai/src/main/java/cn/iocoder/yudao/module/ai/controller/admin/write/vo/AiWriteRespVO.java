@@ -48,6 +48,18 @@ public class AiWriteRespVO {
     @Schema(description = "错误信息")
     private String errorMessage;
 
+    @Schema(description = "请求编号", example = "0b4f6c0e-7d3c-4f0e-9a3c-1f2a3b4c5d6e")
+    private String requestId;
+
+    @Schema(description = "输入 Token 数", example = "120")
+    private Long inputTokens;
+
+    @Schema(description = "输出 Token 数", example = "800")
+    private Long outputTokens;
+
+    @Schema(description = "合计 Token 数", example = "920")
+    private Long totalTokens;
+
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 
