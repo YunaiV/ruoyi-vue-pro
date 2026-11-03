@@ -87,7 +87,7 @@
         <justauth-starter.version>1.4.0</justauth-starter.version>
         <jimureport.version>2.3.4</jimureport.version> <!-- JimuBI 2.3.2 依赖此版本中的 JimuAiConfigBean，升级到 2.5.4 会导致启动失败 -->
         <jimubi.version>2.3.2</jimubi.version>
-        <ureport2.version>2.0.1-SNAPSHOT</ureport2.version>
+        <ureport2.version>2.0.1</ureport2.version>
         <weixin-java.version>4.8.6-20261010.094603</weixin-java.version>
         <alipay-sdk-java.version>4.40.1044.ALL</alipay-sdk-java.version>
         <!-- 专属于 JDK8 安全漏洞升级 -->
