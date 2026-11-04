@@ -139,6 +139,55 @@ public class IotModbusTcpClientUtils {
     }
 
     /**
+     * 写入保持寄存器中的一位：在同一个有序任务里先 FC03 读 1 个寄存器，再 FC06 写回，只改变 bitIndex 这一位
+     * <p>
+     * 1. 同一连接的轮询、标准写、透传、其它位写入都排在同一个有序队列里，网关自己的请求不会插进读和写之间；
+     * 2. 写回只尝试 1 次（retries = 1）：超时后不再用旧的读取结果重发，失败直接返回给调用方；
+     *    传输失败时在本任务内关闭连接，丢弃可能晚到的回显，之后的请求由 j2mod 重连；
+     * 3. PLC 程序或其它 Modbus 主站在读和写之间改写同一寄存器的其它位时，仍会被旧值覆盖（需要设备侧原子时用 FC22）
+     * <p>
+     * 需求来源：https://t.zsxq.com/Qg5LP
+     *
+     * @param connection Modbus 连接
+     * @param slaveId    从站地址
+     * @param point      位点位（{@link IotModbusCommonUtils#isBitPoint} 为 true）
+     * @param bitValue   要写入的位值
+     * @return 是否成功
+     */
+    public static Future<Boolean> writeBit(IotModbusTcpClientConnectionManager.ModbusConnection connection,
+                                           Integer slaveId, IotModbusPointRespDTO point, boolean bitValue) {
+        return connection.executeBlocking(tcpConnection -> {
+            try {
+                // 1. 读取当前寄存器值（与标准读一样使用 j2mod 默认重试：只影响拿到快照的时间，不拉长读写之间的窗口）
+                ReadMultipleRegistersRequest readRequest = new ReadMultipleRegistersRequest(point.getRegisterAddress(), 1);
+                readRequest.setUnitID(slaveId);
+                ModbusTCPTransaction readTransaction = new ModbusTCPTransaction(tcpConnection);
+                readTransaction.setRequest(readRequest);
+                readTransaction.execute();
+                int current = ((ReadMultipleRegistersResponse) readTransaction.getResponse()).getRegisterValue(0);
+
+                // 2. 只修改目标位后写回：只尝试 1 次（0 会被 j2mod 当成默认的 5 次）
+                WriteSingleRegisterRequest writeRequest = new WriteSingleRegisterRequest(point.getRegisterAddress(),
+                        new SimpleRegister(setBit(current, point.getBitIndex(), bitValue)));
+                writeRequest.setUnitID(slaveId);
+                ModbusTCPTransaction writeTransaction = new ModbusTCPTransaction(tcpConnection);
+                writeTransaction.setRetries(1);
+                writeTransaction.setRequest(writeRequest);
+                writeTransaction.execute();
+                return true;
+            } catch (Exception e) {
+                // 传输失败（读超时、IO 异常）：在本有序任务内关闭连接，下一个任务执行时由 j2mod 重连。
+                // 写回只尝试 1 次，不会经过 j2mod 重试时的 close；不关闭的话，设备晚到的回显会留在 socket 里，后续请求的响应全部错位
+                if (isTransportFailure(e)) {
+                    tcpConnection.close();
+                }
+                throw new RuntimeException(String.format("Modbus 位写入失败 [slaveId=%d, identifier=%s, address=%d, bit=%d]",
+                        slaveId, point.getIdentifier(), point.getRegisterAddress(), point.getBitIndex()), e);
+            }
+        });
+    }
+
+    /**
      * 执行透传请求（raw.push / encode 输出的 PDU）
      * <p>
      * 设备的正常、异常响应都从 transaction.getResponse() 取真实响应，先核对事务号、unit、功能码，再还原 PDU：

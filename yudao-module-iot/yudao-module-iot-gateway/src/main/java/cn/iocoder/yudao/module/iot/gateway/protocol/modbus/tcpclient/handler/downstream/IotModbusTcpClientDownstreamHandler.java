@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.utils.IotModbu
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.utils.IotModbusTcpClientUtils;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpclient.manager.IotModbusTcpClientConfigCacheService;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpclient.manager.IotModbusTcpClientConnectionManager;
+import io.vertx.core.Future;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -94,11 +95,11 @@ public class IotModbusTcpClientDownstreamHandler {
             return;
         }
 
-        // 2.1 转换属性值为原始值
-        int[] rawValues = IotModbusCommonUtils.convertToRawValues(value, point);
-        // 2.2 执行 Modbus 写入
-        IotModbusTcpClientUtils.write(connection, slaveId, point, rawValues)
-                .onSuccess(success -> log.info("[writeProperty][写入成功, deviceId={}, identifier={}, value={}]",
+        // 2. 执行 Modbus 写入：位点位只修改寄存器中的这一位（读-改-写）；其它点位保持原逻辑，转换为原始值后整体写入
+        Future<Boolean> future = IotModbusCommonUtils.isBitPoint(point)
+                ? IotModbusTcpClientUtils.writeBit(connection, slaveId, point, IotModbusCommonUtils.toBitValue(value))
+                : IotModbusTcpClientUtils.write(connection, slaveId, point, IotModbusCommonUtils.convertToRawValues(value, point));
+        future.onSuccess(success -> log.info("[writeProperty][写入成功, deviceId={}, identifier={}, value={}]",
                         config.getDeviceId(), point.getIdentifier(), value))
                 .onFailure(e -> log.error("[writeProperty][写入失败, deviceId={}, identifier={}]",
                         config.getDeviceId(), point.getIdentifier(), e));

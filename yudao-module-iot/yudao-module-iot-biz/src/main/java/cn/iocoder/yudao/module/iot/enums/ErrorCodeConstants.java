@@ -70,6 +70,8 @@ public interface ErrorCodeConstants {
     // ========== 设备 Modbus 点位 1-050-007-000 ==========
     ErrorCode DEVICE_MODBUS_POINT_NOT_EXISTS = new ErrorCode(1_050_007_000, "设备 Modbus 点位配置不存在");
     ErrorCode DEVICE_MODBUS_POINT_EXISTS = new ErrorCode(1_050_007_001, "设备 Modbus 点位配置已存在");
+    ErrorCode DEVICE_MODBUS_POINT_BIT_INDEX_INVALID = new ErrorCode(1_050_007_002,
+            "位索引仅支持功能码 03/04、数据类型 BOOLEAN、寄存器数量为 1 的点位");
 
     // ========== 设备影子 1-050-007-100 ==========
     ErrorCode DEVICE_SHADOW_NOT_ENABLED = new ErrorCode(1_050_007_100, "设备影子未启用");

@@ -5,8 +5,11 @@ import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.modbus.IotDeviceModbusPointPageReqVO;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.modbus.IotDeviceModbusPointSaveReqVO;
+import cn.iocoder.yudao.module.iot.core.enums.modbus.IotModbusFunctionCodeEnum;
+import cn.iocoder.yudao.module.iot.core.enums.modbus.IotModbusRawDataTypeEnum;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceModbusPointDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.device.IotDeviceModbusPointMapper;
@@ -50,6 +53,8 @@ public class IotDeviceModbusPointServiceImpl implements IotDeviceModbusPointServ
         IotThingModelDO thingModel = validateThingModelExists(createReqVO.getThingModelId());
         // 1.3 校验同一设备下点位唯一性（基于 identifier）
         validateDeviceModbusPointUnique(createReqVO.getDeviceId(), thingModel.getIdentifier(), null);
+        // 1.4 校验位索引配置
+        validateBitIndex(createReqVO);
 
         // 2. 插入
         IotDeviceModbusPointDO modbusPoint = BeanUtils.toBean(createReqVO, IotDeviceModbusPointDO.class,
@@ -68,11 +73,13 @@ public class IotDeviceModbusPointServiceImpl implements IotDeviceModbusPointServ
         IotThingModelDO thingModel = validateThingModelExists(updateReqVO.getThingModelId());
         // 1.4 校验同一设备下点位唯一性
         validateDeviceModbusPointUnique(updateReqVO.getDeviceId(), thingModel.getIdentifier(), updateReqVO.getId());
+        // 1.5 校验位索引配置
+        validateBitIndex(updateReqVO);
 
         // 2. 更新
         IotDeviceModbusPointDO updateObj = BeanUtils.toBean(updateReqVO, IotDeviceModbusPointDO.class,
                 o -> o.setIdentifier(thingModel.getIdentifier()).setName(thingModel.getName()));
-        modbusPointMapper.updateById(updateObj);
+        modbusPointMapper.updateForSave(updateObj); // bitIndex 为空时也写入，才能清空位索引
     }
 
     @Override
@@ -109,6 +116,21 @@ public class IotDeviceModbusPointServiceImpl implements IotDeviceModbusPointServ
         IotDeviceModbusPointDO point = modbusPointMapper.selectByDeviceIdAndIdentifier(deviceId, identifier);
         if (point != null && ObjUtil.notEqual(point.getId(), excludeId)) {
             throw exception(DEVICE_MODBUS_POINT_EXISTS);
+        }
+    }
+
+    /**
+     * 校验位索引：只用于从 FC03/FC04 的单个寄存器里取一位，作为 BOOLEAN 点位（与网关、前端的位点位规则一致）
+     */
+    private void validateBitIndex(IotDeviceModbusPointSaveReqVO reqVO) {
+        if (reqVO.getBitIndex() == null) {
+            return;
+        }
+        if (!ObjectUtils.equalsAny(reqVO.getFunctionCode(), IotModbusFunctionCodeEnum.READ_HOLDING_REGISTERS.getCode(),
+                IotModbusFunctionCodeEnum.READ_INPUT_REGISTERS.getCode())
+                || ObjUtil.notEqual(reqVO.getRawDataType(), IotModbusRawDataTypeEnum.BOOLEAN.getType())
+                || ObjUtil.notEqual(reqVO.getRegisterCount(), 1)) {
+            throw exception(DEVICE_MODBUS_POINT_BIT_INDEX_INVALID);
         }
     }
 

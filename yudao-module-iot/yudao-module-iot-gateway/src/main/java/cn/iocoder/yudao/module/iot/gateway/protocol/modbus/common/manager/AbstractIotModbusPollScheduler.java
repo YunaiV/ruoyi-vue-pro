@@ -189,8 +189,10 @@ public abstract class AbstractIotModbusPollScheduler {
 
     /**
      * 提交轮询请求到设备请求队列（保证同设备请求间隔）
+     * <p>
+     * 子类可覆盖：例如 TCP Client 的连接本身已串行执行，只需防止同一任务重入
      */
-    private void submitPollRequest(Long deviceId, String taskKey) {
+    protected void submitPollRequest(Long deviceId, String taskKey) {
         // 1. 【重要】将请求添加到设备的请求队列
         Queue<Runnable> queue = deviceRequestQueues.computeIfAbsent(deviceId, k -> new ConcurrentLinkedQueue<>());
         while (queue.size() >= MAX_QUEUE_SIZE) {

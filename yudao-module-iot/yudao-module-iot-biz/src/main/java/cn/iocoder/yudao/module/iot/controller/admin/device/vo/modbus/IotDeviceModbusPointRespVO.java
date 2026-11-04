@@ -34,6 +34,9 @@ public class IotDeviceModbusPointRespVO {
     @Schema(description = "寄存器数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer registerCount;
 
+    @Schema(description = "位索引（0-15，0 为最低位）", example = "8")
+    private Integer bitIndex;
+
     @Schema(description = "字节序", requiredMode = Schema.RequiredMode.REQUIRED, example = "AB")
     private String byteOrder;
 
