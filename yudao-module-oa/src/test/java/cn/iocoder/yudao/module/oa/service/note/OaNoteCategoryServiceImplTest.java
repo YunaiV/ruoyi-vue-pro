@@ -15,6 +15,7 @@ import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static cn.iocoder.yudao.module.oa.enums.ErrorCodeConstants.NOTE_CATEGORY_NAME_DUPLICATE;
 import static cn.iocoder.yudao.module.oa.enums.ErrorCodeConstants.NOTE_CATEGORY_NOT_EXISTS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -47,6 +48,26 @@ public class OaNoteCategoryServiceImplTest extends BaseDbUnitTest {
         // 调用，并断言异常
         assertServiceException(() -> noteCategoryService.createNoteCategory(reqVO, category.getUserId()),
                 NOTE_CATEGORY_NAME_DUPLICATE);
+    }
+
+    @Test
+    public void testCreateNoteCategory_ignoreBodyId() {
+        // mock 数据：别人已有一条目录
+        OaNoteCategoryDO other = randomNoteCategoryDO();
+        noteCategoryMapper.insert(other);
+        // 准备参数：请求体里带上别人的 id（换个不冲突的名字，避免撞名称唯一校验）
+        Long loginUserId = other.getUserId() + 1;
+        OaNoteCategorySaveReqVO reqVO = new OaNoteCategorySaveReqVO().setId(other.getId())
+                .setName("绕过前端的目录").setSort(3);
+
+        // 调用
+        Long createdId = noteCategoryService.createNoteCategory(reqVO, loginUserId);
+
+        // 断言：body 里的 id 不算数 —— 新建的是另一条行，归属取登录用户，别人的行没被覆盖
+        assertNotEquals(other.getId(), createdId);
+        OaNoteCategoryDO created = noteCategoryMapper.selectById(createdId);
+        assertEquals(loginUserId, created.getUserId());
+        assertEquals(reqVO.getName(), created.getName());
     }
 
     @Test
