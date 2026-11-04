@@ -120,6 +120,7 @@ public class AiReasoningUtils {
             case MOONSHOT:
             case BAI_CHUAN:
             case STEP_FUN:
+            case MI_MO:
                 return ReasoningRoute.HTTP;
             case OPENAI:
             case GROK:

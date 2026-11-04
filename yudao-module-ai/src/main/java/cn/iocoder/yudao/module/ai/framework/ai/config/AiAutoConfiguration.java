@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.ai.framework.ai.core.model.gemini.GeminiChatModel
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.grok.GrokChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.hunyuan.HunYuanChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.midjourney.api.MidjourneyApi;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.mimo.MiMoChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.minimax.MiniMaxChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.moonshot.MoonshotChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlowApiConstants;
@@ -381,6 +382,27 @@ public class AiAutoConfiguration {
         return new StepFunChatModel(buildDeepSeekCompatibleChatModel(
                 StrUtil.blankToDefault(properties.getBaseUrl(), StepFunChatModel.BASE_URL),
                 StepFunChatModel.COMPLETE_PATH, properties.getApiKey(), properties.getModel(),
+                properties.getTemperature(), properties.getMaxTokens(), properties.getTopP(), patcher));
+    }
+
+    @Bean
+    @ConditionalOnProperty(value = "yudao.ai.mimo.enable", havingValue = "true")
+    public MiMoChatModel miMoChatClient(YudaoAiProperties yudaoAiProperties) {
+        YudaoAiProperties.MiMo properties = yudaoAiProperties.getMimo();
+        return buildMiMoChatClient(properties);
+    }
+
+    public MiMoChatModel buildMiMoChatClient(YudaoAiProperties.MiMo properties) {
+        return buildMiMoChatClient(properties, null);
+    }
+
+    public MiMoChatModel buildMiMoChatClient(YudaoAiProperties.MiMo properties, AiRequestBodyPatcher patcher) {
+        if (StrUtil.isEmpty(properties.getModel())) {
+            properties.setModel(MiMoChatModel.MODEL_DEFAULT);
+        }
+        return new MiMoChatModel(buildDeepSeekCompatibleChatModel(
+                StrUtil.blankToDefault(properties.getBaseUrl(), MiMoChatModel.BASE_URL),
+                MiMoChatModel.COMPLETE_PATH, properties.getApiKey(), properties.getModel(),
                 properties.getTemperature(), properties.getMaxTokens(), properties.getTopP(), patcher));
     }
 

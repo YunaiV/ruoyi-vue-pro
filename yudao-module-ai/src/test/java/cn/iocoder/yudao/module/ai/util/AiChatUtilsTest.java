@@ -180,4 +180,15 @@ public class AiChatUtilsTest {
         assertEquals(withoutReasoning.getMaxTokens(), withReasoning.getMaxTokens());
     }
 
+    @Test
+    public void testBuildChatOptions_miMo() {
+        // 调用
+        DeepSeekChatOptions options = (DeepSeekChatOptions) AiChatUtils.buildChatOptions(AiPlatformEnum.MI_MO,
+                "mimo-v2.6-flash", 0.7, 1024);
+        // 断言：复用 DeepSeek 客户端的选项
+        assertEquals("mimo-v2.6-flash", options.getModel());
+        assertEquals(0.7, options.getTemperature());
+        assertEquals(1024, options.getMaxTokens());
+    }
+
 }

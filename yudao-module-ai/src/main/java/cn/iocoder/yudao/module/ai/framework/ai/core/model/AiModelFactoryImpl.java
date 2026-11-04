@@ -17,6 +17,7 @@ import cn.iocoder.yudao.module.ai.framework.ai.core.model.gemini.GeminiChatModel
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.grok.GrokChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.hunyuan.HunYuanChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.midjourney.api.MidjourneyApi;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.mimo.MiMoChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.minimax.MiniMaxChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.moonshot.MoonshotChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlowApiConstants;
@@ -168,6 +169,9 @@ public class AiModelFactoryImpl implements AiModelFactory {
                 case STEP_FUN:
                     return new AiAutoConfiguration().buildStepFunChatClient(
                             new YudaoAiProperties.StepFun().setBaseUrl(url).setApiKey(apiKey), patcher);
+                case MI_MO:
+                    return new AiAutoConfiguration().buildMiMoChatClient(
+                            new YudaoAiProperties.MiMo().setBaseUrl(url).setApiKey(apiKey), patcher);
                 case XING_HUO:
                     return new AiAutoConfiguration().buildXingHuoChatClient(
                             new YudaoAiProperties.XingHuo().setApiKey(apiKey).setModel(XingHuoChatModel.MODEL_DEFAULT),
@@ -207,6 +211,8 @@ public class AiModelFactoryImpl implements AiModelFactory {
                 return buildMoonshotChatModel(apiKey, url);
             case STEP_FUN:
                 return buildStepFunChatModel(apiKey, url);
+            case MI_MO:
+                return buildMiMoChatModel(apiKey, url);
             case XING_HUO:
                 return buildXingHuoChatModel(apiKey);
             case BAI_CHUAN:
@@ -252,6 +258,8 @@ public class AiModelFactoryImpl implements AiModelFactory {
                 return SpringUtil.getBean(MoonshotChatModel.class);
             case STEP_FUN:
                 return SpringUtil.getBean(StepFunChatModel.class);
+            case MI_MO:
+                return SpringUtil.getBean(MiMoChatModel.class);
             case XING_HUO:
                 return SpringUtil.getBean(XingHuoChatModel.class);
             case BAI_CHUAN:
@@ -511,6 +519,15 @@ public class AiModelFactoryImpl implements AiModelFactory {
         YudaoAiProperties.StepFun properties = new YudaoAiProperties.StepFun()
                 .setBaseUrl(url).setApiKey(apiKey);
         return new AiAutoConfiguration().buildStepFunChatClient(properties);
+    }
+
+    /**
+     * 可参考 {@link AiAutoConfiguration#miMoChatClient(YudaoAiProperties)}
+     */
+    private MiMoChatModel buildMiMoChatModel(String apiKey, String url) {
+        YudaoAiProperties.MiMo properties = new YudaoAiProperties.MiMo()
+                .setBaseUrl(url).setApiKey(apiKey);
+        return new AiAutoConfiguration().buildMiMoChatClient(properties);
     }
 
     /**
