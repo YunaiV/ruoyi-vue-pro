@@ -212,6 +212,10 @@ public class IotModbusCommonUtils {
         if (ArrayUtil.isEmpty(rawValues)) {
             return null;
         }
+        // 位点位：直接返回目标位，不经过缩放因子（否则 1 × 0.1 再取整会变成 false）
+        if (isBitPoint(point)) {
+            return getBit(rawValues[0], point.getBitIndex());
+        }
         String rawDataType = point.getRawDataType();
         String byteOrder = point.getByteOrder();
         BigDecimal scale = ObjectUtil.defaultIfNull(point.getScale(), BigDecimal.ONE);
@@ -632,6 +636,48 @@ public class IotModbusCommonUtils {
 
     private static boolean isReadResponseShapeValid(byte[] responsePdu, int expectedByteCount) {
         return responsePdu.length == 2 + expectedByteCount && (responsePdu[1] & 0xFF) == expectedByteCount;
+    }
+
+    // ==================== 寄存器位 ====================
+
+    /**
+     * 是否是寄存器位点位：FC03/FC04、BOOLEAN、1 个寄存器，且 bitIndex 在 0-15
+     * <p>
+     * 与管理后台、前端的位点位规则一致；不满足时（例如历史脏数据）按原逻辑处理：整个寄存器非 0 即 true、整字写。
+     * 需求来源：https://t.zsxq.com/Qg5LP
+     */
+    public static boolean isBitPoint(IotModbusPointRespDTO point) {
+        Integer bitIndex = point.getBitIndex();
+        return bitIndex != null && bitIndex >= 0 && bitIndex <= 15
+                && ObjectUtils.equalsAny(point.getFunctionCode(), FC_READ_HOLDING_REGISTERS, FC_READ_INPUT_REGISTERS)
+                && IotModbusRawDataTypeEnum.BOOLEAN.getType().equals(point.getRawDataType())
+                && ObjectUtil.equal(point.getRegisterCount(), 1);
+    }
+
+    public static boolean getBit(int registerValue, int bitIndex) {
+        return ((registerValue >> bitIndex) & 1) == 1;
+    }
+
+    /**
+     * 只修改寄存器的 bitIndex 位，其它位保持不变
+     */
+    public static int setBit(int registerValue, int bitIndex, boolean value) {
+        int mask = 1 << bitIndex;
+        return (value ? registerValue | mask : registerValue & ~mask) & 0xFFFF;
+    }
+
+    /**
+     * 把位点位的下发值解析为布尔：支持 Boolean、"true"/"false"、数字（0 为 false，非 0 为 true）；只用于位点位，不影响原有写入转换
+     */
+    public static boolean toBitValue(Object value) {
+        if (value instanceof Boolean) {
+            return (Boolean) value;
+        }
+        String str = StrUtil.trim(String.valueOf(value));
+        if ("true".equalsIgnoreCase(str) || "false".equalsIgnoreCase(str)) {
+            return Boolean.parseBoolean(str);
+        }
+        return new BigDecimal(str).signum() != 0;
     }
 
     // ==================== 点位查找 ====================

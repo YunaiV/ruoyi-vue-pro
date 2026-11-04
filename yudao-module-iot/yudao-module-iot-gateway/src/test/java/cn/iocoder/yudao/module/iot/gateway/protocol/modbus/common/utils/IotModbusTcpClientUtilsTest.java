@@ -2,6 +2,8 @@ package cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.utils;
 
 import cn.hutool.core.util.HexUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
+import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusPointRespDTO;
+import cn.iocoder.yudao.module.iot.core.enums.modbus.IotModbusRawDataTypeEnum;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.manager.IotModbusTx;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpclient.manager.IotModbusTcpClientConnectionManager.ModbusConnection;
 import com.ghgande.j2mod.modbus.ModbusIOException;
@@ -9,24 +11,33 @@ import com.ghgande.j2mod.modbus.ModbusSlaveException;
 import com.ghgande.j2mod.modbus.io.AbstractModbusTransport;
 import com.ghgande.j2mod.modbus.msg.ModbusRequest;
 import com.ghgande.j2mod.modbus.msg.ModbusResponse;
+import com.ghgande.j2mod.modbus.msg.ReadMultipleRegistersRequest;
+import com.ghgande.j2mod.modbus.msg.WriteSingleRegisterRequest;
 import com.ghgande.j2mod.modbus.net.TCPMasterConnection;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ConnectException;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.module.iot.gateway.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.utils.IotModbusCommonUtils.FC_READ_HOLDING_REGISTERS;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -273,6 +284,127 @@ public class IotModbusTcpClientUtilsTest {
         verify(tcpConnection, times(2)).close();
     }
 
+    // ========== writeBit：寄存器位写入（读-改-写） ==========
+
+    @Test
+    public void testWriteBit_readModifyWrite() throws Exception {
+        // mock 方法：FC03 读到 0x5A00，FC06 原样回显
+        mockBitWriteResponses("03025A00", false);
+
+        // 调用：置第 10 位
+        Future<Boolean> result = await(IotModbusTcpClientUtils.writeBit(connection, SLAVE_ID, randomBitPoint(10), true));
+
+        // 断言：先 FC03 读 1 个寄存器，再 FC06 写回只改了第 10 位的值
+        assertTrue(result.succeeded());
+        ArgumentCaptor<ModbusRequest> captor = ArgumentCaptor.forClass(ModbusRequest.class);
+        verify(transport, times(2)).writeRequest(captor.capture());
+        ReadMultipleRegistersRequest readRequest = assertInstanceOf(ReadMultipleRegistersRequest.class, captor.getAllValues().get(0));
+        assertEquals(0x10, readRequest.getReference());
+        assertEquals(1, readRequest.getWordCount());
+        assertEquals(SLAVE_ID, readRequest.getUnitID());
+        WriteSingleRegisterRequest writeRequest = assertInstanceOf(WriteSingleRegisterRequest.class, captor.getAllValues().get(1));
+        assertEquals(0x10, writeRequest.getReference());
+        assertEquals(0x5E00, writeRequest.getRegister().getValue());
+        assertEquals(SLAVE_ID, writeRequest.getUnitID());
+    }
+
+    @Test
+    public void testWriteBit_writeTimeoutTriedOnce() throws Exception {
+        // mock 方法：FC03 读到 0x5A00，FC06 读响应超时
+        mockBitWriteResponses("03025A00", true);
+
+        // 调用
+        Future<Boolean> result = await(IotModbusTcpClientUtils.writeBit(connection, SLAVE_ID, randomBitPoint(10), true));
+
+        // 断言：失败直接返回调用方；FC06 只写出 1 次，不用旧的读取结果重发
+        assertTrue(result.failed());
+        assertTrue(IotModbusTcpClientUtils.isTimeoutFailure(result.cause()));
+        ArgumentCaptor<ModbusRequest> captor = ArgumentCaptor.forClass(ModbusRequest.class);
+        verify(transport, times(2)).writeRequest(captor.capture());
+        assertInstanceOf(ReadMultipleRegistersRequest.class, captor.getAllValues().get(0));
+        assertInstanceOf(WriteSingleRegisterRequest.class, captor.getAllValues().get(1));
+        // 断言：在本有序任务内关闭连接，丢弃可能晚到的回显
+        verify(tcpConnection, times(1)).close();
+    }
+
+    @Test
+    public void testWriteBit_readFailNotWrite() throws Exception {
+        // mock 方法：FC03 收到异常响应 83 02
+        mockResponse(0, SLAVE_ID, "8302");
+
+        // 调用
+        Future<Boolean> result = await(IotModbusTcpClientUtils.writeBit(connection, SLAVE_ID, randomBitPoint(10), true));
+
+        // 断言：读取失败不写回；设备异常响应说明链路正常，不关闭连接
+        assertTrue(result.failed());
+        verify(transport, times(1)).writeRequest(any(ReadMultipleRegistersRequest.class));
+        verify(transport, never()).writeRequest(any(WriteSingleRegisterRequest.class));
+        verify(tcpConnection, never()).close();
+    }
+
+    @Test
+    public void testWriteBit_networkSequentialAndConcurrent() throws Exception {
+        // 准备参数：真实网络上的从站，保持寄存器 0x0010 = 0x5A00
+        try (FakeRegisterSlave slave = new FakeRegisterSlave(0x5A00, 0)) {
+            ModbusConnection networkConnection = connect(slave.getPort());
+            try {
+                // 调用：依次置第 10 位、清第 9 位
+                assertTrue(await(IotModbusTcpClientUtils.writeBit(networkConnection, SLAVE_ID, randomBitPoint(10), true)).succeeded());
+                assertEquals(0x5E00, slave.getRegister());
+                assertTrue(await(IotModbusTcpClientUtils.writeBit(networkConnection, SLAVE_ID, randomBitPoint(9), false)).succeeded());
+                // 断言：每次只改目标位
+                assertEquals(0x5C00, slave.getRegister());
+
+                // 调用：恢复为 0x5A00 后，同时提交置第 10 位、清第 9 位
+                slave.setRegister(0x5A00);
+                Future<Boolean> setBit10 = IotModbusTcpClientUtils.writeBit(networkConnection, SLAVE_ID, randomBitPoint(10), true);
+                Future<Boolean> clearBit9 = IotModbusTcpClientUtils.writeBit(networkConnection, SLAVE_ID, randomBitPoint(9), false);
+                // 断言：同一连接的有序队列里先后执行，两次修改都保留
+                assertTrue(await(setBit10).succeeded());
+                assertTrue(await(clearBit9).succeeded());
+                assertEquals(0x5C00, slave.getRegister());
+                assertEquals(4, slave.getWriteCount());
+            } finally {
+                networkConnection.getTcpConnection().close();
+            }
+        }
+    }
+
+    @Test
+    public void testWriteBit_networkWriteAckLateThenRecover() throws Exception {
+        // 准备参数：真实网络上的从站，FC06 的回显比网关的读超时（500ms）晚到
+        try (FakeRegisterSlave slave = new FakeRegisterSlave(0x5A00, 800)) {
+            ModbusConnection networkConnection = connect(slave.getPort());
+            try {
+                // 调用
+                Future<Boolean> result = await(IotModbusTcpClientUtils.writeBit(networkConnection, SLAVE_ID, randomBitPoint(10), true));
+                // 断言：读超时失败；从站只收到 1 次 FC06，不自动重发
+                assertTrue(result.failed());
+                assertTrue(IotModbusTcpClientUtils.isTimeoutFailure(result.cause()));
+                assertEquals(1, slave.getWriteCount());
+
+                // 调用：等晚到的回显发出后，在同一个连接上连续读取 2 次
+                assertTrue(slave.awaitWriteAck());
+                Future<int[]> read01 = await(IotModbusTcpClientUtils.read(networkConnection, SLAVE_ID, FC_READ_HOLDING_REGISTERS, 0x10, 1));
+                Future<int[]> read02 = await(IotModbusTcpClientUtils.read(networkConnection, SLAVE_ID, FC_READ_HOLDING_REGISTERS, 0x10, 1));
+                // 断言：超时时已关闭旧连接，晚到的回显不会被读到；重连后读到从站的实际值（FC06 已在从站生效）
+                assertTrue(read01.succeeded());
+                assertArrayEquals(new int[]{0x5E00}, read01.result());
+                assertTrue(read02.succeeded());
+                assertArrayEquals(new int[]{0x5E00}, read02.result());
+
+                // 调用：同一个连接上再次位写入
+                slave.setWriteAckDelayMillis(0);
+                assertTrue(await(IotModbusTcpClientUtils.writeBit(networkConnection, SLAVE_ID, randomBitPoint(9), false)).succeeded());
+                // 断言
+                assertEquals(0x5C00, slave.getRegister());
+                assertEquals(2, slave.getWriteCount());
+            } finally {
+                networkConnection.getTcpConnection().close();
+            }
+        }
+    }
+
     // ========== 辅助方法 ==========
 
     /**
@@ -288,6 +420,52 @@ public class IotModbusTcpClientUtilsTest {
             int transactionId = (sentTransactionId.get() + transactionIdOffset) & 0xFFFF;
             return readResponse(String.format("%04X0000%04X%02X", transactionId, pdu.length + 1, unitId) + pduHex);
         }).when(transport).readResponse();
+    }
+
+    /**
+     * mock 位写入的读响应：FC03 回 readPduHex；FC06 按写出的请求原样回显，writeTimeout 为 true 时读响应超时
+     */
+    private void mockBitWriteResponses(String readPduHex, boolean writeTimeout) throws Exception {
+        doAnswer(invocation -> {
+            String pduHex = readPduHex;
+            if (sentRequest.get() instanceof WriteSingleRegisterRequest) {
+                if (writeTimeout) {
+                    throw new ModbusIOException("Socket timeout reading response - Read timed out");
+                }
+                WriteSingleRegisterRequest writeRequest = (WriteSingleRegisterRequest) sentRequest.get();
+                pduHex = String.format("06%04X%04X", writeRequest.getReference(), writeRequest.getRegister().getValue());
+            }
+            int pduLength = pduHex.length() / 2;
+            return readResponse(String.format("%04X0000%04X%02X", sentTransactionId.get() & 0xFFFF, pduLength + 1, SLAVE_ID) + pduHex);
+        }).when(transport).readResponse();
+    }
+
+    /**
+     * 连接真实网络上的从站（与 IotModbusTcpClientConnectionManager.createConnection 一致）
+     */
+    private ModbusConnection connect(int port) throws Exception {
+        TCPMasterConnection networkTcpConnection = new TCPMasterConnection(InetAddress.getLoopbackAddress());
+        networkTcpConnection.setPort(port);
+        networkTcpConnection.setTimeout(500);
+        networkTcpConnection.connect();
+        ModbusConnection networkConnection = new ModbusConnection();
+        networkConnection.setTcpConnection(networkTcpConnection);
+        networkConnection.setContext(vertx.getOrCreateContext());
+        return networkConnection;
+    }
+
+    /**
+     * 位点位：保持寄存器 0x0010、BOOLEAN、1 个寄存器
+     */
+    private static IotModbusPointRespDTO randomBitPoint(Integer bitIndex) {
+        IotModbusPointRespDTO point = new IotModbusPointRespDTO();
+        point.setIdentifier("alarm");
+        point.setFunctionCode(FC_READ_HOLDING_REGISTERS);
+        point.setRegisterAddress(0x10);
+        point.setRegisterCount(1);
+        point.setRawDataType(IotModbusRawDataTypeEnum.BOOLEAN.getType());
+        point.setBitIndex(bitIndex);
+        return point;
     }
 
     private Future<byte[]> executeRaw() throws InterruptedException {
@@ -322,6 +500,120 @@ public class IotModbusTcpClientUtilsTest {
         assertTrue(result.failed());
         assertInstanceOf(ServiceException.class, result.cause());
         assertEquals(code, ((ServiceException) result.cause()).getCode());
+    }
+
+    /**
+     * 真实网络上的 Modbus TCP 从站：只有 1 个保持寄存器，处理 FC03 读、FC06 写；
+     * writeAckDelayMillis 大于 0 时，FC06 先写入寄存器，延迟后再回显（模拟回显晚于网关的读超时）。
+     * 每个连接一个线程，网关关闭连接后可以重新连上
+     */
+    private static class FakeRegisterSlave implements AutoCloseable {
+
+        private final ServerSocket serverSocket = new ServerSocket(0, 1, InetAddress.getLoopbackAddress());
+        private final AtomicInteger register;
+        private volatile long writeAckDelayMillis;
+        /**
+         * 收到的 FC06 次数
+         */
+        private final AtomicInteger writeCount = new AtomicInteger();
+        /**
+         * FC06 的回显已发出（连接已被网关关闭、发送失败也算）
+         */
+        private final CountDownLatch writeAcked = new CountDownLatch(1);
+
+        private FakeRegisterSlave(int register, long writeAckDelayMillis) throws IOException {
+            this.register = new AtomicInteger(register);
+            this.writeAckDelayMillis = writeAckDelayMillis;
+            Thread thread = new Thread(this::accept, "fake-modbus-slave");
+            thread.setDaemon(true);
+            thread.start();
+        }
+
+        private void accept() {
+            try {
+                while (true) {
+                    Socket socket = serverSocket.accept();
+                    Thread thread = new Thread(() -> serve(socket), "fake-modbus-slave-connection");
+                    thread.setDaemon(true);
+                    thread.start();
+                }
+            } catch (IOException ignored) {
+                // 测试结束，serverSocket 关闭
+            }
+        }
+
+        private void serve(Socket socket) {
+            try (Socket closeable = socket;
+                 DataInputStream in = new DataInputStream(closeable.getInputStream());
+                 DataOutputStream out = new DataOutputStream(closeable.getOutputStream())) {
+                while (true) {
+                    // 1. 读请求：MBAP 头（事务号、协议号、长度、unit）+ PDU
+                    int transactionId = in.readUnsignedShort();
+                    in.readUnsignedShort();
+                    byte[] pdu = new byte[in.readUnsignedShort() - 1];
+                    int unitId = in.readUnsignedByte();
+                    in.readFully(pdu);
+                    // 2. 处理请求：FC03 返回寄存器值；FC06 写入寄存器后原样回显（可延迟）
+                    byte[] response;
+                    if (pdu[0] == 3) {
+                        int value = register.get();
+                        response = new byte[]{3, 2, (byte) (value >> 8), (byte) value};
+                    } else {
+                        writeCount.incrementAndGet();
+                        register.set(((pdu[3] & 0xFF) << 8) | (pdu[4] & 0xFF));
+                        if (writeAckDelayMillis > 0) {
+                            Thread.sleep(writeAckDelayMillis);
+                        }
+                        response = pdu;
+                    }
+                    // 3. 写响应
+                    try {
+                        out.writeShort(transactionId);
+                        out.writeShort(0);
+                        out.writeShort(response.length + 1);
+                        out.writeByte(unitId);
+                        out.write(response);
+                        out.flush();
+                    } finally {
+                        if (pdu[0] == 6) {
+                            writeAcked.countDown();
+                        }
+                    }
+                }
+            } catch (IOException | InterruptedException ignored) {
+                // 测试结束或网关关闭连接
+            }
+        }
+
+        public boolean awaitWriteAck() throws InterruptedException {
+            return writeAcked.await(5, TimeUnit.SECONDS);
+        }
+
+        public void setWriteAckDelayMillis(long writeAckDelayMillis) {
+            this.writeAckDelayMillis = writeAckDelayMillis;
+        }
+
+        public int getPort() {
+            return serverSocket.getLocalPort();
+        }
+
+        public int getRegister() {
+            return register.get();
+        }
+
+        public void setRegister(int value) {
+            register.set(value);
+        }
+
+        public int getWriteCount() {
+            return writeCount.get();
+        }
+
+        @Override
+        public void close() throws IOException {
+            serverSocket.close();
+        }
+
     }
 
 }
