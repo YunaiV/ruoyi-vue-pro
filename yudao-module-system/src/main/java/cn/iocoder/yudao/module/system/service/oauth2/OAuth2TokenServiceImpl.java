@@ -83,20 +83,17 @@ public class OAuth2TokenServiceImpl implements OAuth2TokenService {
             throw exception0(GlobalErrorCodeConstants.BAD_REQUEST.getCode(), "刷新令牌的客户端编号不正确");
         }
 
-        // 移除相关的访问令牌
-        List<OAuth2AccessTokenDO> accessTokenDOs = oauth2AccessTokenMapper.selectListByRefreshToken(refreshToken);
-        if (CollUtil.isNotEmpty(accessTokenDOs)) {
-            oauth2AccessTokenMapper.deleteByIds(convertSet(accessTokenDOs, OAuth2AccessTokenDO::getId));
-            oauth2AccessTokenRedisDAO.deleteList(convertSet(accessTokenDOs, OAuth2AccessTokenDO::getAccessToken));
-        }
-
-        // 已过期的情况下，删除刷新令牌
+        // 已过期的情况下，删除刷新令牌及其访问令牌
         if (DateUtils.isExpired(refreshTokenDO.getExpiresTime())) {
+            removeAccessTokenListByRefreshToken(refreshToken);
             oauth2RefreshTokenMapper.deleteById(refreshTokenDO.getId());
             throw exception0(GlobalErrorCodeConstants.UNAUTHORIZED.getCode(), "刷新令牌已过期");
         }
 
         // 创建访问令牌
+        // 注意：不删除该刷新令牌下的旧访问令牌，由其有效期自然结束，退出登录时再一并删除
+        // 原因是：多个标签页共享同一个刷新令牌，若刷新时删除，会使其它标签页的访问令牌失效，导致互相刷新甚至被踢下线
+        // 相关 issue：https://github.com/YunaiV/ruoyi-vue-pro/issues/1332
         return createOAuth2AccessToken(refreshTokenDO, clientDO);
     }
 
@@ -149,6 +146,9 @@ public class OAuth2TokenServiceImpl implements OAuth2TokenService {
         }
         oauth2AccessTokenMapper.deleteById(accessTokenDO.getId());
         oauth2AccessTokenRedisDAO.delete(accessToken);
+        // 删除同一刷新令牌下的其它访问令牌。原因是：刷新时保留了旧访问令牌，多个标签页可能各持有一个，需一并删除
+        // 相关 issue：https://github.com/YunaiV/ruoyi-vue-pro/issues/1332
+        removeAccessTokenListByRefreshToken(accessTokenDO.getRefreshToken());
         // 删除刷新令牌
         oauth2RefreshTokenMapper.deleteByRefreshToken(accessTokenDO.getRefreshToken());
         oauth2AccessTokenRedisDAO.delete(accessTokenDO.getRefreshToken());
@@ -203,6 +203,20 @@ public class OAuth2TokenServiceImpl implements OAuth2TokenService {
                 .setExpiresTime(LocalDateTime.now().plusSeconds(clientDO.getRefreshTokenValiditySeconds()));
         oauth2RefreshTokenMapper.insert(refreshToken);
         return refreshToken;
+    }
+
+    /**
+     * 删除刷新令牌下的所有访问令牌
+     *
+     * @param refreshToken 刷新令牌
+     */
+    private void removeAccessTokenListByRefreshToken(String refreshToken) {
+        List<OAuth2AccessTokenDO> accessTokenDOs = oauth2AccessTokenMapper.selectListByRefreshToken(refreshToken);
+        if (CollUtil.isEmpty(accessTokenDOs)) {
+            return;
+        }
+        oauth2AccessTokenMapper.deleteByIds(convertSet(accessTokenDOs, OAuth2AccessTokenDO::getId));
+        oauth2AccessTokenRedisDAO.deleteList(convertSet(accessTokenDOs, OAuth2AccessTokenDO::getAccessToken));
     }
 
     private OAuth2AccessTokenDO convertToAccessToken(OAuth2RefreshTokenDO refreshTokenDO) {
