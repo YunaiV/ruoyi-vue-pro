@@ -40,7 +40,9 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
+import tools.jackson.core.JacksonException;
 import tools.jackson.databind.exc.InvalidFormatException;
+import tools.jackson.databind.exc.MismatchedInputException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -192,10 +194,26 @@ public class GlobalExceptionHandler {
             InvalidFormatException invalidFormatException = (InvalidFormatException) ex.getCause();
             return CommonResult.error(BAD_REQUEST.getCode(), String.format("请求参数类型错误:%s", invalidFormatException.getValue()));
         }
+        // JSON 结构与参数类型不匹配，例如说 Map 字段传了数组，属于客户端参数错误
+        if (ex.getCause() instanceof MismatchedInputException) {
+            String path = getJsonPath((MismatchedInputException) ex.getCause());
+            return CommonResult.error(BAD_REQUEST.getCode(), StrUtil.isEmpty(path) ? "请求参数类型错误"
+                    : String.format("请求参数类型错误:%s", path));
+        }
         if (StrUtil.startWith(ex.getMessage(), "Required request body is missing")) {
             return CommonResult.error(BAD_REQUEST.getCode(), "请求参数类型错误: request body 缺失");
         }
         return defaultExceptionHandler(ServletUtils.getRequest(), ex);
+    }
+
+    /**
+     * 获得 JSON 异常的字段路径，例如说 reasoningConfig.levels[0].options
+     */
+    private static String getJsonPath(JacksonException ex) {
+        String path = CollUtil.join(ex.getPath(), "", reference -> reference.getPropertyName() != null
+                ? StrUtil.DOT + reference.getPropertyName()
+                : reference.getIndex() >= 0 ? "[" + reference.getIndex() + "]" : "");
+        return StrUtil.removePrefix(path, StrUtil.DOT);
     }
 
     /**

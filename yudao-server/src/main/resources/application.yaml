@@ -242,6 +242,10 @@ yudao:
       enable: false
       api-key: ${STEPFUN_API_KEY:sk-xxxx}
       model: step-3.7-flash
+    mimo: # 小米 MiMo
+      enable: false
+      api-key: ${MIMO_API_KEY:sk-xxxx}
+      model: mimo-v2.6-flash
     grok: # Grok
       enable: false
       api-key: ${GROK_API_KEY:sk-xxxx}

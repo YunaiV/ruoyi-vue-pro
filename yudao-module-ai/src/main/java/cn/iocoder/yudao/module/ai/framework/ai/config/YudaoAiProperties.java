@@ -64,6 +64,11 @@ public class YudaoAiProperties {
     private StepFun stepfun;
 
     /**
+     * 小米 MiMo
+     */
+    private MiMo mimo;
+
+    /**
      * Grok
      */
     private Grok grok;
@@ -198,6 +203,20 @@ public class YudaoAiProperties {
         private String enable;
         private String baseUrl;
         private String apiKey;
+
+        private String model;
+        private Double temperature;
+        private Integer maxTokens;
+        private Double topP;
+
+    }
+
+    @Data
+    public static class MiMo {
+
+        private String enable;
+        private String apiKey;
+        private String baseUrl;
 
         private String model;
         private Double temperature;

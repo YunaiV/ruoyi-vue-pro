@@ -18,16 +18,18 @@ import java.util.Map;
 public interface AiModelFactory {
 
     /**
-     * 基于指定配置，获得 ChatModel 对象
+     * 基于指定配置和思考参数，获得 ChatModel 对象
      *
-     * 如果不存在，则进行创建
+     * 如果不存在，则进行创建。思考参数为 null、或平台不走 HTTP 层补丁时，按平台、API KEY、URL 缓存；
+     * 否则参数通过 AiRequestBodyPatcher 绑定在客户端实例的 HTTP 层，缓存键追加参数的规范化哈希
      *
      * @param platform 平台
      * @param apiKey API KEY
      * @param url API URL
+     * @param reasoningOptions 思考参数，可为 null
      * @return ChatModel 对象
      */
-    ChatModel getOrCreateChatModel(AiPlatformEnum platform, String apiKey, String url);
+    ChatModel getOrCreateChatModel(AiPlatformEnum platform, String apiKey, String url, Map<String, Object> reasoningOptions);
 
     /**
      * 基于默认配置，获得 ChatModel 对象

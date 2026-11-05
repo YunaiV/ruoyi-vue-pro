@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.mybatis.core.type.StringListTypeHandler;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeSegmentDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiModelDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.requestlog.AiRequestLogDO;
 import cn.iocoder.yudao.module.ai.framework.ai.core.webserch.AiWebSearchResponse;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -122,5 +123,30 @@ public class AiChatMessageDO extends BaseDO {
      */
     @TableField(typeHandler = StringListTypeHandler.class)
     private List<String> attachmentUrls;
+
+    /**
+     * 请求编号
+     *
+     * 仅 assistant 消息有值，关联 {@link AiRequestLogDO#getRequestId()}
+     */
+    private String requestId;
+    /**
+     * 输入 Token 数
+     *
+     * 未知为 null
+     */
+    private Long inputTokens;
+    /**
+     * 输出 Token 数
+     *
+     * 未知为 null
+     */
+    private Long outputTokens;
+    /**
+     * 合计 Token 数
+     *
+     * 输入、输出都已知时才有值，否则为 null
+     */
+    private Long totalTokens;
 
 }

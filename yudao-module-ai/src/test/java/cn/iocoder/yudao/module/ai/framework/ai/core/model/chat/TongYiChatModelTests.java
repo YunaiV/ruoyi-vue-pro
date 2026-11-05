@@ -2,9 +2,8 @@ package cn.iocoder.yudao.module.ai.framework.ai.core.model.chat;
 
 import cn.hutool.system.SystemUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.tongyi.TongYiChatModel;
 import com.alibaba.cloud.ai.dashscope.api.DashScopeApi;
-import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatModel;
-import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 import com.alibaba.cloud.ai.dashscope.rerank.DashScopeRerankModel;
 import com.alibaba.cloud.ai.dashscope.rerank.DashScopeRerankOptions;
 import com.alibaba.cloud.ai.model.RerankModel;
@@ -19,17 +18,20 @@ import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.document.Document;
+import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.openai.OpenAiChatOptions;
 import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
-import static cn.iocoder.yudao.module.ai.util.AiUtils.validateApiKey;
+import static cn.iocoder.yudao.module.ai.framework.ai.core.model.AiModelTestUtils.validateApiKey;
 import static java.util.Arrays.asList;
 
 /**
- * {@link DashScopeChatModel} 集成测试类
+ * {@link TongYiChatModel} 集成测试类
  *
  * @author fansili
  */
@@ -40,19 +42,17 @@ public class TongYiChatModelTests {
     private static final String MODEL = SystemUtil.get("DASHSCOPE_MODEL",
             "qwen3.8-max");
 
-    private final DashScopeChatModel chatModel = DashScopeChatModel.builder()
-            .dashScopeApi(DashScopeApi.builder()
+    private final TongYiChatModel chatModel = new TongYiChatModel(OpenAiChatModel.builder()
+            .options(OpenAiChatOptions.builder()
+                    .baseUrl(TongYiChatModel.BASE_URL)
                     .apiKey(API_KEY)
-                    .build())
-            .defaultOptions(DashScopeChatOptions.builder()
-                    .multiModel(true) // 多模态模型（如 qwen3.8-max）需要设置为 true，以选择多模态接口，可见 https://help.aliyun.com/zh/model-studio/error-code#error-url
                     .model(MODEL) // 模型
 //                    .model("deepseek-r1") // 模型（deepseek-r1）
 //                    .model("deepseek-v3") // 模型（deepseek-v3）
 //                    .model("deepseek-r1-distill-qwen-1.5b") // 模型（deepseek-r1-distill-qwen-1.5b）
-//                    .enableThinking(true)
+//                    .extraBody(Map.of("enable_thinking", true))
                     .build())
-            .build();
+            .build());
 
     @Test
     @Disabled
@@ -95,10 +95,10 @@ public class TongYiChatModelTests {
         // 准备参数
         List<Message> messages = new ArrayList<>();
         messages.add(new UserMessage("详细分析下，如何设计一个电商系统？"));
-        DashScopeChatOptions options = DashScopeChatOptions.builder()
-                .model(MODEL).multiModel(true)
+        OpenAiChatOptions options = OpenAiChatOptions.builder()
+                .model(MODEL)
 //                .withModel("qwen-max-2025-01-25")
-                .enableThinking(true) // 必须设置，否则会报错
+                .extraBody(Map.of("enable_thinking", true)) // 必须设置，否则会报错
                 .build();
 
         // 调用

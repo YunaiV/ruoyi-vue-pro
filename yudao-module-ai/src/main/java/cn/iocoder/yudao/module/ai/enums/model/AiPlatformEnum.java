@@ -29,6 +29,7 @@ public enum AiPlatformEnum implements ArrayValuable<String> {
     MOONSHOT("Moonshot", "月之暗面"), // KIMI
     BAI_CHUAN("BaiChuan", "百川智能"), // 百川智能
     STEP_FUN("StepFun", "阶跃星辰"), // 阶跃星辰
+    MI_MO("MiMo", "小米 MiMo"), // 小米
 
     // ========== 国外平台 ==========
 
