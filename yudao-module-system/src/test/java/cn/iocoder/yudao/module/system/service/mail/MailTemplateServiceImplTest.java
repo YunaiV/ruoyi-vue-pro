@@ -22,6 +22,7 @@ import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEq
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.MAIL_TEMPLATE_CODE_EXISTS;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.MAIL_TEMPLATE_NOT_EXISTS;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -69,6 +70,18 @@ public class MailTemplateServiceImplTest extends BaseDbUnitTest {
         // 校验是否更新正确
         MailTemplateDO mailTemplate = mailTemplateMapper.selectById(reqVO.getId()); // 获取最新的
         assertPojoEquals(reqVO, mailTemplate);
+    }
+
+    // 编码重复时，错误提示要带上真实的 code，而不是把未格式化的 `{}` 甩给用户
+    @Test
+    public void testValidateCodeUnique_duplicated() {
+        // mock 数据
+        MailTemplateDO dbMailTemplate = randomPojo(MailTemplateDO.class);
+        mailTemplateMapper.insert(dbMailTemplate);// @Sql: 先插入出一条存在的数据
+
+        // 调用, 并断言异常（新增场景 id 为 null，code 已存在）
+        assertServiceException(() -> mailTemplateService.validateCodeUnique(null, dbMailTemplate.getCode()),
+                MAIL_TEMPLATE_CODE_EXISTS, dbMailTemplate.getCode());
     }
 
     @Test
