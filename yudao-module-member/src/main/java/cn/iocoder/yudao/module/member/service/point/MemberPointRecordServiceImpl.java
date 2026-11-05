@@ -74,6 +74,11 @@ public class MemberPointRecordServiceImpl implements MemberPointRecordService {
         Integer userPoint = ObjectUtil.defaultIfNull(user.getPoint(), 0);
         int totalPoint = userPoint + point; // 用户变动后的积分
         if (totalPoint < 0) {
+            // 特殊：下单抵扣积分时，积分不足需抛出异常，使订单一起回滚。否则并发下单时，后一笔未扣积分却下单成功
+            // 其它业务（例如说取消订单时，扣除已赠送的积分）保持原逻辑：积分不足时，打印日志后跳过
+            if (bizType == MemberPointBizTypeEnum.ORDER_USE) {
+                throw exception(USER_POINT_NOT_ENOUGH);
+            }
             log.error("[createPointRecord][userId({}) point({}) bizType({}) bizId({}) {}]", userId, point, bizType, bizId,
                     USER_POINT_NOT_ENOUGH);
             return;

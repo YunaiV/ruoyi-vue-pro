@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.trade.service.brokerage;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.number.MoneyUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
 import cn.iocoder.yudao.module.product.api.sku.dto.ProductSkuRespDTO;
@@ -30,9 +31,14 @@ import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.bui
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
+import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
+import static cn.iocoder.yudao.module.trade.enums.ErrorCodeConstants.BROKERAGE_WITHDRAW_USER_BALANCE_NOT_ENOUGH;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -118,6 +124,62 @@ public class BrokerageRecordServiceImplTest extends BaseDbUnitTest {
         assertEquals(200L, records.get(0).getUserId());
         assertEquals(100, records.get(0).getPrice());
         verify(brokerageUserService).updateUserPrice(200L, 100);
+    }
+
+    @Test
+    public void testReduceBrokerage_success() {
+        // mock 方法
+        BrokerageUserDO user = new BrokerageUserDO().setId(200L).setBrokeragePrice(100);
+        when(brokerageUserService.getBrokerageUser(200L)).thenReturn(user);
+        when(brokerageUserService.updateUserPriceDecrIfEnough(200L, -100)).thenReturn(true);
+
+        // 调用：提现，扣减佣金
+        brokerageRecordService.reduceBrokerage(200L, BrokerageRecordBizTypeEnum.WITHDRAW, "1", 100,
+                BrokerageRecordBizTypeEnum.WITHDRAW.getTitle());
+        // 断言：使用要求佣金充足的扣减，并记录佣金流水
+        verify(brokerageUserService, never()).updateUserPrice(anyLong(), anyInt());
+        List<BrokerageRecordDO> records = brokerageRecordMapper.selectList(null);
+        assertEquals(1, records.size());
+        assertEquals(200L, records.get(0).getUserId());
+        assertEquals(-100, records.get(0).getPrice());
+    }
+
+    @Test
+    public void testReduceBrokerage_concurrentNotEnough() {
+        // mock 方法：余额校验通过，但并发提现时，其它提现已经扣减佣金
+        BrokerageUserDO user = new BrokerageUserDO().setId(200L).setBrokeragePrice(100);
+        when(brokerageUserService.getBrokerageUser(200L)).thenReturn(user);
+        when(brokerageUserService.updateUserPriceDecrIfEnough(200L, -100)).thenReturn(false);
+
+        // 调用，并断言异常
+        assertServiceException(() -> brokerageRecordService.reduceBrokerage(200L, BrokerageRecordBizTypeEnum.WITHDRAW,
+                "1", 100, BrokerageRecordBizTypeEnum.WITHDRAW.getTitle()),
+                BROKERAGE_WITHDRAW_USER_BALANCE_NOT_ENOUGH, MoneyUtils.fenToYuanStr(100));
+        // 断言：不使用允许扣出负数的扣减，也不记录佣金流水
+        verify(brokerageUserService, never()).updateUserPrice(anyLong(), anyInt());
+        assertEquals(0, brokerageRecordMapper.selectCount());
+    }
+
+    @Test
+    public void testCancelBrokerage_settlementAllowNegative() {
+        // mock 数据：已结算的佣金记录
+        BrokerageRecordDO record = randomPojo(BrokerageRecordDO.class, o -> {
+            o.setUserId(200L);
+            o.setBizType(BrokerageRecordBizTypeEnum.ORDER.getType());
+            o.setBizId("1");
+            o.setPrice(100);
+            o.setStatus(BrokerageRecordStatusEnum.SETTLEMENT.getStatus());
+            o.setDeleted(false);
+        });
+        brokerageRecordMapper.insert(record);
+
+        // 调用：售后取消佣金
+        brokerageRecordService.cancelBrokerage(BrokerageRecordBizTypeEnum.ORDER, "1");
+        // 断言：保持原逻辑，佣金可能已经提现，允许扣出负数，确保平台不会造成损失
+        verify(brokerageUserService).updateUserPrice(200L, -100);
+        verify(brokerageUserService, never()).updateUserPriceDecrIfEnough(anyLong(), anyInt());
+        assertEquals(BrokerageRecordStatusEnum.CANCEL.getStatus(),
+                brokerageRecordMapper.selectById(record.getId()).getStatus());
     }
 
     @Test

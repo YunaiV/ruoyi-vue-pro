@@ -149,6 +149,11 @@ public class BrokerageUserServiceImpl implements BrokerageUserService {
     }
 
     @Override
+    public boolean updateUserPriceDecrIfEnough(Long id, Integer price) {
+        return brokerageUserMapper.updatePriceDecrIfEnough(id, price) > 0;
+    }
+
+    @Override
     public void updateUserFrozenPrice(Long id, Integer frozenPrice) {
         if (frozenPrice > 0) {
             brokerageUserMapper.updateFrozenPriceIncr(id, frozenPrice);

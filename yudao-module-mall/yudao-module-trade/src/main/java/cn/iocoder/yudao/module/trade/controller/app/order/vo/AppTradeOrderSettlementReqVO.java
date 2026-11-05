@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.trade.controller.app.order.vo;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.framework.common.validation.Mobile;
@@ -22,7 +23,8 @@ public class AppTradeOrderSettlementReqVO {
 
     @Schema(description = "商品项数组", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotEmpty(message = "商品不能为空")
-    private List<Item> items;
+    @Valid // 级联校验商品项，避免购买数量为负数等，导致价格、库存计算错误
+    private List<@NotNull(message = "商品项不能为空") Item> items;
 
     @Schema(description = "优惠劵编号", example = "1024")
     private Long couponId;
@@ -74,7 +76,7 @@ public class AppTradeOrderSettlementReqVO {
             return true;
         }
         // 校验订单项是否超出
-        return items.size() == 1;
+        return CollUtil.size(items) == 1;
     }
 
     @Data
@@ -82,8 +84,7 @@ public class AppTradeOrderSettlementReqVO {
     @Valid
     public static class Item {
 
-        @Schema(description = "商品 SKU 编号", example = "2048")
-        @NotNull(message = "商品 SKU 编号不能为空")
+        @Schema(description = "商品 SKU 编号", example = "2048") // 和 cartId 二选一，见 isValid 方法
         private Long skuId;
 
         @Schema(description = "购买数量", example = "1")
@@ -97,8 +98,9 @@ public class AppTradeOrderSettlementReqVO {
         @JsonIgnore
         public boolean isValid() {
             // 组合一：skuId + count 使用商品 SKU
-            if (skuId != null && count != null) {
-                return true;
+            // 注意：传递 skuId 时，必须传递 count，即使同时传递了 cartId（优先使用 skuId + count）
+            if (skuId != null) {
+                return count != null;
             }
             // 组合二：cartId 使用购物车项
             return cartId != null;

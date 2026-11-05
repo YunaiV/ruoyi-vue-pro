@@ -306,7 +306,9 @@ public class BrokerageRecordServiceImpl implements BrokerageRecordService {
         }
 
         // 2. 更新佣金余额
-        boolean success = brokerageUserService.updateUserPrice(userId, brokeragePrice);
+        // 扣减时（例如说提现），要求佣金充足后原子扣减。原因是：上面的余额校验在并发时都会通过，避免多笔提现超额扣成负数
+        boolean success = brokeragePrice < 0 ? brokerageUserService.updateUserPriceDecrIfEnough(userId, brokeragePrice)
+                : brokerageUserService.updateUserPrice(userId, brokeragePrice);
         if (!success) {
             // 失败时，则抛出异常。只会出现扣减佣金时，余额不足的情况
             throw exception(BROKERAGE_WITHDRAW_USER_BALANCE_NOT_ENOUGH, MoneyUtils.fenToYuanStr(balance));

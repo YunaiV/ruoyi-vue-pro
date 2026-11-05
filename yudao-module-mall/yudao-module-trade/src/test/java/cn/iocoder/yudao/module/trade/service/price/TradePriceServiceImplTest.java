@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.trade.service.price;
 
+import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.product.api.property.dto.ProductPropertyValueDetailRespDTO;
 import cn.iocoder.yudao.module.product.api.sku.ProductSkuApi;
@@ -10,6 +11,7 @@ import cn.iocoder.yudao.module.trade.enums.order.TradeOrderTypeEnum;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateReqBO;
 import cn.iocoder.yudao.module.trade.service.price.bo.TradePriceCalculateRespBO;
 import cn.iocoder.yudao.module.trade.service.price.calculator.TradePriceCalculator;
+import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -29,6 +31,8 @@ import static org.mockito.Mockito.when;
  * @author 芋道源码
  */
 public class TradePriceServiceImplTest extends BaseMockitoUnitTest {
+
+    // DONE @AI：我记得有个 validatorutils 还是啥？可以简化这个？（已去掉自建的 Validator，改用 ValidationUtils#validate，校验失败时抛出 ConstraintViolationException）
 
     @InjectMocks
     private TradePriceServiceImpl tradePriceService;
@@ -128,6 +132,37 @@ public class TradePriceServiceImplTest extends BaseMockitoUnitTest {
         assertEquals("https://t.cn/3.png", calculateRespBO.getItems().get(2).getPicUrl());
         assertEquals(666L, calculateRespBO.getItems().get(2).getCategoryId());
         assertEquals(skuList.get(2).getProperties(), calculateRespBO.getItems().get(2).getProperties());
+    }
+
+    // DONE @AI：VO 不做单测；（原在 AppTradeOrderSettlementReqVOTest，已删除该 VO 单测类，VO 的参数校验由实际 Controller 的 MVC 验证覆盖；这里只保留结算 BO 的购买数量校验）
+    @Test
+    public void testValidateCalculateReqBO_itemCountInvalid() {
+        for (Integer count : Arrays.asList(-1, 0, null)) {
+            // 准备参数：例如说，购物车解析后的购买数量不正确
+            TradePriceCalculateReqBO calculateReqBO = buildCalculateReqBO(count);
+
+            // 调用
+            ConstraintViolationException exception = assertThrows(ConstraintViolationException.class,
+                    () -> ValidationUtils.validate(calculateReqBO));
+            // 断言：通过 @Valid 级联校验到商品项的购买数量
+            assertEquals(1, exception.getConstraintViolations().size(), String.valueOf(count));
+            assertEquals("items[0].count", exception.getConstraintViolations().iterator().next().getPropertyPath().toString());
+        }
+    }
+
+    @Test
+    public void testValidateCalculateReqBO_success() {
+        // 准备参数
+        TradePriceCalculateReqBO calculateReqBO = buildCalculateReqBO(1);
+
+        // 调用，并断言
+        assertDoesNotThrow(() -> ValidationUtils.validate(calculateReqBO));
+    }
+
+    private static TradePriceCalculateReqBO buildCalculateReqBO(Integer count) {
+        return new TradePriceCalculateReqBO().setUserId(10L).setPointStatus(false)
+                .setItems(singletonList(new TradePriceCalculateReqBO.Item().setSkuId(100L).setCount(count)
+                        .setCartId(233L).setSelected(true)));
     }
 
 }

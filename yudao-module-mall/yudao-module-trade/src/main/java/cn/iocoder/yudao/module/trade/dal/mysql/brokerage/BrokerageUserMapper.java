@@ -48,7 +48,7 @@ public interface BrokerageUserMapper extends BaseMapperX<BrokerageUserDO> {
     default void updatePriceIncr(Long id, Integer incrCount) {
         Assert.isTrue(incrCount > 0);
         LambdaUpdateWrapper<BrokerageUserDO> lambdaUpdateWrapper = new LambdaUpdateWrapper<BrokerageUserDO>()
-                .setSql(" brokerage_price = brokerage_price + " + incrCount)
+                .setIncrBy(BrokerageUserDO::getBrokeragePrice, incrCount)
                 .eq(BrokerageUserDO::getId, id);
         update(null, lambdaUpdateWrapper);
     }
@@ -64,8 +64,25 @@ public interface BrokerageUserMapper extends BaseMapperX<BrokerageUserDO> {
     default int updatePriceDecr(Long id, Integer incrCount) {
         Assert.isTrue(incrCount < 0);
         LambdaUpdateWrapper<BrokerageUserDO> lambdaUpdateWrapper = new LambdaUpdateWrapper<BrokerageUserDO>()
-                .setSql(" brokerage_price = brokerage_price + " + incrCount) // 负数，所以使用 + 号
+                .setIncrBy(BrokerageUserDO::getBrokeragePrice, incrCount) // 负数，所以使用 setIncrBy
                 .eq(BrokerageUserDO::getId, id);
+        return update(null, lambdaUpdateWrapper);
+    }
+
+    /**
+     * 更新用户可用佣金（减少），要求佣金充足
+     * 注意：和 {@link #updatePriceDecr(Long, Integer)} 不同，不允许扣出负数，适用于提现等场景
+     *
+     * @param id        用户编号
+     * @param incrCount 增加佣金（负数）
+     * @return 更新行数；佣金不足时为 0
+     */
+    default int updatePriceDecrIfEnough(Long id, Integer incrCount) {
+        Assert.isTrue(incrCount < 0);
+        LambdaUpdateWrapper<BrokerageUserDO> lambdaUpdateWrapper = new LambdaUpdateWrapper<BrokerageUserDO>()
+                .setIncrBy(BrokerageUserDO::getBrokeragePrice, incrCount) // 负数，所以使用 setIncrBy
+                .eq(BrokerageUserDO::getId, id)
+                .ge(BrokerageUserDO::getBrokeragePrice, -(long) incrCount); // cas 逻辑：佣金足够才扣减，避免并发提现扣为负数；使用 long 避免取反溢出
         return update(null, lambdaUpdateWrapper);
     }
 
@@ -78,7 +95,7 @@ public interface BrokerageUserMapper extends BaseMapperX<BrokerageUserDO> {
     default void updateFrozenPriceIncr(Long id, Integer incrCount) {
         Assert.isTrue(incrCount > 0);
         LambdaUpdateWrapper<BrokerageUserDO> lambdaUpdateWrapper = new LambdaUpdateWrapper<BrokerageUserDO>()
-                .setSql(" frozen_price = frozen_price + " + incrCount)
+                .setIncrBy(BrokerageUserDO::getFrozenPrice, incrCount)
                 .eq(BrokerageUserDO::getId, id);
         update(null, lambdaUpdateWrapper);
     }
@@ -93,7 +110,7 @@ public interface BrokerageUserMapper extends BaseMapperX<BrokerageUserDO> {
     default void updateFrozenPriceDecr(Long id, Integer incrCount) {
         Assert.isTrue(incrCount < 0);
         LambdaUpdateWrapper<BrokerageUserDO> lambdaUpdateWrapper = new LambdaUpdateWrapper<BrokerageUserDO>()
-                .setSql(" frozen_price = frozen_price + " + incrCount) // 负数，所以使用 + 号
+                .setIncrBy(BrokerageUserDO::getFrozenPrice, incrCount) // 负数，所以使用 setIncrBy
                 .eq(BrokerageUserDO::getId, id);
         update(null, lambdaUpdateWrapper);
     }
@@ -108,8 +125,8 @@ public interface BrokerageUserMapper extends BaseMapperX<BrokerageUserDO> {
     default int updateFrozenPriceDecrAndPriceIncr(Long id, Integer incrCount) {
         Assert.isTrue(incrCount < 0);
         LambdaUpdateWrapper<BrokerageUserDO> lambdaUpdateWrapper = new LambdaUpdateWrapper<BrokerageUserDO>()
-                .setSql(" frozen_price = frozen_price + " + incrCount + // 负数，所以使用 + 号
-                        ", brokerage_price = brokerage_price + " + -incrCount) // 负数，所以使用 - 号
+                .setIncrBy(BrokerageUserDO::getFrozenPrice, incrCount) // 负数，所以使用 setIncrBy
+                .setIncrBy(BrokerageUserDO::getBrokeragePrice, -incrCount) // 负数取反后为正数，所以使用 setIncrBy
                 .eq(BrokerageUserDO::getId, id)
                 .ge(BrokerageUserDO::getFrozenPrice, -incrCount); // cas 逻辑
         return update(null, lambdaUpdateWrapper);
