@@ -11,6 +11,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 @Mapper
@@ -37,6 +38,13 @@ public interface OAuth2AccessTokenMapper extends BaseMapperX<OAuth2AccessTokenDO
     default List<OAuth2AccessTokenDO> selectListByUserIdAndUserType(Long userId, Integer userType) {
         return selectList(OAuth2AccessTokenDO::getUserId, userId,
                 OAuth2AccessTokenDO::getUserType, userType);
+    }
+
+    default List<OAuth2AccessTokenDO> selectListByUserIdsAndUserType(Collection<Long> userIds, Integer userType) {
+        return selectList(new LambdaQueryWrapperX<OAuth2AccessTokenDO>()
+                .select(OAuth2AccessTokenDO::getId, OAuth2AccessTokenDO::getAccessToken, OAuth2AccessTokenDO::getRefreshToken)
+                .in(OAuth2AccessTokenDO::getUserId, userIds)
+                .eq(OAuth2AccessTokenDO::getUserType, userType));
     }
 
     /**

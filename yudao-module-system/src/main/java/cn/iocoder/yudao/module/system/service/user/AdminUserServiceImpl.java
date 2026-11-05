@@ -5,7 +5,6 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -46,6 +45,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -256,6 +256,9 @@ public class AdminUserServiceImpl implements AdminUserService {
     }
 
     @Override
+    // MySQL 默认的 REPEATABLE_READ 会沿用首次查询的快照，可能漏掉账号校验后、状态更新前提交的令牌。
+    // READ_COMMITTED 让撤权查询读取当时已提交的令牌，将这些令牌一并作废。
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.READ_COMMITTED)
     public void updateUserStatus(Long id, Integer status) {
         // 1.1 校验用户存在
         validateUserExists(id);
@@ -268,16 +271,18 @@ public class AdminUserServiceImpl implements AdminUserService {
         AdminUserDO updateObj = new AdminUserDO();
         updateObj.setId(id);
         updateObj.setStatus(status);
-        userMapper.updateById(updateObj);
+        int updated = userMapper.updateById(updateObj);
 
         // 3. 如果是禁用用户，则删除其 Token 信息
-        if (CommonStatusEnum.isDisable(status)) {
-            oauth2TokenService.removeAccessToken(id, UserTypeEnum.ADMIN.getValue());
+        if (updated > 0 && CommonStatusEnum.isDisable(status)) {
+            oauth2TokenService.removeAdminUserTokens(Collections.singletonList(id));
         }
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    // MySQL 默认的 REPEATABLE_READ 会沿用首次查询的快照，可能漏掉账号校验后、状态更新前提交的令牌。
+    // READ_COMMITTED 让撤权查询读取当时已提交的令牌，将这些令牌一并作废。
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.READ_COMMITTED)
     @LogRecord(type = SYSTEM_USER_TYPE, subType = SYSTEM_USER_DELETE_SUB_TYPE, bizNo = "{{#id}}",
             success = SYSTEM_USER_DELETE_SUCCESS)
     public void deleteUser(Long id) {
@@ -287,7 +292,9 @@ public class AdminUserServiceImpl implements AdminUserService {
         validateUserNotAdmin(id, USER_ADMIN_NOT_ALLOW_DELETE);
 
         // 2.1 删除用户
-        userMapper.deleteById(id);
+        if (userMapper.deleteById(id) > 0) {
+            oauth2TokenService.removeAdminUserTokens(Collections.singletonList(id));
+        }
         // 2.2 删除用户关联数据
         permissionService.processUserDeleted(id);
         // 2.2 删除用户岗位
@@ -298,13 +305,21 @@ public class AdminUserServiceImpl implements AdminUserService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    // MySQL 默认的 REPEATABLE_READ 会沿用首次查询的快照，可能漏掉账号校验后、状态更新前提交的令牌。
+    // READ_COMMITTED 让撤权查询读取当时已提交的令牌，将这些令牌一并作废。
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.READ_COMMITTED)
     public void deleteUserList(List<Long> ids) {
         // 1. 校验不能删除管理员
         ids.forEach(id -> validateUserNotAdmin(id, USER_ADMIN_NOT_ALLOW_DELETE));
 
-        // 2. 批量删除用户
-        userMapper.deleteByIds(ids);
+        // 2. 删除用户并记录实际受影响的账号，避免账号数据权限变化时误撤权
+        List<Long> deletedUserIds = new ArrayList<>();
+        ids.stream().filter(Objects::nonNull).distinct().sorted().forEach(id -> {
+            if (userMapper.deleteById(id) > 0) {
+                deletedUserIds.add(id);
+            }
+        });
+        oauth2TokenService.removeAdminUserTokens(deletedUserIds);
 
         // 3. 批量删除用户关联数据
         ids.forEach(id -> {
@@ -544,7 +559,9 @@ public class AdminUserServiceImpl implements AdminUserService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class) // 添加事务，异常则回滚所有导入
+    // MySQL 默认的 REPEATABLE_READ 会沿用首次查询的快照，可能漏掉账号校验后、状态更新前提交的令牌。
+    // READ_COMMITTED 让撤权查询读取当时已提交的令牌，将这些令牌一并作废。
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.READ_COMMITTED)
     public UserImportRespVO importUserList(List<UserImportExcelVO> importUsers, boolean isUpdateSupport) {
         // 1.1 参数校验
         if (CollUtil.isEmpty(importUsers)) {
@@ -560,6 +577,7 @@ public class AdminUserServiceImpl implements AdminUserService {
         UserImportRespVO respVO = UserImportRespVO.builder().createUsernames(new ArrayList<>())
                 .updateUsernames(new ArrayList<>()).failureUsernames(new LinkedHashMap<>()).build();
         AtomicInteger index = new AtomicInteger(1);
+        Set<Long> disabledUserIds = new LinkedHashSet<>();
         importUsers.forEach(importUser -> {
             int currentIndex = index.getAndIncrement();
             // 2.1.1 校验字段是否符合要求
@@ -604,9 +622,13 @@ public class AdminUserServiceImpl implements AdminUserService {
             // 2.2.4 更新用户
             AdminUserDO updateUser = BeanUtils.toBean(importUser, AdminUserDO.class);
             updateUser.setId(existUser.getId());
-            userMapper.updateById(updateUser);
+            int updated = userMapper.updateById(updateUser);
+            if (updated > 0 && CommonStatusEnum.isDisable(importUser.getStatus())) {
+                disabledUserIds.add(existUser.getId());
+            }
             respVO.getUpdateUsernames().add(importUser.getUsername());
         });
+        oauth2TokenService.removeAdminUserTokens(disabledUserIds);
         return respVO;
     }
 

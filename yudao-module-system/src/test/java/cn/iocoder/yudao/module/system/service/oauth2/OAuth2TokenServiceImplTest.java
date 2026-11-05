@@ -10,9 +10,11 @@ import cn.iocoder.yudao.framework.test.core.ut.BaseDbAndRedisUnitTest;
 import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.token.OAuth2AccessTokenPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2AccessTokenDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2ClientDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2CodeDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2RefreshTokenDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.dal.mysql.oauth2.OAuth2AccessTokenMapper;
+import cn.iocoder.yudao.module.system.dal.mysql.oauth2.OAuth2CodeMapper;
 import cn.iocoder.yudao.module.system.dal.mysql.oauth2.OAuth2RefreshTokenMapper;
 import cn.iocoder.yudao.module.system.dal.redis.oauth2.OAuth2AccessTokenRedisDAO;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
@@ -22,18 +24,28 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -51,9 +63,13 @@ public class OAuth2TokenServiceImplTest extends BaseDbAndRedisUnitTest {
     private OAuth2AccessTokenMapper oauth2AccessTokenMapper;
     @Resource
     private OAuth2RefreshTokenMapper oauth2RefreshTokenMapper;
-
     @Resource
+    private OAuth2CodeMapper oauth2CodeMapper;
+
+    @MockitoSpyBean
     private OAuth2AccessTokenRedisDAO oauth2AccessTokenRedisDAO;
+    @Resource
+    private PlatformTransactionManager transactionManager;
 
     @MockitoBean
     private OAuth2ClientService oauth2ClientService;
@@ -312,8 +328,8 @@ public class OAuth2TokenServiceImplTest extends BaseDbAndRedisUnitTest {
                 .setRefreshToken(accessTokenDO.getRefreshToken());
         oauth2RefreshTokenMapper.insert(refreshTokenDO);
         // 调用
-        OAuth2AccessTokenDO result = oauth2TokenService.removeAccessToken(accessTokenDO.getAccessToken());
-        assertPojoEquals(accessTokenDO, result, "createTime", "updateTime", "deleted",
+        OAuth2AccessTokenDO result = oauth2TokenService.removeAccessToken(sameRefreshAccessTokenDO.getAccessToken());
+        assertPojoEquals(sameRefreshAccessTokenDO, result, "createTime", "updateTime", "deleted",
                 "creator", "updater");
         // 断言数据
         assertNull(oauth2AccessTokenMapper.selectByAccessToken(accessTokenDO.getAccessToken()));
@@ -327,6 +343,118 @@ public class OAuth2TokenServiceImplTest extends BaseDbAndRedisUnitTest {
         assertNotNull(oauth2AccessTokenRedisDAO.get(otherAccessTokenDO.getAccessToken()));
     }
 
+
+    @Test
+    public void testRemoveAdminUserTokens_success() {
+        // mock 数据（后台用户的访问令牌、独立刷新令牌和授权码）
+        Long userId = randomLongId();
+        Integer userType = UserTypeEnum.ADMIN.getValue();
+        LocalDateTime expiresTime = LocalDateTime.now().plusMinutes(5).withNano(0);
+        OAuth2AccessTokenDO accessToken = randomPojo(OAuth2AccessTokenDO.class)
+                .setUserId(userId).setUserType(userType).setExpiresTime(expiresTime);
+        oauth2AccessTokenMapper.insert(accessToken);
+        oauth2AccessTokenRedisDAO.set(accessToken);
+        OAuth2RefreshTokenDO refreshToken = randomPojo(OAuth2RefreshTokenDO.class)
+                .setUserId(userId).setUserType(userType).setExpiresTime(expiresTime);
+        oauth2RefreshTokenMapper.insert(refreshToken);
+        oauth2AccessTokenRedisDAO.set(cloneIgnoreId(accessToken,
+                o -> o.setAccessToken(refreshToken.getRefreshToken())));
+        OAuth2CodeDO code = randomPojo(OAuth2CodeDO.class).setUserId(userId).setUserType(userType);
+        oauth2CodeMapper.insert(code);
+        // mock 数据（编号相同的会员令牌）
+        OAuth2AccessTokenDO memberToken = cloneIgnoreId(accessToken, o -> o.setAccessToken(randomString())
+                .setUserType(UserTypeEnum.MEMBER.getValue()));
+        oauth2AccessTokenMapper.insert(memberToken);
+        oauth2AccessTokenRedisDAO.set(memberToken);
+        doThrow(new IllegalStateException()).doCallRealMethod().when(oauth2AccessTokenRedisDAO).deleteList(anyCollection());
+
+        // 调用，并断言事务提交前仅删除数据库记录
+        new TransactionTemplate(transactionManager).executeWithoutResult(status -> {
+            oauth2TokenService.removeAdminUserTokens(List.of(userId));
+            assertNull(oauth2AccessTokenMapper.selectById(accessToken.getId()));
+            assertNull(oauth2RefreshTokenMapper.selectById(refreshToken.getId()));
+            assertNull(oauth2CodeMapper.selectById(code.getId()));
+            assertNotNull(oauth2AccessTokenRedisDAO.get(accessToken.getAccessToken()));
+            assertNotNull(oauth2AccessTokenRedisDAO.get(refreshToken.getRefreshToken()));
+        });
+        // 断言提交后重试清理 Redis，并保留会员令牌
+        verify(oauth2AccessTokenRedisDAO, times(2)).deleteList(anyCollection());
+        assertNull(oauth2AccessTokenRedisDAO.get(accessToken.getAccessToken()));
+        assertNull(oauth2AccessTokenRedisDAO.get(refreshToken.getRefreshToken()));
+        assertNotNull(oauth2AccessTokenMapper.selectById(memberToken.getId()));
+        assertNotNull(oauth2AccessTokenRedisDAO.get(memberToken.getAccessToken()));
+        oauth2AccessTokenRedisDAO.delete(memberToken.getAccessToken());
+    }
+
+    @Test
+    public void testRemoveAdminUserTokens_rollback() {
+        // mock 数据（没有关联访问令牌的刷新令牌）
+        OAuth2RefreshTokenDO refreshToken = randomPojo(OAuth2RefreshTokenDO.class)
+                .setUserType(UserTypeEnum.ADMIN.getValue()).setExpiresTime(LocalDateTime.now().plusMinutes(5));
+        oauth2RefreshTokenMapper.insert(refreshToken);
+        oauth2AccessTokenRedisDAO.set(randomPojo(OAuth2AccessTokenDO.class)
+                .setAccessToken(refreshToken.getRefreshToken()).setExpiresTime(refreshToken.getExpiresTime()));
+
+        // 调用，并回滚
+        new TransactionTemplate(transactionManager).executeWithoutResult(status -> {
+            oauth2TokenService.removeAdminUserTokens(List.of(refreshToken.getUserId()));
+            assertNull(oauth2RefreshTokenMapper.selectById(refreshToken.getId()));
+            status.setRollbackOnly();
+        });
+        // 断言数据库和缓存都保留原令牌
+        assertNotNull(oauth2RefreshTokenMapper.selectById(refreshToken.getId()));
+        assertNotNull(oauth2AccessTokenRedisDAO.get(refreshToken.getRefreshToken()));
+        oauth2AccessTokenRedisDAO.delete(refreshToken.getRefreshToken());
+    }
+
+    @Test
+    public void testRemoveAdminUserTokens_cacheCleanupFails() {
+        // mock 数据（没有关联访问令牌的刷新令牌）
+        OAuth2RefreshTokenDO refreshToken = randomPojo(OAuth2RefreshTokenDO.class)
+                .setUserType(UserTypeEnum.ADMIN.getValue());
+        oauth2RefreshTokenMapper.insert(refreshToken);
+        doThrow(new IllegalStateException()).when(oauth2AccessTokenRedisDAO).deleteList(anyCollection());
+
+        AtomicBoolean otherCallbackCalled = new AtomicBoolean();
+
+        // 调用，并断言数据库提交后，缓存异常不影响其他提交回调
+        new TransactionTemplate(transactionManager).executeWithoutResult(status -> {
+            oauth2TokenService.removeAdminUserTokens(List.of(refreshToken.getUserId()));
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    otherCallbackCalled.set(true);
+                }
+            });
+        });
+        assertTrue(otherCallbackCalled.get());
+        assertNull(oauth2RefreshTokenMapper.selectById(refreshToken.getId()));
+        verify(oauth2AccessTokenRedisDAO, times(2)).deleteList(anyCollection());
+    }
+
+    @Test
+    public void testRemoveAdminUserTokens_otherCommitCallbackFails() {
+        // mock 数据（缓存中的刷新令牌）
+        OAuth2RefreshTokenDO refreshToken = randomPojo(OAuth2RefreshTokenDO.class)
+                .setUserType(UserTypeEnum.ADMIN.getValue()).setExpiresTime(LocalDateTime.now().plusMinutes(5));
+        oauth2RefreshTokenMapper.insert(refreshToken);
+        oauth2AccessTokenRedisDAO.set(randomPojo(OAuth2AccessTokenDO.class)
+                .setAccessToken(refreshToken.getRefreshToken()).setExpiresTime(refreshToken.getExpiresTime()));
+
+        // 调用，并断言其他提交回调抛错时，令牌缓存仍能清理
+        assertThrows(IllegalStateException.class, () -> new TransactionTemplate(transactionManager)
+                .executeWithoutResult(status -> {
+                    TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                        @Override
+                        public void afterCommit() {
+                            throw new IllegalStateException();
+                        }
+                    });
+                    oauth2TokenService.removeAdminUserTokens(List.of(refreshToken.getUserId()));
+                }));
+        assertNull(oauth2RefreshTokenMapper.selectById(refreshToken.getId()));
+        assertNull(oauth2AccessTokenRedisDAO.get(refreshToken.getRefreshToken()));
+    }
 
     @Test
     public void testGetAccessTokenPage() {
