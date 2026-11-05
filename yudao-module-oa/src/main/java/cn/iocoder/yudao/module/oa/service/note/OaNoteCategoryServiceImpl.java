@@ -42,7 +42,7 @@ public class OaNoteCategoryServiceImpl implements OaNoteCategoryService {
         validateNoteCategoryNameUnique(null, userId, createReqVO.getName());
 
         // 2. 新增笔记目录
-        OaNoteCategoryDO category = BeanUtils.toBean(createReqVO, OaNoteCategoryDO.class).setUserId(userId);
+        OaNoteCategoryDO category = BeanUtils.toBean(createReqVO, OaNoteCategoryDO.class).setId(null).setUserId(userId);
         noteCategoryMapper.insert(category);
         return category.getId();
     }
