@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.iot.controller.admin.device.vo.modbus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
@@ -33,6 +35,11 @@ public class IotDeviceModbusPointSaveReqVO {
     @Schema(description = "寄存器数量", example = "1")
     private Integer registerCount;
 
+    @Schema(description = "位索引（0-15，0 为最低位；仅 FC03/FC04、BOOLEAN、1 个寄存器的点位；为空表示整个寄存器）", example = "8")
+    @Min(value = 0, message = "位索引不能小于 0")
+    @Max(value = 15, message = "位索引不能大于 15")
+    private Integer bitIndex;
+
     @Schema(description = "字节序", requiredMode = Schema.RequiredMode.REQUIRED, example = "AB")
     @NotEmpty(message = "字节序不能为空")
     private String byteOrder;
@@ -45,6 +52,7 @@ public class IotDeviceModbusPointSaveReqVO {
     private BigDecimal scale;
 
     @Schema(description = "轮询间隔（毫秒）", example = "5000")
+    @Min(value = 100, message = "轮询间隔不能小于 100 毫秒")
     private Integer pollInterval;
 
     @Schema(description = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")

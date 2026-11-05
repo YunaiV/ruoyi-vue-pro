@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.write.vo.AiWriteGenerateReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.write.vo.AiWriteGenerateRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.write.vo.AiWritePageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.write.vo.AiWriteRespVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.write.AiWriteDO;
@@ -31,7 +32,8 @@ public class AiWriteController {
 
     @PostMapping(value = "/generate-stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @Operation(summary = "写作生成（流式）", description = "流式返回，响应较快")
-    public Flux<CommonResult<String>> generateWriteContent(@RequestBody @Valid AiWriteGenerateReqVO generateReqVO) {
+    public Flux<CommonResult<AiWriteGenerateRespVO>> generateWriteContent(
+            @RequestBody @Valid AiWriteGenerateReqVO generateReqVO) {
         return writeService.generateWriteContent(generateReqVO, getLoginUserId());
     }
 

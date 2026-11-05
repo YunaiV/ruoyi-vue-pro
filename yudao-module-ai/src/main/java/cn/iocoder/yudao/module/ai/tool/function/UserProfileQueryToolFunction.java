@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.ai.tool.function;
 
-import cn.iocoder.yudao.module.ai.util.AiUtils;
+import cn.iocoder.yudao.module.ai.util.AiChatUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.security.core.LoginUser;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
@@ -72,12 +72,12 @@ public class UserProfileQueryToolFunction
 
     @Override
     public Response apply(Request request, ToolContext toolContext) {
-        Long tenantId = (Long) toolContext.getContext().get(AiUtils.TOOL_CONTEXT_TENANT_ID);
+        Long tenantId = (Long) toolContext.getContext().get(AiChatUtils.TOOL_CONTEXT_TENANT_ID);
         if (tenantId == null) {
             return new Response();
         }
         if (request.getId() == null) {
-            LoginUser loginUser = (LoginUser) toolContext.getContext().get(AiUtils.TOOL_CONTEXT_LOGIN_USER);
+            LoginUser loginUser = (LoginUser) toolContext.getContext().get(AiChatUtils.TOOL_CONTEXT_LOGIN_USER);
             if (loginUser == null) {
                 return new Response();
             }

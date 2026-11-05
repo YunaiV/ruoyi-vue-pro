@@ -14,6 +14,7 @@ import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServic
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
 import static cn.iocoder.yudao.module.oa.enums.ErrorCodeConstants.CONTACT_CATEGORY_NOT_EXISTS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -34,6 +35,33 @@ public class OaContactCategoryServiceImplTest extends BaseDbUnitTest {
 
     @MockBean
     private OaContactService contactService;
+
+    @Test
+    public void testCreateContactCategory_ignoreReqId() {
+        // mock 数据：其他用户的分类
+        OaContactCategoryDO otherCategory = new OaContactCategoryDO().setUserId(1L).setName("客户").setSort(1);
+        contactCategoryMapper.insert(otherCategory);
+        // 准备参数：请求体携带其他用户分类的编号
+        Long userId = 2L;
+        OaContactCategorySaveReqVO reqVO = new OaContactCategorySaveReqVO().setId(otherCategory.getId())
+                .setName("供应商").setSort(2);
+
+        // 调用
+        Long categoryId = contactCategoryService.createContactCategory(reqVO, userId);
+
+        // 断言：忽略请求编号，由数据库生成新编号，归属当前用户
+        assertNotEquals(otherCategory.getId(), categoryId);
+        OaContactCategoryDO category = contactCategoryMapper.selectById(categoryId);
+        assertEquals(userId, category.getUserId());
+        assertEquals("供应商", category.getName());
+        assertEquals(2, category.getSort());
+        // 断言：其他用户的分类不变
+        OaContactCategoryDO dbOtherCategory = contactCategoryMapper.selectById(otherCategory.getId());
+        assertEquals(1L, dbOtherCategory.getUserId());
+        assertEquals("客户", dbOtherCategory.getName());
+        assertEquals(1, dbOtherCategory.getSort());
+        verifyNoInteractions(contactService);
+    }
 
     @Test
     public void testUpdateContactCategory_noAssignmentUpdate() {

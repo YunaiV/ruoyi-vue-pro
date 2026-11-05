@@ -45,6 +45,15 @@ public class AiChatMessageSendRespVO {
         @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
         private LocalDateTime createTime;
 
+        @Schema(description = "输入 Token 数，未知为空", example = "100")
+        private Long inputTokens;
+
+        @Schema(description = "输出 Token 数，未知为空", example = "20")
+        private Long outputTokens;
+
+        @Schema(description = "合计 Token 数，未知为空", example = "120")
+        private Long totalTokens;
+
     }
 
 }

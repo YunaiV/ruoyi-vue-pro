@@ -28,7 +28,6 @@ import java.util.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
-import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.IMAGE_NOT_EXISTS;
 import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.MUSIC_NOT_EXISTS;
 
 /**
@@ -136,7 +135,7 @@ public class AiMusicServiceImpl implements AiMusicService {
         // 1. 校验是否存在
         AiMusicDO music = validateMusicExists(id);
         if (ObjUtil.notEqual(music.getUserId(), userId)) {
-            throw exception(IMAGE_NOT_EXISTS);
+            throw exception(MUSIC_NOT_EXISTS);
         }
         // 2. 删除记录
         musicMapper.deleteById(id);

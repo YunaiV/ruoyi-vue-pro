@@ -8,12 +8,14 @@ import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.manager.Abstra
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.utils.IotModbusCommonUtils;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.utils.IotModbusTcpClientUtils;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpclient.handler.upstream.IotModbusTcpClientUpstreamHandler;
+import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.RejectedExecutionException;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
@@ -32,6 +34,13 @@ public class IotModbusTcpClientPollScheduler extends AbstractIotModbusPollSchedu
     private final IotModbusTcpClientUpstreamHandler upstreamHandler;
     private final IotModbusTcpClientConfigCacheService configCacheService;
 
+    /**
+     * 在途的读取段：deviceId:taskKey
+     * <p>
+     * 上一次读取还在排队或执行时，本次定时触发直接跳过，避免设备变慢、离线时读任务在连接的有序队列里堆积
+     */
+    private final Set<String> inFlightTasks = ConcurrentHashMap.newKeySet();
+
     public IotModbusTcpClientPollScheduler(Vertx vertx,
                                            IotModbusTcpClientConnectionManager connectionManager,
                                            IotModbusTcpClientUpstreamHandler upstreamHandler,
@@ -43,6 +52,17 @@ public class IotModbusTcpClientPollScheduler extends AbstractIotModbusPollSchedu
     }
 
     // ========== 轮询执行 ==========
+
+    /**
+     * 不经过基类的 1000ms 限速队列：连接的有序 executeBlocking 已保证同一连接一问一答，
+     * 采集节奏交给 pollInterval；同一读取段同一时刻最多一个请求在途（见 {@link #pollTask}）
+     * <p>
+     * 需求来源：https://t.zsxq.com/Qg5LP
+     */
+    @Override
+    protected void submitPollRequest(Long deviceId, String taskKey) {
+        pollTask(deviceId, taskKey);
+    }
 
     @Override
     protected List<PollTask> buildPollTasks(IotModbusDeviceConfigRespDTO config) {
@@ -77,9 +97,23 @@ public class IotModbusTcpClientPollScheduler extends AbstractIotModbusPollSchedu
         Integer slaveId = connectionManager.getSlaveId(deviceId);
         Assert.notNull(slaveId, "设备 {} 没有配置 slaveId", deviceId);
 
-        // 3. 执行 Modbus 批量读取：读取结果的上报交给连接的 worker 队列
-        IotModbusTcpClientUtils.read(connection, slaveId, segment.getFunctionCode(),
-                        segment.getStartAddress(), segment.getRegisterCount())
+        // 3.1 上一次读取还没结束（排队或执行中）：跳过本次，等下一个周期
+        String inFlightKey = deviceId + ":" + taskKey;
+        if (!inFlightTasks.add(inFlightKey)) {
+            log.debug("[pollTask][设备 {} 读取段 {} 上次读取未结束，跳过本次]", deviceId, taskKey);
+            return;
+        }
+        // 3.2 执行 Modbus 批量读取：读取结束（成功或失败）释放在途标记；读取结果的上报交给连接的 worker 队列
+        Future<int[]> future;
+        try {
+            future = IotModbusTcpClientUtils.read(connection, slaveId, segment.getFunctionCode(),
+                    segment.getStartAddress(), segment.getRegisterCount());
+        } catch (RuntimeException e) {
+            // 提交被同步拒绝（例如 Context 已关闭）：释放标记，避免这个读取段永远被跳过
+            inFlightTasks.remove(inFlightKey);
+            throw e;
+        }
+        future.onComplete(ar -> inFlightTasks.remove(inFlightKey))
                 .onSuccess(rawValues -> submitReadResult(connection, deviceId,
                         () -> handleSegmentReadResult(config, segment, rawValues)))
                 .onFailure(e -> log.error("[pollTask][读取点位段失败, deviceId={}, segment={}]",

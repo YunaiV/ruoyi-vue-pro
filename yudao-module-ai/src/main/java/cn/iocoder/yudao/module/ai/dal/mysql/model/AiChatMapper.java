@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiModelPageReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiModelDO;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
 import javax.annotation.Nullable;
@@ -40,6 +41,11 @@ public interface AiChatMapper extends BaseMapperX<AiModelDO> {
                 .eq(AiModelDO::getType, type)
                 .eqIfPresent(AiModelDO::getPlatform, platform)
                 .orderByAsc(AiModelDO::getSort));
+    }
+
+    default void updateForSave(AiModelDO model) {
+        update(model, new LambdaUpdateWrapper<AiModelDO>().eq(AiModelDO::getId, model.getId())
+                .set(model.getReasoningConfig() == null, AiModelDO::getReasoningConfig, null, JDBC_TYPE_VARCHAR));
     }
 
 }

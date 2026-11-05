@@ -28,4 +28,7 @@ public class AiChatMessageSendReqVO {
     @Schema(description = "附件 URL 数组", example = "https://www.iocoder.cn/1.png")
     private List<String> attachmentUrls;
 
+    @Schema(description = "本次思考档位；为空表示使用模型默认档位，模型未配置档位时必须为空", example = "high")
+    private String reasoningLevel;
+
 }

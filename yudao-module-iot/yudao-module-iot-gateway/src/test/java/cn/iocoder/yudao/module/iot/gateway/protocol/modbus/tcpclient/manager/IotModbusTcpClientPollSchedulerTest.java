@@ -12,11 +12,14 @@ import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpclient.manager.Iot
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import cn.iocoder.yudao.module.iot.gateway.util.IotWorkerTaskQueue;
 import io.vertx.core.Context;
+import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -56,6 +59,8 @@ public class IotModbusTcpClientPollSchedulerTest extends BaseMockitoUnitTest {
     private IotDeviceMessageService messageService;
     @Mock
     private ModbusConnection connection;
+    @Mock
+    private IotWorkerTaskQueue upstreamQueue;
 
     @Test
     public void testPollPoint_reportNotBlockConnectionContext() throws Exception {
@@ -129,6 +134,119 @@ public class IotModbusTcpClientPollSchedulerTest extends BaseMockitoUnitTest {
         } finally {
             vertx.close().toCompletionStage().toCompletableFuture().get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
         }
+    }
+
+    @Test
+    public void testSubmitPollRequest_skipWhileInFlight() {
+        // 准备参数：FC03 一个读取段，轮询间隔 100ms
+        IotModbusPointRespDTO point = randomPoint(POINT_ID, FC_READ_HOLDING_REGISTERS, 0, 1, 100);
+        IotModbusDeviceConfigRespDTO config = randomConfig(point);
+        String taskKey = IotModbusTcpClientPollScheduler.buildReadSegments(config).get(0).getKey();
+        IotModbusTcpClientPollScheduler pollScheduler = new IotModbusTcpClientPollScheduler(mock(Vertx.class), connectionManager,
+                new IotModbusTcpClientUpstreamHandler(messageService, SERVER_ID), configCacheService);
+        List<Promise<int[]>> reads = new ArrayList<>();
+        // mock 方法：配置、连接、slave ID
+        when(configCacheService.getConfig(DEVICE_ID)).thenReturn(config);
+        when(connectionManager.getConnection(DEVICE_ID)).thenReturn(connection);
+        when(connectionManager.getSlaveId(DEVICE_ID)).thenReturn(SLAVE_ID);
+        // mock 方法：设备变慢，读取一直不结束，直到手动完成
+        when(connection.executeBlocking(any())).thenAnswer(invocation -> {
+            Promise<int[]> read = Promise.promise();
+            reads.add(read);
+            return read.future();
+        });
+        // mock 方法：上报队列
+        when(connection.getUpstreamQueue()).thenReturn(upstreamQueue);
+        when(upstreamQueue.submit(any())).thenReturn(Future.succeededFuture());
+
+        // 调用：上次读取未结束时，又触发 2 次
+        pollScheduler.submitPollRequest(DEVICE_ID, taskKey);
+        pollScheduler.submitPollRequest(DEVICE_ID, taskKey);
+        pollScheduler.submitPollRequest(DEVICE_ID, taskKey);
+        // 断言：只发出 1 次读取，后 2 次跳过
+        assertEquals(1, reads.size());
+
+        // 调用：读取失败后再触发
+        reads.get(0).fail("读取超时");
+        pollScheduler.submitPollRequest(DEVICE_ID, taskKey);
+        // 断言：失败释放在途标记，发出第 2 次读取
+        assertEquals(2, reads.size());
+
+        // 调用：读取成功后再触发
+        reads.get(1).complete(new int[]{250});
+        pollScheduler.submitPollRequest(DEVICE_ID, taskKey);
+        // 断言：成功同样释放，发出第 3 次读取；成功的结果交给上报队列
+        assertEquals(3, reads.size());
+        verify(upstreamQueue, times(1)).submit(any());
+    }
+
+    @Test
+    public void testSubmitPollRequest_releaseWhenReadThrows() {
+        // 准备参数
+        IotModbusPointRespDTO point = randomPoint(POINT_ID, FC_READ_HOLDING_REGISTERS, 0, 1, 100);
+        IotModbusDeviceConfigRespDTO config = randomConfig(point);
+        String taskKey = IotModbusTcpClientPollScheduler.buildReadSegments(config).get(0).getKey();
+        IotModbusTcpClientPollScheduler pollScheduler = new IotModbusTcpClientPollScheduler(mock(Vertx.class), connectionManager,
+                new IotModbusTcpClientUpstreamHandler(messageService, SERVER_ID), configCacheService);
+        // mock 方法：配置、连接、slave ID
+        when(configCacheService.getConfig(DEVICE_ID)).thenReturn(config);
+        when(connectionManager.getConnection(DEVICE_ID)).thenReturn(connection);
+        when(connectionManager.getSlaveId(DEVICE_ID)).thenReturn(SLAVE_ID);
+        // mock 方法：第 1 次提交被同步拒绝（例如 Context 已关闭），第 2 次正常提交
+        when(connection.executeBlocking(any())).thenThrow(new IllegalStateException("Context 已关闭"))
+                .thenAnswer(invocation -> Promise.promise().future());
+
+        // 调用 + 断言：同步异常照常抛出
+        assertThrows(IllegalStateException.class, () -> pollScheduler.submitPollRequest(DEVICE_ID, taskKey));
+        // 调用：再次触发
+        pollScheduler.submitPollRequest(DEVICE_ID, taskKey);
+        // 断言：在途标记已释放，第 2 次照常发出读取
+        verify(connection, times(2)).executeBlocking(any());
+    }
+
+    @Test
+    public void testSubmitPollRequest_noMinIntervalAndBoundInFlight() {
+        // 准备参数：3 个不连续的读取段，轮询间隔都是 100ms
+        IotModbusPointRespDTO point01 = randomPoint(1L, FC_READ_HOLDING_REGISTERS, 0, 1, 100);
+        IotModbusPointRespDTO point02 = randomPoint(2L, FC_READ_HOLDING_REGISTERS, 10, 1, 100);
+        IotModbusPointRespDTO point03 = randomPoint(3L, FC_READ_HOLDING_REGISTERS, 20, 1, 100);
+        IotModbusDeviceConfigRespDTO config = randomConfig(point01, point02, point03);
+        List<ReadSegment> segments = IotModbusTcpClientPollScheduler.buildReadSegments(config);
+        assertEquals(3, segments.size());
+        IotModbusTcpClientPollScheduler pollScheduler = new IotModbusTcpClientPollScheduler(mock(Vertx.class), connectionManager,
+                new IotModbusTcpClientUpstreamHandler(messageService, SERVER_ID), configCacheService);
+        List<Promise<int[]>> reads = new ArrayList<>();
+        // mock 方法：配置、连接、slave ID
+        when(configCacheService.getConfig(DEVICE_ID)).thenReturn(config);
+        when(connectionManager.getConnection(DEVICE_ID)).thenReturn(connection);
+        when(connectionManager.getSlaveId(DEVICE_ID)).thenReturn(SLAVE_ID);
+        // mock 方法：设备变慢，读取一直不结束，直到手动完成
+        when(connection.executeBlocking(any())).thenAnswer(invocation -> {
+            Promise<int[]> read = Promise.promise();
+            reads.add(read);
+            return read.future();
+        });
+        // mock 方法：上报队列
+        when(connection.getUpstreamQueue()).thenReturn(upstreamQueue);
+        when(upstreamQueue.submit(any())).thenReturn(Future.succeededFuture());
+
+        // 调用：每个读取段触发 1 次
+        segments.forEach(segment -> pollScheduler.submitPollRequest(DEVICE_ID, segment.getKey()));
+        // 断言：3 个读取段立即提交，不再经过基类的 1000ms 限速队列
+        assertEquals(3, reads.size());
+
+        // 调用：读取都未结束时，再触发 100 轮
+        for (int i = 0; i < 100; i++) {
+            segments.forEach(segment -> pollScheduler.submitPollRequest(DEVICE_ID, segment.getKey()));
+        }
+        // 断言：连接上排队的读取不超过读取段数，写入最多排在 3 个读取之后
+        assertEquals(3, reads.size());
+
+        // 调用：读取都结束后，再触发 1 轮
+        reads.forEach(read -> read.complete(new int[]{0}));
+        segments.forEach(segment -> pollScheduler.submitPollRequest(DEVICE_ID, segment.getKey()));
+        // 断言：每个读取段各发出下一次读取
+        assertEquals(6, reads.size());
     }
 
     @Test

@@ -88,8 +88,13 @@ public class IotModbusTcpServerDownstreamHandler {
                 log.warn("[handle][点位 {} 不支持写操作, 功能码={}]", identifier, point.getFunctionCode());
                 continue;
             }
+            // 2.3 位点位需要读-改-写，而 TCP Server 的写入不等待设备响应：暂不支持，避免整字写冲掉其它位
+            if (IotModbusCommonUtils.isBitPoint(point)) {
+                log.warn("[handle][点位 {} 是寄存器位点位, Modbus TCP Server 暂不支持位写入]", identifier);
+                continue;
+            }
 
-            // 2.3 执行写入
+            // 2.4 执行写入
             writeProperty(config.getDeviceId(), connInfo, point, value);
         }
     }

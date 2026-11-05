@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.mybatis.core.util.SqlDialectUtils.Dialect;
 import com.baomidou.dynamic.datasource.DynamicRoutingDataSource;
 import com.baomidou.dynamic.datasource.toolkit.DynamicDataSourceContextHolder;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.google.common.collect.ImmutableMap;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.ParameterMapping;
@@ -29,6 +30,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -349,10 +351,18 @@ public class SqlDialectUtilsTest {
         assertEquals("JSON_CONTAINS(t.label_ids, JSON_ARRAY({0}))",
                 SqlDialectUtils.jsonArrayContains(Dialect.ORIGINAL, "t.label_ids", true));
         // PostgreSQL：两种原有片段统一为 jsonb 包含，参数按 BIGINT 匹配数字元素
-        assertEquals("CAST(booking_user_ids AS jsonb) @> jsonb_build_array(CAST({0} AS BIGINT))",
+        assertEquals(postgreSQLJsonArrayContains("booking_user_ids"),
                 SqlDialectUtils.jsonArrayContains(Dialect.POSTGRESQL, "booking_user_ids", false));
-        assertEquals("CAST(t.label_ids AS jsonb) @> jsonb_build_array(CAST({0} AS BIGINT))",
+        assertEquals(postgreSQLJsonArrayContains("t.label_ids"),
                 SqlDialectUtils.jsonArrayContains(Dialect.POSTGRESQL, "t.label_ids", true));
+        // PostgreSQL：{0} 只出现一次；openGauss、GaussDB 没有 jsonb_build_array，
+        // openGauss 的 A、B 兼容模式下 || 会忽略 NULL 或作为逻辑或，所以不使用；null 参数由 COALESCE 拼成 [null]
+        String postgreSQL = SqlDialectUtils.jsonArrayContains(Dialect.POSTGRESQL, "t.label_ids", true);
+        assertEquals(1, postgreSQL.split("\\{0}", -1).length - 1, postgreSQL);
+        assertTrue(postgreSQL.contains("CAST({0} AS BIGINT)"), postgreSQL);
+        assertTrue(postgreSQL.contains("COALESCE(CAST(CAST({0} AS BIGINT) AS TEXT), 'null')"), postgreSQL);
+        assertFalse(postgreSQL.contains("jsonb_build_array"), postgreSQL);
+        assertFalse(postgreSQL.contains("||"), postgreSQL);
         // Oracle、SQL Server、H2：两种原有片段相同，{0} 只出现一次，不使用 JSON 函数
         for (Dialect dialect : java.util.Arrays.asList(Dialect.ORACLE, Dialect.SQLSERVER, Dialect.H2)) {
             String condition = SqlDialectUtils.jsonArrayContains(dialect, "t.label_ids", true);
@@ -534,9 +544,10 @@ public class SqlDialectUtilsTest {
         // H2：仅 JSON 片段使用严格的平面 Long 数组写法，其它片段仍保持原有
         assertEquals(Dialect.H2, resolveJson("H2", "jdbc:h2:mem:testdb;MODE=MYSQL", 2));
         assertEquals(Dialect.ORIGINAL, resolve("H2", "jdbc:h2:mem:testdb;MODE=MYSQL", 2));
+        // openGauss、GaussDB：仅 JSON 片段使用 PostgreSQL 写法，见 testResolveJsonDialect_openGauss
+        assertEquals(Dialect.POSTGRESQL, resolveJson("PostgreSQL", "jdbc:opengauss://127.0.0.1:5432/test", 9));
+        assertEquals(Dialect.POSTGRESQL, resolveJson("openGauss", "jdbc:opengauss://127.0.0.1:5432/test", 5));
         // 其它 PostgreSQL 变种（含产品名为 PostgreSQL 的金仓 URL）、达梦、神通、MySQL：保持原有 JSON_CONTAINS
-        assertEquals(Dialect.ORIGINAL, resolveJson("PostgreSQL", "jdbc:opengauss://127.0.0.1:5432/test", 9));
-        assertEquals(Dialect.ORIGINAL, resolveJson("openGauss", "jdbc:opengauss://127.0.0.1:5432/test", 5));
         assertEquals(Dialect.ORIGINAL, resolveJson("PostgreSQL", "jdbc:kingbase8://127.0.0.1:54321/test", 12));
         assertEquals(Dialect.ORIGINAL, resolveJson("DM DBMS", "jdbc:dm://127.0.0.1:5236", 8));
         assertEquals(Dialect.ORIGINAL, resolveJson("OSCAR", "jdbc:oscar://127.0.0.1:2003/osrdb", 7));
@@ -547,6 +558,31 @@ public class SqlDialectUtilsTest {
         assertEquals(Dialect.ORACLE, resolveJson("Oracle", "jdbc:oracle:thin:@127.0.0.1:1521:xe", 21));
         assertEquals(Dialect.SQLSERVER, resolveJson("Microsoft SQL Server", "jdbc:sqlserver://127.0.0.1:1433", 11));
         assertThrows(IllegalStateException.class, () -> resolveJson("SQLite", "jdbc:sqlite:/tmp/test.db", 3));
+    }
+
+    /**
+     * openGauss、GaussDB（含 MogDB）：JSON 片段与普通片段的分类有意不同
+     *
+     * 项目要求使用 PG 兼容模式，原有 JSON_CONTAINS 不存在或匹配不精确，所以 JSON 片段按 PostgreSQL 处理；
+     * 日期、行数限制等普通片段未验收，仍保持原有片段
+     */
+    @Test
+    public void testResolveJsonDialect_openGauss() throws SQLException {
+        // 原生产品名：openGauss（含 openGauss 原生驱动连接的 MogDB）、GaussDB
+        assertEquals(Dialect.POSTGRESQL, resolveJson("openGauss", "jdbc:opengauss://127.0.0.1:15434/postgres", 9));
+        assertEquals(Dialect.ORIGINAL, resolve("openGauss", "jdbc:opengauss://127.0.0.1:15434/postgres", 9));
+        assertEquals(Dialect.POSTGRESQL, resolveJson("GaussDB", "jdbc:gaussdb://127.0.0.1:8000/postgres", 9));
+        assertEquals(Dialect.ORIGINAL, resolve("GaussDB", "jdbc:gaussdb://127.0.0.1:8000/postgres", 9));
+        // 产品名为 PostgreSQL 或未登记时，按原生驱动 URL 识别，不区分大小写
+        for (String url : Arrays.asList("jdbc:opengauss://127.0.0.1:5432/test", "jdbc:gaussdb://127.0.0.1:8000/test",
+                "jdbc:mogdb://127.0.0.1:5432/test", "JDBC:OPENGAUSS://127.0.0.1:5432/test")) {
+            assertEquals(Dialect.POSTGRESQL, resolveJson("PostgreSQL", url, 9), url);
+            assertEquals(Dialect.POSTGRESQL, resolveJson("MogDB", url, 5), url);
+            assertEquals(Dialect.ORIGINAL, resolve("PostgreSQL", url, 9), url);
+        }
+        // URL 只按开头的协议识别：库名中出现 opengauss 的 MySQL 仍保持原有片段
+        assertEquals(Dialect.ORIGINAL, resolveJson("MySQL", "jdbc:mysql://127.0.0.1:3306/opengauss", 8));
+        assertEquals(Dialect.ORIGINAL, resolveJson("DM DBMS", "jdbc:dm://127.0.0.1:5236?schema=gaussdb", 8));
     }
 
     @Test
@@ -632,6 +668,59 @@ public class SqlDialectUtilsTest {
             assertEquals(java.util.Arrays.asList(1, "1024"), getParameterValues(boundSql, bookingWrapper));
             assertNotNull(CCJSqlParserUtil.parse(sql), route.getValue() + " " + sql);
         }
+    }
+
+    /**
+     * openGauss、GaussDB 路由到 PostgreSQL 的 JSON 片段：超出 2^53 的相邻编号仍各自作为参数绑定，按 BIGINT 比较。
+     * 这里只验证片段与参数结构，数据库中的实际匹配结果需在实库验收
+     */
+    @Test
+    public void testBoundSql_jsonArrayContains_openGauss() throws Exception {
+        FakeDataSource openGauss = new FakeDataSource("openGauss", "jdbc:opengauss://127.0.0.1:15434/postgres", 9);
+        FakeDataSource gaussDB = new FakeDataSource("GaussDB", "jdbc:gaussdb://127.0.0.1:8000/postgres", 9);
+        mockDynamicRoutingDataSource(ImmutableMap.of("master", openGauss, "gaussdb", gaussDB));
+        SqlSource sqlSource = new XMLLanguageDriver().createSqlSource(new Configuration(),
+                "<script>SELECT id FROM pms_work_item ${ew.customSqlSegment}</script>", Map.class);
+        long id = 9007199254740992L; // 2^53，与相邻编号转为 double 后相同
+
+        for (String route : Arrays.asList("master", "gaussdb")) {
+            DynamicDataSourceContextHolder.push(route);
+            // PMS：参数为 Long
+            String labelCondition = SqlDialectUtils.jsonArrayContains("label_ids", true);
+            assertEquals(postgreSQLJsonArrayContains("label_ids"), labelCondition, route);
+            QueryWrapper<Object> labelWrapper = new QueryWrapper<>();
+            labelWrapper.and(w -> w.or().apply(labelCondition, id).or().apply(labelCondition, id + 1));
+            BoundSql boundSql = sqlSource.getBoundSql(Collections.singletonMap("ew", labelWrapper));
+            String sql = normalize(boundSql.getSql());
+            String expected = labelCondition.replace("{0}", "?");
+            assertTrue(sql.contains(expected + " OR " + expected), sql);
+            assertFalse(sql.toUpperCase().contains("JSON_CONTAINS"), sql);
+            assertFalse(sql.contains(String.valueOf(id)), sql); // 值只通过参数绑定，不拼接到 SQL 中
+            assertEquals(Arrays.asList(id, id + 1), getParameterValues(boundSql, labelWrapper));
+            assertNotNull(CCJSqlParserUtil.parse(sql), route + " " + sql);
+
+            // OA：参数仍为 ID 的数字文本，由 CAST(? AS BIGINT) 转为整数
+            String bookingCondition = SqlDialectUtils.jsonArrayContains("booking_user_ids", false);
+            assertEquals(postgreSQLJsonArrayContains("booking_user_ids"), bookingCondition, route);
+            QueryWrapper<Object> bookingWrapper = new QueryWrapper<>();
+            bookingWrapper.apply(bookingCondition, String.valueOf(id + 1));
+            boundSql = sqlSource.getBoundSql(Collections.singletonMap("ew", bookingWrapper));
+            sql = normalize(boundSql.getSql());
+            assertTrue(sql.contains(bookingCondition.replace("{0}", "?")), sql);
+            assertEquals(Collections.singletonList("9007199254740993"), getParameterValues(boundSql, bookingWrapper));
+            assertNotNull(CCJSqlParserUtil.parse(sql), route + " " + sql);
+
+            // null 参数仍只绑定一次，由片段中的 COALESCE 拼成 [null]，不拼接到 SQL 中
+            QueryWrapper<Object> nullWrapper = new QueryWrapper<>();
+            nullWrapper.apply(bookingCondition, (Object) null);
+            boundSql = sqlSource.getBoundSql(Collections.singletonMap("ew", nullWrapper));
+            assertEquals(Collections.singletonList(null), getParameterValues(boundSql, nullWrapper));
+            DynamicDataSourceContextHolder.poll();
+        }
+        // 普通片段的分类不变：仍为原有片段
+        DynamicDataSourceContextHolder.push("gaussdb");
+        assertEquals(Dialect.ORIGINAL, SqlDialectUtils.getDialect());
+        assertEquals(Dialect.POSTGRESQL, SqlDialectUtils.getJsonDialect());
     }
 
     // ========== 行数限制 ==========
@@ -1026,6 +1115,16 @@ public class SqlDialectUtilsTest {
 
     private static Dialect resolveJson(String productName, String url, int majorVersion) throws SQLException {
         return SqlDialectUtils.resolveJsonDialect(new FakeDataSource(productName, url, majorVersion).getMetaData());
+    }
+
+    /**
+     * PostgreSQL 及其兼容数据库的 JSON 数组包含片段：参数转为 BIGINT 后拼成单元素 JSON 数组，null 参数拼成 [null]
+     *
+     * @param column JSON 数组列名
+     * @return 期望的 SQL 片段
+     */
+    private static String postgreSQLJsonArrayContains(String column) {
+        return "CAST(" + column + " AS jsonb) @> CAST(CONCAT('[', COALESCE(CAST(CAST({0} AS BIGINT) AS TEXT), 'null'), ']') AS jsonb)";
     }
 
     /**

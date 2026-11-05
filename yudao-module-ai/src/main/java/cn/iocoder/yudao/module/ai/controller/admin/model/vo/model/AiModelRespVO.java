@@ -46,6 +46,9 @@ public class AiModelRespVO {
     @Schema(description = "输入模态数组", example = "[\"text\", \"image\"]")
     private List<String> inputModalities;
 
+    @Schema(description = "思考配置", example = "{\"levels\":[{\"level\":\"off\",\"options\":{\"thinking\":{\"type\":\"disabled\"}}}],\"defaultLevel\":\"off\"}")
+    private AiModelSaveReqVO.ReasoningConfig reasoningConfig;
+
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 

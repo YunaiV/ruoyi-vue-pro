@@ -17,6 +17,7 @@ import cn.iocoder.yudao.module.ai.framework.ai.core.model.gemini.GeminiChatModel
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.grok.GrokChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.hunyuan.HunYuanChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.midjourney.api.MidjourneyApi;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.mimo.MiMoChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.minimax.MiniMaxChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.moonshot.MoonshotChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlowApiConstants;
@@ -28,7 +29,8 @@ import cn.iocoder.yudao.module.ai.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.xinghuo.XingHuoChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.yiyan.YiYanChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.zhipu.ZhiPuChatModel;
-import cn.iocoder.yudao.module.ai.util.AiUtils;
+import cn.iocoder.yudao.module.ai.framework.ai.core.reasoning.AiRequestBodyPatcher;
+import cn.iocoder.yudao.module.ai.util.AiReasoningUtils;
 import com.alibaba.cloud.ai.autoconfigure.dashscope.DashScopeChatAutoConfiguration;
 import com.alibaba.cloud.ai.autoconfigure.dashscope.DashScopeEmbeddingAutoConfiguration;
 import com.alibaba.cloud.ai.autoconfigure.dashscope.DashScopeImageAutoConfiguration;
@@ -101,6 +103,7 @@ import org.springframework.ai.vectorstore.redis.autoconfigure.RedisVectorStorePr
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
+import org.springframework.core.env.Environment;
 import redis.clients.jedis.JedisPooled;
 
 import java.io.File;
@@ -110,7 +113,9 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.API_CONFIG_PLACEHOLDER_NOT_RESOLVED;
 
 /**
  * AI Model 模型工厂的实现类
@@ -120,53 +125,113 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 public class AiModelFactoryImpl implements AiModelFactory {
 
     @Override
-    public ChatModel getOrCreateChatModel(AiPlatformEnum platform, String rawApiKey, String rawUrl) {
+    public ChatModel getOrCreateChatModel(AiPlatformEnum platform, String rawApiKey, String rawUrl,
+                                          Map<String, Object> reasoningOptions) {
         final String apiKey = resolveSpringPlaceholders(rawApiKey);
         final String url = resolveSpringPlaceholders(rawUrl);
-        String cacheKey = buildClientCacheKey(ChatModel.class, platform, apiKey, url);
+        // 情况一：未配置思考、或不走 HTTP 路由（思考参数在 ChatOptions 中），按平台、API KEY、URL 缓存
+        if (reasoningOptions == null || !AiReasoningUtils.isReasoningHttpRoute(platform)) {
+            String cacheKey = buildClientCacheKey(ChatModel.class, platform, apiKey, url);
+            return Singleton.get(cacheKey, (Func0<ChatModel>) () -> buildChatModel(platform, apiKey, url));
+        }
+        // 情况二：HTTP 路由，思考参数绑定在客户端实例的 HTTP 层
+        // 规范化后的思考参数：键顺序不同的同一参数共用一个客户端；HTTP 层补丁只读，共享不会串值
+        final String patchJson = AiReasoningUtils.toCanonicalReasoningJson(reasoningOptions);
+        String cacheKey = buildClientCacheKey(ChatModel.class, platform, apiKey, url,
+                AiReasoningUtils.hashReasoningOptions(reasoningOptions));
         return Singleton.get(cacheKey, (Func0<ChatModel>) () -> {
+            AiRequestBodyPatcher patcher = new AiRequestBodyPatcher(patchJson);
             // noinspection EnhancedSwitchMigration
             switch (platform) {
-                case TONG_YI:
-                    return buildTongYiChatModel(apiKey);
                 case YI_YAN:
-                    return buildYiYanChatModel(apiKey);
+                    return new AiAutoConfiguration().buildYiYanChatClient(
+                            new YudaoAiProperties.YiYan().setApiKey(apiKey), patcher);
                 case DEEP_SEEK:
-                    return buildDeepSeekChatModel(apiKey);
+                    return buildDeepSeekChatModel(apiKey, patcher);
                 case DOU_BAO:
-                    return buildDouBaoChatModel(apiKey);
+                    return new AiAutoConfiguration().buildDouBaoChatClient(
+                            new YudaoAiProperties.DouBao().setApiKey(apiKey), patcher);
                 case HUN_YUAN:
-                    return buildHunYuanChatModel(apiKey, url);
+                    return new AiAutoConfiguration().buildHunYuanChatClient(
+                            new YudaoAiProperties.HunYuan().setBaseUrl(url).setApiKey(apiKey), patcher);
                 case SILICON_FLOW:
-                    return buildSiliconFlowChatModel(apiKey);
+                    return new AiAutoConfiguration().buildSiliconFlowChatClient(
+                            new YudaoAiProperties.SiliconFlow().setApiKey(apiKey), patcher);
                 case ZHI_PU:
-                    return buildZhiPuChatModel(apiKey, url);
+                    return new AiAutoConfiguration().buildZhiPuChatClient(
+                            new YudaoAiProperties.ZhiPu().setBaseUrl(url).setApiKey(apiKey), patcher);
                 case MINI_MAX:
-                    return buildMiniMaxChatModel(apiKey, url);
+                    return new AiAutoConfiguration().buildMiniMaxChatClient(
+                            new YudaoAiProperties.MiniMax().setBaseUrl(url).setApiKey(apiKey), patcher);
                 case MOONSHOT:
-                    return buildMoonshotChatModel(apiKey, url);
+                    return new AiAutoConfiguration().buildMoonshotChatClient(
+                            new YudaoAiProperties.Moonshot().setBaseUrl(url).setApiKey(apiKey), patcher);
                 case STEP_FUN:
-                    return buildStepFunChatModel(apiKey, url);
+                    return new AiAutoConfiguration().buildStepFunChatClient(
+                            new YudaoAiProperties.StepFun().setBaseUrl(url).setApiKey(apiKey), patcher);
+                case MI_MO:
+                    return new AiAutoConfiguration().buildMiMoChatClient(
+                            new YudaoAiProperties.MiMo().setBaseUrl(url).setApiKey(apiKey), patcher);
                 case XING_HUO:
-                    return buildXingHuoChatModel(apiKey);
+                    return new AiAutoConfiguration().buildXingHuoChatClient(
+                            new YudaoAiProperties.XingHuo().setApiKey(apiKey).setModel(XingHuoChatModel.MODEL_DEFAULT),
+                            patcher);
                 case BAI_CHUAN:
-                    return buildBaiChuanChatModel(apiKey);
-                case OPENAI:
-                    return buildOpenAiChatModel(apiKey, url);
-                case AZURE_OPENAI:
-                    return buildAzureOpenAiChatModel(apiKey, url);
-                case ANTHROPIC:
-                    return buildAnthropicChatModel(apiKey, url);
-                case GEMINI:
-                    return buildGeminiChatModel(apiKey);
-                case OLLAMA:
-                    return buildOllamaChatModel(url);
-                case GROK:
-                    return buildGrokChatModel(apiKey, url);
+                    return new AiAutoConfiguration().buildBaiChuanChatClient(
+                            new YudaoAiProperties.BaiChuan().setApiKey(apiKey), patcher);
                 default:
-                    throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));
+                    throw new IllegalArgumentException(StrUtil.format("平台({})不走 HTTP 思考参数", platform));
             }
         });
+    }
+
+    /**
+     * 按平台创建 ChatModel 对象，不带思考参数
+     */
+    private ChatModel buildChatModel(AiPlatformEnum platform, String apiKey, String url) {
+        // noinspection EnhancedSwitchMigration
+        switch (platform) {
+            case TONG_YI:
+                return buildTongYiChatModel(apiKey);
+            case YI_YAN:
+                return buildYiYanChatModel(apiKey);
+            case DEEP_SEEK:
+                return buildDeepSeekChatModel(apiKey);
+            case DOU_BAO:
+                return buildDouBaoChatModel(apiKey);
+            case HUN_YUAN:
+                return buildHunYuanChatModel(apiKey, url);
+            case SILICON_FLOW:
+                return buildSiliconFlowChatModel(apiKey);
+            case ZHI_PU:
+                return buildZhiPuChatModel(apiKey, url);
+            case MINI_MAX:
+                return buildMiniMaxChatModel(apiKey, url);
+            case MOONSHOT:
+                return buildMoonshotChatModel(apiKey, url);
+            case STEP_FUN:
+                return buildStepFunChatModel(apiKey, url);
+            case MI_MO:
+                return buildMiMoChatModel(apiKey, url);
+            case XING_HUO:
+                return buildXingHuoChatModel(apiKey);
+            case BAI_CHUAN:
+                return buildBaiChuanChatModel(apiKey);
+            case OPENAI:
+                return buildOpenAiChatModel(apiKey, url);
+            case AZURE_OPENAI:
+                return buildAzureOpenAiChatModel(apiKey, url);
+            case ANTHROPIC:
+                return buildAnthropicChatModel(apiKey, url);
+            case GEMINI:
+                return buildGeminiChatModel(apiKey);
+            case OLLAMA:
+                return buildOllamaChatModel(url);
+            case GROK:
+                return buildGrokChatModel(apiKey, url);
+            default:
+                throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));
+        }
     }
 
     @Override
@@ -193,6 +258,8 @@ public class AiModelFactoryImpl implements AiModelFactory {
                 return SpringUtil.getBean(MoonshotChatModel.class);
             case STEP_FUN:
                 return SpringUtil.getBean(StepFunChatModel.class);
+            case MI_MO:
+                return SpringUtil.getBean(MiMoChatModel.class);
             case XING_HUO:
                 return SpringUtil.getBean(XingHuoChatModel.class);
             case BAI_CHUAN:
@@ -322,9 +389,23 @@ public class AiModelFactoryImpl implements AiModelFactory {
         return StrUtil.format("{}#{}", clazz.getName(), ArrayUtil.join(params, "_"));
     }
 
+    /**
+     * 解析 DB 等动态配置里的 Spring 占位符，例如 ${OPENAI_API_KEY}
+     *
+     * yml 配置的占位符由 Spring 自动解析；DB 里保存的 ${xxx} 需要在这里手动解析
+     *
+     * @param value 待解析的配置值
+     * @return 解析后的配置值
+     */
     private static String resolveSpringPlaceholders(String value) {
-        // yml 配置的占位符由 Spring 自动解析；DB 里保存的 ${xxx} 需要在这里手动解析。
-        return AiUtils.resolveSpringPlaceholders(value);
+        if (StrUtil.isBlank(value) || !StrUtil.contains(value, "${")) {
+            return value;
+        }
+        try {
+            return SpringUtil.getBean(Environment.class).resolveRequiredPlaceholders(value);
+        } catch (IllegalArgumentException ex) {
+            throw exception(API_CONFIG_PLACEHOLDER_NOT_RESOLVED, value);
+        }
     }
 
     // ========== 各种创建 spring-ai 客户端的方法 ==========
@@ -363,7 +444,11 @@ public class AiModelFactoryImpl implements AiModelFactory {
      * 可参考 {@link DeepSeekChatAutoConfiguration} 的 deepSeekChatModel 方法
      */
     private static DeepSeekChatModel buildDeepSeekChatModel(String apiKey) {
-        DeepSeekApi deepSeekApi = DeepSeekApi.builder().apiKey(apiKey).build();
+        return buildDeepSeekChatModel(apiKey, null);
+    }
+
+    private static DeepSeekChatModel buildDeepSeekChatModel(String apiKey, AiRequestBodyPatcher patcher) {
+        DeepSeekApi deepSeekApi = AiRequestBodyPatcher.configure(DeepSeekApi.builder().apiKey(apiKey), patcher).build();
         DeepSeekChatOptions options = DeepSeekChatOptions.builder().model(DeepSeekApi.DEFAULT_CHAT_MODEL)
                 .temperature(0.7).build();
         return DeepSeekChatModel.builder()
@@ -434,6 +519,15 @@ public class AiModelFactoryImpl implements AiModelFactory {
         YudaoAiProperties.StepFun properties = new YudaoAiProperties.StepFun()
                 .setBaseUrl(url).setApiKey(apiKey);
         return new AiAutoConfiguration().buildStepFunChatClient(properties);
+    }
+
+    /**
+     * 可参考 {@link AiAutoConfiguration#miMoChatClient(YudaoAiProperties)}
+     */
+    private MiMoChatModel buildMiMoChatModel(String apiKey, String url) {
+        YudaoAiProperties.MiMo properties = new YudaoAiProperties.MiMo()
+                .setBaseUrl(url).setApiKey(apiKey);
+        return new AiAutoConfiguration().buildMiMoChatClient(properties);
     }
 
     /**

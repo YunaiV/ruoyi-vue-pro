@@ -16,6 +16,7 @@ import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static cn.iocoder.yudao.module.oa.enums.ErrorCodeConstants.NOTE_CATEGORY_NAME_DUPLICATE;
 import static cn.iocoder.yudao.module.oa.enums.ErrorCodeConstants.NOTE_CATEGORY_NOT_EXISTS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -48,6 +49,32 @@ public class OaNoteCategoryServiceImplTest extends BaseDbUnitTest {
         // 调用，并断言异常
         assertServiceException(() -> noteCategoryService.createNoteCategory(reqVO, category.getUserId()),
                 NOTE_CATEGORY_NAME_DUPLICATE);
+    }
+
+    @Test
+    public void testCreateNoteCategory_ignoreReqId() {
+        // mock 数据：其他用户的目录
+        OaNoteCategoryDO otherCategory = randomNoteCategoryDO().setUserId(1L);
+        noteCategoryMapper.insert(otherCategory);
+        // 准备参数：请求体携带其他用户目录的编号
+        Long userId = 2L;
+        OaNoteCategorySaveReqVO reqVO = new OaNoteCategorySaveReqVO().setId(otherCategory.getId())
+                .setName("新建目录").setSort(3);
+
+        // 调用
+        Long categoryId = noteCategoryService.createNoteCategory(reqVO, userId);
+
+        // 断言：忽略请求编号，由数据库生成新编号，归属当前用户
+        assertNotEquals(otherCategory.getId(), categoryId);
+        OaNoteCategoryDO category = noteCategoryMapper.selectById(categoryId);
+        assertEquals(userId, category.getUserId());
+        assertEquals(reqVO.getName(), category.getName());
+        assertEquals(reqVO.getSort(), category.getSort());
+        // 断言：其他用户的目录不变
+        OaNoteCategoryDO dbOtherCategory = noteCategoryMapper.selectById(otherCategory.getId());
+        assertEquals(1L, dbOtherCategory.getUserId());
+        assertEquals(otherCategory.getName(), dbOtherCategory.getName());
+        assertEquals(0, dbOtherCategory.getSort());
     }
 
     @Test

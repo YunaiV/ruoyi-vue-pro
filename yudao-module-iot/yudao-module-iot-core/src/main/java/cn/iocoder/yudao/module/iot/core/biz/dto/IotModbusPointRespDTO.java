@@ -44,6 +44,13 @@ public class IotModbusPointRespDTO {
      */
     private Integer registerCount;
     /**
+     * 位索引（0-15，0 为最低位）
+     *
+     * 仅 FC03/FC04、BOOLEAN、1 个寄存器的点位使用：取寄存器中的某一位；为空时保持原逻辑
+     * 需求来源：https://t.zsxq.com/Qg5LP
+     */
+    private Integer bitIndex;
+    /**
      * 字节序
      *
      * 枚举 {@link IotModbusByteOrderEnum}
