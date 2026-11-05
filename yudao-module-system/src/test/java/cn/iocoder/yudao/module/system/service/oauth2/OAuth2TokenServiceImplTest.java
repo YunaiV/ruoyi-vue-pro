@@ -148,11 +148,19 @@ public class OAuth2TokenServiceImplTest extends BaseDbAndRedisUnitTest {
                 .setRefreshToken(refreshToken).setClientId(clientId)
                 .setExpiresTime(LocalDateTime.now().minusDays(1));
         oauth2RefreshTokenMapper.insert(refreshTokenDO);
+        // mock 数据（访问令牌）
+        OAuth2AccessTokenDO accessTokenDO = randomPojo(OAuth2AccessTokenDO.class).setRefreshToken(refreshToken)
+                .setExpiresTime(LocalDateTime.now().plusDays(1).withNano(0));
+        oauth2AccessTokenMapper.insert(accessTokenDO);
+        oauth2AccessTokenRedisDAO.set(accessTokenDO);
 
         // 调用，并断言
         assertServiceException(() -> oauth2TokenService.refreshAccessToken(refreshToken, clientId),
                 new ErrorCode(401, "刷新令牌已过期"));
+        // 断言，刷新令牌及其访问令牌被删除
+        assertNull(oauth2RefreshTokenMapper.selectByRefreshToken(refreshToken));
         assertEquals(0, oauth2AccessTokenMapper.selectCount());
+        assertNull(oauth2AccessTokenRedisDAO.get(accessTokenDO.getAccessToken()));
     }
 
     @Test
@@ -175,7 +183,8 @@ public class OAuth2TokenServiceImplTest extends BaseDbAndRedisUnitTest {
         oauth2RefreshTokenMapper.insert(refreshTokenDO);
         // mock 数据（访问令牌）
         OAuth2AccessTokenDO accessTokenDO = randomPojo(OAuth2AccessTokenDO.class).setRefreshToken(refreshToken)
-                .setUserType(refreshTokenDO.getUserType());
+                .setUserType(refreshTokenDO.getUserType())
+                .setExpiresTime(LocalDateTime.now().plusDays(1).withNano(0));
         oauth2AccessTokenMapper.insert(accessTokenDO);
         oauth2AccessTokenRedisDAO.set(accessTokenDO);
         // mock 数据（用户）
@@ -188,9 +197,9 @@ public class OAuth2TokenServiceImplTest extends BaseDbAndRedisUnitTest {
             mockedTime.when(LocalDateTime::now).thenReturn(now);
             newAccessTokenDO = oauth2TokenService.refreshAccessToken(refreshToken, clientId);
         }
-        // 断言，老的访问令牌被删除
-        assertNull(oauth2AccessTokenMapper.selectByAccessToken(accessTokenDO.getAccessToken()));
-        assertNull(oauth2AccessTokenRedisDAO.get(accessTokenDO.getAccessToken()));
+        // 断言，老的访问令牌保留，由其有效期自然结束（多标签页场景：https://github.com/YunaiV/ruoyi-vue-pro/issues/1332）
+        assertNotNull(oauth2AccessTokenMapper.selectByAccessToken(accessTokenDO.getAccessToken()));
+        assertNotNull(oauth2AccessTokenRedisDAO.get(accessTokenDO.getAccessToken()));
         // 断言，新的访问令牌
         OAuth2AccessTokenDO dbAccessTokenDO = oauth2AccessTokenMapper.selectByAccessToken(newAccessTokenDO.getAccessToken());
         assertPojoEquals(newAccessTokenDO, dbAccessTokenDO, "createTime", "updateTime", "deleted");
@@ -287,6 +296,17 @@ public class OAuth2TokenServiceImplTest extends BaseDbAndRedisUnitTest {
         OAuth2AccessTokenDO accessTokenDO = randomPojo(OAuth2AccessTokenDO.class)
                 .setExpiresTime(LocalDateTime.now().plusDays(1).withNano(0));
         oauth2AccessTokenMapper.insert(accessTokenDO);
+        // mock 数据（同一刷新令牌下的其它访问令牌，例如说其它标签页刷新所得）
+        OAuth2AccessTokenDO sameRefreshAccessTokenDO = randomPojo(OAuth2AccessTokenDO.class)
+                .setRefreshToken(accessTokenDO.getRefreshToken())
+                .setExpiresTime(LocalDateTime.now().plusDays(1).withNano(0));
+        oauth2AccessTokenMapper.insert(sameRefreshAccessTokenDO);
+        oauth2AccessTokenRedisDAO.set(sameRefreshAccessTokenDO);
+        // mock 数据（其它刷新令牌下的访问令牌）
+        OAuth2AccessTokenDO otherAccessTokenDO = randomPojo(OAuth2AccessTokenDO.class)
+                .setExpiresTime(LocalDateTime.now().plusDays(1).withNano(0));
+        oauth2AccessTokenMapper.insert(otherAccessTokenDO);
+        oauth2AccessTokenRedisDAO.set(otherAccessTokenDO);
         // mock 数据（刷新令牌）
         OAuth2RefreshTokenDO refreshTokenDO = randomPojo(OAuth2RefreshTokenDO.class)
                 .setRefreshToken(accessTokenDO.getRefreshToken());
@@ -299,6 +319,12 @@ public class OAuth2TokenServiceImplTest extends BaseDbAndRedisUnitTest {
         assertNull(oauth2AccessTokenMapper.selectByAccessToken(accessTokenDO.getAccessToken()));
         assertNull(oauth2RefreshTokenMapper.selectByRefreshToken(accessTokenDO.getRefreshToken()));
         assertNull(oauth2AccessTokenRedisDAO.get(accessTokenDO.getAccessToken()));
+        // 断言，同一刷新令牌下的其它访问令牌被删除
+        assertNull(oauth2AccessTokenMapper.selectByAccessToken(sameRefreshAccessTokenDO.getAccessToken()));
+        assertNull(oauth2AccessTokenRedisDAO.get(sameRefreshAccessTokenDO.getAccessToken()));
+        // 断言，其它刷新令牌下的访问令牌保留
+        assertNotNull(oauth2AccessTokenMapper.selectByAccessToken(otherAccessTokenDO.getAccessToken()));
+        assertNotNull(oauth2AccessTokenRedisDAO.get(otherAccessTokenDO.getAccessToken()));
     }
 
 
