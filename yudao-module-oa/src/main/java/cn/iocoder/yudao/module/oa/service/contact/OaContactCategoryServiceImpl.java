@@ -43,7 +43,7 @@ public class OaContactCategoryServiceImpl implements OaContactCategoryService {
 
         // 2. 新增联系人分类
         OaContactCategoryDO category = BeanUtils.toBean(createReqVO, OaContactCategoryDO.class)
-                .setUserId(userId);
+                .setId(null).setUserId(userId);
         contactCategoryMapper.insert(category);
         return category.getId();
     }
