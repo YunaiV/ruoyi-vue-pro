@@ -30,6 +30,11 @@ public class IotModbusTcpServerConfig {
     private Integer customFunctionCode = 65;
 
     /**
+     * 同一设备的最小轮询请求间隔（毫秒），小于等于 0 表示不限制
+     */
+    private int minRequestInterval = 1000;
+
+    /**
      * Pending Request 超时时间（毫秒）
      */
     @NotNull(message = "请求超时时间不能为空")
