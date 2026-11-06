@@ -431,7 +431,7 @@ public class IotModbusTcpServerTransactionChannelTest {
     private IotModbusTcpServerPollScheduler createPollScheduler(IotModbusTcpServerTransactionChannel channel,
                                                                 IotModbusFrameFormatEnum frameFormat) {
         return new IotModbusTcpServerPollScheduler(vertx, createConnectionManager(channel, frameFormat),
-                new IotModbusFrameEncoder(65), pendingRequestManager, REQUEST_TIMEOUT, mockConfigCacheService());
+                new IotModbusFrameEncoder(65), pendingRequestManager, REQUEST_TIMEOUT, 1000, mockConfigCacheService());
     }
 
     /**

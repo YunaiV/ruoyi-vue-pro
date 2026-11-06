@@ -185,6 +185,7 @@ yudao:
           modbus-tcp-server:
             config-refresh-interval: 30     # 配置刷新间隔（秒）
             custom-function-code: 65        # 自定义功能码（用于认证等扩展交互）
+            min-request-interval: 1000      # 同一设备的最小轮询请求间隔（毫秒，小于等于 0 表示不限制）
             request-timeout: 5000           # Pending Request 超时时间（毫秒）
             request-cleanup-interval: 10000 # Pending Request 清理间隔（毫秒）
 

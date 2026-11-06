@@ -124,7 +124,7 @@ public class IotModbusTcpServerProtocol implements IotProtocol {
         // 初始化轮询调度器
         this.pollScheduler = new IotModbusTcpServerPollScheduler(
                 vertx, connectionManager, frameEncoder, pendingRequestManager,
-                slaveConfig.getRequestTimeout(), configCacheService);
+                slaveConfig.getRequestTimeout(), slaveConfig.getMinRequestInterval(), configCacheService);
 
         // 初始化 Handler
         IotDeviceMessageService messageService = SpringUtil.getBean(IotDeviceMessageService.class);
