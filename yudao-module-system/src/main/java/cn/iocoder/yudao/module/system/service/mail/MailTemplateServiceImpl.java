@@ -84,7 +84,8 @@ public class MailTemplateServiceImpl implements MailTemplateService {
         // 存在 template 记录的情况下
         if (id == null // 新增时，说明重复
                 || ObjUtil.notEqual(id, template.getId())) { // 更新时，如果 id 不一致，说明重复
-            throw exception(MAIL_TEMPLATE_CODE_EXISTS);
+            // 传入 code，否则消息里的 `{}` 会原样展示给用户（exception(ErrorCode) 单参重载不做格式化）
+            throw exception(MAIL_TEMPLATE_CODE_EXISTS, code);
         }
     }
 
