@@ -159,6 +159,60 @@ class ConvertorTableScanTest(unittest.TestCase):
                 for ghost in ("undo_log", "ghost", "ghost_block", "ghost_line", "ghost_hash"):
                     self.assertNotIn(f"Table structure for {ghost}\n", out)
 
+    def test_erp_purchase_in_with_quoted_indexes(self):
+        sql = HEADER + """
+CREATE TABLE `erp_purchase_in`  (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `no` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '采购入库编号',
+  `status` tinyint NOT NULL COMMENT '采购状态',
+  `supplier_id` bigint NOT NULL COMMENT '供应商编号',
+  `account_id` bigint NOT NULL COMMENT '结算账户编号',
+  `in_time` datetime NOT NULL COMMENT '入库时间',
+  `order_id` bigint NOT NULL COMMENT '采购订单编号',
+  `order_no` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '采购订单号',
+  `total_count` decimal(24, 6) NOT NULL COMMENT '合计数量',
+  `total_price` decimal(24, 6) NOT NULL COMMENT '合计价格，单位：元',
+  `payment_price` decimal(24, 6) NOT NULL DEFAULT 0.000000 COMMENT '已付款金额，单位：元',
+  `total_product_price` decimal(24, 6) NOT NULL COMMENT '合计产品价格，单位：元',
+  `total_tax_price` decimal(24, 6) NOT NULL COMMENT '合计税额，单位：元',
+  `discount_percent` decimal(24, 6) NOT NULL COMMENT '优惠率，百分比',
+  `discount_price` decimal(24, 6) NOT NULL COMMENT '优惠金额，单位：元',
+  `other_price` decimal(24, 6) NOT NULL DEFAULT 0.000000 COMMENT '其它金额，单位：元',
+  `file_url` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '附件地址',
+  `remark` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '备注',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `tenant_id` bigint NOT NULL DEFAULT 0 COMMENT '租户编号',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `no`(`no` ASC) USING BTREE,
+  INDEX `idx_order_id`(`order_id` ASC) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 22 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'ERP 采购入库表';
+"""
+        out, err = convert(PostgreSQLConvertor(self.write_sql(sql)))
+        self.assertNotIn("无法正常解析", err)
+        self.assertIn("CREATE TABLE erp_purchase_in (", out)
+        self.assertIn("PRIMARY KEY (id)", out)
+        self.assertIn("CREATE UNIQUE INDEX uk_erp_purchase_in_01 ON erp_purchase_in (no);", out)
+        self.assertIn("CREATE INDEX idx_erp_purchase_in_01 ON erp_purchase_in (order_id);", out)
+        self.assertIn("DEFAULT 0.000000", out)
+        self.assertIn("COMMENT ON TABLE erp_purchase_in IS 'ERP 采购入库表';", out)
+
+    def test_backtick_in_string_default(self):
+        sql = HEADER + """
+CREATE TABLE `demo` (
+  `id` bigint NOT NULL,
+  `value` varchar(64) DEFAULT 'a`b' COMMENT '示例',
+  PRIMARY KEY (`id`)
+);
+"""
+        out, err = convert(PostgreSQLConvertor(self.write_sql(sql)))
+        self.assertNotIn("无法正常解析", err)
+        self.assertIn("DEFAULT 'a`b'", out)
+        self.assertIn("COMMENT ON COLUMN demo.value IS '示例';", out)
+
     def test_comment_from_real_table(self):
         # 前面 INSERT 数据中存在同名的建表文本，不能影响真实建表语句的注释
         fake_insert = """
