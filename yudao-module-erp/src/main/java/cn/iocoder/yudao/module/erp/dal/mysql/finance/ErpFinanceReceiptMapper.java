@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.erp.dal.mysql.finance;
 
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
@@ -28,9 +29,9 @@ public interface ErpFinanceReceiptMapper extends BaseMapperX<ErpFinanceReceiptDO
                 .eqIfPresent(ErpFinanceReceiptDO::getStatus, reqVO.getStatus())
                 .likeIfPresent(ErpFinanceReceiptDO::getRemark, reqVO.getRemark())
                 .orderByDesc(ErpFinanceReceiptDO::getId);
-        if (reqVO.getBizNo() != null) {
+        if (StrUtil.isNotBlank(reqVO.getBizNo())) {
             query.leftJoin(ErpFinanceReceiptItemDO.class, ErpFinanceReceiptItemDO::getReceiptId, ErpFinanceReceiptDO::getId)
-                    .eq(reqVO.getBizNo() != null, ErpFinanceReceiptItemDO::getBizNo, reqVO.getBizNo())
+                    .eq(ErpFinanceReceiptItemDO::getBizNo, reqVO.getBizNo())
                     .groupBy(ErpFinanceReceiptDO::getId); // 避免 1 对多查询，产生相同的 1
         }
         return selectJoinPage(reqVO, ErpFinanceReceiptDO.class, query);
