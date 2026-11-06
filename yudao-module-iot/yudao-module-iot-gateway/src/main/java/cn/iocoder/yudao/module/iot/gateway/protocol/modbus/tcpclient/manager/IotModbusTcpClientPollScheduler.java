@@ -45,7 +45,7 @@ public class IotModbusTcpClientPollScheduler extends AbstractIotModbusPollSchedu
                                            IotModbusTcpClientConnectionManager connectionManager,
                                            IotModbusTcpClientUpstreamHandler upstreamHandler,
                                            IotModbusTcpClientConfigCacheService configCacheService) {
-        super(vertx);
+        super(vertx, 0); // TCP Client 不使用基类的限速队列
         this.connectionManager = connectionManager;
         this.upstreamHandler = upstreamHandler;
         this.configCacheService = configCacheService;
@@ -54,7 +54,7 @@ public class IotModbusTcpClientPollScheduler extends AbstractIotModbusPollSchedu
     // ========== 轮询执行 ==========
 
     /**
-     * 不经过基类的 1000ms 限速队列：连接的有序 executeBlocking 已保证同一连接一问一答，
+     * 不经过基类的限速队列：连接的有序 executeBlocking 已保证同一连接一问一答，
      * 采集节奏交给 pollInterval；同一读取段同一时刻最多一个请求在途（见 {@link #pollTask}）
      * <p>
      * 需求来源：https://t.zsxq.com/Qg5LP

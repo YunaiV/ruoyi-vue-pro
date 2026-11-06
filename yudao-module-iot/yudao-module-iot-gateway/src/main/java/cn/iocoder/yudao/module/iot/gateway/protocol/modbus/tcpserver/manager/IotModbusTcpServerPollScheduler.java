@@ -32,8 +32,9 @@ public class IotModbusTcpServerPollScheduler extends AbstractIotModbusPollSchedu
                                           IotModbusFrameEncoder frameEncoder,
                                           IotModbusTcpServerPendingRequestManager pendingRequestManager,
                                           int requestTimeout,
+                                          int minRequestInterval,
                                           IotModbusTcpServerConfigCacheService configCacheService) {
-        super(vertx);
+        super(vertx, minRequestInterval);
         this.connectionManager = connectionManager;
         this.frameEncoder = frameEncoder;
         this.pendingRequestManager = pendingRequestManager;
