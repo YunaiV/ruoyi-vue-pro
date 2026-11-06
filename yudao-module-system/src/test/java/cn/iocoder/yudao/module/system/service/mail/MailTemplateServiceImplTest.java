@@ -22,6 +22,7 @@ import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEq
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
+import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.MAIL_TEMPLATE_CODE_EXISTS;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.MAIL_TEMPLATE_NOT_EXISTS;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -69,6 +70,51 @@ public class MailTemplateServiceImplTest extends BaseDbUnitTest {
         // 校验是否更新正确
         MailTemplateDO mailTemplate = mailTemplateMapper.selectById(reqVO.getId()); // 获取最新的
         assertPojoEquals(reqVO, mailTemplate);
+    }
+
+    @Test
+    public void testCreateMailTemplate_codeExists() {
+        // mock 数据
+        MailTemplateDO dbMailTemplate = randomPojo(MailTemplateDO.class);
+        mailTemplateMapper.insert(dbMailTemplate);
+        // 准备参数
+        MailTemplateSaveReqVO reqVO = randomPojo(MailTemplateSaveReqVO.class)
+                .setId(null).setCode(dbMailTemplate.getCode());
+
+        // 调用, 并断言异常
+        assertServiceException(() -> mailTemplateService.createMailTemplate(reqVO),
+                MAIL_TEMPLATE_CODE_EXISTS, dbMailTemplate.getCode());
+    }
+
+    @Test
+    public void testUpdateMailTemplate_codeExists() {
+        // mock 数据
+        MailTemplateDO dbMailTemplate = randomPojo(MailTemplateDO.class).setCode("existing");
+        mailTemplateMapper.insert(dbMailTemplate);
+        MailTemplateDO otherMailTemplate = randomPojo(MailTemplateDO.class).setCode("other");
+        mailTemplateMapper.insert(otherMailTemplate);
+        // 准备参数
+        MailTemplateSaveReqVO reqVO = randomPojo(MailTemplateSaveReqVO.class)
+                .setId(dbMailTemplate.getId()).setCode(otherMailTemplate.getCode());
+
+        // 调用, 并断言异常
+        assertServiceException(() -> mailTemplateService.updateMailTemplate(reqVO),
+                MAIL_TEMPLATE_CODE_EXISTS, otherMailTemplate.getCode());
+    }
+
+    @Test
+    public void testUpdateMailTemplate_sameCode() {
+        // mock 数据
+        MailTemplateDO dbMailTemplate = randomPojo(MailTemplateDO.class);
+        mailTemplateMapper.insert(dbMailTemplate);
+        // 准备参数
+        MailTemplateSaveReqVO reqVO = randomPojo(MailTemplateSaveReqVO.class)
+                .setId(dbMailTemplate.getId()).setCode(dbMailTemplate.getCode());
+
+        // 调用
+        mailTemplateService.updateMailTemplate(reqVO);
+        // 断言
+        assertPojoEquals(reqVO, mailTemplateMapper.selectById(reqVO.getId()));
     }
 
     @Test
