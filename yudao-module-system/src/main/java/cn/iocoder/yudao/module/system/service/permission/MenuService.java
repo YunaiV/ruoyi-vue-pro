@@ -52,7 +52,7 @@ public interface MenuService {
 
     /**
      * 基于租户，筛选菜单列表
-     * 注意，如果是系统租户，返回的还是全菜单
+     * 超级管理员或当前租户为系统租户时，不按租户套餐过滤
      *
      * @param reqVO 筛选条件请求 VO
      * @return 菜单列表
