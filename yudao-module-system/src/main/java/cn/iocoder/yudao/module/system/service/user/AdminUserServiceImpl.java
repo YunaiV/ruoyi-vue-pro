@@ -251,8 +251,7 @@ public class AdminUserServiceImpl implements AdminUserService {
         userMapper.updateById(updateObj);
 
         // 3. 记录操作日志上下文
-        LogRecordContext.putVariable("user", user);
-        LogRecordContext.putVariable("newPassword", updateObj.getPassword());
+        LogRecordContext.putVariable("nickname", user.getNickname());
     }
 
     @Override

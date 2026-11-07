@@ -32,7 +32,7 @@ public class MarkdownQaSplitter extends TextSplitter {
     /**
      * 二级标题正则：匹配 "## " 开头的行
      */
-    private static final Pattern H2_PATTERN = Pattern.compile("^##\\s+(.+)$", Pattern.MULTILINE);
+    private static final Pattern H2_PATTERN = Pattern.compile("^##[ \t]+(.+)$", Pattern.MULTILINE);
 
     /**
      * 段落分隔符：双换行

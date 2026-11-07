@@ -25,6 +25,7 @@ import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.mqtt.MqttClient;
 import io.vertx.mqtt.MqttClientOptions;
+import io.vertx.mqtt.messages.MqttConnAckMessage;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -143,8 +144,15 @@ public class IotEmqxProtocol implements IotProtocol {
             this.downstreamSubscriber.start();
         } catch (Exception e) {
             log.error("[start][IoT EMQX 协议 {} 启动失败]", getId(), e);
-            // 启动失败时，关闭资源
-            stop0();
+            // 启动失败时，关闭资源：启动等待被中断时，先清除中断标记保证关闭完整执行，再恢复中断标记
+            boolean interrupted = Thread.interrupted();
+            try {
+                stop0();
+            } finally {
+                if (interrupted) {
+                    Thread.currentThread().interrupt();
+                }
+            }
             throw e;
         }
     }
@@ -184,6 +192,9 @@ public class IotEmqxProtocol implements IotProtocol {
                 vertx.close().toCompletionStage().toCompletableFuture()
                         .get(10, TimeUnit.SECONDS);
                 log.info("[stop][IoT EMQX 协议 {} Vertx 已关闭]", getId());
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                log.warn("[stop][IoT EMQX 协议 {} 等待 Vertx 关闭被中断]", getId());
             } catch (Exception e) {
                 log.error("[stop][IoT EMQX 协议 {} Vertx 关闭失败]", getId(), e);
             }
@@ -228,6 +239,9 @@ public class IotEmqxProtocol implements IotProtocol {
                     .get(10, TimeUnit.SECONDS);
             log.info("[startHttpServer][IoT EMQX 协议 {} HTTP Hook 服务启动成功, port: {}, ssl: {}]",
                     getId(), properties.getPort(), httpConfig != null && Boolean.TRUE.equals(httpConfig.getSslEnabled()));
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("HTTP Hook 服务启动被中断", e);
         } catch (Exception e) {
             log.error("[startHttpServer][IoT EMQX 协议 {} HTTP Hook 服务启动失败, port: {}]", getId(), properties.getPort(), e);
             throw new RuntimeException("HTTP Hook 服务启动失败", e);
@@ -242,6 +256,9 @@ public class IotEmqxProtocol implements IotProtocol {
             httpServer.close().toCompletionStage().toCompletableFuture()
                     .get(5, TimeUnit.SECONDS);
             log.info("[stopHttpServer][IoT EMQX 协议 {} HTTP Hook 服务已停止]", getId());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.warn("[stopHttpServer][IoT EMQX 协议 {} 等待 HTTP Hook 服务停止被中断]", getId());
         } catch (Exception e) {
             log.error("[stopHttpServer][IoT EMQX 协议 {} HTTP Hook 服务停止失败]", getId(), e);
         } finally {
@@ -256,8 +273,13 @@ public class IotEmqxProtocol implements IotProtocol {
         MqttClient client = createMqttClient();
         this.mqttClient = client;
         // 1.2 连接 MQTT Broker
-        if (!connectMqttClient(client)) {
-            throw new RuntimeException("MQTT Client 启动失败: 连接 Broker 失败");
+        try {
+            if (!connectMqttClient(client)) {
+                throw new RuntimeException("MQTT Client 启动失败: 连接 Broker 失败");
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("MQTT Client 启动失败: 连接 Broker 被中断", e);
         }
 
         // 2. 启动定时重连检查
@@ -278,6 +300,9 @@ public class IotEmqxProtocol implements IotProtocol {
                 try {
                     client.unsubscribe(topicList).toCompletionStage().toCompletableFuture()
                             .get(5, TimeUnit.SECONDS);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    log.warn("[stopMqttClient][IoT EMQX 协议 {} 等待取消订阅被中断]", getId());
                 } catch (Exception e) {
                     log.warn("[stopMqttClient][IoT EMQX 协议 {} 取消订阅异常]", getId(), e);
                 }
@@ -288,6 +313,9 @@ public class IotEmqxProtocol implements IotProtocol {
         try {
             client.disconnect().toCompletionStage().toCompletableFuture()
                     .get(5, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.warn("[stopMqttClient][IoT EMQX 协议 {} 等待断开连接被中断]", getId());
         } catch (Exception e) {
             log.warn("[stopMqttClient][IoT EMQX 协议 {} 断开连接异常]", getId(), e);
         }
@@ -349,15 +377,18 @@ public class IotEmqxProtocol implements IotProtocol {
      *
      * @param client MQTT 客户端
      * @return 连接成功返回 true，失败返回 false
+     * @throws InterruptedException 等待被中断：已废弃本次客户端，由调用方恢复中断标记
      */
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    private synchronized boolean connectMqttClient(MqttClient client) {
+    private synchronized boolean connectMqttClient(MqttClient client) throws InterruptedException {
         String host = emqxConfig.getMqttHost();
         int port = emqxConfig.getMqttPort();
         int timeoutSeconds = emqxConfig.getConnectTimeoutSeconds();
+        Future<MqttConnAckMessage> connectFuture = null;
         try {
             // 1. 连接 Broker
-            client.connect(port, host).toCompletionStage().toCompletableFuture()
+            connectFuture = client.connect(port, host);
+            connectFuture.toCompletionStage().toCompletableFuture()
                     .get(timeoutSeconds, TimeUnit.SECONDS);
             log.info("[connectMqttClient][IoT EMQX 协议 {} 连接成功, host: {}, port: {}]",
                     getId(), host, port);
@@ -366,9 +397,48 @@ public class IotEmqxProtocol implements IotProtocol {
             setupMqttClientHandlers(client);
             subscribeMqttClientTopics(client);
             return true;
+        } catch (InterruptedException e) {
+            // 只有 connect 返回之后的等待会被中断，此时 connectFuture 一定非空
+            log.warn("[connectMqttClient][IoT EMQX 协议 {} 连接等待被中断，废弃本次 MQTT Client]", getId());
+            discardMqttClient(client, connectFuture);
+            throw e;
         } catch (Exception e) {
             log.error("[connectMqttClient][IoT EMQX 协议 {} 连接发生异常]", getId(), e);
             return false;
+        }
+    }
+
+    /**
+     * 废弃连接等待被中断的 MQTT 客户端
+     * <p>
+     * 1. 仅当它仍是当前客户端时才清理引用，避免误清替代客户端
+     * 2. 立即断开它：关闭仍在等待 CONNACK 的连接
+     * 3. 异步连接在等待结束后才成功时，再断开它一次
+     * <p>
+     * 断开动作都只绑定被废弃的客户端，不影响替代客户端
+     *
+     * @param client        被废弃的 MQTT 客户端
+     * @param connectFuture 它的连接结果
+     */
+    private void discardMqttClient(MqttClient client, Future<MqttConnAckMessage> connectFuture) {
+        if (this.mqttClient == client) {
+            this.mqttClient = null;
+        }
+        disconnectDiscardedMqttClient(client);
+        connectFuture.onSuccess(ack -> disconnectDiscardedMqttClient(client));
+    }
+
+    /**
+     * 尽力断开被废弃的 MQTT 客户端：不等待结果，失败只打印日志
+     *
+     * @param client 被废弃的 MQTT 客户端
+     */
+    private void disconnectDiscardedMqttClient(MqttClient client) {
+        try {
+            client.disconnect().onFailure(e ->
+                    log.warn("[disconnectDiscardedMqttClient][IoT EMQX 协议 {} 断开废弃的 MQTT Client 失败]", getId(), e));
+        } catch (Exception e) {
+            log.warn("[disconnectDiscardedMqttClient][IoT EMQX 协议 {} 断开废弃的 MQTT Client 异常]", getId(), e);
         }
     }
 
@@ -385,6 +455,8 @@ public class IotEmqxProtocol implements IotProtocol {
         try {
             oldClient.disconnect().toCompletionStage().toCompletableFuture()
                     .get(5, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         } catch (Exception ignored) {
         }
     }
@@ -441,6 +513,10 @@ public class IotEmqxProtocol implements IotProtocol {
         try {
             // 2. 关闭旧客户端
             closeMqttClient();
+            if (Thread.currentThread().isInterrupted()) {
+                log.warn("[tryReconnectMqttClient][IoT EMQX 协议 {} 重连被中断，放弃本次重连]", getId());
+                return;
+            }
 
             // 3.1 创建新客户端
             MqttClient client = createMqttClient();
@@ -449,9 +525,27 @@ public class IotEmqxProtocol implements IotProtocol {
             if (!connectMqttClient(client)) {
                 log.warn("[tryReconnectMqttClient][IoT EMQX 协议 {} 重连失败，等待下次重试]", getId());
             }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.warn("[tryReconnectMqttClient][IoT EMQX 协议 {} 重连等待被中断]", getId());
         } catch (Exception e) {
             log.error("[tryReconnectMqttClient][IoT EMQX 协议 {} 重连异常]", getId(), e);
         }
+    }
+
+    /**
+     * 因客户端断开而尝试重连 MQTT Client
+     * <p>
+     * 断开事件排队到执行期间，当前客户端可能已被替换：只有断开的仍是当前客户端时才重连，避免过期事件干扰替代客户端
+     *
+     * @param closedClient 断开的 MQTT 客户端
+     */
+    private synchronized void tryReconnectClosedMqttClient(MqttClient closedClient) {
+        if (this.mqttClient != closedClient) {
+            log.debug("[tryReconnectClosedMqttClient][IoT EMQX 协议 {} 断开的不是当前客户端，忽略]", getId());
+            return;
+        }
+        tryReconnectMqttClient();
     }
 
     // ======================================= MQTT Handler ======================================
@@ -462,13 +556,14 @@ public class IotEmqxProtocol implements IotProtocol {
     private void setupMqttClientHandlers(MqttClient client) {
         // 1. 断开重连监听
         client.closeHandler(closeEvent -> {
-            if (!running) {
+            // 已废弃、已被替换的客户端断开时，无权触发重连
+            if (!running || this.mqttClient != client) {
                 return;
             }
             log.warn("[setupMqttClientHandlers][IoT EMQX 协议 {} 连接断开，立即尝试重连]", getId());
             // 用 executeBlocking 避免阻塞 event-loop（tryReconnectMqttClient 内部有同步等待）
             vertx.executeBlocking(() -> {
-                tryReconnectMqttClient();
+                tryReconnectClosedMqttClient(client);
                 return null;
             });
         });
@@ -484,7 +579,7 @@ public class IotEmqxProtocol implements IotProtocol {
     /**
      * 订阅 MQTT Client 主题（同步等待）
      */
-    private void subscribeMqttClientTopics(MqttClient client) {
+    private void subscribeMqttClientTopics(MqttClient client) throws InterruptedException {
         List<String> topicList = emqxConfig.getMqttTopics();
         if (!client.isConnected()) {
             log.warn("[subscribeMqttClientTopics][IoT EMQX 协议 {} MQTT Client 未连接, 跳过订阅]", getId());
@@ -501,6 +596,10 @@ public class IotEmqxProtocol implements IotProtocol {
             client.subscribe(topics).toCompletionStage().toCompletableFuture()
                     .get(10, TimeUnit.SECONDS);
             log.info("[subscribeMqttClientTopics][IoT EMQX 协议 {} 订阅成功, 共 {} 个主题]", getId(), topicList.size());
+        } catch (InterruptedException e) {
+            // 交给 connectMqttClient 废弃本次 MQTT Client，再由其调用方恢复中断标记
+            log.warn("[subscribeMqttClientTopics][IoT EMQX 协议 {} 订阅等待被中断]", getId());
+            throw e;
         } catch (Exception e) {
             log.error("[subscribeMqttClientTopics][IoT EMQX 协议 {} 订阅失败]", getId(), e);
         }
@@ -513,12 +612,14 @@ public class IotEmqxProtocol implements IotProtocol {
      * @param payload 消息内容
      */
     public void publishMessage(String topic, byte[] payload) {
-        if (mqttClient == null || !mqttClient.isConnected()) {
+        // 连接检查和 publish 使用同一个客户端：避免并发 stop、重连清空 mqttClient 字段
+        MqttClient client = this.mqttClient;
+        if (client == null || !client.isConnected()) {
             log.warn("[publishMessage][IoT EMQX 协议 {} MQTT Client 未连接, 无法发布消息]", getId());
             return;
         }
         MqttQoS qos = MqttQoS.valueOf(emqxConfig.getMqttQos());
-        mqttClient.publish(topic, Buffer.buffer(payload), qos, false, false)
+        client.publish(topic, Buffer.buffer(payload), qos, false, false)
                 .onFailure(e -> log.error("[publishMessage][IoT EMQX 协议 {} 发布失败, topic: {}]", getId(), topic, e));
     }
 

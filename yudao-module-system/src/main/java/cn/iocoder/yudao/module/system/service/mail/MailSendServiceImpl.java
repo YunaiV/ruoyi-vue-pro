@@ -89,7 +89,7 @@ public class MailSendServiceImpl implements MailSendService {
 
         // 创建发送日志。如果模板被禁用，则不发送短信，只记录日志
         Boolean isSend = CommonStatusEnum.ENABLE.getStatus().equals(template.getStatus());
-        String title = mailTemplateService.formatMailTemplateContent(template.getTitle(), templateParams);
+        String title = formatMailTitle(template.getTitle(), templateParams);
         String content = mailTemplateService.formatMailTemplateContent(template.getContent(), templateParams);
         Long sendLogId = mailLogService.createMailLog(userId, userType, toMailSet, ccMailSet, bccMailSet,
                 account, template, content, templateParams, isSend);
@@ -99,6 +99,30 @@ public class MailSendServiceImpl implements MailSendService {
                     account.getId(), template.getNickname(), title, content, attachments);
         }
         return sendLogId;
+    }
+
+    /**
+     * 格式化邮件标题
+     *
+     * 标题是纯文本，不按 HTML 正文解析（避免 < > 等字符被当作标签）：
+     * 只替换参数，并按原有的替换链反转义 HTML 实体（先替换一次 &amp;amp;，&amp;nbsp; 替换为空格）
+     *
+     * @param title 标题模板
+     * @param params 参数
+     * @return 标题
+     */
+    private static String formatMailTitle(String title, Map<String, Object> params) {
+        String formattedTitle = StrUtil.format(title, params);
+        if (StrUtil.isEmpty(formattedTitle)) {
+            return formattedTitle;
+        }
+        return formattedTitle
+                .replace("&amp;", "&")
+                .replace("&lt;", "<")
+                .replace("&gt;", ">")
+                .replace("&quot;", "\"")
+                .replace("&#39;", "'")
+                .replace("&nbsp;", " ");
     }
 
     private String getUserMail(Long userId, Integer userType) {

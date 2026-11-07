@@ -416,4 +416,13 @@ public class HrmRecruitPostServiceImplTest extends BaseDbUnitTest {
         return randomPojo(HrmRecruitPostSaveReqVO.class, ArrayUtils.append(consumer, consumers));
     }
 
+    @Test
+    public void testSalaryRangeValid_negotiableWithDifferentScales() {
+        HrmRecruitPostSaveReqVO reqVO = new HrmRecruitPostSaveReqVO()
+                .setMinSalary(new BigDecimal("-1.0")).setMaxSalary(new BigDecimal("-1.00")).setSalaryUnit(-1);
+        assertTrue(reqVO.isSalaryRangeValid());
+        assertFalse(reqVO.setMaxSalary(BigDecimal.TEN).isSalaryRangeValid());
+        assertFalse(reqVO.setMinSalary(null).isSalaryRangeValid());
+    }
+
 }

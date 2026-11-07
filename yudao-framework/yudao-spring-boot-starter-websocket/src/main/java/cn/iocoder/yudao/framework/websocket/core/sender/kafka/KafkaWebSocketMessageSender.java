@@ -59,7 +59,10 @@ public class KafkaWebSocketMessageSender extends AbstractWebSocketMessageSender 
                 .setMessageType(messageType).setMessageContent(messageContent);
         try {
             kafkaTemplate.send(topic, mqMessage).get();
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.warn("[sendKafkaMessage][等待 Kafka 发送结果时被中断]", e);
+        } catch (ExecutionException e) {
             log.error("[sendKafkaMessage][发送消息({}) 到 Kafka 失败]", mqMessage, e);
         }
     }

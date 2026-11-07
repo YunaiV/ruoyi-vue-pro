@@ -18,7 +18,7 @@ public interface LogRecordConstants {
     String SYSTEM_USER_DELETE_SUB_TYPE = "删除用户";
     String SYSTEM_USER_DELETE_SUCCESS = "删除了用户【{{#user.nickname}}】";
     String SYSTEM_USER_UPDATE_PASSWORD_SUB_TYPE = "重置用户密码";
-    String SYSTEM_USER_UPDATE_PASSWORD_SUCCESS = "将用户【{{#user.nickname}}】的密码从【{{#user.password}}】重置为【{{#newPassword}}】";
+    String SYSTEM_USER_UPDATE_PASSWORD_SUCCESS = "重置了用户【{{#nickname}}】的密码";
 
     // ======================= SYSTEM_ROLE 角色 =======================
 

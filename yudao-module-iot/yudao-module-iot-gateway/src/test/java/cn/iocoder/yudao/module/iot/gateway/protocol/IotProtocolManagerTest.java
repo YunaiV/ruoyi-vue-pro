@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.INTERNAL_SERVER_ERROR;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
@@ -164,6 +165,93 @@ public class IotProtocolManagerTest {
         // 断言：启动时间已更新
         assertTrue(awaitFirstWriteAlive().getStartTimes().get("server-mqtt") > firstStartTime);
         verify(mqttProtocol, times(2)).start();
+    }
+
+    @Test
+    public void testStart_partialFailRollbackAndRetry() throws Exception {
+        // mock 方法：第二个协议实例（TCP）启动失败
+        IllegalStateException startException = new IllegalStateException("端口被占用");
+        doThrow(startException).doNothing().when(tcpProtocol).start();
+
+        // 调用，并断言：抛出原启动异常
+        assertSame(startException, assertThrows(IllegalStateException.class, () -> protocolManager.start()));
+        // 断言：已启动成功的 MQTT 被回滚；启动失败的 TCP、未启动的 EMQX 不停止
+        verify(mqttProtocol).stop();
+        verify(tcpProtocol, never()).stop();
+        verify(emqxProtocol, never()).start();
+        // 断言：状态已清空，没有续期线程，也不上报
+        assertFalse(protocolManager.isRunning());
+        assertNoAliveThread();
+        protocolManager.writeAlive();
+        verify(deviceApi, never()).keepAliveGatewayServers(any());
+
+        // 调用：重试启动
+        protocolManager.start();
+        // 断言：全部启动成功，只上报本次启动的协议实例
+        assertTrue(protocolManager.isRunning());
+        verify(mqttProtocol, times(2)).start();
+        verify(emqxProtocol).start();
+        assertEquals(new HashSet<>(Arrays.asList("server-mqtt", "server-tcp")),
+                awaitFirstWriteAlive().getStartTimes().keySet());
+    }
+
+    @Test
+    public void testStart_interruptedRollback() {
+        // mock 方法：TCP 启动等待被中断（恢复中断标记后抛出）
+        IllegalStateException startException = new IllegalStateException("启动被中断");
+        doAnswer(invocation -> {
+            Thread.currentThread().interrupt();
+            throw startException;
+        }).when(tcpProtocol).start();
+        // mock 方法：回滚 MQTT 时记录中断标记，并且停止失败
+        AtomicBoolean interruptedWhenStop = new AtomicBoolean(true);
+        IllegalStateException stopException = new IllegalStateException("停止失败");
+        doAnswer(invocation -> {
+            interruptedWhenStop.set(Thread.currentThread().isInterrupted());
+            throw stopException;
+        }).when(mqttProtocol).stop();
+
+        try {
+            // 调用
+            IllegalStateException exception = assertThrows(IllegalStateException.class, () -> protocolManager.start());
+            // 断言：回滚完整执行，执行时没有中断标记
+            verify(mqttProtocol).stop();
+            assertFalse(interruptedWhenStop.get());
+            // 断言：保留原启动异常，清理失败附加在上面
+            assertSame(startException, exception);
+            assertArrayEquals(new Throwable[]{stopException}, exception.getSuppressed());
+            assertFalse(protocolManager.isRunning());
+            // 断言：恢复中断标记
+            assertTrue(Thread.currentThread().isInterrupted());
+        } finally {
+            Thread.interrupted();
+        }
+    }
+
+    @Test
+    public void testStart_errorRollbackAllProtocols() throws Exception {
+        // mock 方法：最后一个协议实例（EMQX）启动抛出 Error
+        LinkageError startError = new LinkageError("类加载失败");
+        doThrow(startError).when(emqxProtocol).start();
+        // mock 方法：回滚时，MQTT 重复抛出同一个 Error 对象，TCP 抛出另一个异常
+        doThrow(startError).when(mqttProtocol).stop();
+        IllegalStateException stopException = new IllegalStateException("停止失败");
+        doThrow(stopException).when(tcpProtocol).stop();
+
+        // 调用
+        LinkageError error = assertThrows(LinkageError.class, () -> protocolManager.start());
+        // 断言：原样抛出原 Error，不因自抑制丢失；其它清理失败附加在上面
+        assertSame(startError, error);
+        assertArrayEquals(new Throwable[]{stopException}, error.getSuppressed());
+        // 断言：一个 stop 失败不阻断后续停止
+        verify(mqttProtocol).stop();
+        verify(tcpProtocol).stop();
+        verify(emqxProtocol, never()).stop();
+        // 断言：状态已清空，没有续期线程
+        assertFalse(protocolManager.isRunning());
+        assertNoAliveThread();
+        protocolManager.writeAlive();
+        verify(deviceApi, never()).keepAliveGatewayServers(any());
     }
 
     // ========== 辅助方法 ==========

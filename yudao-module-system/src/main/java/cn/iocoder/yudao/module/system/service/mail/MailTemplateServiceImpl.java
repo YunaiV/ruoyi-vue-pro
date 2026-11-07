@@ -14,6 +14,9 @@ import com.google.common.annotations.VisibleForTesting;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -22,7 +25,6 @@ import org.springframework.validation.annotation.Validated;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -44,6 +46,12 @@ public class MailTemplateServiceImpl implements MailTemplateService {
      * 正则表达式，匹配 {} 中的变量
      */
     private static final Pattern PATTERN_PARAMS = Pattern.compile("\\{(.*?)}");
+
+    /**
+     * 正则表达式，判断是否为完整的 HTML 文档（包含 doctype、html、head 或 body 标签）
+     */
+    private static final Pattern PATTERN_HTML_DOCUMENT = Pattern.compile("<(?:!doctype|html|head|body)[\\s/>]",
+            Pattern.CASE_INSENSITIVE);
 
     @Resource
     private MailTemplateMapper mailTemplateMapper;
@@ -143,75 +151,23 @@ public class MailTemplateServiceImpl implements MailTemplateService {
         // 1. 先替换模板变量
         String formattedContent = StrUtil.format(content, params);
 
+        if (StrUtil.isEmpty(formattedContent)) {
+            return formattedContent;
+        }
+
         // 关联 Pull Request：https://gitee.com/zhijiantianya/ruoyi-vue-pro/pulls/1461 讨论
-        // 2.1 反转义HTML特殊字符
-        formattedContent = unescapeHtml(formattedContent);
-        // 2.2 处理代码块（确保<pre><code>标签格式正确）
-        formattedContent = formatHtmlCodeBlocks(formattedContent);
-        // 2.3 将最外层的 pre 标签替换为 div 标签
-        formattedContent = replaceOuterPreWithDiv(formattedContent);
-        return formattedContent;
-    }
-
-    private String replaceOuterPreWithDiv(String content) {
-        if (StrUtil.isEmpty(content)) {
-            return content;
+        // 2. 按标准 HTML 解析：完整文档保留 doctype、head 等内容，片段只返回片段
+        boolean fullDocument = PATTERN_HTML_DOCUMENT.matcher(formattedContent).find();
+        Document document = fullDocument ? Jsoup.parse(formattedContent) : Jsoup.parseBodyFragment(formattedContent);
+        document.outputSettings().prettyPrint(false);
+        // 3. 将 pre 标签替换为 div 标签；pre 内只有一个 code 子节点时，同时去掉 code 的属性
+        for (Element pre : document.select("pre")) {
+            if (pre.childNodeSize() == 1 && pre.childrenSize() == 1 && "code".equals(pre.child(0).normalName())) {
+                pre.child(0).clearAttributes();
+            }
+            pre.tagName("div").clearAttributes();
         }
-        // 使用正则表达式匹配所有的 <pre> 标签，包括嵌套的 <code> 标签
-        String regex = "(?s)<pre[^>]*>(.*?)</pre>";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(content);
-        StringBuilder sb = new StringBuilder();
-        while (matcher.find()) {
-            // 提取 <pre> 标签内的内容
-            String innerContent = matcher.group(1);
-            // 返回 div 标签包裹的内容
-            matcher.appendReplacement(sb, Matcher.quoteReplacement("<div>" + innerContent + "</div>"));
-        }
-        matcher.appendTail(sb);
-        return sb.toString();
-    }
-
-    /**
-     * 反转义 HTML 特殊字符
-     *
-     * @param input 输入字符串
-     * @return 反转义后的字符串
-     */
-    private String unescapeHtml(String input) {
-        if (StrUtil.isEmpty(input)) {
-            return input;
-        }
-        return input
-                .replace("&amp;", "&")
-                .replace("&lt;", "<")
-                .replace("&gt;", ">")
-                .replace("&quot;", "\"")
-                .replace("&#39;", "'")
-                .replace("&nbsp;", " ");
-    }
-
-    /**
-     * 格式化 HTML 中的代码块
-     *
-     * @param content 邮件内容
-     * @return 格式化后的邮件内容
-     */
-    private String formatHtmlCodeBlocks(String content) {
-        // 匹配 <pre><code> 标签的代码块
-        Pattern codeBlockPattern = Pattern.compile("<pre\\s*.*?><code\\s*.*?>(.*?)</code></pre>", Pattern.DOTALL);
-        Matcher matcher = codeBlockPattern.matcher(content);
-        StringBuilder sb = new StringBuilder();
-        while (matcher.find()) {
-            // 获取代码块内容
-            String codeBlock = matcher.group(1);
-            // 为代码块添加样式
-            String replacement = "<pre style=\"background-color: #f5f5f5; padding: 10px; border-radius: 5px; overflow-x: auto;\"><code>" + codeBlock + "</code></pre>";
-            // 代码块内容可能包含 $ 或 \\，需要 quoteReplacement，否则会抛 IllegalArgumentException: Illegal group reference
-            matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement));
-        }
-        matcher.appendTail(sb);
-        return sb.toString();
+        return fullDocument ? document.outerHtml() : document.body().html();
     }
 
     @Override

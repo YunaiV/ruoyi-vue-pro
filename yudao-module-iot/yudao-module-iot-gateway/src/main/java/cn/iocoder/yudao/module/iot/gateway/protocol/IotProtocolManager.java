@@ -83,24 +83,31 @@ public class IotProtocolManager implements SmartLifecycle {
             return;
         }
 
-        for (IotGatewayProperties.ProtocolProperties config : protocolConfigs) {
-            if (BooleanUtil.isFalse(config.getEnabled())) {
-                log.info("[start][协议实例 {} 未启用，跳过]", config.getId());
-                continue;
+        try {
+            for (IotGatewayProperties.ProtocolProperties config : protocolConfigs) {
+                if (BooleanUtil.isFalse(config.getEnabled())) {
+                    log.info("[start][协议实例 {} 未启用，跳过]", config.getId());
+                    continue;
+                }
+                IotProtocol protocol = createProtocol(config);
+                if (protocol == null) {
+                    continue;
+                }
+                // 启动前取时间：保证启动后才连上的设备，上线时间都不早于它
+                long startTime = System.currentTimeMillis();
+                protocol.start();
+                startTimes.put(protocol, startTime);
+                protocols.add(protocol);
             }
-            IotProtocol protocol = createProtocol(config);
-            if (protocol == null) {
-                continue;
-            }
-            // 启动前取时间：保证启动后才连上的设备，上线时间都不早于它
-            long startTime = System.currentTimeMillis();
-            protocol.start();
-            startTimes.put(protocol, startTime);
-            protocols.add(protocol);
+            // 定时续期存活标记
+            aliveExecutor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("iot-gateway-alive-", true));
+            aliveExecutor.scheduleWithFixedDelay(this::writeAlive, 0, ALIVE_INTERVAL_SECONDS, TimeUnit.SECONDS);
+        } catch (Throwable e) {
+            // 包括 Error：任何可传播的启动失败都要回滚，原样抛出
+            log.error("[start][协议管理器启动失败，回滚已启动的 {} 个协议实例]", protocols.size(), e);
+            rollbackStart(e);
+            throw e;
         }
-        // 定时续期存活标记
-        aliveExecutor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("iot-gateway-alive-", true));
-        aliveExecutor.scheduleWithFixedDelay(this::writeAlive, 0, ALIVE_INTERVAL_SECONDS, TimeUnit.SECONDS);
         running = true;
         log.info("[start][协议管理器启动完成，共启动 {} 个协议实例]", protocols.size());
     }
@@ -124,6 +131,38 @@ public class IotProtocolManager implements SmartLifecycle {
         startTimes.clear();
         running = false;
         log.info("[stop][协议管理器已停止]");
+    }
+
+    /**
+     * 回滚启动到一半的协议管理器：停止已启动成功的协议实例，并清空状态，保证后续可以重试
+     * <p>
+     * 被中断时，先清除中断标记保证回滚完整执行，再恢复中断标记；
+     * 某个协议实例停止失败（包括 Error）不阻断后续停止，只附加到原启动异常上，不覆盖它
+     *
+     * @param cause 原启动异常
+     */
+    private void rollbackStart(Throwable cause) {
+        boolean interrupted = Thread.interrupted();
+        try {
+            stopAliveExecutor();
+            for (IotProtocol protocol : protocols) {
+                try {
+                    protocol.stop();
+                } catch (Throwable e) {
+                    log.error("[rollbackStart][协议实例 {} 回滚停止失败]", protocol.getId(), e);
+                    // 重复抛出的是同一个异常对象时，不能自抑制（否则 addSuppressed 抛出 IllegalArgumentException，覆盖原异常）
+                    if (e != cause) {
+                        cause.addSuppressed(e);
+                    }
+                }
+            }
+        } finally {
+            protocols.clear();
+            startTimes.clear();
+            if (interrupted) {
+                Thread.currentThread().interrupt();
+            }
+        }
     }
 
     // DONE @AI：方法注释；（已补充）

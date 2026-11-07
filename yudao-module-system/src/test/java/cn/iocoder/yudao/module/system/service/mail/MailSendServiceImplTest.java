@@ -17,6 +17,7 @@ import org.dromara.hutool.extra.mail.MailAccount;
 import org.dromara.hutool.extra.mail.MailUtil;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
@@ -85,13 +86,11 @@ public class MailSendServiceImplTest extends BaseMockitoUnitTest {
         // mock MailTemplateService 的方法
         MailTemplateDO template = randomPojo(MailTemplateDO.class, o -> {
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
+            o.setTitle("{op} 验证码");
             o.setContent("验证码为{code}, 操作为{op}");
             o.setParams(Lists.newArrayList("code", "op"));
         });
         when(mailTemplateService.getMailTemplateByCodeFromCache(eq(templateCode))).thenReturn(template);
-        String title = RandomUtils.randomString();
-        when(mailTemplateService.formatMailTemplateContent(eq(template.getTitle()), eq(templateParams)))
-                .thenReturn(title);
         String content = RandomUtils.randomString();
         when(mailTemplateService.formatMailTemplateContent(eq(template.getContent()), eq(templateParams)))
                 .thenReturn(content);
@@ -116,7 +115,7 @@ public class MailSendServiceImplTest extends BaseMockitoUnitTest {
                 argThat(toMailSet -> toMailSet.contains(user.getEmail()) && toMailSet.contains("admin@test.com")),
                 argThat(ccMailSet -> ccMailSet.contains("cc@test.com")),
                 argThat(bccMailSet -> bccMailSet.contains("bcc@test.com")),
-                eq(account.getId()), eq(template.getNickname()), eq(title), eq(content), isNull());
+                eq(account.getId()), eq(template.getNickname()), eq("login 验证码"), eq(content), isNull());
     }
 
     /**
@@ -136,13 +135,11 @@ public class MailSendServiceImplTest extends BaseMockitoUnitTest {
         // mock MailTemplateService 的方法
         MailTemplateDO template = randomPojo(MailTemplateDO.class, o -> {
             o.setStatus(CommonStatusEnum.ENABLE.getStatus());
+            o.setTitle("验证码通知");
             o.setContent("验证码为{code}, 操作为{op}");
             o.setParams(Lists.newArrayList("code", "op"));
         });
         when(mailTemplateService.getMailTemplateByCodeFromCache(eq(templateCode))).thenReturn(template);
-        String title = RandomUtils.randomString();
-        when(mailTemplateService.formatMailTemplateContent(eq(template.getTitle()), eq(templateParams)))
-                .thenReturn(title);
         String content = RandomUtils.randomString();
         when(mailTemplateService.formatMailTemplateContent(eq(template.getContent()), eq(templateParams)))
                 .thenReturn(content);
@@ -166,7 +163,65 @@ public class MailSendServiceImplTest extends BaseMockitoUnitTest {
                 argThat(toMailSet -> toMailSet.contains(mail)),
                 argThat(Collection::isEmpty),
                 argThat(Collection::isEmpty),
-                eq(account.getId()), eq(template.getNickname()), eq(title), eq(content), isNull());
+                eq(account.getId()), eq(template.getNickname()), eq("验证码通知"), eq(content), isNull());
+    }
+
+    /**
+     * 发送成功，标题按纯文本处理：替换参数、按原有替换链反转义 HTML 实体，不按 HTML 正文解析
+     */
+    @Test
+    public void testSendSingleMail_plainTextTitle() {
+        // 准备参数
+        String templateCode = RandomUtils.randomString();
+        Map<String, Object> templateParams = MapUtil.<String, Object>builder().put("shop", "芋道 <商城>").build();
+        Collection<String> toMails = Lists.newArrayList("admin@test.com");
+
+        // mock MailTemplateService 的方法
+        MailTemplateDO template = randomPojo(MailTemplateDO.class, o -> {
+            o.setStatus(CommonStatusEnum.ENABLE.getStatus());
+            o.setTitle("【{shop}】研发 & 运维 &amp; 测试 <待发货>&nbsp;&amp;lt;急&amp;gt; &amp;amp;");
+            o.setContent("<p>{shop}</p>");
+            o.setParams(Lists.newArrayList("shop"));
+        });
+        when(mailTemplateService.getMailTemplateByCodeFromCache(eq(templateCode))).thenReturn(template);
+        String content = RandomUtils.randomString();
+        when(mailTemplateService.formatMailTemplateContent(eq(template.getContent()), eq(templateParams)))
+                .thenReturn(content);
+        // mock MailAccountService 的方法
+        MailAccountDO account = randomPojo(MailAccountDO.class);
+        when(mailAccountService.getMailAccountFromCache(eq(template.getAccountId()))).thenReturn(account);
+        // mock MailLogService 的方法
+        Long mailLogId = randomLongId();
+        when(mailLogService.createMailLog(isNull(), isNull(), any(), any(), any(),
+                eq(account), eq(template), eq(content), eq(templateParams), eq(true))).thenReturn(mailLogId);
+
+        // 调用
+        mailSendService.sendSingleMail(toMails, null, null, null, null, templateCode, templateParams, (File[]) null);
+        // 断言：MQ 消息中的标题完整保留 &、尖括号，参数被替换；
+        // 实体按原有替换链反转义：&amp;lt; 还原为 <，&nbsp; 为 ASCII 空格，&amp;amp; 只还原一次为 &amp;
+        String expectedTitle = "【芋道 <商城>】研发 & 运维 & 测试 <待发货> <急> &amp;";
+        ArgumentCaptor<String> titleCaptor = ArgumentCaptor.forClass(String.class);
+        verify(mailProducer).sendMailSendMessage(eq(mailLogId), any(), any(), any(),
+                eq(account.getId()), eq(template.getNickname()), titleCaptor.capture(), eq(content), isNull());
+        assertEquals(expectedTitle, titleCaptor.getValue());
+        // 断言：标题没有走 HTML 正文格式化
+        verify(mailTemplateService, never()).formatMailTemplateContent(eq(template.getTitle()), any());
+
+        // 继续执行 MQ 消费，断言最终传给 MailUtil.send 的标题一致
+        try (MockedStatic<MailUtil> mailUtilMock = mockStatic(MailUtil.class)) {
+            MailSendMessage message = randomPojo(MailSendMessage.class, o -> o.setLogId(mailLogId)
+                    .setAccountId(template.getAccountId()).setNickname(template.getNickname())
+                    .setTitle(titleCaptor.getValue()).setContent(content));
+            String messageId = randomString();
+            mailUtilMock.when(() -> MailUtil.send(any(MailAccount.class), eq(message.getToMails()),
+                    eq(message.getCcMails()), eq(message.getBccMails()), eq(expectedTitle), eq(content),
+                    eq(true), eq(message.getAttachments()))).thenReturn(messageId);
+
+            // 调用
+            mailSendService.doSendMail(message);
+            // 断言
+            verify(mailLogService).updateMailSendResult(eq(mailLogId), eq(messageId), isNull());
+        }
     }
 
     /**
@@ -190,9 +245,6 @@ public class MailSendServiceImplTest extends BaseMockitoUnitTest {
             o.setParams(Lists.newArrayList("code", "op"));
         });
         when(mailTemplateService.getMailTemplateByCodeFromCache(eq(templateCode))).thenReturn(template);
-        String title = RandomUtils.randomString();
-        when(mailTemplateService.formatMailTemplateContent(eq(template.getTitle()), eq(templateParams)))
-                .thenReturn(title);
         String content = RandomUtils.randomString();
         when(mailTemplateService.formatMailTemplateContent(eq(template.getContent()), eq(templateParams)))
                 .thenReturn(content);
