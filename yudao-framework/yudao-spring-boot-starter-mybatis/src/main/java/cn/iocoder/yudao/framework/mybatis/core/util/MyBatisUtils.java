@@ -34,7 +34,7 @@ public class MyBatisUtils {
 
     private static final String MYSQL_ESCAPE_CHARACTER = "`";
 
-    private static final Pattern SAFE_COLUMN_NAME_PATTERN = Pattern.compile("^[a-zA-Z0-9_]+(\\.[a-zA-Z0-9_]+)*$");
+    private static final Pattern SAFE_COLUMN_NAME_PATTERN = Pattern.compile("^[a-zA-Z0-9_]++(?:\\.[a-zA-Z0-9_]++)*+$");
 
     private static final String FIND_IN_SET_VALUE_PLACEHOLDER = "#{value}";
 

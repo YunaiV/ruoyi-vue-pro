@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.*;
 
 import java.lang.reflect.Field;
+import java.util.Map;
 
 /**
  * 支付渠道 DO
@@ -94,8 +95,15 @@ public class PayChannelDO extends TenantBaseDO {
             }
 
             // 兼容老版本的包路径
-            String className = JsonUtils.parseObject(json, "@class", String.class);
-            className = StrUtil.subAfter(className, ".", true);
+            Map<String, Object> values = JsonUtils.parseObjectQuietly(json, new TypeReference<Map<String, Object>>() {});
+            Object type = values != null ? values.get("@class") : null;
+            if (!(type instanceof String)) {
+                throw new IllegalArgumentException("缺少 PayClientConfig 类型");
+            }
+            String className = StrUtil.subAfter((String) type, ".", true);
+            if (StrUtil.isEmpty(className)) {
+                throw new IllegalArgumentException("缺少 PayClientConfig 类型");
+            }
             switch (className) {
                 case "AlipayPayClientConfig":
                     return JsonUtils.parseObject2(json, AlipayPayClientConfig.class);
@@ -104,7 +112,7 @@ public class PayChannelDO extends TenantBaseDO {
                 case "NonePayClientConfig":
                     return JsonUtils.parseObject2(json, NonePayClientConfig.class);
                 default:
-                    throw new IllegalArgumentException("未知的 PayClientConfig 类型：" + json);
+                    throw new IllegalArgumentException("未知的 PayClientConfig 类型");
             }
         }
 

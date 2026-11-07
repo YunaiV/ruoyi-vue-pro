@@ -76,6 +76,23 @@ public class SocialClientServiceImplTest extends BaseDbUnitTest {
     private WxMaProperties wxMaProperties;
 
     @Test
+    public void testGetAuthorizeUrl_justAuthDisabled() {
+        // 准备参数
+        Integer socialType = SocialTypeEnum.WECHAT_MP.getType();
+        Integer userType = UserTypeEnum.ADMIN.getValue();
+        String redirectUri = "https://example.invalid";
+        // mock 关闭 JustAuth 后，可选的请求工厂未注入
+        ReflectUtil.setFieldValue(socialClientService, "authRequestFactory", null);
+        try {
+            // 调用、断言
+            assertServiceException(() -> socialClientService.getAuthorizeUrl(socialType, userType, redirectUri),
+                    SOCIAL_USER_AUTH_FAILURE, "社交登录未启用");
+        } finally {
+            ReflectUtil.setFieldValue(socialClientService, "authRequestFactory", authRequestFactory);
+        }
+    }
+
+    @Test
     public void testGetAuthorizeUrl() {
         try (MockedStatic<AuthStateUtils> authStateUtilsMock = mockStatic(AuthStateUtils.class)) {
             // 准备参数

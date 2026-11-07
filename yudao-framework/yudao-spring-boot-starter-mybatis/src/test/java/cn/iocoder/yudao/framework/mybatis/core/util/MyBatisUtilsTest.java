@@ -238,6 +238,38 @@ public class MyBatisUtilsTest {
         assertEquals(value2, query.getParamNameValuePairs().get("MPGENVAL2"));
     }
 
+    @Test
+    public void testSafeColumnName_boundaries() {
+        // 准备参数
+        List<String> validColumns = Arrays.asList("a", "_", "9", "u.id", "A9_._b2", "a.b.c");
+        List<String> invalidColumns = Arrays.asList("", ".a", "a.", "a..b", "a b", "a\n", "中文", "a;drop", "`a`");
+
+        // 调用，并断言
+        for (String valid : validColumns) {
+            assertTrue(MyBatisUtils.isSafeColumnName(valid), valid);
+        }
+        for (String invalid : invalidColumns) {
+            assertFalse(MyBatisUtils.isSafeColumnName(invalid), invalid);
+        }
+        assertFalse(MyBatisUtils.isSafeColumnName(null));
+    }
+
+    @Test
+    public void testBuildPage_longSegmentedColumn() {
+        // 准备参数
+        String valid = "a.".repeat(10_000) + "a";
+
+        // 调用
+        Page<Object> page = MyBatisUtils.buildPage(new PageParam(),
+                Collections.singletonList(new SortingField(valid, SortingField.ORDER_ASC)));
+
+        // 断言
+        assertEquals(1, page.orders().size());
+        assertEquals(valid, page.orders().get(0).getColumn());
+        assertTrue(MyBatisUtils.buildPage(new PageParam(),
+                Collections.singletonList(new SortingField(valid + ".", SortingField.ORDER_ASC))).orders().isEmpty());
+    }
+
     private void assertOrderItem(OrderItem orderItem, String column, boolean asc) {
         assertEquals(column, orderItem.getColumn());
         assertEquals(asc, orderItem.isAsc());

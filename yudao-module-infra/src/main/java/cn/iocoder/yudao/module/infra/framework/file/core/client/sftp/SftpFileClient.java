@@ -6,10 +6,11 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.ftp.FtpConfig;
 import cn.hutool.extra.ssh.JschRuntimeException;
 import cn.hutool.extra.ssh.Sftp;
-import cn.iocoder.yudao.framework.common.util.io.FileUtils;
 import cn.iocoder.yudao.module.infra.framework.file.core.client.AbstractFileClient;
 import com.jcraft.jsch.JSch;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 
 /**
@@ -55,10 +56,9 @@ public class SftpFileClient extends AbstractFileClient<SftpFileClientConfig> {
         String filePath = getFilePath(path);
         String fileName = FileUtil.getName(filePath);
         String dir = StrUtil.removeSuffix(filePath, fileName);
-        File file = FileUtils.createTempFile(content);
         reconnectIfTimeout();
         sftp.mkDirs(dir); // 需要创建父目录，不然会报错
-        boolean success = sftp.upload(filePath, file);
+        boolean success = sftp.upload(dir, fileName, new ByteArrayInputStream(content));
         if (!success) {
             throw new JschRuntimeException(StrUtil.format("上传文件到目标目录 ({}) 失败", filePath));
         }
@@ -76,10 +76,10 @@ public class SftpFileClient extends AbstractFileClient<SftpFileClientConfig> {
     @Override
     public byte[] getContent(String path) {
         String filePath = getFilePath(path);
-        File destFile = FileUtils.createTempFile();
         reconnectIfTimeout();
-        sftp.download(filePath, destFile);
-        return FileUtil.readBytes(destFile);
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        sftp.download(filePath, output);
+        return output.toByteArray();
     }
 
     private String getFilePath(String path) {

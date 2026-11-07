@@ -206,6 +206,9 @@ public class SocialClientServiceImpl implements SocialClientService {
     @VisibleForTesting
     AuthRequest buildAuthRequest(Integer socialType, Integer userType) {
         // 1. 先查找默认的配置项，从 application-*.yaml 中读取
+        if (authRequestFactory == null) {
+            throw exception(SOCIAL_USER_AUTH_FAILURE, "社交登录未启用");
+        }
         AuthRequest request = authRequestFactory.get(SocialTypeEnum.valueOfType(socialType).getSource());
         Assert.notNull(request, String.format("社交平台(%d) 不存在", socialType));
         // 2. 查询 DB 的配置项，如果存在则进行覆盖

@@ -9,6 +9,8 @@ import cn.iocoder.yudao.module.pay.dal.dataobject.channel.PayChannelDO;
 import cn.iocoder.yudao.module.pay.dal.mysql.channel.PayChannelMapper;
 import cn.iocoder.yudao.module.pay.enums.PayChannelEnum;
 import cn.iocoder.yudao.module.pay.framework.pay.core.client.PayClient;
+import cn.iocoder.yudao.module.pay.framework.pay.core.client.PayClientConfig;
+import cn.iocoder.yudao.module.pay.framework.pay.core.client.impl.NonePayClientConfig;
 import cn.iocoder.yudao.module.pay.framework.pay.core.client.PayClientFactory;
 import cn.iocoder.yudao.module.pay.framework.pay.core.client.impl.alipay.AlipayPayClientConfig;
 import cn.iocoder.yudao.module.pay.framework.pay.core.client.impl.weixin.WxPayClientConfig;
@@ -43,6 +45,68 @@ public class PayChannelServiceTest extends BaseDbUnitTest {
     private PayClientFactory payClientFactory;
     @MockitoBean
     private Validator validator;
+
+    @Test
+    public void testPayConfigTypeHandler_currentAndLegacyTypes() {
+        // 准备参数
+        PayChannelDO.PayClientConfigTypeHandler handler = new PayChannelDO.PayClientConfigTypeHandler(PayClientConfig.class);
+        for (PayClientConfig config : new PayClientConfig[]{new AlipayPayClientConfig(), new WxPayClientConfig(), new NonePayClientConfig()}) {
+            // 调用
+            String json = handler.toJson(config);
+            Object parsedConfig = handler.parse(json);
+            String legacyJson = json.replace(config.getClass().getName(), "legacy.package." + config.getClass().getSimpleName());
+            Object legacyConfig = handler.parse(legacyJson);
+
+            // 断言
+            assertEquals(config.getClass().getName(), JsonUtils.parseObject(json, "@class", String.class));
+            assertEquals(config.getClass(), parsedConfig.getClass());
+            assertEquals(config, parsedConfig);
+            assertEquals(config, legacyConfig);
+        }
+    }
+
+    @Test
+    public void testPayConfigTypeHandler_rejectsUnregisteredTypeWithoutConstruction() {
+        // 准备参数
+        PayChannelDO.PayClientConfigTypeHandler handler = new PayChannelDO.PayClientConfigTypeHandler(PayClientConfig.class);
+        UnregisteredPayClientConfig.constructed = 0;
+        String json = "{\"@class\":\"" + UnregisteredPayClientConfig.class.getName() + "\",\"secret\":\"synthetic-secret\"}";
+
+        // 调用，并断言异常
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class, () -> handler.parse(json));
+
+        // 断言
+        assertEquals(0, UnregisteredPayClientConfig.constructed);
+        assertFalse(error.getMessage().contains("synthetic-secret"));
+    }
+
+    @Test
+    public void testPayConfigTypeHandler_rejectsMissingUnknownAndNonConfigType() {
+        // 准备参数
+        PayChannelDO.PayClientConfigTypeHandler handler = new PayChannelDO.PayClientConfigTypeHandler(PayClientConfig.class);
+        for (String json : new String[]{"{}", "{\"@class\":42}", "not-json", "{\"@class\":\"unknown.MissingConfig\"}", "{\"@class\":\"java.lang.String\"}"}) {
+            // 调用，并断言异常
+            assertThrows(IllegalArgumentException.class, () -> handler.parse(json));
+        }
+    }
+
+    /**
+     * 未注册配置的安全探针，仅记录构造次数。
+     *
+     * @author 芋道源码
+     */
+    public static class UnregisteredPayClientConfig implements PayClientConfig {
+
+        private static int constructed;
+
+        public UnregisteredPayClientConfig() {
+            constructed++;
+        }
+
+        @Override
+        public void validate(Validator validator) {
+        }
+    }
 
     @Test
     public void testCreateChannel_success() {

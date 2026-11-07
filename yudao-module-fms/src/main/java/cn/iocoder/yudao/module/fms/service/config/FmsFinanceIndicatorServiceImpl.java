@@ -41,11 +41,10 @@ import static cn.iocoder.yudao.module.fms.enums.ErrorCodeConstants.HOME_METRIC_I
 @Validated
 public class FmsFinanceIndicatorServiceImpl implements FmsFinanceIndicatorService {
 
-    // TODO DONE @AI：补充行次公式正则说明。
     /**
      * 行次公式格式，例如 {@code L1+L2-L3}
      */
-    private static final Pattern LINE_FORMULA_PATTERN = Pattern.compile("[+-]?L\\d+(?:[+-]L\\d+)*");
+    private static final Pattern LINE_FORMULA_PATTERN = Pattern.compile("[+-]?L\\d++(?:[+-]L\\d++)*+");
 
     private static final String PRESET_RESOURCE = "fms/config/finance-indicator-presets.json";
 
@@ -61,7 +60,6 @@ public class FmsFinanceIndicatorServiceImpl implements FmsFinanceIndicatorServic
 
     @Override
     public Long createFinanceIndicator(FmsFinanceIndicatorSaveReqVO reqVO, Long userId) {
-        // TODO DONE @AI：方法步骤已对齐 FMS Service 风格。
         // 1.1 校验账套写权限
         accountSetService.validateAccountSetWritePermission(reqVO.getAccountSetId(), userId);
         // 1.2 校验指标公式

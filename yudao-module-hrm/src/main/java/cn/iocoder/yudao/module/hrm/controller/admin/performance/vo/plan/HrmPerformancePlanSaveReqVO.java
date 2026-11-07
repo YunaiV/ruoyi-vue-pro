@@ -195,8 +195,8 @@ public class HrmPerformancePlanSaveReqVO {
         private Integer type;
 
         @Schema(description = "上级或部门层级", example = "1")
-        @Min(value = 1, message = "处理人层级不能小于 1")
-        @Max(value = 10, message = "处理人层级不能大于 10")
+        @Min(value = HrmPerformanceRaterTypeEnum.MIN_LEVEL, message = "处理人层级不能小于 1")
+        @Max(value = HrmPerformanceRaterTypeEnum.MAX_LEVEL, message = "处理人层级不能大于 10")
         private Integer level;
 
         @Schema(description = "指定处理员工编号", example = "1024")
