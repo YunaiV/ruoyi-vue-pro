@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,7 +34,7 @@ public class AppArticleController {
     @Resource
     private ArticleService articleService;
 
-    @RequestMapping("/list")
+    @GetMapping("/list")
     @Operation(summary = "获得文章详情列表")
     @Parameters({
             @Parameter(name = "recommendHot", description = "是否热门", example = "false"), // 场景一：查看指定的文章
@@ -47,14 +48,14 @@ public class AppArticleController {
                 articleService.getArticleCategoryListByRecommend(recommendHot, recommendBanner)));
     }
 
-    @RequestMapping("/page")
+    @GetMapping("/page")
     @Operation(summary = "获得文章详情分页")
     @PermitAll
     public CommonResult<PageResult<AppArticleRespVO>> getArticlePage(AppArticlePageReqVO pageReqVO) {
         return success(ArticleConvert.INSTANCE.convertPage02(articleService.getArticlePage(pageReqVO)));
     }
 
-    @RequestMapping("/get")
+    @GetMapping("/get")
     @Operation(summary = "获得文章详情")
     @Parameters({
             @Parameter(name = "id", description = "文章编号", example = "1024"),

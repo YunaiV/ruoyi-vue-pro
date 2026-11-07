@@ -31,8 +31,10 @@ public class MarkdownQaSplitter extends TextSplitter {
 
     /**
      * 二级标题正则：匹配 "## " 开头的行
+     *
+     * 只固定匹配一个空格/制表符，其余前导空白交给 (.+) 并在提取时 trim，避免两个量词重叠回溯
      */
-    private static final Pattern H2_PATTERN = Pattern.compile("^##[ \t]+(.+)$", Pattern.MULTILINE);
+    private static final Pattern H2_PATTERN = Pattern.compile("^##[ \t](.+)$", Pattern.MULTILINE);
 
     /**
      * 段落分隔符：双换行

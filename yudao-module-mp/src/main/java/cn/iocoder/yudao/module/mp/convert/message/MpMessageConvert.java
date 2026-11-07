@@ -65,6 +65,7 @@ public interface MpMessageConvert {
                 break;
             case WxConsts.XmlMsgType.NEWS: // 5. 图文
                 message.setArticles(sendReqBO.getArticles());
+                break;
             case WxConsts.XmlMsgType.MUSIC: // 6. 音乐
                 message.setTitle(sendReqBO.getTitle()).setDescription(sendReqBO.getDescription())
                         .setMusicUrl(sendReqBO.getMusicUrl()).setHqMusicUrl(sendReqBO.getHqMusicUrl())

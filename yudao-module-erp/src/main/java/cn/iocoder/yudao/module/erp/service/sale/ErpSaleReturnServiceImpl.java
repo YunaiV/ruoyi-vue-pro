@@ -198,7 +198,7 @@ public class ErpSaleReturnServiceImpl implements ErpSaleReturnService {
     @Override
     public void updateSaleReturnRefundPrice(Long id, BigDecimal refundPrice) {
         ErpSaleReturnDO saleReturn = saleReturnMapper.selectById(id);
-        if (saleReturn.getRefundPrice().equals(refundPrice)) {
+        if (saleReturn.getRefundPrice().compareTo(refundPrice) == 0) {
             return;
         }
         if (refundPrice.compareTo(saleReturn.getTotalPrice()) > 0) {
