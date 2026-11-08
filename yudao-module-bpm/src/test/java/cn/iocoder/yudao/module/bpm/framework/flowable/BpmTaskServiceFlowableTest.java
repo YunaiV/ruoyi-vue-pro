@@ -899,6 +899,42 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         verify(messageService, never()).sendMessageWhenProcessInstanceReject(any());
     }
 
+    @Test
+    public void testProcessCallback_cancelTriggerTask() {
+        // 准备参数：流程停留在 receiveTask 等待节点，没有运行中的任务
+        deploy("bpmn/trigger-task.bpmn20.xml");
+        String processInstanceId = startProcessInstance("triggerTask");
+
+        // 调用
+        processInstanceService.cancelProcessInstanceByStartUser(1L, new BpmProcessInstanceCancelReqVO()
+                .setId(processInstanceId).setReason("不想请了"));
+        // 断言：流程实例结束，并发送取消的状态事件
+        assertNull(processInstanceService.getProcessInstance(processInstanceId));
+        assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstanceId).count());
+        assertEquals(BpmProcessInstanceStatusEnum.CANCEL.getStatus(), getHistoricProcessVariable(processInstanceId,
+                BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_STATUS));
+        BpmProcessInstanceStatusEvent event = getProcessInstanceStatusEvent(processInstanceId);
+        assertEquals(BpmProcessInstanceStatusEnum.CANCEL.getStatus(), event.getStatus());
+        assertEquals(BpmReasonEnum.CANCEL_PROCESS_INSTANCE_BY_START_USER.format("不想请了"), event.getReason());
+    }
+
+    @Test
+    public void testProcessCallback_cancelDelayTimer() {
+        // 准备参数：流程停留在延迟器，没有运行中的任务
+        deploy("bpmn/delay-timer.bpmn20.xml");
+        String processInstanceId = startProcessInstance("delayTimer");
+
+        // 调用
+        processInstanceService.cancelProcessInstanceByAdmin(100L, new BpmProcessInstanceCancelReqVO()
+                .setId(processInstanceId).setReason("流程配置错误"));
+        // 断言：流程实例结束，延迟器的定时任务一并删除，不会再推进流程
+        assertNull(processInstanceService.getProcessInstance(processInstanceId));
+        assertEquals(0, managementService.createTimerJobQuery().processInstanceId(processInstanceId).count());
+        BpmProcessInstanceStatusEvent event = getProcessInstanceStatusEvent(processInstanceId);
+        assertEquals(BpmProcessInstanceStatusEnum.CANCEL.getStatus(), event.getStatus());
+        assertEquals(BpmReasonEnum.CANCEL_PROCESS_INSTANCE_BY_ADMIN.format("用户100", "流程配置错误"), event.getReason());
+    }
+
     // ========== 自动审批相关（依赖 getSelf() 获取 Spring 代理） ==========
 
     @Test

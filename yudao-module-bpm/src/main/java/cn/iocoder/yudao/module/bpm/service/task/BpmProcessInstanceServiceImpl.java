@@ -1058,6 +1058,11 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
 
         // 3. 结束流程
         taskService.moveTaskToEnd(id, reason);
+        // 特殊：没有运行中的任务时（例如停留在延迟器、触发器），moveTaskToEnd 无法结束流程，直接删除流程实例
+        // 相关 issue：https://github.com/YunaiV/ruoyi-vue-pro/issues/966
+        if (runtimeService.createProcessInstanceQuery().processInstanceId(id).count() > 0) {
+            runtimeService.deleteProcessInstance(id, reason);
+        }
     }
 
     @Override
