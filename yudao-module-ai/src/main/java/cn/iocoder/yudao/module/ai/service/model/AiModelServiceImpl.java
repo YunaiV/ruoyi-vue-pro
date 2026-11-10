@@ -192,9 +192,7 @@ public class AiModelServiceImpl implements AiModelService {
     }
 
     @Override
-    public SunoApi getSunoApi() {
-        AiApiKeyDO apiKey = apiKeyService.getRequiredDefaultApiKey(
-                AiPlatformEnum.SUNO.getPlatform(), CommonStatusEnum.ENABLE.getStatus());
+    public SunoApi getSunoApi(AiApiKeyDO apiKey) {
         return modelFactory.getOrCreateSunoApi(apiKey.getApiKey(), apiKey.getUrl());
     }
 

@@ -14,6 +14,7 @@ import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.util.HashSet;
@@ -35,6 +36,14 @@ public class AiModelSaveReqVO {
     @Schema(description = "模型名字", requiredMode = Schema.RequiredMode.REQUIRED, example = "张三")
     @NotEmpty(message = "模型名字不能为空")
     private String name;
+
+    @Schema(description = "模型简介", example = "通用推荐")
+    @Size(max = 255, message = "模型简介不能超过 255 个字符")
+    private String description;
+
+    @Schema(description = "模型图标地址", example = "https://www.iocoder.cn/suno.png")
+    @Size(max = 1024, message = "模型图标地址不能超过 1024 个字符")
+    private String iconUrl;
 
     @Schema(description = "模型标识", requiredMode = Schema.RequiredMode.REQUIRED, example = "gpt-3.5-turbo-0125")
     @NotEmpty(message = "模型标识不能为空")

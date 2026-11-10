@@ -1,26 +1,122 @@
-### 生成音乐：Suno + 歌词模式
+### 生成音乐：灵感模式
 POST {{baseUrl}}/ai/music/generate
 Content-Type: application/json
 Authorization: {{token}}
+tenant-id: {{adminTenantId}}
 
 {
-  "platform": "Suno",
-  "generateMode": 2,
-  "prompt": "创作一首带有轻松吉他旋律的流行歌曲，[verse] 描述夏日海滩的宁静，[chorus] 节奏加快，表达对自由的向往。",
-  "model": "chirp-v3.5",
-  "tags": ["Happy"],
-  "title": "Happy Song"
-}
-
-### 生成音乐：Suno + 描述模式
-POST {{baseUrl}}/ai/music/generate
-Content-Type: application/json
-Authorization: {{token}}
-
-{
-  "platform": "Suno",
   "generateMode": 1,
-  "model": "chirp-v3.5",
-  "prompt": "happy music",
+  "modelId": 1,
+  "prompt": "一首关于夏日海边的轻快流行歌",
   "makeInstrumental": false
 }
+
+### 生成音乐：自定义模式
+POST {{baseUrl}}/ai/music/generate
+Content-Type: application/json
+Authorization: {{token}}
+tenant-id: {{adminTenantId}}
+
+{
+  "generateMode": 2,
+  "modelId": 1,
+  "title": "夏日海风",
+  "lyric": "[Verse]\n海风吹过沙滩\n[Chorus]\n我们一起奔跑",
+  "tags": "pop, female vocals",
+  "makeInstrumental": false
+}
+
+### 续写音乐
+POST {{baseUrl}}/ai/music/extend
+Content-Type: application/json
+Authorization: {{token}}
+tenant-id: {{adminTenantId}}
+
+{
+  "id": 1,
+  "extendSeconds": 60,
+  "title": "夏日海风（续）",
+  "lyric": "[Verse 2]\n夕阳落在海面"
+}
+
+### 拼接音乐
+POST {{baseUrl}}/ai/music/concat
+Content-Type: application/json
+Authorization: {{token}}
+tenant-id: {{adminTenantId}}
+
+{
+  "id": 2
+}
+
+### 上传音乐
+POST {{baseUrl}}/ai/music/upload
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+Authorization: {{token}}
+tenant-id: {{adminTenantId}}
+
+--WebAppBoundary
+Content-Disposition: form-data; name="modelId"
+
+1
+--WebAppBoundary
+Content-Disposition: form-data; name="title"
+
+我的哼唱
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="demo.mp3"
+
+< ./demo.mp3
+--WebAppBoundary--
+
+### 生成歌词
+POST {{baseUrl}}/ai/music/generate-lyric
+Content-Type: application/json
+Authorization: {{token}}
+tenant-id: {{adminTenantId}}
+
+{
+  "prompt": "夏日海边"
+}
+
+### 获得【我的】音乐分页
+GET {{baseUrl}}/ai/music/my-page?pageNo=1&pageSize=10
+Authorization: {{token}}
+tenant-id: {{adminTenantId}}
+
+### 获得音乐广场分页
+GET {{baseUrl}}/ai/music/public-page?pageNo=1&pageSize=10
+Authorization: {{token}}
+tenant-id: {{adminTenantId}}
+
+### 获得音乐详情
+GET {{baseUrl}}/ai/music/get-detail?id=1
+Authorization: {{token}}
+tenant-id: {{adminTenantId}}
+
+### 修改【我的】音乐
+PUT {{baseUrl}}/ai/music/update-my
+Content-Type: application/json
+Authorization: {{token}}
+tenant-id: {{adminTenantId}}
+
+{
+  "id": 1,
+  "title": "夏日海风",
+  "publicStatus": true
+}
+
+### 记录播放
+POST {{baseUrl}}/ai/music/play?id=1
+Authorization: {{token}}
+tenant-id: {{adminTenantId}}
+
+### 获得音乐分页（管理）
+GET {{baseUrl}}/ai/music/page?pageNo=1&pageSize=10&status=40
+Authorization: {{token}}
+tenant-id: {{adminTenantId}}
+
+### 获得音乐（管理）
+GET {{baseUrl}}/ai/music/get?id=1
+Authorization: {{token}}
+tenant-id: {{adminTenantId}}

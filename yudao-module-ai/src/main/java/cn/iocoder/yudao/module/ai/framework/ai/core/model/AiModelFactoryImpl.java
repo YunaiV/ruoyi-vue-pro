@@ -335,7 +335,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
         final String apiKey = resolveSpringPlaceholders(rawApiKey);
         final String url = resolveSpringPlaceholders(rawUrl);
         String cacheKey = buildClientCacheKey(SunoApi.class, AiPlatformEnum.SUNO.getPlatform(), apiKey, url);
-        return Singleton.get(cacheKey, (Func0<SunoApi>) () -> new SunoApi(url));
+        return Singleton.get(cacheKey, (Func0<SunoApi>) () -> new SunoApi(url, apiKey));
     }
 
     @Override

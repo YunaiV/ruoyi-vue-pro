@@ -269,10 +269,6 @@ yudao:
       base-url: https://api.holdai.top/mj
       api-key: ${MIDJOURNEY_API_KEY:sk-xxxx}
       notify-url: http://java.nat300.top/admin-api/ai/image/midjourney/notify
-    suno:
-      enable: true
-  #    base-url: https://suno-55ishh05u-status2xxs-projects.vercel.app
-      base-url: http://127.0.0.1:3001
     web-search:
       enable: true
       api-key: ${WEB_SEARCH_API_KEY:sk-xxxx}

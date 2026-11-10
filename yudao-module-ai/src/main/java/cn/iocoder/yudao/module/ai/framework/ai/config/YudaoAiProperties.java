@@ -84,12 +84,6 @@ public class YudaoAiProperties {
     private Midjourney midjourney;
 
     /**
-     * Suno 音乐
-     */
-    @SuppressWarnings("SpellCheckingInspection")
-    private Suno suno;
-
-    /**
      * 网络搜索
      */
     private WebSearch webSearch;
@@ -265,15 +259,6 @@ public class YudaoAiProperties {
 
         private String apiKey;
         private String notifyUrl;
-
-    }
-
-    @Data
-    public static class Suno {
-
-        private boolean enable;
-
-        private String baseUrl;
 
     }
 

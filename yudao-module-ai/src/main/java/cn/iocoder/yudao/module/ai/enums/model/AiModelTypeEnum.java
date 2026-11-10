@@ -20,7 +20,8 @@ public enum AiModelTypeEnum implements ArrayValuable<Integer> {
     VOICE(3, "语音"),
     VIDEO(4, "视频"),
     EMBEDDING(5, "向量"),
-    RERANK(6, "重排序");
+    RERANK(6, "重排序"),
+    MUSIC(7, "音乐");
 
     /**
      * 类型

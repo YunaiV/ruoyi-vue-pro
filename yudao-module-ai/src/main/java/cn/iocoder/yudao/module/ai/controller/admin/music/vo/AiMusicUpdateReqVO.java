@@ -8,11 +8,12 @@ import lombok.Data;
 @Data
 public class AiMusicUpdateReqVO {
 
-    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "15583")
+    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "10241")
     @NotNull(message = "编号不能为空")
     private Long id;
 
-    @Schema(description = "是否发布", example = "true")
+    @Schema(description = "是否公开", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
+    @NotNull(message = "是否公开不能为空")
     private Boolean publicStatus;
 
 }

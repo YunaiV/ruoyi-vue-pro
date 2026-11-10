@@ -16,7 +16,6 @@ import cn.iocoder.yudao.module.ai.framework.ai.core.model.moonshot.MoonshotChatM
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlowApiConstants;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlowChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.stepfun.StepFunChatModel;
-import cn.iocoder.yudao.module.ai.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.xinghuo.XingHuoChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.yiyan.YiYanChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.zhipu.ZhiPuChatModel;
@@ -434,12 +433,6 @@ public class AiAutoConfiguration {
     public MidjourneyApi midjourneyApi(YudaoAiProperties yudaoAiProperties) {
         YudaoAiProperties.Midjourney config = yudaoAiProperties.getMidjourney();
         return new MidjourneyApi(config.getBaseUrl(), config.getApiKey(), config.getNotifyUrl());
-    }
-
-    @Bean
-    @ConditionalOnProperty(value = "yudao.ai.suno.enable", havingValue = "true")
-    public SunoApi sunoApi(YudaoAiProperties yudaoAiProperties) {
-        return new SunoApi(yudaoAiProperties.getSuno().getBaseUrl());
     }
 
     @Bean

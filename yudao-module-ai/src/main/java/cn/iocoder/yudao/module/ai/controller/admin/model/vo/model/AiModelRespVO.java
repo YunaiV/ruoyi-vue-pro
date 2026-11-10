@@ -19,6 +19,12 @@ public class AiModelRespVO {
     @Schema(description = "模型名字", example = "张三")
     private String name;
 
+    @Schema(description = "模型简介", example = "通用推荐")
+    private String description;
+
+    @Schema(description = "模型图标地址", example = "https://www.iocoder.cn/suno.png")
+    private String iconUrl;
+
     @Schema(description = "模型标识", example = "gpt-3.5-turbo-0125")
     private String model;
 

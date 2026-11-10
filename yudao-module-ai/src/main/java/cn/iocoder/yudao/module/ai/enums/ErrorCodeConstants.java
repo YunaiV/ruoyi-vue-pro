@@ -45,6 +45,15 @@ public interface ErrorCodeConstants {
 
     // ========== API 音乐 1-040-006-000 ==========
     ErrorCode MUSIC_NOT_EXISTS = new ErrorCode(1_040_006_000, "音乐不存在!");
+    ErrorCode MUSIC_MODEL_TYPE_ERROR = new ErrorCode(1_040_006_001, "操作失败，所选模型不是 Suno 音乐模型");
+    ErrorCode MUSIC_REF_NOT_AVAILABLE = new ErrorCode(1_040_006_002, "来源音乐不存在、未完成或不属于你，无法继续创作");
+    ErrorCode MUSIC_REF_NOT_EXTEND = new ErrorCode(1_040_006_003, "只有续写作品才能合并为完整歌曲");
+    ErrorCode MUSIC_EXTEND_SECONDS_EXCEED = new ErrorCode(1_040_006_004, "续写起点不能超过原曲时长");
+    ErrorCode MUSIC_REF_API_KEY_UNAVAILABLE = new ErrorCode(1_040_006_005, "原曲所在渠道不可用，无法续写或合并");
+    ErrorCode MUSIC_STATUS_NOT_FINISHED = new ErrorCode(1_040_006_006, "音乐还在生成中，暂不能执行该操作");
+    ErrorCode MUSIC_STATUS_NOT_SUCCESS = new ErrorCode(1_040_006_007, "只有已完成的音乐才能执行该操作");
+    ErrorCode MUSIC_LYRIC_GENERATE_FAIL = new ErrorCode(1_040_006_009, "歌词生成失败，请稍后重试");
+    ErrorCode MUSIC_UPLOAD_FILE_INVALID = new ErrorCode(1_040_006_010, "只支持 mp3、wav 格式的音频，请重新上传");
 
     // ========== API 写作 1-040-007-000 ==========
     ErrorCode WRITE_NOT_EXISTS = new ErrorCode(1_040_007_000, "作文不存在!");

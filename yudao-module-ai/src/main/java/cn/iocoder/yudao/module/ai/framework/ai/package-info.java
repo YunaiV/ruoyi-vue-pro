@@ -8,6 +8,6 @@
  *  4. hunyuan 包：【腾讯混元】HunYuan，自己实现
  *  5. siliconflow 包：【硅基硅流】SiliconFlow，自己实现
  *  6. midjourney 包：Midjourney API，对接 https://github.com/novicezk/midjourney-proxy 实现
- *  7. suno 包：Suno API，对接 https://github.com/gcui-art/suno-api 实现
+ *  7. suno 包：Suno API，对接 New API 兼容的 /suno/* 中转协议实现
  */
 package cn.iocoder.yudao.module.ai.framework.ai;

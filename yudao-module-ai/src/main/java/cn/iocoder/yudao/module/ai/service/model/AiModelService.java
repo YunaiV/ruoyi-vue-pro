@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.ai.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiModelPageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiModelSaveReqVO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiApiKeyDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiModelDO;
 import cn.iocoder.yudao.module.ai.enums.model.AiPlatformEnum;
 import dev.tinyflow.core.Tinyflow;
@@ -142,9 +143,10 @@ public interface AiModelService {
     /**
      * 获得 SunoApi 对象
      *
+     * @param apiKey API 密钥
      * @return SunoApi 对象
      */
-    SunoApi getSunoApi();
+    SunoApi getSunoApi(AiApiKeyDO apiKey);
 
     /**
      * 获得 VectorStore 对象

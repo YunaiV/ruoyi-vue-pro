@@ -15,6 +15,16 @@ public class FileTypeUtils {
     private static final Tika TIKA = new Tika();
 
     /**
+     * 获得文件的 mineType，按文件内容识别
+     *
+     * @param data 文件内容
+     * @return mineType 无法识别时会返回“application/octet-stream”
+     */
+    public static String getMineType(byte[] data) {
+        return TIKA.detect(data);
+    }
+
+    /**
      * 已知文件名，获取文件类型，在某些情况下比通过字节数组准确，例如使用 jar 文件时，通过名字更为准确
      *
      * @param name 文件名
