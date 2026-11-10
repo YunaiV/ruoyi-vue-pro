@@ -51,15 +51,18 @@ public class SmsCodeServiceImpl implements SmsCodeService {
     }
 
     private String createSmsCode(String mobile, Integer scene, String ip) {
-        // 校验是否可以发送验证码，不用筛选场景
-        SmsCodeDO lastSmsCode = smsCodeMapper.selectLastByMobile(mobile, null, null);
-        if (lastSmsCode != null) {
-            if (LocalDateTimeUtil.between(lastSmsCode.getCreateTime(), LocalDateTime.now()).toMillis()
-                    < smsCodeProperties.getSendFrequency().toMillis()) { // 发送过于频繁
-                throw exception(SMS_CODE_SEND_TOO_FAST);
-            }
-            if (isToday(lastSmsCode.getCreateTime()) && // 必须是今天，才能计算超过当天的上限
-                    lastSmsCode.getTodayIndex() >= smsCodeProperties.getSendMaximumQuantityPerDay()) { // 超过当天发送的上限。
+        // 发送间隔按手机号 + 场景：登录刚发过，不应挡住改密 / 找回密码。
+        SmsCodeDO lastSameScene = smsCodeMapper.selectLastByMobile(mobile, null, scene);
+        if (lastSameScene != null
+                && LocalDateTimeUtil.between(lastSameScene.getCreateTime(), LocalDateTime.now()).toMillis()
+                        < smsCodeProperties.getSendFrequency().toMillis()) { // 发送过于频繁
+            throw exception(SMS_CODE_SEND_TOO_FAST);
+        }
+        // 每日上限仍按手机号全局计数，避免换场景绕过。
+        SmsCodeDO lastAnyScene = smsCodeMapper.selectLastByMobile(mobile, null, null);
+        if (lastAnyScene != null) {
+            if (isToday(lastAnyScene.getCreateTime()) && // 必须是今天，才能计算超过当天的上限
+                    lastAnyScene.getTodayIndex() >= smsCodeProperties.getSendMaximumQuantityPerDay()) { // 超过当天发送的上限。
                 throw exception(SMS_CODE_EXCEED_SEND_MAXIMUM_QUANTITY_PER_DAY);
             }
             // TODO 芋艿：提升，每个 IP 每天可发送数量
@@ -70,7 +73,7 @@ public class SmsCodeServiceImpl implements SmsCodeService {
         String code = String.format("%0" + smsCodeProperties.getEndCode().toString().length() + "d",
                 randomInt(smsCodeProperties.getBeginCode(), smsCodeProperties.getEndCode() + 1));
         SmsCodeDO newSmsCode = SmsCodeDO.builder().mobile(mobile).code(code).scene(scene)
-                .todayIndex(lastSmsCode != null && isToday(lastSmsCode.getCreateTime()) ? lastSmsCode.getTodayIndex() + 1 : 1)
+                .todayIndex(lastAnyScene != null && isToday(lastAnyScene.getCreateTime()) ? lastAnyScene.getTodayIndex() + 1 : 1)
                 .createIp(ip).used(false).build();
         smsCodeMapper.insert(newSmsCode);
         return code;
