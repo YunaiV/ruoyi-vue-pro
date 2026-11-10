@@ -44,6 +44,7 @@ public class SunoApiUnitTest extends BaseMockitoUnitTest {
 
     private static final String BASE_URL = "https://relay.example.com/";
     private static final String API_KEY = "test-suno-key";
+    private static final String APIMAX_BASE_URL = "https://api.apimax.ai";
 
     @Mock
     private ExchangeFunction exchangeFunction;
@@ -157,6 +158,107 @@ public class SunoApiUnitTest extends BaseMockitoUnitTest {
         IllegalStateException exception = assertThrows(IllegalStateException.class, () -> sunoApi.submitMusic(
                 new SunoApi.MusicRequest("a", null, null, null, "chirp-v4", false, null, null, null)));
         assertEquals("中转返回格式不正确", exception.getMessage());
+    }
+
+    // ========== submitMusic：apimax ==========
+
+    @Test
+    public void testSubmitMusic_apimaxInspiration() {
+        // 准备参数
+        sunoApi = createSunoApi(APIMAX_BASE_URL, API_KEY);
+        mockResponse(HttpStatus.OK, "{\"code\":\"success\",\"message\":\"\",\"data\":\"task_1\"}");
+        SunoApi.MusicRequest request = new SunoApi.MusicRequest("原创纯音乐", null, null, null,
+                "suno_music", true, null, null, null);
+
+        // 调用
+        String taskId = sunoApi.submitMusic(request);
+        // 断言：走原生接口
+        assertEquals("task_1", taskId);
+        ClientRequest clientRequest = captureRequest();
+        assertEquals(URI.create("https://api.apimax.ai/v1/music/generations"), clientRequest.url());
+        assertEquals("Bearer test-suno-key", clientRequest.headers().getFirst(HttpHeaders.AUTHORIZATION));
+        JsonNode body = JsonUtils.parseTree(readBody(clientRequest));
+        assertEquals("suno_music", body.get("model").asText());
+        assertEquals("原创纯音乐", body.get("prompt").asText());
+        assertTrue(body.get("instrumental").asBoolean());
+        assertFalse(body.has("lyrics"));
+        assertFalse(body.has("gpt_description_prompt"));
+        assertFalse(body.has("mv"));
+    }
+
+    @Test
+    public void testSubmitMusic_apimaxCustom() {
+        // 准备参数：根地址带结尾的 /
+        sunoApi = createSunoApi(APIMAX_BASE_URL + "/", API_KEY);
+        mockResponse(HttpStatus.OK, "{\"code\":\"success\",\"data\":\"task_2\"}");
+        SunoApi.MusicRequest request = new SunoApi.MusicRequest(null, "[Verse]\n歌词", "pop", "夏日",
+                "suno_music", false, null, null, null);
+
+        // 调用
+        sunoApi.submitMusic(request);
+        // 断言：歌词放 lyrics，风格放 style
+        ClientRequest clientRequest = captureRequest();
+        assertEquals(URI.create("https://api.apimax.ai/v1/music/generations"), clientRequest.url());
+        JsonNode body = JsonUtils.parseTree(readBody(clientRequest));
+        assertEquals("[Verse]\n歌词", body.get("lyrics").asText());
+        assertEquals("pop", body.get("style").asText());
+        assertEquals("夏日", body.get("title").asText());
+        assertFalse(body.get("instrumental").asBoolean());
+        assertFalse(body.has("prompt"));
+        assertFalse(body.has("tags"));
+    }
+
+    @Test
+    public void testSubmitMusic_apimaxCustomInstrumental() {
+        // 准备参数：与 AiMusicServiceImpl 自定义纯音乐的请求形状一致，歌词为空字符串
+        sunoApi = createSunoApi(APIMAX_BASE_URL, API_KEY);
+        mockResponse(HttpStatus.OK, "{\"code\":\"success\",\"data\":\"task_4\"}");
+        SunoApi.MusicRequest request = new SunoApi.MusicRequest(null, "", "lofi, piano", "夜晚",
+                "suno_music", true, null, null, null);
+
+        // 调用
+        sunoApi.submitMusic(request);
+        // 断言：风格作为描述 prompt，不传空 lyrics，style、title 照常传
+        ClientRequest clientRequest = captureRequest();
+        assertEquals(URI.create("https://api.apimax.ai/v1/music/generations"), clientRequest.url());
+        JsonNode body = JsonUtils.parseTree(readBody(clientRequest));
+        assertEquals("lofi, piano", body.get("prompt").asText());
+        assertEquals("lofi, piano", body.get("style").asText());
+        assertEquals("夜晚", body.get("title").asText());
+        assertTrue(body.get("instrumental").asBoolean());
+        assertFalse(body.has("lyrics"));
+    }
+
+    @Test
+    public void testSubmitMusic_apimaxExtend() {
+        // 准备参数：续写不走原生接口
+        sunoApi = createSunoApi(APIMAX_BASE_URL, API_KEY);
+        mockResponse(HttpStatus.OK, "{\"code\":\"success\",\"data\":\"task_3\"}");
+        SunoApi.MusicRequest request = new SunoApi.MusicRequest(null, "[Verse]\n歌词", "pop", "续写",
+                "suno_music", false, "task_1", "clip-1", 60);
+
+        // 调用
+        sunoApi.submitMusic(request);
+        // 断言：仍走兼容路径，续写字段原样传递
+        ClientRequest clientRequest = captureRequest();
+        assertEquals(URI.create("https://api.apimax.ai/suno/submit/music"), clientRequest.url());
+        JsonNode body = JsonUtils.parseTree(readBody(clientRequest));
+        assertEquals("task_1", body.get("task_id").asText());
+        assertEquals("clip-1", body.get("continue_clip_id").asText());
+        assertEquals("[Verse]\n歌词", body.get("prompt").asText());
+        assertFalse(body.has("lyrics"));
+    }
+
+    @Test
+    public void testSubmitMusic_apimaxSimilarDomain() {
+        // 准备参数：相近域名不是 apimax 官方 API
+        sunoApi = createSunoApi("https://api.apimax.ai.example.com", API_KEY);
+        mockResponse(HttpStatus.OK, "{\"code\":\"success\",\"data\":\"task-1\"}");
+
+        // 调用
+        sunoApi.submitMusic(new SunoApi.MusicRequest("a", null, null, null, "chirp-v4", false, null, null, null));
+        // 断言：走兼容路径
+        assertEquals(URI.create("https://api.apimax.ai.example.com/suno/submit/music"), captureRequest().url());
     }
 
     // ========== submitConcat、uploadAudioUrl ==========
@@ -303,13 +405,104 @@ public class SunoApiUnitTest extends BaseMockitoUnitTest {
         assertEquals(List.of("clip-1"), task2.data().stream().map(SunoApi.Clip::id).toList());
     }
 
+    @Test
+    public void testFetchTasks_infai() {
+        // mock 方法：InfAI 的歌曲，id 是中转的记录编号、clipId 才是歌曲编号，status 为整数，
+        // 地址为 cld2*Url，风格、歌词、时长在歌曲顶层
+        mockResponse(HttpStatus.OK, """
+                {"code":"success","data":[{"task_id":"task-1","action":"MUSIC","status":"SUCCESS","progress":"100%",
+                  "data":[{"id":"2120087722226888705","clipId":"clip-1","title":"夏日","status":30,"progress":100,
+                    "cld2AudioUrl":"https://cdn.example.com/1.m4a","cld2ImageUrl":"https://cdn.example.com/1.jpeg",
+                    "cld2VideoUrl":"https://cdn.example.com/1-video.mp4","duration":183.56,"tags":"pop","prompt":"[Verse] 1"},
+                   {"id":"2120087722226888706","clipId":"clip-2","title":"夏日","status":30,"progress":100,
+                    "cld2AudioUrl":"https://cdn.example.com/2.m4a","cld2ImageUrl":"https://cdn.example.com/2.jpeg",
+                    "cld2VideoUrl":"","duration":"175.2","tags":"pop","makeInstrumental":true}]}]}
+                """);
+
+        // 调用
+        List<SunoApi.Task> tasks = sunoApi.fetchTasks(List.of("task-1"));
+        // 断言：请求
+        ClientRequest clientRequest = captureRequest();
+        assertRequest(clientRequest, "/suno/fetch");
+        JsonNode body = JsonUtils.parseTree(readBody(clientRequest));
+        assertEquals("task-1", body.get("ids").get(0).asText());
+        assertEquals("MUSIC", body.get("action").asText());
+        // 断言：两首歌曲
+        assertEquals(1, tasks.size());
+        assertTrue(tasks.get(0).isSuccess());
+        List<SunoApi.Clip> clips = tasks.get(0).data();
+        assertEquals(2, clips.size());
+        // 断言：歌曲编号取 clipId，不取中转的记录编号 id；整数 status 读为字符串
+        SunoApi.Clip clip1 = clips.get(0);
+        assertEquals("clip-1", clip1.id());
+        assertEquals("30", clip1.status());
+        assertEquals("https://cdn.example.com/1.m4a", clip1.audioUrl());
+        assertEquals("https://cdn.example.com/1.jpeg", clip1.coverUrl());
+        assertEquals("https://cdn.example.com/1-video.mp4", clip1.videoUrl());
+        assertEquals(183.56, clip1.metadata().duration());
+        assertEquals("pop", clip1.metadata().tags());
+        assertEquals("[Verse] 1", clip1.metadata().prompt());
+        assertNull(clip1.errorMessage());
+        SunoApi.Clip clip2 = clips.get(1);
+        assertEquals("clip-2", clip2.id());
+        assertEquals("30", clip2.status());
+        assertEquals("https://cdn.example.com/2.m4a", clip2.audioUrl());
+        assertEquals("https://cdn.example.com/2.jpeg", clip2.coverUrl());
+        assertEquals("", clip2.videoUrl());
+        assertEquals(175.2, clip2.metadata().duration());
+        assertNull(clip2.metadata().prompt());
+        assertNull(clip2.errorMessage());
+    }
+
+    @Test
+    public void testFetchTasks_salpx() {
+        // mock 方法：SalpX 的 data 为对象，clips 以歌曲编号为键，sunoData 是同一批歌曲
+        mockResponse(HttpStatus.OK, """
+                {"code":"success","data":[{"task_id":"task-1","action":"MUSIC","status":"SUCCESS","progress":"100%",
+                  "data":{"task_id":"task-1","status":"SUCCESS",
+                    "clips":{
+                      "clip-1":{"id":"clip-1","clip_id":"clip-1","title":"夏日","status":"complete",
+                        "audio_url":"https://cdn.example.com/1.mp3","image_url":"https://cdn.example.com/1.png",
+                        "image_large_url":"https://cdn.example.com/1-large.png","video_url":"","model_name":"chirp-v6",
+                        "metadata":{"tags":"pop","prompt":"[Verse] 1","duration":201.5,"error_message":null}},
+                      "clip-2":{"id":"clip-2","clip_id":"clip-2","title":"夏日","status":"complete",
+                        "audio_url":"https://cdn.example.com/2.mp3","image_url":"https://cdn.example.com/2.png",
+                        "metadata":{"tags":"pop","prompt":"[Verse] 2","duration":198.0}}},
+                    "sunoData":[{"id":"clip-1","audio_url":"https://cdn.example.com/1.mp3"},
+                                {"id":"clip-2","audio_url":"https://cdn.example.com/2.mp3"}]}}]}
+                """);
+
+        // 调用
+        List<SunoApi.Task> tasks = sunoApi.fetchTasks(List.of("task-1"));
+        // 断言：只解析 clips，不因 sunoData 重复
+        assertEquals(1, tasks.size());
+        assertTrue(tasks.get(0).isSuccess());
+        List<SunoApi.Clip> clips = tasks.get(0).data();
+        assertEquals(List.of("clip-1", "clip-2"), clips.stream().map(SunoApi.Clip::id).toList());
+        SunoApi.Clip clip1 = clips.get(0);
+        assertEquals("https://cdn.example.com/1.mp3", clip1.audioUrl());
+        assertEquals("https://cdn.example.com/1-large.png", clip1.coverUrl());
+        assertEquals(201.5, clip1.metadata().duration());
+        assertEquals("pop", clip1.metadata().tags());
+        assertEquals("[Verse] 1", clip1.metadata().prompt());
+        assertNull(clip1.errorMessage());
+        SunoApi.Clip clip2 = clips.get(1);
+        assertEquals("https://cdn.example.com/2.mp3", clip2.audioUrl());
+        assertEquals("https://cdn.example.com/2.png", clip2.coverUrl());
+        assertEquals(198.0, clip2.metadata().duration());
+    }
+
     // ========== 工具方法 ==========
 
     private SunoApi createSunoApi(String apiKey) {
+        return createSunoApi(BASE_URL, apiKey);
+    }
+
+    private SunoApi createSunoApi(String baseUrl, String apiKey) {
         WebClient.Builder builder = WebClient.builder().exchangeFunction(exchangeFunction);
         try (MockedStatic<WebClient> webClientMock = mockStatic(WebClient.class)) {
             webClientMock.when(WebClient::builder).thenReturn(builder);
-            return new SunoApi(BASE_URL, apiKey);
+            return new SunoApi(baseUrl, apiKey);
         }
     }
 

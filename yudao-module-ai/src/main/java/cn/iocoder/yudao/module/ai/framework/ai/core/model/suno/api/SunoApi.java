@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpRequest;
@@ -19,14 +20,15 @@ import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-// DONE @AI：不要提到 与 GeekAI 相同，geekai 这种
 /**
  * Suno API
  *
@@ -36,8 +38,11 @@ import java.util.regex.Pattern;
  * 1. 生成、续写（/suno/submit/music）与查询（/suno/fetch）为基础能力
  * 2. 拼接（/suno/submit/concat）、上传（/suno/uploads/audio-url）为扩展路径：New API 官方 SunoAPI 插件 1.1.0
  *    只接受 /suno/submit/{music|lyrics}，不支持这两项；需使用实现了对应路径的兼容中转，否则提交即失败
+ * 3. 例外：根地址为 apimax 官方 API（{@link #APIMAX_BASE_URL}）时，灵感、自定义的生成改走其原生接口 /v1/music/generations
+ *    （其 /suno/submit/music 会返回 400），续写、拼接、上传、查询仍走上述路径
  *
  * @see <a href="https://doc.newapi.pro/api/suno-music/">New API · Suno 音乐接口</a>
+ * @see <a href="https://apimax.ai/zh/docs/suno-submit-music">apimax · Suno 音乐生成</a>
  * @see <a href="https://github.com/QuantumNous/new-api-plugins/blob/main/plugins/tasks/sunoapi/1.1.0/plugin.js">New API 官方 SunoAPI 插件</a>
  * @author xiaoxin
  */
@@ -52,7 +57,6 @@ public class SunoApi {
      * 中转返回成功的 code
      */
     private static final String CODE_SUCCESS = "success";
-    // DONE @AI：是不是可以去掉 500，有点过度了？（异常不再截断，由 Service 入库截断；仅日志限长）
     /**
      * 日志里保留的最大响应长度
      */
@@ -61,6 +65,19 @@ public class SunoApi {
      * 地址中的查询参数：上传时请求体、响应里可能带私有文件的签名地址，写日志前打码
      */
     private static final Pattern URL_QUERY_PATTERN = Pattern.compile("(https?://[^\\s?#\"'<>]+)\\?[^\\s\"'<>]*");
+    /**
+     * apimax 官方 API 根地址：整体精确匹配，避免误匹配相近域名或其它路径
+     */
+    private static final String APIMAX_BASE_URL = "https://api.apimax.ai";
+    /**
+     * 歌曲字段的其它写法（例如 InfAI）：key 为标准字段，value 为其它写法，参见 {@link #normalizeClip(ObjectNode)}
+     */
+    private static final Map<String, String> CLIP_FIELD_ALIASES = ImmutableMap.of(
+            "audio_url", "cld2AudioUrl", "image_url", "cld2ImageUrl", "video_url", "cld2VideoUrl");
+    /**
+     * 歌曲元数据的字段：没有 metadata 对象时，从歌曲顶层读取，参见 {@link #normalizeClip(ObjectNode)}
+     */
+    private static final List<String> CLIP_METADATA_FIELDS = Arrays.asList("tags", "prompt", "duration");
 
     private final Predicate<HttpStatusCode> STATUS_PREDICATE = status -> !status.is2xxSuccessful();
 
@@ -73,7 +90,6 @@ public class SunoApi {
                 HttpStatusCode status = response.statusCode();
                 log.error("[suno-api] 调用失败！请求方式:[{}]，请求路径:[{}]，响应状态:[{}]，错误摘要:[{}]",
                         request.getMethod(), request.getURI().getPath(), status.value(), buildLogText(parseMessage(responseBody)));
-                // DONE @AI：404、405 看看有没枚举，spring ai 里的（已用 HttpStatus）
                 // 404、405 通常是中转未实现该路径（例如官方 SunoAPI 插件没有上传、拼接），只给出路径，不暴露中转地址
                 if (status.isSameCodeAs(HttpStatus.NOT_FOUND) || status.isSameCodeAs(HttpStatus.METHOD_NOT_ALLOWED)) {
                     sink.error(new IllegalStateException(StrUtil.format("当前中转不支持该接口（HTTP {}）：{}",
@@ -84,11 +100,16 @@ public class SunoApi {
                         status.value(), parseMessage(responseBody))));
             });
 
+    /**
+     * 中转根地址：已去掉结尾的 /
+     */
+    private final String baseUrl;
     private final WebClient webClient;
 
     public SunoApi(String baseUrl, String apiKey) {
+        this.baseUrl = StrUtil.removeSuffix(baseUrl, "/");
         this.webClient = WebClient.builder()
-                .baseUrl(StrUtil.removeSuffix(baseUrl, "/"))
+                .baseUrl(this.baseUrl)
                 .defaultHeaders(httpHeaders -> {
                     httpHeaders.setContentType(MediaType.APPLICATION_JSON);
                     if (StrUtil.isNotEmpty(apiKey)) {
@@ -101,11 +122,29 @@ public class SunoApi {
     /**
      * 提交音乐生成：灵感、自定义、续写共用
      *
+     * apimax 官方 API 的灵感、自定义生成走原生接口；续写（带 taskId、continueClipId、continueAt 任一）仍走 /suno/submit/music
+     *
      * @param request 请求
      * @return 中转任务编号
      */
     public String submitMusic(MusicRequest request) {
+        boolean extend = request.taskId() != null || request.continueClipId() != null || request.continueAt() != null;
+        if (isApimax() && !extend) {
+            // 无歌词的纯音乐（自定义模式）：apimax 按 prompt 理解风格，只传 style 可能被忽略，所以没有描述时用风格作为描述
+            String lyrics = StrUtil.emptyToNull(request.prompt());
+            String prompt = lyrics == null && Boolean.TRUE.equals(request.makeInstrumental())
+                    ? StrUtil.blankToDefault(request.gptDescriptionPrompt(), request.tags()) : request.gptDescriptionPrompt();
+            return submit("/v1/music/generations", new ApimaxMusicRequest(request.mv(), prompt,
+                    lyrics, request.tags(), request.title(), request.makeInstrumental()));
+        }
         return submit("/suno/submit/music", request);
+    }
+
+    /**
+     * 是否为 apimax 官方 API：是的话，普通生成走原生接口
+     */
+    private boolean isApimax() {
+        return APIMAX_BASE_URL.equalsIgnoreCase(baseUrl);
     }
 
     /**
@@ -160,7 +199,6 @@ public class SunoApi {
         return tasks;
     }
 
-    // DONE @AI：方法注释
     /**
      * 解析单个任务：不是对象或缺少 task_id 时跳过
      *
@@ -178,19 +216,24 @@ public class SunoApi {
     }
 
     /**
-     * 解析任务的歌曲：只有数组才是歌曲列表（未完成时可能是提交确认对象），无法解析的歌曲逐首跳过
+     * 解析任务的歌曲，无法解析的歌曲逐首跳过
+     *
+     * 1. data 为数组：即歌曲列表
+     * 2. data 为对象：取其中的 clips（例如 SalpX，以歌曲编号为键的对象），同对象里的 sunoData 是同一批歌曲，不重复解析；
+     *    没有 clips 的（例如未完成时的提交确认对象），视为没有歌曲
      */
     private static List<Clip> parseClips(String taskId, JsonNode data) {
-        if (data == null || !data.isArray()) {
+        JsonNode clipNodes = data != null && data.isObject() ? data.get("clips") : data;
+        if (clipNodes == null || !(clipNodes.isArray() || clipNodes.isObject())) {
             return Collections.emptyList();
         }
-        List<Clip> clips = new ArrayList<>(data.size());
-        for (JsonNode node : data) {
+        List<Clip> clips = new ArrayList<>(clipNodes.size());
+        for (JsonNode node : clipNodes) {
             if (node == null || !node.isObject()) {
                 continue;
             }
             try {
-                clips.add(JsonUtils.parseObject(node.toString(), Clip.class));
+                clips.add(JsonUtils.parseObject(normalizeClip((ObjectNode) node).toString(), Clip.class));
             } catch (Exception e) {
                 log.warn("[suno-api][parseClips][task({}) 歌曲格式不正确，跳过]", taskId, e);
             }
@@ -198,12 +241,44 @@ public class SunoApi {
         return clips;
     }
 
+    /**
+     * 兼容歌曲字段的其它写法（例如 InfAI），转换为 {@link Clip} 的标准字段；已有标准字段时不覆盖
+     *
+     * 1. 歌曲编号为 clipId（续写时的 continue_clip_id），id 是中转自己的记录编号：有 clipId 时，用它作为 id
+     * 2. 音频、封面、视频地址为 cld2AudioUrl、cld2ImageUrl、cld2VideoUrl
+     * 3. 没有 metadata 对象，风格、歌词、时长在歌曲顶层
+     */
+    private static ObjectNode normalizeClip(ObjectNode node) {
+        ObjectNode clip = node.deepCopy();
+        String clipId = getText(clip, "clipId");
+        if (StrUtil.isNotBlank(clipId)) {
+            clip.put("id", clipId);
+        }
+        CLIP_FIELD_ALIASES.forEach((field, alias) -> {
+            if (!clip.hasNonNull(field) && clip.hasNonNull(alias)) {
+                clip.set(field, clip.get(alias));
+            }
+        });
+        if (!clip.path("metadata").isObject()) {
+            ObjectNode metadata = clip.objectNode();
+            for (String field : CLIP_METADATA_FIELDS) {
+                JsonNode value = clip.get(field);
+                if (value != null && value.isValueNode() && !value.isNull()) {
+                    metadata.set(field, value);
+                }
+            }
+            if (metadata.size() > 0) {
+                clip.set("metadata", metadata);
+            }
+        }
+        return clip;
+    }
+
     private static String getText(JsonNode node, String field) {
         JsonNode value = node.get(field);
         return value == null || value.isNull() || !value.isValueNode() ? null : value.asText();
     }
 
-    // DONE @AI：方法注释
     /**
      * 提交任务：生成、续写、拼接、上传共用
      *
@@ -296,6 +371,27 @@ public class SunoApi {
                                @JsonProperty("task_id") String taskId,
                                @JsonProperty("continue_clip_id") String continueClipId,
                                @JsonProperty("continue_at") Integer continueAt) {
+    }
+
+    /**
+     * apimax 原生的音乐生成请求
+     *
+     * 灵感模式传 prompt（歌曲描述）；自定义模式传 lyrics（歌词）、style、title
+     *
+     * @param model 模型标识，例如 suno_music
+     * @param prompt 歌曲描述（灵感模式），对应 {@link MusicRequest#gptDescriptionPrompt()}；无歌词的纯音乐没有描述时，取音乐风格
+     * @param lyrics 歌词（自定义模式），对应 {@link MusicRequest#prompt()}
+     * @param style 音乐风格，对应 {@link MusicRequest#tags()}
+     * @param title 歌曲名称
+     * @param instrumental 是否纯音乐
+     */
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public record ApimaxMusicRequest(String model,
+                                     String prompt,
+                                     String lyrics,
+                                     String style,
+                                     String title,
+                                     Boolean instrumental) {
     }
 
     /**
