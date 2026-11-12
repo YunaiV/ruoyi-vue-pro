@@ -11,6 +11,7 @@ import cn.hutool.http.HttpUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.music.vo.*;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiApiKeyDO;
@@ -28,14 +29,8 @@ import cn.iocoder.yudao.module.ai.util.AiChatUtils;
 import cn.iocoder.yudao.module.ai.util.FileTypeUtils;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.net.InetAddresses;
 import jakarta.annotation.Resource;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-import okio.BufferedSource;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
@@ -44,12 +39,8 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.net.SocketFactory;
-import java.io.IOException;
-import java.net.*;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
 
@@ -58,13 +49,14 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 import static cn.iocoder.yudao.framework.common.util.collection.SetUtils.asSet;
 import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.*;
 
-// TODO @AI：最好有 1. 2. 3 这样，更好理解；
 /**
  * AI 音乐 Service 实现类
  *
- * 提交时创建待处理记录（PENDING），取得中转任务编号后进入生成中（IN_PROGRESS）。
- * 中转生成成功后，每首歌曲单独进入转存中（SAVING），音频转存成功后置为已完成（SUCCESS）。
- * 确认任务失败或超时后置为已失败（FAIL）。
+ * 音乐的生成流程：
+ * 1. 提交：创建待处理（PENDING）的占位行，提交中转取得任务编号后，更新为生成中（IN_PROGRESS）
+ * 2. 查询：定时批量查询中转，生成成功后拆分为每首一行，有音频的更新为转存中（SAVING），参见 {@link #fetchMusic()}
+ * 3. 转存：把音频、封面转存到文件服务后，更新为已完成（SUCCESS），参见 {@link #transferMusic()}
+ * 4. 失败：中转确认失败、没有音频，或超过 {@link #TIMEOUT_MINUTES} 分钟未完成，更新为已失败（FAIL），参见 {@link #timeoutMusic()}
  *
  * @author xiaoxin
  */
@@ -90,22 +82,6 @@ public class AiMusicServiceImpl implements AiMusicService {
      * 允许上传的音频类型（按文件内容识别）：mp3、wav
      */
     private static final Set<String> UPLOAD_AUDIO_TYPES = asSet("audio/mpeg", "audio/vnd.wave");
-
-    /**
-     * 下载文件的最大字节数
-     */
-    // TODO @AI：不限制噢；（保留：文件服务没有大小限制，下载内容整体读入内存，不限制时异常大的文件会占满内存）
-    // TODO @AI：不限制；
-    private static final int MAX_DOWNLOAD_BYTES = 50 * 1024 * 1024;
-    // TODO @AI：使用 httputil 噢；简化下；（保留：hutool 基于 HttpURLConnection，无法在实际连接前校验 IP，会放行内网）
-    // TODO @AI：就按照我说的；
-    /**
-     * 下载文件的 HTTP 客户端：不走代理，自动跟随跳转；每次建立连接时校验实际连接的 IP，参见 {@link PublicSocketFactory}
-     */
-    private static final OkHttpClient DOWNLOAD_CLIENT = new OkHttpClient.Builder()
-            .proxy(Proxy.NO_PROXY).socketFactory(new PublicSocketFactory())
-            .connectTimeout(60, TimeUnit.SECONDS).readTimeout(60, TimeUnit.SECONDS)
-            .build();
 
     /**
      * 歌词提示词：第一行为歌曲名称，参见 {@link #parseLyric(String)}
@@ -141,21 +117,21 @@ public class AiMusicServiceImpl implements AiMusicService {
         AiModelDO model = validateMusicModel(reqVO.getModelId());
         AiApiKeyDO apiKey = apiKeyService.validateApiKey(model.getKeyId());
 
-        // 2. 插入占位行
+        // 2. 插入占位行：灵感模式只保留描述；自定义模式保留名称、风格、歌词（纯音乐不要歌词）
         boolean inspiration = Objects.equals(reqVO.getGenerateMode(), AiMusicGenerateModeEnum.INSPIRATION.getMode());
         boolean instrumental = Boolean.TRUE.equals(reqVO.getMakeInstrumental());
         AiMusicDO music = buildPendingMusic(userId, reqVO.getGenerateMode(), model, apiKey.getId())
-                .setPrompt(inspiration ? reqVO.getPrompt() : null)
-                .setLyric(inspiration || instrumental ? null : reqVO.getLyric())
-                .setTags(inspiration ? null : reqVO.getTags())
-                .setTitle(inspiration ? null : reqVO.getTitle())
                 .setMakeInstrumental(instrumental);
+        if (inspiration) {
+            music.setPrompt(reqVO.getPrompt());
+        } else {
+            music.setTitle(reqVO.getTitle()).setTags(reqVO.getTags()).setLyric(instrumental ? null : reqVO.getLyric());
+        }
         musicMapper.insert(music);
 
-        // 3. 提交中转
-        SunoApi.MusicRequest request = inspiration
-                ? new SunoApi.MusicRequest(music.getPrompt(), null, null, null, model.getModel(), instrumental, null, null, null)
-                : new SunoApi.MusicRequest(null, StrUtil.nullToEmpty(music.getLyric()), music.getTags(), music.getTitle(),
+        // 3. 提交中转：灵感模式不传歌词；自定义模式的歌词至少传空串
+        SunoApi.MusicRequest request = new SunoApi.MusicRequest(music.getPrompt(),
+                inspiration ? null : StrUtil.nullToEmpty(music.getLyric()), music.getTags(), music.getTitle(),
                 model.getModel(), instrumental, null, null, null);
         submitMusic(music, apiKey, sunoApi -> sunoApi.submitMusic(request));
         return music.getId();
@@ -206,10 +182,10 @@ public class AiMusicServiceImpl implements AiMusicService {
     }
 
     @Override
-    @SneakyThrows
     public Long uploadMusic(Long userId, AiMusicUploadReqVO reqVO) {
-        // 1.1 校验音频：按文件内容识别类型，只接受 mp3、wav
-        byte[] content = reqVO.getFile().getBytes();
+        // 1.1 校验音频：按文件内容识别类型，只接受 mp3、wav；私有存储时使用预签名地址
+        String accessUrl = fileApi.presignGetUrlQuietly(reqVO.getFileUrl());
+        byte[] content = HttpUtil.downloadBytes(accessUrl);
         if (!UPLOAD_AUDIO_TYPES.contains(FileTypeUtils.getMineType(content))) {
             throw exception(MUSIC_UPLOAD_FILE_INVALID);
         }
@@ -217,29 +193,18 @@ public class AiMusicServiceImpl implements AiMusicService {
         AiModelDO model = validateMusicModel(reqVO.getModelId());
         AiApiKeyDO apiKey = apiKeyService.validateApiKey(model.getKeyId());
 
-        // 2. 转存到文件服务：交给中转的只有文件服务的地址，不接受调用方传入的地址
-        String fileUrl = fileApi.createFile(content);
-
-        // 3. 插入占位行：提交前先记录文件地址
+        // 2. 插入占位行：提交前先记录文件地址；名称默认取文件名
+        String title = StrUtil.blankToDefault(reqVO.getTitle(), FileUtil.mainName(HttpUtils.decodeUrlPath(
+                HttpUtils.removeUrlPathQueryAndFragment(reqVO.getFileUrl()))));
         AiMusicDO music = buildPendingMusic(userId, AiMusicGenerateModeEnum.UPLOAD.getMode(), model, apiKey.getId())
-                .setTitle(StrUtil.blankToDefault(reqVO.getTitle(), FileUtil.mainName(reqVO.getFile().getOriginalFilename())))
-                .setAudioUrl(fileUrl).setMakeInstrumental(false);
+                .setTitle(title).setAudioUrl(reqVO.getFileUrl()).setMakeInstrumental(false);
         musicMapper.insert(music);
 
-        // 4. 提交中转：中转需要能访问该地址，私有存储时使用预签名地址；本地等存储不支持预签名，直接使用原地址
-        // DONE @AI：别的模块，目前有这么搞么？presignGetUrl？如果没有，我们先简化掉；（OA 文件、PMS 文档分享也在用；只有 S3 实现，本地等存储抛 UnsupportedOperationException，所以保留兜底）
-        String accessUrl;
-        try {
-            accessUrl = fileApi.presignGetUrl(fileUrl, null);
-        } catch (UnsupportedOperationException e) {
-            accessUrl = fileUrl;
-        }
-        String finalAccessUrl = accessUrl;
-        submitMusic(music, apiKey, sunoApi -> sunoApi.uploadAudioUrl(finalAccessUrl));
+        // 3. 提交中转：中转需要能访问该地址，使用上面的预签名地址
+        submitMusic(music, apiKey, sunoApi -> sunoApi.uploadAudioUrl(accessUrl));
         return music.getId();
     }
 
-    // DONE @AI：方法内注释；看看要不要拆几个点；
     @Override
     public AiMusicLyricRespVO generateLyric(Long userId, AiMusicLyricReqVO reqVO) {
         // 1.1 获得默认的对话模型
@@ -372,40 +337,25 @@ public class AiMusicServiceImpl implements AiMusicService {
     @Override
     public void updateMyMusic(AiMusicUpdateMyReqVO updateReqVO, Long userId) {
         // 1. 校验：本人、已完成
-        AiMusicDO music = validateMusicExists(updateReqVO.getId());
-        if (ObjUtil.notEqual(music.getUserId(), userId)) {
-            throw exception(MUSIC_NOT_EXISTS);
-        }
-        if (ObjUtil.notEqual(music.getStatus(), AiMusicStatusEnum.SUCCESS.getStatus())) {
-            throw exception(MUSIC_STATUS_NOT_SUCCESS);
-        }
+        validateMusicSuccess(validateMyMusicExists(updateReqVO.getId(), userId));
 
         // 2. 更新
-        // DONE @AI：StrUtil.emptyToNull(StrUtil.trim(、StrUtil.emptyToNull( 类似这种都去掉，简化下；
         musicMapper.updateById(BeanUtils.toBean(updateReqVO, AiMusicDO.class));
     }
 
     @Override
     public void deleteMusicMy(Long id, Long userId) {
         // 1. 校验：本人、已结束
-        AiMusicDO music = validateMusicExists(id);
-        if (ObjUtil.notEqual(music.getUserId(), userId)) {
-            throw exception(MUSIC_NOT_EXISTS);
-        }
-        validateMusicFinished(music);
+        validateMusicFinished(validateMyMusicExists(id, userId));
 
         // 2. 删除记录
         musicMapper.deleteById(id);
     }
 
-    // DONE @AI：方法内注释；
     @Override
     public void playMusic(Long id, Long userId) {
         // 1. 校验：可见、已完成
-        AiMusicDO music = validateMusicVisible(id, userId);
-        if (ObjUtil.notEqual(music.getStatus(), AiMusicStatusEnum.SUCCESS.getStatus())) {
-            throw exception(MUSIC_STATUS_NOT_SUCCESS);
-        }
+        validateMusicSuccess(validateMusicVisible(id, userId));
 
         // 2. 增加播放次数
         musicMapper.updatePlayCountIncr(id);
@@ -444,10 +394,7 @@ public class AiMusicServiceImpl implements AiMusicService {
     @Override
     public void updateMusic(AiMusicUpdateReqVO updateReqVO) {
         // 校验存在、已完成
-        AiMusicDO music = validateMusicExists(updateReqVO.getId());
-        if (ObjUtil.notEqual(music.getStatus(), AiMusicStatusEnum.SUCCESS.getStatus())) {
-            throw exception(MUSIC_STATUS_NOT_SUCCESS);
-        }
+        validateMusicSuccess(validateMusicExists(updateReqVO.getId()));
         // 更新
         musicMapper.updateById(new AiMusicDO().setId(updateReqVO.getId()).setPublicStatus(updateReqVO.getPublicStatus()));
     }
@@ -468,9 +415,26 @@ public class AiMusicServiceImpl implements AiMusicService {
         return music;
     }
 
+    /**
+     * 校验本人的作品存在：不是本人的，按不存在处理
+     */
+    private AiMusicDO validateMyMusicExists(Long id, Long userId) {
+        AiMusicDO music = validateMusicExists(id);
+        if (ObjUtil.notEqual(music.getUserId(), userId)) {
+            throw exception(MUSIC_NOT_EXISTS);
+        }
+        return music;
+    }
+
     private static void validateMusicFinished(AiMusicDO music) {
         if (AiMusicStatusEnum.isRunning(music.getStatus())) {
             throw exception(MUSIC_STATUS_NOT_FINISHED);
+        }
+    }
+
+    private static void validateMusicSuccess(AiMusicDO music) {
+        if (ObjUtil.notEqual(music.getStatus(), AiMusicStatusEnum.SUCCESS.getStatus())) {
+            throw exception(MUSIC_STATUS_NOT_SUCCESS);
         }
     }
 
@@ -478,18 +442,20 @@ public class AiMusicServiceImpl implements AiMusicService {
 
     @Override
     public int syncMusic() {
-        // 三步互相独立：任一步异常都不影响其它步骤
         int count = 0;
+        // 1. 查询中转：生成成功的拆分为每首一行；各步互相独立，异常不影响后续步骤
         try {
             count += fetchMusic();
         } catch (Exception e) {
             log.error("[syncMusic][查询中转异常]", e);
         }
+        // 2. 转存：把音频、封面转存到文件服务
         try {
             count += transferMusic();
         } catch (Exception e) {
             log.error("[syncMusic][转存异常]", e);
         }
+        // 3. 超时：超过时限未完成的，置为已失败
         try {
             count += timeoutMusic();
         } catch (Exception e) {
@@ -499,18 +465,15 @@ public class AiMusicServiceImpl implements AiMusicService {
     }
 
     /**
-     * ① 查询：生成中、且未拆分的占位行，按提交时绑定的密钥分组，批量查询中转
+     * 流程 2. 查询：生成中、且未拆分的占位行，按提交时绑定的密钥分组，批量查询中转
      *
      * @return 处理的数量
      */
-    // DONE @AI：方法内注释；
-    // DONE @AI：看看一些能不能使用 CollectionUtils 简化；别的方法也是；
     @VisibleForTesting
     int fetchMusic() {
         // 1. 查询生成中、且未拆分的占位行
         List<AiMusicDO> list = musicMapper.selectListForFetch(AiMusicStatusEnum.IN_PROGRESS.getStatus(), SYNC_LIMIT);
         // 2. 按密钥分组查询：某个渠道异常（例如中转地址配置错误）时，只跳过该渠道，下轮重试
-        // DONE @AI：先转换出来，再 for 循环；convertMultiMap(list, AiMusicDO::getApiKeyId).entrySet())
         Map<Long, List<AiMusicDO>> musicMap = convertMultiMap(list, AiMusicDO::getApiKeyId);
         int count = 0;
         for (Map.Entry<Long, List<AiMusicDO>> entry : musicMap.entrySet()) {
@@ -589,7 +552,6 @@ public class AiMusicServiceImpl implements AiMusicService {
             Set<String> clipIds = new HashSet<>();
             List<SunoApi.Clip> clips = filterList(task.data(),
                     clip -> clip != null && StrUtil.isNotBlank(clip.id()) && clipIds.add(clip.id()));
-            // DONE @AI：CollUtil 类似的，都改成这种判断噢；
             if (CollUtil.isEmpty(clips)) {
                 updateMusicFail(music.getId(), AiMusicStatusEnum.IN_PROGRESS.getStatus(), "中转返回成功，但没有有效的歌曲");
                 return;
@@ -612,7 +574,7 @@ public class AiMusicServiceImpl implements AiMusicService {
     }
 
     /**
-     * ② 拆分：占位行更新为第 1 首，其余首新增行，共享 task_id；单事务、不做文件下载。
+     * 流程 2. 查询（拆分）：占位行更新为第 1 首，其余首新增行，共享 task_id；单事务、不做文件下载。
      * 插入撞唯一键 (api_key_id, task_id, clip_id) 时抛出异常整体回滚
      *
      * @param music 占位行
@@ -646,8 +608,6 @@ public class AiMusicServiceImpl implements AiMusicService {
         SunoApi.Metadata metadata = clip.metadata();
         Double duration = metadata != null ? metadata.duration() : null;
         String videoUrl = HttpUtil.isHttp(clip.videoUrl()) || HttpUtil.isHttps(clip.videoUrl()) ? clip.videoUrl() : null;
-        // DONE @AI：一些 trim blank 看看简化掉，没必要哈；包括 128 1024 阶段，也先不弄；简化！
-        // （去掉 128、1024 截断：Suno 的名称、风格本身在字段长度内；名称、歌词、风格中转为空时沿用提交时的，保留）
         music.setClipId(clip.id()).setProgress(100)
                 .setTitle(StrUtil.blankToDefault(clip.title(), music.getTitle()))
                 .setLyric(metadata != null ? StrUtil.blankToDefault(metadata.prompt(), music.getLyric()) : music.getLyric())
@@ -665,7 +625,7 @@ public class AiMusicServiceImpl implements AiMusicService {
     }
 
     /**
-     * ③ 转存：逐行独立，把转存中的音频、封面存到文件服务；视频不转存。
+     * 流程 3. 转存：逐行独立，把转存中的音频、封面存到文件服务；视频不转存。
      * 失败时保持转存中，下轮重试；一直失败由超时兜底
      *
      * @return 转存成功的数量
@@ -688,14 +648,14 @@ public class AiMusicServiceImpl implements AiMusicService {
     /**
      * 转存一首：音频必须成功；封面可选，失败时置空，不阻塞完成
      */
-    private void transferMusic(AiMusicDO music) throws IOException {
+    private void transferMusic(AiMusicDO music) {
         // 1. 转存音频
-        String audioUrl = fileApi.createFile(downloadFile(music.getAudioUrl()));
+        String audioUrl = transferFile(music.getAudioUrl());
         // 2. 转存封面
         String coverUrl = null;
         if (StrUtil.isNotBlank(music.getCoverUrl())) {
             try {
-                coverUrl = fileApi.createFile(downloadFile(music.getCoverUrl()));
+                coverUrl = transferFile(music.getCoverUrl());
             } catch (Exception e) {
                 log.warn("[transferMusic][music({}) 封面转存失败，置空]", music.getId(), e);
             }
@@ -706,92 +666,18 @@ public class AiMusicServiceImpl implements AiMusicService {
                 .setStatus(AiMusicStatusEnum.SUCCESS.getStatus()).setFinishTime(LocalDateTime.now()));
     }
 
-    // TODO @AI：使用 hutool httputil 下载噢；（保留：原因同 DOWNLOAD_CLIENT）
     /**
-     * 下载中转返回的文件：只支持 http(s)，最多读取 {@link #MAX_DOWNLOAD_BYTES} 字节
+     * 转存中转返回的文件：下载后保存到文件服务
+     *
+     * @param url 中转返回的文件地址
+     * @return 文件服务的地址
      */
-    @VisibleForTesting
-    byte[] downloadFile(String url) throws IOException {
-        try (Response response = DOWNLOAD_CLIENT.newCall(new Request.Builder().url(url).build()).execute()) {
-            if (!response.isSuccessful()) {
-                throw new IOException("下载失败（HTTP " + response.code() + "）");
-            }
-            // 先缓冲到上限 + 1 字节：能缓冲到，说明超过上限
-            BufferedSource source = response.body().source();
-            if (source.request(MAX_DOWNLOAD_BYTES + 1L)) {
-                throw new IOException("文件超过 " + MAX_DOWNLOAD_BYTES + " 字节");
-            }
-            return source.readByteArray();
-        }
+    private String transferFile(String url) {
+        return fileApi.createFile(HttpUtil.downloadBytes(url));
     }
 
     /**
-     * 只连接公网地址的 SocketFactory：OkHttp 解析域名（或 IP 字面量）后，用选中的 IP 建立连接，
-     * 在真正连接前校验这个 IP，避免校验与连接各自解析、结果不一致；跳转后的每次连接同样经过这里
-     */
-    private static class PublicSocketFactory extends SocketFactory {
-
-        @Override
-        public Socket createSocket() {
-            return new Socket() {
-
-                @Override
-                public void connect(SocketAddress endpoint, int timeout) throws IOException {
-                    InetAddress address = ((InetSocketAddress) endpoint).getAddress();
-                    if (address == null || !isPublicAddress(address)) {
-                        throw new ConnectException("文件地址不是公网地址：" + endpoint);
-                    }
-                    super.connect(endpoint, timeout);
-                }
-
-            };
-        }
-
-        @Override
-        public Socket createSocket(String host, int port) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public Socket createSocket(String host, int port, InetAddress localHost, int localPort) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public Socket createSocket(InetAddress host, int port) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public Socket createSocket(InetAddress address, int port, InetAddress localAddress, int localPort) {
-            throw new UnsupportedOperationException();
-        }
-
-    }
-
-    // TODO @AI：去掉，有点冗余了；（保留：这是下载时唯一的内网限制，去掉后服务端可被引导访问内网）
-    /**
-     * 是否为公网地址：拒绝本机、内网、链路本地（含云元数据 169.254.169.254）、
-     * 运营商级 NAT（100.64.0.0/10，含阿里云元数据 100.100.100.200）、组播与保留地址；
-     * IPv6 只放行全球单播 2000::/3，内嵌 IPv4 的按内嵌地址判断
-     */
-    @VisibleForTesting
-    static boolean isPublicAddress(InetAddress address) {
-        if (address instanceof Inet6Address && InetAddresses.hasEmbeddedIPv4ClientAddress((Inet6Address) address)) {
-            address = InetAddresses.getEmbeddedIPv4ClientAddress((Inet6Address) address);
-        }
-        byte[] bytes = address.getAddress();
-        if (bytes.length == 16) {
-            return (bytes[0] & 0xE0) == 0x20;
-        }
-        int first = bytes[0] & 0xFF;
-        int second = bytes[1] & 0xFF;
-        return !address.isLoopbackAddress() && !address.isSiteLocalAddress() && !address.isLinkLocalAddress()
-                && first != 0 && first < 224 && !(first == 100 && second >= 64 && second < 128);
-    }
-
-    /**
-     * ④ 超时：待处理、生成中、转存中的，从创建时间起超过 {@link #TIMEOUT_MINUTES} 分钟，置为已失败
+     * 流程 4. 超时：待处理、生成中、转存中的，从创建时间起超过 {@link #TIMEOUT_MINUTES} 分钟，置为已失败
      *
      * @return 处理的数量
      */
@@ -802,9 +688,6 @@ public class AiMusicServiceImpl implements AiMusicService {
                 Arrays.asList(AiMusicStatusEnum.PENDING.getStatus(), AiMusicStatusEnum.IN_PROGRESS.getStatus(),
                         AiMusicStatusEnum.SAVING.getStatus()),
                 LocalDateTime.now().minusMinutes(TIMEOUT_MINUTES));
-        if (CollUtil.isEmpty(list)) {
-            return 0;
-        }
         // 2. 逐个置为已失败
         list.forEach(music -> updateMusicFail(music.getId(), music.getStatus(), "任务超时"));
         return list.size();

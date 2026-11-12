@@ -81,4 +81,19 @@ public interface ErrorCodeConstants {
     ErrorCode WORKFLOW_NOT_EXISTS = new ErrorCode(1_040_011_000, "工作流不存在");
     ErrorCode WORKFLOW_CODE_EXISTS = new ErrorCode(1_040_011_001, "工作流标识已存在");
 
+    // ========== AI PPT 1-040-012-000 ==========
+    ErrorCode PPT_NOT_EXISTS = new ErrorCode(1_040_012_000, "PPT 不存在");
+    ErrorCode PPT_IMAGE_MODEL_NOT_SUPPORTED = new ErrorCode(1_040_012_001, "操作失败，PPT 只支持 OpenAI、硅基流动、通义的绘图模型");
+    ErrorCode PPT_STATUS_IN_PROGRESS = new ErrorCode(1_040_012_006, "PPT 生成中，请稍后再试");
+    ErrorCode PPT_STATUS_NOT_FAIL = new ErrorCode(1_040_012_007, "只有已失败的 PPT 才能继续生成");
+    ErrorCode PPT_STATUS_NOT_SUCCESS = new ErrorCode(1_040_012_008, "只有已完成的 PPT 才能导出");
+    ErrorCode PPT_SLIDE_NOT_EXISTS = new ErrorCode(1_040_012_009, "第 {} 页不存在");
+    ErrorCode PPT_SLIDE_IMAGE_NOT_EXISTS = new ErrorCode(1_040_012_010, "第 {} 页还没有配图，请先继续生成");
+    ErrorCode PPT_SLIDE_VERSION_NOT_EXISTS = new ErrorCode(1_040_012_011, "第 {} 页没有该版本，请刷新后重试");
+    ErrorCode PPT_EXPORT_FORMAT_INVALID = new ErrorCode(1_040_012_012, "只支持导出 pptx、pdf 格式");
+    ErrorCode PPT_EXPORT_FAIL = new ErrorCode(1_040_012_013, "导出失败：{}");
+    ErrorCode PPT_IMAGE_MODEL_PLATFORM_MISMATCH = new ErrorCode(1_040_012_014,
+            "操作失败，绘图模型的平台（{}）与 API 密钥的平台（{}）不一致，请修改模型配置");
+    ErrorCode PPT_UPDATE_CONFLICT = new ErrorCode(1_040_012_015, "PPT 已被修改，请刷新后重试");
+
 }

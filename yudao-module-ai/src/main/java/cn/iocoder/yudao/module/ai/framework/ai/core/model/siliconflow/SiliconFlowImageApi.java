@@ -100,6 +100,7 @@ public class SiliconFlowImageApi {
 	public record SiliconflowImageRequest (
 			@JsonProperty("prompt") String prompt,
 			@JsonProperty("model") String model,
+			@JsonProperty("image_size") String imageSize,
 			@JsonProperty("batch_size") Integer batchSize,
 			@JsonProperty("negative_prompt") String negativePrompt,
 			@JsonProperty("seed") Integer seed,
@@ -108,7 +109,7 @@ public class SiliconFlowImageApi {
 			@JsonProperty("image") String image) {
 
 		public SiliconflowImageRequest(String prompt, String model) {
-			this(prompt, model, null, null, null, null, null, null);
+			this(prompt, model, null, null, null, null, null, null, null);
 		}
 	}
 

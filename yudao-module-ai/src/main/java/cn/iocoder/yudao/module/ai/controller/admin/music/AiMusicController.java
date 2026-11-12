@@ -63,8 +63,8 @@ public class AiMusicController {
     }
 
     @PostMapping("/upload")
-    @Operation(summary = "上传音乐", description = "音频先存到文件服务，再把文件服务生成的访问地址提交中转；生成后可续写")
-    public CommonResult<Long> uploadMusic(@Valid AiMusicUploadReqVO reqVO) {
+    @Operation(summary = "上传音乐", description = "音频先通过文件上传接口存到文件服务，再把文件地址提交中转；生成后可续写")
+    public CommonResult<Long> uploadMusic(@Valid @RequestBody AiMusicUploadReqVO reqVO) {
         return success(musicService.uploadMusic(getLoginUserId(), reqVO));
     }
 

@@ -38,6 +38,7 @@ import cn.iocoder.yudao.module.ai.service.model.AiModelService;
 import cn.iocoder.yudao.module.ai.service.model.AiToolService;
 import cn.iocoder.yudao.module.ai.service.requestlog.AiRequestLogServiceImpl;
 import cn.iocoder.yudao.module.ai.service.requestlog.dto.AiRequestLogCreateReqDTO;
+import cn.iocoder.yudao.module.ai.util.AiDocumentUtils;
 import lombok.Data;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -784,13 +785,16 @@ public class AiChatMessageServiceImplTest extends BaseMockitoUnitTest {
         // mock 对话、模型：自定义型号配置了 image
         mockMediaConversation(reqVO.getConversationId(), userId, AiPlatformEnum.DEEP_SEEK, TEXT_IMAGE);
         // mock 方法
-        when(knowledgeDocumentService.readUrl(eq(PDF_URL))).thenReturn("文档内容");
         when(chatModel.call(any(Prompt.class))).thenReturn(buildChatResponse());
 
-        try (MockedStatic<HttpUtil> httpUtilMock = mockStatic(HttpUtil.class)) {
+        try (MockedStatic<HttpUtil> httpUtilMock = mockStatic(HttpUtil.class);
+             MockedStatic<AiDocumentUtils> documentUtilsMock = mockStatic(AiDocumentUtils.class)) {
             httpUtilMock.when(() -> HttpUtil.downloadBytes(eq(IMAGE_URL))).thenReturn(IMAGE_BYTES);
+            documentUtilsMock.when(() -> AiDocumentUtils.readUrl(eq(PDF_URL))).thenReturn("文档内容");
             // 调用
             chatMessageService.sendMessage(reqVO, userId);
+            // 断言：图片不按文档读取
+            documentUtilsMock.verify(() -> AiDocumentUtils.readUrl(eq(IMAGE_URL)), never());
         }
         // 断言：图片和问题在同一条 UserMessage 中，以 Media 传输
         Prompt prompt = captureCallPrompt();
@@ -803,7 +807,6 @@ public class AiChatMessageServiceImplTest extends BaseMockitoUnitTest {
         UserMessage attachmentMessage = findUserMessage(prompt, "<Attachment");
         assertTrue(attachmentMessage.getText().contains("文档内容"));
         assertFalse(attachmentMessage.getText().contains("a.png"));
-        verify(knowledgeDocumentService, never()).readUrl(eq(IMAGE_URL));
     }
 
     @Test
@@ -966,15 +969,16 @@ public class AiChatMessageServiceImplTest extends BaseMockitoUnitTest {
         // mock 方法
         when(chatModel.call(any(Prompt.class))).thenReturn(buildChatResponse());
 
-        try (MockedStatic<HttpUtil> httpUtilMock = mockStatic(HttpUtil.class)) {
+        try (MockedStatic<HttpUtil> httpUtilMock = mockStatic(HttpUtil.class);
+             MockedStatic<AiDocumentUtils> documentUtilsMock = mockStatic(AiDocumentUtils.class)) {
             // 调用：不拒绝
             chatMessageService.sendMessage(reqVO, userId);
-            // 断言：视频不当作图片下载
+            // 断言：视频不当作图片下载，沿用原 Attachment 逻辑读取
             httpUtilMock.verify(() -> HttpUtil.downloadBytes(any(String.class)), never());
+            documentUtilsMock.verify(() -> AiDocumentUtils.readUrl(eq(VIDEO_URL)));
         }
-        // 断言：没有 Media，视频沿用原 Attachment 逻辑
+        // 断言：没有 Media
         assertNoMedia(captureCallPrompt());
-        verify(knowledgeDocumentService).readUrl(eq(VIDEO_URL));
     }
 
     @Test

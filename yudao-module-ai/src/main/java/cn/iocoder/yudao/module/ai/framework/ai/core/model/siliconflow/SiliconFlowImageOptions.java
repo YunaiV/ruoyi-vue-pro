@@ -73,18 +73,16 @@ public class SiliconFlowImageOptions implements ImageOptions {
      */
     private Integer height;
 
-    public void setHeight(Integer height) {
-        this.height = height;
-        if (this.width != null && this.height != null) {
-            this.imageSize = this.width + "x" + this.height;
+    /**
+     * 获得图片尺寸：设置了宽、高时，使用「宽x高」
+     *
+     * 在 getter 里拼接，因为 builder 不会调用 setter；序列化时也使用该方法
+     */
+    public String getImageSize() {
+        if (width != null && height != null) {
+            return width + "x" + height;
         }
-    }
-
-    public void setWidth(Integer width) {
-        this.width = width;
-        if (this.width != null && this.height != null) {
-            this.imageSize = this.width + "x" + this.height;
-        }
+        return imageSize;
     }
 
     @Override

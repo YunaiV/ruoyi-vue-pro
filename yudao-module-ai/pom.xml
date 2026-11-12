@@ -179,6 +179,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <!-- PDFBox：AI PPT 导出 PDF；POI（导出 PPTX）由 yudao-spring-boot-starter-excel 引入 -->
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+        </dependency>
 
         <!-- MCP 相关 -->
         <!--

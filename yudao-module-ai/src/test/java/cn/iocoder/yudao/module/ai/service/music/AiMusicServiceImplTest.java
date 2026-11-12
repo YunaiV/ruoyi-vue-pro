@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.ai.service.music;
 
+import cn.hutool.core.io.IORuntimeException;
 import cn.hutool.extra.spring.SpringUtil;
+import cn.hutool.http.HttpUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.ai.controller.admin.music.vo.*;
@@ -16,20 +18,13 @@ import cn.iocoder.yudao.module.ai.framework.ai.core.model.suno.api.SunoApi;
 import cn.iocoder.yudao.module.ai.service.model.AiApiKeyService;
 import cn.iocoder.yudao.module.ai.service.model.AiModelService;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
-import com.google.common.net.InetAddresses;
-import com.sun.net.httpserver.HttpServer;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Spy;
-import org.springframework.mock.web.MockMultipartFile;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
@@ -37,7 +32,6 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.*;
@@ -350,44 +344,47 @@ public class AiMusicServiceImplTest extends BaseMockitoUnitTest {
 
     @Test
     public void testUploadMusic_success() {
-        // mock 方法：交给中转的是文件服务的预签名地址
+        // mock 方法：下载、交给中转的都是文件服务的预签名地址
         mockMusicModel();
         mockInsert();
-        when(fileApi.createFile(MP3_CONTENT)).thenReturn("https://files.example.com/a.mp3");
-        when(fileApi.presignGetUrl("https://files.example.com/a.mp3", null)).thenReturn("https://files.example.com/a.mp3?sign=1");
-        when(sunoApi.uploadAudioUrl("https://files.example.com/a.mp3?sign=1")).thenReturn("task-4");
+        when(fileApi.presignGetUrlQuietly("https://files.example.com/demo_1731.mp3")).thenReturn("https://files.example.com/demo_1731.mp3?sign=1");
+        when(sunoApi.uploadAudioUrl("https://files.example.com/demo_1731.mp3?sign=1")).thenReturn("task-4");
         // 准备参数：未传名称时使用文件名
-        AiMusicUploadReqVO reqVO = new AiMusicUploadReqVO().setModelId(MODEL_ID)
-                .setFile(new MockMultipartFile("file", "demo.mp3", "audio/mpeg", MP3_CONTENT));
+        AiMusicUploadReqVO reqVO = new AiMusicUploadReqVO().setModelId(MODEL_ID).setFileUrl("https://files.example.com/demo_1731.mp3");
 
-        // 调用
-        musicService.uploadMusic(USER_ID, reqVO);
-        // 断言：占位行记录文件服务地址（不带签名）
+        try (MockedStatic<HttpUtil> httpUtilMock = mockStatic(HttpUtil.class)) {
+            httpUtilMock.when(() -> HttpUtil.downloadBytes("https://files.example.com/demo_1731.mp3?sign=1")).thenReturn(MP3_CONTENT);
+            // 调用
+            musicService.uploadMusic(USER_ID, reqVO);
+        }
+        // 断言：占位行记录文件地址（不带签名），不再重复存文件
         AiMusicDO music = captureInsert();
         assertEquals(AiMusicGenerateModeEnum.UPLOAD.getMode(), music.getGenerateMode());
-        assertEquals("demo", music.getTitle());
-        assertEquals("https://files.example.com/a.mp3", music.getAudioUrl());
-        verify(sunoApi).uploadAudioUrl("https://files.example.com/a.mp3?sign=1");
+        assertEquals("demo_1731", music.getTitle());
+        assertEquals("https://files.example.com/demo_1731.mp3", music.getAudioUrl());
+        verify(sunoApi).uploadAudioUrl("https://files.example.com/demo_1731.mp3?sign=1");
+        verify(fileApi, never()).createFile(any(byte[].class));
     }
 
     @Test
     public void testUploadMusic_wav() {
-        // mock 方法
+        // mock 方法：本地等存储不支持预签名时，使用原地址
         mockMusicModel();
         mockInsert();
-        when(fileApi.createFile(WAV_CONTENT)).thenReturn("https://files.example.com/a.wav");
-        // 本地等存储不支持预签名时，使用原地址
-        when(fileApi.presignGetUrl("https://files.example.com/a.wav", null)).thenThrow(new UnsupportedOperationException());
+        when(fileApi.presignGetUrlQuietly("https://files.example.com/a.mp3")).thenReturn("https://files.example.com/a.mp3");
         when(sunoApi.uploadAudioUrl(any())).thenReturn("task-4");
         // 准备参数：文件名后缀与内容不符时，以内容为准
         AiMusicUploadReqVO reqVO = new AiMusicUploadReqVO().setModelId(MODEL_ID).setTitle("哼唱")
-                .setFile(new MockMultipartFile("file", "demo.mp3", "audio/mpeg", WAV_CONTENT));
+                .setFileUrl("https://files.example.com/a.mp3");
 
-        // 调用
-        musicService.uploadMusic(USER_ID, reqVO);
+        try (MockedStatic<HttpUtil> httpUtilMock = mockStatic(HttpUtil.class)) {
+            httpUtilMock.when(() -> HttpUtil.downloadBytes("https://files.example.com/a.mp3")).thenReturn(WAV_CONTENT);
+            // 调用
+            musicService.uploadMusic(USER_ID, reqVO);
+        }
         // 断言
         assertEquals("哼唱", captureInsert().getTitle());
-        verify(sunoApi).uploadAudioUrl("https://files.example.com/a.wav");
+        verify(sunoApi).uploadAudioUrl("https://files.example.com/a.mp3");
     }
 
     @Test
@@ -395,14 +392,16 @@ public class AiMusicServiceImplTest extends BaseMockitoUnitTest {
         // 准备参数：普通 ftyp 容器、网页、图片，后缀伪装成 mp3，都不是支持的音频
         List<byte[]> contents = List.of("\0\0\0 ftypisom\0\0\0\0".getBytes(StandardCharsets.ISO_8859_1),
                 "<html><body>demo</body></html>".getBytes(StandardCharsets.UTF_8), PNG_CONTENT);
+        when(fileApi.presignGetUrlQuietly("https://files.example.com/a.mp3")).thenReturn("https://files.example.com/a.mp3");
 
         for (byte[] content : contents) {
-            AiMusicUploadReqVO reqVO = new AiMusicUploadReqVO().setModelId(MODEL_ID)
-                    .setFile(new MockMultipartFile("file", "demo.mp3", "audio/mpeg", content));
-            // 调用，并断言异常：不存文件、不插入、不提交
-            assertServiceException(() -> musicService.uploadMusic(USER_ID, reqVO), MUSIC_UPLOAD_FILE_INVALID);
+            AiMusicUploadReqVO reqVO = new AiMusicUploadReqVO().setModelId(MODEL_ID).setFileUrl("https://files.example.com/a.mp3");
+            try (MockedStatic<HttpUtil> httpUtilMock = mockStatic(HttpUtil.class)) {
+                httpUtilMock.when(() -> HttpUtil.downloadBytes("https://files.example.com/a.mp3")).thenReturn(content);
+                // 调用，并断言异常：不插入、不提交
+                assertServiceException(() -> musicService.uploadMusic(USER_ID, reqVO), MUSIC_UPLOAD_FILE_INVALID);
+            }
         }
-        verify(fileApi, never()).createFile(any(byte[].class));
         verify(musicMapper, never()).insert(any(AiMusicDO.class));
         verify(sunoApi, never()).uploadAudioUrl(any());
     }
@@ -889,7 +888,7 @@ public class AiMusicServiceImplTest extends BaseMockitoUnitTest {
     // ========== 同步：转存、超时 ==========
 
     @Test
-    public void testTransferMusic_partialFail() throws Exception {
+    public void testTransferMusic_partialFail() {
         // mock 数据：第 1 首下载失败，第 2 首成功
         AiMusicDO music1 = new AiMusicDO().setId(1L).setStatus(AiMusicStatusEnum.SAVING.getStatus())
                 .setCoverUrl("https://cdn.example.com/1.png").setAudioUrl("https://cdn.example.com/1.mp3");
@@ -897,14 +896,19 @@ public class AiMusicServiceImplTest extends BaseMockitoUnitTest {
                 .setCoverUrl("https://cdn.example.com/2.png").setAudioUrl("https://cdn.example.com/2.mp3");
         when(musicMapper.selectListByStatus(eq(AiMusicStatusEnum.SAVING.getStatus()), anyInt()))
                 .thenReturn(List.of(music1, music2));
-        doThrow(new IOException("下载失败（HTTP 404）")).when(musicService).downloadFile("https://cdn.example.com/1.mp3");
-        doReturn(PNG_CONTENT).when(musicService).downloadFile("https://cdn.example.com/2.png");
-        doReturn(MP3_CONTENT).when(musicService).downloadFile("https://cdn.example.com/2.mp3");
         when(fileApi.createFile(PNG_CONTENT)).thenReturn("https://oss/2-cover.png");
         when(fileApi.createFile(MP3_CONTENT)).thenReturn("https://oss/2.mp3");
 
-        // 调用
-        assertEquals(1, musicService.transferMusic());
+        // mock 静态方法：第 1 首音频下载失败，第 2 首正常
+        try (MockedStatic<HttpUtil> httpUtilMock = mockStatic(HttpUtil.class)) {
+            httpUtilMock.when(() -> HttpUtil.downloadBytes("https://cdn.example.com/1.mp3"))
+                    .thenThrow(new IORuntimeException("下载失败（HTTP 404）"));
+            httpUtilMock.when(() -> HttpUtil.downloadBytes("https://cdn.example.com/2.png")).thenReturn(PNG_CONTENT);
+            httpUtilMock.when(() -> HttpUtil.downloadBytes("https://cdn.example.com/2.mp3")).thenReturn(MP3_CONTENT);
+
+            // 调用
+            assertEquals(1, musicService.transferMusic());
+        }
         // 断言：只有第 2 首完成，第 1 首保持转存中
         AiMusicDO update = captureUpdateForSave(2L);
         assertEquals(AiMusicStatusEnum.SUCCESS.getStatus(), update.getStatus());
@@ -915,17 +919,22 @@ public class AiMusicServiceImplTest extends BaseMockitoUnitTest {
     }
 
     @Test
-    public void testTransferMusic_coverFail() throws Exception {
+    public void testTransferMusic_coverFail() {
         // mock 数据：封面下载失败，音频正常
         AiMusicDO music = new AiMusicDO().setId(1L).setStatus(AiMusicStatusEnum.SAVING.getStatus())
                 .setCoverUrl("https://cdn.example.com/1.png").setAudioUrl("https://cdn.example.com/1.mp3");
         when(musicMapper.selectListByStatus(eq(AiMusicStatusEnum.SAVING.getStatus()), anyInt())).thenReturn(List.of(music));
-        doReturn(MP3_CONTENT).when(musicService).downloadFile("https://cdn.example.com/1.mp3");
-        doThrow(new IOException("下载失败（HTTP 404）")).when(musicService).downloadFile("https://cdn.example.com/1.png");
         when(fileApi.createFile(MP3_CONTENT)).thenReturn("https://oss/1.mp3");
 
-        // 调用
-        assertEquals(1, musicService.transferMusic());
+        // mock 静态方法：封面下载失败
+        try (MockedStatic<HttpUtil> httpUtilMock = mockStatic(HttpUtil.class)) {
+            httpUtilMock.when(() -> HttpUtil.downloadBytes("https://cdn.example.com/1.mp3")).thenReturn(MP3_CONTENT);
+            httpUtilMock.when(() -> HttpUtil.downloadBytes("https://cdn.example.com/1.png"))
+                    .thenThrow(new IORuntimeException("下载失败（HTTP 404）"));
+
+            // 调用
+            assertEquals(1, musicService.transferMusic());
+        }
         // 断言：封面置空，不阻塞完成
         AiMusicDO update = captureUpdateForSave(1L);
         assertEquals(AiMusicStatusEnum.SUCCESS.getStatus(), update.getStatus());
@@ -935,7 +944,7 @@ public class AiMusicServiceImplTest extends BaseMockitoUnitTest {
     }
 
     @Test
-    public void testTimeoutMusic() throws Exception {
+    public void testTimeoutMusic() {
         // mock 数据：待处理、生成中、转存中各一条超时
         AiMusicDO music1 = new AiMusicDO().setId(1L).setStatus(AiMusicStatusEnum.PENDING.getStatus());
         AiMusicDO music2 = new AiMusicDO().setId(2L).setStatus(AiMusicStatusEnum.IN_PROGRESS.getStatus());
@@ -944,59 +953,23 @@ public class AiMusicServiceImplTest extends BaseMockitoUnitTest {
         when(musicMapper.selectListByStatusAndCreateTimeLt(any(), any())).thenReturn(List.of(music1, music2, music3));
 
         // 调用
-        assertEquals(3, musicService.timeoutMusic());
-        // 断言：都按原状态条件更新为已失败，不再下载
+        int count;
+        try (MockedStatic<HttpUtil> httpUtilMock = mockStatic(HttpUtil.class)) {
+            count = musicService.timeoutMusic();
+            // 断言：只更新状态，不再下载文件
+            httpUtilMock.verify(() -> HttpUtil.downloadBytes(anyString()), never());
+        }
+        assertEquals(3, count);
+        // 断言：都按原状态条件更新为已失败
         for (AiMusicDO music : List.of(music1, music2, music3)) {
             AiMusicDO update = captureUpdateByIdAndStatus(music.getId(), music.getStatus());
             assertEquals(AiMusicStatusEnum.FAIL.getStatus(), update.getStatus());
             assertEquals("任务超时", update.getErrorMessage());
         }
-        verify(musicService, never()).downloadFile(any());
         // 断言：超时时间
         ArgumentCaptor<LocalDateTime> timeCaptor = ArgumentCaptor.forClass(LocalDateTime.class);
         verify(musicMapper).selectListByStatusAndCreateTimeLt(any(), timeCaptor.capture());
         assertTrue(timeCaptor.getValue().isBefore(LocalDateTime.now().minusMinutes(AiMusicServiceImpl.TIMEOUT_MINUTES - 1)));
-    }
-
-    // ========== 同步：下载 ==========
-
-    @Test
-    public void testDownloadFile_notPublic() throws Exception {
-        // 准备环境：本机服务，记录收到的请求
-        HttpServer server = HttpServer.create(new InetSocketAddress(InetAddress.getLoopbackAddress(), 0), 0);
-        int port = server.getAddress().getPort();
-        AtomicInteger requestCount = new AtomicInteger();
-        server.createContext("/", exchange -> {
-            requestCount.incrementAndGet();
-            exchange.sendResponseHeaders(200, MP3_CONTENT.length);
-            try (OutputStream out = exchange.getResponseBody()) {
-                out.write(MP3_CONTENT);
-            }
-        });
-        server.start();
-        try {
-            // 调用，并断言异常：直接写 IP、写域名，都在连接前拒绝
-            for (String url : List.of("http://127.0.0.1:" + port + "/1.mp3", "http://localhost:" + port + "/1.mp3",
-                    "http://[::ffff:127.0.0.1]:" + port + "/1.mp3")) {
-                assertThrows(IOException.class, () -> musicService.downloadFile(url), url);
-            }
-            assertEquals(0, requestCount.get());
-        } finally {
-            server.stop(0);
-        }
-    }
-
-    @Test
-    public void testIsPublicAddress() {
-        for (String ip : List.of("127.0.0.1", "10.1.2.3", "172.16.0.1", "192.168.0.1", "169.254.169.254", "0.0.0.0",
-                "100.64.0.1", "100.100.100.200", "224.0.0.1", "240.0.0.1",
-                "::", "::1", "fd00::1", "fe80::1", "ff02::1", "64:ff9b::7f00:1", // NAT64，内嵌 127.0.0.1
-                "2002:7f00:1::1")) { // 6to4，内嵌 127.0.0.1
-            assertFalse(AiMusicServiceImpl.isPublicAddress(InetAddresses.forString(ip)), ip);
-        }
-        for (String ip : List.of("8.8.8.8", "1.1.1.1", "100.128.0.1", "2606:4700:4700::1111")) {
-            assertTrue(AiMusicServiceImpl.isPublicAddress(InetAddresses.forString(ip)), ip);
-        }
     }
 
     // ========== 工具方法 ==========

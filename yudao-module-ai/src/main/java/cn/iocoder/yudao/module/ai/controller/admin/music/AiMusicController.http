@@ -51,23 +51,15 @@ tenant-id: {{adminTenantId}}
 
 ### 上传音乐
 POST {{baseUrl}}/ai/music/upload
-Content-Type: multipart/form-data; boundary=WebAppBoundary
+Content-Type: application/json
 Authorization: {{token}}
 tenant-id: {{adminTenantId}}
 
---WebAppBoundary
-Content-Disposition: form-data; name="modelId"
-
-1
---WebAppBoundary
-Content-Disposition: form-data; name="title"
-
-我的哼唱
---WebAppBoundary
-Content-Disposition: form-data; name="file"; filename="demo.mp3"
-
-< ./demo.mp3
---WebAppBoundary--
+{
+  "modelId": 1,
+  "fileUrl": "http://127.0.0.1:48080/admin-api/infra/file/4/get/demo.mp3",
+  "title": "我的哼唱"
+}
 
 ### 生成歌词
 POST {{baseUrl}}/ai/music/generate-lyric

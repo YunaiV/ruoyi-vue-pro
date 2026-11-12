@@ -68,6 +68,7 @@
         <commons-lang3.version>3.21.0</commons-lang3.version>
         <jsch.version>2.28.8</jsch.version>
         <tika-core.version>3.3.1</tika-core.version>
+        <pdfbox.version>3.0.8</pdfbox.version>
         <ip2region.version>2.7.0</ip2region.version>
         <bizlog-sdk.version>3.0.6</bizlog-sdk.version>
         <netty.version>4.2.19.Final</netty.version>
@@ -533,6 +534,11 @@
                 <groupId>org.apache.tika</groupId>
                 <artifactId>tika-core</artifactId> <!-- 文件类型的识别 -->
                 <version>${tika-core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.pdfbox</groupId>
+                <artifactId>pdfbox</artifactId> <!-- PDF 的生成 -->
+                <version>${pdfbox.version}</version>
             </dependency>
 
             <dependency>

@@ -22,6 +22,7 @@ import cn.iocoder.yudao.module.ai.service.knowledge.bo.AiKnowledgeSegmentSearchR
 import cn.iocoder.yudao.module.ai.service.knowledge.splitter.MarkdownQaSplitter;
 import cn.iocoder.yudao.module.ai.service.knowledge.splitter.SemanticTextSplitter;
 import cn.iocoder.yudao.module.ai.service.model.AiModelService;
+import cn.iocoder.yudao.module.ai.util.AiDocumentUtils;
 import com.alibaba.cloud.ai.dashscope.rerank.DashScopeRerankOptions;
 import com.alibaba.cloud.ai.model.RerankModel;
 import com.alibaba.cloud.ai.model.RerankRequest;
@@ -310,7 +311,7 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
     @Override
     public List<AiKnowledgeSegmentDO> splitContent(String url, Integer segmentMaxTokens) {
         // 1. 读取 URL 内容
-        String content = knowledgeDocumentService.readUrl(url);
+        String content = AiDocumentUtils.readUrl(url);
 
         // 2.1 自动检测文档类型并选择策略
         AiDocumentSplitStrategyEnum strategy = detectDocumentStrategy(content, url);

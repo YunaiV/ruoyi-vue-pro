@@ -90,14 +90,6 @@ public interface AiKnowledgeDocumentService {
     AiKnowledgeDocumentDO validateKnowledgeDocumentExists(Long id);
 
     /**
-     * 读取 URL 内容
-     *
-     * @param url URL
-     * @return 内容
-     */
-    String readUrl(String url);
-
-    /**
      * 获取文档列表
      *
      * @param ids 文档编号列表
