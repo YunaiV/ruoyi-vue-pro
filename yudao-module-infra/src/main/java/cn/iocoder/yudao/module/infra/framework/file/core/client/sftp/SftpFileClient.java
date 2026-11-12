@@ -11,7 +11,6 @@ import com.jcraft.jsch.JSch;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 
 /**
  * Sftp 文件客户端
@@ -83,7 +82,8 @@ public class SftpFileClient extends AbstractFileClient<SftpFileClientConfig> {
     }
 
     private String getFilePath(String path) {
-        return config.getBasePath() + File.separator + path;
+        // 远程 SFTP 路径固定使用 /，不能使用 File.separator（Windows 下为 \，会被 JSch 当作转义符去掉）
+        return config.getBasePath() + StrUtil.SLASH + path;
     }
 
     private synchronized void reconnectIfTimeout() {
