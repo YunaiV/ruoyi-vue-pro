@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.ClientResponse;
@@ -37,6 +38,11 @@ public class MidjourneyApi {
                 HttpRequest request = response.request();
                 log.error("[midjourney-api] 调用失败！请求方式:[{}]，请求地址:[{}]，请求参数:[{}]，响应数据: [{}]",
                         request.getMethod(), request.getURI(), reqParam, responseBody);
+                // 中转没有该接口（例如说不支持融图、换脸、局部重绘），转为明确的错误
+                if (response.statusCode().value() == HttpStatus.NOT_FOUND.value()) {
+                    sink.error(new IllegalStateException("[midjourney-api] 中转不支持该接口：" + request.getURI().getPath()));
+                    return;
+                }
                 sink.error(new IllegalStateException("[midjourney-api] 调用失败！"));
             });
 
@@ -87,6 +93,45 @@ public class MidjourneyApi {
             request.setNotifyHook(notifyUrl);
         }
         String response = post("/submit/action", request);
+        return JsonUtils.parseObject(response, SubmitResponse.class);
+    }
+
+    /**
+     * blend - 融图：2-5 张图片
+     *
+     * @param request 请求
+     * @return 提交结果
+     */
+    public SubmitResponse blend(BlendRequest request) {
+        if (StrUtil.isEmpty(request.notifyHook())) {
+            request = new BlendRequest(request.base64Array(), request.dimensions(), notifyUrl, request.state());
+        }
+        String response = post("/submit/blend", request);
+        return JsonUtils.parseObject(response, SubmitResponse.class);
+    }
+
+    /**
+     * swapFace - 换脸：把来源图的脸换到目标图上
+     *
+     * @param request 请求
+     * @return 提交结果
+     */
+    public SubmitResponse swapFace(SwapFaceRequest request) {
+        if (StrUtil.isEmpty(request.notifyHook())) {
+            request = new SwapFaceRequest(request.sourceBase64(), request.targetBase64(), notifyUrl, request.state());
+        }
+        String response = post("/insight-face/swap", request);
+        return JsonUtils.parseObject(response, SubmitResponse.class);
+    }
+
+    /**
+     * modal - 提交弹窗内容，例如说局部重绘的蒙版与提示词
+     *
+     * @param request 请求
+     * @return 提交结果
+     */
+    public SubmitResponse modal(ModalRequest request) {
+        String response = post("/submit/modal", request);
         return JsonUtils.parseObject(response, SubmitResponse.class);
     }
 
@@ -177,9 +222,49 @@ public class MidjourneyApi {
     }
 
     /**
+     * Blend 请求（融图）
+     *
+     * @param base64Array 图片 base64 数组，2-5 张
+     * @param dimensions 尺寸：PORTRAIT(2:3)、SQUARE(1:1)、LANDSCAPE(3:2)
+     * @param notifyHook 通知地址
+     * @param state 自定义参数
+     */
+    public record BlendRequest(List<String> base64Array,
+                               String dimensions,
+                               String notifyHook,
+                               String state) {
+    }
+
+    /**
+     * SwapFace 请求（换脸）
+     *
+     * @param sourceBase64 来源人脸图片 base64
+     * @param targetBase64 目标图片 base64
+     * @param notifyHook 通知地址
+     * @param state 自定义参数
+     */
+    public record SwapFaceRequest(String sourceBase64,
+                                  String targetBase64,
+                                  String notifyHook,
+                                  String state) {
+    }
+
+    /**
+     * Modal 请求（局部重绘等弹窗的提交）
+     *
+     * @param taskId 任务编号
+     * @param prompt 提示词
+     * @param maskBase64 蒙版 base64：黑底，白色为重绘区域
+     */
+    public record ModalRequest(String taskId,
+                               String prompt,
+                               String maskBase64) {
+    }
+
+    /**
      * Submit 统一返回
      *
-     * @param code 状态码: 1(提交成功), 21(已存在), 22(排队中), other(错误)
+     * @param code 状态码: 1(提交成功), 21(已存在 / 窗口等待), 22(排队中), other(错误)
      * @param description 描述
      * @param properties 扩展字段
      * @param result 任务ID
@@ -316,7 +401,11 @@ public class MidjourneyApi {
         /**
          * 多图混合
          */
-        BLEND
+        BLEND,
+        /**
+         * 换脸
+         */
+        SWAP_FACE
 
     }
 
@@ -336,6 +425,10 @@ public class MidjourneyApi {
          */
         SUBMITTED(1),
         /**
+         * 窗口等待（例如说：局部重绘等需要弹窗确认的操作）
+         */
+        MODAL(2),
+        /**
          * 执行中
          */
         IN_PROGRESS(3),
@@ -346,9 +439,29 @@ public class MidjourneyApi {
         /**
          * 成功
          */
-        SUCCESS(4);
+        SUCCESS(4),
+        /**
+         * 已取消
+         */
+        CANCEL(4);
 
         private final int order;
+
+    }
+
+    /**
+     * 局部重绘（Modal）的中转流程
+     */
+    public enum ModalProtocolEnum {
+
+        /**
+         * 先执行局部重绘（Inpaint）按钮，再用返回的任务编号提交蒙版
+         */
+        ACTION_THEN_MODAL,
+        /**
+         * 直接用来源任务编号提交蒙版
+         */
+        DIRECT_MODAL
 
     }
 

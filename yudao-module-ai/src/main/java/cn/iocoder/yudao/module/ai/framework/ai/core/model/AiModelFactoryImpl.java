@@ -58,6 +58,7 @@ import org.springframework.ai.document.MetadataMode;
 import org.springframework.ai.embedding.BatchingStrategy;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.embedding.observation.EmbeddingModelObservationConvention;
+import com.volcengine.ark.runtime.service.ArkService;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.model.anthropic.autoconfigure.AnthropicChatAutoConfiguration;
 import org.springframework.ai.model.azure.openai.autoconfigure.AzureOpenAiChatAutoConfiguration;
@@ -299,7 +300,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
     }
 
     @Override
-    public ImageModel getOrCreateImageModel(AiPlatformEnum platform, String rawApiKey, String rawUrl) {
+    public ImageModel getOrCreateImageModel(AiPlatformEnum platform, String rawApiKey, String rawUrl, String model) {
         String apiKey = resolveSpringPlaceholders(rawApiKey);
         String url = resolveSpringPlaceholders(rawUrl);
         // noinspection EnhancedSwitchMigration
@@ -311,7 +312,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
             case SILICON_FLOW:
                 return buildSiliconFlowImageModel(apiKey, url);
             case STABLE_DIFFUSION:
-                return buildStabilityAiImageModel(apiKey, url);
+                return buildStabilityAiImageModel(apiKey, url, model);
             default:
                 throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));
         }
@@ -327,6 +328,20 @@ public class AiModelFactoryImpl implements AiModelFactory {
             YudaoAiProperties.Midjourney properties = SpringUtil.getBean(YudaoAiProperties.class)
                     .getMidjourney();
             return new MidjourneyApi(url, apiKey, properties.getNotifyUrl());
+        });
+    }
+
+    @Override
+    public ArkService getOrCreateArkService(String rawApiKey, String rawUrl) {
+        final String apiKey = resolveSpringPlaceholders(rawApiKey);
+        final String url = resolveSpringPlaceholders(rawUrl);
+        String cacheKey = buildClientCacheKey(ArkService.class, AiPlatformEnum.DOU_BAO.getPlatform(), apiKey, url);
+        return Singleton.get(cacheKey, (Func0<ArkService>) () -> {
+            ArkService.Builder builder = ArkService.builder().apiKey(apiKey).timeout(Duration.ofMinutes(3));
+            if (StrUtil.isNotEmpty(url)) {
+                builder.baseUrl(url);
+            }
+            return builder.build();
         });
     }
 
@@ -629,9 +644,11 @@ public class AiModelFactoryImpl implements AiModelFactory {
     /**
      * 可参考 {@link StabilityAiImageAutoConfiguration} 的 stabilityAiImageModel 方法
      */
-    private StabilityAiImageModel buildStabilityAiImageModel(String apiKey, String url) {
+    private StabilityAiImageModel buildStabilityAiImageModel(String apiKey, String url, String model) {
         url = StrUtil.blankToDefault(url, StabilityAiApi.DEFAULT_BASE_URL);
-        StabilityAiApi stabilityAiApi = new StabilityAiApi(apiKey, StabilityAiApi.DEFAULT_IMAGE_MODEL, url);
+        // 注意：Stability AI 的模型拼接在请求路径中（/generation/{model}/text-to-image），只能在创建 API 时指定
+        model = StrUtil.blankToDefault(model, StabilityAiApi.DEFAULT_IMAGE_MODEL);
+        StabilityAiApi stabilityAiApi = new StabilityAiApi(apiKey, model, url);
         return new StabilityAiImageModel(stabilityAiApi);
     }
 

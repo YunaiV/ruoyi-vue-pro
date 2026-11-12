@@ -42,6 +42,16 @@ public interface ErrorCodeConstants {
     ErrorCode IMAGE_NOT_EXISTS = new ErrorCode(1_040_005_000, "图片不存在!");
     ErrorCode IMAGE_MIDJOURNEY_SUBMIT_FAIL = new ErrorCode(1_040_005_001, "Midjourney 提交失败!原因：{}");
     ErrorCode IMAGE_CUSTOM_ID_NOT_EXISTS = new ErrorCode(1_040_005_002, "Midjourney 按钮 customId 不存在! {}");
+    ErrorCode IMAGE_MODEL_PLATFORM_MISMATCH = new ErrorCode(1_040_005_003,
+            "操作失败，绘图模型的平台（{}）与 API 密钥的平台（{}）不一致，请修改模型配置");
+    ErrorCode IMAGE_MODEL_NOT_SUPPORTED = new ErrorCode(1_040_005_004, "操作失败，绘图模型({})不可用：{}");
+    ErrorCode IMAGE_OPTION_INVALID = new ErrorCode(1_040_005_005, "参数({})不合法：{}");
+    ErrorCode IMAGE_REFERENCE_COUNT_EXCEED = new ErrorCode(1_040_005_006, "图片数量不正确：需要 {} 张，当前 {} 张");
+    ErrorCode IMAGE_PUBLIC_NOT_EXISTS = new ErrorCode(1_040_005_007, "作品不存在或已取消公开");
+    ErrorCode IMAGE_PUBLIC_STATUS_FAIL = new ErrorCode(1_040_005_008, "只有已完成的作品才能公开");
+    ErrorCode IMAGE_MIDJOURNEY_ACTION_NOT_SUPPORTED = new ErrorCode(1_040_005_009, "Midjourney 按钮({})暂不支持");
+    ErrorCode IMAGE_MIDJOURNEY_SOURCE_INVALID = new ErrorCode(1_040_005_010, "来源作品还未完成，不能执行该操作");
+    ErrorCode IMAGE_OPTIMIZE_PROMPT_FAIL = new ErrorCode(1_040_005_011, "生成专业绘画指令失败，请稍后重试");
 
     // ========== API 音乐 1-040-006-000 ==========
     ErrorCode MUSIC_NOT_EXISTS = new ErrorCode(1_040_006_000, "音乐不存在!");

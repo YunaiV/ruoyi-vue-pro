@@ -11,6 +11,7 @@ import cn.iocoder.yudao.module.ai.enums.model.AiPlatformEnum;
 import dev.tinyflow.core.Tinyflow;
 import jakarta.validation.Valid;
 import org.springframework.ai.chat.model.ChatModel;
+import com.volcengine.ark.runtime.service.ArkService;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.vectorstore.VectorStore;
 
@@ -139,6 +140,22 @@ public interface AiModelService {
      * @return MidjourneyApi 对象
      */
     MidjourneyApi getMidjourneyApi(Long id);
+
+    /**
+     * 获得 MidjourneyApi 对象：使用绘图记录绑定的 API 密钥
+     *
+     * @param apiKey API 密钥
+     * @return MidjourneyApi 对象
+     */
+    MidjourneyApi getMidjourneyApi(AiApiKeyDO apiKey);
+
+    /**
+     * 获得火山方舟 ArkService 对象（豆包 Seedream 绘图）
+     *
+     * @param id 编号
+     * @return ArkService 对象
+     */
+    ArkService getArkService(Long id);
 
     /**
      * 获得 SunoApi 对象

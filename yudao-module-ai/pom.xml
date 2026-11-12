@@ -23,6 +23,10 @@
         <!-- https://mvnrepository.com/artifact/com.alibaba.cloud.ai/spring-ai-alibaba -->
         <alibaba-ai.version>1.1.2.2</alibaba-ai.version>
         <tinyflow.version>1.2.6</tinyflow.version>
+        <!-- https://mvnrepository.com/artifact/com.volcengine/volcengine-java-sdk-ark-runtime -->
+        <!-- 注意：使用 volcengine-java-sdk-ark-runtime 系列（2.0.0 起兼容 Jackson 2.20+ 的 PropertyNamingStrategies），
+             与 TinyFlow 间接依赖的同名构件统一为该版本；不使用 com.volcengine:ark-runtime（0.17.0 仍引用已移除的 SNAKE_CASE） -->
+        <volcengine-ark-runtime.version>2.0.34</volcengine-ark-runtime.version>
     </properties>
 
     <dependencyManagement>
@@ -54,6 +58,10 @@
         <dependency>
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-biz-tenant</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-spring-boot-starter-protection</artifactId>
         </dependency>
 
         <!-- Web 相关 -->
@@ -128,6 +136,12 @@
             <groupId>com.alibaba.cloud.ai</groupId>
             <artifactId>spring-ai-alibaba-starter-dashscope</artifactId>
             <version>${alibaba-ai.version}</version>
+        </dependency>
+        <dependency>
+            <!-- 火山方舟：豆包 Seedream 绘图 -->
+            <groupId>com.volcengine</groupId>
+            <artifactId>volcengine-java-sdk-ark-runtime</artifactId>
+            <version>${volcengine-ark-runtime.version}</version>
         </dependency>
         <!-- 向量存储：https://db-engines.com/en/ranking/vector+dbms -->
         <dependency>

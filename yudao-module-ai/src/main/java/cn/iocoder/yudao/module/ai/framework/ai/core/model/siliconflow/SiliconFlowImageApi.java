@@ -103,7 +103,7 @@ public class SiliconFlowImageApi {
 			@JsonProperty("image_size") String imageSize,
 			@JsonProperty("batch_size") Integer batchSize,
 			@JsonProperty("negative_prompt") String negativePrompt,
-			@JsonProperty("seed") Integer seed,
+			@JsonProperty("seed") Long seed,
 			@JsonProperty("num_inference_steps") Integer numInferenceSteps,
 			@JsonProperty("guidance_scale") Float guidanceScale,
 			@JsonProperty("image") String image) {

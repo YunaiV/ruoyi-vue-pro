@@ -1,14 +1,10 @@
 package cn.iocoder.yudao.module.ai.controller.admin.image.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Data;
-import org.springframework.ai.openai.OpenAiImageOptions;
-import org.springframework.ai.stabilityai.api.StabilityAiImageOptions;
 
-import java.util.Map;
+import java.util.List;
 
 @Schema(description = "管理后台 - AI 绘画 Request VO")
 @Data
@@ -23,27 +19,54 @@ public class AiImageDrawReqVO {
     @Size(max = 1200, message = "提示词最大 1200")
     private String prompt;
 
-    /**
-     * 1. dall-e-2 模型：256x256、512x512、1024x1024
-     * 2. dall-e-3 模型：1024x1024, 1792x1024, 或 1024x1792
-     */
-    @Schema(description = "图片高度")
-    @NotNull(message = "图片高度不能为空")
-    private Integer height;
+    @Schema(description = "不希望出现的内容", example = "文字、水印")
+    @Size(max = 2000, message = "不希望出现的内容最大 2000")
+    private String negativePrompt;
 
-    @Schema(description = "图片宽度")
-    @NotNull(message = "图片宽度不能为空")
+    @Schema(description = "参考图地址数组")
+    @Size(max = 10, message = "参考图最多 10 张")
+    private List<String> referenceImageUrls;
+
+    // ========== 尺寸：固定尺寸、像素宽高使用 width / height；Seedream 档位使用 sizeLevel ==========
+
+    @Schema(description = "图片宽度", example = "1024")
+    @Min(value = 1, message = "图片宽度最小 1")
     private Integer width;
 
-    // ========== 各平台绘画的拓展参数 ==========
+    @Schema(description = "图片高度", example = "1024")
+    @Min(value = 1, message = "图片高度最小 1")
+    private Integer height;
 
-    /**
-     * 绘制参数，不同 platform 的不同参数
-     *
-     * 1. {@link OpenAiImageOptions}
-     * 2. {@link StabilityAiImageOptions}
-     */
-    @Schema(description = "绘制参数")
-    private Map<String, String> options;
+    @Schema(description = "尺寸档位（Seedream）", example = "2K")
+    private String sizeLevel;
+
+    @Schema(description = "比例（只用于回填）", example = "1:1")
+    private String aspectRatio;
+
+    // ========== 画质、高级参数：前端按模型开放 ==========
+
+    @Schema(description = "画质（OpenAI）", example = "hd")
+    private String quality;
+
+    @Schema(description = "随机种子（硅基、Stability）", example = "0")
+    @Min(value = 0, message = "随机种子最小 0")
+    private Long seed;
+
+    @Schema(description = "推理步数（硅基、Stability）", example = "30")
+    @Min(value = 1, message = "推理步数最小 1")
+    private Integer steps;
+
+    @Schema(description = "引导系数（硅基 guidance_scale、Stability cfg_scale）", example = "7.5")
+    @DecimalMin(value = "0", message = "引导系数最小 0")
+    private Double cfgScale;
+
+    @Schema(description = "采样器（Stability）", example = "K_DPMPP_2M")
+    private String sampler;
+
+    @Schema(description = "风格预设（Stability）", example = "anime")
+    private String stylePreset;
+
+    @Schema(description = "CLIP 引导（Stability）", example = "NONE")
+    private String clipGuidancePreset;
 
 }

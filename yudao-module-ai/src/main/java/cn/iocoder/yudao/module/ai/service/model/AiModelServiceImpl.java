@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.ai.service.model;
 
+import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.module.ai.enums.model.AiPlatformEnum;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.AiModelFactory;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.midjourney.api.MidjourneyApi;
@@ -21,6 +22,7 @@ import dev.tinyflow.core.Tinyflow;
 import jakarta.annotation.Resource;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.embedding.EmbeddingModel;
+import com.volcengine.ark.runtime.service.ArkService;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.vectorstore.SimpleVectorStore;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -180,15 +182,45 @@ public class AiModelServiceImpl implements AiModelService {
     public ImageModel getImageModel(Long id) {
         AiModelDO model = validateModel(id);
         AiApiKeyDO apiKey = apiKeyService.validateApiKey(model.getKeyId());
-        AiPlatformEnum platform = AiPlatformEnum.validatePlatform(apiKey.getPlatform());
-        return modelFactory.getOrCreateImageModel(platform, apiKey.getApiKey(), apiKey.getUrl());
+        AiPlatformEnum platform = validateImagePlatform(model, apiKey);
+        return modelFactory.getOrCreateImageModel(platform, apiKey.getApiKey(), apiKey.getUrl(), model.getModel());
     }
 
     @Override
     public MidjourneyApi getMidjourneyApi(Long id) {
         AiModelDO model = validateModel(id);
         AiApiKeyDO apiKey = apiKeyService.validateApiKey(model.getKeyId());
+        validateImagePlatform(model, apiKey);
         return modelFactory.getOrCreateMidjourneyApi(apiKey.getApiKey(), apiKey.getUrl());
+    }
+
+    @Override
+    public MidjourneyApi getMidjourneyApi(AiApiKeyDO apiKey) {
+        // 绘图记录绑定的 API 密钥，平台可能在之后被修改，所以仍需校验
+        if (ObjUtil.notEqual(apiKey.getPlatform(), AiPlatformEnum.MIDJOURNEY.getPlatform())) {
+            throw exception(IMAGE_MODEL_PLATFORM_MISMATCH, AiPlatformEnum.MIDJOURNEY.getPlatform(), apiKey.getPlatform());
+        }
+        return modelFactory.getOrCreateMidjourneyApi(apiKey.getApiKey(), apiKey.getUrl());
+    }
+
+    @Override
+    public ArkService getArkService(Long id) {
+        AiModelDO model = validateModel(id);
+        AiApiKeyDO apiKey = apiKeyService.validateApiKey(model.getKeyId());
+        validateImagePlatform(model, apiKey);
+        return modelFactory.getOrCreateArkService(apiKey.getApiKey(), apiKey.getUrl());
+    }
+
+    /**
+     * 校验绘图模型的平台，与 API 密钥的平台一致
+     *
+     * 客户端按 API 密钥的平台创建，而绘图参数按模型的平台构建，两者不一致时会请求错误的平台
+     */
+    private static AiPlatformEnum validateImagePlatform(AiModelDO model, AiApiKeyDO apiKey) {
+        if (ObjUtil.notEqual(model.getPlatform(), apiKey.getPlatform())) {
+            throw exception(IMAGE_MODEL_PLATFORM_MISMATCH, model.getPlatform(), apiKey.getPlatform());
+        }
+        return AiPlatformEnum.validatePlatform(apiKey.getPlatform());
     }
 
     @Override

@@ -19,6 +19,9 @@ public class AiImagePageReqVO extends PageParam {
     @Schema(description = "平台", example = "OpenAI")
     private String platform;
 
+    @Schema(description = "生成方式", example = "20")
+    private Integer mode;
+
     @Schema(description = "提示词", example = "1")
     private String prompt;
 

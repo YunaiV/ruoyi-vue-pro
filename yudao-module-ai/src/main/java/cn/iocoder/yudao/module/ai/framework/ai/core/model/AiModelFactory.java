@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.ai.framework.ai.core.model;
 import cn.iocoder.yudao.module.ai.enums.model.AiPlatformEnum;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.suno.api.SunoApi;
+import com.volcengine.ark.runtime.service.ArkService;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.image.ImageModel;
@@ -59,9 +60,10 @@ public interface AiModelFactory {
      * @param platform 平台
      * @param apiKey API KEY
      * @param url API URL
+     * @param model 模型标识（例如说：Stability AI 需要拼接到请求路径中）
      * @return ImageModel 对象
      */
-    ImageModel getOrCreateImageModel(AiPlatformEnum platform, String apiKey, String url);
+    ImageModel getOrCreateImageModel(AiPlatformEnum platform, String apiKey, String url, String model);
 
     /**
      * 基于指定配置，获得 MidjourneyApi 对象
@@ -73,6 +75,15 @@ public interface AiModelFactory {
      * @return MidjourneyApi 对象
      */
     MidjourneyApi getOrCreateMidjourneyApi(String apiKey, String url);
+
+    /**
+     * 基于指定配置，获得火山方舟 ArkService 对象（豆包 Seedream 绘图）
+     *
+     * @param apiKey API Key
+     * @param url API URL，允许空
+     * @return ArkService 对象
+     */
+    ArkService getOrCreateArkService(String apiKey, String url);
 
     /**
      * 基于指定配置，获得 SunoApi 对象

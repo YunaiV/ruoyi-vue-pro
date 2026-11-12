@@ -55,7 +55,7 @@ public class SiliconFlowImageOptions implements ImageOptions {
      *
      */
     @JsonProperty("seed")
-    private Integer seed =  (int)(Math.random() * 1_000_000_000);
+    private Long seed = (long) (Math.random() * 1_000_000_000);
 
     /**
      * The image that needs to be uploaded should be converted into base64 format.
