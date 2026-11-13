@@ -123,4 +123,22 @@ public interface ErrorCodeConstants {
     ErrorCode OCR_STATUS_NOT_SUCCESS = new ErrorCode(1_040_014_004, "只有识别成功的记录才能保存修订");
     ErrorCode OCR_CONFIG_INVALID = new ErrorCode(1_040_014_005, "文字识别配置不正确：{}");
 
+    // ========== AI 技能 1-040-015-000 ==========
+    ErrorCode SKILL_NOT_EXISTS = new ErrorCode(1_040_015_000, "技能不存在");
+    ErrorCode SKILL_NAME_DUPLICATE = new ErrorCode(1_040_015_001, "技能名称({})已存在");
+    ErrorCode SKILL_DISABLE = new ErrorCode(1_040_015_002, "技能({})已停用，不能绑定");
+    ErrorCode SKILL_FILE_NOT_EXISTS = new ErrorCode(1_040_015_100, "技能文件不存在");
+    ErrorCode SKILL_FILE_NAME_INVALID = new ErrorCode(1_040_015_101, "名称不合法：不能为空、不能为 . 或 ..，不能包含 / \\ 和控制字符，长度不超过 {} 个字符");
+    ErrorCode SKILL_FILE_NAME_DUPLICATE = new ErrorCode(1_040_015_102, "同一目录下已存在名称({})");
+    ErrorCode SKILL_FILE_LOCKED = new ErrorCode(1_040_015_103, "固定文件或目录不能{}");
+    ErrorCode SKILL_FILE_PARENT_NOT_EXISTS = new ErrorCode(1_040_015_104, "父目录不存在");
+    ErrorCode SKILL_FILE_PARENT_INVALID = new ErrorCode(1_040_015_105, "父目录必须是同一技能下的目录");
+    ErrorCode SKILL_FILE_MOVE_TO_SELF = new ErrorCode(1_040_015_106, "不能移动到自身");
+    ErrorCode SKILL_FILE_MOVE_TO_DESCENDANT = new ErrorCode(1_040_015_107, "不能移动到自身的子目录");
+    ErrorCode SKILL_FILE_NOT_FILE = new ErrorCode(1_040_015_108, "目录不能保存内容");
+    ErrorCode SKILL_FILE_TYPE_NOT_SUPPORTED = new ErrorCode(1_040_015_109, "文件({})类型不支持，只允许 {} 文本文件");
+    ErrorCode SKILL_FILE_SIZE_EXCEED = new ErrorCode(1_040_015_110, "单个文件不能超过 {} KB，当前 {} KB");
+    ErrorCode SKILL_FILE_TOTAL_SIZE_EXCEED = new ErrorCode(1_040_015_111, "技能文件合计不能超过 {} MB，保存后为 {} KB");
+    ErrorCode SKILL_FILE_SKILL_MD_INVALID = new ErrorCode(1_040_015_112, "SKILL.md 头信息不正确：{}");
+
 }

@@ -29,6 +29,7 @@ import cn.iocoder.yudao.module.ai.dal.dataobject.chat.AiChatMessageDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiModelDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiToolDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.skill.AiSkillDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.chat.AiChatMessageMapper;
 import cn.iocoder.yudao.module.ai.enums.model.AiPlatformEnum;
 import cn.iocoder.yudao.module.ai.enums.requestlog.AiRequestLogStatusEnum;
@@ -38,6 +39,8 @@ import cn.iocoder.yudao.module.ai.service.model.AiModelService;
 import cn.iocoder.yudao.module.ai.service.model.AiToolService;
 import cn.iocoder.yudao.module.ai.service.requestlog.AiRequestLogServiceImpl;
 import cn.iocoder.yudao.module.ai.service.requestlog.dto.AiRequestLogCreateReqDTO;
+import cn.iocoder.yudao.module.ai.service.skill.AiSkillService;
+import cn.iocoder.yudao.module.ai.tool.skill.AiSkillToolCallback;
 import cn.iocoder.yudao.module.ai.util.AiDocumentUtils;
 import lombok.Data;
 import org.junit.jupiter.api.AfterEach;
@@ -137,6 +140,8 @@ public class AiChatMessageServiceImplTest extends BaseMockitoUnitTest {
     private AiToolService toolService;
     @Mock
     private ToolCallbackResolver toolCallbackResolver;
+    @Mock
+    private AiSkillService skillService;
     @Mock
     private DeepSeekApi deepSeekApi;
     /**
@@ -326,6 +331,59 @@ public class AiChatMessageServiceImplTest extends BaseMockitoUnitTest {
         // 断言消息删除（无内容）
         verify(chatMessageMapper).deleteById(ASSISTANT_MESSAGE_ID);
         verify(chatMessageMapper, never()).updateById(any(AiChatMessageDO.class));
+    }
+
+    @Test
+    public void testSendMessage_skill() {
+        // 准备参数
+        Long userId = randomLongId();
+        Long roleId = randomLongId();
+        AiChatMessageSendReqVO reqVO = new AiChatMessageSendReqVO().setConversationId(randomLongId())
+                .setContent("统计上周订单");
+        // mock 对话、模型
+        mockConversation(reqVO.getConversationId(), userId, roleId);
+        // mock 登录用户、租户
+        Long tenantId = randomLongId();
+        mockLoginUser(userId, tenantId);
+        // mock 角色技能：真实的 AiSkillToolCallback
+        AiChatRoleDO role = new AiChatRoleDO().setId(roleId).setSkillIds(singletonList(1L));
+        when(chatRoleService.getChatRole(eq(roleId))).thenReturn(role);
+        AiSkillDO skill = new AiSkillDO().setId(1L).setName("order-analysis").setDescription("订单统计口径与报表格式");
+        when(skillService.getSkillToolCallbackList(same(role)))
+                .thenReturn(AiSkillToolCallback.buildList(roleId, tenantId, singletonList(skill), skillService));
+        List<Long> readTenantIds = new CopyOnWriteArrayList<>();
+        when(skillService.readSkillFile(eq(roleId), eq("order-analysis"), isNull())).thenAnswer(invocation -> {
+            readTenantIds.add(TenantContextHolder.getTenantId());
+            return "# 订单统计口径";
+        });
+        // mock deepSeekApi 的方法：先调用 read_skill，再返回回答
+        ChatCompletionMessage toolCallMessage = new ChatCompletionMessage("", Role.ASSISTANT, null, null,
+                singletonList(new ToolCall("call_1", "function", new ChatCompletionFunction(
+                        AiSkillToolCallback.NAME_READ_SKILL, "{\"name\":\"order-analysis\"}"))));
+        when(deepSeekApi.chatCompletionEntity(any())).thenReturn(buildChatCompletion(toolCallMessage),
+                buildChatCompletion(new ChatCompletionMessage(PLAIN_ANSWER, Role.ASSISTANT)));
+
+        // 调用
+        AiChatMessageSendRespVO respVO = chatMessageService.sendMessage(reqVO, userId);
+        // 断言
+        assertEquals(PLAIN_ANSWER, respVO.getReceive().getContent());
+        ArgumentCaptor<ChatCompletionRequest> requestCaptor = ArgumentCaptor.forClass(ChatCompletionRequest.class);
+        verify(deepSeekApi, times(2)).chatCompletionEntity(requestCaptor.capture());
+        // 断言首轮请求：带上两个只读工具，系统设定只包含技能的名称与描述
+        ChatCompletionRequest request = requestCaptor.getAllValues().get(0);
+        assertEquals(asList(AiSkillToolCallback.NAME_READ_SKILL, AiSkillToolCallback.NAME_READ_SKILL_FILE),
+                request.tools().stream().map(tool -> tool.getFunction().getName()).collect(Collectors.toList()));
+        ChatCompletionMessage systemMessage = request.messages().get(0);
+        assertEquals(Role.SYSTEM, systemMessage.role());
+        assertTrue(systemMessage.content().startsWith("## 可用技能\n"));
+        assertTrue(systemMessage.content().contains("- order-analysis：订单统计口径与报表格式"));
+        // 断言次轮请求回传 SKILL.md，且按请求开始时的租户读取
+        ChatCompletionMessage toolMessage = CollUtil.getLast(requestCaptor.getAllValues().get(1).messages());
+        assertEquals(Role.TOOL, toolMessage.role());
+        assertTrue(toolMessage.content().contains("# 订单统计口径"));
+        assertEquals(singletonList(tenantId), readTenantIds);
+        // 断言消息保存
+        assertAssistantMessageUpdated(PLAIN_ANSWER);
     }
 
     // ========== 思考档位：校验失败不调用模型、不留下消息；思考参数与客户端、ChatOptions 是同一份 ==========
