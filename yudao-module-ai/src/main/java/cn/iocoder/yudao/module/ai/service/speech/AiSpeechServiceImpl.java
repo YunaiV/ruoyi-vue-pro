@@ -10,6 +10,7 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.speech.vo.AiSpeechGenerateReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.speech.vo.AiSpeechPageReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiApiKeyDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiModelDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.speech.AiSpeechDO;
@@ -211,10 +212,7 @@ public class AiSpeechServiceImpl implements AiSpeechService {
     @Override
     public void deleteSpeechMy(Long id, Long userId) {
         // 1. 校验：本人、已结束（生成中的删除后，迟到的结果会写回已删除的记录）
-        AiSpeechDO speech = validateMySpeechExists(id, userId);
-        if (ObjUtil.equal(speech.getStatus(), AiSpeechStatusEnum.IN_PROGRESS.getStatus())) {
-            throw exception(SPEECH_STATUS_NOT_FINISHED);
-        }
+        validateSpeechFinished(validateMySpeechExists(id, userId));
         // 2. 删除记录：文件保留
         speechMapper.deleteById(id);
     }
@@ -228,6 +226,40 @@ public class AiSpeechServiceImpl implements AiSpeechService {
             throw exception(SPEECH_NOT_EXISTS);
         }
         return speech;
+    }
+
+    // ========== 语音管理 ==========
+
+    @Override
+    public PageResult<AiSpeechDO> getSpeechPage(AiSpeechPageReqVO pageReqVO) {
+        return speechMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public AiSpeechDO getSpeech(Long id) {
+        return speechMapper.selectById(id);
+    }
+
+    @Override
+    public void deleteSpeech(Long id) {
+        // 1. 校验：存在、已结束（生成中的删除后，迟到的结果会写回已删除的记录）
+        validateSpeechFinished(validateSpeechExists(id));
+        // 2. 删除记录：文件保留
+        speechMapper.deleteById(id);
+    }
+
+    private AiSpeechDO validateSpeechExists(Long id) {
+        AiSpeechDO speech = speechMapper.selectById(id);
+        if (speech == null) {
+            throw exception(SPEECH_NOT_EXISTS);
+        }
+        return speech;
+    }
+
+    private static void validateSpeechFinished(AiSpeechDO speech) {
+        if (ObjUtil.equal(speech.getStatus(), AiSpeechStatusEnum.IN_PROGRESS.getStatus())) {
+            throw exception(SPEECH_STATUS_NOT_FINISHED);
+        }
     }
 
     // ========== 同步 ==========

@@ -120,7 +120,6 @@ public interface ErrorCodeConstants {
     ErrorCode OCR_MODEL_PLATFORM_MISMATCH = new ErrorCode(1_040_014_001,
             "操作失败，文字识别模型的平台（{}）与 API 密钥的平台（{}）不一致，请修改模型配置");
     ErrorCode OCR_MODEL_PLATFORM_NOT_SUPPORTED = new ErrorCode(1_040_014_002, "平台({})暂不支持文字识别");
-    ErrorCode OCR_IMAGE_INVALID = new ErrorCode(1_040_014_003, "只支持 PNG、JPEG 格式且不超过 {}MB 的图片");
     ErrorCode OCR_STATUS_NOT_SUCCESS = new ErrorCode(1_040_014_004, "只有识别成功的记录才能保存修订");
     ErrorCode OCR_CONFIG_INVALID = new ErrorCode(1_040_014_005, "文字识别配置不正确：{}");
 

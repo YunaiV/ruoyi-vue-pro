@@ -17,6 +17,12 @@ public class AiOcrRespVO {
     @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
+    @Schema(description = "用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    private Long userId;
+
+    @Schema(description = "用户昵称（仅管理端）", example = "芋艿")
+    private String userNickname;
+
     @Schema(description = "模型编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long modelId;
 

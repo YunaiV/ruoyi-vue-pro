@@ -17,6 +17,12 @@ public class AiSpeechRespVO {
     @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
+    @Schema(description = "用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    private Long userId;
+
+    @Schema(description = "用户昵称（仅管理端）", example = "芋艿")
+    private String userNickname;
+
     @Schema(description = "模型编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "31")
     private Long modelId;
 
@@ -41,7 +47,7 @@ public class AiSpeechRespVO {
     @Schema(description = "状态，参见 AiSpeechStatusEnum 枚举", requiredMode = Schema.RequiredMode.REQUIRED, example = "20")
     private Integer status;
 
-    @Schema(description = "音频访问地址（私有存储时为签名地址）", example = "https://www.iocoder.cn/speech-1024.mp3")
+    @Schema(description = "音频地址", example = "https://www.iocoder.cn/speech-1024.mp3")
     private String audioUrl;
 
     @Schema(description = "音频大小，单位：字节", example = "102400")

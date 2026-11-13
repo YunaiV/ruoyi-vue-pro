@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
+import cn.iocoder.yudao.module.ai.controller.admin.ocr.vo.AiOcrPageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.ocr.vo.AiOcrRecognizeReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.ocr.vo.AiOcrUpdateReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiModelDO;
@@ -19,14 +20,12 @@ import cn.iocoder.yudao.module.ai.framework.ai.core.ocr.OcrResult;
 import cn.iocoder.yudao.module.ai.service.model.AiModelService;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
@@ -38,7 +37,7 @@ import static org.mockito.Mockito.*;
 /**
  * {@link AiOcrServiceImpl} 的单元测试类
  *
- * 重点：图片按文件内容校验、成功失败都记录且失败原因脱敏、【我的】记录隔离、修订文本的空字符串语义
+ * 重点：成功失败都记录且失败原因脱敏、【我的】记录隔离、修订文本的空字符串语义
  *
  * @author 芋道源码
  */
@@ -141,27 +140,19 @@ public class AiOcrServiceImplTest extends BaseMockitoUnitTest {
     }
 
     @Test
-    public void testRecognizeOcr_fakeImage() {
-        // 调用，并断言异常：地址是 png，内容是文本
-        assertImageInvalid("hello world".getBytes(StandardCharsets.UTF_8));
-    }
+    public void testRecognizeOcr_otherType() {
+        // mock 方法：不限制类型，按文件内容识别出的类型交给识别服务
+        mockModel(prompt -> {
+            assertEquals("application/pdf", prompt.getInstructions().getMimeType().toString());
+            return new OcrResponse(new OcrResult("PDF"));
+        });
 
-    @Test
-    public void testRecognizeOcr_pdf() {
-        // 调用，并断言异常
-        assertImageInvalid("%PDF-1.7\n%âãÏÓ\n1 0 obj\n".getBytes(StandardCharsets.ISO_8859_1));
-    }
-
-    @Test
-    public void testRecognizeOcr_tooLarge() {
-        // 调用，并断言异常
-        assertImageInvalid(Arrays.copyOf(png(), AiOcrServiceImpl.IMAGE_MAX_SIZE_MB * 1024 * 1024 + 1));
-    }
-
-    @Test
-    public void testRecognizeOcr_empty() {
-        // 调用，并断言异常
-        assertImageInvalid(new byte[0]);
+        // 调用
+        recognizeOcr("%PDF-1.7\n%âãÏÓ\n1 0 obj\n".getBytes(StandardCharsets.ISO_8859_1));
+        // 断言
+        AiOcrDO inserted = captureInsert();
+        assertEquals(AiOcrStatusEnum.SUCCESS.getStatus(), inserted.getStatus());
+        assertEquals("PDF", inserted.getOriginalText());
     }
 
     @Test
@@ -284,6 +275,46 @@ public class AiOcrServiceImplTest extends BaseMockitoUnitTest {
         verify(ocrMapper, never()).deleteById(OCR_ID);
     }
 
+    // ========== OCR 管理 ==========
+
+    @Test
+    public void testGetOcrPage() {
+        // mock 方法
+        AiOcrPageReqVO pageReqVO = new AiOcrPageReqVO();
+        PageResult<AiOcrDO> pageResult = new PageResult<>();
+        when(ocrMapper.selectPage(pageReqVO)).thenReturn(pageResult);
+
+        // 调用，并断言
+        assertSame(pageResult, ocrService.getOcrPage(pageReqVO));
+    }
+
+    @Test
+    public void testGetOcr() {
+        // mock 数据：别人的记录，管理端也能查看
+        AiOcrDO ocr = mockOcr(OTHER_USER_ID, AiOcrStatusEnum.SUCCESS);
+
+        // 调用，并断言
+        assertSame(ocr, ocrService.getOcr(OCR_ID));
+    }
+
+    @Test
+    public void testDeleteOcr_success() {
+        // mock 数据：别人的记录，管理端也能删除
+        mockOcr(OTHER_USER_ID, AiOcrStatusEnum.SUCCESS);
+
+        // 调用
+        ocrService.deleteOcr(OCR_ID);
+        // 断言
+        verify(ocrMapper).deleteById(OCR_ID);
+    }
+
+    @Test
+    public void testDeleteOcr_notExists() {
+        // 调用，并断言异常
+        assertServiceException(() -> ocrService.deleteOcr(OCR_ID), OCR_NOT_EXISTS);
+        verify(ocrMapper, never()).deleteById(OCR_ID);
+    }
+
     // ========== 工具方法 ==========
 
     /**
@@ -298,15 +329,6 @@ public class AiOcrServiceImplTest extends BaseMockitoUnitTest {
             httpUtilMock.when(() -> HttpUtil.downloadBytes(ACCESS_URL)).thenReturn(content);
             return ocrService.recognizeOcr(USER_ID, reqVO);
         }
-    }
-
-    /**
-     * 断言图片不合法：不校验模型、不记录
-     */
-    private void assertImageInvalid(byte[] content) {
-        Executable executable = () -> recognizeOcr(content);
-        assertServiceException(executable, OCR_IMAGE_INVALID, AiOcrServiceImpl.IMAGE_MAX_SIZE_MB);
-        verifyNoInteractions(modelService, ocrMapper);
     }
 
     private void mockModel(OcrModel ocrModel) {

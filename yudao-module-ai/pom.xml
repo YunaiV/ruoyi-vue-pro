@@ -27,6 +27,17 @@
         <!-- 注意：使用 volcengine-java-sdk-ark-runtime 系列（2.0.0 起兼容 Jackson 2.20+ 的 PropertyNamingStrategies），
              与 TinyFlow 间接依赖的同名构件统一为该版本；不使用 com.volcengine:ark-runtime（0.17.0 仍引用已移除的 SNAKE_CASE） -->
         <volcengine-ark-runtime.version>2.0.34</volcengine-ark-runtime.version>
+        <!-- https://mvnrepository.com/artifact/com.tencentcloudapi/tencentcloud-sdk-java-ocr -->
+        <tencentcloud-sdk-ocr.version>3.1.1257</tencentcloud-sdk-ocr.version>
+        <tencentcloud-sdk-common.version>3.1.1261</tencentcloud-sdk-common.version>
+        <!-- https://mvnrepository.com/artifact/com.volcengine/volc-sdk-java -->
+        <volc-sdk.version>1.0.221</volc-sdk.version>
+        <!-- https://mvnrepository.com/artifact/com.tencentcloudapi/tencentcloud-sdk-java-tts -->
+        <!-- 注意：与 TinyFlow 间接引入的 tencentcloud-sdk-java-common 3.1.1261 同属 3.1 系列（tts 包没有 3.1.1261 版本） -->
+        <tencentcloud-sdk-tts.version>3.1.1253</tencentcloud-sdk-tts.version>
+        <!-- https://mvnrepository.com/artifact/com.alibaba/dashscope-sdk-java -->
+        <!-- 注意：显式声明，覆盖 TinyFlow（agents-flex-image-qwen）间接引入的 2.18.2 -->
+        <dashscope-sdk.version>2.23.6</dashscope-sdk.version>
     </properties>
 
     <dependencyManagement>
@@ -138,10 +149,94 @@
             <version>${alibaba-ai.version}</version>
         </dependency>
         <dependency>
+            <!-- 阿里百炼 DashScope 官方 SDK：通义 OCR、万相 / HappyHorse 视频 -->
+            <groupId>com.alibaba</groupId>
+            <artifactId>dashscope-sdk-java</artifactId>
+            <version>${dashscope-sdk.version}</version>
+            <exclusions>
+                <!-- 直接声明后，其间接依赖 4.31.1 会就近覆盖 Spring AI 使用的 4.38.0（降级），因此排除，沿用工程现有版本 -->
+                <exclusion>
+                    <groupId>com.github.victools</groupId>
+                    <artifactId>jsonschema-generator</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
             <!-- 火山方舟：豆包 Seedream 绘图 -->
             <groupId>com.volcengine</groupId>
             <artifactId>volcengine-java-sdk-ark-runtime</artifactId>
             <version>${volcengine-ark-runtime.version}</version>
+        </dependency>
+        <!-- OCR 文字识别：腾讯云、火山引擎官方 SDK（阿里百炼、硅基流动、百度走 HTTP，无需额外依赖） -->
+        <dependency>
+            <!-- 腾讯云 OCR：GeneralAccurateOCR -->
+            <groupId>com.tencentcloudapi</groupId>
+            <artifactId>tencentcloud-sdk-java-ocr</artifactId>
+            <version>${tencentcloud-sdk-ocr.version}</version>
+        </dependency>
+        <dependency>
+            <!-- 腾讯云 SDK 公共包：固定为 TinyFlow 已间接引入的版本，避免 OCR 包把它降级 -->
+            <groupId>com.tencentcloudapi</groupId>
+            <artifactId>tencentcloud-sdk-java-common</artifactId>
+            <version>${tencentcloud-sdk-common.version}</version>
+            <exclusions>
+                <!-- 保留现有的 okhttp 4.x 版 logging-interceptor、commons-logging 1.4.x，不被 SDK 的旧版本就近覆盖 -->
+                <exclusion>
+                    <groupId>com.squareup.okhttp3</groupId>
+                    <artifactId>logging-interceptor</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <!-- 火山引擎视觉智能：OCRNormal（不是方舟 Ark runtime）；版本与 TinyFlow 已间接引入的一致 -->
+            <groupId>com.volcengine</groupId>
+            <artifactId>volc-sdk-java</artifactId>
+            <version>${volc-sdk.version}</version>
+            <exclusions>
+                <!-- 直接声明后，这些间接依赖会就近覆盖现有版本（protobuf、commons-logging 降级，httpclient 升级），
+                     因此排除，沿用工程现有版本 -->
+                <exclusion>
+                    <groupId>com.google.protobuf</groupId>
+                    <artifactId>protobuf-java</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.google.protobuf</groupId>
+                    <artifactId>protobuf-java-util</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.httpcomponents</groupId>
+                    <artifactId>httpclient</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.httpcomponents</groupId>
+                    <artifactId>httpmime</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.google.code.findbugs</groupId>
+                    <artifactId>jsr305</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <!-- 腾讯云语音合成：长文本异步任务，只引入 tts 单产品包 -->
+            <groupId>com.tencentcloudapi</groupId>
+            <artifactId>tencentcloud-sdk-java-tts</artifactId>
+            <version>${tencentcloud-sdk-tts.version}</version>
+            <exclusions>
+                <!-- SDK 公共包沿用工程现有版本（TinyFlow 间接引入），避免被 tts 包就近降级 -->
+                <exclusion>
+                    <groupId>com.tencentcloudapi</groupId>
+                    <artifactId>tencentcloud-sdk-java-common</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- 向量存储：https://db-engines.com/en/ranking/vector+dbms -->
         <dependency>

@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.biz.infra.logger.ApiErrorLogCommonApi;
 import cn.iocoder.yudao.framework.common.enums.WebFilterOrderEnum;
 import cn.iocoder.yudao.framework.web.core.filter.CacheRequestBodyFilter;
 import cn.iocoder.yudao.framework.web.core.filter.DemoFilter;
+import cn.iocoder.yudao.framework.web.core.handler.GlobalExceptionContentTypeResolver;
 import cn.iocoder.yudao.framework.web.core.handler.GlobalExceptionHandler;
 import cn.iocoder.yudao.framework.web.core.handler.GlobalResponseBodyHandler;
 import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
@@ -27,8 +28,11 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.servlet.HandlerExceptionResolver;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
+import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
@@ -84,6 +88,19 @@ public class YudaoWebAutoConfiguration {
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     public GlobalExceptionHandler globalExceptionHandler(ApiErrorLogCommonApi apiErrorLogApi) {
         return new GlobalExceptionHandler(applicationName, apiErrorLogApi);
+    }
+
+    @Bean
+    public WebMvcConfigurer globalExceptionWebMvcConfigurer() {
+        return new WebMvcConfigurer() {
+
+            @Override
+            public void extendHandlerExceptionResolvers(List<HandlerExceptionResolver> resolvers) {
+                // 放在最前面，保证在 GlobalExceptionHandler 处理异常前，预设 JSON 的 Content-Type
+                resolvers.add(0, new GlobalExceptionContentTypeResolver());
+            }
+
+        };
     }
 
     @Bean

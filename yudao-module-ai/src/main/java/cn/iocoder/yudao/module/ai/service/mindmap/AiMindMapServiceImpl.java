@@ -1,12 +1,9 @@
 package cn.iocoder.yudao.module.ai.service.mindmap;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.iocoder.yudao.module.ai.enums.model.AiModelTypeEnum;
-import cn.iocoder.yudao.module.ai.enums.model.AiPlatformEnum;
-import cn.iocoder.yudao.module.ai.util.AiChatUtils;
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -15,17 +12,17 @@ import cn.iocoder.yudao.module.ai.controller.admin.mindmap.vo.AiMindMapGenerateR
 import cn.iocoder.yudao.module.ai.controller.admin.mindmap.vo.AiMindMapGenerateRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.mindmap.vo.AiMindMapPageReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.mindmap.AiMindMapDO;
-import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiModelDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.mindmap.AiMindMapMapper;
 import cn.iocoder.yudao.module.ai.enums.AiChatRoleEnum;
-import cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants;
+import cn.iocoder.yudao.module.ai.enums.model.AiModelTypeEnum;
+import cn.iocoder.yudao.module.ai.enums.model.AiPlatformEnum;
 import cn.iocoder.yudao.module.ai.enums.requestlog.AiRequestLogBizTypeEnum;
 import cn.iocoder.yudao.module.ai.enums.requestlog.AiRequestLogStatusEnum;
-import cn.iocoder.yudao.module.ai.service.model.AiChatRoleService;
 import cn.iocoder.yudao.module.ai.service.model.AiModelService;
 import cn.iocoder.yudao.module.ai.service.requestlog.AiRequestLogService;
 import cn.iocoder.yudao.module.ai.service.requestlog.dto.AiRequestLogCreateReqDTO;
+import cn.iocoder.yudao.module.ai.util.AiChatUtils;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.messages.Message;
@@ -59,8 +56,6 @@ public class AiMindMapServiceImpl implements AiMindMapService {
     @Resource
     private AiModelService modalService;
     @Resource
-    private AiChatRoleService chatRoleService;
-    @Resource
     private AiRequestLogService requestLogService;
 
     @Resource
@@ -69,15 +64,13 @@ public class AiMindMapServiceImpl implements AiMindMapService {
     @Override
     public Flux<CommonResult<AiMindMapGenerateRespVO>> generateMindMap(AiMindMapGenerateReqVO generateReqVO,
                                                                        Long userId) {
-        // 1. 获取导图模型。尝试获取思维导图助手角色，如果没有则使用默认模型
-        AiChatRoleDO role = CollUtil.getFirst(
-                chatRoleService.getChatRoleListByName(AiChatRoleEnum.AI_MIND_MAP_ROLE.getName()));
-        // 1.1 获取导图执行模型
-        AiModelDO model = getModel(role);
-        // 1.2 获取角色设定消息
-        String systemMessage = role != null && StrUtil.isNotBlank(role.getSystemMessage())
-                ? role.getSystemMessage() : AiChatRoleEnum.AI_MIND_MAP_ROLE.getSystemMessage();
-        // 1.3 校验平台
+        // 1. 校验模型：校验失败返回错误帧，由前端提示原因
+        AiModelDO model;
+        try {
+            model = validateChatModel(generateReqVO.getModelId());
+        } catch (ServiceException ex) {
+            return Flux.just(error(ex.getCode(), ex.getMessage()));
+        }
         AiPlatformEnum platform = AiPlatformEnum.validatePlatform(model.getPlatform());
         ChatModel chatModel = modalService.getChatModel(model.getId());
 
@@ -92,10 +85,10 @@ public class AiMindMapServiceImpl implements AiMindMapService {
                 AiRequestLogBizTypeEnum.MIND_MAP, mindMapDO.getId(), model);
         AtomicBoolean finished = new AtomicBoolean(false);
 
-        // 3.1 构建 Prompt，并进行调用
+        // 3.1 构建 Prompt，并进行调用：系统提示词由思维导图自身持有，使用内置文本
         Flux<ChatResponse> streamResponse;
         try {
-            Prompt prompt = buildPrompt(generateReqVO, model, systemMessage);
+            Prompt prompt = buildPrompt(generateReqVO, model, AiChatRoleEnum.AI_MIND_MAP_ROLE.getSystemMessage());
             streamResponse = chatModel.stream(prompt);
         } catch (RuntimeException ex) {
             finishMindMap(requestLog, finished, mindMapDO.getId(), null, AiRequestLogStatusEnum.FAIL, ex);
@@ -117,12 +110,29 @@ public class AiMindMapServiceImpl implements AiMindMapService {
         }).doOnComplete(() -> finishMindMap(requestLog, finished, mindMapDO.getId(), contentBuffer.toString(),
                 AiRequestLogStatusEnum.SUCCESS, null)
         ).doOnError(throwable -> {
-            log.error("[generateMindMap][generateReqVO({}) 发生异常]", generateReqVO, throwable);
+            // 不打印请求对象：需求可能是很长的原文
+            log.error("[generateMindMap][mindMapId({}) requestId({}) 发生异常]",
+                    mindMapDO.getId(), requestId, throwable);
             finishMindMap(requestLog, finished, mindMapDO.getId(), null, AiRequestLogStatusEnum.FAIL, throwable);
         }).doOnCancel(() -> {
             log.info("[generateMindMap][requestId({}) 取消请求]", requestId);
             finishMindMap(requestLog, finished, mindMapDO.getId(), null, AiRequestLogStatusEnum.CANCEL, null);
-        }).onErrorResume(error -> Flux.just(error(ErrorCodeConstants.WRITE_STREAM_ERROR)));
+        }).onErrorResume(error -> Flux.just(error(MIND_MAP_GENERATE_FAIL,
+                StrUtil.blankToDefault(error.getMessage(), error.getClass().getName()))));
+    }
+
+    /**
+     * 校验模型：存在、启用，并且是对话模型
+     *
+     * @param modelId 模型编号
+     * @return 模型
+     */
+    private AiModelDO validateChatModel(Long modelId) {
+        AiModelDO model = modalService.validateModel(modelId);
+        if (ObjUtil.notEqual(model.getType(), AiModelTypeEnum.CHAT.getType())) {
+            throw exception(MODEL_USE_TYPE_ERROR);
+        }
+        return model;
     }
 
     /**
@@ -146,7 +156,7 @@ public class AiMindMapServiceImpl implements AiMindMapService {
                 log.error("[finishMindMap][requestId({}) 记录请求日志失败]", requestLog.getRequestId(), ex);
             }
             updateObj = new AiMindMapDO().setId(mindMapId).setGeneratedContent(generatedContent)
-                    .setErrorMessage(error != null ? error.getMessage() : null)
+                    .setErrorMessage(requestLog.getErrorMessage())
                     .setInputTokens(requestLog.getInputTokens()).setOutputTokens(requestLog.getOutputTokens()).setTotalTokens(requestLog.getTotalTokens());
             updateObj.setUpdater(StrUtil.toStringOrNull(requestLog.getUserId()));
         }
@@ -177,27 +187,9 @@ public class AiMindMapServiceImpl implements AiMindMapService {
         if (StrUtil.isNotBlank(systemMessage)) {
             chatMessages.add(new SystemMessage(systemMessage));
         }
-        // 2. 用户输入
+        // 2. 用户输入：原文作为 user 消息，不套模板
         chatMessages.add(new UserMessage(generateReqVO.getPrompt()));
         return chatMessages;
-    }
-
-    private AiModelDO getModel(AiChatRoleDO role) {
-        AiModelDO model = null;
-        if (role != null && role.getModelId() != null) {
-            model = modalService.getModel(role.getModelId());
-        }
-        if (model == null) {
-            model = modalService.getRequiredDefaultModel(AiModelTypeEnum.CHAT.getType());
-        }
-        // 校验模型存在、且合法
-        if (model == null) {
-            throw exception(MODEL_NOT_EXISTS);
-        }
-        if (ObjUtil.notEqual(model.getType(), AiModelTypeEnum.CHAT.getType())) {
-            throw exception(MODEL_USE_TYPE_ERROR);
-        }
-        return model;
     }
 
     @Override

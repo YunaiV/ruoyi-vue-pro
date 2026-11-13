@@ -9,6 +9,7 @@ import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.ai.controller.admin.speech.vo.AiSpeechGenerateReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.speech.vo.AiSpeechPageReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiApiKeyDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiModelDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.speech.AiSpeechDO;
@@ -40,6 +41,9 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildBetweenTime;
+import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
+import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
@@ -48,8 +52,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-// TODO DONE @AI：检查下单测风格，应该对齐 system user test；也检查下别的模块的；git diff 里的；
-// （已对齐 AdminUserServiceImplTest：mock 数据、准备参数、调用、断言分段；randomPojo 构造记录；assertPojoEquals 断言请求参数。别的模块的单测不在语音范围内，未改）
 /**
  * {@link AiSpeechServiceImpl} 的单元测试类
  *
@@ -478,6 +480,78 @@ public class AiSpeechServiceImplTest extends BaseDbUnitTest {
         assertNull(speechMapper.selectById(success.getId()));
         assertNotNull(speechMapper.selectById(running.getId()));
         assertNotNull(speechMapper.selectById(other.getId()));
+    }
+
+    // ========== 语音管理 ==========
+
+    @Test
+    public void testGetSpeechPage() {
+        // mock 数据
+        AiSpeechDO dbSpeech = randomSpeech(o -> o.setUserId(USER_ID).setPlatform(AiPlatformEnum.MINIMAX.getPlatform())
+                .setStatus(AiSpeechStatusEnum.SUCCESS.getStatus()).setInputText("欢迎使用芋道语音")
+                .setCreateTime(buildTime(2026, 11, 12)));
+        speechMapper.insert(dbSpeech);
+        // 测试 userId 不匹配
+        speechMapper.insert(cloneIgnoreId(dbSpeech, o -> o.setUserId(OTHER_USER_ID)));
+        // 测试 platform 不匹配
+        speechMapper.insert(cloneIgnoreId(dbSpeech, o -> o.setPlatform(AiPlatformEnum.TENCENT.getPlatform())));
+        // 测试 status 不匹配
+        speechMapper.insert(cloneIgnoreId(dbSpeech, o -> o.setStatus(AiSpeechStatusEnum.FAIL.getStatus())));
+        // 测试 inputText 不匹配
+        speechMapper.insert(cloneIgnoreId(dbSpeech, o -> o.setInputText("你好，世界")));
+        // 测试 createTime 不匹配
+        speechMapper.insert(cloneIgnoreId(dbSpeech, o -> o.setCreateTime(buildTime(2026, 10, 1))));
+        // 准备参数
+        AiSpeechPageReqVO reqVO = new AiSpeechPageReqVO();
+        reqVO.setUserId(USER_ID);
+        reqVO.setPlatform(AiPlatformEnum.MINIMAX.getPlatform());
+        reqVO.setStatus(AiSpeechStatusEnum.SUCCESS.getStatus());
+        reqVO.setInputText("芋道");
+        reqVO.setCreateTime(buildBetweenTime(2026, 11, 1, 2026, 11, 30));
+
+        // 调用
+        PageResult<AiSpeechDO> pageResult = speechService.getSpeechPage(reqVO);
+        // 断言
+        assertEquals(1, pageResult.getTotal());
+        assertEquals(1, pageResult.getList().size());
+        assertPojoEquals(dbSpeech, pageResult.getList().get(0));
+    }
+
+    @Test
+    public void testGetSpeech() {
+        // mock 数据：别人的语音，管理端也能查看
+        AiSpeechDO dbSpeech = insertSpeech(OTHER_USER_ID, AiSpeechStatusEnum.SUCCESS, LocalDateTime.now());
+
+        // 调用，并断言
+        assertPojoEquals(dbSpeech, speechService.getSpeech(dbSpeech.getId()));
+        assertNull(speechService.getSpeech(-1L));
+    }
+
+    @Test
+    public void testDeleteSpeech_success() {
+        // mock 数据：别人的语音，管理端也能删除
+        AiSpeechDO dbSpeech = insertSpeech(OTHER_USER_ID, AiSpeechStatusEnum.FAIL, LocalDateTime.now());
+
+        // 调用
+        speechService.deleteSpeech(dbSpeech.getId());
+        // 断言
+        assertNull(speechMapper.selectById(dbSpeech.getId()));
+    }
+
+    @Test
+    public void testDeleteSpeech_notExists() {
+        // 调用，并断言异常
+        assertServiceException(() -> speechService.deleteSpeech(-1L), SPEECH_NOT_EXISTS);
+    }
+
+    @Test
+    public void testDeleteSpeech_inProgress() {
+        // mock 数据
+        AiSpeechDO dbSpeech = insertSpeech(OTHER_USER_ID, AiSpeechStatusEnum.IN_PROGRESS, LocalDateTime.now());
+
+        // 调用，并断言异常
+        assertServiceException(() -> speechService.deleteSpeech(dbSpeech.getId()), SPEECH_STATUS_NOT_FINISHED);
+        assertNotNull(speechMapper.selectById(dbSpeech.getId()));
     }
 
     @Test
