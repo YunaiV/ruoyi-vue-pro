@@ -123,7 +123,7 @@ public class AiImageServiceImplUnitTest extends BaseMockitoUnitTest {
     @Test
     public void testDrawImage_siliconFlow() {
         // mock 方法
-        AiModelDO model = mockModel(AiPlatformEnum.SILICON_FLOW, "Kwai-Kolors/Kolors");
+        AiModelDO model = mockModel(AiPlatformEnum.SILICONFLOW, "Kwai-Kolors/Kolors");
         ImageModel imageModel = mock(ImageModel.class);
         when(modelService.getImageModel(MODEL_ID)).thenReturn(imageModel);
         AiImageServiceImpl self = mock(AiImageServiceImpl.class);
@@ -157,7 +157,7 @@ public class AiImageServiceImplUnitTest extends BaseMockitoUnitTest {
     @Test
     public void testDrawImage_seedream() {
         // mock 方法
-        mockModel(AiPlatformEnum.DOU_BAO, "doubao-seedream-4-5-251128");
+        mockModel(AiPlatformEnum.BYTEDANCE, "doubao-seedream-4-5-251128");
         ArkService arkService = mock(ArkService.class);
         when(modelService.getArkService(MODEL_ID)).thenReturn(arkService);
         AiImageServiceImpl self = mock(AiImageServiceImpl.class);
@@ -191,7 +191,7 @@ public class AiImageServiceImplUnitTest extends BaseMockitoUnitTest {
     @Test
     public void testDrawImage_sizeEmpty() {
         // mock 方法：通用模型
-        mockModel(AiPlatformEnum.SILICON_FLOW, "Kwai-Kolors/Kolors");
+        mockModel(AiPlatformEnum.SILICONFLOW, "Kwai-Kolors/Kolors");
 
         // 调用，并断言异常：通用模型的宽高必填
         assertServiceException(() -> imageService.drawImage(USER_ID, buildDrawReqVO().setHeight(null)),
@@ -206,11 +206,11 @@ public class AiImageServiceImplUnitTest extends BaseMockitoUnitTest {
         // mock 方法：模型的平台为 OpenAI，API 密钥的平台为硅基流动
         mockModel(AiPlatformEnum.OPENAI, "dall-e-3");
         when(modelService.getImageModel(MODEL_ID)).thenThrow(exception(IMAGE_MODEL_PLATFORM_MISMATCH,
-                AiPlatformEnum.OPENAI.getPlatform(), AiPlatformEnum.SILICON_FLOW.getPlatform()));
+                AiPlatformEnum.OPENAI.getPlatform(), AiPlatformEnum.SILICONFLOW.getPlatform()));
 
         // 调用，并断言异常
         assertServiceException(() -> imageService.drawImage(USER_ID, buildDrawReqVO()), IMAGE_MODEL_PLATFORM_MISMATCH,
-                AiPlatformEnum.OPENAI.getPlatform(), AiPlatformEnum.SILICON_FLOW.getPlatform());
+                AiPlatformEnum.OPENAI.getPlatform(), AiPlatformEnum.SILICONFLOW.getPlatform());
         // 断言：不保存 image，更不会请求绘图平台
         verifyNoInteractions(imageMapper, fileApi);
     }
@@ -230,7 +230,7 @@ public class AiImageServiceImplUnitTest extends BaseMockitoUnitTest {
         SiliconFlowImageModel imageModel = new SiliconFlowImageModel(
                 new SiliconFlowImageApi("http://127.0.0.1", "sk-test", restClientBuilder));
         // mock 数据
-        AiImageDO image = new AiImageDO().setId(IMAGE_ID).setPlatform(AiPlatformEnum.SILICON_FLOW.getPlatform())
+        AiImageDO image = new AiImageDO().setId(IMAGE_ID).setPlatform(AiPlatformEnum.SILICONFLOW.getPlatform())
                 .setModel("Kwai-Kolors/Kolors").setPrompt("一只猫").setNegativePrompt("文字").setWidth(1024).setHeight(768)
                 .setInputImages(Collections.singletonList(
                         new AiImageDO.InputImage(AiImageInputRoleEnum.REFERENCE.getRole(), "https://file/ref.png")))
@@ -289,7 +289,7 @@ public class AiImageServiceImplUnitTest extends BaseMockitoUnitTest {
 
     @Test
     public void testBuildImageOptions_stabilityDefault() {
-        AiImageDO image = new AiImageDO().setPlatform(AiPlatformEnum.STABLE_DIFFUSION.getPlatform())
+        AiImageDO image = new AiImageDO().setPlatform(AiPlatformEnum.STABILITYAI.getPlatform())
                 .setModel("stable-diffusion-xl-1024-v1-0").setWidth(1024).setHeight(1024);
 
         StabilityAiImageOptions options = (StabilityAiImageOptions) AiImageUtils.buildImageOptions(image);
@@ -302,7 +302,7 @@ public class AiImageServiceImplUnitTest extends BaseMockitoUnitTest {
 
     @Test
     public void testBuildImageOptions_stability() {
-        AiImageDO image = new AiImageDO().setPlatform(AiPlatformEnum.STABLE_DIFFUSION.getPlatform())
+        AiImageDO image = new AiImageDO().setPlatform(AiPlatformEnum.STABILITYAI.getPlatform())
                 .setModel("stable-diffusion-xl-1024-v1-0").setWidth(1024).setHeight(1024)
                 .setOptions(new AiImageDO.Options().setSeed(7L).setSteps(40).setCfgScale(12.0)
                         .setSampler("DDIM").setStylePreset("anime").setClipGuidancePreset("FAST_BLUE"));
@@ -404,7 +404,7 @@ public class AiImageServiceImplUnitTest extends BaseMockitoUnitTest {
     private static AiImageDO buildSeedreamImage(List<String> referenceUrls) {
         List<AiImageDO.InputImage> inputImages = referenceUrls == null ? null : referenceUrls.stream()
                 .map(url -> new AiImageDO.InputImage(AiImageInputRoleEnum.REFERENCE.getRole(), url)).toList();
-        return new AiImageDO().setId(IMAGE_ID).setPlatform(AiPlatformEnum.DOU_BAO.getPlatform())
+        return new AiImageDO().setId(IMAGE_ID).setPlatform(AiPlatformEnum.BYTEDANCE.getPlatform())
                 .setModel("doubao-seedream-4-5-251128").setPrompt("一只猫").setInputImages(inputImages)
                 .setSeedreamOptions(new AiImageDO.SeedreamOptions().setSize("2K").setWatermark(false)
                         .setOptimizePromptMode("standard"));

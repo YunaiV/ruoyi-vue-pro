@@ -43,20 +43,20 @@ public class AiReasoningUtilsTest {
     @Test
     public void testGetReasoningRoute() {
         // 调用，并断言：HTTP 路由
-        for (AiPlatformEnum platform : Arrays.asList(AiPlatformEnum.DEEP_SEEK, AiPlatformEnum.DOU_BAO,
-                AiPlatformEnum.HUN_YUAN, AiPlatformEnum.SILICON_FLOW, AiPlatformEnum.YI_YAN, AiPlatformEnum.ZHI_PU,
-                AiPlatformEnum.XING_HUO, AiPlatformEnum.MINI_MAX, AiPlatformEnum.MOONSHOT, AiPlatformEnum.BAI_CHUAN,
-                AiPlatformEnum.STEP_FUN, AiPlatformEnum.MI_MO)) {
+        for (AiPlatformEnum platform : Arrays.asList(AiPlatformEnum.DEEPSEEK, AiPlatformEnum.BYTEDANCE,
+                AiPlatformEnum.TENCENT, AiPlatformEnum.SILICONFLOW, AiPlatformEnum.BAIDU, AiPlatformEnum.ZHIPU,
+                AiPlatformEnum.IFLYTEK, AiPlatformEnum.MINIMAX, AiPlatformEnum.MOONSHOT, AiPlatformEnum.BAICHUAN,
+                AiPlatformEnum.STEPFUN, AiPlatformEnum.MIMO)) {
             assertEquals(AiReasoningUtils.ReasoningRoute.HTTP, AiReasoningUtils.getReasoningRoute(platform), platform.name());
         }
         // 调用，并断言：OpenAI、通义路由
         assertEquals(AiReasoningUtils.ReasoningRoute.OPENAI, AiReasoningUtils.getReasoningRoute(AiPlatformEnum.OPENAI));
         assertEquals(AiReasoningUtils.ReasoningRoute.OPENAI, AiReasoningUtils.getReasoningRoute(AiPlatformEnum.GROK));
         assertEquals(AiReasoningUtils.ReasoningRoute.OPENAI, AiReasoningUtils.getReasoningRoute(AiPlatformEnum.GEMINI));
-        assertEquals(AiReasoningUtils.ReasoningRoute.TONG_YI, AiReasoningUtils.getReasoningRoute(AiPlatformEnum.TONG_YI));
+        assertEquals(AiReasoningUtils.ReasoningRoute.ALIBABA, AiReasoningUtils.getReasoningRoute(AiPlatformEnum.ALIBABA));
         // 调用，并断言：不支持
         assertEquals(AiReasoningUtils.ReasoningRoute.UNSUPPORTED, AiReasoningUtils.getReasoningRoute(AiPlatformEnum.ANTHROPIC));
-        assertEquals(AiReasoningUtils.ReasoningRoute.UNSUPPORTED, AiReasoningUtils.getReasoningRoute(AiPlatformEnum.AZURE_OPENAI));
+        assertEquals(AiReasoningUtils.ReasoningRoute.UNSUPPORTED, AiReasoningUtils.getReasoningRoute(AiPlatformEnum.AZURE));
         assertEquals(AiReasoningUtils.ReasoningRoute.UNSUPPORTED, AiReasoningUtils.getReasoningRoute(AiPlatformEnum.OLLAMA));
         assertEquals(AiReasoningUtils.ReasoningRoute.UNSUPPORTED, AiReasoningUtils.getReasoningRoute(null));
     }
@@ -66,7 +66,7 @@ public class AiReasoningUtilsTest {
     @Test
     public void testValidateReasoningConfig_success() {
         // 调用，并断言
-        assertDoesNotThrow(() -> validateReasoning(AiPlatformEnum.DEEP_SEEK, deepSeekConfig()));
+        assertDoesNotThrow(() -> validateReasoning(AiPlatformEnum.DEEPSEEK, deepSeekConfig()));
     }
 
     @Test
@@ -82,8 +82,8 @@ public class AiReasoningUtilsTest {
     @Test
     public void testValidateReasoningConfig_notChat() {
         // 调用，并断言异常
-        assertServiceException(() -> AiReasoningUtils.validateReasoningConfig(AiPlatformEnum.DEEP_SEEK,
-                AiPlatformEnum.DEEP_SEEK, AiModelTypeEnum.IMAGE.getType(), deepSeekConfig()),
+        assertServiceException(() -> AiReasoningUtils.validateReasoningConfig(AiPlatformEnum.DEEPSEEK,
+                AiPlatformEnum.DEEPSEEK, AiModelTypeEnum.IMAGE.getType(), deepSeekConfig()),
                 MODEL_REASONING_CONFIG_INVALID, "只有对话模型可以配置思考");
     }
 
@@ -97,9 +97,9 @@ public class AiReasoningUtilsTest {
     @Test
     public void testValidateReasoningConfig_platformMismatch() {
         // 调用，并断言异常
-        assertServiceException(() -> AiReasoningUtils.validateReasoningConfig(AiPlatformEnum.DEEP_SEEK,
+        assertServiceException(() -> AiReasoningUtils.validateReasoningConfig(AiPlatformEnum.DEEPSEEK,
                 AiPlatformEnum.OPENAI, CHAT, deepSeekConfig()),
-                MODEL_REASONING_PLATFORM_MISMATCH, AiPlatformEnum.DEEP_SEEK.getPlatform(),
+                MODEL_REASONING_PLATFORM_MISMATCH, AiPlatformEnum.DEEPSEEK.getPlatform(),
                 AiPlatformEnum.OPENAI.getPlatform());
     }
 
@@ -109,7 +109,7 @@ public class AiReasoningUtilsTest {
         for (String key : Arrays.asList("model", "messages", "stream", "stream_options", "tools", "tool_choice")) {
             AiModelDO.ReasoningLevel off = emptyLevel("off");
             off.getOptions().put(key, "x");
-            assertConfigInvalid(AiPlatformEnum.DEEP_SEEK, config("off", off));
+            assertConfigInvalid(AiPlatformEnum.DEEPSEEK, config("off", off));
         }
 
         // 准备参数：HTTP 路由允许覆盖其它顶层字段、允许嵌套
@@ -117,7 +117,7 @@ public class AiReasoningUtilsTest {
         off.getOptions().put("temperature", 1.0);
         off.getOptions().put("thinking", new HashMap<>(Map.of("type", "disabled")));
         // 调用，并断言
-        assertDoesNotThrow(() -> validateReasoning(AiPlatformEnum.ZHI_PU, config("off", off)));
+        assertDoesNotThrow(() -> validateReasoning(AiPlatformEnum.ZHIPU, config("off", off)));
     }
 
     @Test
@@ -163,14 +163,14 @@ public class AiReasoningUtilsTest {
         AiModelDO.ReasoningLevel nullBudget = level("high", nullBudgetOptions);
 
         // 调用，并断言
-        assertDoesNotThrow(() -> validateReasoning(AiPlatformEnum.TONG_YI, config("high", off, high)));
+        assertDoesNotThrow(() -> validateReasoning(AiPlatformEnum.ALIBABA, config("high", off, high)));
         // 调用，并断言异常：缺 enable_thinking
-        assertConfigInvalid(AiPlatformEnum.TONG_YI, config("off", emptyLevel("off")));
+        assertConfigInvalid(AiPlatformEnum.ALIBABA, config("off", emptyLevel("off")));
         // 调用，并断言异常
-        assertConfigInvalid(AiPlatformEnum.TONG_YI, config("off", notBool));
-        assertConfigInvalid(AiPlatformEnum.TONG_YI, config("off", otherKey));
-        assertConfigInvalid(AiPlatformEnum.TONG_YI, config("high", badBudget));
-        assertConfigInvalid(AiPlatformEnum.TONG_YI, config("high", nullBudget));
+        assertConfigInvalid(AiPlatformEnum.ALIBABA, config("off", notBool));
+        assertConfigInvalid(AiPlatformEnum.ALIBABA, config("off", otherKey));
+        assertConfigInvalid(AiPlatformEnum.ALIBABA, config("high", badBudget));
+        assertConfigInvalid(AiPlatformEnum.ALIBABA, config("high", nullBudget));
     }
 
     @Test
@@ -180,7 +180,7 @@ public class AiReasoningUtilsTest {
         off.getOptions().put("note", StrUtil.repeat('思', 1400));
 
         // 调用，并断言
-        assertDoesNotThrow(() -> validateReasoning(AiPlatformEnum.DEEP_SEEK, config("off", off)));
+        assertDoesNotThrow(() -> validateReasoning(AiPlatformEnum.DEEPSEEK, config("off", off)));
     }
 
     // ========== 思考档位：发送 ==========
@@ -233,7 +233,7 @@ public class AiReasoningUtilsTest {
     public void testValidateReasoningRoute() {
         // 调用，并断言
         assertDoesNotThrow(() -> AiReasoningUtils.validateReasoningRoute(AiPlatformEnum.ANTHROPIC, new AiModelDO()));
-        assertDoesNotThrow(() -> AiReasoningUtils.validateReasoningRoute(AiPlatformEnum.DEEP_SEEK, managedModel()));
+        assertDoesNotThrow(() -> AiReasoningUtils.validateReasoningRoute(AiPlatformEnum.DEEPSEEK, managedModel()));
         // 调用，并断言异常
         assertServiceException(() -> AiReasoningUtils.validateReasoningRoute(AiPlatformEnum.OLLAMA, managedModel()),
                 MODEL_REASONING_PLATFORM_NOT_SUPPORTED, AiPlatformEnum.OLLAMA.getPlatform());
@@ -409,7 +409,7 @@ public class AiReasoningUtilsTest {
     }
 
     private static AiModelDO managedModel() {
-        return new AiModelDO().setModel("deepseek-chat").setPlatform(AiPlatformEnum.DEEP_SEEK.getPlatform())
+        return new AiModelDO().setModel("deepseek-chat").setPlatform(AiPlatformEnum.DEEPSEEK.getPlatform())
                 .setType(CHAT).setReasoningConfig(deepSeekConfig());
     }
 

@@ -337,7 +337,7 @@ public class AiChatMessageServiceImplTest extends BaseMockitoUnitTest {
         AiChatMessageSendReqVO reqVO = new AiChatMessageSendReqVO().setConversationId(randomLongId())
                 .setContent("你好").setReasoningLevel("high");
         // mock 对话、模型：未配置思考
-        mockReasoningConversation(reqVO.getConversationId(), userId, null, AiPlatformEnum.DEEP_SEEK, false);
+        mockReasoningConversation(reqVO.getConversationId(), userId, null, AiPlatformEnum.DEEPSEEK, false);
 
         // 调用
         List<CommonResult<AiChatMessageSendRespVO>> results = chatMessageService
@@ -355,7 +355,7 @@ public class AiChatMessageServiceImplTest extends BaseMockitoUnitTest {
         AiChatMessageSendReqVO reqVO = new AiChatMessageSendReqVO().setConversationId(randomLongId())
                 .setContent("你好").setReasoningLevel("ultra");
         // mock 对话、模型
-        mockReasoningConversation(reqVO.getConversationId(), userId, null, AiPlatformEnum.DEEP_SEEK, true);
+        mockReasoningConversation(reqVO.getConversationId(), userId, null, AiPlatformEnum.DEEPSEEK, true);
 
         // 调用
         List<CommonResult<AiChatMessageSendRespVO>> results = chatMessageService
@@ -393,7 +393,7 @@ public class AiChatMessageServiceImplTest extends BaseMockitoUnitTest {
                 .setContent("杭州天气怎么样？");
         // mock 对话、模型、客户端
         AiModelDO model = mockReasoningConversation(reqVO.getConversationId(), userId, roleId,
-                AiPlatformEnum.DEEP_SEEK, true);
+                AiPlatformEnum.DEEPSEEK, true);
         mockReasoningClient(model);
         // mock 工具
         List<ToolContext> toolContexts = new CopyOnWriteArrayList<>();
@@ -425,7 +425,7 @@ public class AiChatMessageServiceImplTest extends BaseMockitoUnitTest {
                 .setContent("杭州天气怎么样？").setReasoningLevel("off");
         // mock 对话、模型、客户端
         AiModelDO model = mockReasoningConversation(reqVO.getConversationId(), userId, roleId,
-                AiPlatformEnum.DEEP_SEEK, true);
+                AiPlatformEnum.DEEPSEEK, true);
         mockReasoningClient(model);
         // mock 工具
         List<ToolContext> toolContexts = new CopyOnWriteArrayList<>();
@@ -460,7 +460,7 @@ public class AiChatMessageServiceImplTest extends BaseMockitoUnitTest {
                 .setContent("杭州天气怎么样？");
         // mock 对话、模型、客户端、工具
         AiModelDO model = mockReasoningConversation(reqVO.getConversationId(), userId, roleId,
-                AiPlatformEnum.DEEP_SEEK, true);
+                AiPlatformEnum.DEEPSEEK, true);
         mockReasoningClient(model);
         List<ToolContext> toolContexts = new CopyOnWriteArrayList<>();
         mockWeatherTool(roleId, toolContexts);
@@ -491,7 +491,7 @@ public class AiChatMessageServiceImplTest extends BaseMockitoUnitTest {
                 .setContent("杭州天气怎么样？").setReasoningLevel("high");
         // mock 对话、模型、客户端、工具
         AiModelDO model = mockReasoningConversation(reqVO.getConversationId(), userId, roleId,
-                AiPlatformEnum.DEEP_SEEK, true);
+                AiPlatformEnum.DEEPSEEK, true);
         mockReasoningClient(model);
         List<ToolContext> toolContexts = new CopyOnWriteArrayList<>();
         mockWeatherTool(roleId, toolContexts);
@@ -523,7 +523,7 @@ public class AiChatMessageServiceImplTest extends BaseMockitoUnitTest {
                 .setContent("你好").setReasoningLevel("off");
         // mock 对话、模型
         AiModelDO model = mockReasoningConversation(reqVO.getConversationId(), userId, null,
-                AiPlatformEnum.DEEP_SEEK, true);
+                AiPlatformEnum.DEEPSEEK, true);
         when(modalService.getChatModel(eq(model.getId()), any()))
                 .thenReturn(DeepSeekChatModel.builder().deepSeekApi(deepSeekApi).build());
         mockMessageInsert();
@@ -671,7 +671,7 @@ public class AiChatMessageServiceImplTest extends BaseMockitoUnitTest {
         when(chatConversationService.validateChatConversationExists(eq(conversationId))).thenReturn(conversation);
         // mock 模型：真实的 DeepSeekChatModel
         AiModelDO model = new AiModelDO().setId(conversation.getModelId()).setModel(MODEL_NAME)
-                .setPlatform(AiPlatformEnum.DEEP_SEEK.getPlatform());
+                .setPlatform(AiPlatformEnum.DEEPSEEK.getPlatform());
         when(modalService.validateModel(eq(model.getId()))).thenReturn(model);
         when(modalService.getChatModel(eq(model.getId()), isNull()))
                 .thenReturn(DeepSeekChatModel.builder().deepSeekApi(deepSeekApi).build());
@@ -783,7 +783,7 @@ public class AiChatMessageServiceImplTest extends BaseMockitoUnitTest {
         AiChatMessageSendReqVO reqVO = new AiChatMessageSendReqVO().setConversationId(randomLongId())
                 .setContent("这是我的车？").setAttachmentUrls(asList(IMAGE_URL, PDF_URL));
         // mock 对话、模型：自定义型号配置了 image
-        mockMediaConversation(reqVO.getConversationId(), userId, AiPlatformEnum.DEEP_SEEK, TEXT_IMAGE);
+        mockMediaConversation(reqVO.getConversationId(), userId, AiPlatformEnum.DEEPSEEK, TEXT_IMAGE);
         // mock 方法
         when(chatModel.call(any(Prompt.class))).thenReturn(buildChatResponse());
 
@@ -816,7 +816,7 @@ public class AiChatMessageServiceImplTest extends BaseMockitoUnitTest {
         AiChatMessageSendReqVO reqVO = new AiChatMessageSendReqVO().setConversationId(randomLongId())
                 .setContent("这是我的车？").setAttachmentUrls(singletonList(IMAGE_URL));
         // mock 对话、模型：未配置 image
-        mockMediaConversation(reqVO.getConversationId(), userId, AiPlatformEnum.DEEP_SEEK,
+        mockMediaConversation(reqVO.getConversationId(), userId, AiPlatformEnum.DEEPSEEK,
                 singletonList(AiModelInputModalityEnum.TEXT.getModality()));
         // mock 方法
         when(chatModel.call(any(Prompt.class))).thenReturn(buildChatResponse());
@@ -841,7 +841,7 @@ public class AiChatMessageServiceImplTest extends BaseMockitoUnitTest {
         AiChatMessageSendReqVO reqVO = new AiChatMessageSendReqVO().setConversationId(randomLongId())
                 .setContent("这是我的车？").setUseContext(true);
         // mock 对话、模型：maxContexts = 1，只选入最近一组
-        mockMediaConversation(reqVO.getConversationId(), userId, AiPlatformEnum.DEEP_SEEK, TEXT_IMAGE);
+        mockMediaConversation(reqVO.getConversationId(), userId, AiPlatformEnum.DEEPSEEK, TEXT_IMAGE);
         when(chatMessageMapper.selectListByConversationId(eq(reqVO.getConversationId())))
                 .thenReturn(buildHistoryMessages());
         // mock 方法
@@ -868,7 +868,7 @@ public class AiChatMessageServiceImplTest extends BaseMockitoUnitTest {
         AiChatMessageSendReqVO reqVO = new AiChatMessageSendReqVO().setConversationId(randomLongId())
                 .setContent("这是我的车？").setUseContext(false);
         // mock 对话、模型
-        mockMediaConversation(reqVO.getConversationId(), userId, AiPlatformEnum.DEEP_SEEK, TEXT_IMAGE);
+        mockMediaConversation(reqVO.getConversationId(), userId, AiPlatformEnum.DEEPSEEK, TEXT_IMAGE);
         when(chatMessageMapper.selectListByConversationId(eq(reqVO.getConversationId())))
                 .thenReturn(buildHistoryMessages());
         // mock 方法
@@ -893,7 +893,7 @@ public class AiChatMessageServiceImplTest extends BaseMockitoUnitTest {
         AiChatMessageSendReqVO reqVO = new AiChatMessageSendReqVO().setConversationId(randomLongId())
                 .setContent("这是我的车？").setAttachmentUrls(singletonList(IMAGE_URL));
         // mock 对话、模型：配置了 image
-        mockMediaConversation(reqVO.getConversationId(), userId, AiPlatformEnum.DEEP_SEEK, TEXT_IMAGE);
+        mockMediaConversation(reqVO.getConversationId(), userId, AiPlatformEnum.DEEPSEEK, TEXT_IMAGE);
 
         try (MockedStatic<HttpUtil> httpUtilMock = mockStatic(HttpUtil.class)) {
             httpUtilMock.when(() -> HttpUtil.downloadBytes(eq(IMAGE_URL)))
@@ -914,7 +914,7 @@ public class AiChatMessageServiceImplTest extends BaseMockitoUnitTest {
         AiChatMessageSendReqVO reqVO = new AiChatMessageSendReqVO().setConversationId(randomLongId())
                 .setContent("这是我的车？").setAttachmentUrls(singletonList(IMAGE_URL));
         // mock 对话、模型：配置了 image
-        mockMediaConversation(reqVO.getConversationId(), userId, AiPlatformEnum.DEEP_SEEK, TEXT_IMAGE);
+        mockMediaConversation(reqVO.getConversationId(), userId, AiPlatformEnum.DEEPSEEK, TEXT_IMAGE);
 
         List<CommonResult<AiChatMessageSendRespVO>> results;
         try (MockedStatic<HttpUtil> httpUtilMock = mockStatic(HttpUtil.class)) {
@@ -938,7 +938,7 @@ public class AiChatMessageServiceImplTest extends BaseMockitoUnitTest {
         AiChatMessageSendReqVO reqVO = new AiChatMessageSendReqVO().setConversationId(randomLongId())
                 .setContent("这是我的车？").setAttachmentUrls(singletonList(IMAGE_URL));
         // mock 对话、模型：配置了 image
-        mockMediaConversation(reqVO.getConversationId(), userId, AiPlatformEnum.DEEP_SEEK, TEXT_IMAGE);
+        mockMediaConversation(reqVO.getConversationId(), userId, AiPlatformEnum.DEEPSEEK, TEXT_IMAGE);
         // mock 方法
         when(chatModel.stream(any(Prompt.class))).thenReturn(Flux.just(buildChatResponse()));
 
@@ -963,7 +963,7 @@ public class AiChatMessageServiceImplTest extends BaseMockitoUnitTest {
         AiChatMessageSendReqVO reqVO = new AiChatMessageSendReqVO().setConversationId(randomLongId())
                 .setContent("视频里有什么？").setAttachmentUrls(singletonList(VIDEO_URL));
         // mock 对话、模型：即使配置了 video，本期也不实现视频传输
-        mockMediaConversation(reqVO.getConversationId(), userId, AiPlatformEnum.DEEP_SEEK,
+        mockMediaConversation(reqVO.getConversationId(), userId, AiPlatformEnum.DEEPSEEK,
                 asList(AiModelInputModalityEnum.TEXT.getModality(), AiModelInputModalityEnum.IMAGE.getModality(),
                         AiModelInputModalityEnum.VIDEO.getModality()));
         // mock 方法
@@ -988,7 +988,7 @@ public class AiChatMessageServiceImplTest extends BaseMockitoUnitTest {
         AiChatMessageSendReqVO reqVO = new AiChatMessageSendReqVO().setConversationId(randomLongId())
                 .setContent("你好");
         // mock 对话、模型
-        mockMediaConversation(reqVO.getConversationId(), userId, AiPlatformEnum.DEEP_SEEK, TEXT_IMAGE);
+        mockMediaConversation(reqVO.getConversationId(), userId, AiPlatformEnum.DEEPSEEK, TEXT_IMAGE);
         // mock 方法
         when(chatModel.call(any(Prompt.class))).thenReturn(buildChatResponse());
 
@@ -1007,7 +1007,7 @@ public class AiChatMessageServiceImplTest extends BaseMockitoUnitTest {
         AiChatMessageSendReqVO reqVO = new AiChatMessageSendReqVO().setConversationId(randomLongId())
                 .setContent("这是我的车？").setUseContext(true);
         // mock 对话、模型：通义的自定义型号，不在 TONG_YI_MULTI_MODELS 名单
-        mockMediaConversation(reqVO.getConversationId(), userId, AiPlatformEnum.TONG_YI, TEXT_IMAGE);
+        mockMediaConversation(reqVO.getConversationId(), userId, AiPlatformEnum.ALIBABA, TEXT_IMAGE);
         when(chatMessageMapper.selectListByConversationId(eq(reqVO.getConversationId())))
                 .thenReturn(buildHistoryMessages());
         // mock 方法
@@ -1030,7 +1030,7 @@ public class AiChatMessageServiceImplTest extends BaseMockitoUnitTest {
         AiChatMessageSendReqVO reqVO = new AiChatMessageSendReqVO().setConversationId(randomLongId())
                 .setContent("你好");
         // mock 对话、模型：通义的自定义型号
-        mockMediaConversation(reqVO.getConversationId(), userId, AiPlatformEnum.TONG_YI, TEXT_IMAGE);
+        mockMediaConversation(reqVO.getConversationId(), userId, AiPlatformEnum.ALIBABA, TEXT_IMAGE);
         // mock 方法
         when(chatModel.call(any(Prompt.class))).thenReturn(buildChatResponse());
 

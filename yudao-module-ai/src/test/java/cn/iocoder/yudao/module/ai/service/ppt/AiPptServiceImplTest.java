@@ -201,13 +201,13 @@ public class AiPptServiceImplTest extends BaseDbUnitTest {
         // mock 方法：OpenAI 的模型绑定了硅基流动的密钥，实际会按硅基流动创建客户端，与 OpenAI 的生图参数不匹配
         mockImageModel();
         when(apiKeyService.validateApiKey(eq(IMAGE_KEY_ID))).thenReturn(new AiApiKeyDO().setId(IMAGE_KEY_ID)
-                .setPlatform(AiPlatformEnum.SILICON_FLOW.getPlatform()));
+                .setPlatform(AiPlatformEnum.SILICONFLOW.getPlatform()));
         // 准备参数
         AiPptGenerateReqVO reqVO = buildGenerateReqVO().setContent("大纲");
 
         // 调用，并断言异常
         assertServiceException(() -> pptService.generatePpt(USER_ID, reqVO), PPT_IMAGE_MODEL_PLATFORM_MISMATCH,
-                AiPlatformEnum.OPENAI.getPlatform(), AiPlatformEnum.SILICON_FLOW.getPlatform());
+                AiPlatformEnum.OPENAI.getPlatform(), AiPlatformEnum.SILICONFLOW.getPlatform());
         assertEquals(0L, pptMapper.selectCount());
         verify(modelService, never()).getImageModel(any());
     }
@@ -393,7 +393,7 @@ public class AiPptServiceImplTest extends BaseDbUnitTest {
         // mock 方法：创建后，模型改绑了硅基流动的密钥
         ImageModel imageModel = mockImageModel();
         when(apiKeyService.validateApiKey(eq(IMAGE_KEY_ID))).thenReturn(new AiApiKeyDO().setId(IMAGE_KEY_ID)
-                .setPlatform(AiPlatformEnum.SILICON_FLOW.getPlatform()));
+                .setPlatform(AiPlatformEnum.SILICONFLOW.getPlatform()));
         // 准备参数
         AiPptRedrawReqVO reqVO = new AiPptRedrawReqVO().setId(dbPpt.getId()).setSlideIndex(1).setPrompt("新提示词");
 
@@ -913,11 +913,11 @@ public class AiPptServiceImplTest extends BaseDbUnitTest {
         assertEquals(1792, dallE.getWidth());
         assertEquals(1024, dallE.getHeight());
         ImageOptions siliconFlow = AiPptServiceImpl.buildImageOptions(new AiModelDO()
-                .setPlatform(AiPlatformEnum.SILICON_FLOW.getPlatform()).setModel("Qwen/Qwen-Image"));
+                .setPlatform(AiPlatformEnum.SILICONFLOW.getPlatform()).setModel("Qwen/Qwen-Image"));
         assertEquals(1664, siliconFlow.getWidth());
         assertEquals(928, siliconFlow.getHeight());
         ImageOptions tongYi = AiPptServiceImpl.buildImageOptions(new AiModelDO()
-                .setPlatform(AiPlatformEnum.TONG_YI.getPlatform()).setModel("wanx2.1-t2i-turbo"));
+                .setPlatform(AiPlatformEnum.ALIBABA.getPlatform()).setModel("wanx2.1-t2i-turbo"));
         assertEquals(1280, tongYi.getWidth());
         assertEquals(720, tongYi.getHeight());
     }

@@ -21,7 +21,7 @@ public class AiMusicRespVO {
     @Schema(description = "生成模式", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer generateMode;
 
-    @Schema(description = "平台", requiredMode = Schema.RequiredMode.REQUIRED, example = "Suno")
+    @Schema(description = "平台", requiredMode = Schema.RequiredMode.REQUIRED, example = "SUNO")
     private String platform;
 
     @Schema(description = "模型编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "31")

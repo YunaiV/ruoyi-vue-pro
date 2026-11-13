@@ -150,7 +150,7 @@ public class AiImageDO extends BaseDO {
     /**
      * Seedream 的绘制参数
      *
-     * 只用于 platform = {@link AiPlatformEnum#DOU_BAO}
+     * 只用于 platform = {@link AiPlatformEnum#BYTEDANCE}
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
     private SeedreamOptions seedreamOptions;

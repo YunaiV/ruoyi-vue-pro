@@ -1,10 +1,14 @@
 package cn.iocoder.yudao.module.ai.service.model;
 
 import cn.hutool.core.util.ObjUtil;
+import cn.iocoder.yudao.module.ai.enums.model.AiModelTypeEnum;
 import cn.iocoder.yudao.module.ai.enums.model.AiPlatformEnum;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.AiModelFactory;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.suno.api.SunoApi;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.tencent.api.TencentTtsApi;
+import cn.iocoder.yudao.module.ai.framework.ai.core.ocr.OcrException;
+import cn.iocoder.yudao.module.ai.framework.ai.core.ocr.OcrModel;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -20,6 +24,7 @@ import com.agentsflex.llm.qwen.QwenLlm;
 import com.agentsflex.llm.qwen.QwenLlmConfig;
 import dev.tinyflow.core.Tinyflow;
 import jakarta.annotation.Resource;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.speech.AiSpeechModel;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.embedding.EmbeddingModel;
 import com.volcengine.ark.runtime.service.ArkService;
@@ -29,10 +34,14 @@ import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
 import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.*;
 
 /**
@@ -43,6 +52,12 @@ import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.*;
 @Service
 @Validated
 public class AiModelServiceImpl implements AiModelService {
+
+    /**
+     * 支持文字识别的平台
+     */
+    private static final Set<AiPlatformEnum> OCR_PLATFORMS = EnumSet.of(AiPlatformEnum.ALIBABA, AiPlatformEnum.SILICONFLOW,
+            AiPlatformEnum.TENCENT, AiPlatformEnum.BAIDU, AiPlatformEnum.BYTEDANCE);
 
     @Resource
     private AiApiKeyService apiKeyService;
@@ -60,6 +75,9 @@ public class AiModelServiceImpl implements AiModelService {
         AiApiKeyDO apiKey = apiKeyService.validateApiKey(createReqVO.getKeyId());
         AiModelDO model = BeanUtils.toBean(createReqVO, AiModelDO.class);
         validateReasoningConfig(platform, apiKey, model.getType(), model.getReasoningConfig());
+        if (AiModelTypeEnum.OCR.getType().equals(model.getType())) {
+            buildOcrModel(model, apiKey);
+        }
 
         // 2. 插入：未配置（null 或档位为空）时思考配置不写入
         if (!AiReasoningUtils.isReasoningConfigured(model)) {
@@ -77,6 +95,9 @@ public class AiModelServiceImpl implements AiModelService {
         AiApiKeyDO apiKey = apiKeyService.validateApiKey(updateReqVO.getKeyId());
         AiModelDO updateObj = BeanUtils.toBean(updateReqVO, AiModelDO.class);
         validateReasoningConfig(platform, apiKey, updateObj.getType(), updateObj.getReasoningConfig());
+        if (AiModelTypeEnum.OCR.getType().equals(updateObj.getType())) {
+            buildOcrModel(updateObj, apiKey);
+        }
 
         // 2. 更新：未配置（null 或档位为空）时思考配置清空，由 updateForSave 与普通字段同一条 UPDATE 置空
         // DONE @AI：类似别的模块，updateForSave，这样是不是可以把逻辑放到 mapper；这样 2.1 2.2 就可以和上面 create 一样的逻辑呀；（已新增 AiChatMapper#updateForSave，更新与创建同样先把未配置归一为 null）
@@ -229,6 +250,65 @@ public class AiModelServiceImpl implements AiModelService {
     }
 
     @Override
+    public AiSpeechModel getTextToSpeechModel(AiApiKeyDO apiKey, String model) {
+        AiPlatformEnum platform = AiPlatformEnum.validatePlatform(apiKey.getPlatform());
+        return modelFactory.getOrCreateTextToSpeechModel(platform, apiKey.getApiKey(), apiKey.getUrl(), model);
+    }
+
+    @Override
+    public TencentTtsApi getTencentTtsApi(AiApiKeyDO apiKey) {
+        return modelFactory.getOrCreateTencentTtsApi(apiKey.getApiKey(), apiKey.getUrl());
+    }
+
+    @Override
+    public OcrModel getOcrModel(Long id) {
+        AiModelDO model = validateModel(id);
+        AiApiKeyDO apiKey = apiKeyService.validateApiKey(model.getKeyId());
+        return buildOcrModel(model, apiKey);
+    }
+
+    @Override
+    public List<AiModelDO> getOcrModelList() {
+        List<AiModelDO> models = modelMapper.selectListByStatusAndType(
+                CommonStatusEnum.ENABLE.getStatus(), AiModelTypeEnum.OCR.getType(), null);
+        Map<Long, AiApiKeyDO> apiKeys = convertMap(apiKeyService.getApiKeyList(), AiApiKeyDO::getId);
+        return filterList(models, model -> {
+            AiApiKeyDO apiKey = apiKeys.get(model.getKeyId());
+            return apiKey != null && CommonStatusEnum.isEnable(apiKey.getStatus())
+                    && ObjUtil.equal(model.getPlatform(), apiKey.getPlatform())
+                    && OCR_PLATFORMS.stream().anyMatch(platform -> platform.getPlatform().equals(model.getPlatform()));
+        });
+    }
+
+    /**
+     * 校验文字识别模型，并创建（或从缓存获得）OcrModel；创建时只校验密钥、模型标识的格式，不发起调用
+     *
+     * 文字识别不使用对话参数，校验通过后把 model 上的对话参数归一为 null：保存时不写入；
+     * 获取 OcrModel 时 model 是本次查询出的对象，只影响内存，不影响创建出的 OcrModel
+     */
+    private OcrModel buildOcrModel(AiModelDO model, AiApiKeyDO apiKey) {
+        if (ObjUtil.notEqual(model.getType(), AiModelTypeEnum.OCR.getType())) {
+            throw exception(MODEL_USE_TYPE_ERROR);
+        }
+        if (ObjUtil.notEqual(model.getPlatform(), apiKey.getPlatform())) {
+            throw exception(OCR_MODEL_PLATFORM_MISMATCH, model.getPlatform(), apiKey.getPlatform());
+        }
+        AiPlatformEnum platform = AiPlatformEnum.validatePlatform(apiKey.getPlatform());
+        if (!OCR_PLATFORMS.contains(platform)) {
+            throw exception(OCR_MODEL_PLATFORM_NOT_SUPPORTED, platform.getPlatform());
+        }
+        OcrModel ocrModel;
+        try {
+            ocrModel = modelFactory.getOrCreateOcrModel(platform, apiKey.getApiKey(), apiKey.getUrl(), model.getModel());
+        } catch (OcrException ex) { // 异常消息已脱敏，不含密钥
+            throw exception(OCR_CONFIG_INVALID, ex.getMessage());
+        }
+        model.setTemperature(null).setMaxTokens(null).setMaxContexts(null).setInputModalities(null)
+                .setReasoningConfig(null);
+        return ocrModel;
+    }
+
+    @Override
     public VectorStore getOrCreateVectorStore(Long id, Map<String, Class<?>> metadataFields) {
         // 获取模型 + 密钥
         AiModelDO model = validateModel(id);
@@ -255,7 +335,7 @@ public class AiModelServiceImpl implements AiModelService {
         switch (platform) {
             // TODO @lesan 考虑到未来不需要使用agents-flex 现在仅测试通义千问
             // TODO @lesan：【重要】是不是可以实现一个 SpringAiLlm，这样的话，内部全部用它就好了。只实现 chat 部分；这样，就把 flex 作为一个 agent 框架，内部调用，还是 spring ai 相关的。成本可能低一点？！
-            case TONG_YI:
+            case ALIBABA:
                 QwenLlmConfig qwenLlmConfig = new QwenLlmConfig();
                 qwenLlmConfig.setApiKey(apiKey.getApiKey());
                 qwenLlmConfig.setModel(model.getModel());

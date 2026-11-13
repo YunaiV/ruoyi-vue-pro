@@ -67,10 +67,11 @@ public interface ErrorCodeConstants {
 
     // ========== API 写作 1-040-007-000 ==========
     ErrorCode WRITE_NOT_EXISTS = new ErrorCode(1_040_007_000, "作文不存在!");
-    ErrorCode WRITE_STREAM_ERROR = new ErrorCode(1_040_07_001, "写作生成异常!");
+    ErrorCode WRITE_GENERATE_FAIL = new ErrorCode(1_040_007_002, "写作生成失败：{}");
 
     // ========== API 思维导图 1-040-008-000 ==========
     ErrorCode MIND_MAP_NOT_EXISTS = new ErrorCode(1_040_008_000, "思维导图不存在!");
+    ErrorCode MIND_MAP_GENERATE_FAIL = new ErrorCode(1_040_008_001, "思维导图生成失败：{}");
 
     // ========== API 知识库 1-040-009-000 ==========
     ErrorCode KNOWLEDGE_NOT_EXISTS = new ErrorCode(1_040_009_000, "知识库不存在!");
@@ -93,7 +94,7 @@ public interface ErrorCodeConstants {
 
     // ========== AI PPT 1-040-012-000 ==========
     ErrorCode PPT_NOT_EXISTS = new ErrorCode(1_040_012_000, "PPT 不存在");
-    ErrorCode PPT_IMAGE_MODEL_NOT_SUPPORTED = new ErrorCode(1_040_012_001, "操作失败，PPT 只支持 OpenAI、硅基流动、通义的绘图模型");
+    ErrorCode PPT_IMAGE_MODEL_NOT_SUPPORTED = new ErrorCode(1_040_012_001, "操作失败，PPT 只支持 OpenAI、硅基流动、阿里巴巴的绘图模型");
     ErrorCode PPT_STATUS_IN_PROGRESS = new ErrorCode(1_040_012_006, "PPT 生成中，请稍后再试");
     ErrorCode PPT_STATUS_NOT_FAIL = new ErrorCode(1_040_012_007, "只有已失败的 PPT 才能继续生成");
     ErrorCode PPT_STATUS_NOT_SUCCESS = new ErrorCode(1_040_012_008, "只有已完成的 PPT 才能导出");
@@ -105,5 +106,22 @@ public interface ErrorCodeConstants {
     ErrorCode PPT_IMAGE_MODEL_PLATFORM_MISMATCH = new ErrorCode(1_040_012_014,
             "操作失败，绘图模型的平台（{}）与 API 密钥的平台（{}）不一致，请修改模型配置");
     ErrorCode PPT_UPDATE_CONFLICT = new ErrorCode(1_040_012_015, "PPT 已被修改，请刷新后重试");
+
+    // ========== AI 语音 1-040-013-000 ==========
+    ErrorCode SPEECH_NOT_EXISTS = new ErrorCode(1_040_013_000, "语音不存在");
+    ErrorCode SPEECH_MODEL_PLATFORM_MISMATCH = new ErrorCode(1_040_013_001,
+            "操作失败，语音模型的平台（{}）与 API 密钥的平台（{}）不一致，请修改模型配置");
+    ErrorCode SPEECH_MODEL_NOT_SUPPORTED = new ErrorCode(1_040_013_002, "操作失败，语音模型({})不可用：{}");
+    ErrorCode SPEECH_OPTION_INVALID = new ErrorCode(1_040_013_003, "语音参数不正确：{}");
+    ErrorCode SPEECH_STATUS_NOT_FINISHED = new ErrorCode(1_040_013_004, "语音还在生成中，暂不能删除");
+
+    // ========== AI 文字识别 1-040-014-000 ==========
+    ErrorCode OCR_NOT_EXISTS = new ErrorCode(1_040_014_000, "文字识别记录不存在");
+    ErrorCode OCR_MODEL_PLATFORM_MISMATCH = new ErrorCode(1_040_014_001,
+            "操作失败，文字识别模型的平台（{}）与 API 密钥的平台（{}）不一致，请修改模型配置");
+    ErrorCode OCR_MODEL_PLATFORM_NOT_SUPPORTED = new ErrorCode(1_040_014_002, "平台({})暂不支持文字识别");
+    ErrorCode OCR_IMAGE_INVALID = new ErrorCode(1_040_014_003, "只支持 PNG、JPEG 格式且不超过 {}MB 的图片");
+    ErrorCode OCR_STATUS_NOT_SUCCESS = new ErrorCode(1_040_014_004, "只有识别成功的记录才能保存修订");
+    ErrorCode OCR_CONFIG_INVALID = new ErrorCode(1_040_014_005, "文字识别配置不正确：{}");
 
 }

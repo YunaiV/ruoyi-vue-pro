@@ -49,9 +49,9 @@ public class AiModelServiceImplImageTest extends BaseMockitoUnitTest {
     @Test
     public void testGetImageModel_success() {
         // mock 数据：Stability AI 模型与密钥
-        mockModelAndApiKey(AiPlatformEnum.STABLE_DIFFUSION, "stable-diffusion-xl-1024-v1-0", AiPlatformEnum.STABLE_DIFFUSION);
+        mockModelAndApiKey(AiPlatformEnum.STABILITYAI, "stable-diffusion-xl-1024-v1-0", AiPlatformEnum.STABILITYAI);
         ImageModel imageModel = mock(ImageModel.class);
-        when(modelFactory.getOrCreateImageModel(AiPlatformEnum.STABLE_DIFFUSION, API_KEY, URL,
+        when(modelFactory.getOrCreateImageModel(AiPlatformEnum.STABILITYAI, API_KEY, URL,
                 "stable-diffusion-xl-1024-v1-0")).thenReturn(imageModel);
 
         // 调用，并断言：使用模型标识创建客户端
@@ -61,11 +61,11 @@ public class AiModelServiceImplImageTest extends BaseMockitoUnitTest {
     @Test
     public void testGetImageModel_platformMismatch() {
         // mock 数据：模型的平台为 OpenAI，API 密钥的平台为硅基流动
-        mockModelAndApiKey(AiPlatformEnum.OPENAI, "dall-e-3", AiPlatformEnum.SILICON_FLOW);
+        mockModelAndApiKey(AiPlatformEnum.OPENAI, "dall-e-3", AiPlatformEnum.SILICONFLOW);
 
         // 调用，并断言异常
         assertServiceException(() -> modelService.getImageModel(MODEL_ID), IMAGE_MODEL_PLATFORM_MISMATCH,
-                AiPlatformEnum.OPENAI.getPlatform(), AiPlatformEnum.SILICON_FLOW.getPlatform());
+                AiPlatformEnum.OPENAI.getPlatform(), AiPlatformEnum.SILICONFLOW.getPlatform());
         // 断言：不创建客户端
         verifyNoInteractions(modelFactory);
     }
@@ -126,7 +126,7 @@ public class AiModelServiceImplImageTest extends BaseMockitoUnitTest {
     @Test
     public void testGetArkService_success() {
         // mock 数据：豆包 Seedream 模型与密钥
-        mockModelAndApiKey(AiPlatformEnum.DOU_BAO, "doubao-seedream-4-5-251128", AiPlatformEnum.DOU_BAO);
+        mockModelAndApiKey(AiPlatformEnum.BYTEDANCE, "doubao-seedream-4-5-251128", AiPlatformEnum.BYTEDANCE);
         ArkService arkService = mock(ArkService.class);
         when(modelFactory.getOrCreateArkService(API_KEY, URL)).thenReturn(arkService);
 
@@ -137,11 +137,11 @@ public class AiModelServiceImplImageTest extends BaseMockitoUnitTest {
     @Test
     public void testGetArkService_platformMismatch() {
         // mock 数据：模型的平台为豆包，API 密钥的平台为 OpenAI
-        mockModelAndApiKey(AiPlatformEnum.DOU_BAO, "doubao-seedream-4-5-251128", AiPlatformEnum.OPENAI);
+        mockModelAndApiKey(AiPlatformEnum.BYTEDANCE, "doubao-seedream-4-5-251128", AiPlatformEnum.OPENAI);
 
         // 调用，并断言异常
         assertServiceException(() -> modelService.getArkService(MODEL_ID), IMAGE_MODEL_PLATFORM_MISMATCH,
-                AiPlatformEnum.DOU_BAO.getPlatform(), AiPlatformEnum.OPENAI.getPlatform());
+                AiPlatformEnum.BYTEDANCE.getPlatform(), AiPlatformEnum.OPENAI.getPlatform());
         // 断言：不创建客户端
         verifyNoInteractions(modelFactory);
     }

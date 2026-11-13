@@ -36,10 +36,10 @@ public class AiReasoningUtils {
     public static final String REASONING_LEVEL_OFF = "off";
 
     /**
-     * 通义的思考参数键
+     * 阿里巴巴（DashScope）的思考参数键
      */
-    public static final String TONG_YI_ENABLE_THINKING = "enable_thinking";
-    public static final String TONG_YI_THINKING_BUDGET = "thinking_budget";
+    public static final String ALIBABA_ENABLE_THINKING = "enable_thinking";
+    public static final String ALIBABA_THINKING_BUDGET = "thinking_budget";
 
     /**
      * OpenAI 路由中写入强类型字段的键
@@ -86,10 +86,11 @@ public class AiReasoningUtils {
          * OpenAI 兼容客户端：reasoning_effort 写强类型字段，其余键追加到 extraBody
          */
         OPENAI,
+        // TODO DONE @AI：类似“通义”一些注释，都检查下噢；（平台相关的“通义”已改为阿里巴巴，思考参数常量改为 ALIBABA_*；通义千问、通义万相等产品名保留）
         /**
-         * 通义：只认 enable_thinking、thinking_budget，映射到 DashScope 原生字段
+         * 阿里巴巴：只认 enable_thinking、thinking_budget，映射到 DashScope 原生字段
          */
-        TONG_YI,
+        ALIBABA,
         /**
          * 不支持思考配置
          */
@@ -109,25 +110,25 @@ public class AiReasoningUtils {
         }
         // noinspection EnhancedSwitchMigration
         switch (platform) {
-            case DEEP_SEEK:
-            case DOU_BAO:
-            case HUN_YUAN:
-            case SILICON_FLOW:
-            case YI_YAN:
-            case ZHI_PU:
-            case XING_HUO:
-            case MINI_MAX:
+            case DEEPSEEK:
+            case BYTEDANCE:
+            case TENCENT:
+            case SILICONFLOW:
+            case BAIDU:
+            case ZHIPU:
+            case IFLYTEK:
+            case MINIMAX:
             case MOONSHOT:
-            case BAI_CHUAN:
-            case STEP_FUN:
-            case MI_MO:
+            case BAICHUAN:
+            case STEPFUN:
+            case MIMO:
                 return ReasoningRoute.HTTP;
             case OPENAI:
             case GROK:
             case GEMINI: // JDK17 的 Gemini 走 OpenAI 兼容层
                 return ReasoningRoute.OPENAI;
-            case TONG_YI:
-                return ReasoningRoute.TONG_YI;
+            case ALIBABA:
+                return ReasoningRoute.ALIBABA;
             default:
                 return ReasoningRoute.UNSUPPORTED;
         }
@@ -219,20 +220,20 @@ public class AiReasoningUtils {
                             "档位(" + level + ")的 reasoning_effort 必须是非空字符串");
                 }
                 return;
-            case TONG_YI:
-                // TONG_YI：映射到 DashScope 原生字段，只认 enable_thinking（必填布尔）、thinking_budget（可选正整数）
+            case ALIBABA:
+                // ALIBABA：映射到 DashScope 原生字段，只认 enable_thinking（必填布尔）、thinking_budget（可选正整数）
                 for (String key : options.keySet()) {
-                    if (!TONG_YI_ENABLE_THINKING.equals(key) && !TONG_YI_THINKING_BUDGET.equals(key)) {
+                    if (!ALIBABA_ENABLE_THINKING.equals(key) && !ALIBABA_THINKING_BUDGET.equals(key)) {
                         throw exception(MODEL_REASONING_CONFIG_INVALID,
-                                "档位(" + level + ")的通义思考参数只支持 enable_thinking、thinking_budget，不支持 " + key);
+                                "档位(" + level + ")的阿里巴巴思考参数只支持 enable_thinking、thinking_budget，不支持 " + key);
                     }
                 }
-                if (!(options.get(TONG_YI_ENABLE_THINKING) instanceof Boolean)) {
+                if (!(options.get(ALIBABA_ENABLE_THINKING) instanceof Boolean)) {
                     throw exception(MODEL_REASONING_CONFIG_INVALID,
-                            "档位(" + level + ")的通义思考参数必须包含布尔值 enable_thinking");
+                            "档位(" + level + ")的阿里巴巴思考参数必须包含布尔值 enable_thinking");
                 }
-                if (options.containsKey(TONG_YI_THINKING_BUDGET)) {
-                    Object budget = options.get(TONG_YI_THINKING_BUDGET);
+                if (options.containsKey(ALIBABA_THINKING_BUDGET)) {
+                    Object budget = options.get(ALIBABA_THINKING_BUDGET);
                     if (!(budget instanceof Integer) || (Integer) budget <= 0) {
                         throw exception(MODEL_REASONING_CONFIG_INVALID,
                                 "档位(" + level + ")的 thinking_budget 必须是正整数");

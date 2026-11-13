@@ -109,7 +109,7 @@ public class AiPptServiceImpl implements AiPptService {
      * Stable Diffusion 需要额外的采样参数，Midjourney 是另一套异步接口，都不支持
      */
     private static final Set<String> IMAGE_PLATFORMS = asSet(AiPlatformEnum.OPENAI.getPlatform(),
-            AiPlatformEnum.SILICON_FLOW.getPlatform(), AiPlatformEnum.TONG_YI.getPlatform());
+            AiPlatformEnum.SILICONFLOW.getPlatform(), AiPlatformEnum.ALIBABA.getPlatform());
 
     /**
      * 分镜的系统提示词：图文并茂（imagePrompt 写明画面上应出现的文字），输出带标题的 JSON 对象
@@ -480,10 +480,10 @@ public class AiPptServiceImpl implements AiPptService {
             return StrUtil.startWithIgnoreCase(model.getModel(), "gpt-image")
                     ? AiImageUtils.buildImageOptions(platform, model.getModel(), 1536, 1024)
                     : AiImageUtils.buildImageOptions(platform, model.getModel(), 1792, 1024);
-        } else if (platform == AiPlatformEnum.SILICON_FLOW) {
+        } else if (platform == AiPlatformEnum.SILICONFLOW) {
             // Qwen-Image 的 16:9 尺寸
             return AiImageUtils.buildImageOptions(platform, model.getModel(), 1664, 928);
-        } else if (platform == AiPlatformEnum.TONG_YI) {
+        } else if (platform == AiPlatformEnum.ALIBABA) {
             return AiImageUtils.buildImageOptions(platform, model.getModel(), 1280, 720);
         }
         throw new IllegalArgumentException("不支持的 AI 平台：" + model.getPlatform());

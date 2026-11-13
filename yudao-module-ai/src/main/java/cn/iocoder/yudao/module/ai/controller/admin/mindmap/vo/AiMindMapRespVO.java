@@ -21,7 +21,7 @@ public class AiMindMapRespVO {
     @Schema(description = "生成的思维导图内容")
     private String generatedContent;
 
-    @Schema(description = "平台", requiredMode = Schema.RequiredMode.REQUIRED, example = "OpenAI")
+    @Schema(description = "平台", requiredMode = Schema.RequiredMode.REQUIRED, example = "OPENAI")
     private String platform;
 
     @Schema(description = "模型", requiredMode = Schema.RequiredMode.REQUIRED, example = "gpt-3.5-turbo-0125")

@@ -95,7 +95,7 @@ public class AiChatUtils {
         toolContext = ObjUtil.defaultIfNull(toolContext, Collections.emptyMap());
         // noinspection EnhancedSwitchMigration
         switch (platform) {
-            case TONG_YI:
+            case ALIBABA:
                 DashScopeChatOptions.DashScopeChatOptionsBuilder dashScopeBuilder = DashScopeChatOptions.builder()
                         .model(model).temperature(temperature).maxToken(maxTokens)
                         .enableThinking(true) // TODO 芋艿：默认都开启 thinking 模式，后续可以让用户配置
@@ -104,25 +104,25 @@ public class AiChatUtils {
                 if (reasoningOptions != null) {
                     // 已配置思考：保存时已保证 enable_thinking 为布尔值、thinking_budget 为正整数
                     dashScopeBuilder.enableThinking(
-                            (Boolean) reasoningOptions.get(AiReasoningUtils.TONG_YI_ENABLE_THINKING));
-                    Object budget = reasoningOptions.get(AiReasoningUtils.TONG_YI_THINKING_BUDGET);
+                            (Boolean) reasoningOptions.get(AiReasoningUtils.ALIBABA_ENABLE_THINKING));
+                    Object budget = reasoningOptions.get(AiReasoningUtils.ALIBABA_THINKING_BUDGET);
                     if (budget instanceof Integer) {
                         dashScopeBuilder.thinkingBudget((Integer) budget);
                     }
                 }
                 return dashScopeBuilder.build();
-            case DEEP_SEEK:
-            case DOU_BAO: // 复用 DeepSeek 客户端
-            case HUN_YUAN: // 复用 DeepSeek 客户端
-            case SILICON_FLOW: // 复用 DeepSeek 客户端
-            case YI_YAN: // 复用 DeepSeek 客户端
-            case ZHI_PU: // 复用 DeepSeek 客户端
-            case XING_HUO: // 复用 DeepSeek 客户端
-            case MINI_MAX: // 复用 DeepSeek 客户端
+            case DEEPSEEK:
+            case BYTEDANCE: // 复用 DeepSeek 客户端
+            case TENCENT: // 复用 DeepSeek 客户端
+            case SILICONFLOW: // 复用 DeepSeek 客户端
+            case BAIDU: // 复用 DeepSeek 客户端
+            case ZHIPU: // 复用 DeepSeek 客户端
+            case IFLYTEK: // 复用 DeepSeek 客户端
+            case MINIMAX: // 复用 DeepSeek 客户端
             case MOONSHOT: // 复用 DeepSeek 客户端
-            case BAI_CHUAN: // 复用 DeepSeek 客户端
-            case STEP_FUN: // 复用 DeepSeek 客户端
-            case MI_MO: // 复用 DeepSeek 客户端
+            case BAICHUAN: // 复用 DeepSeek 客户端
+            case STEPFUN: // 复用 DeepSeek 客户端
+            case MIMO: // 复用 DeepSeek 客户端
                 return DeepSeekChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)
                         .toolCallbacks(toolCallbacks).toolContext(toolContext).build();
             case OPENAI:
@@ -146,7 +146,7 @@ public class AiChatUtils {
                     }
                 }
                 return openAiBuilder.build();
-            case AZURE_OPENAI:
+            case AZURE:
                 return AzureOpenAiChatOptions.builder().deploymentName(model).temperature(temperature).maxTokens(maxTokens)
                         .toolCallbacks(toolCallbacks).toolContext(toolContext).build();
             case ANTHROPIC:

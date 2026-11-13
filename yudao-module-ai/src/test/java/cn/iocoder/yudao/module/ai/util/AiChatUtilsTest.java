@@ -39,7 +39,7 @@ public class AiChatUtilsTest {
     @Test
     public void testBuildChatOptions_tongYiCustomModelWithMedia() {
         // 调用
-        DashScopeChatOptions options = (DashScopeChatOptions) AiChatUtils.buildChatOptions(AiPlatformEnum.TONG_YI,
+        DashScopeChatOptions options = (DashScopeChatOptions) AiChatUtils.buildChatOptions(AiPlatformEnum.ALIBABA,
                 CUSTOM_MODEL, 0.7, 1024, null, null, true);
         // 断言：含 Media 走多模态接口
         assertEquals(Boolean.TRUE, options.getMultiModel());
@@ -48,7 +48,7 @@ public class AiChatUtilsTest {
     @Test
     public void testBuildChatOptions_tongYiCustomModelTextOnly() {
         // 调用
-        DashScopeChatOptions options = (DashScopeChatOptions) AiChatUtils.buildChatOptions(AiPlatformEnum.TONG_YI,
+        DashScopeChatOptions options = (DashScopeChatOptions) AiChatUtils.buildChatOptions(AiPlatformEnum.ALIBABA,
                 CUSTOM_MODEL, 0.7, 1024, null, null, false);
         // 断言：纯文本保持原通道
         assertEquals(Boolean.FALSE, options.getMultiModel());
@@ -57,7 +57,7 @@ public class AiChatUtilsTest {
     @Test
     public void testBuildChatOptions_tongYiListedModelTextOnly() {
         // 调用：原有重载，默认不含 Media
-        DashScopeChatOptions options = (DashScopeChatOptions) AiChatUtils.buildChatOptions(AiPlatformEnum.TONG_YI,
+        DashScopeChatOptions options = (DashScopeChatOptions) AiChatUtils.buildChatOptions(AiPlatformEnum.ALIBABA,
                 LISTED_MODEL, 0.7, 1024);
         // 断言：名单内型号纯文本仍按名单走多模态接口，与改动前一致
         assertEquals(Boolean.TRUE, options.getMultiModel());
@@ -83,7 +83,7 @@ public class AiChatUtilsTest {
     @Test
     public void testBuildChatOptions_tongYiNullOptionsKeepsDefault() {
         // 调用：未配置思考
-        DashScopeChatOptions options = (DashScopeChatOptions) AiChatUtils.buildChatOptions(AiPlatformEnum.TONG_YI,
+        DashScopeChatOptions options = (DashScopeChatOptions) AiChatUtils.buildChatOptions(AiPlatformEnum.ALIBABA,
                 CUSTOM_MODEL, 0.7, 1024, null, null, false, null);
         // 断言：与原有行为一致，固定开启思考、不发预算
         assertEquals(Boolean.TRUE, options.getEnableThinking());
@@ -100,9 +100,9 @@ public class AiChatUtilsTest {
         budgetReasoningOptions.put("thinking_budget", 8192);
 
         // 调用
-        DashScopeChatOptions offOptions = (DashScopeChatOptions) AiChatUtils.buildChatOptions(AiPlatformEnum.TONG_YI,
+        DashScopeChatOptions offOptions = (DashScopeChatOptions) AiChatUtils.buildChatOptions(AiPlatformEnum.ALIBABA,
                 CUSTOM_MODEL, 0.7, 1024, null, null, false, offReasoningOptions);
-        DashScopeChatOptions budgetOptions = (DashScopeChatOptions) AiChatUtils.buildChatOptions(AiPlatformEnum.TONG_YI,
+        DashScopeChatOptions budgetOptions = (DashScopeChatOptions) AiChatUtils.buildChatOptions(AiPlatformEnum.ALIBABA,
                 CUSTOM_MODEL, 0.7, 1024, null, null, true, budgetReasoningOptions);
         // 断言：映射到原生字段；多模态判断不受影响
         assertEquals(Boolean.FALSE, offOptions.getEnableThinking());
@@ -170,9 +170,9 @@ public class AiChatUtilsTest {
         levelOptions.put("thinking", MapUtil.of("type", "disabled"));
 
         // 调用
-        DeepSeekChatOptions withReasoning = (DeepSeekChatOptions) AiChatUtils.buildChatOptions(AiPlatformEnum.DEEP_SEEK,
+        DeepSeekChatOptions withReasoning = (DeepSeekChatOptions) AiChatUtils.buildChatOptions(AiPlatformEnum.DEEPSEEK,
                 "deepseek-test", 0.7, 1024, null, null, false, levelOptions);
-        DeepSeekChatOptions withoutReasoning = (DeepSeekChatOptions) AiChatUtils.buildChatOptions(AiPlatformEnum.DEEP_SEEK,
+        DeepSeekChatOptions withoutReasoning = (DeepSeekChatOptions) AiChatUtils.buildChatOptions(AiPlatformEnum.DEEPSEEK,
                 "deepseek-test", 0.7, 1024);
         // 断言：DeepSeek 族的思考参数装在客户端 HTTP 层，options 与未配置时一致
         assertEquals(withoutReasoning.getModel(), withReasoning.getModel());
@@ -183,7 +183,7 @@ public class AiChatUtilsTest {
     @Test
     public void testBuildChatOptions_miMo() {
         // 调用
-        DeepSeekChatOptions options = (DeepSeekChatOptions) AiChatUtils.buildChatOptions(AiPlatformEnum.MI_MO,
+        DeepSeekChatOptions options = (DeepSeekChatOptions) AiChatUtils.buildChatOptions(AiPlatformEnum.MIMO,
                 "mimo-v2.6-flash", 0.7, 1024);
         // 断言：复用 DeepSeek 客户端的选项
         assertEquals("mimo-v2.6-flash", options.getModel());

@@ -73,8 +73,8 @@ public class AiModelFactoryImplImageTest {
     public void testGetOrCreateImageModel_stabilityModelInPath() {
         // 准备参数：同一个 API 密钥、URL，两个不同的模型
         String url = "http://127.0.0.1:" + server.getAddress().getPort() + "/v1";
-        ImageModel modelA = modelFactory.getOrCreateImageModel(AiPlatformEnum.STABLE_DIFFUSION, "sk-test", url, "model-a");
-        ImageModel modelB = modelFactory.getOrCreateImageModel(AiPlatformEnum.STABLE_DIFFUSION, "sk-test", url, "model-b");
+        ImageModel modelA = modelFactory.getOrCreateImageModel(AiPlatformEnum.STABILITYAI, "sk-test", url, "model-a");
+        ImageModel modelB = modelFactory.getOrCreateImageModel(AiPlatformEnum.STABILITYAI, "sk-test", url, "model-b");
 
         // 调用
         modelA.call(new ImagePrompt("一只猫", StabilityAiImageOptions.builder().model("model-a").build()));
@@ -88,7 +88,7 @@ public class AiModelFactoryImplImageTest {
     public void testGetOrCreateImageModel_stabilityBlankModel() {
         // 准备参数：未配置模型
         String url = "http://127.0.0.1:" + server.getAddress().getPort() + "/v1";
-        ImageModel imageModel = modelFactory.getOrCreateImageModel(AiPlatformEnum.STABLE_DIFFUSION, "sk-test", url, null);
+        ImageModel imageModel = modelFactory.getOrCreateImageModel(AiPlatformEnum.STABILITYAI, "sk-test", url, null);
 
         // 调用
         imageModel.call(new ImagePrompt("一只猫", StabilityAiImageOptions.builder().build()));

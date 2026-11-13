@@ -147,7 +147,7 @@ public class AiImageServiceImpl implements AiImageService {
         if (ObjUtil.equal(model.getPlatform(), AiPlatformEnum.MIDJOURNEY.getPlatform())) {
             throw exception(IMAGE_MODEL_NOT_SUPPORTED, model.getName(), "Midjourney 模型请使用 Midjourney 生成");
         }
-        boolean seedream = ObjUtil.equal(model.getPlatform(), AiPlatformEnum.DOU_BAO.getPlatform());
+        boolean seedream = ObjUtil.equal(model.getPlatform(), AiPlatformEnum.BYTEDANCE.getPlatform());
         // 宽高：通用模型必填（按宽高请求）；Seedream 按尺寸档位请求，不需要
         if (!seedream && (drawReqVO.getWidth() == null || drawReqVO.getHeight() == null)) {
             throw exception(IMAGE_OPTION_INVALID, "width/height", "图片宽高不能为空");

@@ -37,7 +37,7 @@ public class AiImageUtilsTest {
     @Test
     public void testBuildImageOptions_siliconFlow() {
         // 调用
-        ImageOptions options = AiImageUtils.buildImageOptions(AiPlatformEnum.SILICON_FLOW, "Qwen/Qwen-Image", 1664, 928);
+        ImageOptions options = AiImageUtils.buildImageOptions(AiPlatformEnum.SILICONFLOW, "Qwen/Qwen-Image", 1664, 928);
         // 断言
         assertInstanceOf(SiliconFlowImageOptions.class, options);
         assertEquals("Qwen/Qwen-Image", options.getModel());
@@ -48,7 +48,7 @@ public class AiImageUtilsTest {
     @Test
     public void testBuildImageOptions_tongYi() {
         // 调用
-        ImageOptions options = AiImageUtils.buildImageOptions(AiPlatformEnum.TONG_YI, "wanx2.1-t2i-turbo", 1280, 720);
+        ImageOptions options = AiImageUtils.buildImageOptions(AiPlatformEnum.ALIBABA, "wanx2.1-t2i-turbo", 1280, 720);
         // 断言
         assertInstanceOf(DashScopeImageOptions.class, options);
         assertEquals("wanx2.1-t2i-turbo", options.getModel());

@@ -55,9 +55,9 @@ public class AiImageUtils {
                 // gpt-image 系列：固定返回 b64_json，不支持 response_format 参数
                 return OpenAiImageOptions.builder().model(model).width(width).height(height)
                         .responseFormat(StrUtil.startWithIgnoreCase(model, "gpt-image") ? null : "b64_json").build();
-            case SILICON_FLOW:
+            case SILICONFLOW:
                 return SiliconFlowImageOptions.builder().model(model).width(width).height(height).build();
-            case TONG_YI:
+            case ALIBABA:
                 return DashScopeImageOptions.builder().model(model).n(1).width(width).height(height).build();
             default:
                 throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));
@@ -83,9 +83,9 @@ public class AiImageUtils {
                         .quality(options.getQuality())
                         .responseFormat(StrUtil.startWithIgnoreCase(image.getModel(), "gpt-image") ? null : "b64_json")
                         .build();
-            case SILICON_FLOW:
+            case SILICONFLOW:
                 return buildSiliconFlowImageOptions(image, options);
-            case STABLE_DIFFUSION:
+            case STABILITYAI:
                 // https://platform.stability.ai/docs/api-reference#tag/SDXL-and-SD1.6/operation/textToImage
                 // 未传递的参数，使用与前端一致的默认值
                 return StabilityAiImageOptions.builder().model(image.getModel())
@@ -97,7 +97,7 @@ public class AiImageUtils {
                         .stylePreset(options.getStylePreset())
                         .clipGuidancePreset(StrUtil.blankToDefault(options.getClipGuidancePreset(), "NONE"))
                         .build();
-            case TONG_YI:
+            case ALIBABA:
                 return DashScopeImageOptions.builder().model(image.getModel()).n(1)
                         .width(image.getWidth()).height(image.getHeight())
                         .build();

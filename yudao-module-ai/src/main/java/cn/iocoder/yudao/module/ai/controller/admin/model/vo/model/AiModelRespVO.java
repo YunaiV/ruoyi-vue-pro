@@ -28,7 +28,7 @@ public class AiModelRespVO {
     @Schema(description = "模型标识", example = "gpt-3.5-turbo-0125")
     private String model;
 
-    @Schema(description = "模型平台", example = "OpenAI")
+    @Schema(description = "模型平台", example = "OPENAI")
     private String platform;
 
     @Schema(description = "模型类型", example = "1")

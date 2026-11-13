@@ -17,7 +17,7 @@ public class AiImageRespVO {
     @Schema(description = "用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long userId;
 
-    @Schema(description = "平台", requiredMode = Schema.RequiredMode.REQUIRED, example = "OpenAI")
+    @Schema(description = "平台", requiredMode = Schema.RequiredMode.REQUIRED, example = "OPENAI")
     private String platform;  // 参见 AiPlatformEnum 枚举
 
     @Schema(description = "生成方式", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")

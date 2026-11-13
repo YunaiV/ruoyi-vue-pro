@@ -49,7 +49,7 @@ public class AiModelSaveReqVO {
     @NotEmpty(message = "模型标识不能为空")
     private String model;
 
-    @Schema(description = "模型平台", requiredMode = Schema.RequiredMode.REQUIRED, example = "OpenAI")
+    @Schema(description = "模型平台", requiredMode = Schema.RequiredMode.REQUIRED, example = "OPENAI")
     @NotEmpty(message = "模型平台不能为空")
     @InEnum(AiPlatformEnum.class)
     private String platform;

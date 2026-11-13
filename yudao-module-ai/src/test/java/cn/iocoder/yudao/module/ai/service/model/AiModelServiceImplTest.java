@@ -99,7 +99,7 @@ public class AiModelServiceImplTest extends BaseMockitoUnitTest {
         reqVO.setKeyId(randomLongId());
         reqVO.setName("自定义视觉模型");
         reqVO.setModel("my-vlm-x");
-        reqVO.setPlatform(AiPlatformEnum.DEEP_SEEK.getPlatform());
+        reqVO.setPlatform(AiPlatformEnum.DEEPSEEK.getPlatform());
         reqVO.setType(AiModelTypeEnum.CHAT.getType());
         reqVO.setSort(1);
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
