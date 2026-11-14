@@ -28,7 +28,9 @@ public class DouBaoSeedanceVideoApiTest {
 
     private static final String API_KEY = "test-ark-key";
     private static final String MODEL_PRO_FAST = "doubao-seedance-1-0-pro-fast-251015";
+    private static final String MODEL_PRO = "doubao-seedance-1-0-pro-250528";
     private static final String MODEL_2_0 = "doubao-seedance-2-0-260128";
+    private static final String MODEL_2_5 = "doubao-seedance-2-5-260601";
 
     private static DouBaoSeedanceVideoRequest t2v() {
         return new DouBaoSeedanceVideoRequest().setModel(MODEL_PRO_FAST).setPrompt("一只猫")
@@ -48,7 +50,8 @@ public class DouBaoSeedanceVideoApiTest {
         assertTrue(body.get("camera_fixed").asBoolean());
         assertFalse(body.get("watermark").asBoolean());
 
-        ObjectNode fl = DouBaoSeedanceVideoApi.buildRequestBody(t2v().setFirstFrame("https://a.com/1.png")
+        // 首尾帧：1.0 pro 支持（pro fast 不支持）
+        ObjectNode fl = DouBaoSeedanceVideoApi.buildRequestBody(t2v().setModel(MODEL_PRO).setFirstFrame("https://a.com/1.png")
                 .setLastFrame("asset://asset-1"));
         JsonNode first = fl.get("content").get(1);
         assertEquals("image_url", first.get("type").asText());
@@ -104,6 +107,39 @@ public class DouBaoSeedanceVideoApiTest {
         // 文生需要提示词
         assertThatThrownBy(() -> DouBaoSeedanceVideoApi.buildRequestBody(t2v().setPrompt(null)))
                 .isInstanceOf(IllegalArgumentException.class);
+        // 1.0 pro fast 只支持文生、首帧：不支持首尾帧、参考图
+        assertThatThrownBy(() -> DouBaoSeedanceVideoApi.buildRequestBody(t2v().setFirstFrame("https://a.com/1.png")
+                .setLastFrame("https://a.com/2.png"))).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> DouBaoSeedanceVideoApi.buildRequestBody(t2v()
+                .setReferenceImages(ListUtil.toList("https://a.com/1.png")))).isInstanceOf(IllegalArgumentException.class);
+        assertEquals("first_frame", DouBaoSeedanceVideoApi.buildRequestBody(t2v().setFirstFrame("https://a.com/1.png"))
+                .get("content").get(1).get("role").asText());
+    }
+
+    @Test
+    public void testBuildRequestBody_v25() {
+        // 2.5 时长：-1 或 4 ~ 30
+        assertEquals(4, DouBaoSeedanceVideoApi.buildRequestBody(new DouBaoSeedanceVideoRequest().setModel(MODEL_2_5)
+                .setPrompt("x").setDuration(4)).get("duration").asInt());
+        assertEquals(30, DouBaoSeedanceVideoApi.buildRequestBody(new DouBaoSeedanceVideoRequest().setModel(MODEL_2_5)
+                .setPrompt("x").setDuration(30)).get("duration").asInt());
+        assertEquals(-1, DouBaoSeedanceVideoApi.buildRequestBody(new DouBaoSeedanceVideoRequest().setModel(MODEL_2_5)
+                .setPrompt("x").setDuration(-1)).get("duration").asInt());
+        assertThatThrownBy(() -> DouBaoSeedanceVideoApi.buildRequestBody(new DouBaoSeedanceVideoRequest().setModel(MODEL_2_5)
+                .setPrompt("x").setDuration(3))).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> DouBaoSeedanceVideoApi.buildRequestBody(new DouBaoSeedanceVideoRequest().setModel(MODEL_2_5)
+                .setPrompt("x").setDuration(31))).isInstanceOf(IllegalArgumentException.class);
+        // 2.5 首帧 / 首尾帧只支持 adaptive；文生可指定比例
+        assertThatThrownBy(() -> DouBaoSeedanceVideoApi.buildRequestBody(new DouBaoSeedanceVideoRequest().setModel(MODEL_2_5)
+                .setFirstFrame("https://a.com/1.png").setRatio("16:9"))).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> DouBaoSeedanceVideoApi.buildRequestBody(new DouBaoSeedanceVideoRequest().setModel(MODEL_2_5)
+                .setFirstFrame("https://a.com/1.png").setLastFrame("https://a.com/2.png").setRatio("1:1")))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertEquals("adaptive", DouBaoSeedanceVideoApi.buildRequestBody(new DouBaoSeedanceVideoRequest().setModel(MODEL_2_5)
+                .setFirstFrame("https://a.com/1.png").setLastFrame("https://a.com/2.png").setRatio("adaptive"))
+                .get("ratio").asText());
+        assertEquals("16:9", DouBaoSeedanceVideoApi.buildRequestBody(new DouBaoSeedanceVideoRequest().setModel(MODEL_2_5)
+                .setPrompt("x").setRatio("16:9")).get("ratio").asText());
     }
 
     // ========== 提交 ==========
@@ -138,20 +174,19 @@ public class DouBaoSeedanceVideoApiTest {
             server.enqueueJson(200, "{}");
             DouBaoSeedanceVideoApi api = new DouBaoSeedanceVideoApi(server.url(), API_KEY);
 
-            assertKind(api, AiVideoException.Kind.AUTHENTICATION, false);
-            assertKind(api, AiVideoException.Kind.INSUFFICIENT_BALANCE, false);
-            assertKind(api, AiVideoException.Kind.PERMISSION, false);
-            assertKind(api, AiVideoException.Kind.CONTENT_REJECTED, false);
-            assertKind(api, AiVideoException.Kind.RATE_LIMITED, false);
-            assertKind(api, AiVideoException.Kind.SERVER_ERROR, true);
-            assertKind(api, AiVideoException.Kind.INVALID_RESPONSE, true);
+            assertSubmitError(api, false);
+            assertSubmitError(api, false);
+            assertSubmitError(api, false);
+            assertSubmitError(api, false);
+            assertSubmitError(api, false);
+            assertSubmitError(api, true);
+            assertSubmitError(api, true);
             assertEquals(7, server.requests().size());
         }
     }
 
-    private static void assertKind(DouBaoSeedanceVideoApi api, AiVideoException.Kind kind, boolean unknown) {
+    private static void assertSubmitError(DouBaoSeedanceVideoApi api, boolean unknown) {
         assertThatThrownBy(() -> api.createTask(t2v())).isInstanceOfSatisfying(AiVideoException.class, ex -> {
-            assertEquals(kind, ex.getKind());
             assertEquals(unknown, ex.isSubmitOutcomeUnknown());
             assertThat(ex.getMessage()).doesNotContain(API_KEY);
         });
@@ -163,7 +198,6 @@ public class DouBaoSeedanceVideoApiTest {
             server.enqueue(VideoMockServer.Response.json(200, "{\"id\":\"late\"}").delay(3000));
             DouBaoSeedanceVideoApi api = new DouBaoSeedanceVideoApi(server.url(), API_KEY, Duration.ofMillis(500));
             assertThatThrownBy(() -> api.createTask(t2v())).isInstanceOfSatisfying(AiVideoException.class, ex -> {
-                assertEquals(AiVideoException.Kind.TIMEOUT, ex.getKind());
                 assertTrue(ex.isSubmitOutcomeUnknown());
             });
             Thread.sleep(300);
@@ -219,7 +253,6 @@ public class DouBaoSeedanceVideoApiTest {
             server.enqueueJson(404, "{\"error\":{\"code\":\"ResourceNotFound\",\"message\":\"The specified task is not found.\"}}");
             DouBaoSeedanceVideoApi api = new DouBaoSeedanceVideoApi(server.url(), API_KEY);
             assertThatThrownBy(() -> api.getTask("cgt-x")).isInstanceOfSatisfying(AiVideoException.class, ex -> {
-                assertEquals(AiVideoException.Kind.NOT_FOUND, ex.getKind());
                 assertFalse(ex.isSubmitOutcomeUnknown());
             });
         }

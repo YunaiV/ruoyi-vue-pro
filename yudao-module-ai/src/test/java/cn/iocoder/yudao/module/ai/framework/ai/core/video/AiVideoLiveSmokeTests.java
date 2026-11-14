@@ -231,11 +231,9 @@ public class AiVideoLiveSmokeTests {
                     break;
                 }
             } catch (AiVideoException ex) {
+                // 异常不再区分类别：查询失败都在等待时间内继续重试，超时后中止
                 write(dir.resolve("query-error.json"), toJson(ex));
-                if (!isRetryable(ex)) {
-                    throw ex;
-                }
-                log(name, "查询异常，下一轮继续：" + ex.getKind());
+                log(name, "查询异常，下一轮继续：" + ex.getMessage());
             }
             if (System.currentTimeMillis() + interval > deadline) {
                 throw new TestAbortedException(name + " 在等待时间内未完成，任务编号已保存在 " + taskFile + "，稍后重跑继续查询");
@@ -279,11 +277,6 @@ public class AiVideoLiveSmokeTests {
         log(name, "完成，视频 " + videos.size() + " 个");
     }
 
-    private static boolean isRetryable(AiVideoException ex) {
-        return ex.getKind() == AiVideoException.Kind.TIMEOUT || ex.getKind() == AiVideoException.Kind.NETWORK
-                || ex.getKind() == AiVideoException.Kind.SERVER_ERROR || ex.getKind() == AiVideoException.Kind.RATE_LIMITED;
-    }
-
     private static ObjectNode toJson(AiVideoTaskRef ref) {
         ObjectNode node = AiVideoUtils.newObject();
         node.put("platform", ref.getPlatform());
@@ -321,11 +314,6 @@ public class AiVideoLiveSmokeTests {
 
     private static ObjectNode toJson(AiVideoException ex) {
         ObjectNode node = AiVideoUtils.newObject();
-        node.put("platform", ex.getPlatform());
-        node.put("kind", String.valueOf(ex.getKind()));
-        node.put("httpStatus", ex.getHttpStatus());
-        node.put("code", ex.getCode());
-        node.put("requestId", ex.getRequestId());
         node.put("submitOutcomeUnknown", ex.isSubmitOutcomeUnknown());
         node.put("message", ex.getMessage());
         node.put("at", OffsetDateTime.now().toString());

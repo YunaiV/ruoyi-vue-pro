@@ -52,7 +52,6 @@ public class AiVideoHttpClientTest {
             assertThatThrownBy(() -> client.execute(HttpMethod.POST, URI.create(server.url() + "/x"), null,
                     new byte[0], "提交", true))
                     .isInstanceOfSatisfying(AiVideoException.class, ex -> {
-                        assertEquals(AiVideoException.Kind.TIMEOUT, ex.getKind());
                         assertTrue(ex.isSubmitOutcomeUnknown());
                     });
             Thread.sleep(200);
@@ -68,7 +67,6 @@ public class AiVideoHttpClientTest {
 
             assertThatThrownBy(() -> client.execute(HttpMethod.GET, URI.create(server.url() + "/x"), null, null, "查询", false))
                     .isInstanceOfSatisfying(AiVideoException.class, ex -> {
-                        assertEquals(AiVideoException.Kind.TIMEOUT, ex.getKind());
                         assertFalse(ex.isSubmitOutcomeUnknown());
                     });
         }
@@ -82,8 +80,7 @@ public class AiVideoHttpClientTest {
             AiVideoHttpClient client = new AiVideoHttpClient("test", Duration.ofSeconds(5), 1024);
 
             assertThatThrownBy(() -> client.execute(HttpMethod.GET, URI.create(server.url() + "/x"), null, null, "查询", false))
-                    .isInstanceOfSatisfying(AiVideoException.class,
-                            ex -> assertEquals(AiVideoException.Kind.INVALID_RESPONSE, ex.getKind()));
+                    .isInstanceOf(AiVideoException.class);
         }
     }
 
@@ -97,7 +94,6 @@ public class AiVideoHttpClientTest {
         assertThatThrownBy(() -> client.execute(HttpMethod.POST, URI.create("http://127.0.0.1:" + port + "/x"), null,
                 new byte[0], "提交", true))
                 .isInstanceOfSatisfying(AiVideoException.class, ex -> {
-                    assertEquals(AiVideoException.Kind.NETWORK, ex.getKind());
                     // 连接被拒绝：请求未发出，可以安全重试
                     assertFalse(ex.isSubmitOutcomeUnknown());
                 });

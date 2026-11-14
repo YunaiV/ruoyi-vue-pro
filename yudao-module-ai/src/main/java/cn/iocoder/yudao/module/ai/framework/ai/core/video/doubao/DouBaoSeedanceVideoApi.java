@@ -139,6 +139,9 @@ public class DouBaoSeedanceVideoApi {
             if (model.contains("lite-i2v")) {
                 AiVideoUtils.checkArgument(hasFirst || imageCount > 0, "模型({})需要首帧或参考图", model);
             }
+            if (model.contains("pro-fast")) {
+                AiVideoUtils.checkArgument(!hasLast && !reference, "模型({})只支持文生视频、首帧图生视频", model);
+            }
         }
         // 1.2 输出参数
         AiVideoUtils.checkIn(request.getResolution(), RESOLUTIONS, "分辨率");
@@ -153,6 +156,10 @@ public class DouBaoSeedanceVideoApi {
             }
         }
         AiVideoUtils.checkIn(request.getRatio(), RATIOS, "比例");
+        if (v25 && hasFirst) {
+            AiVideoUtils.checkArgument(request.getRatio() == null || "adaptive".equals(request.getRatio()),
+                    "Seedance 2.5 首帧 / 首尾帧生视频只支持 ratio=adaptive（比例跟随首帧）");
+        }
         if (request.getDuration() != null) {
             AiVideoUtils.checkArgument(request.getDuration() == -1 || (request.getDuration() >= 2 && request.getDuration() <= 30),
                     "时长应为 -1（智能选择）或 2 ~ 30 秒");
@@ -161,6 +168,9 @@ public class DouBaoSeedanceVideoApi {
             } else if (series == Series.V2_0) {
                 AiVideoUtils.checkArgument(request.getDuration() == -1 || (request.getDuration() >= 4 && request.getDuration() <= 15),
                         "Seedance 2.0 时长应为 -1 或 4 ~ 15 秒");
+            } else if (v25) {
+                AiVideoUtils.checkArgument(request.getDuration() == -1 || request.getDuration() >= 4,
+                        "Seedance 2.5 时长应为 -1 或 4 ~ 30 秒");
             }
         }
         if (request.getFrames() != null) {
@@ -268,8 +278,7 @@ public class DouBaoSeedanceVideoApi {
         }
         String taskId = AiVideoUtils.text(root, "id");
         if (taskId == null) {
-            throw new AiVideoException(PLATFORM, AiVideoException.Kind.INVALID_RESPONSE, result.getStatus(), null,
-                    getRequestId(result), true, "豆包 Seedance 视频任务提交后未返回 id，任务是否已创建未知，请勿自动重新提交");
+            throw new AiVideoException("豆包 Seedance 视频任务提交后未返回 id，任务是否已创建未知，请勿自动重新提交", true);
         }
         log.info("[createTask][豆包 Seedance 视频任务已提交，model({}) taskId({})]", request.getModel(), taskId);
         return new AiVideoTaskRef(PLATFORM, request.getModel(), taskId, null, getRequestId(result));
@@ -288,8 +297,7 @@ public class DouBaoSeedanceVideoApi {
             throw buildException(result, root, false);
         }
         if (root == null || !root.isObject()) {
-            throw new AiVideoException(PLATFORM, AiVideoException.Kind.INVALID_RESPONSE, result.getStatus(), null,
-                    getRequestId(result), false, "查询豆包 Seedance 视频任务失败：返回格式不正确");
+            throw new AiVideoException("查询豆包 Seedance 视频任务失败：返回格式不正确");
         }
         AiVideoTaskResult task = parseTask(taskId, root);
         task.setRequestId(getRequestId(result));
@@ -352,42 +360,10 @@ public class DouBaoSeedanceVideoApi {
         String requestId = getRequestId(result);
         log.warn("[DouBaoSeedance][{}失败，HTTP {}，code {}，requestId {}]", submit ? "提交" : "查询",
                 result.getStatus(), code, requestId);
-        return new AiVideoException(PLATFORM, getKind(code, result.getStatus()), result.getStatus(), code, requestId, unknown,
+        return new AiVideoException(
                 StrUtil.format("豆包 Seedance 视频任务{}失败（HTTP {}，{}）：{}{}", submit ? "提交" : "查询", result.getStatus(),
                         StrUtil.blankToDefault(code, "-"), AiVideoUtils.sanitize(message, apiKey),
-                        unknown ? "；任务是否已创建未知，请勿自动重新提交" : ""));
-    }
-
-    static AiVideoException.Kind getKind(String code, int httpStatus) {
-        if (code != null) {
-            if (code.startsWith("AuthenticationError") || code.startsWith("InvalidApiKey") || code.startsWith("Unauthorized")) {
-                return AiVideoException.Kind.AUTHENTICATION;
-            }
-            if (code.startsWith("AccountOverdue") || code.contains("InsufficientBalance") || code.contains("Arrear")) {
-                return AiVideoException.Kind.INSUFFICIENT_BALANCE;
-            }
-            if (code.startsWith("AccessDenied") || code.startsWith("ModelNotOpen") || code.contains("NotActivated")
-                    || code.startsWith("OperationDenied")) {
-                return AiVideoException.Kind.PERMISSION;
-            }
-            if (code.contains("SensitiveContent") || code.contains("RiskDetection")) {
-                return AiVideoException.Kind.CONTENT_REJECTED;
-            }
-            if (code.startsWith("RateLimitExceeded") || code.startsWith("QuotaExceeded") || code.contains("ServerOverloaded")) {
-                return AiVideoException.Kind.RATE_LIMITED;
-            }
-            if (code.startsWith("ResourceNotFound") || code.startsWith("InvalidEndpointOrModel")
-                    || code.startsWith("ModelNotFound")) {
-                return AiVideoException.Kind.NOT_FOUND;
-            }
-            if (code.startsWith("InvalidParameter") || code.startsWith("MissingParameter")) {
-                return AiVideoException.Kind.INVALID_REQUEST;
-            }
-            if (code.startsWith("InternalServiceError")) {
-                return AiVideoException.Kind.SERVER_ERROR;
-            }
-        }
-        return AiVideoException.kindOfHttpStatus(httpStatus);
+                        unknown ? "；任务是否已创建未知，请勿自动重新提交" : ""), unknown);
     }
 
     private Map<String, String> headers() {

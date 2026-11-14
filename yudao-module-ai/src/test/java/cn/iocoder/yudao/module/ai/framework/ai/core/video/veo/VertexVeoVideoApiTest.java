@@ -142,19 +142,18 @@ public class VertexVeoVideoApiTest {
             server.enqueueJson(200, "{}");
             VertexVeoVideoApi api = api(server, null);
 
-            assertKind(api, AiVideoException.Kind.AUTHENTICATION, false);
-            assertKind(api, AiVideoException.Kind.INSUFFICIENT_BALANCE, false);
-            assertKind(api, AiVideoException.Kind.PERMISSION, false);
-            assertKind(api, AiVideoException.Kind.RATE_LIMITED, false);
-            assertKind(api, AiVideoException.Kind.SERVER_ERROR, true);
-            assertKind(api, AiVideoException.Kind.INVALID_RESPONSE, true);
+            assertSubmitError(api, false);
+            assertSubmitError(api, false);
+            assertSubmitError(api, false);
+            assertSubmitError(api, false);
+            assertSubmitError(api, true);
+            assertSubmitError(api, true);
             assertEquals(6, server.requests().size());
         }
     }
 
-    private static void assertKind(VertexVeoVideoApi api, AiVideoException.Kind kind, boolean unknown) {
+    private static void assertSubmitError(VertexVeoVideoApi api, boolean unknown) {
         assertThatThrownBy(() -> api.createTask(t2v())).isInstanceOfSatisfying(AiVideoException.class, ex -> {
-            assertEquals(kind, ex.getKind());
             assertEquals(unknown, ex.isSubmitOutcomeUnknown());
             assertThat(ex.getMessage()).doesNotContain("test-access-token");
         });
@@ -166,7 +165,6 @@ public class VertexVeoVideoApiTest {
             server.enqueue(VideoMockServer.Response.json(200, "{}").delay(3000));
             assertThatThrownBy(() -> api(server, Duration.ofMillis(500)).createTask(t2v()))
                     .isInstanceOfSatisfying(AiVideoException.class, ex -> {
-                        assertEquals(AiVideoException.Kind.TIMEOUT, ex.getKind());
                         assertTrue(ex.isSubmitOutcomeUnknown());
                     });
             Thread.sleep(300);
@@ -174,7 +172,6 @@ public class VertexVeoVideoApiTest {
 
             VertexVeoVideoApi noToken = new VertexVeoVideoApi(PROJECT, null, () -> "", server.url(), null, 0);
             assertThatThrownBy(() -> noToken.createTask(t2v())).isInstanceOfSatisfying(AiVideoException.class, ex -> {
-                assertEquals(AiVideoException.Kind.AUTHENTICATION, ex.getKind());
                 assertFalse(ex.isSubmitOutcomeUnknown());
             });
             assertEquals(1, server.requests().size());
@@ -215,8 +212,7 @@ public class VertexVeoVideoApiTest {
             AiVideoTaskResult failed = api.getTask(ref);
             assertEquals(AiVideoTaskStatus.FAILED, failed.getStatus());
             assertEquals("INVALID_ARGUMENT", failed.getErrorCode());
-            assertThatThrownBy(() -> api.getTask(ref)).isInstanceOfSatisfying(AiVideoException.class,
-                    ex -> assertEquals(AiVideoException.Kind.NOT_FOUND, ex.getKind()));
+            assertThatThrownBy(() -> api.getTask(ref)).isInstanceOf(AiVideoException.class);
 
             VideoMockServer.Request request = server.lastRequest();
             assertEquals("POST", request.method());
@@ -239,6 +235,17 @@ public class VertexVeoVideoApiTest {
                     "../../evil", null, null))).isInstanceOf(IllegalArgumentException.class);
             assertEquals(0, server.requests().size());
         }
+    }
+
+    @Test
+    public void testOfVertexUrl() {
+        assertThat(VertexVeoVideoApi.ofVertexUrl(
+                "https://us-central1-aiplatform.googleapis.com/v1/projects/my-project/locations/us-central1/", () -> TOKEN))
+                .isNotNull();
+        assertThatThrownBy(() -> VertexVeoVideoApi.ofVertexUrl("https://generativelanguage.googleapis.com", () -> TOKEN))
+                .isInstanceOf(IllegalArgumentException.class).hasMessageContaining("Vertex AI 地址");
+        assertThatThrownBy(() -> VertexVeoVideoApi.ofVertexUrl(null, () -> TOKEN))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
 }

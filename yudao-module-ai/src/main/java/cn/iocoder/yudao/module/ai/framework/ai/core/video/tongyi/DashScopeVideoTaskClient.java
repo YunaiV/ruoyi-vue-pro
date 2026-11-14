@@ -13,6 +13,7 @@ import com.alibaba.dashscope.aigc.videosynthesis.VideoSynthesisParam;
 import com.alibaba.dashscope.aigc.videosynthesis.VideoSynthesisResult;
 import com.alibaba.dashscope.aigc.videosynthesis.VideoSynthesisUsage;
 import com.alibaba.dashscope.base.AsyncTaskParam;
+import com.alibaba.dashscope.common.ErrorType;
 import com.alibaba.dashscope.common.Status;
 import com.alibaba.dashscope.exception.ApiException;
 import com.alibaba.dashscope.exception.NoApiKeyException;
@@ -25,6 +26,8 @@ import com.alibaba.dashscope.protocol.StreamingMode;
 import com.alibaba.dashscope.protocol.okhttp.OkHttpHttpClient;
 import com.alibaba.dashscope.utils.JsonUtils;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Response;
@@ -148,9 +151,7 @@ public class DashScopeVideoTaskClient {
         VideoSynthesisResult result = send(new HalfDuplexRequest(param, option), action, true);
         String taskId = result.getOutput() != null ? result.getOutput().getTaskId() : null;
         if (StrUtil.isBlank(taskId)) {
-            throw new AiVideoException(platform, AiVideoException.Kind.INVALID_RESPONSE, result.getStatusCode(),
-                    StrUtil.emptyToNull(result.getCode()), result.getRequestId(), true,
-                    action + "后未返回 task_id，任务是否已创建未知，请勿自动重新提交");
+            throw new AiVideoException(action + "后未返回 task_id，任务是否已创建未知，请勿自动重新提交", true);
         }
         log.info("[submit][{} 已提交，model({}) taskId({})]", platform, param.getModel(), taskId);
         return new AiVideoTaskRef(platform, param.getModel(), taskId, null, result.getRequestId());
@@ -168,8 +169,7 @@ public class DashScopeVideoTaskClient {
         AsyncTaskParam param = AsyncTaskParam.builder().taskId(taskId).apiKey(apiKey).build();
         VideoSynthesisResult result = send(new HalfDuplexRequest(param, option), action, false);
         if (result.getOutput() == null) {
-            throw new AiVideoException(platform, AiVideoException.Kind.INVALID_RESPONSE, result.getStatusCode(), null,
-                    result.getRequestId(), false, action + "失败：返回格式不正确");
+            throw new AiVideoException(action + "失败：返回格式不正确");
         }
         return parseTask(taskId, result);
     }
@@ -240,9 +240,8 @@ public class DashScopeVideoTaskClient {
             return VideoSynthesisResult.fromDashScopeResult(response);
         } catch (RuntimeException ex) {
             // output、usage 结构不符合文档
-            throw new AiVideoException(platform, AiVideoException.Kind.INVALID_RESPONSE, response.getStatusCode(), null,
-                    response.getRequestId(), submit, action + "失败：返回格式不正确"
-                    + (submit ? "，任务是否已创建未知，请勿自动重新提交" : ""));
+            throw new AiVideoException(action + "失败：返回格式不正确"
+                    + (submit ? "，任务是否已创建未知，请勿自动重新提交" : ""), submit);
         }
     }
 
@@ -255,61 +254,38 @@ public class DashScopeVideoTaskClient {
         // 1. 服务端返回了非 2xx：SDK 已解析出 code、message、request_id
         if (httpStatus > 0) {
             String code = StrUtil.emptyToNull(status.getCode());
+            // 响应体无法解析（网关 HTML、非 JSON）时，SDK 合成 response_error：不是服务商的错误码，按「没有错误码」处理
+            if (ErrorType.RESPONSE_ERROR.getValue().equals(code)) {
+                code = null;
+            }
             String requestId = StrUtil.emptyToNull(status.getRequestId());
             boolean unknown = submit && (httpStatus >= 500 || code == null);
             log.warn("[{}][{}失败，HTTP {}，code {}，requestId {}]", platform, action, httpStatus, code, requestId);
-            return new AiVideoException(platform, getKind(code, httpStatus), httpStatus, code, requestId, unknown,
+            return new AiVideoException(
                     StrUtil.format("{}失败（HTTP {}，{}）：{}{}", action, httpStatus, StrUtil.blankToDefault(code, "-"),
                             AiVideoUtils.sanitize(StrUtil.blankToDefault(status.getMessage(), "返回格式不正确"), apiKey),
-                            unknown ? "；任务是否已创建未知，请勿自动重新提交" : ""));
+                            unknown ? "；任务是否已创建未知，请勿自动重新提交" : ""), unknown);
         }
-        // 2. 没有收到完整响应：超时、网络中断、响应过大
+        // 2. 没有收到完整响应：超时、网络中断、响应过大、2xx 响应体不是 JSON 对象
         Throwable cause = ex.getCause() != null ? ex.getCause() : ex;
         if (cause instanceof ResponseTooLargeException) {
-            return new AiVideoException(platform, AiVideoException.Kind.INVALID_RESPONSE, null, null, null, submit,
-                    action + "失败：响应超过大小上限" + (submit ? unknownHint : ""));
+            return new AiVideoException(action + "失败：响应超过大小上限" + (submit ? unknownHint : ""), submit);
+        }
+        if (cause instanceof MalformedResponseException) {
+            return new AiVideoException(action + "失败：返回格式不正确" + (submit ? unknownHint : ""), submit);
         }
         if (cause instanceof InterruptedIOException) {
-            return new AiVideoException(platform, AiVideoException.Kind.TIMEOUT, null, null, null, submit,
-                    action + "超时" + (submit ? unknownHint : ""));
+            return new AiVideoException(action + "超时" + (submit ? unknownHint : ""), submit);
+        }
+        // 非 IO 异常：SDK 处理已收到的 2xx 响应时失败（例如字段类型不符），属于返回格式不正确，而不是网络异常
+        if (cause != ex && !(cause instanceof IOException)) {
+            return new AiVideoException(action + "失败：返回格式不正确" + (submit ? unknownHint : ""), submit);
         }
         // 连接被拒绝、域名解析失败：请求没有发出，可以确定任务未创建
         boolean notSent = cause instanceof ConnectException || cause instanceof UnknownHostException;
-        return new AiVideoException(platform, AiVideoException.Kind.NETWORK, null, null, null, submit && !notSent,
+        return new AiVideoException(
                 StrUtil.format("{}失败：网络异常（{}）{}", action, cause.getClass().getSimpleName(),
-                        submit && !notSent ? unknownHint : ""));
-    }
-
-    static AiVideoException.Kind getKind(String code, int httpStatus) {
-        if (code != null) {
-            if (code.startsWith("InvalidApiKey")) {
-                return AiVideoException.Kind.AUTHENTICATION;
-            }
-            if (code.startsWith("Arrearage")) {
-                return AiVideoException.Kind.INSUFFICIENT_BALANCE;
-            }
-            if (code.startsWith("AccessDenied") || code.startsWith("Model.AccessDenied")
-                    || code.startsWith("Workspace.AccessDenied")) {
-                return AiVideoException.Kind.PERMISSION;
-            }
-            if (code.startsWith("Throttling")) {
-                return AiVideoException.Kind.RATE_LIMITED;
-            }
-            if (code.startsWith("DataInspectionFailed") || code.contains("DataInspection")
-                    || code.startsWith("IPInfringementSuspect")) {
-                return AiVideoException.Kind.CONTENT_REJECTED;
-            }
-            if (code.startsWith("ModelNotFound") || code.startsWith("NotFound")) {
-                return AiVideoException.Kind.NOT_FOUND;
-            }
-            if (code.startsWith("InvalidParameter") || code.startsWith("InvalidURL") || code.startsWith("BadRequest")) {
-                return AiVideoException.Kind.INVALID_REQUEST;
-            }
-            if (code.startsWith("InternalError") || code.startsWith("SystemError")) {
-                return AiVideoException.Kind.SERVER_ERROR;
-            }
-        }
-        return AiVideoException.kindOfHttpStatus(httpStatus);
+                        submit && !notSent ? unknownHint : ""), submit && !notSent);
     }
 
     // ========== 传输 ==========
@@ -335,14 +311,44 @@ public class DashScopeVideoTaskClient {
 
     /**
      * 最多缓冲 maxSize + 1 字节：超过上限直接报错，不会无界读取
+     *
+     * 2xx 的响应体须为空，或为 output 是 JSON 对象的完整 JSON 对象，否则提前拒绝。原因是 SDK 遇到以下情况会把响应内容写入错误日志：
+     * 1. 解析失败：DashScopeResult 记录 Gson 异常，异常中的 JSON 路径会带出属性名，数组、字符串等则带出整个值
+     * 2. 缺少 output：VideoSynthesisResult 记录响应体中的 request_id
      */
     private static Response limitResponseSize(Response response, long maxSize) throws IOException {
         ResponseBody body = response.body();
-        if (body != null && body.source().request(maxSize + 1)) {
+        if (body == null) {
+            return response;
+        }
+        if (body.source().request(maxSize + 1)) {
             response.close();
             throw new ResponseTooLargeException(maxSize);
         }
+        if (response.isSuccessful() && !isTaskResponseOrEmpty(response, maxSize)) {
+            response.close();
+            throw new MalformedResponseException();
+        }
         return response;
+    }
+
+    /**
+     * 用 SDK 相同的解析器（{@link JsonUtils#parse}，本身不记录日志）静默预解析已缓冲的响应体：
+     * 解析异常直接丢弃，不记录、也不作为 cause 向上抛出，避免异常消息中的响应内容外泄
+     */
+    private static boolean isTaskResponseOrEmpty(Response response, long maxSize) throws IOException {
+        // 与 SDK 一样按响应的字符集解码；响应体已完整缓冲（不超过 maxSize），这里只是复制
+        String text = response.peekBody(maxSize).string();
+        if (text.isEmpty()) {
+            return true;
+        }
+        try {
+            JsonObject json = JsonUtils.parse(text);
+            JsonElement output = json.get("output");
+            return output != null && output.isJsonObject();
+        } catch (RuntimeException ex) {
+            return false;
+        }
     }
 
     /**
@@ -352,6 +358,17 @@ public class DashScopeVideoTaskClient {
 
         ResponseTooLargeException(long maxSize) {
             super("响应超过 " + maxSize + " 字节");
+        }
+
+    }
+
+    /**
+     * 2xx 响应体不是含 output 对象的 JSON 对象：不携带解析异常与响应内容
+     */
+    static class MalformedResponseException extends IOException {
+
+        MalformedResponseException() {
+            super("响应体格式不正确");
         }
 
     }

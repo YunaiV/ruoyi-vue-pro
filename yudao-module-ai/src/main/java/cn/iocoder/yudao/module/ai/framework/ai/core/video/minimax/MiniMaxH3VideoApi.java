@@ -194,9 +194,7 @@ public class MiniMaxH3VideoApi {
         String taskId = root != null ? AiVideoUtils.text(root, "task_id") : null;
         if (taskId == null) {
             // 2xx 却没有任务编号：是否已创建未知
-            throw new AiVideoException(PLATFORM, AiVideoException.Kind.INVALID_RESPONSE, result.getStatus(), null,
-                    root != null ? AiVideoUtils.text(root, "request_id") : null, true,
-                    "MiniMax-H3 视频任务提交后未返回 task_id，任务是否已创建未知，请勿自动重新提交");
+            throw new AiVideoException("MiniMax-H3 视频任务提交后未返回 task_id，任务是否已创建未知，请勿自动重新提交", true);
         }
         log.info("[createTask][MiniMax-H3 视频任务已提交，model({}) taskId({})]", request.getModel(), taskId);
         return new AiVideoTaskRef(PLATFORM, request.getModel(), taskId, null, AiVideoUtils.text(root, "request_id"));
@@ -215,8 +213,7 @@ public class MiniMaxH3VideoApi {
             throw buildException(result, root, false);
         }
         if (root == null || !root.isObject()) {
-            throw new AiVideoException(PLATFORM, AiVideoException.Kind.INVALID_RESPONSE, result.getStatus(), null, null, false,
-                    "查询 MiniMax-H3 视频任务失败：返回格式不正确");
+            throw new AiVideoException("查询 MiniMax-H3 视频任务失败：返回格式不正确");
         }
         // response_format=task 时字段在 task 下；flat 时在顶层
         JsonNode task = root.has("task") ? root.get("task") : root;
@@ -276,38 +273,14 @@ public class MiniMaxH3VideoApi {
         String requestId = AiVideoUtils.text(root, "request_id");
         Matcher matcher = INTERNAL_CODE_PATTERN.matcher(message);
         String code = matcher.find() ? matcher.group(1) : type;
-        AiVideoException.Kind kind = getKind(type, code, result.getStatus(), message);
         // 5xx、格式不正确的响应：创建任务是否成功未知
         boolean unknown = submit && (result.getStatus() >= 500 || root == null);
         log.warn("[MiniMaxH3][{}失败，HTTP {}，type {}，code {}，requestId {}]", submit ? "提交" : "查询",
                 result.getStatus(), type, code, requestId);
-        return new AiVideoException(PLATFORM, kind, result.getStatus(), code, requestId, unknown,
+        return new AiVideoException(
                 StrUtil.format("MiniMax-H3 视频任务{}失败（HTTP {}，{}）：{}{}", submit ? "提交" : "查询", result.getStatus(),
                         StrUtil.blankToDefault(code, "-"), AiVideoUtils.sanitize(message, apiKey),
-                        unknown ? "；任务是否已创建未知，请勿自动重新提交" : ""));
-    }
-
-    static AiVideoException.Kind getKind(String type, String code, int httpStatus, String message) {
-        if ("2049".equals(code) || "1004".equals(code) || "authorized_error".equals(type)) {
-            return AiVideoException.Kind.AUTHENTICATION;
-        }
-        if ("1008".equals(code) || "insufficient_balance_error".equals(type)) {
-            return AiVideoException.Kind.INSUFFICIENT_BALANCE;
-        }
-        if ("1026".equals(code) || "1027".equals(code) || "unprocessable_entity_error".equals(type)) {
-            return AiVideoException.Kind.CONTENT_REJECTED;
-        }
-        if ("1002".equals(code) || "rate_limit_error".equals(type)) {
-            return AiVideoException.Kind.RATE_LIMITED;
-        }
-        if ("2013".equals(code) && StrUtil.containsIgnoreCase(message, "does not exist")) {
-            return AiVideoException.Kind.NOT_FOUND;
-        }
-        if ("server_error".equals(type) || "overloaded_error".equals(type)
-                || "1000".equals(code) || "1001".equals(code) || "1013".equals(code)) {
-            return AiVideoException.Kind.SERVER_ERROR;
-        }
-        return AiVideoException.kindOfHttpStatus(httpStatus);
+                        unknown ? "；任务是否已创建未知，请勿自动重新提交" : ""), unknown);
     }
 
     private Map<String, String> headers() {

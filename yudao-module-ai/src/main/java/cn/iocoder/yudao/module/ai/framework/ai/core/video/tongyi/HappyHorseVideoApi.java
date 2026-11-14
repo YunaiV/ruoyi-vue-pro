@@ -35,6 +35,9 @@ public class HappyHorseVideoApi {
     public static final List<String> RESOLUTIONS = ListUtil.of("480P", "720P", "1080P");
     public static final List<String> RATIOS = ListUtil.of("16:9", "9:16", "1:1", "4:3", "3:4", "4:5", "5:4", "9:21", "21:9");
 
+    /**
+     * 提示词上限：5000 个非中文字符或 2500 个中文字符（中文字符按 2 计）；超出部分会被服务端静默截断，所以提前校验
+     */
     private static final int MAX_PROMPT_LENGTH = 5000;
     private static final int MAX_REFERENCE_IMAGES = 9;
     private static final long MAX_SEED = 2147483647L;
@@ -67,7 +70,7 @@ public class HappyHorseVideoApi {
         if (!i2v) {
             AiVideoUtils.requireText(request.getPrompt(), "提示词");
         }
-        AiVideoUtils.checkMaxLength(request.getPrompt(), MAX_PROMPT_LENGTH, "提示词");
+        checkPromptLength(request.getPrompt());
         if (i2v) {
             AiVideoUtils.checkMediaUrl(request.getFirstFrame(), "首帧图片");
             AiVideoUtils.checkArgument(request.getRatio() == null, "HappyHorse 图生视频不支持 ratio，比例跟随首帧");
@@ -102,6 +105,16 @@ public class HappyHorseVideoApi {
             builder.media(media);
         }
         return builder.build();
+    }
+
+    private static void checkPromptLength(String prompt) {
+        if (prompt == null) {
+            return;
+        }
+        int length = prompt.codePoints()
+                .map(c -> Character.UnicodeScript.of(c) == Character.UnicodeScript.HAN ? 2 : 1).sum();
+        AiVideoUtils.checkArgument(length <= MAX_PROMPT_LENGTH, "提示词过长：最多 {} 个非中文字符或 {} 个中文字符",
+                MAX_PROMPT_LENGTH, MAX_PROMPT_LENGTH / 2);
     }
 
     /**

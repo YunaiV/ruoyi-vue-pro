@@ -132,8 +132,7 @@ public class AiVideoHttpClient {
         try {
             HttpResult result = mono.timeout(timeout).block();
             if (result == null) {
-                throw new AiVideoException(platform, AiVideoException.Kind.INVALID_RESPONSE, null, null, null,
-                        submit, action + "失败：没有响应");
+                throw new AiVideoException(action + "失败：没有响应", submit);
             }
             return result;
         } catch (AiVideoException ex) {
@@ -153,23 +152,21 @@ public class AiVideoHttpClient {
     private AiVideoException convertException(Throwable cause, String action, boolean submit) {
         String unknownHint = submit ? "，任务是否已创建未知，请勿自动重新提交" : "";
         if (cause instanceof TimeoutException) {
-            return new AiVideoException(platform, AiVideoException.Kind.TIMEOUT, null, null, null, submit,
-                    StrUtil.format("{}超时（{} 秒）{}", action, timeout.getSeconds(), unknownHint));
+            return new AiVideoException(StrUtil.format("{}超时（{} 秒）{}", action, timeout.getSeconds(), unknownHint), submit);
         }
         if (cause instanceof DataBufferLimitException) {
-            return new AiVideoException(platform, AiVideoException.Kind.INVALID_RESPONSE, null, null, null, submit,
-                    StrUtil.format("{}失败：响应超过大小上限{}", action, unknownHint));
+            return new AiVideoException(StrUtil.format("{}失败：响应超过大小上限{}", action, unknownHint), submit);
         }
         if (cause instanceof WebClientRequestException) {
             Throwable root = cause.getCause() != null ? cause.getCause() : cause;
             // 连接被拒绝：请求没有发出，可以确定任务未创建
             boolean notSent = root instanceof ConnectException;
-            return new AiVideoException(platform, AiVideoException.Kind.NETWORK, null, null, null, submit && !notSent,
+            return new AiVideoException(
                     StrUtil.format("{}失败：网络异常（{}）{}", action, root.getClass().getSimpleName(),
-                            notSent ? "" : unknownHint));
+                            notSent ? "" : unknownHint), submit && !notSent);
         }
-        return new AiVideoException(platform, AiVideoException.Kind.NETWORK, null, null, null, submit,
-                StrUtil.format("{}失败：{}{}", action, AiVideoUtils.sanitize(cause.getMessage(), secrets), unknownHint));
+        return new AiVideoException(
+                StrUtil.format("{}失败：{}{}", action, AiVideoUtils.sanitize(cause.getMessage(), secrets), unknownHint), submit);
     }
 
     /**
@@ -177,7 +174,7 @@ public class AiVideoHttpClient {
      *
      * 只用于下载服务商返回的结果地址；不要用于需要凭证的地址（例如 gs://），避免把密钥转发到其它域名
      *
-     * @param url 视频地址，只允许 https（测试时允许 http）
+     * @param url 视频地址，只允许 http(s)：服务商返回的通常是 https；http 地址同样不携带任何凭证，按原样下载，避免已付费的结果无法转存
      * @param target 目标文件，不存在时创建，存在时覆盖
      * @param maxBytes 最大字节数
      * @param timeout 整体超时

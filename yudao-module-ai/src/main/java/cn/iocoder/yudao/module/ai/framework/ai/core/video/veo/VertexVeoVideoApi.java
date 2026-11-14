@@ -24,6 +24,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -67,6 +68,11 @@ public class VertexVeoVideoApi {
     public static final int DEFAULT_MAX_RESPONSE_SIZE = 128 * 1024 * 1024;
     private static final Pattern MODEL_PATTERN = Pattern.compile("veo-[0-9a-z.\\-]{1,64}");
     private static final Pattern ID_PATTERN = Pattern.compile("[a-z0-9][a-z0-9\\-]{0,62}");
+    // TODO DONE @AI：这个是不是可以放到 Veo Client 里？（已从 AiVideoServiceImpl 移到这里，由 ofVertexUrl 解析地址创建客户端）
+    /**
+     * Vertex AI 地址：{服务地址}/v1/projects/{项目 ID}/locations/{地域}
+     */
+    private static final Pattern VERTEX_URL_PATTERN = Pattern.compile("(https?://[^/]+)/v1/projects/([^/]+)/locations/([^/]+)/?");
 
     private final String projectId;
     private final String location;
@@ -98,6 +104,22 @@ public class VertexVeoVideoApi {
 
     public VertexVeoVideoApi(String projectId, String location, Supplier<String> accessTokenSupplier) {
         this(projectId, location, accessTokenSupplier, null, null, DEFAULT_MAX_RESPONSE_SIZE);
+    }
+
+    /**
+     * 按 Vertex AI 地址创建：从地址中解析服务地址、项目 ID、地域
+     *
+     * @param vertexUrl Vertex AI 地址，例如 https://us-central1-aiplatform.googleapis.com/v1/projects/{项目 ID}/locations/us-central1
+     * @param accessTokenSupplier OAuth 访问令牌提供者
+     */
+    public static VertexVeoVideoApi ofVertexUrl(String vertexUrl, Supplier<String> accessTokenSupplier) {
+        Matcher matcher = VERTEX_URL_PATTERN.matcher(StrUtil.nullToEmpty(vertexUrl));
+        if (!matcher.matches()) {
+            throw new IllegalArgumentException("Veo 需要在 API 密钥的地址中填写 Vertex AI 地址，例如 "
+                    + "https://us-central1-aiplatform.googleapis.com/v1/projects/{项目 ID}/locations/us-central1");
+        }
+        return new VertexVeoVideoApi(matcher.group(2), matcher.group(3), accessTokenSupplier, matcher.group(1),
+                null, DEFAULT_MAX_RESPONSE_SIZE);
     }
 
     public static String defaultBaseUrl(String location) {
@@ -232,8 +254,7 @@ public class VertexVeoVideoApi {
         }
         String name = AiVideoUtils.text(root, "name");
         if (name == null) {
-            throw new AiVideoException(PLATFORM, AiVideoException.Kind.INVALID_RESPONSE, result.getStatus(), null, null, true,
-                    "Veo 视频任务提交后未返回 operation name，任务是否已创建未知，请勿自动重新提交");
+            throw new AiVideoException("Veo 视频任务提交后未返回 operation name，任务是否已创建未知，请勿自动重新提交", true);
         }
         log.info("[createTask][Veo 视频任务已提交，model({}) operation({})]", request.getModel(), name);
         return new AiVideoTaskRef(PLATFORM, request.getModel(), name, null, null);
@@ -260,8 +281,7 @@ public class VertexVeoVideoApi {
             throw buildException(result, root, false);
         }
         if (root == null || !root.isObject()) {
-            throw new AiVideoException(PLATFORM, AiVideoException.Kind.INVALID_RESPONSE, result.getStatus(), null, null, false,
-                    "查询 Veo 视频任务失败：返回格式不正确");
+            throw new AiVideoException("查询 Veo 视频任务失败：返回格式不正确");
         }
         return parseOperation(name, root);
     }
@@ -302,8 +322,7 @@ public class VertexVeoVideoApi {
                     try {
                         output.setData(Base64.getDecoder().decode(base64));
                     } catch (IllegalArgumentException ex) {
-                        throw new AiVideoException(PLATFORM, AiVideoException.Kind.INVALID_RESPONSE, null, null, null, false,
-                                "查询 Veo 视频任务失败：视频内容不是合法的 base64");
+                        throw new AiVideoException("查询 Veo 视频任务失败：视频内容不是合法的 base64");
                     }
                 }
                 output.setMimeType(StrUtil.blankToDefault(AiVideoUtils.text(item, "mimeType"), "video/mp4"));
@@ -334,46 +353,16 @@ public class VertexVeoVideoApi {
         }
         boolean unknown = submit && (result.getStatus() >= 500 || error == null);
         log.warn("[VertexVeo][{}失败，HTTP {}，status {}，reason {}]", submit ? "提交" : "查询", result.getStatus(), status, reason);
-        return new AiVideoException(PLATFORM, getKind(status, reason, result.getStatus()), result.getStatus(),
-                StrUtil.blankToDefault(reason, status), null, unknown,
+        return new AiVideoException(
                 StrUtil.format("Veo 视频任务{}失败（HTTP {}，{}）：{}{}", submit ? "提交" : "查询", result.getStatus(),
                         StrUtil.blankToDefault(StrUtil.blankToDefault(reason, status), "-"), AiVideoUtils.sanitize(message),
-                        unknown ? "；任务是否已创建未知，请勿自动重新提交" : ""));
-    }
-
-    static AiVideoException.Kind getKind(String status, String reason, int httpStatus) {
-        if ("BILLING_DISABLED".equals(reason)) {
-            return AiVideoException.Kind.INSUFFICIENT_BALANCE;
-        }
-        if ("SERVICE_DISABLED".equals(reason)) {
-            return AiVideoException.Kind.PERMISSION;
-        }
-        if ("UNAUTHENTICATED".equals(status)) {
-            return AiVideoException.Kind.AUTHENTICATION;
-        }
-        if ("PERMISSION_DENIED".equals(status)) {
-            return AiVideoException.Kind.PERMISSION;
-        }
-        if ("RESOURCE_EXHAUSTED".equals(status)) {
-            return AiVideoException.Kind.RATE_LIMITED;
-        }
-        if ("NOT_FOUND".equals(status)) {
-            return AiVideoException.Kind.NOT_FOUND;
-        }
-        if ("INVALID_ARGUMENT".equals(status) || "FAILED_PRECONDITION".equals(status) || "OUT_OF_RANGE".equals(status)) {
-            return AiVideoException.Kind.INVALID_REQUEST;
-        }
-        if ("INTERNAL".equals(status) || "UNAVAILABLE".equals(status) || "DEADLINE_EXCEEDED".equals(status)) {
-            return AiVideoException.Kind.SERVER_ERROR;
-        }
-        return AiVideoException.kindOfHttpStatus(httpStatus);
+                        unknown ? "；任务是否已创建未知，请勿自动重新提交" : ""), unknown);
     }
 
     private Map<String, String> headers() {
         String token = accessTokenSupplier.get();
         if (StrUtil.isBlank(token)) {
-            throw new AiVideoException(PLATFORM, AiVideoException.Kind.AUTHENTICATION, null, null, null, false,
-                    "Vertex AI 访问令牌为空");
+            throw new AiVideoException("Vertex AI 访问令牌为空");
         }
         Map<String, String> headers = new LinkedHashMap<>();
         headers.put("Authorization", "Bearer " + token.trim());

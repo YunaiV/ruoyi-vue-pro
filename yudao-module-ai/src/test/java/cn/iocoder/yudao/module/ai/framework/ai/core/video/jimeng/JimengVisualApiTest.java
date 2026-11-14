@@ -231,22 +231,21 @@ public class JimengVisualApiTest {
             server.enqueueJson(200, "not json");
             JimengVisualApi api = JimengVisualApi.ofApiKey(API_KEY, server.url(), null);
 
-            assertKind(api, AiVideoException.Kind.AUTHENTICATION, false);
-            assertKind(api, AiVideoException.Kind.CONTENT_REJECTED, false);
-            assertKind(api, AiVideoException.Kind.RATE_LIMITED, false);
-            assertKind(api, AiVideoException.Kind.SERVER_ERROR, true);
-            assertKind(api, AiVideoException.Kind.AUTHENTICATION, false);
-            assertKind(api, AiVideoException.Kind.PERMISSION, false);
-            assertKind(api, AiVideoException.Kind.INVALID_RESPONSE, true);
-            assertKind(api, AiVideoException.Kind.INVALID_RESPONSE, true);
+            assertSubmitError(api, false);
+            assertSubmitError(api, false);
+            assertSubmitError(api, false);
+            assertSubmitError(api, true);
+            assertSubmitError(api, false);
+            assertSubmitError(api, false);
+            assertSubmitError(api, true);
+            assertSubmitError(api, true);
             assertEquals(8, server.requests().size());
         }
     }
 
-    private static void assertKind(JimengVisualApi api, AiVideoException.Kind kind, boolean unknown) {
+    private static void assertSubmitError(JimengVisualApi api, boolean unknown) {
         assertThatThrownBy(() -> api.submitVideo(new JimengVideoRequest().setReqKey(JimengVisualApi.REQ_KEY_T2V_V30).setPrompt("x")))
                 .isInstanceOfSatisfying(AiVideoException.class, ex -> {
-                    assertEquals(kind, ex.getKind());
                     assertEquals(unknown, ex.isSubmitOutcomeUnknown());
                     assertThat(ex.getMessage()).doesNotContain(API_KEY);
                 });
@@ -259,7 +258,6 @@ public class JimengVisualApiTest {
             JimengVisualApi api = JimengVisualApi.ofApiKey(API_KEY, server.url(), Duration.ofMillis(500));
             assertThatThrownBy(() -> api.submitVideo(new JimengVideoRequest().setReqKey(JimengVisualApi.REQ_KEY_T2V_V30).setPrompt("x")))
                     .isInstanceOfSatisfying(AiVideoException.class, ex -> {
-                        assertEquals(AiVideoException.Kind.TIMEOUT, ex.getKind());
                         assertTrue(ex.isSubmitOutcomeUnknown());
                     });
             Thread.sleep(300);
@@ -304,8 +302,7 @@ public class JimengVisualApiTest {
             assertEquals("50215", invalid.getErrorCode());
             assertEquals("50516", api.getTask(ref).getErrorCode());
             // 限流：抛出异常，稍后重查，不能当作任务失败
-            assertThatThrownBy(() -> api.getTask(ref)).isInstanceOfSatisfying(AiVideoException.class,
-                    ex -> assertEquals(AiVideoException.Kind.RATE_LIMITED, ex.getKind()));
+            assertThatThrownBy(() -> api.getTask(ref)).isInstanceOf(AiVideoException.class);
 
             VideoMockServer.Request request = server.lastRequest();
             assertEquals("/api/common/v3/get_result_v2", request.path());

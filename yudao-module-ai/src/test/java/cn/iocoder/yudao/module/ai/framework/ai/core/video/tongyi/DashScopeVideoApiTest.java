@@ -1,5 +1,9 @@
 package cn.iocoder.yudao.module.ai.framework.ai.core.video.tongyi;
 
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.classic.spi.ThrowableProxyUtil;
+import ch.qos.logback.core.read.ListAppender;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.module.ai.framework.ai.core.video.AiVideoException;
@@ -13,7 +17,9 @@ import com.alibaba.dashscope.utils.Constants;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.Test;
+import org.slf4j.LoggerFactory;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -83,6 +89,23 @@ public class DashScopeVideoApiTest {
                 .setPrompt("x").setResolution("4K"))).isInstanceOf(IllegalArgumentException.class);
         assertThatThrownBy(() -> HappyHorseVideoApi.buildRequestBody(new HappyHorseVideoRequest().setModel("happyhorse-2.0")
                 .setPrompt("x"))).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    public void testHappyHorse_promptLength() {
+        // 5000 个非中文字符或 2500 个中文字符：超出部分服务端会静默截断，提前拒绝
+        HappyHorseVideoApi.buildRequestBody(new HappyHorseVideoRequest().setModel("happyhorse-1.1-t2v")
+                .setPrompt(StrUtil.repeat('猫', 2500)));
+        HappyHorseVideoApi.buildRequestBody(new HappyHorseVideoRequest().setModel("happyhorse-1.1-t2v")
+                .setPrompt(StrUtil.repeat('a', 5000)));
+        HappyHorseVideoApi.buildRequestBody(new HappyHorseVideoRequest().setModel("happyhorse-1.1-t2v")
+                .setPrompt(StrUtil.repeat('猫', 1000) + StrUtil.repeat('a', 3000)));
+        assertThatThrownBy(() -> HappyHorseVideoApi.buildRequestBody(new HappyHorseVideoRequest().setModel("happyhorse-1.1-t2v")
+                .setPrompt(StrUtil.repeat('猫', 2501)))).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> HappyHorseVideoApi.buildRequestBody(new HappyHorseVideoRequest().setModel("happyhorse-1.1-t2v")
+                .setPrompt(StrUtil.repeat('a', 5001)))).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> HappyHorseVideoApi.buildRequestBody(new HappyHorseVideoRequest().setModel("happyhorse-1.1-t2v")
+                .setPrompt(StrUtil.repeat('猫', 1000) + StrUtil.repeat('a', 3001)))).isInstanceOf(IllegalArgumentException.class);
     }
 
     // ========== 通义万相参数 ==========
@@ -159,6 +182,33 @@ public class DashScopeVideoApiTest {
                 .setPrompt("x").setShotType("multi")).get("parameters").get("shot_type").asText());
     }
 
+    @Test
+    public void testWan_legacyModelConstraints() {
+        // 文生 size 按模型：wanx2.1-t2v-plus 只有 720P 档，wan2.6-t2v 没有 480P 档
+        assertEquals("1280*720", TongYiWanVideoApi.buildRequestBody(new TongYiWanVideoRequest().setModel("wanx2.1-t2v-plus")
+                .setPrompt("x").setSize("1280*720")).get("parameters").get("size").asText());
+        assertThatThrownBy(() -> TongYiWanVideoApi.buildRequestBody(new TongYiWanVideoRequest().setModel("wanx2.1-t2v-plus")
+                .setPrompt("x").setSize("832*480"))).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> TongYiWanVideoApi.buildRequestBody(new TongYiWanVideoRequest().setModel("wan2.6-t2v")
+                .setPrompt("x").setSize("832*480"))).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> TongYiWanVideoApi.buildRequestBody(new TongYiWanVideoRequest().setModel("wan2.2-t2v-plus")
+                .setPrompt("x").setSize("1280*720"))).isInstanceOf(IllegalArgumentException.class);
+        // 2.1 文生固定 5 秒
+        assertThatThrownBy(() -> TongYiWanVideoApi.buildRequestBody(new TongYiWanVideoRequest().setModel("wanx2.1-t2v-plus")
+                .setPrompt("x").setDuration(10))).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> TongYiWanVideoApi.buildRequestBody(new TongYiWanVideoRequest().setModel("wanx2.1-t2v-turbo")
+                .setPrompt("x").setDuration(3))).isInstanceOf(IllegalArgumentException.class);
+        // 提示词：2.2 / 2.1 最多 800，2.6 / 2.5 最多 1500
+        TongYiWanVideoApi.buildRequestBody(new TongYiWanVideoRequest().setModel("wan2.2-t2v-plus").setPrompt(StrUtil.repeat('猫', 800)));
+        assertThatThrownBy(() -> TongYiWanVideoApi.buildRequestBody(new TongYiWanVideoRequest().setModel("wan2.2-t2v-plus")
+                .setPrompt(StrUtil.repeat('猫', 801)))).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> TongYiWanVideoApi.buildRequestBody(new TongYiWanVideoRequest().setModel("wanx2.1-i2v-turbo")
+                .setFirstFrame("https://a.com/1.png").setPrompt(StrUtil.repeat('a', 801)))).isInstanceOf(IllegalArgumentException.class);
+        TongYiWanVideoApi.buildRequestBody(new TongYiWanVideoRequest().setModel("wan2.6-t2v").setPrompt(StrUtil.repeat('猫', 1500)));
+        assertThatThrownBy(() -> TongYiWanVideoApi.buildRequestBody(new TongYiWanVideoRequest().setModel("wan2.5-i2v-preview")
+                .setFirstFrame("https://a.com/1.png").setPrompt(StrUtil.repeat('a', 1501)))).isInstanceOf(IllegalArgumentException.class);
+    }
+
     // ========== 提交、查询 ==========
 
     @Test
@@ -194,21 +244,19 @@ public class DashScopeVideoApiTest {
             TongYiWanVideoApi api = new TongYiWanVideoApi(server.url(), API_KEY);
             TongYiWanVideoRequest request = new TongYiWanVideoRequest().setModel("wan2.7-t2v").setPrompt("一只猫");
 
-            assertKind(api, request, AiVideoException.Kind.AUTHENTICATION, false);
-            assertKind(api, request, AiVideoException.Kind.INSUFFICIENT_BALANCE, false);
-            assertKind(api, request, AiVideoException.Kind.PERMISSION, false);
-            assertKind(api, request, AiVideoException.Kind.CONTENT_REJECTED, false);
-            assertKind(api, request, AiVideoException.Kind.RATE_LIMITED, false);
-            assertKind(api, request, AiVideoException.Kind.SERVER_ERROR, true);
-            assertKind(api, request, AiVideoException.Kind.INVALID_RESPONSE, true);
+            assertSubmitError(api, request, false);
+            assertSubmitError(api, request, false);
+            assertSubmitError(api, request, false);
+            assertSubmitError(api, request, false);
+            assertSubmitError(api, request, false);
+            assertSubmitError(api, request, true);
+            assertSubmitError(api, request, true);
             assertEquals(7, server.requests().size());
         }
     }
 
-    private static void assertKind(TongYiWanVideoApi api, TongYiWanVideoRequest request, AiVideoException.Kind kind,
-                                   boolean unknown) {
+    private static void assertSubmitError(TongYiWanVideoApi api, TongYiWanVideoRequest request, boolean unknown) {
         assertThatThrownBy(() -> api.createTask(request)).isInstanceOfSatisfying(AiVideoException.class, ex -> {
-            assertEquals(kind, ex.getKind());
             assertEquals(unknown, ex.isSubmitOutcomeUnknown());
             assertThat(ex.getMessage()).doesNotContain(API_KEY);
         });
@@ -221,7 +269,6 @@ public class DashScopeVideoApiTest {
             HappyHorseVideoApi api = new HappyHorseVideoApi(server.url(), API_KEY, Duration.ofMillis(500));
             assertThatThrownBy(() -> api.createTask(new HappyHorseVideoRequest().setModel("happyhorse-1.1-t2v").setPrompt("x")))
                     .isInstanceOfSatisfying(AiVideoException.class, ex -> {
-                        assertEquals(AiVideoException.Kind.TIMEOUT, ex.getKind());
                         assertTrue(ex.isSubmitOutcomeUnknown());
                     });
             Thread.sleep(300);
@@ -329,7 +376,6 @@ public class DashScopeVideoApiTest {
             HappyHorseVideoApi api = new HappyHorseVideoApi(server.url(), API_KEY);
             assertThatThrownBy(() -> api.createTask(new HappyHorseVideoRequest().setModel("happyhorse-1.1-t2v").setPrompt("x")))
                     .isInstanceOfSatisfying(AiVideoException.class, ex -> {
-                        assertEquals(503, ex.getHttpStatus());
                         assertTrue(ex.isSubmitOutcomeUnknown());
                     });
             assertEquals(1, server.requests().size());
@@ -344,7 +390,6 @@ public class DashScopeVideoApiTest {
             HappyHorseVideoApi api = new HappyHorseVideoApi(server.url(), API_KEY);
             assertThatThrownBy(() -> api.createTask(new HappyHorseVideoRequest().setModel("happyhorse-1.1-t2v").setPrompt("x")))
                     .isInstanceOfSatisfying(AiVideoException.class, ex -> {
-                        assertEquals(AiVideoException.Kind.NETWORK, ex.getKind());
                         assertTrue(ex.isSubmitOutcomeUnknown());
                         assertThat(ex.getMessage()).doesNotContain(API_KEY);
                     });
@@ -362,7 +407,6 @@ public class DashScopeVideoApiTest {
         HappyHorseVideoApi api = new HappyHorseVideoApi(url, API_KEY);
         assertThatThrownBy(() -> api.createTask(new HappyHorseVideoRequest().setModel("happyhorse-1.1-t2v").setPrompt("x")))
                 .isInstanceOfSatisfying(AiVideoException.class, ex -> {
-                    assertEquals(AiVideoException.Kind.NETWORK, ex.getKind());
                     assertFalse(ex.isSubmitOutcomeUnknown());
                 });
     }
@@ -375,11 +419,112 @@ public class DashScopeVideoApiTest {
             HappyHorseVideoApi api = new HappyHorseVideoApi(server.url(), API_KEY);
             assertThatThrownBy(() -> api.createTask(new HappyHorseVideoRequest().setModel("happyhorse-1.1-t2v").setPrompt("x")))
                     .isInstanceOfSatisfying(AiVideoException.class, ex -> {
-                        assertEquals(AiVideoException.Kind.INVALID_RESPONSE, ex.getKind());
                         assertTrue(ex.isSubmitOutcomeUnknown());
                     });
             assertEquals(1, server.requests().size());
         }
+    }
+
+    @Test
+    public void testSubmit_unparseableErrorIsUnknown() throws Exception {
+        try (VideoMockServer server = new VideoMockServer()) {
+            // 网关返回的 HTML / 非 JSON 错误：SDK 合成 response_error，不是服务商错误码，任务是否已创建未知
+            server.enqueue(new VideoMockServer.Response(408, "<html>Request Timeout</html>".getBytes(StandardCharsets.UTF_8))
+                    .header("Content-Type", "text/html"));
+            server.enqueue(VideoMockServer.Response.json(400, "<html>bad gateway</html>"));
+            server.enqueueJson(200, "{\"output\":{\"task_status\":\"PENDING\",\"task_id\":\"t\"}}");
+            HappyHorseVideoApi api = new HappyHorseVideoApi(server.url(), API_KEY);
+            HappyHorseVideoRequest request = new HappyHorseVideoRequest().setModel("happyhorse-1.1-t2v").setPrompt("x");
+
+            assertThatThrownBy(() -> api.createTask(request)).isInstanceOfSatisfying(AiVideoException.class, ex -> {
+                assertTrue(ex.isSubmitOutcomeUnknown());
+            });
+            assertThatThrownBy(() -> api.createTask(request)).isInstanceOfSatisfying(AiVideoException.class, ex -> {
+                assertTrue(ex.isSubmitOutcomeUnknown());
+            });
+            assertEquals(2, server.requests().size());
+        }
+    }
+
+    @Test
+    public void testSubmitAndQuery_nonObjectBodyRejectedBeforeSdkParse() throws Exception {
+        try (VideoMockServer server = new VideoMockServer()) {
+            // 2xx 但响应体不是 JSON 对象：在 SDK 解析（并记录整个响应体）之前拒绝
+            String secretUrl = "https://a.com/v.mp4?Signature=secret-signature";
+            server.enqueueJson(200, "[\"" + API_KEY + "\",\"" + secretUrl + "\"]");
+            server.enqueueJson(200, "\"" + secretUrl + "\"");
+            server.enqueue(new VideoMockServer.Response(200, secretUrl.getBytes(StandardCharsets.UTF_8))
+                    .header("Content-Type", "text/plain"));
+            HappyHorseVideoApi api = new HappyHorseVideoApi(server.url(), API_KEY);
+
+            assertThatThrownBy(() -> api.createTask(new HappyHorseVideoRequest().setModel("happyhorse-1.1-t2v").setPrompt("x")))
+                    .isInstanceOfSatisfying(AiVideoException.class, ex -> {
+                        assertTrue(ex.isSubmitOutcomeUnknown());
+                        assertThat(ex.getMessage()).doesNotContain(API_KEY).doesNotContain("secret-signature");
+                    });
+            for (int i = 0; i < 2; i++) {
+                assertThatThrownBy(() -> api.getTask("t")).isInstanceOfSatisfying(AiVideoException.class, ex -> {
+                    assertFalse(ex.isSubmitOutcomeUnknown());
+                    assertThat(ex.getMessage()).doesNotContain("secret-signature");
+                });
+            }
+            assertEquals(3, server.requests().size());
+        }
+    }
+
+    @Test
+    public void testSubmitAndQuery_malformedBodyNotLogged() throws Exception {
+        String signed = "https://a.com/v.mp4?Signature=secret-signature";
+        ListAppender<ILoggingEvent> logs = new ListAppender<>();
+        logs.start();
+        Logger root = (Logger) LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
+        root.addAppender(logs);
+        try (VideoMockServer server = new VideoMockServer()) {
+            // 1. 以 { 开头的非法对象：属性名为配置的 API Key / 签名地址（SDK 解析失败时，Gson 异常的 JSON 路径会带出属性名）
+            server.enqueueJson(200, "{\"" + API_KEY + "\":");
+            server.enqueueJson(200, "{\"output\":{\"task_id\":\"t\",\"task_status\":\"SUCCEEDED\",\"video_url\":\"" + signed
+                    + "\"},\"" + signed + "\":");
+            // 2. 合法对象但缺少 output：SDK 会记录响应体中的 request_id
+            server.enqueueJson(200, "{\"request_id\":\"" + API_KEY + "\"}");
+            server.enqueueJson(200, "{\"request_id\":\"" + signed + "\",\"output\":null}");
+            // 3. 合法对象但字段类型不符：SDK 抛出非 IO 异常，按返回格式不正确处理（不是网络异常）
+            server.enqueueJson(200, "{\"output\":{\"task_id\":\"t\"},\"usage\":[\"" + signed + "\"]}");
+            server.enqueueJson(200, "{\"output\":{\"task_id\":\"t\",\"task_status\":\"RUNNING\"},\"request_id\":{\"k\":\"" + signed + "\"}}");
+            // 4. 空响应体：保持原处理（返回格式不正确）；之后正常响应仍可用
+            server.enqueue(new VideoMockServer.Response(200, new byte[0]));
+            server.enqueueJson(200, "{\"request_id\":\"r\",\"output\":{\"task_id\":\"t\",\"task_status\":\"PENDING\"}}");
+            HappyHorseVideoApi api = new HappyHorseVideoApi(server.url(), API_KEY);
+            HappyHorseVideoRequest request = new HappyHorseVideoRequest().setModel("happyhorse-1.1-t2v").setPrompt("x");
+
+            assertInvalidResponse(() -> api.createTask(request), true, signed);
+            assertInvalidResponse(() -> api.getTask("t"), false, signed);
+            assertInvalidResponse(() -> api.createTask(request), true, signed);
+            assertInvalidResponse(() -> api.getTask("t"), false, signed);
+            assertInvalidResponse(() -> api.createTask(request), true, signed);
+            assertInvalidResponse(() -> api.getTask("t"), false, signed);
+            assertInvalidResponse(() -> api.getTask("t"), false, signed);
+            assertEquals(AiVideoTaskStatus.QUEUED, api.getTask("t").getStatus());
+            // 每次调用只请求一次
+            assertEquals(8, server.requests().size());
+        } finally {
+            root.detachAppender(logs);
+            logs.stop();
+        }
+        // 日志中不出现配置的 API Key、签名地址，SDK 也没有记录解析失败
+        for (ILoggingEvent event : logs.list) {
+            String text = event.getFormattedMessage()
+                    + (event.getThrowableProxy() != null ? ThrowableProxyUtil.asString(event.getThrowableProxy()) : "");
+            assertThat(text).as("log: %s", event.getLoggerName()).doesNotContain(API_KEY).doesNotContain("secret-signature");
+            assertThat(text).doesNotContain("Failed to parse");
+        }
+    }
+
+    private static void assertInvalidResponse(org.assertj.core.api.ThrowableAssert.ThrowingCallable call, boolean unknown,
+                                              String signed) {
+        assertThatThrownBy(call).isInstanceOfSatisfying(AiVideoException.class, ex -> {
+            assertEquals(unknown, ex.isSubmitOutcomeUnknown());
+            assertThat(ex.getMessage()).doesNotContain(API_KEY).doesNotContain(signed).doesNotContain("secret-signature");
+        });
     }
 
     @Test
@@ -389,11 +534,9 @@ public class DashScopeVideoApiTest {
             server.enqueue(VideoMockServer.Response.json(200, "{}").delay(3000));
             HappyHorseVideoApi api = new HappyHorseVideoApi(server.url(), API_KEY, Duration.ofMillis(500));
             assertThatThrownBy(() -> api.getTask("t")).isInstanceOfSatisfying(AiVideoException.class, ex -> {
-                assertEquals(AiVideoException.Kind.NETWORK, ex.getKind());
                 assertFalse(ex.isSubmitOutcomeUnknown());
             });
             assertThatThrownBy(() -> api.getTask("t")).isInstanceOfSatisfying(AiVideoException.class, ex -> {
-                assertEquals(AiVideoException.Kind.TIMEOUT, ex.getKind());
                 assertFalse(ex.isSubmitOutcomeUnknown());
             });
             Thread.sleep(300);
@@ -452,11 +595,9 @@ public class DashScopeVideoApiTest {
             server.enqueueJson(200, "{\"request_id\":\"r\"}");
             TongYiWanVideoApi api = new TongYiWanVideoApi(server.url(), API_KEY);
             assertThatThrownBy(() -> api.getTask("t")).isInstanceOfSatisfying(AiVideoException.class, ex -> {
-                assertEquals(AiVideoException.Kind.AUTHENTICATION, ex.getKind());
                 assertFalse(ex.isSubmitOutcomeUnknown());
             });
-            assertThatThrownBy(() -> api.getTask("t")).isInstanceOfSatisfying(AiVideoException.class,
-                    ex -> assertEquals(AiVideoException.Kind.INVALID_RESPONSE, ex.getKind()));
+            assertThatThrownBy(() -> api.getTask("t")).isInstanceOf(AiVideoException.class);
             assertThatThrownBy(() -> api.getTask("a/b")).isInstanceOf(IllegalArgumentException.class);
             assertEquals(2, server.requests().size());
         }

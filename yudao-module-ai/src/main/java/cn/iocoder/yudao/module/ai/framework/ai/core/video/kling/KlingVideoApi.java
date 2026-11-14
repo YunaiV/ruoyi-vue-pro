@@ -364,9 +364,7 @@ public class KlingVideoApi {
 
     private AiVideoTaskRef toTaskRef(String model, String route, String taskId, JsonNode root) {
         if (taskId == null) {
-            throw new AiVideoException(PLATFORM, AiVideoException.Kind.INVALID_RESPONSE, 200, null,
-                    AiVideoUtils.text(root, "request_id"), true,
-                    "可灵视频任务提交后未返回任务编号，任务是否已创建未知，请勿自动重新提交");
+            throw new AiVideoException("可灵视频任务提交后未返回任务编号，任务是否已创建未知，请勿自动重新提交", true);
         }
         log.info("[createTask][可灵视频任务已提交，model({}) route({}) taskId({})]", model, route, taskId);
         return new AiVideoTaskRef(PLATFORM, model, taskId, route, AiVideoUtils.text(root, "request_id"));
@@ -393,40 +391,11 @@ public class KlingVideoApi {
         String message = StrUtil.blankToDefault(AiVideoUtils.text(root, "message"), "返回格式不正确");
         String requestId = AiVideoUtils.text(root, "request_id");
         boolean unknown = submit && (result.getStatus() >= 500 || code == null);
-        AiVideoException.Kind kind = code != null ? getKind(code, result.getStatus()) : AiVideoException.kindOfHttpStatus(result.getStatus());
         log.warn("[Kling][{}失败，HTTP {}，code {}，requestId {}]", submit ? "提交" : "查询", result.getStatus(), code, requestId);
-        throw new AiVideoException(PLATFORM, kind, result.getStatus(), code != null ? String.valueOf(code) : null, requestId, unknown,
+        throw new AiVideoException(
                 StrUtil.format("可灵视频任务{}失败（HTTP {}，code={}）：{}{}", submit ? "提交" : "查询", result.getStatus(),
                         code != null ? code : "-", AiVideoUtils.sanitize(message, credentials.secrets()),
-                        unknown ? "；任务是否已创建未知，请勿自动重新提交" : ""));
-    }
-
-    static AiVideoException.Kind getKind(int code, int httpStatus) {
-        if (code >= 1000 && code <= 1004) {
-            return AiVideoException.Kind.AUTHENTICATION;
-        }
-        if (code == 1101 || code == 1102) {
-            return AiVideoException.Kind.INSUFFICIENT_BALANCE;
-        }
-        if (code == 1100 || code == 1103 || code == 1304) {
-            return AiVideoException.Kind.PERMISSION;
-        }
-        if (code == 1200 || code == 1201) {
-            return AiVideoException.Kind.INVALID_REQUEST;
-        }
-        if (code == 1202 || code == 1203) {
-            return AiVideoException.Kind.NOT_FOUND;
-        }
-        if (code == 1300 || code == 1301) {
-            return AiVideoException.Kind.CONTENT_REJECTED;
-        }
-        if (code == 1302 || code == 1303) {
-            return AiVideoException.Kind.RATE_LIMITED;
-        }
-        if (code >= 5000 && code < 6000) {
-            return AiVideoException.Kind.SERVER_ERROR;
-        }
-        return AiVideoException.kindOfHttpStatus(httpStatus);
+                        unknown ? "；任务是否已创建未知，请勿自动重新提交" : ""), unknown);
     }
 
     private Map<String, String> headers() {

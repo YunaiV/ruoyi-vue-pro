@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +56,16 @@ public class TongYiWanVideoApi {
     public static final List<String> LEGACY_T2V_MODELS = ListUtil.of("wan2.6-t2v", "wan2.5-t2v-preview",
             "wan2.2-t2v-plus", "wanx2.1-t2v-turbo", "wanx2.1-t2v-plus");
     /**
+     * 2.6 及更早文生：各档位可选的 size（宽*高）
+     */
+    private static final List<String> SIZES_480P = ListUtil.of("832*480", "480*832", "624*624");
+    private static final List<String> SIZES_720P = ListUtil.of("1280*720", "720*1280", "960*960", "1088*832", "832*1088");
+    private static final List<String> SIZES_1080P = ListUtil.of("1920*1080", "1080*1920", "1440*1440", "1632*1248", "1248*1632");
+    /**
+     * 2.6 及更早文生：模型 → 可选 size
+     */
+    public static final Map<String, List<String>> LEGACY_T2V_SIZES = new LinkedHashMap<>();
+    /**
      * 2.6 及更早首帧图生：模型 → 可选分辨率（第一个为默认）
      */
     public static final Map<String, List<String>> LEGACY_I2V_RESOLUTIONS = new LinkedHashMap<>();
@@ -64,6 +75,11 @@ public class TongYiWanVideoApi {
     private static final Map<String, List<Integer>> LEGACY_DURATIONS = new LinkedHashMap<>();
 
     static {
+        LEGACY_T2V_SIZES.put("wan2.6-t2v", concat(SIZES_720P, SIZES_1080P));
+        LEGACY_T2V_SIZES.put("wan2.5-t2v-preview", concat(SIZES_480P, SIZES_720P, SIZES_1080P));
+        LEGACY_T2V_SIZES.put("wan2.2-t2v-plus", concat(SIZES_480P, SIZES_1080P));
+        LEGACY_T2V_SIZES.put("wanx2.1-t2v-turbo", concat(SIZES_480P, SIZES_720P));
+        LEGACY_T2V_SIZES.put("wanx2.1-t2v-plus", SIZES_720P);
         LEGACY_I2V_RESOLUTIONS.put("wan2.6-i2v-flash", ListUtil.of("1080P", "720P"));
         LEGACY_I2V_RESOLUTIONS.put("wan2.6-i2v", ListUtil.of("1080P", "720P"));
         LEGACY_I2V_RESOLUTIONS.put("wan2.5-i2v-preview", ListUtil.of("1080P", "480P", "720P"));
@@ -73,6 +89,8 @@ public class TongYiWanVideoApi {
         LEGACY_I2V_RESOLUTIONS.put("wanx2.1-i2v-plus", ListUtil.of("720P"));
         LEGACY_DURATIONS.put("wan2.5-t2v-preview", ListUtil.of(5, 10));
         LEGACY_DURATIONS.put("wan2.2-t2v-plus", ListUtil.of(5));
+        LEGACY_DURATIONS.put("wanx2.1-t2v-turbo", ListUtil.of(5));
+        LEGACY_DURATIONS.put("wanx2.1-t2v-plus", ListUtil.of(5));
         LEGACY_DURATIONS.put("wan2.5-i2v-preview", ListUtil.of(5, 10));
         LEGACY_DURATIONS.put("wan2.2-i2v-flash", ListUtil.of(5));
         LEGACY_DURATIONS.put("wan2.2-i2v-plus", ListUtil.of(5));
@@ -84,8 +102,12 @@ public class TongYiWanVideoApi {
     public static final List<String> V27_RATIOS = ListUtil.of("16:9", "9:16", "1:1", "4:3", "3:4");
     public static final List<String> SHOT_TYPES = ListUtil.of("single", "multi");
 
+    /**
+     * 提示词上限：2.7 为 5000 字符，2.6 / 2.5 为 1500 字符，2.2 / 2.1 为 800 字符；超出部分会被服务端静默截断，所以提前校验
+     */
     private static final int MAX_PROMPT_LENGTH_V27 = 5000;
     private static final int MAX_PROMPT_LENGTH_LEGACY = 1500;
+    private static final int MAX_PROMPT_LENGTH_V22 = 800;
     private static final int MAX_NEGATIVE_PROMPT_LENGTH = 500;
     private static final long MAX_SEED = 2147483647L;
 
@@ -135,7 +157,9 @@ public class TongYiWanVideoApi {
         if (t2v) {
             AiVideoUtils.requireText(request.getPrompt(), "提示词");
         }
-        AiVideoUtils.checkMaxLength(request.getPrompt(), v27 ? MAX_PROMPT_LENGTH_V27 : MAX_PROMPT_LENGTH_LEGACY, "提示词");
+        boolean v22 = model.startsWith("wan2.2-") || model.startsWith("wanx2.1-");
+        AiVideoUtils.checkMaxLength(request.getPrompt(),
+                v27 ? MAX_PROMPT_LENGTH_V27 : v22 ? MAX_PROMPT_LENGTH_V22 : MAX_PROMPT_LENGTH_LEGACY, "提示词");
         AiVideoUtils.checkMaxLength(request.getNegativePrompt(), MAX_NEGATIVE_PROMPT_LENGTH, "反向提示词");
         if (request.getAudioUrl() != null) {
             AiVideoUtils.checkArgument(family == Family.T2V_V27 || wan26 || wan25, "模型({})不支持 audio_url", model);
@@ -143,8 +167,7 @@ public class TongYiWanVideoApi {
         }
         // 1.2 尺寸、分辨率、比例
         if (family == Family.T2V_LEGACY) {
-            AiVideoUtils.checkArgument(request.getSize() == null || request.getSize().matches("\\d{3,4}\\*\\d{3,4}"),
-                    "尺寸格式应为 宽*高，例如 1280*720");
+            AiVideoUtils.checkIn(request.getSize(), LEGACY_T2V_SIZES.get(model), model + " 尺寸");
             AiVideoUtils.checkArgument(request.getResolution() == null && request.getRatio() == null,
                     "模型({})用 size 指定尺寸，不支持 resolution、ratio", model);
         } else {
@@ -217,6 +240,15 @@ public class TongYiWanVideoApi {
      */
     public static ObjectNode buildRequestBody(TongYiWanVideoRequest request) {
         return DashScopeVideoTaskClient.toJson(buildParam(request));
+    }
+
+    @SafeVarargs
+    private static List<String> concat(List<String>... lists) {
+        List<String> result = new ArrayList<>();
+        for (List<String> list : lists) {
+            result.addAll(list);
+        }
+        return Collections.unmodifiableList(result);
     }
 
     private static void addMedia(List<VideoSynthesisParam.Media> media, String type, String url, String name) {

@@ -18,7 +18,7 @@ public class TongYiWanVideoRequest {
 
     private String model;
     /**
-     * 提示词：2.7 最多 5000 字符，2.6 / 2.5 最多 1500 字符；文生必填
+     * 提示词：2.7 最多 5000 字符，2.6 / 2.5 最多 1500 字符，2.2 / 2.1 最多 800 字符；文生必填
      */
     private String prompt;
     /**
@@ -31,7 +31,7 @@ public class TongYiWanVideoRequest {
     private String audioUrl;
 
     /**
-     * 输出尺寸，宽*高：只用于 2.6 及更早的文生
+     * 输出尺寸，宽*高：只用于 2.6 及更早的文生，可选值按模型（见 TongYiWanVideoApi.LEGACY_T2V_SIZES）
      */
     private String size;
     /**

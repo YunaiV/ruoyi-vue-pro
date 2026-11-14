@@ -260,8 +260,7 @@ public class MiniMaxHailuoVideoApi {
         checkBaseResp(result, root, true, "提交 MiniMax 海螺视频任务");
         String taskId = AiVideoUtils.text(root, "task_id");
         if (taskId == null) {
-            throw new AiVideoException(PLATFORM, AiVideoException.Kind.INVALID_RESPONSE, result.getStatus(), null, null, true,
-                    "MiniMax 海螺视频任务提交后未返回 task_id，任务是否已创建未知，请勿自动重新提交");
+            throw new AiVideoException("MiniMax 海螺视频任务提交后未返回 task_id，任务是否已创建未知，请勿自动重新提交", true);
         }
         log.info("[createTask][MiniMax 海螺视频任务已提交，model({}) taskId({})]", request.getModel(), taskId);
         return new AiVideoTaskRef(PLATFORM, request.getModel(), taskId, null, null);
@@ -334,20 +333,14 @@ public class MiniMaxHailuoVideoApi {
         }
         String message = baseResp != null ? AiVideoUtils.text(baseResp, "status_msg") : null;
         String codeText = code != null ? String.valueOf(code) : null;
-        AiVideoException.Kind kind = code != null
-                ? MiniMaxH3VideoApi.getKind(null, codeText, result.getStatus(), StrUtil.nullToEmpty(message))
-                : AiVideoException.kindOfHttpStatus(result.getStatus());
-        if (code != null && kind == AiVideoException.Kind.INVALID_RESPONSE) {
-            kind = AiVideoException.Kind.INVALID_REQUEST;
-        }
         // 2xx 却解析不到 base_resp、5xx：创建任务是否成功未知
         boolean unknown = submit && (result.getStatus() >= 500 || code == null);
         log.warn("[MiniMaxHailuo][{}失败，HTTP {}，status_code {}]", action, result.getStatus(), codeText);
-        throw new AiVideoException(PLATFORM, kind, result.getStatus(), codeText, null, unknown,
+        throw new AiVideoException(
                 StrUtil.format("{}失败（HTTP {}，status_code={}）：{}{}", action, result.getStatus(),
                         StrUtil.blankToDefault(codeText, "-"),
                         StrUtil.isBlank(message) ? "返回格式不正确" : AiVideoUtils.sanitize(message, apiKey),
-                        unknown ? "；任务是否已创建未知，请勿自动重新提交" : ""));
+                        unknown ? "；任务是否已创建未知，请勿自动重新提交" : ""), unknown);
     }
 
     private Map<String, String> headers() {

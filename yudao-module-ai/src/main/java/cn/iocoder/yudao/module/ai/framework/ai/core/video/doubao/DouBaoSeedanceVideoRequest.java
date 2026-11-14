@@ -11,7 +11,7 @@ import java.util.List;
  * 生成方式由素材决定，三种图片用法不能混用：
  * 1. 文生：只有 prompt
  * 2. 首帧：firstFrame
- * 3. 首尾帧：firstFrame + lastFrame（尾帧必须配首帧）
+ * 3. 首尾帧：firstFrame + lastFrame（尾帧必须配首帧；1.0 pro fast 不支持）
  * 4. 参考：referenceImages（2.0 系列 1 ~ 9 张），2.0 / 2.5 系列另可带参考视频、参考音频（音频不能单独输入）
  *
  * 素材地址支持公网 URL、data:{mime};base64,{内容}、asset://{素材 ID}
@@ -41,11 +41,11 @@ public class DouBaoSeedanceVideoRequest {
      */
     private String resolution;
     /**
-     * 比例：16:9、4:3、1:1、3:4、9:16、21:9、adaptive
+     * 比例：16:9、4:3、1:1、3:4、9:16、21:9、adaptive；2.5 首帧 / 首尾帧只支持 adaptive
      */
     private String ratio;
     /**
-     * 时长（秒），-1 表示由模型智能选择；与 frames 二选一
+     * 时长（秒），-1 表示由模型智能选择；与 frames 二选一。1.0 为 [2, 12]，2.0 为 -1 或 [4, 15]，2.5 为 -1 或 [4, 30]
      */
     private Integer duration;
     /**

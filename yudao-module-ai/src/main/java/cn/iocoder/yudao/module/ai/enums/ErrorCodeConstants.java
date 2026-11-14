@@ -146,4 +146,13 @@ public interface ErrorCodeConstants {
     ErrorCode ASR_MODEL_NOT_SUPPORTED = new ErrorCode(1_040_016_001, "操作失败，语音识别模型({})不可用：{}");
     ErrorCode ASR_NOT_EXISTS = new ErrorCode(1_040_016_002, "语音识别记录不存在");
 
+    // ========== AI 视频 1-040-017-000 ==========
+    ErrorCode VIDEO_NOT_EXISTS = new ErrorCode(1_040_017_000, "视频不存在");
+    ErrorCode VIDEO_MODEL_TYPE_ERROR = new ErrorCode(1_040_017_001, "操作失败，所选模型不是视频模型");
+    ErrorCode VIDEO_MODEL_PLATFORM_MISMATCH = new ErrorCode(1_040_017_002,
+            "操作失败，视频模型的平台（{}）与 API 密钥的平台（{}）不一致，请修改模型配置");
+    ErrorCode VIDEO_PARAMS_INVALID = new ErrorCode(1_040_017_003, "视频参数不正确：{}");
+    ErrorCode VIDEO_STATUS_NOT_FINISHED = new ErrorCode(1_040_017_004, "视频还在生成中，暂不能执行该操作");
+    ErrorCode VIDEO_STATUS_NOT_SUCCESS = new ErrorCode(1_040_017_005, "只有已完成的视频才能执行该操作");
+
 }

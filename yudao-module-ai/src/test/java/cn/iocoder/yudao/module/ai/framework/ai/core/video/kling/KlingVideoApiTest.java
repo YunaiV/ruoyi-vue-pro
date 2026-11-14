@@ -199,19 +199,18 @@ public class KlingVideoApiTest {
             server.enqueueJson(200, "{\"code\":0,\"data\":{}}");
             KlingVideoApi api = new KlingVideoApi(server.url(), KlingCredentials.ofApiKey(API_KEY));
 
-            assertKind(api, AiVideoException.Kind.AUTHENTICATION, false);
-            assertKind(api, AiVideoException.Kind.INSUFFICIENT_BALANCE, false);
-            assertKind(api, AiVideoException.Kind.CONTENT_REJECTED, false);
-            assertKind(api, AiVideoException.Kind.RATE_LIMITED, false);
-            assertKind(api, AiVideoException.Kind.SERVER_ERROR, true);
-            assertKind(api, AiVideoException.Kind.INVALID_RESPONSE, true);
+            assertSubmitError(api, false);
+            assertSubmitError(api, false);
+            assertSubmitError(api, false);
+            assertSubmitError(api, false);
+            assertSubmitError(api, true);
+            assertSubmitError(api, true);
             assertEquals(6, server.requests().size());
         }
     }
 
-    private static void assertKind(KlingVideoApi api, AiVideoException.Kind kind, boolean unknown) {
+    private static void assertSubmitError(KlingVideoApi api, boolean unknown) {
         assertThatThrownBy(() -> api.createTask(t2v())).isInstanceOfSatisfying(AiVideoException.class, ex -> {
-            assertEquals(kind, ex.getKind());
             assertEquals(unknown, ex.isSubmitOutcomeUnknown());
             assertThat(ex.getMessage()).doesNotContain(API_KEY);
         });
@@ -223,7 +222,6 @@ public class KlingVideoApiTest {
             server.enqueue(VideoMockServer.Response.json(200, "{}").delay(3000));
             KlingVideoApi api = new KlingVideoApi(server.url(), KlingCredentials.ofApiKey(API_KEY), Duration.ofMillis(500));
             assertThatThrownBy(() -> api.createTask(t2v())).isInstanceOfSatisfying(AiVideoException.class, ex -> {
-                assertEquals(AiVideoException.Kind.TIMEOUT, ex.getKind());
                 assertTrue(ex.isSubmitOutcomeUnknown());
             });
             Thread.sleep(300);
@@ -262,8 +260,7 @@ public class KlingVideoApiTest {
             assertEquals(AiVideoTaskStatus.FAILED, api.getTask(ref).getStatus());
             // 列表中没有该任务：未知
             assertEquals(AiVideoTaskStatus.UNKNOWN, api.getTask(ref).getStatus());
-            assertThatThrownBy(() -> api.getTask(ref)).isInstanceOfSatisfying(AiVideoException.class,
-                    ex -> assertEquals(AiVideoException.Kind.NOT_FOUND, ex.getKind()));
+            assertThatThrownBy(() -> api.getTask(ref)).isInstanceOf(AiVideoException.class);
 
             assertEquals("GET", server.lastRequest().method());
             assertEquals("/tasks", server.lastRequest().path());

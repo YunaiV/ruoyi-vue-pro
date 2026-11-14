@@ -323,13 +323,11 @@ public class JimengVisualApi {
         JsonNode root = checkResponse(result, "即梦主体检测", false);
         JsonNode respData = AiVideoUtils.parseJson(AiVideoUtils.text(root.get("data"), "resp_data"));
         if (respData == null) {
-            throw new AiVideoException(PLATFORM, AiVideoException.Kind.INVALID_RESPONSE, result.getStatus(), null, null, false,
-                    "即梦主体检测失败：resp_data 格式不正确");
+            throw new AiVideoException("即梦主体检测失败：resp_data 格式不正确");
         }
         Integer innerCode = AiVideoUtils.integer(respData, "code");
         if (innerCode != null && innerCode != 0) {
-            throw new AiVideoException(PLATFORM, AiVideoException.Kind.INVALID_REQUEST, result.getStatus(), String.valueOf(innerCode),
-                    null, false, "即梦主体检测失败：resp_data.code=" + innerCode);
+            throw new AiVideoException("即梦主体检测失败：resp_data.code=" + innerCode);
         }
         if (!Integer.valueOf(1).equals(AiVideoUtils.integer(respData, "status"))) {
             return Collections.emptyList();
@@ -531,8 +529,7 @@ public class JimengVisualApi {
         JsonNode root = checkResponse(result, action, true);
         String taskId = AiVideoUtils.text(root.get("data"), "task_id");
         if (taskId == null) {
-            throw new AiVideoException(PLATFORM, AiVideoException.Kind.INVALID_RESPONSE, result.getStatus(), null,
-                    AiVideoUtils.text(root, "request_id"), true, action + "后未返回 task_id，任务是否已创建未知，请勿自动重新提交");
+            throw new AiVideoException(action + "后未返回 task_id，任务是否已创建未知，请勿自动重新提交", true);
         }
         log.info("[submit][{}成功，reqKey({}) taskId({})]", action, reqKey, taskId);
         return new AiVideoTaskRef(PLATFORM, reqKey, taskId, queryAction, AiVideoUtils.text(root, "request_id"));
@@ -600,76 +597,29 @@ public class JimengVisualApi {
         String message = AiVideoUtils.text(root, "message");
         String codeText = code != null ? String.valueOf(code) : null;
         String requestId = AiVideoUtils.text(root, "request_id");
-        AiVideoException.Kind kind;
-        if (code != null) {
-            kind = getKind(code, message, result.getStatus());
-        } else {
+        if (code == null) {
             // 网关层错误：{ResponseMetadata: {RequestId, Error: {Code, Message}}}
             JsonNode metadata = root != null ? root.get("ResponseMetadata") : null;
             JsonNode error = metadata != null ? metadata.get("Error") : null;
             codeText = AiVideoUtils.text(error, "Code");
             message = AiVideoUtils.text(error, "Message");
             requestId = AiVideoUtils.text(metadata, "RequestId");
-            kind = getGatewayKind(codeText, result.getStatus());
         }
         boolean unknown = submit && (result.getStatus() >= 500 || (code == null && codeText == null));
         log.warn("[Jimeng][{}失败，HTTP {}，code {}，requestId {}]", action, result.getStatus(), codeText, requestId);
-        throw new AiVideoException(PLATFORM, kind, result.getStatus(), codeText, requestId, unknown,
+        throw new AiVideoException(
                 StrUtil.format("{}失败（HTTP {}，code={}）：{}{}", action, result.getStatus(), StrUtil.blankToDefault(codeText, "-"),
                         StrUtil.isBlank(message) ? "返回格式不正确" : AiVideoUtils.sanitize(message, secrets),
-                        unknown ? "；任务是否已创建未知，请勿自动重新提交" : ""));
+                        unknown ? "；任务是否已创建未知，请勿自动重新提交" : ""), unknown);
     }
 
     /**
      * 是否为任务本身的失败（审核未通过、输入不符合要求），而不是鉴权、限流、服务端错误
      */
     static boolean isTaskFailure(int code) {
-        return getKind(code, null, 200) == AiVideoException.Kind.CONTENT_REJECTED
+        // 50411~50413、50511~50519：内容审核未通过；50200~50299：输入不符合要求
+        return (code >= 50411 && code <= 50413) || (code >= 50511 && code <= 50519)
                 || (code >= 50200 && code <= 50299);
-    }
-
-    /**
-     * 按文档的错误码表判断；文档未列出的错误码按 HTTP 状态判断
-     */
-    static AiVideoException.Kind getKind(int code, String message, int httpStatus) {
-        if (code == 50400) {
-            // 例如「apikey does not exist」、签名错误；其他为无权限访问
-            return StrUtil.containsAnyIgnoreCase(message, "apikey", "signature", "accesskey", "credential")
-                    ? AiVideoException.Kind.AUTHENTICATION : AiVideoException.Kind.PERMISSION;
-        }
-        if (code == 50429 || code == 50430) {
-            return AiVideoException.Kind.RATE_LIMITED;
-        }
-        if (code == 50500 || code == 50501 || code == 50520 || code == 50521 || code == 50522) {
-            return AiVideoException.Kind.SERVER_ERROR;
-        }
-        if ((code >= 50411 && code <= 50413) || (code >= 50511 && code <= 50519)) {
-            return AiVideoException.Kind.CONTENT_REJECTED;
-        }
-        if (code >= 50200 && code <= 50299) {
-            // 50215 Input invalid for this service 等
-            return AiVideoException.Kind.INVALID_REQUEST;
-        }
-        return AiVideoException.kindOfHttpStatus(httpStatus);
-    }
-
-    static AiVideoException.Kind getGatewayKind(String code, int httpStatus) {
-        if (code != null) {
-            if (code.contains("Signature") || code.contains("AccessKey") || code.contains("Authentication")
-                    || code.contains("Credential")) {
-                return AiVideoException.Kind.AUTHENTICATION;
-            }
-            if (code.contains("AccessDenied") || code.contains("Forbidden") || code.contains("NotOpen")) {
-                return AiVideoException.Kind.PERMISSION;
-            }
-            if (code.contains("FlowLimit") || code.contains("Throttl")) {
-                return AiVideoException.Kind.RATE_LIMITED;
-            }
-            if (code.contains("InternalError") || code.contains("ServiceUnavailable")) {
-                return AiVideoException.Kind.SERVER_ERROR;
-            }
-        }
-        return AiVideoException.kindOfHttpStatus(httpStatus);
     }
 
 }
