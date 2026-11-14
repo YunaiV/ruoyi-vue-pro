@@ -47,9 +47,6 @@ public class AiOcrRespVO {
     @Schema(description = "识别出的原文", example = "芋道源码")
     private String originalText;
 
-    @Schema(description = "修订后的文本：null 表示未修订，空字符串表示已清空", example = "芋道源码")
-    private String editedText;
-
     @Schema(description = "失败原因", example = "识别超时，请稍后重试")
     private String errorMessage;
 

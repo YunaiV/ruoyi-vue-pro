@@ -120,7 +120,6 @@ public interface ErrorCodeConstants {
     ErrorCode OCR_MODEL_PLATFORM_MISMATCH = new ErrorCode(1_040_014_001,
             "操作失败，文字识别模型的平台（{}）与 API 密钥的平台（{}）不一致，请修改模型配置");
     ErrorCode OCR_MODEL_PLATFORM_NOT_SUPPORTED = new ErrorCode(1_040_014_002, "平台({})暂不支持文字识别");
-    ErrorCode OCR_STATUS_NOT_SUCCESS = new ErrorCode(1_040_014_004, "只有识别成功的记录才能保存修订");
     ErrorCode OCR_CONFIG_INVALID = new ErrorCode(1_040_014_005, "文字识别配置不正确：{}");
 
     // ========== AI 技能 1-040-015-000 ==========
@@ -140,5 +139,11 @@ public interface ErrorCodeConstants {
     ErrorCode SKILL_FILE_SIZE_EXCEED = new ErrorCode(1_040_015_110, "单个文件不能超过 {} KB，当前 {} KB");
     ErrorCode SKILL_FILE_TOTAL_SIZE_EXCEED = new ErrorCode(1_040_015_111, "技能文件合计不能超过 {} MB，保存后为 {} KB");
     ErrorCode SKILL_FILE_SKILL_MD_INVALID = new ErrorCode(1_040_015_112, "SKILL.md 头信息不正确：{}");
+
+    // ========== AI 语音识别 1-040-016-000 ==========
+    ErrorCode ASR_MODEL_PLATFORM_MISMATCH = new ErrorCode(1_040_016_000,
+            "操作失败，语音识别模型的平台（{}）与 API 密钥的平台（{}）不一致，请修改模型配置");
+    ErrorCode ASR_MODEL_NOT_SUPPORTED = new ErrorCode(1_040_016_001, "操作失败，语音识别模型({})不可用：{}");
+    ErrorCode ASR_NOT_EXISTS = new ErrorCode(1_040_016_002, "语音识别记录不存在");
 
 }

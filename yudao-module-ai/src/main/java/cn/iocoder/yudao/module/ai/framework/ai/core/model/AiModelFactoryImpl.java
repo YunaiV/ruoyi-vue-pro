@@ -50,6 +50,7 @@ import io.qdrant.client.QdrantGrpcClient;
 import lombok.SneakyThrows;
 import org.springframework.ai.azure.openai.AzureOpenAiChatModel;
 import org.springframework.ai.azure.openai.AzureOpenAiEmbeddingModel;
+import org.springframework.ai.audio.transcription.TranscriptionModel;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.deepseek.DeepSeekChatModel;
 import org.springframework.ai.deepseek.DeepSeekChatOptions;
@@ -61,6 +62,11 @@ import org.springframework.ai.embedding.observation.EmbeddingModelObservationCon
 import com.volcengine.ark.runtime.service.ArkService;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.baidu.BaiduSpeechModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.doubao.DouBaoSpeechModel;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.deepseek.DeepSeekSpeechModel;
+import cn.iocoder.yudao.module.ai.framework.ai.core.asr.baidu.BaiduTranscriptionModel;
+import cn.iocoder.yudao.module.ai.framework.ai.core.asr.deepseek.DeepSeekTranscriptionModel;
+import cn.iocoder.yudao.module.ai.framework.ai.core.asr.tencent.TencentTranscriptionModel;
+import cn.iocoder.yudao.module.ai.framework.ai.core.asr.tongyi.TongYiTranscriptionModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.minimax.MiniMaxSpeechModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.speech.AiSpeechModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.tencent.TencentSpeechModel;
@@ -68,6 +74,7 @@ import cn.iocoder.yudao.module.ai.framework.ai.core.model.tencent.api.TencentTts
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.tongyi.TongYiSpeechModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.ocr.OcrModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.ocr.baidu.BaiduOcrModel;
+import cn.iocoder.yudao.module.ai.framework.ai.core.ocr.deepseek.DeepSeekOcrModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.ocr.siliconflow.SiliconFlowOcrModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.ocr.tencent.TencentOcrModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.ocr.tongyi.TongYiOcrModel;
@@ -385,8 +392,33 @@ public class AiModelFactoryImpl implements AiModelFactory {
                     return new BaiduSpeechModel(url, apiKey, model);
                 case TENCENT: // 腾讯云长文本语音合成（原生为异步任务），密钥为 SecretId|SecretKey
                     return new TencentSpeechModel(new TencentTtsApi(apiKey, url));
+                case DEEPSEEK: // DeepSeek 整段合成，模型只用于本地标识
+                    return new DeepSeekSpeechModel(url, apiKey, model);
                 default:
                     throw new IllegalArgumentException(StrUtil.format("平台({})不支持语音合成", platform));
+            }
+        });
+    }
+
+    @Override
+    @SuppressWarnings("EnhancedSwitchMigration")
+    public TranscriptionModel getOrCreateTranscriptionModel(AiPlatformEnum platform, String rawApiKey, String rawUrl,
+                                                            String model) {
+        final String apiKey = resolveSpringPlaceholders(rawApiKey);
+        final String url = resolveSpringPlaceholders(rawUrl);
+        String cacheKey = buildClientCacheKey(TranscriptionModel.class, platform, apiKey, url, model);
+        return Singleton.get(cacheKey, (Func0<TranscriptionModel>) () -> {
+            switch (platform) {
+                case DEEPSEEK: // DeepSeek 没有模型参数
+                    return new DeepSeekTranscriptionModel(url, apiKey);
+                case ALIBABA: // 阿里云百炼的录音文件识别，模型如 qwen3-asr-flash
+                    return new TongYiTranscriptionModel(url, apiKey, model);
+                case TENCENT: // 腾讯云一句话识别，模型为引擎类型（如 16k_zh），密钥为 SecretId|SecretKey
+                    return new TencentTranscriptionModel(url, apiKey, model);
+                case BAIDU: // 百度短语音识别标准版，模型为 dev_pid（如 1537），使用百度智能云的 API Key
+                    return new BaiduTranscriptionModel(url, apiKey, model);
+                default:
+                    throw new IllegalArgumentException(StrUtil.format("平台({})不支持语音识别", platform));
             }
         });
     }
@@ -417,6 +449,8 @@ public class AiModelFactoryImpl implements AiModelFactory {
                     return new BaiduOcrModel(apiKey, url, model);
                 case BYTEDANCE:
                     return new VolcEngineOcrModel(apiKey, url, model);
+                case DEEPSEEK:
+                    return new DeepSeekOcrModel(apiKey, url, model);
                 default:
                     throw new IllegalArgumentException(StrUtil.format("平台({})不支持文字识别", platform));
             }

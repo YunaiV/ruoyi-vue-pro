@@ -181,9 +181,7 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
                 sendReqVO.getContent(), conversation);
 
         // 2.2 联网搜索
-        AiWebSearchResponse webSearchResponse = Boolean.TRUE.equals(sendReqVO.getUseSearch()) && webSearchClient != null ?
-                webSearchClient.search(new AiWebSearchRequest().setQuery(sendReqVO.getContent())
-                        .setSummary(true).setCount(WEB_SEARCH_COUNT)) : null;
+        AiWebSearchResponse webSearchResponse = searchWeb(sendReqVO);
 
         // 2.3 创建 chat 需要的 Prompt：在插入消息前构建，图片读取失败时不留下消息
         Prompt prompt = buildPrompt(conversation, contextMessages, knowledgeSegments, webSearchResponse, model, sendReqVO,
@@ -269,9 +267,7 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
                 sendReqVO.getContent(), conversation);
 
         // 2.2 联网搜索
-        AiWebSearchResponse webSearchResponse = Boolean.TRUE.equals(sendReqVO.getUseSearch()) && webSearchClient != null ?
-                webSearchClient.search(new AiWebSearchRequest().setQuery(sendReqVO.getContent())
-                        .setSummary(true).setCount(WEB_SEARCH_COUNT)) : null;
+        AiWebSearchResponse webSearchResponse = searchWeb(sendReqVO);
 
         // 2.3 构建 Prompt：在插入消息前构建，图片读取失败时返回错误帧，不留下消息
         Prompt prompt;
@@ -438,6 +434,20 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
                     .setKnowledgeId(knowledgeId).setContent(content)));
         }
         return knowledgeSegments;
+    }
+
+    /**
+     * 联网搜索：按消息内容搜索
+     *
+     * @param sendReqVO 发送请求
+     * @return 搜索结果；未开启联网搜索时返回 null
+     */
+    private AiWebSearchResponse searchWeb(AiChatMessageSendReqVO sendReqVO) {
+        if (!Boolean.TRUE.equals(sendReqVO.getUseSearch()) || webSearchClient == null) {
+            return null;
+        }
+        return webSearchClient.search(new AiWebSearchRequest().setQuery(sendReqVO.getContent())
+                .setSummary(true).setCount(WEB_SEARCH_COUNT));
     }
 
     private Prompt buildPrompt(AiChatConversationDO conversation, List<AiChatMessageDO> contextMessages,

@@ -55,7 +55,10 @@ public class AiModelFactoryImplOcrTest {
         assertThrows(IllegalArgumentException.class, () -> modelFactory.getOrCreateOcrModel(
                 AiPlatformEnum.OPENAI, "sk", URL, "gpt-4o"));
         assertThrows(IllegalArgumentException.class, () -> modelFactory.getOrCreateOcrModel(
-                AiPlatformEnum.DEEPSEEK, "sk", URL, "deepseek-chat"));
+                AiPlatformEnum.MOONSHOT, "sk", URL, "kimi-latest"));
+        // DeepSeek 支持文字识别，但模型标识只能是 purpose
+        assertEquals(OcrException.Type.INVALID_CONFIG, assertThrows(OcrException.class,
+                () -> modelFactory.getOrCreateOcrModel(AiPlatformEnum.DEEPSEEK, "sk", URL, "deepseek-chat")).getType());
     }
 
     @Test

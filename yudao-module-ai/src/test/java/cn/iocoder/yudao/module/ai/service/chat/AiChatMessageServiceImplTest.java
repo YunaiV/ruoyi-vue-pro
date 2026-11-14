@@ -32,6 +32,9 @@ import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiToolDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.skill.AiSkillDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.chat.AiChatMessageMapper;
 import cn.iocoder.yudao.module.ai.enums.model.AiPlatformEnum;
+import cn.iocoder.yudao.module.ai.framework.ai.core.webserch.AiWebSearchClient;
+import cn.iocoder.yudao.module.ai.framework.ai.core.webserch.AiWebSearchRequest;
+import cn.iocoder.yudao.module.ai.framework.ai.core.webserch.AiWebSearchResponse;
 import cn.iocoder.yudao.module.ai.enums.requestlog.AiRequestLogStatusEnum;
 import cn.iocoder.yudao.module.ai.service.knowledge.AiKnowledgeDocumentService;
 import cn.iocoder.yudao.module.ai.service.model.AiChatRoleService;
@@ -68,6 +71,7 @@ import org.springframework.ai.tool.resolution.ToolCallbackResolver;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.util.ReflectionTestUtils;
 import reactor.core.publisher.Flux;
 
 import java.util.LinkedHashMap;
@@ -140,6 +144,8 @@ public class AiChatMessageServiceImplTest extends BaseMockitoUnitTest {
     private AiToolService toolService;
     @Mock
     private ToolCallbackResolver toolCallbackResolver;
+    @Mock
+    private AiWebSearchClient webSearchClient;
     @Mock
     private AiSkillService skillService;
     @Mock
@@ -815,6 +821,41 @@ public class AiChatMessageServiceImplTest extends BaseMockitoUnitTest {
     private static ChatCompletionFinishReason buildFinishReason(ChatCompletionMessage message) {
         return CollUtil.isNotEmpty(message.toolCalls()) ? ChatCompletionFinishReason.TOOL_CALLS
                 : ChatCompletionFinishReason.STOP;
+    }
+
+    // ========== 联网搜索：只按消息内容搜索，不主动读取链接 ==========
+
+    @Test
+    public void testSearchWeb_search() {
+        // 准备参数
+        AiChatMessageSendReqVO reqVO = new AiChatMessageSendReqVO();
+        reqVO.setUseSearch(true);
+        reqVO.setContent("今天杭州天气 https://a.com/1");
+        // mock 方法
+        AiWebSearchResponse searchResponse = new AiWebSearchResponse().setTotal(0L).setLists(new ArrayList<>());
+        when(webSearchClient.search(any(AiWebSearchRequest.class))).thenReturn(searchResponse);
+
+        // 调用
+        AiWebSearchResponse response = ReflectionTestUtils.invokeMethod(chatMessageService, "searchWeb", reqVO);
+
+        // 断言：带链接也只搜索，不读取
+        assertSame(searchResponse, response);
+        ArgumentCaptor<AiWebSearchRequest> captor = ArgumentCaptor.forClass(AiWebSearchRequest.class);
+        verify(webSearchClient).search(captor.capture());
+        assertEquals("今天杭州天气 https://a.com/1", captor.getValue().getQuery());
+        verify(webSearchClient, never()).fetch(any());
+    }
+
+    @Test
+    public void testSearchWeb_disabled() {
+        // 准备参数
+        AiChatMessageSendReqVO reqVO = new AiChatMessageSendReqVO();
+        reqVO.setUseSearch(false);
+        reqVO.setContent("看看 https://a.com/1");
+
+        // 调用，并断言：不联网
+        assertNull(ReflectionTestUtils.invokeMethod(chatMessageService, "searchWeb", reqVO));
+        verifyNoInteractions(webSearchClient);
     }
 
     // ========== 附件多模态：模型配置 image 的图片走 Media，其它附件走原 Attachment 文本 ==========

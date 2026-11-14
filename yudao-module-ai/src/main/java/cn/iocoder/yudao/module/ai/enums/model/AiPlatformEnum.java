@@ -20,14 +20,13 @@ public enum AiPlatformEnum implements ArrayValuable<String> {
 
     // ========== 国内平台 ==========
 
-    // TODO DONE @AI：这个是不是注释到类上？（已移到类注释）
-    ALIBABA("ALIBABA", "阿里巴巴"), // 阿里：通义千问、通义万相、Qwen-OCR、语音合成
-    BAIDU("BAIDU", "百度"), // 百度：文心一言（千帆）、语音合成；文字识别的密钥为 bce-v3 API Key，或 APIKey|SecretKey
-    DEEPSEEK("DEEPSEEK", "DeepSeek"), // DeepSeek
+    ALIBABA("ALIBABA", "阿里巴巴"), // 阿里：通义千问、通义万相、Qwen-OCR、语音合成、语音识别
+    BAIDU("BAIDU", "百度"), // 百度：文心一言（千帆）、语音合成、语音识别；文字识别的密钥为 bce-v3 API Key，或 APIKey|SecretKey
+    DEEPSEEK("DEEPSEEK", "DeepSeek"), // DeepSeek：对话、文字识别、语音合成、语音识别
     ZHIPU("ZHIPU", "智谱"), // 智谱 AI
     IFLYTEK("IFLYTEK", "科大讯飞"), // 讯飞：星火
     BYTEDANCE("BYTEDANCE", "字节跳动"), // 字节：豆包（火山方舟）、Seedream、豆包语音；文字识别（火山引擎）的密钥为 AccessKeyId|SecretAccessKey
-    TENCENT("TENCENT", "腾讯"), // 腾讯：混元、语音合成；文字识别、语音合成的密钥为 SecretId|SecretKey
+    TENCENT("TENCENT", "腾讯"), // 腾讯：混元、语音合成、语音识别；文字识别、语音合成、语音识别的密钥为 SecretId|SecretKey
     SILICONFLOW("SILICONFLOW", "硅基流动"), // 硅基流动
     MINIMAX("MINIMAX", "MiniMax"), // 稀宇科技
     MOONSHOT("MOONSHOT", "月之暗面"), // KIMI

@@ -4,7 +4,6 @@ import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.ai.controller.admin.ocr.vo.AiOcrPageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.ocr.vo.AiOcrRecognizeReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.ocr.vo.AiOcrUpdateReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.ocr.AiOcrDO;
 
 /**
@@ -43,15 +42,6 @@ public interface AiOcrService {
      * @return 识别记录；不存在、或不属于该用户时抛出业务异常
      */
     AiOcrDO getOcrMy(Long id, Long userId);
-
-    /**
-     * 保存【我的】识别修订
-     *
-     * @param updateReqVO 修订信息
-     * @param userId 用户编号
-     * @return 保存后的识别记录
-     */
-    AiOcrDO updateOcrMy(AiOcrUpdateReqVO updateReqVO, Long userId);
 
     /**
      * 删除【我的】识别记录（逻辑删除，图片文件保留）

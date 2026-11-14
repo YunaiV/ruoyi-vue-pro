@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.ai.framework.ai.core.model;
 
 import cn.iocoder.yudao.module.ai.enums.model.AiPlatformEnum;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.baidu.BaiduSpeechModel;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.deepseek.DeepSeekSpeechModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.doubao.DouBaoSpeechModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.minimax.MiniMaxSpeechModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.speech.AbstractAiSpeechModel;
@@ -41,6 +42,8 @@ public class AiModelFactoryImplSpeechTest {
         // 腾讯云：原生为异步任务，由 TencentSpeechModel 统一为“提交并得到音频”
         assertInstanceOf(TencentSpeechModel.class, modelFactory.getOrCreateTextToSpeechModel(
                 AiPlatformEnum.TENCENT, "AKIDspeech|speechKey", null, "tencent-tts"));
+        assertInstanceOf(DeepSeekSpeechModel.class, modelFactory.getOrCreateTextToSpeechModel(
+                AiPlatformEnum.DEEPSEEK, "speech-factory-key-1", URL, "deepseek-tts"));
 
         // 相同配置复用实例；不同模型是不同实例，模型绑定在实例上
         AbstractAiSpeechModel hd = (AbstractAiSpeechModel) modelFactory.getOrCreateTextToSpeechModel(

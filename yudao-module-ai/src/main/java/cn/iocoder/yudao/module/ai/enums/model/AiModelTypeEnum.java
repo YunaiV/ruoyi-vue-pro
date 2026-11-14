@@ -22,7 +22,8 @@ public enum AiModelTypeEnum implements ArrayValuable<Integer> {
     EMBEDDING(5, "向量"),
     RERANK(6, "重排序"),
     MUSIC(7, "音乐"),
-    OCR(8, "文字识别");
+    OCR(8, "文字识别"),
+    ASR(9, "语音识别");
 
     /**
      * 类型

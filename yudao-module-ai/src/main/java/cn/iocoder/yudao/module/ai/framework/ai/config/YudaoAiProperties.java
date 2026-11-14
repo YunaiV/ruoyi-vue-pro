@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.ai.framework.ai.config;
 
+import cn.iocoder.yudao.module.ai.framework.ai.core.webserch.AiWebSearchPlatformEnum;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -150,6 +151,11 @@ public class YudaoAiProperties {
     public static class WebSearch {
 
         private boolean enable;
+
+        /**
+         * 平台，默认 DeepSeek
+         */
+        private AiWebSearchPlatformEnum platform = AiWebSearchPlatformEnum.DEEPSEEK;
 
         private String apiKey;
 

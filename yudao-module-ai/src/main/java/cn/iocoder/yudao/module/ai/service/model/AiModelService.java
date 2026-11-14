@@ -13,6 +13,7 @@ import cn.iocoder.yudao.module.ai.enums.model.AiPlatformEnum;
 import dev.tinyflow.core.Tinyflow;
 import jakarta.validation.Valid;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.speech.AiSpeechModel;
+import org.springframework.ai.audio.transcription.TranscriptionModel;
 import org.springframework.ai.chat.model.ChatModel;
 import com.volcengine.ark.runtime.service.ArkService;
 import org.springframework.ai.image.ImageModel;
@@ -171,6 +172,15 @@ public interface AiModelService {
      * @return AiSpeechModel 对象
      */
     AiSpeechModel getTextToSpeechModel(AiApiKeyDO apiKey, String model);
+
+    /**
+     * 获得语音识别的 TranscriptionModel 对象
+     *
+     * @param apiKey API 密钥
+     * @param model 模型标识
+     * @return TranscriptionModel 对象
+     */
+    TranscriptionModel getTranscriptionModel(AiApiKeyDO apiKey, String model);
 
     /**
      * 获得 TencentTtsApi 对象

@@ -25,6 +25,7 @@ import com.agentsflex.llm.qwen.QwenLlmConfig;
 import dev.tinyflow.core.Tinyflow;
 import jakarta.annotation.Resource;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.speech.AiSpeechModel;
+import org.springframework.ai.audio.transcription.TranscriptionModel;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.embedding.EmbeddingModel;
 import com.volcengine.ark.runtime.service.ArkService;
@@ -57,7 +58,7 @@ public class AiModelServiceImpl implements AiModelService {
      * 支持文字识别的平台
      */
     private static final Set<AiPlatformEnum> OCR_PLATFORMS = EnumSet.of(AiPlatformEnum.ALIBABA, AiPlatformEnum.SILICONFLOW,
-            AiPlatformEnum.TENCENT, AiPlatformEnum.BAIDU, AiPlatformEnum.BYTEDANCE);
+            AiPlatformEnum.TENCENT, AiPlatformEnum.BAIDU, AiPlatformEnum.BYTEDANCE, AiPlatformEnum.DEEPSEEK);
 
     @Resource
     private AiApiKeyService apiKeyService;
@@ -253,6 +254,12 @@ public class AiModelServiceImpl implements AiModelService {
     public AiSpeechModel getTextToSpeechModel(AiApiKeyDO apiKey, String model) {
         AiPlatformEnum platform = AiPlatformEnum.validatePlatform(apiKey.getPlatform());
         return modelFactory.getOrCreateTextToSpeechModel(platform, apiKey.getApiKey(), apiKey.getUrl(), model);
+    }
+
+    @Override
+    public TranscriptionModel getTranscriptionModel(AiApiKeyDO apiKey, String model) {
+        AiPlatformEnum platform = AiPlatformEnum.validatePlatform(apiKey.getPlatform());
+        return modelFactory.getOrCreateTranscriptionModel(platform, apiKey.getApiKey(), apiKey.getUrl(), model);
     }
 
     @Override

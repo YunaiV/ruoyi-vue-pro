@@ -7,7 +7,6 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.ai.controller.admin.ocr.vo.AiOcrPageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.ocr.vo.AiOcrRecognizeReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.ocr.vo.AiOcrUpdateReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiModelDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.ocr.AiOcrDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.ocr.AiOcrMapper;
@@ -31,13 +30,12 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 /**
  * {@link AiOcrServiceImpl} 的单元测试类
  *
- * 重点：成功失败都记录且失败原因脱敏、【我的】记录隔离、修订文本的空字符串语义
+ * 重点：成功失败都记录且失败原因脱敏、【我的】记录隔离
  *
  * @author 芋道源码
  */
@@ -72,7 +70,7 @@ public class AiOcrServiceImplTest extends BaseMockitoUnitTest {
 
         // 调用
         AiOcrDO ocr = recognizeOcr(png());
-        // 断言：记录模型快照、文件地址（不带签名）、原文；未修订
+        // 断言：记录模型快照、文件地址（不带签名）、原文
         AiOcrDO inserted = captureInsert();
         assertSame(ocr, inserted);
         assertEquals(USER_ID, inserted.getUserId());
@@ -84,7 +82,6 @@ public class AiOcrServiceImplTest extends BaseMockitoUnitTest {
         assertEquals(FILE_URL, inserted.getImageUrl());
         assertEquals(AiOcrStatusEnum.SUCCESS.getStatus(), inserted.getStatus());
         assertEquals("芋道源码\n2026", inserted.getOriginalText());
-        assertNull(inserted.getEditedText());
         assertNull(inserted.getErrorMessage());
         assertNotNull(inserted.getDuration());
     }
@@ -203,55 +200,6 @@ public class AiOcrServiceImplTest extends BaseMockitoUnitTest {
         assertServiceException(() -> ocrService.getOcrMy(OCR_ID, USER_ID), OCR_NOT_EXISTS);
     }
 
-    // ========== updateOcrMy ==========
-
-    @Test
-    public void testUpdateOcrMy_emptyString() {
-        // mock 数据
-        mockOcr(USER_ID, AiOcrStatusEnum.SUCCESS);
-
-        // 调用：清空内容
-        ocrService.updateOcrMy(buildUpdateReqVO(""), USER_ID);
-        // 断言：空字符串原样保存，不转成 null；只更新修订文本
-        AiOcrDO updateObj = captureUpdate();
-        assertEquals(OCR_ID, updateObj.getId());
-        assertEquals("", updateObj.getEditedText());
-        assertNull(updateObj.getUserId());
-        assertNull(updateObj.getStatus());
-        assertNull(updateObj.getOriginalText());
-    }
-
-    @Test
-    public void testUpdateOcrMy_success() {
-        // mock 数据
-        mockOcr(USER_ID, AiOcrStatusEnum.SUCCESS);
-
-        // 调用
-        ocrService.updateOcrMy(buildUpdateReqVO("修订后的文本"), USER_ID);
-        // 断言
-        assertEquals("修订后的文本", captureUpdate().getEditedText());
-    }
-
-    @Test
-    public void testUpdateOcrMy_otherUser() {
-        // mock 数据：别人的记录
-        mockOcr(OTHER_USER_ID, AiOcrStatusEnum.SUCCESS);
-
-        // 调用，并断言异常
-        assertServiceException(() -> ocrService.updateOcrMy(buildUpdateReqVO("x"), USER_ID), OCR_NOT_EXISTS);
-        verify(ocrMapper, never()).updateById(any(AiOcrDO.class));
-    }
-
-    @Test
-    public void testUpdateOcrMy_notSuccess() {
-        // mock 数据：识别失败的记录
-        mockOcr(USER_ID, AiOcrStatusEnum.FAIL);
-
-        // 调用，并断言异常
-        assertServiceException(() -> ocrService.updateOcrMy(buildUpdateReqVO("x"), USER_ID), OCR_STATUS_NOT_SUCCESS);
-        verify(ocrMapper, never()).updateById(any(AiOcrDO.class));
-    }
-
     // ========== deleteOcrMy ==========
 
     @Test
@@ -348,19 +296,6 @@ public class AiOcrServiceImplTest extends BaseMockitoUnitTest {
         ArgumentCaptor<AiOcrDO> captor = ArgumentCaptor.forClass(AiOcrDO.class);
         verify(ocrMapper).insert(captor.capture());
         return captor.getValue();
-    }
-
-    private AiOcrDO captureUpdate() {
-        ArgumentCaptor<AiOcrDO> captor = ArgumentCaptor.forClass(AiOcrDO.class);
-        verify(ocrMapper).updateById(captor.capture());
-        return captor.getValue();
-    }
-
-    private static AiOcrUpdateReqVO buildUpdateReqVO(String editedText) {
-        AiOcrUpdateReqVO reqVO = new AiOcrUpdateReqVO();
-        reqVO.setId(OCR_ID);
-        reqVO.setEditedText(editedText);
-        return reqVO;
     }
 
     private static byte[] png() {

@@ -9,7 +9,6 @@ import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiModelRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.ocr.vo.AiOcrPageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.ocr.vo.AiOcrRecognizeReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.ocr.vo.AiOcrRespVO;
-import cn.iocoder.yudao.module.ai.controller.admin.ocr.vo.AiOcrUpdateReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.ocr.AiOcrDO;
 import cn.iocoder.yudao.module.ai.service.model.AiModelService;
 import cn.iocoder.yudao.module.ai.service.ocr.AiOcrService;
@@ -79,13 +78,6 @@ public class AiOcrController {
     @Parameter(name = "id", required = true, description = "编号", example = "1024")
     public CommonResult<AiOcrRespVO> getOcrMy(@RequestParam("id") Long id) {
         AiOcrDO ocr = ocrService.getOcrMy(id, getLoginUserId());
-        return success(BeanUtils.toBean(ocr, AiOcrRespVO.class));
-    }
-
-    @PutMapping("/update-my")
-    @Operation(summary = "保存【我的】识别修订", description = "仅识别成功的记录；空字符串表示清空内容")
-    public CommonResult<AiOcrRespVO> updateOcrMy(@Valid @RequestBody AiOcrUpdateReqVO updateReqVO) {
-        AiOcrDO ocr = ocrService.updateOcrMy(updateReqVO, getLoginUserId());
         return success(BeanUtils.toBean(ocr, AiOcrRespVO.class));
     }
 

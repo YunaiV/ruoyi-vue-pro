@@ -21,7 +21,9 @@ import cn.iocoder.yudao.module.ai.framework.ai.core.model.yiyan.YiYanChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.zhipu.ZhiPuChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.reasoning.AiRequestBodyPatcher;
 import cn.iocoder.yudao.module.ai.framework.ai.core.webserch.AiWebSearchClient;
+import cn.iocoder.yudao.module.ai.framework.ai.core.webserch.baidu.AiBaiduWebSearchClient;
 import cn.iocoder.yudao.module.ai.framework.ai.core.webserch.bocha.AiBoChaWebSearchClient;
+import cn.iocoder.yudao.module.ai.framework.ai.core.webserch.deepseek.AiDeepSeekWebSearchClient;
 import cn.iocoder.yudao.module.ai.tool.function.DirectoryListToolFunction;
 import cn.iocoder.yudao.module.ai.tool.function.UserProfileQueryToolFunction;
 import cn.iocoder.yudao.module.ai.tool.function.WeatherQueryToolFunction;
@@ -484,7 +486,15 @@ public class AiAutoConfiguration {
     @Bean
     @ConditionalOnProperty(value = "yudao.ai.web-search.enable", havingValue = "true")
     public AiWebSearchClient webSearchClient(YudaoAiProperties yudaoAiProperties) {
-        return new AiBoChaWebSearchClient(yudaoAiProperties.getWebSearch().getApiKey());
+        YudaoAiProperties.WebSearch properties = yudaoAiProperties.getWebSearch();
+        switch (properties.getPlatform()) {
+            case BOCHA:
+                return new AiBoChaWebSearchClient(properties.getApiKey());
+            case BAIDU:
+                return new AiBaiduWebSearchClient(properties.getApiKey());
+            default:
+                return new AiDeepSeekWebSearchClient(properties.getApiKey());
+        }
     }
 
     // ========== MCP & 工具相关 ==========

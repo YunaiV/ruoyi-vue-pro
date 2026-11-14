@@ -6,10 +6,8 @@ import cn.hutool.http.HttpUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
-import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.ocr.vo.AiOcrPageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.ocr.vo.AiOcrRecognizeReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.ocr.vo.AiOcrUpdateReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiModelDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.ocr.AiOcrDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.ocr.AiOcrMapper;
@@ -95,20 +93,6 @@ public class AiOcrServiceImpl implements AiOcrService {
     @Override
     public AiOcrDO getOcrMy(Long id, Long userId) {
         return validateOcrMyExists(id, userId);
-    }
-
-    @Override
-    public AiOcrDO updateOcrMy(AiOcrUpdateReqVO updateReqVO, Long userId) {
-        // 1. 校验
-        AiOcrDO ocr = validateOcrMyExists(updateReqVO.getId(), userId);
-        if (ObjUtil.notEqual(ocr.getStatus(), AiOcrStatusEnum.SUCCESS.getStatus())) {
-            throw exception(OCR_STATUS_NOT_SUCCESS);
-        }
-
-        // 2. 更新：修订文本已由 VO 校验非 null，空字符串（用户清空）原样保存
-        AiOcrDO updateObj = BeanUtils.toBean(updateReqVO, AiOcrDO.class);
-        ocrMapper.updateById(updateObj);
-        return ocrMapper.selectById(ocr.getId());
     }
 
     @Override

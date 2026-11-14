@@ -11,7 +11,7 @@ import lombok.Data;
 /**
  * AI 文字识别 DO
  *
- * 一次识别一行：成功、失败都记录；重新识别是新的一行，不覆盖已有的修订
+ * 一次识别一行：成功、失败都记录；重新识别是新的一行，不修改已有的记录
  *
  * @author 芋道源码
  */
@@ -70,10 +70,6 @@ public class AiOcrDO extends BaseDO {
      * 识别出的原文；图片中没有文字时为空字符串
      */
     private String originalText;
-    /**
-     * 用户修订后的文本
-     */
-    private String editedText;
     /**
      * 失败原因
      */
