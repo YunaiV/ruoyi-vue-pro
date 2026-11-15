@@ -25,6 +25,7 @@ public interface AuthConvert {
     SmsCodeSendReqDTO convert(AppAuthSmsSendReqVO reqVO);
     SmsCodeUseReqDTO convert(AppMemberUserResetPasswordReqVO reqVO, SmsSceneEnum scene, String usedIp);
     SmsCodeUseReqDTO convert(AppAuthSmsLoginReqVO reqVO, Integer scene, String usedIp);
+    SmsCodeUseReqDTO convert(AppAuthRegisterReqVO reqVO, Integer scene, String usedIp);
 
     AppAuthLoginRespVO convert(OAuth2AccessTokenRespDTO bean, String openid);
 

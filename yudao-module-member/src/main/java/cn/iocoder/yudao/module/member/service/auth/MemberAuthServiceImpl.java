@@ -49,6 +49,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
 
     @Resource
     private MemberUserService userService;
+
     @Resource
     private SmsCodeApi smsCodeApi;
     @Resource
@@ -59,6 +60,26 @@ public class MemberAuthServiceImpl implements MemberAuthService {
     private SocialClientApi socialClientApi;
     @Resource
     private OAuth2TokenCommonApi oauth2TokenApi;
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public AppAuthLoginRespVO register(AppAuthRegisterReqVO reqVO) {
+        // 校验手机号未注册
+        if (userService.getUserByMobile(reqVO.getMobile()) != null) {
+            throw exception(AUTH_MOBILE_USED);
+        }
+
+        // 校验并消费注册验证码
+        String userIp = getClientIP();
+        smsCodeApi.useSmsCode(AuthConvert.INSTANCE.convert(reqVO, SmsSceneEnum.MEMBER_REGISTER.getScene(), userIp));
+
+        // 创建会员并登录
+        MemberUserDO user = userService.createUserForRegister(reqVO.getMobile(), reqVO.getNickname(),
+                reqVO.getPassword(), userIp, getTerminal());
+
+        // 创建 Token 令牌，记录登录日志
+        return createTokenAfterLoginSuccess(user, user.getMobile(), LoginLogTypeEnum.LOGIN_SMS, null);
+    }
 
     @Override
     public AppAuthLoginRespVO login(AppAuthLoginReqVO reqVO) {
@@ -228,21 +249,28 @@ public class MemberAuthServiceImpl implements MemberAuthService {
 
     @Override
     public void sendSmsCode(Long userId, AppAuthSmsSendReqVO reqVO) {
-        // 情况 1：如果是修改手机场景，需要校验新手机号是否已经注册，说明不能使用该手机了
+        // 情况 1：注册时，校验手机号未注册
+        if (Objects.equals(reqVO.getScene(), SmsSceneEnum.MEMBER_REGISTER.getScene())) {
+            MemberUserDO user = userService.getUserByMobile(reqVO.getMobile());
+            if (user != null) {
+                throw exception(AUTH_MOBILE_USED);
+            }
+        }
+        // 情况 2：修改手机时，校验新手机号未被其他用户使用
         if (Objects.equals(reqVO.getScene(), SmsSceneEnum.MEMBER_UPDATE_MOBILE.getScene())) {
             MemberUserDO user = userService.getUserByMobile(reqVO.getMobile());
             if (user != null && !Objects.equals(user.getId(), userId)) {
                 throw exception(AUTH_MOBILE_USED);
             }
         }
-        // 情况 2：如果是重置密码场景，需要校验手机号是存在的
+        // 情况 3：重置密码时，校验手机号已注册
         if (Objects.equals(reqVO.getScene(), SmsSceneEnum.MEMBER_RESET_PASSWORD.getScene())) {
             MemberUserDO user = userService.getUserByMobile(reqVO.getMobile());
             if (user == null) {
                 throw exception(USER_MOBILE_NOT_EXISTS);
             }
         }
-        // 情况 3：如果是修改密码场景，需要查询手机号，无需前端传递
+        // 情况 4：修改密码时，查询当前用户的手机号，无需前端传递
         if (Objects.equals(reqVO.getScene(), SmsSceneEnum.MEMBER_UPDATE_PASSWORD.getScene())) {
             MemberUserDO user = userService.getUser(userId);
             // TODO 芋艿：后续 member user 手机非强绑定，这块需要做下调整；
