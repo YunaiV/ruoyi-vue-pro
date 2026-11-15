@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Schema(description = "用户 APP - 用户个人信息 Response VO")
 @Data
 @NoArgsConstructor
@@ -17,6 +19,9 @@ public class AppMemberUserInfoRespVO {
     @Schema(description = "用户昵称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋艿")
     private String nickname;
 
+    @Schema(description = "个人简介", example = "热爱阅读与分享")
+    private String introduction;
+
     @Schema(description = "用户头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/xxx.png")
     private String avatar;
 
@@ -28,6 +33,9 @@ public class AppMemberUserInfoRespVO {
 
     @Schema(description = "用户性别", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer sex;
+
+    @Schema(description = "生日，毫秒时间戳", example = "1786032000000")
+    private LocalDateTime birthday;
 
     @Schema(description = "积分", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
     private Integer point;
