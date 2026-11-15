@@ -43,21 +43,21 @@ public class ImSensitiveWordManagerController {
     @PostMapping("/create")
     @Operation(summary = "新增敏感词")
     @PreAuthorize("@ss.hasPermission('im:manager:sensitive-word:create')")
-    public CommonResult<Long> createSensitiveWord(@Valid @RequestBody ImSensitiveWordSaveReqVO reqVO) {
-        return success(sensitiveWordService.createSensitiveWord(reqVO));
+    public CommonResult<Long> createSensitiveWord(@Valid @RequestBody ImSensitiveWordSaveReqVO createReqVO) {
+        return success(sensitiveWordService.createSensitiveWord(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "修改敏感词")
     @PreAuthorize("@ss.hasPermission('im:manager:sensitive-word:update')")
-    public CommonResult<Boolean> updateSensitiveWord(@Valid @RequestBody ImSensitiveWordSaveReqVO reqVO) {
-        sensitiveWordService.updateSensitiveWord(reqVO);
+    public CommonResult<Boolean> updateSensitiveWord(@Valid @RequestBody ImSensitiveWordSaveReqVO updateReqVO) {
+        sensitiveWordService.updateSensitiveWord(updateReqVO);
         return success(true);
     }
 
     @DeleteMapping("/delete")
     @Operation(summary = "删除敏感词")
-    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @Parameter(name = "id", description = "敏感词编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('im:manager:sensitive-word:delete')")
     public CommonResult<Boolean> deleteSensitiveWord(@RequestParam("id") Long id) {
         sensitiveWordService.deleteSensitiveWord(id);
@@ -66,13 +66,22 @@ public class ImSensitiveWordManagerController {
 
     @DeleteMapping("/delete-list")
     @Operation(summary = "批量删除敏感词")
-    @Parameter(name = "ids", description = "编号列表", required = true)
+    @Parameter(name = "ids", description = "敏感词编号列表", required = true)
     @PreAuthorize("@ss.hasPermission('im:manager:sensitive-word:delete')")
     public CommonResult<Boolean> deleteSensitiveWordList(
             @RequestParam("ids")
             @Size(max = 100, message = "批量删除最多 100 条") List<Long> ids) {
         sensitiveWordService.deleteSensitiveWordList(ids);
         return success(true);
+    }
+
+    @GetMapping("/get")
+    @Operation(summary = "获得敏感词详情")
+    @Parameter(name = "id", description = "敏感词编号", required = true, example = "1024")
+    @PreAuthorize("@ss.hasPermission('im:manager:sensitive-word:query')")
+    public CommonResult<ImSensitiveWordRespVO> getSensitiveWord(@RequestParam("id") Long id) {
+        ImSensitiveWordDO sensitiveWord = sensitiveWordService.getSensitiveWord(id);
+        return success(BeanUtils.toBean(sensitiveWord, ImSensitiveWordRespVO.class));
     }
 
     @GetMapping("/page")
@@ -92,15 +101,6 @@ public class ImSensitiveWordManagerController {
         return success(BeanUtils.toBean(pageResult, ImSensitiveWordRespVO.class, vo ->
                 MapUtils.findAndThen(userMap, NumberUtils.parseLong(vo.getCreator()),
                         user -> vo.setCreatorName(user.getNickname()))));
-    }
-
-    @GetMapping("/get")
-    @Operation(summary = "获得敏感词详情")
-    @Parameter(name = "id", description = "编号", required = true, example = "1024")
-    @PreAuthorize("@ss.hasPermission('im:manager:sensitive-word:query')")
-    public CommonResult<ImSensitiveWordRespVO> getSensitiveWord(@RequestParam("id") Long id) {
-        ImSensitiveWordDO word = sensitiveWordService.getSensitiveWord(id);
-        return success(BeanUtils.toBean(word, ImSensitiveWordRespVO.class));
     }
 
 }
