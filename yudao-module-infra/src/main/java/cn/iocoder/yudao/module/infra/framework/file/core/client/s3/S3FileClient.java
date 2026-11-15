@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.infra.framework.file.core.client.s3;
 
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.StrUtil;
@@ -10,17 +11,23 @@ import cn.iocoder.yudao.module.infra.framework.file.core.utils.FileTypeUtils;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.S3Configuration;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.net.URI;
 import java.net.URL;
 import java.time.Duration;
@@ -110,6 +117,29 @@ public class S3FileClient extends AbstractFileClient<S3FileClientConfig> {
     }
 
     @Override
+    public String upload(InputStream content, long size, String path, String type) {
+        // 已关闭分块编码，SDK 会先读取请求体计算签名或校验和、再重新读取发送，而文件流只能回退有限长度；
+        // 因此先边读边写到本地临时文件，再按文件上传，不把整个文件读入内存
+        File tempFile = FileUtil.createTempFile();
+        try {
+            FileUtil.writeFromStream(content, tempFile, false);
+            // 构造 PutObjectRequest，以实际写入的长度为准
+            PutObjectRequest putRequest = PutObjectRequest.builder()
+                    .bucket(config.getBucket())
+                    .key(path)
+                    .contentType(type)
+                    .contentLength(tempFile.length())
+                    .build();
+            // 上传文件
+            client.putObject(putRequest, RequestBody.fromFile(tempFile));
+        } finally {
+            FileUtil.del(tempFile);
+        }
+        // 拼接返回路径
+        return presignGetUrl(path, null);
+    }
+
+    @Override
     public void delete(String path) {
         DeleteObjectRequest deleteRequest = DeleteObjectRequest.builder()
                 .bucket(config.getBucket())
@@ -124,7 +154,22 @@ public class S3FileClient extends AbstractFileClient<S3FileClientConfig> {
                 .bucket(config.getBucket())
                 .key(path)
                 .build();
-        return IoUtil.readBytes(client.getObject(getRequest));
+        // 读取完成后关闭响应流，释放 HTTP 连接
+        try (ResponseInputStream<GetObjectResponse> input = client.getObject(getRequest)) {
+            return IoUtil.readBytes(input, false);
+        } catch (IOException ex) {
+            throw new UncheckedIOException(ex);
+        }
+    }
+
+    @Override
+    public InputStream getStream(String path) {
+        GetObjectRequest getRequest = GetObjectRequest.builder()
+                .bucket(config.getBucket())
+                .key(path)
+                .build();
+        // 返回 SDK 响应流，调用方关闭时释放 HTTP 连接
+        return client.getObject(getRequest);
     }
 
     @Override

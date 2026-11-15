@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.module.infra.framework.file.core.client;
 
+import java.io.InputStream;
+
 /**
  * 文件客户端
  *
@@ -25,6 +27,18 @@ public interface FileClient {
     String upload(byte[] content, String path, String type) throws Exception;
 
     /**
+     * 上传文件流，边读边写到文件存储器
+     *
+     * @param content 文件流，由调用方关闭
+     * @param size    文件大小，单位：字节
+     * @param path    相对路径
+     * @param type    文件的 MIME 类型
+     * @return 完整路径，即 HTTP 访问地址
+     * @throws Exception 上传文件时，抛出 Exception 异常
+     */
+    String upload(InputStream content, long size, String path, String type) throws Exception;
+
+    /**
      * 删除文件
      *
      * @param path 相对路径
@@ -39,6 +53,14 @@ public interface FileClient {
      * @return 文件的内容
      */
     byte[] getContent(String path) throws Exception;
+
+    /**
+     * 打开文件流，用于边读边写
+     *
+     * @param path 相对路径
+     * @return 文件流，由调用方关闭；文件不存在时，部分客户端返回 null
+     */
+    InputStream getStream(String path) throws Exception;
 
     // ========== 文件签名，目前仅 S3 支持 ==========
 

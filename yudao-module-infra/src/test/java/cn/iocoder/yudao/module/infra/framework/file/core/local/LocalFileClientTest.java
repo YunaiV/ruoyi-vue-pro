@@ -10,8 +10,11 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomString;
 import static org.junit.jupiter.api.Assertions.*;
@@ -54,6 +57,35 @@ public class LocalFileClientTest {
         // 断言
         assertEquals("http://127.0.0.1:48080/admin-api/infra/file/0/get/avatar/%E4%B8%AD%E6%96%87%20100%25+%E6%96%87%E4%BB%B6.txt", url);
         assertArrayEquals(content, FileUtil.readBytes(new File(tempDir, path)));
+    }
+
+    @Test
+    public void testUpload_stream() throws Exception {
+        // 准备参数：3MB 的文件流
+        LocalFileClient client = createClient();
+        byte[] content = new byte[3 * 1024 * 1024];
+        Arrays.fill(content, (byte) 'a');
+        String path = "avatar/大文件.txt";
+
+        // 调用
+        String url = client.upload(new ByteArrayInputStream(content), content.length, path, "text/plain");
+
+        // 断言：边读边写到目标文件，打开的文件流读取到完整内容
+        assertEquals("http://127.0.0.1:48080/admin-api/infra/file/0/get/avatar/%E5%A4%A7%E6%96%87%E4%BB%B6.txt", url);
+        assertArrayEquals(content, FileUtil.readBytes(new File(tempDir, path)));
+        try (InputStream input = client.getStream(path)) {
+            assertArrayEquals(content, input.readAllBytes());
+        }
+    }
+
+    @Test
+    public void testGetStream_notExists() {
+        // 准备参数
+        LocalFileClient client = createClient();
+
+        // 调用，并断言：文件不存在时返回 null，沿用 404 规则；路径越界仍拒绝
+        assertNull(client.getStream("avatar/missing.txt"));
+        assertThrows(ServiceException.class, () -> client.getStream("../test.txt"));
     }
 
     @Test
