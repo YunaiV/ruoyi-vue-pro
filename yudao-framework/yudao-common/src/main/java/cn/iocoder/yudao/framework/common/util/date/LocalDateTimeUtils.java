@@ -294,6 +294,57 @@ public class LocalDateTimeUtils {
     }
 
     /**
+     * 计算从起点开始经过指定工作日后的时间，保留起点的时分秒
+     *
+     * 起点当天不计入；例如周五 10:00 加 1 个工作日为下周一 10:00，周六加 1 个工作日同样为下周一。
+     * 工作日只排除周六、周日，不排除法定节假日与调休
+     *
+     * @param start 起点
+     * @param workdays 工作日数，不能为负数
+     * @return 截止时间；起点为空时返回 null
+     */
+    public static LocalDateTime plusWorkdays(LocalDateTime start, int workdays) {
+        if (start == null) {
+            return null;
+        }
+        if (workdays < 0) {
+            throw new IllegalArgumentException("工作日数不能为负数");
+        }
+        LocalDateTime result = start;
+        int remaining = workdays;
+        while (remaining > 0) {
+            result = result.plusDays(1);
+            if (!LocalDateTimeUtil.isWeekend(result)) {
+                remaining--;
+            }
+        }
+        return result;
+    }
+
+    /**
+     * 统计两个时间之间经过的工作日数，按日期计算，起点当天不计入
+     *
+     * 工作日只排除周六、周日，不排除法定节假日与调休
+     *
+     * @param start 起点
+     * @param end 终点
+     * @return 工作日数；任一时间为空或终点不晚于起点时返回 0
+     */
+    public static int countWorkdays(LocalDateTime start, LocalDateTime end) {
+        if (start == null || end == null || !end.isAfter(start)) {
+            return 0;
+        }
+        int count = 0;
+        LocalDate endDate = end.toLocalDate();
+        for (LocalDate date = start.toLocalDate().plusDays(1); !date.isAfter(endDate); date = date.plusDays(1)) {
+            if (!LocalDateTimeUtil.isWeekend(date)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    /**
      * 从时间范围列表中扣除指定时间范围
      *
      * @param sourceRanges 原时间范围列表

@@ -6,6 +6,7 @@ import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -39,6 +40,24 @@ public class NumberUtils {
      */
     public static BigDecimal zeroIfNull(BigDecimal value) {
         return value == null ? BigDecimal.ZERO : value;
+    }
+
+    /**
+     * 获得数字去掉末尾 0 后的十进制文本（{@link BigDecimal#toPlainString()}）的长度，含负号与小数点
+     *
+     * 按 precision、scale 计算，不实际展开文本：例如 1E+999999999 展开后约 1GB，这里只返回长度；
+     * 长度使用 long，scale 为 int 的上下界时也不会溢出
+     *
+     * @param value 数字，不能为 null
+     * @return 十进制文本的长度，例如 12.3400 为 5（12.34）、-0.05 为 5、0 为 1
+     * @throws ArithmeticException 去掉末尾 0 后 scale 超出 int 范围时
+     */
+    public static long getPlainStringLength(BigDecimal value) {
+        BigDecimal number = value.stripTrailingZeros();
+        long precision = number.precision();
+        long scale = number.scale();
+        long length = scale <= 0 ? precision - scale : scale >= precision ? scale + 2 : precision + 1;
+        return number.signum() < 0 ? length + 1 : length;
     }
 
     /**
@@ -106,6 +125,22 @@ public class NumberUtils {
             }
         }
         return NumberUtil.mul(values);
+    }
+
+    /**
+     * 除法运算，结果保留两位小数并四舍五入
+     *
+     * @param dividend 被除数，空值按 0 处理
+     * @param divisor 除数，为空或 0 时返回 0
+     * @return 商
+     */
+    public static Double div(Long dividend, Long divisor) {
+        if (divisor == null || divisor == 0) {
+            return 0D;
+        }
+        return BigDecimal.valueOf(dividend == null ? 0L : dividend)
+                .divide(BigDecimal.valueOf(divisor), 2, RoundingMode.HALF_UP)
+                .doubleValue();
     }
 
 }
