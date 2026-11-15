@@ -24,6 +24,16 @@ public interface SocialClientApi {
     String getAuthorizeUrl(Integer socialType, Integer userType, String redirectUri);
 
     /**
+     * 获得指定用户类型下，已具备授权配置的社交平台类型列表
+     *
+     * 只返回平台类型，不包含任何凭据；只判断配置完整，不请求社交平台校验凭据
+     *
+     * @param userType 用户类型
+     * @return 社交平台的类型列表 {@link SocialTypeEnum}；未开启 JustAuth 时返回空列表
+     */
+    List<Integer> getAvailableSocialTypeList(Integer userType);
+
+    /**
      * 创建微信公众号 JS SDK 初始化所需的签名
      *
      * @param userType 用户类型

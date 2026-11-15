@@ -21,7 +21,6 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.cache.CacheUtils;
-import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialWxQrcodeReqDTO;
 import cn.iocoder.yudao.module.system.api.social.dto.SocialWxaOrderNotifyConfirmReceiveReqDTO;
@@ -39,6 +38,7 @@ import com.binarywang.spring.starter.wxjava.mp.properties.WxMpProperties;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.xkcoding.justauth.autoconfigure.JustAuthProperties;
 import jakarta.annotation.Resource;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -49,7 +49,9 @@ import me.chanjar.weixin.common.redis.RedisTemplateWxRedisOps;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.api.impl.WxMpServiceImpl;
 import me.chanjar.weixin.mp.config.impl.WxMpRedisConfigImpl;
+import me.zhyd.oauth.cache.AuthStateCache;
 import me.zhyd.oauth.config.AuthConfig;
+import me.zhyd.oauth.exception.AuthException;
 import me.zhyd.oauth.model.AuthCallback;
 import me.zhyd.oauth.model.AuthResponse;
 import me.zhyd.oauth.model.AuthUser;
@@ -64,11 +66,14 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.framework.common.util.collection.MapUtils.findAndThen;
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.UTC_MS_WITH_XXX_OFFSET_FORMATTER;
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.toEpochSecond;
@@ -167,24 +172,32 @@ public class SocialClientServiceImpl implements SocialClientService {
     @Resource
     private SocialClientMapper socialClientMapper;
 
+    /**
+     * JustAuth 全局配置；配置类不受 justauth.enabled 控制，始终存在。按请求合并配置时只读取，不修改
+     */
+    @Resource
+    private JustAuthProperties justAuthProperties;
+    @Resource
+    private AuthStateCache authStateCache;
+
     @Override
     public String getAuthorizeUrl(Integer socialType, Integer userType, String redirectUri) {
-        // 获得对应的 AuthRequest 实现
-        AuthRequest authRequest = buildAuthRequest(socialType, userType);
+        // 获得对应的 AuthRequest 实现：构造时即使用本次回调地址，换取令牌时需传入同一个
+        AuthRequest authRequest = buildAuthRequest(socialType, userType, redirectUri);
         // 生成跳转地址
-        String authorizeUri = authRequest.authorize(AuthStateUtils.createState());
-        return HttpUtils.replaceUrlQuery(authorizeUri, "redirect_uri", redirectUri);
+        return authRequest.authorize(AuthStateUtils.createState());
     }
 
     @Override
-    public AuthUser getAuthUser(Integer socialType, Integer userType, String code, String state) {
-        // 构建请求
-        AuthRequest authRequest = buildAuthRequest(socialType, userType);
+    public AuthUser getAuthUser(Integer socialType, Integer userType, String code, String state, String redirectUri) {
+        // 构建请求：网页授权传入发起授权时的回调地址，换取令牌时使用同一个
+        AuthRequest authRequest = buildAuthRequest(socialType, userType, redirectUri);
         AuthCallback authCallback = AuthCallback.builder().code(code).auth_code(code).state(state).build();
         // 执行请求
         AuthResponse<?> authResponse = authRequest.login(authCallback);
-        log.info("[getAuthUser][请求社交平台 type({}) request({}) response({})]", socialType,
-                toJsonString(authCallback), toJsonString(authResponse));
+        // 日志不记录授权码和令牌
+        log.info("[getAuthUser][请求社交平台 type({}) state({}) code({}) msg({})]", socialType, state,
+                authResponse.getCode(), authResponse.getMsg());
         if (!authResponse.ok()) {
             throw exception(SOCIAL_USER_AUTH_FAILURE, authResponse.getMsg());
         }
@@ -196,42 +209,133 @@ public class SocialClientServiceImpl implements SocialClientService {
         return authUser;
     }
 
+    @Override
+    public List<Integer> getAvailableSocialTypeList(Integer userType) {
+        // 未开启 JustAuth 时，没有可用的社交平台
+        if (authRequestFactory == null) {
+            return Collections.emptyList();
+        }
+        // 1. 一次查询该用户类型的社交应用，按社交平台类型分组
+        Map<Integer, SocialClientDO> clientMap = convertMap(socialClientMapper.selectListByUserType(userType),
+                SocialClientDO::getSocialType);
+        // 2. 逐个平台合并有效配置，配置完整时可发起授权
+        List<Integer> socialTypes = new ArrayList<>();
+        for (SocialTypeEnum socialType : SocialTypeEnum.values()) {
+            SocialClientDO client = clientMap.get(socialType.getType());
+            AuthConfig authConfig = buildAuthConfig(socialType, client);
+            if (isAuthConfigComplete(socialType, authConfig, client)) {
+                socialTypes.add(socialType.getType());
+            }
+        }
+        return socialTypes;
+    }
+
+    /**
+     * 合并社交平台的有效授权配置
+     *
+     * 以配置文件中的全局配置为基础并复制一份，不修改共享的全局配置；
+     * 社交应用启用时，覆盖 clientId、clientSecret，以及非空的 agentId；未启用时使用全局配置
+     *
+     * @param socialType 社交平台的类型
+     * @param client     该用户类型的社交应用，可为 null
+     * @return 授权配置；全局未配置且没有启用的社交应用时返回 null
+     */
+    @VisibleForTesting
+    AuthConfig buildAuthConfig(SocialTypeEnum socialType, SocialClientDO client) {
+        // 1. 复制全局配置；没有全局配置时，由启用的社交应用单独提供配置
+        AuthConfig defaultConfig = justAuthProperties.getType().get(socialType.getSource());
+        boolean clientEnabled = client != null && Objects.equals(client.getStatus(), CommonStatusEnum.ENABLE.getStatus());
+        if (defaultConfig == null && !clientEnabled) {
+            return null;
+        }
+        AuthConfig authConfig;
+        if (defaultConfig == null) {
+            authConfig = new AuthConfig();
+        } else {
+            authConfig = ReflectUtil.newInstance(defaultConfig.getClass());
+            BeanUtil.copyProperties(defaultConfig, authConfig);
+        }
+        // 2. 启用的社交应用覆盖密钥
+        if (clientEnabled) {
+            authConfig.setClientId(client.getClientId());
+            authConfig.setClientSecret(client.getClientSecret());
+            if (client.getAgentId() != null) { // 如果有 agentId 则修改 agentId
+                authConfig.setAgentId(client.getAgentId());
+            }
+        }
+        return authConfig;
+    }
+
+    /**
+     * 判断授权配置是否完整，可以用于发起授权；只校验必填项，不请求社交平台
+     *
+     * @param socialType 社交平台的类型
+     * @param authConfig 合并后的授权配置，可为 null
+     * @param client     该用户类型的社交应用，可为 null
+     * @return 是否完整
+     */
+    @SuppressWarnings("deprecation")
+    private static boolean isAuthConfigComplete(SocialTypeEnum socialType, AuthConfig authConfig,
+                                                SocialClientDO client) {
+        if (authConfig == null || StrUtil.hasBlank(authConfig.getClientId(), authConfig.getClientSecret())) {
+            return false;
+        }
+        // 企业微信需要 agentId
+        if (socialType == SocialTypeEnum.WECHAT_ENTERPRISE) {
+            return StrUtil.isNotBlank(authConfig.getAgentId());
+        }
+        // 支付宝小程序需要公钥：启用的社交应用使用其 publicKey，否则使用全局配置
+        if (socialType == SocialTypeEnum.ALIPAY_MINI_PROGRAM) {
+            boolean clientEnabled = client != null
+                    && Objects.equals(client.getStatus(), CommonStatusEnum.ENABLE.getStatus());
+            return StrUtil.isNotBlank(clientEnabled ? client.getPublicKey() : authConfig.getAlipayPublicKey());
+        }
+        return true;
+    }
+
     /**
      * 构建 AuthRequest 对象，支持多租户配置
      *
-     * @param socialType 社交类型
-     * @param userType   用户类型
+     * 先合并全局配置和启用的社交应用配置，再构造 AuthRequest：构造时即校验凭据和回调地址
+     *
+     * @param socialType  社交类型
+     * @param userType    用户类型
+     * @param redirectUri 本次授权的回调地址；为空时使用合并后配置中的回调地址
      * @return AuthRequest 对象
      */
     @VisibleForTesting
-    AuthRequest buildAuthRequest(Integer socialType, Integer userType) {
-        // 1. 先查找默认的配置项，从 application-*.yaml 中读取
+    AuthRequest buildAuthRequest(Integer socialType, Integer userType, String redirectUri) {
+        // 1. 合并全局配置和启用的社交应用配置，配置不完整时不可用
         if (authRequestFactory == null) {
             throw exception(SOCIAL_USER_AUTH_FAILURE, "社交登录未启用");
         }
-        AuthRequest request = authRequestFactory.get(SocialTypeEnum.valueOfType(socialType).getSource());
-        Assert.notNull(request, String.format("社交平台(%d) 不存在", socialType));
-        // 2. 查询 DB 的配置项，如果存在则进行覆盖
-        SocialClientDO client = socialClientMapper.selectBySocialTypeAndUserType(socialType, userType);
-        if (client != null && Objects.equals(client.getStatus(), CommonStatusEnum.ENABLE.getStatus())) {
-            // 2.1 构造新的 AuthConfig 对象
-            AuthConfig authConfig = (AuthConfig) ReflectUtil.getFieldValue(request, "config");
-            AuthConfig newAuthConfig = ReflectUtil.newInstance(authConfig.getClass());
-            BeanUtil.copyProperties(authConfig, newAuthConfig);
-            // 2.2 修改对应的 clientId + clientSecret 密钥
-            newAuthConfig.setClientId(client.getClientId());
-            newAuthConfig.setClientSecret(client.getClientSecret());
-            if (client.getAgentId() != null) { // 如果有 agentId 则修改 agentId
-                newAuthConfig.setAgentId(client.getAgentId());
-            }
-            // 2.3 设置会 request 里，进行后续使用
-            if (SocialTypeEnum.ALIPAY_MINI_PROGRAM.getType().equals(socialType)) {
-                // 特殊：如果是支付宝的小程序，多了 publicKey 属性，可见 AuthConfig 里的 alipayPublicKey 字段说明
-                return new AuthAlipayRequest(newAuthConfig, client.getPublicKey());
-            }
-            ReflectUtil.setFieldValue(request, "config", newAuthConfig);
+        SocialTypeEnum socialTypeEnum = SocialTypeEnum.valueOfType(socialType);
+        if (socialTypeEnum == null) {
+            throw exception(SOCIAL_USER_AUTH_FAILURE, "社交平台未开启");
         }
-        return request;
+        SocialClientDO client = socialClientMapper.selectBySocialTypeAndUserType(socialType, userType);
+        AuthConfig authConfig = buildAuthConfig(socialTypeEnum, client);
+        if (!isAuthConfigComplete(socialTypeEnum, authConfig, client)) {
+            throw exception(SOCIAL_USER_AUTH_FAILURE, "社交平台未配置");
+        }
+        // 2. 设置本次授权的回调地址
+        if (redirectUri != null) {
+            authConfig.setRedirectUri(redirectUri);
+        }
+        // 3. 构造 AuthRequest：构造时校验凭据和回调地址，例如回调地址为空或不是 HTTP 地址，按授权失败返回
+        try {
+            if (SocialTypeEnum.ALIPAY_MINI_PROGRAM == socialTypeEnum && client != null
+                    && Objects.equals(client.getStatus(), CommonStatusEnum.ENABLE.getStatus())) {
+                // 特殊：如果是支付宝的小程序，多了 publicKey 属性，可见 AuthConfig 里的 alipayPublicKey 字段说明
+                return new AuthAlipayRequest(authConfig, client.getPublicKey());
+            }
+            // 其它平台：复制一份全局配置，只把本次合并后的授权配置放入，再按原有方式构造；不修改共享的全局配置
+            JustAuthProperties properties = BeanUtil.copyProperties(justAuthProperties, JustAuthProperties.class);
+            properties.setType(Collections.singletonMap(socialTypeEnum.getSource(), authConfig));
+            return new AuthRequestFactory(properties, authStateCache).get(socialTypeEnum.getSource());
+        } catch (AuthException ex) {
+            throw exception(SOCIAL_USER_AUTH_FAILURE, ex.getMessage());
+        }
     }
 
     // =================== 微信公众号独有 ===================

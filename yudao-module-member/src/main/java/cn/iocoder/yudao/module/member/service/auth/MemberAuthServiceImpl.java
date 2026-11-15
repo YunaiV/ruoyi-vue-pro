@@ -90,7 +90,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         String openid = null;
         if (reqVO.getSocialType() != null) {
             openid = socialUserApi.bindSocialUser(new SocialUserBindReqDTO(user.getId(), getUserType().getValue(),
-                    reqVO.getSocialType(), reqVO.getSocialCode(), reqVO.getSocialState()));
+                    reqVO.getSocialType(), reqVO.getSocialCode(), reqVO.getSocialState(), null));
         }
 
         // 创建 Token 令牌，记录登录日志
@@ -115,7 +115,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         String openid = null;
         if (reqVO.getSocialType() != null) {
             openid = socialUserApi.bindSocialUser(new SocialUserBindReqDTO(user.getId(), getUserType().getValue(),
-                    reqVO.getSocialType(), reqVO.getSocialCode(), reqVO.getSocialState()));
+                    reqVO.getSocialType(), reqVO.getSocialCode(), reqVO.getSocialState(), null));
         }
 
         // 创建 Token 令牌，记录登录日志
@@ -125,9 +125,9 @@ public class MemberAuthServiceImpl implements MemberAuthService {
     @Override
     @Transactional
     public AppAuthLoginRespVO socialLogin(AppAuthSocialLoginReqVO reqVO) {
-        // 使用 code 授权码，进行登录。然后，获得到绑定的用户编号
+        // 使用 code 授权码，进行登录。然后，获得到绑定的用户编号；网页授权使用发起授权时的回调地址换取令牌
         SocialUserRespDTO socialUser = socialUserApi.getSocialUserByCode(UserTypeEnum.MEMBER.getValue(), reqVO.getType(),
-                reqVO.getCode(), reqVO.getState());
+                reqVO.getCode(), reqVO.getState(), reqVO.getRedirectUri());
         if (socialUser == null) {
             throw exception(AUTH_SOCIAL_USER_NOT_FOUND);
         }
@@ -140,7 +140,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         } else {
             user = userService.createUser(socialUser.getNickname(), socialUser.getAvatar(), getClientIP(), getTerminal());
             socialUserApi.bindSocialUser(new SocialUserBindReqDTO(user.getId(), getUserType().getValue(),
-                    reqVO.getType(), reqVO.getCode(), reqVO.getState()));
+                    reqVO.getType(), reqVO.getCode(), reqVO.getState(), reqVO.getRedirectUri()));
         }
         if (user == null) {
             throw exception(USER_NOT_EXISTS);
@@ -168,7 +168,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
 
         // 绑定社交用户
         String openid = socialUserApi.bindSocialUser(new SocialUserBindReqDTO(user.getId(), getUserType().getValue(),
-                SocialTypeEnum.WECHAT_MINI_PROGRAM.getType(), reqVO.getLoginCode(), reqVO.getState()));
+                SocialTypeEnum.WECHAT_MINI_PROGRAM.getType(), reqVO.getLoginCode(), reqVO.getState(), null));
 
         // 创建 Token 令牌，记录登录日志
         return createTokenAfterLoginSuccess(user, user.getMobile(), LoginLogTypeEnum.LOGIN_SOCIAL, openid);
