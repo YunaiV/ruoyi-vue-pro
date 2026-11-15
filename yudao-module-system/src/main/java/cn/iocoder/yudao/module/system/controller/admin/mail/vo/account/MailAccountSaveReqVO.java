@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
 @Schema(description = "管理后台 - 邮箱账号创建/修改 Request VO")
@@ -41,5 +43,11 @@ public class MailAccountSaveReqVO {
     @Schema(description = "是否开启 starttls", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
     @NotNull(message = "是否开启 starttls 必填")
     private Boolean starttlsEnable;
+
+    @Schema(description = "SMTP 读取超时，单位：毫秒，0 表示不限制", requiredMode = Schema.RequiredMode.REQUIRED, example = "10000")
+    @NotNull(message = "SMTP 读取超时不能为空")
+    @Min(value = 0, message = "SMTP 读取超时不能小于 0")
+    @Max(value = 65535, message = "SMTP 读取超时不能大于 65535")
+    private Integer timeout;
 
 }
