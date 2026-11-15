@@ -28,13 +28,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 // TODO DONE @AI：是不是独立页面噢？分开下？整个功能都独立哈。。。。。（已独立：菜单与页面 views/ai/asr、接口 api/ai/asr、AiAsrController / AiAsrService、各平台客户端 framework/ai/core/asr、错误码 1-040-016；识别记录保存在 ai_asr，有【我的】记录和「语音识别管理」；AI 对话的语音输入只是调用本接口）
-/**
- * 管理后台 - AI 语音识别
- *
- * 【我的】接口：用户、租户都由登录态决定，不接受前端传入；【语音识别管理】接口：按权限查看、删除本租户的全部记录
- *
- * @author 芋道源码
- */
+// DONE @AI：@author 芋道源码 类和接口上，这个也不应该有呀；（已去掉类注释，说明以 @Tag 为准，同 AiModelController、system 的 UserController）
 @Tag(name = "管理后台 - AI 语音识别")
 @RestController
 @RequestMapping("/ai/asr")

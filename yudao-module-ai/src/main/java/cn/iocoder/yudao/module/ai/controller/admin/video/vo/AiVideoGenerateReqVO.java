@@ -13,20 +13,18 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * AI 视频生成 Request VO
- *
  * @author 芋道源码
  */
 @Schema(description = "管理后台 - AI 视频生成 Request VO")
 @Data
 public class AiVideoGenerateReqVO {
 
-    @Schema(description = "创作类型：1 视频生成 2 数字人口播 3 动作模仿", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "创作类型，参见 AiVideoTypeEnum 枚举类", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "创作类型不能为空")
     @InEnum(AiVideoTypeEnum.class)
     private Integer type;
 
-    @Schema(description = "生成方式（视频生成）：text 文生 / image 图生 / first_last 首尾帧 / reference 参考", example = "text")
+    @Schema(description = "生成方式（视频生成），参见 AiVideoModeEnum 枚举类", example = "text")
     @InEnum(AiVideoModeEnum.class)
     private String mode;
 

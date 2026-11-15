@@ -387,9 +387,9 @@ public class AiAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(value = "yudao.ai.mimo.chat.enable", havingValue = "true")
+    @ConditionalOnProperty(value = "yudao.ai.xiaomi.chat.enable", havingValue = "true")
     public MiMoChatModel miMoChatClient(YudaoAiProperties yudaoAiProperties) {
-        YudaoAiProperties.Chat properties = yudaoAiProperties.getMimo().getChat();
+        YudaoAiProperties.Chat properties = yudaoAiProperties.getXiaomi().getChat();
         return buildMiMoChatClient(properties);
     }
 

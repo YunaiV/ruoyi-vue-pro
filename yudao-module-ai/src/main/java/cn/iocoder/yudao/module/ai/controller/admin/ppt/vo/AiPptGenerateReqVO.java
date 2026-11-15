@@ -12,8 +12,6 @@ import lombok.Data;
 import java.util.Objects;
 
 /**
- * AI PPT 生成 Request VO
- *
  * @author 芋道源码
  */
 @Schema(description = "管理后台 - AI PPT 生成 Request VO")

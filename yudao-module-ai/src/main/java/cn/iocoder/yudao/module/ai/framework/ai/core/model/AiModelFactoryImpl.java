@@ -43,6 +43,7 @@ import com.alibaba.cloud.ai.dashscope.embedding.DashScopeEmbeddingOptions;
 import com.alibaba.cloud.ai.dashscope.image.DashScopeImageModel;
 import com.azure.ai.openai.OpenAIClientBuilder;
 import com.azure.core.credential.KeyCredential;
+import com.google.common.annotations.VisibleForTesting;
 import io.micrometer.observation.ObservationRegistry;
 import io.milvus.client.MilvusServiceClient;
 import io.qdrant.client.QdrantClient;
@@ -125,6 +126,8 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpHeaders;
+import org.springframework.util.LinkedMultiValueMap;
 import redis.clients.jedis.JedisPooled;
 
 import java.io.File;
@@ -190,7 +193,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
                 case STEPFUN:
                     return new AiAutoConfiguration().buildStepFunChatClient(
                             new YudaoAiProperties.Chat().setBaseUrl(url).setApiKey(apiKey), patcher);
-                case MIMO:
+                case XIAOMI:
                     return new AiAutoConfiguration().buildMiMoChatClient(
                             new YudaoAiProperties.Chat().setBaseUrl(url).setApiKey(apiKey), patcher);
                 case IFLYTEK:
@@ -232,7 +235,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
                 return buildMoonshotChatModel(apiKey, url);
             case STEPFUN:
                 return buildStepFunChatModel(apiKey, url);
-            case MIMO:
+            case XIAOMI:
                 return buildMiMoChatModel(apiKey, url);
             case IFLYTEK:
                 return buildXingHuoChatModel(apiKey);
@@ -279,7 +282,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
                 return SpringUtil.getBean(MoonshotChatModel.class);
             case STEPFUN:
                 return SpringUtil.getBean(StepFunChatModel.class);
-            case MIMO:
+            case XIAOMI:
                 return SpringUtil.getBean(MiMoChatModel.class);
             case IFLYTEK:
                 return SpringUtil.getBean(XingHuoChatModel.class);
@@ -567,7 +570,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
     }
 
     private static DeepSeekChatModel buildDeepSeekChatModel(String apiKey, AiRequestBodyPatcher patcher) {
-        DeepSeekApi deepSeekApi = AiRequestBodyPatcher.configure(DeepSeekApi.builder().apiKey(apiKey), patcher).build();
+        DeepSeekApi deepSeekApi = AiRequestBodyPatcher.configure(buildDeepSeekApiBuilder(apiKey), patcher).build();
         DeepSeekChatOptions options = DeepSeekChatOptions.builder().model(DeepSeekApi.DEFAULT_CHAT_MODEL)
                 .temperature(0.7).build();
         return DeepSeekChatModel.builder()
@@ -575,6 +578,18 @@ public class AiModelFactoryImpl implements AiModelFactory {
                 .defaultOptions(options)
                 .toolCallingManager(getToolCallingManager())
                 .build();
+    }
+
+    /**
+     * 创建 DeepSeekApi 的构建器：请求不压缩的响应（Accept-Encoding: identity）
+     *
+     * 原因：默认的 HttpComponents 客户端会请求 gzip，并在读取时自动解压。实测 DeepSeek 的非流式响应走这条路径时，
+     * 只读到第一个字节（"{"），解析报 JsonEOFException；请求不压缩的响应则能完整读取
+     */
+    @VisibleForTesting
+    static DeepSeekApi.Builder buildDeepSeekApiBuilder(String apiKey) {
+        return DeepSeekApi.builder().apiKey(apiKey)
+                .headers(new LinkedMultiValueMap<>(Map.of(HttpHeaders.ACCEPT_ENCODING, List.of("identity"))));
     }
 
     /**

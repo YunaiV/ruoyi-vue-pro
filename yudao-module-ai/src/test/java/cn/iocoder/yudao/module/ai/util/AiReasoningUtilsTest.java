@@ -46,7 +46,7 @@ public class AiReasoningUtilsTest {
         for (AiPlatformEnum platform : Arrays.asList(AiPlatformEnum.DEEPSEEK, AiPlatformEnum.BYTEDANCE,
                 AiPlatformEnum.TENCENT, AiPlatformEnum.SILICONFLOW, AiPlatformEnum.BAIDU, AiPlatformEnum.ZHIPU,
                 AiPlatformEnum.IFLYTEK, AiPlatformEnum.MINIMAX, AiPlatformEnum.MOONSHOT, AiPlatformEnum.BAICHUAN,
-                AiPlatformEnum.STEPFUN, AiPlatformEnum.MIMO)) {
+                AiPlatformEnum.STEPFUN, AiPlatformEnum.XIAOMI)) {
             assertEquals(AiReasoningUtils.ReasoningRoute.HTTP, AiReasoningUtils.getReasoningRoute(platform), platform.name());
         }
         // 调用，并断言：OpenAI、通义路由

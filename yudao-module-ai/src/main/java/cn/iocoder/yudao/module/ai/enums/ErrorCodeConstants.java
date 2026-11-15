@@ -155,4 +155,27 @@ public interface ErrorCodeConstants {
     ErrorCode VIDEO_STATUS_NOT_FINISHED = new ErrorCode(1_040_017_004, "视频还在生成中，暂不能执行该操作");
     ErrorCode VIDEO_STATUS_NOT_SUCCESS = new ErrorCode(1_040_017_005, "只有已完成的视频才能执行该操作");
 
+    // ========== AI 短剧 1-040-018-000 ==========
+    ErrorCode DRAMA_PROJECT_NOT_EXISTS = new ErrorCode(1_040_018_000, "短剧项目不存在");
+    ErrorCode DRAMA_PROJECT_PUBLIC_NOT_ALLOWED = new ErrorCode(1_040_018_001, "只有成片已完成的项目才能公开");
+    ErrorCode DRAMA_SCRIPT_NOT_EXISTS = new ErrorCode(1_040_018_002, "剧本不存在，请先生成或填写剧本");
+    ErrorCode DRAMA_CHAT_FAIL = new ErrorCode(1_040_018_003, "{}失败：{}");
+    ErrorCode DRAMA_CHARACTER_NOT_EXISTS = new ErrorCode(1_040_018_004, "角色不存在");
+    ErrorCode DRAMA_APPEARANCE_NOT_EXISTS = new ErrorCode(1_040_018_005, "角色形象不存在");
+    ErrorCode DRAMA_LOCATION_NOT_EXISTS = new ErrorCode(1_040_018_006, "场景不存在");
+    ErrorCode DRAMA_VISUAL_ASSET_NOT_EXISTS = new ErrorCode(1_040_018_007, "视觉资产不存在");
+    ErrorCode DRAMA_AUDIO_NOT_EXISTS = new ErrorCode(1_040_018_008, "音频不存在");
+    ErrorCode DRAMA_STORYBOARD_NOT_EXISTS = new ErrorCode(1_040_018_009, "分镜不存在");
+    ErrorCode DRAMA_IMAGE_MODEL_ERROR = new ErrorCode(1_040_018_010, "操作失败，所选模型不是可用的绘画模型：{}");
+    ErrorCode DRAMA_TASK_RUNNING = new ErrorCode(1_040_018_011, "正在生成中，请稍后再试");
+    ErrorCode DRAMA_COMPOSE_STORYBOARD_NOT_SUCCESS = new ErrorCode(1_040_018_012, "镜头（{}）的视频未完成，不能合成");
+    ErrorCode DRAMA_AUDIO_TYPE_ERROR = new ErrorCode(1_040_018_013, "音频类型不正确：{}");
+    ErrorCode DRAMA_SPEECH_FAIL = new ErrorCode(1_040_018_014, "音频生成失败：{}");
+    ErrorCode DRAMA_TASK_NOT_FAIL = new ErrorCode(1_040_018_015, "只有已失败的任务才能重新提交");
+    ErrorCode DRAMA_TASK_NOT_RUNNING = new ErrorCode(1_040_018_016, "只有进行中的任务才能执行该操作");
+    ErrorCode DRAMA_TASK_SYNC_NOT_SUPPORTED = new ErrorCode(1_040_018_017, "只有镜头视频支持同步状态");
+    ErrorCode DRAMA_SELECTED_INDEX_INVALID = new ErrorCode(1_040_018_018, "选用的候选图不存在");
+    ErrorCode DRAMA_TASK_RESUBMIT_NO_MODEL = new ErrorCode(1_040_018_019, "找不到上次使用的模型，请用户在工作台重新生成");
+    ErrorCode DRAMA_TASK_SYNC_FAIL = new ErrorCode(1_040_018_020, "同步状态失败：{}");
+
 }

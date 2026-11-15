@@ -121,7 +121,7 @@ public class AiReasoningUtils {
             case MOONSHOT:
             case BAICHUAN:
             case STEPFUN:
-            case MIMO:
+            case XIAOMI:
                 return ReasoningRoute.HTTP;
             case OPENAI:
             case GROK:

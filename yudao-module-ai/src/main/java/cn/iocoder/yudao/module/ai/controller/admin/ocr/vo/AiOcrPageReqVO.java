@@ -11,9 +11,8 @@ import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
+// DONE @AI：应该 controller、service 类注释都删除完？（按 vm 模板与 system 模块：Controller 不写类说明，说明以 @Tag 为准，只保留原作者；Service 接口、实现类只保留「Xxx Service 接口 / 实现类」，实现类保留必要的业务说明；范围为短剧、语音识别、文字识别、语音合成、视频、PPT）
 /**
- * 管理后台 - AI 文字识别分页 Request VO
- *
  * @author 芋道源码
  */
 @Schema(description = "管理后台 - AI 文字识别分页 Request VO")

@@ -7,13 +7,9 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 /**
- * AI PPT 单页重绘 Request VO
- *
- * 文生图重绘：用修改后的完整提示词重新出图，不参考当前图
- *
  * @author 芋道源码
  */
-@Schema(description = "管理后台 - AI PPT 单页重绘 Request VO")
+@Schema(description = "管理后台 - AI PPT 单页重绘 Request VO：文生图重绘，用修改后的完整提示词重新出图，不参考当前图")
 @Data
 public class AiPptRedrawReqVO {
 

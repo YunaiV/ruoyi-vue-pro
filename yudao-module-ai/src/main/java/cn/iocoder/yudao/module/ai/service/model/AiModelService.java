@@ -90,11 +90,11 @@ public interface AiModelService {
      * 获得模型列表
      *
      * @param status 状态
-     * @param type 类型
+     * @param type 类型，允许空
      * @param platform 平台，允许空
      * @return 模型列表
      */
-    List<AiModelDO> getModelListByStatusAndType(Integer status, Integer type,
+    List<AiModelDO> getModelListByStatusAndType(Integer status, @Nullable Integer type,
                                                 @Nullable String platform);
 
     // ========== 与 Spring AI 集成 ==========

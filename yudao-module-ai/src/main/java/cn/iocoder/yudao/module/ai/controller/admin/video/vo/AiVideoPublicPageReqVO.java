@@ -7,8 +7,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 /**
- * AI 视频公开作品分页 Request VO
- *
  * @author 芋道源码
  */
 @Schema(description = "管理后台 - AI 视频公开作品分页 Request VO")

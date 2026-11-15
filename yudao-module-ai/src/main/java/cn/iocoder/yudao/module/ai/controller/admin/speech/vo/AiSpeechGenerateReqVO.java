@@ -7,8 +7,6 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 /**
- * AI 语音合成 Request VO
- *
  * @author 芋道源码
  */
 @Schema(description = "管理后台 - AI 语音合成 Request VO")

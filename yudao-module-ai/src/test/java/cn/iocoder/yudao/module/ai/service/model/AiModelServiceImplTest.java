@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.ai.service.model;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
+import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiModelSaveReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiModelDO;
@@ -9,7 +10,12 @@ import cn.iocoder.yudao.module.ai.dal.mysql.model.AiChatMapper;
 import cn.iocoder.yudao.module.ai.enums.model.AiModelTypeEnum;
 import cn.iocoder.yudao.module.ai.enums.model.AiPlatformEnum;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.AiModelFactory;
+import com.baomidou.mybatisplus.core.MybatisConfiguration;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import jakarta.validation.ConstraintViolationException;
+import org.apache.ibatis.builder.MapperBuilderAssistant;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
@@ -20,6 +26,7 @@ import java.util.List;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -42,6 +49,12 @@ public class AiModelServiceImplTest extends BaseMockitoUnitTest {
     private AiChatMapper modelMapper;
     @Mock
     private AiModelFactory modelFactory;
+
+    @BeforeAll
+    public static void initTableInfo() {
+        // LambdaQueryWrapperX 需要实体的表信息才能解析列名
+        TableInfoHelper.initTableInfo(new MapperBuilderAssistant(new MybatisConfiguration(), ""), AiModelDO.class);
+    }
 
     @Test
     public void testCreateModel_inputModalities() {
@@ -91,6 +104,41 @@ public class AiModelServiceImplTest extends BaseMockitoUnitTest {
 
         // 调用，并断言：@InEnum 拒绝非法值
         assertThrows(ConstraintViolationException.class, () -> ValidationUtils.validate(reqVO));
+    }
+
+    // DONE @AI：融合到 AiModelServiceTest 单测，不要独立；（原 AiModelServiceImplListTest 的两项覆盖已并入本类，改用 Mock 断言查询条件，原文件与它专用的 H2 ai_model 表已删除）
+    @Test
+    public void testGetModelListByStatusAndType_typeNull() {
+        // mock 方法：Mapper 的默认方法执行真实逻辑，便于断言最终的查询条件
+        when(modelMapper.selectListByStatusAndType(any(), any(), any())).thenCallRealMethod();
+
+        // 调用：类型为空，例如说短剧任务的模型筛选，同时包含绘画、视频模型
+        modelService.getModelListByStatusAndType(CommonStatusEnum.ENABLE.getStatus(), null, null);
+        // 断言：只按状态过滤，不过滤类型
+        String sqlSegment = captureSelectListWrapper().getSqlSegment();
+        assertTrue(sqlSegment.contains("status ="));
+        assertFalse(sqlSegment.contains("type ="));
+    }
+
+    @Test
+    public void testGetModelListByStatusAndType_type() {
+        // mock 方法
+        when(modelMapper.selectListByStatusAndType(any(), any(), any())).thenCallRealMethod();
+
+        // 调用
+        modelService.getModelListByStatusAndType(CommonStatusEnum.ENABLE.getStatus(),
+                AiModelTypeEnum.IMAGE.getType(), null);
+        // 断言：按类型过滤
+        LambdaQueryWrapperX<AiModelDO> wrapper = captureSelectListWrapper();
+        assertTrue(wrapper.getSqlSegment().contains("type ="));
+        assertTrue(wrapper.getParamNameValuePairs().containsValue(AiModelTypeEnum.IMAGE.getType()));
+    }
+
+    @SuppressWarnings("unchecked")
+    private LambdaQueryWrapperX<AiModelDO> captureSelectListWrapper() {
+        ArgumentCaptor<Wrapper<AiModelDO>> wrapperCaptor = ArgumentCaptor.forClass(Wrapper.class);
+        verify(modelMapper).selectList(wrapperCaptor.capture());
+        return (LambdaQueryWrapperX<AiModelDO>) wrapperCaptor.getValue();
     }
 
     private static AiModelSaveReqVO buildSaveReqVO(Long id) {

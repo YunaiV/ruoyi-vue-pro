@@ -31,10 +31,6 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 /**
- * 管理后台 - OCR 文字识别
- *
- * 【我的】接口：用户、租户都由登录态决定，不接受前端传入；【OCR 管理】接口：按权限查看、删除本租户的全部记录
- *
  * @author 芋道源码
  */
 @Tag(name = "管理后台 - OCR 文字识别")

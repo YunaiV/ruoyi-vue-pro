@@ -34,8 +34,6 @@ import static java.util.Collections.singletonList;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 /**
- * 管理后台 - AI PPT 生成
- *
  * @author 芋道源码
  */
 @Tag(name = "管理后台 - AI PPT 生成")

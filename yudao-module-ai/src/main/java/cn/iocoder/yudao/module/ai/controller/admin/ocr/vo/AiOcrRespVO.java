@@ -6,8 +6,6 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 /**
- * 管理后台 - AI 文字识别 Response VO
- *
  * @author 芋道源码
  */
 @Schema(description = "管理后台 - AI 文字识别 Response VO")

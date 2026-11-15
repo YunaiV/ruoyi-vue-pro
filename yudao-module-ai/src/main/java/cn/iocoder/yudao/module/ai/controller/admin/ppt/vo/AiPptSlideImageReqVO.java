@@ -6,8 +6,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 /**
- * AI PPT 切换单页图片版本 Request VO
- *
  * @author 芋道源码
  */
 @Schema(description = "管理后台 - AI PPT 切换单页图片版本 Request VO")

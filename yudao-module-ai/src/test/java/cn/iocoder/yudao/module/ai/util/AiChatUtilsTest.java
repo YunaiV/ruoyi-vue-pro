@@ -183,7 +183,7 @@ public class AiChatUtilsTest {
     @Test
     public void testBuildChatOptions_miMo() {
         // 调用
-        DeepSeekChatOptions options = (DeepSeekChatOptions) AiChatUtils.buildChatOptions(AiPlatformEnum.MIMO,
+        DeepSeekChatOptions options = (DeepSeekChatOptions) AiChatUtils.buildChatOptions(AiPlatformEnum.XIAOMI,
                 "mimo-v2.6-flash", 0.7, 1024);
         // 断言：复用 DeepSeek 客户端的选项
         assertEquals("mimo-v2.6-flash", options.getModel());

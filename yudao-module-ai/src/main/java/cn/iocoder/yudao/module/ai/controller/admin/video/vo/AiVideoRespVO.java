@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * AI 视频 Response VO
- *
  * @author 芋道源码
  */
 @Schema(description = "管理后台 - AI 视频 Response VO")

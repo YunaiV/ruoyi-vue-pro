@@ -32,7 +32,7 @@ public enum AiPlatformEnum implements ArrayValuable<String> {
     MOONSHOT("MOONSHOT", "月之暗面"), // KIMI
     BAICHUAN("BAICHUAN", "百川智能"), // 百川智能
     STEPFUN("STEPFUN", "阶跃星辰"), // 阶跃星辰
-    MIMO("MIMO", "小米 MiMo"), // 小米
+    XIAOMI("XIAOMI", "小米"), // 小米：MiMo
     KLING("KLING", "可灵"), // 快手：可灵视频；密钥为 API Key，或 AccessKey|SecretKey
 
     // ========== 国外平台 ==========

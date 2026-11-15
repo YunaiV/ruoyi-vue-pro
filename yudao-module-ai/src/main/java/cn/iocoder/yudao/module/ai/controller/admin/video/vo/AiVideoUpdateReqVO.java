@@ -5,8 +5,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 /**
- * AI 视频修改 Request VO
- *
  * @author 芋道源码
  */
 @Schema(description = "管理后台 - AI 视频修改 Request VO")

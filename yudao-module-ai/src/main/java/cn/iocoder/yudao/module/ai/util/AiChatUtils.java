@@ -122,7 +122,7 @@ public class AiChatUtils {
             case MOONSHOT: // 复用 DeepSeek 客户端
             case BAICHUAN: // 复用 DeepSeek 客户端
             case STEPFUN: // 复用 DeepSeek 客户端
-            case MIMO: // 复用 DeepSeek 客户端
+            case XIAOMI: // 复用 DeepSeek 客户端
                 return DeepSeekChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)
                         .toolCallbacks(toolCallbacks).toolContext(toolContext).build();
             case OPENAI:

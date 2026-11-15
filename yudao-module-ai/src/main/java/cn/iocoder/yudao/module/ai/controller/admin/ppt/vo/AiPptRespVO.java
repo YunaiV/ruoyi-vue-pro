@@ -7,8 +7,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * 管理后台 - AI PPT Response VO
- *
  * @author 芋道源码
  */
 @Schema(description = "管理后台 - AI PPT Response VO")

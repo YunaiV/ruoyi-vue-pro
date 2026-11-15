@@ -266,7 +266,7 @@ yudao:
         enable: false
         api-key: ${STEPFUN_API_KEY:sk-xxxx}
         model: step-3.7-flash
-    mimo: # 小米 MiMo
+    xiaomi: # 小米：MiMo
       chat:
         enable: false
         api-key: ${MIMO_API_KEY:sk-xxxx}
