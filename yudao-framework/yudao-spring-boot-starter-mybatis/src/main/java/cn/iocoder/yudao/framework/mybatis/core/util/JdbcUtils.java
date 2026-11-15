@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.annotation.DbType;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.datasource.ConnectionHolder;
+import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.ConcurrentReferenceHashMap;
 
@@ -208,6 +209,28 @@ public class JdbcUtils {
      */
     public static boolean isSQLServer(DbType dbType) {
         return ObjectUtils.equalsAny(dbType, DbType.SQL_SERVER, DbType.SQL_SERVER2005);
+    }
+
+    // TODO @芋艿：后面看看，还有哪些地方，可以复用下！
+    /**
+     * 在当前事务提交后执行操作；无事务时立即执行
+     *
+     * @param action 待执行操作
+     */
+    public static void executeAfterCommit(Runnable action) {
+        if (!TransactionSynchronizationManager.isActualTransactionActive()
+                || !TransactionSynchronizationManager.isSynchronizationActive()) {
+            action.run();
+            return;
+        }
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+
+            @Override
+            public void afterCommit() {
+                action.run();
+            }
+
+        });
     }
 
     /**
