@@ -25,7 +25,8 @@
         <!-- DB 相关 -->
         <druid.version>1.2.28</druid.version>
         <mybatis.version>3.5.19</mybatis.version>
-        <mybatis-plus.version>3.5.18.1</mybatis-plus.version>
+        <mybatis-plus.version>3.5.17</mybatis-plus.version>
+        <jsqlparser.version>5.4</jsqlparser.version>
         <mybatis-plus-join.version>1.5.9</mybatis-plus-join.version>
         <easy-es.version>3.0.2</easy-es.version>
         <elasticsearch-client.version>7.17.28</elasticsearch-client.version>
@@ -224,6 +225,12 @@
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-jsqlparser</artifactId>
                 <version>${mybatis-plus.version}</version>
+            </dependency>
+            <dependency>
+                <!-- 注意：必须声明，mybatis-plus-jsqlparser 默认引入的 jsqlparser 5.2 无法解析 Oracle JSON_VALUE RETURNING 等 SQL！！！ -->
+                <groupId>com.github.jsqlparser</groupId>
+                <artifactId>jsqlparser</artifactId>
+                <version>${jsqlparser.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.baomidou</groupId>
