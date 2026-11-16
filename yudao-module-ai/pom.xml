@@ -20,6 +20,7 @@
     </description>
     <properties>
         <spring-ai.version>1.1.8</spring-ai.version>
+        <mcp-sdk.version>0.18.3</mcp-sdk.version> <!-- 与 Spring AI 使用的 MCP SDK 版本一致 -->
         <!-- https://mvnrepository.com/artifact/com.alibaba.cloud.ai/spring-ai-alibaba -->
         <alibaba-ai.version>1.1.2.2</alibaba-ai.version>
         <tinyflow.version>1.2.6</tinyflow.version>
@@ -316,6 +317,13 @@
             <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-starter-mcp-client</artifactId>
             <version>${spring-ai.version}</version>
+        </dependency>
+
+        <dependency>
+            <!-- Parallel 联网搜索使用的 HTTP 客户端传输，不引入 WebFlux starter -->
+            <groupId>io.modelcontextprotocol.sdk</groupId>
+            <artifactId>mcp-spring-webflux</artifactId>
+            <version>${mcp-sdk.version}</version>
         </dependency>
 
         <!-- TinyFlow：AI 工作流 -->

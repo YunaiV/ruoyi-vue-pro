@@ -285,7 +285,8 @@ yudao:
         notify-url: http://java.nat300.top/admin-api/ai/image/midjourney/notify
     web-search:
       enable: true
-      api-key: ${WEB_SEARCH_API_KEY:sk-xxxx}
+      platform: bocha # 可选 parallel，发送联网搜索问题至 mcp.parallel.ai，无需搜索 API Key
+      api-key: ${WEB_SEARCH_API_KEY:sk-xxxx} # 仅博查使用
 
 --- #################### 芋道相关配置 ####################
 

@@ -151,6 +151,16 @@ public class YudaoAiProperties {
 
         private boolean enable;
 
+        /**
+         * 联网搜索平台
+         */
+        private Platform platform = Platform.BOCHA;
+
+        public enum Platform {
+            BOCHA, PARALLEL
+        }
+
+
         private String apiKey;
 
     }
