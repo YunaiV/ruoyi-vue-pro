@@ -37,6 +37,10 @@ public class MemberUserBaseVO {
     @NotNull(message = "用户昵称不能为空")
     private String nickname;
 
+    @Schema(description = "个人简介", example = "热爱阅读与分享")
+    @Size(max = 500, message = "个人简介长度不能超过 500 个字符")
+    private String introduction;
+
     @Schema(description = "头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/x.png")
     @URL(message = "头像必须是 URL 格式")
     private String avatar;

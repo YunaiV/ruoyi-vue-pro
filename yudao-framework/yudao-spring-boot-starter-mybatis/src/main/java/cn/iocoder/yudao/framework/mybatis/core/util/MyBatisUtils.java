@@ -7,12 +7,14 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.SortingField;
 import cn.iocoder.yudao.framework.mybatis.core.enums.DbTypeEnum;
+import cn.iocoder.yudao.framework.mybatis.core.query.MPJLambdaWrapperX;
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
+import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.InnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -117,6 +119,11 @@ public class MyBatisUtils {
             throw new IllegalArgumentException("Unsupported wrapper type: " + wrapper.getClass().getName());
         }
 
+    }
+
+    public static <T, S> void addOrder(MPJLambdaWrapperX<T> wrapper, SFunction<S, ?> column,
+                                       SortingField sortingField) {
+        wrapper.orderBy(true, isAscOrder(sortingField.getOrder()), column);
     }
 
     public static boolean isAscOrder(String order) {

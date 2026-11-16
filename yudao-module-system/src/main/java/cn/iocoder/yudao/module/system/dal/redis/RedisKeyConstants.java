@@ -108,6 +108,28 @@ public interface RedisKeyConstants {
     String SMS_TEMPLATE = "sms_template";
 
     /**
+     * 短信验证码校验次数的缓存
+     * <p>
+     * KEY 格式：sms_code_validate_count:{id}
+     * VALUE 数据类型：String 已预占的校验次数
+     */
+    String SMS_CODE_VALIDATE_COUNT = "sms_code_validate_count:%d";
+    /**
+     * 短信验证码 IP 每日发送数量的缓存
+     * <p>
+     * KEY 格式：sms_code_send_ip_count:{date}:{ip}
+     * VALUE 数据类型：String 当日发送数量
+     */
+    String SMS_CODE_SEND_IP_COUNT = "sms_code_send_ip_count:%s:%s";
+    /**
+     * 短信验证码 IP 每小时发送数量的缓存
+     * <p>
+     * KEY 格式：sms_code_send_ip_hour_count:{yyyyMMddHH}:{ip}
+     * VALUE 数据类型：String 当前小时发送数量
+     */
+    String SMS_CODE_SEND_IP_HOUR_COUNT = "sms_code_send_ip_hour_count:%s:%s";
+
+    /**
      * 小程序订阅模版的缓存
      *
      * KEY 格式：wxa_subscribe_template:{userType}

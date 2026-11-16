@@ -62,7 +62,7 @@ public class SocialUserServiceImpl implements SocialUserService {
     public String bindSocialUser(SocialUserBindReqDTO reqDTO) {
         // 获得社交用户
         SocialUserDO socialUser = authSocialUser(reqDTO.getSocialType(), reqDTO.getUserType(),
-                reqDTO.getCode(), reqDTO.getState());
+                reqDTO.getCode(), reqDTO.getState(), reqDTO.getRedirectUri());
         Assert.notNull(socialUser, "社交用户不能为空");
 
         // 社交用户可能之前绑定过别的用户，需要进行解绑
@@ -107,9 +107,9 @@ public class SocialUserServiceImpl implements SocialUserService {
     }
 
     @Override
-    public SocialUserRespDTO getSocialUserByCode(Integer userType, Integer socialType, String code, String state) {
+    public SocialUserRespDTO getSocialUserByCode(Integer userType, Integer socialType, String code, String state, String redirectUri) {
         // 获得社交用户
-        SocialUserDO socialUser = authSocialUser(socialType, userType, code, state);
+        SocialUserDO socialUser = authSocialUser(socialType, userType, code, state, redirectUri);
         Assert.notNull(socialUser, "社交用户不能为空");
 
         // 获得绑定用户
@@ -127,10 +127,11 @@ public class SocialUserServiceImpl implements SocialUserService {
      * @param userType 用户类型
      * @param code     授权码
      * @param state    state
+     * @param redirectUri 发起授权时的回调地址，换取令牌时需与其一致；为空时使用配置中的回调地址
      * @return 授权用户
      */
     @NotNull
-    public SocialUserDO authSocialUser(Integer socialType, Integer userType, String code, String state) {
+    public SocialUserDO authSocialUser(Integer socialType, Integer userType, String code, String state, String redirectUri) {
         // 优先从 DB 中获取，因为 code 有且可以使用一次。
         // 在社交登录时，当未绑定 User 时，需要绑定登录，此时需要 code 使用两次
         SocialUserDO socialUser = socialUserMapper.selectByTypeAndCodeAnState(socialType, code, state);
@@ -139,7 +140,7 @@ public class SocialUserServiceImpl implements SocialUserService {
         }
 
         // 请求获取
-        AuthUser authUser = socialClientService.getAuthUser(socialType, userType, code, state);
+        AuthUser authUser = socialClientService.getAuthUser(socialType, userType, code, state, redirectUri);
         Assert.notNull(authUser, "三方用户不能为空");
 
         // 保存到 DB 中

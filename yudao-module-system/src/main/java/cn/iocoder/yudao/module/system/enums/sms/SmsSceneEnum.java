@@ -20,6 +20,7 @@ public enum SmsSceneEnum implements ArrayValuable<Integer> {
     MEMBER_UPDATE_MOBILE(2, "user-update-mobile", "会员用户 - 修改手机"),
     MEMBER_UPDATE_PASSWORD(3, "user-update-password", "会员用户 - 修改密码"),
     MEMBER_RESET_PASSWORD(4, "user-reset-password", "会员用户 - 忘记密码"),
+    MEMBER_REGISTER(5, "user-sms-register", "会员用户 - 手机号注册"),
 
     ADMIN_MEMBER_LOGIN(21, "admin-sms-login", "后台用户 - 手机号登录"),
     ADMIN_MEMBER_REGISTER(22, "admin-sms-register", "后台用户 - 手机号注册"),

@@ -523,6 +523,7 @@ CREATE TABLE IF NOT EXISTS "system_mail_account" (
     "port" int NOT NULL,
     "ssl_enable" bit NOT NULL,
     "starttls_enable" bit NOT NULL,
+    "timeout" int NOT NULL DEFAULT 0,
     "creator" varchar DEFAULT '',
     "create_time" datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updater" varchar DEFAULT '',

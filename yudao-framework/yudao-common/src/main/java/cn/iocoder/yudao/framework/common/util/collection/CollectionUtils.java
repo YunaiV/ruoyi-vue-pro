@@ -3,6 +3,7 @@ package cn.iocoder.yudao.framework.common.util.collection;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import com.google.common.collect.ImmutableMap;
@@ -22,6 +23,14 @@ import static java.util.Arrays.asList;
  * @author 芋道源码
  */
 public class CollectionUtils {
+
+    public static void addIfNotBlank(Collection<String> target, String... values) {
+        for (String value : values) {
+            if (StrUtil.isNotBlank(value)) {
+                target.add(value);
+            }
+        }
+    }
 
     public static boolean containsAny(Object source, Object... targets) {
         return asList(targets).contains(source);
@@ -253,11 +262,17 @@ public class CollectionUtils {
     }
 
     public static <T, K, V> Map<K, List<V>> convertMultiMap(Collection<T> from, Function<T, K> keyFunc, Function<T, V> valueFunc) {
+        return convertMultiMap(from, keyFunc, valueFunc, HashMap::new);
+    }
+
+    public static <T, K, V> Map<K, List<V>> convertMultiMap(Collection<T> from, Function<T, K> keyFunc,
+                                                         Function<T, V> valueFunc,
+                                                         Supplier<? extends Map<K, List<V>>> supplier) {
         if (CollUtil.isEmpty(from)) {
-            return new HashMap<>();
+            return supplier.get();
         }
-        return from.stream()
-                .collect(Collectors.groupingBy(keyFunc, Collectors.mapping(valueFunc, Collectors.toList())));
+        return from.stream().collect(Collectors.groupingBy(keyFunc, supplier,
+                Collectors.mapping(valueFunc, Collectors.toList())));
     }
 
     // 暂时没想好名字，先以 2 结尾噶

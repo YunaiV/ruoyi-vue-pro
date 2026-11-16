@@ -14,6 +14,14 @@ import jakarta.validation.Valid;
 public interface MemberAuthService {
 
     /**
+     * 手机验证码注册
+     *
+     * @param reqVO 注册信息
+     * @return 登录结果
+     */
+    AppAuthLoginRespVO register(@Valid AppAuthRegisterReqVO reqVO);
+
+    /**
      * 手机 + 密码登录
      *
      * @param reqVO 登录信息

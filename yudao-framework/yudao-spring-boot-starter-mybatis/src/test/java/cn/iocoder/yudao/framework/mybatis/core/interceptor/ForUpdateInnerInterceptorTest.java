@@ -239,6 +239,11 @@ public class ForUpdateInnerInterceptorTest {
         // 首行
         assertEquals("SELECT TOP (1) id FROM t WITH (UPDLOCK, ROWLOCK) WHERE (a = ?) ORDER BY id ASC  ",
                 ForUpdateInnerInterceptor.rewriteForSqlServer("SELECT id FROM t WHERE (a = ?) ORDER BY id ASC LIMIT 1 FOR UPDATE", true));
+        // 多行：按 AST 节点（JSqlParser 5.4 起为 Node）首尾 token 的行列定位，换行保持原样
+        assertEquals("SELECT id\nFROM t WITH (UPDLOCK, ROWLOCK)\nWHERE a = ?\n",
+                ForUpdateInnerInterceptor.rewriteForSqlServer("SELECT id\nFROM t\nWHERE a = ?\nFOR UPDATE", false));
+        assertEquals("SELECT TOP (1) id\r\nFROM t WITH (UPDLOCK, ROWLOCK)\r\nWHERE a = ?\r\n ",
+                ForUpdateInnerInterceptor.rewriteForSqlServer("SELECT id\r\nFROM t\r\nWHERE a = ?\r\nLIMIT 1 FOR UPDATE", true));
     }
 
     @Test

@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstant
 import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.framework.common.pojo.SortablePageParam;
 import cn.iocoder.yudao.framework.common.pojo.SortingField;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
@@ -334,6 +335,16 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
     default T selectFirstOne(SFunction<T, ?> field, Object value) {
         List<T> list = selectList(new LambdaQueryWrapper<T>().eq(field, value));
         return CollUtil.getFirst(list);
+    }
+
+    /**
+     * 获取满足条件的第 1 条记录
+     *
+     * @param queryWrapper 查询条件
+     * @return 实体
+     */
+    default T selectFirstOne(LambdaQueryWrapper<T> queryWrapper) {
+        return selectFirstOne((Wrapper<T>) queryWrapper);
     }
 
     default T selectFirstOne(SFunction<T, ?> field1, Object value1, SFunction<T, ?> field2, Object value2) {
