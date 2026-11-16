@@ -28,14 +28,14 @@ import java.util.Map;
 /**
  * Parallel {@link AiWebSearchClient} 实现类
  */
-public class AiParallelWebSearchClient implements AiWebSearchClient, AutoCloseable {
+public class AiParallelWebSearchClient implements AiWebSearchClient {
 
     private static final String USER_AGENT = "ruoyi-vue-pro";
     private static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(5);
     private static final Duration SEARCH_TIMEOUT = Duration.ofSeconds(20);
     private static final Duration CLOSE_TIMEOUT = Duration.ofSeconds(2);
 
-    private final McpAsyncClient client;
+    private final WebClient.Builder webClient;
 
     public AiParallelWebSearchClient() {
         this("https://mcp.parallel.ai");
@@ -47,23 +47,27 @@ public class AiParallelWebSearchClient implements AiWebSearchClient, AutoCloseab
                 .followRedirect(false)
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, (int) CONNECT_TIMEOUT.toMillis())
                 .responseTimeout(SEARCH_TIMEOUT);
-        WebClient.Builder webClient = WebClient.builder().baseUrl(baseUrl)
+        this.webClient = WebClient.builder().baseUrl(baseUrl)
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .codecs(codecs -> codecs.defaultCodecs().maxInMemorySize(1024 * 1024))
                 .filter((request, next) -> {
                     if (request.method() == HttpMethod.DELETE) {
+                        // SDK 在 DELETE 完成后关闭连接，必须限制响应体的读取时间。
                         return next.exchange(request).flatMap(response -> response.releaseBody()
                                         .thenReturn(response.mutate().body(Flux.empty()).build()))
-                                .timeout(CLOSE_TIMEOUT.minusMillis(250))
+                                .timeout(CLOSE_TIMEOUT)
                                 .onErrorResume(error -> Mono.empty());
                     }
                     return next.exchange(request);
                 });
-        WebClientStreamableHttpTransport transport = WebClientStreamableHttpTransport.builder(webClient)
+    }
+
+    private McpAsyncClient createClient() {
+        WebClientStreamableHttpTransport transport = WebClientStreamableHttpTransport.builder(webClient.clone())
                 .endpoint("/mcp")
                 .resumableStreams(false)
                 .build();
-        this.client = McpClient.async(transport)
+        return McpClient.async(transport)
                 .clientInfo(new McpSchema.Implementation(USER_AGENT, "1.0"))
                 .initializationTimeout(CONNECT_TIMEOUT)
                 .requestTimeout(SEARCH_TIMEOUT)
@@ -76,7 +80,10 @@ public class AiParallelWebSearchClient implements AiWebSearchClient, AutoCloseab
         McpSchema.CallToolRequest toolRequest = McpSchema.CallToolRequest.builder().name("web_search")
                 .arguments(Map.of("objective", query, "search_queries", List.of(query)))
                 .build();
-        McpSchema.CallToolResult result = client.callTool(toolRequest).block(CONNECT_TIMEOUT.plus(SEARCH_TIMEOUT));
+        // 每次搜索使用独立会话，超时后关闭流，不影响其他并发搜索。
+        McpSchema.CallToolResult result = Mono.usingWhen(Mono.fromSupplier(this::createClient),
+                client -> client.callTool(toolRequest).timeout(CONNECT_TIMEOUT.plus(SEARCH_TIMEOUT)),
+                McpAsyncClient::closeGracefully).block();
         if (result == null || Boolean.TRUE.equals(result.isError())) {
             throw new IllegalStateException("Parallel 联网搜索失败");
         }
@@ -127,16 +134,6 @@ public class AiParallelWebSearchClient implements AiWebSearchClient, AutoCloseab
         } catch (IllegalArgumentException ignored) {
             return null;
         }
-    }
-
-    @Override
-    public void close() {
-        // 回收 MCP 会话。关闭请求超时时，终止本地连接。
-        client.closeGracefully().timeout(CLOSE_TIMEOUT)
-                .onErrorResume(error -> {
-                    client.close();
-                    return Mono.empty();
-                }).block();
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
