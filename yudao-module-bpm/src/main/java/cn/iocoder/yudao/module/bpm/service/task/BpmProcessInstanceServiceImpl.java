@@ -9,6 +9,7 @@ import cn.hutool.core.util.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
@@ -167,16 +168,26 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                                                         BpmApprovalDetailReqVO reqVO,
                                                         HistoricProcessInstance processInstance,
                                                         BpmTaskRespVO todoTask) {
-        // 情况一：有待办任务，以待办任务所在节点的表单权限为准，可编辑
+        // 情况一：退回且选项从当前节点审批时， 获取退回目标节点的字段权限，而不是当前审批节点的权限。
+        if (processInstance != null && StrUtil.isNotEmpty(reqVO.getTaskId())) {
+            Task revisionTask = taskService.getRevisionTasks(loginUserId).stream().filter(task ->
+                    Objects.equals(task.getId(), reqVO.getTaskId())
+                            && Objects.equals(task.getProcessInstanceId(), processInstance.getId())).findFirst().orElse(null);
+            if (revisionTask != null) {
+                String targetNode = (String) revisionTask.getTaskLocalVariables().get(BpmnVariableConstants.TASK_VARIABLE_REVISION_TARGET_NODE);
+                return BpmnModelUtils.parseFormFieldsPermission(bpmnModel, targetNode);
+            }
+        }
+        // 情况二：有待办任务，以待办任务所在节点的表单权限为准，可编辑
         if (todoTask != null) {
             return BpmnModelUtils.parseFormFieldsPermission(bpmnModel, todoTask.getTaskDefinitionKey());
         }
-        // 情况二：流程未发起，使用传递的流程活动（例如说，发起人节点）的表单权限，可编辑
+        // 情况三：流程未发起，使用传递的流程活动（例如说，发起人节点）的表单权限，可编辑
         if (processInstance == null) {
             return BpmnModelUtils.parseFormFieldsPermission(bpmnModel, reqVO.getActivityId());
         }
 
-        // 情况三：流程已发起，但没有待办任务，只能查看
+        // 情况四：流程已发起，但没有待办任务，只能查看
         // 3.1 优先，使用自己办理过的任务（已办）所在节点
         String activityId = getMyHistoricTaskDefinitionKey(loginUserId, reqVO.getTaskId(), processInstance.getId());
         // 3.2 其次，使用传递的流程活动（例如说，抄送节点）
@@ -602,7 +613,16 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                 if (task == null) {
                     continue;
                 }
-                activityNode.getTasks().add(BpmProcessInstanceConvert.INSTANCE.buildApprovalTaskInfo(task, null));
+                ActivityNodeTask taskInfo = BpmProcessInstanceConvert.INSTANCE.buildApprovalTaskInfo(task, null);
+                // 如果是已退回，等待处理人修改状态，获取回退目标节点和处理人信息用于展示
+                if (BpmTaskStatusEnum.WAIT_REVISION.getStatus().equals(taskInfo.getStatus())) {
+                    String targetId = (String) task.getTaskLocalVariables().get(BpmnVariableConstants.TASK_VARIABLE_REVISION_TARGET_NODE);
+                    String assignee = (String) task.getTaskLocalVariables().get(BpmnVariableConstants.TASK_VARIABLE_REVISION_ASSIGNEE);
+                    FlowElement target = BpmnModelUtils.getFlowElementById(bpmnModel, targetId);
+                    taskInfo.setRevisionTargetNode(targetId).setRevisionTargetNodeName(target != null ? target.getName() : targetId)
+                            .setRevisionAssignee(NumberUtils.parseLong(assignee));
+                }
+                activityNode.getTasks().add(taskInfo);
                 // 加签子任务，需要过滤掉已经完成的加签子任务
                 List<HistoricTaskInstance> childrenTasks = filterList(
                         taskService.getAllChildrenTaskListByParentTaskId(activity.getTaskId(), tasks),

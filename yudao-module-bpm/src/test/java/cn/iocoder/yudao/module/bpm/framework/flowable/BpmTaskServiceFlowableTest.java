@@ -309,6 +309,100 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
     }
 
     @Test
+    public void testReturnToStarterAndResubmitKeepsTask() {
+        deploy("bpmn/revision-approve.bpmn20.xml");
+        doAnswer(invocation -> new BpmProcessDefinitionInfoDO().setProcessDefinitionId(invocation.getArgument(0))
+                .setModelType(BpmModelTypeEnum.BPMN.getType())
+                .setFormType(cn.iocoder.yudao.module.bpm.enums.definition.BpmModelFormTypeEnum.NORMAL.getType())
+                .setFormFields(List.of("{\"field\":\"amount\",\"type\":\"input\"}")))
+                .when(processDefinitionService).getProcessDefinitionInfo(anyString());
+        String processId = startProcessInstance("revisionApprove");
+        Task task = getRunningTask(processId);
+        if ("StartUserNode".equals(task.getTaskDefinitionKey())) {
+            approveRunningTask(processId);
+            task = getRunningTask(processId);
+        }
+        String taskId = task.getId();
+        bpmTaskService.returnTask(1L, new BpmTaskReturnReqVO().setId(taskId)
+                .setTargetTaskDefinitionKey("StartUserNode").setReason("请修改"));
+        assertEquals(taskId, getRunningTask(processId).getId());
+        assertEquals(BpmTaskStatusEnum.WAIT_REVISION.getStatus(), getTaskStatus(taskId));
+        assertEquals(1, bpmTaskService.getRevisionTasks(1L).size());
+        assertTrue(bpmTaskService.getRevisionTasks(2L).isEmpty());
+        assertServiceException(() -> bpmTaskService.approveTask(1L,
+                new BpmTaskApproveReqVO().setId(taskId).setReason("同意")), TASK_WAIT_REVISION);
+        assertServiceException(() -> bpmTaskService.resubmitTask(2L,
+                new BpmTaskResubmitReqVO().setTaskId(taskId)), TASK_RESUBMIT_NOT_ALLOWED);
+        bpmTaskService.resubmitTask(1L, new BpmTaskResubmitReqVO().setTaskId(taskId)
+                .setVariables(Map.of("amount", 42)));
+        assertEquals(taskId, getRunningTask(processId).getId());
+        assertEquals(42, runtimeService.getVariable(processId, "amount"));
+        assertTrue(bpmTaskService.getRevisionTasks(1L).isEmpty());
+        assertServiceException(() -> bpmTaskService.resubmitTask(1L,
+                new BpmTaskResubmitReqVO().setTaskId(taskId)), TASK_RESUBMIT_NOT_ALLOWED);
+        bpmTaskService.approveTask(1L, new BpmTaskApproveReqVO().setId(taskId).setReason("同意"));
+        assertNull(processInstanceService.getProcessInstance(processId));
+    }
+
+    @Test
+    public void testReturnToHistoricalAssigneeAndResubmit() {
+        deploy("bpmn/revision-history.bpmn20.xml");
+        doAnswer(invocation -> new BpmProcessDefinitionInfoDO().setProcessDefinitionId(invocation.getArgument(0))
+                .setModelType(BpmModelTypeEnum.BPMN.getType())
+                .setFormType(cn.iocoder.yudao.module.bpm.enums.definition.BpmModelFormTypeEnum.NORMAL.getType())
+                .setFormFields(List.of("{\"field\":\"amount\",\"type\":\"input\"}")))
+                .when(processDefinitionService).getProcessDefinitionInfo(anyString());
+        String processId = startProcessInstance("revisionHistory");
+        Task previous = getRunningTask(processId);
+        if ("StartUserNode".equals(previous.getTaskDefinitionKey())) {
+            approveRunningTask(processId);
+            previous = getRunningTask(processId);
+        }
+        assertEquals("previous", previous.getTaskDefinitionKey());
+        flowableTaskService.setAssignee(previous.getId(), "2");
+        bpmTaskService.approveTask(2L, new BpmTaskApproveReqVO().setId(previous.getId()).setReason("同意"));
+        Task current = getRunningTask(processId);
+        String currentId = current.getId();
+        bpmTaskService.returnTask(1L, new BpmTaskReturnReqVO().setId(currentId)
+                .setTargetTaskDefinitionKey("previous").setReason("请修改"));
+        assertEquals(currentId, getRunningTask(processId).getId());
+        assertTrue(bpmTaskService.getRevisionTasks(1L).isEmpty());
+        assertEquals(1, bpmTaskService.getRevisionTasks(2L).size());
+        assertServiceException(() -> bpmTaskService.resubmitTask(1L,
+                new BpmTaskResubmitReqVO().setTaskId(currentId)), TASK_RESUBMIT_NOT_ALLOWED);
+        bpmTaskService.resubmitTask(2L, new BpmTaskResubmitReqVO().setTaskId(currentId)
+                .setVariables(Map.of("amount", 42)));
+        assertEquals(currentId, getRunningTask(processId).getId());
+        assertEquals(42, runtimeService.getVariable(processId, "amount"));
+        bpmTaskService.approveTask(1L, new BpmTaskApproveReqVO().setId(currentId).setReason("同意"));
+        assertNull(processInstanceService.getProcessInstance(processId));
+    }
+
+    @Test
+    public void testTimeoutWhileWaitingForRevision() {
+        deploy("bpmn/revision-approve.bpmn20.xml");
+        doAnswer(invocation -> new BpmProcessDefinitionInfoDO().setProcessDefinitionId(invocation.getArgument(0))
+                .setModelType(BpmModelTypeEnum.BPMN.getType())
+                .setFormType(cn.iocoder.yudao.module.bpm.enums.definition.BpmModelFormTypeEnum.NORMAL.getType())
+                .setFormFields(List.of()))
+                .when(processDefinitionService).getProcessDefinitionInfo(anyString());
+        String processId = startProcessInstance("revisionApprove");
+        Task task = getRunningTask(processId);
+        if ("StartUserNode".equals(task.getTaskDefinitionKey())) {
+            approveRunningTask(processId);
+            task = getRunningTask(processId);
+        }
+        String taskId = task.getId();
+        bpmTaskService.returnTask(1L, new BpmTaskReturnReqVO().setId(taskId)
+                .setTargetTaskDefinitionKey("StartUserNode").setReason("请修改"));
+        bpmTaskService.processTaskTimeout(processId, "approve", BpmUserTaskTimeoutHandlerTypeEnum.APPROVE.getType());
+        assertNull(processInstanceService.getProcessInstance(processId));
+        assertTrue(bpmTaskService.getRevisionTasks(1L).isEmpty());
+        assertServiceException(() -> bpmTaskService.resubmitTask(1L,
+                new BpmTaskResubmitReqVO().setTaskId(taskId)), TASK_NOT_EXISTS);
+    }
+
+    @Test
     public void testReturnTask_targetNotExists() {
         // 准备参数
         String processInstanceId = startProcessInstance();

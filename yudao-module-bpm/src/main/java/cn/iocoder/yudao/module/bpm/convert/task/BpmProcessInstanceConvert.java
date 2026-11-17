@@ -221,6 +221,7 @@ public interface BpmProcessInstanceConvert {
         for (BpmApprovalDetailRespVO.ActivityNode activityNode : activityNodes) {
             CollUtil.addAll(userIds, convertSet(activityNode.getTasks(), BpmApprovalDetailRespVO.ActivityNodeTask::getAssignee));
             CollUtil.addAll(userIds, convertSet(activityNode.getTasks(), BpmApprovalDetailRespVO.ActivityNodeTask::getOwner));
+            CollUtil.addAll(userIds, convertSet(activityNode.getTasks(), BpmApprovalDetailRespVO.ActivityNodeTask::getRevisionAssignee));
             CollUtil.addAll(userIds, activityNode.getCandidateUserIds());
         }
         if (todoTask != null) {
@@ -272,6 +273,7 @@ public interface BpmProcessInstanceConvert {
                 approveNode.getTasks().forEach(task -> {
                     task.setAssigneeUser(buildUser(task.getAssignee(), userMap, deptMap));
                     task.setOwnerUser(buildUser(task.getOwner(), userMap, deptMap));
+                    task.setRevisionAssigneeUser(buildUser(task.getRevisionAssignee(), userMap, deptMap));
                 });
             }
             approveNode.setCandidateUsers(convertList(approveNode.getCandidateUserIds(), userId -> buildUser(userId, userMap, deptMap)));

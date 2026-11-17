@@ -10,6 +10,7 @@ import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
@@ -339,6 +340,9 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         Integer status = (Integer) task.getTaskLocalVariables().get(BpmnVariableConstants.TASK_VARIABLE_STATUS);
         if (BpmTaskStatusEnum.APPROVING.getStatus().equals(status)) {
             throw exception(TASK_OPERATE_FAIL_APPROVING);
+        }
+        if (BpmTaskStatusEnum.WAIT_REVISION.getStatus().equals(status)) {
+            throw exception(TASK_WAIT_REVISION);
         }
         return task;
     }
@@ -876,6 +880,16 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             throw exception(PROCESS_INSTANCE_NOT_EXISTS);
         }
 
+        // 如果配置是驳回到指定任务节点， 且退回配置为从当前节点审批时。不能走常规的跳转
+        BpmnModel rejectModel = modelService.getBpmnModelByDefinitionId(task.getProcessDefinitionId());
+        FlowElement rejectElement = BpmnModelUtils.getFlowElementById(rejectModel, task.getTaskDefinitionKey());
+        if (BpmnModelUtils.parseRejectHandlerType(rejectElement) == BpmUserTaskRejectHandlerTypeEnum.RETURN_USER_TASK
+                && BpmnModelUtils.parseReturnApproveMode(rejectElement) == BpmReturnApproveModeEnum.RESUME_SOURCE) {
+            returnTask(userId, new BpmTaskReturnReqVO().setId(task.getId())
+                    .setTargetTaskDefinitionKey(BpmnModelUtils.parseReturnTaskId(rejectElement)).setReason(reqVO.getReason()));
+            return;
+        }
+
         // 2.1 更新流程任务为不通过
         updateTaskStatusAndReason(task.getId(), BpmTaskStatusEnum.REJECT.getStatus(), reqVO.getReason());
         // 2.2 添加流程评论
@@ -978,8 +992,99 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         FlowElement targetElement = validateTargetTaskCanReturn(bpmnModel, task.getTaskDefinitionKey(),
                 reqVO.getTargetTaskDefinitionKey());
 
-        // 2. 调用 Flowable 框架的退回逻辑
+        // 1.4 回退选项为当前节点审批，不能使用常规退回跳转。
+        FlowElement sourceElement = BpmnModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
+        if (BpmnModelUtils.parseReturnApproveMode(sourceElement) == BpmReturnApproveModeEnum.RESUME_SOURCE) {
+            BpmProcessDefinitionInfoDO definitionInfo = bpmProcessDefinitionService.getProcessDefinitionInfo(task.getProcessDefinitionId());
+            if (definitionInfo == null || !BpmModelFormTypeEnum.NORMAL.getType().equals(definitionInfo.getFormType())
+                    || task.getParentTaskId() != null || task.getDelegationState() != null
+                    || task.getScopeType() != null
+                    || !(sourceElement instanceof UserTask)) {
+                throw exception(TASK_RETURN_RESUME_SOURCE_NOT_SUPPORTED);
+            }
+
+            // 获取修改人，如果退回目标节点分配了多个审批人，获取最后一个修改审批人
+            List<HistoricTaskInstance> history = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(task.getProcessInstanceId()).taskDefinitionKey(targetElement.getId()).finished()
+                    .orderByHistoricTaskInstanceEndTime().desc().listPage(0, 1);
+            String revisionUser = history.isEmpty() ? null : history.get(0).getAssignee();
+            if (StrUtil.isBlank(revisionUser)) {
+                throw exception(TASK_REVISION_ASSIGNEE_NOT_FOUND);
+            }
+            taskService.setVariableLocal(task.getId(), BpmnVariableConstants.TASK_VARIABLE_REVISION_ASSIGNEE, revisionUser);
+            taskService.setVariableLocal(task.getId(), BpmnVariableConstants.TASK_VARIABLE_REVISION_TARGET_NODE, targetElement.getId());
+            updateTaskStatusAndReason(task.getId(), BpmTaskStatusEnum.WAIT_REVISION.getStatus(), reqVO.getReason());
+            commentService.createComment(task.getId(), task.getProcessInstanceId(), BpmCommentTypeEnum.RETURN, reqVO.getReason());
+            return;
+        }
         returnTask(userId, bpmnModel, task, targetElement, reqVO);
+    }
+
+    @Override
+    public List<Task> getRevisionTasks(Long userId) {
+        return taskService.createTaskQuery().taskTenantId(FlowableUtils.getTenantId()).active()
+                .taskVariableValueEquals(BpmnVariableConstants.TASK_VARIABLE_REVISION_ASSIGNEE, String.valueOf(userId))
+                .taskVariableValueEquals(BpmnVariableConstants.TASK_VARIABLE_STATUS, BpmTaskStatusEnum.WAIT_REVISION.getStatus())
+                .includeTaskLocalVariables().orderByTaskCreateTime().desc().list();
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void resubmitTask(Long userId, BpmTaskResubmitReqVO reqVO) {
+        Task task = validateTaskExists(reqVO.getTaskId());
+        Object revisionAssignee = task.getTaskLocalVariables().get(BpmnVariableConstants.TASK_VARIABLE_REVISION_ASSIGNEE);
+        if (!Objects.equals(revisionAssignee, String.valueOf(userId))
+                || !Objects.equals(task.getTaskLocalVariables().get(BpmnVariableConstants.TASK_VARIABLE_STATUS),
+                        BpmTaskStatusEnum.WAIT_REVISION.getStatus())) {
+            throw exception(TASK_RESUBMIT_NOT_ALLOWED);
+        }
+        ProcessInstance instance = processInstanceService.getProcessInstance(task.getProcessInstanceId());
+        if (instance == null) {
+            throw exception(TASK_RESUBMIT_NOT_ALLOWED);
+        }
+        BpmProcessDefinitionInfoDO info = bpmProcessDefinitionService.getProcessDefinitionInfo(task.getProcessDefinitionId());
+        if (info == null || !BpmModelFormTypeEnum.NORMAL.getType().equals(info.getFormType())) {
+            throw exception(TASK_RETURN_RESUME_SOURCE_NOT_SUPPORTED);
+        }
+        Map<String, Object> variables = MapUtil.emptyIfNull(reqVO.getVariables());
+        Set<String> fieldNames = new HashSet<>();
+        if (info.getFormFields() != null) {
+            for (String field : info.getFormFields()) {
+                collectFormFields(JsonUtils.parseObject(field, com.fasterxml.jackson.databind.JsonNode.class), fieldNames);
+            }
+        }
+        BpmnModel model = modelService.getBpmnModelByDefinitionId(task.getProcessDefinitionId());
+        String targetNode = (String) task.getTaskLocalVariables().get(BpmnVariableConstants.TASK_VARIABLE_REVISION_TARGET_NODE);
+        if (StrUtil.isBlank(targetNode)) {
+            throw exception(TASK_RESUBMIT_NOT_ALLOWED);
+        }
+        Map<String, String> permissions = BpmnModelUtils.parseFormFieldsPermission(model, targetNode);
+        // 校验修改的字段
+        for (String key : variables.keySet()) {
+            if (key.startsWith("PROCESS_") || key.startsWith("TASK_") || key.startsWith("RETURN_")
+                    || key.startsWith("_FLOWABLE_") || !fieldNames.contains(key)
+                    || (permissions != null && permissions.containsKey(key)
+                    && !String.valueOf(BpmFieldPermissionEnum.WRITE.getPermission()).equals(permissions.get(key)))) {
+                throw exception(TASK_RESUBMIT_NOT_ALLOWED);
+            }
+        }
+        runtimeService.setVariables(task.getProcessInstanceId(), variables);
+        updateTaskStatusAndReason(task.getId(), BpmTaskStatusEnum.RUNNING.getStatus(), "");
+        taskService.removeVariableLocal(task.getId(), BpmnVariableConstants.TASK_VARIABLE_REVISION_ASSIGNEE);
+        taskService.removeVariableLocal(task.getId(), BpmnVariableConstants.TASK_VARIABLE_REVISION_TARGET_NODE);
+        commentService.createComment(task.getId(), task.getProcessInstanceId(), BpmCommentTypeEnum.RESUBMIT);
+    }
+
+    private void collectFormFields(com.fasterxml.jackson.databind.JsonNode node, Set<String> fields) {
+        if (node == null) {
+            return;
+        }
+        if (node.isObject() && node.hasNonNull("field")) {
+            fields.add(node.get("field").asText());
+        }
+        if (node.isContainerNode()) {
+            node.elements().forEachRemaining(child -> collectFormFields(child, fields));
+        }
     }
 
     /**
@@ -1754,6 +1859,12 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
             // 情况二：自动同意
             if (Objects.equals(handlerType, BpmUserTaskTimeoutHandlerTypeEnum.APPROVE.getType())) {
+                if (Objects.equals(getTask(task.getId()).getTaskLocalVariables().get(BpmnVariableConstants.TASK_VARIABLE_STATUS),
+                        BpmTaskStatusEnum.WAIT_REVISION.getStatus())) {
+                    updateTaskStatus(task.getId(), BpmTaskStatusEnum.RUNNING.getStatus());
+                    taskService.removeVariableLocal(task.getId(), BpmnVariableConstants.TASK_VARIABLE_REVISION_ASSIGNEE);
+                    taskService.removeVariableLocal(task.getId(), BpmnVariableConstants.TASK_VARIABLE_REVISION_TARGET_NODE);
+                }
                 approveTask(Long.parseLong(task.getAssignee()),
                         new BpmTaskApproveReqVO().setId(task.getId()).setReason(BpmReasonEnum.TIMEOUT_APPROVE.getReason()));
                 return;
@@ -1761,6 +1872,12 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
             // 情况三：自动拒绝
             if (Objects.equals(handlerType, BpmUserTaskTimeoutHandlerTypeEnum.REJECT.getType())) {
+                if (Objects.equals(getTask(task.getId()).getTaskLocalVariables().get(BpmnVariableConstants.TASK_VARIABLE_STATUS),
+                        BpmTaskStatusEnum.WAIT_REVISION.getStatus())) {
+                    updateTaskStatus(task.getId(), BpmTaskStatusEnum.RUNNING.getStatus());
+                    taskService.removeVariableLocal(task.getId(), BpmnVariableConstants.TASK_VARIABLE_REVISION_ASSIGNEE);
+                    taskService.removeVariableLocal(task.getId(), BpmnVariableConstants.TASK_VARIABLE_REVISION_TARGET_NODE);
+                }
                 rejectTask(Long.parseLong(task.getAssignee()),
                         new BpmTaskRejectReqVO().setId(task.getId()).setReason(BpmReasonEnum.REJECT_TASK.getReason()));
             }

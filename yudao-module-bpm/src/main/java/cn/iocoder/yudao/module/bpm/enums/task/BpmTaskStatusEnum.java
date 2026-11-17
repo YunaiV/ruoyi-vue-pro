@@ -28,6 +28,11 @@ public enum BpmTaskStatusEnum implements ArrayValuable<Integer> {
     RETURN(5, "已退回"),
 
     /**
+     * 用于退回后审批配置为 【从当前节点审批】的情况
+     */
+    WAIT_REVISION(8, "已退回，等待处理人修改"),
+
+    /**
      * 使用场景：
      * 1. 任务被向后【加签】时，它在审批通过后，会变成 APPROVING 这个状态，然后等到【加签】出来的任务都被审批后，才会变成 APPROVE 审批通过
      */

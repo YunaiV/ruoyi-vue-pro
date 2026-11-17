@@ -258,6 +258,10 @@ public interface BpmTaskService {
      */
     void returnTask(Long userId, BpmTaskReturnReqVO reqVO);
 
+    List<Task> getRevisionTasks(Long userId);
+
+    void resubmitTask(Long userId, BpmTaskResubmitReqVO reqVO);
+
     /**
      * 将指定任务委派给其他人处理，等接收人处理后再回到原审批人手中审批
      *

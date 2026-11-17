@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn" targetNamespace="http://www.yudao.iocoder.cn/bpm">
+    <process id="revisionHistory" name="退回历史节点" isExecutable="true">
+        <startEvent id="start"/>
+        <sequenceFlow id="s1" sourceRef="start" targetRef="StartUserNode"/>
+        <userTask id="StartUserNode" name="发起人"><extensionElements><flowable:candidateStrategy>30</flowable:candidateStrategy></extensionElements></userTask>
+        <sequenceFlow id="s2" sourceRef="StartUserNode" targetRef="previous"/>
+        <userTask id="previous" name="历史审批"><extensionElements><flowable:candidateStrategy>30</flowable:candidateStrategy></extensionElements></userTask>
+        <sequenceFlow id="s3" sourceRef="previous" targetRef="current"/>
+        <userTask id="current" name="当前审批"><extensionElements><flowable:candidateStrategy>30</flowable:candidateStrategy><flowable:returnApproveMode>2</flowable:returnApproveMode></extensionElements></userTask>
+        <sequenceFlow id="s4" sourceRef="current" targetRef="end"/>
+        <endEvent id="end"/>
+    </process>
+</definitions>

@@ -79,6 +79,10 @@ public class BpmSimpleModelNodeVO {
      */
     private RejectHandler rejectHandler;
 
+    @Schema(description = "退回到当前审批节点后的审批方式", example = "1")
+    @InEnum(BpmReturnApproveModeEnum.class)
+    private Integer returnApproveMode;
+
     /**
      * 审批节点超时处理
      */

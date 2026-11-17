@@ -100,6 +100,17 @@ public class BpmnVariableConstants {
      * @see org.flowable.task.api.Task#getTaskLocalVariables()
      */
     public static final String TASK_VARIABLE_REASON = "TASK_REASON";
+
+    /**
+     * 任务局部变量 - 退回修改的处理人编号
+     */
+    public static final String TASK_VARIABLE_REVISION_ASSIGNEE = "REVISION_ASSIGNEE";
+
+    /**
+     * 任务局部变量 - 退回修改的目标节点编号
+     */
+    public static final String TASK_VARIABLE_REVISION_TARGET_NODE = "REVISION_TARGET_NODE";
+
     /**
      * 任务变量 - 签名图片 URL
      */

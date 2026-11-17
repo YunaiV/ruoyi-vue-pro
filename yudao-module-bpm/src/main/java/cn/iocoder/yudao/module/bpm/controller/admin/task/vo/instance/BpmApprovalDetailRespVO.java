@@ -98,6 +98,18 @@ public class BpmApprovalDetailRespVO {
         @Schema(description = "任务分配人", example = "2048")
         private UserSimpleBaseVO assigneeUser;
 
+        @Schema(description = "退回修改的目标节点编号")
+        private String revisionTargetNode;
+
+        @Schema(description = "退回修改的目标节点名称")
+        private String revisionTargetNodeName;
+
+        @JsonIgnore
+        private Long revisionAssignee;
+
+        @Schema(description = "退回修改的处理人")
+        private UserSimpleBaseVO revisionAssigneeUser;
+
         @Schema(description = "任务状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
         private Integer status;  // 参见 BpmTaskStatusEnum 枚举
 

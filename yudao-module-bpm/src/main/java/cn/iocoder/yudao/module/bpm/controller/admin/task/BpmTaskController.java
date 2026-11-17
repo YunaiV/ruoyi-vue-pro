@@ -42,6 +42,8 @@ import java.util.stream.Stream;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.getLoginUserId;
+import static cn.iocoder.yudao.module.bpm.enums.task.BpmTaskStatusEnum.WAIT_REVISION;
+import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants.TASK_VARIABLE_REASON;
 
 @Tag(name = "管理后台 - 流程任务实例")
 @RestController
@@ -184,6 +186,25 @@ public class BpmTaskController {
     @PreAuthorize("@ss.hasPermission('bpm:task:update')")
     public CommonResult<Boolean> returnTask(@Valid @RequestBody BpmTaskReturnReqVO reqVO) {
         taskService.returnTask(getLoginUserId(), reqVO);
+        return success(true);
+    }
+
+    @GetMapping("/revision-list")
+    @Operation(summary = "获取当前用户待修改的任务")
+    @PreAuthorize("@ss.hasPermission('bpm:process-instance:query')")
+    public CommonResult<List<BpmTaskRespVO>> getRevisionList() {
+        return success(convertList(taskService.getRevisionTasks(getLoginUserId()), task ->
+                new BpmTaskRespVO().setId(task.getId()).setName(task.getName())
+                        .setTaskDefinitionKey(task.getTaskDefinitionKey()).setProcessInstanceId(task.getProcessInstanceId())
+                        .setStatus(WAIT_REVISION.getStatus())
+                        .setReason((String) task.getTaskLocalVariables().get(TASK_VARIABLE_REASON))));
+    }
+
+    @PutMapping("/resubmit")
+    @Operation(summary = "退回修改后重新提交")
+    @PreAuthorize("@ss.hasPermission('bpm:process-instance:query')")
+    public CommonResult<Boolean> resubmit(@Valid @RequestBody BpmTaskResubmitReqVO reqVO) {
+        taskService.resubmitTask(getLoginUserId(), reqVO);
         return success(true);
     }
 
