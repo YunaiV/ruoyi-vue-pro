@@ -189,15 +189,29 @@ public class BpmTaskController {
         return success(true);
     }
 
-    @GetMapping("/revision-list")
+    @GetMapping("/revision-page")
     @Operation(summary = "获取当前用户待修改的任务")
     @PreAuthorize("@ss.hasPermission('bpm:process-instance:query')")
-    public CommonResult<List<BpmTaskRespVO>> getRevisionList() {
-        return success(convertList(taskService.getRevisionTasks(getLoginUserId()), task ->
-                new BpmTaskRespVO().setId(task.getId()).setName(task.getName())
-                        .setTaskDefinitionKey(task.getTaskDefinitionKey()).setProcessInstanceId(task.getProcessInstanceId())
-                        .setStatus(WAIT_REVISION.getStatus())
-                        .setReason((String) task.getTaskLocalVariables().get(TASK_VARIABLE_REASON))));
+    public CommonResult<PageResult<BpmTaskRespVO>> getRevisionTaskPage(@Valid BpmTaskPageReqVO pageVO) {
+        PageResult<Task> pageResult = taskService.getRevisionTaskPage(getLoginUserId(), pageVO);
+        if (CollUtil.isEmpty(pageResult.getList())) {
+            return success(PageResult.empty());
+        }
+        Map<String, ProcessInstance> processInstanceMap = processInstanceService.getProcessInstanceMap(
+                convertSet(pageResult.getList(), Task::getProcessInstanceId));
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
+                convertSet(processInstanceMap.values(), instance -> Long.valueOf(instance.getStartUserId())));
+        Map<String, BpmProcessDefinitionInfoDO> processDefinitionInfoMap = processDefinitionService.getProcessDefinitionInfoMap(
+                convertSet(pageResult.getList(), Task::getProcessDefinitionId));
+        PageResult<BpmTaskRespVO> result = BpmTaskConvert.INSTANCE.buildTodoTaskPage(
+                pageResult, processInstanceMap, userMap, processDefinitionInfoMap);
+        Map<String, Task> taskMap = convertMap(pageResult.getList(), Task::getId);
+        result.getList().forEach(task -> {
+            Task source = taskMap.get(task.getId());
+            task.setStatus(WAIT_REVISION.getStatus());
+            task.setReason((String) source.getTaskLocalVariables().get(TASK_VARIABLE_REASON));
+        });
+        return success(result);
     }
 
     @PutMapping("/resubmit")

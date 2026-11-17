@@ -1029,6 +1029,19 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     }
 
     @Override
+    public PageResult<Task> getRevisionTaskPage(Long userId, BpmTaskPageReqVO pageVO) {
+        TaskQuery query = taskService.createTaskQuery().taskTenantId(FlowableUtils.getTenantId()).active()
+                .taskVariableValueEquals(BpmnVariableConstants.TASK_VARIABLE_REVISION_ASSIGNEE, String.valueOf(userId))
+                .taskVariableValueEquals(BpmnVariableConstants.TASK_VARIABLE_STATUS, BpmTaskStatusEnum.WAIT_REVISION.getStatus())
+                .includeTaskLocalVariables().includeProcessVariables().orderByTaskCreateTime().desc();
+        long count = query.count();
+        if (count == 0) {
+            return PageResult.empty();
+        }
+        return new PageResult<>(query.listPage(PageUtils.getStart(pageVO), pageVO.getPageSize()), count);
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public void resubmitTask(Long userId, BpmTaskResubmitReqVO reqVO) {
         Task task = validateTaskExists(reqVO.getTaskId());

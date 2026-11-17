@@ -260,6 +260,8 @@ public interface BpmTaskService {
 
     List<Task> getRevisionTasks(Long userId);
 
+    PageResult<Task> getRevisionTaskPage(Long userId, BpmTaskPageReqVO pageVO);
+
     void resubmitTask(Long userId, BpmTaskResubmitReqVO reqVO);
 
     /**
