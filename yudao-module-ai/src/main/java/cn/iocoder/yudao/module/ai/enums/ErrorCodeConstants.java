@@ -177,5 +177,24 @@ public interface ErrorCodeConstants {
     ErrorCode DRAMA_SELECTED_INDEX_INVALID = new ErrorCode(1_040_018_018, "选用的候选图不存在");
     ErrorCode DRAMA_TASK_RESUBMIT_NO_MODEL = new ErrorCode(1_040_018_019, "找不到上次使用的模型，请用户在工作台重新生成");
     ErrorCode DRAMA_TASK_SYNC_FAIL = new ErrorCode(1_040_018_020, "同步状态失败：{}");
+    ErrorCode DRAMA_CHAT_RUNNING = new ErrorCode(1_040_018_021, "该项目正在{}，请等待完成后再试");
+    ErrorCode DRAMA_VISUAL_ASSET_NO_PREVIOUS = new ErrorCode(1_040_018_022, "没有可撤销的上一张图片");
+    ErrorCode DRAMA_PREVIOUS_STORYBOARD_NOT_EXISTS = new ErrorCode(1_040_018_023, "没有上一个镜头，或上一个镜头的视频未完成");
+    ErrorCode DRAMA_FFMPEG_FAIL = new ErrorCode(1_040_018_024, "{}失败：{}");
+    ErrorCode DRAMA_MATERIAL_EMPTY = new ErrorCode(1_040_018_025, "请先上传素材图片");
+    ErrorCode DRAMA_FIRST_FRAME_EMPTY = new ErrorCode(1_040_018_026, "当前没有关键帧，不能修正构图");
+    ErrorCode DRAMA_SCRIPT_CHANGED = new ErrorCode(1_040_018_027, "剧本已修改，请重新分析资产和生成分镜后再生成");
+    ErrorCode DRAMA_CANVAS_REVISION_CONFLICT = new ErrorCode(1_040_018_028, "画布已在另一窗口更新，请重新加载后继续编辑");
+    ErrorCode DRAMA_CANVAS_INVALID = new ErrorCode(1_040_018_029, "画布无效：{}");
+    ErrorCode DRAMA_DIRECTOR_REVISION_CONFLICT = new ErrorCode(1_040_018_030, "导演工程已在另一窗口更新，请先导出备份，再重新加载");
+    ErrorCode DRAMA_DIRECTOR_INVALID = new ErrorCode(1_040_018_031, "导演工程无效：{}");
+    ErrorCode DRAMA_MOTION_REFERENCE_NOT_EXISTS = new ErrorCode(1_040_018_032, "动作参考不存在");
+    ErrorCode DRAMA_MOTION_REFERENCE_INVALID = new ErrorCode(1_040_018_033, "动作参考视频不符合要求：{}");
+    ErrorCode DRAMA_VIDEO_SUBMISSION_NOT_EXISTS = new ErrorCode(1_040_018_034, "视频提交记录不存在");
+    ErrorCode DRAMA_VIDEO_SUBMISSION_PARAMS_CHANGED = new ErrorCode(1_040_018_035, "该请求编号已用于不同的视频参数，请重新提交");
+    ErrorCode DRAMA_VIDEO_SUBMISSION_NOT_UNKNOWN = new ErrorCode(1_040_018_036, "只有提交结果未知、且仍是镜头当前提交的记录才能处理");
+    ErrorCode DRAMA_VIDEO_SUBMISSION_NO_VIDEO = new ErrorCode(1_040_018_037, "该提交没有可使用的视频");
+    ErrorCode DRAMA_MUSIC_NOT_READY = new ErrorCode(1_040_018_038, "AI 音乐不存在或未生成完成");
+    ErrorCode DRAMA_STORYBOARD_EMPTY = new ErrorCode(1_040_018_039, "当前剧本还没有分镜，请先拆分分镜");
 
 }

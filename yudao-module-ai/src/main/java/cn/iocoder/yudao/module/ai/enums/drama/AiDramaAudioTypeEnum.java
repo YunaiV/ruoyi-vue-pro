@@ -9,8 +9,6 @@ import java.util.Arrays;
 /**
  * AI 短剧音频类型的枚举
  *
- * 角色样音的「选用」没有单独字段，用类型区分：同一角色最多一条 {@link #SAMPLE_SELECTED}，其余为 {@link #SAMPLE}
- *
  * @author 芋道源码
  */
 @AllArgsConstructor
@@ -18,8 +16,10 @@ import java.util.Arrays;
 public enum AiDramaAudioTypeEnum implements ArrayValuable<Integer> {
 
     SAMPLE(1, "角色样音"),
-    SAMPLE_SELECTED(2, "选用样音"),
-    NARRATION(3, "旁白");
+    NARRATION(2, "旁白"),
+    DIALOGUE(3, "对白"),
+    BGM(4, "配乐"),
+    REFERENCE(5, "参考音频");
 
     public static final Integer[] ARRAYS = Arrays.stream(values()).map(AiDramaAudioTypeEnum::getType).toArray(Integer[]::new);
 

@@ -5,13 +5,8 @@ import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
-import java.util.List;
+import cn.iocoder.yudao.module.ai.enums.drama.AiDramaScriptCreationModeEnum;
+import cn.iocoder.yudao.module.ai.enums.drama.AiDramaScriptSourceEnum;
 
 /**
  * AI 短剧剧本 DO
@@ -20,7 +15,7 @@ import java.util.List;
  *
  * @author 芋道源码
  */
-@TableName(value = "ai_drama_script", autoResultMap = true)
+@TableName("ai_drama_script")
 @KeySequence("ai_drama_script_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 public class AiDramaScriptDO extends BaseDO {
@@ -53,29 +48,28 @@ public class AiDramaScriptDO extends BaseDO {
      */
     private String content;
     /**
-     * 打磨意见与修改记录
+     * 剧本来源
+     * <p>
+     * 枚举 {@link AiDramaScriptSourceEnum}
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
-    private List<RevisionNote> revisionNotes;
-
+    private Integer source;
     /**
-     * 打磨意见
+     * 创作模式：生成、打磨剧本时的创作方式
+     * <p>
+     * 枚举 {@link AiDramaScriptCreationModeEnum}
      */
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class RevisionNote {
-
-        /**
-         * 意见
-         */
-        private String note;
-        // DONE @AI：localdatetime 把？！（已改为 LocalDateTime；JSON 里存毫秒时间戳，历史的 yyyy-MM-dd HH:mm:ss 字符串也能读取）
-        /**
-         * 时间
-         */
-        private LocalDateTime time;
-
-    }
+    private Integer creationMode;
+    /**
+     * 创作资料：生成、打磨剧本时参考的原始资料
+     */
+    private String sourceMaterial;
+    /**
+     * 世界观设定：生成、打磨剧本时使用
+     */
+    private String worldbuilding;
+    /**
+     * 修订要求：本版剧本当前的制作与修订要求，修改时整体替换；之前的要求保留在旧版本剧本中
+     */
+    private String revisionNote;
 
 }

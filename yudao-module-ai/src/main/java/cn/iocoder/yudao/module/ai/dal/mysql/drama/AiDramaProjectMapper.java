@@ -11,11 +11,14 @@ import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.task.AiDramaTaskPage
 import cn.iocoder.yudao.module.ai.dal.dataobject.drama.AiDramaProjectDO;
 import cn.iocoder.yudao.module.ai.enums.drama.AiDramaDurationTypeEnum;
 import cn.iocoder.yudao.module.ai.enums.drama.AiDramaStatusEnum;
+import cn.iocoder.yudao.module.ai.enums.drama.AiDramaStyleEnum;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -34,7 +37,7 @@ public interface AiDramaProjectMapper extends BaseMapperX<AiDramaProjectDO> {
                 .eqIfPresent(AiDramaProjectDO::getStatus, reqVO.getStatus())
                 .eqIfPresent(AiDramaProjectDO::getComposeStatus, reqVO.getComposeStatus())
                 .eqIfPresent(AiDramaProjectDO::getPublicStatus, reqVO.getPublicStatus())
-                .eqIfPresent(AiDramaProjectDO::getAspectRatio, reqVO.getAspectRatio())
+                .eqIfPresent(AiDramaProjectDO::getComposeAspectRatio, reqVO.getAspectRatio())
                 .betweenIfPresent(AiDramaProjectDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(AiDramaProjectDO::getId));
     }
@@ -59,8 +62,12 @@ public interface AiDramaProjectMapper extends BaseMapperX<AiDramaProjectDO> {
                 .eq(AiDramaProjectDO::getComposeStatus, AiDramaStatusEnum.SUCCESS.getStatus())
                 .eqIfPresent(AiDramaProjectDO::getComposeAspectRatio, reqVO.getAspectRatio());
         if (StrUtil.isNotBlank(reqVO.getKeyword())) {
+            // 画风是枚举：按名称匹配出编号
+            List<Integer> styles = Arrays.stream(AiDramaStyleEnum.values())
+                    .filter(style -> StrUtil.contains(style.getName(), reqVO.getKeyword()))
+                    .map(AiDramaStyleEnum::getStyle).toList();
             query.and(w -> w.like(AiDramaProjectDO::getName, reqVO.getKeyword())
-                    .or().like(AiDramaProjectDO::getStyle, reqVO.getKeyword()));
+                    .or(CollUtil.isNotEmpty(styles), o -> o.in(AiDramaProjectDO::getStyle, styles)));
         }
         AiDramaDurationTypeEnum durationType = AiDramaDurationTypeEnum.of(reqVO.getDurationType());
         if (durationType != null) {
@@ -69,6 +76,16 @@ public interface AiDramaProjectMapper extends BaseMapperX<AiDramaProjectDO> {
         }
         return selectPage(reqVO, query.orderByDesc(AiDramaProjectDO::getUpdateTime)
                 .orderByDesc(AiDramaProjectDO::getId));
+    }
+
+    /**
+     * 编辑保存：美学、导演技能为空时清空（updateById 会忽略空值）
+     */
+    default void updateForSave(AiDramaProjectDO updateObj) {
+        update(updateObj, new LambdaUpdateWrapper<AiDramaProjectDO>()
+                .eq(AiDramaProjectDO::getId, updateObj.getId())
+                .set(updateObj.getAestheticSkillId() == null, AiDramaProjectDO::getAestheticSkillId, null)
+                .set(updateObj.getDirectorSkillId() == null, AiDramaProjectDO::getDirectorSkillId, null));
     }
 
     default List<AiDramaProjectDO> selectListByUserId(Long userId) {
@@ -98,7 +115,6 @@ public interface AiDramaProjectMapper extends BaseMapperX<AiDramaProjectDO> {
     /**
      * 按合成任务的条件更新：只更新状态未变、且仍是同一合成任务的项目（被标记失败后又重新合成时，任务编号已变）；任务编号为空时匹配为空的
      */
-    // DONE @AI：是不是按照 id + status 就够了？没必要？whereComposeTaskId（评估后保留：管理员标记失败后再重新合成，状态会回到合成中，只有任务编号能区分旧合成，旧合成上传完成后不能把新一轮写成成功，见 AiDramaProjectServiceImplTest#testExecuteCompose_resubmittedDuringUpload；任务编号为空时按为空匹配，不放宽为只按状态）
     default int updateByIdAndComposeStatusAndTaskId(Long id, Integer whereComposeStatus, String whereComposeTaskId, AiDramaProjectDO updateObj) {
         return update(updateObj, new LambdaUpdateWrapper<AiDramaProjectDO>()
                 .eq(AiDramaProjectDO::getId, id)

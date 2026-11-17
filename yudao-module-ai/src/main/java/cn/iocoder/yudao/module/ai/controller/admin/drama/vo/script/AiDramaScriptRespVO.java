@@ -1,15 +1,10 @@
 package cn.iocoder.yudao.module.ai.controller.admin.drama.vo.script;
 
-import cn.iocoder.yudao.module.ai.dal.dataobject.drama.AiDramaScriptDO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
-/**
- * @author 芋道源码
- */
 @Schema(description = "管理后台 - AI 短剧剧本 Response VO")
 @Data
 public class AiDramaScriptRespVO {
@@ -32,8 +27,20 @@ public class AiDramaScriptRespVO {
     @Schema(description = "剧本正文", example = "……")
     private String content;
 
-    @Schema(description = "打磨意见与修改记录")
-    private List<AiDramaScriptDO.RevisionNote> revisionNotes;
+    @Schema(description = "来源", example = "2")
+    private Integer source;
+
+    @Schema(description = "创作模式", example = "1")
+    private Integer creationMode;
+
+    @Schema(description = "创作资料", example = "……")
+    private String sourceMaterial;
+
+    @Schema(description = "世界观设定", example = "……")
+    private String worldbuilding;
+
+    @Schema(description = "修订要求", example = "结尾加一个反转")
+    private String revisionNote;
 
     @Schema(description = "创建时间")
     private LocalDateTime createTime;

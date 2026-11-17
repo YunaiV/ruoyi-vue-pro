@@ -27,8 +27,56 @@ public interface AiDramaVisualAssetMapper extends BaseMapperX<AiDramaVisualAsset
                 .orderByAsc(AiDramaVisualAssetDO::getId));
     }
 
+    /**
+     * 获得项目的当前资产：不含历史版本
+     */
+    default List<AiDramaVisualAssetDO> selectListByProjectIdAndKindAndParentIdIsNull(Long projectId, Integer kind) {
+        return selectList(new LambdaQueryWrapperX<AiDramaVisualAssetDO>()
+                .eq(AiDramaVisualAssetDO::getProjectId, projectId)
+                .eq(AiDramaVisualAssetDO::getKind, kind)
+                .isNull(AiDramaVisualAssetDO::getParentId)
+                .orderByAsc(AiDramaVisualAssetDO::getId));
+    }
+
+    /**
+     * 获得镜头的当前关键帧：不含历史版本
+     */
+    default AiDramaVisualAssetDO selectByStoryboardIdAndKindAndParentIdIsNull(Long storyboardId, Integer kind) {
+        return selectFirstOne(new LambdaQueryWrapperX<AiDramaVisualAssetDO>()
+                .eq(AiDramaVisualAssetDO::getStoryboardId, storyboardId)
+                .eq(AiDramaVisualAssetDO::getKind, kind)
+                .isNull(AiDramaVisualAssetDO::getParentId)
+                .orderByDesc(AiDramaVisualAssetDO::getId));
+    }
+
+    default List<AiDramaVisualAssetDO> selectListByStoryboardIdsAndKindAndParentIdIsNull(Collection<Long> storyboardIds,
+                                                                                         Integer kind) {
+        return selectList(new LambdaQueryWrapperX<AiDramaVisualAssetDO>()
+                .in(AiDramaVisualAssetDO::getStoryboardId, storyboardIds)
+                .eq(AiDramaVisualAssetDO::getKind, kind)
+                .isNull(AiDramaVisualAssetDO::getParentId));
+    }
+
+    /**
+     * 获得最近一个历史版本
+     */
+    default AiDramaVisualAssetDO selectLatestByParentId(Long parentId) {
+        return selectFirstOne(new LambdaQueryWrapperX<AiDramaVisualAssetDO>()
+                .eq(AiDramaVisualAssetDO::getParentId, parentId)
+                .orderByDesc(AiDramaVisualAssetDO::getId));
+    }
+
     default int deleteByProjectId(Long projectId) {
         return delete(AiDramaVisualAssetDO::getProjectId, projectId);
+    }
+
+    default int deleteByParentId(Long parentId) {
+        return delete(AiDramaVisualAssetDO::getParentId, parentId);
+    }
+
+    default int deleteByStoryboardIds(Collection<Long> storyboardIds) {
+        return delete(new LambdaQueryWrapperX<AiDramaVisualAssetDO>()
+                .in(AiDramaVisualAssetDO::getStoryboardId, storyboardIds));
     }
 
     /**
@@ -44,6 +92,7 @@ public interface AiDramaVisualAssetMapper extends BaseMapperX<AiDramaVisualAsset
                 .eqIfPresent(AiDramaVisualAssetDO::getModelId, reqVO.getModelId())
                 .betweenIfPresent(AiDramaVisualAssetDO::getUpdateTime, reqVO.getUpdateTime())
                 .isNotNull(AiDramaVisualAssetDO::getStatus)
+                .isNull(AiDramaVisualAssetDO::getParentId)
                 .orderByDesc(AiDramaVisualAssetDO::getUpdateTime)
                 .orderByDesc(AiDramaVisualAssetDO::getId));
     }
@@ -63,6 +112,21 @@ public interface AiDramaVisualAssetMapper extends BaseMapperX<AiDramaVisualAsset
                 .eq(AiDramaVisualAssetDO::getStatus, whereStatus)
                 .eq(whereTaskId != null, AiDramaVisualAssetDO::getTaskId, whereTaskId)
                 .isNull(whereTaskId == null, AiDramaVisualAssetDO::getTaskId));
+    }
+
+    /**
+     * 撤销时恢复版本：以状态、任务编号为条件，期间重新出图时不覆盖；状态为空时匹配为空的；失败原因一并清空
+     */
+    default int updateVersionByIdAndStatusAndTaskId(Long id, Integer whereStatus, String whereTaskId,
+                                                    AiDramaVisualAssetDO updateObj) {
+        return update(updateObj, new LambdaUpdateWrapper<AiDramaVisualAssetDO>()
+                .eq(AiDramaVisualAssetDO::getId, id)
+                .eq(whereStatus != null, AiDramaVisualAssetDO::getStatus, whereStatus)
+                .isNull(whereStatus == null, AiDramaVisualAssetDO::getStatus)
+                .eq(whereTaskId != null, AiDramaVisualAssetDO::getTaskId, whereTaskId)
+                .isNull(whereTaskId == null, AiDramaVisualAssetDO::getTaskId)
+                .set(updateObj.getImageUrl() == null, AiDramaVisualAssetDO::getImageUrl, null)
+                .set(updateObj.getErrorMessage() == null, AiDramaVisualAssetDO::getErrorMessage, null));
     }
 
 }

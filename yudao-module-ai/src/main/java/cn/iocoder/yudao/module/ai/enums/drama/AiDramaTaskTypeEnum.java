@@ -17,7 +17,6 @@ import java.util.Objects;
 @Getter
 public enum AiDramaTaskTypeEnum implements ArrayValuable<Integer> {
 
-    // TODO DONE @AI：按照项目的风格，应该是 int 噢；（改为 1-5，字典 ai_drama_task_type 同步；任务类型不入库，只用于接口参数）
     APPEARANCE(1, "角色形象"),
     LOCATION(2, "场景图"),
     VISUAL_ASSET(3, "视觉资产"),

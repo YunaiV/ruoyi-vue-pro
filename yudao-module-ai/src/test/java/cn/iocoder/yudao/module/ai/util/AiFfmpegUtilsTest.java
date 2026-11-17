@@ -3,9 +3,7 @@ package cn.iocoder.yudao.module.ai.util;
 import cn.iocoder.yudao.module.ai.enums.drama.AiDramaTransitionTypeEnum;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -32,7 +30,7 @@ public class AiFfmpegUtilsTest {
                 new AiFfmpegUtils.Clip(null, 5, true), new AiFfmpegUtils.Clip(null, 4.5, false));
 
         String filter = AiFfmpegUtils.buildFilterComplex(clips, 720, 1280, AiDramaTransitionTypeEnum.NONE,
-                0.5, false, null, null);
+                0.5, false, null, null, null);
 
         // 画面统一到画布；有音轨的补齐截断，没有音轨的补静音
         assertTrue(filter.contains("[0:v]scale=720:1280:force_original_aspect_ratio=decrease,pad=720:1280"));
@@ -50,7 +48,7 @@ public class AiFfmpegUtilsTest {
                 new AiFfmpegUtils.Clip(null, 4, true), new AiFfmpegUtils.Clip(null, 6, true));
 
         String filter = AiFfmpegUtils.buildFilterComplex(clips, 720, 1280, AiDramaTransitionTypeEnum.FADE,
-                0.5, true, "/fonts/cjk.ttc", "/tmp/watermark.txt");
+                0.5, true, null, "/fonts/cjk.ttc", "/tmp/watermark.txt");
 
         // 转场：offset 为前面镜头时长之和减去已重叠的转场
         assertTrue(filter.contains("[v0][v1]xfade=transition=fadeblack:duration=0.5:offset=4.5[vx1]"));
@@ -66,12 +64,50 @@ public class AiFfmpegUtilsTest {
     }
 
     @Test
+    public void testBuildFilterComplex_music() {
+        List<AiFfmpegUtils.Clip> clips = Arrays.asList(new AiFfmpegUtils.Clip(null, 5, true),
+                new AiFfmpegUtils.Clip(null, 4, true), new AiFfmpegUtils.Clip(null, 6, true));
+        AiFfmpegUtils.MusicTrack track = new AiFfmpegUtils.MusicTrack();
+        track.setClipIndexes(new HashSet<>(Arrays.asList(1, 2)));
+        track.setVolume(0.2);
+        track.setStartOffset(3.0);
+
+        String filter = AiFfmpegUtils.buildFilterComplex(clips, 720, 1280, AiDramaTransitionTypeEnum.NONE,
+                0.5, false, Collections.singletonList(track), null, null);
+
+        // 第 2、3 个镜头连续使用，合并为 5 ~ 15 秒一段：从配乐第 3 秒开始，延迟到第 5 秒
+        assertTrue(filter.contains("[3:a]aformat=sample_fmts=fltp:sample_rates=44100:channel_layouts=stereo,"
+                + "atrim=start=3:duration=10,asetpts=PTS-STARTPTS,volume=0.2,"));
+        assertTrue(filter.contains("adelay=5000:all=1[m3]"));
+        // 按对白压低后，与原声混音
+        assertTrue(filter.contains("[m3]amix=inputs=1:normalize=0[music]"));
+        assertTrue(filter.contains("[ac]asplit=2[dialogue][side]"));
+        assertTrue(filter.contains("[music][side]sidechaincompress="));
+        assertTrue(filter.endsWith("[vc]null[vout];[amusic]anull[aout]"));
+    }
+
+    @Test
+    public void testBuildMusicRanges_transition() {
+        List<AiFfmpegUtils.Clip> clips = Arrays.asList(new AiFfmpegUtils.Clip(null, 5, true),
+                new AiFfmpegUtils.Clip(null, 4, true), new AiFfmpegUtils.Clip(null, 6, true));
+        AiFfmpegUtils.MusicTrack track = new AiFfmpegUtils.MusicTrack();
+        track.setClipIndexes(new HashSet<>(Arrays.asList(0, 2)));
+
+        List<double[]> ranges = AiFfmpegUtils.buildMusicRanges(clips, track, AiDramaTransitionTypeEnum.FADE, 0.5);
+
+        // 不连续的镜头分为两段；有转场时后一个镜头提前转场时长开始
+        assertEquals(2, ranges.size());
+        assertArrayEquals(new double[]{0, 5}, ranges.get(0), 0.001);
+        assertArrayEquals(new double[]{8, 14}, ranges.get(1), 0.001);
+    }
+
+    @Test
     public void testBuildFilterComplex_transitionTooLong() {
         List<AiFfmpegUtils.Clip> clips = Arrays.asList(
                 new AiFfmpegUtils.Clip(null, 5, true), new AiFfmpegUtils.Clip(null, 1, true));
 
         assertThrows(IllegalArgumentException.class, () -> AiFfmpegUtils.buildFilterComplex(clips, 720, 1280,
-                AiDramaTransitionTypeEnum.DISSOLVE, 1.0, false, null, null));
+                AiDramaTransitionTypeEnum.DISSOLVE, 1.0, false, null, null, null));
     }
 
     @Test
@@ -84,7 +120,7 @@ public class AiFfmpegUtilsTest {
                     new AiFfmpegUtils.Clip(null, 5, true), new AiFfmpegUtils.Clip(null, 4.5, true));
 
             String filter = AiFfmpegUtils.buildFilterComplex(clips, 720, 1280, AiDramaTransitionTypeEnum.FADE,
-                    0.5, false, null, null);
+                    0.5, false, null, null, null);
 
             assertTrue(filter.contains("atrim=0:4.5,"));
             assertTrue(filter.contains("[v0][v1]xfade=transition=fadeblack:duration=0.5:offset=4.5[vx1]"));

@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.project.AiDramaCompo
 import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.project.AiDramaProjectUpdatePublicReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.drama.AiDramaAudioDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.drama.AiDramaProjectDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.drama.AiDramaScriptDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.drama.AiDramaStoryboardDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.drama.AiDramaProjectMapper;
 import cn.iocoder.yudao.module.ai.enums.drama.AiDramaAudioTypeEnum;
@@ -61,6 +62,8 @@ public class AiDramaProjectServiceImplTest extends BaseMockitoUnitTest {
     private AiDramaAssetService assetService;
     @Mock
     private AiDramaStoryboardService storyboardService;
+    @Mock
+    private AiDramaCanvasService canvasService;
     @Mock
     private FileApi fileApi;
 
@@ -300,9 +303,19 @@ public class AiDramaProjectServiceImplTest extends BaseMockitoUnitTest {
                 DRAMA_COMPOSE_STORYBOARD_NOT_SUCCESS, "已完成的镜头不足 2 个");
     }
 
-    // ========== 合成：FFmpeg 命令的构建见 AiFfmpegUtilsTest ==========
+    @Test
+    public void testRecomposeProject_otherScriptVersion() {
+        when(projectMapper.selectById(PROJECT_ID)).thenReturn(project(USER_ID).setComposeStatus(AiDramaStatusEnum.FAIL.getStatus()));
+        when(scriptService.getScriptByProjectId(PROJECT_ID)).thenReturn(new AiDramaScriptDO().setId(2L).setProjectId(PROJECT_ID));
+        // 准备：2 个已完成的镜头，其中 1 个属于历史剧本版本
+        when(storyboardService.getStoryboardList(PROJECT_ID)).thenReturn(Arrays.asList(
+                storyboard(1L, AiDramaStatusEnum.SUCCESS.getStatus()).setScriptId(1L),
+                storyboard(2L, AiDramaStatusEnum.SUCCESS.getStatus()).setScriptId(2L)));
 
-    // DONE @AI：DramaComposer 融合掉，不用单独的类；单测也是；（已合并到 AiDramaProjectServiceImpl 与本单测，删除 AiDramaComposer、AiDramaComposerTest）
+        // 断言：只使用当前剧本版本的镜头，不足 2 个
+        assertServiceException(() -> projectService.recomposeProject(PROJECT_ID),
+                DRAMA_COMPOSE_STORYBOARD_NOT_SUCCESS, "已完成的镜头不足 2 个");
+    }
 
     // ========== 生成任务 ==========
 
@@ -354,18 +367,19 @@ public class AiDramaProjectServiceImplTest extends BaseMockitoUnitTest {
 
         projectService.deleteProject(PROJECT_ID);
 
-        // 断言：先删除资产、分镜、剧本，最后删除项目
-        InOrder inOrder = inOrder(assetService, storyboardService, scriptService, projectMapper);
+        // 断言：先删除资产、分镜、剧本、画布，最后删除项目
+        InOrder inOrder = inOrder(assetService, storyboardService, scriptService, canvasService, projectMapper);
         inOrder.verify(assetService).deleteAssetListByProjectId(PROJECT_ID);
         inOrder.verify(storyboardService).deleteStoryboardListByProjectId(PROJECT_ID);
         inOrder.verify(scriptService).deleteScriptByProjectId(PROJECT_ID);
+        inOrder.verify(canvasService).deleteCanvasByProjectId(PROJECT_ID);
         inOrder.verify(projectMapper).deleteById(PROJECT_ID);
     }
 
     // ========== 工具 ==========
 
     private static AiDramaProjectDO project(Long userId) {
-        return new AiDramaProjectDO().setId(PROJECT_ID).setUserId(userId).setName("末班地铁").setAspectRatio("9:16")
+        return new AiDramaProjectDO().setId(PROJECT_ID).setUserId(userId).setName("末班地铁").setComposeAspectRatio("9:16")
                 .setPublicStatus(false);
     }
 

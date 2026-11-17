@@ -12,12 +12,14 @@ import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.project.*;
 import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.task.AiDramaTaskPageReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.drama.AiDramaAudioDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.drama.AiDramaProjectDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.drama.AiDramaScriptDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.drama.AiDramaStoryboardDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.drama.AiDramaProjectMapper;
 import cn.iocoder.yudao.module.ai.enums.drama.AiDramaAspectRatioEnum;
 import cn.iocoder.yudao.module.ai.enums.drama.AiDramaAudioTypeEnum;
-import cn.iocoder.yudao.module.ai.enums.drama.AiDramaProjectStepEnum;
+import cn.iocoder.yudao.module.ai.enums.drama.AiDramaProjectStatusEnum;
 import cn.iocoder.yudao.module.ai.enums.drama.AiDramaStatusEnum;
+import cn.iocoder.yudao.module.ai.enums.drama.AiDramaStyleEnum;
 import cn.iocoder.yudao.module.ai.enums.drama.AiDramaTransitionTypeEnum;
 import cn.iocoder.yudao.module.ai.util.AiFfmpegUtils;
 import cn.iocoder.yudao.module.ai.util.AiFfmpegUtils.ComposeRequest;
@@ -51,7 +53,6 @@ import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.*;
 @Slf4j
 public class AiDramaProjectServiceImpl implements AiDramaProjectService {
 
-    // DONE @AI：如果有枚举，可以简化下；（新增 AiDramaAspectRatioEnum，默认画幅直接用 RATIO_9_16，合成请求的画幅也用它 @InEnum 校验）
     /**
      * 默认转场时长（秒）
      */
@@ -79,6 +80,9 @@ public class AiDramaProjectServiceImpl implements AiDramaProjectService {
     @Resource
     @Lazy // 延迟加载，避免循环依赖
     private AiDramaStoryboardService storyboardService;
+    @Resource
+    @Lazy // 延迟加载，避免循环依赖
+    private AiDramaCanvasService canvasService;
 
     @Resource
     private FileApi fileApi;
@@ -87,12 +91,13 @@ public class AiDramaProjectServiceImpl implements AiDramaProjectService {
 
     @Override
     public Long createProject(Long userId, AiDramaProjectSaveReqVO createReqVO) {
-        // 插入：画幅为空时使用默认，从想法步骤开始，默认不公开
+        // 插入：画幅为空时使用默认，状态为草稿，默认不公开；画风为空时随剧本基调
         AiDramaProjectDO project = BeanUtils.toBean(createReqVO, AiDramaProjectDO.class, o -> o.setId(null).setUserId(userId)
-                .setAspectRatio(StrUtil.blankToDefault(createReqVO.getAspectRatio(), AiDramaAspectRatioEnum.RATIO_9_16.getRatio()))
+                .setStyle(ObjUtil.defaultIfNull(createReqVO.getStyle(), AiDramaStyleEnum.SCRIPT_TONE.getStyle()))
+                .setComposeAspectRatio(StrUtil.blankToDefault(createReqVO.getComposeAspectRatio(), AiDramaAspectRatioEnum.RATIO_9_16.getRatio()))
                 .setComposeTransitionType(AiDramaTransitionTypeEnum.NONE.getType())
                 .setComposeTransitionDurationSeconds(DEFAULT_TRANSITION_DURATION)
-                .setStatus(AiDramaProjectStepEnum.IDEA.getStep()).setPublicStatus(false));
+                .setStatus(AiDramaProjectStatusEnum.DRAFT.getStatus()).setPublicStatus(false));
         projectMapper.insert(project);
         return project.getId();
     }
@@ -102,18 +107,15 @@ public class AiDramaProjectServiceImpl implements AiDramaProjectService {
         // 1. 校验存在，且属于该用户
         validateProjectMy(updateReqVO.getId(), userId);
 
-        // 2. 更新：画幅为空时使用默认
-        projectMapper.updateById(BeanUtils.toBean(updateReqVO, AiDramaProjectDO.class,
-                o -> o.setAspectRatio(StrUtil.blankToDefault(updateReqVO.getAspectRatio(), AiDramaAspectRatioEnum.RATIO_9_16.getRatio()))));
+        // 2. 更新：画幅为空时使用默认；分镜技能为空时按空数组保存（有序多选，清空即不使用）
+        projectMapper.updateForSave(BeanUtils.toBean(updateReqVO, AiDramaProjectDO.class, o -> o
+                .setComposeAspectRatio(StrUtil.blankToDefault(updateReqVO.getComposeAspectRatio(), AiDramaAspectRatioEnum.RATIO_9_16.getRatio()))
+                .setStoryboardSkillIds(ObjUtil.defaultIfNull(updateReqVO.getStoryboardSkillIds(), new ArrayList<>()))));
     }
 
     @Override
-    public void updateProjectStatusMy(Long userId, AiDramaProjectUpdateStatusReqVO updateReqVO) {
-        // 1. 校验存在，且属于该用户
-        validateProjectMy(updateReqVO.getId(), userId);
-
-        // 2. 更新当前步骤
-        projectMapper.updateById(new AiDramaProjectDO().setId(updateReqVO.getId()).setStatus(updateReqVO.getStatus()));
+    public void updateProjectStatus(Long id, Integer status) {
+        projectMapper.updateById(new AiDramaProjectDO().setId(id).setStatus(status));
     }
 
     @Override
@@ -166,13 +168,46 @@ public class AiDramaProjectServiceImpl implements AiDramaProjectService {
             narrationUrl = fileApi.presignGetUrlQuietly(narration.getFileUrl());
         }
 
-        // 2. 记录本次的转场设置，置为合成中；镜头选择、旁白、水印不保存
+        // 2. 记录本次的转场设置，置为合成中；镜头选择、旁白、水印不保存；配乐按项目音频的使用设置混入
         startCompose(project, new ComposeRequest()
                 .setVideoUrls(convertList(storyboards, storyboard -> fileApi.presignGetUrlQuietly(storyboard.getVideoUrl())))
                 .setAspectRatio(reqVO.getAspectRatio())
                 .setTransitionType(AiDramaTransitionTypeEnum.of(reqVO.getTransitionType()))
                 .setTransitionDuration(ObjUtil.defaultIfNull(reqVO.getTransitionDuration(), DEFAULT_TRANSITION_DURATION))
-                .setNarrationUrl(narrationUrl).setWatermarkText(StrUtil.trim(reqVO.getWatermarkText())));
+                .setNarrationUrl(narrationUrl).setWatermarkText(StrUtil.trim(reqVO.getWatermarkText()))
+                .setMusicTracks(buildMusicTracks(project.getId(), storyboards)));
+    }
+
+    /**
+     * 构建配乐：项目中设置了使用分镜的配乐，按本次合成的镜头换算为镜头下标；本次没有用到的不混入
+     *
+     * @param projectId 项目编号
+     * @param storyboards 本次合成的镜头，按播放顺序
+     * @return 配乐
+     */
+    private List<AiFfmpegUtils.MusicTrack> buildMusicTracks(Long projectId, List<AiDramaStoryboardDO> storyboards) {
+        List<AiFfmpegUtils.MusicTrack> tracks = new ArrayList<>();
+        for (AiDramaAudioDO audio : assetService.getAudioList(projectId)) {
+            // 1. 只取设置了使用分镜的配乐
+            if (ObjUtil.notEqual(audio.getType(), AiDramaAudioTypeEnum.BGM.getType()) || StrUtil.isEmpty(audio.getFileUrl())
+                    || CollUtil.isEmpty(audio.getStoryboardIds())) {
+                continue;
+            }
+            // 2. 换算为本次合成的镜头下标；本次没有用到的，不混入
+            Set<Integer> clipIndexes = new HashSet<>();
+            for (int i = 0; i < storyboards.size(); i++) {
+                if (audio.getStoryboardIds().contains(storyboards.get(i).getId())) {
+                    clipIndexes.add(i);
+                }
+            }
+            if (clipIndexes.isEmpty()) {
+                continue;
+            }
+            // 3. 构建配乐
+            tracks.add(new AiFfmpegUtils.MusicTrack().setUrl(fileApi.presignGetUrlQuietly(audio.getFileUrl()))
+                    .setClipIndexes(clipIndexes).setVolume(audio.getVolume()).setStartOffset(audio.getStartOffset()));
+        }
+        return tracks;
     }
 
     /**
@@ -187,7 +222,8 @@ public class AiDramaProjectServiceImpl implements AiDramaProjectService {
         projectMapper.updateById(new AiDramaProjectDO().setId(project.getId())
                 .setComposeTransitionType(request.getTransitionType().getType())
                 .setComposeTransitionDurationSeconds(request.getTransitionDuration())
-                .setComposeStatus(AiDramaStatusEnum.IN_PROGRESS.getStatus()).setComposeTaskId(taskId));
+                .setComposeStatus(AiDramaStatusEnum.IN_PROGRESS.getStatus()).setComposeTaskId(taskId)
+                .setComposeProgress(0));
 
         // 2. 异步执行合成：通过代理调用，使 @Async 生效
         getSelf().executeCompose(project.getId(), taskId, request);
@@ -213,7 +249,8 @@ public class AiDramaProjectServiceImpl implements AiDramaProjectService {
 
             // 3. 回写成功：记录成片实际使用的画幅、镜头数
             projectMapper.updateByIdAndComposeStatusAndTaskId(projectId, whereStatus, taskId, new AiDramaProjectDO()
-                    .setComposeStatus(AiDramaStatusEnum.SUCCESS.getStatus())
+                    .setComposeStatus(AiDramaStatusEnum.SUCCESS.getStatus()).setComposeProgress(100)
+                    .setComposeFinishTime(LocalDateTime.now())
                     .setComposeFileUrl(fileUrl).setComposeDuration(result.getDuration())
                     .setComposeAspectRatio(request.getAspectRatio()).setComposeStoryboardCount(request.getVideoUrls().size()));
         } catch (Exception e) {
@@ -317,12 +354,14 @@ public class AiDramaProjectServiceImpl implements AiDramaProjectService {
         // 1. 校验存在
         validateProjectExists(id);
 
-        // 2.1 删除资产：角色、角色形象、场景、视觉资产、音频
+        // 2.1 删除资产：角色、角色形象、场景、视觉资产、音频、动作参考
         assetService.deleteAssetListByProjectId(id);
-        // 2.2 删除分镜、剧本
+        // 2.2 删除分镜（含视频提交记录）、剧本
         storyboardService.deleteStoryboardListByProjectId(id);
         scriptService.deleteScriptByProjectId(id);
-        // 2.3 删除项目
+        // 2.3 删除画布、3D 导演工程
+        canvasService.deleteCanvasByProjectId(id);
+        // 2.4 删除项目
         projectMapper.deleteById(id);
     }
 
@@ -331,21 +370,25 @@ public class AiDramaProjectServiceImpl implements AiDramaProjectService {
         // 1.1 校验项目：合成中的不能重复提交
         AiDramaProjectDO project = validateProjectExists(id);
         validateComposeNotRunning(project);
-        // 1.2 使用全部已完成的镜头：至少 2 个
+        // 1.2 使用当前剧本版本全部已完成的镜头：至少 2 个
+        AiDramaScriptDO script = scriptService.getScriptByProjectId(id);
+        Long scriptId = script != null ? script.getId() : null;
         List<AiDramaStoryboardDO> storyboards = filterList(storyboardService.getStoryboardList(id),
-                storyboard -> Objects.equals(storyboard.getVideoStatus(), AiDramaStatusEnum.SUCCESS.getStatus())
+                storyboard -> Objects.equals(storyboard.getScriptId(), scriptId)
+                        && Objects.equals(storyboard.getVideoStatus(), AiDramaStatusEnum.SUCCESS.getStatus())
                         && StrUtil.isNotEmpty(storyboard.getVideoUrl()));
         if (storyboards.size() < 2) {
             throw exception(DRAMA_COMPOSE_STORYBOARD_NOT_SUCCESS, "已完成的镜头不足 2 个");
         }
 
-        // 2. 使用项目当前的画幅与转场合成；不含旁白、水印
+        // 2. 使用项目当前的画幅、转场与配乐合成；不含旁白、水印
         startCompose(project, new ComposeRequest()
                 .setVideoUrls(convertList(storyboards, storyboard -> fileApi.presignGetUrlQuietly(storyboard.getVideoUrl())))
-                .setAspectRatio(StrUtil.blankToDefault(project.getAspectRatio(), AiDramaAspectRatioEnum.RATIO_9_16.getRatio()))
+                .setAspectRatio(StrUtil.blankToDefault(project.getComposeAspectRatio(), AiDramaAspectRatioEnum.RATIO_9_16.getRatio()))
                 .setTransitionType(AiDramaTransitionTypeEnum.of(project.getComposeTransitionType()))
                 .setTransitionDuration(ObjUtil.defaultIfNull(project.getComposeTransitionDurationSeconds(),
-                        DEFAULT_TRANSITION_DURATION)));
+                        DEFAULT_TRANSITION_DURATION))
+                .setMusicTracks(buildMusicTracks(id, storyboards)));
     }
 
     // ========== 生成任务 ==========

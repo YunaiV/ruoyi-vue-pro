@@ -7,21 +7,32 @@ import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.asset.character.AiDramaAppearanceSaveReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.asset.audio.AiDramaAudioCreateReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.asset.audio.AiDramaAudioGenerateReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.asset.audio.AiDramaAudioMusicReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.asset.AiDramaImageGenerateReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.task.AiDramaTaskPageReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.drama.*;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiApiKeyDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiModelDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.music.AiMusicDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.skill.AiSkillDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.skill.AiSkillFileDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.drama.*;
 import cn.iocoder.yudao.module.ai.enums.drama.AiDramaAudioTypeEnum;
 import cn.iocoder.yudao.module.ai.enums.drama.AiDramaStatusEnum;
+import cn.iocoder.yudao.module.ai.enums.drama.AiDramaStyleEnum;
 import cn.iocoder.yudao.module.ai.enums.drama.AiDramaTaskTypeEnum;
+import cn.iocoder.yudao.module.ai.enums.drama.AiDramaVisualAssetKindEnum;
 import cn.iocoder.yudao.module.ai.enums.model.AiModelTypeEnum;
 import cn.iocoder.yudao.module.ai.enums.model.AiPlatformEnum;
+import cn.iocoder.yudao.module.ai.enums.music.AiMusicStatusEnum;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.speech.AbstractAiSpeechModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.speech.AiSpeechModel;
 import cn.iocoder.yudao.module.ai.service.model.AiApiKeyService;
 import cn.iocoder.yudao.module.ai.service.model.AiModelService;
+import cn.iocoder.yudao.module.ai.service.music.AiMusicService;
+import cn.iocoder.yudao.module.ai.service.skill.AiSkillFileService;
+import cn.iocoder.yudao.module.ai.service.skill.AiSkillService;
+import cn.iocoder.yudao.module.ai.util.AiFfmpegUtils;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
@@ -77,30 +88,49 @@ public class AiDramaAssetServiceImplTest extends BaseMockitoUnitTest {
     @Mock
     private AiDramaAudioMapper audioMapper;
     @Mock
+    private AiDramaMotionReferenceMapper motionReferenceMapper;
+    @Mock
     private AiDramaProjectService projectService;
     @Mock
     private AiModelService modelService;
     @Mock
     private AiApiKeyService apiKeyService;
     @Mock
+    private AiMusicService musicService;
+    @Mock
+    private AiDramaScriptService scriptService;
+    @Mock
+    private AiSkillService skillService;
+    @Mock
+    private AiSkillFileService skillFileService;
+    @Mock
     private FileApi fileApi;
 
-    // ========== 候选图 ==========
+    // ========== 候选图、历史版本 ==========
 
     @Test
-    public void testAppendPlaceholder_removeFailed() {
-        List<AiDramaCharacterAppearanceDO.Candidate> candidates = Arrays.asList(
-                new AiDramaCharacterAppearanceDO.Candidate().setUrl("https://files.example.com/1.png"),
-                new AiDramaCharacterAppearanceDO.Candidate().setModelId(9L));
+    public void testArchiveVisualAsset_shotFrame() {
+        AiDramaVisualAssetDO current = new AiDramaVisualAssetDO().setId(5L).setProjectId(PROJECT_ID).setStoryboardId(7L)
+                .setKind(AiDramaVisualAssetKindEnum.SHOT_FRAME.getType()).setPrompt("提示词")
+                .setImageUrl("https://files.example.com/k.png").setStatus(AiDramaStatusEnum.SUCCESS.getStatus());
 
-        List<AiDramaCharacterAppearanceDO.Candidate> result = AiDramaAssetServiceImpl.appendPlaceholder(candidates,
-                "提示词", IMAGE_MODEL_ID);
+        assetService.archiveVisualAsset(current);
 
-        assertEquals(2, result.size());
-        assertEquals("https://files.example.com/1.png", result.get(0).getUrl());
-        assertNull(result.get(1).getUrl());
-        assertEquals(IMAGE_MODEL_ID, result.get(1).getModelId());
-        assertEquals("提示词", result.get(1).getDescription());
+        // 断言：复制为历史版本，指向当前版本
+        ArgumentCaptor<AiDramaVisualAssetDO> captor = ArgumentCaptor.forClass(AiDramaVisualAssetDO.class);
+        verify(visualAssetMapper).insert(captor.capture());
+        assertEquals(5L, captor.getValue().getParentId());
+        assertEquals(AiDramaVisualAssetKindEnum.ARCHIVED_SHOT_FRAME.getType(), captor.getValue().getKind());
+        assertEquals(7L, captor.getValue().getStoryboardId());
+        assertEquals("https://files.example.com/k.png", captor.getValue().getImageUrl());
+        assertNull(captor.getValue().getId());
+    }
+
+    @Test
+    public void testArchiveVisualAsset_noImage() {
+        assetService.archiveVisualAsset(new AiDramaVisualAssetDO().setId(5L).setKind(AiDramaVisualAssetKindEnum.PROP.getType()));
+
+        verify(visualAssetMapper, never()).insert(any(AiDramaVisualAssetDO.class));
     }
 
     @Test
@@ -110,14 +140,28 @@ public class AiDramaAssetServiceImplTest extends BaseMockitoUnitTest {
     }
 
     @Test
+    public void testBuildStyleText_scriptToneAndSkillMedia() {
+        when(scriptService.getScriptByProjectId(PROJECT_ID)).thenReturn(new AiDramaScriptDO().setId(1L).setProjectId(PROJECT_ID)
+                .setTone("冷峻悬疑").setWorldbuilding("近未来城市"));
+        when(skillService.getSkill(5L)).thenReturn(AiSkillDO.builder().id(5L).name("胶片").description("技能描述").build());
+        when(skillFileService.getSkillFileListBySkillId(5L)).thenReturn(Collections.singletonList(AiSkillFileDO.builder()
+                .parentId(AiSkillFileDO.PARENT_ID_ROOT).name(AiSkillFileDO.NAME_SKILL)
+                .content("---\nname: film\n---\n# 胶片\n长篇说明\n## 媒体提示词\n35mm 胶片颗粒，低饱和\n## 其它\n不进入媒体").build()));
+        AiDramaProjectDO project = new AiDramaProjectDO().setId(PROJECT_ID)
+                .setStyle(AiDramaStyleEnum.SCRIPT_TONE.getStyle()).setAestheticSkillId(5L);
+
+        // 断言：随剧本基调取基调；带上世界观；技能取媒体提示词段，而不是描述
+        assertEquals("冷峻悬疑，世界观：近未来城市，35mm 胶片颗粒，低饱和", assetService.buildStyleText(project));
+    }
+
+    @Test
     public void testUpdateAppearanceMy_selectedIndexInvalid() {
-        mockAppearanceOwner(appearance().setCandidates(Collections.singletonList(
-                new AiDramaCharacterAppearanceDO.Candidate().setModelId(IMAGE_MODEL_ID))));
+        mockAppearanceOwner(appearance().setImageUrls(Collections.emptyList()));
         AiDramaAppearanceSaveReqVO reqVO = new AiDramaAppearanceSaveReqVO();
         reqVO.setId(APPEARANCE_ID);
         reqVO.setSelectedIndex(0);
 
-        // 生成中、已失败的占位候选不能选用
+        // 超出候选图的下标不能选用
         assertServiceException(() -> assetService.updateAppearanceMy(USER_ID, reqVO), DRAMA_SELECTED_INDEX_INVALID);
     }
 
@@ -156,7 +200,8 @@ public class AiDramaAssetServiceImplTest extends BaseMockitoUnitTest {
     public void testGenerateAppearanceImageMy_success() {
         mockAppearanceOwner(appearance());
         when(modelService.validateModel(IMAGE_MODEL_ID)).thenReturn(imageModel(AiPlatformEnum.OPENAI.getPlatform()));
-        when(projectService.validateProjectExists(PROJECT_ID)).thenReturn(new AiDramaProjectDO().setId(PROJECT_ID).setStyle("电影感"));
+        when(projectService.validateProjectExists(PROJECT_ID)).thenReturn(new AiDramaProjectDO().setId(PROJECT_ID)
+                .setStyle(AiDramaStyleEnum.REALISTIC.getStyle()));
         doNothing().when(assetService).executeImage(any(), any(), any(), any(), any(), any());
 
         try (MockedStatic<SpringUtil> springUtil = mockStatic(SpringUtil.class)) {
@@ -164,16 +209,15 @@ public class AiDramaAssetServiceImplTest extends BaseMockitoUnitTest {
             assetService.generateAppearanceImageMy(USER_ID, imageReqVO());
         }
 
-        // 断言：追加占位候选，置为生成中
+        // 断言：记录本次的模型，置为生成中
         ArgumentCaptor<AiDramaCharacterAppearanceDO> captor = ArgumentCaptor.forClass(AiDramaCharacterAppearanceDO.class);
         verify(appearanceMapper).updateById(captor.capture());
         assertEquals(AiDramaStatusEnum.IN_PROGRESS.getStatus(), captor.getValue().getStatus());
-        assertEquals(1, captor.getValue().getCandidates().size());
-        assertEquals(IMAGE_MODEL_ID, captor.getValue().getCandidates().get(0).getModelId());
+        assertEquals(IMAGE_MODEL_ID, captor.getValue().getModelId());
         // 断言：异步出图，带上记录的任务编号；参考图取角色的参考图
         ArgumentCaptor<String> taskIdCaptor = ArgumentCaptor.forClass(String.class);
         verify(assetService).executeImage(eq(AiDramaTaskTypeEnum.APPEARANCE), eq(APPEARANCE_ID), taskIdCaptor.capture(),
-                any(), contains("林夏"), eq(Collections.singletonList("https://files.example.com/ref.png")));
+                any(), argThat((String prompt) -> prompt.contains("林夏") && prompt.contains("画风：真人写实")), eq(Collections.singletonList("https://files.example.com/ref.png")));
         assertNotNull(taskIdCaptor.getValue());
         assertEquals(taskIdCaptor.getValue(), captor.getValue().getTaskId());
     }
@@ -186,8 +230,7 @@ public class AiDramaAssetServiceImplTest extends BaseMockitoUnitTest {
         when(response.getResult().getOutput().getUrl()).thenReturn("https://provider.example.com/tmp.png");
         when(imageModel.call(any(ImagePrompt.class))).thenReturn(response);
         when(fileApi.createFile(any(byte[].class))).thenReturn("https://files.example.com/new.png");
-        when(appearanceMapper.selectById(APPEARANCE_ID)).thenReturn(appearance().setCandidates(new ArrayList<>(List.of(
-                new AiDramaCharacterAppearanceDO.Candidate().setModelId(IMAGE_MODEL_ID)))));
+        when(appearanceMapper.selectById(APPEARANCE_ID)).thenReturn(appearance());
         AiDramaAssetServiceImpl.ImageClient client = new AiDramaAssetServiceImpl.ImageClient(
                 imageModel(AiPlatformEnum.OPENAI.getPlatform()), null, imageModel);
 
@@ -197,12 +240,14 @@ public class AiDramaAssetServiceImplTest extends BaseMockitoUnitTest {
                     Collections.emptyList());
         }
 
-        // 断言：回填占位候选，默认选用；以生成中、本次任务编号为条件
+        // 断言：追加候选图与说明，未选用时默认选用；以生成中、本次任务编号为条件
         ArgumentCaptor<AiDramaCharacterAppearanceDO> captor = ArgumentCaptor.forClass(AiDramaCharacterAppearanceDO.class);
         verify(appearanceMapper).updateByIdAndStatusAndTaskId(eq(APPEARANCE_ID), eq(AiDramaStatusEnum.IN_PROGRESS.getStatus()),
                 eq("task-1"), captor.capture());
         assertEquals(AiDramaStatusEnum.SUCCESS.getStatus(), captor.getValue().getStatus());
-        assertEquals("https://files.example.com/new.png", captor.getValue().getCandidates().get(0).getUrl());
+        assertEquals(List.of("https://files.example.com/new.png"), captor.getValue().getImageUrls());
+        assertEquals(List.of("提示词"), captor.getValue().getImageDescriptions());
+        assertEquals(Collections.emptyList(), captor.getValue().getPreviousImageUrls());
         assertEquals(0, captor.getValue().getSelectedIndex());
     }
 
@@ -218,8 +263,7 @@ public class AiDramaAssetServiceImplTest extends BaseMockitoUnitTest {
         AtomicReference<String> dbTaskId = new AtomicReference<>("task-old");
         List<AiDramaCharacterAppearanceDO> written = new ArrayList<>();
         when(appearanceMapper.selectById(APPEARANCE_ID)).thenAnswer(invocation -> appearance()
-                .setStatus(dbStatus.get()).setTaskId(dbTaskId.get()).setCandidates(new ArrayList<>(List.of(
-                        new AiDramaCharacterAppearanceDO.Candidate().setModelId(IMAGE_MODEL_ID)))));
+                .setStatus(dbStatus.get()).setTaskId(dbTaskId.get()));
         when(appearanceMapper.updateByIdAndStatusAndTaskId(eq(APPEARANCE_ID), any(), any(), any())).thenAnswer(invocation -> {
             if (!Objects.equals(invocation.getArgument(1), dbStatus.get())
                     || !Objects.equals(invocation.getArgument(2), dbTaskId.get())) {
@@ -258,8 +302,7 @@ public class AiDramaAssetServiceImplTest extends BaseMockitoUnitTest {
 
         assertEquals(1, written.size());
         assertEquals(AiDramaStatusEnum.SUCCESS.getStatus(), written.get(0).getStatus());
-        assertEquals(1, written.get(0).getCandidates().size());
-        assertEquals("https://files.example.com/new.png", written.get(0).getCandidates().get(0).getUrl());
+        assertEquals(List.of("https://files.example.com/new.png"), written.get(0).getImageUrls());
     }
 
     @Test
@@ -336,11 +379,11 @@ public class AiDramaAssetServiceImplTest extends BaseMockitoUnitTest {
 
         assertEquals(CHARACTER_ID, assetService.createCharacter(new AiDramaCharacterDO().setProjectId(PROJECT_ID).setName("老周")));
 
-        // 断言：同时创建第 1 个形象
+        // 断言：同时创建第 1 个形象，序号从 0 开始
         ArgumentCaptor<AiDramaCharacterAppearanceDO> captor = ArgumentCaptor.forClass(AiDramaCharacterAppearanceDO.class);
         verify(appearanceMapper).insert(captor.capture());
         assertEquals(CHARACTER_ID, captor.getValue().getCharacterId());
-        assertEquals(1, captor.getValue().getAppearanceIndex());
+        assertEquals(0, captor.getValue().getAppearanceIndex());
     }
 
     // ========== 生成任务 ==========
@@ -408,20 +451,21 @@ public class AiDramaAssetServiceImplTest extends BaseMockitoUnitTest {
         verify(locationMapper).deleteByProjectId(PROJECT_ID);
         verify(visualAssetMapper).deleteByProjectId(PROJECT_ID);
         verify(audioMapper).deleteByProjectId(PROJECT_ID);
+        verify(motionReferenceMapper).deleteByProjectId(PROJECT_ID);
     }
 
     // ========== 音频 ==========
 
     @Test
-    public void testCreateAudioMy_selectedTypeNotAllowed() {
+    public void testCreateAudioMy_dialogueNotAllowed() {
         AiDramaAudioCreateReqVO reqVO = new AiDramaAudioCreateReqVO();
         reqVO.setProjectId(PROJECT_ID);
         reqVO.setCharacterId(CHARACTER_ID);
-        reqVO.setType(AiDramaAudioTypeEnum.SAMPLE_SELECTED.getType());
+        reqVO.setType(AiDramaAudioTypeEnum.DIALOGUE.getType());
         reqVO.setFileUrl("https://files.example.com/a.mp3");
 
         assertServiceException(() -> assetService.createAudioMy(USER_ID, reqVO),
-                DRAMA_AUDIO_TYPE_ERROR, AiDramaAudioTypeEnum.SAMPLE_SELECTED.getType());
+                DRAMA_AUDIO_TYPE_ERROR, AiDramaAudioTypeEnum.DIALOGUE.getType());
     }
 
     @Test
@@ -512,15 +556,12 @@ public class AiDramaAssetServiceImplTest extends BaseMockitoUnitTest {
 
         assetService.selectAudioMy(USER_ID, 9L);
 
-        // 断言：原来选用的改回普通样音
-        ArgumentCaptor<AiDramaAudioDO> typeCaptor = ArgumentCaptor.forClass(AiDramaAudioDO.class);
-        verify(audioMapper).updateByCharacterIdAndType(eq(CHARACTER_ID),
-                eq(Collections.singletonList(AiDramaAudioTypeEnum.SAMPLE_SELECTED.getType())), typeCaptor.capture());
-        assertEquals(AiDramaAudioTypeEnum.SAMPLE.getType(), typeCaptor.getValue().getType());
-        // 断言：选用当前样音
-        ArgumentCaptor<AiDramaAudioDO> captor = ArgumentCaptor.forClass(AiDramaAudioDO.class);
-        verify(audioMapper).updateById(captor.capture());
-        assertEquals(AiDramaAudioTypeEnum.SAMPLE_SELECTED.getType(), captor.getValue().getType());
+        // 断言：记录为角色选用的样音，音频类型不变
+        ArgumentCaptor<AiDramaCharacterDO> captor = ArgumentCaptor.forClass(AiDramaCharacterDO.class);
+        verify(characterMapper).updateById(captor.capture());
+        assertEquals(CHARACTER_ID, captor.getValue().getId());
+        assertEquals(9L, captor.getValue().getSampleAudioId());
+        verify(audioMapper, never()).updateById(any(AiDramaAudioDO.class));
     }
 
     @Test
@@ -529,6 +570,57 @@ public class AiDramaAssetServiceImplTest extends BaseMockitoUnitTest {
                 .setType(AiDramaAudioTypeEnum.NARRATION.getType()));
 
         assertServiceException(() -> assetService.selectAudioMy(USER_ID, 9L), DRAMA_AUDIO_TYPE_ERROR, "只有角色样音可以选用");
+    }
+
+    @Test
+    public void testCreateMusicAudioMy_success() {
+        when(musicService.getMusic(3L)).thenReturn(new AiMusicDO().setId(3L).setUserId(USER_ID).setTitle("雨夜")
+                .setStatus(AiMusicStatusEnum.SUCCESS.getStatus()).setAudioUrl("https://files.example.com/m.mp3").setDuration(30D));
+        AiDramaAudioMusicReqVO reqVO = new AiDramaAudioMusicReqVO();
+        reqVO.setProjectId(PROJECT_ID);
+        reqVO.setMusicId(3L);
+        reqVO.setStoryboardIds(List.of(7L));
+
+        assetService.createMusicAudioMy(USER_ID, reqVO);
+
+        // 断言：作为配乐插入，复制音乐的地址、时长，并记录来源音乐
+        ArgumentCaptor<AiDramaAudioDO> captor = ArgumentCaptor.forClass(AiDramaAudioDO.class);
+        verify(audioMapper).insert(captor.capture());
+        assertEquals(AiDramaAudioTypeEnum.BGM.getType(), captor.getValue().getType());
+        assertEquals("雨夜", captor.getValue().getName());
+        assertEquals("https://files.example.com/m.mp3", captor.getValue().getFileUrl());
+        assertEquals(30D, captor.getValue().getDuration());
+        assertEquals(List.of(7L), captor.getValue().getStoryboardIds());
+        assertEquals(3L, captor.getValue().getMusicId());
+    }
+
+    @Test
+    public void testCreateMusicAudioMy_notReady() {
+        when(musicService.getMusic(3L)).thenReturn(new AiMusicDO().setId(3L).setUserId(USER_ID)
+                .setStatus(AiMusicStatusEnum.IN_PROGRESS.getStatus()));
+        AiDramaAudioMusicReqVO reqVO = new AiDramaAudioMusicReqVO();
+        reqVO.setProjectId(PROJECT_ID);
+        reqVO.setMusicId(3L);
+
+        assertServiceException(() -> assetService.createMusicAudioMy(USER_ID, reqVO), DRAMA_MUSIC_NOT_READY);
+        verify(audioMapper, never()).insert(any(AiDramaAudioDO.class));
+    }
+
+    // ========== 动作参考 ==========
+
+    @Test
+    public void testValidateMotionVideo() {
+        // 合规：5 秒、30fps、720x1280 H.264
+        AiDramaAssetServiceImpl.validateMotionVideo(new AiFfmpegUtils.VideoInfo(5, 720, 1280, 30, "h264"));
+        // 不合规：时长过长、帧率过低、分辨率过低、编码不支持
+        assertThrows(Exception.class, () -> AiDramaAssetServiceImpl.validateMotionVideo(
+                new AiFfmpegUtils.VideoInfo(31, 720, 1280, 30, "h264")));
+        assertThrows(Exception.class, () -> AiDramaAssetServiceImpl.validateMotionVideo(
+                new AiFfmpegUtils.VideoInfo(5, 720, 1280, 15, "h264")));
+        assertThrows(Exception.class, () -> AiDramaAssetServiceImpl.validateMotionVideo(
+                new AiFfmpegUtils.VideoInfo(5, 360, 640, 30, "h264")));
+        assertThrows(Exception.class, () -> AiDramaAssetServiceImpl.validateMotionVideo(
+                new AiFfmpegUtils.VideoInfo(5, 720, 1280, 30, "vp9")));
     }
 
     // ========== 工具 ==========

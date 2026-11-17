@@ -12,19 +12,16 @@ import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
-/**
- * @author 芋道源码
- */
 @Schema(description = "管理后台 - AI 短剧生成任务分页 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class AiDramaTaskPageReqVO extends PageParam {
 
-    @Schema(description = "任务类型，参见 AiDramaTaskTypeEnum 枚举类；为空表示全部", example = "4")
+    @Schema(description = "任务类型", example = "4")
     @InEnum(AiDramaTaskTypeEnum.class)
     private Integer type;
 
-    @Schema(description = "状态，参见 AiDramaStatusEnum 枚举类", example = "50")
+    @Schema(description = "状态", example = "50")
     private Integer status;
 
     @Schema(description = "用户编号", example = "1")

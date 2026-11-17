@@ -15,7 +15,6 @@ import java.util.Arrays;
 @Getter
 public enum AiDramaTransitionTypeEnum implements ArrayValuable<Integer> {
 
-    // DONE @AI：按照yudao 的风格，还是 int 噢；（已改为 Integer，前端、ai_drama_project.compose_transition_type 一起调整）
     NONE(0, "无", null),
     DISSOLVE(1, "溶解", "dissolve"),
     FADE(2, "黑场淡入淡出", "fadeblack"),

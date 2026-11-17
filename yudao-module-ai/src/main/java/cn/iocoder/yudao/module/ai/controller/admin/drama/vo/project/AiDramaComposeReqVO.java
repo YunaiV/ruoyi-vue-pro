@@ -13,9 +13,6 @@ import lombok.Data;
 
 import java.util.List;
 
-/**
- * @author 芋道源码
- */
 @Schema(description = "管理后台 - AI 短剧成片合成 Request VO")
 @Data
 public class AiDramaComposeReqVO {
@@ -29,14 +26,12 @@ public class AiDramaComposeReqVO {
     @Size(min = 2, message = "至少选择 2 个已完成的镜头")
     private List<Long> storyboardIds;
 
-    // DONE @AI：inenum 下？补充下枚举？（新增 AiDramaAspectRatioEnum，加 @InEnum）
-    @Schema(description = "画幅，参见 AiDramaAspectRatioEnum 枚举类", requiredMode = Schema.RequiredMode.REQUIRED, example = "9:16")
+    @Schema(description = "画幅", requiredMode = Schema.RequiredMode.REQUIRED, example = "9:16")
     @NotBlank(message = "画幅不能为空")
     @InEnum(AiDramaAspectRatioEnum.class)
     private String aspectRatio;
 
-    // DONE @AI：“：0 无 1 溶解 2 黑场淡入淡出 3 滑动”去掉；（改为“参见 AiDramaTransitionTypeEnum 枚举类”）
-    @Schema(description = "转场类型，参见 AiDramaTransitionTypeEnum 枚举类", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "转场类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "转场类型不能为空")
     @InEnum(AiDramaTransitionTypeEnum.class)
     private Integer transitionType;

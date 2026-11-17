@@ -6,9 +6,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
-/**
- * @author 芋道源码
- */
 @Schema(description = "管理后台 - AI 短剧音频生成 Request VO：使用语音模型合成角色样音或旁白")
 @Data
 public class AiDramaAudioGenerateReqVO {

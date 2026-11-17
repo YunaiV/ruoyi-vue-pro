@@ -1,11 +1,20 @@
 package cn.iocoder.yudao.module.ai.service.drama;
 
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.script.AiDramaChatReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.script.AiDramaChatStreamReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.script.AiDramaScriptPolishReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.script.AiDramaScriptUpdateReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.storyboard.AiDramaStoryboardImportReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.drama.AiDramaScriptDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.drama.AiDramaStoryboardDO;
+import cn.iocoder.yudao.module.ai.enums.drama.AiDramaChatTypeEnum;
+import reactor.core.publisher.Flux;
 
-// DONE @AI：详细注释，只在实现类上写“每个项目一份剧本；生成、打磨、分析、拆分都同步调用对话模型”；其它也检查下；（已移到实现类；分镜、生成任务 Service 接口上的实现细节一并移到实现类，资产 Service 的出图说明同样处理）
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
 /**
  * AI 短剧剧本 Service 接口
  *
@@ -14,7 +23,7 @@ import cn.iocoder.yudao.module.ai.dal.dataobject.drama.AiDramaScriptDO;
 public interface AiDramaScriptService {
 
     /**
-     * 获得项目的剧本
+     * 获得项目的当前剧本：最新的版本
      *
      * @param projectId 项目编号
      * @return 剧本，可能为空
@@ -22,15 +31,41 @@ public interface AiDramaScriptService {
     AiDramaScriptDO getScriptByProjectId(Long projectId);
 
     /**
-     * 保存我的剧本：不存在时创建
+     * 获得我的项目的全部剧本版本：新的在前
+     *
+     * @param userId 用户编号
+     * @param projectId 项目编号
+     * @return 剧本版本列表
+     */
+    List<AiDramaScriptDO> getScriptListMy(Long userId, Long projectId);
+
+    /**
+     * 获得多个项目的当前剧本编号
+     *
+     * @param projectIds 项目编号
+     * @return key 为项目编号，value 为当前剧本编号；没有剧本的项目不在其中
+     */
+    Map<Long, Long> getLatestScriptIdMap(Collection<Long> projectIds);
+
+    /**
+     * 保存我的剧本：指定编号时更新该剧本版本，不新增版本；未指定时新增一个版本
      *
      * @param userId 用户编号
      * @param updateReqVO 剧本
+     * @return 剧本编号
      */
-    void updateScriptMy(Long userId, AiDramaScriptUpdateReqVO updateReqVO);
+    Long updateScriptMy(Long userId, AiDramaScriptUpdateReqVO updateReqVO);
 
     /**
-     * 根据故事想法生成剧本：覆盖已有的剧本内容
+     * 获得剧本
+     *
+     * @param id 剧本编号
+     * @return 剧本
+     */
+    AiDramaScriptDO getScript(Long id);
+
+    /**
+     * 根据故事想法生成剧本：新增一个剧本版本
      *
      * @param userId 用户编号
      * @param reqVO 请求
@@ -39,7 +74,7 @@ public interface AiDramaScriptService {
     AiDramaScriptDO generateScriptMy(Long userId, AiDramaChatReqVO reqVO);
 
     /**
-     * 按修改意见打磨剧本，并记录修改意见
+     * 按修改意见打磨剧本：新增一个剧本版本，并记录修改意见
      *
      * @param userId 用户编号
      * @param reqVO 请求
@@ -56,7 +91,7 @@ public interface AiDramaScriptService {
     void analyzeAssetListMy(Long userId, AiDramaChatReqVO reqVO);
 
     /**
-     * 由剧本拆分分镜：替换项目已有的全部分镜；有镜头视频生成中时不允许
+     * 由当前剧本拆分分镜：替换当前剧本的分镜，其它版本的保留；其中有镜头视频生成中时不允许
      *
      * @param userId 用户编号
      * @param reqVO 请求
@@ -64,7 +99,59 @@ public interface AiDramaScriptService {
     void generateStoryboardListMy(Long userId, AiDramaChatReqVO reqVO);
 
     /**
-     * 删除项目的剧本
+     * 为当前剧本的分镜生成摄影规则、表演指导或关键帧规划：按分镜顺序逐个更新；其中有镜头视频生成中时不允许
+     *
+     * @param userId 用户编号
+     * @param reqVO 请求
+     * @param type 类型：摄影规则、表演指导、关键帧规划
+     */
+    void generateStoryboardDetailMy(Long userId, AiDramaChatReqVO reqVO, AiDramaChatTypeEnum type);
+
+    /**
+     * 由当前剧本规划分镜：只返回，不保存，供审阅后导入
+     *
+     * @param userId 用户编号
+     * @param reqVO 请求
+     * @return 规划的分镜（未保存，没有编号）
+     */
+    List<AiDramaStoryboardDO> planStoryboardListMy(Long userId, AiDramaChatReqVO reqVO);
+
+    /**
+     * 导入审阅后的分镜：替换当前剧本的分镜，项目置为分镜就绪；其中有镜头视频生成中时不允许
+     *
+     * @param userId 用户编号
+     * @param reqVO 请求
+     */
+    void importStoryboardListMy(Long userId, AiDramaStoryboardImportReqVO reqVO);
+
+    /**
+     * 流式生成：生成剧本、打磨剧本、分析资产、拆分分镜；结束后解析入库
+     *
+     * @param userId 用户编号
+     * @param reqVO 请求
+     * @return 增量文本；失败时为错误
+     */
+    Flux<CommonResult<String>> streamChatMy(Long userId, AiDramaChatStreamReqVO reqVO);
+
+    /**
+     * 接续我的项目进行中的流式生成：先重放已生成的内容；没有进行中的生成时直接结束
+     *
+     * @param userId 用户编号
+     * @param projectId 项目编号
+     * @return 增量文本
+     */
+    Flux<CommonResult<String>> resumeChatStreamMy(Long userId, Long projectId);
+
+    /**
+     * 获得项目进行中的流式生成的类型
+     *
+     * @param projectId 项目编号
+     * @return 类型，参见 AiDramaChatTypeEnum；没有时为空
+     */
+    Integer getRunningChatType(Long projectId);
+
+    /**
+     * 删除项目的剧本：全部版本
      *
      * @param projectId 项目编号
      */

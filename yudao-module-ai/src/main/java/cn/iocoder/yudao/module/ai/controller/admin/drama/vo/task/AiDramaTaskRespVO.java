@@ -5,14 +5,11 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
-/**
- * @author 芋道源码
- */
 @Schema(description = "管理后台 - AI 短剧生成任务 Response VO：由角色形象、场景、视觉资产、分镜、成片记录汇总而来")
 @Data
 public class AiDramaTaskRespVO {
 
-    @Schema(description = "任务类型，参见 AiDramaTaskTypeEnum 枚举类", requiredMode = Schema.RequiredMode.REQUIRED, example = "4")
+    @Schema(description = "任务类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "4")
     private Integer type;
 
     @Schema(description = "记录编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
@@ -33,7 +30,7 @@ public class AiDramaTaskRespVO {
     @Schema(description = "任务标题", example = "林夏 · 形象 1")
     private String title;
 
-    @Schema(description = "状态，参见 AiDramaStatusEnum 枚举类", requiredMode = Schema.RequiredMode.REQUIRED, example = "50")
+    @Schema(description = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "50")
     private Integer status;
 
     @Schema(description = "失败原因", example = "生成失败")

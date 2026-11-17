@@ -41,6 +41,7 @@ public interface AiDramaLocationMapper extends BaseMapperX<AiDramaLocationDO> {
         return selectPage(pageParam, new LambdaQueryWrapperX<AiDramaLocationDO>()
                 .inIfPresent(AiDramaLocationDO::getProjectId, projectIds)
                 .eqIfPresent(AiDramaLocationDO::getStatus, reqVO.getStatus())
+                .eqIfPresent(AiDramaLocationDO::getModelId, reqVO.getModelId())
                 .betweenIfPresent(AiDramaLocationDO::getUpdateTime, reqVO.getUpdateTime())
                 .isNotNull(AiDramaLocationDO::getStatus)
                 .orderByDesc(AiDramaLocationDO::getUpdateTime)
@@ -62,6 +63,22 @@ public interface AiDramaLocationMapper extends BaseMapperX<AiDramaLocationDO> {
                 .eq(AiDramaLocationDO::getStatus, whereStatus)
                 .eq(whereTaskId != null, AiDramaLocationDO::getTaskId, whereTaskId)
                 .isNull(whereTaskId == null, AiDramaLocationDO::getTaskId));
+    }
+
+    /**
+     * 更新候选图：删除候选图、撤销时使用；选用、上一版为空时清空；以状态、任务编号为条件，期间重新出图时不覆盖
+     */
+    default int updateImagesByIdAndStatusAndTaskId(Long id, Integer whereStatus, String whereTaskId,
+                                                   AiDramaLocationDO updateObj) {
+        return update(updateObj, new LambdaUpdateWrapper<AiDramaLocationDO>()
+                .eq(AiDramaLocationDO::getId, id)
+                .eq(whereStatus != null, AiDramaLocationDO::getStatus, whereStatus)
+                .isNull(whereStatus == null, AiDramaLocationDO::getStatus)
+                .eq(whereTaskId != null, AiDramaLocationDO::getTaskId, whereTaskId)
+                .isNull(whereTaskId == null, AiDramaLocationDO::getTaskId)
+                .set(updateObj.getSelectedIndex() == null, AiDramaLocationDO::getSelectedIndex, null)
+                .set(updateObj.getPreviousImageUrls() == null, AiDramaLocationDO::getPreviousImageUrls, null)
+                .set(updateObj.getPreviousDescriptions() == null, AiDramaLocationDO::getPreviousDescriptions, null));
     }
 
 }

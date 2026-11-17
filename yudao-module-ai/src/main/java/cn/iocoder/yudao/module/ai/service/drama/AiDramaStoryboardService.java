@@ -2,10 +2,10 @@ package cn.iocoder.yudao.module.ai.service.drama;
 
 import cn.iocoder.yudao.framework.common.pojo.PageParam;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.storyboard.AiDramaStoryboardSaveReqVO;
-import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.storyboard.AiDramaStoryboardVideoReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.storyboard.*;
 import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.task.AiDramaTaskPageReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.drama.AiDramaStoryboardDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.drama.AiDramaVideoSubmissionDO;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -56,6 +56,31 @@ public interface AiDramaStoryboardService {
     AiDramaStoryboardDO getStoryboard(Long id);
 
     /**
+     * 获得【我的】分镜：包括历史剧本版本的分镜，用于核对画布节点绑定的镜头
+     *
+     * @param userId 用户编号
+     * @param id     编号
+     * @return 分镜；不存在时为空
+     */
+    AiDramaStoryboardDO getStoryboardMy(Long userId, Long id);
+
+    /**
+     * 获得【我的】剧本版本的分镜列表：按镜头序号排序，用于只读查看历史版本
+     *
+     * @param userId   用户编号
+     * @param scriptId 剧本编号
+     * @return 分镜列表
+     */
+    List<AiDramaStoryboardDO> getStoryboardListByScriptIdMy(Long userId, Long scriptId);
+
+    /**
+     * 校验镜头视频不在生成中：生成期间不能修改关键帧等起始帧的来源；分镜不存在时不校验
+     *
+     * @param id 分镜编号
+     */
+    void validateStoryboardVideoNotRunning(Long id);
+
+    /**
      * 创建我的分镜
      *
      * @param userId 用户编号
@@ -81,12 +106,13 @@ public interface AiDramaStoryboardService {
     void deleteStoryboardMy(Long userId, Long id);
 
     /**
-     * 替换项目的全部分镜：在事务中删除旧的、插入新的；用于由剧本拆分分镜
+     * 替换剧本的分镜：在事务中删除该剧本旧的、插入新的，其它剧本版本的分镜保留；用于由剧本拆分分镜
      *
      * @param projectId 项目编号
+     * @param scriptId 剧本编号
      * @param storyboards 新的分镜列表
      */
-    void replaceStoryboardList(Long projectId, List<AiDramaStoryboardDO> storyboards);
+    void replaceStoryboardList(Long projectId, Long scriptId, List<AiDramaStoryboardDO> storyboards);
 
     /**
      * 删除项目的全部分镜
@@ -94,6 +120,13 @@ public interface AiDramaStoryboardService {
      * @param projectId 项目编号
      */
     void deleteStoryboardListByProjectId(Long projectId);
+
+    /**
+     * 批量更新分镜：用于摄影规则、表演指导、关键帧规划的生成结果
+     *
+     * @param updateList 更新的分镜，需要有编号
+     */
+    void updateStoryboardList(List<AiDramaStoryboardDO> updateList);
 
     /**
      * 生成镜头视频：同步提交服务商，之后由 Job 查询结果
@@ -160,5 +193,103 @@ public interface AiDramaStoryboardService {
      * @return 处理的数量
      */
     int timeoutStoryboardVideo(LocalDateTime updateTime, String errorMessage);
+
+    // ========== 镜头视频：提交记录 ==========
+
+    /**
+     * 获得我的镜头的视频提交记录：新的在前
+     *
+     * @param userId 用户编号
+     * @param storyboardId 分镜编号
+     * @return 提交记录
+     */
+    List<AiDramaVideoSubmissionDO> getVideoSubmissionListMy(Long userId, Long storyboardId);
+
+    /**
+     * 确认提交结果未知的提交记录的任务编号：分镜改为生成中，由 Job 查询结果
+     *
+     * @param userId 用户编号
+     * @param reqVO 请求
+     */
+    void resolveVideoSubmissionMy(Long userId, AiDramaVideoSubmissionResolveReqVO reqVO);
+
+    /**
+     * 确认提交结果未知的提交记录为已失败：服务商未创建任务
+     *
+     * @param userId 用户编号
+     * @param id 提交记录编号
+     */
+    void confirmVideoSubmissionFailMy(Long userId, Long id);
+
+    /**
+     * 使用提交记录的视频作为镜头视频
+     *
+     * @param userId 用户编号
+     * @param id 提交记录编号
+     * @param previous true 为恢复提交前的视频，false 为使用本次提交成功的视频
+     */
+    void useVideoSubmissionMy(Long userId, Long id, boolean previous);
+
+    // ========== 关键帧、素材 ==========
+
+    /**
+     * 生成我的镜头关键帧：存为视觉资产（shot_frame 类型），同步校验模型后置为出图中，异步出图；有修正说明时，以当前关键帧为参考修正构图
+     *
+     * @param userId 用户编号
+     * @param reqVO 请求
+     */
+    void generateStoryboardFrameMy(Long userId, AiDramaStoryboardFrameReqVO reqVO);
+
+    /**
+     * 批量生成我的镜头关键帧：当前剧本中镜头序号在范围内的镜头，已有关键帧、出图中、镜头视频生成中的跳过
+     *
+     * @param userId 用户编号
+     * @param reqVO 请求
+     * @return 提交的数量
+     */
+    int generateStoryboardFrameBatchMy(Long userId, AiDramaStoryboardFrameBatchReqVO reqVO);
+
+    /**
+     * 承接上一镜头：同一剧本版本中上一个镜头视频的尾帧，作为本镜头的手动起始帧
+     *
+     * @param userId 用户编号
+     * @param id 分镜编号
+     */
+    void usePreviousLastFrameMy(Long userId, Long id);
+
+    /**
+     * 把我的镜头的素材图片渲染为镜头视频：按项目画幅、镜头时长，直接作为已完成的镜头视频
+     *
+     * @param userId 用户编号
+     * @param id 分镜编号
+     */
+    void renderStoryboardMaterialMy(Long userId, Long id);
+
+    /**
+     * 导入外部视频，直接作为我的镜头的已完成视频：截取尾帧供下一镜承接
+     *
+     * @param userId 用户编号
+     * @param reqVO 请求
+     */
+    void importStoryboardVideoMy(Long userId, AiDramaStoryboardImportVideoReqVO reqVO);
+
+    // ========== 声音 ==========
+
+    /**
+     * 获得我的镜头的声音预览：生成镜头视频时使用的发言角色、参考音频
+     *
+     * @param userId 用户编号
+     * @param id 分镜编号
+     * @return 声音预览
+     */
+    AiDramaStoryboardVoiceRespVO getStoryboardVoiceMy(Long userId, Long id);
+
+    /**
+     * 设置我的镜头的发言角色：为空时按台词自动识别
+     *
+     * @param userId 用户编号
+     * @param reqVO 请求
+     */
+    void updateStoryboardSpeakersMy(Long userId, AiDramaStoryboardSpeakerReqVO reqVO);
 
 }

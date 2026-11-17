@@ -33,28 +33,52 @@ public class AiDramaCharacterAppearanceDO extends BaseDO {
      * 关联 {@link AiDramaCharacterDO#getId()}
      */
     private Long characterId;
-    // DONE @AI：需要这个字段么？appearance？或者使用 version？这个 selectedIndex 字段会影响到么？（保留：它是角色下「形象 N」的展示序号，素材、分镜引用、生成任务标题都用它；与 selectedIndex（候选图下标）无关；不改名 version，避免误解为历史版本）
     /**
-     * 形象序号，从 1 开始：角色下的第几个形象，用于展示「形象 N」
+     * 形象序号，从 0 开始：0 表示主形象，其余为角色下的第几个变化形象
      */
     private Integer appearanceIndex;
+    /**
+     * 形象变化原因，例如换装、受伤
+     */
+    private String changeReason;
     /**
      * 形象设定
      */
     private String description;
     /**
-     * 出图提示词
+     * 形象参考图：区别于角色的参考图 {@link AiDramaCharacterDO#getReferenceImageUrl()}
      */
-    private String prompt;
+    private String referenceImageUrl;
     /**
-     * 候选图：最后一项可能是生成中、已失败的任务（url 为空），用于重新提交时取模型
+     * 候选图地址数组（文件服务）
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
-    private List<Candidate> candidates;
+    private List<String> imageUrls;
+    /**
+     * 候选图描述数组：与 {@link #imageUrls} 按下标一一对应，为生成该图时的提示词
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<String> imageDescriptions;
     /**
      * 选用的候选下标
      */
     private Integer selectedIndex;
+    /**
+     * 上一轮候选图地址数组：重新生成后保留，用于撤销
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<String> previousImageUrls;
+    /**
+     * 上一轮候选图描述数组：与 {@link #previousImageUrls} 按下标一一对应
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<String> previousDescriptions;
+    /**
+     * 最近一次出图使用的绘画模型编号：供重试与展示
+     * <p>
+     * 关联 {@link AiModelDO#getId()}
+     */
+    private Long modelId;
     /**
      * 出图任务编号：每次提交出图生成一个；异步出图的最终回写以它为条件，被标记失败后又重新提交时，旧的执行结果不再写入
      */
@@ -69,29 +93,5 @@ public class AiDramaCharacterAppearanceDO extends BaseDO {
      * 生成失败原因
      */
     private String errorMessage;
-
-    /**
-     * 候选图：角色形象、场景共用
-     */
-    @Data
-    public static class Candidate {
-
-        /**
-         * 图片地址（文件服务）；生成中、已失败时为空
-         */
-        private String url;
-        /**
-         * 描述：生成时的提示词
-         */
-        private String description;
-        // DONE @AI：关联字段；（已补充关联 AiModelDO）
-        /**
-         * 生成使用的绘画模型编号
-         * <p>
-         * 关联 {@link AiModelDO#getId()}
-         */
-        private Long modelId;
-
-    }
 
 }

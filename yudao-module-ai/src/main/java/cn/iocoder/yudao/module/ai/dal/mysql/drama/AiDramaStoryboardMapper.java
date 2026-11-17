@@ -36,6 +36,12 @@ public interface AiDramaStoryboardMapper extends BaseMapperX<AiDramaStoryboardDO
         return delete(AiDramaStoryboardDO::getProjectId, projectId);
     }
 
+    default int deleteByProjectIdAndScriptId(Long projectId, Long scriptId) {
+        return delete(new LambdaQueryWrapperX<AiDramaStoryboardDO>()
+                .eq(AiDramaStoryboardDO::getProjectId, projectId)
+                .eq(AiDramaStoryboardDO::getScriptId, scriptId));
+    }
+
     default List<AiDramaStoryboardDO> selectListByVideoStatus(Collection<Integer> videoStatuses, int limit) {
         return selectListLimitN(new LambdaQueryWrapperX<AiDramaStoryboardDO>()
                 .in(AiDramaStoryboardDO::getVideoStatus, videoStatuses)
@@ -67,21 +73,26 @@ public interface AiDramaStoryboardMapper extends BaseMapperX<AiDramaStoryboardDO
     }
 
     /**
-     * 编辑保存：场景为空时清空（updateById 会忽略空值）；只用于编辑，状态回写不经过这里，不会清掉场景
+     * 编辑保存：场景、视频模型、道具为空时清空（updateById 会忽略空值）；只用于编辑，状态回写不经过这里，不会清掉它们
+     *
+     * 道具为空表示按道具的镜头序号匹配，空数组表示明确不使用道具，两者要区分保存
      */
     default void updateForSave(AiDramaStoryboardDO updateObj) {
         update(updateObj, new LambdaUpdateWrapper<AiDramaStoryboardDO>()
                 .eq(AiDramaStoryboardDO::getId, updateObj.getId())
-                .set(updateObj.getLocationId() == null, AiDramaStoryboardDO::getLocationId, null));
+                .set(updateObj.getLocationId() == null, AiDramaStoryboardDO::getLocationId, null)
+                .set(updateObj.getVideoModelId() == null, AiDramaStoryboardDO::getVideoModelId, null)
+                .set(updateObj.getVisualAssetIds() == null, AiDramaStoryboardDO::getVisualAssetIds, null));
     }
 
     /**
-     * 按任务编号的条件更新：只更新状态未变、且仍是同一轮提交的镜头（被标记失败后又重新提交时，任务编号已变）；任务编号为空时匹配为空的
+     * 按任务编号的条件更新：只更新状态未变、且仍是同一轮提交的镜头（被标记失败后又重新提交时，任务编号已变）；状态、任务编号为空时匹配为空的
      */
     default int updateByIdAndVideoStatusAndTaskId(Long id, Integer whereVideoStatus, String whereTaskId, AiDramaStoryboardDO updateObj) {
         return update(updateObj, new LambdaUpdateWrapper<AiDramaStoryboardDO>()
                 .eq(AiDramaStoryboardDO::getId, id)
-                .eq(AiDramaStoryboardDO::getVideoStatus, whereVideoStatus)
+                .eq(whereVideoStatus != null, AiDramaStoryboardDO::getVideoStatus, whereVideoStatus)
+                .isNull(whereVideoStatus == null, AiDramaStoryboardDO::getVideoStatus)
                 .eq(whereTaskId != null, AiDramaStoryboardDO::getTaskId, whereTaskId)
                 .isNull(whereTaskId == null, AiDramaStoryboardDO::getTaskId));
     }

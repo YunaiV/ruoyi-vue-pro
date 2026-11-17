@@ -4,11 +4,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
-// DONE @AI：参考下 vm，检查下 ai 模块的类注释；（按 vm 模板，类说明只放在 @Schema，类注释只保留原作者署名；短剧、语音识别、文字识别、语音合成、视频、PPT 的 VO 已对齐；音乐有其它会话在改，未动）
-/**
- * @author 芋道源码
- */
 @Schema(description = "管理后台 - AI 短剧音频 Response VO")
 @Data
 public class AiDramaAudioRespVO {
@@ -22,12 +19,38 @@ public class AiDramaAudioRespVO {
     @Schema(description = "角色编号", example = "1")
     private Long characterId;
 
-    // DONE @AI：inenum 把？不用写：“：1 角色样音 2 选用样音 3 旁白” swagger 了；其它 ai 模块类似的，都查下；（按 system 用户 VO 的写法改为“参见 XxxEnum 枚举类”；Response VO 不做校验，@InEnum 只加在 Request VO 上；短剧其它枚举字段、视频生成的类型与方式一并调整）
-    @Schema(description = "类型，参见 AiDramaAudioTypeEnum 枚举类", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer type;
+
+    @Schema(description = "名称", example = "雨夜钢琴")
+    private String name;
+
+    @Schema(description = "文本", example = "这是最后一班车了。")
+    private String text;
+
+    @Schema(description = "音色", example = "longxiaochun")
+    private String voice;
+
+    @Schema(description = "分镜编号：对白所属的镜头", example = "1")
+    private Long storyboardId;
+
+    @Schema(description = "时长（秒）", example = "3.2")
+    private Double duration;
 
     @Schema(description = "文件地址", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/1.mp3")
     private String fileUrl;
+
+    @Schema(description = "使用的分镜编号：配乐、参考音频使用；为空表示候选")
+    private List<Long> storyboardIds;
+
+    @Schema(description = "音量", example = "0.6")
+    private Double volume;
+
+    @Schema(description = "起始偏移（秒）", example = "0")
+    private Double startOffset;
+
+    @Schema(description = "AI 音乐编号：由 AI 音乐选用的配乐", example = "1")
+    private Long musicId;
 
     @Schema(description = "创建时间")
     private LocalDateTime createTime;

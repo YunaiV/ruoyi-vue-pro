@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.task.AiDramaTaskResp
 import cn.iocoder.yudao.module.ai.dal.dataobject.drama.*;
 import cn.iocoder.yudao.module.ai.enums.drama.AiDramaStatusEnum;
 import cn.iocoder.yudao.module.ai.enums.drama.AiDramaTaskTypeEnum;
+import cn.iocoder.yudao.module.ai.enums.drama.AiDramaVisualAssetKindEnum;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -120,49 +121,40 @@ public class AiDramaTaskServiceImpl implements AiDramaTaskService {
                                                       AiDramaTaskPageReqVO reqVO, Set<Long> projectIds) {
         switch (type) {
             case APPEARANCE: {
-                // 模型记录在候选图中，不支持模型筛选
-                if (reqVO.getModelId() != null) {
-                    return PageResult.empty();
-                }
                 PageResult<AiDramaCharacterAppearanceDO> page = assetService.getAppearanceTaskPage(pageParam, reqVO, projectIds);
                 Map<Long, AiDramaCharacterDO> characterMap = convertMap(assetService.getCharacterList(
                         convertSet(page.getList(), AiDramaCharacterAppearanceDO::getCharacterId)), AiDramaCharacterDO::getId);
                 return new PageResult<>(convertList(page.getList(), appearance -> {
                     AiDramaCharacterDO character = characterMap.get(appearance.getCharacterId());
-                    AiDramaCharacterAppearanceDO.Candidate last = CollUtil.getLast(CollUtil.emptyIfNull(appearance.getCandidates()));
                     return buildTask(type, appearance.getId(), character != null ? character.getProjectId() : null,
                             (character != null ? character.getName() : "") + " · 形象 " + appearance.getAppearanceIndex(),
-                            appearance.getStatus(), appearance.getErrorMessage(), last != null ? last.getDescription() : null,
-                            last != null ? last.getModelId() : null, null,
-                            getSelectedUrl(appearance.getCandidates(), appearance.getSelectedIndex()),
+                            appearance.getStatus(), appearance.getErrorMessage(), CollUtil.getLast(appearance.getImageDescriptions()),
+                            appearance.getModelId(), appearance.getTaskId(),
+                            getSelectedUrl(appearance.getImageUrls(), appearance.getSelectedIndex()),
                             appearance.getCreateTime(), appearance.getUpdateTime());
                 }), page.getTotal());
             }
             case LOCATION: {
-                if (reqVO.getModelId() != null) {
-                    return PageResult.empty();
-                }
                 PageResult<AiDramaLocationDO> page = assetService.getLocationTaskPage(pageParam, reqVO, projectIds);
-                return new PageResult<>(convertList(page.getList(), location -> {
-                    AiDramaCharacterAppearanceDO.Candidate last = CollUtil.getLast(CollUtil.emptyIfNull(location.getCandidates()));
-                    return buildTask(type, location.getId(), location.getProjectId(), location.getName(),
-                            location.getStatus(), location.getErrorMessage(), last != null ? last.getDescription() : null,
-                            last != null ? last.getModelId() : null, null,
-                            getSelectedUrl(location.getCandidates(), location.getSelectedIndex()),
-                            location.getCreateTime(), location.getUpdateTime());
-                }), page.getTotal());
+                return new PageResult<>(convertList(page.getList(), location -> buildTask(type, location.getId(),
+                        location.getProjectId(), location.getName(), location.getStatus(), location.getErrorMessage(),
+                        CollUtil.getLast(location.getImageDescriptions()), location.getModelId(), location.getTaskId(),
+                        getSelectedUrl(location.getImageUrls(), location.getSelectedIndex()),
+                        location.getCreateTime(), location.getUpdateTime())), page.getTotal());
             }
             case VISUAL_ASSET: {
                 PageResult<AiDramaVisualAssetDO> page = assetService.getVisualAssetTaskPage(pageParam, reqVO, projectIds);
                 return new PageResult<>(convertList(page.getList(), visualAsset -> buildTask(type, visualAsset.getId(),
-                        visualAsset.getProjectId(), visualAsset.getTitle(), visualAsset.getStatus(), visualAsset.getErrorMessage(),
+                        visualAsset.getProjectId(), (ObjUtil.equal(visualAsset.getKind(), AiDramaVisualAssetKindEnum.SHOT_FRAME.getType())
+                                ? "关键帧 · " : "道具 · ") + ObjUtil.defaultIfNull(visualAsset.getTitle(), ""),
+                        visualAsset.getStatus(), visualAsset.getErrorMessage(),
                         visualAsset.getPrompt(), visualAsset.getModelId(), visualAsset.getTaskId(), visualAsset.getImageUrl(),
                         visualAsset.getCreateTime(), visualAsset.getUpdateTime())), page.getTotal());
             }
             case STORYBOARD: {
                 PageResult<AiDramaStoryboardDO> page = storyboardService.getStoryboardTaskPage(pageParam, reqVO, projectIds);
                 return new PageResult<>(convertList(page.getList(), storyboard -> buildTask(type, storyboard.getId(),
-                        storyboard.getProjectId(), "第 " + storyboard.getSceneNo() + " 场 · " + ObjUtil.defaultIfNull(storyboard.getTitle(), ""),
+                        storyboard.getProjectId(), "第 " + storyboard.getSceneNo() + " 镜 · " + ObjUtil.defaultIfNull(storyboard.getTitle(), ""),
                         storyboard.getVideoStatus(), storyboard.getErrorMessage(), storyboard.getVideoPrompt(),
                         storyboard.getVideoModelId(), storyboard.getTaskId(), storyboard.getVideoUrl(),
                         storyboard.getCreateTime(), storyboard.getUpdateTime())), page.getTotal());
@@ -196,14 +188,14 @@ public class AiDramaTaskServiceImpl implements AiDramaTaskService {
     /**
      * 获得任务的结果图：选用的候选图，未选用时取最后一张
      */
-    private static String getSelectedUrl(List<AiDramaCharacterAppearanceDO.Candidate> candidates, Integer selectedIndex) {
-        if (CollUtil.isEmpty(candidates)) {
+    private static String getSelectedUrl(List<String> imageUrls, Integer selectedIndex) {
+        if (CollUtil.isEmpty(imageUrls)) {
             return null;
         }
-        if (selectedIndex != null && selectedIndex >= 0 && selectedIndex < candidates.size()) {
-            return candidates.get(selectedIndex).getUrl();
+        if (selectedIndex != null && selectedIndex >= 0 && selectedIndex < imageUrls.size()) {
+            return imageUrls.get(selectedIndex);
         }
-        return CollUtil.getLast(candidates).getUrl();
+        return CollUtil.getLast(imageUrls);
     }
 
     // ========== 操作 ==========
@@ -217,9 +209,15 @@ public class AiDramaTaskServiceImpl implements AiDramaTaskService {
             case LOCATION:
                 assetService.resubmitLocationImage(reqVO.getId());
                 break;
-            case VISUAL_ASSET:
+            case VISUAL_ASSET: {
+                // 关键帧：镜头视频生成中不能重新出图，视频的查询依赖起始帧
+                AiDramaVisualAssetDO visualAsset = assetService.getVisualAsset(reqVO.getId());
+                if (visualAsset != null && visualAsset.getStoryboardId() != null) {
+                    storyboardService.validateStoryboardVideoNotRunning(visualAsset.getStoryboardId());
+                }
                 assetService.resubmitVisualAssetImage(reqVO.getId());
                 break;
+            }
             case STORYBOARD:
                 storyboardService.resubmitStoryboardVideo(reqVO.getId());
                 break;

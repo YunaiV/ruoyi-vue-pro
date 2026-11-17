@@ -8,9 +8,6 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * @author 芋道源码
- */
 @Schema(description = "管理后台 - AI 短剧公开作品 Response VO：只包含白名单字段，不返回剧本正文、提示词与资产配置")
 @Data
 public class AiDramaPublicRespVO {
@@ -21,8 +18,8 @@ public class AiDramaPublicRespVO {
     @Schema(description = "作品名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "末班地铁")
     private String name;
 
-    @Schema(description = "风格", example = "电影感写实")
-    private String style;
+    @Schema(description = "画风", example = "2")
+    private Integer style;
 
     @Schema(description = "画幅：成片实际使用的画幅", example = "9:16")
     private String aspectRatio;

@@ -37,12 +37,12 @@ public interface AiDramaProjectService {
     void updateProjectMy(Long userId, AiDramaProjectSaveReqVO updateReqVO);
 
     /**
-     * 修改我的项目的当前步骤
+     * 修改项目的状态：剧本变更、分镜就绪时由剧本、分镜流程调用；编辑步骤由前端维护，不保存
      *
-     * @param userId 用户编号
-     * @param updateReqVO 修改信息
+     * @param id 编号
+     * @param status 状态，参见 {@link cn.iocoder.yudao.module.ai.enums.drama.AiDramaProjectStatusEnum}
      */
-    void updateProjectStatusMy(Long userId, AiDramaProjectUpdateStatusReqVO updateReqVO);
+    void updateProjectStatus(Long id, Integer status);
 
     /**
      * 删除我的项目：一并删除剧本、资产、分镜
@@ -153,7 +153,7 @@ public interface AiDramaProjectService {
     void deleteProject(Long id);
 
     /**
-     * 重新合成成片：使用全部已完成的镜头，项目当前的画幅与转场；不含旁白、水印
+     * 重新合成成片：使用当前剧本版本全部已完成的镜头，项目当前的画幅与转场；不含旁白、水印
      *
      * @param id 编号
      */

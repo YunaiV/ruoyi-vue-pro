@@ -6,9 +6,6 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-/**
- * @author 芋道源码
- */
 @Schema(description = "管理后台 - AI 短剧剧本打磨 Request VO")
 @Data
 @EqualsAndHashCode(callSuper = true)

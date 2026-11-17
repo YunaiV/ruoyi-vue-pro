@@ -6,14 +6,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-/**
- * @author 芋道源码
- */
 @Schema(description = "管理后台 - AI 短剧生成任务操作 Request VO：重新提交、同步状态、标记失败")
 @Data
 public class AiDramaTaskActionReqVO {
 
-    @Schema(description = "任务类型，参见 AiDramaTaskTypeEnum 枚举类", requiredMode = Schema.RequiredMode.REQUIRED, example = "4")
+    @Schema(description = "任务类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "4")
     @NotNull(message = "任务类型不能为空")
     @InEnum(AiDramaTaskTypeEnum.class)
     private Integer type;

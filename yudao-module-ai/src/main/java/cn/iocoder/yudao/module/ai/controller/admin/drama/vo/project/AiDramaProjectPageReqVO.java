@@ -9,9 +9,6 @@ import java.time.LocalDateTime;
 
 import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
-/**
- * @author 芋道源码
- */
 @Schema(description = "管理后台 - AI 短剧项目分页 Request VO")
 @Data
 public class AiDramaProjectPageReqVO extends PageParam {
@@ -22,10 +19,10 @@ public class AiDramaProjectPageReqVO extends PageParam {
     @Schema(description = "项目名称，模糊匹配", example = "地铁")
     private String name;
 
-    @Schema(description = "当前步骤，参见 AiDramaProjectStepEnum 枚举类", example = "2")
+    @Schema(description = "状态", example = "10")
     private Integer status;
 
-    @Schema(description = "成片状态，参见 AiDramaStatusEnum 枚举类", example = "40")
+    @Schema(description = "成片状态", example = "40")
     private Integer composeStatus;
 
     @Schema(description = "是否公开", example = "true")

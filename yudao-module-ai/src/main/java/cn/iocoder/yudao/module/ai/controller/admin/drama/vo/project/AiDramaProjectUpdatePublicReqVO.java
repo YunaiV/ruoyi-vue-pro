@@ -4,9 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-/**
- * @author 芋道源码
- */
 @Schema(description = "管理后台 - AI 短剧项目公开状态修改 Request VO")
 @Data
 public class AiDramaProjectUpdatePublicReqVO {

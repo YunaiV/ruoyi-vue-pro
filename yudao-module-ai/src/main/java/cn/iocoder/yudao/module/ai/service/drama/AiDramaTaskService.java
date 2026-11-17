@@ -16,7 +16,7 @@ public interface AiDramaTaskService {
      * 获得生成任务分页
      *
      * 指定类型时直接分页；全部类型时，每类取前 pageNo * pageSize 条，合并后按更新时间倒序再分页
-     * 模型筛选只对视觉资产、镜头视频生效（角色形象、场景的模型记录在候选图中，成片没有模型）
+     * 模型筛选对角色形象、场景、视觉资产、镜头视频生效（都记录了上次出图、生成的模型），成片没有模型
      *
      * @param pageReqVO 分页查询
      * @return 分页；不含用户昵称
@@ -24,7 +24,7 @@ public interface AiDramaTaskService {
     PageResult<AiDramaTaskRespVO> getTaskPage(AiDramaTaskPageReqVO pageReqVO);
 
     /**
-     * 重新提交已失败的任务：使用上次的模型；成片使用全部已完成的镜头重新合成
+     * 重新提交已失败的任务：使用上次的模型；成片使用当前剧本版本全部已完成的镜头重新合成
      *
      * @param reqVO 任务
      */

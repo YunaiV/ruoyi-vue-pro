@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -97,7 +98,7 @@ public class AiDramaTaskServiceImplTest extends BaseMockitoUnitTest {
         assertFalse(compose.getTimeout());
         AiDramaTaskRespVO storyboard = pageResult.getList().get(1);
         assertEquals(AiDramaTaskTypeEnum.STORYBOARD.getType(), storyboard.getType());
-        assertEquals("第 1 场 · 进站", storyboard.getTitle());
+        assertEquals("第 1 镜 · 进站", storyboard.getTitle());
         assertTrue(storyboard.getTimeout());
         // 断言：每类取前 pageNo * pageSize 条
         verify(storyboardService).getStoryboardTaskPage(argThat(page -> page.getPageNo() == 1 && page.getPageSize() == 2),
@@ -105,14 +106,24 @@ public class AiDramaTaskServiceImplTest extends BaseMockitoUnitTest {
     }
 
     @Test
-    public void testGetTaskPage_modelFilterSkipAppearance() {
+    public void testGetTaskPage_modelFilterAppearance() {
         AiDramaTaskPageReqVO reqVO = new AiDramaTaskPageReqVO();
         reqVO.setType(AiDramaTaskTypeEnum.APPEARANCE.getType());
         reqVO.setModelId(10L);
+        when(assetService.getAppearanceTaskPage(any(), same(reqVO), isNull())).thenReturn(new PageResult<>(
+                Collections.singletonList(new AiDramaCharacterAppearanceDO().setId(11L).setCharacterId(1L).setAppearanceIndex(0)
+                        .setModelId(10L).setStatus(AiDramaStatusEnum.SUCCESS.getStatus())
+                        .setImageUrls(List.of("https://files.example.com/a.png", "https://files.example.com/b.png"))
+                        .setImageDescriptions(List.of("第一张", "第二张")).setSelectedIndex(0)), 1L));
 
-        assertEquals(0L, taskService.getTaskPage(reqVO).getTotal());
-        // 角色形象的模型记录在候选图中，不支持模型筛选
-        verify(assetService, never()).getAppearanceTaskPage(any(), any(), any());
+        PageResult<AiDramaTaskRespVO> pageResult = taskService.getTaskPage(reqVO);
+
+        // 断言：角色形象记录了出图模型，按模型筛选；结果为选用的候选图，提示词为最后一次的说明
+        assertEquals(1L, pageResult.getTotal());
+        AiDramaTaskRespVO task = pageResult.getList().get(0);
+        assertEquals(10L, task.getModelId());
+        assertEquals("https://files.example.com/a.png", task.getResultUrl());
+        assertEquals("第二张", task.getPrompt());
     }
 
     // ========== 操作 ==========
@@ -125,6 +136,17 @@ public class AiDramaTaskServiceImplTest extends BaseMockitoUnitTest {
         assertServiceException(() -> taskService.resubmitTask(actionReqVO(AiDramaTaskTypeEnum.COMPOSE, PROJECT_ID)),
                 DRAMA_TASK_NOT_FAIL);
         verify(projectService, never()).recomposeProject(any());
+    }
+
+    @Test
+    public void testResubmitTask_frameVideoRunning() {
+        when(assetService.getVisualAsset(1L)).thenReturn(new AiDramaVisualAssetDO().setId(1L).setStoryboardId(2L));
+        doThrow(exception(DRAMA_TASK_RUNNING)).when(storyboardService).validateStoryboardVideoNotRunning(2L);
+
+        // 断言：镜头视频生成中，关键帧不能重新出图
+        assertServiceException(() -> taskService.resubmitTask(actionReqVO(AiDramaTaskTypeEnum.VISUAL_ASSET, 1L)),
+                DRAMA_TASK_RUNNING);
+        verify(assetService, never()).resubmitVisualAssetImage(any());
     }
 
     @Test

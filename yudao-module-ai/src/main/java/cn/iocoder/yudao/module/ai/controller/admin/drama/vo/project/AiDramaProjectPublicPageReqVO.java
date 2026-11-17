@@ -6,9 +6,6 @@ import cn.iocoder.yudao.module.ai.enums.drama.AiDramaDurationTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-/**
- * @author 芋道源码
- */
 @Schema(description = "管理后台 - AI 短剧公开作品分页 Request VO")
 @Data
 public class AiDramaProjectPublicPageReqVO extends PageParam {
@@ -19,7 +16,7 @@ public class AiDramaProjectPublicPageReqVO extends PageParam {
     @Schema(description = "画幅：按成片实际使用的画幅筛选", example = "9:16")
     private String aspectRatio;
 
-    @Schema(description = "时长，参见 AiDramaDurationTypeEnum 枚举类", example = "1")
+    @Schema(description = "时长", example = "1")
     @InEnum(value = AiDramaDurationTypeEnum.class, message = "时长必须是 {value}")
     private Integer durationType;
 

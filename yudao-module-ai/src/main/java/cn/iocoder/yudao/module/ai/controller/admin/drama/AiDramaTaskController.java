@@ -21,9 +21,6 @@ import java.util.Map;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
-/**
- * @author 芋道源码
- */
 @Tag(name = "管理后台 - AI 短剧生成任务")
 @RestController
 @RequestMapping("/ai/drama/task")

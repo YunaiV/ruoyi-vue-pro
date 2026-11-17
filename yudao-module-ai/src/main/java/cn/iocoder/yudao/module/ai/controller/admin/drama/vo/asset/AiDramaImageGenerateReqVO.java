@@ -4,9 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-/**
- * @author 芋道源码
- */
 @Schema(description = "管理后台 - AI 短剧资产出图 Request VO：角色形象、场景、视觉资产共用")
 @Data
 public class AiDramaImageGenerateReqVO {

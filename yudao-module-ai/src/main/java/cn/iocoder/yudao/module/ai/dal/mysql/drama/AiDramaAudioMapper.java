@@ -6,7 +6,6 @@ import cn.iocoder.yudao.module.ai.dal.dataobject.drama.AiDramaAudioDO;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -32,13 +31,19 @@ public interface AiDramaAudioMapper extends BaseMapperX<AiDramaAudioDO> {
     }
 
     /**
-     * 把角色的样音全部更新为指定类型：选用样音前，先把原来选用的改回普通样音
+     * 修改配乐、参考音频：使用的分镜为空时清空，表示候选（updateById 会忽略空值）
      */
-    // DONE @AI：风格应该是 updateObj 噢，结尾字段噢；（已改为 updateObj 放最后，调用方一起调整）
-    default int updateByCharacterIdAndType(Long characterId, Collection<Integer> whereTypes, AiDramaAudioDO updateObj) {
-        return update(updateObj, new LambdaUpdateWrapper<AiDramaAudioDO>()
-                .eq(AiDramaAudioDO::getCharacterId, characterId)
-                .in(AiDramaAudioDO::getType, whereTypes));
+    default void updateForSave(AiDramaAudioDO updateObj) {
+        update(updateObj, new LambdaUpdateWrapper<AiDramaAudioDO>()
+                .eq(AiDramaAudioDO::getId, updateObj.getId())
+                .set(updateObj.getStoryboardIds() == null, AiDramaAudioDO::getStoryboardIds, null));
+    }
+
+    default List<AiDramaAudioDO> selectListByProjectIdAndType(Long projectId, Integer type) {
+        return selectList(new LambdaQueryWrapperX<AiDramaAudioDO>()
+                .eq(AiDramaAudioDO::getProjectId, projectId)
+                .eq(AiDramaAudioDO::getType, type)
+                .orderByAsc(AiDramaAudioDO::getId));
     }
 
 }

@@ -5,9 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
-/**
- * @author 芋道源码
- */
+import java.util.List;
+
 @Schema(description = "管理后台 - AI 短剧场景创建 / 修改 Request VO")
 @Data
 public class AiDramaLocationSaveReqVO {
@@ -27,9 +26,18 @@ public class AiDramaLocationSaveReqVO {
     @Size(max = 2000, message = "场景设定不能超过 2000 个字符")
     private String description;
 
-    @Schema(description = "场景出图提示词", example = "深夜地铁车厢，冷白灯光")
-    @Size(max = 2000, message = "出图提示词不能超过 2000 个字符")
-    private String prompt;
+    @Schema(description = "是否有群众演员", example = "false")
+    private Boolean crowd;
+
+    @Schema(description = "群众演员描述", example = "零星几名乘客")
+    @Size(max = 500, message = "群众演员描述不能超过 500 个字符")
+    private String crowdDescription;
+
+    @Schema(description = "可用站位")
+    private List<String> availableSlots;
+
+    @Schema(description = "场景描述：一个场景可有多段描述")
+    private List<String> descriptions;
 
     @Schema(description = "用户参考图", example = "https://www.iocoder.cn/1.png")
     @Size(max = 1024, message = "参考图地址不能超过 1024 个字符")

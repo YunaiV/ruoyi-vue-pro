@@ -9,12 +9,12 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.asset.audio.*;
 import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.asset.character.*;
 import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.asset.location.*;
+import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.asset.motion.AiDramaMotionReferenceRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.asset.visualAsset.*;
 import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.project.*;
 import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.script.AiDramaScriptRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.storyboard.AiDramaStoryboardRespVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.drama.*;
-import cn.iocoder.yudao.module.ai.enums.drama.AiDramaAudioTypeEnum;
 import cn.iocoder.yudao.module.ai.enums.drama.AiDramaStatusEnum;
 import cn.iocoder.yudao.module.ai.service.drama.AiDramaAssetService;
 import cn.iocoder.yudao.module.ai.service.drama.AiDramaProjectService;
@@ -36,10 +36,6 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
-// DONE @AI：看看哪些 beanutils 简化下；（公开作品改为 BeanUtils.toBean，只覆盖成片实际的画幅、镜头数与是否本人；项目详情改为链式 set）
-/**
- * @author 芋道源码
- */
 @Tag(name = "管理后台 - AI 短剧项目")
 @RestController
 @RequestMapping("/ai/drama/project")
@@ -69,13 +65,6 @@ public class AiDramaProjectController {
     @Operation(summary = "修改【我的】项目")
     public CommonResult<Boolean> updateProjectMy(@Valid @RequestBody AiDramaProjectSaveReqVO updateReqVO) {
         projectService.updateProjectMy(getLoginUserId(), updateReqVO);
-        return success(true);
-    }
-
-    @PutMapping("/update-status-my")
-    @Operation(summary = "修改【我的】项目的当前步骤")
-    public CommonResult<Boolean> updateProjectStatusMy(@Valid @RequestBody AiDramaProjectUpdateStatusReqVO updateReqVO) {
-        projectService.updateProjectStatusMy(getLoginUserId(), updateReqVO);
         return success(true);
     }
 
@@ -128,13 +117,11 @@ public class AiDramaProjectController {
         AiDramaScriptDO script = scriptService.getScriptByProjectId(id);
         respVO.setOutline(script != null ? script.getOutline() : null);
         List<AiDramaCharacterDO> characters = assetService.getCharacterList(id);
-        // DONE @AI：assetService.getAppearanceListByCharacterIds(convertList(characters, AiDramaCharacterDO::getId)),
-        //                AiDramaCharacterAppearanceDO::getCharacterId) 提供一个 default multimap 的获取方法？简化使用方的难度；（新增 AiDramaAssetService#getAppearanceMapByCharacterIds 默认方法）
         Map<Long, List<AiDramaCharacterAppearanceDO>> appearanceMap = assetService.getAppearanceMapByCharacterIds(
                 convertList(characters, AiDramaCharacterDO::getId));
         respVO.setCharacters(convertList(characters, character -> {
             AiDramaCharacterAppearanceDO appearance = CollUtil.getFirst(appearanceMap.get(character.getId()));
-            String imageUrl = appearance != null ? getSelectedUrl(appearance.getCandidates(), appearance.getSelectedIndex()) : null;
+            String imageUrl = appearance != null ? getSelectedUrl(appearance.getImageUrls(), appearance.getSelectedIndex()) : null;
             return new AiDramaPublicRespVO.Cast().setName(character.getName())
                     .setImageUrl(StrUtil.blankToDefault(imageUrl, character.getReferenceImageUrl()));
         }));
@@ -144,7 +131,7 @@ public class AiDramaProjectController {
     // ================ 管理 ================
 
     @GetMapping("/page")
-    @Operation(summary = "获得项目分页", description = "用于【短剧管理】")
+    @Operation(summary = "获得项目分页", description = "用于【短剧制作管理】")
     @PreAuthorize("@ss.hasPermission('ai:drama:query')")
     public CommonResult<PageResult<AiDramaProjectRespVO>> getProjectPage(@Valid AiDramaProjectPageReqVO pageReqVO) {
         PageResult<AiDramaProjectDO> pageResult = projectService.getProjectPage(pageReqVO);
@@ -152,7 +139,7 @@ public class AiDramaProjectController {
     }
 
     @GetMapping("/get-detail")
-    @Operation(summary = "获得项目详情", description = "用于【短剧管理】只读查看")
+    @Operation(summary = "获得项目详情", description = "用于【短剧制作管理】只读查看")
     @Parameter(name = "id", required = true, description = "项目编号", example = "1024")
     @PreAuthorize("@ss.hasPermission('ai:drama:query')")
     public CommonResult<AiDramaProjectDetailRespVO> getProjectDetail(@RequestParam("id") Long id) {
@@ -160,7 +147,7 @@ public class AiDramaProjectController {
     }
 
     @PutMapping("/update-public")
-    @Operation(summary = "修改项目的公开状态", description = "用于【短剧管理】")
+    @Operation(summary = "修改项目的公开状态", description = "用于【短剧制作管理】")
     @PreAuthorize("@ss.hasPermission('ai:drama:update')")
     public CommonResult<Boolean> updateProjectPublicStatus(@Valid @RequestBody AiDramaProjectUpdatePublicReqVO updateReqVO) {
         projectService.updateProjectPublicStatus(updateReqVO);
@@ -168,7 +155,7 @@ public class AiDramaProjectController {
     }
 
     @DeleteMapping("/delete")
-    @Operation(summary = "删除项目", description = "用于【短剧管理】")
+    @Operation(summary = "删除项目", description = "用于【短剧制作管理】")
     @Parameter(name = "id", required = true, description = "项目编号", example = "1024")
     @PreAuthorize("@ss.hasPermission('ai:drama:delete')")
     public CommonResult<Boolean> deleteProject(@RequestParam("id") Long id) {
@@ -183,15 +170,15 @@ public class AiDramaProjectController {
             return Collections.emptyList();
         }
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertSet(list, AiDramaProjectDO::getUserId));
-        // DONE @AI：同上：convertMultiMap(
-        //                storyboardService.getStoryboardListByProjectIds(convertSet(list, AiDramaProjectDO::getId)),
-        //                AiDramaStoryboardDO::getProjectId);（新增 AiDramaStoryboardService#getStoryboardMapByProjectIds 默认方法）
         Map<Long, List<AiDramaStoryboardDO>> storyboardMap = storyboardService.getStoryboardMapByProjectIds(
                 convertSet(list, AiDramaProjectDO::getId));
+        Map<Long, Long> scriptIdMap = scriptService.getLatestScriptIdMap(convertSet(list, AiDramaProjectDO::getId));
         return BeanUtils.toBean(list, AiDramaProjectRespVO.class, project -> {
             MapUtils.findAndThen(userMap, project.getUserId(), user -> project.setUserNickname(user.getNickname()));
-            List<AiDramaStoryboardDO> storyboards = storyboardMap.getOrDefault(project.getId(), Collections.emptyList());
-            // DONE @AI：Colleciontutils 简化下这个 count？（改用 CollectionUtils#count）
+            // 镜头数只统计当前剧本版本的分镜，与详情、合成一致
+            Long scriptId = scriptIdMap.get(project.getId());
+            List<AiDramaStoryboardDO> storyboards = filterList(storyboardMap.getOrDefault(project.getId(), Collections.emptyList()),
+                    storyboard -> Objects.equals(storyboard.getScriptId(), scriptId));
             project.setStoryboardCount(storyboards.size()).setStoryboardSuccessCount((int) count(storyboards,
                     storyboard -> Objects.equals(storyboard.getVideoStatus(), AiDramaStatusEnum.SUCCESS.getStatus())));
         });
@@ -221,14 +208,15 @@ public class AiDramaProjectController {
         List<AiDramaCharacterDO> characters = assetService.getCharacterList(project.getId());
         Map<Long, List<AiDramaCharacterAppearanceDO>> appearanceMap = assetService.getAppearanceMapByCharacterIds(
                 convertList(characters, AiDramaCharacterDO::getId));
-        // DONE@AI：提供一个 default multimap 方法？根据参数进行 audio.getCharacterId() != null？（新增 AiDramaAssetService#getAudioMapByProjectId 默认方法，方法内过滤旁白）
         Map<Long, List<AiDramaAudioDO>> audioMap = assetService.getAudioMapByProjectId(project.getId());
+        // 1.2 剧本、分镜：分镜只取当前剧本版本的；历史版本的分镜保留，不展示
+        AiDramaScriptDO script = scriptService.getScriptByProjectId(project.getId());
+        Long scriptId = script != null ? script.getId() : null;
 
         // 2. 拼接
-        // DONE @AI：看看哪些，可以链式调用，简化下？（改为链式 set）
         return new AiDramaProjectDetailRespVO()
                 .setProject(CollUtil.getFirst(buildProjectList(Collections.singletonList(project))))
-                .setScript(BeanUtils.toBean(scriptService.getScriptByProjectId(project.getId()), AiDramaScriptRespVO.class))
+                .setScript(BeanUtils.toBean(script, AiDramaScriptRespVO.class))
                 .setCharacters(BeanUtils.toBean(characters, AiDramaCharacterRespVO.class, character -> character
                         .setAppearances(BeanUtils.toBean(appearanceMap.getOrDefault(character.getId(), Collections.emptyList()),
                                 AiDramaAppearanceRespVO.class))
@@ -236,16 +224,19 @@ public class AiDramaProjectController {
                                 AiDramaAudioRespVO.class))))
                 .setLocations(BeanUtils.toBean(assetService.getLocationList(project.getId()), AiDramaLocationRespVO.class))
                 .setVisualAssets(BeanUtils.toBean(assetService.getVisualAssetList(project.getId()), AiDramaVisualAssetRespVO.class))
-                .setNarrations(BeanUtils.toBean(filterList(assetService.getAudioList(project.getId()), audio ->
-                        Objects.equals(audio.getType(), AiDramaAudioTypeEnum.NARRATION.getType())), AiDramaAudioRespVO.class))
-                .setStoryboards(BeanUtils.toBean(storyboardService.getStoryboardList(project.getId()), AiDramaStoryboardRespVO.class));
+                .setAudios(BeanUtils.toBean(filterList(assetService.getAudioList(project.getId()), audio ->
+                        audio.getCharacterId() == null), AiDramaAudioRespVO.class))
+                .setMotionReferences(BeanUtils.toBean(assetService.getMotionReferenceList(project.getId()),
+                        AiDramaMotionReferenceRespVO.class))
+                .setStoryboards(BeanUtils.toBean(filterList(storyboardService.getStoryboardList(project.getId()),
+                        storyboard -> Objects.equals(storyboard.getScriptId(), scriptId)), AiDramaStoryboardRespVO.class));
     }
 
-    private static String getSelectedUrl(List<AiDramaCharacterAppearanceDO.Candidate> candidates, Integer selectedIndex) {
-        if (CollUtil.isEmpty(candidates) || selectedIndex == null || selectedIndex < 0 || selectedIndex >= candidates.size()) {
+    private static String getSelectedUrl(List<String> imageUrls, Integer selectedIndex) {
+        if (CollUtil.isEmpty(imageUrls) || selectedIndex == null || selectedIndex < 0 || selectedIndex >= imageUrls.size()) {
             return null;
         }
-        return candidates.get(selectedIndex).getUrl();
+        return imageUrls.get(selectedIndex);
     }
 
 }

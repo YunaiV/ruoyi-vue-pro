@@ -48,6 +48,7 @@ public interface AiDramaCharacterAppearanceMapper extends BaseMapperX<AiDramaCha
         return selectPage(pageParam, new LambdaQueryWrapperX<AiDramaCharacterAppearanceDO>()
                 .inIfPresent(AiDramaCharacterAppearanceDO::getCharacterId, characterIds)
                 .eqIfPresent(AiDramaCharacterAppearanceDO::getStatus, reqVO.getStatus())
+                .eqIfPresent(AiDramaCharacterAppearanceDO::getModelId, reqVO.getModelId())
                 .betweenIfPresent(AiDramaCharacterAppearanceDO::getUpdateTime, reqVO.getUpdateTime())
                 .isNotNull(AiDramaCharacterAppearanceDO::getStatus)
                 .orderByDesc(AiDramaCharacterAppearanceDO::getUpdateTime)
@@ -69,6 +70,22 @@ public interface AiDramaCharacterAppearanceMapper extends BaseMapperX<AiDramaCha
                 .eq(AiDramaCharacterAppearanceDO::getStatus, whereStatus)
                 .eq(whereTaskId != null, AiDramaCharacterAppearanceDO::getTaskId, whereTaskId)
                 .isNull(whereTaskId == null, AiDramaCharacterAppearanceDO::getTaskId));
+    }
+
+    /**
+     * 更新候选图：删除候选图、撤销时使用；选用、上一版为空时清空；以状态、任务编号为条件，期间重新出图时不覆盖
+     */
+    default int updateImagesByIdAndStatusAndTaskId(Long id, Integer whereStatus, String whereTaskId,
+                                                   AiDramaCharacterAppearanceDO updateObj) {
+        return update(updateObj, new LambdaUpdateWrapper<AiDramaCharacterAppearanceDO>()
+                .eq(AiDramaCharacterAppearanceDO::getId, id)
+                .eq(whereStatus != null, AiDramaCharacterAppearanceDO::getStatus, whereStatus)
+                .isNull(whereStatus == null, AiDramaCharacterAppearanceDO::getStatus)
+                .eq(whereTaskId != null, AiDramaCharacterAppearanceDO::getTaskId, whereTaskId)
+                .isNull(whereTaskId == null, AiDramaCharacterAppearanceDO::getTaskId)
+                .set(updateObj.getSelectedIndex() == null, AiDramaCharacterAppearanceDO::getSelectedIndex, null)
+                .set(updateObj.getPreviousImageUrls() == null, AiDramaCharacterAppearanceDO::getPreviousImageUrls, null)
+                .set(updateObj.getPreviousDescriptions() == null, AiDramaCharacterAppearanceDO::getPreviousDescriptions, null));
     }
 
 }
