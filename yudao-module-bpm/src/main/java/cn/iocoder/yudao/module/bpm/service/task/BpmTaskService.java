@@ -258,10 +258,29 @@ public interface BpmTaskService {
      */
     void returnTask(Long userId, BpmTaskReturnReqVO reqVO);
 
+    /**
+     * 获取指定用户待修改的任务列表。
+     *
+     * @param userId 用户编号
+     * @return 待修改任务列表
+     */
     List<Task> getRevisionTasks(Long userId);
 
+    /**
+     * 分页获取指定用户待修改的任务。
+     *
+     * @param userId 用户编号
+     * @param pageVO 分页参数
+     * @return 待修改任务分页结果
+     */
     PageResult<Task> getRevisionTaskPage(Long userId, BpmTaskPageReqVO pageVO);
 
+    /**
+     * 由退回目标处理人修改表单后重新提交，恢复原审批节点的人工处理。
+     *
+     * @param userId 用户编号
+     * @param reqVO 重新提交的任务编号和表单变量
+     */
     void resubmitTask(Long userId, BpmTaskResubmitReqVO reqVO);
 
     /**
