@@ -52,4 +52,20 @@ public interface FileApi {
     String presignGetUrl(@NotEmpty(message = "URL 不能为空") String url,
                          Integer expirationSeconds);
 
+    /**
+     * 生成文件预签名地址，用于读取
+     *
+     * 不支持预签名的存储（例如本地、数据库），直接返回原地址；其它异常继续抛出
+     *
+     * @param url 完整的文件访问地址
+     * @return 文件预签名地址
+     */
+    default String presignGetUrlQuietly(String url) {
+        try {
+            return presignGetUrl(url, null);
+        } catch (UnsupportedOperationException e) {
+            return url;
+        }
+    }
+
 }

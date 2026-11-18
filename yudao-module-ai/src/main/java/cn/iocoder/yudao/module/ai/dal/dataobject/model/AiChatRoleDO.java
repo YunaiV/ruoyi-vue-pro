@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
 import cn.iocoder.yudao.framework.mybatis.core.type.StringListTypeHandler;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.skill.AiSkillDO;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -88,6 +89,13 @@ public class AiChatRoleDO extends BaseDO {
      */
     @TableField(typeHandler = StringListTypeHandler.class)
     private List<String> mcpClientNames;
+    /**
+     * 引用的技能编号列表
+     *
+     * 关联 {@link AiSkillDO#getId()} 字段；与 {@link #toolIds} 相互独立，对话时以只读工具按需读取
+     */
+    @TableField(typeHandler = LongListTypeHandler.class)
+    private List<Long> skillIds;
 
     /**
      * 是否公开

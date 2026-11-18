@@ -2,14 +2,20 @@ package cn.iocoder.yudao.module.ai.service.model;
 
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.suno.api.SunoApi;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.tencent.api.TencentTtsApi;
+import cn.iocoder.yudao.module.ai.framework.ai.core.ocr.OcrModel;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiModelPageReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.model.vo.model.AiModelSaveReqVO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiApiKeyDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiModelDO;
 import cn.iocoder.yudao.module.ai.enums.model.AiPlatformEnum;
 import dev.tinyflow.core.Tinyflow;
 import jakarta.validation.Valid;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.speech.AiSpeechModel;
+import org.springframework.ai.audio.transcription.TranscriptionModel;
 import org.springframework.ai.chat.model.ChatModel;
+import com.volcengine.ark.runtime.service.ArkService;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.vectorstore.VectorStore;
 
@@ -84,11 +90,11 @@ public interface AiModelService {
      * 获得模型列表
      *
      * @param status 状态
-     * @param type 类型
+     * @param type 类型，允许空
      * @param platform 平台，允许空
      * @return 模型列表
      */
-    List<AiModelDO> getModelListByStatusAndType(Integer status, Integer type,
+    List<AiModelDO> getModelListByStatusAndType(Integer status, @Nullable Integer type,
                                                 @Nullable String platform);
 
     // ========== 与 Spring AI 集成 ==========
@@ -102,9 +108,7 @@ public interface AiModelService {
     ChatModel getChatModel(Long id);
 
     /**
-     * 获得 ChatModel 对象，并带上本次的思考参数
-     *
-     * 参数为 null、或平台不走 HTTP 路由时，与 {@link #getChatModel(Long)} 完全一致
+     * 获得 ChatModel 对象，并带上思考参数
      *
      * @param id 编号
      * @param reasoningOptions 思考参数，可为 null
@@ -115,11 +119,8 @@ public interface AiModelService {
     /**
      * 校验思考配置使用的平台
      *
-     * 1. 未配置思考：不查 API 密钥，直接返回模型平台，与现状一致
-     * 2. 已配置思考：模型平台必须与 API 密钥平台一致，否则抛出 MODEL_REASONING_PLATFORM_MISMATCH
-     *
      * @param model 模型
-     * @return 平台；路由、客户端都使用这一个平台
+     * @return 平台
      */
     AiPlatformEnum validateReasoningPlatform(AiModelDO model);
 
@@ -140,11 +141,69 @@ public interface AiModelService {
     MidjourneyApi getMidjourneyApi(Long id);
 
     /**
+     * 获得 MidjourneyApi 对象
+     *
+     * @param apiKey API 密钥
+     * @return MidjourneyApi 对象
+     */
+    MidjourneyApi getMidjourneyApi(AiApiKeyDO apiKey);
+
+    /**
+     * 获得 ArkService 对象
+     *
+     * @param id 编号
+     * @return ArkService 对象
+     */
+    ArkService getArkService(Long id);
+
+    /**
      * 获得 SunoApi 对象
      *
+     * @param apiKey API 密钥
      * @return SunoApi 对象
      */
-    SunoApi getSunoApi();
+    SunoApi getSunoApi(AiApiKeyDO apiKey);
+
+    /**
+     * 获得 AiSpeechModel 对象
+     *
+     * @param apiKey API 密钥
+     * @param model 模型标识
+     * @return AiSpeechModel 对象
+     */
+    AiSpeechModel getTextToSpeechModel(AiApiKeyDO apiKey, String model);
+
+    /**
+     * 获得语音识别的 TranscriptionModel 对象
+     *
+     * @param apiKey API 密钥
+     * @param model 模型标识
+     * @return TranscriptionModel 对象
+     */
+    TranscriptionModel getTranscriptionModel(AiApiKeyDO apiKey, String model);
+
+    /**
+     * 获得 TencentTtsApi 对象
+     *
+     * @param apiKey API 密钥
+     * @return TencentTtsApi 对象
+     */
+    TencentTtsApi getTencentTtsApi(AiApiKeyDO apiKey);
+
+    /**
+     * 获得 OcrModel 对象
+     *
+     * @param id 编号
+     * @return OcrModel 对象
+     */
+    OcrModel getOcrModel(Long id);
+
+    /**
+     * 获得可用的文字识别模型列表
+     *
+     * @return 模型列表
+     */
+    List<AiModelDO> getOcrModelList();
 
     /**
      * 获得 VectorStore 对象

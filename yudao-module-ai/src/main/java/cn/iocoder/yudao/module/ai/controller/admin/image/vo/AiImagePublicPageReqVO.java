@@ -8,7 +8,4 @@ import lombok.Data;
 @Data
 public class AiImagePublicPageReqVO extends PageParam {
 
-    @Schema(description = "提示词")
-    private String prompt;
-
 }

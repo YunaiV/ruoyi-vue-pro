@@ -100,12 +100,12 @@ public class AiChatUtils {
         toolContext = ObjUtil.defaultIfNull(toolContext, Collections.emptyMap());
         // noinspection EnhancedSwitchMigration
         switch (platform) {
-            case TONG_YI:
+            case ALIBABA:
                 // 通义走百炼的 OpenAI 兼容接口（参见 TongYiChatModel）：图片按 OpenAI 格式放在消息中，不再需要 DashScope 的 multiModel 参数；
                 // enable_thinking、thinking_budget 不是 OpenAI 标准字段，追加到 extraBody。
                 // 特殊：不设置 streamUsage，Spring AI 2.x 流式默认只发送 include_usage = true，用于返回用量
                 Map<String, Object> tongYiExtraBody = new LinkedHashMap<>();
-                tongYiExtraBody.put(AiReasoningUtils.TONG_YI_ENABLE_THINKING, true); // TODO 芋艿：默认都开启 thinking 模式，后续可以让用户配置
+                tongYiExtraBody.put(AiReasoningUtils.ALIBABA_ENABLE_THINKING, true); // TODO 芋艿：默认都开启 thinking 模式，后续可以让用户配置
                 if (reasoningOptions != null) {
                     // 已配置思考：保存时已保证 enable_thinking 为布尔值、thinking_budget 为正整数
                     tongYiExtraBody.putAll(reasoningOptions);
@@ -113,18 +113,18 @@ public class AiChatUtils {
                 return OpenAiChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)
                         .extraBody(tongYiExtraBody)
                         .toolCallbacks(toolCallbacks).toolContext(toolContext).build();
-            case DEEP_SEEK:
-            case DOU_BAO: // 复用 DeepSeek 客户端
-            case HUN_YUAN: // 复用 DeepSeek 客户端
-            case SILICON_FLOW: // 复用 DeepSeek 客户端
-            case YI_YAN: // 复用 DeepSeek 客户端
-            case ZHI_PU: // 复用 DeepSeek 客户端
-            case XING_HUO: // 复用 DeepSeek 客户端
-            case MINI_MAX: // 复用 DeepSeek 客户端
+            case DEEPSEEK:
+            case BYTEDANCE: // 复用 DeepSeek 客户端
+            case TENCENT: // 复用 DeepSeek 客户端
+            case SILICONFLOW: // 复用 DeepSeek 客户端
+            case BAIDU: // 复用 DeepSeek 客户端
+            case ZHIPU: // 复用 DeepSeek 客户端
+            case IFLYTEK: // 复用 DeepSeek 客户端
+            case MINIMAX: // 复用 DeepSeek 客户端
             case MOONSHOT: // 复用 DeepSeek 客户端
-            case BAI_CHUAN: // 复用 DeepSeek 客户端
-            case STEP_FUN: // 复用 DeepSeek 客户端
-            case MI_MO: // 复用 DeepSeek 客户端
+            case BAICHUAN: // 复用 DeepSeek 客户端
+            case STEPFUN: // 复用 DeepSeek 客户端
+            case XIAOMI: // 复用 DeepSeek 客户端
                 return DeepSeekChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)
                         .toolCallbacks(toolCallbacks).toolContext(toolContext).build();
             case OPENAI:
@@ -170,7 +170,7 @@ public class AiChatUtils {
                     }
                 }
                 return geminiBuilder.build();
-            case AZURE_OPENAI:
+            case AZURE:
                 return OpenAiChatOptions.builder().model(model).deploymentName(model).azure(true)
                         .temperature(temperature).maxTokens(maxTokens)
                         .toolCallbacks(toolCallbacks).toolContext(toolContext).build();

@@ -1,10 +1,15 @@
 package cn.iocoder.yudao.module.ai.framework.ai.config;
 
+import cn.iocoder.yudao.module.ai.framework.ai.core.webserch.AiWebSearchPlatformEnum;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * 芋道 AI 配置类
+ *
+ * 配置项按「提供方 + 能力」分层，与 Spring AI 的 spring.ai.{provider}.{capability} 保持一致，例如说 yudao.ai.bytedance.chat。
+ * 提供方与 {@link cn.iocoder.yudao.module.ai.enums.model.AiPlatformEnum} 一一对应；能力与模型类型对应。
+ * 凭据放在能力层，因为同一提供方的不同能力，密钥可能不同（例如说腾讯混元的 API Key、腾讯文字识别的 SecretId|SecretKey）
  *
  * @author fansili
  * @since 1.0
@@ -14,209 +19,100 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class YudaoAiProperties {
 
     /**
-     * 字节豆包
+     * 字节跳动：豆包
      */
-    private DouBao doubao;
+    private ChatProvider bytedance;
 
     /**
-     * 腾讯混元
+     * 腾讯：混元
      */
-    private HunYuan hunyuan;
+    private ChatProvider tencent;
 
     /**
      * 硅基流动
      */
-    private SiliconFlow siliconflow;
+    private ChatProvider siliconflow;
 
     /**
-     * 讯飞星火
+     * 科大讯飞：星火
      */
-    private XingHuo xinghuo;
+    private ChatProvider iflytek;
 
     /**
-     * 百川
+     * 百川智能
      */
-    private BaiChuan baichuan;
+    private ChatProvider baichuan;
 
     /**
-     * 文心一言
+     * 百度：文心一言
      */
-    private YiYan yiyan;
+    private ChatProvider baidu;
 
     /**
      * 智谱
      */
-    private ZhiPu zhipu;
+    private ChatProvider zhipu;
 
     /**
      * MiniMax
      */
-    private MiniMax minimax;
+    private ChatProvider minimax;
 
     /**
      * 月之暗面
      */
-    private Moonshot moonshot;
+    private ChatProvider moonshot;
 
     /**
      * 阶跃星辰
      */
-    private StepFun stepfun;
+    private ChatProvider stepfun;
 
     /**
-     * 小米 MiMo
+     * 小米：MiMo
      */
-    private MiMo mimo;
+    private ChatProvider xiaomi;
 
     /**
      * Grok
      */
-    private Grok grok;
+    private ChatProvider grok;
 
     /**
-     * Midjourney 绘图
+     * Midjourney
      */
     private Midjourney midjourney;
-
-    /**
-     * Suno 音乐
-     */
-    @SuppressWarnings("SpellCheckingInspection")
-    private Suno suno;
 
     /**
      * 网络搜索
      */
     private WebSearch webSearch;
 
+    /**
+     * 提供对话能力的提供方
+     */
     @Data
-    public static class DouBao {
+    public static class ChatProvider {
 
-        private String enable;
-        private String apiKey;
-
-        private String model;
-        private Double temperature;
-        private Integer maxTokens;
-        private Double topP;
+        /**
+         * 对话
+         */
+        private Chat chat;
 
     }
 
+    /**
+     * 对话能力的配置
+     */
     @Data
-    public static class HunYuan {
+    public static class Chat {
 
         private String enable;
+        /**
+         * API 地址，为空时使用各平台的默认地址（部分平台支持自定义）
+         */
         private String baseUrl;
         private String apiKey;
-
-        private String model;
-        private Double temperature;
-        private Integer maxTokens;
-        private Double topP;
-
-    }
-
-    @Data
-    public static class SiliconFlow {
-
-        private String enable;
-        private String apiKey;
-
-        private String model;
-        private Double temperature;
-        private Integer maxTokens;
-        private Double topP;
-
-    }
-
-    @Data
-    public static class XingHuo {
-
-        private String enable;
-        private String apiKey;
-
-        private String model;
-        private Double temperature;
-        private Integer maxTokens;
-        private Double topP;
-
-    }
-
-    @Data
-    public static class BaiChuan {
-
-        private String enable;
-        private String apiKey;
-
-        private String model;
-        private Double temperature;
-        private Integer maxTokens;
-        private Double topP;
-
-    }
-
-    @Data
-    public static class YiYan {
-
-        private String enable;
-        private String baseUrl;
-        private String apiKey;
-
-        private String model;
-        private Double temperature;
-        private Integer maxTokens;
-        private Double topP;
-
-    }
-
-    @Data
-    public static class ZhiPu {
-
-        private String enable;
-        private String baseUrl;
-        private String apiKey;
-
-        private String model;
-        private Double temperature;
-        private Integer maxTokens;
-        private Double topP;
-
-    }
-
-    @Data
-    public static class MiniMax {
-
-        private String enable;
-        private String baseUrl;
-        private String apiKey;
-
-        private String model;
-        private Double temperature;
-        private Integer maxTokens;
-        private Double topP;
-
-    }
-
-    @Data
-    public static class Moonshot {
-
-        private String enable;
-        private String baseUrl;
-        private String apiKey;
-
-        private String model;
-        private Double temperature;
-        private Integer maxTokens;
-        private Double topP;
-
-    }
-
-    @Data
-    public static class MiMo {
-
-        private String enable;
-        private String apiKey;
-        private String baseUrl;
 
         private String model;
         private Double temperature;
@@ -228,6 +124,16 @@ public class YudaoAiProperties {
     @Data
     public static class Midjourney {
 
+        /**
+         * 绘图
+         */
+        private MidjourneyImage image;
+
+    }
+
+    @Data
+    public static class MidjourneyImage {
+
         private String enable;
         private String baseUrl;
 
@@ -237,46 +143,14 @@ public class YudaoAiProperties {
     }
 
     @Data
-    public static class Suno {
-
-        private boolean enable;
-
-        private String baseUrl;
-
-    }
-
-    @Data
-    public static class Grok {
-
-        private String enable;
-        private String apiKey;
-        private String baseUrl;
-
-        private String model;
-        private Double temperature;
-        private Integer maxTokens;
-        private Double topP;
-
-    }
-
-    @Data
-    public static class StepFun {
-
-        private String enable;
-        private String apiKey;
-        private String baseUrl;
-
-        private String model;
-        private Double temperature;
-        private Integer maxTokens;
-        private Double topP;
-
-    }
-
-    @Data
     public static class WebSearch {
 
         private boolean enable;
+
+        /**
+         * 平台，默认 DeepSeek
+         */
+        private AiWebSearchPlatformEnum platform = AiWebSearchPlatformEnum.DEEPSEEK;
 
         private String apiKey;
 

@@ -30,7 +30,7 @@ public class AiRequestLogPageReqVO extends PageParam {
     @InEnum(value = AiRequestLogBizTypeEnum.class, message = "业务类型必须是 {value}")
     private Integer bizType;
 
-    @Schema(description = "平台", example = "TongYi")
+    @Schema(description = "平台", example = "ALIBABA")
     private String platform;
 
     @Schema(description = "模型编号", example = "2048")

@@ -110,7 +110,7 @@ public class OpenAiDelegateChatModelTest {
                 "sk-test", "http://127.0.0.1:1/v1", null));
         assertInstanceOf(GrokChatModel.class, modelFactory.getOrCreateChatModel(AiPlatformEnum.GROK,
                 "sk-test", "http://127.0.0.1:1/v1", null));
-        assertInstanceOf(TongYiChatModel.class, modelFactory.getOrCreateChatModel(AiPlatformEnum.TONG_YI,
+        assertInstanceOf(TongYiChatModel.class, modelFactory.getOrCreateChatModel(AiPlatformEnum.ALIBABA,
                 "sk-test", null, null));
     }
 

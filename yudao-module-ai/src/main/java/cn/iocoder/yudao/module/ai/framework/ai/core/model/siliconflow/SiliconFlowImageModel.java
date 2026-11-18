@@ -113,6 +113,7 @@ public class SiliconFlowImageModel implements ImageModel {
 		return new SiliconFlowImageApi.SiliconflowImageRequest(
                 instructions,
                 ModelOptionsUtils.mergeOption(requestImageOptions.getModel(), SiliconFlowApiConstants.DEFAULT_IMAGE_MODEL),
+                requestImageOptions.getImageSize(),
                 requestImageOptions.getN(),
                 requestImageOptions.getNegativePrompt(),
                 requestImageOptions.getSeed(),
@@ -159,6 +160,8 @@ public class SiliconFlowImageModel implements ImageModel {
                 .width(ModelOptionsUtils.mergeOption(runtimeOptionsForProvider.getWidth(), defaultOptions.getWidth()))
                 .height(ModelOptionsUtils.mergeOption(runtimeOptionsForProvider.getHeight(), defaultOptions.getHeight()))
                 // Handle SiliconFlow specific image options
+                .imageSize(ModelOptionsUtils.mergeOption(runtimeOptionsForProvider.getImageSize(), defaultOptions.getImageSize()))
+                .image(ModelOptionsUtils.mergeOption(runtimeOptionsForProvider.getImage(), defaultOptions.getImage()))
                 .negativePrompt(ModelOptionsUtils.mergeOption(runtimeOptionsForProvider.getNegativePrompt(), defaultOptions.getNegativePrompt()))
                 .numInferenceSteps(ModelOptionsUtils.mergeOption(runtimeOptionsForProvider.getNumInferenceSteps(), defaultOptions.getNumInferenceSteps()))
                 .guidanceScale(ModelOptionsUtils.mergeOption(runtimeOptionsForProvider.getGuidanceScale(), defaultOptions.getGuidanceScale()))

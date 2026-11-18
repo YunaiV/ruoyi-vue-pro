@@ -16,7 +16,7 @@ public class AiApiKeyRespVO {
     @Schema(description = "密钥", requiredMode = Schema.RequiredMode.REQUIRED, example = "ABC")
     private String apiKey;
 
-    @Schema(description = "平台", requiredMode = Schema.RequiredMode.REQUIRED, example = "OpenAI")
+    @Schema(description = "平台", requiredMode = Schema.RequiredMode.REQUIRED, example = "OPENAI")
     private String platform;
 
     @Schema(description = "自定义 API 地址", example = "https://aip.baidubce.com")

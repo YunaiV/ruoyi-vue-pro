@@ -75,15 +75,16 @@ public class AiModelController {
 
     @GetMapping("/simple-list")
     @Operation(summary = "获得模型列表")
-    @Parameter(name = "type", description = "类型", required = true, example = "1")
+    @Parameter(name = "type", description = "类型，为空时返回全部类型", example = "1")
     @Parameter(name = "platform", description = "平台", example = "midjourney")
     public CommonResult<List<AiModelRespVO>> getModelSimpleList(
-            @RequestParam("type") Integer type,
+            @RequestParam(value = "type", required = false) Integer type,
             @RequestParam(value = "platform", required = false) String platform) {
         List<AiModelDO> list = modelService.getModelListByStatusAndType(
                 CommonStatusEnum.ENABLE.getStatus(), type, platform);
         return success(convertList(list, model -> new AiModelRespVO().setId(model.getId())
                 .setName(model.getName()).setModel(model.getModel()).setPlatform(model.getPlatform())
+                .setDescription(model.getDescription()).setIconUrl(model.getIconUrl())
                 .setInputModalities(model.getInputModalities())));
     }
 

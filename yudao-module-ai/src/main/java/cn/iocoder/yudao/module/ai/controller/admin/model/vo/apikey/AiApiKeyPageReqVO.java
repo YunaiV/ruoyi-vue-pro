@@ -16,7 +16,7 @@ public class AiApiKeyPageReqVO extends PageParam {
     @Schema(description = "名称", example = "文心一言")
     private String name;
 
-    @Schema(description = "平台", example = "OpenAI")
+    @Schema(description = "平台", example = "OPENAI")
     private String platform;
 
     @Schema(description = "状态", example = "1")

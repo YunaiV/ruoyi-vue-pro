@@ -29,7 +29,7 @@ public class AiRequestLogRespVO {
     @Schema(description = "业务编号", example = "2048")
     private Long bizId;
 
-    @Schema(description = "平台", example = "TongYi")
+    @Schema(description = "平台", example = "ALIBABA")
     private String platform;
 
     @Schema(description = "模型编号", example = "10")

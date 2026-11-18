@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.ai.framework.ai.core.model.midjourney.api;
 
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,15 +14,23 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.codec.HttpMessageWriter;
+import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.mock.http.client.reactive.MockClientHttpRequest;
+import org.springframework.web.reactive.function.BodyInserter;
 import org.springframework.web.reactive.function.client.ClientRequest;
 import org.springframework.web.reactive.function.client.ClientResponse;
+import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.ExchangeFunction;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -35,6 +44,7 @@ import static org.mockito.Mockito.*;
  * 1. 保留原有的 Authorization: Bearer 请求头，兼容托管服务
  * 2. 补充 mj-api-secret 请求头，兼容 novicezk/midjourney-proxy 开启 mj.api-secret 后的鉴权
  * 3. 非 2xx 且无响应 body 时，仍抛出异常，不被吞掉
+ * 4. 融图、换脸、局部重绘的请求路径与请求体；中转返回 404 时，转为明确的错误
  *
  * @author 芋道源码
  */
@@ -204,6 +214,80 @@ public class MidjourneyApiUnitTest extends BaseMockitoUnitTest {
         assertAuthorizedRequest(captureRequest(), "/task/list-by-condition");
     }
 
+    // ========== blend、swapFace、modal ==========
+
+    @Test
+    public void testBlend_success() {
+        // mock 方法（Midjourney Proxy 返回）
+        mockResponse(HttpStatus.OK, MediaType.APPLICATION_JSON_VALUE,
+                "{\"code\":\"1\",\"description\":\"提交成功\",\"result\":\"task-3\"}");
+
+        // 调用
+        MidjourneyApi.SubmitResponse response = midjourneyApi.blend(new MidjourneyApi.BlendRequest(
+                Arrays.asList("data:image/png;base64,AAA", "data:image/png;base64,BBB"), "PORTRAIT", null, null));
+        // 断言：返回
+        assertEquals("task-3", response.result());
+        // 断言：请求，未传回调地址时，使用默认的回调地址
+        ClientRequest clientRequest = captureRequest();
+        assertAuthorizedRequest(clientRequest, "/submit/blend");
+        Map<String, Object> body = readBody(clientRequest);
+        assertEquals(Arrays.asList("data:image/png;base64,AAA", "data:image/png;base64,BBB"), body.get("base64Array"));
+        assertEquals("PORTRAIT", body.get("dimensions"));
+        assertEquals(NOTIFY_URL, body.get("notifyHook"));
+    }
+
+    @Test
+    public void testSwapFace_success() {
+        // mock 方法（Midjourney Proxy 返回）
+        mockResponse(HttpStatus.OK, MediaType.APPLICATION_JSON_VALUE,
+                "{\"code\":\"1\",\"description\":\"提交成功\",\"result\":\"task-4\"}");
+
+        // 调用
+        MidjourneyApi.SubmitResponse response = midjourneyApi.swapFace(new MidjourneyApi.SwapFaceRequest(
+                "data:image/png;base64,SRC", "data:image/png;base64,DST", "https://other/notify", null));
+        // 断言：返回
+        assertEquals("task-4", response.result());
+        // 断言：请求，传了回调地址时，保持不变
+        ClientRequest clientRequest = captureRequest();
+        assertAuthorizedRequest(clientRequest, "/insight-face/swap");
+        Map<String, Object> body = readBody(clientRequest);
+        assertEquals("data:image/png;base64,SRC", body.get("sourceBase64"));
+        assertEquals("data:image/png;base64,DST", body.get("targetBase64"));
+        assertEquals("https://other/notify", body.get("notifyHook"));
+    }
+
+    @Test
+    public void testModal_success() {
+        // mock 方法（Midjourney Proxy 返回）
+        mockResponse(HttpStatus.OK, MediaType.APPLICATION_JSON_VALUE,
+                "{\"code\":\"1\",\"description\":\"提交成功\",\"result\":\"task-5\"}");
+
+        // 调用
+        MidjourneyApi.SubmitResponse response = midjourneyApi.modal(new MidjourneyApi.ModalRequest(
+                "task-modal", "换成红色的帽子", "data:image/png;base64,MASK"));
+        // 断言：返回
+        assertEquals("task-5", response.result());
+        // 断言：请求，局部重绘不传回调地址
+        ClientRequest clientRequest = captureRequest();
+        assertAuthorizedRequest(clientRequest, "/submit/modal");
+        Map<String, Object> body = readBody(clientRequest);
+        assertEquals("task-modal", body.get("taskId"));
+        assertEquals("换成红色的帽子", body.get("prompt"));
+        assertEquals("data:image/png;base64,MASK", body.get("maskBase64"));
+        assertFalse(body.containsKey("notifyHook"));
+    }
+
+    @Test
+    public void testSwapFace_notFound() {
+        // mock 方法（中转没有换脸接口）
+        mockResponse(HttpStatus.NOT_FOUND, MediaType.TEXT_PLAIN_VALUE, "Not Found");
+
+        // 调用，并断言异常
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> midjourneyApi.swapFace(
+                new MidjourneyApi.SwapFaceRequest("data:image/png;base64,SRC", "data:image/png;base64,DST", null, null)));
+        assertEquals("[midjourney-api] 中转不支持该接口：/mj/insight-face/swap", exception.getMessage());
+    }
+
     // ========== 辅助方法 ==========
 
     /**
@@ -217,9 +301,16 @@ public class MidjourneyApiUnitTest extends BaseMockitoUnitTest {
         }
     }
 
+    /**
+     * mock 返回；与真实 {@link WebClient} 一致，响应关联本次请求，否则 {@link ClientResponse#request()} 的地址为空
+     */
     private void mockResponse(HttpStatus status, String contentType, String body) {
-        when(exchangeFunction.exchange(any(ClientRequest.class))).thenReturn(Mono.just(
-                ClientResponse.create(status).header(HttpHeaders.CONTENT_TYPE, contentType).body(body).build()));
+        when(exchangeFunction.exchange(any(ClientRequest.class))).thenAnswer(invocation -> {
+            ClientRequest request = invocation.getArgument(0);
+            return Mono.just(ClientResponse.create(status).header(HttpHeaders.CONTENT_TYPE, contentType).body(body)
+                    .request(new org.springframework.mock.http.client.MockClientHttpRequest(request.method(), request.url()))
+                    .build());
+        });
     }
 
     /**
@@ -234,6 +325,32 @@ public class MidjourneyApiUnitTest extends BaseMockitoUnitTest {
         ArgumentCaptor<ClientRequest> requestCaptor = ArgumentCaptor.forClass(ClientRequest.class);
         verify(exchangeFunction).exchange(requestCaptor.capture());
         return requestCaptor.getValue();
+    }
+
+    /**
+     * 读取请求体：把 {@link ClientRequest#body()} 写入 {@link MockClientHttpRequest}
+     */
+    private static Map<String, Object> readBody(ClientRequest request) {
+        MockClientHttpRequest httpRequest = new MockClientHttpRequest(request.method(), request.url());
+        request.body().insert(httpRequest, new BodyInserter.Context() {
+
+            @Override
+            public List<HttpMessageWriter<?>> messageWriters() {
+                return ExchangeStrategies.withDefaults().messageWriters();
+            }
+
+            @Override
+            public Optional<ServerHttpRequest> serverRequest() {
+                return Optional.empty();
+            }
+
+            @Override
+            public Map<String, Object> hints() {
+                return Collections.emptyMap();
+            }
+
+        }).block();
+        return JsonUtils.parseMap(httpRequest.getBodyAsString().block());
     }
 
     private static void assertAuthorizedRequest(ClientRequest request, String path) {

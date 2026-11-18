@@ -1,42 +1,137 @@
-### 生成图片：OpenAI（DALL）
+### 生成图片：OpenAI（DALL·E）
 POST {{baseUrl}}/ai/image/draw
 Content-Type: application/json
 Authorization: {{token}}
+tenant-id: {{adminTenentId}}
 
 {
-  "platform": "OpenAI",
+  "modelId": 1,
   "prompt": "可爱的小喵星人",
-  "model": "dall-e-3",
-  "height": "1024",
-  "width": "1024",
-  "options": {
-    "style": "vivid"
-  }
+  "width": 1024,
+  "height": 1024,
+  "quality": "hd"
 }
 
-### 生成图片：StableDiffusion
+### 生成图片：硅基流动（参考图、反向提示词、高级参数）
 POST {{baseUrl}}/ai/image/draw
 Content-Type: application/json
 Authorization: {{token}}
+tenant-id: {{adminTenentId}}
 
 {
-  "platform": "StableDiffusion",
-  "prompt": "中国长城",
-  "model": "stable-diffusion-v1-6",
-  "height": "1024",
-  "width": "1024",
-  "style": "vivid"
+  "modelId": 2,
+  "prompt": "中国长城，日落",
+  "negativePrompt": "文字、水印",
+  "referenceImageUrls": ["https://www.iocoder.cn/1.png"],
+  "width": 1024,
+  "height": 1024,
+  "seed": 42,
+  "steps": 30,
+  "cfgScale": 7.5
 }
 
-### 生成图片：生成图片（Midjourney）
+### 生成图片：豆包 Seedream
+POST {{baseUrl}}/ai/image/draw
+Content-Type: application/json
+Authorization: {{token}}
+tenant-id: {{adminTenentId}}
+
+{
+  "modelId": 3,
+  "prompt": "一只在雨后小巷的橘猫，电影感光线",
+  "sizeLevel": "2K",
+  "aspectRatio": "1:1"
+}
+
+### 生成专业绘画指令
+POST {{baseUrl}}/ai/image/optimize-prompt
+Content-Type: application/json
+Authorization: {{token}}
+tenant-id: {{adminTenentId}}
+
+{
+  "prompt": "一只猫在雨后的小巷"
+}
+
+### 获取【我的】绘图分页
+GET {{baseUrl}}/ai/image/my-page?pageNo=1&pageSize=10
+Authorization: {{token}}
+tenant-id: {{adminTenentId}}
+
+### 获取公开的绘图分页
+GET {{baseUrl}}/ai/image/public-page?pageNo=1&pageSize=10
+Authorization: {{token}}
+tenant-id: {{adminTenentId}}
+
+### 更新【我的】绘画的公开状态
+PUT {{baseUrl}}/ai/image/update-public-my
+Content-Type: application/json
+Authorization: {{token}}
+tenant-id: {{adminTenentId}}
+
+{
+  "id": 1,
+  "publicStatus": true
+}
+
+### 【Midjourney】文生图
 POST {{baseUrl}}/ai/image/midjourney/imagine
 Content-Type: application/json
 Authorization: {{token}}
+tenant-id: {{adminTenentId}}
 
 {
+  "modelId": 4,
+  "mode": 20,
   "prompt": "中国旗袍",
-  "model": "midjourney",
-  "width": "1",
-  "height": "1",
-  "version": "6.0"
+  "version": "--v 7",
+  "aspectRatio": "2:3",
+  "stylize": 100
+}
+
+### 【Midjourney】融图
+POST {{baseUrl}}/ai/image/midjourney/blend
+Content-Type: application/json
+Authorization: {{token}}
+tenant-id: {{adminTenentId}}
+
+{
+  "modelId": 4,
+  "imageUrls": ["https://www.iocoder.cn/1.png", "https://www.iocoder.cn/2.png"],
+  "dimensions": "SQUARE"
+}
+
+### 【Midjourney】换脸
+POST {{baseUrl}}/ai/image/midjourney/swap-face
+Content-Type: application/json
+Authorization: {{token}}
+tenant-id: {{adminTenentId}}
+
+{
+  "modelId": 4,
+  "sourceUrl": "https://www.iocoder.cn/face.png",
+  "targetUrl": "https://www.iocoder.cn/target.png"
+}
+
+### 【Midjourney】按钮动作
+POST {{baseUrl}}/ai/image/midjourney/action
+Content-Type: application/json
+Authorization: {{token}}
+tenant-id: {{adminTenentId}}
+
+{
+  "id": 1,
+  "customId": "MJ::JOB::upsample::1::85a4b4c1-8835-46c5-a15c-aea34fad1862"
+}
+
+### 【Midjourney】局部重绘
+POST {{baseUrl}}/ai/image/midjourney/modal
+Content-Type: application/json
+Authorization: {{token}}
+tenant-id: {{adminTenentId}}
+
+{
+  "id": 1,
+  "prompt": "换成一顶红色的帽子",
+  "maskUrl": "https://www.iocoder.cn/mask.png"
 }

@@ -53,9 +53,9 @@ public class AiChatUtilsTest {
     @Test
     public void testBuildChatOptions_tongYiOpenAiCompatible() {
         // 调用：含 Media、纯文本各一次
-        OpenAiChatOptions mediaOptions = (OpenAiChatOptions) AiChatUtils.buildChatOptions(AiPlatformEnum.TONG_YI,
+        OpenAiChatOptions mediaOptions = (OpenAiChatOptions) AiChatUtils.buildChatOptions(AiPlatformEnum.ALIBABA,
                 CUSTOM_MODEL, 0.7, 1024, null, null, true);
-        OpenAiChatOptions textOptions = (OpenAiChatOptions) AiChatUtils.buildChatOptions(AiPlatformEnum.TONG_YI,
+        OpenAiChatOptions textOptions = (OpenAiChatOptions) AiChatUtils.buildChatOptions(AiPlatformEnum.ALIBABA,
                 CUSTOM_MODEL, 0.7, 1024, null, null, false);
         // 断言：走 OpenAI 兼容接口，图片随消息发送，是否含 Media 不影响 options
         assertEquals(CUSTOM_MODEL, mediaOptions.getModel());
@@ -86,7 +86,7 @@ public class AiChatUtilsTest {
         // 调用：经 ChatClient 发起流式请求，捕获 OpenAI SDK 实际序列化的请求体
         Map<?, ?> openAiBody = captureOpenAiStreamRequestBody(AiPlatformEnum.OPENAI, "gpt-test");
         Map<?, ?> grokBody = captureOpenAiStreamRequestBody(AiPlatformEnum.GROK, "grok-test");
-        Map<?, ?> tongYiBody = captureOpenAiStreamRequestBody(AiPlatformEnum.TONG_YI, CUSTOM_MODEL);
+        Map<?, ?> tongYiBody = captureOpenAiStreamRequestBody(AiPlatformEnum.ALIBABA, CUSTOM_MODEL);
         // 断言：OpenAI 请求带 include_usage = true；Grok 请求带 include_usage = false，
         // 不是 Spring AI 2.x 未设置 stream_options 时默认发送的 true
         assertEquals(Boolean.TRUE, ((Map<?, ?>) openAiBody.get("stream_options")).get("include_usage"));
@@ -118,7 +118,7 @@ public class AiChatUtilsTest {
             chatModel = new OpenAiDelegateChatModel(chatModel);
         } else if (platform == AiPlatformEnum.GROK) {
             chatModel = new GrokChatModel(chatModel);
-        } else if (platform == AiPlatformEnum.TONG_YI) {
+        } else if (platform == AiPlatformEnum.ALIBABA) {
             chatModel = new TongYiChatModel(chatModel);
         }
 
@@ -138,7 +138,7 @@ public class AiChatUtilsTest {
     @Test
     public void testBuildChatOptions_tongYiNullOptionsKeepsDefault() {
         // 调用：未配置思考
-        OpenAiChatOptions options = (OpenAiChatOptions) AiChatUtils.buildChatOptions(AiPlatformEnum.TONG_YI,
+        OpenAiChatOptions options = (OpenAiChatOptions) AiChatUtils.buildChatOptions(AiPlatformEnum.ALIBABA,
                 CUSTOM_MODEL, 0.7, 1024, null, null, false, null);
         // 断言：与原有行为一致，固定开启思考、不发预算
         assertEquals(MapUtil.of("enable_thinking", true), options.getExtraBody());
@@ -154,9 +154,9 @@ public class AiChatUtilsTest {
         budgetReasoningOptions.put("thinking_budget", 8192);
 
         // 调用
-        OpenAiChatOptions offOptions = (OpenAiChatOptions) AiChatUtils.buildChatOptions(AiPlatformEnum.TONG_YI,
+        OpenAiChatOptions offOptions = (OpenAiChatOptions) AiChatUtils.buildChatOptions(AiPlatformEnum.ALIBABA,
                 CUSTOM_MODEL, 0.7, 1024, null, null, false, offReasoningOptions);
-        OpenAiChatOptions budgetOptions = (OpenAiChatOptions) AiChatUtils.buildChatOptions(AiPlatformEnum.TONG_YI,
+        OpenAiChatOptions budgetOptions = (OpenAiChatOptions) AiChatUtils.buildChatOptions(AiPlatformEnum.ALIBABA,
                 CUSTOM_MODEL, 0.7, 1024, null, null, true, budgetReasoningOptions);
         // 断言：追加到 extraBody，关闭思考不被默认开启覆盖；关闭时不发预算
         assertEquals(offReasoningOptions, offOptions.getExtraBody());
@@ -261,9 +261,9 @@ public class AiChatUtilsTest {
         levelOptions.put("thinking", MapUtil.of("type", "disabled"));
 
         // 调用
-        DeepSeekChatOptions withReasoning = (DeepSeekChatOptions) AiChatUtils.buildChatOptions(AiPlatformEnum.DEEP_SEEK,
+        DeepSeekChatOptions withReasoning = (DeepSeekChatOptions) AiChatUtils.buildChatOptions(AiPlatformEnum.DEEPSEEK,
                 "deepseek-test", 0.7, 1024, null, null, false, levelOptions);
-        DeepSeekChatOptions withoutReasoning = (DeepSeekChatOptions) AiChatUtils.buildChatOptions(AiPlatformEnum.DEEP_SEEK,
+        DeepSeekChatOptions withoutReasoning = (DeepSeekChatOptions) AiChatUtils.buildChatOptions(AiPlatformEnum.DEEPSEEK,
                 "deepseek-test", 0.7, 1024);
         // 断言：DeepSeek 族的思考参数装在客户端 HTTP 层，options 与未配置时一致
         assertEquals(withoutReasoning.getModel(), withReasoning.getModel());
@@ -274,7 +274,7 @@ public class AiChatUtilsTest {
     @Test
     public void testBuildChatOptions_miMo() {
         // 调用
-        DeepSeekChatOptions options = (DeepSeekChatOptions) AiChatUtils.buildChatOptions(AiPlatformEnum.MI_MO,
+        DeepSeekChatOptions options = (DeepSeekChatOptions) AiChatUtils.buildChatOptions(AiPlatformEnum.XIAOMI,
                 "mimo-v2.6-flash", 0.7, 1024);
         // 断言：复用 DeepSeek 客户端的选项
         assertEquals("mimo-v2.6-flash", options.getModel());

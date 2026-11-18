@@ -3,6 +3,11 @@ package cn.iocoder.yudao.module.ai.framework.ai.core.model;
 import cn.iocoder.yudao.module.ai.enums.model.AiPlatformEnum;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.midjourney.api.MidjourneyApi;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.suno.api.SunoApi;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.tencent.api.TencentTtsApi;
+import cn.iocoder.yudao.module.ai.framework.ai.core.ocr.OcrModel;
+import com.volcengine.ark.runtime.service.ArkService;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.speech.AiSpeechModel;
+import org.springframework.ai.audio.transcription.TranscriptionModel;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.image.ImageModel;
@@ -59,9 +64,10 @@ public interface AiModelFactory {
      * @param platform 平台
      * @param apiKey API KEY
      * @param url API URL
+     * @param model 模型标识（例如说：Stability AI 需要拼接到请求路径中）
      * @return ImageModel 对象
      */
-    ImageModel getOrCreateImageModel(AiPlatformEnum platform, String apiKey, String url);
+    ImageModel getOrCreateImageModel(AiPlatformEnum platform, String apiKey, String url, String model);
 
     /**
      * 基于指定配置，获得 MidjourneyApi 对象
@@ -75,6 +81,15 @@ public interface AiModelFactory {
     MidjourneyApi getOrCreateMidjourneyApi(String apiKey, String url);
 
     /**
+     * 基于指定配置，获得火山方舟 ArkService 对象（豆包 Seedream 绘图）
+     *
+     * @param apiKey API Key
+     * @param url API URL，允许空
+     * @return ArkService 对象
+     */
+    ArkService getOrCreateArkService(String apiKey, String url);
+
+    /**
      * 基于指定配置，获得 SunoApi 对象
      *
      * 如果不存在，则进行创建
@@ -84,6 +99,56 @@ public interface AiModelFactory {
      * @return SunoApi 对象
      */
     SunoApi getOrCreateSunoApi(String apiKey, String url);
+
+    /**
+     * 基于指定配置，获得语音合成的 AiSpeechModel 对象：阿里云（通义）、MiniMax、字节跳动（豆包）、百度、腾讯云、DeepSeek
+     *
+     * 如果不存在，则进行创建。模型在创建时绑定，请求不能切换
+     *
+     * @param platform 平台
+     * @param apiKey API KEY
+     * @param url API URL，允许空（使用平台默认地址）
+     * @param model 模型标识
+     * @return AiSpeechModel 对象
+     */
+    AiSpeechModel getOrCreateTextToSpeechModel(AiPlatformEnum platform, String apiKey, String url, String model);
+
+    /**
+     * 基于指定配置，获得语音识别的 TranscriptionModel 对象：DeepSeek、阿里云、腾讯云、百度
+     *
+     * 如果不存在，则进行创建
+     *
+     * @param platform 平台
+     * @param apiKey API KEY
+     * @param url API URL，允许空（使用平台默认地址）
+     * @param model 模型标识（DeepSeek 没有模型参数，只用于本地区分；腾讯云为引擎类型，百度为 dev_pid）
+     * @return TranscriptionModel 对象
+     */
+    TranscriptionModel getOrCreateTranscriptionModel(AiPlatformEnum platform, String apiKey, String url, String model);
+
+    /**
+     * 基于指定配置，获得腾讯云语音合成的 TencentTtsApi 对象：按任务编号查询未在时限内完成的任务
+     *
+     * 如果不存在，则进行创建
+     *
+     * @param apiKey 凭证，格式为 SecretId|SecretKey
+     * @param url API URL，允许空
+     * @return TencentTtsApi 对象
+     */
+    TencentTtsApi getOrCreateTencentTtsApi(String apiKey, String url);
+
+    /**
+     * 基于指定配置，获得 OcrModel 对象：通义、硅基流动、腾讯云、百度、火山引擎、DeepSeek
+     *
+     * 如果不存在，则进行创建。按平台、API KEY、URL、模型标识缓存，配置变更后不会复用旧凭证
+     *
+     * @param platform 平台
+     * @param apiKey API KEY
+     * @param url API URL，允许空（使用平台默认地址）
+     * @param model 模型标识或服务代码
+     * @return OcrModel 对象
+     */
+    OcrModel getOrCreateOcrModel(AiPlatformEnum platform, String apiKey, String url, String model);
 
     /**
      * 基于指定配置，获得 EmbeddingModel 对象
