@@ -3,7 +3,11 @@ package cn.iocoder.yudao.module.ai.service.drama;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.script.AiDramaChatReqVO;
+import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.project.AiDramaProjectSaveReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.script.AiDramaChatStreamReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.script.AiDramaScriptCreateReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.script.AiDramaScriptCreateRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.script.AiDramaScriptPolishReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.script.AiDramaScriptUpdateReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.storyboard.AiDramaStoryboardImportReqVO;
@@ -17,6 +21,7 @@ import cn.iocoder.yudao.module.ai.enums.drama.AiDramaStatusEnum;
 import cn.iocoder.yudao.module.ai.enums.drama.AiDramaStyleEnum;
 import cn.iocoder.yudao.module.ai.enums.model.AiModelTypeEnum;
 import cn.iocoder.yudao.module.ai.enums.model.AiPlatformEnum;
+import cn.iocoder.yudao.module.ai.service.drama.bo.AiDramaStoryboardPlanRespBO;
 import cn.iocoder.yudao.module.ai.service.model.AiModelService;
 import cn.iocoder.yudao.module.ai.util.AiReasoningUtils;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
@@ -32,6 +37,8 @@ import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.deepseek.DeepSeekChatOptions;
 import org.springframework.ai.deepseek.api.ResponseFormat;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionTemplate;
 import reactor.core.publisher.Flux;
 
 import java.util.Arrays;
@@ -71,6 +78,8 @@ public class AiDramaScriptServiceImplTest extends BaseMockitoUnitTest {
     private AiDramaStoryboardService storyboardService;
     @Mock
     private AiModelService modelService;
+    @Mock
+    private TransactionTemplate transactionTemplate;
 
     // ========== parseJson ==========
 
@@ -544,7 +553,140 @@ public class AiDramaScriptServiceImplTest extends BaseMockitoUnitTest {
         assertEquals(Boolean.TRUE, ((DashScopeChatOptions) captor.getValue().getOptions()).getEnableThinking());
     }
 
+    // ========== 从故事想法创建项目 ==========
+
+    @Test
+    public void testCreateProjectStreamMy_success() {
+        // 准备参数：名称未填写；模型分两段返回剧本
+        mockChatStream("{\"title\":\"末班地铁\",\"tone\":\"悬疑\",", "\"content\":\"第一场 车厢\"}");
+        mockTransaction();
+        when(projectService.createProject(eq(USER_ID), any(AiDramaProjectSaveReqVO.class))).thenReturn(PROJECT_ID);
+        AiDramaScriptCreateReqVO reqVO = createReqVO("  ");
+
+        // 调用
+        List<CommonResult<AiDramaScriptCreateRespVO>> results = scriptService.createProjectStreamMy(USER_ID, reqVO)
+                .collectList().block();
+
+        // 断言：先返回增量文本，最后返回项目编号
+        assertNotNull(results);
+        assertEquals(3, results.size());
+        assertEquals("\"content\":\"第一场 车厢\"}", results.get(1).getData().getContent());
+        assertEquals(PROJECT_ID, results.get(2).getData().getProjectId());
+        // 断言：同一事务内创建项目、保存剧本；名称为空时使用剧名，项目设置沿用请求
+        verify(transactionTemplate).execute(any());
+        ArgumentCaptor<AiDramaProjectSaveReqVO> projectCaptor = ArgumentCaptor.forClass(AiDramaProjectSaveReqVO.class);
+        verify(projectService).createProject(eq(USER_ID), projectCaptor.capture());
+        assertEquals("末班地铁", projectCaptor.getValue().getName());
+        assertEquals("末班车上的相遇", projectCaptor.getValue().getIdea());
+        assertEquals("16:9", projectCaptor.getValue().getComposeAspectRatio());
+        ArgumentCaptor<AiDramaScriptDO> scriptCaptor = ArgumentCaptor.forClass(AiDramaScriptDO.class);
+        verify(scriptMapper).insert(scriptCaptor.capture());
+        assertEquals(PROJECT_ID, scriptCaptor.getValue().getProjectId());
+        assertEquals("第一场 车厢", scriptCaptor.getValue().getContent());
+        // 断言：项目尚未创建，不查询世界观
+        verify(scriptMapper, never()).selectLatestByProjectId(any());
+    }
+
+    @Test
+    public void testCreateProjectStreamMy_keepName() {
+        // 准备参数：填写了名称
+        mockChatStream("{\"title\":\"末班地铁\",\"content\":\"第一场 车厢\"}");
+        mockTransaction();
+        when(projectService.createProject(eq(USER_ID), any(AiDramaProjectSaveReqVO.class))).thenReturn(PROJECT_ID);
+
+        // 调用
+        scriptService.createProjectStreamMy(USER_ID, createReqVO(" 十年后的我 ")).blockLast();
+
+        // 断言：使用填写的名称
+        ArgumentCaptor<AiDramaProjectSaveReqVO> captor = ArgumentCaptor.forClass(AiDramaProjectSaveReqVO.class);
+        verify(projectService).createProject(eq(USER_ID), captor.capture());
+        assertEquals("十年后的我", captor.getValue().getName());
+    }
+
+    @Test
+    public void testCreateProjectStreamMy_parseFail() {
+        // 准备参数：模型没有返回剧本正文
+        mockChatStream("{\"title\":\"末班地铁\"}");
+
+        // 调用
+        CommonResult<AiDramaScriptCreateRespVO> last = scriptService.createProjectStreamMy(USER_ID, createReqVO(null)).blockLast();
+
+        // 断言：返回错误，不创建项目、不保存剧本；结束后可再次创建
+        assertNotNull(last);
+        assertEquals(DRAMA_CHAT_FAIL.getCode(), last.getCode());
+        verify(projectService, never()).createProject(any(), any());
+        verify(scriptMapper, never()).insert(any(AiDramaScriptDO.class));
+        verifyNoInteractions(transactionTemplate);
+        mockChatStream("{\"title\":\"末班地铁\"}");
+        assertEquals(DRAMA_CHAT_FAIL.getCode(), scriptService.createProjectStreamMy(USER_ID, createReqVO(null)).blockLast().getCode());
+    }
+
+    @Test
+    public void testCreateProjectStreamMy_preStreamException() {
+        // 准备参数：构建模型时抛出非业务异常
+        when(modelService.getRequiredDefaultModel(AiModelTypeEnum.CHAT.getType()))
+                .thenReturn(chatModelDO(AiPlatformEnum.OPENAI, "gpt-4o"));
+        when(modelService.getChatModel(eq(CHAT_MODEL_ID), any())).thenThrow(new IllegalStateException("模型配置错误"));
+
+        // 调用
+        CommonResult<AiDramaScriptCreateRespVO> result = scriptService.createProjectStreamMy(USER_ID, createReqVO(null)).blockLast();
+
+        // 断言：返回错误，不创建项目；占位已释放，再次创建不会被拒绝为「进行中」
+        assertNotNull(result);
+        assertEquals(DRAMA_CHAT_FAIL.getCode(), result.getCode());
+        verify(projectService, never()).createProject(any(), any());
+        assertNotEquals(DRAMA_CREATE_RUNNING.getCode(),
+                scriptService.createProjectStreamMy(USER_ID, createReqVO(null)).blockLast().getCode());
+    }
+
+    @Test
+    public void testCreateProjectStreamMy_running() {
+        // 准备参数：第一次生成未结束
+        AiModelDO model = chatModelDO(AiPlatformEnum.OPENAI, "gpt-4o");
+        when(modelService.getRequiredDefaultModel(AiModelTypeEnum.CHAT.getType())).thenReturn(model);
+        ChatModel chatModel = mock(ChatModel.class);
+        when(modelService.getChatModel(eq(CHAT_MODEL_ID), any())).thenReturn(chatModel);
+        when(chatModel.stream(any(Prompt.class))).thenReturn(Flux.never());
+        scriptService.createProjectStreamMy(USER_ID, createReqVO(null));
+
+        // 调用：同一用户再次创建
+        CommonResult<AiDramaScriptCreateRespVO> result = scriptService.createProjectStreamMy(USER_ID, createReqVO(null)).blockFirst();
+
+        // 断言：拒绝，不再调用模型
+        assertNotNull(result);
+        assertEquals(DRAMA_CREATE_RUNNING.getCode(), result.getCode());
+        verify(chatModel, times(1)).stream(any(Prompt.class));
+    }
+
     // ========== 工具 ==========
+
+    private void mockChatStream(String... texts) {
+        AiModelDO model = chatModelDO(AiPlatformEnum.OPENAI, "gpt-4o");
+        when(modelService.getRequiredDefaultModel(AiModelTypeEnum.CHAT.getType())).thenReturn(model);
+        ChatModel chatModel = mock(ChatModel.class);
+        when(modelService.getChatModel(eq(CHAT_MODEL_ID), any())).thenReturn(chatModel);
+        List<ChatResponse> responses = Arrays.stream(texts).map(text -> {
+            ChatResponse response = mock(ChatResponse.class, Answers.RETURNS_DEEP_STUBS);
+            when(response.getResult().getOutput().getText()).thenReturn(text);
+            return response;
+        }).toList();
+        when(chatModel.stream(any(Prompt.class))).thenReturn(Flux.fromIterable(responses));
+    }
+
+    @SuppressWarnings("unchecked")
+    private void mockTransaction() {
+        when(transactionTemplate.execute(any())).thenAnswer(invocation ->
+                ((TransactionCallback<Object>) invocation.getArgument(0)).doInTransaction(null));
+    }
+
+    private static AiDramaScriptCreateReqVO createReqVO(String name) {
+        AiDramaScriptCreateReqVO reqVO = new AiDramaScriptCreateReqVO();
+        reqVO.setName(name);
+        reqVO.setIdea("末班车上的相遇");
+        reqVO.setComposeAspectRatio("16:9");
+        return reqVO;
+    }
+
 
     private void mockChat(String text) {
         mockChat(text, AiPlatformEnum.OPENAI);
@@ -590,6 +732,163 @@ public class AiDramaScriptServiceImplTest extends BaseMockitoUnitTest {
         AiDramaChatReqVO reqVO = new AiDramaChatReqVO();
         reqVO.setProjectId(PROJECT_ID);
         return reqVO;
+    }
+
+    // ========== 逐场规划、形象匹配 ==========
+
+    @Test
+    public void testSplitScriptScenes_headings() {
+        String content = """
+                开场前的说明
+                第一场 地铁车厢 夜
+                林夏上车。
+                第一场雪落在站台上。
+                场景2：站台
+                周远追出车门。
+                内景 出租屋 日
+                两人对坐。""";
+
+        List<String> scenes = AiDramaScriptServiceImpl.splitScriptScenes(content);
+
+        // 断言：标题前的内容并入第一场；「第一场雪」是正文，不切分
+        assertEquals(3, scenes.size());
+        assertTrue(scenes.get(0).startsWith("开场前的说明"));
+        assertTrue(scenes.get(0).contains("第一场雪落在站台上"));
+        assertTrue(scenes.get(1).startsWith("场景2：站台"));
+        assertTrue(scenes.get(2).startsWith("内景 出租屋 日"));
+    }
+
+    @Test
+    public void testSplitScriptScenes_bracketHeadings() {
+        // 准备：前言在第一个标题之前；标题带全角括号的预计时长、方括号
+        String content = """
+                本剧讲述末班车上的相遇。
+                第一场（预计 20 秒）
+                林夏上车。
+                【第二场】站台（预计 12 秒）
+                周远追出车门。
+                [第3场] 出租屋
+                两人对坐。""";
+
+        List<String> scenes = AiDramaScriptServiceImpl.splitScriptScenes(content);
+        int[] budgets = AiDramaScriptServiceImpl.estimateSceneSeconds(scenes);
+
+        // 断言：三场；前言并入第一场，预算仍取真实标题的「预计 N 秒」
+        assertEquals(3, scenes.size());
+        assertTrue(scenes.get(0).startsWith("本剧讲述"));
+        assertTrue(scenes.get(1).startsWith("【第二场】"));
+        assertTrue(scenes.get(2).startsWith("[第3场]"));
+        assertEquals(20, budgets[0]);
+        assertEquals(12, budgets[1]);
+    }
+
+    @Test
+    public void testSplitScriptScenes_plainText() {
+        // 无法识别场次时只有一项，按整部剧本拆分
+        List<String> scenes = AiDramaScriptServiceImpl.splitScriptScenes("林夏上车，看见对面的乘客。\n她愣住了。");
+
+        assertEquals(1, scenes.size());
+    }
+
+    @Test
+    public void testEstimateSceneSeconds() {
+        int[] budgets = AiDramaScriptServiceImpl.estimateSceneSeconds(Arrays.asList(
+                "第一场（预计 20 秒）\n短", "第二场\n" + "长".repeat(98)));
+
+        assertEquals(20, budgets[0]);
+        assertTrue(budgets[1] > budgets[0]);
+    }
+
+    @Test
+    public void testMatchAppearance() {
+        List<AiDramaCharacterAppearanceDO> appearances = Arrays.asList(
+                appearance(11L, 0, null, "白衬衫"), appearance(12L, 1, "受伤", "额头缠着纱布"),
+                appearance(13L, 2, "换装", "黑色晚礼服"), appearance(14L, 3, "换装后受伤", "礼服沾血"));
+
+        // 未指定：初始形象
+        assertEquals(11L, AiDramaScriptServiceImpl.matchAppearance(appearances, null).getId());
+        // 按序号
+        assertEquals(13L, AiDramaScriptServiceImpl.matchAppearance(appearances, "形象2").getId());
+        // 按变化原因：完全相同优先
+        assertEquals(12L, AiDramaScriptServiceImpl.matchAppearance(appearances, "受伤").getId());
+        // 按形象设定
+        assertEquals(13L, AiDramaScriptServiceImpl.matchAppearance(appearances, "晚礼服").getId());
+        // 无法唯一匹配：为空，由调用方用初始形象并提示检查
+        assertNull(AiDramaScriptServiceImpl.matchAppearance(appearances, "换"));
+        assertNull(AiDramaScriptServiceImpl.matchAppearance(appearances, "9"));
+    }
+
+    @Test
+    public void testPlanStoryboardListMy_byScene() {
+        // 准备：两场的剧本，林夏有「受伤」形象
+        when(projectService.validateProjectMy(PROJECT_ID, USER_ID)).thenReturn(project());
+        when(scriptMapper.selectLatestByProjectId(PROJECT_ID)).thenReturn(new AiDramaScriptDO().setId(1L).setProjectId(PROJECT_ID)
+                .setContent("第一场 车厢\n林夏上车。\n第二场 站台\n林夏下车，额头流血。"));
+        when(assetService.getCharacterList(PROJECT_ID)).thenReturn(List.of(new AiDramaCharacterDO().setId(1L).setName("林夏")));
+        when(assetService.getAppearanceListByCharacterIds(any())).thenReturn(Arrays.asList(
+                appearance(11L, 0, null, "白衬衫").setCharacterId(1L), appearance(12L, 1, "受伤", "额头缠着纱布").setCharacterId(1L)));
+        when(modelService.getRequiredDefaultModel(AiModelTypeEnum.CHAT.getType())).thenReturn(chatModelDO(AiPlatformEnum.OPENAI, "gpt-4o"));
+        ChatModel chatModel = mock(ChatModel.class);
+        when(modelService.getChatModel(eq(CHAT_MODEL_ID), any())).thenReturn(chatModel);
+        ChatResponse firstScene = mock(ChatResponse.class, Answers.RETURNS_DEEP_STUBS);
+        when(firstScene.getResult().getOutput().getText()).thenReturn("[{\"title\":\"上车\",\"characters\":[{\"name\":\"林夏\"}]}]");
+        ChatResponse secondScene = mock(ChatResponse.class, Answers.RETURNS_DEEP_STUBS);
+        when(secondScene.getResult().getOutput().getText()).thenReturn(
+                "[{\"title\":\"下车\",\"characters\":[{\"name\":\"林夏\",\"appearance\":\"受伤\"}]},"
+                + "{\"title\":\"回望\",\"characters\":[{\"name\":\"林夏\",\"appearance\":\"不存在的形象\"}]}]");
+        when(chatModel.call(any(Prompt.class))).thenAnswer(invocation ->
+                invocation.getArgument(0, Prompt.class).getContents().contains("本次只拆第 1 场") ? firstScene : secondScene);
+
+        List<AiDramaStoryboardPlanRespBO> plans = scriptService.planStoryboardListMy(USER_ID, chatReqVO());
+        List<AiDramaStoryboardDO> storyboards = plans.stream().map(AiDramaStoryboardPlanRespBO::getStoryboard).toList();
+
+        // 断言：逐场调用，每场只带本场原文，按原场次顺序合并；场次以切分为准
+        ArgumentCaptor<Prompt> promptCaptor = ArgumentCaptor.forClass(Prompt.class);
+        verify(chatModel, times(2)).call(promptCaptor.capture());
+        String secondPrompt = promptCaptor.getAllValues().stream().map(Prompt::getContents)
+                .filter(content -> content.contains("本次只拆第 2 场")).findFirst().orElseThrow();
+        assertTrue(secondPrompt.contains("上一场结尾"));
+        assertTrue(secondPrompt.contains("林夏（可换形象：1 受伤）"));
+        assertEquals(Arrays.asList("上车", "下车", "回望"), storyboards.stream().map(AiDramaStoryboardDO::getTitle).toList());
+        assertEquals(Arrays.asList(1, 2, 2), storyboards.stream().map(item -> item.getContinuity().getSceneNumber()).toList());
+        assertEquals(Arrays.asList(1, 2, 3), storyboards.stream().map(AiDramaStoryboardDO::getSceneNo).toList());
+        // 断言：形象按变化原因匹配；未指定用初始；指定了但无法匹配用初始并提示
+        assertEquals(11L, storyboards.get(0).getCharacters().get(0).getAppearanceId());
+        assertEquals(12L, storyboards.get(1).getCharacters().get(0).getAppearanceId());
+        assertEquals(11L, storyboards.get(2).getCharacters().get(0).getAppearanceId());
+        assertNull(plans.get(1).getWarnings());
+        assertEquals(1, plans.get(2).getWarnings().size());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testGenerateStoryboardListMy_byScene() {
+        // 准备：两场的剧本；画布执行的直接拆分与规划分镜共用逐场拆分
+        when(projectService.validateProjectMy(PROJECT_ID, USER_ID)).thenReturn(project());
+        when(scriptMapper.selectLatestByProjectId(PROJECT_ID)).thenReturn(new AiDramaScriptDO().setId(SCRIPT_ID).setProjectId(PROJECT_ID)
+                .setContent("第一场（预计 8 秒）\n林夏上车。\n第二场（预计 6 秒）\n林夏下车。"));
+        when(modelService.getRequiredDefaultModel(AiModelTypeEnum.CHAT.getType())).thenReturn(chatModelDO(AiPlatformEnum.OPENAI, "gpt-4o"));
+        ChatModel chatModel = mock(ChatModel.class);
+        when(modelService.getChatModel(eq(CHAT_MODEL_ID), any())).thenReturn(chatModel);
+        ChatResponse response = mock(ChatResponse.class, Answers.RETURNS_DEEP_STUBS);
+        when(response.getResult().getOutput().getText()).thenReturn("[{\"title\":\"镜头\"}]");
+        when(chatModel.call(any(Prompt.class))).thenReturn(response);
+
+        scriptService.generateStoryboardListMy(USER_ID, chatReqVO());
+
+        // 断言：每场一次调用，预算取标题；合并后替换当前剧本的分镜
+        ArgumentCaptor<Prompt> promptCaptor = ArgumentCaptor.forClass(Prompt.class);
+        verify(chatModel, times(2)).call(promptCaptor.capture());
+        assertTrue(promptCaptor.getAllValues().stream().map(Prompt::getContents).anyMatch(content ->
+                content.contains("本次只拆第 2 场") && content.contains("约 6 秒")));
+        ArgumentCaptor<List<AiDramaStoryboardDO>> captor = ArgumentCaptor.forClass(List.class);
+        verify(storyboardService).replaceStoryboardList(eq(PROJECT_ID), eq(SCRIPT_ID), captor.capture());
+        assertEquals(Arrays.asList(1, 2), captor.getValue().stream().map(item -> item.getContinuity().getSceneNumber()).toList());
+    }
+
+    private static AiDramaCharacterAppearanceDO appearance(Long id, Integer index, String changeReason, String description) {
+        return new AiDramaCharacterAppearanceDO().setId(id).setAppearanceIndex(index).setChangeReason(changeReason)
+                .setDescription(description);
     }
 
 }

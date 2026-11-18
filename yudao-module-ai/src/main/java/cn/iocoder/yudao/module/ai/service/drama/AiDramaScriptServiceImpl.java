@@ -13,7 +13,10 @@ import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.script.AiDramaChatReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.project.AiDramaProjectSaveReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.script.AiDramaChatStreamReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.script.AiDramaScriptCreateReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.script.AiDramaScriptCreateRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.script.AiDramaScriptPolishReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.script.AiDramaScriptUpdateReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.storyboard.AiDramaStoryboardImportReqVO;
@@ -25,6 +28,7 @@ import cn.iocoder.yudao.module.ai.dal.mysql.drama.AiDramaScriptMapper;
 import cn.iocoder.yudao.module.ai.enums.drama.*;
 import cn.iocoder.yudao.module.ai.enums.model.AiModelTypeEnum;
 import cn.iocoder.yudao.module.ai.enums.model.AiPlatformEnum;
+import cn.iocoder.yudao.module.ai.service.drama.bo.AiDramaStoryboardPlanRespBO;
 import cn.iocoder.yudao.module.ai.service.model.AiModelService;
 import cn.iocoder.yudao.module.ai.service.skill.AiSkillFileService;
 import cn.iocoder.yudao.module.ai.service.skill.AiSkillService;
@@ -32,6 +36,9 @@ import cn.iocoder.yudao.module.ai.util.AiChatUtils;
 import cn.iocoder.yudao.module.ai.util.AiReasoningUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.annotations.VisibleForTesting;
 import jakarta.annotation.Resource;
 import lombok.AllArgsConstructor;
@@ -45,14 +52,22 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.deepseek.DeepSeekChatOptions;
 import org.springframework.ai.deepseek.api.ResponseFormat;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.validation.annotation.Validated;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.invalidParamException;
@@ -122,6 +137,31 @@ public class AiDramaScriptServiceImpl implements AiDramaScriptService {
             剧本：
             {}
 
+            """ + "{}";
+
+    /**
+     * 逐场拆分分镜：只拆当前一场，带本场角色、时长预算与上一场结尾；输出格式与整部剧本拆分一致
+     */
+    private static final String GENERATE_SCENE_STORYBOARDS_PROMPT = """
+            你是一名短剧分镜师。剧本共 {} 场，本次只拆第 {} 场为镜头分镜，每个镜头 3 到 10 秒；不要拆其它场次，也不要重复上一场的内容。
+            本场时长预算：约 {} 秒，按原文实际的对白与动作估算，不为凑时长新增对白或情节。
+            画风：{}
+            本场角色：{}
+            可用场景：{}
+            可用道具：{}
+            剧情大纲（只作因果上下文）：{}
+            上一场结尾（只作承接参考，不重复生成）：
+            {}
+            本场原文：
+            {}
+
+            本场出镜与发声的角色，只以本场原文及上一场结尾的明确承接为据，不添加本场没有安排的角色。sceneNumber 固定为 {}。
+            """ + "{}";
+
+    /**
+     * 拆分分镜的连续性要求与输出格式：整部剧本拆分、逐场拆分共用
+     */
+    private static final String STORYBOARDS_JSON_FORMAT = """
             连续性要求：同一场景且同一连续时刻内，下一镜的 startState 承接上一镜的 endState；narrativeCause 承接上一镜的 \
             storyResult；场景切换必须有剧情原因，startState 写明“新场景建立”。imagePrompt 只描述 startState 的静态首帧，\
             不提前画出结束动作。
@@ -137,7 +177,8 @@ public class AiDramaScriptServiceImpl implements AiDramaScriptService {
             "title":"镜头标题","sourceText":"对应的剧本原文","sceneText":"镜头内容描述",\
             "shotType":"景别","cameraMove":"运镜","duration":秒数,"imagePrompt":"用于关键帧出图的画面描述",\
             "videoPrompt":"用于视频生成的画面描述，包含人物动作与环境","dialogues":[{"character":"角色名，旁白为空","line":"台词"}],\
-            "characters":[{"name":"出场角色名","slot":"站位，取场景的可用站位"}],"location":"场景名","props":["道具名"],\
+            "characters":[{"name":"出场角色名","slot":"站位，取场景的可用站位",\
+            "appearance":"角色换了形象时填形象序号或变化原因，取可用角色中列出的形象；初始形象不填"}],"location":"场景名","props":["道具名"],\
             "startState":"本镜 0 秒的静态状态","endState":"本镜最后一帧的人物位置、朝向、姿态、道具与动作结果",\
             "continuityAction":"与下一镜衔接的未完成动作、视线方向或运动趋势",\
             "spatialAnchor":"空间锚点，明确左右、前后、远近与人物相对位置",\
@@ -184,6 +225,39 @@ public class AiDramaScriptServiceImpl implements AiDramaScriptService {
             {}
 
             """;
+    /**
+     * 从故事想法创建项目时：项目名称的最大长度，与项目创建的校验一致；未填写且没有剧名时的默认名称
+     */
+    private static final int PROJECT_NAME_MAX_LENGTH = 64;
+    private static final String DEFAULT_PROJECT_NAME = "未命名短剧";
+
+    /**
+     * 场次标题：「第一场」「第一场（预计 20 秒）」「【第一场】车厢」「场景 1」「内景 / 外景」开头，或「1-2 日 内 车厢」、
+     * Markdown 的「## 一、车厢」；「第一场雪」等正文不算，序号后需为结尾、空白、标点或括号
+     */
+    private static final Pattern SCENE_HEADING_PATTERN = Pattern.compile(
+            "^(?:#{1,6}\\s*)?(?:\\*\\*)?[【\\[（(]?\\s*(?:"
+                    + "(?:第\\s*[一二三四五六七八九十百零〇两0-9]+\\s*场|场景\\s*[一二三四五六七八九十百零〇0-9]+)"
+                    + "(?:$|[\\s　：:、.．】\\]）)（(【\\[\\-—*].*)"
+                    + "|(?:[0-9]+\\s*[.、．]\\s*)?(?:内景|外景|内外景|INT\\.|EXT\\.).*"
+                    + "|[0-9]+[-－–][0-9]+[\\s　]+(?:日|夜|晨|清晨|早晨|白天|午后|傍晚|黄昏|黎明|深夜|接上)[\\s　]+(?:内外景|内景|外景|内外|内|外)(?:[\\s　].*)?"
+                    + ")$"
+                    + "|^#{2,6}\\s+[一二三四五六七八九十百0-9]+[\\s　、.．]+\\S.*$");
+    /**
+     * 场次标题中的预计时长，例如「第一场（预计 20 秒）」
+     */
+    private static final Pattern SCENE_ESTIMATE_PATTERN = Pattern.compile("预计\\s*(\\d+(?:\\.\\d+)?)\\s*秒");
+    /**
+     * 逐场拆分：未写明预计时长时，按原文长度分配的总时长（秒），与整部剧本拆分的 1 到 3 分钟一致；每场至少的时长（秒）
+     */
+    private static final int SCRIPT_TOTAL_SECONDS = 120;
+    private static final int SCENE_MIN_SECONDS = 5;
+    /**
+     * 逐场拆分：带给下一场的上一场结尾的长度（字符）；同时调用的场数
+     */
+    private static final int PREVIOUS_SCENE_ENDING_LENGTH = 1000;
+    private static final int SCENE_PLAN_CONCURRENCY = 3;
+
     private static final String WORLDBUILDING_PROMPT = """
             当前项目的世界观设定，人物、场景与剧情须遵守：
             {}
@@ -206,11 +280,17 @@ public class AiDramaScriptServiceImpl implements AiDramaScriptService {
     private AiSkillService skillService;
     @Resource
     private AiSkillFileService skillFileService;
+    @Resource
+    private TransactionTemplate transactionTemplate;
 
     /**
      * 进行中的流式生成：key 为项目编号；同一项目同时只有一个
      */
     private final Map<Long, ChatTask> chatTasks = new ConcurrentHashMap<>();
+    /**
+     * 进行中的从故事想法创建项目：用户编号；同一用户同时只有一个
+     */
+    private final Set<Long> createTasks = ConcurrentHashMap.newKeySet();
 
     // ========== 剧本 ==========
 
@@ -303,8 +383,17 @@ public class AiDramaScriptServiceImpl implements AiDramaScriptService {
 
     @Override
     public void generateStoryboardListMy(Long userId, AiDramaChatReqVO reqVO) {
+        // 1. 校验：没有进行中的流式生成；当前剧本存在，其分镜没有镜头视频在生成中
         AiDramaProjectDO project = projectService.validateProjectMy(reqVO.getProjectId(), userId);
-        executeChat(AiDramaChatTypeEnum.STORYBOARD_GENERATE, project, reqVO.getModelId(), null);
+        AiDramaChatTypeEnum type = AiDramaChatTypeEnum.STORYBOARD_GENERATE;
+        ChatTask running = chatTasks.get(project.getId());
+        if (running != null) {
+            throw exception(DRAMA_CHAT_RUNNING, running.getType().getName());
+        }
+        AiDramaScriptDO script = validateChatPrecondition(type, project, null);
+
+        // 2. 与规划分镜相同的逐场拆分，直接替换该剧本的分镜（画布执行使用）
+        saveStoryboardList(project, script, planStoryboards(project, script, reqVO.getModelId()));
     }
 
     @Override
@@ -314,7 +403,7 @@ public class AiDramaScriptServiceImpl implements AiDramaScriptService {
     }
 
     @Override
-    public List<AiDramaStoryboardDO> planStoryboardListMy(Long userId, AiDramaChatReqVO reqVO) {
+    public List<AiDramaStoryboardPlanRespBO> planStoryboardListMy(Long userId, AiDramaChatReqVO reqVO) {
         // 1. 校验：没有进行中的流式生成；当前剧本存在
         AiDramaProjectDO project = projectService.validateProjectMy(reqVO.getProjectId(), userId);
         ChatTask running = chatTasks.get(project.getId());
@@ -323,10 +412,146 @@ public class AiDramaScriptServiceImpl implements AiDramaScriptService {
         }
         AiDramaScriptDO script = validateScriptExists(project.getId());
 
-        // 2. 调用对话模型，解析为分镜：不保存，供审阅后导入
+        // 2. 逐场拆分为分镜：不保存，供审阅后导入
+        return buildStoryboardList(project, script, planStoryboards(project, script, reqVO.getModelId()));
+    }
+
+    /**
+     * 由剧本拆分分镜：规划分镜（审阅后导入）、直接拆分分镜（画布执行）共用
+     *
+     * 1. 无法识别出多个场次时：整部剧本一次拆分（原有用法）
+     * 2. 逐场拆分：每场带本场角色、时长预算与上一场结尾，并行（最多 SCENE_PLAN_CONCURRENCY 场）调用，按原场次顺序合并；
+     *    任一场失败时整体失败，不保存跨任务的场级检查点，重试时重新规划
+     *
+     * @return 模型返回的分镜 JSON 数组；逐场时原文场次 sceneNumber 以切分为准
+     */
+    private JsonNode planStoryboards(AiDramaProjectDO project, AiDramaScriptDO script, Long modelId) {
+        // 1. 整部剧本一次拆分
         AiDramaChatTypeEnum type = AiDramaChatTypeEnum.STORYBOARD_GENERATE;
-        String content = chat(type.getName(), reqVO.getModelId(), type.isJsonObject(), buildChatPrompt(type, project, script, null));
-        return buildStoryboardList(project, script, parseJson(type.getName(), content));
+        List<String> scenes = splitScriptScenes(script.getContent());
+        if (scenes.size() <= 1) {
+            String content = chat(type.getName(), modelId, type.isJsonObject(), buildChatPrompt(type, project, script, null));
+            return parseJson(type.getName(), content);
+        }
+        // 2.1 逐场调用模型并解析：在弹性线程中并行（最多 SCENE_PLAN_CONCURRENCY 场），带上当前租户；结果按原场次顺序返回。
+        //     任一场调用、解析失败时整体失败，其它进行中的场次随之取消
+        List<String> prompts = buildScenePlanPrompts(project, script, scenes);
+        Long tenantId = TenantContextHolder.getTenantId();
+        List<JsonNode> results = Flux.range(0, prompts.size())
+                .flatMapSequential(i -> Mono.fromCallable(() -> executeInTenant(tenantId, () -> {
+                            String content = chat(type.getName(), modelId, type.isJsonObject(), prompts.get(i));
+                            return parseJson(type.getName() + "（第 " + (i + 1) + " 场）", content);
+                        }))
+                        .subscribeOn(Schedulers.boundedElastic()), SCENE_PLAN_CONCURRENCY)
+                .collectList().block();
+        // 2.2 按原场次顺序合并：任一场没有返回分镜时整体失败
+        ArrayNode merged = JsonNodeFactory.instance.arrayNode();
+        for (int i = 0; i < results.size(); i++) {
+            int sceneNumber = i + 1;
+            JsonNode result = results.get(i);
+            if (!result.isArray() || result.isEmpty()) {
+                throw exception(DRAMA_CHAT_FAIL, type.getName(), "模型没有返回第 " + sceneNumber + " 场的分镜");
+            }
+            for (JsonNode node : result) {
+                // 原文场次以切分的场次为准：模型返回的不可靠
+                if (node instanceof ObjectNode objectNode) {
+                    objectNode.put("sceneNumber", sceneNumber);
+                }
+                merged.add(node);
+            }
+        }
+        return merged;
+    }
+
+    /**
+     * 拼接逐场拆分的提示词：技能、世界观、资产等对每场相同的部分只构建一次
+     */
+    private List<String> buildScenePlanPrompts(AiDramaProjectDO project, AiDramaScriptDO script, List<String> scenes) {
+        // 1. 每场相同的部分
+        String prefix = buildStoryboardSkillPrompt(project) + buildWorldbuildingPrompt(script);
+        String style = getStyleName(project, script);
+        List<AiDramaCharacterDO> characters = assetService.getCharacterList(project.getId());
+        String locationNames = buildLocationNames(project.getId());
+        String propNames = joinNames(convertList(assetService.getPropList(project.getId()), AiDramaVisualAssetDO::getTitle));
+        String outline = StrUtil.blankToDefault(StrUtil.trim(script.getOutline()), "无");
+        int[] budgets = estimateSceneSeconds(scenes);
+
+        // 2. 逐场拼接：同时用到本场、上一场、场次编号与时长预算，按下标遍历
+        List<String> prompts = new ArrayList<>();
+        for (int i = 0; i < scenes.size(); i++) {
+            int sceneNumber = i + 1;
+            String scene = scenes.get(i);
+            String previousEnding = i > 0 ? StrUtil.subSufByLength(scenes.get(i - 1), PREVIOUS_SCENE_ENDING_LENGTH) : "无（本场为第一场）";
+            // 本场角色：本场原文、上一场结尾中出现的角色（名称或别名）；都没有出现时提供全部角色
+            List<AiDramaCharacterDO> sceneCharacters = CollUtil.defaultIfEmpty(filterList(characters,
+                    character -> isCharacterMentioned(character, scene) || isCharacterMentioned(character, previousEnding)), characters);
+            prompts.add(prefix + StrUtil.format(GENERATE_SCENE_STORYBOARDS_PROMPT, scenes.size(), sceneNumber, budgets[i], style,
+                    buildCharacterNames(sceneCharacters), locationNames, propNames,
+                    outline, previousEnding, scene, sceneNumber, STORYBOARDS_JSON_FORMAT));
+        }
+        return prompts;
+    }
+
+    /**
+     * 角色是否在文本中出现：按名称或别名
+     */
+    private static boolean isCharacterMentioned(AiDramaCharacterDO character, String text) {
+        if (StrUtil.isNotBlank(character.getName()) && text.contains(character.getName())) {
+            return true;
+        }
+        return StrUtil.split(StrUtil.nullToEmpty(character.getAliases()), ',', true, true).stream().anyMatch(text::contains);
+    }
+
+    /**
+     * 按原文场次切分剧本：识别「第一场」「场景 1」「内景 / 外景」等场次标题；第一个标题之前的内容并入第一场
+     *
+     * @return 场次原文；无法识别出场次时只有一项（整部剧本）
+     */
+    @VisibleForTesting
+    static List<String> splitScriptScenes(String content) {
+        List<String> scenes = new ArrayList<>();
+        StringBuilder current = new StringBuilder(); // 当前场次的原文
+        boolean seenHeading = false; // 是否已遇到过场次标题
+        for (String line : StrUtil.nullToEmpty(content).split("\\R")) {
+            // 1. 遇到场次标题：结束上一场，开始新的一场；第一个标题之前没有已结束的场次，前言留在 current 并入第一场
+            boolean heading = SCENE_HEADING_PATTERN.matcher(line.strip()).matches();
+            if (heading && seenHeading && StrUtil.isNotBlank(current)) {
+                scenes.add(current.toString().strip());
+                current.setLength(0);
+            }
+            seenHeading |= heading;
+            // 2. 标题行、正文行都计入当前场次
+            current.append(line).append('\n');
+        }
+        // 3. 最后一场；没有识别出标题时即整部剧本
+        if (StrUtil.isNotBlank(current)) {
+            scenes.add(current.toString().strip());
+        }
+        return scenes;
+    }
+
+    /**
+     * 估算每场的时长预算（秒）：场次标题写明「预计 N 秒」时按它，其余按原文长度分配总时长
+     *
+     * 场次标题取本场第一个标题行：第一场可能并入了标题之前的前言，不能取首行
+     */
+    @VisibleForTesting
+    static int[] estimateSceneSeconds(List<String> scenes) {
+        int totalLength = scenes.stream().mapToInt(String::length).sum();
+        int[] budgets = new int[scenes.size()];
+        for (int i = 0; i < scenes.size(); i++) {
+            // 1. 本场的第一个标题行
+            String scene = scenes.get(i);
+            String heading = scene.lines().filter(line -> SCENE_HEADING_PATTERN.matcher(line.strip()).matches())
+                    .findFirst().orElse("");
+            // 2. 标题写明「预计 N 秒」时按它；否则按本场原文占全部原文的比例，分配剧本总时长
+            Matcher matcher = SCENE_ESTIMATE_PATTERN.matcher(heading);
+            int budget = matcher.find() ? (int) Math.round(Double.parseDouble(matcher.group(1)))
+                    : (int) Math.round((double) SCRIPT_TOTAL_SECONDS * scene.length() / Math.max(totalLength, 1));
+            // 3. 不低于每场的最短时长
+            budgets[i] = Math.max(budget, SCENE_MIN_SECONDS);
+        }
+        return budgets;
     }
 
     @Override
@@ -429,6 +654,100 @@ public class AiDramaScriptServiceImpl implements AiDramaScriptService {
     }
 
     @Override
+    public Flux<CommonResult<AiDramaScriptCreateRespVO>> createProjectStreamMy(Long userId, AiDramaScriptCreateReqVO reqVO) {
+        // 1. 同一用户同时只允许一个：前端刷新、重复点击时不重复创建项目
+        if (!createTasks.add(userId)) {
+            ServiceException ex = exception(DRAMA_CREATE_RUNNING);
+            return Flux.just(error(ex.getCode(), ex.getMessage()));
+        }
+        // 2. 校验并构建对话模型的流：项目尚未创建，按请求中的项目设置拼接提示词；不通过时（包括非业务异常）释放占位，直接返回错误
+        AiDramaChatTypeEnum type = AiDramaChatTypeEnum.SCRIPT_GENERATE;
+        AiDramaProjectSaveReqVO projectReqVO;
+        Flux<String> stream;
+        try {
+            projectReqVO = BeanUtils.toBean(reqVO, AiDramaProjectSaveReqVO.class);
+            projectReqVO.setName(StrUtil.trimToNull(reqVO.getName()));
+            AiDramaProjectDO project = new AiDramaProjectDO().setName(projectReqVO.getName()).setIdea(reqVO.getIdea())
+                    .setStyle(ObjUtil.defaultIfNull(reqVO.getStyle(), AiDramaStyleEnum.SCRIPT_TONE.getStyle()));
+            stream = chatStream(reqVO.getModelId(), type.isJsonObject(), buildChatPrompt(type, project, null, null));
+        } catch (RuntimeException e) {
+            createTasks.remove(userId);
+            return Flux.just(buildChatError(type, null, e));
+        }
+
+        // 3. 构建任务：逐段返回增量文本；结束后在请求时的租户、登录用户下（创建人、更新人与请求一致）解析，
+        //    成功时创建项目、保存剧本，最后返回项目编号
+        Long tenantId = TenantContextHolder.getTenantId();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        StringBuilder content = new StringBuilder();
+        Flux<CommonResult<AiDramaScriptCreateRespVO>> flux = stream.map(text -> {
+                    content.append(text);
+                    return success(new AiDramaScriptCreateRespVO().setContent(text));
+                })
+                .concatWith(Mono.fromCallable(() -> executeInTenant(tenantId, () -> executeAs(authentication, () -> success(
+                        new AiDramaScriptCreateRespVO().setProjectId(createProjectByScript(userId, projectReqVO, content.toString())))))))
+                .onErrorResume(e -> Flux.just(buildChatError(type, null, e)))
+                .doFinally(signal -> createTasks.remove(userId))
+                .cache();
+
+        // 4. 在后台订阅：前端断开不影响生成、入库
+        flux.subscribe();
+        return flux;
+    }
+
+    /**
+     * 在指定的租户下执行：异常原样抛出（{@link TenantUtils#execute(Long, java.util.concurrent.Callable)} 会把业务异常包装为
+     * RuntimeException，丢失错误码与提示）
+     */
+    @SuppressWarnings("unchecked")
+    private static <T> T executeInTenant(Long tenantId, Supplier<T> supplier) {
+        Object[] result = new Object[1];
+        TenantUtils.execute(tenantId, () -> {
+            result[0] = supplier.get();
+        });
+        return (T) result[0];
+    }
+
+    /**
+     * 在指定的登录用户下执行：流式生成结束后的入库运行在其它线程，没有请求的登录用户，创建人、更新人会为空；
+     * 执行后恢复原来的上下文
+     */
+    private static <T> T executeAs(Authentication authentication, Supplier<T> supplier) {
+        SecurityContext original = SecurityContextHolder.getContext();
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(authentication);
+        SecurityContextHolder.setContext(context);
+        try {
+            return supplier.get();
+        } finally {
+            SecurityContextHolder.setContext(original);
+        }
+    }
+
+    /**
+     * 解析生成的剧本，在同一事务内创建项目、保存剧本：解析失败时不创建项目
+     *
+     * @return 项目编号
+     */
+    private Long createProjectByScript(Long userId, AiDramaProjectSaveReqVO projectReqVO, String content) {
+        // 1. 解析剧本
+        AiDramaScriptDO script = parseScript(AiDramaChatTypeEnum.SCRIPT_GENERATE.getName(), content)
+                .setSource(AiDramaScriptSourceEnum.LLM.getSource())
+                .setCreationMode(AiDramaScriptCreationModeEnum.STANDARD.getMode());
+        // 2. 项目名称未填写时，使用剧名
+        if (StrUtil.isBlank(projectReqVO.getName())) {
+            projectReqVO.setName(StrUtil.sub(StrUtil.blankToDefault(StrUtil.trim(script.getTitle()), DEFAULT_PROJECT_NAME),
+                    0, PROJECT_NAME_MAX_LENGTH));
+        }
+        // 3. 同一事务内创建项目、保存剧本
+        return transactionTemplate.execute(status -> {
+            Long projectId = projectService.createProject(userId, projectReqVO);
+            scriptMapper.insert(script.setProjectId(projectId));
+            return projectId;
+        });
+    }
+
+    @Override
     public Integer getRunningChatType(Long projectId) {
         ChatTask task = chatTasks.get(projectId);
         return task != null ? task.getType().getType() : null;
@@ -437,7 +756,7 @@ public class AiDramaScriptServiceImpl implements AiDramaScriptService {
     /**
      * 构建流式生成的错误：业务异常（例如解析失败）直接返回，其它异常记为调用失败
      */
-    private static CommonResult<String> buildChatError(AiDramaChatTypeEnum type, Long projectId, Throwable e) {
+    private static <T> CommonResult<T> buildChatError(AiDramaChatTypeEnum type, Long projectId, Throwable e) {
         log.error("[buildChatError][project({}) type({}) 流式生成失败]", projectId, type.getType(), e);
         ServiceException ex = e instanceof ServiceException ? (ServiceException) e
                 : exception(DRAMA_CHAT_FAIL, type.getName(), StrUtil.blankToDefault(e.getMessage(), "调用对话模型失败"));
@@ -492,9 +811,9 @@ public class AiDramaScriptServiceImpl implements AiDramaScriptService {
      */
     private String buildChatPrompt(AiDramaChatTypeEnum type, AiDramaProjectDO project, AiDramaScriptDO script, String note) {
         String style = getStyleName(project, script);
-        // 世界观：生成剧本时取当前剧本的（新版本沿用），其它取所用剧本的
+        // 世界观：生成剧本时取当前剧本的（新版本沿用；从故事想法创建项目时项目尚未创建，没有），其它取所用剧本的
         String worldbuilding = buildWorldbuildingPrompt(type == AiDramaChatTypeEnum.SCRIPT_GENERATE
-                ? scriptMapper.selectLatestByProjectId(project.getId()) : script);
+                ? (project.getId() != null ? scriptMapper.selectLatestByProjectId(project.getId()) : null) : script);
         switch (type) {
             case SCRIPT_GENERATE:
                 // 故事想法为空时使用项目名称
@@ -517,18 +836,52 @@ public class AiDramaScriptServiceImpl implements AiDramaScriptService {
                 return buildSkillPrompt(project.getAestheticSkillId()) + worldbuilding + StrUtil.format(FRAME_PLAN_PROMPT,
                         style, buildPanelText(project, script));
             default: {
-                // 拆分分镜：美学、导演技能在前，分镜技能按顺序追加；提供可用的资产名称（场景带站位），便于按名称关联
-                StringBuilder skillPrompt = new StringBuilder(buildSkillPrompt(project.getAestheticSkillId()))
-                        .append(buildSkillPrompt(project.getDirectorSkillId()));
-                CollUtil.emptyIfNull(project.getStoryboardSkillIds()).forEach(skillId -> skillPrompt.append(buildSkillPrompt(skillId)));
-                return skillPrompt + worldbuilding + StrUtil.format(GENERATE_STORYBOARDS_PROMPT, style,
-                        joinNames(convertList(assetService.getCharacterList(project.getId()), AiDramaCharacterDO::getName)),
-                        joinNames(convertList(assetService.getLocationList(project.getId()), location -> location.getName()
-                                + (CollUtil.isNotEmpty(location.getAvailableSlots()) ? "（站位：" + CollUtil.join(location.getAvailableSlots(), "、") + "）" : ""))),
+                // 拆分分镜：技能在前；提供可用的资产名称（角色带可换的形象，场景带站位），便于按名称关联
+                return buildStoryboardSkillPrompt(project) + worldbuilding + StrUtil.format(GENERATE_STORYBOARDS_PROMPT, style,
+                        buildCharacterNames(assetService.getCharacterList(project.getId())), buildLocationNames(project.getId()),
                         joinNames(convertList(assetService.getPropList(project.getId()), AiDramaVisualAssetDO::getTitle)),
-                        script.getContent());
+                        script.getContent(), STORYBOARDS_JSON_FORMAT);
             }
         }
+    }
+
+    /**
+     * 拼接拆分分镜的技能提示词：美学、导演技能在前，分镜技能按顺序追加
+     */
+    private String buildStoryboardSkillPrompt(AiDramaProjectDO project) {
+        StringBuilder skillPrompt = new StringBuilder(buildSkillPrompt(project.getAestheticSkillId()))
+                .append(buildSkillPrompt(project.getDirectorSkillId()));
+        CollUtil.emptyIfNull(project.getStoryboardSkillIds()).forEach(skillId -> skillPrompt.append(buildSkillPrompt(skillId)));
+        return skillPrompt.toString();
+    }
+
+    /**
+     * 拼接角色名称：有变化形象的，列出可换的形象（序号与变化原因），供分镜按序号或变化原因指定
+     *
+     * 例如说：林夏（可换形象：1 受伤、2 换装）、周远
+     */
+    private String buildCharacterNames(List<AiDramaCharacterDO> characters) {
+        Map<Long, List<AiDramaCharacterAppearanceDO>> appearanceMap = convertMultiMap(
+                assetService.getAppearanceListByCharacterIds(convertList(characters, AiDramaCharacterDO::getId)),
+                AiDramaCharacterAppearanceDO::getCharacterId);
+        return joinNames(convertList(characters, character -> {
+            List<String> changes = new ArrayList<>();
+            appearanceMap.getOrDefault(character.getId(), Collections.emptyList()).forEach(appearance -> {
+                if (appearance.getAppearanceIndex() != null && appearance.getAppearanceIndex() > 0) {
+                    changes.add(appearance.getAppearanceIndex() + " " + StrUtil.blankToDefault(StrUtil.trim(
+                            appearance.getChangeReason()), StrUtil.sub(StrUtil.nullToEmpty(appearance.getDescription()), 0, 20)));
+                }
+            });
+            return character.getName() + (changes.isEmpty() ? "" : "（可换形象：" + String.join("、", changes) + "）");
+        }));
+    }
+
+    /**
+     * 拼接场景名称：带可用站位
+     */
+    private String buildLocationNames(Long projectId) {
+        return joinNames(convertList(assetService.getLocationList(projectId), location -> location.getName()
+                + (CollUtil.isNotEmpty(location.getAvailableSlots()) ? "（站位：" + CollUtil.join(location.getAvailableSlots(), "、") + "）" : "")));
     }
 
     private static boolean isStoryboardDetail(AiDramaChatTypeEnum type) {
@@ -752,8 +1105,9 @@ public class AiDramaScriptServiceImpl implements AiDramaScriptService {
      * 保存拆分出的分镜：替换该剧本的分镜，其它版本的保留；完成后项目置为分镜就绪
      */
     private void saveStoryboardList(AiDramaProjectDO project, AiDramaScriptDO script, JsonNode root) {
-        // 1. 构建分镜；校验生成期间没有开始生成镜头视频
-        List<AiDramaStoryboardDO> storyboards = buildStoryboardList(project, script, root);
+        // 1. 构建分镜（规划提示不保存）；校验生成期间没有开始生成镜头视频
+        List<AiDramaStoryboardDO> storyboards = convertList(buildStoryboardList(project, script, root),
+                AiDramaStoryboardPlanRespBO::getStoryboard);
         validateStoryboardNotRunning(project.getId(), script.getId());
 
         // 2. 替换该剧本的分镜，项目置为分镜就绪
@@ -763,8 +1117,10 @@ public class AiDramaScriptServiceImpl implements AiDramaScriptService {
 
     /**
      * 把模型返回的分镜构建为分镜（不保存）：资产按名称关联，角色取主形象
+     *
+     * @return 分镜，及其规划提示（规划分镜时返回供审阅，直接拆分时不使用）
      */
-    private List<AiDramaStoryboardDO> buildStoryboardList(AiDramaProjectDO project, AiDramaScriptDO script, JsonNode root) {
+    private List<AiDramaStoryboardPlanRespBO> buildStoryboardList(AiDramaProjectDO project, AiDramaScriptDO script, JsonNode root) {
         // 1. 校验：模型返回了分镜
         if (!root.isArray() || root.isEmpty()) {
             throw exception(DRAMA_CHAT_FAIL, AiDramaChatTypeEnum.STORYBOARD_GENERATE.getName(), "模型没有返回分镜");
@@ -773,14 +1129,14 @@ public class AiDramaScriptServiceImpl implements AiDramaScriptService {
         // 2. 构建分镜：资产按名称关联
         List<AiDramaCharacterDO> characters = assetService.getCharacterList(project.getId());
         Map<String, AiDramaCharacterDO> characterMap = convertMap(characters, AiDramaCharacterDO::getName);
-        Map<Long, Long> firstAppearanceMap = new HashMap<>();
-        assetService.getAppearanceListByCharacterIds(convertList(characters, AiDramaCharacterDO::getId))
-                .forEach(appearance -> firstAppearanceMap.putIfAbsent(appearance.getCharacterId(), appearance.getId()));
+        Map<Long, List<AiDramaCharacterAppearanceDO>> appearanceMap = convertMultiMap(
+                assetService.getAppearanceListByCharacterIds(convertList(characters, AiDramaCharacterDO::getId)),
+                AiDramaCharacterAppearanceDO::getCharacterId);
         Map<String, AiDramaLocationDO> locationMap = convertMap(assetService.getLocationList(project.getId()),
                 AiDramaLocationDO::getName);
         Map<String, AiDramaVisualAssetDO> visualAssetMap = convertMap(assetService.getPropList(project.getId()),
                 AiDramaVisualAssetDO::getTitle);
-        List<AiDramaStoryboardDO> storyboards = new ArrayList<>();
+        List<AiDramaStoryboardPlanRespBO> storyboards = new ArrayList<>();
         int index = 0;
         for (JsonNode node : root) {
             index++;
@@ -794,12 +1150,22 @@ public class AiDramaScriptServiceImpl implements AiDramaScriptService {
                 dialogues.add(new AiDramaStoryboardDO.Dialogue()
                         .setCharacterId(speaker != null ? speaker.getId() : null).setLine(line));
             }
-            // 出场角色：兼容只返回角色名的
+            // 出场角色：兼容只返回角色名的；形象按序号或变化原因匹配，未指定时用初始形象，指定了但无法唯一匹配时用初始形象并提示检查
             List<AiDramaStoryboardDO.CharacterRef> characterRefs = new ArrayList<>();
+            List<String> planWarnings = new ArrayList<>();
             for (JsonNode item : node.path("characters")) {
                 String name = StrUtil.trim(item.isObject() ? item.path("name").asText() : item.asText());
                 AiDramaCharacterDO character = characterMap.get(name);
-                Long appearanceId = character != null ? firstAppearanceMap.get(character.getId()) : null;
+                if (character == null) {
+                    continue;
+                }
+                String appearanceSpec = item.isObject() ? textOrNull(item, "appearance") : null;
+                AiDramaCharacterAppearanceDO appearance = matchAppearance(appearanceMap.get(character.getId()), appearanceSpec);
+                if (appearance == null && appearanceSpec != null) {
+                    appearance = matchAppearance(appearanceMap.get(character.getId()), null);
+                    planWarnings.add(StrUtil.format("{}的形象「{}」无法唯一匹配，已使用初始形象，请检查", name, appearanceSpec));
+                }
+                Long appearanceId = appearance != null ? appearance.getId() : null;
                 if (appearanceId != null && !CollUtil.contains(characterRefs, ref -> appearanceId.equals(ref.getAppearanceId()))) {
                     characterRefs.add(new AiDramaStoryboardDO.CharacterRef().setAppearanceId(appearanceId)
                             .setSlot(item.isObject() ? textOrNull(item, "slot") : null));
@@ -818,7 +1184,7 @@ public class AiDramaScriptServiceImpl implements AiDramaScriptService {
             }
             AiDramaLocationDO location = locationMap.get(StrUtil.trim(node.path("location").asText()));
             // 镜头序号：按返回顺序编号，保证同一剧本内不重复；原文场次记录在连续性设置中
-            storyboards.add(new AiDramaStoryboardDO().setProjectId(project.getId()).setScriptId(script.getId())
+            AiDramaStoryboardDO storyboard = new AiDramaStoryboardDO().setProjectId(project.getId()).setScriptId(script.getId())
                     .setSceneNo(index).setContinuity(buildPlanContinuity(node))
                     .setTitle(textOrNull(node, "title")).setSourceText(textOrNull(node, "sourceText"))
                     .setSceneText(textOrNull(node, "sceneText")).setShotType(textOrNull(node, "shotType"))
@@ -827,9 +1193,55 @@ public class AiDramaScriptServiceImpl implements AiDramaScriptService {
                     .setImagePrompt(textOrNull(node, "imagePrompt"))
                     .setVideoPrompt(textOrNull(node, "videoPrompt")).setDialogues(dialogues)
                     .setCharacters(characterRefs).setLocationId(location != null ? location.getId() : null)
-                    .setVisualAssetIds(visualAssetIds));
+                    .setVisualAssetIds(visualAssetIds);
+            storyboards.add(new AiDramaStoryboardPlanRespBO().setStoryboard(storyboard)
+                    .setWarnings(planWarnings.isEmpty() ? null : planWarnings));
         }
         return storyboards;
+    }
+
+    /**
+     * 匹配角色的形象
+     *
+     * 1. 未指定时：初始形象（形象序号为 0，没有时取序号最小的）
+     * 2. 指定为数字（可带「形象」前缀）时：按形象序号
+     * 3. 其它按变化原因：先完全相同，再互相包含，最后按形象设定包含；须唯一
+     *
+     * @param appearances 角色的形象
+     * @param spec 模型指定的形象，为空表示未指定
+     * @return 形象；指定了但无法唯一匹配、角色没有形象时为空
+     */
+    @VisibleForTesting
+    static AiDramaCharacterAppearanceDO matchAppearance(List<AiDramaCharacterAppearanceDO> appearances, String spec) {
+        if (CollUtil.isEmpty(appearances)) {
+            return null;
+        }
+        // 1. 未指定：初始形象
+        String text = StrUtil.trimToNull(spec);
+        if (text == null) {
+            return appearances.stream().min(Comparator.comparing(AiDramaCharacterAppearanceDO::getAppearanceIndex,
+                    Comparator.nullsLast(Comparator.naturalOrder()))).orElse(null);
+        }
+        // 2. 按形象序号
+        String index = StrUtil.removePrefix(text, "形象").trim();
+        if (StrUtil.isNotEmpty(index) && StrUtil.isNumeric(index)) {
+            return findUnique(appearances, appearance -> Objects.equals(appearance.getAppearanceIndex(), Integer.valueOf(index)));
+        }
+        // 3. 按变化原因、形象设定
+        AiDramaCharacterAppearanceDO appearance = findUnique(appearances, item -> StrUtil.equalsIgnoreCase(StrUtil.trim(item.getChangeReason()), text));
+        if (appearance == null) {
+            appearance = findUnique(appearances, item -> StrUtil.isNotBlank(item.getChangeReason())
+                    && (item.getChangeReason().contains(text) || text.contains(StrUtil.trim(item.getChangeReason()))));
+        }
+        if (appearance == null) {
+            appearance = findUnique(appearances, item -> StrUtil.contains(item.getDescription(), text));
+        }
+        return appearance;
+    }
+
+    private static <T> T findUnique(List<T> list, java.util.function.Predicate<T> predicate) {
+        List<T> matched = filterList(list, predicate::test);
+        return matched.size() == 1 ? matched.get(0) : null;
     }
 
     /**

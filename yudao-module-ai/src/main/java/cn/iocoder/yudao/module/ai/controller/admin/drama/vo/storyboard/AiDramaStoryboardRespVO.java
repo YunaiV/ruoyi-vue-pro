@@ -96,6 +96,9 @@ public class AiDramaStoryboardRespVO {
     @Schema(description = "失败原因", example = "生成失败")
     private String errorMessage;
 
+    @Schema(description = "规划提示：只在规划分镜时返回，例如角色指定的形象无法唯一匹配", example = "[\"林夏的形象「受伤」无法唯一匹配，已使用初始形象，请检查\"]")
+    private List<String> planWarnings;
+
     @Schema(description = "创建时间")
     private LocalDateTime createTime;
 

@@ -184,10 +184,12 @@ public class AiDramaProjectServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testComposeProjectMy_success() {
         when(projectMapper.selectById(PROJECT_ID)).thenReturn(project(USER_ID));
+        // 镜头 3：未选、视频未完成的已有镜头，也计入提交时的最大镜头编号
         when(storyboardService.getStoryboardList(PROJECT_ID)).thenReturn(Arrays.asList(
-                storyboard(1L, AiDramaStatusEnum.SUCCESS.getStatus()), storyboard(2L, AiDramaStatusEnum.SUCCESS.getStatus())));
+                storyboard(1L, AiDramaStatusEnum.SUCCESS.getStatus()), storyboard(2L, AiDramaStatusEnum.SUCCESS.getStatus()),
+                storyboard(3L, AiDramaStatusEnum.IN_PROGRESS.getStatus())));
         when(fileApi.presignGetUrlQuietly(anyString())).thenAnswer(invocation -> invocation.getArgument(0) + "?sign");
-        doNothing().when(projectService).executeCompose(any(), any(), any());
+        doNothing().when(projectService).executeCompose(any(), any(), any(), any());
         // 准备参数：按提交的顺序合成
         AiDramaComposeReqVO reqVO = composeReqVO(2L, 1L);
         reqVO.setTransitionType(AiDramaTransitionTypeEnum.DISSOLVE.getType());
@@ -207,9 +209,17 @@ public class AiDramaProjectServiceImplTest extends BaseMockitoUnitTest {
         // 断言：合成参数，带上本次的合成任务编号
         ArgumentCaptor<String> taskIdCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<ComposeRequest> requestCaptor = ArgumentCaptor.forClass(ComposeRequest.class);
-        verify(projectService).executeCompose(eq(PROJECT_ID), taskIdCaptor.capture(), requestCaptor.capture());
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<List<AiDramaProjectDO.ComposeVideo>> videosCaptor = ArgumentCaptor.forClass(List.class);
+        verify(projectService).executeCompose(eq(PROJECT_ID), taskIdCaptor.capture(), videosCaptor.capture(), requestCaptor.capture());
         assertNotNull(taskIdCaptor.getValue());
         assertEquals(taskIdCaptor.getValue(), updateCaptor.getValue().getComposeTaskId());
+        // 断言：使用的镜头视频按提交的顺序，记录原始地址（非签名地址）
+        assertEquals(Arrays.asList(2L, 1L), videosCaptor.getValue().stream()
+                .map(AiDramaProjectDO.ComposeVideo::getStoryboardId).toList());
+        assertEquals("https://files.example.com/2.mp4", videosCaptor.getValue().get(0).getVideoUrl());
+        assertEquals(3L, videosCaptor.getValue().get(0).getMaxStoryboardId());
+        assertEquals(3L, videosCaptor.getValue().get(1).getMaxStoryboardId());
         ComposeRequest request = requestCaptor.getValue();
         assertEquals(Arrays.asList("https://files.example.com/2.mp4?sign", "https://files.example.com/1.mp4?sign"),
                 request.getVideoUrls());
@@ -223,9 +233,10 @@ public class AiDramaProjectServiceImplTest extends BaseMockitoUnitTest {
         ffmpegUtilsMock.when(() -> AiFfmpegUtils.compose(any(), any(), any(), any())).thenReturn(new ComposeResult(new byte[]{1}, 12.5));
         when(fileApi.createFile(any(byte[].class))).thenReturn("https://files.example.com/drama.mp4");
 
-        projectService.executeCompose(PROJECT_ID, "task-1", composeRequest());
+        List<AiDramaProjectDO.ComposeVideo> videos = List.of(composeVideo(1L), composeVideo(2L));
+        projectService.executeCompose(PROJECT_ID, "task-1", videos, composeRequest());
 
-        // 断言：以合成中、本次任务编号为条件；记录成片实际使用的画幅、镜头数
+        // 断言：以合成中、本次任务编号为条件；记录成片实际使用的画幅、镜头数、镜头视频
         ArgumentCaptor<AiDramaProjectDO> captor = ArgumentCaptor.forClass(AiDramaProjectDO.class);
         verify(projectMapper).updateByIdAndComposeStatusAndTaskId(eq(PROJECT_ID), eq(AiDramaStatusEnum.IN_PROGRESS.getStatus()),
                 eq("task-1"), captor.capture());
@@ -234,6 +245,132 @@ public class AiDramaProjectServiceImplTest extends BaseMockitoUnitTest {
         assertEquals(12.5, captor.getValue().getComposeDuration());
         assertEquals("16:9", captor.getValue().getComposeAspectRatio());
         assertEquals(2, captor.getValue().getComposeStoryboardCount());
+        assertEquals(videos, captor.getValue().getComposeVideos());
+    }
+
+    @Test
+    public void testGetComposeStaleReason_notStale() {
+        // 准备：成片使用镜头 1、2；镜头 2 只改了文字；镜头 3 是合成时未选的已有镜头
+        AiDramaProjectDO project = composedProject(composeVideo(1L), composeVideo(2L));
+        List<AiDramaStoryboardDO> storyboards = Arrays.asList(composedStoryboard(1L),
+                composedStoryboard(2L).setTitle("改过的标题").setVideoPrompt("改过的视频提示词"),
+                (AiDramaStoryboardDO) composedStoryboard(3L).setCreateTime(project.getComposeFinishTime().minusMinutes(1)));
+
+        assertNull(projectService.getComposeStaleReason(project, storyboards, 1L));
+    }
+
+    @Test
+    public void testGetComposeStaleReason_noRecord() {
+        // 准备：之前合成的成片，没有记录使用的镜头视频，不判断
+        AiDramaProjectDO project = composedProject().setComposeVideos(null);
+
+        assertNull(projectService.getComposeStaleReason(project, List.of(composedStoryboard(1L).setVideoUrl("https://files.example.com/x.mp4")), 1L));
+    }
+
+    @Test
+    public void testGetComposeStaleReason_videoReplaced() {
+        // 准备：镜头 2 的视频重新生成成功，或换用、恢复了历史视频
+        AiDramaProjectDO project = composedProject(composeVideo(1L), composeVideo(2L));
+        List<AiDramaStoryboardDO> storyboards = Arrays.asList(composedStoryboard(1L),
+                composedStoryboard(2L).setVideoUrl("https://files.example.com/2-new.mp4"));
+
+        assertEquals("成片使用的镜头视频已更换", projectService.getComposeStaleReason(project, storyboards, 1L));
+    }
+
+    @Test
+    public void testGetComposeStaleReason_regenerating() {
+        // 准备：镜头 2 重新生成中，镜头视频仍是原视频
+        AiDramaProjectDO project = composedProject(composeVideo(1L), composeVideo(2L));
+        List<AiDramaStoryboardDO> storyboards = Arrays.asList(composedStoryboard(1L),
+                composedStoryboard(2L).setVideoStatus(AiDramaStatusEnum.IN_PROGRESS.getStatus()));
+
+        assertNull(projectService.getComposeStaleReason(project, storyboards, 1L));
+    }
+
+    @Test
+    public void testGetComposeStaleReason_deleted() {
+        AiDramaProjectDO project = composedProject(composeVideo(1L), composeVideo(2L));
+
+        assertEquals("成片使用的镜头已删除", projectService.getComposeStaleReason(project, List.of(composedStoryboard(1L)), 1L));
+    }
+
+    @Test
+    public void testGetComposeStaleReason_added() {
+        // 准备：之前合成的快照，没有记录最大镜头编号；成片完成后新增镜头 3，且视频已完成
+        AiDramaProjectDO project = composedProject(composeVideo(1L), composeVideo(2L));
+        List<AiDramaStoryboardDO> storyboards = Arrays.asList(composedStoryboard(1L), composedStoryboard(2L),
+                (AiDramaStoryboardDO) composedStoryboard(3L).setCreateTime(project.getComposeFinishTime().plusMinutes(1)));
+
+        assertEquals("成片合成后新增了镜头", projectService.getComposeStaleReason(project, storyboards, 1L));
+    }
+
+    @Test
+    public void testGetComposeStaleReason_addedDuringCompose() {
+        // 准备：提交时最大镜头编号 2，10:00 完成；镜头 3 在合成期间（9:40）新增，之后视频完成
+        AiDramaProjectDO project = composedProject(composeVideo(1L).setMaxStoryboardId(2L),
+                composeVideo(2L).setMaxStoryboardId(2L));
+        List<AiDramaStoryboardDO> storyboards = Arrays.asList(composedStoryboard(1L), composedStoryboard(2L),
+                (AiDramaStoryboardDO) composedStoryboard(3L).setCreateTime(LocalDateTime.of(2026, 11, 17, 9, 40)));
+
+        assertEquals("成片合成后新增了镜头", projectService.getComposeStaleReason(project, storyboards, 1L));
+        // 视频未完成时不算
+        storyboards.get(2).setVideoStatus(AiDramaStatusEnum.IN_PROGRESS.getStatus());
+        assertNull(projectService.getComposeStaleReason(project, storyboards, 1L));
+    }
+
+    @Test
+    public void testGetComposeStaleReason_addedSameSecond() {
+        // 准备：镜头 3 与提交合成在同一秒新增（创建时间秒级，与快照时间无法区分），按编号判断为新增
+        AiDramaProjectDO project = composedProject(composeVideo(1L).setMaxStoryboardId(2L),
+                composeVideo(2L).setMaxStoryboardId(2L));
+        LocalDateTime sameSecond = LocalDateTime.of(2026, 11, 17, 9, 30);
+        List<AiDramaStoryboardDO> storyboards = Arrays.asList(
+                (AiDramaStoryboardDO) composedStoryboard(1L).setCreateTime(sameSecond),
+                (AiDramaStoryboardDO) composedStoryboard(2L).setCreateTime(sameSecond),
+                (AiDramaStoryboardDO) composedStoryboard(3L).setCreateTime(sameSecond));
+
+        assertEquals("成片合成后新增了镜头", projectService.getComposeStaleReason(project, storyboards, 1L));
+    }
+
+    @Test
+    public void testGetComposeStaleReason_subsetAndReorder() {
+        // 准备：画布按 2、1 的顺序只合成了两镜，提交前已有的镜头 3（提交时未完成，之后视频完成）未选
+        AiDramaProjectDO project = composedProject(composeVideo(2L).setMaxStoryboardId(3L),
+                composeVideo(1L).setMaxStoryboardId(3L));
+        List<AiDramaStoryboardDO> storyboards = Arrays.asList(composedStoryboard(1L), composedStoryboard(2L),
+                composedStoryboard(3L));
+
+        assertNull(projectService.getComposeStaleReason(project, storyboards, 1L));
+    }
+
+    @Test
+    public void testGetComposeStaleReason_scriptStoryboardsUpdated() {
+        // 准备：成片使用剧本 1 的镜头；当前剧本 2
+        AiDramaProjectDO project = composedProject(composeVideo(1L), composeVideo(2L));
+        List<AiDramaStoryboardDO> storyboards = new ArrayList<>(Arrays.asList(composedStoryboard(1L), composedStoryboard(2L)));
+        // 只新增了剧本版本、尚无分镜视频：不算
+        storyboards.add(composedStoryboard(3L).setScriptId(2L).setVideoStatus(null).setVideoUrl(null));
+        assertNull(projectService.getComposeStaleReason(project, storyboards, 2L));
+        // 当前剧本版本的分镜已有完成视频
+        storyboards.add(composedStoryboard(4L).setScriptId(2L));
+        assertEquals("剧本的分镜已更新", projectService.getComposeStaleReason(project, storyboards, 2L));
+    }
+
+    private static AiDramaProjectDO composedProject(AiDramaProjectDO.ComposeVideo... videos) {
+        return project(USER_ID).setComposeStatus(AiDramaStatusEnum.SUCCESS.getStatus())
+                .setComposeFileUrl("https://files.example.com/drama.mp4")
+                .setComposeFinishTime(LocalDateTime.of(2026, 11, 17, 10, 0)).setComposeVideos(Arrays.asList(videos));
+    }
+
+    private static AiDramaStoryboardDO composedStoryboard(Long id) {
+        AiDramaStoryboardDO storyboard = storyboard(id, AiDramaStatusEnum.SUCCESS.getStatus()).setScriptId(1L);
+        storyboard.setCreateTime(LocalDateTime.of(2026, 11, 17, 9, 0));
+        return storyboard;
+    }
+
+    private static AiDramaProjectDO.ComposeVideo composeVideo(Long storyboardId) {
+        return new AiDramaProjectDO.ComposeVideo().setStoryboardId(storyboardId)
+                .setVideoUrl("https://files.example.com/" + storyboardId + ".mp4");
     }
 
     @Test
@@ -241,7 +378,7 @@ public class AiDramaProjectServiceImplTest extends BaseMockitoUnitTest {
         ffmpegUtilsMock.when(() -> AiFfmpegUtils.compose(any(), any(), any(), any()))
                 .thenThrow(new IllegalStateException("FFmpeg 执行失败：No such filter"));
 
-        projectService.executeCompose(PROJECT_ID, "task-1", composeRequest());
+        projectService.executeCompose(PROJECT_ID, "task-1", null, composeRequest());
 
         ArgumentCaptor<AiDramaProjectDO> captor = ArgumentCaptor.forClass(AiDramaProjectDO.class);
         verify(projectMapper).updateByIdAndComposeStatusAndTaskId(eq(PROJECT_ID), eq(AiDramaStatusEnum.IN_PROGRESS.getStatus()),
@@ -282,12 +419,12 @@ public class AiDramaProjectServiceImplTest extends BaseMockitoUnitTest {
         });
 
         // 调用：旧合成上传完成后回写，不命中，新合成仍合成中
-        projectService.executeCompose(PROJECT_ID, "task-old", composeRequest());
+        projectService.executeCompose(PROJECT_ID, "task-old", null, composeRequest());
         assertTrue(written.isEmpty());
         assertEquals(AiDramaStatusEnum.IN_PROGRESS.getStatus(), dbStatus.get());
         assertEquals("task-new", dbTaskId.get());
         // 调用：新合成结束，正常写入
-        projectService.executeCompose(PROJECT_ID, "task-new", composeRequest());
+        projectService.executeCompose(PROJECT_ID, "task-new", null, composeRequest());
         assertEquals(1, written.size());
         assertEquals(AiDramaStatusEnum.SUCCESS.getStatus(), written.get(0).getComposeStatus());
         assertEquals("https://files.example.com/new.mp4", written.get(0).getComposeFileUrl());

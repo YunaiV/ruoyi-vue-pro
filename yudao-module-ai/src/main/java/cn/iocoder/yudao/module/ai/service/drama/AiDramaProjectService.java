@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.project.*;
 import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.task.AiDramaTaskPageReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.drama.AiDramaProjectDO;
+import cn.iocoder.yudao.module.ai.dal.dataobject.drama.AiDramaStoryboardDO;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -158,6 +159,18 @@ public interface AiDramaProjectService {
      * @param id 编号
      */
     void recomposeProject(Long id);
+
+    /**
+     * 获得成片需要重新合成的原因：成片使用的镜头视频被替换（重新生成成功、选用或恢复历史视频）、使用的镜头被删除，
+     * 提交合成后同一剧本版本新增了已完成视频的镜头，或当前剧本版本的分镜已有完成视频而成片未使用该版本；
+     * 只改镜头文字、合成时只选部分镜头或调整顺序不算
+     *
+     * @param project 项目
+     * @param storyboards 项目的全部分镜（包括旧剧本版本的）
+     * @param currentScriptId 当前剧本编号，可为空
+     * @return 原因；不需要重新合成、没有成片时为空
+     */
+    String getComposeStaleReason(AiDramaProjectDO project, List<AiDramaStoryboardDO> storyboards, Long currentScriptId);
 
     /**
      * 获得成片的生成任务分页：有成片状态的项目

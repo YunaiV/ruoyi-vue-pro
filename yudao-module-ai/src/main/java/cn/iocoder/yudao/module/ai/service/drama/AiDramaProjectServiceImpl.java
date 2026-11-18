@@ -17,6 +17,7 @@ import cn.iocoder.yudao.module.ai.dal.dataobject.drama.AiDramaStoryboardDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.drama.AiDramaProjectMapper;
 import cn.iocoder.yudao.module.ai.enums.drama.AiDramaAspectRatioEnum;
 import cn.iocoder.yudao.module.ai.enums.drama.AiDramaAudioTypeEnum;
+import cn.iocoder.yudao.module.ai.enums.drama.AiDramaComposeStaleReasonEnum;
 import cn.iocoder.yudao.module.ai.enums.drama.AiDramaProjectStatusEnum;
 import cn.iocoder.yudao.module.ai.enums.drama.AiDramaStatusEnum;
 import cn.iocoder.yudao.module.ai.enums.drama.AiDramaStyleEnum;
@@ -40,7 +41,9 @@ import java.util.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.getMaxValue;
 import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.*;
 
 /**
@@ -147,8 +150,8 @@ public class AiDramaProjectServiceImpl implements AiDramaProjectService {
         AiDramaProjectDO project = validateProjectMy(reqVO.getProjectId(), userId);
         validateComposeNotRunning(project);
         // 1.2 校验镜头：属于该项目且视频已完成，按提交的顺序合成
-        Map<Long, AiDramaStoryboardDO> storyboardMap = convertMap(
-                storyboardService.getStoryboardList(project.getId()), AiDramaStoryboardDO::getId);
+        List<AiDramaStoryboardDO> allStoryboards = storyboardService.getStoryboardList(project.getId());
+        Map<Long, AiDramaStoryboardDO> storyboardMap = convertMap(allStoryboards, AiDramaStoryboardDO::getId);
         List<AiDramaStoryboardDO> storyboards = convertList(reqVO.getStoryboardIds(), storyboardId -> {
             AiDramaStoryboardDO storyboard = storyboardMap.get(storyboardId);
             if (storyboard == null) {
@@ -168,8 +171,8 @@ public class AiDramaProjectServiceImpl implements AiDramaProjectService {
             narrationUrl = fileApi.presignGetUrlQuietly(narration.getFileUrl());
         }
 
-        // 2. 记录本次的转场设置，置为合成中；镜头选择、旁白、水印不保存；配乐按项目音频的使用设置混入
-        startCompose(project, new ComposeRequest()
+        // 2. 记录本次的转场设置，置为合成中；镜头选择在合成成功时记录，旁白、水印不保存；配乐按项目音频的使用设置混入
+        startCompose(project, storyboards, allStoryboards, new ComposeRequest()
                 .setVideoUrls(convertList(storyboards, storyboard -> fileApi.presignGetUrlQuietly(storyboard.getVideoUrl())))
                 .setAspectRatio(reqVO.getAspectRatio())
                 .setTransitionType(AiDramaTransitionTypeEnum.of(reqVO.getTransitionType()))
@@ -214,10 +217,19 @@ public class AiDramaProjectServiceImpl implements AiDramaProjectService {
      * 开始合成：记录转场设置，置为合成中，再异步执行合成
      *
      * @param project 项目
+     * @param storyboards 本次合成的镜头，按播放顺序：合成成功时记录使用的镜头视频，用于判断成片是否需要重新合成
+     * @param allStoryboards 项目全部的镜头（包括未选、视频未完成的）：记录提交时最大的镜头编号
      * @param request 合成参数
      */
-    private void startCompose(AiDramaProjectDO project, ComposeRequest request) {
-        // 1. 置为合成中：生成本次的合成任务编号，异步合成的最终回写以它为条件
+    private void startCompose(AiDramaProjectDO project, List<AiDramaStoryboardDO> storyboards,
+                              List<AiDramaStoryboardDO> allStoryboards, ComposeRequest request) {
+        // 1.1 本次使用的镜头视频：提交时的快照，合成期间镜头视频又变化时，成片完成后即需要重新合成
+        //     记录提交时项目最大的镜头编号，作为「提交后新增镜头」的边界（镜头编号自增，不受创建时间秒级精度影响）
+        Long maxStoryboardId = ObjUtil.defaultIfNull(getMaxValue(allStoryboards, AiDramaStoryboardDO::getId), 0L);
+        List<AiDramaProjectDO.ComposeVideo> composeVideos = convertList(storyboards, storyboard ->
+                new AiDramaProjectDO.ComposeVideo().setStoryboardId(storyboard.getId()).setVideoUrl(storyboard.getVideoUrl())
+                        .setScriptId(storyboard.getScriptId()).setMaxStoryboardId(maxStoryboardId));
+        // 1.2 置为合成中：生成本次的合成任务编号，异步合成的最终回写以它为条件
         String taskId = IdUtil.fastSimpleUUID();
         projectMapper.updateById(new AiDramaProjectDO().setId(project.getId())
                 .setComposeTransitionType(request.getTransitionType().getType())
@@ -226,7 +238,7 @@ public class AiDramaProjectServiceImpl implements AiDramaProjectService {
                 .setComposeProgress(0));
 
         // 2. 异步执行合成：通过代理调用，使 @Async 生效
-        getSelf().executeCompose(project.getId(), taskId, request);
+        getSelf().executeCompose(project.getId(), taskId, composeVideos, request);
     }
 
     /**
@@ -235,10 +247,11 @@ public class AiDramaProjectServiceImpl implements AiDramaProjectService {
      *
      * @param projectId 项目编号
      * @param taskId 合成任务编号
+     * @param composeVideos 使用的镜头视频：提交合成时的，合成期间镜头视频又变化时，成片随即需要重新合成
      * @param request 合成参数
      */
     @Async
-    public void executeCompose(Long projectId, String taskId, ComposeRequest request) {
+    public void executeCompose(Long projectId, String taskId, List<AiDramaProjectDO.ComposeVideo> composeVideos, ComposeRequest request) {
         Integer whereStatus = AiDramaStatusEnum.IN_PROGRESS.getStatus();
         try {
             // 1. 调用 FFmpeg 合成
@@ -247,12 +260,13 @@ public class AiDramaProjectServiceImpl implements AiDramaProjectService {
             // 2. 转存到文件服务：不指定文件名，按内容摘要命名，重新合成不会覆盖之前的成片地址
             String fileUrl = fileApi.createFile(result.getContent());
 
-            // 3. 回写成功：记录成片实际使用的画幅、镜头数
+            // 3. 回写成功：记录成片实际使用的画幅、镜头数、镜头视频
             projectMapper.updateByIdAndComposeStatusAndTaskId(projectId, whereStatus, taskId, new AiDramaProjectDO()
                     .setComposeStatus(AiDramaStatusEnum.SUCCESS.getStatus()).setComposeProgress(100)
                     .setComposeFinishTime(LocalDateTime.now())
                     .setComposeFileUrl(fileUrl).setComposeDuration(result.getDuration())
-                    .setComposeAspectRatio(request.getAspectRatio()).setComposeStoryboardCount(request.getVideoUrls().size()));
+                    .setComposeAspectRatio(request.getAspectRatio()).setComposeStoryboardCount(request.getVideoUrls().size())
+                    .setComposeVideos(composeVideos));
         } catch (Exception e) {
             // 4. 回写失败
             log.error("[executeCompose][project({}) 合成失败]", projectId, e);
@@ -373,7 +387,8 @@ public class AiDramaProjectServiceImpl implements AiDramaProjectService {
         // 1.2 使用当前剧本版本全部已完成的镜头：至少 2 个
         AiDramaScriptDO script = scriptService.getScriptByProjectId(id);
         Long scriptId = script != null ? script.getId() : null;
-        List<AiDramaStoryboardDO> storyboards = filterList(storyboardService.getStoryboardList(id),
+        List<AiDramaStoryboardDO> allStoryboards = storyboardService.getStoryboardList(id);
+        List<AiDramaStoryboardDO> storyboards = filterList(allStoryboards,
                 storyboard -> Objects.equals(storyboard.getScriptId(), scriptId)
                         && Objects.equals(storyboard.getVideoStatus(), AiDramaStatusEnum.SUCCESS.getStatus())
                         && StrUtil.isNotEmpty(storyboard.getVideoUrl()));
@@ -382,13 +397,58 @@ public class AiDramaProjectServiceImpl implements AiDramaProjectService {
         }
 
         // 2. 使用项目当前的画幅、转场与配乐合成；不含旁白、水印
-        startCompose(project, new ComposeRequest()
+        startCompose(project, storyboards, allStoryboards, new ComposeRequest()
                 .setVideoUrls(convertList(storyboards, storyboard -> fileApi.presignGetUrlQuietly(storyboard.getVideoUrl())))
                 .setAspectRatio(StrUtil.blankToDefault(project.getComposeAspectRatio(), AiDramaAspectRatioEnum.RATIO_9_16.getRatio()))
                 .setTransitionType(AiDramaTransitionTypeEnum.of(project.getComposeTransitionType()))
-                .setTransitionDuration(ObjUtil.defaultIfNull(project.getComposeTransitionDurationSeconds(),
-                        DEFAULT_TRANSITION_DURATION))
+                .setTransitionDuration(ObjUtil.defaultIfNull(project.getComposeTransitionDurationSeconds(), DEFAULT_TRANSITION_DURATION))
                 .setMusicTracks(buildMusicTracks(id, storyboards)));
+    }
+
+    @Override
+    public String getComposeStaleReason(AiDramaProjectDO project, List<AiDramaStoryboardDO> storyboards, Long currentScriptId) {
+        // 1. 没有成片，或没有记录使用的镜头视频（例如之前合成的）时，不判断
+        if (StrUtil.isEmpty(project.getComposeFileUrl()) || CollUtil.isEmpty(project.getComposeVideos())) {
+            return null;
+        }
+        // 2.1 使用的镜头被删除（包括重新导入分镜替换）、镜头视频被替换（重新生成成功、选用或恢复历史视频）；
+        //     重新生成未完成时仍是原视频，不算；合成时的顺序、只选部分镜头是用户的选择，不算
+        Map<Long, AiDramaStoryboardDO> storyboardMap = convertMap(storyboards, AiDramaStoryboardDO::getId);
+        Set<Long> scriptIds = new HashSet<>();
+        for (AiDramaProjectDO.ComposeVideo video : project.getComposeVideos()) {
+            AiDramaStoryboardDO storyboard = storyboardMap.get(video.getStoryboardId());
+            if (storyboard == null) {
+                return AiDramaComposeStaleReasonEnum.STORYBOARD_DELETED.getReason();
+            }
+            if (ObjUtil.notEqual(storyboard.getVideoUrl(), video.getVideoUrl())) {
+                return AiDramaComposeStaleReasonEnum.VIDEO_REPLACED.getReason();
+            }
+            scriptIds.add(storyboard.getScriptId());
+        }
+        // 2.2 提交合成后（包括合成期间），同一剧本版本新增、并已完成视频的镜头；提交前已有、合成时未选的镜头不算。
+        //     按提交时最大的镜头编号判断新增；没有记录时（之前合成的快照）退回按创建时间晚于合成完成时间
+        Long maxStoryboardId = project.getComposeVideos().get(0).getMaxStoryboardId();
+        LocalDateTime finishTime = project.getComposeFinishTime();
+        Set<Long> composedIds = convertSet(project.getComposeVideos(), AiDramaProjectDO.ComposeVideo::getStoryboardId);
+        boolean added = CollUtil.contains(storyboards, storyboard ->
+                scriptIds.contains(storyboard.getScriptId()) && !composedIds.contains(storyboard.getId())
+                        && isVideoSuccess(storyboard)
+                        && (maxStoryboardId != null ? storyboard.getId() > maxStoryboardId
+                        : finishTime != null && storyboard.getCreateTime() != null && storyboard.getCreateTime().isAfter(finishTime)));
+        if (added) {
+            return AiDramaComposeStaleReasonEnum.STORYBOARD_ADDED.getReason();
+        }
+        // 2.3 当前剧本版本已有完成视频的分镜，而成片没有使用该版本的镜头：剧本的分镜已更新；只新增剧本版本（尚无分镜视频）不算
+        if (currentScriptId != null && !scriptIds.contains(currentScriptId) && CollUtil.contains(storyboards, storyboard ->
+                Objects.equals(storyboard.getScriptId(), currentScriptId) && isVideoSuccess(storyboard))) {
+            return AiDramaComposeStaleReasonEnum.SCRIPT_UPDATED.getReason();
+        }
+        return null;
+    }
+
+    private static boolean isVideoSuccess(AiDramaStoryboardDO storyboard) {
+        return Objects.equals(storyboard.getVideoStatus(), AiDramaStatusEnum.SUCCESS.getStatus())
+                && StrUtil.isNotEmpty(storyboard.getVideoUrl());
     }
 
     // ========== 生成任务 ==========

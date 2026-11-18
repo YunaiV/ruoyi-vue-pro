@@ -196,5 +196,6 @@ public interface ErrorCodeConstants {
     ErrorCode DRAMA_VIDEO_SUBMISSION_NO_VIDEO = new ErrorCode(1_040_018_037, "该提交没有可使用的视频");
     ErrorCode DRAMA_MUSIC_NOT_READY = new ErrorCode(1_040_018_038, "AI 音乐不存在或未生成完成");
     ErrorCode DRAMA_STORYBOARD_EMPTY = new ErrorCode(1_040_018_039, "当前剧本还没有分镜，请先拆分分镜");
+    ErrorCode DRAMA_CREATE_RUNNING = new ErrorCode(1_040_018_040, "初版剧本正在生成，请等待完成后再试");
 
 }

@@ -76,6 +76,12 @@ public class AiDramaProjectRespVO {
     @Schema(description = "合成完成时间")
     private LocalDateTime composeFinishTime;
 
+    @Schema(description = "成片是否需要重新合成：成片使用的镜头视频被替换、镜头被删除，或之后新增了已完成视频的镜头；只在项目详情返回", example = "false")
+    private Boolean composeStale;
+
+    @Schema(description = "需要重新合成的原因：只在项目详情返回", example = "镜头视频已更换")
+    private String composeStaleReason;
+
     @Schema(description = "镜头数", example = "8")
     private Integer storyboardCount;
 

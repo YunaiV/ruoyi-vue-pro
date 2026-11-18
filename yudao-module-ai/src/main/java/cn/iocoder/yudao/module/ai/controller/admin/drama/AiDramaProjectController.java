@@ -212,10 +212,15 @@ public class AiDramaProjectController {
         // 1.2 剧本、分镜：分镜只取当前剧本版本的；历史版本的分镜保留，不展示
         AiDramaScriptDO script = scriptService.getScriptByProjectId(project.getId());
         Long scriptId = script != null ? script.getId() : null;
+        List<AiDramaStoryboardDO> storyboards = storyboardService.getStoryboardList(project.getId());
+        // 1.3 成片是否需要重新合成：按项目全部版本的分镜判断（成片可能使用旧版本剧本的镜头）
+        String composeStaleReason = projectService.getComposeStaleReason(project, storyboards, scriptId);
+        AiDramaProjectRespVO projectVO = CollUtil.getFirst(buildProjectList(Collections.singletonList(project)))
+                .setComposeStale(composeStaleReason != null).setComposeStaleReason(composeStaleReason);
 
         // 2. 拼接
         return new AiDramaProjectDetailRespVO()
-                .setProject(CollUtil.getFirst(buildProjectList(Collections.singletonList(project))))
+                .setProject(projectVO)
                 .setScript(BeanUtils.toBean(script, AiDramaScriptRespVO.class))
                 .setCharacters(BeanUtils.toBean(characters, AiDramaCharacterRespVO.class, character -> character
                         .setAppearances(BeanUtils.toBean(appearanceMap.getOrDefault(character.getId(), Collections.emptyList()),
@@ -228,7 +233,7 @@ public class AiDramaProjectController {
                         audio.getCharacterId() == null), AiDramaAudioRespVO.class))
                 .setMotionReferences(BeanUtils.toBean(assetService.getMotionReferenceList(project.getId()),
                         AiDramaMotionReferenceRespVO.class))
-                .setStoryboards(BeanUtils.toBean(filterList(storyboardService.getStoryboardList(project.getId()),
+                .setStoryboards(BeanUtils.toBean(filterList(storyboards,
                         storyboard -> Objects.equals(storyboard.getScriptId(), scriptId)), AiDramaStoryboardRespVO.class));
     }
 

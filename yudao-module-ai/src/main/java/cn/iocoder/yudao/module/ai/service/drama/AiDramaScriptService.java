@@ -3,12 +3,14 @@ package cn.iocoder.yudao.module.ai.service.drama;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.script.AiDramaChatReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.script.AiDramaChatStreamReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.script.AiDramaScriptCreateReqVO;
+import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.script.AiDramaScriptCreateRespVO;
 import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.script.AiDramaScriptPolishReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.script.AiDramaScriptUpdateReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.storyboard.AiDramaStoryboardImportReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.drama.AiDramaScriptDO;
-import cn.iocoder.yudao.module.ai.dal.dataobject.drama.AiDramaStoryboardDO;
 import cn.iocoder.yudao.module.ai.enums.drama.AiDramaChatTypeEnum;
+import cn.iocoder.yudao.module.ai.service.drama.bo.AiDramaStoryboardPlanRespBO;
 import reactor.core.publisher.Flux;
 
 import java.util.Collection;
@@ -112,9 +114,9 @@ public interface AiDramaScriptService {
      *
      * @param userId 用户编号
      * @param reqVO 请求
-     * @return 规划的分镜（未保存，没有编号）
+     * @return 规划的分镜（未保存，没有编号），及其规划提示
      */
-    List<AiDramaStoryboardDO> planStoryboardListMy(Long userId, AiDramaChatReqVO reqVO);
+    List<AiDramaStoryboardPlanRespBO> planStoryboardListMy(Long userId, AiDramaChatReqVO reqVO);
 
     /**
      * 导入审阅后的分镜：替换当前剧本的分镜，项目置为分镜就绪；其中有镜头视频生成中时不允许
@@ -141,6 +143,17 @@ public interface AiDramaScriptService {
      * @return 增量文本
      */
     Flux<CommonResult<String>> resumeChatStreamMy(Long userId, Long projectId);
+
+    /**
+     * 从故事想法创建项目：流式生成初版剧本，生成成功、解析成功后，在同一事务内创建项目、保存剧本
+     *
+     * 前端断开后仍在后台完成；失败时不创建项目；同一用户同时只允许一个
+     *
+     * @param userId 用户编号
+     * @param reqVO 项目设置与故事想法
+     * @return 增量文本；最后一条为项目编号
+     */
+    Flux<CommonResult<AiDramaScriptCreateRespVO>> createProjectStreamMy(Long userId, AiDramaScriptCreateReqVO reqVO);
 
     /**
      * 获得项目进行中的流式生成的类型

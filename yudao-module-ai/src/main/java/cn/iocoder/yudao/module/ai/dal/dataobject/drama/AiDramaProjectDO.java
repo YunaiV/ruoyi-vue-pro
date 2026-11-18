@@ -138,5 +138,47 @@ public class AiDramaProjectDO extends BaseDO {
      * 最近一次合成完成时间
      */
     private LocalDateTime composeFinishTime;
+    /**
+     * 成片使用的镜头视频：按拼接顺序，合成成功时记录提交合成时的镜头与视频地址；
+     * 用于判断成片是否需要重新合成（镜头视频被替换、镜头被删除等），为空表示没有记录（不判断）
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<ComposeVideo> composeVideos;
+
+    /**
+     * 成片使用的镜头视频
+     *
+     * @author 芋道源码
+     */
+    @Data
+    public static class ComposeVideo {
+
+        /**
+         * 镜头编号
+         * <p>
+         * 关联 {@link AiDramaStoryboardDO#getId()}
+         */
+        private Long storyboardId;
+        /**
+         * 合成时的镜头视频地址
+         */
+        private String videoUrl;
+        /**
+         * 镜头所属的剧本编号：判断剧本版本的分镜是否已变化
+         * <p>
+         * 关联 {@link AiDramaScriptDO#getId()}
+         */
+        private Long scriptId;
+        /**
+         * 提交合成时项目最大的镜头编号（包括未选、视频未完成的镜头）：同一次合成相同
+         * <p>
+         * 判断「合成后新增镜头」的边界：编号更大的镜头为提交后新增，完成视频后成片需要重新合成；
+         * 镜头编号自增，不受创建时间精度影响；只作边界比较，该镜头之后被删除时仍然有效
+         * <p>
+         * 关联 {@link AiDramaStoryboardDO#getId()}
+         */
+        private Long maxStoryboardId;
+
+    }
 
 }

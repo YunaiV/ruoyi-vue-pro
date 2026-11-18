@@ -541,12 +541,64 @@ public class AiDramaStoryboardServiceImpl implements AiDramaStoryboardService {
      * 校验连续多镜段的每个出场角色都有参考图：缺少时视频无法对应角色的身份与衣装
      */
     private void validateMultiShotCharacterImages(AiDramaStoryboardDO storyboard, Map<Long, AiDramaCharacterDO> characterMap) {
+        Map<Long, String> imageUrls = getAppearanceImageUrls(storyboard, characterMap);
         assetService.getAppearanceList(getAppearanceIds(storyboard)).forEach(appearance -> {
             AiDramaCharacterDO character = characterMap.get(appearance.getCharacterId());
-            if (character != null && StrUtil.isBlank(getSelectedUrl(appearance.getImageUrls(), appearance.getSelectedIndex()))) {
+            if (character != null && StrUtil.isBlank(imageUrls.get(appearance.getId()))) {
                 throw invalidParamException("连续多镜段缺少角色参考：{}", character.getName());
             }
         });
+    }
+
+    /**
+     * 获得出场角色形象的参考图，缺图时依次回退：该形象的选用图、形象参考图 → 同角色其它有图的形象（按形象序号，主形象优先）→ 角色参考图；
+     * 关键帧、视频共用，只使用本项目角色的
+     *
+     * @return key 为形象编号，value 为参考图地址；都没有图时不包含
+     */
+    private Map<Long, String> getAppearanceImageUrls(AiDramaStoryboardDO storyboard, Map<Long, AiDramaCharacterDO> characterMap) {
+        // 1.1 出场形象：只取本项目角色的
+        List<AiDramaCharacterAppearanceDO> appearances = filterList(assetService.getAppearanceList(getAppearanceIds(storyboard)),
+                appearance -> characterMap.containsKey(appearance.getCharacterId()));
+        if (appearances.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        // 1.2 一次查询出场角色的全部形象
+        List<AiDramaCharacterAppearanceDO> characterAppearances = assetService.getAppearanceListByCharacterIds(
+                convertSet(appearances, AiDramaCharacterAppearanceDO::getCharacterId));
+        // 1.3 按形象序号排序（主形象优先，没有序号的最后）后，按角色分组
+        Map<Long, List<AiDramaCharacterAppearanceDO>> characterAppearanceMap = convertMultiMap(characterAppearances.stream()
+                .sorted(Comparator.comparing(AiDramaCharacterAppearanceDO::getAppearanceIndex,
+                        Comparator.nullsLast(Comparator.naturalOrder())))
+                .toList(), AiDramaCharacterAppearanceDO::getCharacterId);
+
+        // 2. 逐个出场形象回退取图
+        Map<Long, String> result = new HashMap<>();
+        for (AiDramaCharacterAppearanceDO appearance : appearances) {
+            // 2.1 该形象自身的图
+            String url = getAppearanceImageUrl(appearance);
+            // 2.2 同角色第一个有图的形象
+            if (StrUtil.isBlank(url)) {
+                url = findFirst(convertList(characterAppearanceMap.get(appearance.getCharacterId()),
+                        AiDramaStoryboardServiceImpl::getAppearanceImageUrl), StrUtil::isNotBlank);
+            }
+            // 2.3 角色参考图
+            if (StrUtil.isBlank(url)) {
+                url = characterMap.get(appearance.getCharacterId()).getReferenceImageUrl();
+            }
+            if (StrUtil.isNotBlank(url)) {
+                result.put(appearance.getId(), url);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * 获得形象自身的图：选用的候选图，没有时为形象参考图
+     */
+    private static String getAppearanceImageUrl(AiDramaCharacterAppearanceDO appearance) {
+        String selectedUrl = getSelectedUrl(appearance.getImageUrls(), appearance.getSelectedIndex());
+        return StrUtil.blankToDefault(selectedUrl, appearance.getReferenceImageUrl());
     }
 
     /**
@@ -638,12 +690,12 @@ public class AiDramaStoryboardServiceImpl implements AiDramaStoryboardService {
     private Map<String, Set<String>> getReferenceImages(AiDramaStoryboardDO storyboard, AiDramaProjectDO project,
                                                         Map<Long, AiDramaCharacterDO> characterMap, boolean frame) {
         Map<String, Set<String>> images = new LinkedHashMap<>();
-        // 角色形象：只使用本项目角色的
+        // 角色形象：只使用本项目角色的；缺图时按 getAppearanceImageUrls 的次序回退
+        Map<Long, String> appearanceImageUrls = getAppearanceImageUrls(storyboard, characterMap);
         assetService.getAppearanceList(getAppearanceIds(storyboard)).forEach(appearance -> {
             AiDramaCharacterDO character = characterMap.get(appearance.getCharacterId());
             if (character != null && !isFrameAbsent(storyboard, frame, character.getName())) {
-                putIfNotBlank(images, getSelectedUrl(appearance.getImageUrls(), appearance.getSelectedIndex()),
-                        character.getName() + "的形象");
+                putIfNotBlank(images, appearanceImageUrls.get(appearance.getId()), character.getName() + "的形象");
             }
         });
         // 场景：设置为不包含场景图时不带
