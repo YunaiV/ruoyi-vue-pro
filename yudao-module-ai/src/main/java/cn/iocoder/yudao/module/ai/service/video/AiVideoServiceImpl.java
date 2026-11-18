@@ -114,11 +114,11 @@ public class AiVideoServiceImpl implements AiVideoService {
         // 2.1 构建记录：生成方式只用于视频生成，默认文生；输入文件只保留类型、方式对应的角色
         boolean generate = Objects.equals(reqVO.getType(), AiVideoTypeEnum.GENERATE.getType());
         String mode = generate ? StrUtil.blankToDefault(reqVO.getMode(), AiVideoModeEnum.TEXT.getMode()) : null;
-        AiVideoDO video = BeanUtils.toBean(reqVO, AiVideoDO.class).setUserId(userId).setMode(mode)
+        AiVideoDO video = BeanUtils.toBean(reqVO, AiVideoDO.class, o -> o.setUserId(userId).setMode(mode)
                 .setPlatform(model.getPlatform()).setModel(model.getModel()).setApiKeyId(apiKey.getId())
                 .setPrompt(StrUtil.trimToNull(reqVO.getPrompt()))
                 .setInputUrls(AiVideoUtils.filterInputUrls(reqVO.getType(), mode, reqVO.getInputUrls()))
-                .setStatus(AiVideoStatusEnum.PENDING.getStatus()).setProgress(0).setPublicStatus(false);
+                .setStatus(AiVideoStatusEnum.PENDING.getStatus()).setProgress(0).setPublicStatus(false));
         if (!generate) {
             // 数字人口播、动作模仿不使用分辨率、比例、时长：不保存，完成后取服务商返回的时长
             video.setResolution(null).setRatio(null).setDuration(null);
@@ -225,7 +225,7 @@ public class AiVideoServiceImpl implements AiVideoService {
         throw exception(VIDEO_NOT_EXISTS);
     }
 
-    // ========== 视频管理 ==========
+    // ========== 视频生成管理 ==========
 
     @Override
     public PageResult<AiVideoDO> getVideoPage(AiVideoPageReqVO pageReqVO) {
@@ -336,6 +336,8 @@ public class AiVideoServiceImpl implements AiVideoService {
             case BYTEDANCE: {
                 // 2.1 字节跳动：即梦视频 3.0，或方舟 Seedance
                 if (AiVideoUtils.isJimeng(video)) {
+                    validateInputsUnused(video, AiVideoInputRoleEnum.REFERENCE_IMAGE, AiVideoInputRoleEnum.REFERENCE_VIDEO,
+                            AiVideoInputRoleEnum.REFERENCE_AUDIO);
                     JimengVideoRequest request = new JimengVideoRequest().setReqKey(model).setPrompt(video.getPrompt())
                             .setSeed(options.getSeed()).setAspectRatio(video.getRatio())
                             .setFrames(AiVideoUtils.getJimengFrames(video.getDuration()));
@@ -359,6 +361,8 @@ public class AiVideoServiceImpl implements AiVideoService {
             }
             case KLING: {
                 // 2.2 可灵：旧版、新版接口的请求相同，校验与路径不同
+                validateInputsUnused(video, AiVideoInputRoleEnum.REFERENCE_IMAGE, AiVideoInputRoleEnum.REFERENCE_VIDEO,
+                        AiVideoInputRoleEnum.REFERENCE_AUDIO);
                 KlingVideoRequest request = new KlingVideoRequest().setModel(model).setPrompt(video.getPrompt())
                         .setFirstFrame(firstFrame).setLastFrame(lastFrame)
                         .setResolution(video.getResolution()).setAspectRatio(video.getRatio())
@@ -388,6 +392,10 @@ public class AiVideoServiceImpl implements AiVideoService {
                     MiniMaxH3VideoApi api = AiVideoUtils.getMiniMaxH3Api(apiKey);
                     return () -> api.createTask(request);
                 }
+                validateInputsUnused(video, AiVideoInputRoleEnum.REFERENCE_VIDEO, AiVideoInputRoleEnum.REFERENCE_AUDIO);
+                if (referenceImages.size() > 1) {
+                    throw new IllegalArgumentException(StrUtil.format("模型({})的主体参考图最多 1 张", model));
+                }
                 MiniMaxHailuoVideoRequest request = new MiniMaxHailuoVideoRequest().setModel(model).setPrompt(video.getPrompt())
                         .setPromptOptimizer(options.getPromptExtend()).setDuration(video.getDuration())
                         .setResolution(video.getResolution()).setFirstFrameImage(firstFrame).setLastFrameImage(lastFrame)
@@ -399,6 +407,7 @@ public class AiVideoServiceImpl implements AiVideoService {
             case ALIBABA: {
                 // 2.4 阿里：HappyHorse，或通义万相
                 if (AiVideoUtils.isHappyHorse(model)) {
+                    validateInputsUnused(video, AiVideoInputRoleEnum.REFERENCE_VIDEO, AiVideoInputRoleEnum.REFERENCE_AUDIO);
                     HappyHorseVideoRequest request = new HappyHorseVideoRequest().setModel(model).setPrompt(video.getPrompt())
                             .setFirstFrame(firstFrame).setResolution(video.getResolution()).setRatio(video.getRatio())
                             .setDuration(video.getDuration()).setWatermark(options.getWatermark()).setSeed(options.getSeed());
@@ -407,6 +416,8 @@ public class AiVideoServiceImpl implements AiVideoService {
                     HappyHorseVideoApi api = AiVideoUtils.getHappyHorseApi(apiKey);
                     return () -> api.createTask(request);
                 }
+                validateInputsUnused(video, AiVideoInputRoleEnum.REFERENCE_IMAGE, AiVideoInputRoleEnum.REFERENCE_VIDEO,
+                        AiVideoInputRoleEnum.REFERENCE_AUDIO);
                 TongYiWanVideoRequest request = new TongYiWanVideoRequest().setModel(model).setPrompt(video.getPrompt())
                         .setNegativePrompt(options.getNegativePrompt()).setSize(options.getSize())
                         .setResolution(video.getResolution()).setRatio(video.getRatio())
@@ -421,6 +432,7 @@ public class AiVideoServiceImpl implements AiVideoService {
             case GEMINI: {
                 // 2.5 Google Veo（Vertex AI）：图片以 base64 提交，提交前下载
                 AiVideoUtils.validateVeoModel(model);
+                validateInputsUnused(video, AiVideoInputRoleEnum.REFERENCE_VIDEO, AiVideoInputRoleEnum.REFERENCE_AUDIO);
                 VertexVeoVideoRequest request = new VertexVeoVideoRequest().setModel(model).setPrompt(video.getPrompt())
                         .setNegativePrompt(options.getNegativePrompt()).setAspectRatio(video.getRatio())
                         .setDurationSeconds(video.getDuration()).setResolution(video.getResolution())
@@ -486,6 +498,17 @@ public class AiVideoServiceImpl implements AiVideoService {
      */
     private String getInput(AiVideoDO video, AiVideoInputRoleEnum role) {
         return CollUtil.getFirst(getInputs(video, role));
+    }
+
+    /**
+     * 校验没有客户端不会提交的输入文件：避免被静默丢弃（例如短剧按是否通过校验，决定带哪些参考素材）；与前端 video.ts 的模型能力一致
+     */
+    private void validateInputsUnused(AiVideoDO video, AiVideoInputRoleEnum... roles) {
+        for (AiVideoInputRoleEnum role : roles) {
+            if (!getInputs(video, role, false).isEmpty()) {
+                throw new IllegalArgumentException(StrUtil.format("模型({})不支持{}", video.getModel(), role.getName()));
+            }
+        }
     }
 
     /**

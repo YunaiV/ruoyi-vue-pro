@@ -938,31 +938,29 @@ public class AiImageServiceImplUnitTest extends BaseMockitoUnitTest {
     }
 
     @Test
-    public void testUpdateImagePublicMy_success() {
-        when(imageMapper.selectById(IMAGE_ID)).thenReturn(new AiImageDO().setId(IMAGE_ID).setUserId(USER_ID)
+    public void testUpdateImage_success() {
+        // 管理员公开：不校验作者
+        when(imageMapper.selectById(IMAGE_ID)).thenReturn(new AiImageDO().setId(IMAGE_ID).setUserId(USER_ID + 1)
                 .setStatus(AiImageStatusEnum.SUCCESS.getStatus()));
 
-        imageService.updateImagePublicMy(USER_ID, new AiImageUpdateReqVO().setId(IMAGE_ID).setPublicStatus(true));
+        imageService.updateImage(new AiImageUpdateReqVO().setId(IMAGE_ID).setPublicStatus(true));
         verify(imageMapper).updateById(argThat((AiImageDO update) -> Objects.equals(update.getId(), IMAGE_ID)
                 && Boolean.TRUE.equals(update.getPublicStatus()) && update.getStatus() == null));
     }
 
     @Test
-    public void testUpdateImagePublicMy_notSuccess() {
+    public void testUpdateImage_notSuccess() {
         when(imageMapper.selectById(IMAGE_ID)).thenReturn(new AiImageDO().setId(IMAGE_ID).setUserId(USER_ID)
                 .setStatus(IN_PROGRESS));
 
-        assertServiceException(() -> imageService.updateImagePublicMy(USER_ID,
+        assertServiceException(() -> imageService.updateImage(
                 new AiImageUpdateReqVO().setId(IMAGE_ID).setPublicStatus(true)), IMAGE_PUBLIC_STATUS_FAIL);
         verify(imageMapper, never()).updateById(any(AiImageDO.class));
     }
 
     @Test
-    public void testUpdateImagePublicMy_notOwner() {
-        when(imageMapper.selectById(IMAGE_ID)).thenReturn(new AiImageDO().setId(IMAGE_ID).setUserId(USER_ID + 1)
-                .setStatus(AiImageStatusEnum.SUCCESS.getStatus()));
-
-        assertServiceException(() -> imageService.updateImagePublicMy(USER_ID,
+    public void testUpdateImage_notExists() {
+        assertServiceException(() -> imageService.updateImage(
                 new AiImageUpdateReqVO().setId(IMAGE_ID).setPublicStatus(true)), IMAGE_NOT_EXISTS);
     }
 

@@ -51,7 +51,7 @@ public interface AiOcrService {
      */
     void deleteOcrMy(Long id, Long userId);
 
-    // ========== OCR 管理 ==========
+    // ========== 图片识别管理 ==========
 
     /**
      * 获得识别记录分页

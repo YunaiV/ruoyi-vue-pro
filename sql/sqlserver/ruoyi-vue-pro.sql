@@ -8466,7 +8466,7 @@ INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon
 GO
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (816, N'AI 绘画', N'', 2, 2, 791, N'image', N'ep:picture-rounded', N'ai/image/index/index.vue', N'AiImage', 0, N'1', N'1', N'1', N'1', N'2024-05-26 11:45:17', N'1', N'2026-08-14 01:49:42', N'0')
 GO
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (817, N'绘画管理', N'', 2, 11, 793, N'image', N'fa:file-image-o', N'ai/image/manager/index.vue', N'AiImageManager', 0, N'1', N'1', N'1', N'', N'2024-06-26 13:32:31', N'1', N'2026-08-14 01:49:42', N'0')
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (817, N'图片生成管理', N'', 2, 11, 793, N'image', N'fa:file-image-o', N'ai/image/manager/index.vue', N'AiImageManager', 0, N'1', N'1', N'1', N'', N'2024-06-26 13:32:31', N'1', N'2026-08-14 01:49:42', N'0')
 GO
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (818, N'绘画查询', N'ai:image:query', 3, 1, 817, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'', N'2024-06-26 13:32:31', N'1', N'2026-08-14 01:49:42', N'0')
 GO
@@ -8474,7 +8474,7 @@ INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon
 GO
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (820, N'绘图更新', N'ai:image:update', 3, 2, 817, N'', N'', N'', N'', 0, N'1', N'1', N'1', N'1', N'2024-06-26 22:47:56', N'1', N'2026-08-14 01:49:42', N'0')
 GO
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (821, N'音乐管理', N'', 2, 12, 793, N'music', N'fa:music', N'ai/music/manager/index.vue', N'AiMusicManager', 0, N'1', N'1', N'1', N'', N'2024-06-27 15:03:33', N'1', N'2026-08-14 01:49:42', N'0')
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (821, N'音乐生成管理', N'', 2, 12, 793, N'music', N'fa:music', N'ai/music/manager/index.vue', N'AiMusicManager', 0, N'1', N'1', N'1', N'', N'2024-06-27 15:03:33', N'1', N'2026-08-14 01:49:42', N'0')
 GO
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (822, N'音乐查询', N'ai:music:query', 3, 1, 821, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'', N'2024-06-27 15:03:33', N'', N'2026-08-14 01:49:42', N'0')
 GO
@@ -8484,7 +8484,7 @@ INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon
 GO
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (825, N'AI 写作', N'', 2, 3, 791, N'write', N'fa-solid:book-reader', N'ai/write/index/index.vue', N'AiWrite', 0, N'1', N'1', N'1', N'1', N'2024-07-08 09:26:44', N'1', N'2026-08-14 01:49:42', N'0')
 GO
-INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (826, N'写作管理', N'', 2, 13, 793, N'write', N'fa:bookmark-o', N'ai/write/manager/index.vue', N'AiWriteManager', 0, N'1', N'1', N'1', N'', N'2024-07-10 13:24:34', N'1', N'2026-08-14 01:49:42', N'0')
+INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (826, N'写作翻译管理', N'', 2, 13, 793, N'write', N'fa:bookmark-o', N'ai/write/manager/index.vue', N'AiWriteManager', 0, N'1', N'1', N'1', N'', N'2024-07-10 13:24:34', N'1', N'2026-08-14 01:49:42', N'0')
 GO
 INSERT INTO system_menu (id, name, permission, type, sort, parent_id, path, icon, component, component_name, status, visible, keep_alive, always_show, creator, create_time, updater, update_time, deleted) VALUES (827, N'AI 写作查询', N'ai:write:query', 3, 1, 826, N'', N'', N'', NULL, 0, N'1', N'1', N'1', N'', N'2024-07-10 13:24:34', N'', N'2026-08-14 01:49:42', N'0')
 GO

@@ -457,16 +457,16 @@ public class AiMusicServiceImplTest extends BaseMockitoUnitTest {
                 .setStatus(AiMusicStatusEnum.SUCCESS.getStatus()));
         // 准备参数
         AiMusicUpdateMyReqVO reqVO = new AiMusicUpdateMyReqVO().setId(MUSIC_ID).setTitle("新名称")
-                .setCoverUrl("https://cdn.example.com/cover.png").setPublicStatus(true);
+                .setCoverUrl("https://cdn.example.com/cover.png");
 
         // 调用
         musicService.updateMyMusic(reqVO, USER_ID);
-        // 断言
+        // 断言：只修改名称、封面；公开状态由管理员在【音乐生成管理】修改
         ArgumentCaptor<AiMusicDO> captor = ArgumentCaptor.forClass(AiMusicDO.class);
         verify(musicMapper).updateById(captor.capture());
         assertEquals("新名称", captor.getValue().getTitle());
         assertEquals("https://cdn.example.com/cover.png", captor.getValue().getCoverUrl());
-        assertTrue(captor.getValue().getPublicStatus());
+        assertNull(captor.getValue().getPublicStatus());
         assertNull(captor.getValue().getStatus());
     }
 
@@ -478,19 +478,46 @@ public class AiMusicServiceImplTest extends BaseMockitoUnitTest {
 
         // 调用，并断言异常
         assertServiceException(() -> musicService.updateMyMusic(new AiMusicUpdateMyReqVO().setId(MUSIC_ID)
-                .setPublicStatus(false), USER_ID), MUSIC_NOT_EXISTS);
+                .setTitle("新名称"), USER_ID), MUSIC_NOT_EXISTS);
         verify(musicMapper, never()).updateById(any(AiMusicDO.class));
     }
 
     @Test
     public void testUpdateMyMusic_notSuccess() {
-        // mock 数据：未完成的不能公开
+        // mock 数据：未完成的不能修改
         when(musicMapper.selectById(MUSIC_ID)).thenReturn(new AiMusicDO().setId(MUSIC_ID).setUserId(USER_ID)
                 .setStatus(AiMusicStatusEnum.FAIL.getStatus()));
 
         // 调用，并断言异常
         assertServiceException(() -> musicService.updateMyMusic(new AiMusicUpdateMyReqVO().setId(MUSIC_ID)
-                .setPublicStatus(true), USER_ID), MUSIC_STATUS_NOT_SUCCESS);
+                .setTitle("新名称"), USER_ID), MUSIC_STATUS_NOT_SUCCESS);
+    }
+
+    @Test
+    public void testUpdateMusic_success() {
+        // mock 数据：管理员公开，不校验作者
+        when(musicMapper.selectById(MUSIC_ID)).thenReturn(new AiMusicDO().setId(MUSIC_ID).setUserId(OTHER_USER_ID)
+                .setStatus(AiMusicStatusEnum.SUCCESS.getStatus()));
+
+        // 调用
+        musicService.updateMusic(new AiMusicUpdateReqVO().setId(MUSIC_ID).setPublicStatus(true));
+        // 断言
+        ArgumentCaptor<AiMusicDO> captor = ArgumentCaptor.forClass(AiMusicDO.class);
+        verify(musicMapper).updateById(captor.capture());
+        assertEquals(MUSIC_ID, captor.getValue().getId());
+        assertTrue(captor.getValue().getPublicStatus());
+    }
+
+    @Test
+    public void testUpdateMusic_notSuccess() {
+        // mock 数据：未完成的不能公开
+        when(musicMapper.selectById(MUSIC_ID)).thenReturn(new AiMusicDO().setId(MUSIC_ID).setUserId(OTHER_USER_ID)
+                .setStatus(AiMusicStatusEnum.FAIL.getStatus()));
+
+        // 调用，并断言异常
+        assertServiceException(() -> musicService.updateMusic(new AiMusicUpdateReqVO().setId(MUSIC_ID)
+                .setPublicStatus(true)), MUSIC_STATUS_NOT_SUCCESS);
+        verify(musicMapper, never()).updateById(any(AiMusicDO.class));
     }
 
     @Test

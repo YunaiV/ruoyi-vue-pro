@@ -101,7 +101,6 @@ public class AiModelServiceImpl implements AiModelService {
         }
 
         // 2. 更新：未配置（null 或档位为空）时思考配置清空，由 updateForSave 与普通字段同一条 UPDATE 置空
-        // DONE @AI：类似别的模块，updateForSave，这样是不是可以把逻辑放到 mapper；这样 2.1 2.2 就可以和上面 create 一样的逻辑呀；（已新增 AiChatMapper#updateForSave，更新与创建同样先把未配置归一为 null）
         if (!AiReasoningUtils.isReasoningConfigured(updateObj)) {
             updateObj.setReasoningConfig(null);
         }

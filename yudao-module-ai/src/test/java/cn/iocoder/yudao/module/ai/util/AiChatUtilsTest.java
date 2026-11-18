@@ -12,8 +12,6 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-// DONE @AI：单测名字不对，对齐下；AiUtilsTest 才对；已合并进 AiUtilsTest，删除 AiUtilsUsageTest
-// DONE @AI：代码风格，要对齐 system user test 噢；已按「准备参数 / 调用 / 断言」步骤注释对齐，纯单元测试不启动 Spring 容器
 /**
  * {@link AiChatUtils} 的单元测试类
  *

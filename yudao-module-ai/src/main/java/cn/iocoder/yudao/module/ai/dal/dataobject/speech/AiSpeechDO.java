@@ -85,7 +85,6 @@ public class AiSpeechDO extends BaseDO {
      * 服务商的任务编号：异步任务（腾讯云）可轮询的编号；同步合成为空
      */
     private String taskId;
-    // TODO DONE @AI：“：文件服务的原始地址，访问时再生成签名地址”这个注释不需要把；其他也检查下；（已收敛为「音频地址」，与 AiMusicDO 一致；AiSpeechRespVO 的 @Schema、本地建表 SQL 的列注释同步收敛）
     /**
      * 音频地址
      */

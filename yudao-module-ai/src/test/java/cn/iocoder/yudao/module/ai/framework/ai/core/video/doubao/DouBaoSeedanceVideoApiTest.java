@@ -114,6 +114,17 @@ public class DouBaoSeedanceVideoApiTest {
                 .setReferenceImages(ListUtil.toList("https://a.com/1.png")))).isInstanceOf(IllegalArgumentException.class);
         assertEquals("first_frame", DouBaoSeedanceVideoApi.buildRequestBody(t2v().setFirstFrame("https://a.com/1.png"))
                 .get("content").get(1).get("role").asText());
+        // 推理接入点等无法识别系列的：只做通用校验，参考素材交给服务商判断
+        assertEquals("reference_image", DouBaoSeedanceVideoApi.buildRequestBody(t2v().setModel("ep-20260101-abcde")
+                .setReferenceImages(ListUtil.toList("https://a.com/1.png"))).get("content").get(1).get("role").asText());
+        // 1.x 只有 i2v 支持参考图，且最多 4 张
+        assertThatThrownBy(() -> DouBaoSeedanceVideoApi.buildRequestBody(t2v().setModel(MODEL_PRO)
+                .setReferenceImages(ListUtil.toList("https://a.com/1.png")))).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> DouBaoSeedanceVideoApi.buildRequestBody(t2v().setModel("doubao-seedance-1-0-lite-i2v-250428")
+                .setReferenceImages(ListUtil.toList("https://a.com/1.png", "https://a.com/2.png", "https://a.com/3.png",
+                        "https://a.com/4.png", "https://a.com/5.png")))).isInstanceOf(IllegalArgumentException.class);
+        assertEquals("reference_image", DouBaoSeedanceVideoApi.buildRequestBody(t2v().setModel("doubao-seedance-1-0-lite-i2v-250428")
+                .setReferenceImages(ListUtil.toList("https://a.com/1.png"))).get("content").get(1).get("role").asText());
     }
 
     @Test

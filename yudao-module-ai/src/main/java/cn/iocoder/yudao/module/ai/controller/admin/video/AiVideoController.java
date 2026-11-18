@@ -85,7 +85,7 @@ public class AiVideoController {
         return success(true);
     }
 
-    // ================ 视频管理 ================
+    // ================ 视频生成管理 ================
 
     @GetMapping("/page")
     @Operation(summary = "获得视频分页")
@@ -143,8 +143,6 @@ public class AiVideoController {
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertSet(list, AiVideoDO::getUserId));
         return BeanUtils.toBean(list, AiVideoRespVO.class, video -> {
             MapUtils.findAndThen(userMap, video.getUserId(), user -> video.setUserNickname(user.getNickname()));
-            // TODO DONE @AI：是不是可以返回噢。其它类似的，也检查下噢；（API 密钥编号、服务商任务编号不再清空；短剧镜头的 taskId 同样返回）
-            // TODO DONE @AI：notequlas；（改用 ObjUtil.notEqual）
             if (!admin && ObjUtil.notEqual(video.getUserId(), loginUserId)) {
                 video.setInputUrls(null);
             }

@@ -87,7 +87,7 @@ public interface AiPptService {
      */
     byte[] exportPpt(AiPptDO ppt, String format);
 
-    // ========== PPT 管理 ==========
+    // ========== PPT 生成管理 ==========
 
     /**
      * 获得 PPT 分页

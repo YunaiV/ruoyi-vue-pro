@@ -37,7 +37,7 @@ public class AiWriteController {
         return writeService.generateWriteContent(generateReqVO, getLoginUserId());
     }
 
-    // ================ 写作管理 ================
+    // ================ 写作翻译管理 ================
 
     @DeleteMapping("/delete")
     @Operation(summary = "删除写作")

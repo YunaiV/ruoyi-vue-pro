@@ -80,7 +80,7 @@ public interface AiVideoService {
      */
     void deleteVideoMy(Long id, Long userId);
 
-    // ========== 视频管理 ==========
+    // ========== 视频生成管理 ==========
 
     /**
      * 获得视频分页

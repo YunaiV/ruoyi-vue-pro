@@ -223,7 +223,7 @@ public class AiOcrServiceImplTest extends BaseMockitoUnitTest {
         verify(ocrMapper, never()).deleteById(OCR_ID);
     }
 
-    // ========== OCR 管理 ==========
+    // ========== 图片识别管理 ==========
 
     @Test
     public void testGetOcrPage() {

@@ -85,14 +85,6 @@ public interface AiImageService {
     void deleteImageMy(Long id, Long userId);
 
     /**
-     * 更新【我的】绘画的公开状态：只有已完成的绘画才能公开
-     *
-     * @param userId 用户编号
-     * @param updateReqVO 更新信息
-     */
-    void updateImagePublicMy(Long userId, AiImageUpdateReqVO updateReqVO);
-
-    /**
      * 生成专业绘画指令：使用默认的对话模型，改写提示词
      *
      * @param userId 用户编号

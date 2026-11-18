@@ -109,9 +109,9 @@ public class AiSpeechServiceImpl implements AiSpeechService {
         }
 
         // 2. 插入生成中的记录：请求参数由 BeanUtils 复制；用户、平台、模型、密钥、状态为提交时的快照，不取自请求
-        AiSpeechDO speech = BeanUtils.toBean(reqVO, AiSpeechDO.class).setUserId(userId)
+        AiSpeechDO speech = BeanUtils.toBean(reqVO, AiSpeechDO.class, o -> o.setUserId(userId)
                 .setPlatform(model.getPlatform()).setModel(model.getModel()).setApiKeyId(apiKey.getId())
-                .setStatus(AiSpeechStatusEnum.IN_PROGRESS.getStatus());
+                .setStatus(AiSpeechStatusEnum.IN_PROGRESS.getStatus()));
         speechMapper.insert(speech);
 
         // 3. 异步合成：绑定当前租户，不依赖登录上下文；前端按返回的编号轮询结果
@@ -228,7 +228,7 @@ public class AiSpeechServiceImpl implements AiSpeechService {
         return speech;
     }
 
-    // ========== 语音管理 ==========
+    // ========== 语音生成管理 ==========
 
     @Override
     public PageResult<AiSpeechDO> getSpeechPage(AiSpeechPageReqVO pageReqVO) {

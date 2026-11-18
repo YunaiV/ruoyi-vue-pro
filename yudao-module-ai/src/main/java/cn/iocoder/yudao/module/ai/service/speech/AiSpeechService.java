@@ -48,7 +48,7 @@ public interface AiSpeechService {
      */
     void deleteSpeechMy(Long id, Long userId);
 
-    // ========== 语音管理 ==========
+    // ========== 语音生成管理 ==========
 
     /**
      * 获得语音分页

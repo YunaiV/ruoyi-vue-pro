@@ -21,7 +21,4 @@ public class AiMusicUpdateMyReqVO {
     @Size(max = 1024, message = "封面地址不能超过 1024 个字符")
     private String coverUrl;
 
-    @Schema(description = "是否公开", example = "true")
-    private Boolean publicStatus;
-
 }

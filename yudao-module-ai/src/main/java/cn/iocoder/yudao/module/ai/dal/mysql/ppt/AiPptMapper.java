@@ -46,10 +46,10 @@ public interface AiPptMapper extends BaseMapperX<AiPptDO> {
      *
      * @param whereUpdateTimeLt 更新时间早于该时间才更新，允许空
      */
-    default int updateByIdAndStatusAndAttempt(AiPptDO updateObj, Integer whereStatus, Integer whereAttempt,
-                                              LocalDateTime whereUpdateTimeLt) {
+    default int updateByIdAndStatusAndAttempt(Long id, Integer whereStatus, Integer whereAttempt,
+                                              LocalDateTime whereUpdateTimeLt, AiPptDO updateObj) {
         return update(updateObj, new LambdaUpdateWrapper<AiPptDO>()
-                .eq(AiPptDO::getId, updateObj.getId())
+                .eq(AiPptDO::getId, id)
                 .eq(AiPptDO::getStatus, whereStatus)
                 .eq(AiPptDO::getAttempt, whereAttempt)
                 .lt(whereUpdateTimeLt != null, AiPptDO::getUpdateTime, whereUpdateTimeLt)

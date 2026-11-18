@@ -60,8 +60,8 @@ public class AiSkillServiceImpl implements AiSkillService {
         validateSkillNameUnique(createReqVO.getName());
 
         // 2. 插入：描述保持单行，与 SKILL.md 头信息一致
-        AiSkillDO skill = BeanUtils.toBean(createReqVO, AiSkillDO.class).setId(null)
-                .setDescription(AiSkillFileServiceImpl.toFrontmatterValue(createReqVO.getDescription()));
+        AiSkillDO skill = BeanUtils.toBean(createReqVO, AiSkillDO.class, o -> o.setId(null)
+                .setDescription(AiSkillFileServiceImpl.toFrontmatterValue(createReqVO.getDescription())));
         skillMapper.insert(skill);
 
         // 3. 创建固定文件：SKILL.md + scripts/ + reference/

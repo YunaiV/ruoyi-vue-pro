@@ -260,6 +260,28 @@ public class AiVideoServiceImplTest extends BaseMockitoUnitTest {
         assertEquals(VIDEO_PARAMS_INVALID.getCode(), exception.getCode());
     }
 
+    @Test
+    public void testBuildVideoSubmitter_referenceUnused() {
+        // 可灵：不提交参考素材
+        AiVideoDO kling = new AiVideoDO().setType(AiVideoTypeEnum.GENERATE.getType()).setMode(AiVideoModeEnum.REFERENCE.getMode())
+                .setPlatform(AiPlatformEnum.KLING.getPlatform()).setModel("kling-2.6").setPrompt("海边的日落").setDuration(5)
+                .setInputUrls(Map.of("reference_image", List.of("https://files.example.com/a.png")));
+        assertServiceException(() -> videoService.buildVideoSubmitter(kling, new AiApiKeyDO()),
+                VIDEO_PARAMS_INVALID, "模型(kling-2.6)不支持参考图");
+        // Veo：只提交参考图
+        AiVideoDO veo = veoVideo("veo-3.1-fast-generate-001").setMode(AiVideoModeEnum.REFERENCE.getMode())
+                .setInputUrls(Map.of("reference_audio", List.of("https://files.example.com/v.mp3")));
+        assertServiceException(() -> videoService.buildVideoSubmitter(veo, veoApiKey(VERTEX_URL)),
+                VIDEO_PARAMS_INVALID, "模型(veo-3.1-fast-generate-001)不支持参考音频");
+        // 海螺：只提交 1 张主体参考图
+        when(fileApi.presignGetUrlQuietly(anyString())).thenAnswer(invocation -> invocation.getArgument(0));
+        AiVideoDO hailuo = new AiVideoDO().setType(AiVideoTypeEnum.GENERATE.getType()).setMode(AiVideoModeEnum.REFERENCE.getMode())
+                .setPlatform(AiPlatformEnum.MINIMAX.getPlatform()).setModel("MiniMax-Hailuo-02").setPrompt("海边的日落")
+                .setInputUrls(Map.of("reference_image", List.of("https://files.example.com/a.png", "https://files.example.com/b.png")));
+        assertServiceException(() -> videoService.buildVideoSubmitter(hailuo, new AiApiKeyDO()),
+                VIDEO_PARAMS_INVALID, "模型(MiniMax-Hailuo-02)的主体参考图最多 1 张");
+    }
+
     // ========== filterInputUrls ==========
 
     @Test

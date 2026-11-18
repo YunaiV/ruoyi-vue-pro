@@ -85,7 +85,7 @@ public class AiOcrController {
         return success(true);
     }
 
-    // ================ OCR 管理 ================
+    // ================ 图片识别管理 ================
 
     @GetMapping("/page")
     @Operation(summary = "获得识别记录分页")

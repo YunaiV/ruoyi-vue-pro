@@ -206,9 +206,6 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
             chatResponse = chatModel.call(prompt);
         } catch (RuntimeException ex) {
             finishChatCall(requestLog, AiRequestLogStatusEnum.FAIL, ex);
-            // DONE @AI：可以不超限，忽略掉这个情况？
-            // DONE @AI：技能读取不要超过上限的校验。。。（已去掉 getSkillErrorCode）
-            // DONE @AI：这个是不是过度了？？？（已去掉 isToolNotSupportedError，异常处理保持项目现状）
             throw ex;
         }
         requestLogService.setCreateReqDTO(requestLog, chatResponse);

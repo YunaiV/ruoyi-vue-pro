@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-// DONE @AI：挪到 suno 目录（package 已对齐）
 /**
  * {@link SunoApi} 集成测试：需要可用的 New API 中转地址与密钥，手动执行
  *

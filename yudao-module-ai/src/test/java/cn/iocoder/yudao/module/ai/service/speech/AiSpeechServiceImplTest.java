@@ -482,7 +482,7 @@ public class AiSpeechServiceImplTest extends BaseDbUnitTest {
         assertNotNull(speechMapper.selectById(other.getId()));
     }
 
-    // ========== 语音管理 ==========
+    // ========== 语音生成管理 ==========
 
     @Test
     public void testGetSpeechPage() {

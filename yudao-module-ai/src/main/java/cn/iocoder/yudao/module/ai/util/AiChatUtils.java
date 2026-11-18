@@ -42,7 +42,6 @@ public class AiChatUtils {
      */
     public static final Set<String> TONG_YI_MULTI_MODELS = SetUtils.asSet(
             // qwen3.5 / 3.6 / 3.7 / 3.8 系列（统一多模态主干）
-            // DONE @AI：3.8 搞进来；新的模型哈；（已按百炼文档加入 qwen3.8-max、qwen3.8-flash 及全模态 qwen3.8-omni-flash）
             "qwen3.8-max", "qwen3.8-flash",
             "qwen3.7-max", "qwen3.7-plus", "qwen3.7-flash",
             "qwen3.6-plus", "qwen3.6-flash",

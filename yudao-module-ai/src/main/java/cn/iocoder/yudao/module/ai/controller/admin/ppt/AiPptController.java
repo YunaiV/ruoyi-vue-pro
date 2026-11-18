@@ -113,7 +113,7 @@ public class AiPptController {
         return success(true);
     }
 
-    // ================ PPT 管理 ================
+    // ================ PPT 生成管理 ================
 
     @GetMapping("/page")
     @Operation(summary = "获得 PPT 分页")

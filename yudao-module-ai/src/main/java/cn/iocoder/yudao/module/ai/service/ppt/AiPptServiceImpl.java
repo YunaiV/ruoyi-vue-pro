@@ -160,10 +160,10 @@ public class AiPptServiceImpl implements AiPptService {
         boolean upload = ObjUtil.equal(reqVO.getSource(), AiPptSourceEnum.UPLOAD.getSource());
         String title = upload ? FileUtil.mainName(HttpUtils.decodeUrlPath(
                 HttpUtils.removeUrlPathQueryAndFragment(reqVO.getFileUrl()))) : buildTitle(reqVO.getContent());
-        AiPptDO ppt = BeanUtils.toBean(reqVO, AiPptDO.class).setUserId(userId).setTitle(title)
+        AiPptDO ppt = BeanUtils.toBean(reqVO, AiPptDO.class, o -> o.setUserId(userId).setTitle(title)
                 .setContent(upload ? null : reqVO.getContent()).setFileUrl(upload ? reqVO.getFileUrl() : null)
                 .setChatModelId(chatModel.getId()).setSlides(new ArrayList<>())
-                .setStatus(AiPptStatusEnum.IN_PROGRESS.getStatus()).setAttempt(1);
+                .setStatus(AiPptStatusEnum.IN_PROGRESS.getStatus()).setAttempt(1));
         pptMapper.insert(ppt);
 
         // 3. 异步生成，前端通过轮询获取进度
@@ -516,13 +516,14 @@ public class AiPptServiceImpl implements AiPptService {
      */
     private boolean updatePpt(AiPptDO ppt, Integer whereStatus, Integer whereAttempt, LocalDateTime whereUpdateTimeLt) {
         List<AiPptDO.Slide> slides = ppt.getSlides();
-        AiPptDO updateObj = new AiPptDO().setId(ppt.getId()).setTitle(ppt.getTitle()).setContent(ppt.getContent())
+        AiPptDO updateObj = new AiPptDO().setTitle(ppt.getTitle()).setContent(ppt.getContent())
                 .setSlides(slides).setSlideCount(slides.size())
                 .setCoverUrl(findFirst(slides, slide -> StrUtil.isNotBlank(slide.getImageUrl()), AiPptDO.Slide::getImageUrl))
                 .setFinishCount((int) count(slides, slide -> StrUtil.isNotBlank(slide.getImageUrl())))
                 .setStatus(ppt.getStatus()).setAttempt(ppt.getAttempt())
                 .setErrorMessage(ppt.getErrorMessage()).setFinishTime(ppt.getFinishTime());
-        return pptMapper.updateByIdAndStatusAndAttempt(updateObj, whereStatus, whereAttempt, whereUpdateTimeLt) > 0;
+        return pptMapper.updateByIdAndStatusAndAttempt(ppt.getId(), whereStatus, whereAttempt, whereUpdateTimeLt,
+                updateObj) > 0;
     }
 
     /**
@@ -636,7 +637,7 @@ public class AiPptServiceImpl implements AiPptService {
         }
     }
 
-    // ========== PPT 管理 ==========
+    // ========== PPT 生成管理 ==========
 
     @Override
     public PageResult<AiPptDO> getPptPage(AiPptPageReqVO pageReqVO) {

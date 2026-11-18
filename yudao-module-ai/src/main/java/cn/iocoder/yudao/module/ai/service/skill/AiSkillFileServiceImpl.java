@@ -126,7 +126,6 @@ public class AiSkillFileServiceImpl implements AiSkillFileService {
         validateSkillFileNameUnique(null, createReqVO.getSkillId(), createReqVO.getParentId(), name);
         // 1.3 校验大小：Markdown 文件使用默认模板内容，其它文件为空内容
         String content = file ? ("md".equals(fileType) ? MARKDOWN_FILE_CONTENT_TEMPLATE : "") : null;
-        // DONE @AI：看看是不是抽到方法里；（getSize 已去掉，直接使用 StrUtil.byteLength）
         int size = StrUtil.byteLength(content, StandardCharsets.UTF_8);
         validateSkillFileSize(createReqVO.getSkillId(), null, size);
 
@@ -382,7 +381,6 @@ public class AiSkillFileServiceImpl implements AiSkillFileService {
      * @param size      新内容的字节数
      */
     private void validateSkillFileSize(Long skillId, Long excludeId, int size) {
-        // DONE @AI：看看是不是抽到方法里；（toKb 已去掉，直接在异常参数中换算）
         if (size > FILE_SIZE_MAX) {
             throw exception(SKILL_FILE_SIZE_EXCEED, FILE_SIZE_MAX / 1024, (size + 1023) / 1024);
         }

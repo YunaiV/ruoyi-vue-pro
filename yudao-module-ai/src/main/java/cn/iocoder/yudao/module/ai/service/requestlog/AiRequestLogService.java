@@ -30,7 +30,6 @@ public interface AiRequestLogService {
      */
     AiRequestLogCreateReqDTO buildCreateReqDTO(String requestId, Long userId, AiRequestLogBizTypeEnum bizType, Long bizId, AiModelDO model);
 
-    // DONE @AI：应该叫 setCreateReqDTO 把；更好理解吧。（已由原方法名 setCreateReqDTOResponse 改名，调用方同步）
     /**
      * 根据模型响应（同步结果或流式 chunk），设置创建快照的用量与响应元数据；只修改内存中的快照，不写数据库
      *

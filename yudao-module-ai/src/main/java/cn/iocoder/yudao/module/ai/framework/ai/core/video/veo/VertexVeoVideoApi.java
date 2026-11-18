@@ -68,7 +68,6 @@ public class VertexVeoVideoApi {
     public static final int DEFAULT_MAX_RESPONSE_SIZE = 128 * 1024 * 1024;
     private static final Pattern MODEL_PATTERN = Pattern.compile("veo-[0-9a-z.\\-]{1,64}");
     private static final Pattern ID_PATTERN = Pattern.compile("[a-z0-9][a-z0-9\\-]{0,62}");
-    // TODO DONE @AI：这个是不是可以放到 Veo Client 里？（已从 AiVideoServiceImpl 移到这里，由 ofVertexUrl 解析地址创建客户端）
     /**
      * Vertex AI 地址：{服务地址}/v1/projects/{项目 ID}/locations/{地域}
      */

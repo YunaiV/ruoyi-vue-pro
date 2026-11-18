@@ -99,7 +99,7 @@ public class AiMusicController {
     }
 
     @PutMapping("/update-my")
-    @Operation(summary = "修改【我的】音乐", description = "名称、封面、是否公开")
+    @Operation(summary = "修改【我的】音乐", description = "名称、封面")
     public CommonResult<Boolean> updateMyMusic(@Valid @RequestBody AiMusicUpdateMyReqVO updateReqVO) {
         musicService.updateMyMusic(updateReqVO, getLoginUserId());
         return success(true);
@@ -121,7 +121,7 @@ public class AiMusicController {
         return success(true);
     }
 
-    // ================ 音乐管理 ================
+    // ================ 音乐生成管理 ================
 
     @GetMapping("/page")
     @Operation(summary = "获得音乐分页")

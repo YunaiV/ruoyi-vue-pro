@@ -94,8 +94,7 @@ tenant-id: {{adminTenantId}}
 
 {
   "id": 1,
-  "title": "夏日海风",
-  "publicStatus": true
+  "title": "夏日海风"
 }
 
 ### 记录播放

@@ -62,8 +62,6 @@ public class AiImageController {
         return success(BeanUtils.toBean(image, AiImageRespVO.class, AiImageController::clearPublicResp));
     }
 
-    // TODO DONE @AI：是不是不用单独的 VO？直接用原本的 VO 就行了？然后，直接设置可以么？（去掉 AiImagePublicRespVO，复用 AiImageRespVO 直接清空）
-    // TODO DONE @AI：链式调用！
     /**
      * 清空公开作品不对外展示的字段；蒙版等过程图片，也不对外展示
      */
@@ -114,13 +112,6 @@ public class AiImageController {
         return success(true);
     }
 
-    @Operation(summary = "更新【我的】绘画的公开状态")
-    @PutMapping("/update-public-my")
-    public CommonResult<Boolean> updateImagePublicMy(@Valid @RequestBody AiImageUpdateReqVO updateReqVO) {
-        imageService.updateImagePublicMy(getLoginUserId(), updateReqVO);
-        return success(true);
-    }
-
     // ================ midjourney 专属 ================
 
     @Operation(summary = "【Midjourney】生成图片", description = "文生图、图生图、一致性")
@@ -162,7 +153,7 @@ public class AiImageController {
         return success(imageService.midjourneyModal(getLoginUserId(), reqVO));
     }
 
-    // ================ 绘图管理 ================
+    // ================ 图片生成管理 ================
 
     @GetMapping("/page")
     @Operation(summary = "获得绘画分页")
@@ -181,13 +172,10 @@ public class AiImageController {
         if (image == null) {
             return success(null);
         }
-        // TODO DONE @AI：别的模块有返回 apikey name 么？如果没有，感觉可以简化；（不返回，前端按 apiKeyId 展示）
-        // TODO DONE @AI：租户 id 是不是没必要返回。（不返回）
         return success(buildImageDetail(image));
     }
 
     private AiImageRespVO buildImageDetail(AiImageDO image) {
-        // TODO DONE @AI：先 getImageListByParentId 列表。然后 beanutils；
         List<AiImageDO> children = imageService.getImageListByParentId(image.getId());
         return BeanUtils.toBean(image, AiImageRespVO.class)
                 .setChildren(BeanUtils.toBean(children, AiImageRespVO.class));

@@ -45,7 +45,6 @@ import java.util.function.Supplier;
  */
 public class AiUsageUtils {
 
-    // DONE @AI：字段注释；几个都写下；（已为下面 4 个 KEY 补充字段注释）
     /**
      * 原生用量 Map 中输入 Token 的候选 KEY，按优先级排列：OpenAI 兼容为 prompt_tokens，Anthropic、通义为 input_tokens，及其驼峰写法
      */

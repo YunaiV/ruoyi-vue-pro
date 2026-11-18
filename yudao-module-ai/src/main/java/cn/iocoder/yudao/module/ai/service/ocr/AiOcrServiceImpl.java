@@ -111,7 +111,7 @@ public class AiOcrServiceImpl implements AiOcrService {
         return ocr;
     }
 
-    // ========== OCR 管理 ==========
+    // ========== 图片识别管理 ==========
 
     @Override
     public PageResult<AiOcrDO> getOcrPage(AiOcrPageReqVO pageReqVO) {

@@ -106,7 +106,6 @@ public class AiModelServiceImplTest extends BaseMockitoUnitTest {
         assertThrows(ConstraintViolationException.class, () -> ValidationUtils.validate(reqVO));
     }
 
-    // DONE @AI：融合到 AiModelServiceTest 单测，不要独立；（原 AiModelServiceImplListTest 的两项覆盖已并入本类，改用 Mock 断言查询条件，原文件与它专用的 H2 ai_model 表已删除）
     @Test
     public void testGetModelListByStatusAndType_typeNull() {
         // mock 方法：Mapper 的默认方法执行真实逻辑，便于断言最终的查询条件

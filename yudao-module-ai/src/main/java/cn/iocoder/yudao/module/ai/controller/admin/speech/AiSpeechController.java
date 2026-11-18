@@ -77,7 +77,7 @@ public class AiSpeechController {
         return success(true);
     }
 
-    // ================ 语音管理 ================
+    // ================ 语音生成管理 ================
 
     @GetMapping("/page")
     @Operation(summary = "获得语音分页")
@@ -123,8 +123,6 @@ public class AiSpeechController {
     /**
      * 构建语音：不返回密钥编号、任务编号
      */
-    // TODO DONE @AI：fileApi.presignGetUrlQuietly 已经判空了，可以简化下了。其它模块类似的，也这么处理下噢；（核对 FileApi 现有语义：presignGetUrlQuietly 只兜底 UnsupportedOperationException，不处理空地址，所以这里保留一处判空，删除冗长说明；音乐、OCR、PPT 等其它模块的调用不在语音范围，未改）
-    // TODO DONE @AI：需先在 infra 的 presignGetUrlQuietly 里判空，再去掉这里的判断 本次就改噢；（按后续指示「按 FileApi 现有语义最小化、不改 infra」，未改 FileApi；若 presignGetUrlQuietly 加上空地址原样返回，这里的判空即可去掉）
     private AiSpeechRespVO buildSpeech(AiSpeechDO speech) {
         // 生成中、失败的语音没有音频地址，presignGetUrlQuietly 不处理空地址，所以先判断
         return BeanUtils.toBean(speech, AiSpeechRespVO.class, respVO -> respVO.setAudioUrl(
