@@ -58,6 +58,7 @@ public class DouBaoSeedanceVideoApi {
     }
 
     private static final int MAX_PROMPT_LENGTH = 2000;
+    private static final int MAX_REFERENCE_IMAGES_V1 = 4;
     private static final int MAX_REFERENCE_IMAGES = 9;
     private static final int MAX_REFERENCE_IMAGES_V25 = 30;
     private static final int MAX_REFERENCE_VIDEOS = 3;
@@ -132,6 +133,11 @@ public class DouBaoSeedanceVideoApi {
             }
             if (audioCount > 0 && !v25) {
                 AiVideoUtils.checkArgument(imageCount + videoCount > 0, "参考音频不能单独输入，需同时提供参考图或参考视频");
+            }
+            // 1.x 只有 i2v 模型支持参考图，且最多 4 张；与前端 video.ts 的模型能力一致
+            if (imageCount > 0 && series != Series.V2_0 && !v25) {
+                AiVideoUtils.checkArgument(model.contains("i2v"), "模型({})不支持参考图，参考生视频请使用 i2v 或 Seedance 2.0 / 2.5 模型", model);
+                AiVideoUtils.checkArgument(imageCount <= MAX_REFERENCE_IMAGES_V1, "参考图最多 {} 张", MAX_REFERENCE_IMAGES_V1);
             }
             if (model.contains("lite-t2v")) {
                 AiVideoUtils.checkArgument(!hasFirst && !reference, "模型({})只支持文生视频", model);

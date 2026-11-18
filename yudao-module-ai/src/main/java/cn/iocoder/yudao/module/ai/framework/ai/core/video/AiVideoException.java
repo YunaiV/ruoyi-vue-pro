@@ -15,8 +15,6 @@ import lombok.Getter;
 @Getter
 public class AiVideoException extends RuntimeException {
 
-    // TODO DONE @AI：你看看 image 做了么？如果没有，一些可以简化。（image 没有错误分类；业务只用到消息和「提交结果未知」，已删除 Kind、HTTP 状态码、服务商错误码、请求编号，排查信息在客户端日志与消息中）
-
     /**
      * 「创建任务」是否结果未知：true 时不能自动重新提交
      */
@@ -30,8 +28,6 @@ public class AiVideoException extends RuntimeException {
         super(message);
         this.submitOutcomeUnknown = submitOutcomeUnknown;
     }
-
-    // TODO DONE @AI：401、等等错误码，要不要使用 spring 的枚举；（按状态码分类的 kindOfHttpStatus 已删除，401、403、429 等具体状态码不再判断；只剩「>= 500 时提交结果未知」的区间判断，保留数字比较，Spring 的 HttpStatus.valueOf 遇到非标准状态码会抛异常）
 
     /**
      * 构建提交失败的原因：提交结果未知时，提示服务商可能已创建，不要重复提交
