@@ -93,8 +93,8 @@
         <bouncycastle.version>1.87</bouncycastle.version>
         <alipay-sdk-java.version>4.40.1067.ALL</alipay-sdk-java.version>
         <!-- AI 相关 -->
-        <spring-ai.version>2.1.0-jdk25-SNAPSHOT</spring-ai.version>
-        <spring-ai-alibaba.version>1.1.2.2-jdk25-SNAPSHOT</spring-ai-alibaba.version>
+        <spring-ai.version>2.1.0-jdk25-preview-20261119</spring-ai.version>
+        <spring-ai-alibaba.version>1.1.2.2-jdk25-20261119</spring-ai-alibaba.version>
         <tinyflow.version>1.2.6</tinyflow.version>
         <!-- https://mvnrepository.com/artifact/com.volcengine/volcengine-java-sdk-ark-runtime -->
         <!-- 注意：使用 volcengine-java-sdk-ark-runtime 系列（2.0.0 起兼容 Jackson 2.20+ 的 PropertyNamingStrategies），
