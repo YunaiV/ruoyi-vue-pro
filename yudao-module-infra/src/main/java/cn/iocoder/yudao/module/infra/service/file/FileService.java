@@ -7,6 +7,7 @@ import cn.iocoder.yudao.module.infra.controller.admin.file.vo.file.FilePresigned
 import cn.iocoder.yudao.module.infra.dal.dataobject.file.FileDO;
 import jakarta.validation.constraints.NotEmpty;
 
+import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -35,6 +36,18 @@ public interface FileService {
      */
     String createFile(@NotEmpty(message = "文件内容不能为空") byte[] content,
                       String name, String directory, String type);
+
+    /**
+     * 保存文件流，边读边写到文件存储器，并返回文件的访问路径
+     *
+     * @param content   文件流，由调用方关闭
+     * @param size      文件大小，单位：字节
+     * @param name      文件名称，允许空
+     * @param directory 目录，允许空
+     * @param type      文件的 MIME 类型，允许空；以实际文件内容探测的类型为准
+     * @return 文件路径
+     */
+    String createFile(InputStream content, long size, String name, String directory, String type);
 
     /**
      * 生成文件预签名地址信息，用于上传
@@ -85,6 +98,15 @@ public interface FileService {
      * @return 文件内容
      */
     byte[] getFileContent(Long configId, String path) throws Exception;
+
+    /**
+     * 打开文件流，用于边读边写
+     *
+     * @param configId 配置编号
+     * @param path     文件路径
+     * @return 文件流，由调用方关闭；文件不存在时，部分客户端返回 null
+     */
+    InputStream getFileStream(Long configId, String path) throws Exception;
 
     /**
      * 获得文件

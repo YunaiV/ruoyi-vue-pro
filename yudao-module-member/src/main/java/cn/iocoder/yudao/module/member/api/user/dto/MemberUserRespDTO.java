@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.member.api.user.dto;
 
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
+import cn.iocoder.yudao.module.system.enums.common.SexEnum;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -22,6 +23,10 @@ public class MemberUserRespDTO {
      */
     private String nickname;
     /**
+     * 个人简介
+     */
+    private String introduction;
+    /**
      * 帐号状态
      *
      * 枚举 {@link CommonStatusEnum}
@@ -39,6 +44,16 @@ public class MemberUserRespDTO {
      * 邮箱
      */
     private String email;
+    /**
+     * 性别
+     *
+     * 枚举 {@link SexEnum}
+     */
+    private Integer sex;
+    /**
+     * 生日
+     */
+    private LocalDateTime birthday;
     /**
      * 创建时间（注册时间）
      */

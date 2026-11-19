@@ -53,3 +53,8 @@ application-my.yaml
 /yudao-ui-app/unpackage/
 .DS_Store
 **/.DS_Store
+
+# Local review and browser artifacts
+/output
+/.playwright-cli
+/.playwright-mcp

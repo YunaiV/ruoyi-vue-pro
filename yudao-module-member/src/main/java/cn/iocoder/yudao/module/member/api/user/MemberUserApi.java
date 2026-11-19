@@ -1,8 +1,10 @@
 package cn.iocoder.yudao.module.member.api.user;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.module.member.api.user.dto.MemberUserRespDTO;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -38,6 +40,9 @@ public interface MemberUserApi {
      * @return 会员用户 Map
      */
     default Map<Long, MemberUserRespDTO> getUserMap(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyMap();
+        }
         List<MemberUserRespDTO> list = getUserList(ids);
         return convertMap(list, MemberUserRespDTO::getId);
     }

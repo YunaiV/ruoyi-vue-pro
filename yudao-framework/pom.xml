@@ -13,6 +13,7 @@
         <module>yudao-common</module>
         <module>yudao-spring-boot-starter-mybatis</module>
         <module>yudao-spring-boot-starter-redis</module>
+        <module>yudao-spring-boot-starter-elasticsearch</module>
         <module>yudao-spring-boot-starter-web</module>
         <module>yudao-spring-boot-starter-security</module>
         <module>yudao-spring-boot-starter-websocket</module>

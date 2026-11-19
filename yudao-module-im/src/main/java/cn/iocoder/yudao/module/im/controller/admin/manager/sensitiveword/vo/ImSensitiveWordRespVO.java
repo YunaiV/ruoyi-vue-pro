@@ -9,14 +9,14 @@ import java.time.LocalDateTime;
 @Data
 public class ImSensitiveWordRespVO {
 
-    @Schema(description = "编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
+    @Schema(description = "敏感词编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
     private Long id;
 
     @Schema(description = "敏感词", requiredMode = Schema.RequiredMode.REQUIRED, example = "敏感词内容")
     private String word;
 
-    @Schema(description = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
-    private Integer status; // 参见 CommonStatusEnum 枚举类
+    @Schema(description = "状态，参见 CommonStatusEnum 枚举类", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
+    private Integer status;
 
     @Schema(description = "创建人")
     private String creator;

@@ -4,10 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeSet;
 import java.util.function.BiFunction;
 
@@ -17,6 +20,33 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * {@link CollectionUtils} 的单元测试
  */
 public class CollectionUtilsTest {
+
+    @Test
+    public void testAddIfNotBlank() {
+        // 准备参数
+        List<String> values = new ArrayList<>();
+
+        // 调用
+        CollectionUtils.addIfNotBlank(values, "a", null, "", " ", "b");
+
+        // 断言
+        assertEquals(Arrays.asList("a", "b"), values);
+    }
+
+    @Test
+    public void testConvertMultiMapWithLinkedHashMap() {
+        // 准备参数
+        List<String> values = Arrays.asList("b1", "a1", "b2");
+
+        // 调用
+        Map<String, List<String>> result = CollectionUtils.convertMultiMap(
+                values, value -> value.substring(0, 1),
+                value -> value, LinkedHashMap::new);
+
+        // 断言
+        assertEquals(Arrays.asList("b", "a"), new ArrayList<>(result.keySet()));
+        assertEquals(Arrays.asList("b1", "b2"), result.get("b"));
+    }
 
     @Data
     @AllArgsConstructor

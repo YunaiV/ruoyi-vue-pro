@@ -20,22 +20,21 @@ import java.util.List;
 @Mapper
 public interface ImSensitiveWordMapper extends BaseMapperX<ImSensitiveWordDO> {
 
-    default List<ImSensitiveWordDO> selectListByStatus(Integer status) {
-        return selectList(new LambdaQueryWrapperX<ImSensitiveWordDO>()
-                .eq(ImSensitiveWordDO::getStatus, status));
-    }
-
-    default ImSensitiveWordDO selectByWord(String word) {
-        return selectOne(new LambdaQueryWrapperX<ImSensitiveWordDO>()
-                .eq(ImSensitiveWordDO::getWord, word));
-    }
-
     default PageResult<ImSensitiveWordDO> selectPage(ImSensitiveWordPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<ImSensitiveWordDO>()
                 .likeIfPresent(ImSensitiveWordDO::getWord, reqVO.getWord())
                 .eqIfPresent(ImSensitiveWordDO::getStatus, reqVO.getStatus())
                 .betweenIfPresent(ImSensitiveWordDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(ImSensitiveWordDO::getId));
+    }
+
+    default List<ImSensitiveWordDO> selectListByStatus(Integer status) {
+        return selectList(new LambdaQueryWrapperX<ImSensitiveWordDO>()
+                .eq(ImSensitiveWordDO::getStatus, status));
+    }
+
+    default ImSensitiveWordDO selectByWord(String word) {
+        return selectOne(ImSensitiveWordDO::getWord, word);
     }
 
     @Select("SELECT MAX(update_time) FROM im_sensitive_word")

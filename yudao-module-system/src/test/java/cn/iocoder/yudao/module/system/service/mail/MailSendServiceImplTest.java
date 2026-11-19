@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.system.service.mail;
 
+import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
@@ -17,14 +18,26 @@ import org.dromara.hutool.extra.mail.MailAccount;
 import org.dromara.hutool.extra.mail.MailUtil;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 
 import java.io.File;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
@@ -273,7 +286,7 @@ public class MailSendServiceImplTest extends BaseMockitoUnitTest {
             // 准备参数
             MailSendMessage message = randomPojo(MailSendMessage.class, o -> o.setNickname("芋艿"));
             // mock 方法（获得邮箱账号）
-            MailAccountDO account = randomPojo(MailAccountDO.class, o -> o.setMail("7685@qq.com"));
+            MailAccountDO account = randomPojo(MailAccountDO.class, o -> o.setMail("7685@qq.com").setTimeout(0));
             when(mailAccountService.getMailAccountFromCache(eq(message.getAccountId())))
                     .thenReturn(account);
 
@@ -288,6 +301,7 @@ public class MailSendServiceImplTest extends BaseMockitoUnitTest {
                         assertEquals(account.getHost(), mailAccount.getHost());
                         assertEquals(account.getPort(), mailAccount.getPort());
                         assertEquals(account.getSslEnable(), mailAccount.isSslEnable());
+                        assertNull(mailAccount.getSmtpProps().getProperty("mail.smtp.timeout"));
                         return true;
                     }), eq(message.getToMails()), eq(message.getCcMails()), eq(message.getBccMails()),
                     eq(message.getTitle()), eq(message.getContent()), eq(true), eq(message.getAttachments())))
@@ -306,7 +320,7 @@ public class MailSendServiceImplTest extends BaseMockitoUnitTest {
             // 准备参数
             MailSendMessage message = randomPojo(MailSendMessage.class, o -> o.setNickname("芋艿"));
             // mock 方法（获得邮箱账号）
-            MailAccountDO account = randomPojo(MailAccountDO.class, o -> o.setMail("7685@qq.com"));
+            MailAccountDO account = randomPojo(MailAccountDO.class, o -> o.setMail("7685@qq.com").setTimeout(10000));
             when(mailAccountService.getMailAccountFromCache(eq(message.getAccountId())))
                     .thenReturn(account);
 
@@ -320,6 +334,8 @@ public class MailSendServiceImplTest extends BaseMockitoUnitTest {
                         assertEquals(account.getHost(), mailAccount.getHost());
                         assertEquals(account.getPort(), mailAccount.getPort());
                         assertEquals(account.getSslEnable(), mailAccount.isSslEnable());
+                        // 读取超时为 0 时不限制，不写入 SMTP 属性
+                        assertEquals("10000", mailAccount.getSmtpProps().getProperty("mail.smtp.timeout"));
                         return true;
                     }), eq(message.getToMails()), eq(message.getCcMails()), eq(message.getBccMails()),
                     eq(message.getTitle()), eq(message.getContent()), eq(true), same(message.getAttachments()))).thenThrow(e);
@@ -329,6 +345,91 @@ public class MailSendServiceImplTest extends BaseMockitoUnitTest {
             // 断言
             verify(mailLogService).updateMailSendResult(eq(message.getLogId()), isNull(), same(e));
         }
+    }
+
+    @Test
+    public void testDoSendMail_readTimeout() throws Exception {
+        // 准备参数：本地 SMTP 服务端只接受连接、不发送问候语，读取超时 500 毫秒
+        ExecutorService executor = Executors.newFixedThreadPool(2, DAEMON_THREAD_FACTORY);
+        ServerSocket server = new ServerSocket(0, 1, InetAddress.getByName("127.0.0.1"));
+        Future<Socket> accepted = executor.submit(server::accept);
+        try {
+            MailSendMessage message = mockLocalMailAccount(server.getLocalPort(), 500);
+
+            // 调用：经真实 MailUtil 连接本地服务端
+            long start = System.nanoTime();
+            executor.submit(() -> mailSendService.doSendMail(message)).get(5, TimeUnit.SECONDS);
+            long elapsedMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
+            // 断言：等待问候语读取超时，失败结果写入发送日志
+            ArgumentCaptor<Exception> exceptionCaptor = ArgumentCaptor.forClass(Exception.class);
+            verify(mailLogService).updateMailSendResult(eq(message.getLogId()), isNull(), exceptionCaptor.capture());
+            assertTrue(ExceptionUtil.isCausedBy(exceptionCaptor.getValue(), SocketTimeoutException.class));
+            assertTrue(elapsedMillis >= 400 && elapsedMillis < 5000, "实际耗时：" + elapsedMillis + " 毫秒");
+        } finally {
+            closeLocalSmtpServer(server, accepted);
+            executor.shutdownNow();
+        }
+    }
+
+    @Test
+    public void testDoSendMail_noReadTimeout() throws Exception {
+        // 准备参数：本地 SMTP 服务端只接受连接、不发送问候语，读取超时 0 表示不限制
+        ExecutorService executor = Executors.newFixedThreadPool(2, DAEMON_THREAD_FACTORY);
+        ServerSocket server = new ServerSocket(0, 1, InetAddress.getByName("127.0.0.1"));
+        Future<Socket> accepted = executor.submit(server::accept);
+        try {
+            MailSendMessage message = mockLocalMailAccount(server.getLocalPort(), 0);
+
+            // 调用：经真实 MailUtil 连接本地服务端
+            Future<?> sending = executor.submit(() -> mailSendService.doSendMail(message));
+            // 断言：超过正值用例的读取超时后，仍在等待问候语
+            Thread.sleep(1500);
+            assertFalse(sending.isDone());
+            verifyNoInteractions(mailLogService);
+
+            // 调用：服务端主动断开连接，结束等待
+            accepted.get(1, TimeUnit.SECONDS).close();
+            sending.get(5, TimeUnit.SECONDS);
+            // 断言：因连接断开而失败，不是读取超时
+            ArgumentCaptor<Exception> exceptionCaptor = ArgumentCaptor.forClass(Exception.class);
+            verify(mailLogService).updateMailSendResult(eq(message.getLogId()), isNull(), exceptionCaptor.capture());
+            assertFalse(ExceptionUtil.isCausedBy(exceptionCaptor.getValue(), SocketTimeoutException.class));
+        } finally {
+            closeLocalSmtpServer(server, accepted);
+            executor.shutdownNow();
+        }
+    }
+
+    /**
+     * 守护线程工厂，避免发送线程意外阻塞时拖住测试进程退出
+     */
+    private static final ThreadFactory DAEMON_THREAD_FACTORY = runnable -> {
+        Thread thread = new Thread(runnable);
+        thread.setDaemon(true);
+        return thread;
+    };
+
+    private MailSendMessage mockLocalMailAccount(int port, int timeout) {
+        MailSendMessage message = randomPojo(MailSendMessage.class, o -> o.setNickname("芋艿")
+                .setToMails(Lists.newArrayList("to@example.com")).setCcMails(Collections.emptyList())
+                .setBccMails(Collections.emptyList()).setAttachments(new File[0]));
+        MailAccountDO account = randomPojo(MailAccountDO.class, o -> o.setMail("from@example.com")
+                .setHost("127.0.0.1").setPort(port).setSslEnable(false).setStarttlsEnable(false)
+                .setTimeout(timeout));
+        when(mailAccountService.getMailAccountFromCache(eq(message.getAccountId()))).thenReturn(account);
+        return message;
+    }
+
+    private static void closeLocalSmtpServer(ServerSocket server, Future<Socket> accepted) throws Exception {
+        // 先关闭已接受的连接，解除仍在等待的发送线程，再关闭监听端口
+        if (accepted.isDone() && !accepted.isCancelled()) {
+            try {
+                accepted.get().close();
+            } catch (ExecutionException ignored) {
+                // 监听端口已关闭，没有接受到连接
+            }
+        }
+        server.close();
     }
 
 }

@@ -17,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -385,6 +386,41 @@ public class LocalDateTimeUtilsTest {
         assertEquals(date.plusDays(1).atTime(6, 0), result.getEndTime());
         assertNull(LocalDateTimeUtils.findDailyTimeRange(
                 date, LocalTime.of(8, 0), LocalTime.of(10, 0), date.atTime(12, 0)));
+    }
+
+    @Test
+    public void testPlusWorkdays() {
+        // 准备参数：2026-10-23 为周五
+        LocalDateTime friday = LocalDateTime.of(2026, 10, 23, 10, 0, 0);
+        LocalDateTime saturday = LocalDateTime.of(2026, 10, 24, 15, 30, 0);
+
+        // 调用，并断言：起点当天不计入，跳过周六周日，保留时分秒
+        assertEquals(LocalDateTime.of(2026, 10, 26, 10, 0, 0), LocalDateTimeUtils.plusWorkdays(friday, 1));
+        assertEquals(LocalDateTime.of(2026, 10, 26, 15, 30, 0), LocalDateTimeUtils.plusWorkdays(saturday, 1));
+        assertEquals(LocalDateTime.of(2026, 11, 3, 10, 0, 0), LocalDateTimeUtils.plusWorkdays(friday, 7));
+        assertEquals(LocalDateTime.of(2026, 11, 13, 10, 0, 0), LocalDateTimeUtils.plusWorkdays(friday, 15));
+        // 调用，并断言：0 个工作日为起点本身，起点为空返回 null，负数抛出异常
+        assertEquals(friday, LocalDateTimeUtils.plusWorkdays(friday, 0));
+        assertNull(LocalDateTimeUtils.plusWorkdays(null, 7));
+        assertThrows(IllegalArgumentException.class, () -> LocalDateTimeUtils.plusWorkdays(friday, -1));
+    }
+
+    @Test
+    public void testCountWorkdays() {
+        // 准备参数：2026-10-23 为周五
+        LocalDateTime friday = LocalDateTime.of(2026, 10, 23, 10, 0, 0);
+        LocalDateTime saturday = LocalDateTime.of(2026, 10, 24, 15, 30, 0);
+        LocalDateTime monday = LocalDateTime.of(2026, 10, 26, 9, 0, 0);
+
+        // 调用，并断言：起点当天不计入，周末不计入，按日期而非整 24 小时计算
+        assertEquals(1, LocalDateTimeUtils.countWorkdays(friday, monday));
+        assertEquals(7, LocalDateTimeUtils.countWorkdays(friday, LocalDateTime.of(2026, 11, 3, 8, 0, 0)));
+        assertEquals(0, LocalDateTimeUtils.countWorkdays(friday, friday.plusHours(8)));
+        assertEquals(0, LocalDateTimeUtils.countWorkdays(friday, saturday));
+        // 调用，并断言：终点早于起点或为空时为 0
+        assertEquals(0, LocalDateTimeUtils.countWorkdays(monday, friday));
+        assertEquals(0, LocalDateTimeUtils.countWorkdays(null, monday));
+        assertEquals(0, LocalDateTimeUtils.countWorkdays(friday, null));
     }
 
     private static void assertTimeRange(TimeRange timeRange,

@@ -255,6 +255,23 @@ public class JsonUtils {
         }
     }
 
+    /**
+     * 解析 JSON 字符串成 JsonNode，空字符串或解析失败返回 null
+     *
+     * @param text JSON 字符串
+     * @return JsonNode 对象
+     */
+    public static JsonNode parseTreeQuietly(String text) {
+        if (StrUtil.isEmpty(text)) {
+            return null;
+        }
+        try {
+            return objectMapper.readTree(text);
+        } catch (JacksonException e) {
+            return null;
+        }
+    }
+
     public static String getText(JsonNode node, String fieldName) {
         if (node == null) {
             return null;

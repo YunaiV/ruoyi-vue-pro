@@ -26,6 +26,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.method.HandlerMethod;
 import tools.jackson.databind.JsonNode;
@@ -49,7 +50,15 @@ import static cn.iocoder.yudao.framework.common.util.json.JsonUtils.toJsonString
 @Slf4j
 public class ApiAccessLogFilter extends ApiRequestFilter {
 
-    private static final String[] SANITIZE_KEYS = new String[]{"password", "token", "accessToken", "refreshToken"};
+    /**
+     * 默认敏感字段：访问日志入库、非 prod 控制台打印、异常日志入库三个出口共用
+     */
+    private static final String[] SANITIZE_KEYS = new String[]{"password", "token", "accessToken", "refreshToken",
+            "refresh_token", // OAuth2 开放接口的刷新令牌表单参数
+            "oldPassword", "newPassword", // 修改密码
+            "secret", "clientSecret", "client_secret", // OAuth2 客户端、社交客户端
+            "apiKey", "apiSecret", // 短信渠道
+            "accessKey", "accessSecret", "privateKey", "privateKeyPassphrase"}; // 文件存储
 
     private final String applicationName;
 
@@ -101,12 +110,9 @@ public class ApiAccessLogFilter extends ApiRequestFilter {
                                       Map<String, String> queryString, String requestBody, Exception ex) {
         // 判断：是否要记录操作日志
         HandlerMethod handlerMethod = (HandlerMethod) request.getAttribute(ATTRIBUTE_HANDLER_METHOD);
-        ApiAccessLog accessLogAnnotation = null;
-        if (handlerMethod != null) {
-            accessLogAnnotation = handlerMethod.getMethodAnnotation(ApiAccessLog.class);
-            if (accessLogAnnotation != null && BooleanUtil.isFalse(accessLogAnnotation.enable())) {
-                return false;
-            }
+        ApiAccessLog accessLogAnnotation = getApiAccessLogAnnotation(handlerMethod);
+        if (accessLogAnnotation != null && BooleanUtil.isFalse(accessLogAnnotation.enable())) {
+            return false;
         }
 
         // 处理用户信息
@@ -159,6 +165,22 @@ public class ApiAccessLogFilter extends ApiRequestFilter {
         return true;
     }
 
+    /**
+     * 获得 API 访问日志注解，方法级配置优先于类级配置
+     *
+     * @param handlerMethod 处理方法，可为空
+     * @return API 访问日志注解；未配置时返回 null
+     */
+    public static ApiAccessLog getApiAccessLogAnnotation(HandlerMethod handlerMethod) {
+        if (handlerMethod == null) {
+            return null;
+        }
+        ApiAccessLog annotation = AnnotatedElementUtils.findMergedAnnotation(
+                handlerMethod.getMethod(), ApiAccessLog.class);
+        return annotation != null ? annotation : AnnotatedElementUtils.findMergedAnnotation(
+                handlerMethod.getBeanType(), ApiAccessLog.class);
+    }
+
     // ========== 解析 @ApiAccessLog、@Swagger 注解  ==========
 
     private static OperateTypeEnum parseOperateLogType(HttpServletRequest request) {
@@ -182,29 +204,61 @@ public class ApiAccessLogFilter extends ApiRequestFilter {
 
     // ========== 请求和响应的脱敏逻辑，移除类似 password、token 等敏感字段 ==========
 
-    private static String sanitizeMap(Map<String, ?> map, String[] sanitizeKeys) {
+    /**
+     * 脱敏查询参数，移除默认敏感字段和注解配置的敏感字段
+     *
+     * @param map 查询参数，会被直接修改
+     * @param sanitizeKeys 注解配置的敏感字段，可为空
+     * @return 脱敏后的 JSON 字符串；参数为空时返回 null
+     */
+    public static String sanitizeMap(Map<String, ?> map, String[] sanitizeKeys) {
         if (CollUtil.isEmpty(map)) {
             return null;
+        }
+        return JsonUtils.toJsonString(sanitizeParamMap(map, sanitizeKeys));
+    }
+
+    /**
+     * 脱敏查询参数，移除默认敏感字段和注解配置的敏感字段，保留 Map 结构
+     *
+     * @param map 查询参数，会被直接修改
+     * @param sanitizeKeys 注解配置的敏感字段，可为空
+     * @return 脱敏后的查询参数，即传入的 map
+     */
+    public static Map<String, ?> sanitizeParamMap(Map<String, ?> map, String[] sanitizeKeys) {
+        if (CollUtil.isEmpty(map)) {
+            return map;
         }
         if (sanitizeKeys != null) {
             MapUtil.removeAny(map, sanitizeKeys);
         }
         MapUtil.removeAny(map, SANITIZE_KEYS);
-        return JsonUtils.toJsonString(map);
+        return map;
     }
 
-    private static String sanitizeJson(String jsonString, String[] sanitizeKeys) {
+    /**
+     * 脱敏 JSON 字符串，递归移除默认敏感字段和注解配置的敏感字段
+     *
+     * @param jsonString JSON 字符串
+     * @param sanitizeKeys 注解配置的敏感字段，可为空
+     * @return 脱敏后的 JSON 字符串；为空或无法解析时返回 null，不回退原文
+     */
+    public static String sanitizeJson(String jsonString, String[] sanitizeKeys) {
         if (StrUtil.isEmpty(jsonString)) {
             return null;
         }
         try {
-            JsonNode rootNode = JsonUtils.parseTree(jsonString);
+            // 静默解析：格式错误时 parseTree 会打印原文，这里既不打印也不回退原文
+            JsonNode rootNode = JsonUtils.parseObjectQuietly(jsonString, JsonNode.class);
+            if (rootNode == null) {
+                return null;
+            }
             sanitizeJson(rootNode, sanitizeKeys);
             return JsonUtils.toJsonString(rootNode);
         } catch (Exception e) {
-            // 脱敏失败的情况下，直接忽略异常，避免影响用户请求
-            log.error("[sanitizeJson][脱敏({}) 发生异常]", jsonString, e);
-            return jsonString;
+            // 脱敏失败的情况下，直接忽略异常，避免影响用户请求；原文和解析异常信息可能包含敏感值，均不记录
+            log.error("[sanitizeJson][脱敏发生异常({})，忽略原文]", e.getClass().getName());
+            return null;
         }
     }
 
@@ -212,19 +266,22 @@ public class ApiAccessLogFilter extends ApiRequestFilter {
         if (commonResult == null) {
             return null;
         }
-        String jsonString = toJsonString(commonResult);
         try {
-            JsonNode rootNode = JsonUtils.parseTree(jsonString);
+            JsonNode rootNode = JsonUtils.parseTree(toJsonString(commonResult));
             sanitizeJson(rootNode.get("data"), sanitizeKeys); // 只处理 data 字段，不处理 code、msg 字段，避免错误被脱敏掉
             return JsonUtils.toJsonString(rootNode);
         } catch (Exception e) {
-            // 脱敏失败的情况下，直接忽略异常，避免影响用户请求
-            log.error("[sanitizeJson][脱敏({}) 发生异常]", jsonString, e);
-            return jsonString;
+            // 脱敏失败的情况下，直接忽略异常，避免影响用户请求；原文和解析异常信息可能包含敏感值，均不记录
+            log.error("[sanitizeJson][脱敏发生异常({})，忽略原文]", e.getClass().getName());
+            return null;
         }
     }
 
     private static void sanitizeJson(JsonNode node, String[] sanitizeKeys) {
+        // 情况零：空节点，例如响应没有 data 字段
+        if (node == null) {
+            return;
+        }
         // 情况一：数组，遍历处理
         if (node.isArray()) {
             for (JsonNode childNode : node) {

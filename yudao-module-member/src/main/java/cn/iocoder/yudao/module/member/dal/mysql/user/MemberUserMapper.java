@@ -48,10 +48,12 @@ public interface MemberUserMapper extends BaseMapperX<MemberUserDO> {
         }
         // 分页查询
         return selectPage(reqVO, new LambdaQueryWrapperX<MemberUserDO>()
+                .eqIfPresent(MemberUserDO::getId, reqVO.getId())
                 .likeIfPresent(MemberUserDO::getMobile, reqVO.getMobile())
                 .likeIfPresent(MemberUserDO::getEmail, reqVO.getEmail())
                 .betweenIfPresent(MemberUserDO::getLoginDate, reqVO.getLoginDate())
                 .likeIfPresent(MemberUserDO::getNickname, reqVO.getNickname())
+                .eqIfPresent(MemberUserDO::getStatus, reqVO.getStatus())
                 .betweenIfPresent(MemberUserDO::getCreateTime, reqVO.getCreateTime())
                 .eqIfPresent(MemberUserDO::getLevelId, reqVO.getLevelId())
                 .eqIfPresent(MemberUserDO::getGroupId, reqVO.getGroupId())

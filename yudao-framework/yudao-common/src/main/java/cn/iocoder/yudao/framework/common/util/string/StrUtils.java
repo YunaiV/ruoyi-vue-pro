@@ -80,6 +80,25 @@ public class StrUtils {
     }
 
     /**
+     * 姓名脱敏：去除首尾空白后保留首字，其余每个字替换为 *；单字姓名为首字加 *
+     *
+     * 例：「张三」→ "张*"、「欧阳娜娜」→ "欧***"、「张」→ "张*"
+     *
+     * @param name 姓名
+     * @return 脱敏后的姓名；为空时返回空字符串
+     */
+    public static String maskName(String name) {
+        String value = StrUtil.trim(name);
+        if (StrUtil.isEmpty(value)) {
+            return "";
+        }
+        // 按码点截取首字，避免把生僻字等代理对拆开
+        int firstEnd = value.offsetByCodePoints(0, 1);
+        int restCount = value.codePointCount(firstEnd, value.length());
+        return value.substring(0, firstEnd) + StrUtil.repeat('*', Math.max(restCount, 1));
+    }
+
+    /**
      * 转小写拼音，字之间以空格分隔，便于调用方按需拼接 / 取首字母 / 拼音搜索
      *
      * 例：「老张」→ "lao zhang"、「ZhangSan」→ "zhangsan"

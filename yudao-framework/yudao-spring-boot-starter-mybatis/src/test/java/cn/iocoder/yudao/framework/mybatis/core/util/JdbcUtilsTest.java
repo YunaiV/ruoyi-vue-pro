@@ -140,8 +140,6 @@ public class JdbcUtilsTest {
         // 产品名未登记时，按明确的原生驱动 URL 识别，与 getDbType(url) 的归类一致
         assertEquals(DbType.POSTGRE_SQL, JdbcUtils.getDbType(
                 new FakeDataSource("HighGo", "jdbc:highgo://127.0.0.1:5866/highgo").getDataSource()));
-        assertEquals(DbType.MARIADB, JdbcUtils.getDbType(
-                new FakeDataSource("MariaDB", "jdbc:mariadb://127.0.0.1:3306/a").getDataSource()));
 
         // 完全未识别的产品：明确异常，而不是 NPE；异常信息不包含 URL
         FakeDataSource sqlite = new FakeDataSource("SQLite", "jdbc:sqlite:/tmp/test.db?user=root&password=secret");
@@ -149,6 +147,17 @@ public class JdbcUtilsTest {
                 () -> JdbcUtils.getDbType(sqlite.getDataSource()));
         assertTrue(ex.getMessage().contains("SQLite"));
         assertFalse(ex.getMessage().contains("secret"));
+    }
+
+    @Test
+    public void testGetDbType_mariaDB() {
+        // 产品名 MariaDB 已登记：原生驱动、p6spy 包装、MySQL 驱动 URL 均识别为 MARIADB
+        assertEquals(DbType.MARIADB, JdbcUtils.getDbType(
+                new FakeDataSource("MariaDB", "jdbc:mariadb://127.0.0.1:3306/a").getDataSource()));
+        assertEquals(DbType.MARIADB, JdbcUtils.getDbType(
+                new FakeDataSource("MariaDB", "jdbc:p6spy:mariadb://127.0.0.1:3306/a").getDataSource()));
+        assertEquals(DbType.MARIADB, JdbcUtils.getDbType(
+                new FakeDataSource("MariaDB", "jdbc:mysql://127.0.0.1:3306/a").getDataSource()));
     }
 
     @Test

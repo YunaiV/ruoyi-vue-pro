@@ -5,6 +5,7 @@ import cn.hutool.extra.servlet.JakartaServletUtil;
 import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import jakarta.servlet.ServletRequest;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.MediaType;
@@ -40,6 +41,27 @@ public class ServletUtils {
     public static String getUserAgent(HttpServletRequest request) {
         String ua = request.getHeader("User-Agent");
         return ua != null ? ua : "";
+    }
+
+    /**
+     * 获得指定名称的 Cookie
+     *
+     * @param request 请求
+     * @param name Cookie 名称
+     * @return Cookie，不存在时返回 null
+     */
+    public static Cookie getCookie(HttpServletRequest request, String name) {
+        return JakartaServletUtil.getCookie(request, name);
+    }
+
+    /**
+     * 写入 Cookie
+     *
+     * @param response 响应
+     * @param cookie Cookie
+     */
+    public static void addCookie(HttpServletResponse response, Cookie cookie) {
+        JakartaServletUtil.addCookie(response, cookie);
     }
 
     /**
