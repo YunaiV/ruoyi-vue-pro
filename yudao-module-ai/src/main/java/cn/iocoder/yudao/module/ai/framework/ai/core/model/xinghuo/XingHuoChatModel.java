@@ -88,13 +88,6 @@ public class XingHuoChatModel implements ChatModel {
         return options;
     }
 
-    @Override
-    @Deprecated(forRemoval = true)
-    @SuppressWarnings("removal")
-    public ChatOptions getDefaultOptions() {
-        return getOptions();
-    }
-
     private ChatModel getChatModel(Prompt prompt) {
         String model = options.getModel();
         ChatOptions options = prompt.getOptions();
@@ -123,12 +116,12 @@ public class XingHuoChatModel implements ChatModel {
 
     private static Prompt buildApiPrompt(Prompt prompt) {
         ChatOptions options = prompt.getOptions();
-        if (options == null) {
+        if (!(options instanceof DeepSeekChatOptions)) {
             return prompt;
         }
         return Prompt.builder()
                 .messages(prompt.getInstructions())
-                .chatOptions(options.mutate().model(API_MODEL).build())
+                .chatOptions(((DeepSeekChatOptions) options).mutate().model(API_MODEL).build())
                 .build();
     }
 

@@ -33,7 +33,7 @@ public class GrokChatModelTests {
 
     private final GrokChatModel chatModel = new GrokChatModel(OpenAiChatModel.builder()
             .options(OpenAiChatOptions.builder()
-                    .baseUrl(GrokChatModel.BASE_URL)
+                    .baseUrl(GrokChatModel.BASE_URL + "/v1")
                     .apiKey(API_KEY)
                     .model(MODEL)
                     .temperature(0.7)

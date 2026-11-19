@@ -93,7 +93,7 @@ public class AiBaiduWebSearchClient implements AiWebSearchClient {
         // 3. 转换结果：官方不返回总匹配数，使用本次返回条数
         AiWebSearchResponse result = new AiWebSearchResponse();
         if (CollUtil.isEmpty(response.getReferences())) {
-            return result.setTotal(0L).setLists(List.of());
+            return result.setTotal(0L).setLists(Collections.emptyList());
         }
         return result.setTotal((long) response.getReferences().size())
                 .setLists(convertList(response.getReferences(), page -> new AiWebSearchResponse.WebPage()

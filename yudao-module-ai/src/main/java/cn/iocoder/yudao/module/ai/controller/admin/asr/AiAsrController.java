@@ -20,6 +20,7 @@ import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -87,7 +88,7 @@ public class AiAsrController {
         if (asr == null) {
             return success(null);
         }
-        return success(buildAsrList(List.of(asr)).get(0));
+        return success(buildAsrList(Collections.singletonList(asr)).get(0));
     }
 
     @DeleteMapping("/delete")

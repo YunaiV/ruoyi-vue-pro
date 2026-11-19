@@ -287,7 +287,7 @@ public class AiWriteRequestLogMySqlIT {
         assertTrue(results.get(0).isSuccess());
         assertEquals("partial", results.get(0).getData().getContent());
         assertFalse(results.get(1).isSuccess());
-        assertEquals(ErrorCodeConstants.WRITE_STREAM_ERROR.getCode(), results.get(1).getCode());
+        assertEquals(ErrorCodeConstants.WRITE_GENERATE_FAIL.getCode(), results.get(1).getCode());
         // 断言：保留已知用量
         Map<String, Object> write = selectWrite();
         Map<String, Object> requestLog = selectRequestLog();

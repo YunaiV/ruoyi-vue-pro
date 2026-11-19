@@ -18,6 +18,7 @@ import cn.iocoder.yudao.module.ai.framework.ai.core.model.midjourney.api.Midjour
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.mimo.MiMoChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.minimax.MiniMaxChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.moonshot.MoonshotChatModel;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.grok.GrokChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.openai.OpenAiDelegateChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlowApiConstants;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlowChatModel;
@@ -53,7 +54,6 @@ import org.springframework.ai.deepseek.api.DeepSeekApi;
 import org.springframework.ai.document.MetadataMode;
 import org.springframework.ai.embedding.BatchingStrategy;
 import org.springframework.ai.embedding.EmbeddingModel;
-import org.springframework.ai.embedding.observation.EmbeddingModelObservationConvention;
 import org.springframework.ai.google.genai.GoogleGenAiChatModel;
 import org.springframework.ai.google.genai.GoogleGenAiChatOptions;
 import com.volcengine.ark.runtime.service.ArkService;
@@ -136,6 +136,11 @@ import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.API_CONFIG_PLA
  * @author 芋道源码
  */
 public class AiModelFactoryImpl implements AiModelFactory {
+
+    /**
+     * OpenAI 官方地址，不含 /v1
+     */
+    private static final String OPENAI_DEFAULT_BASE_URL = "https://api.openai.com";
 
     @Override
     public ChatModel getOrCreateChatModel(AiPlatformEnum platform, String rawApiKey, String rawUrl,
@@ -277,14 +282,20 @@ public class AiModelFactoryImpl implements AiModelFactory {
                 return SpringUtil.getBean(XingHuoChatModel.class);
             case BAICHUAN:
                 return SpringUtil.getBean(BaiChuanChatModel.class);
-            case OPENAI: // 包装默认的 OpenAiChatModel Bean，流式思考转为增量
+            case OPENAI:
                 return new OpenAiDelegateChatModel(SpringUtil.getBean(OpenAiChatModel.class));
+            case AZURE:
+                // 微软 Azure OpenAI 没有独立的 Spring AI 模型，按 spring.ai.azure.openai 配置创建
+                return buildAzureOpenAiChatModel(SpringUtil.getProperty("spring.ai.azure.openai.api-key"),
+                        SpringUtil.getProperty("spring.ai.azure.openai.endpoint"));
             case ANTHROPIC:
                 return SpringUtil.getBean(AnthropicChatModel.class);
             case GEMINI:
                 return SpringUtil.getBean(GoogleGenAiChatModel.class);
             case OLLAMA:
                 return SpringUtil.getBean(OllamaChatModel.class);
+            case GROK:
+                return SpringUtil.getBean(GrokChatModel.class);
             default:
                 throw new IllegalArgumentException(StrUtil.format("未知平台({})", platform));
         }
@@ -662,7 +673,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
      */
     private static OpenAiDelegateChatModel buildOpenAiChatModel(String openAiToken, String url) {
         return new OpenAiDelegateChatModel(OpenAiChatModel.builder()
-                .options(buildOpenAiChatOptions(openAiToken, url).build())
+                .options(OpenAiChatOptions.builder().baseUrl(buildOpenAiBaseUrl(url)).apiKey(openAiToken).build())
                 .build());
     }
 
@@ -672,6 +683,20 @@ public class AiModelFactoryImpl implements AiModelFactory {
                         .azure(true)
                         .build())
                 .build());
+    }
+
+    /**
+     * 获得 OpenAI 官方 SDK 的 baseUrl
+     *
+     * 原 OpenAiApi 的请求路径为 url + /v1/chat/completions，而 OpenAI 官方 SDK 为 baseUrl + /chat/completions，
+     * 所以补上 /v1，保持 API 秘钥已配置的 url 可用；已以 /v1 结尾的 url 不重复补
+     *
+     * @param url API 秘钥配置的 url，为空时使用 OpenAI 官方地址
+     * @return baseUrl
+     */
+    private static String buildOpenAiBaseUrl(String url) {
+        String baseUrl = StrUtil.removeSuffix(StrUtil.blankToDefault(url, OPENAI_DEFAULT_BASE_URL), "/");
+        return StrUtil.endWith(baseUrl, "/v1") ? baseUrl : baseUrl + "/v1";
     }
 
     private static OpenAiChatOptions.Builder buildOpenAiChatOptions(String apiKey, String url) {
@@ -722,12 +747,8 @@ public class AiModelFactoryImpl implements AiModelFactory {
      * 可参考 {@link OpenAiImageAutoConfiguration} 的 openAiImageModel 方法
      */
     private OpenAiImageModel buildOpenAiImageModel(String openAiToken, String url) {
-        OpenAiImageOptions.Builder optionsBuilder = OpenAiImageOptions.builder().apiKey(openAiToken);
-        if (StrUtil.isNotEmpty(url)) {
-            optionsBuilder.baseUrl(url);
-        }
         return OpenAiImageModel.builder()
-                .options(optionsBuilder.build())
+                .options(OpenAiImageOptions.builder().baseUrl(buildOpenAiBaseUrl(url)).apiKey(openAiToken).build())
                 .build();
     }
 
@@ -790,15 +811,9 @@ public class AiModelFactoryImpl implements AiModelFactory {
      * 可参考 {@link OpenAiEmbeddingAutoConfiguration} 的 openAiEmbeddingModel 方法
      */
     private OpenAiEmbeddingModel buildOpenAiEmbeddingModel(String openAiToken, String url, String model) {
-        OpenAiEmbeddingOptions.Builder optionsBuilder = OpenAiEmbeddingOptions.builder()
-                .apiKey(openAiToken)
-                .model(model);
-        if (StrUtil.isNotEmpty(url)) {
-            optionsBuilder.baseUrl(url);
-        }
         return OpenAiEmbeddingModel.builder()
                 .metadataMode(MetadataMode.EMBED)
-                .options(optionsBuilder.build())
+                .options(OpenAiEmbeddingOptions.builder().baseUrl(buildOpenAiBaseUrl(url)).apiKey(openAiToken).model(model).build())
                 .build();
     }
 
@@ -1000,17 +1015,6 @@ public class AiModelFactoryImpl implements AiModelFactory {
 
     private static BatchingStrategy getBatchingStrategy() {
         return SpringUtil.getBean(BatchingStrategy.class);
-    }
-
-    private static ObjectProvider<EmbeddingModelObservationConvention> getEmbeddingModelObservationConvention() {
-        return new ObjectProvider<>() {
-
-            @Override
-            public EmbeddingModelObservationConvention getObject() throws BeansException {
-                return SpringUtil.getBean(EmbeddingModelObservationConvention.class);
-            }
-
-        };
     }
 
 }

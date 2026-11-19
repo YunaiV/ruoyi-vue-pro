@@ -67,7 +67,6 @@ public interface ErrorCodeConstants {
 
     // ========== API 写作 1-040-007-000 ==========
     ErrorCode WRITE_NOT_EXISTS = new ErrorCode(1_040_007_000, "作文不存在!");
-    ErrorCode WRITE_STREAM_ERROR = new ErrorCode(1_040_07_001, "写作生成异常!"); // 本轮未迁移写作、思维导图，保留其现有流式异常码
     ErrorCode WRITE_GENERATE_FAIL = new ErrorCode(1_040_007_002, "写作生成失败：{}");
 
     // ========== API 思维导图 1-040-008-000 ==========

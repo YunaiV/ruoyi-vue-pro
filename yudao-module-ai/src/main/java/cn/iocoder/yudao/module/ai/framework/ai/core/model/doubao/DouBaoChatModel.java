@@ -42,11 +42,4 @@ public class DouBaoChatModel implements ChatModel {
         return openAiChatModel.getOptions();
     }
 
-    @Override
-    @Deprecated(forRemoval = true)
-    @SuppressWarnings("removal")
-    public ChatOptions getDefaultOptions() {
-        return getOptions();
-    }
-
 }

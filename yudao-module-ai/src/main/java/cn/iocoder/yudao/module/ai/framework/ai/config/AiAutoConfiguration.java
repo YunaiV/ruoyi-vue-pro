@@ -492,7 +492,8 @@ public class AiAutoConfiguration {
         }
         OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
                 .options(OpenAiChatOptions.builder()
-                        .baseUrl(StrUtil.blankToDefault(properties.getBaseUrl(), GrokChatModel.BASE_URL))
+                        .baseUrl(buildOpenAiBaseUrl(StrUtil.blankToDefault(properties.getBaseUrl(), GrokChatModel.BASE_URL),
+                                GrokChatModel.COMPLETE_PATH))
                         .apiKey(properties.getApiKey())
                         .model(properties.getModel())
                         .temperature(properties.getTemperature())
@@ -501,6 +502,19 @@ public class AiAutoConfiguration {
                         .build())
                 .build();
         return new GrokChatModel(openAiChatModel);
+    }
+
+    /**
+     * 获得 OpenAI 官方 SDK 的 baseUrl
+     *
+     * OpenAI 官方 SDK 的请求路径固定为 baseUrl + /chat/completions，所以由原 baseUrl + completionsPath 换算
+     *
+     * @param baseUrl         原 baseUrl
+     * @param completionsPath 原 completionsPath，以 /chat/completions 结尾
+     * @return baseUrl
+     */
+    private static String buildOpenAiBaseUrl(String baseUrl, String completionsPath) {
+        return StrUtil.removeSuffix(StrUtil.removeSuffix(baseUrl, "/") + completionsPath, "/chat/completions");
     }
 
     // ========== RAG 相关 ==========

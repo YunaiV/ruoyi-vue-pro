@@ -55,7 +55,7 @@ public class OpenAiDelegateChatModelTest {
 
     @Test
     public void testStream_grok() {
-        // 准备参数
+        // 准备参数：与 AiAutoConfiguration 一致，Grok 继承 OpenAiDelegateChatModel
         GrokChatModel chatModel = new GrokChatModel(openAiChatModel);
         Prompt prompt = new Prompt(new UserMessage("1 + 1 = ？"));
         // mock 方法
@@ -108,6 +108,8 @@ public class OpenAiDelegateChatModelTest {
         // 调用，并断言：数据库动态入口中，复用 OpenAiChatModel 的平台都经过 OpenAiDelegateChatModel
         assertInstanceOf(OpenAiDelegateChatModel.class, modelFactory.getOrCreateChatModel(AiPlatformEnum.OPENAI,
                 "sk-test", "http://127.0.0.1:1/v1", null));
+        assertInstanceOf(OpenAiDelegateChatModel.class, modelFactory.getOrCreateChatModel(AiPlatformEnum.AZURE,
+                "sk-test", "http://127.0.0.1:1", null));
         assertInstanceOf(GrokChatModel.class, modelFactory.getOrCreateChatModel(AiPlatformEnum.GROK,
                 "sk-test", "http://127.0.0.1:1/v1", null));
         assertInstanceOf(TongYiChatModel.class, modelFactory.getOrCreateChatModel(AiPlatformEnum.ALIBABA,

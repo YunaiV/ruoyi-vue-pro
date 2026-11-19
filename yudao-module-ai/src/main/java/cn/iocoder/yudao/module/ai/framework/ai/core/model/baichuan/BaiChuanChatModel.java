@@ -44,11 +44,4 @@ public class BaiChuanChatModel implements ChatModel {
         return deepSeekChatModel.getOptions();
     }
 
-    @Override
-    @Deprecated(forRemoval = true)
-    @SuppressWarnings("removal")
-    public ChatOptions getDefaultOptions() {
-        return getOptions();
-    }
-
 }

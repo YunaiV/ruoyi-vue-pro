@@ -50,6 +50,7 @@ import org.springframework.validation.annotation.Validated;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.invalidParamException;
@@ -445,7 +446,7 @@ public class AiDramaStoryboardServiceImpl implements AiDramaStoryboardService {
             log.error("[submitStoryboardVideo][storyboard({}) request({}) 提交服务商失败]", storyboard.getId(), requestId, e);
             String errorMessage = AiVideoException.buildSubmitErrorMessage(e);
             updateVideoFail(storyboard.getId(), whereStatus, requestId, errorMessage);
-            if (!(e instanceof AiVideoException videoException && videoException.isSubmitOutcomeUnknown())) {
+            if (!(e instanceof AiVideoException && ((AiVideoException) e).isSubmitOutcomeUnknown())) {
                 videoSubmissionMapper.updateByIdAndStatus(submission.getId(), whereStatus, new AiDramaVideoSubmissionDO()
                         .setStatus(AiDramaStatusEnum.FAIL.getStatus()).setErrorMessage(errorMessage));
             }
@@ -531,7 +532,7 @@ public class AiDramaStoryboardServiceImpl implements AiDramaStoryboardService {
         }
         // 2. 有起始帧为图生视频，否则为文生视频；起始帧按视频参考图镜像替换
         String submitFirstFrameUrl = firstFrameUrl != null
-                ? applyReferenceMirrors(storyboard, List.of(firstFrameUrl)).get(0) : null;
+                ? applyReferenceMirrors(storyboard, Collections.singletonList(firstFrameUrl)).get(0) : null;
         AiVideoDO video = buildVideo(storyboard, model, prompt, submitFirstFrameUrl, project.getComposeAspectRatio())
                 .setResolution(resolution);
         return new VideoSubmitter(video, videoService.buildVideoSubmitter(video, apiKey));
@@ -570,7 +571,7 @@ public class AiDramaStoryboardServiceImpl implements AiDramaStoryboardService {
         Map<Long, List<AiDramaCharacterAppearanceDO>> characterAppearanceMap = convertMultiMap(characterAppearances.stream()
                 .sorted(Comparator.comparing(AiDramaCharacterAppearanceDO::getAppearanceIndex,
                         Comparator.nullsLast(Comparator.naturalOrder())))
-                .toList(), AiDramaCharacterAppearanceDO::getCharacterId);
+                .collect(Collectors.toList()), AiDramaCharacterAppearanceDO::getCharacterId);
 
         // 2. 逐个出场形象回退取图
         Map<Long, String> result = new HashMap<>();
@@ -842,8 +843,8 @@ public class AiDramaStoryboardServiceImpl implements AiDramaStoryboardService {
                 .setMode(firstFrameUrl != null ? AiVideoModeEnum.IMAGE.getMode() : AiVideoModeEnum.TEXT.getMode())
                 .setPlatform(model.getPlatform()).setModelId(model.getId()).setModel(model.getModel())
                 .setPrompt(prompt).setTaskId(storyboard.getTaskId())
-                .setInputUrls(firstFrameUrl != null ? Map.of(AiVideoInputRoleEnum.FIRST_FRAME.getRole(),
-                        List.of(firstFrameUrl)) : null)
+                .setInputUrls(firstFrameUrl != null ? Collections.singletonMap(AiVideoInputRoleEnum.FIRST_FRAME.getRole(),
+                        Collections.singletonList(firstFrameUrl)) : null)
                 .setRatio(aspectRatio).setDuration(storyboard.getDuration());
     }
 
@@ -990,11 +991,11 @@ public class AiDramaStoryboardServiceImpl implements AiDramaStoryboardService {
      * 把 JSON 值展开为文本：对象的值用空格连接，数组的元素用逗号连接
      */
     private static String flattenText(Object value) {
-        if (value instanceof Map<?, ?> map) {
-            return CollUtil.join(convertList(map.values(), item -> StrUtil.emptyToNull(flattenText(item))), " ");
+        if (value instanceof Map) {
+            return CollUtil.join(convertList(((Map<?, ?>) value).values(), item -> StrUtil.emptyToNull(flattenText(item))), " ");
         }
-        if (value instanceof Collection<?> list) {
-            return CollUtil.join(convertList(list, item -> StrUtil.emptyToNull(flattenText(item))), "，");
+        if (value instanceof Collection) {
+            return CollUtil.join(convertList((Collection<?>) value, item -> StrUtil.emptyToNull(flattenText(item))), "，");
         }
         return value != null ? StrUtil.trim(String.valueOf(value)) : null;
     }

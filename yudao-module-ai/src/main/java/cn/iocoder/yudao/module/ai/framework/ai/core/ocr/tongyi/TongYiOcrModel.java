@@ -21,11 +21,13 @@ import com.alibaba.dashscope.exception.NoApiKeyException;
 import com.alibaba.dashscope.exception.UploadFileException;
 import com.alibaba.dashscope.protocol.ConnectionOptions;
 import com.alibaba.dashscope.protocol.Protocol;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 import java.time.Duration;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -62,7 +64,7 @@ public class TongYiOcrModel implements OcrModel {
     /**
      * 支持的图片类型（4K 以下分辨率）：BMP、JPEG、PNG、TIFF、WEBP、HEIC
      */
-    static final Set<String> ALLOWED_MIME_TYPES = Set.of("image/bmp", "image/jpeg", "image/png",
+    static final Set<String> ALLOWED_MIME_TYPES = ImmutableSet.of("image/bmp", "image/jpeg", "image/png",
             "image/tiff", "image/webp", "image/heic");
     /**
      * Base64 编码后字符串不超过 10MB（这里按完整 data URL 计算，更保守）
@@ -107,7 +109,7 @@ public class TongYiOcrModel implements OcrModel {
 
         // 2. 调用
         MultiModalMessage message = MultiModalMessage.builder().role(Role.USER.getValue())
-                .content(List.of(Map.of("image", dataUrl), Map.of("text", PROMPT))).build();
+                .content(ImmutableList.of(ImmutableMap.of("image", dataUrl), ImmutableMap.of("text", PROMPT))).build();
         MultiModalConversationParam param = MultiModalConversationParam.builder()
                 .apiKey(apiKey).model(model).message(message).build();
         MultiModalConversationResult result;

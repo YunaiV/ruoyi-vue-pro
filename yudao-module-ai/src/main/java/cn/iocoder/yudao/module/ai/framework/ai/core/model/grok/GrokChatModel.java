@@ -12,7 +12,7 @@ import org.springframework.ai.chat.model.ChatModel;
 @Slf4j
 public class GrokChatModel extends OpenAiDelegateChatModel {
 
-    public static final String BASE_URL = "https://api.x.ai/v1";
+    public static final String BASE_URL = "https://api.x.ai";
     public static final String COMPLETE_PATH = "/v1/chat/completions";
     public static final String MODEL_DEFAULT = "grok-4.3";
 

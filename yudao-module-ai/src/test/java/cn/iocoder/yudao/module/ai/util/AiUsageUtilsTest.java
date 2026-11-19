@@ -92,77 +92,43 @@ public class AiUsageUtilsTest {
     }
 
     @Test
-    public void testExtractUsage_anthropicWithCache() {
-        // 准备参数：Spring AI 2.x 的 Anthropic 用量，promptTokens 只含基础输入，缓存读取 40、缓存写入 30 由 Usage 单独返回
-        Usage anthropicUsage = new DefaultUsage(100, 20, 120, null, 40L, 30L);
+    public void testExtractUsage_anthropicSdkUsageWithCache() throws Exception {
+        // 准备参数：Spring AI 的 promptTokens 已是 input_tokens + 缓存读取 + 缓存写入 = 100 + 40 + 30
+        com.anthropic.models.messages.Usage nativeUsage = parseAnthropic(
+                "{\"input_tokens\":100,\"output_tokens\":20,\"cache_creation_input_tokens\":30,\"cache_read_input_tokens\":40}",
+                com.anthropic.models.messages.Usage.class);
 
         // 调用
-        UsageSnapshot usage = AiUsageUtils.extractUsage(buildResponse(anthropicUsage), ANTHROPIC);
-        // 断言：完整输入 = 100 + 40 + 30；合计不重复加缓存
+        UsageSnapshot usage = AiUsageUtils.extractUsage(buildResponse(new DefaultUsage(170, 20, 190, nativeUsage, 40L, 30L)), ANTHROPIC);
+        // 断言：完整输入取 promptTokens，不重复加缓存
         assertUsage(usage, 170L, 20L);
     }
 
     @Test
-    public void testExtractUsage_anthropicSyncUsage() throws Exception {
-        // 准备参数：同步时原生用量为完整的 Message Usage
-        com.anthropic.models.messages.Usage withCache = parseAnthropic(
-                "{\"input_tokens\":10,\"output_tokens\":5,\"cache_read_input_tokens\":2,\"cache_creation_input_tokens\":3}",
-                com.anthropic.models.messages.Usage.class);
-        com.anthropic.models.messages.Usage withoutCache = parseAnthropic(
+    public void testExtractUsage_anthropicSdkUsageWithoutCacheFields() throws Exception {
+        // 准备参数
+        com.anthropic.models.messages.Usage nativeUsage = parseAnthropic(
                 "{\"input_tokens\":100,\"output_tokens\":20}", com.anthropic.models.messages.Usage.class);
 
-        // 调用，并断言：完整输入 = 10 + 2 + 3
-        assertUsage(AiUsageUtils.extractUsage(buildResponse(new DefaultUsage(10, 5, 15, withCache, 2L, 3L)), ANTHROPIC),
-                15L, 5L);
-        // 调用，并断言：完整 Usage 未返回缓存字段，视为没有缓存分量
-        assertUsage(AiUsageUtils.extractUsage(buildResponse(new DefaultUsage(100, 20, 120, withoutCache, null, null)), ANTHROPIC),
+        // 调用，并断言：缓存字段未返回，视为没有缓存分量
+        assertUsage(AiUsageUtils.extractUsage(buildResponse(new DefaultUsage(100, 20, 120, nativeUsage)), ANTHROPIC),
                 100L, 20L);
     }
 
     @Test
-    public void testExtractUsage_anthropicStreamDeltaWithoutCacheIsUnknown() throws Exception {
-        // 准备参数：message_delta 只返回 output_tokens；Spring AI 2.0.1 流式只从 message_delta 读取缓存，
-        // message_start 中的缓存读取、写入被丢弃，getter 为 null，promptTokens 只是 message_start 的基础输入
-        MessageDeltaUsage deltaUsage = parseAnthropic("{\"output_tokens\":5}", MessageDeltaUsage.class);
+    public void testExtractUsage_anthropicSdkStreamDeltaUsage() throws Exception {
+        // 准备参数：流式 message_delta 的用量，Spring AI 已沿用 message_start 的输入、缓存，计入 promptTokens
+        MessageDeltaUsage nativeUsage = parseAnthropic("{\"output_tokens\":20}", MessageDeltaUsage.class);
 
-        // 调用，并断言：无法确认缓存分量，完整输入未知，不能把基础输入当成完整输入；输出保留
-        assertUsage(AiUsageUtils.extractUsage(buildResponse(new DefaultUsage(10, 5, 15, deltaUsage, null, null)), ANTHROPIC),
-                null, 5L);
+        // 调用，并断言
+        assertUsage(AiUsageUtils.extractUsage(buildResponse(new DefaultUsage(170, 20, 190, nativeUsage, 40L, 30L)), ANTHROPIC),
+                170L, 20L);
     }
 
     @Test
-    public void testExtractUsage_anthropicStreamDeltaWithCache() throws Exception {
-        // 准备参数：message_delta 返回了缓存字段
-        MessageDeltaUsage deltaUsage = parseAnthropic(
-                "{\"input_tokens\":10,\"output_tokens\":5,\"cache_read_input_tokens\":2,\"cache_creation_input_tokens\":3}",
-                MessageDeltaUsage.class);
-
-        // 调用，并断言：完整输入 = 10 + 2 + 3
-        assertUsage(AiUsageUtils.extractUsage(buildResponse(new DefaultUsage(10, 5, 15, deltaUsage, 2L, 3L)), ANTHROPIC),
-                15L, 5L);
-        // 调用，并断言：缓存字段明确为 0，完整输入即基础输入
-        assertUsage(AiUsageUtils.extractUsage(buildResponse(new DefaultUsage(10, 5, 15, deltaUsage, 0L, 0L)), ANTHROPIC),
-                10L, 5L);
-    }
-
-    @Test
-    public void testExtractUsage_anthropicWithoutNativeUsageAndCache() {
-        // 调用，并断言：无原生用量，且缓存字段未返回，无法确认缓存分量，完整输入未知；输出取 getter
-        assertUsage(AiUsageUtils.extractUsage(buildResponse(new DefaultUsage(100, 20, 120, null, null, null)), ANTHROPIC),
-                null, 20L);
+    public void testExtractUsage_anthropicWithoutNativeUsage() {
+        // 调用，并断言：框架聚合后丢失原生用量，无法确认缓存部分，输入未知，输出取 getter
         assertUsage(AiUsageUtils.extractUsage(buildResponse(new DefaultUsage(10, 5)), ANTHROPIC), null, 5L);
-        // 调用，并断言：只返回其中一个缓存字段，同样未知
-        assertUsage(AiUsageUtils.extractUsage(buildResponse(new DefaultUsage(10, 5, 15, null, 2L, null)), ANTHROPIC),
-                null, 5L);
-    }
-
-    @Test
-    public void testExtractUsage_anthropicUnknownBase() {
-        // 准备参数：基础输入未知（getter 返回 null），但有缓存分量
-        Usage anthropicUsage = new NullPromptUsage(20, 40L, 30L);
-
-        // 调用，并断言：完整输入仍未知，不做估算
-        assertUsage(AiUsageUtils.extractUsage(buildResponse(anthropicUsage), ANTHROPIC), null, 20L);
     }
 
     @Test
@@ -184,15 +150,18 @@ public class AiUsageUtilsTest {
     }
 
     @Test
-    public void testExtractUsage_anthropicNativeUsageIgnored() {
-        // 准备参数：原生用量（例如流式 message_delta）与标准 getter 不一致
+    public void testExtractUsage_anthropicNativeMap() {
+        // 调用，并断言：Map 原生用量同样归一缓存
         Map<String, Object> nativeUsage = MapUtil.<String, Object>builder()
-                .put("input_tokens", 0).put("output_tokens", 8)
-                .put("cache_read_input_tokens", 0).put("cache_creation_input_tokens", 0).build();
-
-        // 调用，并断言：Spring AI 2.x 已在 getter 合并 message_start 的输入，以 getter 为准：50 + 10 + 5
-        assertUsage(AiUsageUtils.extractUsage(buildResponse(new DefaultUsage(50, 8, 58, nativeUsage, 10L, 5L)), ANTHROPIC),
+                .put("input_tokens", 50).put("output_tokens", 8)
+                .put("cache_read_input_tokens", 10).put("cache_creation_input_tokens", 5).build();
+        assertUsage(AiUsageUtils.extractUsage(buildResponse(new DefaultUsage(50, 8, 58, nativeUsage)), ANTHROPIC),
                 65L, 8L);
+        // 调用，并断言：基础输入缺失，输入未知，输出保留
+        Map<String, Object> missingBase = MapUtil.<String, Object>builder()
+                .put("output_tokens", 8).put("cache_read_input_tokens", 10).build();
+        assertUsage(AiUsageUtils.extractUsage(buildResponse(new DefaultUsage(0, 8, 8, missingBase)), ANTHROPIC),
+                null, 8L);
     }
 
     @Test
@@ -389,6 +358,23 @@ public class AiUsageUtilsTest {
     }
 
     @Test
+    public void testExtractResponseMetadata_usageCacheTokens() {
+        // 调用：返回缓存读取 40、缓存写入 30（例如 Anthropic）
+        Map<String, Object> usage = asMap(AiUsageUtils.extractResponseMetadata(
+                buildResponse(new DefaultUsage(170, 20, 190, null, 40L, 30L))).get("usage"));
+        // 断言：两种缓存用量与标准 getter 一起保存
+        assertEquals(170L, ((Number) usage.get("promptTokens")).longValue());
+        assertEquals(40L, ((Number) usage.get("cacheReadInputTokens")).longValue());
+        assertEquals(30L, ((Number) usage.get("cacheWriteInputTokens")).longValue());
+
+        // 调用，并断言：未返回缓存用量时为 null，不是 0
+        Map<String, Object> noCacheUsage = asMap(AiUsageUtils.extractResponseMetadata(
+                buildResponse(new DefaultUsage(10, 5, 15))).get("usage"));
+        assertNull(noCacheUsage.get("cacheReadInputTokens"));
+        assertNull(noCacheUsage.get("cacheWriteInputTokens"));
+    }
+
+    @Test
     public void testExtractResponseMetadata_emptyUsage() {
         // 调用
         Map<String, Object> result = AiUsageUtils.extractResponseMetadata(buildResponse(new EmptyUsage()));
@@ -516,39 +502,6 @@ public class AiUsageUtilsTest {
      */
     public record CustomNativeUsage(Integer inputTokens, Optional<Integer> cachedTokens,
                                     Optional<Integer> missingTokens, Map<String, Object> details) {
-    }
-
-    /**
-     * 基础输入未知的用量：{@link DefaultUsage} 会把 null 转成 0，所以单独实现
-     */
-    private record NullPromptUsage(Integer completionTokens, Long cacheReadInputTokens,
-                                   Long cacheWriteInputTokens) implements Usage {
-
-        @Override
-        public Integer getPromptTokens() {
-            return null;
-        }
-
-        @Override
-        public Integer getCompletionTokens() {
-            return completionTokens;
-        }
-
-        @Override
-        public Object getNativeUsage() {
-            return null;
-        }
-
-        @Override
-        public Long getCacheReadInputTokens() {
-            return cacheReadInputTokens;
-        }
-
-        @Override
-        public Long getCacheWriteInputTokens() {
-            return cacheWriteInputTokens;
-        }
-
     }
 
     /**

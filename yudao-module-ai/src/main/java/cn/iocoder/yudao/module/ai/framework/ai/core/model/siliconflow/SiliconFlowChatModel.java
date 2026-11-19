@@ -39,11 +39,4 @@ public class SiliconFlowChatModel implements ChatModel {
         return openAiChatModel.getOptions();
     }
 
-    @Override
-    @Deprecated(forRemoval = true)
-    @SuppressWarnings("removal")
-    public ChatOptions getDefaultOptions() {
-        return getOptions();
-    }
-
 }

@@ -11,7 +11,9 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.ai.enums.model.AiPlatformEnum;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.openai.OpenAiDelegateChatModel;
 import com.alibaba.cloud.ai.dashscope.spec.DashScopeApiSpec;
+import com.anthropic.models.messages.MessageDeltaUsage;
 import com.google.genai.JsonSerializable;
 import com.google.genai.types.GenerateContentResponseUsageMetadata;
 import com.openai.models.completions.CompletionUsage;
@@ -45,7 +47,6 @@ import java.util.function.Supplier;
  */
 public class AiUsageUtils {
 
-    // DONE @AI：字段注释；几个都写下；（已为下面的 KEY 补充字段注释）
     /**
      * 原生用量 Map 中输入 Token 的候选 KEY，按优先级排列：OpenAI 兼容为 prompt_tokens，Anthropic、通义为 input_tokens，及其驼峰写法
      */
@@ -54,6 +55,14 @@ public class AiUsageUtils {
      * 原生用量 Map 中输出 Token 的候选 KEY，按优先级排列：OpenAI 兼容为 completion_tokens，Anthropic、通义为 output_tokens，及其驼峰写法
      */
     private static final List<String> NATIVE_OUTPUT_KEYS = ListUtil.of("completion_tokens", "output_tokens", "completionTokens", "outputTokens");
+    /**
+     * Anthropic 原生用量 Map 中缓存读取 Token 的候选 KEY，计入完整输入
+     */
+    private static final List<String> ANTHROPIC_CACHE_READ_KEYS = ListUtil.of("cache_read_input_tokens", "cacheReadInputTokens");
+    /**
+     * Anthropic 原生用量 Map 中缓存写入 Token 的候选 KEY，计入完整输入
+     */
+    private static final List<String> ANTHROPIC_CACHE_CREATION_KEYS = ListUtil.of("cache_creation_input_tokens", "cacheCreationInputTokens");
 
     /**
      * 标准用量快照
@@ -88,11 +97,10 @@ public class AiUsageUtils {
     /**
      * 从单个 {@link ChatResponse} 提取标准用量快照，不做估算，不合并流式 chunk
      *
-     * 1. usage 为 null 或 {@link EmptyUsage} 时为未知，不是 0
+     * 1. 无有效 usage 时为未知，不是 0，参见 {@link #isUsagePresent(Usage)}
      * 2. 优先读取原生用量，原生字段为 null 时保持未知
-     * 3. Anthropic 完整输入 = input_tokens + cache_read_input_tokens + cache_creation_input_tokens，基础输入未知时仍未知。
-     *    Spring AI 2.x 的 Anthropic 用量中，promptTokens 只含基础输入，缓存读取、写入由 Usage 单独返回；无法确认缓存分量时也未知
-     * 4. 不使用厂商返回的合计计算用量，缓存、推理等分量不重复计入
+     * 3. Anthropic 完整输入 = input_tokens + cache_read_input_tokens + cache_creation_input_tokens，基础输入未知时仍未知
+     * 4. 不读取厂商返回的合计，缓存、推理等分量不重复计入
      * 5. Gemini 完整输入 = promptTokenCount + toolUsePromptTokenCount，输出 = candidatesTokenCount + thoughtsTokenCount，
      *    与 OpenAI 兼容层的 completion_tokens 一致。带工具续调用时，ChatClient 累加多轮用量后不再保留工具提示、思考分量，
      *    只在可确认时返回，参见 {@link #isGeminiAccumulatedUsageComplete}
@@ -109,13 +117,21 @@ public class AiUsageUtils {
         }
         Object nativeUsage = Opt.ofTry(usage::getNativeUsage).get();
 
-        // 2. Anthropic：缓存读取、写入归一到完整输入（Spring AI 2.x 的原生用量是官方 SDK 对象，流式时不含输入，以标准 getter 为准）
+        // 2.1 Anthropic 官方 SDK 原生用量：Spring AI 的 promptTokens 已是 input_tokens + 缓存读取 + 缓存写入
+        if (nativeUsage instanceof com.anthropic.models.messages.Usage || nativeUsage instanceof MessageDeltaUsage) {
+            return new UsageSnapshot(Convert.toLong(usage.getPromptTokens()), Convert.toLong(usage.getCompletionTokens()));
+        }
         if (StrUtil.equals(platform, AiPlatformEnum.ANTHROPIC.getPlatform())) {
-            return new UsageSnapshot(sumAnthropicInput(Convert.toLong(Opt.ofTry(usage::getPromptTokens).get()),
-                            Opt.ofTry(usage::getCacheReadInputTokens).get(),
-                            Opt.ofTry(usage::getCacheWriteInputTokens).get(),
-                            nativeUsage instanceof com.anthropic.models.messages.Usage),
-                    Convert.toLong(Opt.ofTry(usage::getCompletionTokens).get()));
+            // 2.2 Anthropic 原生 Map：同样归一缓存
+            if (nativeUsage instanceof Map && containsAnyStandardKey((Map<?, ?>) nativeUsage)) {
+                Map<?, ?> nativeMap = (Map<?, ?>) nativeUsage;
+                return new UsageSnapshot(sumAnthropicInput(getFirstLong(nativeMap, NATIVE_INPUT_KEYS),
+                                getFirstLong(nativeMap, ANTHROPIC_CACHE_READ_KEYS),
+                                getFirstLong(nativeMap, ANTHROPIC_CACHE_CREATION_KEYS)),
+                        getFirstLong(nativeMap, NATIVE_OUTPUT_KEYS));
+            }
+            // 2.3 原生用量丢失（例如框架聚合），无法确认缓存部分，输入未知
+            return new UsageSnapshot(null, Convert.toLong(Opt.ofTry(usage::getCompletionTokens).get()));
         }
 
         // 3. 已知厂商的原生 record，保留 null 语义（OpenAI 官方 SDK 的用量字段必填，走第 5 步的标准 getter）
@@ -231,22 +247,13 @@ public class AiUsageUtils {
     /**
      * 计算 Anthropic 完整输入 Token
      *
-     * 1. 同步：原生用量是完整的 Message Usage，缓存字段未返回表示没有缓存分量
-     * 2. 流式（原生用量为 message_delta 的 MessageDeltaUsage）、或无原生用量：缓存字段都返回才可计算，否则完整输入未知。
-     *    原因：Spring AI 2.0.1 流式时只从 message_delta 读取缓存，message_start 中的缓存读取、写入被丢弃，不能当成 0
-     *
      * @param inputTokens         基础输入，null 时完整输入未知
-     * @param cacheReadTokens     缓存读取
-     * @param cacheCreationTokens 缓存写入
-     * @param completeUsage       是否为完整的 Message Usage
+     * @param cacheReadTokens     缓存读取，null 表示没有缓存分量
+     * @param cacheCreationTokens 缓存写入，null 表示没有缓存分量
      * @return 完整输入 Token
      */
-    private static Long sumAnthropicInput(Long inputTokens, Long cacheReadTokens, Long cacheCreationTokens,
-                                          boolean completeUsage) {
+    private static Long sumAnthropicInput(Long inputTokens, Long cacheReadTokens, Long cacheCreationTokens) {
         if (inputTokens == null) {
-            return null;
-        }
-        if (!completeUsage && (cacheReadTokens == null || cacheCreationTokens == null)) {
             return null;
         }
         return inputTokens + ObjUtil.defaultIfNull(cacheReadTokens, 0L) + ObjUtil.defaultIfNull(cacheCreationTokens, 0L);
@@ -297,7 +304,8 @@ public class AiUsageUtils {
     /**
      * generation 扩展属性中排除的 KEY：属于生成正文，已在业务表保存
      */
-    private static final Set<String> EXCLUDED_GENERATION_METADATA_KEYS = SetUtils.asSet("reasoningContent");
+    private static final Set<String> EXCLUDED_GENERATION_METADATA_KEYS = SetUtils.asSet(
+            OpenAiDelegateChatModel.REASONING_CONTENT, OpenAiDelegateChatModel.REASONING_CONTENT_DELTA);
 
     /**
      * 将 {@link ChatResponse} 的元数据转换为 JSON 值快照

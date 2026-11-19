@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.ai.framework.ai.core.model.openai;
 
+import cn.hutool.core.util.ObjUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.model.ChatModel;
@@ -10,12 +11,18 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
 import reactor.core.publisher.Flux;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 复用 {@link OpenAiChatModel} 的 {@link ChatModel} 实现类
  *
- * OpenAI、Azure OpenAI，以及 Grok、通义等兼容 OpenAI 接口的平台，都经过本类调用 {@link OpenAiChatModel}
+ * OpenAI、Azure OpenAI，以及其它复用 OpenAiChatModel 的兼容平台（Grok 等，具体见 AiAutoConfiguration、AiModelFactoryImpl），
+ * 都经过本类调用 {@link OpenAiChatModel}
+ *
+ * 只补充流式思考内容的本次增量（见 {@link #stream(Prompt)}），工具调用、续调用回传思考内容、默认选项都原样交给 {@link OpenAiChatModel}
  *
  * @author 芋道源码
  */
@@ -79,7 +86,7 @@ public class OpenAiDelegateChatModel implements ChatModel {
                 continue;
             }
             // 1. 计算增量：累计值以上次累计为前缀时取新增部分；否则（不应出现）整段作为增量，不丢内容
-            String key = output.getMetadata().get("id") + ":" + Objects.requireNonNullElse(output.getMetadata().get("index"), i);
+            String key = output.getMetadata().get("id") + ":" + ObjUtil.defaultIfNull(output.getMetadata().get("index"), i);
             String current = (String) reasoningContent;
             String last = lastReasoningContents.getOrDefault(key, "");
             String delta = current.startsWith(last) ? current.substring(last.length()) : current;
@@ -96,13 +103,6 @@ public class OpenAiDelegateChatModel implements ChatModel {
     @Override
     public ChatOptions getOptions() {
         return openAiChatModel.getOptions();
-    }
-
-    @Override
-    @Deprecated(forRemoval = true)
-    @SuppressWarnings("removal")
-    public ChatOptions getDefaultOptions() {
-        return getOptions();
     }
 
 }
