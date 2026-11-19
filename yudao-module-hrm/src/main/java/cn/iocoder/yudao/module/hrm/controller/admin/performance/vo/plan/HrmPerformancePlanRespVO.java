@@ -246,6 +246,9 @@ public class HrmPerformancePlanRespVO {
 
             @Schema(description = "评分类型", example = "1")
             private Integer scoreType;
+
+            @Schema(description = "默认目标值", example = "100")
+            private String targetValue;
         }
     }
 

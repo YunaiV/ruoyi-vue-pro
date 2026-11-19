@@ -1,9 +1,12 @@
 package cn.iocoder.yudao.module.hrm.service.performance.assessment;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.module.hrm.service.performance.plan.HrmPerformancePlanService;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
+import cn.iocoder.yudao.module.hrm.controller.admin.performance.vo.assessment.HrmPerformanceAssessmentQuotaScoreRespVO;
 import cn.iocoder.yudao.module.hrm.controller.admin.portal.performance.vo.review.HrmPortalPerformanceQuotaSaveReqVO;
+import cn.iocoder.yudao.module.hrm.controller.admin.portal.performance.vo.review.HrmPortalPerformanceReviewRejectReqVO;
 import cn.iocoder.yudao.module.hrm.controller.admin.portal.performance.vo.process.HrmPortalPerformanceProcessRespVO;
 import cn.iocoder.yudao.module.hrm.controller.admin.portal.performance.vo.review.HrmPortalPerformanceScorePreviewRespVO;
 import cn.iocoder.yudao.module.hrm.controller.admin.portal.performance.vo.review.HrmPortalPerformanceScoreReqVO;
@@ -27,6 +30,7 @@ import cn.iocoder.yudao.module.hrm.dal.mysql.performance.assessment.HrmPerforman
 import cn.iocoder.yudao.module.hrm.dal.mysql.performance.plan.HrmPerformancePlanMapper;
 import cn.iocoder.yudao.module.hrm.dal.mysql.performance.config.HrmPerformanceResultTemplateMapper;
 import cn.iocoder.yudao.module.hrm.enums.performance.plan.HrmPerformancePlanStatusEnum;
+import cn.iocoder.yudao.module.hrm.enums.performance.plan.HrmPerformanceQuotaScoreTypeEnum;
 import cn.iocoder.yudao.module.hrm.enums.performance.plan.HrmPerformanceRaterTypeEnum;
 import cn.iocoder.yudao.module.hrm.enums.performance.assessment.HrmPerformanceAssessmentStageStatusEnum;
 import cn.iocoder.yudao.module.hrm.enums.performance.plan.HrmPerformanceStageTypeEnum;
@@ -44,6 +48,8 @@ import java.util.List;
 
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.module.hrm.enums.ErrorCodeConstants.PERFORMANCE_DATA_ILLEGAL;
+import static cn.iocoder.yudao.module.hrm.enums.ErrorCodeConstants.PERFORMANCE_QUOTA_ACTUAL_VALUE_INVALID;
+import static cn.iocoder.yudao.module.hrm.enums.ErrorCodeConstants.PERFORMANCE_QUOTA_TARGET_VALUE_INVALID;
 import static cn.iocoder.yudao.module.hrm.enums.ErrorCodeConstants.PERFORMANCE_REVIEW_STAGE_NO_PERMISSION;
 import static cn.iocoder.yudao.module.hrm.enums.ErrorCodeConstants.PERFORMANCE_RESULT_LEVEL_NOT_MATCH;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -449,6 +455,406 @@ public class HrmPerformanceAssessmentReviewServiceImplTest extends BaseDbUnitTes
         // 调用，并断言异常
         assertServiceException(() -> reviewService.updateAssessmentQuotaList(
                 QUOTA_ASSESSMENT_ID, Collections.singletonList(reqVO)), PERFORMANCE_DATA_ILLEGAL);
+    }
+
+    // ==================== 完成率指标 ====================
+
+    @Test
+    public void testPreviewScore_mixedQuota_completionRateCalculatedByServer() {
+        // mock 数据：手工指标 50% + 完成率指标 50%
+        PreviewFixture fixture = createPreviewFixture();
+        fixture.quota.setWeight(new BigDecimal("50"));
+        assessmentQuotaMapper.updateById(fixture.quota);
+        HrmPerformanceAssessmentQuotaDO rateQuota = insertCompletionRateQuota(
+                fixture, "销售额完成率", new BigDecimal("50"), "200", null);
+        // 准备参数：完成率指标传入的分数不被采用
+        HrmPortalPerformanceScoreReqVO reqVO = buildScoreReqVO(fixture, fixture.reviewStage,
+                new HrmPortalPerformanceQuotaSaveReqVO().setId(fixture.quota.getId())
+                        .setSelfScore(new BigDecimal("80")),
+                new HrmPortalPerformanceQuotaSaveReqVO().setId(rateQuota.getId()).setActualValue("150")
+                        .setSelfScore(new BigDecimal("100")).setFinalScore(new BigDecimal("100")));
+
+        // 调用
+        HrmPortalPerformanceScorePreviewRespVO preview = reviewService.previewScore(1001L, reqVO);
+
+        // 断言：完成率得分 = 150 / 200 × 100 = 75；阶段得分 = 80 × 50% + 75 × 50%
+        assertEquals(new BigDecimal("77.50"), preview.getStageScore());
+        assertEquals(new BigDecimal("75.00"), findQuotaScore(preview, rateQuota.getId()));
+        assertEquals(new BigDecimal("80"), findQuotaScore(preview, fixture.quota.getId()));
+        // 试算不保存实际值
+        assertNull(assessmentQuotaMapper.selectById(rateQuota.getId()).getActualValue());
+    }
+
+    @Test
+    public void testScoreAssessment_completionRate_entryStageSaveActualValue() {
+        // mock 数据：统一评分上限 90，作为完成率满分
+        PreviewFixture fixture = createPreviewFixture();
+        fixture.plan.getAssessmentConfig().setUpperLimitScore(new BigDecimal("90"));
+        fixture.quota.setWeight(new BigDecimal("40"));
+        assessmentQuotaMapper.updateById(fixture.quota);
+        HrmPerformanceAssessmentQuotaDO partialQuota = insertCompletionRateQuota(
+                fixture, "回款完成率", new BigDecimal("30"), "3", null);
+        HrmPerformanceAssessmentQuotaDO exceededQuota = insertCompletionRateQuota(
+                fixture, "新客完成率", new BigDecimal("30"), "3", null);
+        // 准备参数
+        HrmPortalPerformanceScoreReqVO reqVO = buildScoreReqVO(fixture, fixture.reviewStage,
+                new HrmPortalPerformanceQuotaSaveReqVO().setId(fixture.quota.getId())
+                        .setSelfScore(new BigDecimal("90")),
+                new HrmPortalPerformanceQuotaSaveReqVO().setId(partialQuota.getId()).setActualValue(" 1 "),
+                new HrmPortalPerformanceQuotaSaveReqVO().setId(exceededQuota.getId()).setActualValue("5"));
+
+        // 调用
+        reviewService.scoreAssessment(1001L, reqVO);
+
+        // 断言：1 / 3 × 90 = 30.00；超额完成按上限 90 封顶
+        List<HrmPerformanceAssessmentQuotaScoreDO> scores = assessmentQuotaScoreMapper
+                .selectListByAssessmentStageIds(Collections.singleton(fixture.reviewStage.getId()));
+        assertEquals(new BigDecimal("30.00"), findQuotaScore(scores, partialQuota.getId()));
+        assertEquals(new BigDecimal("90.00"), findQuotaScore(scores, exceededQuota.getId()));
+        // 阶段得分 = 90 × 40% + 30 × 30% + 90 × 30%
+        assertEquals(new BigDecimal("72.00"),
+                assessmentStageMapper.selectById(fixture.reviewStage.getId()).getScore());
+        assertEquals("1", assessmentQuotaMapper.selectById(partialQuota.getId()).getActualValue());
+        assertEquals("5", assessmentQuotaMapper.selectById(exceededQuota.getId()).getActualValue());
+    }
+
+    @Test
+    public void testScoreAssessment_completionRate_actualValueInvalid() {
+        // mock 数据
+        PreviewFixture fixture = createPreviewFixture();
+        HrmPerformanceAssessmentQuotaDO rateQuota = insertCompletionRateQuota(
+                fixture, "销售额完成率", new BigDecimal("50"), "100", null);
+        for (String actualValue : Arrays.asList(null, "", "-1", "95%", "1e2", "约 100")) {
+            // 准备参数
+            HrmPortalPerformanceScoreReqVO reqVO = buildScoreReqVO(fixture, fixture.reviewStage,
+                    new HrmPortalPerformanceQuotaSaveReqVO().setId(fixture.quota.getId())
+                            .setSelfScore(new BigDecimal("80")),
+                    new HrmPortalPerformanceQuotaSaveReqVO().setId(rateQuota.getId())
+                            .setActualValue(actualValue).setSelfScore(new BigDecimal("100")));
+
+            // 调用，并断言异常
+            assertServiceException(() -> reviewService.scoreAssessment(1001L, reqVO),
+                    PERFORMANCE_QUOTA_ACTUAL_VALUE_INVALID, "销售额完成率");
+        }
+        assertEquals(HrmPerformanceAssessmentStageStatusEnum.PENDING.getStatus(),
+                assessmentStageMapper.selectById(fixture.reviewStage.getId()).getStatus());
+    }
+
+    @Test
+    public void testPreviewScore_completionRate_targetValueInvalid() {
+        // mock 数据：目标值不合法时无法计算
+        PreviewFixture fixture = createPreviewFixture();
+        HrmPerformanceAssessmentQuotaDO rateQuota = insertCompletionRateQuota(
+                fixture, "销售额完成率", new BigDecimal("50"), "0", null);
+        HrmPortalPerformanceScoreReqVO reqVO = buildScoreReqVO(fixture, fixture.reviewStage,
+                new HrmPortalPerformanceQuotaSaveReqVO().setId(fixture.quota.getId())
+                        .setSelfScore(new BigDecimal("80")),
+                new HrmPortalPerformanceQuotaSaveReqVO().setId(rateQuota.getId()).setActualValue("10"));
+
+        // 调用，并断言异常
+        assertServiceException(() -> reviewService.previewScore(1001L, reqVO),
+                PERFORMANCE_QUOTA_TARGET_VALUE_INVALID, "销售额完成率");
+    }
+
+    @Test
+    public void testScoreAssessment_completionRate_laterStageUseFrozenActualValue() {
+        // mock 数据：首个评分阶段已录入实际值 100
+        PreviewFixture fixture = createPreviewFixture();
+        fixture.quota.setWeight(new BigDecimal("50"));
+        assessmentQuotaMapper.updateById(fixture.quota);
+        HrmPerformanceAssessmentQuotaDO rateQuota = insertCompletionRateQuota(
+                fixture, "销售额完成率", new BigDecimal("50"), "200", "100");
+        fixture.reviewStage.setWeight(new BigDecimal("50"))
+                .setStatus(HrmPerformanceAssessmentStageStatusEnum.PROCESSED.getStatus());
+        assessmentStageMapper.updateById(fixture.reviewStage);
+        assessmentQuotaScoreMapper.insertBatch(Arrays.asList(
+                new HrmPerformanceAssessmentQuotaScoreDO().setAssessmentStageId(fixture.reviewStage.getId())
+                        .setAssessmentQuotaId(fixture.quota.getId()).setScore(new BigDecimal("80")),
+                new HrmPerformanceAssessmentQuotaScoreDO().setAssessmentStageId(fixture.reviewStage.getId())
+                        .setAssessmentQuotaId(rateQuota.getId()).setScore(new BigDecimal("50"))));
+        fixture.assessment.setStageType(HrmPerformanceStageTypeEnum.OTHER_SCORE.getType());
+        assessmentMapper.updateById(fixture.assessment);
+        HrmPerformanceAssessmentStageDO currentStage = new HrmPerformanceAssessmentStageDO()
+                .setAssessmentId(fixture.assessment.getId())
+                .setType(HrmPerformanceStageTypeEnum.OTHER_SCORE.getType()).setName("上级评分")
+                .setRaterType(HrmPerformanceRaterTypeEnum.SUPERIOR.getType())
+                .setHandlerEmployeeId(200L).setWeight(new BigDecimal("50"))
+                .setRequiredSetting(false).setRejectAuthority(false)
+                .setStatus(HrmPerformanceAssessmentStageStatusEnum.PENDING.getStatus()).setSort(2);
+        assessmentStageMapper.insert(currentStage);
+        // 准备参数：后续阶段尝试改写实际值和完成率分数
+        HrmPortalPerformanceScoreReqVO reqVO = buildScoreReqVO(fixture, currentStage,
+                new HrmPortalPerformanceQuotaSaveReqVO().setId(fixture.quota.getId())
+                        .setReviewerScore(new BigDecimal("70")),
+                new HrmPortalPerformanceQuotaSaveReqVO().setId(rateQuota.getId()).setActualValue("200")
+                        .setReviewerScore(new BigDecimal("100")));
+
+        // 调用：试算与提交均使用冻结的实际值
+        HrmPortalPerformanceScorePreviewRespVO preview = reviewService.previewScore(1001L, reqVO);
+        reviewService.scoreAssessment(1001L, reqVO);
+
+        // 断言
+        assertEquals(new BigDecimal("50.00"), findQuotaScore(preview, rateQuota.getId()));
+        assertEquals(new BigDecimal("60.00"), preview.getStageScore());
+        List<HrmPerformanceAssessmentQuotaScoreDO> scores = assessmentQuotaScoreMapper
+                .selectListByAssessmentStageIds(Collections.singleton(currentStage.getId()));
+        assertEquals(new BigDecimal("50.00"), findQuotaScore(scores, rateQuota.getId()));
+        HrmPerformanceAssessmentQuotaDO quota = assessmentQuotaMapper.selectById(rateQuota.getId());
+        assertEquals("100", quota.getActualValue());
+        assertEquals(new BigDecimal("50.00"), quota.getFinalScore());
+    }
+
+    @Test
+    public void testPreviewScore_lastStage_cumulativeScoreMatchesFinish() {
+        // 调用：最后一个评分阶段，手工指标 80.01；指标汇总 80.005 需先保留两位小数再计算总分
+        assertLastStageCumulativeScoreMatchesFinish(new BigDecimal("80.01"));
+    }
+
+    @Test
+    public void testPreviewScore_lastStage_manualScoreMoreThanTwoDecimals() {
+        // 调用：手工指标 80.009 按保存精度舍入为 80.01，试算与完成评分后保存的结果一致
+        BigDecimal manualScore = assertLastStageCumulativeScoreMatchesFinish(new BigDecimal("80.009"));
+
+        // 断言：保存的手工指标得分
+        assertEquals(new BigDecimal("80.01"), manualScore);
+    }
+
+    @Test
+    public void testScoreAssessment_sameSortQueuedStage_activateAndReject() {
+        // mock 数据：全部重评后排队的阶段与首个阶段 sort 相同、编号更大
+        PreviewFixture fixture = createPreviewFixture();
+        fixture.quota.setWeight(new BigDecimal("50"));
+        assessmentQuotaMapper.updateById(fixture.quota);
+        HrmPerformanceAssessmentQuotaDO rateQuota = insertCompletionRateQuota(
+                fixture, "回款完成率", new BigDecimal("50"), "100", "20");
+        fixture.reviewStage.setWeight(new BigDecimal("50"));
+        assessmentStageMapper.updateById(fixture.reviewStage);
+        HrmPerformanceAssessmentStageDO queuedStage = new HrmPerformanceAssessmentStageDO()
+                .setAssessmentId(fixture.assessment.getId())
+                .setType(HrmPerformanceStageTypeEnum.OTHER_SCORE.getType()).setName("上级评分")
+                .setRaterType(HrmPerformanceRaterTypeEnum.SUPERIOR.getType())
+                .setHandlerEmployeeId(200L).setWeight(new BigDecimal("50"))
+                .setRequiredSetting(false).setRejectAuthority(true)
+                .setStatus(HrmPerformanceAssessmentStageStatusEnum.NOT_PROCESSED.getStatus())
+                .setSort(fixture.reviewStage.getSort());
+        assessmentStageMapper.insert(queuedStage);
+        // 准备参数：首个阶段评分并录入实际值
+        HrmPortalPerformanceScoreReqVO reqVO = buildScoreReqVO(fixture, fixture.reviewStage,
+                new HrmPortalPerformanceQuotaSaveReqVO().setId(fixture.quota.getId())
+                        .setSelfScore(new BigDecimal("80")),
+                new HrmPortalPerformanceQuotaSaveReqVO().setId(rateQuota.getId()).setActualValue("80"));
+
+        // 调用
+        reviewService.scoreAssessment(1001L, reqVO);
+
+        // 断言：排队阶段被激活，实际值已在首个阶段保存
+        assertEquals(HrmPerformanceAssessmentStageStatusEnum.PROCESSED.getStatus(),
+                assessmentStageMapper.selectById(fixture.reviewStage.getId()).getStatus());
+        assertEquals(HrmPerformanceAssessmentStageStatusEnum.PENDING.getStatus(),
+                assessmentStageMapper.selectById(queuedStage.getId()).getStatus());
+        assertEquals("80", assessmentQuotaMapper.selectById(rateQuota.getId()).getActualValue());
+
+        // 调用：排队阶段驳回，退回 sort 相同、编号更小的已完成阶段
+        HrmPortalPerformanceReviewRejectReqVO rejectReqVO = new HrmPortalPerformanceReviewRejectReqVO();
+        rejectReqVO.setAssessmentId(fixture.assessment.getId());
+        rejectReqVO.setReviewStageId(queuedStage.getId());
+        rejectReqVO.setReason("实际值需要修正");
+        reviewService.rejectReviewStage(1001L, rejectReqVO);
+
+        // 断言：首个阶段重新待处理，排队阶段回到未处理
+        assertEquals(HrmPerformanceAssessmentStageStatusEnum.PENDING.getStatus(),
+                assessmentStageMapper.selectById(fixture.reviewStage.getId()).getStatus());
+        assertEquals(HrmPerformanceAssessmentStageStatusEnum.NOT_PROCESSED.getStatus(),
+                assessmentStageMapper.selectById(queuedStage.getId()).getStatus());
+    }
+
+    @Test
+    public void testReplaceAssessmentQuotaList_lockedDimensionIgnorePresetTargetValue() {
+        // mock 数据：不允许编辑的维度中，预置完成率指标使用模板默认目标值
+        HrmPerformancePlanDO plan = buildQuotaPlan(new BigDecimal("100"));
+        HrmPerformanceAssessmentTemplateDO.Dimension dimension = plan.getAssessmentConfig().getDimensions().get(0);
+        dimension.setAllowEdit(false).getQuotas().get(0)
+                .setScoreType(HrmPerformanceQuotaScoreTypeEnum.COMPLETION_RATE.getType()).setTargetValue("100");
+        HrmPerformanceAssessmentDO assessment = buildQuotaAssessment();
+        reviewService.ensureAssessmentQuotaList(plan, assessment);
+        HrmPerformanceAssessmentQuotaDO presetQuota =
+                assessmentQuotaMapper.selectListByAssessmentId(assessment.getId()).get(0);
+        // 准备参数：尝试改写目标值
+        HrmPortalPerformanceQuotaSaveReqVO presetReqVO = new HrmPortalPerformanceQuotaSaveReqVO()
+                .setId(presetQuota.getId()).setTargetValue("120");
+
+        // 调用
+        reviewService.replaceAssessmentQuotaList(plan, assessment, Collections.singletonList(presetReqVO));
+
+        // 断言：目标值保持模板默认值
+        assertEquals("100", assessmentQuotaMapper.selectById(presetQuota.getId()).getTargetValue());
+    }
+
+    @Test
+    public void testEnsureAssessmentQuotaList_copyTemplateTargetValue() {
+        // 准备参数
+        HrmPerformancePlanDO plan = buildQuotaPlan(new BigDecimal("100"));
+        plan.getAssessmentConfig().getDimensions().get(0).getQuotas().get(0)
+                .setScoreType(HrmPerformanceQuotaScoreTypeEnum.COMPLETION_RATE.getType()).setTargetValue("100");
+        HrmPerformanceAssessmentDO assessment = buildQuotaAssessment();
+
+        // 调用
+        reviewService.ensureAssessmentQuotaList(plan, assessment);
+
+        // 断言
+        HrmPerformanceAssessmentQuotaDO quota = assessmentQuotaMapper.selectListByAssessmentId(assessment.getId()).get(0);
+        assertEquals(HrmPerformanceQuotaScoreTypeEnum.COMPLETION_RATE.getType(), quota.getScoreType());
+        assertEquals("100", quota.getTargetValue());
+    }
+
+    @Test
+    public void testReplaceAssessmentQuotaList_presetTargetValueAndCompletionRate() {
+        // mock 数据：预置完成率指标带模板默认目标值
+        HrmPerformancePlanDO plan = buildQuotaPlan(new BigDecimal("60"));
+        plan.getAssessmentConfig().getDimensions().get(0).getQuotas().get(0)
+                .setScoreType(HrmPerformanceQuotaScoreTypeEnum.COMPLETION_RATE.getType()).setTargetValue("100");
+        HrmPerformanceAssessmentDO assessment = buildQuotaAssessment();
+        reviewService.ensureAssessmentQuotaList(plan, assessment);
+        HrmPerformanceAssessmentQuotaDO presetQuota =
+                assessmentQuotaMapper.selectListByAssessmentId(assessment.getId()).get(0);
+        // 准备参数：预置指标只补目标值，尝试修改的其他字段不生效
+        HrmPortalPerformanceQuotaSaveReqVO presetReqVO = new HrmPortalPerformanceQuotaSaveReqVO()
+                .setId(presetQuota.getId()).setTargetValue(" 120 ").setName("篡改名称")
+                .setWeight(new BigDecimal("10")).setScoreType(1);
+        HrmPortalPerformanceQuotaSaveReqVO customReqVO = new HrmPortalPerformanceQuotaSaveReqVO()
+                .setDimensionId(presetQuota.getDimensionId()).setName("回款完成率").setStandard("按回款计算")
+                .setWeight(new BigDecimal("40")).setScoreType(HrmPerformanceQuotaScoreTypeEnum.COMPLETION_RATE.getType())
+                .setTargetValue("50").setActualValue("30");
+
+        // 调用
+        reviewService.replaceAssessmentQuotaList(plan, assessment, Arrays.asList(presetReqVO, customReqVO));
+
+        // 断言
+        HrmPerformanceAssessmentQuotaDO updatedPreset = assessmentQuotaMapper.selectById(presetQuota.getId());
+        assertEquals("120", updatedPreset.getTargetValue());
+        assertEquals("目标达成率", updatedPreset.getName());
+        assertEquals(new BigDecimal("60.00"), updatedPreset.getWeight());
+        assertEquals(HrmPerformanceQuotaScoreTypeEnum.COMPLETION_RATE.getType(), updatedPreset.getScoreType());
+        HrmPerformanceAssessmentQuotaDO customQuota = CollUtil.findOne(
+                assessmentQuotaMapper.selectListByAssessmentId(assessment.getId()), quota -> !quota.getPreset());
+        assertEquals("50", customQuota.getTargetValue());
+        // 完成率指标的实际值只在首个评分阶段录入
+        assertNull(customQuota.getActualValue());
+    }
+
+    @Test
+    public void testReplaceAssessmentQuotaList_completionRateTargetValueInvalid() {
+        // mock 数据
+        HrmPerformancePlanDO plan = buildQuotaPlan(new BigDecimal("60"));
+        plan.getAssessmentConfig().getDimensions().get(0).getQuotas().get(0)
+                .setScoreType(HrmPerformanceQuotaScoreTypeEnum.COMPLETION_RATE.getType()).setTargetValue("100");
+        HrmPerformanceAssessmentDO assessment = buildQuotaAssessment();
+        reviewService.ensureAssessmentQuotaList(plan, assessment);
+        HrmPerformanceAssessmentQuotaDO presetQuota =
+                assessmentQuotaMapper.selectListByAssessmentId(assessment.getId()).get(0);
+        HrmPortalPerformanceQuotaSaveReqVO customReqVO = new HrmPortalPerformanceQuotaSaveReqVO()
+                .setDimensionId(presetQuota.getDimensionId()).setName("回款完成率").setStandard("按回款计算")
+                .setWeight(new BigDecimal("40")).setScoreType(1);
+
+        // 调用，并断言：清空预置完成率指标的目标值
+        HrmPortalPerformanceQuotaSaveReqVO clearedPresetReqVO = new HrmPortalPerformanceQuotaSaveReqVO()
+                .setId(presetQuota.getId()).setTargetValue(" ");
+        assertServiceException(() -> reviewService.replaceAssessmentQuotaList(plan, assessment,
+                Arrays.asList(clearedPresetReqVO, customReqVO)), PERFORMANCE_QUOTA_TARGET_VALUE_INVALID, "目标达成率");
+        // 调用，并断言：自定义完成率指标的目标值不是数字
+        HrmPortalPerformanceQuotaSaveReqVO presetReqVO = new HrmPortalPerformanceQuotaSaveReqVO()
+                .setId(presetQuota.getId()).setTargetValue("100");
+        customReqVO.setScoreType(HrmPerformanceQuotaScoreTypeEnum.COMPLETION_RATE.getType()).setTargetValue("五十");
+        assertServiceException(() -> reviewService.replaceAssessmentQuotaList(plan, assessment,
+                Arrays.asList(presetReqVO, customReqVO)), PERFORMANCE_QUOTA_TARGET_VALUE_INVALID, "回款完成率");
+        // 调用，并断言：未知评分类型
+        customReqVO.setScoreType(99).setTargetValue("50");
+        assertServiceException(() -> reviewService.replaceAssessmentQuotaList(plan, assessment,
+                Arrays.asList(presetReqVO, customReqVO)), PERFORMANCE_DATA_ILLEGAL);
+        assertEquals("100", assessmentQuotaMapper.selectById(presetQuota.getId()).getTargetValue());
+    }
+
+    /**
+     * 两个 50% 评分阶段、两个 50% 指标：首个阶段已完成（手工 80、完成率 80），在最后一个阶段提交手工评分，
+     * 断言试算的累计分与等级和完成评分后保存的结果一致，均为 80.01
+     *
+     * @param currentManualScore 最后一个阶段的手工评分
+     * @return 最后一个阶段保存的手工指标得分
+     */
+    private BigDecimal assertLastStageCumulativeScoreMatchesFinish(
+            BigDecimal currentManualScore) {
+        // mock 数据：首个评分阶段已完成，手工指标 80、完成率指标 80（实际值 160 / 目标值 200）
+        PreviewFixture fixture = createPreviewFixture();
+        fixture.quota.setWeight(new BigDecimal("50"));
+        assessmentQuotaMapper.updateById(fixture.quota);
+        HrmPerformanceAssessmentQuotaDO rateQuota = insertCompletionRateQuota(
+                fixture, "销售额完成率", new BigDecimal("50"), "200", "160");
+        fixture.reviewStage.setWeight(new BigDecimal("50"))
+                .setStatus(HrmPerformanceAssessmentStageStatusEnum.PROCESSED.getStatus());
+        assessmentStageMapper.updateById(fixture.reviewStage);
+        assessmentQuotaScoreMapper.insertBatch(Arrays.asList(
+                new HrmPerformanceAssessmentQuotaScoreDO().setAssessmentStageId(fixture.reviewStage.getId())
+                        .setAssessmentQuotaId(fixture.quota.getId()).setScore(new BigDecimal("80")),
+                new HrmPerformanceAssessmentQuotaScoreDO().setAssessmentStageId(fixture.reviewStage.getId())
+                        .setAssessmentQuotaId(rateQuota.getId()).setScore(new BigDecimal("80"))));
+        fixture.assessment.setStageType(HrmPerformanceStageTypeEnum.OTHER_SCORE.getType());
+        assessmentMapper.updateById(fixture.assessment);
+        HrmPerformanceAssessmentStageDO currentStage = new HrmPerformanceAssessmentStageDO()
+                .setAssessmentId(fixture.assessment.getId())
+                .setType(HrmPerformanceStageTypeEnum.OTHER_SCORE.getType()).setName("上级评分")
+                .setRaterType(HrmPerformanceRaterTypeEnum.SUPERIOR.getType())
+                .setHandlerEmployeeId(200L).setWeight(new BigDecimal("50"))
+                .setRequiredSetting(false).setRejectAuthority(false)
+                .setStatus(HrmPerformanceAssessmentStageStatusEnum.PENDING.getStatus()).setSort(2);
+        assessmentStageMapper.insert(currentStage);
+        // 准备参数
+        HrmPortalPerformanceScoreReqVO reqVO = buildScoreReqVO(fixture, currentStage,
+                new HrmPortalPerformanceQuotaSaveReqVO().setId(fixture.quota.getId())
+                        .setReviewerScore(currentManualScore),
+                new HrmPortalPerformanceQuotaSaveReqVO().setId(rateQuota.getId()));
+
+        // 调用
+        HrmPortalPerformanceScorePreviewRespVO preview = reviewService.previewScore(1001L, reqVO);
+        reviewService.scoreAssessment(1001L, reqVO);
+
+        // 断言：试算的累计分和等级与完成评分后保存的结果一致
+        HrmPerformanceAssessmentDO persisted = assessmentMapper.selectById(fixture.assessment.getId());
+        assertEquals(new BigDecimal("80.01"), preview.getCumulativeScore());
+        assertEquals(new BigDecimal("80.01"), persisted.getScore());
+        assertEquals(persisted.getResultLevel(), preview.getCumulativeResultLevel());
+        return findQuotaScore(assessmentQuotaScoreMapper.selectListByAssessmentStageIds(
+                Collections.singleton(currentStage.getId())), fixture.quota.getId());
+    }
+
+    private HrmPerformanceAssessmentQuotaDO insertCompletionRateQuota(PreviewFixture fixture, String name,
+                                                                    BigDecimal weight, String targetValue,
+                                                                    String actualValue) {
+        HrmPerformanceAssessmentQuotaDO quota = HrmPerformanceAssessmentQuotaDO.builder()
+                .assessmentId(fixture.assessment.getId()).dimensionId(1L).preset(true).name(name)
+                .weight(weight).scoreType(HrmPerformanceQuotaScoreTypeEnum.COMPLETION_RATE.getType())
+                .targetValue(targetValue).actualValue(actualValue)
+                .selfScore(BigDecimal.ZERO).reviewerScore(BigDecimal.ZERO).finalScore(BigDecimal.ZERO).build();
+        assessmentQuotaMapper.insert(quota);
+        return quota;
+    }
+
+    private HrmPortalPerformanceScoreReqVO buildScoreReqVO(PreviewFixture fixture,
+                                                          HrmPerformanceAssessmentStageDO stage,
+                                                          HrmPortalPerformanceQuotaSaveReqVO... quotas) {
+        return new HrmPortalPerformanceScoreReqVO().setAssessmentId(fixture.assessment.getId())
+                .setReviewStageId(stage.getId()).setQuotas(Arrays.asList(quotas));
+    }
+
+    private BigDecimal findQuotaScore(HrmPortalPerformanceScorePreviewRespVO preview, Long quotaId) {
+        HrmPerformanceAssessmentQuotaScoreRespVO score = CollUtil.findOne(preview.getQuotaScores(),
+                item -> quotaId.equals(item.getAssessmentQuotaId()));
+        return score == null ? null : score.getScore();
+    }
+
+    private BigDecimal findQuotaScore(List<HrmPerformanceAssessmentQuotaScoreDO> scores, Long quotaId) {
+        HrmPerformanceAssessmentQuotaScoreDO score = CollUtil.findOne(scores,
+                item -> quotaId.equals(item.getAssessmentQuotaId()));
+        return score == null ? null : score.getScore();
     }
 
     private HrmPortalPerformanceTaskPageReqVO buildPendingTaskPageReqVO() {

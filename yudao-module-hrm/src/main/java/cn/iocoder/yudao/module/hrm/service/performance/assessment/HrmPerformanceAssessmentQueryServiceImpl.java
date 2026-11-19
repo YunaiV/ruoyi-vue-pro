@@ -30,6 +30,7 @@ import cn.iocoder.yudao.module.hrm.enums.performance.plan.HrmPerformancePlanStat
 import cn.iocoder.yudao.module.hrm.enums.performance.plan.HrmPerformanceReviewVisibleContentEnum;
 import cn.iocoder.yudao.module.hrm.enums.performance.plan.HrmPerformanceStageTypeEnum;
 import cn.iocoder.yudao.module.hrm.service.employee.info.HrmEmployeeService;
+import cn.iocoder.yudao.module.hrm.util.HrmPerformanceUtils;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import jakarta.annotation.Resource;
@@ -394,12 +395,15 @@ public class HrmPerformanceAssessmentQueryServiceImpl
                                 List<HrmPerformanceAssessmentStageDO> assessmentStages,
                                 Map<Long, List<HrmPerformanceAssessmentQuotaScoreDO>> quotaScoreMap,
                                 Map<Long, HrmEmployeeDO> employeeMap) {
+        List<HrmPerformanceAssessmentStageDO> reviewStageDOs = filterList(assessmentStages,
+                stage -> HrmPerformanceStageTypeEnum.REVIEW_TYPES.contains(stage.getType()));
         List<HrmPerformanceAssessmentStageRespVO> stageRespVOs = convertList(assessmentStages, assessmentStage -> {
             HrmPerformanceAssessmentStageRespVO stageRespVO = BeanUtils.toBean(
                     assessmentStage, HrmPerformanceAssessmentStageRespVO.class);
             MapUtils.findAndThen(employeeMap, assessmentStage.getHandlerEmployeeId(),
                     handler -> stageRespVO.setHandlerName(handler.getName()));
-            stageRespVO.setCanHandle(false).setCanScore(false);
+            stageRespVO.setCanHandle(false).setCanScore(false)
+                    .setActualValueEditable(HrmPerformanceUtils.isActualValueEditable(assessmentStage, reviewStageDOs));
             stageRespVO.setQuotaScoreList(BeanUtils.toBean(quotaScoreMap.getOrDefault(
                     assessmentStage.getId(), Collections.emptyList()),
                     HrmPerformanceAssessmentQuotaScoreRespVO.class));

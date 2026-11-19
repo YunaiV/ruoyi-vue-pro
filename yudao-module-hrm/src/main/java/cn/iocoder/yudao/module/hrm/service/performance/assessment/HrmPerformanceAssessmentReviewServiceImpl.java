@@ -3,8 +3,10 @@ package cn.iocoder.yudao.module.hrm.service.performance.assessment;
 import cn.iocoder.yudao.module.hrm.service.performance.plan.HrmPerformancePlanService;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.hrm.controller.admin.performance.vo.assessment.HrmPerformanceAssessmentQuotaScoreRespVO;
 import cn.iocoder.yudao.module.hrm.controller.admin.portal.performance.vo.review.HrmPortalPerformanceFillQuotaReqVO;
 import cn.iocoder.yudao.module.hrm.controller.admin.portal.performance.vo.process.HrmPortalPerformanceProcessRespVO;
 import cn.iocoder.yudao.module.hrm.controller.admin.portal.performance.vo.review.HrmPortalPerformanceQuotaSaveReqVO;
@@ -32,11 +34,14 @@ import cn.iocoder.yudao.module.hrm.enums.performance.assessment.HrmPerformanceAs
 import cn.iocoder.yudao.module.hrm.enums.performance.assessment.HrmPerformanceAssessmentProcessStatusEnum;
 import cn.iocoder.yudao.module.hrm.enums.performance.assessment.HrmPerformanceAssessmentStageStatusEnum;
 import cn.iocoder.yudao.module.hrm.enums.performance.plan.HrmPerformancePlanStatusEnum;
+import cn.iocoder.yudao.module.hrm.enums.performance.plan.HrmPerformanceQuotaScoreTypeEnum;
 import cn.iocoder.yudao.module.hrm.enums.performance.plan.HrmPerformanceQuotaSettingTypeEnum;
 import cn.iocoder.yudao.module.hrm.enums.performance.plan.HrmPerformanceRaterTypeEnum;
 import cn.iocoder.yudao.module.hrm.enums.performance.plan.HrmPerformanceStageTypeEnum;
 import cn.iocoder.yudao.module.hrm.enums.performance.config.HrmPerformanceUpperLimitTypeEnum;
 import cn.iocoder.yudao.module.hrm.service.employee.info.HrmEmployeeService;
+import cn.iocoder.yudao.module.hrm.util.HrmPerformanceUtils;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.mzt.logapi.starter.annotation.LogRecord;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -68,7 +73,9 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 import static cn.iocoder.yudao.framework.common.util.number.MoneyUtils.PERCENT_100;
 import static cn.iocoder.yudao.module.hrm.enums.ErrorCodeConstants.PERFORMANCE_ASSESSMENT_NOT_EXISTS;
 import static cn.iocoder.yudao.module.hrm.enums.ErrorCodeConstants.PERFORMANCE_DATA_ILLEGAL;
+import static cn.iocoder.yudao.module.hrm.enums.ErrorCodeConstants.PERFORMANCE_QUOTA_ACTUAL_VALUE_INVALID;
 import static cn.iocoder.yudao.module.hrm.enums.ErrorCodeConstants.PERFORMANCE_QUOTA_SETTING_INVALID;
+import static cn.iocoder.yudao.module.hrm.enums.ErrorCodeConstants.PERFORMANCE_QUOTA_TARGET_VALUE_INVALID;
 import static cn.iocoder.yudao.module.hrm.enums.ErrorCodeConstants.PERFORMANCE_REVIEW_STAGE_NOT_EXISTS;
 import static cn.iocoder.yudao.module.hrm.enums.ErrorCodeConstants.PERFORMANCE_REVIEW_STAGE_NO_PERMISSION;
 import static cn.iocoder.yudao.module.hrm.enums.ErrorCodeConstants.PERFORMANCE_REVIEW_STAGE_REJECT_INVALID;
@@ -192,7 +199,7 @@ public class HrmPerformanceAssessmentReviewServiceImpl
                         .setName(quota.getName()).setDescription(quota.getIllustrate())
                         .setStandard(quota.getStandard())
                         .setWeight(ObjUtil.defaultIfNull(quota.getWeight(), PERCENT_100))
-                        .setScoreType(quota.getScoreType())
+                        .setScoreType(quota.getScoreType()).setTargetValue(quota.getTargetValue())
                         .setSelfScore(BigDecimal.ZERO).setReviewerScore(BigDecimal.ZERO)
                         .setFinalScore(BigDecimal.ZERO).setSort(quotaSort++));
             }
@@ -227,6 +234,7 @@ public class HrmPerformanceAssessmentReviewServiceImpl
                 quota -> Boolean.TRUE.equals(quota.getPreset()));
         // 拆分请求中的预置指标和自定义指标，并校验请求编号不重复且属于当前考核。
         Set<Long> requestIds = new HashSet<>();
+        Map<Long, HrmPortalPerformanceQuotaSaveReqVO> presetRequestMap = new HashMap<>();
         List<HrmPortalPerformanceQuotaSaveReqVO> customRequests = new ArrayList<>();
         for (HrmPortalPerformanceQuotaSaveReqVO request : quotaList) {
             if (request.getId() != null) {
@@ -235,6 +243,7 @@ public class HrmPerformanceAssessmentReviewServiceImpl
                     throw exception(PERFORMANCE_DATA_ILLEGAL);
                 }
                 if (presetQuotaIds.contains(request.getId())) {
+                    presetRequestMap.put(request.getId(), request);
                     continue;
                 }
             }
@@ -244,9 +253,21 @@ public class HrmPerformanceAssessmentReviewServiceImpl
             throw exception(PERFORMANCE_DATA_ILLEGAL);
         }
 
-        // 2. 构造自定义指标，并校验各维度的指标配置
+        // 2.1 预置指标仅允许在可编辑维度中填写目标值，其他字段保持模板配置；不可编辑维度忽略请求中的目标值
         List<HrmPerformanceAssessmentQuotaDO> presetQuotas = filterList(existingQuotas,
                 quota -> presetQuotaIds.contains(quota.getId()));
+        List<HrmPerformanceAssessmentQuotaDO> changedPresetQuotas = new ArrayList<>();
+        for (HrmPerformanceAssessmentQuotaDO quota : presetQuotas) {
+            HrmPerformanceAssessmentDimensionDO dimension = dimensionMap.get(quota.getDimensionId());
+            if (dimension == null || Boolean.FALSE.equals(dimension.getAllowEdit())) {
+                continue;
+            }
+            String targetValue = StrUtil.trimToNull(presetRequestMap.get(quota.getId()).getTargetValue());
+            if (ObjUtil.notEqual(targetValue, quota.getTargetValue())) {
+                changedPresetQuotas.add(quota.setTargetValue(targetValue));
+            }
+        }
+        // 2.2 构造自定义指标，并校验各维度的指标配置
         Map<Long, List<HrmPerformanceAssessmentQuotaDO>> finalQuotaMap =
                 convertMultiMap(presetQuotas, HrmPerformanceAssessmentQuotaDO::getDimensionId);
         List<HrmPerformanceAssessmentQuotaDO> customQuotas = new ArrayList<>();
@@ -261,7 +282,10 @@ public class HrmPerformanceAssessmentReviewServiceImpl
                     .setName(request.getName().trim()).setDescription(request.getDescription())
                     .setStandard(request.getStandard().trim())
                     .setWeight(request.getWeight()).setScoreType(request.getScoreType())
-                    .setTargetValue(request.getTargetValue()).setActualValue(request.getActualValue())
+                    .setTargetValue(StrUtil.trimToNull(request.getTargetValue()))
+                    // 完成率指标的实际值只在首个评分阶段录入，制定阶段不接收
+                    .setActualValue(HrmPerformanceQuotaScoreTypeEnum.isCompletionRate(request.getScoreType())
+                            ? null : request.getActualValue())
                     .setSelfScore(BigDecimal.ZERO).setReviewerScore(BigDecimal.ZERO)
                     .setFinalScore(BigDecimal.ZERO).setSort(nextSort++);
             customQuotas.add(quota);
@@ -269,8 +293,15 @@ public class HrmPerformanceAssessmentReviewServiceImpl
                     request.getDimensionId(), key -> new ArrayList<>()).add(quota);
         }
 
-        // 3. 批量替换自定义指标
+        // 3. 批量更新预置指标的目标值，并替换自定义指标
         validateDimensionQuotaList(dimensions, finalQuotaMap);
+        validateQuotaTargetValues(presetQuotas);
+        validateQuotaTargetValues(customQuotas);
+        // 目标值允许清空，需显式 set 以更新为 null
+        changedPresetQuotas.forEach(quota -> assessmentQuotaMapper.update(
+                new LambdaUpdateWrapper<HrmPerformanceAssessmentQuotaDO>()
+                        .eq(HrmPerformanceAssessmentQuotaDO::getId, quota.getId())
+                        .set(HrmPerformanceAssessmentQuotaDO::getTargetValue, quota.getTargetValue())));
         List<Long> oldCustomQuotaIds = convertList(existingQuotas, HrmPerformanceAssessmentQuotaDO::getId,
                 quota -> Boolean.FALSE.equals(quota.getPreset()));
         if (CollUtil.isNotEmpty(oldCustomQuotaIds)) {
@@ -436,15 +467,10 @@ public class HrmPerformanceAssessmentReviewServiceImpl
             throw exception(PERFORMANCE_DATA_ILLEGAL);
         }
 
-        // 2. 计算当前阶段和当前累计得分
+        // 2. 计算当前阶段和当前累计得分；与提交评分使用同一算法，试算不保存实际值
         HrmPerformancePlanDO plan = validatePerformancePlanExists(assessment.getPlanId());
-        BigDecimal maximumScore = getMaximumScore(plan);
-        Map<Long, BigDecimal> currentScoreMap = new HashMap<>();
-        for (HrmPerformanceAssessmentQuotaDO quota : quotas) {
-            BigDecimal score = getRequestedReviewScore(currentStage, requestQuotaMap.get(quota.getId()));
-            validateReviewScore(score, maximumScore);
-            currentScoreMap.put(quota.getId(), score);
-        }
+        Map<Long, BigDecimal> currentScoreMap = calculateStageQuotaScoreMap(
+                plan, currentStage, reviewStages, quotas, requestQuotaMap);
         BigDecimal stageScore = computeScore(plan, quotas, currentScoreMap);
 
         // 按阶段权重合并当前输入和已完成阶段得分，不将尚未评分的阶段按零分推断为最终结果。
@@ -468,15 +494,22 @@ public class HrmPerformanceAssessmentReviewServiceImpl
                     ObjUtil.defaultIfNull(oldScore, BigDecimal.ZERO).add(reviewScore.getScore()
                             .multiply(completedStage.getWeight()).divide(PERCENT_100, 4, RoundingMode.HALF_UP)));
         }
+        // 最后一个评分阶段与 finishReviewScoring 保持一致：先将指标最终得分保留两位小数，再汇总总分
+        boolean allReviewStagesIncluded = completedStages.size() + 1 == reviewStages.size();
+        if (allReviewStagesIncluded) {
+            cumulativeQuotaScoreMap.replaceAll((quotaId, score) -> score.setScale(2, RoundingMode.HALF_UP));
+        }
         BigDecimal cumulativeScore = computeScore(plan, quotas, cumulativeQuotaScoreMap);
         Level stageLevel = matchResultLevel(plan.getResultConfig(), stageScore);
-        boolean allReviewStagesIncluded = completedStages.size() + 1 == reviewStages.size();
         Level cumulativeLevel = allReviewStagesIncluded
                 ? matchResultLevel(plan.getResultConfig(), cumulativeScore) : null;
         return new HrmPortalPerformanceScorePreviewRespVO()
                 .setStageScore(stageScore).setStageResultLevel(stageLevel == null ? null : stageLevel.getName())
                 .setCumulativeScore(cumulativeScore)
-                .setCumulativeResultLevel(cumulativeLevel == null ? null : cumulativeLevel.getName());
+                .setCumulativeResultLevel(cumulativeLevel == null ? null : cumulativeLevel.getName())
+                .setQuotaScores(convertList(quotas, quota -> new HrmPerformanceAssessmentQuotaScoreRespVO()
+                        .setAssessmentStageId(currentStage.getId()).setAssessmentQuotaId(quota.getId())
+                        .setScore(currentScoreMap.get(quota.getId()))));
     }
 
     @Override
@@ -530,10 +563,11 @@ public class HrmPerformanceAssessmentReviewServiceImpl
         if (ObjUtil.notEqual(Boolean.TRUE, currentStage.getRejectAuthority())) {
             throw exception(PERFORMANCE_REVIEW_STAGE_REJECT_INVALID);
         }
-        HrmPerformanceAssessmentStageDO previousStage = CollUtil.getLast(filterList(reviewStages,
+        // 评分阶段已按 sort、编号排序，取当前阶段之前的最后一个已完成阶段，与激活下一阶段的顺序一致
+        HrmPerformanceAssessmentStageDO previousStage = CollUtil.getLast(filterList(
+                reviewStages.subList(0, reviewStages.indexOf(currentStage)),
                 stage -> Objects.equals(stage.getStatus(),
-                        HrmPerformanceAssessmentStageStatusEnum.PROCESSED.getStatus())
-                        && stage.getSort() < currentStage.getSort()));
+                        HrmPerformanceAssessmentStageStatusEnum.PROCESSED.getStatus())));
         if (previousStage == null) {
             throw exception(PERFORMANCE_REVIEW_STAGE_REJECT_INVALID);
         }
@@ -631,20 +665,19 @@ public class HrmPerformanceAssessmentReviewServiceImpl
 
         // 3. 保存当前阶段的指标评分
         HrmPerformancePlanDO plan = validatePerformancePlanExists(assessment.getPlanId());
-        BigDecimal maximumScore = getMaximumScore(plan);
+        Map<Long, BigDecimal> stageQuotaScoreMap = calculateStageQuotaScoreMap(
+                plan, reviewStage, reviewStages, quotas, requestQuotaMap);
         assessmentQuotaScoreMapper.deleteByAssessmentStageId(reviewStage.getId());
-        Map<Long, BigDecimal> stageQuotaScoreMap = new HashMap<>();
         List<HrmPerformanceAssessmentQuotaScoreDO> reviewScores = new ArrayList<>(quotas.size());
         for (HrmPerformanceAssessmentQuotaDO quota : quotas) {
             HrmPortalPerformanceQuotaSaveReqVO requestQuota = requestQuotaMap.get(quota.getId());
-            BigDecimal quotaScore = getRequestedReviewScore(reviewStage, requestQuota);
-            validateReviewScore(quotaScore, maximumScore);
+            BigDecimal quotaScore = stageQuotaScoreMap.get(quota.getId());
             reviewScores.add(new HrmPerformanceAssessmentQuotaScoreDO()
                     .setAssessmentStageId(reviewStage.getId()).setAssessmentQuotaId(quota.getId())
                     .setScore(quotaScore).setComment(requestQuota.getComment()));
-            stageQuotaScoreMap.put(quota.getId(), quotaScore);
-            // 同步指标实际值以及当前评分角色对应的得分。
-            if (requestQuota.getActualValue() != null) {
+            // 同步指标实际值以及当前评分角色对应的得分。完成率指标的实际值已在计算得分时按录入阶段规则处理。
+            if (!HrmPerformanceQuotaScoreTypeEnum.isCompletionRate(quota.getScoreType())
+                    && requestQuota.getActualValue() != null) {
                 quota.setActualValue(requestQuota.getActualValue());
             }
             if (Objects.equals(reviewStage.getRaterType(), HrmPerformanceRaterTypeEnum.SELF.getType())) {
@@ -670,10 +703,12 @@ public class HrmPerformanceAssessmentReviewServiceImpl
                 .setReviewerComment(joinReviewComments(reviewStages, false));
 
         // 5. 激活下一评分阶段；全部评分完成时汇总结果
-        HrmPerformanceAssessmentStageDO nextStage = CollUtil.findOne(reviewStages,
+        // 评分阶段已按 sort、编号排序，取当前阶段之后的首个未处理阶段，排序相同的排队阶段也能被激活
+        List<HrmPerformanceAssessmentStageDO> laterStages =
+                reviewStages.subList(reviewStages.indexOf(reviewStage) + 1, reviewStages.size());
+        HrmPerformanceAssessmentStageDO nextStage = CollUtil.findOne(laterStages,
                 stage -> Objects.equals(stage.getStatus(),
-                        HrmPerformanceAssessmentStageStatusEnum.NOT_PROCESSED.getStatus())
-                        && stage.getSort() > reviewStage.getSort());
+                        HrmPerformanceAssessmentStageStatusEnum.NOT_PROCESSED.getStatus()));
         if (nextStage != null) {
             nextStage.setStatus(HrmPerformanceAssessmentStageStatusEnum.PENDING.getStatus());
             assessmentStageMapper.updateById(nextStage);
@@ -816,6 +851,82 @@ public class HrmPerformanceAssessmentReviewServiceImpl
         assessmentQuotaMapper.updateBatch(quotas);
     }
 
+    /**
+     * 计算评分阶段的指标得分，试算和提交共用
+     *
+     * 手工指标取请求中的评分；完成率指标忽略请求分数，按服务端保存的目标值和实际值计算。
+     * 实际值只在录入阶段采用请求值（写入 quota 对象，由调用方决定是否持久化），其他阶段沿用已冻结的实际值。
+     *
+     * @param plan 绩效计划
+     * @param reviewStage 当前评分阶段
+     * @param reviewStages 全部评分阶段
+     * @param quotas 指标列表
+     * @param requestQuotaMap 请求指标，key 为指标编号
+     * @return 指标得分，key 为指标编号
+     */
+    private Map<Long, BigDecimal> calculateStageQuotaScoreMap(
+            HrmPerformancePlanDO plan, HrmPerformanceAssessmentStageDO reviewStage,
+            List<HrmPerformanceAssessmentStageDO> reviewStages, List<HrmPerformanceAssessmentQuotaDO> quotas,
+            Map<Long, HrmPortalPerformanceQuotaSaveReqVO> requestQuotaMap) {
+        // 1. 获得评分上限，并判断当前阶段能否录入实际值
+        BigDecimal maximumScore = getMaximumScore(plan);
+        boolean actualValueEditable = HrmPerformanceUtils.isActualValueEditable(reviewStage, reviewStages);
+
+        // 2. 逐个计算指标得分
+        Map<Long, BigDecimal> scoreMap = new HashMap<>();
+        for (HrmPerformanceAssessmentQuotaDO quota : quotas) {
+            HrmPortalPerformanceQuotaSaveReqVO requestQuota = requestQuotaMap.get(quota.getId());
+            // 2.1 手工指标：采用请求中的评分，并校验评分范围；超过两位小数时按保存精度舍入，保证试算与提交一致
+            if (!HrmPerformanceQuotaScoreTypeEnum.isCompletionRate(quota.getScoreType())) {
+                BigDecimal score = getRequestedReviewScore(reviewStage, requestQuota);
+                validateReviewScore(score, maximumScore);
+                if (score.scale() > 2) {
+                    score = score.setScale(2, RoundingMode.HALF_UP);
+                }
+                scoreMap.put(quota.getId(), score);
+                continue;
+            }
+            // 2.2 完成率指标：录入阶段采用请求中的实际值，再按目标值和实际值计算得分
+            if (actualValueEditable) {
+                quota.setActualValue(StrUtil.trimToNull(requestQuota.getActualValue()));
+            }
+            scoreMap.put(quota.getId(), calculateCompletionRateScore(quota, maximumScore));
+        }
+        return scoreMap;
+    }
+
+    /**
+     * 按完成率计算指标得分：min(实际值 / 目标值, 1) × 统一评分上限
+     *
+     * @param quota 完成率指标
+     * @param maximumScore 统一评分上限
+     * @return 指标得分
+     */
+    private BigDecimal calculateCompletionRateScore(HrmPerformanceAssessmentQuotaDO quota, BigDecimal maximumScore) {
+        BigDecimal targetValue = HrmPerformanceUtils.parseTargetValue(quota.getTargetValue());
+        if (targetValue == null) {
+            throw exception(PERFORMANCE_QUOTA_TARGET_VALUE_INVALID, quota.getName());
+        }
+        BigDecimal actualValue = HrmPerformanceUtils.parseActualValue(quota.getActualValue());
+        if (actualValue == null) {
+            throw exception(PERFORMANCE_QUOTA_ACTUAL_VALUE_INVALID, quota.getName());
+        }
+        // 完成率以统一评分上限为满分，未配置上限时无法计算
+        if (maximumScore == null) {
+            throw exception(PERFORMANCE_DATA_ILLEGAL);
+        }
+        return HrmPerformanceUtils.calculateCompletionRateScore(targetValue, actualValue, maximumScore);
+    }
+
+    private void validateQuotaTargetValues(List<HrmPerformanceAssessmentQuotaDO> quotas) {
+        for (HrmPerformanceAssessmentQuotaDO quota : quotas) {
+            if (HrmPerformanceQuotaScoreTypeEnum.isCompletionRate(quota.getScoreType())
+                    && HrmPerformanceUtils.parseTargetValue(quota.getTargetValue()) == null) {
+                throw exception(PERFORMANCE_QUOTA_TARGET_VALUE_INVALID, quota.getName());
+            }
+        }
+    }
+
     private BigDecimal getRequestedReviewScore(HrmPerformanceAssessmentStageDO reviewStage,
                                                HrmPortalPerformanceQuotaSaveReqVO quota) {
         return Objects.equals(reviewStage.getRaterType(), HrmPerformanceRaterTypeEnum.SELF.getType())
@@ -956,7 +1067,7 @@ public class HrmPerformanceAssessmentReviewServiceImpl
                 || !StringUtils.hasText(request.getStandard())
                 || request.getWeight() == null || request.getWeight().signum() <= 0
                 || request.getWeight().compareTo(PERCENT_100) > 0
-                || request.getScoreType() == null) {
+                || HrmPerformanceQuotaScoreTypeEnum.valueOf(request.getScoreType()) == null) {
             throw exception(PERFORMANCE_DATA_ILLEGAL);
         }
     }

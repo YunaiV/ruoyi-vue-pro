@@ -274,6 +274,10 @@ public interface ErrorCodeConstants {
     // ========== 绩效指标 1-050-600-019 ==========
     ErrorCode PERFORMANCE_QUOTA_SETTING_INVALID =
             new ErrorCode(1_050_600_019, "绩效指标制定数据不合法");
+    ErrorCode PERFORMANCE_QUOTA_TARGET_VALUE_INVALID =
+            new ErrorCode(1_050_600_029, "完成率指标【{}】的目标值必须是大于 0 的数字");
+    ErrorCode PERFORMANCE_QUOTA_ACTUAL_VALUE_INVALID =
+            new ErrorCode(1_050_600_030, "完成率指标【{}】的实际值必须是不小于 0 的数字");
 
     // ========== 绩效目标确认 1-050-600-020 ==========
     ErrorCode PERFORMANCE_TARGET_CONFIRM_CONFIG_INVALID =

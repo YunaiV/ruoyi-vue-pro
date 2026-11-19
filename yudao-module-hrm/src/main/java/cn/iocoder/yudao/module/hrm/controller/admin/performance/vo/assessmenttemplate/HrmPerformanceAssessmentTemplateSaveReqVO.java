@@ -229,6 +229,10 @@ public class HrmPerformanceAssessmentTemplateSaveReqVO {
         @NotNull(message = "评分类型不能为空")
         @InEnum(value = HrmPerformanceQuotaScoreTypeEnum.class, message = "评分类型必须是 {value}")
         private Integer scoreType;
+
+        @Schema(description = "默认目标值；完成率指标必须是大于 0 的数字", example = "100")
+        @Size(max = 200, message = "默认目标值不能超过 200 个字符")
+        private String targetValue;
     }
 
 }

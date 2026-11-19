@@ -26,6 +26,7 @@ import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static cn.iocoder.yudao.module.hrm.enums.ErrorCodeConstants.PERFORMANCE_ASSESSMENT_TEMPLATE_NAME_DUPLICATE;
 import static cn.iocoder.yudao.module.hrm.enums.ErrorCodeConstants.PERFORMANCE_ASSESSMENT_TEMPLATE_NOT_EXISTS;
 import static cn.iocoder.yudao.module.hrm.enums.ErrorCodeConstants.PERFORMANCE_DATA_ILLEGAL;
+import static cn.iocoder.yudao.module.hrm.enums.ErrorCodeConstants.PERFORMANCE_QUOTA_TARGET_VALUE_INVALID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -82,6 +83,35 @@ public class HrmPerformanceAssessmentTemplateServiceImplTest extends BaseDbUnitT
         assertServiceException(() -> assessmentTemplateService.createPerformanceAssessmentTemplate(
                         reqVO),
                 PERFORMANCE_ASSESSMENT_TEMPLATE_NAME_DUPLICATE);
+    }
+
+    @Test
+    public void testCreateAssessmentTemplate_completionRateTargetValue() {
+        // 准备参数：完成率指标的默认目标值可以留空，填写时必须是大于 0 的数字
+        HrmPerformanceAssessmentTemplateSaveReqVO reqVO = createAssessmentTemplateReqVO("完成率考核模板");
+        reqVO.getDimensions().get(0).getQuotas().get(0).setScoreType(2).setTargetValue(" 100 ");
+        reqVO.getDimensions().get(0).getQuotas().get(1).setScoreType(2).setTargetValue(" ");
+
+        // 调用
+        Long templateId = assessmentTemplateService.createPerformanceAssessmentTemplate(reqVO);
+
+        // 断言
+        HrmPerformanceAssessmentTemplateDO template = assessmentTemplateMapper.selectById(templateId);
+        assertEquals("100", template.getDimensions().get(0).getQuotas().get(0).getTargetValue());
+        assertNull(template.getDimensions().get(0).getQuotas().get(1).getTargetValue());
+    }
+
+    @Test
+    public void testCreateAssessmentTemplate_completionRateTargetValueInvalid() {
+        for (String targetValue : Arrays.asList("0", "-1", "100%", "一百")) {
+            // 准备参数
+            HrmPerformanceAssessmentTemplateSaveReqVO reqVO = createAssessmentTemplateReqVO("完成率考核模板");
+            reqVO.getDimensions().get(0).getQuotas().get(0).setScoreType(2).setTargetValue(targetValue);
+
+            // 调用，并断言异常
+            assertServiceException(() -> assessmentTemplateService.createPerformanceAssessmentTemplate(reqVO),
+                    PERFORMANCE_QUOTA_TARGET_VALUE_INVALID, "目标达成率");
+        }
     }
 
     @Test

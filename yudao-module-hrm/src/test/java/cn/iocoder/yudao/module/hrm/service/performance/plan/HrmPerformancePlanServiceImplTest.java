@@ -45,6 +45,7 @@ import java.util.Objects;
 
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.module.hrm.enums.ErrorCodeConstants.PERFORMANCE_PLAN_STATUS_NOT_ALLOW_DELETE;
+import static cn.iocoder.yudao.module.hrm.enums.ErrorCodeConstants.PERFORMANCE_QUOTA_TARGET_VALUE_INVALID;
 import static cn.iocoder.yudao.module.hrm.enums.ErrorCodeConstants.PERFORMANCE_STAGE_ACTION_INVALID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -108,6 +109,35 @@ public class HrmPerformancePlanServiceImplTest extends BaseDbUnitTest {
                 reqVO.getResultTemplateId());
         verify(assessmentService).addPerformanceAssessmentList(argThat(actualPlan ->
                 Objects.equals(planId, actualPlan.getId())), eq(Collections.singletonList(200L)));
+    }
+
+    @Test
+    public void testCreatePlan_completionRateTargetValue() {
+        // mock 数据：模板中的完成率指标未配置默认目标值
+        HrmPerformancePlanSaveReqVO reqVO = buildPlanSaveReqVO("完成率绩效计划", 200L);
+        HrmPerformanceAssessmentTemplateDO template = buildAssessmentTemplate();
+        HrmPerformanceAssessmentTemplateDO.Quota quota =
+                CollUtil.getFirst(CollUtil.getFirst(template.getDimensions()).getQuotas()).setScoreType(2);
+        when(assessmentTemplateService.validatePerformanceAssessmentTemplateEnabled(template.getId()))
+                .thenReturn(template);
+
+        // 调用，并断言：系统制定没有员工填写阶段，必须使用模板默认目标值
+        assertServiceException(() -> planService.createPerformancePlan(reqVO),
+                PERFORMANCE_QUOTA_TARGET_VALUE_INVALID, "目标达成率");
+        // 调用，并断言：员工制定但维度不允许编辑时，员工无法填写目标值，同样必须使用模板默认目标值
+        reqVO.setQuotaSettingType(HrmPerformanceQuotaSettingTypeEnum.EMPLOYEE.getType());
+        assertServiceException(() -> planService.createPerformancePlan(reqVO),
+                PERFORMANCE_QUOTA_TARGET_VALUE_INVALID, "目标达成率");
+        // 调用，并断言：员工制定且维度允许编辑时，可以在填写阶段补充目标值
+        CollUtil.getFirst(template.getDimensions()).setAllowEdit(true);
+        assertNotNull(planService.createPerformancePlan(reqVO));
+        CollUtil.getFirst(template.getDimensions()).setAllowEdit(false);
+        // 调用，并断言：系统制定且默认目标值合法
+        quota.setTargetValue("100");
+        reqVO.setName("完成率绩效计划-系统制定").setQuotaSettingType(HrmPerformanceQuotaSettingTypeEnum.SYSTEM.getType());
+        Long planId = planService.createPerformancePlan(reqVO);
+        assertEquals("100", CollUtil.getFirst(CollUtil.getFirst(
+                planMapper.selectById(planId).getAssessmentConfig().getDimensions()).getQuotas()).getTargetValue());
     }
 
     @Test

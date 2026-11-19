@@ -20,9 +20,12 @@ import cn.iocoder.yudao.module.hrm.dal.mysql.performance.plan.HrmPerformancePlan
 import cn.iocoder.yudao.module.hrm.enums.performance.plan.HrmPerformancePlanOperationTypeEnum;
 import cn.iocoder.yudao.module.hrm.enums.performance.plan.HrmPerformancePlanScopeTypeEnum;
 import cn.iocoder.yudao.module.hrm.enums.performance.plan.HrmPerformancePlanStatusEnum;
+import cn.iocoder.yudao.module.hrm.enums.performance.plan.HrmPerformanceQuotaScoreTypeEnum;
+import cn.iocoder.yudao.module.hrm.enums.performance.plan.HrmPerformanceQuotaSettingTypeEnum;
 import cn.iocoder.yudao.module.hrm.enums.performance.plan.HrmPerformanceRaterTypeEnum;
 import cn.iocoder.yudao.module.hrm.enums.performance.plan.HrmPerformanceStageTypeEnum;
 import cn.iocoder.yudao.module.hrm.service.employee.info.HrmEmployeeService;
+import cn.iocoder.yudao.module.hrm.util.HrmPerformanceUtils;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import com.mzt.logapi.context.LogRecordContext;
 import com.mzt.logapi.starter.annotation.LogRecord;
@@ -52,6 +55,7 @@ import static cn.iocoder.yudao.module.hrm.enums.ErrorCodeConstants.PERFORMANCE_P
 import static cn.iocoder.yudao.module.hrm.enums.ErrorCodeConstants.PERFORMANCE_PLAN_STARTED_CANNOT_MODIFY;
 import static cn.iocoder.yudao.module.hrm.enums.ErrorCodeConstants.PERFORMANCE_PLAN_STATUS_NOT_ALLOW_DELETE;
 import static cn.iocoder.yudao.module.hrm.enums.ErrorCodeConstants.PERFORMANCE_DATA_ILLEGAL;
+import static cn.iocoder.yudao.module.hrm.enums.ErrorCodeConstants.PERFORMANCE_QUOTA_TARGET_VALUE_INVALID;
 import static cn.iocoder.yudao.module.hrm.enums.ErrorCodeConstants.PERFORMANCE_STAGE_ACTION_INVALID;
 import static cn.iocoder.yudao.module.hrm.enums.LogRecordConstants.HRM_PERFORMANCE_PLAN_ARCHIVE_SUB_TYPE;
 import static cn.iocoder.yudao.module.hrm.enums.LogRecordConstants.HRM_PERFORMANCE_PLAN_ARCHIVE_SUCCESS;
@@ -108,6 +112,7 @@ public class HrmPerformancePlanServiceImpl implements HrmPerformancePlanService 
                 performanceResultTemplateService.validatePerformanceResultTemplateEnabled(reqVO.getResultTemplateId());
         validatePlanReferences(reqVO);
         validatePlanScoreRange(assessmentTemplate);
+        validatePlanQuotaTargetValues(reqVO.getQuotaSettingType(), assessmentTemplate);
 
         // 2. 创建绩效计划
         HrmPerformancePlanDO plan = BeanUtils.toBean(reqVO, HrmPerformancePlanDO.class)
@@ -158,6 +163,7 @@ public class HrmPerformancePlanServiceImpl implements HrmPerformancePlanService 
         }
         validatePlanReferences(reqVO);
         validatePlanScoreRange(assessmentTemplate);
+        validatePlanQuotaTargetValues(reqVO.getQuotaSettingType(), assessmentTemplate);
 
         // 2. 更新绩效计划，并保留内部维护的排除员工范围
         HrmPerformancePlanDO plan = BeanUtils.toBean(reqVO, HrmPerformancePlanDO.class)
@@ -585,6 +591,35 @@ public class HrmPerformancePlanServiceImpl implements HrmPerformancePlanService 
         if (assessmentTemplate.getUpperLimitScore() == null
                 || assessmentTemplate.getUpperLimitScore().compareTo(BigDecimal.valueOf(100)) > 0) {
             throw exception(PERFORMANCE_DATA_ILLEGAL);
+        }
+    }
+
+    /**
+     * 校验系统制定指标时，完成率指标已配置合法的默认目标值
+     *
+     * 系统制定没有员工填写阶段，模板默认目标值就是考核目标；员工填写时由填写阶段补充和校验
+     *
+     * @param quotaSettingType 指标设置类型
+     * @param assessmentTemplate 考核模板
+     */
+    private void validatePlanQuotaTargetValues(Integer quotaSettingType, HrmPerformanceAssessmentTemplateDO assessmentTemplate) {
+        if (CollUtil.isEmpty(assessmentTemplate.getDimensions())) {
+            return;
+        }
+        // 系统制定指标，或员工制定指标但维度不允许编辑时，员工无法填写目标值，必须由模板提供合法的默认目标值
+        boolean systemQuota = Objects.equals(quotaSettingType, HrmPerformanceQuotaSettingTypeEnum.SYSTEM.getType());
+        for (HrmPerformanceAssessmentTemplateDO.Dimension dimension : assessmentTemplate.getDimensions()) {
+            // 模板 JSON 中历史维度可能未设置 allowEdit，按不可编辑处理
+            boolean locked = Boolean.FALSE.equals(ObjUtil.defaultIfNull(dimension.getAllowEdit(), Boolean.FALSE));
+            if (!systemQuota && !locked) {
+                continue;
+            }
+            for (HrmPerformanceAssessmentTemplateDO.Quota quota : CollUtil.emptyIfNull(dimension.getQuotas())) {
+                if (HrmPerformanceQuotaScoreTypeEnum.isCompletionRate(quota.getScoreType())
+                        && HrmPerformanceUtils.parseTargetValue(quota.getTargetValue()) == null) {
+                    throw exception(PERFORMANCE_QUOTA_TARGET_VALUE_INVALID, quota.getName());
+                }
+            }
         }
     }
 

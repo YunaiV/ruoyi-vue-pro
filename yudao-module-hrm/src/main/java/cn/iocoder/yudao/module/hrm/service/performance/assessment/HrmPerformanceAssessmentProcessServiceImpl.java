@@ -14,6 +14,7 @@ import cn.iocoder.yudao.module.hrm.controller.admin.portal.performance.vo.task.H
 import cn.iocoder.yudao.module.hrm.dal.dataobject.employee.info.HrmEmployeeDO;
 import cn.iocoder.yudao.module.hrm.dal.dataobject.performance.assessment.HrmPerformanceAssessmentAppealRecordDO;
 import cn.iocoder.yudao.module.hrm.dal.dataobject.performance.assessment.HrmPerformanceAssessmentDO;
+import cn.iocoder.yudao.module.hrm.dal.dataobject.performance.assessment.HrmPerformanceAssessmentQuotaDO;
 import cn.iocoder.yudao.module.hrm.dal.dataobject.performance.assessment.HrmPerformanceAssessmentStageDO;
 import cn.iocoder.yudao.module.hrm.dal.dataobject.performance.plan.HrmPerformancePlanDO;
 import cn.iocoder.yudao.module.hrm.dal.dataobject.performance.plan.HrmPerformancePlanDO.HandlerStage;
@@ -33,6 +34,7 @@ import cn.iocoder.yudao.module.hrm.enums.performance.assessment.HrmPerformanceAs
 import cn.iocoder.yudao.module.hrm.enums.performance.assessment.HrmPerformanceConfirmationResultEnum;
 import cn.iocoder.yudao.module.hrm.enums.performance.plan.HrmPerformancePlanOperationTypeEnum;
 import cn.iocoder.yudao.module.hrm.enums.performance.plan.HrmPerformancePlanStatusEnum;
+import cn.iocoder.yudao.module.hrm.enums.performance.plan.HrmPerformanceQuotaScoreTypeEnum;
 import cn.iocoder.yudao.module.hrm.enums.performance.plan.HrmPerformanceQuotaSettingTypeEnum;
 import cn.iocoder.yudao.module.hrm.enums.performance.plan.HrmPerformanceRaterTypeEnum;
 import cn.iocoder.yudao.module.hrm.enums.performance.assessment.HrmPerformanceResultAuditStatusEnum;
@@ -63,6 +65,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.anyMatch;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
@@ -848,7 +851,7 @@ public class HrmPerformanceAssessmentProcessServiceImpl
      * @param assessment 员工绩效考核
      * @param selectedStageIds 指定评分阶段编号列表
      * @param resultAuditResumeSort 结果审核恢复层级；为空时重新开始结果审核
-     * @return 重新打开的评分阶段列表
+     * @return 已激活的评分阶段列表
      */
     private List<HrmPerformanceAssessmentStageDO> reopenReviewStages(
             HrmPerformanceAssessmentDO assessment, List<Long> selectedStageIds,
@@ -871,12 +874,27 @@ public class HrmPerformanceAssessmentProcessServiceImpl
         // 2.1 删除重新评分阶段的指标评分
         List<Long> reopenStageIds = convertList(reopenStages, HrmPerformanceAssessmentStageDO::getId);
         assessmentQuotaScoreMapper.deleteByAssessmentStageIds(reopenStageIds);
-        // 2.2 将所有选中阶段设为待处理
-        assessmentStageMapper.updateToResetByIds(reopenStageIds,
-                HrmPerformanceAssessmentStageStatusEnum.PENDING.getStatus());
-        for (HrmPerformanceAssessmentStageDO reopenStage : reopenStages) {
-            reopenStage.setStatus(HrmPerformanceAssessmentStageStatusEnum.PENDING.getStatus());
-            notifyPendingStage(assessment, reopenStage);
+        // 2.2 全部评分阶段重评且包含完成率指标时，按顺序重评：仅激活首个阶段以便修正实际值，其余阶段排队等待
+        if (reopenStages.size() == reviewStages.size() && hasCompletionRateQuota(assessment.getId())) {
+            List<Long> queuedStageIds = convertList(reopenStages, HrmPerformanceAssessmentStageDO::getId,
+                    stage -> ObjUtil.notEqual(stage.getId(), firstStage.getId()));
+            assessmentStageMapper.updateToResetByIds(Collections.singletonList(firstStage.getId()),
+                    HrmPerformanceAssessmentStageStatusEnum.PENDING.getStatus());
+            if (CollUtil.isNotEmpty(queuedStageIds)) {
+                assessmentStageMapper.updateToResetByIds(queuedStageIds,
+                        HrmPerformanceAssessmentStageStatusEnum.NOT_PROCESSED.getStatus());
+            }
+            firstStage.setStatus(HrmPerformanceAssessmentStageStatusEnum.PENDING.getStatus());
+            notifyPendingStage(assessment, firstStage);
+            reopenStages = Collections.singletonList(firstStage);
+        } else {
+            // 2.3 其他情况将所有选中阶段设为待处理，并行重新评分
+            assessmentStageMapper.updateToResetByIds(reopenStageIds,
+                    HrmPerformanceAssessmentStageStatusEnum.PENDING.getStatus());
+            for (HrmPerformanceAssessmentStageDO reopenStage : reopenStages) {
+                reopenStage.setStatus(HrmPerformanceAssessmentStageStatusEnum.PENDING.getStatus());
+                notifyPendingStage(assessment, reopenStage);
+            }
         }
 
         // 3. 重置后续流程阶段，并以首个重新评分阶段作为当前阶段
@@ -891,6 +909,17 @@ public class HrmPerformanceAssessmentProcessServiceImpl
         assessment.setProcessStatus(HrmPerformanceAssessmentProcessStatusEnum.PROCESSING.getStatus())
                 .setStageSort(firstStage.getSort()).setStageType(firstStage.getType());
         return reopenStages;
+    }
+
+    /**
+     * 判断员工绩效考核是否包含完成率指标
+     *
+     * @param assessmentId 员工绩效考核编号
+     * @return 是否包含
+     */
+    private boolean hasCompletionRateQuota(Long assessmentId) {
+        List<HrmPerformanceAssessmentQuotaDO> quotas = assessmentQuotaMapper.selectListByAssessmentId(assessmentId);
+        return anyMatch(quotas, quota -> HrmPerformanceQuotaScoreTypeEnum.isCompletionRate(quota.getScoreType()));
     }
 
     /**

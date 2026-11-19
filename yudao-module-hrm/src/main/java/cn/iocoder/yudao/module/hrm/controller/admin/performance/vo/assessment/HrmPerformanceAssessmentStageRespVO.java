@@ -77,6 +77,9 @@ public class HrmPerformanceAssessmentStageRespVO {
     @Schema(description = "是否可评分")
     private Boolean canScore;
 
+    @Schema(description = "是否可录入完成率指标实际值；仅首个评分阶段待处理且其余评分阶段均未处理时为 true")
+    private Boolean actualValueEditable;
+
     @Schema(description = "指标评分列表")
     private List<HrmPerformanceAssessmentQuotaScoreRespVO> quotaScoreList;
 

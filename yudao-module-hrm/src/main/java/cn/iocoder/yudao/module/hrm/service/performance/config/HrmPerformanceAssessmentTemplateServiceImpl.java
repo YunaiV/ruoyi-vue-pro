@@ -9,6 +9,8 @@ import cn.iocoder.yudao.module.hrm.controller.admin.performance.vo.assessmenttem
 import cn.iocoder.yudao.module.hrm.controller.admin.performance.vo.assessmenttemplate.HrmPerformanceAssessmentTemplateSaveReqVO;
 import cn.iocoder.yudao.module.hrm.dal.dataobject.performance.config.HrmPerformanceAssessmentTemplateDO;
 import cn.iocoder.yudao.module.hrm.dal.mysql.performance.config.HrmPerformanceAssessmentTemplateMapper;
+import cn.iocoder.yudao.module.hrm.enums.performance.plan.HrmPerformanceQuotaScoreTypeEnum;
+import cn.iocoder.yudao.module.hrm.util.HrmPerformanceUtils;
 import jakarta.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Lazy;
@@ -23,6 +25,7 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.module.hrm.enums.ErrorCodeConstants.PERFORMANCE_ASSESSMENT_TEMPLATE_NAME_DUPLICATE;
 import static cn.iocoder.yudao.module.hrm.enums.ErrorCodeConstants.PERFORMANCE_ASSESSMENT_TEMPLATE_NOT_EXISTS;
 import static cn.iocoder.yudao.module.hrm.enums.ErrorCodeConstants.PERFORMANCE_DATA_ILLEGAL;
+import static cn.iocoder.yudao.module.hrm.enums.ErrorCodeConstants.PERFORMANCE_QUOTA_TARGET_VALUE_INVALID;
 
 /**
  * HRM 绩效考核模板 Service 实现类
@@ -158,18 +161,32 @@ public class HrmPerformanceAssessmentTemplateServiceImpl implements HrmPerforman
      * @param template 考核模板
      */
     private void normalizeAssessmentTemplate(HrmPerformanceAssessmentTemplateDO template) {
+        // 1. 规范化模板基本信息
         template.setName(template.getName().trim()).setIllustrate(StringUtils.trimToNull(template.getIllustrate()));
+
+        // 2. 规范化维度和指标，并统计指标数量
         int quotaCount = 0;
         for (HrmPerformanceAssessmentTemplateDO.Dimension dimension : template.getDimensions()) {
+            // 2.1 规范化维度
             dimension.setName(dimension.getName().trim()).setRemark(StringUtils.trimToNull(dimension.getRemark()))
                     .setAllowEdit(Boolean.TRUE.equals(dimension.getAllowEdit()));
             for (HrmPerformanceAssessmentTemplateDO.Quota quota : dimension.getQuotas()) {
+                // 2.2 规范化指标
                 quota.setName(quota.getName().trim())
                         .setIllustrate(StringUtils.trimToNull(quota.getIllustrate()))
-                        .setStandard(StringUtils.trimToNull(quota.getStandard()));
+                        .setStandard(StringUtils.trimToNull(quota.getStandard()))
+                        .setTargetValue(StringUtils.trimToNull(quota.getTargetValue()));
+                // 2.3 完成率指标的默认目标值可以留空（计划保存时按指标制定方式校验），填写时必须是大于 0 的数字
+                if (HrmPerformanceQuotaScoreTypeEnum.isCompletionRate(quota.getScoreType())
+                        && quota.getTargetValue() != null
+                        && HrmPerformanceUtils.parseTargetValue(quota.getTargetValue()) == null) {
+                    throw exception(PERFORMANCE_QUOTA_TARGET_VALUE_INVALID, quota.getName());
+                }
                 quotaCount++;
             }
         }
+
+        // 3. 回填维度、指标数量
         template.setDimensionCount(template.getDimensions().size()).setQuotaCount(quotaCount);
     }
 

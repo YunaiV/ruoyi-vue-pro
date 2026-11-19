@@ -33,12 +33,14 @@ import cn.iocoder.yudao.module.hrm.enums.performance.assessment.HrmPerformanceAs
 import cn.iocoder.yudao.module.hrm.enums.performance.plan.HrmPerformanceCycleTypeEnum;
 import cn.iocoder.yudao.module.hrm.enums.performance.plan.HrmPerformancePlanStatusEnum;
 import cn.iocoder.yudao.module.hrm.enums.performance.plan.HrmPerformancePlanOperationTypeEnum;
+import cn.iocoder.yudao.module.hrm.enums.performance.plan.HrmPerformanceQuotaScoreTypeEnum;
 import cn.iocoder.yudao.module.hrm.enums.performance.plan.HrmPerformanceRaterTypeEnum;
 import cn.iocoder.yudao.module.hrm.enums.performance.assessment.HrmPerformanceResultAuditStatusEnum;
 import cn.iocoder.yudao.module.hrm.enums.performance.plan.HrmPerformanceReviewScoringTypeEnum;
 import cn.iocoder.yudao.module.hrm.enums.performance.plan.HrmPerformanceReviewVisibleContentEnum;
 import cn.iocoder.yudao.module.hrm.enums.performance.plan.HrmPerformanceStageTypeEnum;
 import cn.iocoder.yudao.module.hrm.service.employee.info.HrmEmployeeService;
+import cn.iocoder.yudao.module.hrm.util.HrmPerformanceUtils;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.notify.NotifyMessageSendApi;
 import cn.iocoder.yudao.module.system.api.notify.dto.NotifySendSingleToUserReqDTO;
@@ -726,6 +728,63 @@ public class HrmPerformanceAssessmentProcessServiceImplTest extends BaseDbUnitTe
                 Arrays.asList(firstReviewStage.getId(), lastReviewStage.getId())).size());
         assertEquals(1, assessmentQuotaScoreMapper.selectListByAssessmentStageIds(
                 Collections.singleton(middleReviewStage.getId())).size());
+    }
+
+    @Test
+    public void testHandleResultAudit_rejectAllStagesWithCompletionRate_reopenSequentially() {
+        // mock 数据：全部评分阶段已完成，且包含完成率指标
+        HrmPerformancePlanDO plan = randomPlan();
+        mockPlan(plan);
+        HrmPerformanceAssessmentDO assessment = randomAssessment(
+                plan.getId(), HrmPerformanceStageTypeEnum.RESULT_AUDIT.getType());
+        assessment.setScore(new BigDecimal("88.00")).setResultLevel("B").setCoefficient(BigDecimal.ONE);
+        assessmentMapper.insert(assessment);
+        HrmPerformanceAssessmentStageDO firstReviewStage = randomStage(
+                assessment.getId(), HrmPerformanceStageTypeEnum.OTHER_SCORE.getType(),
+                "直属上级评分", HANDLER_USER_ID, 1,
+                HrmPerformanceAssessmentStageStatusEnum.PROCESSED.getStatus());
+        assessmentStageMapper.insert(firstReviewStage);
+        HrmPerformanceAssessmentStageDO lastReviewStage = randomStage(
+                assessment.getId(), HrmPerformanceStageTypeEnum.OTHER_SCORE.getType(),
+                "部门负责人评分", 2003L, 2,
+                HrmPerformanceAssessmentStageStatusEnum.PROCESSED.getStatus());
+        assessmentStageMapper.insert(lastReviewStage);
+        HrmPerformanceAssessmentStageDO auditStage = randomStage(
+                assessment.getId(), HrmPerformanceStageTypeEnum.RESULT_AUDIT.getType(),
+                "结果审核", 2002L, 3, HrmPerformanceAssessmentStageStatusEnum.PENDING.getStatus());
+        assessmentStageMapper.insert(auditStage);
+        HrmPerformanceAssessmentQuotaDO quota = HrmPerformanceAssessmentQuotaDO.builder()
+                .assessmentId(assessment.getId()).dimensionId(1L)
+                .preset(true).name("销售额完成率")
+                .scoreType(HrmPerformanceQuotaScoreTypeEnum.COMPLETION_RATE.getType())
+                .targetValue("100").actualValue("80").finalScore(new BigDecimal("80.00")).build();
+        assessmentQuotaMapper.insert(quota);
+        assessmentQuotaScoreMapper.insert(new HrmPerformanceAssessmentQuotaScoreDO()
+                .setAssessmentStageId(firstReviewStage.getId()).setAssessmentQuotaId(quota.getId())
+                .setScore(new BigDecimal("80.00")));
+        assessmentQuotaScoreMapper.insert(new HrmPerformanceAssessmentQuotaScoreDO()
+                .setAssessmentStageId(lastReviewStage.getId()).setAssessmentQuotaId(quota.getId())
+                .setScore(new BigDecimal("80.00")));
+        HrmPortalPerformanceHandleStageReqVO reqVO = buildHandleReqVO(assessment.getId(), auditStage.getId(),
+                HrmPerformanceConfirmationResultEnum.REJECT.getResult());
+        reqVO.setReviewStageIds(Arrays.asList(firstReviewStage.getId(), lastReviewStage.getId()));
+        mockHandlerEmployee(2002L);
+
+        // 调用
+        processService.handleResultAudit(2002L, reqVO);
+
+        // 断言：仅激活首个评分阶段，其余阶段排队，首个阶段可以修正实际值
+        HrmPerformanceAssessmentDO updated = assessmentMapper.selectById(assessment.getId());
+        assertEquals(firstReviewStage.getSort(), updated.getStageSort());
+        List<HrmPerformanceAssessmentStageDO> reviewStages = assessmentStageMapper.selectListByAssessmentIdAndTypes(
+                assessment.getId(), HrmPerformanceStageTypeEnum.REVIEW_TYPES);
+        HrmPerformanceAssessmentStageDO reopenedFirstStage = assessmentStageMapper.selectById(firstReviewStage.getId());
+        assertEquals(HrmPerformanceAssessmentStageStatusEnum.PENDING.getStatus(), reopenedFirstStage.getStatus());
+        assertEquals(HrmPerformanceAssessmentStageStatusEnum.NOT_PROCESSED.getStatus(),
+                assessmentStageMapper.selectById(lastReviewStage.getId()).getStatus());
+        assertTrue(HrmPerformanceUtils.isActualValueEditable(reopenedFirstStage, reviewStages));
+        assertEquals(0, assessmentQuotaScoreMapper.selectListByAssessmentStageIds(
+                Arrays.asList(firstReviewStage.getId(), lastReviewStage.getId())).size());
     }
 
     @Test

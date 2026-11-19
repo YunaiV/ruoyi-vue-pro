@@ -189,6 +189,12 @@ public class HrmPerformanceAssessmentTemplateDO extends BaseDO {
          * 枚举 {@link HrmPerformanceQuotaScoreTypeEnum}
          */
         private Integer scoreType;
+        /**
+         * 默认目标值
+         *
+         * 完成率指标必须是大于 0 的数字；员工填写阶段可以覆盖，系统制定时直接作为考核目标
+         */
+        private String targetValue;
     }
 
 }
