@@ -36,9 +36,10 @@ public class AiVideoException extends RuntimeException {
      * @return 失败原因
      */
     public static String buildSubmitErrorMessage(Exception e) {
-        if (!(e instanceof AiVideoException videoException)) {
+        if (!(e instanceof AiVideoException)) {
             return "提交服务商失败，请稍后重试";
         }
+        AiVideoException videoException = (AiVideoException) e;
         if (videoException.isSubmitOutcomeUnknown()) {
             return "提交结果未知：服务商可能已创建任务并计费，请勿重复提交，可稍后到服务商控制台核对";
         }

@@ -58,7 +58,7 @@ public class Ai1LlmChatToolTest extends BaseMockitoUnitTest {
 
         // mock chatModel 和 llmModelFactory 的方法
         ChatModel chatModel = mock(ChatModel.class);
-        when(chatModel.getDefaultOptions()).thenReturn(ToolCallingChatOptions.builder().build());
+        when(chatModel.getOptions()).thenReturn(ToolCallingChatOptions.builder().build());
         ToolCallingManager manager = ToolCallingManager.builder().build();
         when(chatModel.stream(any(Prompt.class))).thenAnswer(invocation -> {
             Prompt prompt = invocation.getArgument(0);
@@ -94,12 +94,12 @@ public class Ai1LlmChatToolTest extends BaseMockitoUnitTest {
 
     @Test
     public void testChat_whitespaceChunks() {
-        // mock chatModel 和 llmModelFactory 的方法：空格、换行分片也是有效增量，只跳过空串
+        // mock chatModel 和 llmModelFactory 的方法：思考过程为累计值，空格、换行也是有效增量，只跳过空串
         ChatModel chatModel = mock(ChatModel.class);
-        when(chatModel.getDefaultOptions()).thenReturn(ToolCallingChatOptions.builder().build());
+        when(chatModel.getOptions()).thenReturn(ToolCallingChatOptions.builder().build());
         when(chatModel.stream(any(Prompt.class))).thenReturn(Flux.just(
-                buildChunk("想", "你好"), buildChunk(" ", " "), buildChunk("\n", "\n"),
-                buildChunk("", "世界"), buildChunk(null, "")));
+                buildChunk("想", "你好"), buildChunk("想 ", " "), buildChunk("想 \n", "\n"),
+                buildChunk("想 \n", "世界"), buildChunk(null, "")));
         ChatClient chatClient = ChatClient.create(chatModel);
         when(llmModelFactory.buildChatClient(any(), any())).thenReturn(chatClient);
         // 准备参数

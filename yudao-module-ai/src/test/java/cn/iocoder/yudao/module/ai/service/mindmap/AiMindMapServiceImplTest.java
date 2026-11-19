@@ -11,7 +11,6 @@ import cn.iocoder.yudao.module.ai.controller.admin.mindmap.vo.AiMindMapGenerateR
 import cn.iocoder.yudao.module.ai.dal.dataobject.mindmap.AiMindMapDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiModelDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.mindmap.AiMindMapMapper;
-import cn.iocoder.yudao.module.ai.enums.AiChatRoleEnum;
 import cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.ai.enums.model.AiModelTypeEnum;
 import cn.iocoder.yudao.module.ai.enums.model.AiPlatformEnum;
@@ -195,7 +194,8 @@ public class AiMindMapServiceImplTest extends BaseMockitoUnitTest {
         List<Message> messages = promptCaptor.getValue().getInstructions();
         assertEquals(2, messages.size());
         assertInstanceOf(SystemMessage.class, messages.get(0));
-        assertEquals(AiChatRoleEnum.AI_MIND_MAP_ROLE.getSystemMessage(), messages.get(0).getText());
+        assertEquals(AiMindMapServiceImpl.SYSTEM_MESSAGE, messages.get(0).getText());
+        assertTrue(messages.get(0).getText().startsWith(" 你是一位非常优秀的思维导图助手"));
         assertInstanceOf(UserMessage.class, messages.get(1));
         assertEquals("Java 学习路线", messages.get(1).getText());
     }

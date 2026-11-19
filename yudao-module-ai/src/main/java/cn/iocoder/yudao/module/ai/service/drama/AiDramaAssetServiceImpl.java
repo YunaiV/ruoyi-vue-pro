@@ -53,6 +53,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.volcengine.ark.runtime.model.images.generation.ImagesResponse;
 import com.volcengine.ark.runtime.service.ArkService;
 import jakarta.annotation.Resource;
+import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.image.ImagePrompt;
@@ -847,7 +848,14 @@ public class AiDramaAssetServiceImpl implements AiDramaAssetService {
     /**
      * 绘画客户端：Seedream 使用火山方舟，其它使用 Spring AI 的 ImageModel
      */
-    public record ImageClient(AiModelDO model, ArkService arkService, ImageModel imageModel) {
+    @lombok.Value
+    @Accessors(fluent = true)
+    public static class ImageClient {
+
+        AiModelDO model;
+        ArkService arkService;
+        ImageModel imageModel;
+
     }
 
     /**
@@ -1289,8 +1297,8 @@ public class AiDramaAssetServiceImpl implements AiDramaAssetService {
         try {
             speechModel = modelService.getTextToSpeechModel(apiKey, model.getModel());
             // 音频格式：取模型的默认格式，例如通义 Qwen3-TTS 只支持 wav；其它（腾讯云）为 mp3
-            format = speechModel instanceof AbstractAiSpeechModel abstractModel
-                    ? abstractModel.getDefaultFormat() : AiSpeechUtils.FORMAT_MP3;
+            format = speechModel instanceof AbstractAiSpeechModel
+                    ? ((AbstractAiSpeechModel) speechModel).getDefaultFormat() : AiSpeechUtils.FORMAT_MP3;
             speechModel.validateOptions(reqVO.getText(), reqVO.getVoice(), format, reqVO.getSpeed());
         } catch (IllegalArgumentException e) {
             throw exception(DRAMA_SPEECH_FAIL, e.getMessage());

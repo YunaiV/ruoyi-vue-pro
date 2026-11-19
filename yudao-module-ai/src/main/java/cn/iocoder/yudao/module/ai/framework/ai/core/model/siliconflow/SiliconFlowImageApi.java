@@ -16,12 +16,17 @@
 
 package cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Value;
+import lombok.experimental.Accessors;
 import org.springframework.ai.model.ApiKey;
 import org.springframework.ai.model.NoopApiKey;
 import org.springframework.ai.model.SimpleApiKey;
-import org.springframework.ai.openai.api.OpenAiImageApi;
 import org.springframework.ai.retry.RetryUtils;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +36,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestClient;
 
-import java.util.Map;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * 硅基流动 Image API
@@ -58,7 +64,7 @@ public class SiliconFlowImageApi {
 
 	public SiliconFlowImageApi(String baseUrl, String apiKey, RestClient.Builder restClientBuilder,
                                ResponseErrorHandler responseErrorHandler) {
-		this(baseUrl, apiKey, CollectionUtils.toMultiValueMap(Map.of()), restClientBuilder, responseErrorHandler);
+		this(baseUrl, apiKey, CollectionUtils.toMultiValueMap(Collections.emptyMap()), restClientBuilder, responseErrorHandler);
 	}
 
 	public SiliconFlowImageApi(String baseUrl, String apiKey, MultiValueMap<String, String> headers,
@@ -83,7 +89,7 @@ public class SiliconFlowImageApi {
 		// @formatter:on
 	}
 
-	public ResponseEntity<OpenAiImageApi.OpenAiImageResponse> createImage(SiliconflowImageRequest siliconflowImageRequest) {
+	public ResponseEntity<SiliconFlowImageResponse> createImage(SiliconflowImageRequest siliconflowImageRequest) {
 		Assert.notNull(siliconflowImageRequest, "Image request cannot be null.");
 		Assert.hasLength(siliconflowImageRequest.prompt(), "Prompt cannot be empty.");
 
@@ -91,26 +97,60 @@ public class SiliconFlowImageApi {
 			.uri("v1/images/generations")
 			.body(siliconflowImageRequest)
 			.retrieve()
-			.toEntity(OpenAiImageApi.OpenAiImageResponse.class);
+			.toEntity(SiliconFlowImageResponse.class);
 	}
 
 
 	// @formatter:off
 	@JsonInclude(JsonInclude.Include.NON_NULL)
-	public record SiliconflowImageRequest (
-			@JsonProperty("prompt") String prompt,
-			@JsonProperty("model") String model,
-			@JsonProperty("image_size") String imageSize,
-			@JsonProperty("batch_size") Integer batchSize,
-			@JsonProperty("negative_prompt") String negativePrompt,
-			@JsonProperty("seed") Long seed,
-			@JsonProperty("num_inference_steps") Integer numInferenceSteps,
-			@JsonProperty("guidance_scale") Float guidanceScale,
-			@JsonProperty("image") String image) {
+	@Value
+	@Accessors(fluent = true)
+	@NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
+	@AllArgsConstructor
+	@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
+	public static class SiliconflowImageRequest {
+
+		@JsonProperty("prompt") String prompt;
+		@JsonProperty("model") String model;
+		@JsonProperty("image_size") String imageSize;
+		@JsonProperty("batch_size") Integer batchSize;
+		@JsonProperty("negative_prompt") String negativePrompt;
+		@JsonProperty("seed") Long seed;
+		@JsonProperty("num_inference_steps") Integer numInferenceSteps;
+		@JsonProperty("guidance_scale") Float guidanceScale;
+		@JsonProperty("image") String image;
 
 		public SiliconflowImageRequest(String prompt, String model) {
 			this(prompt, model, null, null, null, null, null, null, null);
 		}
+	}
+
+	/**
+	 * 图片生成的响应，与 OpenAI Images 接口的响应格式一致
+	 */
+	@Value
+	@Accessors(fluent = true)
+	@NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
+	@AllArgsConstructor
+	@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
+	public static class SiliconFlowImageResponse {
+
+		@JsonProperty("created") Long created;
+		@JsonProperty("data") List<Data> data;
+
+		@Value
+		@Accessors(fluent = true)
+		@NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
+		@AllArgsConstructor
+		@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
+		public static class Data {
+
+			@JsonProperty("url") String url;
+			@JsonProperty("b64_json") String b64Json;
+			@JsonProperty("revised_prompt") String revisedPrompt;
+
+		}
+
 	}
 
 }

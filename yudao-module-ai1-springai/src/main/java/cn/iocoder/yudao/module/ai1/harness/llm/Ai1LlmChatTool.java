@@ -15,8 +15,6 @@ import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
-import org.springframework.ai.support.ToolCallbacks;
-import org.springframework.ai.tool.ToolCallback;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -63,16 +61,7 @@ public class Ai1LlmChatTool {
         ChatClient.ChatClientRequestSpec spec = llmModelFactory.buildChatClient(model, sessionId).prompt()
                 .messages(buildMessages(systemPrompt, histories, content));
         if (CollUtil.isNotEmpty(tools)) {
-            // Spring AI 1.x 的 tools 只接受 @Tool 对象，MCP / SkillsTool 的回调需直接注册。
-            List<ToolCallback> callbacks = new ArrayList<>();
-            for (Object tool : tools) {
-                if (tool instanceof ToolCallback callback) {
-                    callbacks.add(callback);
-                } else {
-                    callbacks.addAll(List.of(ToolCallbacks.from(tool)));
-                }
-            }
-            spec = spec.toolCallbacks(callbacks);
+            spec = spec.tools(tools.toArray());
         }
         if (CollUtil.isNotEmpty(advisors)) {
             spec = spec.advisors(advisors);
@@ -81,16 +70,26 @@ public class Ai1LlmChatTool {
         // 2. 流式执行，逐段回调
         StringBuilder contentText = new StringBuilder();
         StringBuilder thinkingText = new StringBuilder();
+        String completionId = "";
+        String previousReasoning = "";
         for (ChatResponse chatResponse : spec.stream().chatResponse().toIterable()) {
             Generation generation = chatResponse.getResult();
             // 部分供应商在流末尾下发只含 usage、没有输出的分片，跳过避免 NPE
             if (generation == null || generation.getOutput() == null) {
                 continue;
             }
-            // 2.1 思考过程：Spring AI 1.x 的 reasoning_content 是增量分片，直接转发（重复文本也可能是有效增量）
+            // 2.1 思考过程：推理模型的 reasoning_content 在同一 completion 内累积下发，取变化增量转发，重复值去重；
+            // 工具调用后的下一轮是新的 completion，从头累积，需重置比较基线（无 id 时按同一 completion 处理）
+            String responseId = chatResponse.getMetadata().getId();
+            if (StrUtil.isNotEmpty(responseId) && !responseId.equals(completionId)) {
+                completionId = responseId;
+                previousReasoning = "";
+            }
             Object reasoningValue = generation.getOutput().getMetadata().get(METADATA_REASONING);
-            String delta = reasoningValue instanceof String value ? value : null;
+            String reasoning = reasoningValue instanceof String value ? value : null;
+            String delta = computeReasoningDelta(previousReasoning, reasoning);
             if (StrUtil.isNotEmpty(delta)) {
+                previousReasoning = reasoning;
                 thinkingText.append(delta);
                 if (onThinking != null) {
                     onThinking.accept(delta);
@@ -128,6 +127,16 @@ public class Ai1LlmChatTool {
         }
         messages.add(new UserMessage(content));
         return messages;
+    }
+
+    /**
+     * 推理内容增量计算：与上轮累积内容比较，取新增部分；无变化返回 null
+     */
+    private static String computeReasoningDelta(String previousReasoning, String reasoning) {
+        if (StrUtil.isEmpty(reasoning) || reasoning.equals(previousReasoning)) {
+            return null;
+        }
+        return reasoning.startsWith(previousReasoning) ? reasoning.substring(previousReasoning.length()) : reasoning;
     }
 
     /**

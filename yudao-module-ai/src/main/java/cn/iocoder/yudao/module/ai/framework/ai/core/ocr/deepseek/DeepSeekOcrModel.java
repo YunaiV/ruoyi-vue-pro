@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.ai.framework.ai.core.ocr.OcrResponse;
 import cn.iocoder.yudao.module.ai.framework.ai.core.ocr.OcrResult;
 import cn.iocoder.yudao.module.ai.framework.ai.core.ocr.OcrUtils;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.collect.ImmutableSet;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
 import org.springframework.util.LinkedMultiValueMap;
@@ -46,12 +47,12 @@ public class DeepSeekOcrModel implements OcrModel {
 
     public static final String PURPOSE_TEXT_RECOGNITION = "text_recognition";
     public static final String PURPOSE_RICH_LAYOUT_RECOGNITION = "rich_layout_recognition";
-    static final Set<String> PURPOSES = Set.of(PURPOSE_TEXT_RECOGNITION, PURPOSE_RICH_LAYOUT_RECOGNITION);
+    static final Set<String> PURPOSES = ImmutableSet.of(PURPOSE_TEXT_RECOGNITION, PURPOSE_RICH_LAYOUT_RECOGNITION);
 
     /**
      * 官方支持的图片类型（文件格式由实际内容判断，这里只做图片识别）
      */
-    static final Set<String> ALLOWED_MIME_TYPES = Set.of("image/jpeg", "image/png", "image/webp", "image/gif",
+    static final Set<String> ALLOWED_MIME_TYPES = ImmutableSet.of("image/jpeg", "image/png", "image/webp", "image/gif",
             "image/bmp", "image/tiff");
 
     /**

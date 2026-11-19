@@ -6,7 +6,6 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.openai.OpenAiChatModel;
 import reactor.core.publisher.Flux;
 
 /**
@@ -36,8 +35,8 @@ public class SiliconFlowChatModel implements ChatModel {
     }
 
     @Override
-    public ChatOptions getDefaultOptions() {
-        return openAiChatModel.getDefaultOptions();
+    public ChatOptions getOptions() {
+        return openAiChatModel.getOptions();
     }
 
 }

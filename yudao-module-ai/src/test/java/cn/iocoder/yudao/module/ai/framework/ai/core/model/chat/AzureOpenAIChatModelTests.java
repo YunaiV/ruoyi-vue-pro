@@ -1,38 +1,36 @@
 package cn.iocoder.yudao.module.ai.framework.ai.core.model.chat;
 
-import com.azure.ai.openai.OpenAIClientBuilder;
-import com.azure.core.credential.AzureKeyCredential;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.springframework.ai.azure.openai.AzureOpenAiChatModel;
-import org.springframework.ai.azure.openai.AzureOpenAiChatOptions;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.openai.OpenAiChatOptions;
 import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.springframework.ai.model.azure.openai.autoconfigure.AzureOpenAiChatProperties.DEFAULT_DEPLOYMENT_NAME;
-
 /**
- * {@link AzureOpenAiChatModel} 集成测试
+ * 微软 Azure OpenAI 集成测试：基于 {@link OpenAiChatModel} 的 Azure 模式
  *
  * @author 芋道源码
  */
 public class AzureOpenAIChatModelTests {
 
     // TODO @芋艿：晚点在调整
-    private final OpenAIClientBuilder openAiApi = new OpenAIClientBuilder()
-            .endpoint("https://eastusprejade.openai.azure.com")
-            .credential(new AzureKeyCredential("xxx"));
-    private final AzureOpenAiChatModel chatModel = AzureOpenAiChatModel.builder()
-            .openAIClientBuilder(openAiApi)
-            .defaultOptions(AzureOpenAiChatOptions.builder()
-                    .deploymentName(DEFAULT_DEPLOYMENT_NAME)
+    private static final String DEPLOYMENT_NAME = "gpt-4o";
+
+    private final OpenAiChatModel chatModel = OpenAiChatModel.builder()
+            .options(OpenAiChatOptions.builder()
+                    .baseUrl("https://eastusprejade.openai.azure.com")
+                    .apiKey("xxx")
+                    .azure(true)
+                    .deploymentName(DEPLOYMENT_NAME)
+                    .model(DEPLOYMENT_NAME)
                     .build())
             .build();
 

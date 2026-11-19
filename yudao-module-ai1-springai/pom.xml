@@ -66,9 +66,9 @@
             <artifactId>yudao-spring-boot-starter-test</artifactId>
         </dependency>
 
-        <!-- Spring AI：模型（chat / embedding，OpenAI 兼容协议） -->
+        <!-- Spring AI：模型（chat / embedding，OpenAI 兼容协议）；使用 yudao-dependencies 管理的 yudao-spring-ai（cn.iocoder.spring-ai） -->
         <dependency>
-            <groupId>org.springframework.ai</groupId>
+            <groupId>cn.iocoder.spring-ai</groupId>
             <artifactId>spring-ai-openai</artifactId>
             <exclusions>
                 <exclusion>
@@ -77,19 +77,24 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <!-- agent-utils 的 Spring AI 依赖为 provided，显式使用基础项目 BOM 管理的 1.x ChatClient -->
+        <!-- OpenAI 官方 SDK 的 HTTP 客户端：okhttp 5.x 由 okhttp-bom 管理，JVM 实现在 okhttp-jvm 构件中 -->
         <dependency>
-            <groupId>org.springframework.ai</groupId>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp-jvm</artifactId>
+        </dependency>
+        <!-- agent-utils 的 Spring AI 依赖为 provided，显式使用 yudao-spring-ai 的 ChatClient -->
+        <dependency>
+            <groupId>cn.iocoder.spring-ai</groupId>
             <artifactId>spring-ai-client-chat</artifactId>
         </dependency>
         <!-- Spring AI：RAG Advisor（QuestionAnswerAdvisor） -->
         <dependency>
-            <groupId>org.springframework.ai</groupId>
-            <artifactId>spring-ai-advisors-vector-store</artifactId>
+            <groupId>cn.iocoder.spring-ai</groupId>
+            <artifactId>spring-ai-vector-store-advisor</artifactId>
         </dependency>
         <!-- Spring AI：Milvus 向量存储（非 starter 构件） -->
         <dependency>
-            <groupId>org.springframework.ai</groupId>
+            <groupId>cn.iocoder.spring-ai</groupId>
             <artifactId>spring-ai-milvus-store</artifactId>
             <exclusions>
                 <!-- 解决和 logback 的日志冲突 -->

@@ -63,9 +63,10 @@ public final class OcrUtils {
                     "不支持的图片类型：" + mimeType + "，支持：" + String.join("、", allowedMimeTypes));
         }
         // 2. 只接受服务端读出的图片字节，不把 URL 透传给厂商
-        if (!(media.getData() instanceof byte[] bytes)) {
+        if (!(media.getData() instanceof byte[])) {
             throw new OcrException(platform, OcrException.Type.INVALID_IMAGE, "图片必须以字节形式提供");
         }
+        byte[] bytes = (byte[]) media.getData();
         if (bytes.length == 0) {
             throw new OcrException(platform, OcrException.Type.INVALID_IMAGE, "图片内容为空");
         }
@@ -110,16 +111,16 @@ public final class OcrUtils {
      * 按行拼接识别结果：去掉 null，每行统一换行并去首尾空白
      */
     public static String joinLines(List<String> lines) {
-        return CollUtil.emptyIfNull(lines).stream().filter(Objects::nonNull)
+        return StrUtil.trim(CollUtil.emptyIfNull(lines).stream().filter(Objects::nonNull)
                 .map(OcrUtils::normalizeText)
-                .collect(Collectors.joining("\n")).strip();
+                .collect(Collectors.joining("\n")), 0, Character::isWhitespace);
     }
 
     /**
      * 统一换行符（\r\n、\r 转为 \n）并去掉首尾空白；null 视为空字符串
      */
     public static String normalizeText(String text) {
-        return StrUtil.nullToEmpty(text).replace("\r\n", "\n").replace('\r', '\n').strip();
+        return StrUtil.trim(StrUtil.nullToEmpty(text).replace("\r\n", "\n").replace('\r', '\n'), 0, Character::isWhitespace);
     }
 
     // ========== 错误 ==========
@@ -140,7 +141,7 @@ public final class OcrUtils {
                 result = result.replace(secret, REDACTED);
             }
         }
-        return StrUtil.maxLength(result.replaceAll("\\s+", " ").strip(), MAX_MESSAGE_LENGTH);
+        return StrUtil.maxLength(StrUtil.trim(result.replaceAll("\\s+", " "), 0, Character::isWhitespace), MAX_MESSAGE_LENGTH);
     }
 
     /**
@@ -165,12 +166,18 @@ public final class OcrUtils {
         if (status == null) {
             return OcrException.Type.UPSTREAM_ERROR;
         }
-        return switch (status) {
-            case UNAUTHORIZED, FORBIDDEN -> OcrException.Type.AUTH_FAILED;
-            case TOO_MANY_REQUESTS -> OcrException.Type.RATE_LIMITED;
-            case REQUEST_TIMEOUT, GATEWAY_TIMEOUT -> OcrException.Type.TIMEOUT;
-            default -> OcrException.Type.UPSTREAM_ERROR;
-        };
+        switch (status) {
+            case UNAUTHORIZED:
+            case FORBIDDEN:
+                return OcrException.Type.AUTH_FAILED;
+            case TOO_MANY_REQUESTS:
+                return OcrException.Type.RATE_LIMITED;
+            case REQUEST_TIMEOUT:
+            case GATEWAY_TIMEOUT:
+                return OcrException.Type.TIMEOUT;
+            default:
+                return OcrException.Type.UPSTREAM_ERROR;
+        }
     }
 
     // ========== HTTP（RestClient） ==========
@@ -208,10 +215,11 @@ public final class OcrUtils {
         if (ex instanceof ResourceAccessException) {
             return convertNetworkException(platform, ex);
         }
-        if (!(ex instanceof RestClientResponseException responseEx)) {
+        if (!(ex instanceof RestClientResponseException)) {
             return new OcrException(platform, OcrException.Type.UPSTREAM_ERROR,
                     "调用失败（" + ex.getClass().getSimpleName() + "）");
         }
+        RestClientResponseException responseEx = (RestClientResponseException) ex;
         // 兼容 {"error":{"code","message"}}、{"code","message"}、百度的 {"error_code","error_msg"} / {"error","error_description"}
         int status = responseEx.getStatusCode().value();
         JsonNode body = JsonUtils.parseObjectQuietly(responseEx.getResponseBodyAsString(), JsonNode.class);

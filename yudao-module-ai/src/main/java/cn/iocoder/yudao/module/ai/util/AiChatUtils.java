@@ -7,9 +7,9 @@ import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.module.ai.enums.model.AiPlatformEnum;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.openai.OpenAiDelegateChatModel;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 import org.springframework.ai.anthropic.AnthropicChatOptions;
-import org.springframework.ai.azure.openai.AzureOpenAiChatOptions;
 import org.springframework.ai.chat.messages.*;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.ChatOptions;
@@ -145,8 +145,8 @@ public class AiChatUtils {
                     }
                 }
                 return openAiBuilder.build();
-            case AZURE:
-                return AzureOpenAiChatOptions.builder().deploymentName(model).temperature(temperature).maxTokens(maxTokens)
+            case AZURE: // 复用 OpenAI 客户端（Azure 模式），model 为部署名
+                return OpenAiChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)
                         .toolCallbacks(toolCallbacks).toolContext(toolContext).build();
             case ANTHROPIC:
                 return AnthropicChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)
@@ -204,8 +204,12 @@ public class AiChatUtils {
         if (output instanceof DeepSeekAssistantMessage) {
             return ((DeepSeekAssistantMessage) output).getReasoningContent();
         }
+        // OpenAI 兼容平台：取 OpenAiDelegateChatModel 计算的本次增量
+        if (output.getMetadata().containsKey(OpenAiDelegateChatModel.REASONING_CONTENT_DELTA)) {
+            return MapUtil.getStr(output.getMetadata(), OpenAiDelegateChatModel.REASONING_CONTENT_DELTA);
+        }
         // 通义千问等通过 metadata 透传 reasoningContent
-        return MapUtil.getStr(output.getMetadata(), "reasoningContent");
+        return MapUtil.getStr(output.getMetadata(), OpenAiDelegateChatModel.REASONING_CONTENT);
     }
 
 }

@@ -51,13 +51,13 @@ import com.google.common.collect.Maps;
 import io.modelcontextprotocol.client.McpSyncClient;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.MessageType;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
-import org.springframework.ai.chat.model.StreamingChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.content.Media;
@@ -203,7 +203,8 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
         // 4.2 调用模型
         ChatResponse chatResponse;
         try {
-            chatResponse = chatModel.call(prompt);
+            // 经 ChatClient 调用：Spring AI 2.x 的 ChatModel 不再自行执行工具调用，由 ChatClient 执行
+            chatResponse = ChatClient.create(chatModel).prompt(prompt).call().chatResponse();
         } catch (RuntimeException ex) {
             finishChatCall(requestLog, AiRequestLogStatusEnum.FAIL, ex);
             throw ex;
@@ -255,7 +256,7 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
             return Flux.just(error(ex.getCode(), ex.getMessage()));
         }
         // 1.4 获得模型客户端
-        StreamingChatModel chatModel = modalService.getChatModel(model.getId(), reasoningOptions);
+        ChatModel chatModel = modalService.getChatModel(model.getId(), reasoningOptions);
         // 1.5 选出上下文消息
         List<AiChatMessageDO> contextMessages = filterContextMessages(historyMessages, conversation, sendReqVO);
 
@@ -292,7 +293,8 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
         // 4.2 调用模型
         Flux<ChatResponse> streamResponse;
         try {
-            streamResponse = chatModel.stream(prompt);
+            // 经 ChatClient 调用：Spring AI 2.x 的 ChatModel 不再自行执行工具调用，由 ChatClient 执行
+            streamResponse = ChatClient.create(chatModel).prompt(prompt).stream().chatResponse();
         } catch (RuntimeException ex) {
             finishChatStream(requestLog, finished, assistantMessage.getId(), "", "",
                     AiRequestLogStatusEnum.FAIL, ex);
@@ -505,7 +507,7 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
 
         // 2.1 tool 工具：已在调用方解析
         Map<String,Object> toolContext = CollUtil.isNotEmpty(toolCallbacks) ? AiChatUtils.buildCommonToolContext()
-                : Map.of();
+                : Collections.emptyMap();
         // 2.2 构建 ChatOptions 对象：思考参数与客户端是同一份；未配置思考时为 null，与原有行为一致
         AiPlatformEnum platform = AiPlatformEnum.validatePlatform(model.getPlatform());
         boolean hasMedia = CollUtil.anyMatch(chatMessages, message -> message instanceof UserMessage

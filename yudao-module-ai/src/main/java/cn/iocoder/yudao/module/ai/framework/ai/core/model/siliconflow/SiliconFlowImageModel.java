@@ -27,7 +27,6 @@ import org.springframework.ai.image.observation.ImageModelObservationConvention;
 import org.springframework.ai.image.observation.ImageModelObservationDocumentation;
 import org.springframework.ai.model.ModelOptionsUtils;
 import org.springframework.ai.openai.OpenAiImageModel;
-import org.springframework.ai.openai.api.OpenAiImageApi;
 import org.springframework.ai.openai.metadata.OpenAiImageGenerationMetadata;
 import org.springframework.ai.retry.RetryUtils;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +34,9 @@ import org.springframework.lang.Nullable;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.util.Assert;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 硅基流动 {@link ImageModel} 实现类
@@ -71,7 +72,7 @@ public class SiliconFlowImageModel implements ImageModel {
 
 	public SiliconFlowImageModel(SiliconFlowImageApi siliconFlowImageApi, SiliconFlowImageOptions options, RetryTemplate retryTemplate,
                                  ObservationRegistry observationRegistry) {
-		Assert.notNull(siliconFlowImageApi, "OpenAiImageApi must not be null");
+		Assert.notNull(siliconFlowImageApi, "SiliconFlowImageApi must not be null");
 		Assert.notNull(options, "options must not be null");
 		Assert.notNull(retryTemplate, "retryTemplate must not be null");
 		Assert.notNull(observationRegistry, "observationRegistry must not be null");
@@ -86,7 +87,7 @@ public class SiliconFlowImageModel implements ImageModel {
         SiliconFlowImageOptions requestImageOptions = mergeOptions(imagePrompt.getOptions(), this.defaultOptions);
         SiliconFlowImageApi.SiliconflowImageRequest imageRequest = createRequest(imagePrompt, requestImageOptions);
 
-		var observationContext = ImageModelObservationContext.builder()
+		ImageModelObservationContext observationContext = ImageModelObservationContext.builder()
 			.imagePrompt(imagePrompt)
 			.provider(SiliconFlowApiConstants.PROVIDER_NAME)
             .imagePrompt(imagePrompt)
@@ -96,7 +97,7 @@ public class SiliconFlowImageModel implements ImageModel {
 			.observation(this.observationConvention, DEFAULT_OBSERVATION_CONVENTION, () -> observationContext,
 					this.observationRegistry)
 			.observe(() -> {
-				ResponseEntity<OpenAiImageApi.OpenAiImageResponse> imageResponseEntity = this.retryTemplate
+				ResponseEntity<SiliconFlowImageApi.SiliconFlowImageResponse> imageResponseEntity = this.retryTemplate
 					.execute(ctx -> this.siliconFlowImageApi.createImage(imageRequest));
 
 				ImageResponse imageResponse = convertResponse(imageResponseEntity, imageRequest);
@@ -111,37 +112,41 @@ public class SiliconFlowImageModel implements ImageModel {
                                                                       SiliconFlowImageOptions requestImageOptions) {
 		String instructions = imagePrompt.getInstructions().get(0).getText();
 
-		SiliconFlowImageApi.SiliconflowImageRequest imageRequest = new SiliconFlowImageApi.SiliconflowImageRequest(instructions,
-                SiliconFlowApiConstants.DEFAULT_IMAGE_MODEL);
-
-		return ModelOptionsUtils.merge(requestImageOptions, imageRequest, SiliconFlowImageApi.SiliconflowImageRequest.class);
+		// 未设置的选项保持 null，不发送；模型未设置时，使用默认模型
+		return new SiliconFlowImageApi.SiliconflowImageRequest(instructions,
+				ModelOptionsUtils.mergeOption(requestImageOptions.getModel(), SiliconFlowApiConstants.DEFAULT_IMAGE_MODEL),
+				requestImageOptions.getImageSize(), requestImageOptions.getBatchSize(), requestImageOptions.getNegativePrompt(),
+				requestImageOptions.getSeed(), requestImageOptions.getNumInferenceSteps(), requestImageOptions.getGuidanceScale(),
+				requestImageOptions.getImage());
 	}
 
-	private ImageResponse convertResponse(ResponseEntity<OpenAiImageApi.OpenAiImageResponse> imageResponseEntity,
+	private ImageResponse convertResponse(ResponseEntity<SiliconFlowImageApi.SiliconFlowImageResponse> imageResponseEntity,
 										  SiliconFlowImageApi.SiliconflowImageRequest siliconflowImageRequest) {
-		OpenAiImageApi.OpenAiImageResponse imageApiResponse = imageResponseEntity.getBody();
+		SiliconFlowImageApi.SiliconFlowImageResponse imageApiResponse = imageResponseEntity.getBody();
 		if (imageApiResponse == null) {
 			logger.warn("No image response returned for request: {}", siliconflowImageRequest);
-			return new ImageResponse(List.of());
+			return new ImageResponse(Collections.emptyList());
 		}
 
-		List<ImageGeneration> imageGenerationList = imageApiResponse.data()
+		List<ImageGeneration> imageGenerationList = Collections.unmodifiableList(imageApiResponse.data()
 			.stream()
 			.map(entry -> new ImageGeneration(new Image(entry.url(), entry.b64Json()),
 					new OpenAiImageGenerationMetadata(entry.revisedPrompt())))
-			.toList();
+			.collect(Collectors.toList()));
 
 		ImageResponseMetadata openAiImageResponseMetadata = new ImageResponseMetadata(imageApiResponse.created());
 		return new ImageResponse(imageGenerationList, openAiImageResponseMetadata);
 	}
 
     private SiliconFlowImageOptions mergeOptions(@Nullable ImageOptions runtimeOptions, SiliconFlowImageOptions defaultOptions) {
-        var runtimeOptionsForProvider = ModelOptionsUtils.copyToTarget(runtimeOptions, ImageOptions.class,
-                SiliconFlowImageOptions.class);
-
-        if (runtimeOptionsForProvider == null) {
+        if (runtimeOptions == null) {
             return defaultOptions;
         }
+        // 非硅基流动的选项，只取通用的 ImageOptions 字段
+        SiliconFlowImageOptions runtimeOptionsForProvider = runtimeOptions instanceof SiliconFlowImageOptions
+                ? (SiliconFlowImageOptions) runtimeOptions
+                : SiliconFlowImageOptions.builder().model(runtimeOptions.getModel()).batchSize(runtimeOptions.getN())
+                        .width(runtimeOptions.getWidth()).height(runtimeOptions.getHeight()).build();
 
         return SiliconFlowImageOptions.builder()
                 // Handle portable image options

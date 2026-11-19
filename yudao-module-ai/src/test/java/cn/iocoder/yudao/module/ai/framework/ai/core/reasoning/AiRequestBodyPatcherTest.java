@@ -8,6 +8,7 @@ import com.sun.net.httpserver.HttpServer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
@@ -319,7 +320,8 @@ public class AiRequestBodyPatcherTest {
         DeepSeekChatModel model = buildModel(new AiRequestBodyPatcher(PATCH_JSON));
 
         // 调用
-        ChatResponse response = model.call(new Prompt(new UserMessage("调用工具"), toolOptions(invoked)));
+        ChatResponse response = ChatClient.create(model)
+                .prompt(new Prompt(new UserMessage("调用工具"), toolOptions(invoked))).call().chatResponse();
         // 断言
         assertEquals("done", response.getResult().getOutput().getText());
         assertEquals(List.of("hi"), invoked);
@@ -336,7 +338,8 @@ public class AiRequestBodyPatcherTest {
         DeepSeekChatModel model = buildModel(new AiRequestBodyPatcher(PATCH_JSON));
 
         // 调用
-        List<ChatResponse> chunks = model.stream(new Prompt(new UserMessage("调用工具"), toolOptions(invoked)))
+        List<ChatResponse> chunks = ChatClient.create(model)
+                .prompt(new Prompt(new UserMessage("调用工具"), toolOptions(invoked))).stream().chatResponse()
                 .collectList().block(Duration.ofSeconds(30));
         // 断言
         assertNotNull(chunks);
@@ -387,7 +390,7 @@ public class AiRequestBodyPatcherTest {
                 .baseUrl(baseUrl).apiKey("test-key"), patcher).build();
         return DeepSeekChatModel.builder()
                 .deepSeekApi(api)
-                .defaultOptions(DeepSeekChatOptions.builder().model("deepseek-chat").temperature(0.7).build())
+                .options(DeepSeekChatOptions.builder().model("deepseek-chat").temperature(0.7).build())
                 .toolCallingManager(DefaultToolCallingManager.builder().build())
                 .retryTemplate(RetryTemplate.builder().maxAttempts(1).build())
                 .build();

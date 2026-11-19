@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.ai.framework.ai.core.model;
 
+import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
 import cn.iocoder.yudao.module.ai.enums.image.AiImageInputRoleEnum;
 import cn.iocoder.yudao.module.ai.enums.model.AiPlatformEnum;
@@ -32,10 +33,12 @@ import com.volcengine.ark.runtime.service.ArkService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import org.springframework.ai.audio.transcription.TranscriptionModel;
 import org.springframework.ai.audio.tts.TextToSpeechOptions;
 import org.springframework.ai.audio.tts.TextToSpeechPrompt;
 import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.deepseek.DeepSeekChatModel;
@@ -44,6 +47,7 @@ import org.springframework.ai.deepseek.api.DeepSeekApi;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.image.ImagePrompt;
 import org.springframework.ai.model.tool.DefaultToolCallingManager;
+import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.ai.stabilityai.api.StabilityAiApi;
 import org.springframework.ai.stabilityai.api.StabilityAiImageOptions;
 import org.springframework.retry.support.RetryTemplate;
@@ -57,12 +61,13 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mockStatic;
 
 /**
  * {@link AiModelFactoryImpl} 的单元测试类：按平台创建、按配置缓存
  *
  * 语音识别、文字识别、语音合成只创建对象，不发起请求；
- * 绘图、DeepSeek 对话使用本机 {@link HttpServer} 模拟 Stability AI、火山方舟、DeepSeek 接口，不会请求真实的服务
+ * 绘图、DeepSeek 和 OpenAI 对话使用本机 {@link HttpServer} 模拟 Stability AI、火山方舟、DeepSeek、OpenAI 接口，不会请求真实的服务
  *
  * @author 芋道源码
  */
@@ -109,7 +114,7 @@ public class AiModelFactoryImplTest {
                 requestBodies.add(new String(in.readAllBytes(), StandardCharsets.UTF_8));
             }
             acceptEncodings.add(String.valueOf(exchange.getRequestHeaders().getFirst("Accept-Encoding")));
-            // 按路径返回：DeepSeek 对话、火山方舟出图，其它为 Stability AI 出图
+            // 按路径返回：DeepSeek、OpenAI 对话，火山方舟出图，其它为 Stability AI 出图
             String response = path.endsWith("/chat/completions") ? DEEPSEEK_RESPONSE
                     : path.endsWith("/images/generations") ? ARK_RESPONSE : STABILITY_RESPONSE;
             byte[] body = response.getBytes(StandardCharsets.UTF_8);
@@ -345,10 +350,32 @@ public class AiModelFactoryImplTest {
         assertEquals("enabled", MAPPER.readTree(requestBodies.get(0)).at("/thinking/type").asText());
     }
 
+    // ========== OpenAI 对话 ==========
+    // OpenAI 官方 SDK 的请求路径为 baseUrl + /chat/completions：已配置的 url 不含 /v1 时补上，含 /v1 时不重复补
+
+    @Test
+    public void testOpenAiCall_baseUrl() {
+        try (MockedStatic<SpringUtil> springUtil = mockStatic(SpringUtil.class)) {
+            springUtil.when(() -> SpringUtil.getBean(ToolCallingManager.class))
+                    .thenReturn(DefaultToolCallingManager.builder().build());
+            for (String url : new String[]{baseUrl, baseUrl + "/", baseUrl + "/v1", baseUrl + "/v1/"}) {
+                // 准备参数
+                requestPaths.clear();
+                ChatModel model = modelFactory.getOrCreateChatModel(AiPlatformEnum.OPENAI, "test-openai-key", url, null);
+
+                // 调用
+                ChatResponse response = model.call(new Prompt(new UserMessage("你好")));
+                // 断言
+                assertEquals("ok", response.getResult().getOutput().getText(), url);
+                assertEquals(List.of("/v1/chat/completions"), requestPaths, url);
+            }
+        }
+    }
+
     private static DeepSeekChatModel buildDeepSeekModel(DeepSeekApi api) {
         return DeepSeekChatModel.builder()
                 .deepSeekApi(api)
-                .defaultOptions(DeepSeekChatOptions.builder().model("deepseek-chat").temperature(0.7).build())
+                .options(DeepSeekChatOptions.builder().model("deepseek-chat").temperature(0.7).build())
                 .toolCallingManager(DefaultToolCallingManager.builder().build())
                 .retryTemplate(RetryTemplate.builder().maxAttempts(1).build())
                 .build();

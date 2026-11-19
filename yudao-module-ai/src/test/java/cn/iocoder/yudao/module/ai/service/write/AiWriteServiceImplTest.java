@@ -13,7 +13,6 @@ import cn.iocoder.yudao.module.ai.dal.dataobject.requestlog.AiRequestLogDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.write.AiWriteDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.requestlog.AiRequestLogMapper;
 import cn.iocoder.yudao.module.ai.dal.mysql.write.AiWriteMapper;
-import cn.iocoder.yudao.module.ai.enums.AiChatRoleEnum;
 import cn.iocoder.yudao.module.ai.enums.DictTypeConstants;
 import cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.ai.enums.model.AiModelTypeEnum;
@@ -143,7 +142,8 @@ public class AiWriteServiceImplTest extends BaseDbUnitTest {
         assertRequestLog(write, AiRequestLogStatusEnum.SUCCESS, null);
         // 断言：系统提示词沿用“写作助手”的内置文本
         List<Message> messages = captureMessages();
-        assertEquals(AiChatRoleEnum.AI_WRITE_ROLE.getSystemMessage(), messages.get(0).getText());
+        assertEquals(AiWriteTypeEnum.WRITING.getSystemMessage(), messages.get(0).getText());
+        assertTrue(messages.get(0).getText().startsWith("你是一位出色的写作助手"));
         assertEquals("请撰写一篇关于 [田忌赛马] 的文章。文章的内容格式：自动，语气：自动，语言：自动，长度：自动。"
                 + "请确保涵盖主要内容，不需要除了正文内容外的其他回复，如标题、额外的解释或道歉。", messages.get(1).getText());
         verify(modalService, never()).getRequiredDefaultModel(any());

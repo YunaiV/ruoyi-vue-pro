@@ -19,6 +19,7 @@ import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
@@ -76,7 +77,7 @@ public class AiDeepSeekWebSearchClient implements AiWebSearchClient {
         // 转换结果：官方不返回总匹配数，使用本次返回条数
         AiWebSearchResponse result = new AiWebSearchResponse();
         if (CollUtil.isEmpty(response.getResults())) {
-            return result.setTotal(0L).setLists(List.of());
+            return result.setTotal(0L).setLists(Collections.emptyList());
         }
         return result.setTotal((long) response.getResults().size())
                 .setLists(convertList(response.getResults(), page -> new AiWebSearchResponse.WebPage()

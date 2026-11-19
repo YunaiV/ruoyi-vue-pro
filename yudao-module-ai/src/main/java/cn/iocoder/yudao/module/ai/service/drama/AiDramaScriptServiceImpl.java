@@ -62,6 +62,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.io.BufferedReader;
+import java.io.StringReader;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -92,139 +94,123 @@ import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.*;
 @Slf4j
 public class AiDramaScriptServiceImpl implements AiDramaScriptService {
 
-    private static final String SCRIPT_JSON_FORMAT = """
-            只输出一个 JSON 对象，不要输出其它内容，格式：
-            {"title":"剧名","tone":"叙事基调，例如悬疑、温情","outline":"剧情大纲，300 字以内","content":"剧本正文：按场次书写，每场写明场景、人物动作与台词"}""";
+    private static final String SCRIPT_JSON_FORMAT = "只输出一个 JSON 对象，不要输出其它内容，格式：\n"
+            + "{\"title\":\"剧名\",\"tone\":\"叙事基调，例如悬疑、温情\",\"outline\":\"剧情大纲，300 字以内\",\"content\":\"剧本正文：按场次书写，每场写明场景、人物动作与台词\"}";
 
-    private static final String GENERATE_SCRIPT_PROMPT = """
-            你是一名短剧编剧。请根据下面的故事想法，创作一部 1 到 3 分钟的短剧剧本。
-            画风：{}
-            故事想法：
-            {}
+    private static final String GENERATE_SCRIPT_PROMPT = "你是一名短剧编剧。请根据下面的故事想法，创作一部 1 到 3 分钟的短剧剧本。\n"
+            + "画风：{}\n"
+            + "故事想法：\n"
+            + "{}\n"
+            + "\n" + SCRIPT_JSON_FORMAT;
 
-            """ + SCRIPT_JSON_FORMAT;
+    private static final String POLISH_SCRIPT_PROMPT = "你是一名短剧编剧。请按修改意见打磨下面的剧本，人物与主线保持不变。\n"
+            + "修改意见：{}\n"
+            + "剧名：{}\n"
+            + "叙事基调：{}\n"
+            + "剧情大纲：{}\n"
+            + "剧本正文：\n"
+            + "{}\n"
+            + "\n" + SCRIPT_JSON_FORMAT;
 
-    private static final String POLISH_SCRIPT_PROMPT = """
-            你是一名短剧编剧。请按修改意见打磨下面的剧本，人物与主线保持不变。
-            修改意见：{}
-            剧名：{}
-            叙事基调：{}
-            剧情大纲：{}
-            剧本正文：
-            {}
+    private static final String ANALYZE_ASSETS_PROMPT = "请从下面的短剧剧本中，提取需要保持形象统一的角色、场景与关键道具，用于后续出图。画风：{}\n"
+            + "剧本：\n"
+            + "{}\n"
+            + "\n"
+            + "只输出一个 JSON 对象，不要输出其它内容，格式：\n"
+            + "{\"characters\":[{\"name\":\"角色名\",\"aliases\":[\"别名、称呼\"],\"roleLevel\":\"角色层级：S 绝对主角、A 核心配角、B 重要配角、C 次要角色、D 群众演员\","
+            + "\"ageRange\":\"年龄段\",\"personalityTags\":[\"性格标签\"],\"description\":\"年龄、外貌、服装等设定\",\"prompt\":\"用于出图的人物画面描述\","
+            + "\"voiceDescription\":\"声音描述\"}],"
+            + "\"locations\":[{\"name\":\"场景名\",\"description\":\"用于出图的场景画面描述\",\"crowd\":是否有群众演员,\"crowdDescription\":\"群众演员描述\","
+            + "\"availableSlots\":[\"可用站位，例如 左侧窗边\"]}],"
+            + "\"props\":[{\"title\":\"道具名\",\"prompt\":\"用于出图的道具画面描述\",\"shotNumbers\":[出现的场次数字]}]}";
 
-            """ + SCRIPT_JSON_FORMAT;
-
-    private static final String ANALYZE_ASSETS_PROMPT = """
-            请从下面的短剧剧本中，提取需要保持形象统一的角色、场景与关键道具，用于后续出图。画风：{}
-            剧本：
-            {}
-
-            只输出一个 JSON 对象，不要输出其它内容，格式：
-            {"characters":[{"name":"角色名","aliases":["别名、称呼"],"roleLevel":"角色层级：S 绝对主角、A 核心配角、B 重要配角、C 次要角色、D 群众演员",\
-            "ageRange":"年龄段","personalityTags":["性格标签"],"description":"年龄、外貌、服装等设定","prompt":"用于出图的人物画面描述",\
-            "voiceDescription":"声音描述"}],\
-            "locations":[{"name":"场景名","description":"用于出图的场景画面描述","crowd":是否有群众演员,"crowdDescription":"群众演员描述",\
-            "availableSlots":["可用站位，例如 左侧窗边"]}],\
-            "props":[{"title":"道具名","prompt":"用于出图的道具画面描述","shotNumbers":[出现的场次数字]}]}""";
-
-    private static final String GENERATE_STORYBOARDS_PROMPT = """
-            你是一名短剧分镜师。请把下面的剧本拆分为镜头分镜，每个镜头 3 到 10 秒，总时长 1 到 3 分钟。
-            画风：{}
-            可用角色：{}
-            可用场景：{}
-            可用道具：{}
-            剧本：
-            {}
-
-            """ + "{}";
+    private static final String GENERATE_STORYBOARDS_PROMPT = "你是一名短剧分镜师。请把下面的剧本拆分为镜头分镜，每个镜头 3 到 10 秒，总时长 1 到 3 分钟。\n"
+            + "画风：{}\n"
+            + "可用角色：{}\n"
+            + "可用场景：{}\n"
+            + "可用道具：{}\n"
+            + "剧本：\n"
+            + "{}\n"
+            + "\n" + "{}";
 
     /**
      * 逐场拆分分镜：只拆当前一场，带本场角色、时长预算与上一场结尾；输出格式与整部剧本拆分一致
      */
-    private static final String GENERATE_SCENE_STORYBOARDS_PROMPT = """
-            你是一名短剧分镜师。剧本共 {} 场，本次只拆第 {} 场为镜头分镜，每个镜头 3 到 10 秒；不要拆其它场次，也不要重复上一场的内容。
-            本场时长预算：约 {} 秒，按原文实际的对白与动作估算，不为凑时长新增对白或情节。
-            画风：{}
-            本场角色：{}
-            可用场景：{}
-            可用道具：{}
-            剧情大纲（只作因果上下文）：{}
-            上一场结尾（只作承接参考，不重复生成）：
-            {}
-            本场原文：
-            {}
-
-            本场出镜与发声的角色，只以本场原文及上一场结尾的明确承接为据，不添加本场没有安排的角色。sceneNumber 固定为 {}。
-            """ + "{}";
+    private static final String GENERATE_SCENE_STORYBOARDS_PROMPT = "你是一名短剧分镜师。剧本共 {} 场，本次只拆第 {} 场为镜头分镜，每个镜头 3 到 10 秒；不要拆其它场次，也不要重复上一场的内容。\n"
+            + "本场时长预算：约 {} 秒，按原文实际的对白与动作估算，不为凑时长新增对白或情节。\n"
+            + "画风：{}\n"
+            + "本场角色：{}\n"
+            + "可用场景：{}\n"
+            + "可用道具：{}\n"
+            + "剧情大纲（只作因果上下文）：{}\n"
+            + "上一场结尾（只作承接参考，不重复生成）：\n"
+            + "{}\n"
+            + "本场原文：\n"
+            + "{}\n"
+            + "\n"
+            + "本场出镜与发声的角色，只以本场原文及上一场结尾的明确承接为据，不添加本场没有安排的角色。sceneNumber 固定为 {}。\n" + "{}";
 
     /**
      * 拆分分镜的连续性要求与输出格式：整部剧本拆分、逐场拆分共用
      */
-    private static final String STORYBOARDS_JSON_FORMAT = """
-            连续性要求：同一场景且同一连续时刻内，下一镜的 startState 承接上一镜的 endState；narrativeCause 承接上一镜的 \
-            storyResult；场景切换必须有剧情原因，startState 写明“新场景建立”。imagePrompt 只描述 startState 的静态首帧，\
-            不提前画出结束动作。
-            只输出一个 JSON 数组，不要输出其它内容，每个元素的格式：
-            {"sceneNo":镜头序号，从 1 连续递增不重复,"sceneNumber":原文场次数字，同一场内不因地点、时间变化递增,\
-            "sourceSceneContext":"所属原文场的背景摘要","segmentNumber":场内片段序号,"segmentGoal":"当前片段唯一的剧情任务",\
-            "segmentResult":"片段结束时的剧情变化","bridgeIn":"如何承接上一片段，首片段写开场建立",\
-            "bridgeOut":"留给下一片段承接的动作、情绪、视线或声音",\
-            "beatType":"setup、trigger、reaction、decision、action、result、transition 之一",\
-            "narrativeCause":"本镜发生的直接原因","characterGoal":"焦点角色此刻的具体目标",\
-            "storyAction":"为实现目标采取的可见行动或关键台词","storyResult":"行动造成的新信息、阻碍、位置或关系变化",\
-            "nextHook":"后续镜头承接的问题、动作或后果，本场结尾写收束",\
-            "title":"镜头标题","sourceText":"对应的剧本原文","sceneText":"镜头内容描述",\
-            "shotType":"景别","cameraMove":"运镜","duration":秒数,"imagePrompt":"用于关键帧出图的画面描述",\
-            "videoPrompt":"用于视频生成的画面描述，包含人物动作与环境","dialogues":[{"character":"角色名，旁白为空","line":"台词"}],\
-            "characters":[{"name":"出场角色名","slot":"站位，取场景的可用站位",\
-            "appearance":"角色换了形象时填形象序号或变化原因，取可用角色中列出的形象；初始形象不填"}],"location":"场景名","props":["道具名"],\
-            "startState":"本镜 0 秒的静态状态","endState":"本镜最后一帧的人物位置、朝向、姿态、道具与动作结果",\
-            "continuityAction":"与下一镜衔接的未完成动作、视线方向或运动趋势",\
-            "spatialAnchor":"空间锚点，明确左右、前后、远近与人物相对位置",\
-            "presentCharacters":["0 秒画面中的角色名，后续入场与画外声不列入"],\
-            "backgroundExtras":"0 秒画面中的匿名群演：人数、服饰、位置、姿态，没有为空",\
-            "shotDesign":{"focus":"焦点","framing":"景别与构图","axis":"轴线","movement":"运动","transition":"转场"},\
-            "performanceBeats":[{"name":"出镜角色名","acting":"本镜的触发、意图与可见回应"}],\
-            "timing":{"spokenText":"实际发音台词","speechRate":语速,"actionSeconds":动作秒数,"pauseSeconds":停顿秒数}}""";
+    private static final String STORYBOARDS_JSON_FORMAT = "连续性要求：同一场景且同一连续时刻内，下一镜的 startState 承接上一镜的 endState；narrativeCause 承接上一镜的 "
+            + "storyResult；场景切换必须有剧情原因，startState 写明“新场景建立”。imagePrompt 只描述 startState 的静态首帧，"
+            + "不提前画出结束动作。\n"
+            + "只输出一个 JSON 数组，不要输出其它内容，每个元素的格式：\n"
+            + "{\"sceneNo\":镜头序号，从 1 连续递增不重复,\"sceneNumber\":原文场次数字，同一场内不因地点、时间变化递增,"
+            + "\"sourceSceneContext\":\"所属原文场的背景摘要\",\"segmentNumber\":场内片段序号,\"segmentGoal\":\"当前片段唯一的剧情任务\","
+            + "\"segmentResult\":\"片段结束时的剧情变化\",\"bridgeIn\":\"如何承接上一片段，首片段写开场建立\","
+            + "\"bridgeOut\":\"留给下一片段承接的动作、情绪、视线或声音\","
+            + "\"beatType\":\"setup、trigger、reaction、decision、action、result、transition 之一\","
+            + "\"narrativeCause\":\"本镜发生的直接原因\",\"characterGoal\":\"焦点角色此刻的具体目标\","
+            + "\"storyAction\":\"为实现目标采取的可见行动或关键台词\",\"storyResult\":\"行动造成的新信息、阻碍、位置或关系变化\","
+            + "\"nextHook\":\"后续镜头承接的问题、动作或后果，本场结尾写收束\","
+            + "\"title\":\"镜头标题\",\"sourceText\":\"对应的剧本原文\",\"sceneText\":\"镜头内容描述\","
+            + "\"shotType\":\"景别\",\"cameraMove\":\"运镜\",\"duration\":秒数,\"imagePrompt\":\"用于关键帧出图的画面描述\","
+            + "\"videoPrompt\":\"用于视频生成的画面描述，包含人物动作与环境\",\"dialogues\":[{\"character\":\"角色名，旁白为空\",\"line\":\"台词\"}],"
+            + "\"characters\":[{\"name\":\"出场角色名\",\"slot\":\"站位，取场景的可用站位\","
+            + "\"appearance\":\"角色换了形象时填形象序号或变化原因，取可用角色中列出的形象；初始形象不填\"}],\"location\":\"场景名\",\"props\":[\"道具名\"],"
+            + "\"startState\":\"本镜 0 秒的静态状态\",\"endState\":\"本镜最后一帧的人物位置、朝向、姿态、道具与动作结果\","
+            + "\"continuityAction\":\"与下一镜衔接的未完成动作、视线方向或运动趋势\","
+            + "\"spatialAnchor\":\"空间锚点，明确左右、前后、远近与人物相对位置\","
+            + "\"presentCharacters\":[\"0 秒画面中的角色名，后续入场与画外声不列入\"],"
+            + "\"backgroundExtras\":\"0 秒画面中的匿名群演：人数、服饰、位置、姿态，没有为空\","
+            + "\"shotDesign\":{\"focus\":\"焦点\",\"framing\":\"景别与构图\",\"axis\":\"轴线\",\"movement\":\"运动\",\"transition\":\"转场\"},"
+            + "\"performanceBeats\":[{\"name\":\"出镜角色名\",\"acting\":\"本镜的触发、意图与可见回应\"}],"
+            + "\"timing\":{\"spokenText\":\"实际发音台词\",\"speechRate\":语速,\"actionSeconds\":动作秒数,\"pauseSeconds\":停顿秒数}}";
 
-    private static final String PHOTOGRAPHY_RULES_PROMPT = """
-            你是一名短剧摄影指导。请为下面每个镜头制定摄影规则：光线的方向与质感、人物在画面中的位置、姿态与朝向、景深、色调；\
-            景深随景别变化（远景大景深，近景、特写与多人对话浅景深），同一场次内的光线与色调保持连贯。画风：{}
-            镜头：
-            {}
+    private static final String PHOTOGRAPHY_RULES_PROMPT = "你是一名短剧摄影指导。请为下面每个镜头制定摄影规则：光线的方向与质感、人物在画面中的位置、姿态与朝向、景深、色调；"
+            + "景深随景别变化（远景大景深，近景、特写与多人对话浅景深），同一场次内的光线与色调保持连贯。画风：{}\n"
+            + "镜头：\n"
+            + "{}\n"
+            + "\n"
+            + "只输出一个 JSON 数组，不要输出其它内容，每个镜头一个元素，格式：\n"
+            + "{\"panelNumber\":镜头序号,\"lighting\":{\"direction\":\"光线方向\",\"quality\":\"光线质感\"},"
+            + "\"characters\":[{\"name\":\"角色名\",\"screenPosition\":\"画面位置\",\"posture\":\"姿态\",\"facing\":\"朝向\"}],"
+            + "\"depthOfField\":\"景深\",\"colorTone\":\"色调\"}";
 
-            只输出一个 JSON 数组，不要输出其它内容，每个镜头一个元素，格式：
-            {"panelNumber":镜头序号,"lighting":{"direction":"光线方向","quality":"光线质感"},\
-            "characters":[{"name":"角色名","screenPosition":"画面位置","posture":"姿态","facing":"朝向"}],\
-            "depthOfField":"景深","colorTone":"色调"}""";
+    private static final String ACTING_NOTES_PROMPT = "你是一名短剧表演指导。请为下面每个镜头的每个出场角色写一句表演指导：情绪、表情、肢体与细微动作，符合镜头的场景类型；"
+            + "写看得见的表演，不要只写“开心”“悲伤”等抽象情绪词，称呼使用角色名。画风：{}\n"
+            + "镜头：\n"
+            + "{}\n"
+            + "\n"
+            + "只输出一个 JSON 数组，不要输出其它内容，每个镜头一个元素，格式：\n"
+            + "{\"panelNumber\":镜头序号,\"characters\":[{\"name\":\"角色名\",\"acting\":\"表演指导\"}]}";
 
-    private static final String ACTING_NOTES_PROMPT = """
-            你是一名短剧表演指导。请为下面每个镜头的每个出场角色写一句表演指导：情绪、表情、肢体与细微动作，符合镜头的场景类型；\
-            写看得见的表演，不要只写“开心”“悲伤”等抽象情绪词，称呼使用角色名。画风：{}
-            镜头：
-            {}
-
-            只输出一个 JSON 数组，不要输出其它内容，每个镜头一个元素，格式：
-            {"panelNumber":镜头序号,"characters":[{"name":"角色名","acting":"表演指导"}]}""";
-
-    private static final String FRAME_PLAN_PROMPT = """
-            你是一名短剧分镜画师。请为下面每个镜头规划关键帧：选取最能代表镜头的一瞬间，写出用于出图的画面描述\
-            （人物位置、动作、表情、构图、光线与环境），以及画面焦点；不要包含台词文字。画风：{}
-            镜头：
-            {}
-
-            只输出一个 JSON 数组，不要输出其它内容，每个镜头一个元素，格式：
-            {"panelNumber":镜头序号,"imagePrompt":"关键帧画面描述","frameFocus":"画面焦点"}""";
+    private static final String FRAME_PLAN_PROMPT = "你是一名短剧分镜画师。请为下面每个镜头规划关键帧：选取最能代表镜头的一瞬间，写出用于出图的画面描述"
+            + "（人物位置、动作、表情、构图、光线与环境），以及画面焦点；不要包含台词文字。画风：{}\n"
+            + "镜头：\n"
+            + "{}\n"
+            + "\n"
+            + "只输出一个 JSON 数组，不要输出其它内容，每个镜头一个元素，格式：\n"
+            + "{\"panelNumber\":镜头序号,\"imagePrompt\":\"关键帧画面描述\",\"frameFocus\":\"画面焦点\"}";
 
     /**
      * 技能提示词：放在任务提示词之前，输出格式的要求保持在最后
      */
-    private static final String SKILL_PROMPT = """
-            请遵循下面的创作技能「{}」完成任务：
-            {}
-
-            """;
+    private static final String SKILL_PROMPT = "请遵循下面的创作技能「{}」完成任务：\n"
+            + "{}\n"
+            + "\n";
     /**
      * 从故事想法创建项目时：项目名称的最大长度，与项目创建的校验一致；未填写且没有剧名时的默认名称
      */
@@ -258,11 +244,9 @@ public class AiDramaScriptServiceImpl implements AiDramaScriptService {
     private static final int PREVIOUS_SCENE_ENDING_LENGTH = 1000;
     private static final int SCENE_PLAN_CONCURRENCY = 3;
 
-    private static final String WORLDBUILDING_PROMPT = """
-            当前项目的世界观设定，人物、场景与剧情须遵守：
-            {}
-
-            """;
+    private static final String WORLDBUILDING_PROMPT = "当前项目的世界观设定，人物、场景与剧情须遵守：\n"
+            + "{}\n"
+            + "\n";
 
     @Resource
     private AiDramaScriptMapper scriptMapper;
@@ -454,8 +438,8 @@ public class AiDramaScriptServiceImpl implements AiDramaScriptService {
             }
             for (JsonNode node : result) {
                 // 原文场次以切分的场次为准：模型返回的不可靠
-                if (node instanceof ObjectNode objectNode) {
-                    objectNode.put("sceneNumber", sceneNumber);
+                if (node instanceof ObjectNode) {
+                    ((ObjectNode) node).put("sceneNumber", sceneNumber);
                 }
                 merged.add(node);
             }
@@ -514,9 +498,9 @@ public class AiDramaScriptServiceImpl implements AiDramaScriptService {
         boolean seenHeading = false; // 是否已遇到过场次标题
         for (String line : StrUtil.nullToEmpty(content).split("\\R")) {
             // 1. 遇到场次标题：结束上一场，开始新的一场；第一个标题之前没有已结束的场次，前言留在 current 并入第一场
-            boolean heading = SCENE_HEADING_PATTERN.matcher(line.strip()).matches();
+            boolean heading = SCENE_HEADING_PATTERN.matcher(StrUtil.trim(line, 0, Character::isWhitespace)).matches();
             if (heading && seenHeading && StrUtil.isNotBlank(current)) {
-                scenes.add(current.toString().strip());
+                scenes.add(StrUtil.trim(current.toString(), 0, Character::isWhitespace));
                 current.setLength(0);
             }
             seenHeading |= heading;
@@ -525,7 +509,7 @@ public class AiDramaScriptServiceImpl implements AiDramaScriptService {
         }
         // 3. 最后一场；没有识别出标题时即整部剧本
         if (StrUtil.isNotBlank(current)) {
-            scenes.add(current.toString().strip());
+            scenes.add(StrUtil.trim(current.toString(), 0, Character::isWhitespace));
         }
         return scenes;
     }
@@ -542,7 +526,8 @@ public class AiDramaScriptServiceImpl implements AiDramaScriptService {
         for (int i = 0; i < scenes.size(); i++) {
             // 1. 本场的第一个标题行
             String scene = scenes.get(i);
-            String heading = scene.lines().filter(line -> SCENE_HEADING_PATTERN.matcher(line.strip()).matches())
+            String heading = new BufferedReader(new StringReader(scene)).lines()
+                    .filter(line -> SCENE_HEADING_PATTERN.matcher(StrUtil.trim(line, 0, Character::isWhitespace)).matches())
                     .findFirst().orElse("");
             // 2. 标题写明「预计 N 秒」时按它；否则按本场原文占全部原文的比例，分配剧本总时长
             Matcher matcher = SCENE_ESTIMATE_PATTERN.matcher(heading);
@@ -1373,7 +1358,8 @@ public class AiDramaScriptServiceImpl implements AiDramaScriptService {
         // JSON 输出：DeepSeek 开启 json_object，保证返回合法的 JSON 对象（提示词已包含“JSON”及格式示例，符合其要求）；
         // 它只约束顶层为对象，所以输出数组的拆分分镜不开启。其它平台的参数不统一，仍只靠提示词约束，由 parseJson 容错解析
         if (jsonObject && platform == AiPlatformEnum.DEEPSEEK) {
-            ((DeepSeekChatOptions) options).setResponseFormat(ResponseFormat.builder().type(ResponseFormat.Type.JSON_OBJECT).build());
+            options = ((DeepSeekChatOptions) options).mutate()
+                    .responseFormat(ResponseFormat.builder().type(ResponseFormat.Type.JSON_OBJECT).build()).build();
         }
         return new Prompt(Collections.singletonList(new UserMessage(content)), options);
     }

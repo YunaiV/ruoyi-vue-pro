@@ -1,16 +1,30 @@
 package cn.iocoder.yudao.module.ai.util;
 
 import cn.hutool.core.map.MapUtil;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.ai.enums.model.AiPlatformEnum;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.grok.GrokChatModel;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
+import com.openai.client.OpenAIClient;
+import com.openai.client.OpenAIClientAsync;
+import com.openai.models.chat.completions.ChatCompletionCreateParams;
+import com.openai.services.async.chat.ChatCompletionServiceAsync;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.deepseek.DeepSeekChatOptions;
+import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
+import reactor.core.publisher.Flux;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 /**
  * {@link AiChatUtils} 的单元测试类
@@ -70,10 +84,43 @@ public class AiChatUtilsTest {
                 "gemini-test", 0.7, 1024);
         OpenAiChatOptions grokOptions = (OpenAiChatOptions) AiChatUtils.buildChatOptions(AiPlatformEnum.GROK,
                 "grok-test", 0.7, 1024);
-        // 断言：仅 OpenAI 开启流式用量，复用 OpenAI 客户端的厂商不发送 stream_options
-        assertTrue(openAiOptions.getStreamUsage());
-        assertNull(geminiOptions.getStreamOptions());
-        assertNull(grokOptions.getStreamOptions());
+        // 断言：仅 OpenAI 开启流式用量，复用 OpenAI 客户端的厂商显式关闭
+        // （Spring AI 2.x 流式总是发送 stream_options，未设置时默认 include_usage = true）
+        assertTrue(openAiOptions.getStreamOptions().includeUsage());
+        assertFalse(geminiOptions.getStreamOptions().includeUsage());
+        assertFalse(grokOptions.getStreamOptions().includeUsage());
+    }
+
+    @Test
+    public void testBuildChatOptions_streamUsageRequestBody() throws Exception {
+        // 调用：经 ChatClient 发起流式请求，捕获 OpenAI SDK 实际序列化的请求体
+        Map<?, ?> openAiBody = captureOpenAiStreamRequestBody(AiPlatformEnum.OPENAI, "gpt-test");
+        Map<?, ?> grokBody = captureOpenAiStreamRequestBody(AiPlatformEnum.GROK, "grok-test");
+        // 断言：OpenAI 请求 include_usage = true；Grok 请求 include_usage = false，而不是未设置时默认的 true
+        assertEquals(Boolean.TRUE, ((Map<?, ?>) openAiBody.get("stream_options")).get("include_usage"));
+        assertEquals(Boolean.FALSE, ((Map<?, ?>) grokBody.get("stream_options")).get("include_usage"));
+        assertEquals("grok-test", grokBody.get("model"));
+    }
+
+    private static Map<?, ?> captureOpenAiStreamRequestBody(AiPlatformEnum platform, String model) throws Exception {
+        // mock OpenAI SDK 的异步客户端：只捕获请求，不发起网络调用
+        OpenAIClientAsync clientAsync = mock(OpenAIClientAsync.class, RETURNS_DEEP_STUBS);
+        ChatCompletionServiceAsync completions = clientAsync.chat().completions();
+        when(completions.createStreaming(any(ChatCompletionCreateParams.class), any()))
+                .thenThrow(new IllegalStateException("仅捕获请求"));
+        OpenAiChatModel openAiChatModel = OpenAiChatModel.builder().openAiClient(mock(OpenAIClient.class))
+                .openAiClientAsync(clientAsync).build();
+        ChatModel chatModel = platform == AiPlatformEnum.GROK ? new GrokChatModel(openAiChatModel) : openAiChatModel;
+
+        // 调用：与 AiChatMessageServiceImpl 一样经 ChatClient 流式调用；捕获请求后的失败忽略
+        Prompt prompt = new Prompt("你好", AiChatUtils.buildChatOptions(platform, model, 0.7, 1024));
+        ChatClient.create(chatModel).prompt(prompt).stream().chatResponse()
+                .onErrorResume(ex -> Flux.empty()).blockLast();
+        // 捕获请求
+        ArgumentCaptor<ChatCompletionCreateParams> paramsCaptor = ArgumentCaptor.forClass(ChatCompletionCreateParams.class);
+        verify(completions).createStreaming(paramsCaptor.capture(), any());
+        return JsonUtils.parseObject(com.openai.core.ObjectMappers.jsonMapper()
+                .writeValueAsString(paramsCaptor.getValue()._body()), Map.class);
     }
 
     // ========== buildChatOptions：思考参数 ==========
@@ -119,7 +166,7 @@ public class AiChatUtilsTest {
         // 断言：不发送思考参数
         assertNull(options.getReasoningEffort());
         assertTrue(options.getExtraBody() == null || options.getExtraBody().isEmpty());
-        assertTrue(options.getStreamUsage());
+        assertTrue(options.getStreamOptions().includeUsage());
     }
 
     @Test
@@ -139,9 +186,9 @@ public class AiChatUtilsTest {
         assertFalse(openAiOptions.getExtraBody().containsKey("reasoning_effort"));
         assertEquals(MapUtil.of("enabled", true), openAiOptions.getExtraBody().get("reasoning"));
         assertEquals(0.7, openAiOptions.getTemperature());
-        // 断言：streamUsage 规则不变，仅 OpenAI 开启
-        assertTrue(openAiOptions.getStreamUsage());
-        assertNull(grokOptions.getStreamOptions());
+        // 断言：streamUsage 规则不变，仅 OpenAI 开启，复用 OpenAI 客户端的厂商显式关闭
+        assertTrue(openAiOptions.getStreamOptions().includeUsage());
+        assertFalse(grokOptions.getStreamOptions().includeUsage());
         assertEquals("high", grokOptions.getReasoningEffort());
         // 断言：调用方的思考参数没有被修改
         assertEquals(2, levelOptions.size());

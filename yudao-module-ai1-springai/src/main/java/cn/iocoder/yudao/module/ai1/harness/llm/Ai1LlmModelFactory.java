@@ -6,16 +6,12 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.document.MetadataMode;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.OpenAiEmbeddingModel;
 import org.springframework.ai.openai.OpenAiEmbeddingOptions;
-import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.stereotype.Component;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 
 import java.net.URI;
 import java.time.Duration;
@@ -93,10 +89,13 @@ public class Ai1LlmModelFactory {
     public EmbeddingModel getOrCreateEmbeddingModel(Ai1ModelRespBO model) {
         return embeddingModelCache.asMap().computeIfAbsent(buildCacheKey(model), key -> {
             OpenAiEmbeddingOptions options = OpenAiEmbeddingOptions.builder()
+                    .baseUrl(normalizeBaseUrl(model.getBaseUrl()))
+                    .apiKey(StrUtil.nullToEmpty(model.getApiKey()))
                     .model(model.getModel())
+                    .customHeaders(buildHeaders(model.getHeaders(), null))
                     .build();
             log.debug("[getOrCreateEmbeddingModel][providerId({}) modelId({}) 嵌入模型构建完成]", model.getProviderId(), model.getModelId());
-            return new OpenAiEmbeddingModel(buildOpenAiApi(model, null), MetadataMode.EMBED, options);
+            return OpenAiEmbeddingModel.builder().options(options).build();
         });
     }
 
@@ -145,27 +144,14 @@ public class Ai1LlmModelFactory {
         // 2. 命中缓存直接复用；未命中时按运行时快照构建 OpenAI 兼容对话模型并缓存
         return chatModelCache.asMap().computeIfAbsent(cacheKey, key -> {
             OpenAiChatOptions options = OpenAiChatOptions.builder()
+                    .baseUrl(normalizeBaseUrl(model.getBaseUrl()))
+                    .apiKey(StrUtil.nullToEmpty(model.getApiKey()))
                     .model(model.getModel())
+                    .customHeaders(buildHeaders(model.getHeaders(), sessionId))
                     .build();
             log.debug("[getOrCreateChatModel][providerId({}) modelId({}) 对话模型构建完成]", model.getProviderId(), model.getModelId());
-            return OpenAiChatModel.builder().openAiApi(buildOpenAiApi(model, sessionId)).defaultOptions(options).build();
+            return OpenAiChatModel.builder().options(options).build();
         });
-    }
-
-    /**
-     * Spring AI 1.x 将连接参数放在 OpenAiApi，而非模型 Options；仅在模型构建边界适配。
-     * normalizeBaseUrl 已包含 /v1 或供应商的自定义前缀，因此端点不再重复添加 /v1。
-     */
-    private static OpenAiApi buildOpenAiApi(Ai1ModelRespBO model, Long sessionId) {
-        MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
-        buildHeaders(model.getHeaders(), sessionId).forEach(headers::add);
-        return OpenAiApi.builder()
-                .baseUrl(normalizeBaseUrl(model.getBaseUrl()))
-                .apiKey(StrUtil.nullToEmpty(model.getApiKey()))
-                .headers(headers)
-                .completionsPath("/chat/completions")
-                .embeddingsPath("/embeddings")
-                .build();
     }
 
     /**

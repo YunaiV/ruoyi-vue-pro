@@ -11,13 +11,15 @@ import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.ai.enums.model.AiPlatformEnum;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.openai.OpenAiDelegateChatModel;
 import com.alibaba.cloud.ai.dashscope.spec.DashScopeApiSpec;
+import com.anthropic.models.messages.MessageDeltaUsage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.openai.models.completions.CompletionUsage;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.ai.anthropic.api.AnthropicApi;
 import org.springframework.ai.chat.metadata.ChatGenerationMetadata;
 import org.springframework.ai.chat.metadata.ChatResponseMetadata;
 import org.springframework.ai.chat.metadata.EmptyRateLimit;
@@ -28,7 +30,6 @@ import org.springframework.ai.chat.metadata.Usage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.deepseek.api.DeepSeekApi;
-import org.springframework.ai.openai.api.OpenAiApi;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -95,7 +96,7 @@ public class AiUsageUtils {
     /**
      * 从单个 {@link ChatResponse} 提取标准用量快照，不做估算，不合并流式 chunk
      *
-     * 1. usage 为 null 或 {@link EmptyUsage} 时为未知，不是 0
+     * 1. 无有效 usage 时为未知，不是 0，参见 {@link #isUsagePresent(Usage)}
      * 2. 优先读取原生用量，原生字段为 null 时保持未知
      * 3. Anthropic 完整输入 = input_tokens + cache_read_input_tokens + cache_creation_input_tokens，基础输入未知时仍未知
      * 4. 不读取厂商返回的合计，缓存、推理等分量不重复计入
@@ -105,20 +106,16 @@ public class AiUsageUtils {
      * @return 用量快照，不会返回 null
      */
     public static UsageSnapshot extractUsage(ChatResponse response, String platform) {
-        // 1. 无 usage 或 EmptyUsage，用量未知
+        // 1. 无有效 usage，用量未知
         Usage usage = response != null && response.getMetadata() != null ? response.getMetadata().getUsage() : null;
-        if (usage == null || usage instanceof EmptyUsage) {
+        if (!isUsagePresent(usage)) {
             return UsageSnapshot.unknown();
         }
         Object nativeUsage = Opt.ofTry(usage::getNativeUsage).get();
 
-        // 2.1 Anthropic 原生 record：缓存读取、写入归一到完整输入
-        if (nativeUsage instanceof AnthropicApi.Usage) {
-            AnthropicApi.Usage anthropicUsage = (AnthropicApi.Usage) nativeUsage;
-            return new UsageSnapshot(sumAnthropicInput(Convert.toLong(anthropicUsage.inputTokens()),
-                            Convert.toLong(anthropicUsage.cacheReadInputTokens()),
-                            Convert.toLong(anthropicUsage.cacheCreationInputTokens())),
-                    Convert.toLong(anthropicUsage.outputTokens()));
+        // 2.1 Anthropic 官方 SDK 原生用量：Spring AI 的 promptTokens 已是 input_tokens + 缓存读取 + 缓存写入
+        if (nativeUsage instanceof com.anthropic.models.messages.Usage || nativeUsage instanceof MessageDeltaUsage) {
+            return new UsageSnapshot(Convert.toLong(usage.getPromptTokens()), Convert.toLong(usage.getCompletionTokens()));
         }
         if (StrUtil.equals(platform, AiPlatformEnum.ANTHROPIC.getPlatform())) {
             // 2.2 Anthropic 原生 Map：同样归一缓存
@@ -133,11 +130,7 @@ public class AiUsageUtils {
             return new UsageSnapshot(null, Convert.toLong(Opt.ofTry(usage::getCompletionTokens).get()));
         }
 
-        // 3. 已知厂商的原生 record，保留 null 语义
-        if (nativeUsage instanceof OpenAiApi.Usage) {
-            OpenAiApi.Usage openAiUsage = (OpenAiApi.Usage) nativeUsage;
-            return new UsageSnapshot(Convert.toLong(openAiUsage.promptTokens()), Convert.toLong(openAiUsage.completionTokens()));
-        }
+        // 3. 已知厂商的原生 record，保留 null 语义（OpenAI 官方 SDK 的用量字段必填，走第 5 步的标准 getter）
         if (nativeUsage instanceof DeepSeekApi.Usage) {
             DeepSeekApi.Usage deepSeekUsage = (DeepSeekApi.Usage) nativeUsage;
             return new UsageSnapshot(Convert.toLong(deepSeekUsage.promptTokens()), Convert.toLong(deepSeekUsage.completionTokens()));
@@ -157,6 +150,33 @@ public class AiUsageUtils {
         return new UsageSnapshot(Convert.toLong(Opt.ofTry(usage::getPromptTokens).get()),
                 Convert.toLong(Opt.ofTry(usage::getCompletionTokens).get()));
     }
+
+    /**
+     * 是否为有效用量
+     *
+     * 1. null、{@link EmptyUsage} 无效
+     * 2. Spring AI 2.x 的 OpenAI（及复用其客户端的 Grok 等）流式 chunk 没有 usage 时，用只含三项 0 的 {@link CompletionUsage} 占位，
+     *    同样无效。厂商明确返回的 usage 带 prompt_tokens_details 等字段时，与占位不相等，仍然有效；
+     *    只返回三项 0 时，SDK 解析结果与占位完全相同，无法区分，按未知处理
+     *
+     * @param usage 用量，可以为 null
+     * @return 是否有效
+     */
+    public static boolean isUsagePresent(Usage usage) {
+        if (usage == null || usage instanceof EmptyUsage) {
+            return false;
+        }
+        Object nativeUsage = Opt.ofTry(usage::getNativeUsage).get();
+        return !OPENAI_STREAM_PLACEHOLDER_USAGE.equals(nativeUsage);
+    }
+
+    /**
+     * Spring AI 2.x 的 OpenAI 流式 chunk 没有 usage 时的占位用量，与 OpenAiChatModel 的构建方式一致
+     *
+     * {@link CompletionUsage#equals(Object)} 比较全部字段（含 details、额外属性），只有完全相同才视为占位
+     */
+    private static final CompletionUsage OPENAI_STREAM_PLACEHOLDER_USAGE = CompletionUsage.builder()
+            .promptTokens(0).completionTokens(0).totalTokens(0).build();
 
     /**
      * 计算 Anthropic 完整输入 Token
@@ -218,7 +238,8 @@ public class AiUsageUtils {
     /**
      * generation 扩展属性中排除的 KEY：属于生成正文，已在业务表保存
      */
-    private static final Set<String> EXCLUDED_GENERATION_METADATA_KEYS = SetUtils.asSet("reasoningContent");
+    private static final Set<String> EXCLUDED_GENERATION_METADATA_KEYS = SetUtils.asSet(
+            OpenAiDelegateChatModel.REASONING_CONTENT, OpenAiDelegateChatModel.REASONING_CONTENT_DELTA);
 
     /**
      * 将 {@link ChatResponse} 的元数据转换为 JSON 值快照
@@ -276,6 +297,8 @@ public class AiUsageUtils {
         putSafely(result, errors, "promptTokens", usage::getPromptTokens, "usage.promptTokens");
         putSafely(result, errors, "completionTokens", usage::getCompletionTokens, "usage.completionTokens");
         putSafely(result, errors, "totalTokens", usage::getTotalTokens, "usage.totalTokens");
+        putSafely(result, errors, "cacheReadInputTokens", usage::getCacheReadInputTokens, "usage.cacheReadInputTokens");
+        putSafely(result, errors, "cacheWriteInputTokens", usage::getCacheWriteInputTokens, "usage.cacheWriteInputTokens");
         putSafely(result, errors, "nativeUsage", () -> toJsonValue(usage.getNativeUsage()), "usage.nativeUsage");
         return result;
     }

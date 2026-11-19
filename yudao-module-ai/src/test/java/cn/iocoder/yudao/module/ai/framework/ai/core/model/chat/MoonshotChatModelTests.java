@@ -38,7 +38,7 @@ public class MoonshotChatModelTests {
                     .completionsPath(MoonshotChatModel.COMPLETE_PATH)
                     .apiKey(API_KEY)
                     .build())
-            .defaultOptions(DeepSeekChatOptions.builder()
+            .options(DeepSeekChatOptions.builder()
                     .model(MODEL)
                     .temperature(1D)
                     .build())

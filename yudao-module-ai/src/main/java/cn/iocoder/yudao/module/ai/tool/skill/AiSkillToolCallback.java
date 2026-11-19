@@ -42,23 +42,21 @@ public class AiSkillToolCallback implements ToolCallback {
      */
     public static final int SKILL_PROMPT_MAX_LENGTH = 2000;
 
-    private static final String READ_SKILL_INPUT_SCHEMA = """
-            {
-              "type": "object",
-              "properties": {
-                "name": { "type": "string", "description": "技能名称，取自系统设定中的“可用技能”清单" }
-              },
-              "required": ["name"]
-            }""";
-    private static final String READ_SKILL_FILE_INPUT_SCHEMA = """
-            {
-              "type": "object",
-              "properties": {
-                "name": { "type": "string", "description": "技能名称，取自系统设定中的“可用技能”清单" },
-                "path": { "type": "string", "description": "技能内文件的相对路径，例如 reference/guide.md" }
-              },
-              "required": ["name", "path"]
-            }""";
+    private static final String READ_SKILL_INPUT_SCHEMA = "{\n"
+            + "  \"type\": \"object\",\n"
+            + "  \"properties\": {\n"
+            + "    \"name\": { \"type\": \"string\", \"description\": \"技能名称，取自系统设定中的“可用技能”清单\" }\n"
+            + "  },\n"
+            + "  \"required\": [\"name\"]\n"
+            + "}";
+    private static final String READ_SKILL_FILE_INPUT_SCHEMA = "{\n"
+            + "  \"type\": \"object\",\n"
+            + "  \"properties\": {\n"
+            + "    \"name\": { \"type\": \"string\", \"description\": \"技能名称，取自系统设定中的“可用技能”清单\" },\n"
+            + "    \"path\": { \"type\": \"string\", \"description\": \"技能内文件的相对路径，例如 reference/guide.md\" }\n"
+            + "  },\n"
+            + "  \"required\": [\"name\", \"path\"]\n"
+            + "}";
 
     private final ToolDefinition toolDefinition;
     /**

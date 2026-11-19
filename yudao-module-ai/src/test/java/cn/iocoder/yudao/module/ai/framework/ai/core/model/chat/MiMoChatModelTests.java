@@ -38,7 +38,7 @@ public class MiMoChatModelTests {
                     .completionsPath(MiMoChatModel.COMPLETE_PATH)
                     .apiKey(API_KEY)
                     .build())
-            .defaultOptions(DeepSeekChatOptions.builder()
+            .options(DeepSeekChatOptions.builder()
                     .model(MODEL)
                     .temperature(0.7)
                     .build())
