@@ -37,6 +37,8 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomString;
 import static cn.iocoder.yudao.module.member.enums.ErrorCodeConstants.USER_POINT_NOT_ENOUGH;
+import static cn.iocoder.yudao.module.member.enums.point.MemberPointBizTypeEnum.ORDER_GIVE_CANCEL;
+import static cn.iocoder.yudao.module.member.enums.point.MemberPointBizTypeEnum.ORDER_USE;
 import static cn.iocoder.yudao.module.member.enums.point.MemberPointBizTypeEnum.SIGN;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -136,6 +138,48 @@ public class MemberPointRecordServiceImplTest extends BaseDbUnitTest {
         verify(memberUserService, never()).updateUserPoint(anyLong(), anyInt());
         assertEquals(20, memberUserMapper.selectById(user.getId()).getPoint());
         assertEquals(0, getPointRecordList(user.getId()).size());
+    }
+
+    @Test
+    public void testCreatePointRecord_orderUseNotEnough() {
+        // mock 数据：例如说，并发下单时，前一笔已扣减积分
+        MemberUserDO user = createUser(20);
+
+        // 调用，并断言异常：下单抵扣积分不足，需抛出异常，使订单一起回滚
+        assertServiceException(() -> memberPointRecordService.createPointRecord(user.getId(), -80, ORDER_USE,
+                randomString()), USER_POINT_NOT_ENOUGH);
+        // 断言
+        verify(memberUserService, never()).updateUserPoint(anyLong(), anyInt());
+        assertEquals(20, memberUserMapper.selectById(user.getId()).getPoint());
+        assertEquals(0, getPointRecordList(user.getId()).size());
+    }
+
+    @Test
+    public void testCreatePointRecord_orderGiveCancelNotEnough() {
+        // mock 数据：赠送的积分，已经被使用
+        MemberUserDO user = createUser(20);
+
+        // 调用：取消订单扣除赠送积分时，积分不足，保持打印日志后直接返回，不阻塞取消订单
+        memberPointRecordService.createPointRecord(user.getId(), -80, ORDER_GIVE_CANCEL, randomString());
+        // 断言
+        verify(memberUserService, never()).updateUserPoint(anyLong(), anyInt());
+        assertEquals(20, memberUserMapper.selectById(user.getId()).getPoint());
+        assertEquals(0, getPointRecordList(user.getId()).size());
+    }
+
+    @Test
+    public void testCreatePointRecord_orderUseSuccess() {
+        // mock 数据
+        MemberUserDO user = createUser(100);
+
+        // 调用：下单抵扣积分，积分充足
+        memberPointRecordService.createPointRecord(user.getId(), -100, ORDER_USE, randomString());
+        // 断言
+        assertEquals(0, memberUserMapper.selectById(user.getId()).getPoint());
+        List<MemberPointRecordDO> records = getPointRecordList(user.getId());
+        assertEquals(1, records.size());
+        assertEquals(-100, records.get(0).getPoint());
+        assertEquals(0, records.get(0).getTotalPoint());
     }
 
     @Test

@@ -202,6 +202,11 @@ spring:
 
 yudao:
   ai: # 按「提供方 + 能力」分层，对齐 spring.ai.{provider}.{capability}
+    gemini: # 谷歌：Gemini
+      chat:
+        enable: true
+        api-key: ${GEMINI_API_KEY:sk-xxxx}
+        model: gemini-2.5-flash
     bytedance: # 字节跳动：豆包
       chat:
         enable: true

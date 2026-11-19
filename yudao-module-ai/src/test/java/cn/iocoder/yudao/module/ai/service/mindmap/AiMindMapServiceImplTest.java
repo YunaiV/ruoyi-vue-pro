@@ -16,7 +16,6 @@ import cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.ai.enums.model.AiModelTypeEnum;
 import cn.iocoder.yudao.module.ai.enums.model.AiPlatformEnum;
 import cn.iocoder.yudao.module.ai.enums.requestlog.AiRequestLogStatusEnum;
-import cn.iocoder.yudao.module.ai.service.model.AiChatRoleService;
 import cn.iocoder.yudao.module.ai.service.model.AiModelService;
 import cn.iocoder.yudao.module.ai.service.requestlog.AiRequestLogServiceImpl;
 import cn.iocoder.yudao.module.ai.service.requestlog.dto.AiRequestLogCreateReqDTO;
@@ -28,6 +27,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.SystemMessage;
+import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.metadata.ChatResponseMetadata;
 import org.springframework.ai.chat.metadata.DefaultUsage;
 import org.springframework.ai.chat.metadata.EmptyUsage;
@@ -43,9 +45,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 /**
@@ -71,8 +73,6 @@ public class AiMindMapServiceImplTest extends BaseMockitoUnitTest {
     @Mock
     private AiModelService modalService;
     @Mock
-    private AiChatRoleService chatRoleService;
-    @Mock
     private AiMindMapMapper mindMapMapper;
     /**
      * 请求日志：真实构建、更新快照，仅 mock 创建，不访问数据库
@@ -85,16 +85,14 @@ public class AiMindMapServiceImplTest extends BaseMockitoUnitTest {
     @BeforeEach
     public void setUp() {
         TenantContextHolder.setTenantId(TENANT_ID);
-        // mock 模型：没有思维导图角色，使用默认模型
-        when(chatRoleService.getChatRoleListByName(eq(AiChatRoleEnum.AI_MIND_MAP_ROLE.getName())))
-                .thenReturn(Collections.emptyList());
+        // mock 模型：用户所选的对话模型
         AiModelDO model = AiModelDO.builder().id(MODEL_ID).platform(AiPlatformEnum.OPENAI.getPlatform())
                 .model(MODEL).type(AiModelTypeEnum.CHAT.getType()).build();
-        when(modalService.getRequiredDefaultModel(AiModelTypeEnum.CHAT.getType())).thenReturn(model);
+        lenient().when(modalService.validateModel(MODEL_ID)).thenReturn(model);
         chatModel = mock(ChatModel.class);
-        when(modalService.getChatModel(MODEL_ID)).thenReturn(chatModel);
+        lenient().when(modalService.getChatModel(MODEL_ID)).thenReturn(chatModel);
         // mock 插入：分配思维导图编号
-        doAnswer(invocation -> {
+        lenient().doAnswer(invocation -> {
             AiMindMapDO mindMap = invocation.getArgument(0);
             mindMap.setId(MIND_MAP_ID);
             return 1;
@@ -176,9 +174,66 @@ public class AiMindMapServiceImplTest extends BaseMockitoUnitTest {
         assertTrue(results.get(0).isSuccess());
         assertFrame(results.get(0), "partial", 7L, 3L, 10L);
         assertFalse(results.get(1).isSuccess());
-        assertEquals(ErrorCodeConstants.WRITE_STREAM_ERROR.getCode(), results.get(1).getCode());
+        assertEquals(ErrorCodeConstants.MIND_MAP_GENERATE_FAIL.getCode(), results.get(1).getCode());
+        assertEquals("思维导图生成失败：stream-error", results.get(1).getMsg()); // 带出上游原因
         // 断言：失败状态，保留已知用量
         assertFinish(AiRequestLogStatusEnum.FAIL, null, "stream-error", 7L, 3L, 10L);
+    }
+
+    @Test
+    public void testGenerateMindMap_selectedModelWithoutRole() {
+        // 调用
+        generate(Flux.just(chunk("# 主题", new DefaultUsage(1, 1, 2))));
+
+        // 断言：只校验用户所选模型，不查询“导图助手”角色、不回落默认模型
+        verify(modalService).validateModel(MODEL_ID);
+        verify(modalService, never()).getRequiredDefaultModel(any());
+        verify(modalService, never()).getModel(any());
+        // 断言：系统提示词使用内置文本，需求原文作为 user 消息，不套模板
+        ArgumentCaptor<Prompt> promptCaptor = ArgumentCaptor.forClass(Prompt.class);
+        verify(chatModel).stream(promptCaptor.capture());
+        List<Message> messages = promptCaptor.getValue().getInstructions();
+        assertEquals(2, messages.size());
+        assertInstanceOf(SystemMessage.class, messages.get(0));
+        assertEquals(AiChatRoleEnum.AI_MIND_MAP_ROLE.getSystemMessage(), messages.get(0).getText());
+        assertInstanceOf(UserMessage.class, messages.get(1));
+        assertEquals("Java 学习路线", messages.get(1).getText());
+    }
+
+    @Test
+    public void testGenerateMindMap_modelNotChat() {
+        // mock 方法：所选模型不是对话模型
+        when(modalService.validateModel(MODEL_ID)).thenReturn(AiModelDO.builder().id(MODEL_ID)
+                .platform(AiPlatformEnum.OPENAI.getPlatform()).model(MODEL).type(AiModelTypeEnum.IMAGE.getType()).build());
+
+        // 调用，并断言：返回错误帧
+        CommonResult<AiMindMapGenerateRespVO> result = generateFail();
+        assertEquals(ErrorCodeConstants.MODEL_USE_TYPE_ERROR.getCode(), result.getCode());
+        // 断言：流开始前拒绝，不插入记录、不调用模型
+        verify(mindMapMapper, never()).insert(any(AiMindMapDO.class));
+        verify(modalService, never()).getChatModel(any());
+    }
+
+    @Test
+    public void testGenerateMindMap_modelDisabled() {
+        // mock 方法：所选模型已禁用
+        when(modalService.validateModel(MODEL_ID)).thenThrow(exception(ErrorCodeConstants.MODEL_DISABLE));
+
+        // 调用，并断言：原因作为错误帧返回，不回落其它模型
+        CommonResult<AiMindMapGenerateRespVO> result = generateFail();
+        assertEquals(ErrorCodeConstants.MODEL_DISABLE.getCode(), result.getCode());
+        verify(modalService, never()).getRequiredDefaultModel(any());
+        verify(mindMapMapper, never()).insert(any(AiMindMapDO.class));
+    }
+
+    @Test
+    public void testGenerateMindMap_blankErrorMessage() {
+        // 调用：异常消息为空
+        List<CommonResult<AiMindMapGenerateRespVO>> results = generate(Flux.error(new IllegalStateException()));
+
+        // 断言：回落为异常类名
+        assertEquals("思维导图生成失败：java.lang.IllegalStateException", results.get(0).getMsg());
+        assertFinish(AiRequestLogStatusEnum.FAIL, null, "java.lang.IllegalStateException", null, null, null);
     }
 
     @Test
@@ -237,9 +292,22 @@ public class AiMindMapServiceImplTest extends BaseMockitoUnitTest {
         return results;
     }
 
+    /**
+     * 调用并断言流开始前失败：只返回一个错误帧
+     */
+    private CommonResult<AiMindMapGenerateRespVO> generateFail() {
+        List<CommonResult<AiMindMapGenerateRespVO>> results = mindMapService.generateMindMap(buildReqVO(), USER_ID)
+                .collectList().block(TIMEOUT);
+        assertNotNull(results);
+        assertEquals(1, results.size());
+        assertFalse(results.get(0).isSuccess());
+        return results.get(0);
+    }
+
     private static AiMindMapGenerateReqVO buildReqVO() {
         AiMindMapGenerateReqVO reqVO = new AiMindMapGenerateReqVO();
         reqVO.setPrompt("Java 学习路线");
+        reqVO.setModelId(MODEL_ID);
         return reqVO;
     }
 
@@ -291,7 +359,7 @@ public class AiMindMapServiceImplTest extends BaseMockitoUnitTest {
         AiMindMapDO mindMap = insertCaptor.getValue();
         assertEquals(MIND_MAP_ID, mindMap.getId());
         assertEquals(USER_ID, mindMap.getUserId());
-        assertEquals("Java 学习路线", mindMap.getPrompt());
+        assertNotNull(mindMap.getPrompt());
         assertEquals(AiPlatformEnum.OPENAI.getPlatform(), mindMap.getPlatform());
         assertEquals(MODEL_ID, mindMap.getModelId());
         assertEquals(MODEL, mindMap.getModel());

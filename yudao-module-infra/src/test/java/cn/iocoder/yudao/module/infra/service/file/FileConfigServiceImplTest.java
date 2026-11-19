@@ -4,6 +4,8 @@ import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
 import cn.iocoder.yudao.module.infra.controller.admin.file.vo.config.FileConfigPageReqVO;
 import cn.iocoder.yudao.module.infra.controller.admin.file.vo.config.FileConfigSaveReqVO;
@@ -28,7 +30,6 @@ import java.util.Map;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
-import static cn.iocoder.yudao.framework.common.util.object.ObjectUtils.cloneIgnoreId;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
@@ -184,11 +185,12 @@ public class FileConfigServiceImplTest extends BaseDbUnitTest {
         dbFileConfig.setCreateTime(LocalDateTimeUtil.parse("2020-01-23", DatePattern.NORM_DATE_PATTERN));// 等会查询到
         fileConfigMapper.insert(dbFileConfig);
         // 测试 name 不匹配
-        fileConfigMapper.insert(cloneIgnoreId(dbFileConfig, o -> o.setName("源码")));
+        fileConfigMapper.insert(BeanUtils.toBean(dbFileConfig, FileConfigDO.class, copy -> copy.setId(null).setName("源码")));
         // 测试 storage 不匹配
-        fileConfigMapper.insert(cloneIgnoreId(dbFileConfig, o -> o.setStorage(FileStorageEnum.DB.getStorage())));
+        fileConfigMapper.insert(BeanUtils.toBean(dbFileConfig, FileConfigDO.class, copy -> copy.setId(null).setStorage(FileStorageEnum.DB.getStorage())));
         // 测试 createTime 不匹配
-        fileConfigMapper.insert(cloneIgnoreId(dbFileConfig, o -> o.setCreateTime(LocalDateTimeUtil.parse("2020-11-23", DatePattern.NORM_DATE_PATTERN))));
+        fileConfigMapper.insert(BeanUtils.toBean(dbFileConfig, FileConfigDO.class, copy -> copy.setId(null)
+                .setCreateTime(LocalDateTimeUtil.parse("2020-11-23", DatePattern.NORM_DATE_PATTERN))));
         // 准备参数
         FileConfigPageReqVO reqVO = new FileConfigPageReqVO();
         reqVO.setName("芋道");
@@ -268,13 +270,64 @@ public class FileConfigServiceImplTest extends BaseDbUnitTest {
                 eq(fileConfig.getConfig()));
     }
 
+    @Test
+    public void testFileConfigTypeHandler_currentAndLegacyTypes() throws Exception {
+        // 准备参数
+        FileConfigDO.FileClientConfigTypeHandler handler = new FileConfigDO.FileClientConfigTypeHandler(FileClientConfig.class);
+        for (FileStorageEnum storage : FileStorageEnum.values()) {
+            FileClientConfig config = storage.getConfigClass().getDeclaredConstructor().newInstance();
+            // 调用
+            String json = handler.toJson(config);
+            Object parsedConfig = handler.parse(json);
+            String legacyJson = json.replace(config.getClass().getName(), "legacy.package." + config.getClass().getSimpleName());
+            Object legacyConfig = handler.parse(legacyJson);
+
+            // 断言
+            assertEquals(config.getClass().getName(), JsonUtils.parseObject(json, "@class", String.class));
+            assertEquals(config.getClass(), parsedConfig.getClass());
+            assertEquals(config, parsedConfig);
+            assertEquals(config, legacyConfig);
+        }
+    }
+
+    @Test
+    public void testFileConfigTypeHandler_rejectsUnregisteredTypeWithoutConstruction() {
+        // 准备参数
+        FileConfigDO.FileClientConfigTypeHandler handler = new FileConfigDO.FileClientConfigTypeHandler(FileClientConfig.class);
+        EmptyFileClientConfig.constructed = 0;
+        String json = "{\"@class\":\"" + EmptyFileClientConfig.class.getName() + "\",\"secret\":\"synthetic-secret\"}";
+
+        // 调用，并断言异常
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class, () -> handler.parse(json));
+
+        // 断言
+        assertEquals(0, EmptyFileClientConfig.constructed);
+        assertFalse(error.getMessage().contains("synthetic-secret"));
+    }
+
+    @Test
+    public void testFileConfigTypeHandler_rejectsMissingUnknownAndNonConfigType() {
+        // 准备参数
+        FileConfigDO.FileClientConfigTypeHandler handler = new FileConfigDO.FileClientConfigTypeHandler(FileClientConfig.class);
+        for (String json : new String[]{"{}", "{\"@class\":42}", "not-json", "{\"@class\":\"unknown.MissingConfig\"}", "{\"@class\":\"java.lang.String\"}"}) {
+            // 调用，并断言异常
+            assertThrows(IllegalArgumentException.class, () -> handler.parse(json));
+        }
+    }
+
     private FileConfigDO randomFileConfigDO() {
         return randomPojo(FileConfigDO.class).setStorage(randomEle(FileStorageEnum.values()).getStorage())
-                .setConfig(new EmptyFileClientConfig());
+                .setConfig(new LocalFileClientConfig().setBasePath("/test").setDomain("https://example.invalid"));
     }
 
     @Data
     public static class EmptyFileClientConfig implements FileClientConfig, Serializable {
+
+        private static int constructed;
+
+        public EmptyFileClientConfig() {
+            constructed++;
+        }
 
     }
 

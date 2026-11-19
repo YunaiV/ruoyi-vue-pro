@@ -1,5 +1,11 @@
 package cn.iocoder.yudao.module.infra.framework.file.core.client;
 
+import cn.iocoder.yudao.module.infra.framework.file.core.client.db.DBFileClientConfig;
+import cn.iocoder.yudao.module.infra.framework.file.core.client.ftp.FtpFileClientConfig;
+import cn.iocoder.yudao.module.infra.framework.file.core.client.local.LocalFileClientConfig;
+import cn.iocoder.yudao.module.infra.framework.file.core.client.sftp.SftpFileClientConfig;
+import cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
@@ -8,9 +14,14 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
  *
  * @author 芋道源码
  */
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
-// @JsonTypeInfo 注解的作用，Jackson 多态
-// 1. 序列化到时数据库时，增加 @class 属性。
-// 2. 反序列化到内存对象时，通过 @class 属性，可以创建出正确的类型
+// 类型名沿用完整类名，兼容已有数据库配置；仅允许显式注册的配置类型，不按输入加载任意类。
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "@class")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = DBFileClientConfig.class, name = "cn.iocoder.yudao.module.infra.framework.file.core.client.db.DBFileClientConfig"),
+        @JsonSubTypes.Type(value = FtpFileClientConfig.class, name = "cn.iocoder.yudao.module.infra.framework.file.core.client.ftp.FtpFileClientConfig"),
+        @JsonSubTypes.Type(value = LocalFileClientConfig.class, name = "cn.iocoder.yudao.module.infra.framework.file.core.client.local.LocalFileClientConfig"),
+        @JsonSubTypes.Type(value = SftpFileClientConfig.class, name = "cn.iocoder.yudao.module.infra.framework.file.core.client.sftp.SftpFileClientConfig"),
+        @JsonSubTypes.Type(value = S3FileClientConfig.class, name = "cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig")
+})
 public interface FileClientConfig {
 }

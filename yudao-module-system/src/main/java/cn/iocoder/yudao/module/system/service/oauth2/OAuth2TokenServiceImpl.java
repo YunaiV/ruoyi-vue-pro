@@ -17,23 +17,35 @@ import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.token.OAuth2AccessTokenPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2AccessTokenDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2ClientDO;
+import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2CodeDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2RefreshTokenDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.user.AdminUserDO;
 import cn.iocoder.yudao.module.system.dal.mysql.oauth2.OAuth2AccessTokenMapper;
+import cn.iocoder.yudao.module.system.dal.mysql.oauth2.OAuth2CodeMapper;
 import cn.iocoder.yudao.module.system.dal.mysql.oauth2.OAuth2RefreshTokenMapper;
 import cn.iocoder.yudao.module.system.dal.redis.oauth2.OAuth2AccessTokenRedisDAO;
 import cn.iocoder.yudao.module.system.service.user.AdminUserService;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception0;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 
 /**
@@ -42,12 +54,17 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
  * @author 芋道源码
  */
 @Service
+@Slf4j
 public class OAuth2TokenServiceImpl implements OAuth2TokenService {
+
+    private static final int REMOVE_ADMIN_USER_TOKENS_BATCH_SIZE = 500;
 
     @Resource
     private OAuth2AccessTokenMapper oauth2AccessTokenMapper;
     @Resource
     private OAuth2RefreshTokenMapper oauth2RefreshTokenMapper;
+    @Resource
+    private OAuth2CodeMapper oauth2CodeMapper;
 
     @Resource
     private OAuth2AccessTokenRedisDAO oauth2AccessTokenRedisDAO;
@@ -85,7 +102,7 @@ public class OAuth2TokenServiceImpl implements OAuth2TokenService {
 
         // 已过期的情况下，删除刷新令牌及其访问令牌
         if (DateUtils.isExpired(refreshTokenDO.getExpiresTime())) {
-            removeAccessTokenListByRefreshToken(refreshToken);
+            removeAccessTokenListByRefreshToken(refreshToken, null);
             oauth2RefreshTokenMapper.deleteById(refreshTokenDO.getId());
             throw exception0(GlobalErrorCodeConstants.UNAUTHORIZED.getCode(), "刷新令牌已过期");
         }
@@ -144,11 +161,9 @@ public class OAuth2TokenServiceImpl implements OAuth2TokenService {
         if (accessTokenDO == null) {
             return null;
         }
-        oauth2AccessTokenMapper.deleteById(accessTokenDO.getId());
-        oauth2AccessTokenRedisDAO.delete(accessToken);
-        // 删除同一刷新令牌下的其它访问令牌。原因是：刷新时保留了旧访问令牌，多个标签页可能各持有一个，需一并删除
+        // 删除同一刷新令牌下的所有访问令牌。原因是：刷新时保留了旧访问令牌，多个标签页可能各持有一个，需一并删除
         // 相关 issue：https://github.com/YunaiV/ruoyi-vue-pro/issues/1332
-        removeAccessTokenListByRefreshToken(accessTokenDO.getRefreshToken());
+        removeAccessTokenListByRefreshToken(accessTokenDO.getRefreshToken(), accessTokenDO);
         // 删除刷新令牌
         oauth2RefreshTokenMapper.deleteByRefreshToken(accessTokenDO.getRefreshToken());
         oauth2AccessTokenRedisDAO.delete(accessTokenDO.getRefreshToken());
@@ -168,6 +183,60 @@ public class OAuth2TokenServiceImpl implements OAuth2TokenService {
             // 删除刷新令牌
             oauth2RefreshTokenMapper.deleteByRefreshToken(accessToken.getRefreshToken());
             oauth2AccessTokenRedisDAO.delete(accessToken.getRefreshToken());
+        });
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.MANDATORY, rollbackFor = Exception.class)
+    public void removeAdminUserTokens(Collection<Long> userIds) {
+        if (CollUtil.isEmpty(userIds)) {
+            return;
+        }
+        // 1. 删除后台用户凭证
+        Integer userType = UserTypeEnum.ADMIN.getValue();
+        Set<String> tokens = new HashSet<>();
+        for (List<Long> batchIds : CollUtil.split(new LinkedHashSet<>(userIds), REMOVE_ADMIN_USER_TOKENS_BATCH_SIZE)) {
+            // 1.1 分别查询凭证，覆盖没有关联访问令牌的刷新令牌
+            List<OAuth2CodeDO> codes = oauth2CodeMapper.selectListByUserIdsAndUserType(batchIds, userType);
+            List<OAuth2RefreshTokenDO> refreshTokens = oauth2RefreshTokenMapper.selectListByUserIdsAndUserType(batchIds, userType);
+            List<OAuth2AccessTokenDO> accessTokens = oauth2AccessTokenMapper.selectListByUserIdsAndUserType(batchIds, userType);
+            // 1.2 按查到的主键删除，避免无索引的用户条件扩大写锁范围
+            CollUtil.split(convertList(codes, OAuth2CodeDO::getId), REMOVE_ADMIN_USER_TOKENS_BATCH_SIZE)
+                    .forEach(oauth2CodeMapper::deleteByIds);
+            deleteAccessTokens(accessTokens);
+            CollUtil.split(convertList(refreshTokens, OAuth2RefreshTokenDO::getId), REMOVE_ADMIN_USER_TOKENS_BATCH_SIZE)
+                    .forEach(oauth2RefreshTokenMapper::deleteByIds);
+            // 1.3 收集对应的 Redis key。刷新令牌也可能作为访问令牌被缓存
+            tokens.addAll(convertSet(accessTokens, OAuth2AccessTokenDO::getAccessToken));
+            tokens.addAll(convertSet(accessTokens, OAuth2AccessTokenDO::getRefreshToken));
+            tokens.addAll(convertSet(refreshTokens, OAuth2RefreshTokenDO::getRefreshToken));
+        }
+        if (CollUtil.isEmpty(tokens)) {
+            return;
+        }
+
+        // 2. 提交后清理 Redis，回滚时保留原会话缓存
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+
+            @Override
+            public void afterCompletion(int status) {
+                // 即使其他提交回调失败，也要清理令牌缓存
+                if (status != STATUS_COMMITTED) {
+                    return;
+                }
+                try {
+                    oauth2AccessTokenRedisDAO.deleteList(tokens);
+                } catch (RuntimeException ex) {
+                    log.warn("[removeAdminUserTokens][清理 {} 个账号的令牌缓存失败，重试一次]", userIds.size(), ex);
+                    try {
+                        oauth2AccessTokenRedisDAO.deleteList(tokens);
+                    } catch (RuntimeException retryEx) {
+                        log.error("[removeAdminUserTokens][账号变更已提交，清理 {} 个账号的令牌缓存失败]", userIds.size(), retryEx);
+                        // DONE @AI：也没必要抛出吧？打好 error log 就好；额
+                    }
+                }
+            }
+
         });
     }
 
@@ -209,14 +278,23 @@ public class OAuth2TokenServiceImpl implements OAuth2TokenService {
      * 删除刷新令牌下的所有访问令牌
      *
      * @param refreshToken 刷新令牌
+     * @param accessTokenDO 登出时提供的访问令牌
      */
-    private void removeAccessTokenListByRefreshToken(String refreshToken) {
-        List<OAuth2AccessTokenDO> accessTokenDOs = oauth2AccessTokenMapper.selectListByRefreshToken(refreshToken);
+    private void removeAccessTokenListByRefreshToken(String refreshToken, OAuth2AccessTokenDO accessTokenDO) {
+        List<OAuth2AccessTokenDO> accessTokenDOs = new ArrayList<>(oauth2AccessTokenMapper.selectListByRefreshToken(refreshToken));
+        if (accessTokenDO != null && accessTokenDOs.stream().noneMatch(token -> token.getId().equals(accessTokenDO.getId()))) {
+            accessTokenDOs.add(accessTokenDO);
+        }
         if (CollUtil.isEmpty(accessTokenDOs)) {
             return;
         }
-        oauth2AccessTokenMapper.deleteByIds(convertSet(accessTokenDOs, OAuth2AccessTokenDO::getId));
+        deleteAccessTokens(accessTokenDOs);
         oauth2AccessTokenRedisDAO.deleteList(convertSet(accessTokenDOs, OAuth2AccessTokenDO::getAccessToken));
+    }
+
+    private void deleteAccessTokens(List<OAuth2AccessTokenDO> accessTokens) {
+        // 撤权、登出和过期刷新都先按主键顺序删除访问令牌，再删除刷新令牌
+        accessTokens.stream().map(OAuth2AccessTokenDO::getId).sorted().forEach(oauth2AccessTokenMapper::deleteById);
     }
 
     private OAuth2AccessTokenDO convertToAccessToken(OAuth2RefreshTokenDO refreshTokenDO) {

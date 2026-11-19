@@ -1,6 +1,10 @@
 package cn.iocoder.yudao.module.pay.framework.pay.core.client;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import cn.iocoder.yudao.module.pay.framework.pay.core.client.impl.alipay.AlipayPayClientConfig;
+import cn.iocoder.yudao.module.pay.framework.pay.core.client.impl.weixin.WxPayClientConfig;
+import cn.iocoder.yudao.module.pay.framework.pay.core.client.impl.NonePayClientConfig;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import jakarta.validation.Validator;
 
@@ -10,10 +14,13 @@ import jakarta.validation.Validator;
  *
  * @author 芋道源码
  */
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
-// @JsonTypeInfo 注解的作用，Jackson 多态
-// 1. 序列化到时数据库时，增加 @class 属性。
-// 2. 反序列化到内存对象时，通过 @class 属性，可以创建出正确的类型
+// 类型名沿用完整类名，兼容已有数据库配置；仅允许显式注册的配置类型，不按输入加载任意类。
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "@class")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = AlipayPayClientConfig.class, name = "cn.iocoder.yudao.module.pay.framework.pay.core.client.impl.alipay.AlipayPayClientConfig"),
+        @JsonSubTypes.Type(value = WxPayClientConfig.class, name = "cn.iocoder.yudao.module.pay.framework.pay.core.client.impl.weixin.WxPayClientConfig"),
+        @JsonSubTypes.Type(value = NonePayClientConfig.class, name = "cn.iocoder.yudao.module.pay.framework.pay.core.client.impl.NonePayClientConfig")
+})
 @JsonIgnoreProperties(ignoreUnknown = true) // 目的：忽略未知的属性，避免反序列化失败
 public interface PayClientConfig {
 

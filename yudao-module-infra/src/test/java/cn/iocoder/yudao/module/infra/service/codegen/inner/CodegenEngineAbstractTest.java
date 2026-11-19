@@ -13,11 +13,13 @@ import cn.iocoder.yudao.module.infra.dal.dataobject.codegen.CodegenTableDO;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenVOTypeEnum;
 import cn.iocoder.yudao.module.infra.framework.codegen.config.CodegenProperties;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Spy;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -26,6 +28,8 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 
 /**
  * {@link CodegenEngine} 的单元测试抽象基类
@@ -122,7 +126,65 @@ public abstract class CodegenEngineAbstractTest extends BaseMockitoUnitTest {
             return null;
         }
         content = content.replace("\r\n", "\n").replace('\r', '\n');
-        return content.replaceAll("\\n+\\z", "");
+        // 从尾部扫描一次末尾换行，只 substring 一次，避免正则回溯
+        int end = content.length();
+        while (end > 0 && content.charAt(end - 1) == '\n') {
+            end--;
+        }
+        return content.substring(0, end);
+    }
+
+    // ==================== normalizeLineEndings 单测 ====================
+
+    @Test
+    void testNormalizeLineEndings_nullAndEmpty() {
+        assertNull(normalizeLineEndings(null));
+        assertEquals("", normalizeLineEndings(""));
+    }
+
+    @Test
+    void testNormalizeLineEndings_crlf() {
+        assertEquals("a\nb", normalizeLineEndings("a\r\nb\r\n\r\n"));
+        assertEquals("a\nb", normalizeLineEndings("a\rb\r"));
+        assertEquals("a\n\nb", normalizeLineEndings("a\r\n\rb\n\r\n"));
+    }
+
+    @Test
+    void testNormalizeLineEndings_innerNewlinesKept() {
+        // 连续换行后还有正文，只去掉末尾的换行
+        assertEquals("a\n\n\nb", normalizeLineEndings("a\n\n\nb\n\n"));
+        assertEquals("\n\na", normalizeLineEndings("\n\na\n"));
+    }
+
+    @Test
+    void testNormalizeLineEndings_onlyNewlines() {
+        assertEquals("", normalizeLineEndings("\n"));
+        assertEquals("", normalizeLineEndings("\n\r\n\r"));
+    }
+
+    @Test
+    void testNormalizeLineEndings_noTrailingNewline() {
+        assertEquals("abc", normalizeLineEndings("abc"));
+        assertEquals("a\nb", normalizeLineEndings("a\nb"));
+    }
+
+    @Test
+    void testNormalizeLineEndings_blankKept() {
+        // 只去掉换行，其它空白保持原样
+        assertEquals("  \t", normalizeLineEndings("  \t"));
+        assertEquals("a  ", normalizeLineEndings("a  \n\n"));
+        assertEquals("a\n  ", normalizeLineEndings("a\n  "));
+    }
+
+    @Test
+    void testNormalizeLineEndings_longInput() {
+        String inner = "\n".repeat(200_000);
+        String content = "x" + inner + "y" + "\r\n".repeat(200_000);
+        String result = assertTimeoutPreemptively(Duration.ofSeconds(5), () -> normalizeLineEndings(content));
+        assertEquals("x" + inner + "y", result);
+
+        String onlyNewlines = "\r\n".repeat(500_000);
+        assertEquals("", assertTimeoutPreemptively(Duration.ofSeconds(5), () -> normalizeLineEndings(onlyNewlines)));
     }
 
     // ==================== 调试专用 ====================

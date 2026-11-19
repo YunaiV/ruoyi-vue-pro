@@ -59,6 +59,7 @@ public class TradePriceCalculateReqBO {
      * 商品 SKU 数组
      */
     @NotNull(message = "商品数组不能为空")
+    @Valid // 级联校验商品项：解析购物车后，再次防御性校验购买数量
     private List<Item> items;
 
     // ========== 秒杀活动相关字段 ==========
@@ -107,7 +108,7 @@ public class TradePriceCalculateReqBO {
          * SKU 数量
          */
         @NotNull(message = "商品 SKU 数量不能为空")
-        @Min(value = 0L, message = "商品 SKU 数量必须大于等于 0")
+        @Min(value = 1L, message = "商品 SKU 数量必须大于等于 1")
         private Integer count;
 
         /**

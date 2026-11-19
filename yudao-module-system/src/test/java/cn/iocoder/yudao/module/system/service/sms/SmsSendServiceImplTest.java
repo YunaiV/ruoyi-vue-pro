@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -283,16 +284,27 @@ public class SmsSendServiceImplTest extends BaseMockitoUnitTest {
         String channelCode = randomString();
         String text = randomString();
         // mock SmsClientFactory 的方法
-        SmsClient smsClient = spy(SmsClient.class);
+        SmsClient smsClient = mock(SmsClient.class);
         when(smsChannelService.getSmsClient(eq(channelCode))).thenReturn(smsClient);
-        // mock SmsClient 的方法
-        List<SmsReceiveRespDTO> receiveResults = randomPojoList(SmsReceiveRespDTO.class);
+        // mock SmsClient 的方法：一条成功、一条失败
+        SmsReceiveRespDTO successResult = new SmsReceiveRespDTO().setSuccess(true)
+                .setErrorCode("DELIVRD").setErrorMsg("用户接收成功").setMobile("15601691300")
+                .setReceiveTime(LocalDateTime.of(2026, 1, 2, 3, 4, 5))
+                .setSerialNo("serial-success").setLogId(1024L);
+        SmsReceiveRespDTO failureResult = new SmsReceiveRespDTO().setSuccess(false)
+                .setErrorCode("UNDELIV").setErrorMsg("用户关机").setMobile("15601691301")
+                .setReceiveTime(LocalDateTime.of(2026, 1, 2, 3, 4, 6))
+                .setSerialNo("serial-failure").setLogId(2048L);
+        when(smsClient.parseSmsReceiveStatus(eq(text))).thenReturn(List.of(successResult, failureResult));
 
         // 调用
         smsSendService.receiveSmsStatus(channelCode, text);
         // 断言
-        receiveResults.forEach(result -> smsLogService.updateSmsReceiveResult(eq(result.getLogId()), eq(result.getSerialNo()), eq(result.getSuccess()),
-                eq(result.getReceiveTime()), eq(result.getErrorCode()), eq(result.getErrorCode())));
+        verify(smsLogService).updateSmsReceiveResult(eq(1024L), eq("serial-success"), eq(true),
+                eq(LocalDateTime.of(2026, 1, 2, 3, 4, 5)), eq("DELIVRD"), eq("用户接收成功"));
+        verify(smsLogService).updateSmsReceiveResult(eq(2048L), eq("serial-failure"), eq(false),
+                eq(LocalDateTime.of(2026, 1, 2, 3, 4, 6)), eq("UNDELIV"), eq("用户关机"));
+        verifyNoMoreInteractions(smsLogService);
     }
 
 }

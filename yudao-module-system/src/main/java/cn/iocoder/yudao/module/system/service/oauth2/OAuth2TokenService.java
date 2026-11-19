@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.system.controller.admin.oauth2.vo.token.OAuth2AccessTokenPageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.oauth2.OAuth2AccessTokenDO;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -79,6 +80,13 @@ public interface OAuth2TokenService {
      * @param userType 用户类型
      */
     void removeAccessToken(Long userId, Integer userType);
+
+    /**
+     * 在账号禁用或删除的读已提交事务中，移除后台用户的访问令牌、刷新令牌和授权码
+     *
+     * @param userIds 用户编号列表
+     */
+    void removeAdminUserTokens(Collection<Long> userIds);
 
     /**
      * 获得访问令牌分页

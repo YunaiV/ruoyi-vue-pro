@@ -18,7 +18,7 @@ public class AiWriteRespVO {
     @Schema(description = "写作类型", example = "1")
     private Integer type;
 
-    @Schema(description = "平台", requiredMode = Schema.RequiredMode.REQUIRED, example = "TongYi")
+    @Schema(description = "平台", requiredMode = Schema.RequiredMode.REQUIRED, example = "ALIBABA")
     private String platform;
 
     @Schema(description = "模型", requiredMode = Schema.RequiredMode.REQUIRED, example = "qwen")
@@ -44,6 +44,9 @@ public class AiWriteRespVO {
 
     @Schema(description = "语言提示词", example = "4")
     private Integer language;
+
+    @Schema(description = "场景参数")
+    private AiWriteGenerateReqVO.SceneParams sceneParams;
 
     @Schema(description = "错误信息")
     private String errorMessage;

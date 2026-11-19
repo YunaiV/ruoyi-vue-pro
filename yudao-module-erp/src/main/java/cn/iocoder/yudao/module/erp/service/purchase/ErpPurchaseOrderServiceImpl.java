@@ -193,7 +193,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
         // 1. 更新每个采购订单项
         orderItems.forEach(item -> {
             BigDecimal inCount = inCountMap.getOrDefault(item.getId(), BigDecimal.ZERO);
-            if (item.getInCount().equals(inCount)) {
+            if (item.getInCount().compareTo(inCount) == 0) {
                 return;
             }
             if (inCount.compareTo(item.getCount()) > 0) {
@@ -213,7 +213,7 @@ public class ErpPurchaseOrderServiceImpl implements ErpPurchaseOrderService {
         // 1. 更新每个采购订单项
         orderItems.forEach(item -> {
             BigDecimal returnCount = returnCountMap.getOrDefault(item.getId(), BigDecimal.ZERO);
-            if (item.getReturnCount().equals(returnCount)) {
+            if (item.getReturnCount().compareTo(returnCount) == 0) {
                 return;
             }
             if (returnCount.compareTo(item.getInCount()) > 0) {

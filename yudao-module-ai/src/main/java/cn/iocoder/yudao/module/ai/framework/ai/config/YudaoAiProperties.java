@@ -19,6 +19,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class YudaoAiProperties {
 
     /**
+     * 谷歌：Gemini
+     */
+    private ChatProvider gemini;
+
+    /**
      * 字节跳动：豆包
      */
     private ChatProvider bytedance;

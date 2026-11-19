@@ -2,8 +2,6 @@ package cn.iocoder.yudao.module.ai.service.knowledge;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.http.HttpUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
@@ -14,13 +12,11 @@ import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.document.AiKnowl
 import cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.knowledge.AiKnowledgeDocumentCreateReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.knowledge.AiKnowledgeDocumentDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.knowledge.AiKnowledgeDocumentMapper;
+import cn.iocoder.yudao.module.ai.util.AiDocumentUtils;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.document.Document;
-import org.springframework.ai.reader.tika.TikaDocumentReader;
 import org.springframework.ai.tokenizer.TokenCountEstimator;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,7 +56,7 @@ public class AiKnowledgeDocumentServiceImpl implements AiKnowledgeDocumentServic
         knowledgeService.validateKnowledgeExists(createReqVO.getKnowledgeId());
 
         // 2. 下载文档
-        String content = readUrl(createReqVO.getUrl());
+        String content = AiDocumentUtils.readUrl(createReqVO.getUrl());
 
         // 3. 文档记录入库
         AiKnowledgeDocumentDO documentDO = BeanUtils.toBean(createReqVO, AiKnowledgeDocumentDO.class)
@@ -79,7 +75,7 @@ public class AiKnowledgeDocumentServiceImpl implements AiKnowledgeDocumentServic
         knowledgeService.validateKnowledgeExists(createListReqVO.getKnowledgeId());
 
         // 2. 下载文档
-        List<String> contents = convertList(createListReqVO.getList(), document -> readUrl(document.getUrl()));
+        List<String> contents = convertList(createListReqVO.getList(), document -> AiDocumentUtils.readUrl(document.getUrl()));
 
         // 3. 文档记录入库
         List<AiKnowledgeDocumentDO> documentDOs = new ArrayList<>(createListReqVO.getList().size());
@@ -168,31 +164,6 @@ public class AiKnowledgeDocumentServiceImpl implements AiKnowledgeDocumentServic
             throw exception(KNOWLEDGE_DOCUMENT_NOT_EXISTS);
         }
         return knowledgeDocument;
-    }
-
-    @Override
-    public String readUrl(String url) {
-        // 下载文件
-        ByteArrayResource resource;
-        try {
-            byte[] bytes = HttpUtil.downloadBytes(url);
-            if (bytes.length == 0) {
-                throw exception(KNOWLEDGE_DOCUMENT_FILE_EMPTY);
-            }
-            resource = new ByteArrayResource(bytes);
-        } catch (Exception e) {
-            log.error("[readUrl][url({}) 读取失败]", url, e);
-            throw exception(KNOWLEDGE_DOCUMENT_FILE_DOWNLOAD_FAIL);
-        }
-
-        // 读取文件
-        TikaDocumentReader loader = new TikaDocumentReader(resource);
-        List<Document> documents = loader.get();
-        Document document = CollUtil.getFirst(documents);
-        if (document == null || StrUtil.isEmpty(document.getText())) {
-            throw exception(KNOWLEDGE_DOCUMENT_FILE_READ_FAIL);
-        }
-        return document.getText();
     }
 
     @Override

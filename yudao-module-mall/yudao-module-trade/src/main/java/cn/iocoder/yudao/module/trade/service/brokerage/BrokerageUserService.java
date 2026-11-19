@@ -76,6 +76,17 @@ public interface BrokerageUserService {
     boolean updateUserPrice(Long id, Integer price);
 
     /**
+     * 更新用户佣金（减少），要求佣金充足
+     *
+     * 注意：和 {@link #updateUserPrice(Long, Integer)} 不同，不允许扣出负数，适用于提现等场景
+     *
+     * @param id    用户编号
+     * @param price 减少的可用佣金（负数）
+     * @return 是否成功；佣金不足时返回 false
+     */
+    boolean updateUserPriceDecrIfEnough(Long id, Integer price);
+
+    /**
      * 更新用户冻结佣金
      *
      * @param id          用户编号

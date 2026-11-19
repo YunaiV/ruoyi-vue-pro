@@ -18,16 +18,25 @@ public class WebSocketSenderApiImpl implements WebSocketSenderApi {
 
     @Override
     public void send(Integer userType, Long userId, String messageType, String messageContent) {
+        if (webSocketMessageSender == null) {
+            return;
+        }
         webSocketMessageSender.send(userType, userId, messageType, messageContent);
     }
 
     @Override
     public void send(Integer userType, String messageType, String messageContent) {
+        if (webSocketMessageSender == null) {
+            return;
+        }
         webSocketMessageSender.send(userType, messageType, messageContent);
     }
 
     @Override
     public void send(String sessionId, String messageType, String messageContent) {
+        if (webSocketMessageSender == null) {
+            return;
+        }
         webSocketMessageSender.send(sessionId, messageType, messageContent);
     }
 

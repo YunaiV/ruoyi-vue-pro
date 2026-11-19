@@ -5,3 +5,4 @@ DELETE FROM "ai_skill_file";
 DELETE FROM "ai_speech";
 
 DELETE FROM "ai_ppt";
+DELETE FROM "ai_write";

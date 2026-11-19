@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.service.rule.scene.matcher.condition;
 
+import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.dal.dataobject.rule.IotSceneRuleDO;
 import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleConditionOperatorEnum;
@@ -7,13 +8,15 @@ import cn.iocoder.yudao.module.iot.enums.rule.IotSceneRuleConditionTypeEnum;
 import cn.iocoder.yudao.module.iot.service.rule.scene.matcher.IotBaseConditionMatcherTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomString;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
+import static org.mockito.Mockito.mockStatic;
 
 /**
  * {@link IotCurrentTimeConditionMatcher} 的单元测试
@@ -21,6 +24,15 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author HUIHUI
  */
 public class IotCurrentTimeConditionMatcherTest extends IotBaseConditionMatcherTest {
+
+    /**
+     * 固定的当前时刻
+     */
+    private static final LocalDateTime NOW = LocalDateTime.of(2026, 3, 15, 12, 0, 0);
+    /**
+     * 固定当前时刻对应的秒级时间戳（与生产代码使用同一时区换算）
+     */
+    private static final long NOW_TIMESTAMP = LocalDateTimeUtils.toEpochSecond(NOW);
 
     private IotCurrentTimeConditionMatcher matcher;
 
@@ -60,158 +72,114 @@ public class IotCurrentTimeConditionMatcherTest extends IotBaseConditionMatcherT
 
     @Test
     public void testMatches_dateTimeGreaterThan_success() {
-        // 准备参数
-        IotDeviceMessage message = createDeviceMessage();
-        long pastTimestamp = LocalDateTime.now().minusHours(1).toEpochSecond(ZoneOffset.of("+8"));
-        IotSceneRuleDO.TriggerCondition condition = createDateTimeCondition(
-                IotSceneRuleConditionOperatorEnum.DATE_TIME_GREATER_THAN.getOperator(),
-                String.valueOf(pastTimestamp)
-        );
-
-        // 调用
-        boolean result = matcher.matches(message, condition);
-
-        // 断言
-        assertTrue(result);
+        assertTrue(matchesAt(NOW, IotSceneRuleConditionOperatorEnum.DATE_TIME_GREATER_THAN,
+                String.valueOf(NOW_TIMESTAMP - 3600)));
     }
 
     @Test
     public void testMatches_dateTimeGreaterThan_fail() {
-        // 准备参数
-        IotDeviceMessage message = createDeviceMessage();
-        long futureTimestamp = LocalDateTime.now().plusHours(1).toEpochSecond(ZoneOffset.of("+8"));
-        IotSceneRuleDO.TriggerCondition condition = createDateTimeCondition(
-                IotSceneRuleConditionOperatorEnum.DATE_TIME_GREATER_THAN.getOperator(),
-                String.valueOf(futureTimestamp)
-        );
+        assertFalse(matchesAt(NOW, IotSceneRuleConditionOperatorEnum.DATE_TIME_GREATER_THAN,
+                String.valueOf(NOW_TIMESTAMP + 3600)));
+    }
 
-        // 调用
-        boolean result = matcher.matches(message, condition);
-
-        // 断言
-        assertFalse(result);
+    @Test
+    public void testMatches_dateTimeGreaterThan_boundary() {
+        // 等于目标时间戳时，不满足"大于"
+        assertFalse(matchesAt(NOW, IotSceneRuleConditionOperatorEnum.DATE_TIME_GREATER_THAN,
+                String.valueOf(NOW_TIMESTAMP)));
+        assertTrue(matchesAt(NOW, IotSceneRuleConditionOperatorEnum.DATE_TIME_GREATER_THAN,
+                String.valueOf(NOW_TIMESTAMP - 1)));
     }
 
     @Test
     public void testMatches_dateTimeLessThan_success() {
-        // 准备参数
-        IotDeviceMessage message = createDeviceMessage();
-        long futureTimestamp = LocalDateTime.now().plusHours(1).toEpochSecond(ZoneOffset.of("+8"));
-        IotSceneRuleDO.TriggerCondition condition = createDateTimeCondition(
-                IotSceneRuleConditionOperatorEnum.DATE_TIME_LESS_THAN.getOperator(),
-                String.valueOf(futureTimestamp)
-        );
+        assertTrue(matchesAt(NOW, IotSceneRuleConditionOperatorEnum.DATE_TIME_LESS_THAN,
+                String.valueOf(NOW_TIMESTAMP + 3600)));
+    }
 
-        // 调用
-        boolean result = matcher.matches(message, condition);
+    @Test
+    public void testMatches_dateTimeLessThan_fail() {
+        assertFalse(matchesAt(NOW, IotSceneRuleConditionOperatorEnum.DATE_TIME_LESS_THAN,
+                String.valueOf(NOW_TIMESTAMP - 3600)));
+    }
 
-        // 断言
-        assertTrue(result);
+    @Test
+    public void testMatches_dateTimeLessThan_boundary() {
+        // 等于目标时间戳时，不满足"小于"
+        assertFalse(matchesAt(NOW, IotSceneRuleConditionOperatorEnum.DATE_TIME_LESS_THAN,
+                String.valueOf(NOW_TIMESTAMP)));
+        assertTrue(matchesAt(NOW, IotSceneRuleConditionOperatorEnum.DATE_TIME_LESS_THAN,
+                String.valueOf(NOW_TIMESTAMP + 1)));
     }
 
     @Test
     public void testMatches_dateTimeBetween_success() {
-        // 准备参数
-        IotDeviceMessage message = createDeviceMessage();
-        long startTimestamp = LocalDateTime.now().minusHours(1).toEpochSecond(ZoneOffset.of("+8"));
-        long endTimestamp = LocalDateTime.now().plusHours(1).toEpochSecond(ZoneOffset.of("+8"));
-        IotSceneRuleDO.TriggerCondition condition = createDateTimeCondition(
-                IotSceneRuleConditionOperatorEnum.DATE_TIME_BETWEEN.getOperator(),
-                startTimestamp + "," + endTimestamp
-        );
-
-        // 调用
-        boolean result = matcher.matches(message, condition);
-
-        // 断言
-        assertTrue(result);
+        assertTrue(matchesAt(NOW, IotSceneRuleConditionOperatorEnum.DATE_TIME_BETWEEN,
+                (NOW_TIMESTAMP - 3600) + "," + (NOW_TIMESTAMP + 3600)));
     }
 
     @Test
     public void testMatches_dateTimeBetween_fail() {
-        // 准备参数
-        IotDeviceMessage message = createDeviceMessage();
-        long startTimestamp = LocalDateTime.now().plusHours(1).toEpochSecond(ZoneOffset.of("+8"));
-        long endTimestamp = LocalDateTime.now().plusHours(2).toEpochSecond(ZoneOffset.of("+8"));
-        IotSceneRuleDO.TriggerCondition condition = createDateTimeCondition(
-                IotSceneRuleConditionOperatorEnum.DATE_TIME_BETWEEN.getOperator(),
-                startTimestamp + "," + endTimestamp
-        );
+        assertFalse(matchesAt(NOW, IotSceneRuleConditionOperatorEnum.DATE_TIME_BETWEEN,
+                (NOW_TIMESTAMP + 3600) + "," + (NOW_TIMESTAMP + 7200)));
+        assertFalse(matchesAt(NOW, IotSceneRuleConditionOperatorEnum.DATE_TIME_BETWEEN,
+                (NOW_TIMESTAMP - 7200) + "," + (NOW_TIMESTAMP - 1)));
+    }
 
-        // 调用
-        boolean result = matcher.matches(message, condition);
-
-        // 断言
-        assertFalse(result);
+    @Test
+    public void testMatches_dateTimeBetween_boundary() {
+        // 区间两端均为闭区间
+        assertTrue(matchesAt(NOW, IotSceneRuleConditionOperatorEnum.DATE_TIME_BETWEEN,
+                NOW_TIMESTAMP + "," + (NOW_TIMESTAMP + 3600)));
+        assertTrue(matchesAt(NOW, IotSceneRuleConditionOperatorEnum.DATE_TIME_BETWEEN,
+                (NOW_TIMESTAMP - 3600) + "," + NOW_TIMESTAMP));
+        assertFalse(matchesAt(NOW, IotSceneRuleConditionOperatorEnum.DATE_TIME_BETWEEN,
+                (NOW_TIMESTAMP + 1) + "," + (NOW_TIMESTAMP + 3600)));
     }
 
     // ========== 当日时间条件测试 ==========
 
     @Test
     public void testMatches_timeGreaterThan_earlyMorning() {
-        // 准备参数
-        IotDeviceMessage message = createDeviceMessage();
-        IotSceneRuleDO.TriggerCondition condition = createTimeCondition(
-                IotSceneRuleConditionOperatorEnum.TIME_GREATER_THAN.getOperator(),
-                "06:00:00" // 早上6点
-        );
-
-        // 调用
-        boolean result = matcher.matches(message, condition);
-
-        // 断言
-        // 结果取决于当前时间，如果当前时间大于6点则为true
-        assertNotNull(result);
+        // 早上 6 点之后
+        String param = "06:00:00";
+        assertTrue(matchesAt(atTime(12, 0, 0), IotSceneRuleConditionOperatorEnum.TIME_GREATER_THAN, param));
+        assertTrue(matchesAt(atTime(6, 0, 1), IotSceneRuleConditionOperatorEnum.TIME_GREATER_THAN, param));
+        // 边界：等于 6 点不满足"大于"
+        assertFalse(matchesAt(atTime(6, 0, 0), IotSceneRuleConditionOperatorEnum.TIME_GREATER_THAN, param));
+        assertFalse(matchesAt(atTime(5, 59, 59), IotSceneRuleConditionOperatorEnum.TIME_GREATER_THAN, param));
     }
 
     @Test
     public void testMatches_timeLessThan_lateNight() {
-        // 准备参数
-        IotDeviceMessage message = createDeviceMessage();
-        IotSceneRuleDO.TriggerCondition condition = createTimeCondition(
-                IotSceneRuleConditionOperatorEnum.TIME_LESS_THAN.getOperator(),
-                "23:59:59" // 晚上11点59分59秒
-        );
-
-        // 调用
-        boolean result = matcher.matches(message, condition);
-
-        // 断言
-        // 大部分情况下应该为true，除非在午夜前1秒运行测试
-        assertNotNull(result);
+        // 晚上 11 点 59 分 59 秒之前
+        String param = "23:59:59";
+        assertTrue(matchesAt(atTime(12, 0, 0), IotSceneRuleConditionOperatorEnum.TIME_LESS_THAN, param));
+        assertTrue(matchesAt(atTime(23, 59, 58), IotSceneRuleConditionOperatorEnum.TIME_LESS_THAN, param));
+        // 边界：等于目标时间不满足"小于"
+        assertFalse(matchesAt(atTime(23, 59, 59), IotSceneRuleConditionOperatorEnum.TIME_LESS_THAN, param));
     }
 
     @Test
     public void testMatches_timeBetween_allDay() {
-        // 准备参数
-        IotDeviceMessage message = createDeviceMessage();
-        IotSceneRuleDO.TriggerCondition condition = createTimeCondition(
-                IotSceneRuleConditionOperatorEnum.TIME_BETWEEN.getOperator(),
-                "00:00:00,23:59:59" // 全天
-        );
-
-        // 调用
-        boolean result = matcher.matches(message, condition);
-
-        // 断言
-        assertTrue(result); // 全天范围应该总是匹配
+        // 全天：闭区间两端都匹配
+        String param = "00:00:00,23:59:59";
+        assertTrue(matchesAt(atTime(0, 0, 0), IotSceneRuleConditionOperatorEnum.TIME_BETWEEN, param));
+        assertTrue(matchesAt(atTime(12, 0, 0), IotSceneRuleConditionOperatorEnum.TIME_BETWEEN, param));
+        assertTrue(matchesAt(atTime(23, 59, 59), IotSceneRuleConditionOperatorEnum.TIME_BETWEEN, param));
     }
 
     @Test
     public void testMatches_timeBetween_workingHours() {
-        // 准备参数
-        IotDeviceMessage message = createDeviceMessage();
-        IotSceneRuleDO.TriggerCondition condition = createTimeCondition(
-                IotSceneRuleConditionOperatorEnum.TIME_BETWEEN.getOperator(),
-                "09:00:00,17:00:00" // 工作时间
-        );
-
-        // 调用
-        boolean result = matcher.matches(message, condition);
-
-        // 断言
-        // 结果取决于当前时间是否在工作时间内
-        assertNotNull(result);
+        // 工作时间
+        String param = "09:00:00,17:00:00";
+        assertTrue(matchesAt(atTime(12, 0, 0), IotSceneRuleConditionOperatorEnum.TIME_BETWEEN, param));
+        // 边界：闭区间
+        assertTrue(matchesAt(atTime(9, 0, 0), IotSceneRuleConditionOperatorEnum.TIME_BETWEEN, param));
+        assertTrue(matchesAt(atTime(17, 0, 0), IotSceneRuleConditionOperatorEnum.TIME_BETWEEN, param));
+        // 区间外
+        assertFalse(matchesAt(atTime(8, 59, 59), IotSceneRuleConditionOperatorEnum.TIME_BETWEEN, param));
+        assertFalse(matchesAt(atTime(17, 0, 1), IotSceneRuleConditionOperatorEnum.TIME_BETWEEN, param));
     }
 
     // ========== 异常情况测试 ==========
@@ -307,6 +275,22 @@ public class IotCurrentTimeConditionMatcherTest extends IotBaseConditionMatcherT
     }
 
     // ========== 辅助方法 ==========
+
+    /**
+     * 在固定的当前时刻下执行匹配，避免依赖机器时间
+     */
+    private boolean matchesAt(LocalDateTime now, IotSceneRuleConditionOperatorEnum operator, String param) {
+        IotDeviceMessage message = createDeviceMessage();
+        IotSceneRuleDO.TriggerCondition condition = createTimeCondition(operator.getOperator(), param);
+        try (MockedStatic<LocalDateTime> mockedTime = mockStatic(LocalDateTime.class, CALLS_REAL_METHODS)) {
+            mockedTime.when(LocalDateTime::now).thenReturn(now);
+            return matcher.matches(message, condition);
+        }
+    }
+
+    private static LocalDateTime atTime(int hour, int minute, int second) {
+        return NOW.toLocalDate().atTime(hour, minute, second);
+    }
 
     /**
      * 创建设备消息

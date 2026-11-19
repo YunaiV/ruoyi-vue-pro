@@ -493,10 +493,10 @@ public class OaMailMessageClientImpl implements OaMailMessageClient {
     public Pair<String, byte[]> getAttachment(Message message, String path) throws MessagingException, IOException {
         // 1. 根据元数据中的 MIME 路径定位附件，不读取外部 URL
         Part part = message;
-        if (path == null || (!path.isEmpty() && !path.matches("[0-9]+(\\.[0-9]+)*"))) {
+        if (path == null || (StrUtil.isNotEmpty(path) && !path.matches("[0-9]++(?:\\.[0-9]++)*+"))) {
             throw exception(MAIL_ATTACHMENT_NOT_EXISTS);
         }
-        if (!path.isEmpty()) {
+        if (StrUtil.isNotEmpty(path)) {
             for (String index : path.split("\\.")) {
                 if (!part.isMimeType(MULTIPART_TYPE)) {
                     throw exception(MAIL_ATTACHMENT_NOT_EXISTS);

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.system.service.mail;
 
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
@@ -7,10 +8,14 @@ import cn.iocoder.yudao.module.system.controller.admin.mail.vo.template.MailTemp
 import cn.iocoder.yudao.module.system.controller.admin.mail.vo.template.MailTemplatePageReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailTemplateDO;
 import cn.iocoder.yudao.module.system.dal.mysql.mail.MailTemplateMapper;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 
 import jakarta.annotation.Resource;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -260,17 +265,18 @@ public class MailTemplateServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testFormatMailTemplateContent_htmlUnescape() {
+    public void testFormatMailTemplateContent_htmlEntitiesAsText() {
         // 准备参数
         Map<String, Object> params = new HashMap<>();
         params.put("title", "测试标题");
 
-        // 测试HTML反转义
+        // 测试 HTML 实体按标准 HTML 解析为文字，不再反转义成标签
         String content = "<h1>{title}</h1>&lt;p&gt;这是一个测试&lt;/p&gt;&amp;nbsp;空格";
-        String expected = "<h1>测试标题</h1><p>这是一个测试</p> 空格";
         // 调用，并断言
-        assertEquals(expected,
-                mailTemplateService.formatMailTemplateContent(content, params));
+        Document document = Jsoup.parseBodyFragment(mailTemplateService.formatMailTemplateContent(content, params));
+        assertEquals("测试标题", document.select("h1").text());
+        assertTrue(document.select("p").isEmpty());
+        assertEquals("<p>这是一个测试</p>&nbsp;空格", document.body().textNodes().get(0).getWholeText());
     }
 
     @Test
@@ -318,8 +324,34 @@ public class MailTemplateServiceImplTest extends BaseDbUnitTest {
         // 断言结果中包含替换后的变量
         assertTrue(result.contains("尊敬的 testuser"));
         assertTrue(result.contains("测试公司"));
-        // 断言结果是有效的 HTML
-        assertTrue(result.startsWith("<!DOCTYPE html>"));
+        // 断言结果是完整的 HTML 文档，head 内容被保留
+        assertTrue(StrUtil.startWithIgnoreCase(result, "<!doctype html>"));
+        Document document = Jsoup.parse(result);
+        assertEquals("en", document.selectFirst("html").attr("lang"));
+        assertEquals("Title", document.title());
+        assertEquals(2, document.select("head > meta").size());
+    }
+
+    @Test
+    public void testFormatMailTemplateContent_fullDocumentKeepsHeadAndStyle() {
+        // 准备参数
+        Map<String, Object> params = new HashMap<>();
+        params.put("title", "通知");
+
+        // 测试完整文档中的 head、style 被保留，body 中的代码块被格式化
+        String content = "<!DOCTYPE html><html lang=\"zh\"><head><meta charset=\"UTF-8\"><title>{title}</title>"
+                + "<style>.code > span { color: #f00; }</style></head>"
+                + "<body><p>你好</p><pre class=\"p\"><code class=\"c\">x</code></pre></body></html>";
+        String result = mailTemplateService.formatMailTemplateContent(content, params);
+
+        // 断言
+        assertTrue(StrUtil.startWithIgnoreCase(result, "<!doctype html>"));
+        assertTrue(result.contains("<style>.code > span { color: #f00; }</style>"));
+        assertTrue(result.contains("<body><p>你好</p><div><code>x</code></div></body>"));
+        Document document = Jsoup.parse(result);
+        assertEquals("zh", document.selectFirst("html").attr("lang"));
+        assertEquals("通知", document.title());
+        assertEquals("UTF-8", document.selectFirst("head > meta").attr("charset"));
     }
 
     @Test
@@ -328,8 +360,8 @@ public class MailTemplateServiceImplTest extends BaseDbUnitTest {
         Map<String, Object> params = new HashMap<>();
 
         // 测试空内容
-        String result = mailTemplateService.formatMailTemplateContent("", params);
-        assertEquals("", result);
+        assertEquals("", mailTemplateService.formatMailTemplateContent("", params));
+        assertNull(mailTemplateService.formatMailTemplateContent(null, params));
     }
 
     @Test
@@ -368,8 +400,10 @@ public class MailTemplateServiceImplTest extends BaseDbUnitTest {
         // 简化测试，只测试基本的 HTML 特殊字符
         String content = "&lt;div&gt;测试 &amp; 特殊字符&lt;/div&gt;";
         String result = mailTemplateService.formatMailTemplateContent(content, params);
-        // 断言特殊字符被正确反转义
-        assertTrue(result.contains("<div>测试 & 特殊字符</div>"));
+        // 断言特殊字符按标准 HTML 显示为文字
+        Document document = Jsoup.parseBodyFragment(result);
+        assertTrue(document.body().children().isEmpty());
+        assertEquals("<div>测试 & 特殊字符</div>", document.body().text());
     }
 
     @Test
@@ -432,9 +466,11 @@ public class MailTemplateServiceImplTest extends BaseDbUnitTest {
         System.out.println("formatMailTemplateContent结果：" + formattedContent);
 
         // 断言：HTML 格式被保留并处理
-        assertTrue(formattedContent.contains("<div style='font-family: Arial, sans-serif; color: #333;'>"));
+        Document document = Jsoup.parseBodyFragment(formattedContent);
+        assertEquals("font-family: Arial, sans-serif; color: #333;", document.body().child(0).attr("style"));
         assertTrue(formattedContent.contains("<h1>Welcome, testuser!</h1>"));
-        assertTrue(formattedContent.contains("<a href='https://example.com/activate?code=12345'>here</a>"));
+        assertEquals("https://example.com/activate?code=12345", document.selectFirst("a").attr("href"));
+        assertEquals("here", document.selectFirst("a").text());
         assertTrue(formattedContent.contains("<div><code>public class WelcomeMessage {"));
         assertTrue(formattedContent.contains("</code></div>"));
         // 断言：所有参数都被正确替换
@@ -454,8 +490,148 @@ public class MailTemplateServiceImplTest extends BaseDbUnitTest {
 
         // 调用，并断言内容原样保留
         String result = mailTemplateService.formatMailTemplateContent(content, params);
-        assertTrue(result.contains("echo $HOME && ls \\root"));
         assertTrue(result.contains("<div><code>"));
+        assertEquals("echo $HOME && ls \\root", Jsoup.parseBodyFragment(result).selectFirst("div > code").wholeText());
+    }
+
+    @Test
+    public void testFormatMailTemplateContent_codeWhitespace() {
+        // 准备参数
+        Map<String, Object> params = new HashMap<>();
+
+        // 测试代码块中的换行、缩进被保留
+        String content = "<pre><code class=\"language-java\">if (a) {\n    return \"$1\\n\";\n}\n</code></pre>";
+
+        // 调用，并断言
+        assertEquals("<div><code>if (a) {\n    return \"$1\\n\";\n}\n</code></div>",
+                mailTemplateService.formatMailTemplateContent(content, params));
+    }
+
+    @Test
+    public void testFormatMailTemplateContent_unclosedPreTags() {
+        // 准备参数：大量未闭合的标签（历史上多次正则扫描会对每个 <pre> 反复扫描到末尾，耗时平方级增长）
+        Map<String, Object> params = new HashMap<>();
+        String content01 = "<pre>".repeat(20000) + "末尾 &amp; 内容";
+        String content02 = "<pre><code class=\"a\">".repeat(20000) + "末尾";
+        String content03 = "&lt;pre title=&quot;".repeat(20000);
+
+        // 调用，并断言可终止，未闭合的标签按标准 HTML 自动修复，可见文字保留
+        assertTimeoutPreemptively(Duration.ofSeconds(5), () -> {
+            String result01 = mailTemplateService.formatMailTemplateContent(content01, params);
+            assertFalse(result01.contains("<pre"));
+            assertEquals("末尾 & 内容", Jsoup.parseBodyFragment(result01).text());
+            String result02 = mailTemplateService.formatMailTemplateContent(content02, params);
+            assertFalse(result02.contains("<pre"));
+            assertEquals("末尾", Jsoup.parseBodyFragment(result02).text());
+            String result03 = mailTemplateService.formatMailTemplateContent(content03, params);
+            assertEquals("<pre title=\"".repeat(20000), Jsoup.parseBodyFragment(result03).text());
+        });
+    }
+
+    @Test
+    public void testFormatMailTemplateContent_angleBracketInAttributes() {
+        // 准备参数：pre、code 的单双引号属性中包含 &lt; &gt;
+        Map<String, Object> params = new HashMap<>();
+        String content = "<pre class=\"a &lt; b\" title='c &gt; d'><code class=\"x &gt; y\" data-a='&lt;z&gt;'>int a = 1;</code></pre>"
+                + "<p>after</p>";
+
+        // 调用，并断言属性被去掉，正文完整
+        assertEquals("<div><code>int a = 1;</code></div><p>after</p>",
+                mailTemplateService.formatMailTemplateContent(content, params));
+    }
+
+    @Test
+    public void testFormatMailTemplateContent_closePreInCodeAndSpanAttributes() {
+        // 准备参数：code 属性、代码内部 span 高亮标签属性中包含 &lt;/pre&gt;
+        Map<String, Object> params = new HashMap<>();
+        String content = "<pre><code class=\"language-html\" data-end=\"&lt;/pre&gt;\">"
+                + "<span class=\"hljs-tag\" title=\"&lt;/pre&gt;\">&lt;/pre&gt;</span></code></pre>"
+                + "<pre><code>second</code></pre>";
+
+        // 调用，并断言 code 属性被去掉，span 及其中的文字保留
+        String result = mailTemplateService.formatMailTemplateContent(content, params);
+        assertFalse(result.contains("<pre"));
+        Document document = Jsoup.parseBodyFragment(result);
+        assertEquals(2, document.select("div > code").size());
+        Element code = document.select("div > code").get(0);
+        assertEquals(0, code.attributesSize());
+        assertEquals("</pre>", code.selectFirst("span.hljs-tag").attr("title"));
+        assertEquals("</pre>", code.selectFirst("span.hljs-tag").text());
+        assertEquals("second", document.select("div > code").get(1).text());
+    }
+
+    @Test
+    public void testFormatMailTemplateContent_sameQuoteEntityInQuotedAttributes() {
+        // 准备参数：字面引号包住的属性中包含同类的 &quot; 或 &#39;
+        Map<String, Object> params = new HashMap<>();
+        String content = "<pre title=\"say &quot;&gt;&quot;\"><code class='it&#39;s &gt; ok'>first</code></pre>"
+                + "<pre><code>second</code></pre>";
+
+        // 调用，并断言后续代码块仍正常格式化
+        assertEquals("<div><code>first</code></div><div><code>second</code></div>",
+                mailTemplateService.formatMailTemplateContent(content, params));
+    }
+
+    @Test
+    public void testFormatMailTemplateContent_unquotedAttributeStartsWithQuoteEntity() {
+        // 准备参数：字面标签中，无引号属性值从 &quot; 或 &#39; 开始
+        Map<String, Object> params = new HashMap<>();
+        String content = "<pre title=&quot;a><code class=&#39;b>first</code></pre><pre><code>second</code></pre>";
+
+        // 调用，并断言不会误吞后续代码块
+        assertEquals("<div><code>first</code></div><div><code>second</code></div>",
+                mailTemplateService.formatMailTemplateContent(content, params));
+    }
+
+    @Test
+    public void testFormatMailTemplateContent_escapedMarkupAsText() {
+        // 准备参数：被 HTML 实体转义（一次、两次）的 pre、code 标签，以及与字面标签混合的情况
+        Map<String, Object> params = new HashMap<>();
+        String escaped = "&lt;pre class=&quot;a &gt; b&quot;&gt;&lt;code&gt;x &amp;lt; y&lt;/code&gt;&lt;/pre&gt;";
+        String doubleEscaped = "&amp;lt;pre&amp;gt;second&amp;lt;/pre&amp;gt;";
+        String mixed01 = "<pre>&lt;code class=&quot;java&quot;&gt;x&lt;/code&gt;</pre>";
+        String mixed02 = "&lt;pre&gt;<code class=\"java\">x</code>&lt;/pre&gt;";
+
+        // 调用，并断言转义的标签按标准 HTML 显示为文字，不会变成标签
+        Document document = Jsoup.parseBodyFragment(mailTemplateService.formatMailTemplateContent(escaped, params));
+        assertTrue(document.body().children().isEmpty());
+        assertEquals("<pre class=\"a > b\"><code>x &lt; y</code></pre>", document.body().text());
+        document = Jsoup.parseBodyFragment(mailTemplateService.formatMailTemplateContent(doubleEscaped, params));
+        assertTrue(document.body().children().isEmpty());
+        assertEquals("&lt;pre&gt;second&lt;/pre&gt;", document.body().text());
+        // 断言字面的 pre 仍替换为 div，字面的 code 按实际结构处理
+        document = Jsoup.parseBodyFragment(mailTemplateService.formatMailTemplateContent(mixed01, params));
+        assertEquals("<code class=\"java\">x</code>", document.selectFirst("body > div").wholeText());
+        assertTrue(document.select("code").isEmpty());
+        document = Jsoup.parseBodyFragment(mailTemplateService.formatMailTemplateContent(mixed02, params));
+        assertEquals("<pre>x</pre>", document.body().text());
+        assertEquals("java", document.selectFirst("body > code").attr("class"));
+    }
+
+    @Test
+    public void testFormatMailTemplateContent_incompleteHtmlInCodeText() {
+        // 准备参数：字面 code 正文中包含转义的不完整 HTML 示例，后面紧跟下一个代码块
+        Map<String, Object> params = new HashMap<>();
+        String content = "<pre><code>&lt;img title=&quot;未闭合 alt=&#39;</code></pre><pre><code>second</code></pre>";
+
+        // 调用，并断言两段代码正文均保留为文字，不会吞掉本块或下一块
+        String result = mailTemplateService.formatMailTemplateContent(content, params);
+        Document document = Jsoup.parseBodyFragment(result);
+        assertTrue(document.select("img").isEmpty());
+        assertEquals(2, document.select("div > code").size());
+        assertEquals("<img title=\"未闭合 alt='", document.select("div > code").get(0).wholeText());
+        assertEquals("second", document.select("div > code").get(1).wholeText());
+    }
+
+    @Test
+    public void testFormatMailTemplateContent_preWithoutAdjacentCode() {
+        // 准备参数：没有 code 的 pre，以及 code 未紧贴 pre 的情况
+        Map<String, Object> params = new HashMap<>();
+        String content = "<pre class=\"x\">plain &amp; text</pre><pre> <code class=\"y\">z</code></pre>";
+
+        // 调用，并断言 pre 替换为 div，内容保留
+        assertEquals("<div>plain &amp; text</div><div> <code class=\"y\">z</code></div>",
+                mailTemplateService.formatMailTemplateContent(content, params));
     }
 
 }

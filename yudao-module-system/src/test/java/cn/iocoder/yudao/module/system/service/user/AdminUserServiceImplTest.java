@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.system.service.user;
 
 import cn.hutool.core.util.RandomUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
-import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
@@ -44,6 +43,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import static cn.hutool.core.util.RandomUtil.randomEle;
@@ -291,7 +291,20 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
         // 断言
         AdminUserDO user = userMapper.selectById(userId);
         assertEquals(status, user.getStatus());
-        verify(oauth2TokenService).removeAccessToken(userId, UserTypeEnum.ADMIN.getValue());
+        verify(oauth2TokenService).removeAdminUserTokens(List.of(userId));
+    }
+
+    @Test
+    public void testUpdateUserStatus_tokenRemovalFails() {
+        // mock 数据
+        AdminUserDO dbUser = randomAdminUserDO(o -> o.setStatus(CommonStatusEnum.ENABLE.getStatus()));
+        userMapper.insert(dbUser);
+        doThrow(new IllegalStateException()).when(oauth2TokenService).removeAdminUserTokens(List.of(dbUser.getId()));
+
+        // 调用，并断言账号状态回滚
+        assertThrows(IllegalStateException.class,
+                () -> userService.updateUserStatus(dbUser.getId(), CommonStatusEnum.DISABLE.getStatus()));
+        assertEquals(CommonStatusEnum.ENABLE.getStatus(), userMapper.selectById(dbUser.getId()).getStatus());
     }
 
     @Test
@@ -307,7 +320,7 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
                     USER_ADMIN_NOT_ALLOW_DISABLE);
             assertEquals(CommonStatusEnum.ENABLE.getStatus(), userMapper.selectById(dbUser.getId()).getStatus());
         }
-        verify(oauth2TokenService, never()).removeAccessToken(anyLong(), anyInt());
+        verify(oauth2TokenService, never()).removeAdminUserTokens(anyCollection());
     }
 
     @Test
@@ -337,6 +350,7 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
         assertNull(userMapper.selectById(userId));
         // 校验调用次数
         verify(permissionService, times(1)).processUserDeleted(eq(userId));
+        verify(oauth2TokenService).removeAdminUserTokens(List.of(userId));
     }
 
     @Test
@@ -367,6 +381,21 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
                 USER_ADMIN_NOT_ALLOW_DELETE);
         assertNotNull(userMapper.selectById(ordinaryUser.getId()));
         assertNotNull(userMapper.selectById(adminUser.getId()));
+        verify(oauth2TokenService, never()).removeAdminUserTokens(anyCollection());
+    }
+
+    @Test
+    public void testDeleteUserList_success() {
+        // mock 数据
+        AdminUserDO dbUser = randomAdminUserDO();
+        userMapper.insert(dbUser);
+        Long missingUserId = randomLongId();
+
+        // 调用
+        userService.deleteUserList(List.of(dbUser.getId(), missingUserId));
+        // 断言
+        assertNull(userMapper.selectById(dbUser.getId()));
+        verify(oauth2TokenService).removeAdminUserTokens(List.of(dbUser.getId()));
     }
 
     private void mockUserRole(Long userId, RoleCodeEnum roleCode) {
@@ -580,7 +609,7 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
         userMapper.insert(dbUser);
         // 准备参数
         UserImportExcelVO importUser = randomPojo(UserImportExcelVO.class, o -> {
-            o.setStatus(randomEle(CommonStatusEnum.values()).getStatus()); // 保证 status 的范围
+            o.setStatus(CommonStatusEnum.DISABLE.getStatus());
             o.setSex(randomEle(SexEnum.values()).getSex()); // 保证 sex 的范围
             o.setUsername(dbUser.getUsername());
             o.setEmail(randomEmail());
@@ -601,6 +630,7 @@ public class AdminUserServiceImplTest extends BaseDbUnitTest {
         AdminUserDO user = userMapper.selectByUsername(respVO.getUpdateUsernames().get(0));
         assertPojoEquals(importUser, user);
         assertEquals(0, respVO.getFailureUsernames().size());
+        verify(oauth2TokenService).removeAdminUserTokens(Set.of(dbUser.getId()));
     }
 
     @Test

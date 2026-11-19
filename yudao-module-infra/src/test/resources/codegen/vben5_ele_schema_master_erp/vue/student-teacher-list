@@ -22,11 +22,6 @@ const props = defineProps<{
   destroyOnClose: true,
 });
 
-/** 刷新表格 */
-async function handleRefresh() {
-   await gridApi.query();
-}
-
 /** 创建学生班主任 */
 function handleCreate() {
   if (!props.studentId){
@@ -118,6 +113,11 @@ const [Grid, gridApi] = useVbenVxeGrid({
     checkboxChange: handleRowCheckboxChange,
   }
 });
+
+/** 刷新表格 */
+async function handleRefresh() {
+   await gridApi.query();
+}
 
 /** 监听主表的关联字段的变化，加载对应的子表数据 */
 watch(

@@ -5,10 +5,14 @@ import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiModelDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.requestlog.AiRequestLogDO;
 import cn.iocoder.yudao.module.ai.enums.DictTypeConstants;
+import cn.iocoder.yudao.module.ai.enums.write.AiWriteLanguageEnum;
 import cn.iocoder.yudao.module.ai.enums.write.AiWriteTypeEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 /**
@@ -16,7 +20,7 @@ import lombok.Data;
  *
  * @author xiaoxin
  */
-@TableName("ai_write")
+@TableName(value = "ai_write", autoResultMap = true)
 @KeySequence("ai_write_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 public class AiWriteDO extends BaseDO {
@@ -96,6 +100,11 @@ public class AiWriteDO extends BaseDO {
      * 字典：{@link DictTypeConstants#AI_WRITE_LANGUAGE}
      */
     private Integer language;
+    /**
+     * 场景参数：现有列放不下的参数，只保存本场景的键；不需要参数的场景为 null
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private SceneParams sceneParams;
 
     /**
      * 错误信息
@@ -126,5 +135,70 @@ public class AiWriteDO extends BaseDO {
      * 输入、输出都已知时才有值，否则为 null
      */
     private Long totalTokens;
+
+    /**
+     * 场景参数
+     */
+    @Data
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public static class SceneParams {
+
+        // ========== 周报 ==========
+        /**
+         * 周期
+         */
+        private String period;
+        /**
+         * 岗位 / 团队
+         */
+        private String role;
+
+        // ========== 小红书 ==========
+        /**
+         * 目标受众
+         */
+        private String audience;
+        /**
+         * 风格：种草 / 测评 / 攻略 / 日常分享
+         */
+        private String style;
+        /**
+         * 是否使用 emoji
+         */
+        private Boolean emoji;
+        /**
+         * 话题标签数
+         */
+        private Integer tagCount;
+
+        // ========== 润色 / 改写 ==========
+        /**
+         * 处理方式：润色 / 改写 / 精简 / 扩写
+         */
+        private String mode;
+
+        // ========== 文本翻译 ==========
+        /**
+         * 源语言
+         *
+         * 枚举 {@link AiWriteLanguageEnum}
+         */
+        private Integer sourceLanguage;
+        /**
+         * 目标语言
+         *
+         * 枚举 {@link AiWriteLanguageEnum}
+         */
+        private Integer targetLanguage;
+        /**
+         * 领域：通用 / 技术 / 法律 / 医学 / 商务 / 文学
+         */
+        private String domain;
+        /**
+         * 是否保留格式（换行、列表、Markdown、代码、链接）
+         */
+        private Boolean preserveFormat;
+
+    }
 
 }
