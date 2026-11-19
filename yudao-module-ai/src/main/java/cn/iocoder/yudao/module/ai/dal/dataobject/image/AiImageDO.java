@@ -178,7 +178,6 @@ public class AiImageDO extends BaseDO {
     @AllArgsConstructor
     public static class InputImage {
 
-        // TODO DONE @AI：搞到枚举类里把；（已收敛到 AiImageInputRoleEnum）
         /**
          * 角色
          *

@@ -1,0 +1,36 @@
+### 语音合成：提交
+POST {{baseUrl}}/admin-api/ai/speech/generate
+Content-Type: application/json
+Authorization: {{token}}
+tenant-id: {{adminTenantId}}
+
+{
+  "modelId": {{speechModelId}},
+  "inputText": "这是一段语音合成接口测试文本。",
+  "voice": "{{speechVoice}}",
+  "format": "mp3",
+  "speed": 1.2
+}
+
+### 我的语音分页
+GET {{baseUrl}}/admin-api/ai/speech/my-page?pageNo=1&pageSize=10
+Authorization: {{token}}
+tenant-id: {{adminTenantId}}
+
+### 查询我的语音详情
+GET {{baseUrl}}/admin-api/ai/speech/get-my?id={{speechId}}
+Authorization: {{token}}
+tenant-id: {{adminTenantId}}
+
+### 删除我的语音
+DELETE {{baseUrl}}/admin-api/ai/speech/delete-my?id={{speechId}}
+Authorization: {{token}}
+tenant-id: {{adminTenantId}}
+
+### 变量说明
+# baseUrl：例如 http://127.0.0.1:48080
+# token：登录用户的 Bearer Token
+# adminTenantId：租户编号
+# speechModelId：AI 模型管理中已启用、类型为“语音”的模型编号
+# speechVoice：当前模型支持的音色，例如 Cherry、male-qn-qingse、5003、101001
+# speechId：提交接口返回的语音记录编号

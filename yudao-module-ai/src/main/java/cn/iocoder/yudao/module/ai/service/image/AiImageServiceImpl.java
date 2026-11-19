@@ -62,7 +62,6 @@ import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionU
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.*;
 
-// TODO DONE @AI：service 里的代码，还是 jdk8 兼容哈；保持风格的一致性；（switch 表达式改为传统 switch）
 /**
  * AI 绘画 Service 实现类
  *
@@ -118,7 +117,7 @@ public class AiImageServiceImpl implements AiImageService {
     @Override
     public AiImageDO getImagePublic(Long id) {
         AiImageDO image = imageMapper.selectById(id);
-        if (image == null || !Boolean.TRUE.equals(image.getPublicStatus())
+        if (image == null || Boolean.FALSE.equals(image.getPublicStatus())
                 || ObjUtil.notEqual(image.getStatus(), AiImageStatusEnum.SUCCESS.getStatus())) {
             throw exception(IMAGE_PUBLIC_NOT_EXISTS);
         }
@@ -283,14 +282,6 @@ public class AiImageServiceImpl implements AiImageService {
     }
 
     @Override
-    public void updateImagePublicMy(Long userId, AiImageUpdateReqVO updateReqVO) {
-        // 1. 校验存在
-        AiImageDO image = validateImageMy(updateReqVO.getId(), userId);
-        // 2. 更新公开状态
-        updateImagePublicStatus(image, updateReqVO.getPublicStatus());
-    }
-
-    @Override
     public String optimizePrompt(Long userId, AiImageOptimizePromptReqVO reqVO) {
         // 1. 获得默认的对话模型
         AiModelDO model = modelService.getRequiredDefaultModel(AiModelTypeEnum.CHAT.getType());
@@ -303,7 +294,6 @@ public class AiImageServiceImpl implements AiImageService {
         // 2. 同步生成
         String content;
         try {
-            // TODO DONE @AI：分开，不要连续噢；先调用，产生一个变量；再继续；
             ChatResponse response = chatModel.call(prompt);
             content = AiChatUtils.getChatResponseContent(response);
         } catch (Exception ex) {
@@ -325,17 +315,12 @@ public class AiImageServiceImpl implements AiImageService {
     public void updateImage(AiImageUpdateReqVO updateReqVO) {
         // 1. 校验存在
         AiImageDO image = validateImageExists(updateReqVO.getId());
-        // 2. 更新公开状态
-        updateImagePublicStatus(image, updateReqVO.getPublicStatus());
-    }
-
-    private void updateImagePublicStatus(AiImageDO image, Boolean publicStatus) {
-        // 只有已完成的绘画，才能公开
-        if (Boolean.TRUE.equals(publicStatus)
+        // 2. 更新公开状态：只有已完成的绘画，才能公开
+        if (Boolean.TRUE.equals(updateReqVO.getPublicStatus())
                 && ObjUtil.notEqual(image.getStatus(), AiImageStatusEnum.SUCCESS.getStatus())) {
             throw exception(IMAGE_PUBLIC_STATUS_FAIL);
         }
-        imageMapper.updateById(new AiImageDO().setId(image.getId()).setPublicStatus(publicStatus));
+        imageMapper.updateById(new AiImageDO().setId(image.getId()).setPublicStatus(updateReqVO.getPublicStatus()));
     }
 
     @Override
@@ -437,9 +422,6 @@ public class AiImageServiceImpl implements AiImageService {
         }
         throw exception(IMAGE_OPTION_INVALID, "mode", "只支持文生图、图生图、一致性");
     }
-
-    // TODO DONE @AI：一些类似这种的方法，弄到 AiImageUtils 如何？其它类似也是的，这样 service 更聚焦一些逻辑；
-    // （提示词拼接 buildMidjourneyPrompt、Seedream 请求 buildSeedreamRequest、融图比例 getDimensionsRatio、进度解析 parseProgress，已移到 AiImageUtils）
 
     @Override
     public Long midjourneyBlend(Long userId, AiMidjourneyBlendReqVO reqVO) {

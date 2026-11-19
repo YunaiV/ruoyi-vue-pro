@@ -117,7 +117,6 @@ public class AiReasoningUtils {
          * OpenAI 兼容客户端：reasoning_effort 写强类型字段，其余键追加到 extraBody
          */
         OPENAI,
-        // TODO DONE @AI：类似“通义”一些注释，都检查下噢；（平台相关的“通义”已改为阿里巴巴，思考参数常量改为 ALIBABA_*；通义千问、通义万相等产品名保留）
         /**
          * 阿里巴巴：只认 enable_thinking、thinking_budget，经百炼 OpenAI 兼容接口的 extraBody 发送
          */

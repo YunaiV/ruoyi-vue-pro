@@ -17,7 +17,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-// DONE @AI：是不是不弄上限哦，有点过度了。（已去掉读取上限，删除 AiSkillReadLimitException）
 /**
  * 技能只读工具：read_skill 读取 SKILL.md，read_skill_file 读取技能内的文本文件
  *

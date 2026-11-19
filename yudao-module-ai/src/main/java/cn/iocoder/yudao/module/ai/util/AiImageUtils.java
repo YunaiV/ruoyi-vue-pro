@@ -213,7 +213,6 @@ public class AiImageUtils {
         }
     }
 
-    // TODO DONE @AI：这个还是 JDK8 兼容性哈；
     /**
      * 融图尺寸转换为比例：PORTRAIT → 2:3，LANDSCAPE → 3:2，其它 → 1:1
      */

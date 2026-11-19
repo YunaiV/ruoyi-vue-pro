@@ -89,8 +89,6 @@ public class AiSkillController {
         return success(new PageResult<>(buildSkillList(pageResult.getList()), pageResult.getTotal()));
     }
 
-    // DONE @AI：BeanUtils 下，是不是就可以了。。。
-    // DONE @AI：如果经过重构后，没有外部的引入；是不是 和别的 simepl-lsit 一样，直接设置值，不在独立一个 VO；（已删除 AiSkillSimpleRespVO，与工具 simple-list 一样直接设置字段）
     @GetMapping("/simple-list")
     @Operation(summary = "获得技能精简列表", description = "只包含启用的技能，用于角色绑定技能的下拉选择；不返回文件内容")
     public CommonResult<List<AiSkillRespVO>> getSkillSimpleList() {

@@ -11,7 +11,6 @@ import lombok.Data;
 
 import java.util.Objects;
 
-// DONE @AI：swagger 里，要写类注释么？（以 @Schema 为准，Javadoc 只保留 @author）
 /**
  * AI 音乐创作（灵感 / 自定义） Request VO
  *

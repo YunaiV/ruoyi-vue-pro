@@ -379,7 +379,7 @@ public class AiMusicServiceImpl implements AiMusicService {
         throw exception(MUSIC_NOT_EXISTS);
     }
 
-    // ========== 音乐管理 ==========
+    // ========== 音乐生成管理 ==========
 
     @Override
     public PageResult<AiMusicDO> getMusicPage(AiMusicPageReqVO pageReqVO) {
@@ -591,7 +591,7 @@ public class AiMusicServiceImpl implements AiMusicService {
         }
         // 2. 其余首新增行：复制占位行（用户、模型、密钥、task_id 等），再填入该首的结果
         for (int i = 1; i < clips.size(); i++) {
-            musicMapper.insert(buildClipMusic(BeanUtils.toBean(music, AiMusicDO.class).setId(null), clips.get(i)));
+            musicMapper.insert(buildClipMusic(BeanUtils.toBean(music, AiMusicDO.class, o -> o.setId(null)), clips.get(i)));
         }
     }
 

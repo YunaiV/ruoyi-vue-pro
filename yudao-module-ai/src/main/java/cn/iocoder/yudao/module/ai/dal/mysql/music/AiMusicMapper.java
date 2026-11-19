@@ -53,7 +53,6 @@ public interface AiMusicMapper extends BaseMapperX<AiMusicDO> {
                 .orderByDesc(AiMusicDO::getId));
     }
 
-    // DONE @AI：status 是传入的
     /**
      * 查询待查询中转的占位行：指定状态、已有 task_id、还未拆分（clip_id 为空）
      */
@@ -83,7 +82,6 @@ public interface AiMusicMapper extends BaseMapperX<AiMusicDO> {
                 .eq(AiMusicDO::getStatus, whereStatus));
     }
 
-    // DONE @AI：status 是传入的
     /**
      * 条件更新占位行为第 1 首：只有仍为指定状态且未拆分（clip_id 为空）时才更新
      *

@@ -53,7 +53,6 @@ public interface AiChatRoleMapper extends BaseMapperX<AiChatRoleDO> {
                 .orderByAsc(AiChatRoleDO::getSort));
     }
 
-    // DONE @AI：这个使用场景是什么噢？删除的时候么？可以 selectCount 呀；（技能列表要展示引用角色的名称，删除确认也列出名称，所以查列表）
     /**
      * 查询引用了指定技能的角色：用于技能列表展示“引用角色”名称、删除技能前提示受影响的角色
      */

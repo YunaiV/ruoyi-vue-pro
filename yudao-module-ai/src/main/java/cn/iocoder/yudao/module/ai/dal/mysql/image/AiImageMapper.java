@@ -19,7 +19,6 @@ import java.util.List;
  *
  * @author fansili
  */
-// TODO DONE @AI：mapper 不写 test（已删除 AiImageMapperTest 与 H2 建表脚本）
 @Mapper
 public interface AiImageMapper extends BaseMapperX<AiImageDO> {
 

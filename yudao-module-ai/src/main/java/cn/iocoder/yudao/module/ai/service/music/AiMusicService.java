@@ -5,7 +5,6 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.ai.controller.admin.music.vo.*;
 import cn.iocoder.yudao.module.ai.dal.dataobject.music.AiMusicDO;
 
-// DONE @AI：注释风格，对齐 ai service 其它模块；不用过度冗余；
 /**
  * AI 音乐 Service 接口
  *

@@ -63,17 +63,6 @@ GET {{baseUrl}}/ai/image/public-page?pageNo=1&pageSize=10
 Authorization: {{token}}
 tenant-id: {{adminTenentId}}
 
-### 更新【我的】绘画的公开状态
-PUT {{baseUrl}}/ai/image/update-public-my
-Content-Type: application/json
-Authorization: {{token}}
-tenant-id: {{adminTenentId}}
-
-{
-  "id": 1,
-  "publicStatus": true
-}
-
 ### 【Midjourney】文生图
 POST {{baseUrl}}/ai/image/midjourney/imagine
 Content-Type: application/json

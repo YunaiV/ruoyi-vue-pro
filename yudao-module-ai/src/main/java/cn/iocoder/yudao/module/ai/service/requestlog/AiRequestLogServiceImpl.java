@@ -69,7 +69,6 @@ public class AiRequestLogServiceImpl implements AiRequestLogService {
             }
             try {
                 // 1. 用量：有效 usage 作为当前整体快照；合计 Token 由 createReqDTO 按输入、输出计算
-                // DONE @AI：totalTokens 是不是自己加好了。已由 AiRequestLogCreateReqDTO#getTotalTokens 自己计算，这里只设置输入、输出
                 Usage usage = response.getMetadata() != null ? response.getMetadata().getUsage() : null;
                 boolean usagePresent = AiUsageUtils.isUsagePresent(usage); // 不能只判断 EmptyUsage：Spring AI 2.x 的 Gemini、OpenAI 流式无用量时为全 0 占位
                 if (usagePresent) {
@@ -116,11 +115,11 @@ public class AiRequestLogServiceImpl implements AiRequestLogService {
             }
             LocalDateTime endTime = LocalDateTime.now();
             createReqDTO.setEndTime(endTime);
-            requestLog = BeanUtils.toBean(createReqDTO, AiRequestLogDO.class)
+            requestLog = BeanUtils.toBean(createReqDTO, AiRequestLogDO.class, o -> o
                     .setDuration(Duration.between(createReqDTO.getBeginTime(), endTime).toMillis())
                     .setTotalTokens(createReqDTO.getTotalTokens()) // 只有 getter，BeanUtils 不会复制，需要手动设置
                     .setResponseMetadata(MapUtil.isEmpty(createReqDTO.getResponseMetadata()) ? null
-                            : createReqDTO.getResponseMetadata());
+                            : createReqDTO.getResponseMetadata()));
         }
         // 2.1 异步结束时没有登录上下文，使用请求开始时捕获的用户作为创建者、更新者
         String operator = StrUtil.toStringOrNull(createReqDTO.getUserId());
@@ -166,7 +165,6 @@ public class AiRequestLogServiceImpl implements AiRequestLogService {
             // 1. 按 index 查找已有项，不存在则新增
             Map<String, Object> generation = (Map<String, Object>) item;
             Object index = generation.get(AiUsageUtils.GENERATION_INDEX_KEY);
-            // DONE @AI：g 是不是不缩写噢？（已改为 targetGeneration）
             Map<String, Object> existing = CollUtil.findOne(targetGenerations,
                     targetGeneration -> Objects.equals(targetGeneration.get(AiUsageUtils.GENERATION_INDEX_KEY), index));
             if (existing == null) {

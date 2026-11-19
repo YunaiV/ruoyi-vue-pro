@@ -59,11 +59,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-// DONE @AI：能不能把多个 fatory 的单测整合起来；这样有点怪哈；/Users/yunai/Java/ruoyi-vue-pro-jdk25/yudao-module-ai/src/test/java/cn/iocoder/yudao/module/ai/framework/ai/core/model/AiModelFactoryImplAsrTest.java
-///Users/yunai/Java/ruoyi-vue-pro-jdk25/yudao-module-ai/src/test/java/cn/iocoder/yudao/module/ai/framework/ai/core/model/AiModelFactoryImplSpeechTest.java
-///Users/yunai/Java/ruoyi-vue-pro-jdk25/yudao-module-ai/src/test/java/cn/iocoder/yudao/module/ai/framework/ai/core/model/AiModelFactoryImplOcrTest.java
-///Users/yunai/Java/ruoyi-vue-pro-jdk25/yudao-module-ai/src/test/java/cn/iocoder/yudao/module/ai/framework/ai/core/model/AiModelFactoryImplImageTest.java（合并为本类：语音识别、文字识别、语音合成、绘图、DeepSeek 对话按分隔注释分段，共用一个本机 HTTP 服务）
-// DONE @AI：看看是不是融合到一个统一的 factory test？（已合并到本类）
 /**
  * {@link AiModelFactoryImpl} 的单元测试类：按平台创建、按配置缓存
  *
