@@ -149,6 +149,10 @@
             <version>${alibaba-ai.version}</version>
         </dependency>
         <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp-jvm</artifactId>
+        </dependency>
+        <dependency>
             <!-- 阿里百炼 DashScope 官方 SDK：通义 OCR、万相 / HappyHorse 视频 -->
             <groupId>com.alibaba</groupId>
             <artifactId>dashscope-sdk-java</artifactId>
@@ -180,7 +184,7 @@
             <artifactId>tencentcloud-sdk-java-common</artifactId>
             <version>${tencentcloud-sdk-common.version}</version>
             <exclusions>
-                <!-- 保留现有的 okhttp 4.x 版 logging-interceptor、commons-logging 1.4.x，不被 SDK 的旧版本就近覆盖 -->
+                <!-- 保留统一管理的 logging-interceptor 及现有 commons-logging，避免 SDK 改写版本 -->
                 <exclusion>
                     <groupId>com.squareup.okhttp3</groupId>
                     <artifactId>logging-interceptor</artifactId>
