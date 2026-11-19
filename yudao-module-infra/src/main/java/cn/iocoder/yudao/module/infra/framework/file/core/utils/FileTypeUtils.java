@@ -1,16 +1,20 @@
 package cn.iocoder.yudao.module.infra.framework.file.core.utils;
 
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.Tika;
+import org.apache.tika.io.LookaheadInputStream;
 import org.apache.tika.mime.MimeTypeException;
 import org.apache.tika.mime.MimeTypes;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * 文件类型 Utils
@@ -21,6 +25,13 @@ import java.io.IOException;
 public class FileTypeUtils {
 
     private static final Tika TIKA = new Tika();
+
+    /**
+     * 通过文件流探测类型时，最多读取的文件头部字节数
+     *
+     * 目的：探测只缓冲有限的头部，避免大文件整体读入内存
+     */
+    private static final int DETECT_LIMIT = 256 * 1024;
 
     /**
      * 获得文件的 mineType，对于 doc，jar 等文件会有误差
@@ -52,6 +63,22 @@ public class FileTypeUtils {
      */
     public static String getMineType(byte[] data, String name) {
         return TIKA.detect(data, name);
+    }
+
+    /**
+     * 通过文件流和文件名获得 mineType，只读取文件头部，读取后重置到原位置，不会吞掉已读取的内容
+     *
+     * @param data 文件流，必须支持 mark / reset
+     * @param name 文件名
+     * @return mineType 无法识别时会返回“application/octet-stream”
+     */
+    @SneakyThrows
+    public static String getMineType(InputStream data, String name) {
+        Assert.isTrue(data.markSupported(), "文件流必须支持 mark / reset");
+        // 关闭 LookaheadInputStream 时，会将 data 重置到读取前的位置
+        try (InputStream head = new LookaheadInputStream(data, DETECT_LIMIT)) {
+            return TIKA.detect(head, name);
+        }
     }
 
     /**
@@ -107,6 +134,42 @@ public class FileTypeUtils {
         }
         // 输出附件
         IoUtil.write(response.getOutputStream(), false, content);
+    }
+
+    /**
+     * 返回附件，边读边写，不把整个文件读入内存
+     *
+     * 注意：流式输出不设置 Content-Length 和 Accept-Ranges：真实长度未知时不能凭空声明，且不支持 Range 分段请求，
+     * 带 Range 的请求仍返回完整内容
+     *
+     * @param response 响应
+     * @param filename 文件名
+     * @param content  附件内容，由调用方关闭
+     */
+    public static void writeAttachment(HttpServletResponse response, String filename, InputStream content) throws IOException {
+        // 设置 header 和 contentType：按文件头部和文件名探测类型
+        InputStream input = content.markSupported() ? content : new BufferedInputStream(content);
+        String mineType = getMineType(input, filename);
+        // 文件名可能伪装，按内容识别为 SVG、HTML、XML 等可携带脚本的类型时，以内容为准
+        String contentMineType = getMineType(input, null);
+        if (!isScriptable(mineType) && isScriptable(contentMineType)) {
+            mineType = contentMineType;
+        }
+        response.setContentType(mineType);
+        response.setHeader("X-Content-Type-Options", "nosniff");
+        // 设置内容显示、下载文件名：普通图片 inline，其它 attachment
+        if (isImage(mineType) && !isScriptable(mineType)) {
+            response.setHeader("Content-Disposition", buildContentDisposition("inline", filename));
+        } else {
+            // SVG 等可携带脚本的文件：直接打开时按附件下载；保留原类型，页面中作为图片引用时仍可显示
+            response.setHeader("Content-Disposition", buildContentDisposition("attachment", filename));
+            // 被 object、embed 等嵌入时，按沙箱执行，禁止脚本、隔离来源
+            if (isScriptable(mineType)) {
+                response.setHeader("Content-Security-Policy", "sandbox");
+            }
+        }
+        // 输出附件
+        IoUtil.copy(input, response.getOutputStream());
     }
 
     private static String buildContentDisposition(String dispositionType, String filename) {

@@ -57,5 +57,11 @@ public class MailAccountDO extends BaseDO {
      * 是否开启 STARTTLS
      */
     private Boolean starttlsEnable;
+    /**
+     * SMTP 读取超时，单位：毫秒
+     *
+     * 0 表示不限制
+     */
+    private Integer timeout = 0;
 
 }

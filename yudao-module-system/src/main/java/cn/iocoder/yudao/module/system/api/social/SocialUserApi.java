@@ -47,8 +47,9 @@ public interface SocialUserApi {
      * @param socialType 社交平台的类型
      * @param code       授权码
      * @param state      state
+     * @param redirectUri 发起授权时的回调地址，换取令牌时需与其一致；为空时使用配置中的回调地址
      * @return 社交用户
      */
-    SocialUserRespDTO getSocialUserByCode(Integer userType, Integer socialType, String code, String state);
+    SocialUserRespDTO getSocialUserByCode(Integer userType, Integer socialType, String code, String state, String redirectUri);
 
 }

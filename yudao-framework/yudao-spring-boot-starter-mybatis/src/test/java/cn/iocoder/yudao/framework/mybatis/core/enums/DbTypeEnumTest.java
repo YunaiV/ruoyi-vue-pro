@@ -24,6 +24,8 @@ public class DbTypeEnumTest {
         assertEquals(DbType.KINGBASE_ES, DbTypeEnum.find("KingbaseES"));
         // 神通 JDBC 驱动（jdbc:oscar:）返回的 ProductName
         assertEquals(DbType.OSCAR, DbTypeEnum.find("OSCAR"));
+        // MariaDB Connector/J 3.x（jdbc:mariadb:）返回的 ProductName
+        assertEquals(DbType.MARIADB, DbTypeEnum.find("MariaDB"));
         assertNull(DbTypeEnum.find(""));
         assertNull(DbTypeEnum.find(null));
     }
@@ -32,8 +34,14 @@ public class DbTypeEnumTest {
     public void testFind_unregistered() {
         // 未登记的产品名返回 null，而不是 NPE，由调用方给出明确的处理
         assertNull(DbTypeEnum.find("HighGo"));
-        assertNull(DbTypeEnum.find("MariaDB"));
         assertNull(DbTypeEnum.find("SQLite"));
+    }
+
+    @Test
+    public void testGetFindInSetTemplate_mariaDB() {
+        // MariaDB 与 MySQL 使用相同的 FIND_IN_SET 模板，不再因未登记而抛出异常
+        assertEquals(DbTypeEnum.getFindInSetTemplate(DbType.MYSQL), DbTypeEnum.getFindInSetTemplate(DbType.MARIADB));
+        assertEquals("FIND_IN_SET(#{value}, #{column}) <> 0", DbTypeEnum.getFindInSetTemplate(DbType.MARIADB));
     }
 
     @Test

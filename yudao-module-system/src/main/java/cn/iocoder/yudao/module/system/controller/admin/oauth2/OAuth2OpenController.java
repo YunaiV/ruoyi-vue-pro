@@ -4,6 +4,7 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
@@ -83,6 +84,7 @@ public class OAuth2OpenController {
      */
     @PostMapping("/token")
     @PermitAll
+    @ApiAccessLog(sanitizeKeys = "code") // 授权码可换取访问令牌，不记录；refresh_token、password、client_secret 已在默认敏感字段中
     @Operation(summary = "获得访问令牌", description = "适合 code 授权码模式，或者 implicit 简化模式；在 sso.vue 单点登录界面被【获取】调用")
     @Parameters({
             @Parameter(name = "grant_type", required = true, description = "授权类型", example = "code"),

@@ -25,33 +25,48 @@ public interface ImSensitiveWordService {
     // ==================== 管理后台 ====================
 
     /**
-     * 【管理后台】分页查询敏感词
+     * 【管理后台】创建敏感词
+     *
+     * @param createReqVO 创建信息
+     * @return 敏感词编号
      */
-    PageResult<ImSensitiveWordDO> getSensitiveWordPage(ImSensitiveWordPageReqVO reqVO);
+    Long createSensitiveWord(@Valid ImSensitiveWordSaveReqVO createReqVO);
 
     /**
-     * 【管理后台】获取敏感词详情
+     * 【管理后台】更新敏感词
+     *
+     * @param updateReqVO 更新信息
      */
-    ImSensitiveWordDO getSensitiveWord(Long id);
-
-    /**
-     * 【管理后台】新增敏感词，返回新增 id
-     */
-    Long createSensitiveWord(@Valid ImSensitiveWordSaveReqVO reqVO);
-
-    /**
-     * 【管理后台】修改敏感词
-     */
-    void updateSensitiveWord(@Valid ImSensitiveWordSaveReqVO reqVO);
+    void updateSensitiveWord(@Valid ImSensitiveWordSaveReqVO updateReqVO);
 
     /**
      * 【管理后台】删除敏感词
+     *
+     * @param id 敏感词编号
      */
     void deleteSensitiveWord(Long id);
 
     /**
      * 【管理后台】批量删除敏感词
+     *
+     * @param ids 敏感词编号列表
      */
     void deleteSensitiveWordList(List<Long> ids);
+
+    /**
+     * 【管理后台】获得敏感词
+     *
+     * @param id 敏感词编号
+     * @return 敏感词
+     */
+    ImSensitiveWordDO getSensitiveWord(Long id);
+
+    /**
+     * 【管理后台】获得敏感词分页
+     *
+     * @param pageReqVO 分页查询
+     * @return 敏感词分页
+     */
+    PageResult<ImSensitiveWordDO> getSensitiveWordPage(ImSensitiveWordPageReqVO pageReqVO);
 
 }

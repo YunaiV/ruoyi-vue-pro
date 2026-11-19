@@ -42,6 +42,11 @@ public class SocialClientApiImpl implements SocialClientApi {
     }
 
     @Override
+    public List<Integer> getAvailableSocialTypeList(Integer userType) {
+        return socialClientService.getAvailableSocialTypeList(userType);
+    }
+
+    @Override
     public SocialWxJsapiSignatureRespDTO createWxMpJsapiSignature(Integer userType, String url) {
         WxJsapiSignature signature = socialClientService.createWxMpJsapiSignature(userType, url);
         return BeanUtils.toBean(signature, SocialWxJsapiSignatureRespDTO.class);

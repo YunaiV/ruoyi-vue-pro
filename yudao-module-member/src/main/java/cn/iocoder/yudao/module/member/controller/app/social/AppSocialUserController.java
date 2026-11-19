@@ -38,7 +38,7 @@ public class AppSocialUserController {
     @PermitAll
     public CommonResult<String> socialBind(@RequestBody @Valid AppSocialUserBindReqVO reqVO) {
         SocialUserBindReqDTO reqDTO = new SocialUserBindReqDTO(getLoginUserId(), UserTypeEnum.MEMBER.getValue(),
-                reqVO.getType(), reqVO.getCode(), reqVO.getState());
+                reqVO.getType(), reqVO.getCode(), reqVO.getState(), reqVO.getRedirectUri());
         String openid = socialUserApi.bindSocialUser(reqDTO);
         return success(openid);
     }

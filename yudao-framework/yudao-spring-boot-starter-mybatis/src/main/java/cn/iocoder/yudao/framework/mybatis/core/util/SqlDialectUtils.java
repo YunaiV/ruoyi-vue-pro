@@ -40,7 +40,7 @@ public class SqlDialectUtils {
     /**
      * 保持原有 SQL 片段的数据库类型
      */
-    private static final Set<DbType> ORIGINAL_DB_TYPES = EnumSet.of(DbType.MYSQL, DbType.OCEAN_BASE,
+    private static final Set<DbType> ORIGINAL_DB_TYPES = EnumSet.of(DbType.MYSQL, DbType.MARIADB, DbType.OCEAN_BASE,
             DbType.H2, DbType.DM, DbType.OSCAR, DbType.KINGBASE_ES, DbType.OPENGAUSS, DbType.GAUSS_DB,
             DbType.SQL_SERVER2005);
 

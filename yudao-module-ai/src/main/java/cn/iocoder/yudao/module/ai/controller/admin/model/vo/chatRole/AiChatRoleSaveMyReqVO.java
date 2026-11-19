@@ -40,4 +40,7 @@ public class AiChatRoleSaveMyReqVO {
     @Schema(description = "引用的 MCP Client 名字列表", example = "filesystem")
     private List<String> mcpClientNames;
 
+    @Schema(description = "引用的技能编号列表，只能选择启用的技能", example = "1,2,3")
+    private List<Long> skillIds;
+
 }

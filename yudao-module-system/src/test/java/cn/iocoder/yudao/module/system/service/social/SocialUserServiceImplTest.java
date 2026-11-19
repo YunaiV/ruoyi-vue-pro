@@ -31,7 +31,12 @@ import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomPojo;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomString;
 import static cn.iocoder.yudao.module.system.enums.ErrorCodeConstants.SOCIAL_USER_NOT_FOUND;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.isNull;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -147,7 +152,7 @@ public class SocialUserServiceImplTest extends BaseDbUnitTest {
         socialUserBindMapper.insert(socialUserBind);
 
         // 调用
-        SocialUserRespDTO socialUser = socialUserService.getSocialUserByCode(userType, type, code, state);
+        SocialUserRespDTO socialUser = socialUserService.getSocialUserByCode(userType, type, code, state, null);
         // 断言
         assertEquals(userId, socialUser.getUserId());
         assertEquals(socialUserDO.getOpenid(), socialUser.getOpenid());
@@ -165,7 +170,7 @@ public class SocialUserServiceImplTest extends BaseDbUnitTest {
         socialUserMapper.insert(socialUser);
 
         // 调用
-        SocialUserDO result = socialUserService.authSocialUser(socialType, userType, code, state);
+        SocialUserDO result = socialUserService.authSocialUser(socialType, userType, code, state, null);
         // 断言
         assertPojoEquals(socialUser, result);
     }
@@ -183,7 +188,7 @@ public class SocialUserServiceImplTest extends BaseDbUnitTest {
         String state = "yuanma";
 
         // 调用
-        SocialUserDO result = socialUserService.authSocialUser(socialType, userType, code, state);
+        SocialUserDO result = socialUserService.authSocialUser(socialType, userType, code, state, null);
         // 断言
         assertPojoEquals(socialUser, result);
     }
@@ -197,10 +202,10 @@ public class SocialUserServiceImplTest extends BaseDbUnitTest {
         String state = "yuanma";
         // mock 方法
         AuthUser authUser = randomPojo(AuthUser.class);
-        when(socialClientService.getAuthUser(eq(socialType), eq(userType), eq(code), eq(state))).thenReturn(authUser);
+        when(socialClientService.getAuthUser(eq(socialType), eq(userType), eq(code), eq(state), isNull())).thenReturn(authUser);
 
         // 调用
-        SocialUserDO result = socialUserService.authSocialUser(socialType, userType, code, state);
+        SocialUserDO result = socialUserService.authSocialUser(socialType, userType, code, state, null);
         // 断言
         assertBindSocialUser(socialType, result, authUser);
         assertEquals(code, result.getCode());
@@ -218,14 +223,57 @@ public class SocialUserServiceImplTest extends BaseDbUnitTest {
         socialUserMapper.insert(randomPojo(SocialUserDO.class).setType(socialType).setOpenid("test_openid"));
         // mock 方法
         AuthUser authUser = randomPojo(AuthUser.class);
-        when(socialClientService.getAuthUser(eq(socialType), eq(userType), eq(code), eq(state))).thenReturn(authUser);
+        when(socialClientService.getAuthUser(eq(socialType), eq(userType), eq(code), eq(state), isNull())).thenReturn(authUser);
 
         // 调用
-        SocialUserDO result = socialUserService.authSocialUser(socialType, userType, code, state);
+        SocialUserDO result = socialUserService.authSocialUser(socialType, userType, code, state, null);
         // 断言
         assertBindSocialUser(socialType, result, authUser);
         assertEquals(code, result.getCode());
         assertEquals(state, result.getState());
+    }
+
+    @Test
+    public void testSocialLogin_redirectUriAndAutoBind() {
+        // 准备参数：会员 QQ 登录，回调地址由登录请求带回
+        Integer socialType = SocialTypeEnum.QQ.getType();
+        Integer userType = UserTypeEnum.MEMBER.getValue();
+        String code = "tudou";
+        String state = "yuanma";
+        String redirectUri = "https://cms.test/portal/social-login";
+        // mock 方法：换取令牌时传入同一个回调地址
+        AuthUser authUser = randomPojo(AuthUser.class);
+        when(socialClientService.getAuthUser(eq(socialType), eq(userType), eq(code), eq(state), eq(redirectUri)))
+                .thenReturn(authUser);
+
+        // 调用：未绑定时，先按授权码获取社交用户，再用同一授权码自动绑定新会员
+        SocialUserRespDTO socialUser = socialUserService.getSocialUserByCode(userType, socialType, code, state, redirectUri);
+        assertNull(socialUser.getUserId());
+        String openid = socialUserService.bindSocialUser(
+                new SocialUserBindReqDTO(100L, userType, socialType, code, state, redirectUri));
+
+        // 断言：绑定命中 DB 中保存的 code + state，只换取一次令牌
+        assertEquals(authUser.getUuid(), openid);
+        verify(socialClientService, times(1)).getAuthUser(any(), any(), any(), any(), any());
+        SocialUserDO dbSocialUser = socialUserMapper.selectByTypeAndOpenid(socialType, authUser.getUuid());
+        assertEquals(100L, socialUserBindMapper.selectByUserTypeAndSocialUserId(userType, dbSocialUser.getId()).getUserId());
+    }
+
+    @Test
+    public void testBindSocialUser_redirectUri() {
+        // 准备参数：已登录会员直接绑定微博，回调地址由绑定请求带回
+        Integer socialType = SocialTypeEnum.WEIBO.getType();
+        Integer userType = UserTypeEnum.MEMBER.getValue();
+        String redirectUri = "https://cms.test/portal/social-login";
+        AuthUser authUser = randomPojo(AuthUser.class);
+        when(socialClientService.getAuthUser(eq(socialType), eq(userType), eq("C1"), eq("S1"), eq(redirectUri)))
+                .thenReturn(authUser);
+
+        // 调用
+        String openid = socialUserService.bindSocialUser(
+                new SocialUserBindReqDTO(100L, userType, socialType, "C1", "S1", redirectUri));
+        // 断言：换取令牌使用绑定请求的回调地址
+        assertEquals(authUser.getUuid(), openid);
     }
 
     private void assertBindSocialUser(Integer type, SocialUserDO socialUser, AuthUser authUser) {

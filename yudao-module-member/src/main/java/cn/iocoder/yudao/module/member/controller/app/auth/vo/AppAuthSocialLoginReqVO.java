@@ -31,4 +31,7 @@ public class AppAuthSocialLoginReqVO {
     @NotEmpty(message = "state 不能为空")
     private String state;
 
+    @Schema(description = "发起授权时的回调地址，网页授权换取令牌时需与其一致", example = "https://www.iocoder.cn/social-login")
+    private String redirectUri;
+
 }

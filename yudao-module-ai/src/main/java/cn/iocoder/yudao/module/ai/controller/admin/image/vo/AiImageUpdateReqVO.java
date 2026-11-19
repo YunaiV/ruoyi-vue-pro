@@ -12,7 +12,8 @@ public class AiImageUpdateReqVO {
     @NotNull(message = "编号不能为空")
     private Long id;
 
-    @Schema(description = "是否发布", example = "true")
+    @Schema(description = "是否发布", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
+    @NotNull(message = "是否发布不能为空")
     private Boolean publicStatus;
 
 }

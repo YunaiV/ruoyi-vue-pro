@@ -59,6 +59,19 @@ public interface MemberUserService {
     MemberUserDO createUser(String nickname, String avtar, String registerIp, Integer terminal);
 
     /**
+     * 创建注册会员
+     *
+     * @param mobile     手机号
+     * @param nickname   昵称
+     * @param password   明文密码
+     * @param registerIp 注册 IP
+     * @param terminal   终端 {@link TerminalEnum}
+     * @return 用户对象
+     */
+    MemberUserDO createUserForRegister(@Mobile String mobile, String nickname, String password,
+                                       String registerIp, Integer terminal);
+
+    /**
      * 更新用户的最后登陆信息
      *
      * @param id      用户编号

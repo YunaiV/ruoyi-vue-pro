@@ -51,7 +51,7 @@ class MemberAuthServiceImplStatusTest extends BaseMockitoUnitTest {
         MemberUserDO user = MemberUserDO.builder().id(1L).mobile("15601691300")
                 .status(CommonStatusEnum.DISABLE.getStatus()).build();
         when(socialUserApi.getSocialUserByCode(UserTypeEnum.MEMBER.getValue(), reqVO.getType(),
-                reqVO.getCode(), reqVO.getState()))
+                reqVO.getCode(), reqVO.getState(), reqVO.getRedirectUri()))
                 .thenReturn(new SocialUserRespDTO("openid", "nickname", "avatar", user.getId()));
         when(userService.getUser(user.getId())).thenReturn(user);
 

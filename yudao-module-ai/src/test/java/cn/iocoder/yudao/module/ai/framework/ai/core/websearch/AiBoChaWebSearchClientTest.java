@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.ai.framework.ai.core.websearch;
 
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.module.ai.framework.ai.core.webserch.AiWebFetchResponse;
 import cn.iocoder.yudao.module.ai.framework.ai.core.webserch.AiWebSearchRequest;
 import cn.iocoder.yudao.module.ai.framework.ai.core.webserch.AiWebSearchResponse;
 import cn.iocoder.yudao.module.ai.framework.ai.core.webserch.bocha.AiBoChaWebSearchClient;
@@ -24,6 +25,13 @@ public class AiBoChaWebSearchClientTest {
                 .setQuery("阿里巴巴")
                 .setCount(3);
         AiWebSearchResponse response = webSearchClient.search(request);
+        System.out.println(JsonUtils.toJsonPrettyString(response));
+    }
+
+    @Test
+    @Disabled
+    public void testFetch() {
+        AiWebFetchResponse response = webSearchClient.fetch("https://www.iocoder.cn");
         System.out.println(JsonUtils.toJsonPrettyString(response));
     }
 

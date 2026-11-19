@@ -12,8 +12,10 @@ import cn.iocoder.yudao.module.ai.controller.admin.model.vo.chatRole.AiChatRoleS
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.model.AiChatRoleMapper;
 import cn.iocoder.yudao.module.ai.service.knowledge.AiKnowledgeService;
+import cn.iocoder.yudao.module.ai.service.skill.AiSkillService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -41,6 +43,9 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
     private AiKnowledgeService knowledgeService;
     @Resource
     private AiToolService toolService;
+    @Resource
+    @Lazy // 延迟加载，避免循环依赖
+    private AiSkillService skillService;
 
     @Override
     public Long createChatRole(AiChatRoleSaveReqVO createReqVO) {
@@ -48,6 +53,8 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
         validateDocuments(createReqVO.getKnowledgeIds());
         // 校验工具
         validateTools(createReqVO.getToolIds());
+        // 校验技能：本租户且启用
+        skillService.validateSkillListEnable(createReqVO.getSkillIds());
 
         // 保存角色
         AiChatRoleDO chatRole = BeanUtils.toBean(createReqVO, AiChatRoleDO.class);
@@ -61,6 +68,8 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
         validateDocuments(createReqVO.getKnowledgeIds());
         // 校验工具
         validateTools(createReqVO.getToolIds());
+        // 校验技能：本租户且启用
+        skillService.validateSkillListEnable(createReqVO.getSkillIds());
 
         // 保存角色
         AiChatRoleDO chatRole = BeanUtils.toBean(createReqVO, AiChatRoleDO.class).setUserId(userId)
@@ -77,6 +86,8 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
         validateDocuments(updateReqVO.getKnowledgeIds());
         // 校验工具
         validateTools(updateReqVO.getToolIds());
+        // 校验技能：本租户且启用
+        skillService.validateSkillListEnable(updateReqVO.getSkillIds());
 
         // 更新角色
         AiChatRoleDO updateObj = BeanUtils.toBean(updateReqVO, AiChatRoleDO.class);
@@ -94,6 +105,8 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
         validateDocuments(updateReqVO.getKnowledgeIds());
         // 校验工具
         validateTools(updateReqVO.getToolIds());
+        // 校验技能：本租户且启用
+        skillService.validateSkillListEnable(updateReqVO.getSkillIds());
 
         // 更新
         AiChatRoleDO updateObj = BeanUtils.toBean(updateReqVO, AiChatRoleDO.class);
@@ -195,6 +208,14 @@ public class AiChatRoleServiceImpl implements AiChatRoleService {
     @Override
     public List<AiChatRoleDO> getChatRoleListByName(String name) {
         return chatRoleMapper.selectListByName(name);
+    }
+
+    @Override
+    public List<AiChatRoleDO> getChatRoleListBySkillIds(Collection<Long> skillIds) {
+        if (CollUtil.isEmpty(skillIds)) {
+            return Collections.emptyList();
+        }
+        return chatRoleMapper.selectListBySkillIds(skillIds);
     }
 
 }

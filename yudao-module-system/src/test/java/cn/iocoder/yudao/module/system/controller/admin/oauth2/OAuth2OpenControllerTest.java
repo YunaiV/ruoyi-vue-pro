@@ -3,6 +3,8 @@ package cn.iocoder.yudao.module.system.controller.admin.oauth2;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.map.MapUtil;
+import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
+import cn.iocoder.yudao.framework.apilog.core.filter.ApiAccessLogFilter;
 import cn.iocoder.yudao.framework.common.core.KeyValue;
 import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.exception.ErrorCode;
@@ -25,13 +27,17 @@ import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.web.method.HandlerMethod;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.util.collection.SetUtils.asSet;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
@@ -332,6 +338,41 @@ public class OAuth2OpenControllerTest extends BaseMockitoUnitTest {
         when(request.getParameter(eq("client_id"))).thenReturn(clientId);
         when(request.getParameter(eq("client_secret"))).thenReturn(secret);
         return request;
+    }
+
+    @Test
+    public void testPostAccessToken_sanitizeParams() {
+        // 准备参数：/token 接口真实接收的表单参数
+        Map<String, String> params = new HashMap<>();
+        params.put("grant_type", "authorization_code");
+        params.put("code", "FAKE_CODE");
+        params.put("redirect_uri", "https://www.iocoder.cn");
+        params.put("state", "test");
+        params.put("username", "tudou");
+        params.put("password", "FAKE_PASSWORD");
+        params.put("scope", "user_info");
+        params.put("refresh_token", "FAKE_REFRESH_TOKEN");
+        params.put("client_id", "test_client_id");
+        params.put("client_secret", "FAKE_CLIENT_SECRET");
+        // 准备参数：按真实 handler 读取访问日志注解
+        HandlerMethod handlerMethod = new HandlerMethod(oauth2OpenController, Arrays.stream(
+                OAuth2OpenController.class.getMethods()).filter(method -> method.getName().equals("postAccessToken"))
+                .findFirst().orElseThrow(AssertionError::new));
+        ApiAccessLog annotation = ApiAccessLogFilter.getApiAccessLogAnnotation(handlerMethod);
+        assertNotNull(annotation);
+
+        // 调用
+        Map<String, ?> result = ApiAccessLogFilter.sanitizeParamMap(params, annotation.sanitizeKeys());
+        // 断言：凭证类参数移除，Map 结构和普通参数保留
+        assertSame(params, result);
+        assertFalse(result.containsKey("code"));
+        assertFalse(result.containsKey("password"));
+        assertFalse(result.containsKey("refresh_token"));
+        assertFalse(result.containsKey("client_secret"));
+        assertEquals("authorization_code", result.get("grant_type"));
+        assertEquals("https://www.iocoder.cn", result.get("redirect_uri"));
+        assertEquals("tudou", result.get("username"));
+        assertEquals("test_client_id", result.get("client_id"));
     }
 
 }

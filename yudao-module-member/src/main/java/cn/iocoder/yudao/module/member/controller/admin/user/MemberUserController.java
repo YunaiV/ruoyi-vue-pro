@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.member.controller.admin.user;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.member.controller.admin.user.vo.*;
@@ -18,12 +19,13 @@ import cn.iocoder.yudao.module.member.service.user.MemberUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import javax.annotation.Resource;
+import javax.validation.Valid;
+import javax.validation.constraints.Size;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
-import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -31,6 +33,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils.getLoginUserId;
 
@@ -118,6 +121,34 @@ public class MemberUserController {
         List<MemberGroupDO> groups = memberGroupService.getGroupList(
                 convertSet(pageResult.getList(), MemberUserDO::getGroupId));
         return success(MemberUserConvert.INSTANCE.convertPage(pageResult, tags, levels, groups));
+    }
+
+    @GetMapping("/select-page")
+    @Operation(summary = "获得可选择的会员分页")
+    @PreAuthorize("@ss.hasPermission('member:user:query')")
+    public CommonResult<PageResult<MemberUserRespVO>> getUserSelectPage(@Valid MemberUserPageReqVO pageReqVO) {
+        pageReqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
+        PageResult<MemberUserDO> pageResult = memberUserService.getUserPage(pageReqVO);
+        return success(new PageResult<>(convertList(pageResult.getList(), this::convertUserSelectRespVO),
+                pageResult.getTotal()));
+    }
+
+    @GetMapping("/select-list")
+    @Operation(summary = "根据编号获得已选会员")
+    @Parameter(name = "ids", description = "会员编号列表", required = true, example = "[1024, 2048]")
+    @PreAuthorize("@ss.hasPermission('member:user:query')")
+    public CommonResult<List<MemberUserRespVO>> getUserSelectList(
+            @RequestParam("ids") @Size(max = 1000) List<Long> ids) {
+        List<MemberUserDO> users = memberUserService.getUserList(ids);
+        return success(convertList(users, this::convertUserSelectRespVO));
+    }
+
+    private MemberUserRespVO convertUserSelectRespVO(MemberUserDO user) {
+        MemberUserRespVO userVO = new MemberUserRespVO();
+        userVO.setId(user.getId());
+        userVO.setNickname(user.getNickname());
+        userVO.setAvatar(user.getAvatar());
+        return userVO;
     }
 
 }

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.ai.framework.ai.core.model.image;
 
+import cn.hutool.system.SystemUtil;
 import com.alibaba.cloud.ai.dashscope.api.DashScopeImageApi;
 import com.alibaba.cloud.ai.dashscope.image.DashScopeImageModel;
 import com.alibaba.cloud.ai.dashscope.image.DashScopeImageOptions;
@@ -26,7 +27,7 @@ public class TongYiImagesModelTest {
 
     private final DashScopeImageModel imageModel = DashScopeImageModel.builder()
             .dashScopeApi(DashScopeImageApi.builder()
-                    .apiKey("sk-cd9f39e99ea54840bd1888282325f55a") // https://bailian.console.aliyun.com/cn-beijing/?tab=model#/api-key 获取密钥
+                    .apiKey(SystemUtil.get("DASHSCOPE_API_KEY", "sk-xxxx")) // 从环境变量 DASHSCOPE_API_KEY 读取，https://bailian.console.aliyun.com/cn-beijing/?tab=model#/api-key 获取密钥
                     .build())
             .build();
 

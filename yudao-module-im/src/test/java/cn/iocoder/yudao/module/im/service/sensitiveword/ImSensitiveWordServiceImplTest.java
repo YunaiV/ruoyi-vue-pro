@@ -194,6 +194,27 @@ public class ImSensitiveWordServiceImplTest extends BaseMockitoUnitTest {
     }
 
     @Test
+    public void testValidateText_builtInAllowWordsEnabled() {
+        // mock 后台显式启用的词恰好也在依赖库内置白名单里
+        when(imSensitiveWordMapper.selectListByStatus(CommonStatusEnum.ENABLE.getStatus()))
+                .thenReturn(ListUtil.of(
+                        ImSensitiveWordDO.builder().id(1L).word("曹操")
+                                .status(CommonStatusEnum.ENABLE.getStatus()).build(),
+                        ImSensitiveWordDO.builder().id(2L).word("恶搞")
+                                .status(CommonStatusEnum.ENABLE.getStatus()).build(),
+                        ImSensitiveWordDO.builder().id(3L).word("幸运")
+                                .status(CommonStatusEnum.ENABLE.getStatus()).build()
+                ));
+
+        // 调用，并断言内置白名单不屏蔽后台配置
+        assertServiceException(() -> sensitiveWordService.validateText("曹操来了"), MESSAGE_SENSITIVE_WORD_BLOCKED);
+        assertServiceException(() -> sensitiveWordService.validateText("拒绝恶搞"), MESSAGE_SENSITIVE_WORD_BLOCKED);
+        assertServiceException(() -> sensitiveWordService.validateText("今天很幸运"), MESSAGE_SENSITIVE_WORD_BLOCKED);
+        // 调用，并断言正常文本仍放行
+        assertDoesNotThrow(() -> sensitiveWordService.validateText("hello world"));
+    }
+
+    @Test
     public void testValidateText_lazyLoadsCacheOnFirstCall() {
         // 调用
         sensitiveWordService.validateText("hello world");

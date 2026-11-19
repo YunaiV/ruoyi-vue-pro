@@ -18,6 +18,9 @@ import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_
 @ToString(callSuper = true)
 public class MemberUserPageReqVO extends PageParam {
 
+    @Schema(description = "会员编号", example = "1024")
+    private Long id;
+
     @Schema(description = "手机号", example = "15601691300")
     private String mobile;
 
@@ -26,6 +29,9 @@ public class MemberUserPageReqVO extends PageParam {
 
     @Schema(description = "用户昵称", example = "李四")
     private String nickname;
+
+    @Schema(description = "状态", example = "0")
+    private Integer status;
 
     @Schema(description = "最后登录时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)

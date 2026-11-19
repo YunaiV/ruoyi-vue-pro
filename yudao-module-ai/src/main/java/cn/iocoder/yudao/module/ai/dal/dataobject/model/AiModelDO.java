@@ -48,6 +48,14 @@ public class AiModelDO extends BaseDO {
      */
     private String name;
     /**
+     * 模型简介
+     */
+    private String description;
+    /**
+     * 模型图标地址
+     */
+    private String iconUrl;
+    /**
      * 模型标志
      */
     private String model;

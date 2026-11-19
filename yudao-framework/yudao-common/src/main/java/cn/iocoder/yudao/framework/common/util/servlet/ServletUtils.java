@@ -4,14 +4,15 @@ import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.servlet.ServletUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import javax.servlet.ServletRequest;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.springframework.http.MediaType;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.ServletRequest;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.Map;
@@ -57,6 +58,27 @@ public class ServletUtils {
     public static String getUserAgent(HttpServletRequest request) {
         String ua = request.getHeader("User-Agent");
         return ua != null ? ua : "";
+    }
+
+    /**
+     * 获得指定名称的 Cookie
+     *
+     * @param request 请求
+     * @param name Cookie 名称
+     * @return Cookie，不存在时返回 null
+     */
+    public static Cookie getCookie(HttpServletRequest request, String name) {
+        return ServletUtil.getCookie(request, name);
+    }
+
+    /**
+     * 写入 Cookie
+     *
+     * @param response 响应
+     * @param cookie Cookie
+     */
+    public static void addCookie(HttpServletResponse response, Cookie cookie) {
+        ServletUtil.addCookie(response, cookie);
     }
 
     /**

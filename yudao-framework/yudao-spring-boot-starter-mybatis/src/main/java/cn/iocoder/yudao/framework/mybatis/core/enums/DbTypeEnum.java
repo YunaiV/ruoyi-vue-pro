@@ -29,6 +29,13 @@ public enum DbTypeEnum {
     MY_SQL(DbType.MYSQL, "MySQL", "FIND_IN_SET(#{value}, #{column}) <> 0"),
 
     /**
+     * MariaDB
+     *
+     * MariaDB Connector/J 3.x（jdbc:mariadb:）使用的 ProductName 为 MariaDB；使用 MySQL 驱动连接时为 MySQL，按 {@link #MY_SQL} 处理
+     */
+    MARIA_DB(DbType.MARIADB, "MariaDB", "FIND_IN_SET(#{value}, #{column}) <> 0"),
+
+    /**
      * Oracle
      */
     ORACLE(DbType.ORACLE, "Oracle", "INSTR(',' || #{column} || ',', ',' || #{value} || ',') > 0"),

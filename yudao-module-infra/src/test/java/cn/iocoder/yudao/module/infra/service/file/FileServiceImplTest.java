@@ -22,10 +22,16 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FilterInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils.buildTime;
@@ -818,6 +824,140 @@ public class FileServiceImplTest extends BaseDbUnitTest {
         // 断言
         // 格式为：yyyyMMdd/{时间戳+随机数}/test.jpg
         assertTrue(path.matches("\\d{8}/\\d+/test\\.jpg"));
+    }
+
+    @Test
+    public void testCreateFileStream_success() throws Exception {
+        // 准备参数：图片后追加 3MB 内容，模拟大文件；记录源流已被读取的字节数
+        byte[] image = ResourceUtil.readBytes("file/erweima.jpg");
+        byte[] content = Arrays.copyOf(image, image.length + 3 * 1024 * 1024);
+        AtomicLong readCount = new AtomicLong();
+        InputStream source = new FilterInputStream(new ByteArrayInputStream(content)) {
+
+            @Override
+            public int read() throws IOException {
+                int b = super.read();
+                readCount.addAndGet(b < 0 ? 0 : 1);
+                return b;
+            }
+
+            @Override
+            public int read(byte[] b, int off, int len) throws IOException {
+                int n = super.read(b, off, len);
+                readCount.addAndGet(Math.max(n, 0));
+                return n;
+            }
+
+        };
+        // mock Master 文件客户端：上传时校验此前只读取了头部，并读取上传的完整内容
+        FileClient client = mock(FileClient.class);
+        when(fileConfigService.getMasterFileClient()).thenReturn(client);
+        when(client.getId()).thenReturn(10L);
+        AtomicLong readBeforeUpload = new AtomicLong();
+        AtomicReference<byte[]> uploaded = new AtomicReference<>();
+        when(client.upload(any(InputStream.class), eq((long) content.length),
+                argThat(path -> path.matches("\\d{8}/\\d+/大文件\\.jpg")), eq("image/jpeg"))).thenAnswer(invocation -> {
+            readBeforeUpload.set(readCount.get());
+            uploaded.set(cn.hutool.core.io.IoUtil.readBytes(invocation.<InputStream>getArgument(0)));
+            return "https://www.iocoder.cn/大文件.jpg";
+        });
+
+        // 调用
+        String url = fileService.createFile(source, content.length, "大文件.jpg", null, "text/plain");
+
+        // 断言：上传前只读取了有限的头部，上传内容完整且头部未丢失；不走字节数组上传
+        assertEquals("https://www.iocoder.cn/大文件.jpg", url);
+        assertTrue(readBeforeUpload.get() < content.length / 2, "上传前不应整体读取文件：" + readBeforeUpload.get());
+        assertArrayEquals(content, uploaded.get());
+        verify(client, never()).upload(any(byte[].class), anyString(), anyString());
+        // 校验数据：类型以实际内容为准，不信任传入的 type
+        FileDO file = fileMapper.selectOne(FileDO::getUrl, url);
+        assertEquals(10L, file.getConfigId());
+        assertEquals("image/jpeg", file.getType());
+        assertEquals(content.length, file.getSize());
+    }
+
+    @Test
+    public void testCreateFileStream_nameEmpty() throws Exception {
+        // 准备参数
+        byte[] content = ResourceUtil.readBytes("file/erweima.jpg");
+        // mock Master 文件客户端
+        FileClient client = mock(FileClient.class);
+        when(fileConfigService.getMasterFileClient()).thenReturn(client);
+        when(client.getId()).thenReturn(10L);
+        AtomicReference<byte[]> uploaded = new AtomicReference<>();
+        when(client.upload(any(InputStream.class), eq((long) content.length), argThat(path -> path.matches(
+                "\\d{8}/\\d+/6318848e882d8a7e7e82789d87608f684ee52d41966bfc8cad3ce15aad2b970e\\.jpg")),
+                eq("image/jpeg"))).thenAnswer(invocation -> {
+            uploaded.set(cn.hutool.core.io.IoUtil.readBytes(invocation.<InputStream>getArgument(0)));
+            return "https://www.iocoder.cn/sha256.jpg";
+        });
+
+        // 调用：与字节数组入口一致，name 为空时按内容摘要命名
+        String url = fileService.createFile(new ByteArrayInputStream(content), content.length, null, null, null);
+
+        // 断言
+        assertEquals("https://www.iocoder.cn/sha256.jpg", url);
+        assertArrayEquals(content, uploaded.get());
+        assertEquals(content.length, fileMapper.selectOne(FileDO::getUrl, url).getSize());
+    }
+
+    @Test
+    public void testCreateFileStream_typeNotAllowed_fakeImage() {
+        for (String text : new String[]{"<html><script>alert(1)</script></html>", "普通文本"}) {
+            // 准备参数：后缀和传入类型都是图片，实际内容不是
+            byte[] content = text.getBytes(StandardCharsets.UTF_8);
+
+            // 调用，并断言异常
+            assertServiceException(() -> fileService.createFile(new ByteArrayInputStream(content), content.length,
+                    "头像.jpg", null, "image/jpeg"), FILE_TYPE_NOT_ALLOWED);
+            // 断言未上传文件、未保存记录
+            verifyNoInteractions(fileConfigService);
+            assertEquals(0L, fileMapper.selectCount());
+        }
+    }
+
+    @Test
+    public void testCreateFileStream_fileIsEmpty() {
+        // 调用，并断言异常：声明大小为 0，或声明大小与实际内容不符且内容为空
+        assertServiceException(() -> fileService.createFile(new ByteArrayInputStream(new byte[0]), 0,
+                "头像.jpg", null, null), FILE_IS_EMPTY);
+        assertServiceException(() -> fileService.createFile(new ByteArrayInputStream(new byte[0]), 10,
+                "头像.jpg", null, null), FILE_IS_EMPTY);
+        // 校验调用
+        verifyNoInteractions(fileConfigService);
+    }
+
+    @Test
+    public void testCreateFileStream_uploadFailed() throws Exception {
+        // 准备参数
+        byte[] content = ResourceUtil.readBytes("file/erweima.jpg");
+        // mock 上传失败
+        FileClient client = mock(FileClient.class);
+        when(fileConfigService.getMasterFileClient()).thenReturn(client);
+        when(client.upload(any(InputStream.class), anyLong(), anyString(), anyString()))
+                .thenThrow(new IOException("upload failed"));
+
+        // 调用，并断言异常
+        assertThrows(IOException.class, () -> fileService.createFile(new ByteArrayInputStream(content),
+                content.length, "test.jpg", null, null));
+        // 断言未保存记录
+        assertEquals(0L, fileMapper.selectCount());
+    }
+
+    @Test
+    public void testGetFileStream() throws Exception {
+        // mock 方法
+        FileClient client = mock(FileClient.class);
+        when(fileConfigService.getFileClient(eq(10L))).thenReturn(client);
+        InputStream content = new ByteArrayInputStream(new byte[]{1});
+        when(client.getStream(eq("tudou.jpg"))).thenReturn(content);
+
+        // 调用，并断言：直接返回客户端的文件流，不读取整个内容
+        assertSame(content, fileService.getFileStream(10L, "tudou.jpg"));
+        verify(client, never()).getContent(anyString());
+        // 路径不合法
+        assertServiceException(() -> fileService.getFileStream(10L, "../tudou.jpg"), FILE_PATH_INVALID);
     }
 
 }

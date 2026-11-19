@@ -191,7 +191,7 @@ public class AdminAuthServiceImplTest extends BaseDbUnitTest {
         );
         verify(socialUserService).bindSocialUser(eq(new SocialUserBindReqDTO(
                 user.getId(), UserTypeEnum.ADMIN.getValue(),
-                reqVO.getSocialType(), reqVO.getSocialCode(), reqVO.getSocialState())));
+                reqVO.getSocialType(), reqVO.getSocialCode(), reqVO.getSocialState(), null)));
     }
 
     @Test
@@ -255,7 +255,7 @@ public class AdminAuthServiceImplTest extends BaseDbUnitTest {
         // mock 方法（绑定的用户编号）
         Long userId = 1L;
         when(socialUserService.getSocialUserByCode(eq(UserTypeEnum.ADMIN.getValue()), eq(reqVO.getType()),
-                eq(reqVO.getCode()), eq(reqVO.getState()))).thenReturn(new SocialUserRespDTO(randomString(), randomString(), randomString(), userId));
+                eq(reqVO.getCode()), eq(reqVO.getState()), isNull())).thenReturn(new SocialUserRespDTO(randomString(), randomString(), randomString(), userId));
         // mock（用户）
         AdminUserDO user = randomPojo(AdminUserDO.class, o -> o.setId(userId)
                 .setStatus(CommonStatusEnum.ENABLE.getStatus()));
@@ -299,7 +299,7 @@ public class AdminAuthServiceImplTest extends BaseDbUnitTest {
         AuthSocialLoginReqVO reqVO = randomPojo(AuthSocialLoginReqVO.class);
         Long userId = 1L;
         when(socialUserService.getSocialUserByCode(eq(UserTypeEnum.ADMIN.getValue()), eq(reqVO.getType()),
-                eq(reqVO.getCode()), eq(reqVO.getState())))
+                eq(reqVO.getCode()), eq(reqVO.getState()), isNull()))
                 .thenReturn(new SocialUserRespDTO(randomString(), randomString(), randomString(), userId));
         AdminUserDO user = randomPojo(AdminUserDO.class, o -> o.setId(userId)
                 .setStatus(CommonStatusEnum.DISABLE.getStatus()));

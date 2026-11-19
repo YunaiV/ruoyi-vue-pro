@@ -3,11 +3,7 @@ package cn.iocoder.yudao.module.member.controller.app.social.vo;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.system.enums.social.SocialTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -27,5 +23,8 @@ public class AppSocialUserBindReqVO {
     @Schema(description = "state", requiredMode = Schema.RequiredMode.REQUIRED, example = "9b2ffbc1-7425-4155-9894-9d5c08541d62")
     @NotEmpty(message = "state 不能为空")
     private String state;
+
+    @Schema(description = "发起授权时的回调地址，网页授权换取令牌时需与其一致", example = "https://www.iocoder.cn/social-login")
+    private String redirectUri;
 
 }

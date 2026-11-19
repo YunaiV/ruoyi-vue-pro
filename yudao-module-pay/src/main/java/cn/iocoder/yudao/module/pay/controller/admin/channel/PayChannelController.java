@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.pay.controller.admin.channel;
 
+import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.pay.controller.admin.channel.vo.PayChannelCreateReqVO;
 import cn.iocoder.yudao.module.pay.controller.admin.channel.vo.PayChannelRespVO;
@@ -34,6 +35,7 @@ public class PayChannelController {
     @PostMapping("/create")
     @Operation(summary = "创建支付渠道 ")
     @PreAuthorize("@ss.hasPermission('pay:channel:create')")
+    @ApiAccessLog(sanitizeKeys = "config") // config 是 JSON 字符串，内含商户私钥、API 密钥，不递归脱敏，整体移除
     public CommonResult<Long> createChannel(@Valid @RequestBody PayChannelCreateReqVO createReqVO) {
         return success(channelService.createChannel(createReqVO));
     }
@@ -41,6 +43,7 @@ public class PayChannelController {
     @PutMapping("/update")
     @Operation(summary = "更新支付渠道 ")
     @PreAuthorize("@ss.hasPermission('pay:channel:update')")
+    @ApiAccessLog(sanitizeKeys = "config") // config 是 JSON 字符串，内含商户私钥、API 密钥，不递归脱敏，整体移除
     public CommonResult<Boolean> updateChannel(@Valid @RequestBody PayChannelUpdateReqVO updateReqVO) {
         channelService.updateChannel(updateReqVO);
         return success(true);

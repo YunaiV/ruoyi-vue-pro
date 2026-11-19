@@ -19,10 +19,10 @@ public class AiMusicPageReqVO extends PageParam {
     @Schema(description = "用户编号", example = "12212")
     private Long userId;
 
-    @Schema(description = "音乐名称", example = "夜空中最亮的星")
+    @Schema(description = "音乐名称，模糊匹配", example = "夏夜晚风")
     private String title;
 
-    @Schema(description = "音乐状态", example = "20")
+    @Schema(description = "音乐状态", example = "40")
     @InEnum(AiMusicStatusEnum.class)
     private Integer status;
 
@@ -30,8 +30,11 @@ public class AiMusicPageReqVO extends PageParam {
     @InEnum(AiMusicGenerateModeEnum.class)
     private Integer generateMode;
 
-    @Schema(description = "是否发布", example = "true")
+    @Schema(description = "是否公开", example = "true")
     private Boolean publicStatus;
+
+    @Schema(description = "关键词，模糊匹配歌曲描述或歌词", example = "晚风")
+    private String keyword;
 
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)

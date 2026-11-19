@@ -3,9 +3,11 @@ package cn.iocoder.yudao.module.ai.framework.ai.core.webserch.bocha;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.module.ai.framework.ai.core.webserch.AiWebFetchResponse;
 import cn.iocoder.yudao.module.ai.framework.ai.core.webserch.AiWebSearchClient;
 import cn.iocoder.yudao.module.ai.framework.ai.core.webserch.AiWebSearchRequest;
 import cn.iocoder.yudao.module.ai.framework.ai.core.webserch.AiWebSearchResponse;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
@@ -25,6 +27,7 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
  * 博查 {@link AiWebSearchClient} 实现类
  *
  * @see <a href="https://open.bochaai.com/overview">博查 AI 开放平台</a>
+ * @see <a href="https://bocha-ai.feishu.cn/wiki/LvYdwenEbizr5hkp8UqcUHqgnwe">博查 DeepSeek Fetch API</a>
  *
  * @author 芋道源码
  */
@@ -32,6 +35,10 @@ import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.
 public class AiBoChaWebSearchClient implements AiWebSearchClient {
 
     public static final String BASE_URL = "https://api.bochaai.com";
+    /**
+     * 网页读取地址：与搜索不是同一个域名
+     */
+    public static final String FETCH_URL = "https://api.bocha.cn/v1/deepseek-fetch";
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";
 
@@ -92,6 +99,23 @@ public class AiBoChaWebSearchClient implements AiWebSearchClient {
                         .setSnippet(page.snippet()).setSummary(page.summary())));
     }
 
+    @Override
+    public AiWebFetchResponse fetch(String url) {
+        // 调用博查 API：返回体没有 CommonResult 包装
+        WebFetchRequest webFetchRequest = new WebFetchRequest(url);
+        WebFetchResponse response = this.webClient.post()
+                .uri(FETCH_URL)
+                .bodyValue(webFetchRequest)
+                .retrieve()
+                .onStatus(STATUS_PREDICATE, EXCEPTION_FUNCTION.apply(webFetchRequest))
+                .bodyToMono(WebFetchResponse.class)
+                .block();
+        if (response == null) {
+            throw new IllegalStateException("[fetch][读取结果为空]");
+        }
+        return new AiWebFetchResponse().setTitle(response.title()).setUrl(url).setContent(response.content());
+    }
+
     /**
      * 网页搜索请求参数
      */
@@ -104,6 +128,27 @@ public class AiBoChaWebSearchClient implements AiWebSearchClient {
         public WebSearchRequest {
             Assert.notBlank(query, "query 不能为空");
         }
+    }
+
+    /**
+     * 网页读取请求参数
+     */
+    public record WebFetchRequest(
+            String url
+    ) {
+        public WebFetchRequest {
+            Assert.notBlank(url, "url 不能为空");
+        }
+    }
+
+    /**
+     * 网页读取响应
+     */
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record WebFetchResponse(
+            String title,
+            String content
+    ) {
     }
 
     /**

@@ -83,7 +83,7 @@ public class AiModelServiceImplReasoningTest extends BaseMockitoUnitTest {
         // 准备参数：不提交思考配置
         AiModelSaveReqVO reqVO = buildSaveReqVO(null);
         // mock apiKeyService 的方法
-        mockApiKey(reqVO.getKeyId(), AiPlatformEnum.DEEP_SEEK);
+        mockApiKey(reqVO.getKeyId(), AiPlatformEnum.DEEPSEEK);
 
         // 调用
         modelService.createModel(reqVO);
@@ -96,7 +96,7 @@ public class AiModelServiceImplReasoningTest extends BaseMockitoUnitTest {
         // 准备参数：档位为空视为未配置
         AiModelSaveReqVO reqVO = buildSaveReqVO(null).setReasoningConfig(buildEmptyReasoningConfig());
         // mock apiKeyService 的方法
-        mockApiKey(reqVO.getKeyId(), AiPlatformEnum.DEEP_SEEK);
+        mockApiKey(reqVO.getKeyId(), AiPlatformEnum.DEEPSEEK);
 
         // 调用
         modelService.createModel(reqVO);
@@ -109,7 +109,7 @@ public class AiModelServiceImplReasoningTest extends BaseMockitoUnitTest {
         // 准备参数
         AiModelSaveReqVO reqVO = buildConfiguredReqVO(null);
         // mock apiKeyService 的方法
-        mockApiKey(reqVO.getKeyId(), AiPlatformEnum.DEEP_SEEK);
+        mockApiKey(reqVO.getKeyId(), AiPlatformEnum.DEEPSEEK);
 
         // 调用
         modelService.createModel(reqVO);
@@ -128,7 +128,7 @@ public class AiModelServiceImplReasoningTest extends BaseMockitoUnitTest {
 
         // 调用，并断言异常
         assertServiceException(() -> modelService.createModel(reqVO), MODEL_REASONING_PLATFORM_MISMATCH,
-                AiPlatformEnum.DEEP_SEEK.getPlatform(), AiPlatformEnum.OPENAI.getPlatform());
+                AiPlatformEnum.DEEPSEEK.getPlatform(), AiPlatformEnum.OPENAI.getPlatform());
         verify(modelMapper, never()).insert(any(AiModelDO.class));
     }
 
@@ -165,7 +165,7 @@ public class AiModelServiceImplReasoningTest extends BaseMockitoUnitTest {
         // 准备参数：不提交思考配置，与创建一致视为未配置
         AiModelSaveReqVO reqVO = buildSaveReqVO(id).setName("改名");
         // mock apiKeyService 的方法
-        mockApiKey(reqVO.getKeyId(), AiPlatformEnum.DEEP_SEEK);
+        mockApiKey(reqVO.getKeyId(), AiPlatformEnum.DEEPSEEK);
 
         // 调用
         modelService.updateModel(reqVO);
@@ -183,7 +183,7 @@ public class AiModelServiceImplReasoningTest extends BaseMockitoUnitTest {
         // 准备参数：档位为空表示清空思考配置
         AiModelSaveReqVO reqVO = buildSaveReqVO(id).setReasoningConfig(buildEmptyReasoningConfig());
         // mock apiKeyService 的方法
-        mockApiKey(reqVO.getKeyId(), AiPlatformEnum.DEEP_SEEK);
+        mockApiKey(reqVO.getKeyId(), AiPlatformEnum.DEEPSEEK);
 
         // 调用
         modelService.updateModel(reqVO);
@@ -201,7 +201,7 @@ public class AiModelServiceImplReasoningTest extends BaseMockitoUnitTest {
         // 准备参数
         AiModelSaveReqVO reqVO = buildConfiguredReqVO(id);
         // mock apiKeyService 的方法
-        mockApiKey(reqVO.getKeyId(), AiPlatformEnum.DEEP_SEEK);
+        mockApiKey(reqVO.getKeyId(), AiPlatformEnum.DEEPSEEK);
 
         // 调用
         modelService.updateModel(reqVO);
@@ -219,7 +219,7 @@ public class AiModelServiceImplReasoningTest extends BaseMockitoUnitTest {
         AiModelSaveReqVO reqVO = buildConfiguredReqVO(id);
         Collections.reverse(reqVO.getReasoningConfig().getLevels());
         // mock apiKeyService 的方法
-        mockApiKey(reqVO.getKeyId(), AiPlatformEnum.DEEP_SEEK);
+        mockApiKey(reqVO.getKeyId(), AiPlatformEnum.DEEPSEEK);
 
         // 调用
         modelService.updateModel(reqVO);
@@ -237,11 +237,11 @@ public class AiModelServiceImplReasoningTest extends BaseMockitoUnitTest {
         // 准备参数：提交思考配置，但换成另一个平台的 API 密钥
         AiModelSaveReqVO reqVO = buildConfiguredReqVO(id);
         // mock apiKeyService 的方法
-        mockApiKey(reqVO.getKeyId(), AiPlatformEnum.ZHI_PU);
+        mockApiKey(reqVO.getKeyId(), AiPlatformEnum.ZHIPU);
 
         // 调用，并断言异常：拒绝，不写库
         assertServiceException(() -> modelService.updateModel(reqVO), MODEL_REASONING_PLATFORM_MISMATCH,
-                AiPlatformEnum.DEEP_SEEK.getPlatform(), AiPlatformEnum.ZHI_PU.getPlatform());
+                AiPlatformEnum.DEEPSEEK.getPlatform(), AiPlatformEnum.ZHIPU.getPlatform());
         verify(modelMapper, never()).updateForSave(any(AiModelDO.class));
     }
 
@@ -253,7 +253,7 @@ public class AiModelServiceImplReasoningTest extends BaseMockitoUnitTest {
         // 准备参数：类型改成图片，不提交思考配置
         AiModelSaveReqVO reqVO = buildSaveReqVO(id).setType(AiModelTypeEnum.IMAGE.getType());
         // mock apiKeyService 的方法
-        mockApiKey(reqVO.getKeyId(), AiPlatformEnum.DEEP_SEEK);
+        mockApiKey(reqVO.getKeyId(), AiPlatformEnum.DEEPSEEK);
 
         // 调用
         modelService.updateModel(reqVO);
@@ -384,7 +384,7 @@ public class AiModelServiceImplReasoningTest extends BaseMockitoUnitTest {
     public void testCreateModel_reasoningConvertedToDO() {
         // 准备参数：从请求 JSON 反序列化，思考参数含嵌套对象、数组、整数、布尔
         String json = "{\"keyId\":1,\"name\":\"DeepSeek 对话\",\"model\":\"deepseek-chat\",\"platform\":\""
-                + AiPlatformEnum.DEEP_SEEK.getPlatform() + "\",\"type\":" + AiModelTypeEnum.CHAT.getType()
+                + AiPlatformEnum.DEEPSEEK.getPlatform() + "\",\"type\":" + AiModelTypeEnum.CHAT.getType()
                 + ",\"sort\":1,\"status\":" + CommonStatusEnum.ENABLE.getStatus() + ",\"reasoningConfig\":{\"levels\":["
                 + "{\"level\":\"off\",\"options\":{\"thinking\":{\"type\":\"disabled\"}}},"
                 + "{\"level\":\"1\",\"options\":{\"thinking\":{\"type\":\"enabled\",\"budget_tokens\":1024},"
@@ -392,7 +392,7 @@ public class AiModelServiceImplReasoningTest extends BaseMockitoUnitTest {
         AiModelSaveReqVO reqVO = JsonUtils.parseObject(json, AiModelSaveReqVO.class);
         assertDoesNotThrow(() -> ValidationUtils.validate(reqVO));
         // mock apiKeyService 的方法
-        mockApiKey(reqVO.getKeyId(), AiPlatformEnum.DEEP_SEEK);
+        mockApiKey(reqVO.getKeyId(), AiPlatformEnum.DEEPSEEK);
 
         // 调用
         modelService.createModel(reqVO);
@@ -427,12 +427,12 @@ public class AiModelServiceImplReasoningTest extends BaseMockitoUnitTest {
     public void testValidateReasoningPlatform_unconfigured() {
         // 准备参数：未配置思考
         AiModelDO model = new AiModelDO().setId(randomLongId()).setKeyId(randomLongId())
-                .setPlatform(AiPlatformEnum.DEEP_SEEK.getPlatform());
+                .setPlatform(AiPlatformEnum.DEEPSEEK.getPlatform());
 
         // 调用
         AiPlatformEnum platform = modelService.validateReasoningPlatform(model);
         // 断言：不查 API 密钥
-        assertEquals(AiPlatformEnum.DEEP_SEEK, platform);
+        assertEquals(AiPlatformEnum.DEEPSEEK, platform);
         verify(apiKeyService, never()).validateApiKey(any());
     }
 
@@ -440,14 +440,14 @@ public class AiModelServiceImplReasoningTest extends BaseMockitoUnitTest {
     public void testValidateReasoningPlatform_mismatch() {
         // 准备参数：库里已有的不一致数据
         AiModelDO model = new AiModelDO().setId(randomLongId()).setKeyId(randomLongId())
-                .setPlatform(AiPlatformEnum.DEEP_SEEK.getPlatform())
+                .setPlatform(AiPlatformEnum.DEEPSEEK.getPlatform())
                 .setReasoningConfig(buildReasoningConfig());
         // mock apiKeyService 的方法
-        mockApiKey(model.getKeyId(), AiPlatformEnum.ZHI_PU);
+        mockApiKey(model.getKeyId(), AiPlatformEnum.ZHIPU);
 
         // 调用，并断言异常
         assertServiceException(() -> modelService.validateReasoningPlatform(model), MODEL_REASONING_PLATFORM_MISMATCH,
-                AiPlatformEnum.DEEP_SEEK.getPlatform(), AiPlatformEnum.ZHI_PU.getPlatform());
+                AiPlatformEnum.DEEPSEEK.getPlatform(), AiPlatformEnum.ZHIPU.getPlatform());
     }
 
     @Test
@@ -458,12 +458,12 @@ public class AiModelServiceImplReasoningTest extends BaseMockitoUnitTest {
         when(modelMapper.selectById(eq(id))).thenReturn(new AiModelDO().setId(id).setKeyId(keyId)
                 .setStatus(CommonStatusEnum.ENABLE.getStatus()));
         // mock apiKeyService 的方法
-        AiApiKeyDO apiKey = mockApiKey(keyId, AiPlatformEnum.DEEP_SEEK);
+        AiApiKeyDO apiKey = mockApiKey(keyId, AiPlatformEnum.DEEPSEEK);
 
         // 调用
         modelService.getChatModel(id, null);
         // 断言：思考参数为 null 原样传给工厂，由工厂按平台、API KEY、URL 缓存
-        verify(modelFactory).getOrCreateChatModel(eq(AiPlatformEnum.DEEP_SEEK), eq(apiKey.getApiKey()), eq(apiKey.getUrl()),
+        verify(modelFactory).getOrCreateChatModel(eq(AiPlatformEnum.DEEPSEEK), eq(apiKey.getApiKey()), eq(apiKey.getUrl()),
                 isNull());
     }
 
@@ -475,14 +475,14 @@ public class AiModelServiceImplReasoningTest extends BaseMockitoUnitTest {
         when(modelMapper.selectById(eq(id))).thenReturn(new AiModelDO().setId(id).setKeyId(keyId)
                 .setStatus(CommonStatusEnum.ENABLE.getStatus()));
         // mock apiKeyService 的方法
-        AiApiKeyDO apiKey = mockApiKey(keyId, AiPlatformEnum.DEEP_SEEK);
+        AiApiKeyDO apiKey = mockApiKey(keyId, AiPlatformEnum.DEEPSEEK);
         // 准备参数
         Map<String, Object> levelOptions = Map.of("reasoning_effort", "high");
 
         // 调用
         modelService.getChatModel(id, levelOptions);
         // 断言
-        verify(modelFactory).getOrCreateChatModel(eq(AiPlatformEnum.DEEP_SEEK), eq(apiKey.getApiKey()),
+        verify(modelFactory).getOrCreateChatModel(eq(AiPlatformEnum.DEEPSEEK), eq(apiKey.getApiKey()),
                 eq(apiKey.getUrl()), same(levelOptions));
     }
 
@@ -647,7 +647,7 @@ public class AiModelServiceImplReasoningTest extends BaseMockitoUnitTest {
         reqVO.setKeyId(randomLongId());
         reqVO.setName("DeepSeek 对话");
         reqVO.setModel("deepseek-chat");
-        reqVO.setPlatform(AiPlatformEnum.DEEP_SEEK.getPlatform());
+        reqVO.setPlatform(AiPlatformEnum.DEEPSEEK.getPlatform());
         reqVO.setType(AiModelTypeEnum.CHAT.getType());
         reqVO.setSort(1);
         reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
