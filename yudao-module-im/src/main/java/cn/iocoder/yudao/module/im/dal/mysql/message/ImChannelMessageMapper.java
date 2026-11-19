@@ -3,6 +3,7 @@ package cn.iocoder.yudao.module.im.dal.mysql.message;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import cn.iocoder.yudao.framework.mybatis.core.type.LongListTypeHandler;
 import cn.iocoder.yudao.framework.mybatis.core.util.MyBatisUtils;
 import cn.iocoder.yudao.module.im.controller.admin.manager.message.vo.channel.ImChannelMessagePageReqVO;
 import cn.iocoder.yudao.module.im.dal.dataobject.message.ImChannelMessageDO;
@@ -33,7 +34,9 @@ public interface ImChannelMessageMapper extends BaseMapperX<ImChannelMessageDO> 
         return selectListLimitN(new LambdaQueryWrapperX<ImChannelMessageDO>()
                 .gt(ImChannelMessageDO::getId, minId)
                 .and(w -> w.isNull(ImChannelMessageDO::getReceiverUserIds)
-                        .or().eq(ImChannelMessageDO::getReceiverUserIds, Collections.emptyList())
+                        // 查询条件显式指定转换器，MyBatis-Plus 不再沿用字段的 typeHandler
+                        .or().apply("receiver_user_ids = {0,typeHandler=" + LongListTypeHandler.class.getName() + "}",
+                                Collections.emptyList())
                         .or().apply(MyBatisUtils.findInSet("receiver_user_ids"), userId))
                 .orderByAsc(ImChannelMessageDO::getId), size);
     }
