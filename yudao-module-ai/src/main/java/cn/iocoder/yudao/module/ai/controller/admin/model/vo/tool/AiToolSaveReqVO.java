@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.ai.controller.admin.model.vo.tool;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotEmpty;
 import lombok.Data;
 
 @Schema(description = "管理后台 - AI 工具新增/修改 Request VO")

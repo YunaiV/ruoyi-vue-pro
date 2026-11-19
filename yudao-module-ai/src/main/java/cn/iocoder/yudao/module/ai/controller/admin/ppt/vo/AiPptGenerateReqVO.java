@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.ai.enums.ppt.AiPptModeEnum;
 import cn.iocoder.yudao.module.ai.enums.ppt.AiPptSourceEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.*;
+import javax.validation.constraints.*;
 import lombok.Data;
 
 import java.util.Objects;

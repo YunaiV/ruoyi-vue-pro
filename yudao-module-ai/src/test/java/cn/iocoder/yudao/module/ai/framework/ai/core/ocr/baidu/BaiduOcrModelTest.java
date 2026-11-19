@@ -17,6 +17,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.util.MimeType;
 import org.springframework.util.MimeTypeUtils;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Clock;
@@ -67,7 +68,7 @@ public class BaiduOcrModelTest {
     @Test
     public void testCall_tokenThenRecognize() {
         // 准备参数
-        server.enqueue(Response.json(200, TOKEN_RESPONSE.formatted("token-1")))
+        server.enqueue(Response.json(200, String.format(TOKEN_RESPONSE, "token-1")))
                 .enqueue(Response.json(200, OCR_RESPONSE));
 
         // 调用
@@ -91,7 +92,7 @@ public class BaiduOcrModelTest {
         assertTrue(ocrRequest.header("Content-Type").startsWith("application/x-www-form-urlencoded"));
         assertTrue(ocrRequest.body().startsWith("image="));
         assertEquals(Base64.encode(IMAGE),
-                URLDecoder.decode(ocrRequest.body().substring("image=".length()), StandardCharsets.UTF_8));
+                urlDecode(ocrRequest.body().substring("image=".length())));
     }
 
     @Test
@@ -119,7 +120,7 @@ public class BaiduOcrModelTest {
             assertFalse(request.body().contains("access_token"));
             assertTrue(request.header("Content-Type").startsWith("application/x-www-form-urlencoded"));
             assertEquals(Base64.encode(IMAGE),
-                    URLDecoder.decode(request.body().substring("image=".length()), StandardCharsets.UTF_8));
+                    urlDecode(request.body().substring("image=".length())));
         }
     }
 
@@ -161,10 +162,10 @@ public class BaiduOcrModelTest {
     @Test
     public void testCall_tokenCachedAndRefreshedBeforeExpiry() {
         // 准备参数
-        server.enqueue(Response.json(200, TOKEN_RESPONSE.formatted("token-1")))
+        server.enqueue(Response.json(200, String.format(TOKEN_RESPONSE, "token-1")))
                 .enqueue(Response.json(200, OCR_RESPONSE))
                 .enqueue(Response.json(200, OCR_RESPONSE))
-                .enqueue(Response.json(200, TOKEN_RESPONSE.formatted("token-2")))
+                .enqueue(Response.json(200, String.format(TOKEN_RESPONSE, "token-2")))
                 .enqueue(Response.json(200, OCR_RESPONSE));
         BaiduOcrModel model = buildModel();
 
@@ -186,9 +187,9 @@ public class BaiduOcrModelTest {
     @Test
     public void testCall_tokenInvalidThenRetryOnce() {
         // 准备参数
-        server.enqueue(Response.json(200, TOKEN_RESPONSE.formatted("token-1")))
+        server.enqueue(Response.json(200, String.format(TOKEN_RESPONSE, "token-1")))
                 .enqueue(Response.json(200, "{\"error_code\":110,\"error_msg\":\"Access token invalid or no longer valid\"}"))
-                .enqueue(Response.json(200, TOKEN_RESPONSE.formatted("token-2")))
+                .enqueue(Response.json(200, String.format(TOKEN_RESPONSE, "token-2")))
                 .enqueue(Response.json(200, OCR_RESPONSE));
 
         // 调用
@@ -204,9 +205,9 @@ public class BaiduOcrModelTest {
     @Test
     public void testCall_tokenStillInvalidAfterRetry() {
         // 准备参数
-        server.enqueue(Response.json(200, TOKEN_RESPONSE.formatted("token-1")))
+        server.enqueue(Response.json(200, String.format(TOKEN_RESPONSE, "token-1")))
                 .enqueue(Response.json(200, "{\"error_code\":111,\"error_msg\":\"Access token expired\"}"))
-                .enqueue(Response.json(200, TOKEN_RESPONSE.formatted("token-2")))
+                .enqueue(Response.json(200, String.format(TOKEN_RESPONSE, "token-2")))
                 .enqueue(Response.json(200, "{\"error_code\":111,\"error_msg\":\"Access token expired\"}"));
 
         // 调用，并断言异常
@@ -220,7 +221,7 @@ public class BaiduOcrModelTest {
     @Test
     public void testCall_qpsLimit() {
         // 准备参数
-        server.enqueue(Response.json(200, TOKEN_RESPONSE.formatted("token-1")))
+        server.enqueue(Response.json(200, String.format(TOKEN_RESPONSE, "token-1")))
                 .enqueue(Response.json(200, "{\"error_code\":18,\"error_msg\":\"Open api qps request limit reached\","
                         + "\"log_id\":12345}"));
 
@@ -236,7 +237,7 @@ public class BaiduOcrModelTest {
     @Test
     public void testCall_imageFormatError() {
         // 准备参数
-        server.enqueue(Response.json(200, TOKEN_RESPONSE.formatted("token-1")))
+        server.enqueue(Response.json(200, String.format(TOKEN_RESPONSE, "token-1")))
                 .enqueue(Response.json(200, "{\"error_code\":216201,\"error_msg\":\"image format error\"}"));
 
         // 调用，并断言异常
@@ -263,7 +264,7 @@ public class BaiduOcrModelTest {
     @Test
     public void testCall_ocrTimeoutDoesNotLeakToken() {
         // 准备参数
-        server.enqueue(Response.json(200, TOKEN_RESPONSE.formatted("token-secret-1")))
+        server.enqueue(Response.json(200, String.format(TOKEN_RESPONSE, "token-secret-1")))
                 .enqueue(Response.delayed(1500));
         BaiduOcrModel model = new BaiduOcrModel(API_KEY, server.baseUrl(), null,
                 Duration.ofSeconds(1), Duration.ofMillis(300), clock);
@@ -305,7 +306,7 @@ public class BaiduOcrModelTest {
             assertEquals(OcrException.Type.INVALID_CREDENTIAL, ex.getType());
             // 异常消息不能回显密钥的任何一段
             for (String part : String.valueOf(apiKey).split("\\|")) {
-                if (!part.isBlank() && apiKey != null) {
+                if (!StrUtil.isBlank(part) && apiKey != null) {
                     assertFalse(ex.getMessage().contains(part.trim()), "part=" + part + ", message=" + ex.getMessage());
                 }
             }
@@ -394,6 +395,14 @@ public class BaiduOcrModelTest {
             return now;
         }
 
+    }
+
+    private static String urlDecode(String value) {
+        try {
+            return URLDecoder.decode(value, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
 }

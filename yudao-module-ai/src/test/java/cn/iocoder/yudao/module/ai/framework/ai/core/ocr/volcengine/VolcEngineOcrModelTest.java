@@ -19,6 +19,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.util.MimeType;
 import org.springframework.util.MimeTypeUtils;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -40,9 +41,7 @@ public class VolcEngineOcrModelTest {
     private static final String SECRET_ACCESS_KEY = "volcTestSecretKey001==";
     private static final String API_KEY = ACCESS_KEY_ID + "|" + SECRET_ACCESS_KEY;
 
-    private static final String SUCCESS_RESPONSE = """
-            {"code":10000,"data":{"line_texts":["火山引擎","通用文字识别 "],"line_rects":[]},\
-            "message":"Success","request_id":"req-volc-1","time_elapsed":"20ms"}""";
+    private static final String SUCCESS_RESPONSE = "{\"code\":10000,\"data\":{\"line_texts\":[\"火山引擎\",\"通用文字识别 \"],\"line_rects\":[]},\"message\":\"Success\",\"request_id\":\"req-volc-1\",\"time_elapsed\":\"20ms\"}";
 
     private static final byte[] IMAGE = ResourceUtil.readBytes("ocr/yudao-ocr-2026.png");
 
@@ -99,8 +98,7 @@ public class VolcEngineOcrModelTest {
     @Test
     public void testCall_businessErrorRateLimited() {
         // 准备参数
-        server.enqueue(Response.json(200, """
-                {"code":50429,"data":null,"message":"Request Has Reached API Limit","request_id":"req-volc-2"}"""));
+        server.enqueue(Response.json(200, "{\"code\":50429,\"data\":null,\"message\":\"Request Has Reached API Limit\",\"request_id\":\"req-volc-2\"}"));
 
         // 调用，并断言异常
         OcrException ex = assertThrows(OcrException.class,
@@ -114,10 +112,7 @@ public class VolcEngineOcrModelTest {
     @Test
     public void testCall_signatureError() {
         // 准备参数
-        server.enqueue(Response.json(401, """
-                {"ResponseMetadata":{"RequestId":"req-volc-3","Action":"OCRNormal","Version":"2020-08-26",\
-                "Service":"cv","Region":"cn-north-1","Error":{"CodeN":100010,"Code":"SignatureDoesNotMatch",\
-                "Message":"The request signature we calculated does not match the signature you provided."}}}"""));
+        server.enqueue(Response.json(401, "{\"ResponseMetadata\":{\"RequestId\":\"req-volc-3\",\"Action\":\"OCRNormal\",\"Version\":\"2020-08-26\",\"Service\":\"cv\",\"Region\":\"cn-north-1\",\"Error\":{\"CodeN\":100010,\"Code\":\"SignatureDoesNotMatch\",\"Message\":\"The request signature we calculated does not match the signature you provided.\"}}}"));
 
         // 调用，并断言异常
         OcrException ex = assertThrows(OcrException.class,
@@ -249,8 +244,16 @@ public class VolcEngineOcrModelTest {
     private static Map<String, String> parseForm(String form) {
         return Arrays.stream(form.split("&"))
                 .map(pair -> pair.split("=", 2))
-                .collect(Collectors.toMap(pair -> URLDecoder.decode(pair[0], StandardCharsets.UTF_8),
-                        pair -> pair.length > 1 ? URLDecoder.decode(pair[1], StandardCharsets.UTF_8) : ""));
+                .collect(Collectors.toMap(pair -> urlDecode(pair[0]),
+                        pair -> pair.length > 1 ? urlDecode(pair[1]) : ""));
+    }
+
+    private static String urlDecode(String value) {
+        try {
+            return URLDecoder.decode(value, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
 }

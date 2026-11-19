@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.ai.controller.admin.knowledge.vo.segment;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotEmpty;
 import lombok.Data;
 
 @Schema(description = "管理后台 - AI 新增/修改知识库段落 request VO")

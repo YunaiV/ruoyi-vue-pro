@@ -13,12 +13,13 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatusCode;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
@@ -66,7 +67,7 @@ public class AiDeepSeekWebSearchClient implements AiWebSearchClient {
                 .uri("/v1/tools/search")
                 .bodyValue(searchRequest)
                 .retrieve()
-                .onStatus(HttpStatusCode::isError, this::buildException)
+                .onStatus(HttpStatus::isError, this::buildException)
                 .bodyToMono(SearchResponse.class)
                 .block();
         if (response == null) {
@@ -76,7 +77,7 @@ public class AiDeepSeekWebSearchClient implements AiWebSearchClient {
         // 转换结果：官方不返回总匹配数，使用本次返回条数
         AiWebSearchResponse result = new AiWebSearchResponse();
         if (CollUtil.isEmpty(response.getResults())) {
-            return result.setTotal(0L).setLists(List.of());
+            return result.setTotal(0L).setLists(Collections.emptyList());
         }
         return result.setTotal((long) response.getResults().size())
                 .setLists(convertList(response.getResults(), page -> new AiWebSearchResponse.WebPage()
@@ -94,7 +95,7 @@ public class AiDeepSeekWebSearchClient implements AiWebSearchClient {
                 .uri("/v1/tools/fetch")
                 .bodyValue(fetchRequest)
                 .retrieve()
-                .onStatus(HttpStatusCode::isError, this::buildException)
+                .onStatus(HttpStatus::isError, this::buildException)
                 .bodyToMono(FetchResponse.class)
                 .block();
         if (response == null) {
@@ -108,11 +109,11 @@ public class AiDeepSeekWebSearchClient implements AiWebSearchClient {
      */
     private Mono<? extends Throwable> buildException(ClientResponse response) {
         return response.bodyToMono(String.class).defaultIfEmpty("").map(body -> {
-            log.error("[AiDeepSeekWebSearchClient] 调用失败！状态码: [{}]，响应数据: [{}]", response.statusCode(), body);
+            log.error("[AiDeepSeekWebSearchClient] 调用失败！状态码: [{}]，响应数据: [{}]", response.rawStatusCode(), body);
             ErrorResponse error = JsonUtils.parseObjectQuietly(body, ErrorResponse.class);
             String message = error != null && error.getError() != null ? error.getError().getMessage() : null;
             return new IllegalStateException(String.format("[AiDeepSeekWebSearchClient] 调用失败！status = %s, message = %s",
-                    response.statusCode().value(), StrUtil.blankToDefault(message, body)));
+                    response.rawStatusCode(), StrUtil.blankToDefault(message, body)));
         });
     }
 

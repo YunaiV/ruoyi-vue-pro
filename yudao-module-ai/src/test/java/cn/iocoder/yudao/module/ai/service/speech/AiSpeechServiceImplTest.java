@@ -26,13 +26,13 @@ import cn.iocoder.yudao.module.ai.framework.ai.core.model.tongyi.TongYiSpeechMod
 import cn.iocoder.yudao.module.ai.service.model.AiApiKeyService;
 import cn.iocoder.yudao.module.ai.service.model.AiModelService;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.mockito.stubbing.Answer;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -73,11 +73,11 @@ public class AiSpeechServiceImplTest extends BaseDbUnitTest {
     @Resource
     private AiSpeechMapper speechMapper;
 
-    @MockitoBean
+    @MockBean
     private AiModelService modelService;
-    @MockitoBean
+    @MockBean
     private AiApiKeyService apiKeyService;
-    @MockitoBean
+    @MockBean
     private FileApi fileApi;
 
     @AfterEach

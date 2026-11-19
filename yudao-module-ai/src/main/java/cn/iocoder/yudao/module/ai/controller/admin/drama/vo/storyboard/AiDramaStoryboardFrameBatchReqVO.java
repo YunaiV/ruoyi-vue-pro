@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.ai.controller.admin.drama.vo.storyboard;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 @Schema(description = "管理后台 - AI 短剧批量生成关键帧 Request VO：当前剧本中镜头序号在范围内、还没有关键帧的镜头")

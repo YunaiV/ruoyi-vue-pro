@@ -11,6 +11,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestTemplate;
 
 import static org.hamcrest.Matchers.endsWith;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -45,7 +46,9 @@ public class SiliconFlowImageModelTests {
     public void testCall_imageSize() {
         // mock 硅基流动接口：断言实际请求体带上宽高对应的 image_size
         RestClient.Builder restClientBuilder = RestClient.builder();
-        MockRestServiceServer server = MockRestServiceServer.bindTo(restClientBuilder).build();
+        RestTemplate restTemplate = new RestTemplate();
+        MockRestServiceServer server = MockRestServiceServer.bindTo(restTemplate).build();
+        restClientBuilder.requestFactory(restTemplate.getRequestFactory());
         server.expect(requestTo(endsWith("v1/images/generations")))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(content().json("{\"model\":\"Qwen/Qwen-Image\",\"image_size\":\"1664x928\"}"))

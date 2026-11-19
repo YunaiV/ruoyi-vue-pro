@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.ai.controller.admin.workflow.vo.AiWorkflowPageReq
 import cn.iocoder.yudao.module.ai.controller.admin.workflow.vo.AiWorkflowSaveReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.workflow.vo.AiWorkflowTestReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.workflow.AiWorkflowDO;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 
 /**
  * AI 工作流 Service 接口

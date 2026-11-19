@@ -8,11 +8,12 @@ import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
-import org.springframework.ai.openai.api.OpenAiApi;
+import org.springframework.ai.openai.OpenAiChatOptions;
 import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 基于 {@link OpenAiChatModel} 集成 Coze 测试
@@ -22,7 +23,7 @@ import java.util.List;
 public class CozeChatModelTests {
 
     private final OpenAiChatModel chatModel = OpenAiChatModel.builder()
-            .openAiApi(OpenAiApi.builder()
+            .options(OpenAiChatOptions.builder()
                     .baseUrl("http://127.0.0.1:3000")
                     .apiKey("app-4hy2d7fJauSbrKbzTKX1afuP") // apiKey
                     .build())
@@ -40,7 +41,7 @@ public class CozeChatModelTests {
         ChatResponse response = chatModel.call(new Prompt(messages));
         // 打印结果
         System.out.println(response);
-        System.out.println(response.getResult().getOutput());
+        System.out.println(Objects.requireNonNull(response.getResult()).getOutput());
     }
 
     @Test
@@ -56,7 +57,7 @@ public class CozeChatModelTests {
         // 打印结果
         flux.doOnNext(response -> {
 //            System.out.println(response);
-            System.out.println(response.getResult().getOutput());
+            System.out.println(Objects.requireNonNull(response.getResult()).getOutput());
         }).then().block();
     }
 

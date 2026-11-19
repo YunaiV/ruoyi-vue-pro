@@ -37,7 +37,7 @@ import cn.iocoder.yudao.module.ai.util.AiImageUtils;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import com.volcengine.ark.runtime.model.images.generation.ImagesResponse;
 import com.volcengine.ark.runtime.service.ArkService;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;

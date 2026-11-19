@@ -13,7 +13,7 @@ import cn.iocoder.yudao.module.ai.service.model.AiModelService;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import dev.tinyflow.core.Tinyflow;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

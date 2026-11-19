@@ -6,7 +6,7 @@ import cn.iocoder.yudao.module.ai.controller.admin.skill.vo.file.AiSkillFileMove
 import cn.iocoder.yudao.module.ai.controller.admin.skill.vo.file.AiSkillFileRenameReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.skill.AiSkillDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.skill.AiSkillFileDO;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 
 import java.util.Collection;
 import java.util.List;

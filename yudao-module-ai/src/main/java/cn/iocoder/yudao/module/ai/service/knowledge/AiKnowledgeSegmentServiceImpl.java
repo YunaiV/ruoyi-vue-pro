@@ -27,7 +27,8 @@ import com.alibaba.cloud.ai.dashscope.rerank.DashScopeRerankOptions;
 import com.alibaba.cloud.ai.model.RerankModel;
 import com.alibaba.cloud.ai.model.RerankRequest;
 import com.alibaba.cloud.ai.model.RerankResponse;
-import jakarta.annotation.Resource;
+import com.google.common.collect.ImmutableMap;
+import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.tokenizer.TokenCountEstimator;
@@ -40,6 +41,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedReader;
+import java.io.StringReader;
 import java.util.*;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -60,7 +63,7 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
     private static final String VECTOR_STORE_METADATA_DOCUMENT_ID = "documentId";
     private static final String VECTOR_STORE_METADATA_SEGMENT_ID = "segmentId";
 
-    private static final Map<String, Class<?>> VECTOR_STORE_METADATA_TYPES = Map.of(
+    private static final Map<String, Class<?>> VECTOR_STORE_METADATA_TYPES = ImmutableMap.of(
             VECTOR_STORE_METADATA_KNOWLEDGE_ID, String.class,
             VECTOR_STORE_METADATA_DOCUMENT_ID, String.class,
             VECTOR_STORE_METADATA_SEGMENT_ID, String.class);
@@ -220,7 +223,7 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
         segment.getMetadata().put(VECTOR_STORE_METADATA_KNOWLEDGE_ID, segmentDO.getKnowledgeId().toString());
         segment.getMetadata().put(VECTOR_STORE_METADATA_DOCUMENT_ID, segmentDO.getDocumentId().toString());
         segment.getMetadata().put(VECTOR_STORE_METADATA_SEGMENT_ID, segmentDO.getId().toString());
-        vectorStore.add(List.of(segment));
+        vectorStore.add(Collections.singletonList(segment));
 
         // 2. 更新向量 ID
         segmentMapper.updateById(new AiKnowledgeSegmentDO().setId(segmentDO.getId()).setVectorId(segment.getId()));
@@ -235,7 +238,7 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
                 .setVectorId(AiKnowledgeSegmentDO.VECTOR_ID_EMPTY));
 
         // 2. 删除向量
-        vectorStore.delete(List.of(segmentDO.getVectorId()));
+        vectorStore.delete(Collections.singletonList(segmentDO.getVectorId()));
     }
 
     @Override
@@ -425,7 +428,7 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
         }
 
         // 统计二级标题数量
-        long h2Count = content.lines()
+        long h2Count = new BufferedReader(new StringReader(content)).lines()
                 .filter(line -> line.trim().startsWith("## "))
                 .count();
 
@@ -435,7 +438,7 @@ public class AiKnowledgeSegmentServiceImpl implements AiKnowledgeSegmentService 
         }
 
         // 要求二：检查标题占比（QA 文档标题行数相对较多），如果二级标题占比超过 10%，认为是 QA 格式
-        long totalLines = content.lines().count();
+        long totalLines = new BufferedReader(new StringReader(content)).lines().count();
         double h2Ratio = (double) h2Count / totalLines;
         return h2Ratio > 0.1;
     }

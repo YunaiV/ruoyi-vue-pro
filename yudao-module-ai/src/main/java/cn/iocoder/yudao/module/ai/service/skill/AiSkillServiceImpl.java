@@ -15,7 +15,7 @@ import cn.iocoder.yudao.module.ai.dal.dataobject.skill.AiSkillFileDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.skill.AiSkillMapper;
 import cn.iocoder.yudao.module.ai.service.model.AiChatRoleService;
 import cn.iocoder.yudao.module.ai.tool.skill.AiSkillToolCallback;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;

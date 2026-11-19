@@ -245,8 +245,8 @@ public class AiDramaAssetServiceImplTest extends BaseMockitoUnitTest {
         verify(appearanceMapper).updateByIdAndStatusAndTaskId(eq(APPEARANCE_ID), eq(AiDramaStatusEnum.IN_PROGRESS.getStatus()),
                 eq("task-1"), captor.capture());
         assertEquals(AiDramaStatusEnum.SUCCESS.getStatus(), captor.getValue().getStatus());
-        assertEquals(List.of("https://files.example.com/new.png"), captor.getValue().getImageUrls());
-        assertEquals(List.of("提示词"), captor.getValue().getImageDescriptions());
+        assertEquals(Arrays.asList("https://files.example.com/new.png"), captor.getValue().getImageUrls());
+        assertEquals(Arrays.asList("提示词"), captor.getValue().getImageDescriptions());
         assertEquals(Collections.emptyList(), captor.getValue().getPreviousImageUrls());
         assertEquals(0, captor.getValue().getSelectedIndex());
     }
@@ -302,7 +302,7 @@ public class AiDramaAssetServiceImplTest extends BaseMockitoUnitTest {
 
         assertEquals(1, written.size());
         assertEquals(AiDramaStatusEnum.SUCCESS.getStatus(), written.get(0).getStatus());
-        assertEquals(List.of("https://files.example.com/new.png"), written.get(0).getImageUrls());
+        assertEquals(Arrays.asList("https://files.example.com/new.png"), written.get(0).getImageUrls());
     }
 
     @Test
@@ -423,10 +423,10 @@ public class AiDramaAssetServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testTimeoutImage() {
         Integer inProgress = AiDramaStatusEnum.IN_PROGRESS.getStatus();
-        when(appearanceMapper.selectListByStatusAndUpdateTimeLt(eq(inProgress), any())).thenReturn(List.of(
+        when(appearanceMapper.selectListByStatusAndUpdateTimeLt(eq(inProgress), any())).thenReturn(Arrays.asList(
                 appearance().setStatus(inProgress).setTaskId("task-1")));
         when(appearanceMapper.updateByIdAndStatusAndTaskId(eq(APPEARANCE_ID), eq(inProgress), eq("task-1"), any())).thenReturn(1);
-        when(visualAssetMapper.selectListByStatusAndUpdateTimeLt(eq(inProgress), any())).thenReturn(List.of(
+        when(visualAssetMapper.selectListByStatusAndUpdateTimeLt(eq(inProgress), any())).thenReturn(Arrays.asList(
                 new AiDramaVisualAssetDO().setId(400L).setStatus(inProgress).setTaskId("task-2")));
         // 已被重新提交：任务编号已变，不命中
         when(visualAssetMapper.updateByIdAndStatusAndTaskId(eq(400L), eq(inProgress), eq("task-2"), any())).thenReturn(0);
@@ -446,7 +446,7 @@ public class AiDramaAssetServiceImplTest extends BaseMockitoUnitTest {
 
         assetService.deleteAssetListByProjectId(PROJECT_ID);
 
-        verify(appearanceMapper).deleteByCharacterIds(List.of(CHARACTER_ID));
+        verify(appearanceMapper).deleteByCharacterIds(Arrays.asList(CHARACTER_ID));
         verify(characterMapper).deleteByProjectId(PROJECT_ID);
         verify(locationMapper).deleteByProjectId(PROJECT_ID);
         verify(visualAssetMapper).deleteByProjectId(PROJECT_ID);
@@ -579,7 +579,7 @@ public class AiDramaAssetServiceImplTest extends BaseMockitoUnitTest {
         AiDramaAudioMusicReqVO reqVO = new AiDramaAudioMusicReqVO();
         reqVO.setProjectId(PROJECT_ID);
         reqVO.setMusicId(3L);
-        reqVO.setStoryboardIds(List.of(7L));
+        reqVO.setStoryboardIds(Arrays.asList(7L));
 
         assetService.createMusicAudioMy(USER_ID, reqVO);
 
@@ -590,7 +590,7 @@ public class AiDramaAssetServiceImplTest extends BaseMockitoUnitTest {
         assertEquals("雨夜", captor.getValue().getName());
         assertEquals("https://files.example.com/m.mp3", captor.getValue().getFileUrl());
         assertEquals(30D, captor.getValue().getDuration());
-        assertEquals(List.of(7L), captor.getValue().getStoryboardIds());
+        assertEquals(Arrays.asList(7L), captor.getValue().getStoryboardIds());
         assertEquals(3L, captor.getValue().getMusicId());
     }
 

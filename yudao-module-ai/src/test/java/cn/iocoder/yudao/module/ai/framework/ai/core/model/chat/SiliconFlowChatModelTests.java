@@ -29,7 +29,7 @@ public class SiliconFlowChatModelTests {
                     .baseUrl(SiliconFlowApiConstants.DEFAULT_BASE_URL)
                     .apiKey("sk-epsakfenqnyzoxhmbucsxlhkdqlcbnimslqoivkshalvdozz") // apiKey
                     .build())
-            .defaultOptions(DeepSeekChatOptions.builder()
+            .options(DeepSeekChatOptions.builder()
                     .model(SiliconFlowApiConstants.MODEL_DEFAULT) // 模型
 //                    .model("deepseek-ai/DeepSeek-R1") // 模型（deepseek-ai/DeepSeek-R1）可用赠费
 //                    .model("Pro/deepseek-ai/DeepSeek-R1") // 模型（Pro/deepseek-ai/DeepSeek-R1）需要付费

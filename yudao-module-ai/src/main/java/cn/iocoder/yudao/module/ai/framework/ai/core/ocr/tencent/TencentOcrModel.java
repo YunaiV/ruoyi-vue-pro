@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.ai.framework.ai.core.ocr.OcrPrompt;
 import cn.iocoder.yudao.module.ai.framework.ai.core.ocr.OcrResponse;
 import cn.iocoder.yudao.module.ai.framework.ai.core.ocr.OcrResult;
 import cn.iocoder.yudao.module.ai.framework.ai.core.ocr.OcrUtils;
+import com.google.common.collect.ImmutableSet;
 import com.tencentcloudapi.common.Credential;
 import com.tencentcloudapi.common.exception.TencentCloudSDKException;
 import com.tencentcloudapi.common.profile.ClientProfile;
@@ -22,6 +23,7 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 腾讯云通用文字识别（高精度版）GeneralAccurateOCR 的 {@link OcrModel} 实现（平台 TENCENT）
@@ -49,7 +51,7 @@ public class TencentOcrModel implements OcrModel {
     /**
      * 支持 PNG、JPG、JPEG、BMP（PDF 首版不支持）；Base64 编码后不超过 10M
      */
-    static final Set<String> ALLOWED_MIME_TYPES = Set.of("image/jpeg", "image/png", "image/bmp");
+    static final Set<String> ALLOWED_MIME_TYPES = ImmutableSet.of("image/jpeg", "image/png", "image/bmp");
     static final long MAX_BASE64_LENGTH = 10L * 1024 * 1024;
 
     static final Duration DEFAULT_CONNECT_TIMEOUT = Duration.ofSeconds(10);
@@ -86,8 +88,8 @@ public class TencentOcrModel implements OcrModel {
         // 3. 每个实例独立的 HttpProfile / ClientProfile / OcrClient；SDK 的超时单位为秒
         HttpProfile httpProfile = new HttpProfile();
         applyUrl(httpProfile, url);
-        int readTimeoutSeconds = (int) Math.max(1, readTimeout.toSeconds());
-        httpProfile.setConnTimeout((int) Math.max(1, connectTimeout.toSeconds()));
+        int readTimeoutSeconds = (int) Math.max(1, readTimeout.getSeconds());
+        httpProfile.setConnTimeout((int) Math.max(1, connectTimeout.getSeconds()));
         httpProfile.setReadTimeout(readTimeoutSeconds);
         httpProfile.setWriteTimeout(readTimeoutSeconds);
         ClientProfile clientProfile = new ClientProfile();
@@ -138,7 +140,7 @@ public class TencentOcrModel implements OcrModel {
             return new OcrResponse(new OcrResult(""));
         }
         return new OcrResponse(new OcrResult(OcrUtils.joinLines(
-                Arrays.stream(detections).map(TextDetection::getDetectedText).toList())));
+                Arrays.stream(detections).map(TextDetection::getDetectedText).collect(Collectors.toList()))));
     }
 
     private OcrException convertException(TencentCloudSDKException ex) {

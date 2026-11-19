@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.ai.controller.admin.skill.vo.skill.AiSkillPageReq
 import cn.iocoder.yudao.module.ai.controller.admin.skill.vo.skill.AiSkillSaveReqVO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.skill.AiSkillDO;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 import org.springframework.ai.tool.ToolCallback;
 
 import java.util.Collection;

@@ -1,25 +1,28 @@
 package cn.iocoder.yudao.module.ai.framework.ai.core.model.mcp;
 
+import cn.hutool.system.SystemUtil;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.doubao.DouBaoChatModel;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.method.MethodToolCallbackProvider;
+
+import static cn.iocoder.yudao.module.ai.framework.ai.core.model.AiModelTestUtils.validateApiKey;
 
 @Disabled
 public class DouBaoMcpTests {
 
+    private static final String API_KEY = SystemUtil.get("DOUBAO_API_KEY",
+            "sk-xxxx"); // 按需改成你的豆包 API Key
+
     private final OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
-            .openAiApi(OpenAiApi.builder()
+            .options(OpenAiChatOptions.builder()
                     .baseUrl(DouBaoChatModel.BASE_URL)
-                    .apiKey("5c1b5747-26d2-4ebd-a4e0-dd0e8d8b4272") // apiKey
-                    .build())
-            .defaultOptions(OpenAiChatOptions.builder()
-                    .model("doubao-1-5-lite-32k-250115") // 模型（doubao）
+                    .apiKey(API_KEY)
+                    .model(DouBaoChatModel.MODEL_DEFAULT) // 模型（doubao）
                     .temperature(0.7)
                     .build())
             .build();
@@ -36,6 +39,7 @@ public class DouBaoMcpTests {
 
     @Test
     public void testMcpGetUserInfo() {
+        validateApiKey(API_KEY);
         // 打印结果
         System.out.println(chatClient.prompt()
                 .user("目前有哪些工具可以使用")

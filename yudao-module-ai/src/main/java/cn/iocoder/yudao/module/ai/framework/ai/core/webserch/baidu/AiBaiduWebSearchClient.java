@@ -13,7 +13,7 @@ import cn.iocoder.yudao.module.ai.framework.ai.core.webserch.AiWebSearchResponse
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatusCode;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -78,7 +78,7 @@ public class AiBaiduWebSearchClient implements AiWebSearchClient {
                 .uri("/v2/ai_search/web_search")
                 .bodyValue(body)
                 .retrieve()
-                .onStatus(HttpStatusCode::isError, this::buildException)
+                .onStatus(HttpStatus::isError, this::buildException)
                 .bodyToMono(SearchResponse.class)
                 .block();
         if (response == null) {
@@ -93,7 +93,7 @@ public class AiBaiduWebSearchClient implements AiWebSearchClient {
         // 3. 转换结果：官方不返回总匹配数，使用本次返回条数
         AiWebSearchResponse result = new AiWebSearchResponse();
         if (CollUtil.isEmpty(response.getReferences())) {
-            return result.setTotal(0L).setLists(List.of());
+            return result.setTotal(0L).setLists(Collections.emptyList());
         }
         return result.setTotal((long) response.getReferences().size())
                 .setLists(convertList(response.getReferences(), page -> new AiWebSearchResponse.WebPage()
@@ -109,10 +109,10 @@ public class AiBaiduWebSearchClient implements AiWebSearchClient {
 
     private Mono<? extends Throwable> buildException(ClientResponse response) {
         return response.bodyToMono(String.class).defaultIfEmpty("").map(body -> {
-            log.error("[AiBaiduWebSearchClient] 调用失败！状态码: [{}]，响应数据: [{}]", response.statusCode(), body);
+            log.error("[AiBaiduWebSearchClient] 调用失败！状态码: [{}]，响应数据: [{}]", response.rawStatusCode(), body);
             SearchResponse error = JsonUtils.parseObjectQuietly(body, SearchResponse.class);
             return new IllegalStateException(String.format("[AiBaiduWebSearchClient] 调用失败！status = %s, code = %s, message = %s",
-                    response.statusCode().value(), error != null ? error.getCode() : null,
+                    response.rawStatusCode(), error != null ? error.getCode() : null,
                     error != null ? error.getMessage() : body));
         });
     }

@@ -31,6 +31,7 @@ import reactor.core.publisher.Mono;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -160,7 +161,8 @@ public class AiRequestBodyPatcher {
         }
         ObjectNode result = target != null && target.isObject()
                 ? (ObjectNode) target : OBJECT_MAPPER.createObjectNode();
-        for (Map.Entry<String, JsonNode> field : patch.properties()) {
+        for (Iterator<Map.Entry<String, JsonNode>> it = patch.fields(); it.hasNext(); ) {
+            Map.Entry<String, JsonNode> field = it.next();
             if (field.getValue().isNull()) {
                 result.remove(field.getKey());
                 continue;

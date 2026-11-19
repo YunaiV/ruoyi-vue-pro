@@ -84,7 +84,7 @@ public class XingHuoChatModel implements ChatModel {
     }
 
     @Override
-    public ChatOptions getDefaultOptions() {
+    public ChatOptions getOptions() {
         return options;
     }
 
@@ -110,7 +110,7 @@ public class XingHuoChatModel implements ChatModel {
                         .baseUrl(baseUrl)
                         .apiKey(apiKey), patcher)
                         .build())
-                .defaultOptions(new DeepSeekChatOptions.Builder(options).model(API_MODEL).build())
+                .options(options.mutate().model(API_MODEL).build())
                 .build();
     }
 
@@ -121,7 +121,7 @@ public class XingHuoChatModel implements ChatModel {
         }
         return Prompt.builder()
                 .messages(prompt.getInstructions())
-                .chatOptions(new DeepSeekChatOptions.Builder((DeepSeekChatOptions) options).model(API_MODEL).build())
+                .chatOptions(((DeepSeekChatOptions) options).mutate().model(API_MODEL).build())
                 .build();
     }
 
@@ -155,7 +155,7 @@ public class XingHuoChatModel implements ChatModel {
         public XingHuoChatModel build() {
             DeepSeekChatOptions options = this.options != null ? this.options : DeepSeekChatOptions.builder().build();
             if (StrUtil.isEmpty(options.getModel())) {
-                options = new DeepSeekChatOptions.Builder(options).model(MODEL_DEFAULT).build();
+                options = options.mutate().model(MODEL_DEFAULT).build();
             }
             return new XingHuoChatModel(apiKey, options, patcher);
         }

@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.ai.controller.admin.workflow.vo;
 
 import cn.hutool.core.util.StrUtil;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.AssertTrue;
+import javax.validation.constraints.AssertTrue;
 import lombok.Data;
 
 import java.util.Map;

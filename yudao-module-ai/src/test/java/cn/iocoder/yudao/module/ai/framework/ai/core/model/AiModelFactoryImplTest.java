@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.ai.framework.ai.core.model;
 
+import cn.hutool.core.io.IoUtil;
 import cn.iocoder.yudao.module.ai.dal.dataobject.image.AiImageDO;
 import cn.iocoder.yudao.module.ai.enums.image.AiImageInputRoleEnum;
 import cn.iocoder.yudao.module.ai.enums.model.AiPlatformEnum;
@@ -53,6 +54,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -106,7 +108,7 @@ public class AiModelFactoryImplTest {
             String path = exchange.getRequestURI().getPath();
             requestPaths.add(path);
             try (InputStream in = exchange.getRequestBody()) {
-                requestBodies.add(new String(in.readAllBytes(), StandardCharsets.UTF_8));
+                requestBodies.add(new String(IoUtil.readBytes(in), StandardCharsets.UTF_8));
             }
             acceptEncodings.add(String.valueOf(exchange.getRequestHeaders().getFirst("Accept-Encoding")));
             // 按路径返回：DeepSeek 对话、火山方舟出图，其它为 Stability AI 出图
@@ -271,7 +273,7 @@ public class AiModelFactoryImplTest {
         modelA.call(new ImagePrompt("一只猫", StabilityAiImageOptions.builder().model("model-a").build()));
         modelB.call(new ImagePrompt("一只狗", StabilityAiImageOptions.builder().model("model-b").build()));
         // 断言：各自使用自己的模型拼接请求路径，不会串用
-        assertEquals(List.of("/v1/generation/model-a/text-to-image", "/v1/generation/model-b/text-to-image"),
+        assertEquals(Arrays.asList("/v1/generation/model-a/text-to-image", "/v1/generation/model-b/text-to-image"),
                 requestPaths);
     }
 
@@ -284,7 +286,7 @@ public class AiModelFactoryImplTest {
         // 调用
         imageModel.call(new ImagePrompt("一只猫", StabilityAiImageOptions.builder().build()));
         // 断言：使用默认模型
-        assertEquals(List.of("/v1/generation/" + StabilityAiApi.DEFAULT_IMAGE_MODEL + "/text-to-image"), requestPaths);
+        assertEquals(Arrays.asList("/v1/generation/" + StabilityAiApi.DEFAULT_IMAGE_MODEL + "/text-to-image"), requestPaths);
     }
 
     @Test
@@ -297,11 +299,11 @@ public class AiModelFactoryImplTest {
         assertSame(arkService, modelFactory.getOrCreateArkService("sk-ark-test", url));
         assertNotSame(arkService, modelFactory.getOrCreateArkService("sk-ark-other", url));
         AiImageDO image = new AiImageDO().setModel("doubao-seedream-5-0-flash-260915").setPrompt("一只猫")
-                .setInputImages(List.of(new AiImageDO.InputImage(AiImageInputRoleEnum.REFERENCE.getRole(), "https://file/1.png")))
+                .setInputImages(Arrays.asList(new AiImageDO.InputImage(AiImageInputRoleEnum.REFERENCE.getRole(), "https://file/1.png")))
                 .setSeedreamOptions(new AiImageDO.SeedreamOptions().setSize("2K").setWatermark(false));
         ImagesResponse response = arkService.generateImages(AiImageUtils.buildSeedreamRequest(image));
         // 断言：请求自定义 URL 的路径，并解析返回
-        assertEquals(List.of("/api/v3/images/generations"), requestPaths);
+        assertEquals(Arrays.asList("/api/v3/images/generations"), requestPaths);
         assertTrue(requestBodies.get(0).contains("\"model\":\"doubao-seedream-5-0-flash-260915\""));
         assertTrue(requestBodies.get(0).contains("\"size\":\"2K\""));
         assertTrue(requestBodies.get(0).contains("\"image\":[\"https://file/1.png\"]"));
@@ -327,7 +329,7 @@ public class AiModelFactoryImplTest {
         ChatResponse response = model.call(new Prompt(new UserMessage("你好")));
         // 断言：请求不压缩的响应，完整解析
         assertEquals("ok", response.getResult().getOutput().getText());
-        assertEquals(List.of("identity"), acceptEncodings);
+        assertEquals(Arrays.asList("identity"), acceptEncodings);
     }
 
     @Test
@@ -341,14 +343,14 @@ public class AiModelFactoryImplTest {
         ChatResponse response = model.call(new Prompt(new UserMessage("你好")));
         // 断言
         assertEquals("ok", response.getResult().getOutput().getText());
-        assertEquals(List.of("identity"), acceptEncodings);
+        assertEquals(Arrays.asList("identity"), acceptEncodings);
         assertEquals("enabled", MAPPER.readTree(requestBodies.get(0)).at("/thinking/type").asText());
     }
 
     private static DeepSeekChatModel buildDeepSeekModel(DeepSeekApi api) {
         return DeepSeekChatModel.builder()
                 .deepSeekApi(api)
-                .defaultOptions(DeepSeekChatOptions.builder().model("deepseek-chat").temperature(0.7).build())
+                .options(DeepSeekChatOptions.builder().model("deepseek-chat").temperature(0.7).build())
                 .toolCallingManager(DefaultToolCallingManager.builder().build())
                 .retryTemplate(RetryTemplate.builder().maxAttempts(1).build())
                 .build();

@@ -73,7 +73,7 @@
         <commons-lang3.version>3.22.0</commons-lang3.version>
         <jsch.version>2.28.8</jsch.version>
         <tika-core.version>2.9.4</tika-core.version> <!-- JDK8 不能从 2.9.3 升级到 3.X，会报 JDK8 不支持 -->
-        <pdfbox.version>3.0.8</pdfbox.version>
+        <pdfbox.version>2.0.37</pdfbox.version> <!-- Tika 2.9.X 的 PDF 解析基于 PDFBox 2.X，不能升级到 3.X，否则 PDF 解析报 NoSuchMethodError -->
         <ip2region.version>2.7.0</ip2region.version>
         <bizlog-sdk.version>3.0.6</bizlog-sdk.version>
         <netty.version>4.2.21.Final</netty.version>
@@ -97,6 +97,21 @@
         <alipay-sdk-java.version>4.40.1067.ALL</alipay-sdk-java.version>
         <!-- 专属于 JDK8 安全漏洞升级 -->
         <logback.version>1.2.13</logback.version> <!-- 无法使用 1.3.X 版本，启动会报错 -->
+        <micrometer.version>1.15.12</micrometer.version>
+        <jackson.version>2.21.4</jackson.version>
+        <!-- AI 相关 -->
+        <spring-ai.version>2.1.0-jdk8-preview-20261119</spring-ai.version>
+        <spring-ai-alibaba.version>1.1.2.2-jdk8-20261119</spring-ai-alibaba.version>
+        <tinyflow.version>1.2.6</tinyflow.version>
+        <!-- https://mvnrepository.com/artifact/com.volcengine/volcengine-java-sdk-ark-runtime -->
+        <!-- 注意：使用 volcengine-java-sdk-ark-runtime 系列（2.0.0 起兼容 Jackson 2.20+ 的 PropertyNamingStrategies），
+             与 TinyFlow 间接依赖的同名构件统一为该版本；不使用 com.volcengine:ark-runtime（0.17.0 仍引用已移除的 SNAKE_CASE） -->
+        <volcengine-ark-runtime.version>2.0.34</volcengine-ark-runtime.version>
+        <tencentcloud-sdk.version>3.1.1373</tencentcloud-sdk.version>
+        <volc-sdk.version>1.0.221</volc-sdk.version>
+        <!-- https://mvnrepository.com/artifact/com.alibaba/dashscope-sdk-java -->
+        <!-- 注意：显式声明，覆盖 TinyFlow（agents-flex-image-qwen）间接引入的 2.18.2 -->
+        <dashscope-sdk.version>2.23.6</dashscope-sdk.version>
     </properties>
 
     <dependencyManagement>
@@ -148,6 +163,20 @@
                 <groupId>com.squareup.okio</groupId>
                 <artifactId>okio-bom</artifactId>
                 <version>${okio.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson</groupId>
+                <artifactId>jackson-bom</artifactId> <!-- Spring AI（JDK8 路线）基于 Jackson 2.21 编译，用到 2.15+ 的 API（如 ObjectNode.properties()），Spring Boot 2.7 默认 2.13.x 运行时报 NoSuchMethodError -->
+                <version>${jackson.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.micrometer</groupId>
+                <artifactId>micrometer-bom</artifactId> <!-- Spring AI（JDK8 路线）的 Observation 需要 micrometer-core 1.10+ 的 MeterObservationHandler，Spring Boot 2.7 默认 1.9.x 不兼容 -->
+                <version>${micrometer.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -598,6 +627,21 @@
                 <artifactId>pdfbox</artifactId> <!-- PDF 的生成 -->
                 <version>${pdfbox.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.pdfbox</groupId>
+                <artifactId>fontbox</artifactId>
+                <version>${pdfbox.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.pdfbox</groupId>
+                <artifactId>pdfbox-tools</artifactId> <!-- Tika 的 PDF 解析 -->
+                <version>${pdfbox.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.pdfbox</groupId>
+                <artifactId>xmpbox</artifactId> <!-- Tika 的 XMP 元数据解析 -->
+                <version>${pdfbox.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.apache.velocity</groupId>
@@ -846,6 +890,57 @@
                 <groupId>cn.iocoder.ureport2</groupId>
                 <artifactId>ureport2-spring-boot-starter</artifactId>
                 <version>${ureport2.version}</version>
+            </dependency>
+
+            <!-- AI 相关 -->
+            <dependency>
+                <groupId>cn.iocoder.spring-ai</groupId>
+                <artifactId>spring-ai-bom</artifactId>
+                <version>${spring-ai.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>cn.iocoder.spring-ai-alibaba</groupId>
+                <artifactId>spring-ai-alibaba-bom</artifactId>
+                <version>${spring-ai-alibaba.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>dev.tinyflow</groupId>
+                <artifactId>tinyflow-java-core</artifactId> <!-- AI 工作流 -->
+                <version>${tinyflow.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>dashscope-sdk-java</artifactId> <!-- 阿里百炼 DashScope 官方 SDK -->
+                <version>${dashscope-sdk.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.volcengine</groupId>
+                <artifactId>volcengine-java-sdk-ark-runtime</artifactId> <!-- 火山方舟 -->
+                <version>${volcengine-ark-runtime.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.volcengine</groupId>
+                <artifactId>volc-sdk-java</artifactId> <!-- 火山引擎视觉智能 -->
+                <version>${volc-sdk.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.tencentcloudapi</groupId>
+                <artifactId>tencentcloud-sdk-java-ocr</artifactId> <!-- 腾讯云 OCR -->
+                <version>${tencentcloud-sdk.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.tencentcloudapi</groupId>
+                <artifactId>tencentcloud-sdk-java-common</artifactId> <!-- 腾讯云 SDK 公共包 -->
+                <version>${tencentcloud-sdk.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.tencentcloudapi</groupId>
+                <artifactId>tencentcloud-sdk-java-tts</artifactId> <!-- 腾讯云语音合成 -->
+                <version>${tencentcloud-sdk.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

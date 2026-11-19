@@ -14,7 +14,6 @@ import cn.iocoder.yudao.module.ai.controller.admin.mindmap.vo.AiMindMapPageReqVO
 import cn.iocoder.yudao.module.ai.dal.dataobject.mindmap.AiMindMapDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiModelDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.mindmap.AiMindMapMapper;
-import cn.iocoder.yudao.module.ai.enums.AiChatRoleEnum;
 import cn.iocoder.yudao.module.ai.enums.model.AiModelTypeEnum;
 import cn.iocoder.yudao.module.ai.enums.model.AiPlatformEnum;
 import cn.iocoder.yudao.module.ai.enums.requestlog.AiRequestLogBizTypeEnum;
@@ -23,7 +22,7 @@ import cn.iocoder.yudao.module.ai.service.model.AiModelService;
 import cn.iocoder.yudao.module.ai.service.requestlog.AiRequestLogService;
 import cn.iocoder.yudao.module.ai.service.requestlog.dto.AiRequestLogCreateReqDTO;
 import cn.iocoder.yudao.module.ai.util.AiChatUtils;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
@@ -52,6 +51,24 @@ import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.*;
 @Service
 @Slf4j
 public class AiMindMapServiceImpl implements AiMindMapService {
+
+    /**
+     * 思维导图的系统提示词：把用户的提问总结成最多四级标题的 Markdown
+     */
+    static final String SYSTEM_MESSAGE = " 你是一位非常优秀的思维导图助手，你会把用户的所有提问都总结成思维导图，然后以 Markdown 格式输出。markdown 只需要输出一级标题，二级标题，三级标题，四级标题，最多输出四级，除此之外不要输出任何其他 markdown 标记。下面是一个合格的例子：\n"
+            + " # Geek-AI 助手\n"
+            + " ## 完整的开源系统\n"
+            + " ### 前端开源\n"
+            + " ### 后端开源\n"
+            + " ## 支持各种大模型\n"
+            + " ### OpenAI\n"
+            + " ### Azure\n"
+            + " ### 文心一言\n"
+            + " ### 通义千问\n"
+            + " ## 集成多种收费方式\n"
+            + " ### 支付宝\n"
+            + " ### 微信\n"
+            + "除此之外不要任何解释性语句。\n";
 
     @Resource
     private AiModelService modalService;
@@ -88,7 +105,7 @@ public class AiMindMapServiceImpl implements AiMindMapService {
         // 3.1 构建 Prompt，并进行调用：系统提示词由思维导图自身持有，使用内置文本
         Flux<ChatResponse> streamResponse;
         try {
-            Prompt prompt = buildPrompt(generateReqVO, model, AiChatRoleEnum.AI_MIND_MAP_ROLE.getSystemMessage());
+            Prompt prompt = buildPrompt(generateReqVO, model, SYSTEM_MESSAGE);
             streamResponse = chatModel.stream(prompt);
         } catch (RuntimeException ex) {
             finishMindMap(requestLog, finished, mindMapDO.getId(), null, AiRequestLogStatusEnum.FAIL, ex);

@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.ai.controller.admin.music.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import lombok.Data;
 
 @Schema(description = "管理后台 - AI 修改我的音乐 Request VO")

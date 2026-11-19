@@ -168,7 +168,7 @@ spring:
           host: 127.0.0.1
           port: 19530
     openai: # OpenAI 官方
-      base-url: ${OPENAI_BASE_URL:https://api.openai.com}
+      base-url: ${OPENAI_BASE_URL:https://api.openai.com/v1} # OpenAI 官方 SDK 的 baseUrl 需包含 /v1
       api-key: ${OPENAI_API_KEY:sk-xxxx}
     azure: # OpenAI 微软
       openai:

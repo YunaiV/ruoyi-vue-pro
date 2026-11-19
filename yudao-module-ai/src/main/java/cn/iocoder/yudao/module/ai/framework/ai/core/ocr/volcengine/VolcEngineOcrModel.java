@@ -10,6 +10,7 @@ import cn.iocoder.yudao.module.ai.framework.ai.core.ocr.OcrResponse;
 import cn.iocoder.yudao.module.ai.framework.ai.core.ocr.OcrResult;
 import cn.iocoder.yudao.module.ai.framework.ai.core.ocr.OcrUtils;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.collect.ImmutableSet;
 import com.volcengine.model.Credentials;
 import com.volcengine.model.ServiceInfo;
 import com.volcengine.service.visual.IVisualService;
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,7 +67,7 @@ public class VolcEngineOcrModel implements OcrModel {
     /**
      * 支持 JPG、JPEG、PNG、BMP（PDF 首版不支持）；Base64 编码并 urlencode 后不超过 8MB
      */
-    static final Set<String> ALLOWED_MIME_TYPES = Set.of("image/jpeg", "image/png", "image/bmp");
+    static final Set<String> ALLOWED_MIME_TYPES = ImmutableSet.of("image/jpeg", "image/png", "image/bmp");
     static final long MAX_ENCODED_LENGTH = 8L * 1024 * 1024;
 
     static final Duration DEFAULT_CONNECT_TIMEOUT = Duration.ofSeconds(10);
@@ -119,7 +121,7 @@ public class VolcEngineOcrModel implements OcrModel {
         params.put("SocketTimeout", (int) readTimeout.toMillis());
         params.put("Scheme", uri.getScheme());
         params.put("Host", uri.getRawAuthority());
-        params.put("Header", new ArrayList<Header>(List.of(new BasicHeader("Accept", "application/json"))));
+        params.put("Header", new ArrayList<Header>(Collections.singletonList(new BasicHeader("Accept", "application/json"))));
         params.put("Credentials", new Credentials(DEFAULT_REGION, SERVICE));
         return new ServiceInfo(params);
     }

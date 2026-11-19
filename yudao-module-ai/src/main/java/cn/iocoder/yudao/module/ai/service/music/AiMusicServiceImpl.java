@@ -29,7 +29,7 @@ import cn.iocoder.yudao.module.ai.util.AiChatUtils;
 import cn.iocoder.yudao.module.ai.util.FileTypeUtils;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import com.google.common.annotations.VisibleForTesting;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;

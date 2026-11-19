@@ -32,6 +32,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.*;
@@ -216,7 +217,7 @@ public class AiDramaProjectServiceImplTest extends BaseMockitoUnitTest {
         assertEquals(taskIdCaptor.getValue(), updateCaptor.getValue().getComposeTaskId());
         // 断言：使用的镜头视频按提交的顺序，记录原始地址（非签名地址）
         assertEquals(Arrays.asList(2L, 1L), videosCaptor.getValue().stream()
-                .map(AiDramaProjectDO.ComposeVideo::getStoryboardId).toList());
+                .map(AiDramaProjectDO.ComposeVideo::getStoryboardId).collect(Collectors.toList()));
         assertEquals("https://files.example.com/2.mp4", videosCaptor.getValue().get(0).getVideoUrl());
         assertEquals(3L, videosCaptor.getValue().get(0).getMaxStoryboardId());
         assertEquals(3L, videosCaptor.getValue().get(1).getMaxStoryboardId());
@@ -233,7 +234,7 @@ public class AiDramaProjectServiceImplTest extends BaseMockitoUnitTest {
         ffmpegUtilsMock.when(() -> AiFfmpegUtils.compose(any(), any(), any(), any())).thenReturn(new ComposeResult(new byte[]{1}, 12.5));
         when(fileApi.createFile(any(byte[].class))).thenReturn("https://files.example.com/drama.mp4");
 
-        List<AiDramaProjectDO.ComposeVideo> videos = List.of(composeVideo(1L), composeVideo(2L));
+        List<AiDramaProjectDO.ComposeVideo> videos = Arrays.asList(composeVideo(1L), composeVideo(2L));
         projectService.executeCompose(PROJECT_ID, "task-1", videos, composeRequest());
 
         // 断言：以合成中、本次任务编号为条件；记录成片实际使用的画幅、镜头数、镜头视频
@@ -264,7 +265,7 @@ public class AiDramaProjectServiceImplTest extends BaseMockitoUnitTest {
         // 准备：之前合成的成片，没有记录使用的镜头视频，不判断
         AiDramaProjectDO project = composedProject().setComposeVideos(null);
 
-        assertNull(projectService.getComposeStaleReason(project, List.of(composedStoryboard(1L).setVideoUrl("https://files.example.com/x.mp4")), 1L));
+        assertNull(projectService.getComposeStaleReason(project, Arrays.asList(composedStoryboard(1L).setVideoUrl("https://files.example.com/x.mp4")), 1L));
     }
 
     @Test
@@ -291,7 +292,7 @@ public class AiDramaProjectServiceImplTest extends BaseMockitoUnitTest {
     public void testGetComposeStaleReason_deleted() {
         AiDramaProjectDO project = composedProject(composeVideo(1L), composeVideo(2L));
 
-        assertEquals("成片使用的镜头已删除", projectService.getComposeStaleReason(project, List.of(composedStoryboard(1L)), 1L));
+        assertEquals("成片使用的镜头已删除", projectService.getComposeStaleReason(project, Arrays.asList(composedStoryboard(1L)), 1L));
     }
 
     @Test
@@ -482,7 +483,7 @@ public class AiDramaProjectServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testTimeoutCompose() {
         when(projectMapper.selectListByComposeStatusAndUpdateTimeLt(eq(AiDramaStatusEnum.IN_PROGRESS.getStatus()), any()))
-                .thenReturn(List.of(project(USER_ID).setComposeStatus(AiDramaStatusEnum.IN_PROGRESS.getStatus())
+                .thenReturn(Arrays.asList(project(USER_ID).setComposeStatus(AiDramaStatusEnum.IN_PROGRESS.getStatus())
                         .setComposeTaskId("task-1")));
         when(projectMapper.updateByIdAndComposeStatusAndTaskId(eq(PROJECT_ID), eq(AiDramaStatusEnum.IN_PROGRESS.getStatus()),
                 eq("task-1"), any())).thenReturn(1);

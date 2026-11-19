@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.ai.framework.ai.core.ocr;
 
+import cn.hutool.core.io.IoUtil;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 
@@ -10,6 +11,7 @@ import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -29,8 +31,42 @@ public class OcrStubServer implements AutoCloseable {
     /**
      * 收到的请求
      */
-    public record Request(String method, String path, String rawQuery,
-                          Map<String, List<String>> headers, String body) {
+    public static final class Request {
+
+        private final String method;
+        private final String path;
+        private final String rawQuery;
+        private final Map<String, List<String>> headers;
+        private final String body;
+
+        public Request(String method, String path, String rawQuery,
+                       Map<String, List<String>> headers, String body) {
+            this.method = method;
+            this.path = path;
+            this.rawQuery = rawQuery;
+            this.headers = headers;
+            this.body = body;
+        }
+
+        public String method() {
+            return method;
+        }
+
+        public String path() {
+            return path;
+        }
+
+        public String rawQuery() {
+            return rawQuery;
+        }
+
+        public Map<String, List<String>> headers() {
+            return headers;
+        }
+
+        public String body() {
+            return body;
+        }
 
         public String header(String name) {
             for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
@@ -48,7 +84,35 @@ public class OcrStubServer implements AutoCloseable {
      *
      * @param delayMillis 返回前等待的毫秒数，用于模拟超时
      */
-    public record Response(int status, String contentType, String body, long delayMillis) {
+    public static final class Response {
+
+        private final int status;
+        private final String contentType;
+        private final String body;
+        private final long delayMillis;
+
+        public Response(int status, String contentType, String body, long delayMillis) {
+            this.status = status;
+            this.contentType = contentType;
+            this.body = body;
+            this.delayMillis = delayMillis;
+        }
+
+        public int status() {
+            return status;
+        }
+
+        public String contentType() {
+            return contentType;
+        }
+
+        public String body() {
+            return body;
+        }
+
+        public long delayMillis() {
+            return delayMillis;
+        }
 
         public static Response json(int status, String body) {
             return new Response(status, "application/json", body, 0);
@@ -104,10 +168,11 @@ public class OcrStubServer implements AutoCloseable {
     }
 
     private void handle(HttpExchange exchange) throws IOException {
-        try (exchange) {
-            String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+        try {
+            String body = new String(IoUtil.readBytes(exchange.getRequestBody()), StandardCharsets.UTF_8);
             Request request = new Request(exchange.getRequestMethod(), exchange.getRequestURI().getPath(),
-                    exchange.getRequestURI().getRawQuery(), Map.copyOf(exchange.getRequestHeaders()), body);
+                    exchange.getRequestURI().getRawQuery(),
+                    Collections.unmodifiableMap(new HashMap<>(exchange.getRequestHeaders())), body);
             requests.add(request);
             Function<Request, Response> responder = responses.poll();
             Response response = responder != null ? responder.apply(request)
@@ -127,6 +192,8 @@ public class OcrStubServer implements AutoCloseable {
             } catch (IOException ignored) {
                 // 客户端已超时断开
             }
+        } finally {
+            exchange.close();
         }
     }
 

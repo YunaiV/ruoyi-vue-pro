@@ -52,9 +52,7 @@ public class TencentOcrModelTest {
     @Test
     public void testCall_success() {
         // 准备参数
-        server.enqueue(Response.json(200, """
-                {"Response":{"TextDetections":[{"DetectedText":"腾讯云","Confidence":99},\
-                {"DetectedText":"通用文字识别 ","Confidence":98}],"Angle":0,"RequestId":"req-tc-1"}}"""));
+        server.enqueue(Response.json(200, "{\"Response\":{\"TextDetections\":[{\"DetectedText\":\"腾讯云\",\"Confidence\":99},{\"DetectedText\":\"通用文字识别 \",\"Confidence\":98}],\"Angle\":0,\"RequestId\":\"req-tc-1\"}}"));
 
         // 调用
         String text = buildModel(API_KEY).call(buildPrompt(MimeTypeUtils.IMAGE_PNG, IMAGE)).getResult().getOutput();
@@ -81,9 +79,7 @@ public class TencentOcrModelTest {
     @Test
     public void testCall_imageNoTextReturnsEmpty() {
         // 准备参数
-        server.enqueue(Response.json(200, """
-                {"Response":{"Error":{"Code":"FailedOperation.ImageNoText","Message":"图片中未检测到文本。"},\
-                "RequestId":"req-tc-2"}}"""));
+        server.enqueue(Response.json(200, "{\"Response\":{\"Error\":{\"Code\":\"FailedOperation.ImageNoText\",\"Message\":\"图片中未检测到文本。\"},\"RequestId\":\"req-tc-2\"}}"));
 
         // 调用，并断言
         assertEquals("", buildModel(API_KEY).call(buildPrompt(MimeTypeUtils.IMAGE_PNG, IMAGE)).getResult().getOutput());
@@ -92,9 +88,7 @@ public class TencentOcrModelTest {
     @Test
     public void testCall_authFailure() {
         // 准备参数
-        server.enqueue(Response.json(200, """
-                {"Response":{"Error":{"Code":"AuthFailure.SecretIdNotFound","Message":"The SecretId is not found"},\
-                "RequestId":"req-tc-3"}}"""));
+        server.enqueue(Response.json(200, "{\"Response\":{\"Error\":{\"Code\":\"AuthFailure.SecretIdNotFound\",\"Message\":\"The SecretId is not found\"},\"RequestId\":\"req-tc-3\"}}"));
 
         // 调用，并断言异常
         OcrException ex = assertThrows(OcrException.class,
@@ -109,9 +103,7 @@ public class TencentOcrModelTest {
     @Test
     public void testCall_rateLimited() {
         // 准备参数
-        server.enqueue(Response.json(200, """
-                {"Response":{"Error":{"Code":"RequestLimitExceeded","Message":"请求的次数超过了频率限制。"},\
-                "RequestId":"req-tc-4"}}"""));
+        server.enqueue(Response.json(200, "{\"Response\":{\"Error\":{\"Code\":\"RequestLimitExceeded\",\"Message\":\"请求的次数超过了频率限制。\"},\"RequestId\":\"req-tc-4\"}}"));
 
         // 调用，并断言异常
         OcrException ex = assertThrows(OcrException.class,
@@ -122,9 +114,7 @@ public class TencentOcrModelTest {
     @Test
     public void testCall_imageDecodeFailed() {
         // 准备参数
-        server.enqueue(Response.json(200, """
-                {"Response":{"Error":{"Code":"FailedOperation.ImageDecodeFailed","Message":"图片解码失败。"},\
-                "RequestId":"req-tc-5"}}"""));
+        server.enqueue(Response.json(200, "{\"Response\":{\"Error\":{\"Code\":\"FailedOperation.ImageDecodeFailed\",\"Message\":\"图片解码失败。\"},\"RequestId\":\"req-tc-5\"}}"));
 
         // 调用，并断言异常
         OcrException ex = assertThrows(OcrException.class,

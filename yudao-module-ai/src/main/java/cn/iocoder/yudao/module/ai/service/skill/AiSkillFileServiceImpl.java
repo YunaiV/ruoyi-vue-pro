@@ -12,7 +12,7 @@ import cn.iocoder.yudao.module.ai.dal.dataobject.skill.AiSkillDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.skill.AiSkillFileDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.skill.AiSkillFileMapper;
 import cn.iocoder.yudao.module.ai.enums.skill.AiSkillFileTypeEnum;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

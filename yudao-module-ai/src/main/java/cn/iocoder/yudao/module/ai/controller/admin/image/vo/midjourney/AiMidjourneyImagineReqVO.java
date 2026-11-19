@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.ai.controller.admin.image.vo.midjourney;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.*;
+import javax.validation.constraints.*;
 import lombok.Data;
 
 import java.util.List;

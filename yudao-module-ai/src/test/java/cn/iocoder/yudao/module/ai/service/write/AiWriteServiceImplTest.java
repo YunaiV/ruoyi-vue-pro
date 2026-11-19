@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.ai.service.write;
 
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
+import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.dict.core.DictFrameworkUtils;
 import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
@@ -13,7 +14,6 @@ import cn.iocoder.yudao.module.ai.dal.dataobject.requestlog.AiRequestLogDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.write.AiWriteDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.requestlog.AiRequestLogMapper;
 import cn.iocoder.yudao.module.ai.dal.mysql.write.AiWriteMapper;
-import cn.iocoder.yudao.module.ai.enums.AiChatRoleEnum;
 import cn.iocoder.yudao.module.ai.enums.DictTypeConstants;
 import cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants;
 import cn.iocoder.yudao.module.ai.enums.model.AiModelTypeEnum;
@@ -23,10 +23,11 @@ import cn.iocoder.yudao.module.ai.enums.requestlog.AiRequestLogStatusEnum;
 import cn.iocoder.yudao.module.ai.enums.write.AiWriteTypeEnum;
 import cn.iocoder.yudao.module.ai.service.model.AiModelService;
 import cn.iocoder.yudao.module.ai.service.requestlog.AiRequestLogServiceImpl;
-import jakarta.annotation.Resource;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
+import javax.annotation.Resource;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,7 +43,7 @@ import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import reactor.core.publisher.Flux;
 
 import java.time.Duration;
@@ -79,11 +80,11 @@ public class AiWriteServiceImplTest extends BaseDbUnitTest {
     /**
      * 字典标签：与现库 ai_write_language / ai_write_tone 的值一致
      */
-    private static final Map<String, Map<Integer, String>> DICT_LABELS = Map.of(
-            DictTypeConstants.AI_WRITE_LANGUAGE, Map.of(1, "自动", 2, "中文", 3, "英文", 4, "韩语", 5, "日语"),
-            DictTypeConstants.AI_WRITE_TONE, Map.of(1, "自动", 5, "专业"),
-            DictTypeConstants.AI_WRITE_FORMAT, Map.of(1, "自动"),
-            DictTypeConstants.AI_WRITE_LENGTH, Map.of(1, "自动"));
+    private static final Map<String, Map<Integer, String>> DICT_LABELS = ImmutableMap.of(
+            DictTypeConstants.AI_WRITE_LANGUAGE, ImmutableMap.of(1, "自动", 2, "中文", 3, "英文", 4, "韩语", 5, "日语"),
+            DictTypeConstants.AI_WRITE_TONE, ImmutableMap.of(1, "自动", 5, "专业"),
+            DictTypeConstants.AI_WRITE_FORMAT, ImmutableMap.of(1, "自动"),
+            DictTypeConstants.AI_WRITE_LENGTH, ImmutableMap.of(1, "自动"));
 
     @Resource
     private AiWriteServiceImpl writeService;
@@ -93,7 +94,7 @@ public class AiWriteServiceImplTest extends BaseDbUnitTest {
     @Resource
     private AiRequestLogMapper requestLogMapper;
 
-    @MockitoBean
+    @MockBean
     private AiModelService modalService;
 
     private ChatModel chatModel;
@@ -143,7 +144,8 @@ public class AiWriteServiceImplTest extends BaseDbUnitTest {
         assertRequestLog(write, AiRequestLogStatusEnum.SUCCESS, null);
         // 断言：系统提示词沿用“写作助手”的内置文本
         List<Message> messages = captureMessages();
-        assertEquals(AiChatRoleEnum.AI_WRITE_ROLE.getSystemMessage(), messages.get(0).getText());
+        assertEquals(AiWriteTypeEnum.WRITING.getSystemMessage(), messages.get(0).getText());
+        assertTrue(messages.get(0).getText().startsWith("你是一位出色的写作助手"));
         assertEquals("请撰写一篇关于 [田忌赛马] 的文章。文章的内容格式：自动，语气：自动，语言：自动，长度：自动。"
                 + "请确保涵盖主要内容，不需要除了正文内容外的其他回复，如标题、额外的解释或道歉。", messages.get(1).getText());
         verify(modalService, never()).getRequiredDefaultModel(any());
@@ -336,11 +338,11 @@ public class AiWriteServiceImplTest extends BaseDbUnitTest {
     }
 
     private static void assertValid(AiWriteGenerateReqVO reqVO) {
-        assertEquals(Set.of(), validate(reqVO));
+        assertEquals(Collections.emptySet(), validate(reqVO));
     }
 
     private static void assertInvalid(AiWriteGenerateReqVO reqVO, String message) {
-        assertEquals(Set.of(message), validate(reqVO));
+        assertEquals(SetUtils.asSet(message), validate(reqVO));
     }
 
     /**

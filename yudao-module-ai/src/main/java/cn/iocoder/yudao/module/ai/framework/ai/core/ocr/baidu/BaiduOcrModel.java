@@ -10,6 +10,9 @@ import cn.iocoder.yudao.module.ai.framework.ai.core.ocr.OcrResponse;
 import cn.iocoder.yudao.module.ai.framework.ai.core.ocr.OcrResult;
 import cn.iocoder.yudao.module.ai.framework.ai.core.ocr.OcrUtils;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.collect.ImmutableSet;
+import lombok.Value;
+import lombok.experimental.Accessors;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.util.LinkedMultiValueMap;
@@ -59,7 +62,7 @@ public class BaiduOcrModel implements OcrModel {
     /**
      * 支持 jpg / jpeg / png / bmp；base64 编码并 urlencode 后不超过 10M
      */
-    static final Set<String> ALLOWED_MIME_TYPES = Set.of("image/jpeg", "image/png", "image/bmp");
+    static final Set<String> ALLOWED_MIME_TYPES = ImmutableSet.of("image/jpeg", "image/png", "image/bmp");
     static final long MAX_ENCODED_LENGTH = 10L * 1024 * 1024;
 
     static final Duration DEFAULT_CONNECT_TIMEOUT = Duration.ofSeconds(10);
@@ -73,19 +76,19 @@ public class BaiduOcrModel implements OcrModel {
     /**
      * 错误码：access_token 失效 / 过期
      */
-    private static final Set<String> TOKEN_INVALID_CODES = Set.of("110", "111");
+    private static final Set<String> TOKEN_INVALID_CODES = ImmutableSet.of("110", "111");
     /**
      * 错误码：无权限、IAM 鉴权失败
      */
-    private static final Set<String> AUTH_FAILED_CODES = Set.of("6", "14", "110", "111");
+    private static final Set<String> AUTH_FAILED_CODES = ImmutableSet.of("6", "14", "110", "111");
     /**
      * 错误码：集群 / 每天 / QPS / 总量超限额
      */
-    private static final Set<String> RATE_LIMITED_CODES = Set.of("4", "17", "18", "19");
+    private static final Set<String> RATE_LIMITED_CODES = ImmutableSet.of("4", "17", "18", "19");
     /**
      * 错误码：图片为空 / 格式错误 / 大小错误
      */
-    private static final Set<String> INVALID_IMAGE_CODES = Set.of("216200", "216201", "216202");
+    private static final Set<String> INVALID_IMAGE_CODES = ImmutableSet.of("216200", "216201", "216202");
 
     /**
      * 新版 API Key 的前缀
@@ -109,7 +112,13 @@ public class BaiduOcrModel implements OcrModel {
      */
     private CachedToken cachedToken;
 
-    private record CachedToken(String value, Instant refreshAt) {
+    @Value
+    @Accessors(fluent = true)
+    private static class CachedToken {
+
+        String value;
+        Instant refreshAt;
+
     }
 
     public BaiduOcrModel(String apiKey, String url, String model) {
@@ -249,8 +258,9 @@ public class BaiduOcrModel implements OcrModel {
                     .body(String.class);
         } catch (RestClientResponseException ex) {
             // 换 token 失败时返回 {"error":"invalid_client","error_description":"..."}，4xx 表示 API Key / Secret Key 不正确
-            int status = ex.getStatusCode().value();
-            OcrException.Type type = ex.getStatusCode().is4xxClientError() && status != HttpStatus.TOO_MANY_REQUESTS.value()
+            int status = ex.getRawStatusCode();
+            OcrException.Type type = HttpStatus.Series.resolve(status) == HttpStatus.Series.CLIENT_ERROR
+                    && status != HttpStatus.TOO_MANY_REQUESTS.value()
                     ? OcrException.Type.AUTH_FAILED : OcrUtils.typeOfHttpStatus(status);
             throw buildTokenException(type, JsonUtils.parseObjectQuietly(ex.getResponseBodyAsString(), JsonNode.class),
                     "HTTP " + status);
@@ -266,7 +276,7 @@ public class BaiduOcrModel implements OcrModel {
                     ? OcrException.Type.AUTH_FAILED : OcrException.Type.UPSTREAM_ERROR, root, "响应中没有 access_token");
         }
         long expiresIn = root.path("expires_in").asLong(0);
-        Duration ttl = Duration.ofSeconds(expiresIn > 0 ? expiresIn : Duration.ofDays(30).toSeconds());
+        Duration ttl = Duration.ofSeconds(expiresIn > 0 ? expiresIn : Duration.ofDays(30).getSeconds());
         // 提前刷新；有效期过短时取一半
         Duration ahead = ttl.compareTo(TOKEN_REFRESH_AHEAD.multipliedBy(2)) > 0 ? TOKEN_REFRESH_AHEAD : ttl.dividedBy(2);
         cachedToken = new CachedToken(token, clock.instant().plus(ttl).minus(ahead));

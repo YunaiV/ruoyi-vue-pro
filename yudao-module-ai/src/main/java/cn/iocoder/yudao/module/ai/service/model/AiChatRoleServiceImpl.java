@@ -13,7 +13,7 @@ import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiChatRoleDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.model.AiChatRoleMapper;
 import cn.iocoder.yudao.module.ai.service.knowledge.AiKnowledgeService;
 import cn.iocoder.yudao.module.ai.service.skill.AiSkillService;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;

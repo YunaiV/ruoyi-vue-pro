@@ -2,7 +2,6 @@ package cn.iocoder.yudao.module.ai.enums.write;
 
 import cn.hutool.core.util.ArrayUtil;
 import cn.iocoder.yudao.framework.common.core.ArrayValuable;
-import cn.iocoder.yudao.module.ai.enums.AiChatRoleEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -20,9 +19,9 @@ import java.util.Objects;
 @Getter
 public enum AiWriteTypeEnum implements ArrayValuable<Integer> {
 
-    WRITING(1, "文章写作", AiChatRoleEnum.AI_WRITE_ROLE.getSystemMessage(),
+    WRITING(1, "文章写作", SystemMessages.WRITE,
             "请撰写一篇关于 [{}] 的文章。文章的内容格式：{}，语气：{}，语言：{}，长度：{}。请确保涵盖主要内容，不需要除了正文内容外的其他回复，如标题、额外的解释或道歉。"),
-    REPLY(2, "回复", AiChatRoleEnum.AI_WRITE_ROLE.getSystemMessage(),
+    REPLY(2, "回复", SystemMessages.WRITE,
             "请针对如下内容：[{}] 做个回复。回复内容参考：[{}], 回复格式：{}，语气：{}，语言：{}，长度：{}。不需要除了正文内容外的其他回复，如标题、开头、额外的解释或道歉。"),
     GENERAL(3, "通用写作", "你是全能写作助手，严格按用户要求的体裁、用途和受众写作；只输出正文，不解释、不道歉。",
             "请按以下要求写作：[{}]。格式：{}，语气：{}，语言：{}，长度：{}。"),
@@ -61,6 +60,23 @@ public enum AiWriteTypeEnum implements ArrayValuable<Integer> {
     @Override
     public Integer[] array() {
         return ARRAYS;
+    }
+
+    /**
+     * 多个写作类型共用的系统提示词
+     *
+     * 放在内部类中：枚举常量不能直接引用本枚举在其后声明的静态字段
+     */
+    private static class SystemMessages {
+
+        /**
+         * 写作助手：文章写作、回复共用
+         */
+        private static final String WRITE = "你是一位出色的写作助手，能够帮助用户生成创意和灵感，并在用户提供场景和提示词时生成对应的回复。你的任务包括：\n"
+                + "1.\t撰写建议：根据用户提供的主题或问题，提供详细的写作建议、情节发展方向、角色设定以及背景描写，确保内容结构清晰、有逻辑。\n"
+                + "2.\t回复生成：根据用户提供的场景和提示词，生成合适的对话或文字回复，确保语气和风格符合场景需求。\n"
+                + "除此之外不需要除了正文内容外的其他回复，如标题、开头、任何解释性语句或道歉。\n";
+
     }
 
 }

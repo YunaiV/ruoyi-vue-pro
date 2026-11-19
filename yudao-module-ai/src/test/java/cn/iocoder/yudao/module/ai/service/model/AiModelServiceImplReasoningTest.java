@@ -21,8 +21,9 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.fasterxml.jackson.databind.JsonNode;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.ConstraintViolationException;
+import com.google.common.collect.ImmutableMap;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -477,7 +478,7 @@ public class AiModelServiceImplReasoningTest extends BaseMockitoUnitTest {
         // mock apiKeyService 的方法
         AiApiKeyDO apiKey = mockApiKey(keyId, AiPlatformEnum.DEEPSEEK);
         // 准备参数
-        Map<String, Object> levelOptions = Map.of("reasoning_effort", "high");
+        Map<String, Object> levelOptions = ImmutableMap.of("reasoning_effort", "high");
 
         // 调用
         modelService.getChatModel(id, levelOptions);
@@ -611,16 +612,16 @@ public class AiModelServiceImplReasoningTest extends BaseMockitoUnitTest {
 
     private static AiModelDO.ReasoningConfig buildReasoningConfig() {
         List<AiModelDO.ReasoningLevel> levels = new ArrayList<>();
-        levels.add(new AiModelDO.ReasoningLevel("off", Map.of("thinking", Map.of("type", "disabled"))));
+        levels.add(new AiModelDO.ReasoningLevel("off", ImmutableMap.of("thinking", ImmutableMap.of("type", "disabled"))));
         levels.add(new AiModelDO.ReasoningLevel("high",
-                Map.of("thinking", Map.of("type", "enabled"), "reasoning_effort", "high")));
+                ImmutableMap.of("thinking", ImmutableMap.of("type", "enabled"), "reasoning_effort", "high")));
         return new AiModelDO.ReasoningConfig(levels, "high");
     }
 
     private static AiModelSaveReqVO.ReasoningConfig buildReasoningConfigReqVO() {
         return buildReasoningConfigReqVO("high",
-                buildReasoningLevelReqVO("off", Map.of("thinking", Map.of("type", "disabled"))),
-                buildReasoningLevelReqVO("high", Map.of("thinking", Map.of("type", "enabled"), "reasoning_effort", "high")));
+                buildReasoningLevelReqVO("off", ImmutableMap.of("thinking", ImmutableMap.of("type", "disabled"))),
+                buildReasoningLevelReqVO("high", ImmutableMap.of("thinking", ImmutableMap.of("type", "enabled"), "reasoning_effort", "high")));
     }
 
     private static AiModelSaveReqVO.ReasoningConfig buildReasoningConfigReqVO(String defaultLevel,

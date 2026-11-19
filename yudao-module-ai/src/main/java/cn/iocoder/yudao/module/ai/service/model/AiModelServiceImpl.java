@@ -23,7 +23,7 @@ import com.agentsflex.llm.ollama.OllamaLlmConfig;
 import com.agentsflex.llm.qwen.QwenLlm;
 import com.agentsflex.llm.qwen.QwenLlmConfig;
 import dev.tinyflow.core.Tinyflow;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.speech.AiSpeechModel;
 import org.springframework.ai.audio.transcription.TranscriptionModel;
 import org.springframework.ai.chat.model.ChatModel;

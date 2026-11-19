@@ -390,7 +390,7 @@ public class AiMusicServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testUploadMusic_fileInvalid() {
         // 准备参数：普通 ftyp 容器、网页、图片，后缀伪装成 mp3，都不是支持的音频
-        List<byte[]> contents = List.of("\0\0\0 ftypisom\0\0\0\0".getBytes(StandardCharsets.ISO_8859_1),
+        List<byte[]> contents = Arrays.asList("\0\0\0 ftypisom\0\0\0\0".getBytes(StandardCharsets.ISO_8859_1),
                 "<html><body>demo</body></html>".getBytes(StandardCharsets.UTF_8), PNG_CONTENT);
         when(fileApi.presignGetUrlQuietly("https://files.example.com/a.mp3")).thenReturn("https://files.example.com/a.mp3");
 
@@ -600,10 +600,10 @@ public class AiMusicServiceImplTest extends BaseMockitoUnitTest {
     public void testFetchMusic_split() {
         // mock 数据
         AiMusicDO music = buildFetchMusic();
-        when(musicMapper.selectListForFetch(eq(AiMusicStatusEnum.IN_PROGRESS.getStatus()), anyInt())).thenReturn(List.of(music));
+        when(musicMapper.selectListForFetch(eq(AiMusicStatusEnum.IN_PROGRESS.getStatus()), anyInt())).thenReturn(Arrays.asList(music));
         mockFetchApiKey();
-        when(sunoApi.fetchTasks(List.of("task-1"))).thenReturn(List.of(new SunoApi.Task("task-1", "MUSIC", "SUCCESS",
-                null, "100%", List.of(buildClip("clip-1", null), buildClip("clip-2", null)))));
+        when(sunoApi.fetchTasks(Arrays.asList("task-1"))).thenReturn(Arrays.asList(new SunoApi.Task("task-1", "MUSIC", "SUCCESS",
+                null, "100%", Arrays.asList(buildClip("clip-1", null), buildClip("clip-2", null)))));
         when(musicMapper.updateByIdAndUnsplit(eq(MUSIC_ID), eq(AiMusicStatusEnum.IN_PROGRESS.getStatus()), any())).thenReturn(1);
 
         // 调用
@@ -632,14 +632,14 @@ public class AiMusicServiceImplTest extends BaseMockitoUnitTest {
     public void testFetchMusic_splitInvalidDuration() {
         // mock 数据：时长为 NaN、负数，其它字段有效
         AiMusicDO music = buildFetchMusic();
-        when(musicMapper.selectListForFetch(eq(AiMusicStatusEnum.IN_PROGRESS.getStatus()), anyInt())).thenReturn(List.of(music));
+        when(musicMapper.selectListForFetch(eq(AiMusicStatusEnum.IN_PROGRESS.getStatus()), anyInt())).thenReturn(Arrays.asList(music));
         mockFetchApiKey();
         SunoApi.Clip nanDuration = new SunoApi.Clip("clip-1", "夏日", "complete", "https://cdn.example.com/clip-1.mp3",
                 null, null, null, "chirp-v4", new SunoApi.Metadata("pop", "[Verse]", Double.NaN, null));
         SunoApi.Clip negativeDuration = new SunoApi.Clip("clip-2", "夏日", "complete", "https://cdn.example.com/clip-2.mp3",
                 null, null, null, "chirp-v4", new SunoApi.Metadata("pop", "[Verse]", -1.0, null));
-        when(sunoApi.fetchTasks(List.of("task-1"))).thenReturn(List.of(new SunoApi.Task("task-1", "MUSIC", "SUCCESS",
-                null, "100%", List.of(nanDuration, negativeDuration))));
+        when(sunoApi.fetchTasks(Arrays.asList("task-1"))).thenReturn(Arrays.asList(new SunoApi.Task("task-1", "MUSIC", "SUCCESS",
+                null, "100%", Arrays.asList(nanDuration, negativeDuration))));
         when(musicMapper.updateByIdAndUnsplit(eq(MUSIC_ID), eq(AiMusicStatusEnum.IN_PROGRESS.getStatus()), any())).thenReturn(1);
 
         // 调用
@@ -663,10 +663,10 @@ public class AiMusicServiceImplTest extends BaseMockitoUnitTest {
     public void testFetchMusic_splitAlreadyDone() {
         // mock 数据：条件更新影响 0 行，说明已被其它执行者拆分
         AiMusicDO music = buildFetchMusic();
-        when(musicMapper.selectListForFetch(eq(AiMusicStatusEnum.IN_PROGRESS.getStatus()), anyInt())).thenReturn(List.of(music));
+        when(musicMapper.selectListForFetch(eq(AiMusicStatusEnum.IN_PROGRESS.getStatus()), anyInt())).thenReturn(Arrays.asList(music));
         mockFetchApiKey();
-        when(sunoApi.fetchTasks(any())).thenReturn(List.of(new SunoApi.Task("task-1", "MUSIC", "SUCCESS",
-                null, "100%", List.of(buildClip("clip-1", null), buildClip("clip-2", null)))));
+        when(sunoApi.fetchTasks(any())).thenReturn(Arrays.asList(new SunoApi.Task("task-1", "MUSIC", "SUCCESS",
+                null, "100%", Arrays.asList(buildClip("clip-1", null), buildClip("clip-2", null)))));
         when(musicMapper.updateByIdAndUnsplit(eq(MUSIC_ID), eq(AiMusicStatusEnum.IN_PROGRESS.getStatus()), any())).thenReturn(0);
 
         // 调用
@@ -682,10 +682,10 @@ public class AiMusicServiceImplTest extends BaseMockitoUnitTest {
     public void testFetchMusic_clipError() {
         // mock 数据：第 1 首出错
         AiMusicDO music = buildFetchMusic();
-        when(musicMapper.selectListForFetch(eq(AiMusicStatusEnum.IN_PROGRESS.getStatus()), anyInt())).thenReturn(List.of(music));
+        when(musicMapper.selectListForFetch(eq(AiMusicStatusEnum.IN_PROGRESS.getStatus()), anyInt())).thenReturn(Arrays.asList(music));
         mockFetchApiKey();
-        when(sunoApi.fetchTasks(any())).thenReturn(List.of(new SunoApi.Task("task-1", "MUSIC", "SUCCESS",
-                null, "100%", List.of(buildClip("clip-1", "内容违规")))));
+        when(sunoApi.fetchTasks(any())).thenReturn(Arrays.asList(new SunoApi.Task("task-1", "MUSIC", "SUCCESS",
+                null, "100%", Arrays.asList(buildClip("clip-1", "内容违规")))));
         when(musicMapper.updateByIdAndUnsplit(eq(MUSIC_ID), eq(AiMusicStatusEnum.IN_PROGRESS.getStatus()), any())).thenReturn(1);
 
         // 调用
@@ -704,9 +704,9 @@ public class AiMusicServiceImplTest extends BaseMockitoUnitTest {
     public void testFetchMusic_taskFailure() {
         // mock 数据
         AiMusicDO music = buildFetchMusic();
-        when(musicMapper.selectListForFetch(eq(AiMusicStatusEnum.IN_PROGRESS.getStatus()), anyInt())).thenReturn(List.of(music));
+        when(musicMapper.selectListForFetch(eq(AiMusicStatusEnum.IN_PROGRESS.getStatus()), anyInt())).thenReturn(Arrays.asList(music));
         mockFetchApiKey();
-        when(sunoApi.fetchTasks(any())).thenReturn(List.of(new SunoApi.Task("task-1", "MUSIC", "FAILURE",
+        when(sunoApi.fetchTasks(any())).thenReturn(Arrays.asList(new SunoApi.Task("task-1", "MUSIC", "FAILURE",
                 "生成超时", null, null)));
 
         // 调用
@@ -721,9 +721,9 @@ public class AiMusicServiceImplTest extends BaseMockitoUnitTest {
     public void testFetchMusic_inProgress() {
         // mock 数据
         AiMusicDO music = buildFetchMusic();
-        when(musicMapper.selectListForFetch(eq(AiMusicStatusEnum.IN_PROGRESS.getStatus()), anyInt())).thenReturn(List.of(music));
+        when(musicMapper.selectListForFetch(eq(AiMusicStatusEnum.IN_PROGRESS.getStatus()), anyInt())).thenReturn(Arrays.asList(music));
         mockFetchApiKey();
-        when(sunoApi.fetchTasks(any())).thenReturn(List.of(new SunoApi.Task("task-1", "MUSIC", "IN_PROGRESS",
+        when(sunoApi.fetchTasks(any())).thenReturn(Arrays.asList(new SunoApi.Task("task-1", "MUSIC", "IN_PROGRESS",
                 null, "62%", null)));
 
         // 调用
@@ -738,7 +738,7 @@ public class AiMusicServiceImplTest extends BaseMockitoUnitTest {
     public void testFetchMusic_apiKeyDeleted() {
         // mock 数据：密钥已删除
         AiMusicDO music = buildFetchMusic();
-        when(musicMapper.selectListForFetch(eq(AiMusicStatusEnum.IN_PROGRESS.getStatus()), anyInt())).thenReturn(List.of(music));
+        when(musicMapper.selectListForFetch(eq(AiMusicStatusEnum.IN_PROGRESS.getStatus()), anyInt())).thenReturn(Arrays.asList(music));
 
         // 调用
         musicService.fetchMusic();
@@ -753,7 +753,7 @@ public class AiMusicServiceImplTest extends BaseMockitoUnitTest {
     public void testFetchMusic_apiKeyDisabled() {
         // mock 数据：密钥停用，仍照常查询
         AiMusicDO music = buildFetchMusic();
-        when(musicMapper.selectListForFetch(eq(AiMusicStatusEnum.IN_PROGRESS.getStatus()), anyInt())).thenReturn(List.of(music));
+        when(musicMapper.selectListForFetch(eq(AiMusicStatusEnum.IN_PROGRESS.getStatus()), anyInt())).thenReturn(Arrays.asList(music));
         AiApiKeyDO apiKey = new AiApiKeyDO().setId(API_KEY_ID).setStatus(CommonStatusEnum.DISABLE.getStatus());
         when(apiKeyService.getApiKey(API_KEY_ID)).thenReturn(apiKey);
         when(modelService.getSunoApi(apiKey)).thenReturn(sunoApi);
@@ -761,14 +761,14 @@ public class AiMusicServiceImplTest extends BaseMockitoUnitTest {
         // 调用
         musicService.fetchMusic();
         // 断言
-        verify(sunoApi).fetchTasks(List.of("task-1"));
+        verify(sunoApi).fetchTasks(Arrays.asList("task-1"));
     }
 
     @Test
     public void testFetchMusic_fetchError() {
         // mock 数据：查询中转失败
         AiMusicDO music = buildFetchMusic();
-        when(musicMapper.selectListForFetch(eq(AiMusicStatusEnum.IN_PROGRESS.getStatus()), anyInt())).thenReturn(List.of(music));
+        when(musicMapper.selectListForFetch(eq(AiMusicStatusEnum.IN_PROGRESS.getStatus()), anyInt())).thenReturn(Arrays.asList(music));
         mockFetchApiKey();
         when(sunoApi.fetchTasks(any())).thenThrow(new IllegalStateException("中转返回格式不正确"));
 
@@ -783,14 +783,14 @@ public class AiMusicServiceImplTest extends BaseMockitoUnitTest {
         // mock 数据：两个渠道，第 1 个渠道创建客户端失败
         AiMusicDO music1 = buildFetchMusic();
         AiMusicDO music2 = buildFetchMusic().setId(101L).setApiKeyId(21L).setTaskId("task-2");
-        when(musicMapper.selectListForFetch(eq(AiMusicStatusEnum.IN_PROGRESS.getStatus()), anyInt())).thenReturn(List.of(music1, music2));
+        when(musicMapper.selectListForFetch(eq(AiMusicStatusEnum.IN_PROGRESS.getStatus()), anyInt())).thenReturn(Arrays.asList(music1, music2));
         AiApiKeyDO apiKey1 = new AiApiKeyDO().setId(API_KEY_ID).setStatus(CommonStatusEnum.ENABLE.getStatus());
         AiApiKeyDO apiKey2 = new AiApiKeyDO().setId(21L).setStatus(CommonStatusEnum.ENABLE.getStatus());
         when(apiKeyService.getApiKey(API_KEY_ID)).thenReturn(apiKey1);
         when(apiKeyService.getApiKey(21L)).thenReturn(apiKey2);
         when(modelService.getSunoApi(apiKey1)).thenThrow(new IllegalArgumentException("中转地址不正确"));
         when(modelService.getSunoApi(apiKey2)).thenReturn(sunoApi);
-        when(sunoApi.fetchTasks(List.of("task-2"))).thenReturn(List.of(new SunoApi.Task("task-2", "MUSIC", "IN_PROGRESS",
+        when(sunoApi.fetchTasks(Arrays.asList("task-2"))).thenReturn(Arrays.asList(new SunoApi.Task("task-2", "MUSIC", "IN_PROGRESS",
                 null, "62%", null)));
 
         // 调用
@@ -806,9 +806,9 @@ public class AiMusicServiceImplTest extends BaseMockitoUnitTest {
         // mock 数据：同一批次，第 1 首处理异常
         AiMusicDO music1 = buildFetchMusic();
         AiMusicDO music2 = buildFetchMusic().setId(101L).setTaskId("task-2");
-        when(musicMapper.selectListForFetch(eq(AiMusicStatusEnum.IN_PROGRESS.getStatus()), anyInt())).thenReturn(List.of(music1, music2));
+        when(musicMapper.selectListForFetch(eq(AiMusicStatusEnum.IN_PROGRESS.getStatus()), anyInt())).thenReturn(Arrays.asList(music1, music2));
         mockFetchApiKey();
-        when(sunoApi.fetchTasks(List.of("task-1", "task-2"))).thenReturn(List.of(
+        when(sunoApi.fetchTasks(Arrays.asList("task-1", "task-2"))).thenReturn(Arrays.asList(
                 new SunoApi.Task("task-1", "MUSIC", "IN_PROGRESS", null, "30%", null),
                 new SunoApi.Task("task-2", "MUSIC", "IN_PROGRESS", null, "62%", null)));
         when(musicMapper.updateByIdAndStatus(eq(MUSIC_ID), any(), any())).thenThrow(new RuntimeException("数据库异常"));
@@ -824,11 +824,11 @@ public class AiMusicServiceImplTest extends BaseMockitoUnitTest {
     public void testFetchMusic_splitInvalidClips() {
         // mock 数据：空值、空编号、重复编号的歌曲跳过；没有音频、视频地址不是 http(s) 的歌曲
         AiMusicDO music = buildFetchMusic();
-        when(musicMapper.selectListForFetch(eq(AiMusicStatusEnum.IN_PROGRESS.getStatus()), anyInt())).thenReturn(List.of(music));
+        when(musicMapper.selectListForFetch(eq(AiMusicStatusEnum.IN_PROGRESS.getStatus()), anyInt())).thenReturn(Arrays.asList(music));
         mockFetchApiKey();
         SunoApi.Clip noAudio = new SunoApi.Clip("clip-3", "夏日", "complete", null, null, null,
                 "javascript:alert(1)", "chirp-v4", null);
-        when(sunoApi.fetchTasks(any())).thenReturn(List.of(new SunoApi.Task("task-1", "MUSIC", "SUCCESS", null, "100%",
+        when(sunoApi.fetchTasks(any())).thenReturn(Arrays.asList(new SunoApi.Task("task-1", "MUSIC", "SUCCESS", null, "100%",
                 Arrays.asList(null, buildClip(" ", null), buildClip("clip-1", null), buildClip("clip-1", null), noAudio))));
         when(musicMapper.updateByIdAndUnsplit(eq(MUSIC_ID), eq(AiMusicStatusEnum.IN_PROGRESS.getStatus()), any())).thenReturn(1);
 
@@ -854,9 +854,9 @@ public class AiMusicServiceImplTest extends BaseMockitoUnitTest {
     public void testFetchMusic_splitNoValidClip() {
         // mock 数据：成功但没有有效歌曲
         AiMusicDO music = buildFetchMusic();
-        when(musicMapper.selectListForFetch(eq(AiMusicStatusEnum.IN_PROGRESS.getStatus()), anyInt())).thenReturn(List.of(music));
+        when(musicMapper.selectListForFetch(eq(AiMusicStatusEnum.IN_PROGRESS.getStatus()), anyInt())).thenReturn(Arrays.asList(music));
         mockFetchApiKey();
-        when(sunoApi.fetchTasks(any())).thenReturn(List.of(new SunoApi.Task("task-1", "MUSIC", "SUCCESS", null, "100%",
+        when(sunoApi.fetchTasks(any())).thenReturn(Arrays.asList(new SunoApi.Task("task-1", "MUSIC", "SUCCESS", null, "100%",
                 Arrays.asList(null, buildClip("", null)))));
 
         // 调用
@@ -872,12 +872,12 @@ public class AiMusicServiceImplTest extends BaseMockitoUnitTest {
     public void testFetchMusic_splitOtherHost() {
         // mock 数据：第 1、2 首媒体在不同的 CDN 域名，都不需要登记
         AiMusicDO music = buildFetchMusic();
-        when(musicMapper.selectListForFetch(eq(AiMusicStatusEnum.IN_PROGRESS.getStatus()), anyInt())).thenReturn(List.of(music));
+        when(musicMapper.selectListForFetch(eq(AiMusicStatusEnum.IN_PROGRESS.getStatus()), anyInt())).thenReturn(Arrays.asList(music));
         mockFetchApiKey();
         SunoApi.Clip other = new SunoApi.Clip("clip-2", "夏日", "complete", "https://media.example.org/2.mp3",
                 "https://media.example.org/2.png", null, "https://media.example.org/2.mp4", "chirp-v4", null);
-        when(sunoApi.fetchTasks(any())).thenReturn(List.of(new SunoApi.Task("task-1", "MUSIC", "SUCCESS", null, "100%",
-                List.of(buildClip("clip-1", null), other))));
+        when(sunoApi.fetchTasks(any())).thenReturn(Arrays.asList(new SunoApi.Task("task-1", "MUSIC", "SUCCESS", null, "100%",
+                Arrays.asList(buildClip("clip-1", null), other))));
         when(musicMapper.updateByIdAndUnsplit(eq(MUSIC_ID), eq(AiMusicStatusEnum.IN_PROGRESS.getStatus()), any())).thenReturn(1);
 
         // 调用
@@ -922,7 +922,7 @@ public class AiMusicServiceImplTest extends BaseMockitoUnitTest {
         AiMusicDO music2 = new AiMusicDO().setId(2L).setStatus(AiMusicStatusEnum.SAVING.getStatus())
                 .setCoverUrl("https://cdn.example.com/2.png").setAudioUrl("https://cdn.example.com/2.mp3");
         when(musicMapper.selectListByStatus(eq(AiMusicStatusEnum.SAVING.getStatus()), anyInt()))
-                .thenReturn(List.of(music1, music2));
+                .thenReturn(Arrays.asList(music1, music2));
         when(fileApi.createFile(PNG_CONTENT)).thenReturn("https://oss/2-cover.png");
         when(fileApi.createFile(MP3_CONTENT)).thenReturn("https://oss/2.mp3");
 
@@ -950,7 +950,7 @@ public class AiMusicServiceImplTest extends BaseMockitoUnitTest {
         // mock 数据：封面下载失败，音频正常
         AiMusicDO music = new AiMusicDO().setId(1L).setStatus(AiMusicStatusEnum.SAVING.getStatus())
                 .setCoverUrl("https://cdn.example.com/1.png").setAudioUrl("https://cdn.example.com/1.mp3");
-        when(musicMapper.selectListByStatus(eq(AiMusicStatusEnum.SAVING.getStatus()), anyInt())).thenReturn(List.of(music));
+        when(musicMapper.selectListByStatus(eq(AiMusicStatusEnum.SAVING.getStatus()), anyInt())).thenReturn(Arrays.asList(music));
         when(fileApi.createFile(MP3_CONTENT)).thenReturn("https://oss/1.mp3");
 
         // mock 静态方法：封面下载失败
@@ -977,7 +977,7 @@ public class AiMusicServiceImplTest extends BaseMockitoUnitTest {
         AiMusicDO music2 = new AiMusicDO().setId(2L).setStatus(AiMusicStatusEnum.IN_PROGRESS.getStatus());
         AiMusicDO music3 = new AiMusicDO().setId(3L).setStatus(AiMusicStatusEnum.SAVING.getStatus())
                 .setAudioUrl("https://cdn.example.com/3.mp3");
-        when(musicMapper.selectListByStatusAndCreateTimeLt(any(), any())).thenReturn(List.of(music1, music2, music3));
+        when(musicMapper.selectListByStatusAndCreateTimeLt(any(), any())).thenReturn(Arrays.asList(music1, music2, music3));
 
         // 调用
         int count;
@@ -988,7 +988,7 @@ public class AiMusicServiceImplTest extends BaseMockitoUnitTest {
         }
         assertEquals(3, count);
         // 断言：都按原状态条件更新为已失败
-        for (AiMusicDO music : List.of(music1, music2, music3)) {
+        for (AiMusicDO music : Arrays.asList(music1, music2, music3)) {
             AiMusicDO update = captureUpdateByIdAndStatus(music.getId(), music.getStatus());
             assertEquals(AiMusicStatusEnum.FAIL.getStatus(), update.getStatus());
             assertEquals("任务超时", update.getErrorMessage());

@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.ai.service.image;
 
 import cn.hutool.extra.spring.SpringUtil;
+import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageDrawReqVO;
 import cn.iocoder.yudao.module.ai.controller.admin.image.vo.AiImageOptimizePromptReqVO;
@@ -44,12 +45,14 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
@@ -219,7 +222,9 @@ public class AiImageServiceImplUnitTest extends BaseMockitoUnitTest {
     public void testExecuteDrawImage_siliconFlowRequest() {
         // mock 硅基流动接口：断言实际请求体
         RestClient.Builder restClientBuilder = RestClient.builder();
-        MockRestServiceServer server = MockRestServiceServer.bindTo(restClientBuilder).build();
+        RestTemplate restTemplate = new RestTemplate();
+        MockRestServiceServer server = MockRestServiceServer.bindTo(restTemplate).build();
+        restClientBuilder.requestFactory(restTemplate.getRequestFactory());
         server.expect(requestTo(endsWith("v1/images/generations")))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(content().json("{\"prompt\":\"一只猫\",\"model\":\"Kwai-Kolors/Kolors\",\"image_size\":\"1024x768\","
@@ -403,7 +408,7 @@ public class AiImageServiceImplUnitTest extends BaseMockitoUnitTest {
 
     private static AiImageDO buildSeedreamImage(List<String> referenceUrls) {
         List<AiImageDO.InputImage> inputImages = referenceUrls == null ? null : referenceUrls.stream()
-                .map(url -> new AiImageDO.InputImage(AiImageInputRoleEnum.REFERENCE.getRole(), url)).toList();
+                .map(url -> new AiImageDO.InputImage(AiImageInputRoleEnum.REFERENCE.getRole(), url)).collect(Collectors.toList());
         return new AiImageDO().setId(IMAGE_ID).setPlatform(AiPlatformEnum.BYTEDANCE.getPlatform())
                 .setModel("doubao-seedream-4-5-251128").setPrompt("一只猫").setInputImages(inputImages)
                 .setSeedreamOptions(new AiImageDO.SeedreamOptions().setSize("2K").setWatermark(false)
@@ -723,10 +728,10 @@ public class AiImageServiceImplUnitTest extends BaseMockitoUnitTest {
         mockInProgressImages(buildSyncImage(1L, API_KEY_ID, "task-same"), buildSyncImage(2L, OTHER_API_KEY_ID, "task-same"));
         // mock 方法：两个中转返回不同的结果
         mockMidjourneyApiByKey(API_KEY_ID, midjourneyApi);
-        when(midjourneyApi.getTaskList(Set.of("task-same"))).thenReturn(Collections.singletonList(
+        when(midjourneyApi.getTaskList(SetUtils.asSet("task-same"))).thenReturn(Collections.singletonList(
                 buildNotify("task-same", "IN_PROGRESS", "45%", null)));
         mockMidjourneyApiByKey(OTHER_API_KEY_ID, otherMidjourneyApi);
-        when(otherMidjourneyApi.getTaskList(Set.of("task-same"))).thenReturn(Collections.singletonList(
+        when(otherMidjourneyApi.getTaskList(SetUtils.asSet("task-same"))).thenReturn(Collections.singletonList(
                 buildNotify("task-same", "FAILURE", null, "被拒绝")));
 
         // 调用，并断言：各自使用自己中转的结果，不串
@@ -747,7 +752,7 @@ public class AiImageServiceImplUnitTest extends BaseMockitoUnitTest {
         when(modelService.getModel(MODEL_ID)).thenReturn(new AiModelDO().setId(MODEL_ID).setKeyId(API_KEY_ID));
         when(modelService.getModel(0L)).thenReturn(null);
         mockMidjourneyApiByKey(API_KEY_ID, midjourneyApi);
-        when(midjourneyApi.getTaskList(Set.of("task-a"))).thenReturn(Collections.singletonList(
+        when(midjourneyApi.getTaskList(SetUtils.asSet("task-a"))).thenReturn(Collections.singletonList(
                 buildNotify("task-a", "SUBMITTED", null, null)));
 
         // 调用，并断言：模型不存在的跳过，交给超时处理
@@ -764,9 +769,9 @@ public class AiImageServiceImplUnitTest extends BaseMockitoUnitTest {
         AiApiKeyDO apiKey = new AiApiKeyDO().setId(API_KEY_ID);
         when(apiKeyService.validateApiKey(API_KEY_ID)).thenReturn(apiKey);
         when(modelService.getMidjourneyApi(apiKey)).thenReturn(midjourneyApi);
-        when(midjourneyApi.getTaskList(Set.of("task-a"))).thenThrow(new IllegalStateException("[midjourney-api] 调用失败！"));
+        when(midjourneyApi.getTaskList(SetUtils.asSet("task-a"))).thenThrow(new IllegalStateException("[midjourney-api] 调用失败！"));
         mockMidjourneyApiByKey(OTHER_API_KEY_ID, otherMidjourneyApi);
-        when(otherMidjourneyApi.getTaskList(Set.of("task-b"))).thenReturn(Collections.singletonList(
+        when(otherMidjourneyApi.getTaskList(SetUtils.asSet("task-b"))).thenReturn(Collections.singletonList(
                 buildNotify("task-b", "MODAL", null, null)));
 
         // 调用，并断言：不影响其它密钥；MODAL 仍在进行中
@@ -782,7 +787,7 @@ public class AiImageServiceImplUnitTest extends BaseMockitoUnitTest {
         // mock 数据
         mockInProgressImages(buildSyncImage(1L, API_KEY_ID, "task-cancel"), buildSyncImage(2L, API_KEY_ID, "task-unknown"));
         mockMidjourneyApiByKey(API_KEY_ID, midjourneyApi);
-        when(midjourneyApi.getTaskList(Set.of("task-cancel", "task-unknown"))).thenReturn(Arrays.asList(
+        when(midjourneyApi.getTaskList(SetUtils.asSet("task-cancel", "task-unknown"))).thenReturn(Arrays.asList(
                 buildNotify("task-cancel", "CANCEL", null, null),
                 buildNotify("task-unknown", "SOMETHING_NEW", null, null)));
 
@@ -802,7 +807,7 @@ public class AiImageServiceImplUnitTest extends BaseMockitoUnitTest {
         mockInProgressImages(buildSyncImage(1L, API_KEY_ID, "task-a"));
         mockMidjourneyApiByKey(API_KEY_ID, midjourneyApi);
         List<MidjourneyApi.Button> buttons = Collections.singletonList(new MidjourneyApi.Button(CUSTOM_ID, null, "U1", null, null));
-        when(midjourneyApi.getTaskList(Set.of("task-a"))).thenReturn(Collections.singletonList(new MidjourneyApi.Notify(
+        when(midjourneyApi.getTaskList(SetUtils.asSet("task-a"))).thenReturn(Collections.singletonList(new MidjourneyApi.Notify(
                 "task-a", null, "SUCCESS", null, null, null, null, null, null, null, imageUrl, "100%", null, buttons)));
         when(fileApi.createFile(any(byte[].class))).thenReturn("https://file/mj.png");
 

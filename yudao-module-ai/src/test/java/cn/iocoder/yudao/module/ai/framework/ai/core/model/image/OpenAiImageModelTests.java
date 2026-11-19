@@ -8,7 +8,6 @@ import org.springframework.ai.image.ImagePrompt;
 import org.springframework.ai.image.ImageResponse;
 import org.springframework.ai.openai.OpenAiImageModel;
 import org.springframework.ai.openai.OpenAiImageOptions;
-import org.springframework.ai.openai.api.OpenAiImageApi;
 
 import static cn.iocoder.yudao.module.ai.framework.ai.core.model.AiModelTestUtils.validateApiKey;
 
@@ -21,10 +20,12 @@ public class OpenAiImageModelTests {
 
     private static final String API_KEY = SystemUtil.get("OPENAI_API_KEY", "sk-xxxx");
 
-    private final OpenAiImageModel imageModel = new OpenAiImageModel(OpenAiImageApi.builder()
-            .baseUrl("https://api.holdai.top") // apiKey
-            .apiKey(API_KEY)
-            .build());
+    private final OpenAiImageModel imageModel = OpenAiImageModel.builder()
+            .options(OpenAiImageOptions.builder()
+                    .baseUrl("https://api.holdai.top") // apiKey
+                    .apiKey(API_KEY)
+                    .build())
+            .build();
 
     @Test
     @Disabled

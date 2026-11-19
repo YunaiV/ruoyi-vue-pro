@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.ai.controller.admin.drama.vo.task;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.ai.enums.drama.AiDramaTaskTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 @Schema(description = "管理后台 - AI 短剧生成任务操作 Request VO：重新提交、同步状态、标记失败")

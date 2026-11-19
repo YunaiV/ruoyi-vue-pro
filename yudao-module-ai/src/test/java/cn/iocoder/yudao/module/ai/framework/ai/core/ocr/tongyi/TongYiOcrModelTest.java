@@ -51,9 +51,7 @@ public class TongYiOcrModelTest {
     @Test
     public void testCall_success() {
         // 准备参数
-        server.enqueue(Response.json(200, """
-                {"output":{"choices":[{"finish_reason":"stop","message":{"role":"assistant",\
-                "content":[{"text":"第一行\\r\\n第二行  "}]}}]},"request_id":"req-1"}"""));
+        server.enqueue(Response.json(200, "{\"output\":{\"choices\":[{\"finish_reason\":\"stop\",\"message\":{\"role\":\"assistant\",\"content\":[{\"text\":\"第一行\\r\\n第二行  \"}]}}]},\"request_id\":\"req-1\"}"));
 
         // 调用
         OcrResponse response = buildModel(null).call(buildPrompt(MimeTypeUtils.IMAGE_PNG, IMAGE));
@@ -106,8 +104,7 @@ public class TongYiOcrModelTest {
     @Test
     public void testCall_unauthorized() {
         // 准备参数：百炼的错误体；消息里故意带上密钥，验证会被去掉
-        server.enqueue(Response.json(401, """
-                {"code":"InvalidApiKey","message":"Invalid API-key provided: sk-tongyi-test-key-123","request_id":"req-401"}"""));
+        server.enqueue(Response.json(401, "{\"code\":\"InvalidApiKey\",\"message\":\"Invalid API-key provided: sk-tongyi-test-key-123\",\"request_id\":\"req-401\"}"));
 
         // 调用，并断言异常
         OcrException ex = assertThrows(OcrException.class,
@@ -125,8 +122,7 @@ public class TongYiOcrModelTest {
     @Test
     public void testCall_rateLimited() {
         // 准备参数
-        server.enqueue(Response.json(429, """
-                {"code":"Throttling.RateQuota","message":"Requests rate limit exceeded","request_id":"req-429"}"""));
+        server.enqueue(Response.json(429, "{\"code\":\"Throttling.RateQuota\",\"message\":\"Requests rate limit exceeded\",\"request_id\":\"req-429\"}"));
 
         // 调用，并断言异常
         OcrException ex = assertThrows(OcrException.class,

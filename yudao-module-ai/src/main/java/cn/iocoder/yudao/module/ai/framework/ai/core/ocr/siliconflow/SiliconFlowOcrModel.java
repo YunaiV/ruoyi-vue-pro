@@ -11,12 +11,14 @@ import cn.iocoder.yudao.module.ai.framework.ai.core.ocr.OcrResponse;
 import cn.iocoder.yudao.module.ai.framework.ai.core.ocr.OcrResult;
 import cn.iocoder.yudao.module.ai.framework.ai.core.ocr.OcrUtils;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
 import java.time.Duration;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -57,7 +59,7 @@ public class SiliconFlowOcrModel implements OcrModel {
     /**
      * 文档未列出具体的图片类型和大小限制，这里取常见图片类型，并按 10MB 的 data URL 保守限制
      */
-    static final Set<String> ALLOWED_MIME_TYPES = Set.of("image/jpeg", "image/png", "image/webp", "image/bmp");
+    static final Set<String> ALLOWED_MIME_TYPES = ImmutableSet.of("image/jpeg", "image/png", "image/webp", "image/bmp");
     static final long MAX_DATA_URL_LENGTH = 10L * 1024 * 1024;
 
     static final Duration DEFAULT_CONNECT_TIMEOUT = Duration.ofSeconds(10);
@@ -95,14 +97,14 @@ public class SiliconFlowOcrModel implements OcrModel {
         OcrUtils.checkSize(PLATFORM, dataUrl.length(), MAX_DATA_URL_LENGTH, "base64 编码后的图片");
 
         // 2. 调用
-        Map<String, Object> request = Map.of(
+        Map<String, Object> request = ImmutableMap.of(
                 "model", model,
                 "stream", false,
-                "messages", List.of(Map.of(
+                "messages", ImmutableList.of(ImmutableMap.of(
                         "role", "user",
-                        "content", List.of(
-                                Map.of("type", "image_url", "image_url", Map.of("url", dataUrl)),
-                                Map.of("type", "text", "text", PROMPT)))));
+                        "content", ImmutableList.of(
+                                ImmutableMap.of("type", "image_url", "image_url", ImmutableMap.of("url", dataUrl)),
+                                ImmutableMap.of("type", "text", "text", PROMPT)))));
         String body;
         try {
             body = restClient.post().uri(CHAT_COMPLETIONS_PATH)

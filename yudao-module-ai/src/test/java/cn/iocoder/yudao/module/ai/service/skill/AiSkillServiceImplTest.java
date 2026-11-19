@@ -9,14 +9,15 @@ import cn.iocoder.yudao.module.ai.dal.dataobject.skill.AiSkillDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.skill.AiSkillMapper;
 import cn.iocoder.yudao.module.ai.service.model.AiChatRoleService;
 import cn.iocoder.yudao.module.ai.tool.skill.AiSkillToolCallback;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.*;
@@ -41,9 +42,9 @@ public class AiSkillServiceImplTest extends BaseDbUnitTest {
     @Resource
     private AiSkillMapper skillMapper;
 
-    @MockitoBean
+    @MockBean
     private AiSkillFileService skillFileService;
-    @MockitoBean
+    @MockBean
     private AiChatRoleService chatRoleService;
 
     // ========== 管理 ==========
@@ -141,7 +142,7 @@ public class AiSkillServiceImplTest extends BaseDbUnitTest {
         List<ToolCallback> toolCallbacks = skillService.getSkillToolCallbackList(role);
         // 断言：两个只读工具，只包含启用的技能
         assertEquals(Arrays.asList(AiSkillToolCallback.NAME_READ_SKILL, AiSkillToolCallback.NAME_READ_SKILL_FILE),
-                toolCallbacks.stream().map(callback -> callback.getToolDefinition().name()).toList());
+                toolCallbacks.stream().map(callback -> callback.getToolDefinition().name()).collect(Collectors.toList()));
         String systemMessage = AiSkillToolCallback.appendSkillPrompt("你是数据分析师", toolCallbacks);
         assertTrue(systemMessage.startsWith("你是数据分析师\n\n## 可用技能\n"));
         assertTrue(systemMessage.contains("- order-analysis：" + enable.getDescription()));

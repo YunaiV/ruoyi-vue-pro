@@ -44,7 +44,7 @@ import cn.iocoder.yudao.module.ai.service.model.AiModelService;
 import cn.iocoder.yudao.module.ai.util.AiVideoUtils;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import com.google.common.annotations.VisibleForTesting;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

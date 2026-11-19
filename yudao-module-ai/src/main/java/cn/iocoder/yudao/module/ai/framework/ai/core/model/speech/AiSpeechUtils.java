@@ -9,9 +9,15 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.apache.hc.client5.http.config.ConnectionConfig;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.core5.util.Timeout;
+import org.springframework.ai.compat.http.HttpComponentsClientHttpRequestFactory;
 import org.springframework.core.io.buffer.DataBufferLimitException;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatusCode;
+import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -232,6 +238,28 @@ public class AiSpeechUtils {
     }
 
     /**
+     * 创建同步 RestClient 的请求工厂：与 {@link #buildHttpClient()} 一致，不自动重试、不跟随重定向
+     *
+     * JDK8 的 Spring 5 没有 ReactorClientHttpRequestFactory，改用 Apache HttpClient 5。
+     * 连接超时沿用 Reactor Netty 的默认值 30 秒；timeout 为等待响应、读取数据的超时
+     *
+     * @param timeout 读超时
+     */
+    public static ClientHttpRequestFactory buildRequestFactory(Duration timeout) {
+        return new HttpComponentsClientHttpRequestFactory(HttpClients.custom()
+                .setConnectionManager(PoolingHttpClientConnectionManagerBuilder.create()
+                        .setDefaultConnectionConfig(ConnectionConfig.custom()
+                                .setConnectTimeout(Timeout.ofSeconds(30))
+                                .setSocketTimeout(Timeout.of(timeout))
+                                .build())
+                        .build())
+                .setDefaultRequestConfig(RequestConfig.custom().setResponseTimeout(Timeout.of(timeout)).build())
+                .disableAutomaticRetries()
+                .disableRedirectHandling()
+                .build());
+    }
+
+    /**
      * 创建 WebClient：响应体超过上限时报错，不会无界缓存；传输层不自动重试、不跟随重定向
      *
      * @param baseUrl 根地址，允许为空
@@ -260,10 +288,10 @@ public class AiSpeechUtils {
     }
 
     private static Mono<HttpResult> readResult(ClientResponse response) {
-        HttpStatusCode status = response.statusCode();
+        int status = response.rawStatusCode();
         HttpHeaders headers = response.headers().asHttpHeaders();
         return response.bodyToMono(byte[].class).defaultIfEmpty(new byte[0])
-                .map(body -> new HttpResult(status.value(), headers, body));
+                .map(body -> new HttpResult(status, headers, body));
     }
 
     /**

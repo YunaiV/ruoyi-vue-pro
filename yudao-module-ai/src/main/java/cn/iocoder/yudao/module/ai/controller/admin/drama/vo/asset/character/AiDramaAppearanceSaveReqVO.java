@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.ai.controller.admin.drama.vo.asset.character;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Size;
+import javax.validation.constraints.Size;
 import lombok.Data;
 
 @Schema(description = "管理后台 - AI 短剧角色形象创建 / 修改 Request VO")

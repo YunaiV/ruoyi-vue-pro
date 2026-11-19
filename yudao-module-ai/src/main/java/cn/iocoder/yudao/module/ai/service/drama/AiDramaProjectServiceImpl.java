@@ -26,7 +26,7 @@ import cn.iocoder.yudao.module.ai.util.AiFfmpegUtils;
 import cn.iocoder.yudao.module.ai.util.AiFfmpegUtils.ComposeRequest;
 import cn.iocoder.yudao.module.ai.util.AiFfmpegUtils.ComposeResult;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;

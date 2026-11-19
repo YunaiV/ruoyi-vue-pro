@@ -14,8 +14,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.model.SimpleApiKey;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.http.client.ReactorClientHttpRequestFactory;
 import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
@@ -78,9 +78,7 @@ public class TongYiSpeechModel extends AbstractAiSpeechModel {
         }
         this.timeout = timeout;
         this.maxAudioSize = maxAudioSize;
-        ReactorClientHttpRequestFactory requestFactory = new ReactorClientHttpRequestFactory(AiSpeechUtils.buildHttpClient());
-        requestFactory.setReadTimeout(timeout);
-        requestFactory.setExchangeTimeout(timeout);
+        ClientHttpRequestFactory requestFactory = AiSpeechUtils.buildRequestFactory(timeout);
         this.api = DashScopeQwenTTSApi.builder()
                 .baseUrl(StrUtil.blankToDefault(baseUrl, DEFAULT_BASE_URL))
                 .apiKey(new SimpleApiKey(apiKey))
@@ -154,12 +152,18 @@ public class TongYiSpeechModel extends AbstractAiSpeechModel {
 
         @Override
         public boolean hasError(ClientHttpResponse response) throws IOException {
-            return !response.getStatusCode().is2xxSuccessful();
+            int status = response.getRawStatusCode();
+            return status < 200 || status >= 300;
         }
 
         @Override
         public void handleError(URI url, HttpMethod method, ClientHttpResponse response) throws IOException {
-            int status = response.getStatusCode().value();
+            handleError(response);
+        }
+
+        @Override
+        public void handleError(ClientHttpResponse response) throws IOException {
+            int status = response.getRawStatusCode();
             JsonNode root = AiSpeechUtils.parseJson(IoUtil.readBytes(response.getBody(), AiSpeechUtils.MAX_JSON_SIZE));
             String requestId = root != null ? StrUtil.emptyToNull(root.path("request_id").asText(null)) : null;
             String code = root != null ? StrUtil.emptyToNull(root.path("code").asText(null)) : null;

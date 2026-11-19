@@ -4,6 +4,7 @@ import cn.iocoder.yudao.module.ai.framework.ai.core.model.suno.api.SunoApi;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -73,7 +74,7 @@ public class SunoApiTests {
     @Test
     @Disabled
     public void testFetchTasks() {
-        List<SunoApi.Task> tasks = sunoApi.fetchTasks(List.of("task-id"));
+        List<SunoApi.Task> tasks = sunoApi.fetchTasks(Arrays.asList("task-id"));
         System.out.println(tasks);
     }
 

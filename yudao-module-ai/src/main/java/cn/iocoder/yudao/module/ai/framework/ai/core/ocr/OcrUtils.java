@@ -7,9 +7,15 @@ import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.apache.hc.client5.http.config.ConnectionConfig;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.core5.util.Timeout;
+import org.springframework.ai.compat.http.HttpComponentsClientHttpRequestFactory;
 import org.springframework.ai.content.Media;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.util.MimeType;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
@@ -17,8 +23,6 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestClientResponseException;
 
 import java.io.InterruptedIOException;
-import java.net.http.HttpClient;
-import java.net.http.HttpTimeoutException;
 import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
@@ -63,9 +67,10 @@ public final class OcrUtils {
                     "不支持的图片类型：" + mimeType + "，支持：" + String.join("、", allowedMimeTypes));
         }
         // 2. 只接受服务端读出的图片字节，不把 URL 透传给厂商
-        if (!(media.getData() instanceof byte[] bytes)) {
+        if (!(media.getData() instanceof byte[])) {
             throw new OcrException(platform, OcrException.Type.INVALID_IMAGE, "图片必须以字节形式提供");
         }
+        byte[] bytes = (byte[]) media.getData();
         if (bytes.length == 0) {
             throw new OcrException(platform, OcrException.Type.INVALID_IMAGE, "图片内容为空");
         }
@@ -110,16 +115,16 @@ public final class OcrUtils {
      * 按行拼接识别结果：去掉 null，每行统一换行并去首尾空白
      */
     public static String joinLines(List<String> lines) {
-        return CollUtil.emptyIfNull(lines).stream().filter(Objects::nonNull)
+        return StrUtil.trim(CollUtil.emptyIfNull(lines).stream().filter(Objects::nonNull)
                 .map(OcrUtils::normalizeText)
-                .collect(Collectors.joining("\n")).strip();
+                .collect(Collectors.joining("\n")), 0, Character::isWhitespace);
     }
 
     /**
      * 统一换行符（\r\n、\r 转为 \n）并去掉首尾空白；null 视为空字符串
      */
     public static String normalizeText(String text) {
-        return StrUtil.nullToEmpty(text).replace("\r\n", "\n").replace('\r', '\n').strip();
+        return StrUtil.trim(StrUtil.nullToEmpty(text).replace("\r\n", "\n").replace('\r', '\n'), 0, Character::isWhitespace);
     }
 
     // ========== 错误 ==========
@@ -140,7 +145,7 @@ public final class OcrUtils {
                 result = result.replace(secret, REDACTED);
             }
         }
-        return StrUtil.maxLength(result.replaceAll("\\s+", " ").strip(), MAX_MESSAGE_LENGTH);
+        return StrUtil.maxLength(StrUtil.trim(result.replaceAll("\\s+", " "), 0, Character::isWhitespace), MAX_MESSAGE_LENGTH);
     }
 
     /**
@@ -151,7 +156,7 @@ public final class OcrUtils {
     public static OcrException convertNetworkException(String platform, Throwable ex) {
         String rootCause = ExceptionUtil.getRootCause(ex).getClass().getSimpleName();
         // SocketTimeoutException、Apache ConnectTimeoutException、OkHttp 的 timeout 都是 InterruptedIOException
-        if (ExceptionUtil.isCausedBy(ex, InterruptedIOException.class, HttpTimeoutException.class)) {
+        if (ExceptionUtil.isCausedBy(ex, InterruptedIOException.class)) {
             return new OcrException(platform, OcrException.Type.TIMEOUT, "调用超时（" + rootCause + "）");
         }
         return new OcrException(platform, OcrException.Type.UPSTREAM_ERROR, "网络异常（" + rootCause + "）");
@@ -165,12 +170,18 @@ public final class OcrUtils {
         if (status == null) {
             return OcrException.Type.UPSTREAM_ERROR;
         }
-        return switch (status) {
-            case UNAUTHORIZED, FORBIDDEN -> OcrException.Type.AUTH_FAILED;
-            case TOO_MANY_REQUESTS -> OcrException.Type.RATE_LIMITED;
-            case REQUEST_TIMEOUT, GATEWAY_TIMEOUT -> OcrException.Type.TIMEOUT;
-            default -> OcrException.Type.UPSTREAM_ERROR;
-        };
+        switch (status) {
+            case UNAUTHORIZED:
+            case FORBIDDEN:
+                return OcrException.Type.AUTH_FAILED;
+            case TOO_MANY_REQUESTS:
+                return OcrException.Type.RATE_LIMITED;
+            case REQUEST_TIMEOUT:
+            case GATEWAY_TIMEOUT:
+                return OcrException.Type.TIMEOUT;
+            default:
+                return OcrException.Type.UPSTREAM_ERROR;
+        }
     }
 
     // ========== HTTP（RestClient） ==========
@@ -178,20 +189,28 @@ public final class OcrUtils {
     /**
      * 创建带超时的 RestClient
      *
-     * 1. 使用 JDK HttpClient：HttpURLConnection 会在读超时等情况下静默重发 POST，可能导致重复计费，因此不用
+     * 1. 使用 Apache HttpClient 5（JDK8 没有 java.net.http）：关闭自动重试、重定向、Cookie 和内容压缩，与 JDK HttpClient 的默认行为一致。
+     *    不使用 HttpURLConnection：它会在读超时等情况下静默重发 POST，可能导致重复计费
      * 2. 使用独立的 builder，不挂 Observation，避免把带 access_token 的 URL 写进指标或日志
      * 3. 去掉 baseUrl 末尾的 /，调用方的路径统一以 / 开头
      */
     public static RestClient buildRestClient(String baseUrl, Duration connectTimeout, Duration readTimeout) {
-        HttpClient httpClient = HttpClient.newBuilder()
-                .version(HttpClient.Version.HTTP_1_1)
-                .connectTimeout(connectTimeout)
+        CloseableHttpClient httpClient = HttpClients.custom()
+                .setConnectionManager(PoolingHttpClientConnectionManagerBuilder.create()
+                        .setDefaultConnectionConfig(ConnectionConfig.custom()
+                                .setConnectTimeout(Timeout.of(connectTimeout))
+                                .setSocketTimeout(Timeout.of(readTimeout))
+                                .build())
+                        .build())
+                .setDefaultRequestConfig(RequestConfig.custom().setResponseTimeout(Timeout.of(readTimeout)).build())
+                .disableAutomaticRetries()
+                .disableRedirectHandling()
+                .disableCookieManagement()
+                .disableContentCompression()
                 .build();
-        JdkClientHttpRequestFactory requestFactory = new JdkClientHttpRequestFactory(httpClient);
-        requestFactory.setReadTimeout(readTimeout);
         return RestClient.builder()
                 .baseUrl(StrUtil.removeSuffix(baseUrl.trim(), "/"))
-                .requestFactory(requestFactory)
+                .requestFactory(new HttpComponentsClientHttpRequestFactory(httpClient))
                 .build();
     }
 
@@ -208,12 +227,13 @@ public final class OcrUtils {
         if (ex instanceof ResourceAccessException) {
             return convertNetworkException(platform, ex);
         }
-        if (!(ex instanceof RestClientResponseException responseEx)) {
+        if (!(ex instanceof RestClientResponseException)) {
             return new OcrException(platform, OcrException.Type.UPSTREAM_ERROR,
                     "调用失败（" + ex.getClass().getSimpleName() + "）");
         }
+        RestClientResponseException responseEx = (RestClientResponseException) ex;
         // 兼容 {"error":{"code","message"}}、{"code","message"}、百度的 {"error_code","error_msg"} / {"error","error_description"}
-        int status = responseEx.getStatusCode().value();
+        int status = responseEx.getRawStatusCode();
         JsonNode body = JsonUtils.parseObjectQuietly(responseEx.getResponseBodyAsString(), JsonNode.class);
         JsonNode error = body != null && body.path("error").isObject() ? body.get("error") : body;
         String vendorCode = StrUtil.blankToDefault(getText(error, "code"), getText(body, "error_code"));

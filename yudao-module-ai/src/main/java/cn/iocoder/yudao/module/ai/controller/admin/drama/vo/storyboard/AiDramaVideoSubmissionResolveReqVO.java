@@ -1,9 +1,9 @@
 package cn.iocoder.yudao.module.ai.controller.admin.drama.vo.storyboard;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import lombok.Data;
 
 @Schema(description = "管理后台 - AI 短剧镜头视频提交结果确认 Request VO：提交结果未知时，填写在服务商控制台核对到的任务编号")

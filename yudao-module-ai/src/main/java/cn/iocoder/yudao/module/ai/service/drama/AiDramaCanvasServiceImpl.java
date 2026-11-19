@@ -12,7 +12,7 @@ import cn.iocoder.yudao.module.ai.dal.mysql.drama.AiDramaDirectorMapper;
 import cn.iocoder.yudao.module.ai.enums.drama.AiDramaAspectRatioEnum;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.annotations.VisibleForTesting;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;

@@ -2,22 +2,29 @@ package cn.iocoder.yudao.module.ai.framework.ai.core.model.suno.api;
 
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ImmutableMap;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Value;
+import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -79,25 +86,27 @@ public class SunoApi {
      */
     private static final List<String> CLIP_METADATA_FIELDS = Arrays.asList("tags", "prompt", "duration");
 
-    private final Predicate<HttpStatusCode> STATUS_PREDICATE = status -> !status.is2xxSuccessful();
+    private final Predicate<HttpStatus> STATUS_PREDICATE = status -> !status.is2xxSuccessful();
 
     /**
      * 日志只记录方法、路径、状态和限长的错误摘要，不记录请求体与完整地址
      */
     private final Function<ClientResponse, Mono<? extends Throwable>> EXCEPTION_FUNCTION =
-            response -> response.bodyToMono(String.class).defaultIfEmpty("").handle((responseBody, sink) -> {
-                HttpRequest request = response.request();
-                HttpStatusCode status = response.statusCode();
+            response -> response.createException().handle((ex, sink) -> {
+                // Spring 5 的 ClientResponse 没有 request()，从 createException() 的异常中获取请求与响应体
+                HttpRequest request = ex.getRequest();
+                String responseBody = ex.getResponseBodyAsString(StandardCharsets.UTF_8);
+                int status = ex.getRawStatusCode();
                 log.error("[suno-api] 调用失败！请求方式:[{}]，请求路径:[{}]，响应状态:[{}]，错误摘要:[{}]",
-                        request.getMethod(), request.getURI().getPath(), status.value(), buildLogText(parseMessage(responseBody)));
+                        request.getMethod(), request.getURI().getPath(), status, buildLogText(parseMessage(responseBody)));
                 // 404、405 通常是中转未实现该路径（例如官方 SunoAPI 插件没有上传、拼接），只给出路径，不暴露中转地址
-                if (status.isSameCodeAs(HttpStatus.NOT_FOUND) || status.isSameCodeAs(HttpStatus.METHOD_NOT_ALLOWED)) {
+                if (status == HttpStatus.NOT_FOUND.value() || status == HttpStatus.METHOD_NOT_ALLOWED.value()) {
                     sink.error(new IllegalStateException(StrUtil.format("当前中转不支持该接口（HTTP {}）：{}",
-                            status.value(), request.getURI().getPath())));
+                            status, request.getURI().getPath())));
                     return;
                 }
                 sink.error(new IllegalStateException(StrUtil.format("中转请求失败（HTTP {}）：{}",
-                        status.value(), parseMessage(responseBody))));
+                        status, parseMessage(responseBody))));
             });
 
     /**
@@ -350,77 +359,162 @@ public class SunoApi {
      * 音乐生成请求
      *
      * 灵感模式传 gptDescriptionPrompt；自定义模式传 prompt（歌词）、tags、title；续写再传 taskId、continueClipId、continueAt
-     *
-     * @param gptDescriptionPrompt 歌曲描述（灵感模式）
-     * @param prompt 歌词（自定义模式）
-     * @param tags 音乐风格
-     * @param title 歌曲名称
-     * @param mv 模型标识，例如 chirp-crow
-     * @param makeInstrumental 是否纯音乐
-     * @param taskId 续写：来源歌曲的任务编号
-     * @param continueClipId 续写：来源歌曲编号
-     * @param continueAt 续写：起点（秒）
      */
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    public record MusicRequest(@JsonProperty("gpt_description_prompt") String gptDescriptionPrompt,
-                               String prompt,
-                               String tags,
-                               String title,
-                               String mv,
-                               @JsonProperty("make_instrumental") Boolean makeInstrumental,
-                               @JsonProperty("task_id") String taskId,
-                               @JsonProperty("continue_clip_id") String continueClipId,
-                               @JsonProperty("continue_at") Integer continueAt) {
+    @Value
+    @Accessors(fluent = true)
+    @NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
+    @AllArgsConstructor
+    @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
+    @JsonPropertyOrder({"gpt_description_prompt", "prompt", "tags", "title", "mv", "make_instrumental", "task_id",
+            "continue_clip_id", "continue_at"})
+    public static class MusicRequest {
+
+        /**
+         * 歌曲描述（灵感模式）
+         */
+        @JsonProperty("gpt_description_prompt")
+        String gptDescriptionPrompt;
+        /**
+         * 歌词（自定义模式）
+         */
+        String prompt;
+        /**
+         * 音乐风格
+         */
+        String tags;
+        /**
+         * 歌曲名称
+         */
+        String title;
+        /**
+         * 模型标识，例如 chirp-crow
+         */
+        String mv;
+        /**
+         * 是否纯音乐
+         */
+        @JsonProperty("make_instrumental")
+        Boolean makeInstrumental;
+        /**
+         * 续写：来源歌曲的任务编号
+         */
+        @JsonProperty("task_id")
+        String taskId;
+        /**
+         * 续写：来源歌曲编号
+         */
+        @JsonProperty("continue_clip_id")
+        String continueClipId;
+        /**
+         * 续写：起点（秒）
+         */
+        @JsonProperty("continue_at")
+        Integer continueAt;
+
     }
 
     /**
      * apimax 原生的音乐生成请求
      *
      * 灵感模式传 prompt（歌曲描述）；自定义模式传 lyrics（歌词）、style、title
-     *
-     * @param model 模型标识，例如 suno_music
-     * @param prompt 歌曲描述（灵感模式），对应 {@link MusicRequest#gptDescriptionPrompt()}；无歌词的纯音乐没有描述时，取音乐风格
-     * @param lyrics 歌词（自定义模式），对应 {@link MusicRequest#prompt()}
-     * @param style 音乐风格，对应 {@link MusicRequest#tags()}
-     * @param title 歌曲名称
-     * @param instrumental 是否纯音乐
      */
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    public record ApimaxMusicRequest(String model,
-                                     String prompt,
-                                     String lyrics,
-                                     String style,
-                                     String title,
-                                     Boolean instrumental) {
+    @Value
+    @Accessors(fluent = true)
+    @NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
+    @AllArgsConstructor
+    @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
+    public static class ApimaxMusicRequest {
+
+        /**
+         * 模型标识，例如 suno_music
+         */
+        String model;
+        /**
+         * 歌曲描述（灵感模式），对应 {@link MusicRequest#gptDescriptionPrompt()}；无歌词的纯音乐没有描述时，取音乐风格
+         */
+        String prompt;
+        /**
+         * 歌词（自定义模式），对应 {@link MusicRequest#prompt()}
+         */
+        String lyrics;
+        /**
+         * 音乐风格，对应 {@link MusicRequest#tags()}
+         */
+        String style;
+        /**
+         * 歌曲名称
+         */
+        String title;
+        /**
+         * 是否纯音乐
+         */
+        Boolean instrumental;
+
     }
 
     /**
      * 拼接请求
-     *
-     * @param clipId 续写作品的歌曲编号
-     * @param isInfill 是否填充，固定 false
      */
-    public record ConcatRequest(@JsonProperty("clip_id") String clipId,
-                                @JsonProperty("is_infill") Boolean isInfill) {
+    @Value
+    @Accessors(fluent = true)
+    @NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
+    @AllArgsConstructor
+    @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
+    public static class ConcatRequest {
+
+        /**
+         * 续写作品的歌曲编号
+         */
+        @JsonProperty("clip_id")
+        String clipId;
+        /**
+         * 是否填充，固定 false
+         */
+        @JsonProperty("is_infill")
+        Boolean isInfill;
+
     }
 
     /**
      * 任务
-     *
-     * @param taskId 任务编号
-     * @param action 任务类型，例如 MUSIC
-     * @param status 任务状态：SUCCESS、FAILURE / FAIL，其余（NOT_START、SUBMITTED、QUEUED、IN_PROGRESS 等）视为处理中
-     * @param failReason 失败原因
-     * @param progress 进度，例如 62%
-     * @param data 歌曲数组，成功时通常为 2 首
      */
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public record Task(@JsonProperty("task_id") String taskId,
-                       String action,
-                       String status,
-                       @JsonProperty("fail_reason") String failReason,
-                       String progress,
-                       List<Clip> data) {
+    @Value
+    @Accessors(fluent = true)
+    @NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
+    @AllArgsConstructor
+    @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
+    @JsonPropertyOrder({"task_id", "action", "status", "fail_reason", "progress", "data"})
+    public static class Task {
+
+        /**
+         * 任务编号
+         */
+        @JsonProperty("task_id")
+        String taskId;
+        /**
+         * 任务类型，例如 MUSIC
+         */
+        String action;
+        /**
+         * 任务状态：SUCCESS、FAILURE / FAIL，其余（NOT_START、SUBMITTED、QUEUED、IN_PROGRESS 等）视为处理中
+         */
+        String status;
+        /**
+         * 失败原因
+         */
+        @JsonProperty("fail_reason")
+        String failReason;
+        /**
+         * 进度，例如 62%
+         */
+        String progress;
+        /**
+         * 歌曲数组，成功时通常为 2 首
+         */
+        List<Clip> data;
 
         @JsonIgnore
         public boolean isSuccess() {
@@ -437,27 +531,57 @@ public class SunoApi {
 
     /**
      * 歌曲
-     *
-     * @param id 歌曲编号（clip id）
-     * @param title 歌曲名称
-     * @param status 歌曲状态，例如 complete、error
-     * @param audioUrl 音频地址
-     * @param imageUrl 封面地址
-     * @param imageLargeUrl 大封面地址
-     * @param videoUrl 视频地址，可能为空
-     * @param modelName 模型标识
-     * @param metadata 元数据
      */
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public record Clip(String id,
-                       String title,
-                       String status,
-                       @JsonProperty("audio_url") String audioUrl,
-                       @JsonProperty("image_url") String imageUrl,
-                       @JsonProperty("image_large_url") String imageLargeUrl,
-                       @JsonProperty("video_url") String videoUrl,
-                       @JsonProperty("model_name") String modelName,
-                       Metadata metadata) {
+    @Value
+    @Accessors(fluent = true)
+    @NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
+    @AllArgsConstructor
+    @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
+    @JsonPropertyOrder({"id", "title", "status", "audio_url", "image_url", "image_large_url", "video_url", "model_name", "metadata"})
+    public static class Clip {
+
+        /**
+         * 歌曲编号（clip id）
+         */
+        String id;
+        /**
+         * 歌曲名称
+         */
+        String title;
+        /**
+         * 歌曲状态，例如 complete、error
+         */
+        String status;
+        /**
+         * 音频地址
+         */
+        @JsonProperty("audio_url")
+        String audioUrl;
+        /**
+         * 封面地址
+         */
+        @JsonProperty("image_url")
+        String imageUrl;
+        /**
+         * 大封面地址
+         */
+        @JsonProperty("image_large_url")
+        String imageLargeUrl;
+        /**
+         * 视频地址，可能为空
+         */
+        @JsonProperty("video_url")
+        String videoUrl;
+        /**
+         * 模型标识
+         */
+        @JsonProperty("model_name")
+        String modelName;
+        /**
+         * 元数据
+         */
+        Metadata metadata;
 
         /**
          * @return 封面地址：优先大图
@@ -484,17 +608,33 @@ public class SunoApi {
 
     /**
      * 歌曲元数据
-     *
-     * @param tags 音乐风格
-     * @param prompt 歌词
-     * @param duration 时长（秒）
-     * @param errorMessage 错误信息，可能是字符串或 null
      */
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public record Metadata(String tags,
-                           String prompt,
-                           Double duration,
-                           @JsonProperty("error_message") JsonNode errorMessage) {
+    @Value
+    @Accessors(fluent = true)
+    @NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
+    @AllArgsConstructor
+    @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
+    public static class Metadata {
+
+        /**
+         * 音乐风格
+         */
+        String tags;
+        /**
+         * 歌词
+         */
+        String prompt;
+        /**
+         * 时长（秒）
+         */
+        Double duration;
+        /**
+         * 错误信息，可能是字符串或 null
+         */
+        @JsonProperty("error_message")
+        JsonNode errorMessage;
+
     }
 
 }

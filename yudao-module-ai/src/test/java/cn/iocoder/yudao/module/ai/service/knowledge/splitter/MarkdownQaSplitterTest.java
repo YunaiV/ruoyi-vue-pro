@@ -1,8 +1,10 @@
 package cn.iocoder.yudao.module.ai.service.knowledge.splitter;
 
+import cn.hutool.core.util.StrUtil;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -20,7 +22,7 @@ class MarkdownQaSplitterTest {
     void testSplitText_doesNotTreatNextLineAsHeading() {
         MarkdownQaSplitter splitter = new MarkdownQaSplitter(100);
         String question = "##\t有效标题\r\n回答";
-        assertEquals(List.of(question), splitter.splitText("##\r\n正文\r\n\r\n" + question));
+        assertEquals(Arrays.asList(question), splitter.splitText("##\r\n正文\r\n\r\n" + question));
     }
 
     @Test
@@ -28,7 +30,7 @@ class MarkdownQaSplitterTest {
         MarkdownQaSplitter splitter = new MarkdownQaSplitter(200);
         String first = "## 问题一\n上半段\n## 普通文本\n下半段";
         String second = "## 问题二\n答案";
-        assertEquals(List.of(first, second), splitter.splitText(first + "\n" + second));
+        assertEquals(Arrays.asList(first, second), splitter.splitText(first + "\n" + second));
     }
 
     @Test
@@ -40,27 +42,27 @@ class MarkdownQaSplitterTest {
         String text = "## \t  \t问题\r\n" + paragraph1 + "\n\n" + paragraph2;
 
         // 调用，并断言：切分后的片段使用去除前导空白的问题
-        assertEquals(List.of("## 问题\n" + paragraph1, "## 问题\n" + paragraph2),
+        assertEquals(Arrays.asList("## 问题\n" + paragraph1, "## 问题\n" + paragraph2),
                 splitter.splitText(text));
     }
 
     @Test
     void testSplitText_longSeparatorRun() {
         MarkdownQaSplitter splitter = new MarkdownQaSplitter(100);
-        String text = "##" + " \t".repeat(50_000) + "问题\r\n答案";
+        String text = "##" + StrUtil.repeat(" \t", 50_000) + "问题\r\n答案";
         List<String> result = assertTimeoutPreemptively(Duration.ofSeconds(5), () -> splitter.splitText(text));
-        assertEquals(List.of(text), result);
+        assertEquals(Arrays.asList(text), result);
     }
 
     @Test
     void testSplitText_longBareHeadingLinesNotHeading() {
         // 准备参数：大量没有分隔符的 ## 行，以及 NBSP 分隔的长行，都不应识别为标题
         MarkdownQaSplitter splitter = new MarkdownQaSplitter(100_000);
-        String body = "##\n".repeat(20_000) + "## " + " ".repeat(50_000) + "正文";
+        String body = StrUtil.repeat("##\n", 20_000) + "## " + StrUtil.repeat(" ", 50_000) + "正文";
         String text = body + "\n## 问题\n答案";
 
         List<String> result = assertTimeoutPreemptively(Duration.ofSeconds(5), () -> splitter.splitText(text));
-        assertEquals(List.of("## 问题\n答案"), result);
+        assertEquals(Arrays.asList("## 问题\n答案"), result);
     }
 
 }

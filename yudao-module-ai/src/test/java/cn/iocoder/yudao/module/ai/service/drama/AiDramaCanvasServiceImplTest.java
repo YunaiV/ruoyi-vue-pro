@@ -8,11 +8,14 @@ import cn.iocoder.yudao.module.ai.dal.dataobject.drama.AiDramaCanvasDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.drama.AiDramaDirectorDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.drama.AiDramaCanvasMapper;
 import cn.iocoder.yudao.module.ai.dal.mysql.drama.AiDramaDirectorMapper;
+import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.dao.DuplicateKeyException;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -79,10 +82,10 @@ public class AiDramaCanvasServiceImplTest extends BaseMockitoUnitTest {
 
     @Test
     public void testValidateCanvasDocument_cycle() {
-        Map<String, Object> document = Map.of("schema", 1,
-                "nodes", List.of(node("a", "text"), node("b", "image")),
-                "edges", List.of(Map.of("id", "e1", "source", "a", "target", "b"),
-                        Map.of("id", "e2", "source", "b", "target", "a")));
+        Map<String, Object> document = ImmutableMap.of("schema", 1,
+                "nodes", Arrays.asList(node("a", "text"), node("b", "image")),
+                "edges", Arrays.asList(ImmutableMap.of("id", "e1", "source", "a", "target", "b"),
+                        ImmutableMap.of("id", "e2", "source", "b", "target", "a")));
 
         assertServiceException(() -> AiDramaCanvasServiceImpl.validateCanvasDocument(JsonUtils.parseTree(
                 JsonUtils.toJsonString(document))), DRAMA_CANVAS_INVALID, "连线不能形成循环");
@@ -90,9 +93,9 @@ public class AiDramaCanvasServiceImplTest extends BaseMockitoUnitTest {
 
     @Test
     public void testValidateCanvasDocument_edgeToGroup() {
-        Map<String, Object> document = Map.of("schema", 1,
-                "nodes", List.of(node("a", "text"), node("g", "group")),
-                "edges", List.of(Map.of("id", "e1", "source", "a", "target", "g")));
+        Map<String, Object> document = ImmutableMap.of("schema", 1,
+                "nodes", Arrays.asList(node("a", "text"), node("g", "group")),
+                "edges", Arrays.asList(ImmutableMap.of("id", "e1", "source", "a", "target", "g")));
 
         assertServiceException(() -> AiDramaCanvasServiceImpl.validateCanvasDocument(JsonUtils.parseTree(
                 JsonUtils.toJsonString(document))), DRAMA_CANVAS_INVALID, "连线端点无效");
@@ -109,7 +112,7 @@ public class AiDramaCanvasServiceImplTest extends BaseMockitoUnitTest {
         reqVO.setProjectId(PROJECT_ID);
         reqVO.setNodeId("a");
         reqVO.setRevision(0L);
-        reqVO.setDocument(Map.of("schema", 1));
+        reqVO.setDocument(ImmutableMap.of("schema", 1));
 
         assertServiceException(() -> canvasService.saveDirectorMy(USER_ID, reqVO), DRAMA_DIRECTOR_INVALID,
                 "预演节点不在画布中，请先保存画布");
@@ -119,12 +122,12 @@ public class AiDramaCanvasServiceImplTest extends BaseMockitoUnitTest {
     // ========== 工具 ==========
 
     private static Map<String, Object> document() {
-        return Map.of("schema", 1, "nodes", List.of(node("a", "text"), node("b", "previs")),
-                "edges", List.of(Map.of("id", "e1", "source", "a", "target", "b")));
+        return ImmutableMap.of("schema", 1, "nodes", Arrays.asList(node("a", "text"), node("b", "previs")),
+                "edges", Arrays.asList(ImmutableMap.of("id", "e1", "source", "a", "target", "b")));
     }
 
     private static Map<String, Object> node(String id, String kind) {
-        return Map.of("id", id, "kind", kind, "data", Map.of(), "position", Map.of("x", 0, "y", 0));
+        return ImmutableMap.of("id", id, "kind", kind, "data", Collections.emptyMap(), "position", ImmutableMap.of("x", 0, "y", 0));
     }
 
     private static AiDramaCanvasSaveReqVO canvasReqVO(Long revision, Map<String, Object> document) {

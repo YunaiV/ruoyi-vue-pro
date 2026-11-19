@@ -10,7 +10,6 @@ import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.ai.openai.api.OpenAiApi;
 import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;
@@ -24,12 +23,9 @@ import java.util.List;
 public class GeminiChatModelTests {
 
     private final OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
-        .openAiApi(OpenAiApi.builder()
+        .options(OpenAiChatOptions.builder()
                 .baseUrl(GeminiChatModel.BASE_URL)
-                .completionsPath(GeminiChatModel.COMPLETE_PATH)
                 .apiKey("AIzaSyAVoBxgoFvvte820vEQMma2LKBnC98bqMQ")
-                .build())
-        .defaultOptions(OpenAiChatOptions.builder()
                 .model(GeminiChatModel.MODEL_DEFAULT) // 模型
                 .temperature(0.7)
                 .build())

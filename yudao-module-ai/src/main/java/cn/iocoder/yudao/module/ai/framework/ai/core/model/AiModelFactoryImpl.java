@@ -20,6 +20,7 @@ import cn.iocoder.yudao.module.ai.framework.ai.core.model.midjourney.api.Midjour
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.mimo.MiMoChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.minimax.MiniMaxChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.moonshot.MoonshotChatModel;
+import cn.iocoder.yudao.module.ai.framework.ai.core.model.openai.OpenAiDelegateChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlowApiConstants;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlowChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.siliconflow.SiliconFlowImageApi;
@@ -38,19 +39,15 @@ import com.alibaba.cloud.ai.dashscope.api.DashScopeApi;
 import com.alibaba.cloud.ai.dashscope.api.DashScopeImageApi;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatModel;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
-import com.alibaba.cloud.ai.dashscope.embedding.DashScopeEmbeddingModel;
-import com.alibaba.cloud.ai.dashscope.embedding.DashScopeEmbeddingOptions;
+import com.alibaba.cloud.ai.dashscope.embedding.text.DashScopeEmbeddingModel;
+import com.alibaba.cloud.ai.dashscope.embedding.text.DashScopeEmbeddingOptions;
 import com.alibaba.cloud.ai.dashscope.image.DashScopeImageModel;
-import com.azure.ai.openai.OpenAIClientBuilder;
-import com.azure.core.credential.KeyCredential;
 import com.google.common.annotations.VisibleForTesting;
 import io.micrometer.observation.ObservationRegistry;
 import io.milvus.client.MilvusServiceClient;
 import io.qdrant.client.QdrantClient;
 import io.qdrant.client.QdrantGrpcClient;
 import lombok.SneakyThrows;
-import org.springframework.ai.azure.openai.AzureOpenAiChatModel;
-import org.springframework.ai.azure.openai.AzureOpenAiEmbeddingModel;
 import org.springframework.ai.audio.transcription.TranscriptionModel;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.deepseek.DeepSeekChatModel;
@@ -59,7 +56,6 @@ import org.springframework.ai.deepseek.api.DeepSeekApi;
 import org.springframework.ai.document.MetadataMode;
 import org.springframework.ai.embedding.BatchingStrategy;
 import org.springframework.ai.embedding.EmbeddingModel;
-import org.springframework.ai.embedding.observation.EmbeddingModelObservationConvention;
 import com.volcengine.ark.runtime.service.ArkService;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.baidu.BaiduSpeechModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.doubao.DouBaoSpeechModel;
@@ -82,9 +78,6 @@ import cn.iocoder.yudao.module.ai.framework.ai.core.ocr.tongyi.TongYiOcrModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.ocr.volcengine.VolcEngineOcrModel;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.model.anthropic.autoconfigure.AnthropicChatAutoConfiguration;
-import org.springframework.ai.model.azure.openai.autoconfigure.AzureOpenAiChatAutoConfiguration;
-import org.springframework.ai.model.azure.openai.autoconfigure.AzureOpenAiEmbeddingAutoConfiguration;
-import org.springframework.ai.model.azure.openai.autoconfigure.AzureOpenAiEmbeddingProperties;
 import org.springframework.ai.model.deepseek.autoconfigure.DeepSeekChatAutoConfiguration;
 import org.springframework.ai.model.ollama.autoconfigure.OllamaChatAutoConfiguration;
 import org.springframework.ai.model.openai.autoconfigure.OpenAiChatAutoConfiguration;
@@ -97,14 +90,13 @@ import org.springframework.ai.ollama.OllamaEmbeddingModel;
 import org.springframework.ai.ollama.api.OllamaApi;
 import org.springframework.ai.ollama.api.OllamaEmbeddingOptions;
 import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.OpenAiEmbeddingModel;
 import org.springframework.ai.openai.OpenAiEmbeddingOptions;
 import org.springframework.ai.openai.OpenAiImageModel;
-import org.springframework.ai.openai.api.OpenAiApi;
-import org.springframework.ai.openai.api.OpenAiImageApi;
-import org.springframework.ai.openai.api.common.OpenAiApiConstants;
+import org.springframework.ai.openai.OpenAiImageOptions;
 import org.springframework.ai.anthropic.AnthropicChatModel;
-import org.springframework.ai.anthropic.api.AnthropicApi;
+import org.springframework.ai.anthropic.AnthropicChatOptions;
 import org.springframework.ai.stabilityai.StabilityAiImageModel;
 import org.springframework.ai.stabilityai.api.StabilityAiApi;
 import org.springframework.ai.vectorstore.SimpleVectorStore;
@@ -122,17 +114,16 @@ import org.springframework.ai.vectorstore.qdrant.autoconfigure.QdrantVectorStore
 import org.springframework.ai.vectorstore.redis.RedisVectorStore;
 import org.springframework.ai.vectorstore.redis.autoconfigure.RedisVectorStoreAutoConfiguration;
 import org.springframework.ai.vectorstore.redis.autoconfigure.RedisVectorStoreProperties;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
-import org.springframework.util.LinkedMultiValueMap;
 import redis.clients.jedis.JedisPooled;
 
 import java.io.File;
 import java.time.Duration;
-import java.util.List;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -147,6 +138,11 @@ import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.API_CONFIG_PLA
  * @author 芋道源码
  */
 public class AiModelFactoryImpl implements AiModelFactory {
+
+    /**
+     * OpenAI 官方地址，不含 /v1
+     */
+    private static final String OPENAI_DEFAULT_BASE_URL = "https://api.openai.com";
 
     @Override
     public ChatModel getOrCreateChatModel(AiPlatformEnum platform, String rawApiKey, String rawUrl,
@@ -289,9 +285,11 @@ public class AiModelFactoryImpl implements AiModelFactory {
             case BAICHUAN:
                 return SpringUtil.getBean(BaiChuanChatModel.class);
             case OPENAI:
-                return SpringUtil.getBean(OpenAiChatModel.class);
+                return new OpenAiDelegateChatModel(SpringUtil.getBean(OpenAiChatModel.class));
             case AZURE:
-                return SpringUtil.getBean(AzureOpenAiChatModel.class);
+                // 微软 Azure OpenAI 没有独立的 Spring AI 模型，按 spring.ai.azure.openai 配置创建
+                return buildAzureOpenAiChatModel(SpringUtil.getProperty("spring.ai.azure.openai.api-key"),
+                        SpringUtil.getProperty("spring.ai.azure.openai.endpoint"));
             case ANTHROPIC:
                 return SpringUtil.getBean(AnthropicChatModel.class);
             case GEMINI:
@@ -575,7 +573,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
                 .temperature(0.7).build();
         return DeepSeekChatModel.builder()
                 .deepSeekApi(deepSeekApi)
-                .defaultOptions(options)
+                .options(options)
                 .toolCallingManager(getToolCallingManager())
                 .build();
     }
@@ -588,8 +586,9 @@ public class AiModelFactoryImpl implements AiModelFactory {
      */
     @VisibleForTesting
     static DeepSeekApi.Builder buildDeepSeekApiBuilder(String apiKey) {
-        return DeepSeekApi.builder().apiKey(apiKey)
-                .headers(new LinkedMultiValueMap<>(Map.of(HttpHeaders.ACCEPT_ENCODING, List.of("identity"))));
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.ACCEPT_ENCODING, "identity");
+        return DeepSeekApi.builder().apiKey(apiKey).headers(headers);
     }
 
     /**
@@ -685,41 +684,56 @@ public class AiModelFactoryImpl implements AiModelFactory {
     /**
      * 可参考 {@link OpenAiChatAutoConfiguration} 的 openAiChatModel 方法
      */
-    private static OpenAiChatModel buildOpenAiChatModel(String openAiToken, String url) {
-        url = StrUtil.blankToDefault(url, OpenAiApiConstants.DEFAULT_BASE_URL);
-        OpenAiApi openAiApi = OpenAiApi.builder().baseUrl(url).apiKey(openAiToken).build();
-        return OpenAiChatModel.builder()
-                .openAiApi(openAiApi)
+    private static OpenAiDelegateChatModel buildOpenAiChatModel(String openAiToken, String url) {
+        OpenAiChatOptions options = OpenAiChatOptions.builder()
+                .baseUrl(buildOpenAiBaseUrl(url)).apiKey(openAiToken).build();
+        return new OpenAiDelegateChatModel(OpenAiChatModel.builder()
+                .options(options)
                 .toolCallingManager(getToolCallingManager())
-                .build();
+                .build());
     }
 
     /**
-     * 可参考 {@link AzureOpenAiChatAutoConfiguration}
+     * 可参考 {@link OpenAiChatAutoConfiguration} 的 openAiChatModel 方法
+     *
+     * 微软 Azure OpenAI 基于 OpenAI 官方 SDK 的 Azure 模式，url 为 Azure 的 endpoint
      */
-    private static AzureOpenAiChatModel buildAzureOpenAiChatModel(String apiKey, String url) {
+    private static OpenAiDelegateChatModel buildAzureOpenAiChatModel(String apiKey, String url) {
         // TODO @芋艿：使用前，请测试，暂时没密钥！！！
-        OpenAIClientBuilder openAIClientBuilder = new OpenAIClientBuilder()
-                .endpoint(url).credential(new KeyCredential(apiKey));
-        return AzureOpenAiChatModel.builder()
-                .openAIClientBuilder(openAIClientBuilder)
+        OpenAiChatOptions options = OpenAiChatOptions.builder()
+                .baseUrl(url).apiKey(apiKey).azure(true).build();
+        return new OpenAiDelegateChatModel(OpenAiChatModel.builder()
+                .options(options)
                 .toolCallingManager(getToolCallingManager())
-                .build();
+                .build());
     }
 
     /**
-     * 可参考 {@link AnthropicChatAutoConfiguration} 的 anthropicApi 方法
+     * 可参考 {@link AnthropicChatAutoConfiguration} 的 anthropicChatModel 方法
      */
     private static AnthropicChatModel buildAnthropicChatModel(String apiKey, String url) {
-        AnthropicApi.Builder builder = AnthropicApi.builder().apiKey(apiKey);
+        AnthropicChatOptions.Builder optionsBuilder = AnthropicChatOptions.builder().apiKey(apiKey);
         if (StrUtil.isNotEmpty(url)) {
-            builder.baseUrl(url);
+            optionsBuilder.baseUrl(url);
         }
-        AnthropicApi anthropicApi = builder.build();
         return AnthropicChatModel.builder()
-                .anthropicApi(anthropicApi)
+                .options(optionsBuilder.build())
                 .toolCallingManager(getToolCallingManager())
                 .build();
+    }
+
+    /**
+     * 获得 OpenAI 官方 SDK 的 baseUrl
+     *
+     * 原 OpenAiApi 的请求路径为 url + /v1/chat/completions，而 OpenAI 官方 SDK 为 baseUrl + /chat/completions，
+     * 所以补上 /v1，保持 API 秘钥已配置的 url 可用；已以 /v1 结尾的 url 不重复补
+     *
+     * @param url API 秘钥配置的 url，为空时使用 OpenAI 官方地址
+     * @return baseUrl
+     */
+    private static String buildOpenAiBaseUrl(String url) {
+        String baseUrl = StrUtil.removeSuffix(StrUtil.blankToDefault(url, OPENAI_DEFAULT_BASE_URL), "/");
+        return StrUtil.endWith(baseUrl, "/v1") ? baseUrl : baseUrl + "/v1";
     }
 
     /**
@@ -735,9 +749,9 @@ public class AiModelFactoryImpl implements AiModelFactory {
      * 可参考 {@link OpenAiImageAutoConfiguration} 的 openAiImageModel 方法
      */
     private OpenAiImageModel buildOpenAiImageModel(String openAiToken, String url) {
-        url = StrUtil.blankToDefault(url, OpenAiApiConstants.DEFAULT_BASE_URL);
-        OpenAiImageApi openAiApi = OpenAiImageApi.builder().baseUrl(url).apiKey(openAiToken).build();
-        return new OpenAiImageModel(openAiApi);
+        OpenAiImageOptions options = OpenAiImageOptions.builder()
+                .baseUrl(buildOpenAiBaseUrl(url)).apiKey(openAiToken).build();
+        return new OpenAiImageModel(options);
     }
 
     /**
@@ -794,7 +808,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
         OllamaEmbeddingOptions ollamaOptions = OllamaEmbeddingOptions.builder().model(model).build();
         return OllamaEmbeddingModel.builder()
                 .ollamaApi(ollamaApi)
-                .defaultOptions(ollamaOptions)
+                .options(ollamaOptions)
                 .build();
     }
 
@@ -802,25 +816,21 @@ public class AiModelFactoryImpl implements AiModelFactory {
      * 可参考 {@link OpenAiEmbeddingAutoConfiguration} 的 openAiEmbeddingModel 方法
      */
     private OpenAiEmbeddingModel buildOpenAiEmbeddingModel(String openAiToken, String url, String model) {
-        url = StrUtil.blankToDefault(url, OpenAiApiConstants.DEFAULT_BASE_URL);
-        OpenAiApi openAiApi = OpenAiApi.builder().baseUrl(url).apiKey(openAiToken).build();
-        OpenAiEmbeddingOptions openAiEmbeddingProperties = OpenAiEmbeddingOptions.builder().model(model).build();
-        return new OpenAiEmbeddingModel(openAiApi, MetadataMode.EMBED, openAiEmbeddingProperties);
+        OpenAiEmbeddingOptions options = OpenAiEmbeddingOptions.builder()
+                .baseUrl(buildOpenAiBaseUrl(url)).apiKey(openAiToken).model(model).build();
+        return new OpenAiEmbeddingModel(MetadataMode.EMBED, options);
     }
 
     /**
-     * 可参考 {@link AzureOpenAiEmbeddingAutoConfiguration} 的 azureOpenAiEmbeddingModel 方法
+     * 可参考 {@link OpenAiEmbeddingAutoConfiguration} 的 openAiEmbeddingModel 方法
+     *
+     * 微软 Azure OpenAI 基于 OpenAI 官方 SDK 的 Azure 模式，url 为 Azure 的 endpoint，model 为部署名
      */
-    private AzureOpenAiEmbeddingModel buildAzureOpenAiEmbeddingModel(String apiKey, String url, String model) {
+    private OpenAiEmbeddingModel buildAzureOpenAiEmbeddingModel(String apiKey, String url, String model) {
         // TODO @芋艿：手头暂时没密钥，使用建议再测试下
-        AzureOpenAiEmbeddingAutoConfiguration azureOpenAiAutoConfiguration = new AzureOpenAiEmbeddingAutoConfiguration();
-        // 创建 OpenAIClientBuilder 对象
-        OpenAIClientBuilder openAIClientBuilder = new OpenAIClientBuilder()
-                .endpoint(url).credential(new KeyCredential(apiKey));
-        // 获取 AzureOpenAiChatProperties 对象
-        AzureOpenAiEmbeddingProperties embeddingProperties = SpringUtil.getBean(AzureOpenAiEmbeddingProperties.class);
-        return azureOpenAiAutoConfiguration.azureOpenAiEmbeddingModel(openAIClientBuilder, embeddingProperties,
-                getObservationRegistry(), getEmbeddingModelObservationConvention());
+        OpenAiEmbeddingOptions options = OpenAiEmbeddingOptions.builder()
+                .baseUrl(url).apiKey(apiKey).azure(true).deploymentName(model).model(model).build();
+        return new OpenAiEmbeddingModel(MetadataMode.EMBED, options);
     }
 
     // ========== 各种创建 VectorStore 的方法 ==========
@@ -948,25 +958,13 @@ public class AiModelFactoryImpl implements AiModelFactory {
     }
 
     private static ObjectProvider<ObservationRegistry> getObservationRegistry() {
-        return new ObjectProvider<>() {
-
-            @Override
-            public ObservationRegistry getObject() throws BeansException {
-                return SpringUtil.getBean(ObservationRegistry.class);
-            }
-
-        };
+        return SpringUtil.getBeanFactory().getBeanProvider(ObservationRegistry.class);
     }
 
     private static ObjectProvider<VectorStoreObservationConvention> getCustomObservationConvention() {
-        return new ObjectProvider<>() {
-
-            @Override
-            public VectorStoreObservationConvention getObject() throws BeansException {
-                return new DefaultVectorStoreObservationConvention();
-            }
-
-        };
+        // Spring 5 的 ObjectProvider 需实现多个方法，这里使用 StaticListableBeanFactory 提供固定实例
+        return new StaticListableBeanFactory(Collections.singletonMap("vectorStoreObservationConvention",
+                new DefaultVectorStoreObservationConvention())).getBeanProvider(VectorStoreObservationConvention.class);
     }
 
     private static BatchingStrategy getBatchingStrategy() {
@@ -975,17 +973,6 @@ public class AiModelFactoryImpl implements AiModelFactory {
 
     private static ToolCallingManager getToolCallingManager() {
         return SpringUtil.getBean(ToolCallingManager.class);
-    }
-
-    private static ObjectProvider<EmbeddingModelObservationConvention> getEmbeddingModelObservationConvention() {
-        return new ObjectProvider<>() {
-
-            @Override
-            public EmbeddingModelObservationConvention getObject() throws BeansException {
-                return SpringUtil.getBean(EmbeddingModelObservationConvention.class);
-            }
-
-        };
     }
 
 }

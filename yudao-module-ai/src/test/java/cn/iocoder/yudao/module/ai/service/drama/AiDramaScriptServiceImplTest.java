@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.ai.service.drama;
 
+import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.ai.controller.admin.drama.vo.script.AiDramaChatReqVO;
@@ -26,6 +27,7 @@ import cn.iocoder.yudao.module.ai.service.model.AiModelService;
 import cn.iocoder.yudao.module.ai.util.AiReasoningUtils;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
@@ -45,6 +47,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.*;
@@ -344,14 +348,14 @@ public class AiDramaScriptServiceImplTest extends BaseMockitoUnitTest {
         assertEquals(11L, first.getCharacters().get(0).getAppearanceId());
         assertEquals("左侧", first.getCharacters().get(0).getSlot());
         assertEquals(31L, first.getLocationId());
-        assertEquals(List.of(41L), first.getVisualAssetIds());
+        assertEquals(Arrays.asList(41L), first.getVisualAssetIds());
         assertEquals(1L, first.getDialogues().get(0).getCharacterId());
         assertNull(first.getDialogues().get(1).getCharacterId());
         // 第 1 个镜头的规划字段：原文场次、起始状态、去重的出镜角色、拍法设计与表演节拍
         assertEquals(1, first.getSceneNo());
         assertEquals(1, first.getContinuity().getSceneNumber());
         assertEquals("林夏站在车门内侧", first.getContinuity().getStartState());
-        assertEquals(List.of("林夏"), first.getContinuity().getPresentCharacters());
+        assertEquals(Arrays.asList("林夏"), first.getContinuity().getPresentCharacters());
         assertEquals("林夏", first.getContinuity().getShotDesign().get("focus"));
         assertEquals("抬头看站牌", first.getContinuity().getPerformanceBeats().get(0).getActing());
         // 第 2 个镜头：序号按顺序编号（忽略模型返回的重复序号），缺省时长 5 秒；未返回道具时为空，按道具关联的镜头序号匹配
@@ -454,7 +458,7 @@ public class AiDramaScriptServiceImplTest extends BaseMockitoUnitTest {
         AiDramaStoryboardImportReqVO reqVO = new AiDramaStoryboardImportReqVO();
         reqVO.setProjectId(PROJECT_ID);
         reqVO.setScriptId(SCRIPT_ID);
-        reqVO.setStoryboards(List.of(item));
+        reqVO.setStoryboards(Arrays.asList(item));
 
         scriptService.importStoryboardListMy(USER_ID, reqVO);
 
@@ -477,7 +481,7 @@ public class AiDramaScriptServiceImplTest extends BaseMockitoUnitTest {
         AiDramaStoryboardImportReqVO reqVO = new AiDramaStoryboardImportReqVO();
         reqVO.setProjectId(PROJECT_ID);
         reqVO.setScriptId(SCRIPT_ID);
-        reqVO.setStoryboards(List.of(first, new AiDramaStoryboardSaveReqVO()));
+        reqVO.setStoryboards(Arrays.asList(first, new AiDramaStoryboardSaveReqVO()));
 
         assertThrows(ServiceException.class, () -> scriptService.importStoryboardListMy(USER_ID, reqVO));
         verify(storyboardService, never()).replaceStoryboardList(any(), any(), any());
@@ -490,7 +494,7 @@ public class AiDramaScriptServiceImplTest extends BaseMockitoUnitTest {
         AiDramaStoryboardImportReqVO reqVO = new AiDramaStoryboardImportReqVO();
         reqVO.setProjectId(PROJECT_ID);
         reqVO.setScriptId(SCRIPT_ID - 1);
-        reqVO.setStoryboards(List.of(new AiDramaStoryboardSaveReqVO()));
+        reqVO.setStoryboards(Arrays.asList(new AiDramaStoryboardSaveReqVO()));
 
         assertThrows(ServiceException.class, () -> scriptService.importStoryboardListMy(USER_ID, reqVO));
         verify(storyboardService, never()).replaceStoryboardList(any(), any(), any());
@@ -502,7 +506,7 @@ public class AiDramaScriptServiceImplTest extends BaseMockitoUnitTest {
     public void testGenerateScriptMy_reasoningHttpRoute() {
         // 准备参数：DeepSeek 配置默认档位 off
         when(projectService.validateProjectMy(PROJECT_ID, USER_ID)).thenReturn(project());
-        Map<String, Object> options = Map.of("thinking", Map.of("type", "disabled"));
+        Map<String, Object> options = ImmutableMap.of("thinking", ImmutableMap.of("type", "disabled"));
         mockChat("{\"content\":\"第一场 车厢\"}", chatModelDO(AiPlatformEnum.DEEPSEEK, "deepseek-v4-flash")
                 .setReasoningConfig(offReasoningConfig(options)));
 
@@ -517,7 +521,7 @@ public class AiDramaScriptServiceImplTest extends BaseMockitoUnitTest {
     public void testStreamChatMy_reasoningAlibaba() {
         // 准备参数：通义配置默认档位 off
         when(projectService.validateProjectMy(PROJECT_ID, USER_ID)).thenReturn(project());
-        Map<String, Object> options = Map.of(AiReasoningUtils.ALIBABA_ENABLE_THINKING, false);
+        Map<String, Object> options = ImmutableMap.of(AiReasoningUtils.ALIBABA_ENABLE_THINKING, false);
         AiModelDO model = chatModelDO(AiPlatformEnum.ALIBABA, "qwen-plus").setReasoningConfig(offReasoningConfig(options));
         when(modelService.getRequiredDefaultModel(AiModelTypeEnum.CHAT.getType())).thenReturn(model);
         ChatModel chatModel = mock(ChatModel.class);
@@ -669,7 +673,7 @@ public class AiDramaScriptServiceImplTest extends BaseMockitoUnitTest {
             ChatResponse response = mock(ChatResponse.class, Answers.RETURNS_DEEP_STUBS);
             when(response.getResult().getOutput().getText()).thenReturn(text);
             return response;
-        }).toList();
+        }).collect(Collectors.toList());
         when(chatModel.stream(any(Prompt.class))).thenReturn(Flux.fromIterable(responses));
     }
 
@@ -713,7 +717,7 @@ public class AiDramaScriptServiceImplTest extends BaseMockitoUnitTest {
 
     private static AiModelDO.ReasoningConfig offReasoningConfig(Map<String, Object> options) {
         return AiModelDO.ReasoningConfig.builder().defaultLevel(AiReasoningUtils.REASONING_LEVEL_OFF)
-                .levels(List.of(AiModelDO.ReasoningLevel.builder().level(AiReasoningUtils.REASONING_LEVEL_OFF)
+                .levels(Arrays.asList(AiModelDO.ReasoningLevel.builder().level(AiReasoningUtils.REASONING_LEVEL_OFF)
                         .options(options).build()))
                 .build();
     }
@@ -738,15 +742,14 @@ public class AiDramaScriptServiceImplTest extends BaseMockitoUnitTest {
 
     @Test
     public void testSplitScriptScenes_headings() {
-        String content = """
-                开场前的说明
-                第一场 地铁车厢 夜
-                林夏上车。
-                第一场雪落在站台上。
-                场景2：站台
-                周远追出车门。
-                内景 出租屋 日
-                两人对坐。""";
+        String content = "开场前的说明\n"
+                + "第一场 地铁车厢 夜\n"
+                + "林夏上车。\n"
+                + "第一场雪落在站台上。\n"
+                + "场景2：站台\n"
+                + "周远追出车门。\n"
+                + "内景 出租屋 日\n"
+                + "两人对坐。";
 
         List<String> scenes = AiDramaScriptServiceImpl.splitScriptScenes(content);
 
@@ -761,14 +764,13 @@ public class AiDramaScriptServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testSplitScriptScenes_bracketHeadings() {
         // 准备：前言在第一个标题之前；标题带全角括号的预计时长、方括号
-        String content = """
-                本剧讲述末班车上的相遇。
-                第一场（预计 20 秒）
-                林夏上车。
-                【第二场】站台（预计 12 秒）
-                周远追出车门。
-                [第3场] 出租屋
-                两人对坐。""";
+        String content = "本剧讲述末班车上的相遇。\n"
+                + "第一场（预计 20 秒）\n"
+                + "林夏上车。\n"
+                + "【第二场】站台（预计 12 秒）\n"
+                + "周远追出车门。\n"
+                + "[第3场] 出租屋\n"
+                + "两人对坐。";
 
         List<String> scenes = AiDramaScriptServiceImpl.splitScriptScenes(content);
         int[] budgets = AiDramaScriptServiceImpl.estimateSceneSeconds(scenes);
@@ -793,7 +795,7 @@ public class AiDramaScriptServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testEstimateSceneSeconds() {
         int[] budgets = AiDramaScriptServiceImpl.estimateSceneSeconds(Arrays.asList(
-                "第一场（预计 20 秒）\n短", "第二场\n" + "长".repeat(98)));
+                "第一场（预计 20 秒）\n短", "第二场\n" + StrUtil.repeat("长", 98)));
 
         assertEquals(20, budgets[0]);
         assertTrue(budgets[1] > budgets[0]);
@@ -824,7 +826,7 @@ public class AiDramaScriptServiceImplTest extends BaseMockitoUnitTest {
         when(projectService.validateProjectMy(PROJECT_ID, USER_ID)).thenReturn(project());
         when(scriptMapper.selectLatestByProjectId(PROJECT_ID)).thenReturn(new AiDramaScriptDO().setId(1L).setProjectId(PROJECT_ID)
                 .setContent("第一场 车厢\n林夏上车。\n第二场 站台\n林夏下车，额头流血。"));
-        when(assetService.getCharacterList(PROJECT_ID)).thenReturn(List.of(new AiDramaCharacterDO().setId(1L).setName("林夏")));
+        when(assetService.getCharacterList(PROJECT_ID)).thenReturn(Arrays.asList(new AiDramaCharacterDO().setId(1L).setName("林夏")));
         when(assetService.getAppearanceListByCharacterIds(any())).thenReturn(Arrays.asList(
                 appearance(11L, 0, null, "白衬衫").setCharacterId(1L), appearance(12L, 1, "受伤", "额头缠着纱布").setCharacterId(1L)));
         when(modelService.getRequiredDefaultModel(AiModelTypeEnum.CHAT.getType())).thenReturn(chatModelDO(AiPlatformEnum.OPENAI, "gpt-4o"));
@@ -840,18 +842,18 @@ public class AiDramaScriptServiceImplTest extends BaseMockitoUnitTest {
                 invocation.getArgument(0, Prompt.class).getContents().contains("本次只拆第 1 场") ? firstScene : secondScene);
 
         List<AiDramaStoryboardPlanRespBO> plans = scriptService.planStoryboardListMy(USER_ID, chatReqVO());
-        List<AiDramaStoryboardDO> storyboards = plans.stream().map(AiDramaStoryboardPlanRespBO::getStoryboard).toList();
+        List<AiDramaStoryboardDO> storyboards = plans.stream().map(AiDramaStoryboardPlanRespBO::getStoryboard).collect(Collectors.toList());
 
         // 断言：逐场调用，每场只带本场原文，按原场次顺序合并；场次以切分为准
         ArgumentCaptor<Prompt> promptCaptor = ArgumentCaptor.forClass(Prompt.class);
         verify(chatModel, times(2)).call(promptCaptor.capture());
         String secondPrompt = promptCaptor.getAllValues().stream().map(Prompt::getContents)
-                .filter(content -> content.contains("本次只拆第 2 场")).findFirst().orElseThrow();
+                .filter(content -> content.contains("本次只拆第 2 场")).findFirst().orElseThrow(NoSuchElementException::new);
         assertTrue(secondPrompt.contains("上一场结尾"));
         assertTrue(secondPrompt.contains("林夏（可换形象：1 受伤）"));
-        assertEquals(Arrays.asList("上车", "下车", "回望"), storyboards.stream().map(AiDramaStoryboardDO::getTitle).toList());
-        assertEquals(Arrays.asList(1, 2, 2), storyboards.stream().map(item -> item.getContinuity().getSceneNumber()).toList());
-        assertEquals(Arrays.asList(1, 2, 3), storyboards.stream().map(AiDramaStoryboardDO::getSceneNo).toList());
+        assertEquals(Arrays.asList("上车", "下车", "回望"), storyboards.stream().map(AiDramaStoryboardDO::getTitle).collect(Collectors.toList()));
+        assertEquals(Arrays.asList(1, 2, 2), storyboards.stream().map(item -> item.getContinuity().getSceneNumber()).collect(Collectors.toList()));
+        assertEquals(Arrays.asList(1, 2, 3), storyboards.stream().map(AiDramaStoryboardDO::getSceneNo).collect(Collectors.toList()));
         // 断言：形象按变化原因匹配；未指定用初始；指定了但无法匹配用初始并提示
         assertEquals(11L, storyboards.get(0).getCharacters().get(0).getAppearanceId());
         assertEquals(12L, storyboards.get(1).getCharacters().get(0).getAppearanceId());
@@ -883,7 +885,7 @@ public class AiDramaScriptServiceImplTest extends BaseMockitoUnitTest {
                 content.contains("本次只拆第 2 场") && content.contains("约 6 秒")));
         ArgumentCaptor<List<AiDramaStoryboardDO>> captor = ArgumentCaptor.forClass(List.class);
         verify(storyboardService).replaceStoryboardList(eq(PROJECT_ID), eq(SCRIPT_ID), captor.capture());
-        assertEquals(Arrays.asList(1, 2), captor.getValue().stream().map(item -> item.getContinuity().getSceneNumber()).toList());
+        assertEquals(Arrays.asList(1, 2), captor.getValue().stream().map(item -> item.getContinuity().getSceneNumber()).collect(Collectors.toList()));
     }
 
     private static AiDramaCharacterAppearanceDO appearance(Long id, Integer index, String changeReason, String description) {

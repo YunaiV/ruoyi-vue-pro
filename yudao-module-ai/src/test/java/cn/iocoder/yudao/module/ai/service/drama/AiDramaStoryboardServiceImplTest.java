@@ -31,6 +31,7 @@ import cn.iocoder.yudao.module.ai.service.model.AiModelService;
 import cn.iocoder.yudao.module.ai.service.video.AiVideoService;
 import cn.iocoder.yudao.module.ai.util.AiFfmpegUtils;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
+import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
@@ -47,6 +48,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
@@ -99,7 +101,7 @@ public class AiDramaStoryboardServiceImplTest extends BaseMockitoUnitTest {
         AiVideoDO image = AiDramaStoryboardServiceImpl.buildVideo(storyboard(), model, "提示词",
                 "https://files.example.com/f.png", "9:16");
         assertEquals(AiVideoModeEnum.IMAGE.getMode(), image.getMode());
-        assertEquals(List.of("https://files.example.com/f.png"), image.getInputUrls().get("first_frame"));
+        assertEquals(Arrays.asList("https://files.example.com/f.png"), image.getInputUrls().get("first_frame"));
         assertEquals("9:16", image.getRatio());
         assertEquals(5, image.getDuration());
         assertEquals("doubao-seedance-1-0-pro", image.getModel());
@@ -130,8 +132,8 @@ public class AiDramaStoryboardServiceImplTest extends BaseMockitoUnitTest {
         mockSubmit();
         // 准备：镜头未指定道具，按道具关联的镜头序号匹配
         when(assetService.getPropList(PROJECT_ID)).thenReturn(Arrays.asList(
-                prop(41L, "车票", null).setReferenceImages(new AiDramaVisualAssetDO.ReferenceImages().setShotNumbers(List.of(1, 2))),
-                prop(42L, "雨伞", null).setReferenceImages(new AiDramaVisualAssetDO.ReferenceImages().setShotNumbers(List.of(3)))));
+                prop(41L, "车票", null).setReferenceImages(new AiDramaVisualAssetDO.ReferenceImages().setShotNumbers(Arrays.asList(1, 2))),
+                prop(42L, "雨伞", null).setReferenceImages(new AiDramaVisualAssetDO.ReferenceImages().setShotNumbers(Arrays.asList(3)))));
         when(videoService.buildVideoSubmitter(any(), any())).thenReturn(() -> new AiVideoTaskRef("seedance", "m", "task-1", null, null));
 
         storyboardService.generateStoryboardVideoMy(USER_ID, videoReqVO(STORYBOARD_ID));
@@ -176,19 +178,19 @@ public class AiDramaStoryboardServiceImplTest extends BaseMockitoUnitTest {
     public void testGenerateStoryboardFrameMy_planContinuity() {
         // 准备：分镜规划了起始状态、空间锚点、0 秒出镜角色（只有林夏）与背景群演
         when(storyboardMapper.selectById(STORYBOARD_ID)).thenReturn(storyboard().setImagePrompt("车门半开")
-                .setCharacters(List.of(characterRef(11L), characterRef(12L)))
+                .setCharacters(Arrays.asList(characterRef(11L), characterRef(12L)))
                 .setContinuity(new AiDramaStoryboardDO.Continuity().setStartState("林夏扶着车门")
-                        .setSpatialAnchor("林夏在画面左侧").setPresentCharacters(List.of("林夏"))
+                        .setSpatialAnchor("林夏在画面左侧").setPresentCharacters(Arrays.asList("林夏"))
                         .setBackgroundExtras("两名乘客坐在后排")));
         when(projectService.validateProjectExists(PROJECT_ID)).thenReturn(project());
         when(assetService.getCharacterList(PROJECT_ID)).thenReturn(Arrays.asList(
                 new AiDramaCharacterDO().setId(1L).setProjectId(PROJECT_ID).setName("林夏"),
                 new AiDramaCharacterDO().setId(2L).setProjectId(PROJECT_ID).setName("周远")));
-        when(assetService.getAppearanceList(List.of(11L, 12L))).thenReturn(Arrays.asList(
+        when(assetService.getAppearanceList(Arrays.asList(11L, 12L))).thenReturn(Arrays.asList(
                 new AiDramaCharacterAppearanceDO().setId(11L).setCharacterId(1L).setSelectedIndex(0)
-                        .setImageUrls(List.of("https://files.example.com/a.png")),
+                        .setImageUrls(Arrays.asList("https://files.example.com/a.png")),
                 new AiDramaCharacterAppearanceDO().setId(12L).setCharacterId(2L).setSelectedIndex(0)
-                        .setImageUrls(List.of("https://files.example.com/b.png"))));
+                        .setImageUrls(Arrays.asList("https://files.example.com/b.png"))));
         AiDramaStoryboardFrameReqVO reqVO = new AiDramaStoryboardFrameReqVO();
         reqVO.setId(STORYBOARD_ID);
         reqVO.setModelId(1L);
@@ -207,7 +209,7 @@ public class AiDramaStoryboardServiceImplTest extends BaseMockitoUnitTest {
         assertTrue(prompt.contains("背景群演（匿名，不画成具名角色）：两名乘客坐在后排"));
         assertTrue(prompt.contains("角色：林夏"));
         assertFalse(prompt.contains("周远"));
-        assertEquals(List.of("https://files.example.com/a.png"), referenceCaptor.getValue().getUrls());
+        assertEquals(Arrays.asList("https://files.example.com/a.png"), referenceCaptor.getValue().getUrls());
     }
 
     @Test
@@ -255,7 +257,7 @@ public class AiDramaStoryboardServiceImplTest extends BaseMockitoUnitTest {
         List<AiDramaStoryboardDO> list = storyboardService.getStoryboardListByScriptIdMy(USER_ID, 9L);
 
         // 断言：只返回该剧本版本的分镜，并校验项目归属
-        assertEquals(List.of(STORYBOARD_ID), list.stream().map(AiDramaStoryboardDO::getId).toList());
+        assertEquals(Arrays.asList(STORYBOARD_ID), list.stream().map(AiDramaStoryboardDO::getId).collect(Collectors.toList()));
         verify(projectService).validateProjectMy(PROJECT_ID, USER_ID);
     }
 
@@ -518,9 +520,9 @@ public class AiDramaStoryboardServiceImplTest extends BaseMockitoUnitTest {
         AiVideoDO video = videoCaptor.getValue();
         assertEquals(AiVideoModeEnum.REFERENCE.getMode(), video.getMode());
         assertEquals("768P", video.getResolution());
-        assertEquals(List.of("https://files.example.com/a.png", "https://files.example.com/l.png", "https://files.example.com/p.png"),
+        assertEquals(Arrays.asList("https://files.example.com/a.png", "https://files.example.com/l.png", "https://files.example.com/p.png"),
                 video.getInputUrls().get("reference_image"));
-        assertEquals(List.of("https://files.example.com/v.mp3"), video.getInputUrls().get("reference_audio"));
+        assertEquals(Arrays.asList("https://files.example.com/v.mp3"), video.getInputUrls().get("reference_audio"));
         assertTrue(video.getPrompt().contains("角色：林夏（短发）"));
         assertTrue(video.getPrompt().endsWith("参考素材：参考图1为林夏的形象；参考图2为场景车厢；参考图3为道具车票；参考音频1为林夏的音色"));
         // 断言：记录分辨率，供重新提交沿用
@@ -532,7 +534,7 @@ public class AiDramaStoryboardServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testGenerateStoryboardVideoMy_referenceSpeakers() {
         mockSubmit();
-        when(storyboardMapper.selectById(STORYBOARD_ID)).thenReturn(storyboard().setCharacters(List.of(characterRef(11L))).setLocationId(31L)
+        when(storyboardMapper.selectById(STORYBOARD_ID)).thenReturn(storyboard().setCharacters(Arrays.asList(characterRef(11L))).setLocationId(31L)
                 .setDialogues(Arrays.asList(new AiDramaStoryboardDO.Dialogue().setCharacterId(2L).setLine("还有人吗"),
                         new AiDramaStoryboardDO.Dialogue().setLine("车门关上了"),
                         new AiDramaStoryboardDO.Dialogue().setCharacterId(1L).setLine("最后一班了"),
@@ -554,7 +556,7 @@ public class AiDramaStoryboardServiceImplTest extends BaseMockitoUnitTest {
         verify(videoService).buildVideoSubmitter(videoCaptor.capture(), any());
         AiVideoDO video = videoCaptor.getValue();
         assertEquals(AiVideoModeEnum.REFERENCE.getMode(), video.getMode());
-        assertEquals(List.of("https://files.example.com/v2.mp3", "https://files.example.com/v1.mp3"),
+        assertEquals(Arrays.asList("https://files.example.com/v2.mp3", "https://files.example.com/v1.mp3"),
                 video.getInputUrls().get("reference_audio"));
         assertTrue(video.getPrompt().endsWith("参考素材：参考音频1为周远的音色；参考音频2为林夏的音色"));
     }
@@ -562,14 +564,14 @@ public class AiDramaStoryboardServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testGenerateStoryboardVideoMy_referenceSharedUrl() {
         mockSubmit();
-        when(storyboardMapper.selectById(STORYBOARD_ID)).thenReturn(storyboard().setCharacters(List.of(characterRef(11L))).setLocationId(31L)
-                .setVisualAssetIds(List.of(41L, 42L))
+        when(storyboardMapper.selectById(STORYBOARD_ID)).thenReturn(storyboard().setCharacters(Arrays.asList(characterRef(11L))).setLocationId(31L)
+                .setVisualAssetIds(Arrays.asList(41L, 42L))
                 .setDialogues(Arrays.asList(new AiDramaStoryboardDO.Dialogue().setCharacterId(1L).setLine("最后一班了"),
                         new AiDramaStoryboardDO.Dialogue().setCharacterId(2L).setLine("走吧"))));
         when(assetService.getCharacterList(PROJECT_ID)).thenReturn(Arrays.asList(
                 new AiDramaCharacterDO().setId(1L).setProjectId(PROJECT_ID).setName("林夏").setSampleAudioId(51L),
                 new AiDramaCharacterDO().setId(2L).setProjectId(PROJECT_ID).setName("周远").setSampleAudioId(52L)));
-        when(assetService.getVisualAssetList(List.of(41L, 42L))).thenReturn(Arrays.asList(
+        when(assetService.getVisualAssetList(Arrays.asList(41L, 42L))).thenReturn(Arrays.asList(
                 prop(41L, "车票", "https://files.example.com/p.png"), prop(42L, "月票", "https://files.example.com/p.png")));
         when(assetService.getAudioList(PROJECT_ID)).thenReturn(Arrays.asList(
                 new AiDramaAudioDO().setId(51L).setProjectId(PROJECT_ID).setCharacterId(1L)
@@ -584,8 +586,8 @@ public class AiDramaStoryboardServiceImplTest extends BaseMockitoUnitTest {
         ArgumentCaptor<AiVideoDO> videoCaptor = ArgumentCaptor.forClass(AiVideoDO.class);
         verify(videoService).buildVideoSubmitter(videoCaptor.capture(), any());
         AiVideoDO video = videoCaptor.getValue();
-        assertEquals(List.of("https://files.example.com/p.png"), video.getInputUrls().get("reference_image"));
-        assertEquals(List.of("https://files.example.com/v.mp3"), video.getInputUrls().get("reference_audio"));
+        assertEquals(Arrays.asList("https://files.example.com/p.png"), video.getInputUrls().get("reference_image"));
+        assertEquals(Arrays.asList("https://files.example.com/v.mp3"), video.getInputUrls().get("reference_audio"));
         assertTrue(video.getPrompt().endsWith("参考素材：参考图1为道具车票、道具月票；参考音频1为林夏的音色、周远的音色"));
     }
 
@@ -653,12 +655,12 @@ public class AiDramaStoryboardServiceImplTest extends BaseMockitoUnitTest {
     public void testGenerateStoryboardVideoMy_firstFrame() {
         mockSubmit();
         when(storyboardMapper.selectById(STORYBOARD_ID)).thenReturn(storyboard()
-                .setCharacters(List.of(characterRef(11L))).setLocationId(31L)
+                .setCharacters(Arrays.asList(characterRef(11L))).setLocationId(31L)
                 .setContinuity(new AiDramaStoryboardDO.Continuity().setManualStartFrame(
                         new AiDramaStoryboardDO.ManualStartFrame().setUrl("https://files.example.com/f.png"))));
-        when(assetService.getAppearanceList(List.of(11L))).thenReturn(Collections.singletonList(
+        when(assetService.getAppearanceList(Arrays.asList(11L))).thenReturn(Collections.singletonList(
                 new AiDramaCharacterAppearanceDO().setId(11L).setCharacterId(1L).setSelectedIndex(0)
-                        .setImageUrls(List.of("https://files.example.com/a.png"))));
+                        .setImageUrls(Arrays.asList("https://files.example.com/a.png"))));
         when(videoService.buildVideoSubmitter(any(), any())).thenReturn(() -> new AiVideoTaskRef("seedance", "m", "task-1", null, null));
 
         storyboardService.generateStoryboardVideoMy(USER_ID, videoReqVO(STORYBOARD_ID));
@@ -667,7 +669,7 @@ public class AiDramaStoryboardServiceImplTest extends BaseMockitoUnitTest {
         ArgumentCaptor<AiVideoDO> videoCaptor = ArgumentCaptor.forClass(AiVideoDO.class);
         verify(videoService).buildVideoSubmitter(videoCaptor.capture(), any());
         assertEquals(AiVideoModeEnum.IMAGE.getMode(), videoCaptor.getValue().getMode());
-        assertEquals(List.of("first_frame"), new ArrayList<>(videoCaptor.getValue().getInputUrls().keySet()));
+        assertEquals(Arrays.asList("first_frame"), new ArrayList<>(videoCaptor.getValue().getInputUrls().keySet()));
         // 断言：提交记录记下本次提交的首帧，供查询时使用
         ArgumentCaptor<AiDramaVideoSubmissionDO> submissionCaptor = ArgumentCaptor.forClass(AiDramaVideoSubmissionDO.class);
         verify(videoSubmissionMapper).insert(submissionCaptor.capture());
@@ -681,10 +683,10 @@ public class AiDramaStoryboardServiceImplTest extends BaseMockitoUnitTest {
         // 准备：连续多镜段，有手动起始帧；林夏的形象图使用镜像地址提交
         when(storyboardMapper.selectById(STORYBOARD_ID)).thenReturn(storyboard()
                 .setDialogues(Collections.singletonList(new AiDramaStoryboardDO.Dialogue().setCharacterId(1L).setLine("最后一班了")))
-                .setCharacters(List.of(characterRef(11L))).setLocationId(31L).setVisualAssetIds(List.of(41L))
+                .setCharacters(Arrays.asList(characterRef(11L))).setLocationId(31L).setVisualAssetIds(Arrays.asList(41L))
                 .setContinuity(new AiDramaStoryboardDO.Continuity().setVideoReferenceMode("multi_shot")
                         .setManualStartFrame(new AiDramaStoryboardDO.ManualStartFrame().setUrl("https://files.example.com/f.png"))
-                        .setVideoReferenceMirrors(Map.of("https://files.example.com/a.png", "https://mirror.example.com/a.png"))));
+                        .setVideoReferenceMirrors(ImmutableMap.of("https://files.example.com/a.png", "https://mirror.example.com/a.png"))));
         when(videoService.buildVideoSubmitter(any(), any())).thenReturn(() -> new AiVideoTaskRef("seedance", "m", "task-1", null, null));
 
         storyboardService.generateStoryboardVideoMy(USER_ID, videoReqVO(STORYBOARD_ID));
@@ -695,7 +697,7 @@ public class AiDramaStoryboardServiceImplTest extends BaseMockitoUnitTest {
         AiVideoDO video = videoCaptor.getValue();
         assertEquals(AiVideoModeEnum.REFERENCE.getMode(), video.getMode());
         assertNull(video.getInputUrls().get("first_frame"));
-        assertEquals(List.of("https://files.example.com/f.png", "https://mirror.example.com/a.png",
+        assertEquals(Arrays.asList("https://files.example.com/f.png", "https://mirror.example.com/a.png",
                         "https://files.example.com/l.png", "https://files.example.com/p.png"),
                 video.getInputUrls().get("reference_image"));
         assertTrue(video.getPrompt().contains("参考素材：参考图1为起始画面；参考图2为林夏的形象；参考图3为场景车厢"));
@@ -708,7 +710,7 @@ public class AiDramaStoryboardServiceImplTest extends BaseMockitoUnitTest {
         // 准备：连续多镜段，没有起始帧，林夏有选用的形象图；视频模型不支持参考素材
         when(storyboardMapper.selectById(STORYBOARD_ID)).thenReturn(storyboard()
                 .setDialogues(Collections.singletonList(new AiDramaStoryboardDO.Dialogue().setCharacterId(1L).setLine("最后一班了")))
-                .setCharacters(List.of(characterRef(11L))).setLocationId(31L).setVisualAssetIds(List.of(41L))
+                .setCharacters(Arrays.asList(characterRef(11L))).setLocationId(31L).setVisualAssetIds(Arrays.asList(41L))
                 .setContinuity(new AiDramaStoryboardDO.Continuity().setVideoReferenceMode("multi_shot")));
         when(videoService.buildVideoSubmitter(any(), any())).thenThrow(exception(VIDEO_PARAMS_INVALID, "模型不支持参考图"));
 
@@ -727,7 +729,7 @@ public class AiDramaStoryboardServiceImplTest extends BaseMockitoUnitTest {
         mockSubmit();
         // 准备：连续多镜段，林夏的形象没有选用图
         when(storyboardMapper.selectById(STORYBOARD_ID)).thenReturn(storyboard()
-                .setCharacters(List.of(characterRef(11L))).setLocationId(31L)
+                .setCharacters(Arrays.asList(characterRef(11L))).setLocationId(31L)
                 .setContinuity(new AiDramaStoryboardDO.Continuity().setVideoReferenceMode("multi_shot")));
 
         // 断言：缺少角色参考时不提交
@@ -742,10 +744,10 @@ public class AiDramaStoryboardServiceImplTest extends BaseMockitoUnitTest {
         mockSubmit();
         // 准备：有起始帧（图生视频），镜像的原图不在本镜参考图中
         when(storyboardMapper.selectById(STORYBOARD_ID)).thenReturn(storyboard()
-                .setCharacters(List.of(characterRef(11L))).setLocationId(31L)
+                .setCharacters(Arrays.asList(characterRef(11L))).setLocationId(31L)
                 .setContinuity(new AiDramaStoryboardDO.Continuity()
                         .setManualStartFrame(new AiDramaStoryboardDO.ManualStartFrame().setUrl("https://files.example.com/f.png"))
-                        .setVideoReferenceMirrors(Map.of("https://files.example.com/old.png", "https://mirror.example.com/old.png"))));
+                        .setVideoReferenceMirrors(ImmutableMap.of("https://files.example.com/old.png", "https://mirror.example.com/old.png"))));
 
         // 断言：镜像已过期时不提交
         ServiceException e = assertThrows(ServiceException.class,
@@ -795,7 +797,7 @@ public class AiDramaStoryboardServiceImplTest extends BaseMockitoUnitTest {
         assertEquals(2, count);
         ArgumentCaptor<AiDramaStoryboardDO> captor = ArgumentCaptor.forClass(AiDramaStoryboardDO.class);
         verify(storyboardMapper, times(2)).updateById(captor.capture());
-        assertEquals(Arrays.asList(1L, 3L), captor.getAllValues().stream().map(AiDramaStoryboardDO::getId).toList());
+        assertEquals(Arrays.asList(1L, 3L), captor.getAllValues().stream().map(AiDramaStoryboardDO::getId).collect(Collectors.toList()));
         assertEquals(AiDramaStatusEnum.FAIL.getStatus(), captor.getValue().getVideoStatus());
         assertEquals("视频参数不正确：时长只支持 5、10 秒", captor.getValue().getErrorMessage());
         assertEquals("", captor.getValue().getVideoResolution());
@@ -804,7 +806,7 @@ public class AiDramaStoryboardServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testResubmitStoryboardVideo_success() {
         mockSubmit();
-        when(storyboardMapper.selectById(STORYBOARD_ID)).thenReturn(storyboard().setCharacters(List.of(characterRef(11L))).setLocationId(31L)
+        when(storyboardMapper.selectById(STORYBOARD_ID)).thenReturn(storyboard().setCharacters(Arrays.asList(characterRef(11L))).setLocationId(31L)
                 .setVideoStatus(AiDramaStatusEnum.FAIL.getStatus()).setVideoModelId(VIDEO_MODEL_ID).setVideoResolution("768P"));
         when(videoService.buildVideoSubmitter(any(), any())).thenReturn(() -> new AiVideoTaskRef("minimax-v2", "m", "task-1", null, null));
 
@@ -909,7 +911,7 @@ public class AiDramaStoryboardServiceImplTest extends BaseMockitoUnitTest {
         // 断言：按提交记录的首帧查询（仍为图生视频），不按当前的关键帧重新推导
         ArgumentCaptor<AiVideoDO> videoCaptor = ArgumentCaptor.forClass(AiVideoDO.class);
         verify(videoService).getVideoTask(videoCaptor.capture(), any());
-        assertEquals(List.of("https://files.example.com/k.png"), videoCaptor.getValue().getInputUrls().get("first_frame"));
+        assertEquals(Arrays.asList("https://files.example.com/k.png"), videoCaptor.getValue().getInputUrls().get("first_frame"));
         verify(assetService, never()).getStoryboardFrame(any());
     }
 
@@ -1013,7 +1015,7 @@ public class AiDramaStoryboardServiceImplTest extends BaseMockitoUnitTest {
 
     @Test
     public void testTimeoutStoryboardVideo() {
-        when(storyboardMapper.selectListByVideoStatusAndUpdateTimeLt(any(), any())).thenReturn(List.of(
+        when(storyboardMapper.selectListByVideoStatusAndUpdateTimeLt(any(), any())).thenReturn(Arrays.asList(
                 storyboard().setVideoStatus(AiDramaStatusEnum.SAVING.getStatus()).setTaskId("task-1")));
         when(storyboardMapper.updateByIdAndVideoStatusAndTaskId(eq(STORYBOARD_ID), eq(AiDramaStatusEnum.SAVING.getStatus()),
                 eq("task-1"), any())).thenReturn(1);
@@ -1172,8 +1174,8 @@ public class AiDramaStoryboardServiceImplTest extends BaseMockitoUnitTest {
     public void testBuildPhotographyText() {
         Map<String, Object> rules = new LinkedHashMap<>();
         rules.put("colorTone", "冷蓝");
-        rules.put("lighting", Map.of("direction", "侧逆光"));
-        rules.put("characters", List.of(Map.of("name", "林夏")));
+        rules.put("lighting", ImmutableMap.of("direction", "侧逆光"));
+        rules.put("characters", Arrays.asList(ImmutableMap.of("name", "林夏")));
         rules.put("sceneSummary", "不写入");
 
         assertEquals("光线：侧逆光；人物：林夏；色调：冷蓝", AiDramaStoryboardServiceImpl.buildPhotographyText(rules));
@@ -1191,7 +1193,7 @@ public class AiDramaStoryboardServiceImplTest extends BaseMockitoUnitTest {
     private void mockSubmit() {
         AiDramaStoryboardDO storyboard = storyboard()
                 .setDialogues(Collections.singletonList(new AiDramaStoryboardDO.Dialogue().setCharacterId(1L).setLine("最后一班了")))
-                .setCharacters(List.of(characterRef(11L))).setLocationId(31L);
+                .setCharacters(Arrays.asList(characterRef(11L))).setLocationId(31L);
         when(storyboardMapper.selectById(STORYBOARD_ID)).thenReturn(storyboard);
         AiModelDO model = videoModel();
         when(videoService.validateVideoModel(VIDEO_MODEL_ID)).thenReturn(model);
@@ -1201,7 +1203,7 @@ public class AiDramaStoryboardServiceImplTest extends BaseMockitoUnitTest {
                 new AiDramaCharacterDO().setId(1L).setProjectId(PROJECT_ID).setName("林夏").setDescription("短发")));
         when(assetService.getLocation(31L)).thenReturn(new AiDramaLocationDO().setId(31L).setProjectId(PROJECT_ID)
                 .setName("车厢").setDescription("深夜"));
-        when(assetService.getAppearanceList(List.of(11L))).thenReturn(Collections.singletonList(
+        when(assetService.getAppearanceList(Arrays.asList(11L))).thenReturn(Collections.singletonList(
                 new AiDramaCharacterAppearanceDO().setId(11L).setCharacterId(1L)));
         when(assetService.buildStyleText(any())).thenReturn("电影感");
     }
@@ -1212,14 +1214,14 @@ public class AiDramaStoryboardServiceImplTest extends BaseMockitoUnitTest {
     private void mockReferenceAssets() {
         when(storyboardMapper.selectById(STORYBOARD_ID)).thenReturn(storyboard()
                 .setDialogues(Collections.singletonList(new AiDramaStoryboardDO.Dialogue().setCharacterId(1L).setLine("最后一班了")))
-                .setCharacters(List.of(characterRef(11L))).setLocationId(31L).setVisualAssetIds(List.of(41L)));
-        when(assetService.getAppearanceList(List.of(11L))).thenReturn(Collections.singletonList(
+                .setCharacters(Arrays.asList(characterRef(11L))).setLocationId(31L).setVisualAssetIds(Arrays.asList(41L)));
+        when(assetService.getAppearanceList(Arrays.asList(11L))).thenReturn(Collections.singletonList(
                 new AiDramaCharacterAppearanceDO().setId(11L).setCharacterId(1L).setSelectedIndex(0)
-                        .setImageUrls(List.of("https://files.example.com/a.png"))));
+                        .setImageUrls(Arrays.asList("https://files.example.com/a.png"))));
         when(assetService.getLocation(31L)).thenReturn(new AiDramaLocationDO().setId(31L).setProjectId(PROJECT_ID)
                 .setName("车厢").setDescription("深夜").setSelectedIndex(0)
-                .setImageUrls(List.of("https://files.example.com/l.png")));
-        when(assetService.getVisualAssetList(List.of(41L))).thenReturn(Collections.singletonList(
+                .setImageUrls(Arrays.asList("https://files.example.com/l.png")));
+        when(assetService.getVisualAssetList(Arrays.asList(41L))).thenReturn(Collections.singletonList(
                 prop(41L, "车票", "https://files.example.com/p.png")));
         when(assetService.getCharacterList(PROJECT_ID)).thenReturn(Collections.singletonList(
                 new AiDramaCharacterDO().setId(1L).setProjectId(PROJECT_ID).setName("林夏").setDescription("短发")

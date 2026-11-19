@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-import jakarta.validation.constraints.*;
+import javax.validation.constraints.*;
 import org.hibernate.validator.constraints.URL;
 
 import java.util.List;

@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.ai.enums.video;
 
 import cn.iocoder.yudao.framework.common.core.ArrayValuable;
+import com.google.common.collect.ImmutableList;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -18,10 +19,10 @@ import java.util.List;
 @Getter
 public enum AiVideoModeEnum implements ArrayValuable<String> {
 
-    TEXT("text", "文生视频", List.of()),
-    IMAGE("image", "图生视频", List.of(AiVideoInputRoleEnum.FIRST_FRAME)),
-    FIRST_LAST("first_last", "首尾帧", List.of(AiVideoInputRoleEnum.FIRST_FRAME, AiVideoInputRoleEnum.LAST_FRAME)),
-    REFERENCE("reference", "参考生视频", List.of(AiVideoInputRoleEnum.REFERENCE_IMAGE,
+    TEXT("text", "文生视频", ImmutableList.of()),
+    IMAGE("image", "图生视频", ImmutableList.of(AiVideoInputRoleEnum.FIRST_FRAME)),
+    FIRST_LAST("first_last", "首尾帧", ImmutableList.of(AiVideoInputRoleEnum.FIRST_FRAME, AiVideoInputRoleEnum.LAST_FRAME)),
+    REFERENCE("reference", "参考生视频", ImmutableList.of(AiVideoInputRoleEnum.REFERENCE_IMAGE,
             AiVideoInputRoleEnum.REFERENCE_VIDEO, AiVideoInputRoleEnum.REFERENCE_AUDIO));
 
     public static final String[] ARRAYS = Arrays.stream(values()).map(AiVideoModeEnum::getMode).toArray(String[]::new);

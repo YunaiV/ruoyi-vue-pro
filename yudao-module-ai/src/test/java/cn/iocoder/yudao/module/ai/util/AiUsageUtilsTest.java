@@ -4,8 +4,10 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.iocoder.yudao.module.ai.enums.model.AiPlatformEnum;
 import cn.iocoder.yudao.module.ai.util.AiUsageUtils.UsageSnapshot;
+import com.anthropic.core.ObjectMappers;
+import com.anthropic.models.messages.MessageDeltaUsage;
+import com.openai.models.completions.CompletionUsage;
 import org.junit.jupiter.api.Test;
-import org.springframework.ai.anthropic.api.AnthropicApi;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.metadata.ChatGenerationMetadata;
 import org.springframework.ai.chat.metadata.ChatResponseMetadata;
@@ -16,15 +18,13 @@ import org.springframework.ai.chat.metadata.RateLimit;
 import org.springframework.ai.chat.metadata.Usage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
-import org.springframework.ai.openai.api.OpenAiApi;
-
+import org.springframework.ai.deepseek.api.DeepSeekApi;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -37,10 +37,11 @@ import static org.junit.jupiter.api.Assertions.*;
 public class AiUsageUtilsTest {
 
     private static final String ANTHROPIC = AiPlatformEnum.ANTHROPIC.getPlatform();
+
     private static final String OPENAI = AiPlatformEnum.OPENAI.getPlatform();
 
-    // ========== extractUsage ==========
 
+    // ========== extractUsage ==========
     @Test
     public void testExtractUsage_nullResponse() {
         // 调用，并断言
@@ -59,7 +60,6 @@ public class AiUsageUtilsTest {
     public void testExtractUsage_realZeroKept() {
         // 准备参数
         ChatResponse response = buildResponse(new DefaultUsage(0, 0, 0));
-
         // 调用
         UsageSnapshot usage = AiUsageUtils.extractUsage(response, OPENAI);
         // 断言：厂商明确返回 0，保留 0
@@ -70,37 +70,37 @@ public class AiUsageUtilsTest {
     public void testExtractUsage_providedTotalIgnored() {
         // 调用，并断言：标准 getter，厂商给的 total 与 input + output 不同，不读取，只取输入、输出
         assertUsage(AiUsageUtils.extractUsage(buildResponse(new DefaultUsage(10, 5, 999)), OPENAI), 10L, 5L);
-        // 调用，并断言：OpenAI 原生 record，同样归一
-        OpenAiApi.Usage nativeUsage = new OpenAiApi.Usage(5, 10, 999);
-        assertUsage(AiUsageUtils.extractUsage(buildResponse(new DefaultUsage(10, 5, 999, nativeUsage)), OPENAI),
-                10L, 5L);
+        // 调用，并断言：OpenAI 官方 SDK 用量，同样归一
+        CompletionUsage nativeUsage = CompletionUsage.builder().promptTokens(10).completionTokens(5).totalTokens(999).build();
+        assertUsage(AiUsageUtils.extractUsage(buildResponse(new DefaultUsage(10, 5, 999, nativeUsage)), OPENAI), 10L, 5L);
     }
 
     @Test
-    public void testExtractUsage_openAiNativeNullNotZero() {
-        // 准备参数：原生 prompt_tokens 为 null，框架 DefaultUsage 会转成 0
-        OpenAiApi.Usage nativeUsage = new OpenAiApi.Usage(6, null, null);
-
+    public void testExtractUsage_deepSeekNativeNullNotZero() {
+        // 准备参数：原生 prompt_tokens 为 null，框架 DefaultUsage 会转成 0（Spring AI 2.x 的 OpenAI 官方 SDK 用量字段必填，改用 DeepSeek 原生 record）
+        DeepSeekApi.Usage nativeUsage = new DeepSeekApi.Usage(6, null, null);
         // 调用，并断言：输入保持未知
-        assertUsage(AiUsageUtils.extractUsage(buildResponse(new DefaultUsage(null, 6, null, nativeUsage)), OPENAI),
-                null, 6L);
+        assertUsage(AiUsageUtils.extractUsage(buildResponse(new DefaultUsage(null, 6, null, nativeUsage)), OPENAI), null, 6L);
     }
 
     @Test
-    public void testExtractUsage_anthropicRecordWithCache() {
-        // 准备参数：参数顺序为 inputTokens, outputTokens, cacheCreationInputTokens, cacheReadInputTokens
-        AnthropicApi.Usage nativeUsage = new AnthropicApi.Usage(100, 20, 30, 40);
+    public void testExtractUsage_anthropicSdkUsageWithCache() throws Exception {
+        // 准备参数：Spring AI 的 promptTokens 已是 input_tokens + 缓存读取 + 缓存写入 = 100 + 40 + 30
+        com.anthropic.models.messages.Usage nativeUsage = parseAnthropic(
+                "{\"input_tokens\":100,\"output_tokens\":20,\"cache_creation_input_tokens\":30,\"cache_read_input_tokens\":40}",
+                com.anthropic.models.messages.Usage.class);
 
         // 调用
-        UsageSnapshot usage = AiUsageUtils.extractUsage(buildResponse(new DefaultUsage(100, 20, 120, nativeUsage)), ANTHROPIC);
-        // 断言：完整输入 = 100 + 40 + 30；合计不重复加缓存
+        UsageSnapshot usage = AiUsageUtils.extractUsage(buildResponse(new DefaultUsage(170, 20, 190, nativeUsage, 40L, 30L)), ANTHROPIC);
+        // 断言：完整输入取 promptTokens，不重复加缓存
         assertUsage(usage, 170L, 20L);
     }
 
     @Test
-    public void testExtractUsage_anthropicRecordWithoutCacheFields() {
+    public void testExtractUsage_anthropicSdkUsageWithoutCacheFields() throws Exception {
         // 准备参数
-        AnthropicApi.Usage nativeUsage = new AnthropicApi.Usage(100, 20, null, null);
+        com.anthropic.models.messages.Usage nativeUsage = parseAnthropic(
+                "{\"input_tokens\":100,\"output_tokens\":20}", com.anthropic.models.messages.Usage.class);
 
         // 调用，并断言：缓存字段未返回，视为没有缓存分量
         assertUsage(AiUsageUtils.extractUsage(buildResponse(new DefaultUsage(100, 20, 120, nativeUsage)), ANTHROPIC),
@@ -108,13 +108,13 @@ public class AiUsageUtilsTest {
     }
 
     @Test
-    public void testExtractUsage_anthropicRecordUnknownBase() {
-        // 准备参数：基础 input_tokens 未知，但有缓存分量
-        AnthropicApi.Usage nativeUsage = new AnthropicApi.Usage(null, 20, 30, 40);
+    public void testExtractUsage_anthropicSdkStreamDeltaUsage() throws Exception {
+        // 准备参数：流式 message_delta 的用量，Spring AI 已沿用 message_start 的输入、缓存，计入 promptTokens
+        MessageDeltaUsage nativeUsage = parseAnthropic("{\"output_tokens\":20}", MessageDeltaUsage.class);
 
-        // 调用，并断言：完整输入仍未知，不做估算
-        assertUsage(AiUsageUtils.extractUsage(buildResponse(new DefaultUsage(0, 20, 20, nativeUsage)), ANTHROPIC),
-                null, 20L);
+        // 调用，并断言
+        assertUsage(AiUsageUtils.extractUsage(buildResponse(new DefaultUsage(170, 20, 190, nativeUsage, 40L, 30L)), ANTHROPIC),
+                170L, 20L);
     }
 
     @Test
@@ -127,18 +127,15 @@ public class AiUsageUtilsTest {
     public void testExtractUsage_partialNativeMap() {
         // 调用，并断言：只有输出 KEY，输入保持未知，不能退回 getter 当成 0
         Map<String, Object> outputOnly = MapUtil.of("completion_tokens", 7);
-        assertUsage(AiUsageUtils.extractUsage(buildResponse(new DefaultUsage(null, 7, null, outputOnly)), OPENAI),
-                null, 7L);
+        assertUsage(AiUsageUtils.extractUsage(buildResponse(new DefaultUsage(null, 7, null, outputOnly)), OPENAI), null, 7L);
         // 调用，并断言：输入 KEY 明确为 null
         Map<String, Object> explicitNull = new HashMap<>();
         explicitNull.put("prompt_tokens", null);
         explicitNull.put("completion_tokens", 3);
-        assertUsage(AiUsageUtils.extractUsage(buildResponse(new DefaultUsage(null, 3, null, explicitNull)), OPENAI),
-                null, 3L);
+        assertUsage(AiUsageUtils.extractUsage(buildResponse(new DefaultUsage(null, 3, null, explicitNull)), OPENAI), null, 3L);
         // 调用，并断言：只有输入 KEY
         Map<String, Object> inputOnly = MapUtil.of("input_tokens", 9);
-        assertUsage(AiUsageUtils.extractUsage(buildResponse(new DefaultUsage(9, null, null, inputOnly)), OPENAI),
-                9L, null);
+        assertUsage(AiUsageUtils.extractUsage(buildResponse(new DefaultUsage(9, null, null, inputOnly)), OPENAI), 9L, null);
     }
 
     @Test
@@ -160,14 +157,39 @@ public class AiUsageUtilsTest {
     public void testExtractUsage_unknownNativeRecordUsesGetter() {
         // 准备参数：未知厂商的原生 record
         CustomNativeUsage nativeUsage = new CustomNativeUsage(10, Optional.of(3), Optional.empty(), new HashMap<>());
-
         // 调用，并断言：使用标准 getter
-        assertUsage(AiUsageUtils.extractUsage(buildResponse(new DefaultUsage(10, 2, null, nativeUsage)), OPENAI),
-                10L, 2L);
+        assertUsage(AiUsageUtils.extractUsage(buildResponse(new DefaultUsage(10, 2, null, nativeUsage)), OPENAI), 10L, 2L);
+    }
+
+    @Test
+    public void testExtractUsage_openAiStreamPlaceholderIsUnknown() {
+        // 准备参数：Spring AI 2.x 的 OpenAI 流式正文 chunk 没有 usage 时，用只含三项 0 的 CompletionUsage 占位；
+        // 厂商只返回三项 0 时，SDK 解析结果与占位完全相同，同样按未知处理（无法区分的边界）
+        CompletionUsage placeholder = CompletionUsage.builder().promptTokens(0).completionTokens(0).totalTokens(0).build();
+        Usage placeholderUsage = new DefaultUsage(0, 0, 0, placeholder);
+        // 调用，并断言：不是厂商明确返回的用量，输入、输出未知；复用 OpenAI 客户端的 Grok 同样
+        assertFalse(AiUsageUtils.isUsagePresent(placeholderUsage));
+        assertUsage(AiUsageUtils.extractUsage(buildResponse(placeholderUsage), OPENAI), null, null);
+        assertUsage(AiUsageUtils.extractUsage(buildResponse(placeholderUsage), AiPlatformEnum.GROK.getPlatform()), null, null);
+        // 调用，并断言：厂商明确返回的用量，输出为 0 也保留
+        CompletionUsage realUsage = CompletionUsage.builder().promptTokens(3).completionTokens(0).totalTokens(3).build();
+        assertUsage(AiUsageUtils.extractUsage(buildResponse(new DefaultUsage(3, 0, 3, realUsage)), OPENAI), 3L, 0L);
+        // 调用，并断言：厂商明确返回三项 0，且带 details，与占位不相等，保留 0
+        CompletionUsage zeroWithDetails = CompletionUsage.builder().promptTokens(0).completionTokens(0).totalTokens(0).promptTokensDetails(CompletionUsage.PromptTokensDetails.builder().cachedTokens(0).build()).build();
+        assertTrue(AiUsageUtils.isUsagePresent(new DefaultUsage(0, 0, 0, zeroWithDetails)));
+        assertUsage(AiUsageUtils.extractUsage(buildResponse(new DefaultUsage(0, 0, 0, zeroWithDetails)), OPENAI), 0L, 0L);
+    }
+
+    @Test
+    public void testIsUsagePresent() {
+        // 调用，并断言：null、EmptyUsage 无效
+        assertFalse(AiUsageUtils.isUsagePresent(null));
+        assertFalse(AiUsageUtils.isUsagePresent(new EmptyUsage()));
+        // 调用，并断言：厂商明确返回 0，有效
+        assertTrue(AiUsageUtils.isUsagePresent(new DefaultUsage(0, 0, 0)));
     }
 
     // ========== extractResponseMetadata ==========
-
     @Test
     public void testExtractResponseMetadata_null() {
         // 调用，并断言
@@ -177,27 +199,12 @@ public class AiUsageUtilsTest {
     @Test
     public void testExtractResponseMetadata_full() {
         // 准备参数
-        OpenAiApi.Usage nativeUsage = new OpenAiApi.Usage(5, 10, 15,
-                new OpenAiApi.Usage.PromptTokensDetails(null, 4), null);
-        ChatResponseMetadata metadata = ChatResponseMetadata.builder()
-                .id("resp-1").model("gpt-test")
-                .usage(new DefaultUsage(10, 5, 15, nativeUsage))
-                .rateLimit(new TestRateLimit())
-                .promptMetadata(PromptMetadata.of(PromptMetadata.PromptFilterMetadata.from(0, MapUtil.of("hate", "safe"))))
-                .keyValue("created", 123L)
-                .keyValue("apiKey", "sk-vendor-metadata")
-                .build();
-        ChatGenerationMetadata generationMetadata = ChatGenerationMetadata.builder()
-                .finishReason("STOP").contentFilter("violence")
-                .metadata("role", "ASSISTANT")
-                .metadata("reasoningContent", "推理正文不应保存")
-                .build();
-        ChatResponse response = new ChatResponse(Collections.singletonList(
-                new Generation(new AssistantMessage("生成正文不应保存"), generationMetadata)), metadata);
-
+        CompletionUsage nativeUsage = CompletionUsage.builder().promptTokens(10).completionTokens(5).totalTokens(15).promptTokensDetails(CompletionUsage.PromptTokensDetails.builder().cachedTokens(4).build()).build();
+        ChatResponseMetadata metadata = ChatResponseMetadata.builder().id("resp-1").model("gpt-test").usage(new DefaultUsage(10, 5, 15, nativeUsage)).rateLimit(new TestRateLimit()).promptMetadata(PromptMetadata.of(PromptMetadata.PromptFilterMetadata.from(0, MapUtil.of("hate", "safe")))).keyValue("created", 123L).keyValue("apiKey", "sk-vendor-metadata").build();
+        ChatGenerationMetadata generationMetadata = ChatGenerationMetadata.builder().finishReason("STOP").contentFilter("violence").metadata("role", "ASSISTANT").metadata("reasoningContent", "推理正文不应保存").build();
+        ChatResponse response = new ChatResponse(Collections.singletonList(new Generation(new AssistantMessage("生成正文不应保存"), generationMetadata)), metadata);
         // 调用
         Map<String, Object> result = AiUsageUtils.extractResponseMetadata(response);
-
         // 断言：响应级独立 getter
         assertEquals("resp-1", result.get("id"));
         assertEquals("gpt-test", result.get("model"));
@@ -208,6 +215,7 @@ public class AiUsageUtilsTest {
         assertEquals(10, usage.get("promptTokens"));
         assertEquals(5, usage.get("completionTokens"));
         assertEquals(15, usage.get("totalTokens"));
+        // 断言：原生用量为 OpenAI 官方 SDK 对象，使用 SDK 自带的序列化
         Map<String, Object> nativeUsageMap = asMap(usage.get("nativeUsage"));
         assertEquals(10, nativeUsageMap.get("prompt_tokens"));
         assertEquals(5, nativeUsageMap.get("completion_tokens"));
@@ -249,7 +257,6 @@ public class AiUsageUtilsTest {
     public void testExtractResponseMetadata_emptyUsage() {
         // 调用
         Map<String, Object> result = AiUsageUtils.extractResponseMetadata(buildResponse(new EmptyUsage()));
-
         // 断言：标记为 EmptyUsage
         assertEquals(true, asMap(result.get("usage")).get("empty"));
         // 断言：默认 EmptyRateLimit 不保存
@@ -266,14 +273,12 @@ public class AiUsageUtilsTest {
         details.put("nested", nested);
         CustomNativeUsage nativeUsage = new CustomNativeUsage(10, Optional.of(3), Optional.empty(), details);
         ChatResponse response = buildResponse(new DefaultUsage(10, 2, null, nativeUsage));
-
         // 调用
         Map<String, Object> result = AiUsageUtils.extractResponseMetadata(response);
         // 快照后修改原对象
         details.put("reasoning_tokens", 999);
         details.put("added", true);
         nested.put("audio_tokens", 888);
-
         // 断言：原生字段完整保留，Optional 展开，快照与原对象脱钩
         Map<String, Object> nativeUsageMap = asMap(asMap(result.get("usage")).get("nativeUsage"));
         assertEquals(10, nativeUsageMap.get("inputTokens"));
@@ -289,18 +294,10 @@ public class AiUsageUtilsTest {
     @Test
     public void testExtractResponseMetadata_partialFailure() {
         // 准备参数：一个扩展属性序列化时抛出异常
-        ChatResponseMetadata metadata = ChatResponseMetadata.builder()
-                .id("resp-2").model("m")
-                .usage(new DefaultUsage(1, 2))
-                .keyValue("broken", new BrokenValue())
-                .keyValue("ok", "fine")
-                .build();
-        ChatResponse response = new ChatResponse(Collections.singletonList(new Generation(new AssistantMessage("x"),
-                ChatGenerationMetadata.builder().finishReason("STOP").build())), metadata);
-
+        ChatResponseMetadata metadata = ChatResponseMetadata.builder().id("resp-2").model("m").usage(new DefaultUsage(1, 2)).keyValue("broken", new BrokenValue()).keyValue("ok", "fine").build();
+        ChatResponse response = new ChatResponse(Collections.singletonList(new Generation(new AssistantMessage("x"), ChatGenerationMetadata.builder().finishReason("STOP").build())), metadata);
         // 调用
         Map<String, Object> result = AiUsageUtils.extractResponseMetadata(response);
-
         // 断言：其余字段正常
         assertEquals("resp-2", result.get("id"));
         assertEquals(1, asMap(result.get("usage")).get("promptTokens"));
@@ -316,12 +313,17 @@ public class AiUsageUtilsTest {
         assertTrue(String.valueOf(errors.get(0).get("error")).contains(BrokenValue.MESSAGE));
     }
 
-
     // ========== 辅助方法 ==========
-
     private static ChatResponse buildResponse(Usage usage) {
         ChatResponseMetadata metadata = ChatResponseMetadata.builder().id("id").model("model").usage(usage).build();
         return new ChatResponse(Collections.singletonList(new Generation(new AssistantMessage("content"))), metadata);
+    }
+
+    /**
+     * 使用 Anthropic SDK 自带的 JsonMapper，按真实响应 JSON 构造 SDK 用量对象（与 SDK 解析 SSE 一致，不经过 builder 的必填校验）
+     */
+    private static <T> T parseAnthropic(String json, Class<T> clazz) throws Exception {
+        return ObjectMappers.jsonMapper().readValue(json, clazz);
     }
 
     private static void assertUsage(UsageSnapshot usage, Long input, Long output) {
@@ -345,8 +347,65 @@ public class AiUsageUtilsTest {
     /**
      * 模拟未知厂商的原生用量 record（Spring AI 各厂商原生用量均为 record，需覆盖 record 转换）
      */
-    public record CustomNativeUsage(Integer inputTokens, Optional<Integer> cachedTokens,
-                                    Optional<Integer> missingTokens, Map<String, Object> details) {
+    @com.fasterxml.jackson.annotation.JsonAutoDetect(fieldVisibility = com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY, getterVisibility = com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE, isGetterVisibility = com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE, setterVisibility = com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE)
+    public final static class CustomNativeUsage {
+
+        private final Integer inputTokens;
+
+        public Integer inputTokens() {
+            return this.inputTokens;
+        }
+
+        private final Optional<Integer> cachedTokens;
+
+        public Optional<Integer> cachedTokens() {
+            return this.cachedTokens;
+        }
+
+        private final Optional<Integer> missingTokens;
+
+        public Optional<Integer> missingTokens() {
+            return this.missingTokens;
+        }
+
+        private final Map<String, Object> details;
+
+        public Map<String, Object> details() {
+            return this.details;
+        }
+
+        @com.fasterxml.jackson.annotation.JsonCreator()
+        public CustomNativeUsage(@com.fasterxml.jackson.annotation.JsonProperty("inputTokens") Integer inputTokens, @com.fasterxml.jackson.annotation.JsonProperty("cachedTokens") Optional<Integer> cachedTokens, @com.fasterxml.jackson.annotation.JsonProperty("missingTokens") Optional<Integer> missingTokens, @com.fasterxml.jackson.annotation.JsonProperty("details") Map<String, Object> details) {
+            this.inputTokens = inputTokens;
+            this.cachedTokens = cachedTokens;
+            this.missingTokens = missingTokens;
+            this.details = details;
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            if (this == other)
+                return true;
+            if (other == null || getClass() != other.getClass())
+                return false;
+            CustomNativeUsage that = (CustomNativeUsage) other;
+            return java.util.Objects.equals(this.inputTokens, that.inputTokens) && java.util.Objects.equals(this.cachedTokens, that.cachedTokens) && java.util.Objects.equals(this.missingTokens, that.missingTokens) && java.util.Objects.equals(this.details, that.details);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = 0;
+            result = 31 * result + java.util.Objects.hashCode(this.inputTokens);
+            result = 31 * result + java.util.Objects.hashCode(this.cachedTokens);
+            result = 31 * result + java.util.Objects.hashCode(this.missingTokens);
+            result = 31 * result + java.util.Objects.hashCode(this.details);
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            return "CustomNativeUsage[inputTokens=" + java.lang.String.valueOf((Object) this.inputTokens) + ", cachedTokens=" + java.lang.String.valueOf((Object) this.cachedTokens) + ", missingTokens=" + java.lang.String.valueOf((Object) this.missingTokens) + ", details=" + java.lang.String.valueOf((Object) this.details) + "]";
+        }
     }
 
     /**
@@ -359,7 +418,6 @@ public class AiUsageUtilsTest {
         public String getValue() {
             throw new IllegalStateException(MESSAGE);
         }
-
     }
 
     private static class TestRateLimit implements RateLimit {
@@ -393,7 +451,5 @@ public class AiUsageUtilsTest {
         public Duration getTokensReset() {
             return Duration.ofMinutes(1);
         }
-
     }
-
 }

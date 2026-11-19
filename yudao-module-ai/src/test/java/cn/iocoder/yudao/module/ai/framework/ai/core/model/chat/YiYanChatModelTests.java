@@ -36,7 +36,7 @@ public class YiYanChatModelTests {
                     .baseUrl(YiYanChatModel.BASE_URL)
                     .apiKey(API_KEY)
                     .build())
-            .defaultOptions(DeepSeekChatOptions.builder()
+            .options(DeepSeekChatOptions.builder()
                     .model(MODEL)
                     .build())
             .build());

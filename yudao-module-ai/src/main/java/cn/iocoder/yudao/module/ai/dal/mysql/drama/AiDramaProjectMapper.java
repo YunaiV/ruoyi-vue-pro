@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * AI 短剧项目 Mapper
@@ -65,7 +66,7 @@ public interface AiDramaProjectMapper extends BaseMapperX<AiDramaProjectDO> {
             // 画风是枚举：按名称匹配出编号
             List<Integer> styles = Arrays.stream(AiDramaStyleEnum.values())
                     .filter(style -> StrUtil.contains(style.getName(), reqVO.getKeyword()))
-                    .map(AiDramaStyleEnum::getStyle).toList();
+                    .map(AiDramaStyleEnum::getStyle).collect(Collectors.toList());
             query.and(w -> w.like(AiDramaProjectDO::getName, reqVO.getKeyword())
                     .or(CollUtil.isNotEmpty(styles), o -> o.in(AiDramaProjectDO::getStyle, styles)));
         }

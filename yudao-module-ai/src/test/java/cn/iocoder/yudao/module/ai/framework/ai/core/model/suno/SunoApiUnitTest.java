@@ -24,9 +24,11 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -315,16 +317,14 @@ public class SunoApiUnitTest extends BaseMockitoUnitTest {
     @Test
     public void testFetchTasks_success() {
         // mock 方法：一首成功、一首失败
-        mockResponse(HttpStatus.OK, """
-                {"code":"success","data":[{"task_id":"task-1","action":"MUSIC","status":"SUCCESS","progress":"100%",
-                  "data":[{"id":"clip-1","title":"夏日","status":"complete","audio_url":"https://cdn.example.com/1.mp3",
-                    "image_url":"https://cdn.example.com/1.png","image_large_url":"https://cdn.example.com/1-large.png",
-                    "video_url":"","model_name":"chirp-v4","metadata":{"tags":"pop","prompt":"[Verse]","duration":176.5,"error_message":null}},
-                   {"id":"clip-2","status":"error","metadata":{"error_message":"内容违规"}}]}]}
-                """);
+        mockResponse(HttpStatus.OK, "{\"code\":\"success\",\"data\":[{\"task_id\":\"task-1\",\"action\":\"MUSIC\",\"status\":\"SUCCESS\",\"progress\":\"100%\",\n"
+                + "  \"data\":[{\"id\":\"clip-1\",\"title\":\"夏日\",\"status\":\"complete\",\"audio_url\":\"https://cdn.example.com/1.mp3\",\n"
+                + "    \"image_url\":\"https://cdn.example.com/1.png\",\"image_large_url\":\"https://cdn.example.com/1-large.png\",\n"
+                + "    \"video_url\":\"\",\"model_name\":\"chirp-v4\",\"metadata\":{\"tags\":\"pop\",\"prompt\":\"[Verse]\",\"duration\":176.5,\"error_message\":null}},\n"
+                + "   {\"id\":\"clip-2\",\"status\":\"error\",\"metadata\":{\"error_message\":\"内容违规\"}}]}]}\n");
 
         // 调用
-        List<SunoApi.Task> tasks = sunoApi.fetchTasks(List.of("task-1"));
+        List<SunoApi.Task> tasks = sunoApi.fetchTasks(Arrays.asList("task-1"));
         // 断言：请求
         ClientRequest clientRequest = captureRequest();
         assertRequest(clientRequest, "/suno/fetch");
@@ -354,7 +354,7 @@ public class SunoApiUnitTest extends BaseMockitoUnitTest {
         mockResponse(HttpStatus.OK, "{\"code\":\"success\",\"data\":[{\"task_id\":\"task-1\",\"status\":\"FAILURE\",\"fail_reason\":\"超时\"}]}");
 
         // 调用
-        List<SunoApi.Task> tasks = sunoApi.fetchTasks(List.of("task-1"));
+        List<SunoApi.Task> tasks = sunoApi.fetchTasks(Arrays.asList("task-1"));
         // 断言
         assertTrue(tasks.get(0).isFailure());
         assertEquals("超时", tasks.get(0).failReason());
@@ -373,25 +373,23 @@ public class SunoApiUnitTest extends BaseMockitoUnitTest {
         mockResponse(HttpStatus.OK, "{\"code\":\"success\",\"data\":{\"task_id\":\"task-1\"}}");
 
         // 调用并断言
-        assertThrows(IllegalStateException.class, () -> sunoApi.fetchTasks(List.of("task-1")));
+        assertThrows(IllegalStateException.class, () -> sunoApi.fetchTasks(Arrays.asList("task-1")));
     }
 
     @Test
     public void testFetchTasks_mixed() {
         // mock 方法：同一批次，已提交任务的 data 是对象；缺少 task_id 的任务；成功任务里有空值、非对象、格式错误的歌曲
-        mockResponse(HttpStatus.OK, """
-                {"code":"success","data":[
-                  {"task_id":"task-1","action":"MUSIC","status":"SUBMITTED","progress":"0%","data":{"clip_ids":["a","b"]}},
-                  {"status":"SUCCESS","data":[]},
-                  null,
-                  {"task_id":null,"status":"SUCCESS"},
-                  {"task_id":"task-2","action":"MUSIC","status":"SUCCESS","progress":"100%","fail_reason":null,
-                   "data":[null,"clip-x",{"id":"clip-bad","metadata":{"duration":"很长"}},
-                     {"id":"clip-1","status":"complete","audio_url":"https://cdn.example.com/1.mp3"}]}]}
-                """);
+        mockResponse(HttpStatus.OK, "{\"code\":\"success\",\"data\":[\n"
+                + "  {\"task_id\":\"task-1\",\"action\":\"MUSIC\",\"status\":\"SUBMITTED\",\"progress\":\"0%\",\"data\":{\"clip_ids\":[\"a\",\"b\"]}},\n"
+                + "  {\"status\":\"SUCCESS\",\"data\":[]},\n"
+                + "  null,\n"
+                + "  {\"task_id\":null,\"status\":\"SUCCESS\"},\n"
+                + "  {\"task_id\":\"task-2\",\"action\":\"MUSIC\",\"status\":\"SUCCESS\",\"progress\":\"100%\",\"fail_reason\":null,\n"
+                + "   \"data\":[null,\"clip-x\",{\"id\":\"clip-bad\",\"metadata\":{\"duration\":\"很长\"}},\n"
+                + "     {\"id\":\"clip-1\",\"status\":\"complete\",\"audio_url\":\"https://cdn.example.com/1.mp3\"}]}]}\n");
 
         // 调用
-        List<SunoApi.Task> tasks = sunoApi.fetchTasks(List.of("task-1", "task-2"));
+        List<SunoApi.Task> tasks = sunoApi.fetchTasks(Arrays.asList("task-1", "task-2"));
         // 断言：只跳过无法识别的任务，其它任务照常返回
         assertEquals(2, tasks.size());
         assertEquals("task-1", tasks.get(0).taskId());
@@ -402,25 +400,23 @@ public class SunoApiUnitTest extends BaseMockitoUnitTest {
         SunoApi.Task task2 = tasks.get(1);
         assertTrue(task2.isSuccess());
         assertNull(task2.failReason());
-        assertEquals(List.of("clip-1"), task2.data().stream().map(SunoApi.Clip::id).toList());
+        assertEquals(Arrays.asList("clip-1"), task2.data().stream().map(SunoApi.Clip::id).collect(Collectors.toList()));
     }
 
     @Test
     public void testFetchTasks_infai() {
         // mock 方法：InfAI 的歌曲，id 是中转的记录编号、clipId 才是歌曲编号，status 为整数，
         // 地址为 cld2*Url，风格、歌词、时长在歌曲顶层
-        mockResponse(HttpStatus.OK, """
-                {"code":"success","data":[{"task_id":"task-1","action":"MUSIC","status":"SUCCESS","progress":"100%",
-                  "data":[{"id":"2120087722226888705","clipId":"clip-1","title":"夏日","status":30,"progress":100,
-                    "cld2AudioUrl":"https://cdn.example.com/1.m4a","cld2ImageUrl":"https://cdn.example.com/1.jpeg",
-                    "cld2VideoUrl":"https://cdn.example.com/1-video.mp4","duration":183.56,"tags":"pop","prompt":"[Verse] 1"},
-                   {"id":"2120087722226888706","clipId":"clip-2","title":"夏日","status":30,"progress":100,
-                    "cld2AudioUrl":"https://cdn.example.com/2.m4a","cld2ImageUrl":"https://cdn.example.com/2.jpeg",
-                    "cld2VideoUrl":"","duration":"175.2","tags":"pop","makeInstrumental":true}]}]}
-                """);
+        mockResponse(HttpStatus.OK, "{\"code\":\"success\",\"data\":[{\"task_id\":\"task-1\",\"action\":\"MUSIC\",\"status\":\"SUCCESS\",\"progress\":\"100%\",\n"
+                + "  \"data\":[{\"id\":\"2120087722226888705\",\"clipId\":\"clip-1\",\"title\":\"夏日\",\"status\":30,\"progress\":100,\n"
+                + "    \"cld2AudioUrl\":\"https://cdn.example.com/1.m4a\",\"cld2ImageUrl\":\"https://cdn.example.com/1.jpeg\",\n"
+                + "    \"cld2VideoUrl\":\"https://cdn.example.com/1-video.mp4\",\"duration\":183.56,\"tags\":\"pop\",\"prompt\":\"[Verse] 1\"},\n"
+                + "   {\"id\":\"2120087722226888706\",\"clipId\":\"clip-2\",\"title\":\"夏日\",\"status\":30,\"progress\":100,\n"
+                + "    \"cld2AudioUrl\":\"https://cdn.example.com/2.m4a\",\"cld2ImageUrl\":\"https://cdn.example.com/2.jpeg\",\n"
+                + "    \"cld2VideoUrl\":\"\",\"duration\":\"175.2\",\"tags\":\"pop\",\"makeInstrumental\":true}]}]}\n");
 
         // 调用
-        List<SunoApi.Task> tasks = sunoApi.fetchTasks(List.of("task-1"));
+        List<SunoApi.Task> tasks = sunoApi.fetchTasks(Arrays.asList("task-1"));
         // 断言：请求
         ClientRequest clientRequest = captureRequest();
         assertRequest(clientRequest, "/suno/fetch");
@@ -457,28 +453,26 @@ public class SunoApiUnitTest extends BaseMockitoUnitTest {
     @Test
     public void testFetchTasks_salpx() {
         // mock 方法：SalpX 的 data 为对象，clips 以歌曲编号为键，sunoData 是同一批歌曲
-        mockResponse(HttpStatus.OK, """
-                {"code":"success","data":[{"task_id":"task-1","action":"MUSIC","status":"SUCCESS","progress":"100%",
-                  "data":{"task_id":"task-1","status":"SUCCESS",
-                    "clips":{
-                      "clip-1":{"id":"clip-1","clip_id":"clip-1","title":"夏日","status":"complete",
-                        "audio_url":"https://cdn.example.com/1.mp3","image_url":"https://cdn.example.com/1.png",
-                        "image_large_url":"https://cdn.example.com/1-large.png","video_url":"","model_name":"chirp-v6",
-                        "metadata":{"tags":"pop","prompt":"[Verse] 1","duration":201.5,"error_message":null}},
-                      "clip-2":{"id":"clip-2","clip_id":"clip-2","title":"夏日","status":"complete",
-                        "audio_url":"https://cdn.example.com/2.mp3","image_url":"https://cdn.example.com/2.png",
-                        "metadata":{"tags":"pop","prompt":"[Verse] 2","duration":198.0}}},
-                    "sunoData":[{"id":"clip-1","audio_url":"https://cdn.example.com/1.mp3"},
-                                {"id":"clip-2","audio_url":"https://cdn.example.com/2.mp3"}]}}]}
-                """);
+        mockResponse(HttpStatus.OK, "{\"code\":\"success\",\"data\":[{\"task_id\":\"task-1\",\"action\":\"MUSIC\",\"status\":\"SUCCESS\",\"progress\":\"100%\",\n"
+                + "  \"data\":{\"task_id\":\"task-1\",\"status\":\"SUCCESS\",\n"
+                + "    \"clips\":{\n"
+                + "      \"clip-1\":{\"id\":\"clip-1\",\"clip_id\":\"clip-1\",\"title\":\"夏日\",\"status\":\"complete\",\n"
+                + "        \"audio_url\":\"https://cdn.example.com/1.mp3\",\"image_url\":\"https://cdn.example.com/1.png\",\n"
+                + "        \"image_large_url\":\"https://cdn.example.com/1-large.png\",\"video_url\":\"\",\"model_name\":\"chirp-v6\",\n"
+                + "        \"metadata\":{\"tags\":\"pop\",\"prompt\":\"[Verse] 1\",\"duration\":201.5,\"error_message\":null}},\n"
+                + "      \"clip-2\":{\"id\":\"clip-2\",\"clip_id\":\"clip-2\",\"title\":\"夏日\",\"status\":\"complete\",\n"
+                + "        \"audio_url\":\"https://cdn.example.com/2.mp3\",\"image_url\":\"https://cdn.example.com/2.png\",\n"
+                + "        \"metadata\":{\"tags\":\"pop\",\"prompt\":\"[Verse] 2\",\"duration\":198.0}}},\n"
+                + "    \"sunoData\":[{\"id\":\"clip-1\",\"audio_url\":\"https://cdn.example.com/1.mp3\"},\n"
+                + "                {\"id\":\"clip-2\",\"audio_url\":\"https://cdn.example.com/2.mp3\"}]}}]}\n");
 
         // 调用
-        List<SunoApi.Task> tasks = sunoApi.fetchTasks(List.of("task-1"));
+        List<SunoApi.Task> tasks = sunoApi.fetchTasks(Arrays.asList("task-1"));
         // 断言：只解析 clips，不因 sunoData 重复
         assertEquals(1, tasks.size());
         assertTrue(tasks.get(0).isSuccess());
         List<SunoApi.Clip> clips = tasks.get(0).data();
-        assertEquals(List.of("clip-1", "clip-2"), clips.stream().map(SunoApi.Clip::id).toList());
+        assertEquals(Arrays.asList("clip-1", "clip-2"), clips.stream().map(SunoApi.Clip::id).collect(Collectors.toList()));
         SunoApi.Clip clip1 = clips.get(0);
         assertEquals("https://cdn.example.com/1.mp3", clip1.audioUrl());
         assertEquals("https://cdn.example.com/1-large.png", clip1.coverUrl());

@@ -35,7 +35,7 @@ import cn.iocoder.yudao.module.ai.util.AiDocumentUtils;
 import cn.iocoder.yudao.module.ai.util.AiImageUtils;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
 import com.google.common.annotations.VisibleForTesting;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;

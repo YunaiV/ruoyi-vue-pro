@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.ai.framework.ai.core.model.speech.AiSpeechUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.core.io.Resource;
+import org.springframework.util.StreamUtils;
 
 import java.io.IOException;
 
@@ -26,7 +27,7 @@ public class AiAsrUtils {
         Assert.notNull(resource, "音频不能为空");
         byte[] audio;
         try {
-            audio = resource.getContentAsByteArray();
+            audio = StreamUtils.copyToByteArray(resource.getInputStream());
         } catch (IOException ex) {
             throw new IllegalArgumentException("音频读取失败", ex);
         }

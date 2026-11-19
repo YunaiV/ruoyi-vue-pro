@@ -49,9 +49,7 @@ public class SiliconFlowOcrModelTest {
     @Test
     public void testCall_success() {
         // 准备参数
-        server.enqueue(Response.json(200, """
-                {"id":"0192","object":"chat.completion","model":"deepseek-ai/DeepSeek-OCR",\
-                "choices":[{"index":0,"message":{"role":"assistant","content":"\\nHello OCR\\n硅基流动\\n"}}]}"""));
+        server.enqueue(Response.json(200, "{\"id\":\"0192\",\"object\":\"chat.completion\",\"model\":\"deepseek-ai/DeepSeek-OCR\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\\nHello OCR\\n硅基流动\\n\"}}]}"));
 
         // 调用
         String text = buildModel(null).call(buildPrompt(MimeTypeUtils.IMAGE_PNG, IMAGE)).getResult().getOutput();
@@ -86,8 +84,7 @@ public class SiliconFlowOcrModelTest {
     @Test
     public void testCall_businessError() {
         // 准备参数：硅基流动的错误体 {"code":20015,"message":"...","data":null}
-        server.enqueue(Response.json(400, """
-                {"code":20015,"message":"The parameter is invalid. Please check again.","data":null}"""));
+        server.enqueue(Response.json(400, "{\"code\":20015,\"message\":\"The parameter is invalid. Please check again.\",\"data\":null}"));
 
         // 调用，并断言异常
         OcrException ex = assertThrows(OcrException.class,
@@ -131,6 +128,21 @@ public class SiliconFlowOcrModelTest {
         // 调用，并断言异常
         OcrException ex = assertThrows(OcrException.class, () -> model.call(buildPrompt(MimeTypeUtils.IMAGE_PNG, IMAGE)));
         assertEquals(OcrException.Type.TIMEOUT, ex.getType());
+    }
+
+    @Test
+    public void testCall_timeoutNotRetried() throws Exception {
+        // 准备参数：首个请求超时；桩服务按顺序处理请求，若客户端自动重发，第二个请求会在首个处理完后被记录
+        server.enqueue(Response.delayed(1000)).enqueue(Response.json(200, "{}"));
+        SiliconFlowOcrModel model = new SiliconFlowOcrModel(API_KEY, server.baseUrl(), null,
+                Duration.ofSeconds(1), Duration.ofMillis(300));
+
+        // 调用，并断言异常
+        OcrException ex = assertThrows(OcrException.class, () -> model.call(buildPrompt(MimeTypeUtils.IMAGE_PNG, IMAGE)));
+        assertEquals(OcrException.Type.TIMEOUT, ex.getType());
+        // 断言：等首个请求处理完，仍只收到一次请求（超时的 POST 可能已计费，不自动重发）
+        Thread.sleep(1500);
+        assertEquals(1, server.requests().size());
     }
 
     @Test

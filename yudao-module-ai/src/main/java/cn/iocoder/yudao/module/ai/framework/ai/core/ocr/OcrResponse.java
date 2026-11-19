@@ -4,6 +4,7 @@ import org.springframework.ai.model.ModelResponse;
 import org.springframework.ai.model.ResponseMetadata;
 import org.springframework.util.Assert;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -17,7 +18,7 @@ public class OcrResponse implements ModelResponse<OcrResult> {
 
     public OcrResponse(OcrResult result) {
         Assert.notNull(result, "result 不能为空");
-        this.results = List.of(result);
+        this.results = Collections.singletonList(result);
     }
 
     @Override

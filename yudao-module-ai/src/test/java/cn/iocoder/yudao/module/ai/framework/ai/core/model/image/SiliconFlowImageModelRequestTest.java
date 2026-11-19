@@ -10,6 +10,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestTemplate;
 
 import static org.hamcrest.Matchers.endsWith;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
@@ -32,7 +33,9 @@ public class SiliconFlowImageModelRequestTest {
     @BeforeEach
     public void setUp() {
         RestClient.Builder restClientBuilder = RestClient.builder();
-        server = MockRestServiceServer.bindTo(restClientBuilder).build();
+        RestTemplate restTemplate = new RestTemplate();
+        server = MockRestServiceServer.bindTo(restTemplate).build();
+        restClientBuilder.requestFactory(restTemplate.getRequestFactory());
         imageModel = new SiliconFlowImageModel(new SiliconFlowImageApi("http://127.0.0.1", "sk-test", restClientBuilder));
     }
 

@@ -21,7 +21,6 @@ import org.springframework.http.MediaType;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.reactive.function.client.WebClient;
-
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
@@ -32,7 +31,6 @@ import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -50,11 +48,14 @@ public class AiRequestBodyPatcherTest {
     private static final String PATCH_JSON = "{\"thinking\":{\"type\":\"enabled\"},\"reasoning_effort\":\"high\",\"temperature\":1.0}";
 
     private HttpServer server;
+
     private String baseUrl;
+
     /**
      * 收到的请求
      */
     private final List<CapturedRequest> requests = new CopyOnWriteArrayList<>();
+
     /**
      * 按请求顺序返回的响应；用完后重复最后一个
      */
@@ -67,7 +68,7 @@ public class AiRequestBodyPatcherTest {
         server.createContext("/", exchange -> {
             byte[] body;
             try (InputStream in = exchange.getRequestBody()) {
-                body = in.readAllBytes();
+                body = org.springframework.util.StreamUtils.copyToByteArray(in);
             }
             Map<String, String> headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
             exchange.getRequestHeaders().forEach((k, v) -> headers.put(k, String.join(",", v)));
@@ -91,27 +92,22 @@ public class AiRequestBodyPatcherTest {
     }
 
     // ========== RFC 7396 ==========
-
     @Test
     public void testMergePatch_rfc7396() throws Exception {
         // 准备参数：对象递归、null 删除、数组整体替换、标量覆盖、新增
         JsonNode target = MAPPER.readTree("{\"a\":\"b\",\"c\":{\"d\":\"e\",\"f\":\"g\"},\"arr\":[1,2,3],\"keep\":1}");
         JsonNode patch = MAPPER.readTree("{\"a\":\"z\",\"c\":{\"f\":null,\"h\":1},\"arr\":[9],\"new\":{\"x\":null,\"y\":2}}");
-
         // 调用
         JsonNode result = AiRequestBodyPatcher.mergePatch(target, patch);
         // 断言
-        assertEquals(MAPPER.readTree("{\"a\":\"z\",\"c\":{\"d\":\"e\",\"h\":1},\"arr\":[9],\"keep\":1,\"new\":{\"y\":2}}"),
-                result);
+        assertEquals(MAPPER.readTree("{\"a\":\"z\",\"c\":{\"d\":\"e\",\"h\":1},\"arr\":[9],\"keep\":1,\"new\":{\"y\":2}}"), result);
     }
 
     @Test
     public void testMergePatch_nonObjectPatchReplaces() throws Exception {
         // 调用，并断言：补丁或目标不是对象时，整体替换
-        assertEquals(MAPPER.readTree("[\"c\"]"),
-                AiRequestBodyPatcher.mergePatch(MAPPER.readTree("{\"a\":1}"), MAPPER.readTree("[\"c\"]")));
-        assertEquals(MAPPER.readTree("{\"a\":1}"),
-                AiRequestBodyPatcher.mergePatch(MAPPER.readTree("[1]"), MAPPER.readTree("{\"a\":1}")));
+        assertEquals(MAPPER.readTree("[\"c\"]"), AiRequestBodyPatcher.mergePatch(MAPPER.readTree("{\"a\":1}"), MAPPER.readTree("[\"c\"]")));
+        assertEquals(MAPPER.readTree("{\"a\":1}"), AiRequestBodyPatcher.mergePatch(MAPPER.readTree("[1]"), MAPPER.readTree("{\"a\":1}")));
     }
 
     @Test
@@ -119,7 +115,6 @@ public class AiRequestBodyPatcherTest {
         // 准备参数
         ObjectNode patch = (ObjectNode) MAPPER.readTree("{\"thinking\":{\"type\":\"enabled\"},\"arr\":[1]}");
         JsonNode before = patch.deepCopy();
-
         // 调用
         ObjectNode result = (ObjectNode) AiRequestBodyPatcher.mergePatch(MAPPER.createObjectNode(), patch);
         // 断言：补丁的值写入目标后，修改目标不能影响补丁
@@ -132,7 +127,6 @@ public class AiRequestBodyPatcherTest {
     public void testApply_repeatedCallsIndependent() throws Exception {
         // 准备参数
         AiRequestBodyPatcher patcher = new AiRequestBodyPatcher("{\"thinking\":{\"type\":\"enabled\"}}");
-
         // 调用
         byte[] first = patcher.apply(jsonHeaders(), "{\"thinking\":{\"budget\":1}}".getBytes(StandardCharsets.UTF_8));
         byte[] second = patcher.apply(jsonHeaders(), "{\"model\":\"m\"}".getBytes(StandardCharsets.UTF_8));
@@ -145,7 +139,6 @@ public class AiRequestBodyPatcherTest {
     public void testApply_utf8() throws Exception {
         // 准备参数
         AiRequestBodyPatcher patcher = new AiRequestBodyPatcher("{\"note\":\"思考\"}");
-
         // 调用
         byte[] merged = patcher.apply(jsonHeaders(), "{\"content\":\"你好，世界 😀\"}".getBytes(StandardCharsets.UTF_8));
         // 断言
@@ -155,7 +148,6 @@ public class AiRequestBodyPatcherTest {
     }
 
     // ========== 失败关闭 ==========
-
     @Test
     public void testConstructor_invalidPatch() {
         // 调用，并断言异常：非法 JSON、非对象、尾部多余内容
@@ -173,7 +165,6 @@ public class AiRequestBodyPatcherTest {
         text.setContentType(MediaType.TEXT_PLAIN);
         HttpHeaders gbk = new HttpHeaders();
         gbk.setContentType(new MediaType(MediaType.APPLICATION_JSON, Charset.forName("GBK")));
-
         // 调用，并断言异常：非 JSON Content-Type
         assertThrows(IllegalStateException.class, () -> patcher.apply(text, json));
         // 调用，并断言异常：没有 Content-Type
@@ -195,10 +186,8 @@ public class AiRequestBodyPatcherTest {
         responses.add(StubResponse.json(200, "{}"));
         // 准备参数
         RestClient client = new AiRequestBodyPatcher(PATCH_JSON).restClientBuilder().baseUrl(baseUrl).build();
-
         // 调用，并断言异常
-        assertThrows(RuntimeException.class, () -> client.post().uri("/chat/completions")
-                .contentType(MediaType.TEXT_PLAIN).body("hello").retrieve().toBodilessEntity());
+        assertThrows(RuntimeException.class, () -> client.post().uri("/chat/completions").contentType(MediaType.TEXT_PLAIN).body("hello").retrieve().toBodilessEntity());
         // 断言
         assertTrue(requests.isEmpty(), "补丁失败时不能发出请求");
     }
@@ -209,26 +198,19 @@ public class AiRequestBodyPatcherTest {
         responses.add(StubResponse.json(200, "{}"));
         // 准备参数
         WebClient client = new AiRequestBodyPatcher(PATCH_JSON).webClientBuilder().baseUrl(baseUrl).build();
-
         // 调用，并断言异常：非 JSON Content-Type
-        assertThrows(RuntimeException.class, () -> client.post().uri("/chat/completions")
-                .contentType(MediaType.TEXT_PLAIN).bodyValue("hello").retrieve().toBodilessEntity()
-                .block(Duration.ofSeconds(10)));
+        assertThrows(RuntimeException.class, () -> client.post().uri("/chat/completions").contentType(MediaType.TEXT_PLAIN).bodyValue("hello").retrieve().toBodilessEntity().block(Duration.ofSeconds(10)));
         // 调用，并断言异常：非 JSON 对象
-        assertThrows(RuntimeException.class, () -> client.post().uri("/chat/completions")
-                .contentType(MediaType.APPLICATION_JSON).bodyValue("[1]").retrieve().toBodilessEntity()
-                .block(Duration.ofSeconds(10)));
+        assertThrows(RuntimeException.class, () -> client.post().uri("/chat/completions").contentType(MediaType.APPLICATION_JSON).bodyValue("[1]").retrieve().toBodilessEntity().block(Duration.ofSeconds(10)));
         // 断言
         assertTrue(requests.isEmpty(), "补丁失败时不能发出请求");
     }
 
     // ========== DeepSeekChatModel 同步 / 流式 ==========
-
     @Test
     public void testConfigure_nullPatcherKeepsBuilder() {
         // 准备参数
         DeepSeekApi.Builder builder = DeepSeekApi.builder();
-
         // 调用，并断言
         assertSame(builder, AiRequestBodyPatcher.configure(builder, null));
     }
@@ -239,7 +221,6 @@ public class AiRequestBodyPatcherTest {
         responses.add(StubResponse.json(200, syncStop("ok")));
         // 准备参数
         DeepSeekChatModel model = buildModel(new AiRequestBodyPatcher(PATCH_JSON));
-
         // 调用
         ChatResponse response = model.call(new Prompt(new UserMessage("你好，世界")));
         // 断言
@@ -261,7 +242,6 @@ public class AiRequestBodyPatcherTest {
     public void testDeepSeekCall_emptyPatchEqualsUnpatched() throws Exception {
         // mock 响应
         responses.add(StubResponse.json(200, syncStop("ok")));
-
         // 调用：不装补丁、装空补丁各一次
         buildModel(null).call(new Prompt(new UserMessage("你好")));
         buildModel(new AiRequestBodyPatcher("{}")).call(new Prompt(new UserMessage("你好")));
@@ -282,10 +262,8 @@ public class AiRequestBodyPatcherTest {
         responses.add(StubResponse.sse(streamChunk("你", null), streamChunk("好", "stop")));
         // 准备参数
         DeepSeekChatModel model = buildModel(new AiRequestBodyPatcher(PATCH_JSON));
-
         // 调用
-        List<ChatResponse> chunks = model.stream(new Prompt(new UserMessage("你好，世界 😀")))
-                .collectList().block(Duration.ofSeconds(30));
+        List<ChatResponse> chunks = model.stream(new Prompt(new UserMessage("你好，世界 😀"))).collectList().block(Duration.ofSeconds(30));
         // 断言
         assertNotNull(chunks);
         StringBuilder text = new StringBuilder();
@@ -308,7 +286,6 @@ public class AiRequestBodyPatcherTest {
     }
 
     // ========== 工具续调用 ==========
-
     @Test
     public void testDeepSeekCall_toolContinuationPatched() throws Exception {
         // mock 响应：先返回工具调用，再返回结果
@@ -317,12 +294,11 @@ public class AiRequestBodyPatcherTest {
         // 准备参数
         List<String> invoked = new CopyOnWriteArrayList<>();
         DeepSeekChatModel model = buildModel(new AiRequestBodyPatcher(PATCH_JSON));
-
         // 调用
-        ChatResponse response = model.call(new Prompt(new UserMessage("调用工具"), toolOptions(invoked)));
+        ChatResponse response = org.springframework.ai.chat.client.ChatClient.create(model).prompt(new Prompt(new UserMessage("调用工具"), toolOptions(invoked))).call().chatResponse();
         // 断言
         assertEquals("done", response.getResult().getOutput().getText());
-        assertEquals(List.of("hi"), invoked);
+        assertEquals(org.springframework.ai.util.Java8Collections.listOf("hi"), invoked);
         assertToolContinuation();
     }
 
@@ -334,13 +310,11 @@ public class AiRequestBodyPatcherTest {
         // 准备参数
         List<String> invoked = new CopyOnWriteArrayList<>();
         DeepSeekChatModel model = buildModel(new AiRequestBodyPatcher(PATCH_JSON));
-
         // 调用
-        List<ChatResponse> chunks = model.stream(new Prompt(new UserMessage("调用工具"), toolOptions(invoked)))
-                .collectList().block(Duration.ofSeconds(30));
+        List<ChatResponse> chunks = org.springframework.ai.chat.client.ChatClient.create(model).prompt(new Prompt(new UserMessage("调用工具"), toolOptions(invoked))).stream().chatResponse().collectList().block(Duration.ofSeconds(30));
         // 断言
         assertNotNull(chunks);
-        assertEquals(List.of("hi"), invoked);
+        assertEquals(org.springframework.ai.util.Java8Collections.listOf("hi"), invoked);
         assertToolContinuation();
         assertTrue(requests.get(1).json().get("stream").asBoolean());
     }
@@ -351,7 +325,6 @@ public class AiRequestBodyPatcherTest {
         responses.add(StubResponse.json(400, "{\"error\":{\"message\":\"bad\"}}"));
         // 准备参数
         DeepSeekChatModel model = buildModel(new AiRequestBodyPatcher(PATCH_JSON));
-
         // 调用，并断言异常
         assertThrows(RuntimeException.class, () -> model.call(new Prompt(new UserMessage("你好"))));
         // 断言：补丁已打上，厂商的错误原样抛出
@@ -359,7 +332,6 @@ public class AiRequestBodyPatcherTest {
     }
 
     // ========== 辅助方法 ==========
-
     private void assertToolContinuation() throws Exception {
         assertEquals(2, requests.size());
         for (CapturedRequest request : requests) {
@@ -383,14 +355,8 @@ public class AiRequestBodyPatcherTest {
     }
 
     private DeepSeekChatModel buildModel(AiRequestBodyPatcher patcher) {
-        DeepSeekApi api = AiRequestBodyPatcher.configure(DeepSeekApi.builder()
-                .baseUrl(baseUrl).apiKey("test-key"), patcher).build();
-        return DeepSeekChatModel.builder()
-                .deepSeekApi(api)
-                .defaultOptions(DeepSeekChatOptions.builder().model("deepseek-chat").temperature(0.7).build())
-                .toolCallingManager(DefaultToolCallingManager.builder().build())
-                .retryTemplate(RetryTemplate.builder().maxAttempts(1).build())
-                .build();
+        DeepSeekApi api = AiRequestBodyPatcher.configure(DeepSeekApi.builder().baseUrl(baseUrl).apiKey("test-key"), patcher).build();
+        return DeepSeekChatModel.builder().deepSeekApi(api).options(DeepSeekChatOptions.builder().model("deepseek-chat").temperature(0.7).build()).toolCallingManager(DefaultToolCallingManager.builder().build()).retryTemplate(RetryTemplate.builder().maxAttempts(1).build()).build();
     }
 
     private static DeepSeekChatOptions toolOptions(List<String> invoked) {
@@ -398,11 +364,7 @@ public class AiRequestBodyPatcherTest {
             invoked.add(request.text());
             return "echo:" + request.text();
         };
-        return DeepSeekChatOptions.builder()
-                .model("deepseek-chat")
-                .toolCallbacks(FunctionToolCallback.builder("echo", function)
-                        .description("回显").inputType(EchoRequest.class).build())
-                .build();
+        return DeepSeekChatOptions.builder().model("deepseek-chat").toolCallbacks(FunctionToolCallback.builder("echo", function).description("回显").inputType(EchoRequest.class).build()).build();
     }
 
     private static void assertDefaultRequest(CapturedRequest request) {
@@ -415,7 +377,8 @@ public class AiRequestBodyPatcherTest {
     private static void assertContentLength(CapturedRequest request) {
         String transferEncoding = request.headers.get("Transfer-Encoding");
         if (transferEncoding != null && transferEncoding.toLowerCase().contains("chunked")) {
-            return; // 分块传输：请求体完整性已由 JSON 解析保证
+            // 分块传输：请求体完整性已由 JSON 解析保证
+            return;
         }
         assertNotNull(request.headers.get("Content-Length"), "既不是分块传输，也没有 Content-Length");
         assertEquals(request.body.length, Integer.parseInt(request.headers.get("Content-Length")));
@@ -428,44 +391,117 @@ public class AiRequestBodyPatcherTest {
     }
 
     private static String syncStop(String content) {
-        return "{\"id\":\"r1\",\"object\":\"chat.completion\",\"created\":1,\"model\":\"deepseek-chat\","
-                + "\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"" + content + "\"},"
-                + "\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":1,\"completion_tokens\":1,\"total_tokens\":2}}";
+        return "{\"id\":\"r1\",\"object\":\"chat.completion\",\"created\":1,\"model\":\"deepseek-chat\"," + "\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"" + content + "\"}," + "\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":1,\"completion_tokens\":1,\"total_tokens\":2}}";
     }
 
     private static String syncToolCall() {
-        return "{\"id\":\"r0\",\"object\":\"chat.completion\",\"created\":1,\"model\":\"deepseek-chat\","
-                + "\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\","
-                + "\"tool_calls\":[{\"id\":\"call_1\",\"type\":\"function\",\"function\":{\"name\":\"echo\","
-                + "\"arguments\":\"{\\\"text\\\":\\\"hi\\\"}\"}}]},\"finish_reason\":\"tool_calls\"}],"
-                + "\"usage\":{\"prompt_tokens\":1,\"completion_tokens\":1,\"total_tokens\":2}}";
+        return "{\"id\":\"r0\",\"object\":\"chat.completion\",\"created\":1,\"model\":\"deepseek-chat\"," + "\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\"," + "\"tool_calls\":[{\"id\":\"call_1\",\"type\":\"function\",\"function\":{\"name\":\"echo\"," + "\"arguments\":\"{\\\"text\\\":\\\"hi\\\"}\"}}]},\"finish_reason\":\"tool_calls\"}]," + "\"usage\":{\"prompt_tokens\":1,\"completion_tokens\":1,\"total_tokens\":2}}";
     }
 
     private static String streamChunk(String content, String finishReason) {
-        return "{\"id\":\"c1\",\"object\":\"chat.completion.chunk\",\"created\":1,\"model\":\"deepseek-chat\","
-                + "\"choices\":[{\"index\":0,\"delta\":{\"role\":\"assistant\",\"content\":\"" + content + "\"},"
-                + "\"finish_reason\":" + (finishReason == null ? "null" : "\"" + finishReason + "\"") + "}]}";
+        return "{\"id\":\"c1\",\"object\":\"chat.completion.chunk\",\"created\":1,\"model\":\"deepseek-chat\"," + "\"choices\":[{\"index\":0,\"delta\":{\"role\":\"assistant\",\"content\":\"" + content + "\"}," + "\"finish_reason\":" + (finishReason == null ? "null" : "\"" + finishReason + "\"") + "}]}";
     }
 
     private static String streamToolCall() {
-        return "{\"id\":\"c0\",\"object\":\"chat.completion.chunk\",\"created\":1,\"model\":\"deepseek-chat\","
-                + "\"choices\":[{\"index\":0,\"delta\":{\"role\":\"assistant\",\"content\":\"\","
-                + "\"tool_calls\":[{\"index\":0,\"id\":\"call_1\",\"type\":\"function\",\"function\":{\"name\":\"echo\","
-                + "\"arguments\":\"{\\\"text\\\":\\\"hi\\\"}\"}}]},\"finish_reason\":\"tool_calls\"}]}";
+        return "{\"id\":\"c0\",\"object\":\"chat.completion.chunk\",\"created\":1,\"model\":\"deepseek-chat\"," + "\"choices\":[{\"index\":0,\"delta\":{\"role\":\"assistant\",\"content\":\"\"," + "\"tool_calls\":[{\"index\":0,\"id\":\"call_1\",\"type\":\"function\",\"function\":{\"name\":\"echo\"," + "\"arguments\":\"{\\\"text\\\":\\\"hi\\\"}\"}}]},\"finish_reason\":\"tool_calls\"}]}";
     }
 
-    public record EchoRequest(String text) {
+    @com.fasterxml.jackson.annotation.JsonAutoDetect(fieldVisibility = com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY, getterVisibility = com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE, isGetterVisibility = com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE, setterVisibility = com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE)
+    public final static class EchoRequest {
+
+        private final String text;
+
+        public String text() {
+            return this.text;
+        }
+
+        @com.fasterxml.jackson.annotation.JsonCreator()
+        public EchoRequest(@com.fasterxml.jackson.annotation.JsonProperty("text") String text) {
+            this.text = text;
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            if (this == other)
+                return true;
+            if (other == null || getClass() != other.getClass())
+                return false;
+            EchoRequest that = (EchoRequest) other;
+            return java.util.Objects.equals(this.text, that.text);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = 0;
+            result = 31 * result + java.util.Objects.hashCode(this.text);
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            return "EchoRequest[text=" + java.lang.String.valueOf((Object) this.text) + "]";
+        }
     }
 
-    private record CapturedRequest(String path, Map<String, String> headers, byte[] body) {
+    @com.fasterxml.jackson.annotation.JsonAutoDetect(fieldVisibility = com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY, getterVisibility = com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE, isGetterVisibility = com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE, setterVisibility = com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE)
+    private final static class CapturedRequest {
 
         JsonNode json() throws Exception {
             return MAPPER.readTree(new String(body, StandardCharsets.UTF_8));
         }
 
+        private final String path;
+
+        public String path() {
+            return this.path;
+        }
+
+        private final Map<String, String> headers;
+
+        public Map<String, String> headers() {
+            return this.headers;
+        }
+
+        private final byte[] body;
+
+        public byte[] body() {
+            return this.body;
+        }
+
+        @com.fasterxml.jackson.annotation.JsonCreator()
+        private CapturedRequest(@com.fasterxml.jackson.annotation.JsonProperty("path") String path, @com.fasterxml.jackson.annotation.JsonProperty("headers") Map<String, String> headers, @com.fasterxml.jackson.annotation.JsonProperty("body") byte[] body) {
+            this.path = path;
+            this.headers = headers;
+            this.body = body;
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            if (this == other)
+                return true;
+            if (other == null || getClass() != other.getClass())
+                return false;
+            CapturedRequest that = (CapturedRequest) other;
+            return java.util.Objects.equals(this.path, that.path) && java.util.Objects.equals(this.headers, that.headers) && java.util.Objects.equals(this.body, that.body);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = 0;
+            result = 31 * result + java.util.Objects.hashCode(this.path);
+            result = 31 * result + java.util.Objects.hashCode(this.headers);
+            result = 31 * result + java.util.Objects.hashCode(this.body);
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            return "CapturedRequest[path=" + java.lang.String.valueOf((Object) this.path) + ", headers=" + java.lang.String.valueOf((Object) this.headers) + ", body=" + java.lang.String.valueOf((Object) this.body) + "]";
+        }
     }
 
-    private record StubResponse(int status, String contentType, String body) {
+    @com.fasterxml.jackson.annotation.JsonAutoDetect(fieldVisibility = com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY, getterVisibility = com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE, isGetterVisibility = com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE, setterVisibility = com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE)
+    private final static class StubResponse {
 
         static StubResponse json(int status, String body) {
             return new StubResponse(status, "application/json", body);
@@ -480,6 +516,53 @@ public class AiRequestBodyPatcherTest {
             return new StubResponse(200, "text/event-stream;charset=UTF-8", sb.toString());
         }
 
-    }
+        private final int status;
 
+        public int status() {
+            return this.status;
+        }
+
+        private final String contentType;
+
+        public String contentType() {
+            return this.contentType;
+        }
+
+        private final String body;
+
+        public String body() {
+            return this.body;
+        }
+
+        @com.fasterxml.jackson.annotation.JsonCreator()
+        private StubResponse(@com.fasterxml.jackson.annotation.JsonProperty("status") int status, @com.fasterxml.jackson.annotation.JsonProperty("contentType") String contentType, @com.fasterxml.jackson.annotation.JsonProperty("body") String body) {
+            this.status = status;
+            this.contentType = contentType;
+            this.body = body;
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            if (this == other)
+                return true;
+            if (other == null || getClass() != other.getClass())
+                return false;
+            StubResponse that = (StubResponse) other;
+            return this.status == that.status && java.util.Objects.equals(this.contentType, that.contentType) && java.util.Objects.equals(this.body, that.body);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = 0;
+            result = 31 * result + Integer.hashCode(this.status);
+            result = 31 * result + java.util.Objects.hashCode(this.contentType);
+            result = 31 * result + java.util.Objects.hashCode(this.body);
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            return "StubResponse[status=" + java.lang.String.valueOf((Object) this.status) + ", contentType=" + java.lang.String.valueOf((Object) this.contentType) + ", body=" + java.lang.String.valueOf((Object) this.body) + "]";
+        }
+    }
 }

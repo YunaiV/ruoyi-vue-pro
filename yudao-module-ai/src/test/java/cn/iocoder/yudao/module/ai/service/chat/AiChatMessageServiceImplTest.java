@@ -268,7 +268,7 @@ public class AiChatMessageServiceImplTest extends BaseMockitoUnitTest {
         Long tenantId = randomLongId();
         mockLoginUser(userId, tenantId);
         // mock deepSeekApi 的方法：先请求工具，再流式返回回答
-        when(deepSeekApi.chatCompletionStream(any())).thenReturn(Flux.just(buildChatCompletionChunk(TOOL_CALL_MESSAGE)),
+        when(deepSeekApi.chatCompletionStreamRaw(any())).thenReturn(Flux.just(buildChatCompletionChunk(TOOL_CALL_MESSAGE)),
                 buildAnswerChunks(TOOL_ANSWER_CHUNKS));
 
         // 调用
@@ -279,7 +279,7 @@ public class AiChatMessageServiceImplTest extends BaseMockitoUnitTest {
         assertTrue(results.stream().allMatch(CommonResult::isSuccess));
         assertEquals(TOOL_ANSWER, joinContent(results));
         ArgumentCaptor<ChatCompletionRequest> requestCaptor = ArgumentCaptor.forClass(ChatCompletionRequest.class);
-        verify(deepSeekApi, times(2)).chatCompletionStream(requestCaptor.capture());
+        verify(deepSeekApi, times(2)).chatCompletionStreamRaw(requestCaptor.capture());
         assertToolExecuted(requestCaptor.getAllValues(), toolContexts, userId, tenantId);
         // 断言消息保存
         assertAssistantMessageUpdated(TOOL_ANSWER);
@@ -294,7 +294,7 @@ public class AiChatMessageServiceImplTest extends BaseMockitoUnitTest {
         // mock 对话、模型
         mockConversation(reqVO.getConversationId(), userId, null);
         // mock deepSeekApi 的方法
-        when(deepSeekApi.chatCompletionStream(any())).thenReturn(buildAnswerChunks(PLAIN_ANSWER_CHUNKS));
+        when(deepSeekApi.chatCompletionStreamRaw(any())).thenReturn(buildAnswerChunks(PLAIN_ANSWER_CHUNKS));
 
         // 调用
         List<CommonResult<AiChatMessageSendRespVO>> results = chatMessageService
@@ -303,7 +303,7 @@ public class AiChatMessageServiceImplTest extends BaseMockitoUnitTest {
         assertNotNull(results);
         assertTrue(results.stream().allMatch(CommonResult::isSuccess));
         assertEquals(PLAIN_ANSWER, joinContent(results));
-        verify(deepSeekApi).chatCompletionStream(any());
+        verify(deepSeekApi).chatCompletionStreamRaw(any());
         // 断言消息保存
         assertAssistantMessageUpdated(PLAIN_ANSWER);
     }
@@ -323,7 +323,7 @@ public class AiChatMessageServiceImplTest extends BaseMockitoUnitTest {
         // mock 登录用户、租户
         mockLoginUser(userId, randomLongId());
         // mock deepSeekApi 的方法：先请求工具，再返回异常
-        when(deepSeekApi.chatCompletionStream(any())).thenReturn(Flux.just(buildChatCompletionChunk(TOOL_CALL_MESSAGE)),
+        when(deepSeekApi.chatCompletionStreamRaw(any())).thenReturn(Flux.just(buildChatCompletionChunk(TOOL_CALL_MESSAGE)),
                 Flux.error(new IllegalStateException("模型服务异常")));
 
         // 调用
@@ -332,7 +332,7 @@ public class AiChatMessageServiceImplTest extends BaseMockitoUnitTest {
         // 断言
         assertNotNull(results);
         assertEquals(CHAT_STREAM_ERROR.getCode(), CollUtil.getLast(results).getCode());
-        verify(deepSeekApi, times(2)).chatCompletionStream(any());
+        verify(deepSeekApi, times(2)).chatCompletionStreamRaw(any());
         assertEquals(1, toolContexts.size());
         // 断言消息删除（无内容）
         verify(chatMessageMapper).deleteById(ASSISTANT_MESSAGE_ID);
@@ -498,7 +498,7 @@ public class AiChatMessageServiceImplTest extends BaseMockitoUnitTest {
         Long tenantId = randomLongId();
         mockLoginUser(userId, tenantId);
         // mock deepSeekApi 的方法：先请求工具，再流式返回回答
-        when(deepSeekApi.chatCompletionStream(any())).thenReturn(Flux.just(buildChatCompletionChunk(TOOL_CALL_MESSAGE)),
+        when(deepSeekApi.chatCompletionStreamRaw(any())).thenReturn(Flux.just(buildChatCompletionChunk(TOOL_CALL_MESSAGE)),
                 buildAnswerChunks(TOOL_ANSWER_CHUNKS));
 
         // 调用
@@ -510,7 +510,7 @@ public class AiChatMessageServiceImplTest extends BaseMockitoUnitTest {
         assertEquals(TOOL_ANSWER, joinContent(results));
         assertReasoningOptionsPassed(model, "off");
         ArgumentCaptor<ChatCompletionRequest> requestCaptor = ArgumentCaptor.forClass(ChatCompletionRequest.class);
-        verify(deepSeekApi, times(2)).chatCompletionStream(requestCaptor.capture());
+        verify(deepSeekApi, times(2)).chatCompletionStreamRaw(requestCaptor.capture());
         assertToolExecuted(requestCaptor.getAllValues(), toolContexts, userId, tenantId);
         assertAssistantMessageUpdated(TOOL_ANSWER);
     }
@@ -562,7 +562,7 @@ public class AiChatMessageServiceImplTest extends BaseMockitoUnitTest {
         mockLoginUser(userId, randomLongId());
         // mock deepSeekApi 的方法：厂商不支持该组合，直接报错
         RuntimeException modelException = new NonTransientAiException("400 - thinking 与 tools 不能同时使用");
-        when(deepSeekApi.chatCompletionStream(any())).thenReturn(Flux.error(modelException));
+        when(deepSeekApi.chatCompletionStreamRaw(any())).thenReturn(Flux.error(modelException));
 
         // 调用
         List<CommonResult<AiChatMessageSendRespVO>> results = chatMessageService
@@ -571,7 +571,7 @@ public class AiChatMessageServiceImplTest extends BaseMockitoUnitTest {
         assertSingleErrorFrame(results, CHAT_STREAM_ERROR.getCode());
         // 断言：请求已发出且带工具；工具未执行、空消息删除、请求日志记失败
         ArgumentCaptor<ChatCompletionRequest> requestCaptor = ArgumentCaptor.forClass(ChatCompletionRequest.class);
-        verify(deepSeekApi).chatCompletionStream(requestCaptor.capture());
+        verify(deepSeekApi).chatCompletionStreamRaw(requestCaptor.capture());
         assertEquals(1, requestCaptor.getValue().tools().size());
         assertTrue(toolContexts.isEmpty());
         verify(chatMessageMapper).deleteById(ASSISTANT_MESSAGE_ID);
@@ -619,7 +619,7 @@ public class AiChatMessageServiceImplTest extends BaseMockitoUnitTest {
         // mock deepSeekApi 的方法：首个 chunk 无用量，最后一个 chunk 带用量（输出 0 是真实的 0）
         ChatCompletionChunk usageChunk = buildChatCompletionChunk(new ChatCompletionMessage("我是 AI 助手", Role.ASSISTANT),
                 new DeepSeekApi.Usage(0, 3, 3));
-        when(deepSeekApi.chatCompletionStream(any())).thenReturn(Flux.just(
+        when(deepSeekApi.chatCompletionStreamRaw(any())).thenReturn(Flux.just(
                 buildChatCompletionChunk(new ChatCompletionMessage("你好，", Role.ASSISTANT)), usageChunk));
 
         // 调用
@@ -1152,6 +1152,8 @@ public class AiChatMessageServiceImplTest extends BaseMockitoUnitTest {
                 .setModel(CUSTOM_MODEL_NAME).setPlatform(platform.getPlatform()).setInputModalities(inputModalities);
         when(modalService.validateModel(eq(model.getId()))).thenReturn(model);
         when(modalService.getChatModel(eq(model.getId()), isNull())).thenReturn(chatModel);
+        lenient().when(chatModel.getOptions()).thenReturn(
+                cn.iocoder.yudao.module.ai.util.AiChatUtils.buildChatOptions(platform, CUSTOM_MODEL_NAME, TEMPERATURE, MAX_TOKENS));
     }
 
     /**

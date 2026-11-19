@@ -26,6 +26,7 @@ import org.springframework.ai.audio.transcription.AudioTranscription;
 import org.springframework.ai.audio.transcription.AudioTranscriptionPrompt;
 import org.springframework.ai.audio.transcription.AudioTranscriptionResponse;
 import org.springframework.ai.audio.transcription.TranscriptionModel;
+import org.springframework.util.StreamUtils;
 
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.module.ai.enums.ErrorCodeConstants.*;
@@ -77,7 +78,7 @@ public class AiAsrServiceImplTest extends BaseMockitoUnitTest {
         // 断言：下载的音频原样交给模型
         verify(transcriptionModel).call(argThat(prompt -> {
             try {
-                assertArrayEquals(AUDIO, prompt.getInstructions().getContentAsByteArray());
+                assertArrayEquals(AUDIO, StreamUtils.copyToByteArray(prompt.getInstructions().getInputStream()));
             } catch (Exception e) {
                 fail(e);
             }

@@ -17,9 +17,8 @@ import cn.iocoder.yudao.module.ai.enums.requestlog.AiRequestLogBizTypeEnum;
 import cn.iocoder.yudao.module.ai.service.requestlog.dto.AiRequestLogCreateReqDTO;
 import cn.iocoder.yudao.module.ai.util.AiUsageUtils;
 import cn.iocoder.yudao.module.ai.util.AiUsageUtils.UsageSnapshot;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.chat.metadata.EmptyUsage;
 import org.springframework.ai.chat.metadata.Usage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.stereotype.Service;
@@ -71,7 +70,7 @@ public class AiRequestLogServiceImpl implements AiRequestLogService {
             try {
                 // 1. 用量：有效 usage 作为当前整体快照；合计 Token 由 createReqDTO 按输入、输出计算
                 Usage usage = response.getMetadata() != null ? response.getMetadata().getUsage() : null;
-                boolean usagePresent = usage != null && !(usage instanceof EmptyUsage);
+                boolean usagePresent = AiUsageUtils.isUsagePresent(usage);
                 if (usagePresent) {
                     UsageSnapshot snapshot = AiUsageUtils.extractUsage(response, createReqDTO.getPlatform());
                     createReqDTO.setInputTokens(snapshot.getInputTokens()).setOutputTokens(snapshot.getOutputTokens());
@@ -88,7 +87,7 @@ public class AiRequestLogServiceImpl implements AiRequestLogService {
                     target = new LinkedHashMap<>();
                     createReqDTO.setResponseMetadata(target);
                 }
-                // 2.2 usage：有效 usage 整体替换；null、EmptyUsage 不覆盖已有快照
+                // 2.2 usage：有效 usage 整体替换；无效 usage（null、EmptyUsage 等）不覆盖已有快照
                 Object usageNode = metadata.remove(AiUsageUtils.USAGE_KEY);
                 if (usagePresent) {
                     target.put(AiUsageUtils.USAGE_KEY, usageNode);

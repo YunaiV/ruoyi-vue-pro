@@ -28,6 +28,7 @@ import cn.iocoder.yudao.module.ai.tool.function.DirectoryListToolFunction;
 import cn.iocoder.yudao.module.ai.tool.function.UserProfileQueryToolFunction;
 import cn.iocoder.yudao.module.ai.tool.function.WeatherQueryToolFunction;
 import cn.iocoder.yudao.module.ai.tool.method.PersonService;
+import com.google.common.collect.ImmutableList;
 import io.micrometer.observation.ObservationRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.model.ChatModel;
@@ -39,7 +40,6 @@ import org.springframework.ai.embedding.TokenCountBatchingStrategy;
 import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tokenizer.JTokkitTokenCountEstimator;
 import org.springframework.ai.tokenizer.TokenCountEstimator;
@@ -97,12 +97,9 @@ public class AiAutoConfiguration {
             properties.setModel(GeminiChatModel.MODEL_DEFAULT);
         }
         OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
-                .openAiApi(OpenAiApi.builder()
-                        .baseUrl(GeminiChatModel.BASE_URL)
-                        .completionsPath(GeminiChatModel.COMPLETE_PATH)
+                .options(OpenAiChatOptions.builder()
+                        .baseUrl(buildOpenAiBaseUrl(GeminiChatModel.BASE_URL, GeminiChatModel.COMPLETE_PATH))
                         .apiKey(properties.getApiKey())
-                        .build())
-                .defaultOptions(OpenAiChatOptions.builder()
                         .model(properties.getModel())
                         .temperature(properties.getTemperature())
                         .maxTokens(properties.getMaxTokens())
@@ -134,7 +131,7 @@ public class AiAutoConfiguration {
                         .completionsPath(DouBaoChatModel.COMPLETE_PATH)
                         .apiKey(properties.getApiKey()), patcher)
                         .build())
-                .defaultOptions(DeepSeekChatOptions.builder()
+                .options(DeepSeekChatOptions.builder()
                         .model(properties.getModel())
                         .temperature(properties.getTemperature())
                         .maxTokens(properties.getMaxTokens())
@@ -166,7 +163,7 @@ public class AiAutoConfiguration {
                         .baseUrl(SiliconFlowApiConstants.DEFAULT_BASE_URL)
                         .apiKey(properties.getApiKey()), patcher)
                         .build())
-                .defaultOptions(DeepSeekChatOptions.builder()
+                .options(DeepSeekChatOptions.builder()
                         .model(properties.getModel())
                         .temperature(properties.getTemperature())
                         .maxTokens(properties.getMaxTokens())
@@ -202,7 +199,7 @@ public class AiAutoConfiguration {
                         .completionsPath(HunYuanChatModel.COMPLETE_PATH)
                         .apiKey(properties.getApiKey()), patcher)
                         .build())
-                .defaultOptions(DeepSeekChatOptions.builder()
+                .options(DeepSeekChatOptions.builder()
                         .model(properties.getModel())
                         .temperature(properties.getTemperature())
                         .maxTokens(properties.getMaxTokens())
@@ -261,7 +258,7 @@ public class AiAutoConfiguration {
                         .apiKey(properties.getApiKey())
                         .completionsPath(BaiChuanChatModel.COMPLETE_PATH), patcher)
                         .build())
-                .defaultOptions(DeepSeekChatOptions.builder()
+                .options(DeepSeekChatOptions.builder()
                         .model(properties.getModel())
                         .temperature(properties.getTemperature())
                         .maxTokens(properties.getMaxTokens())
@@ -313,7 +310,7 @@ public class AiAutoConfiguration {
                         .baseUrl(StrUtil.blankToDefault(properties.getBaseUrl(), ZhiPuChatModel.BASE_URL))
                         .apiKey(properties.getApiKey()), patcher)
                         .build())
-                .defaultOptions(DeepSeekChatOptions.builder()
+                .options(DeepSeekChatOptions.builder()
                         .model(properties.getModel())
                         .temperature(properties.getTemperature())
                         .maxTokens(properties.getMaxTokens())
@@ -420,7 +417,7 @@ public class AiAutoConfiguration {
         AiRequestBodyPatcher.configure(apiBuilder, patcher);
         return DeepSeekChatModel.builder()
                 .deepSeekApi(apiBuilder.build())
-                .defaultOptions(DeepSeekChatOptions.builder()
+                .options(DeepSeekChatOptions.builder()
                         .model(model)
                         .temperature(temperature)
                         .maxTokens(maxTokens)
@@ -449,12 +446,10 @@ public class AiAutoConfiguration {
             properties.setModel(GrokChatModel.MODEL_DEFAULT);
         }
         OpenAiChatModel openAiChatModel = OpenAiChatModel.builder()
-                .openAiApi(OpenAiApi.builder()
-                        .baseUrl(StrUtil.blankToDefault(properties.getBaseUrl(), GrokChatModel.BASE_URL))
-                        .completionsPath(GrokChatModel.COMPLETE_PATH)
+                .options(OpenAiChatOptions.builder()
+                        .baseUrl(buildOpenAiBaseUrl(StrUtil.blankToDefault(properties.getBaseUrl(), GrokChatModel.BASE_URL),
+                                GrokChatModel.COMPLETE_PATH))
                         .apiKey(properties.getApiKey())
-                        .build())
-                .defaultOptions(OpenAiChatOptions.builder()
                         .model(properties.getModel())
                         .temperature(properties.getTemperature())
                         .maxTokens(properties.getMaxTokens())
@@ -463,6 +458,19 @@ public class AiAutoConfiguration {
                 .toolCallingManager(getToolCallingManager())
                 .build();
         return new GrokChatModel(openAiChatModel);
+    }
+
+    /**
+     * 获得 OpenAI 官方 SDK 的 baseUrl
+     *
+     * OpenAI 官方 SDK 的请求路径固定为 baseUrl + /chat/completions，所以由原 baseUrl + completionsPath 换算
+     *
+     * @param baseUrl         原 baseUrl
+     * @param completionsPath 原 completionsPath，以 /chat/completions 结尾
+     * @return baseUrl
+     */
+    private static String buildOpenAiBaseUrl(String baseUrl, String completionsPath) {
+        return StrUtil.removeSuffix(StrUtil.removeSuffix(baseUrl, "/") + completionsPath, "/chat/completions");
     }
 
     // ========== RAG 相关 ==========
@@ -504,7 +512,7 @@ public class AiAutoConfiguration {
      */
     @Bean
     public List<ToolCallback> toolCallbacks(PersonService personService) {
-        return List.of(ToolCallbacks.from(personService));
+        return ImmutableList.copyOf(ToolCallbacks.from(personService));
     }
 
     @Bean

@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.ai.controller.admin.drama.vo.project;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 @Schema(description = "管理后台 - AI 短剧项目公开状态修改 Request VO")

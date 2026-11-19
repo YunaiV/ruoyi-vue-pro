@@ -38,8 +38,8 @@ public class YiYanChatModel implements ChatModel {
     }
 
     @Override
-    public ChatOptions getDefaultOptions() {
-        return deepSeekChatModel.getDefaultOptions();
+    public ChatOptions getOptions() {
+        return deepSeekChatModel.getOptions();
     }
 
 }

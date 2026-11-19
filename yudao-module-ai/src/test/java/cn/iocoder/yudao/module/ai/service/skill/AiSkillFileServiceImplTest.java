@@ -10,12 +10,13 @@ import cn.iocoder.yudao.module.ai.dal.dataobject.skill.AiSkillDO;
 import cn.iocoder.yudao.module.ai.dal.dataobject.skill.AiSkillFileDO;
 import cn.iocoder.yudao.module.ai.dal.mysql.skill.AiSkillFileMapper;
 import cn.iocoder.yudao.module.ai.enums.skill.AiSkillFileTypeEnum;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
@@ -42,7 +43,7 @@ public class AiSkillFileServiceImplTest extends BaseDbUnitTest {
     @Resource
     private AiSkillFileMapper skillFileMapper;
 
-    @MockitoBean
+    @MockBean
     private AiSkillService skillService;
 
     @BeforeEach
@@ -274,7 +275,7 @@ public class AiSkillFileServiceImplTest extends BaseDbUnitTest {
         assertEquals("技能(order-analysis)中不存在文件(reference/none.md)",
                 skillFileService.readSkillFile(skill, "reference/none.md"));
         // 调用，并断言：文件路径列表
-        assertEquals(List.of("reference/guide.md"), skillFileService.getSkillFilePathList(SKILL_ID));
+        assertEquals(Arrays.asList("reference/guide.md"), skillFileService.getSkillFilePathList(SKILL_ID));
     }
 
     @Test

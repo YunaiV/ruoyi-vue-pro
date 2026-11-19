@@ -17,7 +17,7 @@ import cn.iocoder.yudao.module.ai.service.model.AiApiKeyService;
 import cn.iocoder.yudao.module.ai.service.model.AiModelService;
 import cn.iocoder.yudao.module.ai.util.AiDocumentUtils;
 import cn.iocoder.yudao.module.infra.api.file.FileApi;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.springframework.ai.chat.messages.AssistantMessage;
@@ -32,7 +32,7 @@ import org.springframework.ai.image.ImageOptions;
 import org.springframework.ai.image.ImagePrompt;
 import org.springframework.ai.image.ImageResponse;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.nio.charset.StandardCharsets;
@@ -80,11 +80,11 @@ public class AiPptServiceImplTest extends BaseDbUnitTest {
     @Resource
     private AiPptMapper pptMapper;
 
-    @MockitoBean
+    @MockBean
     private AiModelService modelService;
-    @MockitoBean
+    @MockBean
     private AiApiKeyService apiKeyService;
-    @MockitoBean
+    @MockBean
     private FileApi fileApi;
 
     // ========== 创作：提交 ==========

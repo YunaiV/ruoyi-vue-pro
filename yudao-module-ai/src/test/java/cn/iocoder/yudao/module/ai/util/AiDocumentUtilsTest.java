@@ -1,6 +1,5 @@
 package cn.iocoder.yudao.module.ai.util;
 
-import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -63,7 +62,7 @@ public class AiDocumentUtilsTest {
         // 调用
         byte[] content = AiDocumentUtils.buildPdf(images);
         // 断言：每页 16:9，只有一张图
-        try (PDDocument document = Loader.loadPDF(content)) {
+        try (PDDocument document = PDDocument.load(content)) {
             assertEquals(2, document.getNumberOfPages());
             for (PDPage page : document.getPages()) {
                 assertEquals(960F, page.getMediaBox().getWidth());

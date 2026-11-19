@@ -37,7 +37,7 @@ public class MiniMaxChatModelTests {
                     .baseUrl(MiniMaxChatModel.BASE_URL)
                     .apiKey(API_KEY)
                     .build())
-            .defaultOptions(DeepSeekChatOptions.builder()
+            .options(DeepSeekChatOptions.builder()
                     .model(MODEL)
                     .build())
             .build());

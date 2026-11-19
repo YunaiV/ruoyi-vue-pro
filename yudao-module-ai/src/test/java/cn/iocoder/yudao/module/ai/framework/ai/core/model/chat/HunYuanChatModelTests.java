@@ -38,7 +38,7 @@ public class HunYuanChatModelTests {
                     .completionsPath(HunYuanChatModel.COMPLETE_PATH)
                     .apiKey(API_KEY) // apiKey
                     .build())
-            .defaultOptions(DeepSeekChatOptions.builder()
+            .options(DeepSeekChatOptions.builder()
                     .model(MODEL) // 模型
                     .temperature(0.7)
                     .build())

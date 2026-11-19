@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.ai.dal.dataobject.model.AiModelDO;
 import cn.iocoder.yudao.module.ai.enums.model.AiModelTypeEnum;
 import cn.iocoder.yudao.module.ai.enums.model.AiPlatformEnum;
+import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -115,7 +116,7 @@ public class AiReasoningUtilsTest {
         // 准备参数：HTTP 路由允许覆盖其它顶层字段、允许嵌套
         AiModelDO.ReasoningLevel off = emptyLevel("off");
         off.getOptions().put("temperature", 1.0);
-        off.getOptions().put("thinking", new HashMap<>(Map.of("type", "disabled")));
+        off.getOptions().put("thinking", new HashMap<>(ImmutableMap.of("type", "disabled")));
         // 调用，并断言
         assertDoesNotThrow(() -> validateReasoning(AiPlatformEnum.ZHIPU, config("off", off)));
     }
@@ -125,7 +126,7 @@ public class AiReasoningUtilsTest {
         // 准备参数：允许 reasoning_effort 和追加的新字段
         AiModelDO.ReasoningLevel ok = emptyLevel("low");
         ok.getOptions().put("reasoning_effort", "low");
-        ok.getOptions().put("reasoning", new HashMap<>(Map.of("effort", "low")));
+        ok.getOptions().put("reasoning", new HashMap<>(ImmutableMap.of("effort", "low")));
         // 准备参数：reasoning_effort 必须是非空字符串
         AiModelDO.ReasoningLevel badEffort = emptyLevel("low");
         badEffort.getOptions().put("reasoning_effort", 1);
@@ -145,17 +146,17 @@ public class AiReasoningUtilsTest {
     @Test
     public void testValidateReasoningConfig_tongYiRules() {
         // 准备参数：合法
-        AiModelDO.ReasoningLevel off = level("off", new HashMap<>(Map.of("enable_thinking", false)));
+        AiModelDO.ReasoningLevel off = level("off", new HashMap<>(ImmutableMap.of("enable_thinking", false)));
         AiModelDO.ReasoningLevel high = level("high",
-                new HashMap<>(Map.of("enable_thinking", true, "thinking_budget", 8192)));
+                new HashMap<>(ImmutableMap.of("enable_thinking", true, "thinking_budget", 8192)));
         // 准备参数：enable_thinking 不是布尔
-        AiModelDO.ReasoningLevel notBool = level("off", new HashMap<>(Map.of("enable_thinking", "false")));
+        AiModelDO.ReasoningLevel notBool = level("off", new HashMap<>(ImmutableMap.of("enable_thinking", "false")));
         // 准备参数：其他键
         AiModelDO.ReasoningLevel otherKey = level("off",
-                new HashMap<>(Map.of("enable_thinking", false, "temperature", 1)));
+                new HashMap<>(ImmutableMap.of("enable_thinking", false, "temperature", 1)));
         // 准备参数：预算非正整数
         AiModelDO.ReasoningLevel badBudget = level("high",
-                new HashMap<>(Map.of("enable_thinking", true, "thinking_budget", 0)));
+                new HashMap<>(ImmutableMap.of("enable_thinking", true, "thinking_budget", 0)));
         // 准备参数：预算为 null
         Map<String, Object> nullBudgetOptions = new HashMap<>();
         nullBudgetOptions.put("enable_thinking", true);
@@ -293,15 +294,15 @@ public class AiReasoningUtilsTest {
     public void testHashReasoningOptions() {
         // 准备参数：a、b 只是键顺序不同（含嵌套）；c 内容不同；d 嵌套值不同；e 多覆盖一个字段
         Map<String, Object> a = new LinkedHashMap<>();
-        a.put("thinking", new LinkedHashMap<>(Map.of("type", "enabled")));
+        a.put("thinking", new LinkedHashMap<>(ImmutableMap.of("type", "enabled")));
         a.put("reasoning_effort", "high");
         Map<String, Object> b = new LinkedHashMap<>();
         b.put("reasoning_effort", "high");
-        b.put("thinking", new LinkedHashMap<>(Map.of("type", "enabled")));
+        b.put("thinking", new LinkedHashMap<>(ImmutableMap.of("type", "enabled")));
         Map<String, Object> c = new LinkedHashMap<>(b);
         c.put("reasoning_effort", "max");
         Map<String, Object> d = new LinkedHashMap<>(b);
-        d.put("thinking", new LinkedHashMap<>(Map.of("type", "disabled")));
+        d.put("thinking", new LinkedHashMap<>(ImmutableMap.of("type", "disabled")));
         Map<String, Object> e = new LinkedHashMap<>(b);
         e.put("temperature", 1.0);
 
@@ -345,15 +346,15 @@ public class AiReasoningUtilsTest {
         reversed.put("a", Arrays.asList(3, 1, 2));
         reversed.put("b", inner);
         // 准备参数：BigDecimal 不同 scale
-        Map<String, Object> scale2 = new LinkedHashMap<>(Map.of("t", new BigDecimal("1.50")));
-        Map<String, Object> scale1 = new LinkedHashMap<>(Map.of("t", new BigDecimal("1.5")));
+        Map<String, Object> scale2 = new LinkedHashMap<>(ImmutableMap.of("t", new BigDecimal("1.50")));
+        Map<String, Object> scale1 = new LinkedHashMap<>(ImmutableMap.of("t", new BigDecimal("1.5")));
 
         // 调用，并断言：读回后再排序，与普通 Map 一致
         assertEquals("{\"a\":[3,1,2],\"b\":{\"a\":1,\"z\":2}}", AiReasoningUtils.toCanonicalReasoningJson(reversed));
         // 调用，并断言：数值读回后统一写法，哈希一致
         assertEquals("{\"t\":1.5}", AiReasoningUtils.toCanonicalReasoningJson(scale2));
         assertEquals(AiReasoningUtils.hashReasoningOptions(scale1), AiReasoningUtils.hashReasoningOptions(scale2));
-        assertEquals(AiReasoningUtils.hashReasoningOptions(Map.<String, Object>of("t", 1.5)), AiReasoningUtils.hashReasoningOptions(scale2));
+        assertEquals(AiReasoningUtils.hashReasoningOptions(ImmutableMap.<String, Object>of("t", 1.5)), AiReasoningUtils.hashReasoningOptions(scale2));
     }
 
 
@@ -401,7 +402,7 @@ public class AiReasoningUtilsTest {
 
     private static Map<String, Object> thinking(String type, String effort) {
         Map<String, Object> levelOptions = new LinkedHashMap<>();
-        levelOptions.put("thinking", new LinkedHashMap<>(Map.of("type", type)));
+        levelOptions.put("thinking", new LinkedHashMap<>(ImmutableMap.of("type", type)));
         if (effort != null) {
             levelOptions.put("reasoning_effort", effort);
         }

@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.ai.controller.admin.drama.vo.script;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 @Schema(description = "管理后台 - AI 短剧对话模型生成 Request VO：生成剧本、分析资产、生成分镜共用")

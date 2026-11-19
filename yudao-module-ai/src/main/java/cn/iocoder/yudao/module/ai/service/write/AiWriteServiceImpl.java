@@ -25,7 +25,7 @@ import cn.iocoder.yudao.module.ai.service.model.AiModelService;
 import cn.iocoder.yudao.module.ai.service.requestlog.AiRequestLogService;
 import cn.iocoder.yudao.module.ai.service.requestlog.dto.AiRequestLogCreateReqDTO;
 import cn.iocoder.yudao.module.ai.util.AiChatUtils;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
@@ -148,21 +148,32 @@ public class AiWriteServiceImpl implements AiWriteService {
                 .setTone(reqVO.getTone()).setLanguage(reqVO.getLanguage());
         AiWriteGenerateReqVO.SceneParams params = reqVO.getSceneParams();
         switch (AiWriteTypeEnum.valueOfType(reqVO.getType())) {
-            case WRITING, GENERAL -> write.setOriginalContent(null);
-            case REPLY -> {
-            }
-            case WEEKLY_REPORT -> write.setFormat(null).setSceneParams(params == null ? null
-                    : new AiWriteDO.SceneParams().setPeriod(params.getPeriod()).setRole(params.getRole()));
-            case XIAOHONGSHU -> write.setOriginalContent(null).setFormat(null).setTone(null)
-                    .setSceneParams(new AiWriteDO.SceneParams().setAudience(params.getAudience()).setStyle(params.getStyle())
-                            .setEmoji(params.getEmoji()).setTagCount(params.getTagCount()));
+            case WRITING:
+            case GENERAL:
+                write.setOriginalContent(null);
+                break;
+            case REPLY:
+                break;
+            case WEEKLY_REPORT:
+                write.setFormat(null).setSceneParams(params == null ? null
+                        : new AiWriteDO.SceneParams().setPeriod(params.getPeriod()).setRole(params.getRole()));
+                break;
+            case XIAOHONGSHU:
+                write.setOriginalContent(null).setFormat(null).setTone(null)
+                        .setSceneParams(new AiWriteDO.SceneParams().setAudience(params.getAudience()).setStyle(params.getStyle())
+                                .setEmoji(params.getEmoji()).setTagCount(params.getTagCount()));
+                break;
             // 润色 / 改写保持原文语言，翻译使用目标语言：都不使用格式、输出语言、长度
-            case REWRITE -> write.setFormat(null).setLanguage(null).setLength(null)
-                    .setSceneParams(new AiWriteDO.SceneParams().setMode(params.getMode()));
-            case TRANSLATE -> write.setFormat(null).setLanguage(null).setLength(null)
-                    .setSceneParams(new AiWriteDO.SceneParams().setSourceLanguage(params.getSourceLanguage())
-                            .setTargetLanguage(params.getTargetLanguage()).setDomain(params.getDomain())
-                            .setPreserveFormat(params.getPreserveFormat()));
+            case REWRITE:
+                write.setFormat(null).setLanguage(null).setLength(null)
+                        .setSceneParams(new AiWriteDO.SceneParams().setMode(params.getMode()));
+                break;
+            case TRANSLATE:
+                write.setFormat(null).setLanguage(null).setLength(null)
+                        .setSceneParams(new AiWriteDO.SceneParams().setSourceLanguage(params.getSourceLanguage())
+                                .setTargetLanguage(params.getTargetLanguage()).setDomain(params.getDomain())
+                                .setPreserveFormat(params.getPreserveFormat()));
+                break;
         }
         return write;
     }
@@ -222,21 +233,30 @@ public class AiWriteServiceImpl implements AiWriteService {
         String language = getDictLabel(DictTypeConstants.AI_WRITE_LANGUAGE, write.getLanguage());
         String length = getDictLabel(DictTypeConstants.AI_WRITE_LENGTH, write.getLength());
         AiWriteDO.SceneParams params = ObjUtil.defaultIfNull(write.getSceneParams(), new AiWriteDO.SceneParams());
-        return switch (type) {
-            case WRITING, GENERAL -> StrUtil.format(type.getPrompt(), prompt,
-                    getDictLabel(DictTypeConstants.AI_WRITE_FORMAT, write.getFormat()), tone, language, length);
-            case REPLY -> StrUtil.format(type.getPrompt(), original, prompt,
-                    getDictLabel(DictTypeConstants.AI_WRITE_FORMAT, write.getFormat()), tone, language, length);
-            case WEEKLY_REPORT -> StrUtil.format(type.getPrompt(), StrUtil.blankToDefault(params.getPeriod(), "无"),
-                    StrUtil.blankToDefault(params.getRole(), "无"), original, prompt, tone, language, length);
-            case XIAOHONGSHU -> StrUtil.format(type.getPrompt(), prompt, params.getAudience(), params.getStyle(),
-                    BooleanUtil.toString(params.getEmoji(), "是", "否"), params.getTagCount(), language, length);
-            case REWRITE -> StrUtil.format(type.getPrompt(), params.getMode(), tone, prompt, original);
-            case TRANSLATE -> StrUtil.format(type.getPrompt(),
-                    getDictLabel(DictTypeConstants.AI_WRITE_LANGUAGE, params.getSourceLanguage()),
-                    getDictLabel(DictTypeConstants.AI_WRITE_LANGUAGE, params.getTargetLanguage()),
-                    params.getDomain(), tone, BooleanUtil.toString(params.getPreserveFormat(), "是", "否"), prompt, original);
-        };
+        switch (type) {
+            case WRITING:
+            case GENERAL:
+                return StrUtil.format(type.getPrompt(), prompt,
+                        getDictLabel(DictTypeConstants.AI_WRITE_FORMAT, write.getFormat()), tone, language, length);
+            case REPLY:
+                return StrUtil.format(type.getPrompt(), original, prompt,
+                        getDictLabel(DictTypeConstants.AI_WRITE_FORMAT, write.getFormat()), tone, language, length);
+            case WEEKLY_REPORT:
+                return StrUtil.format(type.getPrompt(), StrUtil.blankToDefault(params.getPeriod(), "无"),
+                        StrUtil.blankToDefault(params.getRole(), "无"), original, prompt, tone, language, length);
+            case XIAOHONGSHU:
+                return StrUtil.format(type.getPrompt(), prompt, params.getAudience(), params.getStyle(),
+                        BooleanUtil.toString(params.getEmoji(), "是", "否"), params.getTagCount(), language, length);
+            case REWRITE:
+                return StrUtil.format(type.getPrompt(), params.getMode(), tone, prompt, original);
+            case TRANSLATE:
+                return StrUtil.format(type.getPrompt(),
+                        getDictLabel(DictTypeConstants.AI_WRITE_LANGUAGE, params.getSourceLanguage()),
+                        getDictLabel(DictTypeConstants.AI_WRITE_LANGUAGE, params.getTargetLanguage()),
+                        params.getDomain(), tone, BooleanUtil.toString(params.getPreserveFormat(), "是", "否"), prompt, original);
+            default:
+                throw new IllegalArgumentException("未知的写作类型：" + type);
+        }
     }
 
     private static String getDictLabel(String dictType, Integer value) {

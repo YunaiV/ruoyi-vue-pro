@@ -13,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -68,18 +69,18 @@ public class AiDramaTaskServiceImplTest extends BaseMockitoUnitTest {
                 .setSceneNo(2).setVideoStatus(AiDramaStatusEnum.FAIL.getStatus());
         failStoryboard.setUpdateTime(now.minusDays(1));
         when(storyboardService.getStoryboardTaskPage(any(), any(), isNull()))
-                .thenReturn(new PageResult<>(List.of(runningStoryboard, failStoryboard), 2L));
+                .thenReturn(new PageResult<>(Arrays.asList(runningStoryboard, failStoryboard), 2L));
         // 成片：最新
         AiDramaProjectDO composeProject = new AiDramaProjectDO().setId(PROJECT_ID)
                 .setComposeStatus(AiDramaStatusEnum.SUCCESS.getStatus())
                 .setComposeFileUrl("https://files.example.com/drama.mp4");
         composeProject.setUpdateTime(now);
         when(projectService.getComposeTaskPage(any(), any(), isNull()))
-                .thenReturn(new PageResult<>(List.of(composeProject), 1L));
+                .thenReturn(new PageResult<>(Arrays.asList(composeProject), 1L));
         when(assetService.getAppearanceTaskPage(any(), any(), isNull())).thenReturn(PageResult.empty());
         when(assetService.getLocationTaskPage(any(), any(), isNull())).thenReturn(PageResult.empty());
         when(assetService.getVisualAssetTaskPage(any(), any(), isNull())).thenReturn(PageResult.empty());
-        when(projectService.getProjectList(any())).thenReturn(List.of(
+        when(projectService.getProjectList(any())).thenReturn(Arrays.asList(
                 new AiDramaProjectDO().setId(PROJECT_ID).setUserId(1L).setName("末班地铁")));
         AiDramaTaskPageReqVO reqVO = new AiDramaTaskPageReqVO();
         reqVO.setPageNo(1);
@@ -113,8 +114,8 @@ public class AiDramaTaskServiceImplTest extends BaseMockitoUnitTest {
         when(assetService.getAppearanceTaskPage(any(), same(reqVO), isNull())).thenReturn(new PageResult<>(
                 Collections.singletonList(new AiDramaCharacterAppearanceDO().setId(11L).setCharacterId(1L).setAppearanceIndex(0)
                         .setModelId(10L).setStatus(AiDramaStatusEnum.SUCCESS.getStatus())
-                        .setImageUrls(List.of("https://files.example.com/a.png", "https://files.example.com/b.png"))
-                        .setImageDescriptions(List.of("第一张", "第二张")).setSelectedIndex(0)), 1L));
+                        .setImageUrls(Arrays.asList("https://files.example.com/a.png", "https://files.example.com/b.png"))
+                        .setImageDescriptions(Arrays.asList("第一张", "第二张")).setSelectedIndex(0)), 1L));
 
         PageResult<AiDramaTaskRespVO> pageResult = taskService.getTaskPage(reqVO);
 

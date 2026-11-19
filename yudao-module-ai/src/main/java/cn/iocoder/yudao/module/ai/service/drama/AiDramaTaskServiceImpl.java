@@ -11,7 +11,7 @@ import cn.iocoder.yudao.module.ai.dal.dataobject.drama.*;
 import cn.iocoder.yudao.module.ai.enums.drama.AiDramaStatusEnum;
 import cn.iocoder.yudao.module.ai.enums.drama.AiDramaTaskTypeEnum;
 import cn.iocoder.yudao.module.ai.enums.drama.AiDramaVisualAssetKindEnum;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
