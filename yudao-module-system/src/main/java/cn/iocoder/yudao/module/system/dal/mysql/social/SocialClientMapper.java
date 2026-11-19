@@ -7,12 +7,18 @@ import cn.iocoder.yudao.module.system.controller.admin.social.vo.client.SocialCl
 import cn.iocoder.yudao.module.system.dal.dataobject.social.SocialClientDO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 @Mapper
 public interface SocialClientMapper extends BaseMapperX<SocialClientDO> {
 
     default SocialClientDO selectBySocialTypeAndUserType(Integer socialType, Integer userType) {
         return selectOne(SocialClientDO::getSocialType, socialType,
                 SocialClientDO::getUserType, userType);
+    }
+
+    default List<SocialClientDO> selectListByUserType(Integer userType) {
+        return selectList(SocialClientDO::getUserType, userType);
     }
 
     default PageResult<SocialClientDO> selectPage(SocialClientPageReqVO reqVO) {

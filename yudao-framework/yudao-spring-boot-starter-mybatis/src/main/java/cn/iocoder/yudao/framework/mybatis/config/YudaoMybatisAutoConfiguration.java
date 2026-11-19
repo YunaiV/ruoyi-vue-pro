@@ -82,6 +82,10 @@ public class YudaoMybatisAutoConfiguration {
                 CaseInsensitiveResultMap.RESULT_MAP_ID, CaseInsensitiveResultMap.class, new ArrayList<>()).build());
     }
 
+    // TODO @AI：我们能不能不解决这个问题，先留个 TODO 在哪里记录下，等神通的驱动解决 ；（毕竟它是少数者）
+    // TODO 神通：等待神通 7.0.14 / oscarJDBC8-4.1.152（元数据 7.20）后续驱动修复 typed LocalDateTime 毫秒误读、跨时区写入偏移及 DST gap 读取；
+    //  项目先沿用 MyBatis 默认的 LocalDateTimeTypeHandler，升级驱动后需用真实访谈入口与小数秒、跨时区读写验证，不承诺升级已修复
+
     @Bean
     @ConditionalOnProperty(prefix = "mybatis-plus.global-config.db-config", name = "id-type", havingValue = "INPUT")
     public IKeyGenerator keyGenerator(ConfigurableEnvironment environment) {

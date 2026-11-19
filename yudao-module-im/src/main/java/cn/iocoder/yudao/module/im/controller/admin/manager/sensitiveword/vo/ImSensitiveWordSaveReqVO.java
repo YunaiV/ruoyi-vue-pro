@@ -8,11 +8,11 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
-@Schema(description = "管理后台 - IM 敏感词新增 / 修改 Request VO")
+@Schema(description = "管理后台 - IM 敏感词新增/修改 Request VO")
 @Data
 public class ImSensitiveWordSaveReqVO {
 
-    @Schema(description = "编号（修改时必填）", example = "1024")
+    @Schema(description = "敏感词编号", example = "1024")
     private Long id;
 
     @Schema(description = "敏感词", requiredMode = Schema.RequiredMode.REQUIRED, example = "敏感词内容")
@@ -20,9 +20,9 @@ public class ImSensitiveWordSaveReqVO {
     @Size(max = 64, message = "敏感词长度不能超过 64")
     private String word;
 
-    @Schema(description = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
+    @Schema(description = "状态，参见 CommonStatusEnum 枚举类", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
     @NotNull(message = "状态不能为空")
     @InEnum(value = CommonStatusEnum.class, message = "状态必须是 {value}")
-    private Integer status; // 参见 CommonStatusEnum 枚举类（0 启用 / 1 禁用）
+    private Integer status;
 
 }

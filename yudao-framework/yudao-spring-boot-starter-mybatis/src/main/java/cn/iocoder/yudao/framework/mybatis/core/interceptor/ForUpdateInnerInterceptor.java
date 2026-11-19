@@ -12,7 +12,6 @@ import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.parser.CCJSqlParserConstants;
-import net.sf.jsqlparser.parser.SimpleNode;
 import net.sf.jsqlparser.parser.Token;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
@@ -27,10 +26,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-// TODO DONE @AI：能不能不这么搞，而是 mapperx 根据数据库做封装噢？
-// 选择执行路径已在 BaseMapperX 按数据库封装（Oracle 首行锁定走多次查询，其它单条语句）；
-// SQL Server 的 WITH (UPDLOCK, ROWLOCK) 无法被 JSqlParser 解析，若在 Mapper 中直接生成，租户、数据权限等插件会解析失败，
-// 因此只能在所有解析 SQL 的插件之后改写。本拦截器只处理 SelectForUpdateMethod 的内置查询，不再扫描其它 SQL。
 /**
  * 锁定读的拦截器，需要位于拦截器链的末尾：在 prepare 阶段处理，此时租户、数据权限、分页等插件已完成 SQL 改写
  *
@@ -152,14 +147,19 @@ public class ForUpdateInnerInterceptor implements InnerInterceptor {
         if (first ? !isLimitOne(limit) || plainSelect.getDistinct() != null : limit != null) {
             throw unsupported(first ? "首行仅支持 LIMIT 1，且不支持 DISTINCT" : "不支持 LIMIT", sql);
         }
-        SimpleNode tableNode = table.getASTNode();
-        if (tableNode == null) {
+        // getASTNode() 的返回类型：JSqlParser 4.9 为 SimpleNode，5.4 为 Node，二者都有 jjtGetFirstToken、jjtGetLastToken；
+        // 不声明节点类型，只链式取得 token，同一份源码可分别按 4.9、5.4 编译
+        // DONE @AI：这里要注意，jdk8 用的 jsqlparser 4.9 ；因为 jsqlparser 5.4 要 jdk17 了；；；
+        // 处理：去掉 Node / SimpleNode 的 import 与变量类型，改为 getASTNode().jjtGetXxxToken() 的链式访问，4.9、5.4 均可编译；
+        // 实际 5.4 的最低版本为 Java 11（不是 17），4.9 为 Java 8。仅指本类，Oracle JSON_TABLE 等片段在 4.9 下的解析不在此列
+        Token tableLastToken = table.getASTNode() != null ? table.getASTNode().jjtGetLastToken() : null;
+        if (tableLastToken == null) {
             throw unsupported("无法定位表", sql);
         }
 
         // 末尾的 FOR UPDATE：表之后的 token 中，最后两个（不含分号）
         List<Token> tokens = new ArrayList<>();
-        for (Token token = tableNode.jjtGetLastToken().next; token != null && token.kind != CCJSqlParserConstants.EOF;
+        for (Token token = tableLastToken.next; token != null && token.kind != CCJSqlParserConstants.EOF;
              token = token.next) {
             tokens.add(token);
         }
@@ -175,23 +175,24 @@ public class ForUpdateInnerInterceptor implements InnerInterceptor {
         int[] lineStarts = SqlTokenUtils.lineStarts(sql);
         Token forToken = tokens.get(tokens.size() - 2);
         Token updateToken = tokens.get(tokens.size() - 1);
-        int tableEnd = SqlTokenUtils.end(sql, lineStarts, tableNode.jjtGetLastToken());
+        int tableEnd = SqlTokenUtils.end(sql, lineStarts, tableLastToken);
         List<SqlTokenUtils.Patch> patches = new ArrayList<>();
         patches.add(new SqlTokenUtils.Patch(SqlTokenUtils.begin(sql, lineStarts, forToken),
                 SqlTokenUtils.end(sql, lineStarts, updateToken), ""));
         patches.add(new SqlTokenUtils.Patch(tableEnd, tableEnd, SQL_SERVER_LOCK_HINTS));
         // 首行：删除 LIMIT 1，在 SELECT 之后增加 TOP (1)
         if (first) {
-            SimpleNode limitNode = limit.getASTNode();
-            SimpleNode selectNode = plainSelect.getASTNode();
-            if (limitNode == null || selectNode == null
-                    || selectNode.jjtGetFirstToken().kind != CCJSqlParserConstants.K_SELECT) {
+            Token selectToken = plainSelect.getASTNode() != null ? plainSelect.getASTNode().jjtGetFirstToken() : null;
+            Token limitFirstToken = limit.getASTNode() != null ? limit.getASTNode().jjtGetFirstToken() : null;
+            Token limitLastToken = limit.getASTNode() != null ? limit.getASTNode().jjtGetLastToken() : null;
+            if (selectToken == null || limitFirstToken == null || limitLastToken == null
+                    || selectToken.kind != CCJSqlParserConstants.K_SELECT) {
                 throw unsupported("无法定位 SELECT、LIMIT", sql);
             }
-            int selectEnd = SqlTokenUtils.end(sql, lineStarts, selectNode.jjtGetFirstToken());
+            int selectEnd = SqlTokenUtils.end(sql, lineStarts, selectToken);
             patches.add(new SqlTokenUtils.Patch(selectEnd, selectEnd, SQL_SERVER_TOP_ONE));
-            patches.add(new SqlTokenUtils.Patch(SqlTokenUtils.begin(sql, lineStarts, limitNode.jjtGetFirstToken()),
-                    SqlTokenUtils.end(sql, lineStarts, limitNode.jjtGetLastToken()), ""));
+            patches.add(new SqlTokenUtils.Patch(SqlTokenUtils.begin(sql, lineStarts, limitFirstToken),
+                    SqlTokenUtils.end(sql, lineStarts, limitLastToken), ""));
         }
         return SqlTokenUtils.apply(sql, patches);
     }

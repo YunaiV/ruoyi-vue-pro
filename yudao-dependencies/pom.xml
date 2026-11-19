@@ -26,7 +26,11 @@
         <druid.version>1.2.28</druid.version>
         <mybatis.version>3.5.19</mybatis.version>
         <mybatis-plus.version>3.5.17</mybatis-plus.version>
+        <jsqlparser.version>5.4</jsqlparser.version>
         <mybatis-plus-join.version>1.5.9</mybatis-plus-join.version>
+        <easy-es.version>3.0.2</easy-es.version>
+        <elasticsearch-client.version>7.17.28</elasticsearch-client.version>
+        <jakarta-json.version>2.1.3</jakarta-json.version>
         <dynamic-datasource.version>4.6.0</dynamic-datasource.version>
         <easy-trans.version>3.1.8</easy-trans.version>
         <redisson.version>4.8.0</redisson.version>
@@ -223,6 +227,12 @@
                 <version>${mybatis-plus.version}</version>
             </dependency>
             <dependency>
+                <!-- 注意：必须声明，mybatis-plus-jsqlparser 默认引入的 jsqlparser 5.2 无法解析 Oracle JSON_VALUE RETURNING 等 SQL！！！ -->
+                <groupId>com.github.jsqlparser</groupId>
+                <artifactId>jsqlparser</artifactId>
+                <version>${jsqlparser.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-generator</artifactId> <!-- 代码生成器，使用它解析表结构 -->
                 <version>${mybatis-plus.version}</version>
@@ -326,6 +336,32 @@
                 <groupId>org.apache.iotdb</groupId>
                 <artifactId>iotdb-jdbc</artifactId>
                 <version>${iotdb.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.iocoder.boot</groupId>
+                <artifactId>yudao-spring-boot-starter-elasticsearch</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.dromara.easy-es</groupId>
+                <artifactId>easy-es-boot-starter</artifactId>
+                <version>${easy-es.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>co.elastic.clients</groupId>
+                <artifactId>elasticsearch-java</artifactId>
+                <version>${elasticsearch-client.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.elasticsearch.client</groupId>
+                <artifactId>elasticsearch-rest-client</artifactId>
+                <version>${elasticsearch-client.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.json</groupId>
+                <artifactId>jakarta.json-api</artifactId>
+                <version>${jakarta-json.version}</version>
             </dependency>
 
             <!-- Job 定时任务相关 -->

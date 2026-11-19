@@ -24,4 +24,10 @@ public interface SmsCodeMapper extends BaseMapperX<SmsCodeDO> {
                 .orderByDesc(SmsCodeDO::getId));
     }
 
+    default int updateByIdAndUsed(Long id, Boolean whereUsed, SmsCodeDO updateObj) {
+        return update(updateObj, new LambdaQueryWrapperX<SmsCodeDO>()
+                .eq(SmsCodeDO::getId, id)
+                .eq(SmsCodeDO::getUsed, whereUsed));
+    }
+
 }

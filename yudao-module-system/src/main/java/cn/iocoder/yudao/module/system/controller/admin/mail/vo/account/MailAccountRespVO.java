@@ -33,6 +33,9 @@ public class MailAccountRespVO {
     @Schema(description = "是否开启 starttls", requiredMode = Schema.RequiredMode.REQUIRED, example = "true")
     private Boolean starttlsEnable;
 
+    @Schema(description = "SMTP 读取超时，单位：毫秒，0 表示不限制", requiredMode = Schema.RequiredMode.REQUIRED, example = "10000")
+    private Integer timeout;
+
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime createTime;
 

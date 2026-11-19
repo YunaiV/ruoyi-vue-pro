@@ -48,5 +48,11 @@ public class SocialUserBindReqDTO {
      */
     @NotNull(message = "state 不能为空")
     private String state;
+    /**
+     * 发起授权时的回调地址
+     *
+     * 网页授权换取令牌时需与发起授权时一致；小程序等直接使用 code 的平台为空
+     */
+    private String redirectUri;
 
 }

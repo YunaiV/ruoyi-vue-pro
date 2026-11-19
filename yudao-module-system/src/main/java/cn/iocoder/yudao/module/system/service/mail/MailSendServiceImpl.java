@@ -163,7 +163,8 @@ public class MailSendServiceImpl implements MailSendService {
         return new MailAccount().setFrom(from).setAuth(true)
                 .setUser(account.getUsername()).setPass(account.getPassword().toCharArray())
                 .setHost(account.getHost()).setPort(account.getPort())
-                .setSslEnable(account.getSslEnable()).setStarttlsEnable(account.getStarttlsEnable());
+                .setSslEnable(account.getSslEnable()).setStarttlsEnable(account.getStarttlsEnable())
+                .setTimeout(account.getTimeout());
     }
 
     @VisibleForTesting

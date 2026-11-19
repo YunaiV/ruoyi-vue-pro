@@ -4,6 +4,8 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.apilog.core.annotation.ApiAccessLog;
+import cn.iocoder.yudao.framework.apilog.core.filter.ApiAccessLogFilter;
 import cn.iocoder.yudao.framework.common.util.servlet.ServletUtils;
 import cn.iocoder.yudao.framework.common.util.spring.SpringUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -48,8 +50,12 @@ public class ApiAccessLogInterceptor implements HandlerInterceptor {
             if (CollUtil.isEmpty(queryString) && StrUtil.isEmpty(requestBody)) {
                 log.info("[preHandle][开始请求 URL({}) 无参数]", request.getRequestURI());
             } else {
-                log.info("[preHandle][开始请求 URL({}) 参数({})]", request.getRequestURI(),
-                        StrUtil.blankToDefault(requestBody, queryString.toString()));
+                // 与访问日志入库使用相同的脱敏规则，避免密码、令牌、注解声明的凭据打印到日志文件
+                ApiAccessLog accessLogAnnotation = ApiAccessLogFilter.getApiAccessLogAnnotation(handlerMethod);
+                String[] sanitizeKeys = accessLogAnnotation != null ? accessLogAnnotation.sanitizeKeys() : null;
+                log.info("[preHandle][开始请求 URL({}) 参数({})]", request.getRequestURI(), StrUtil.isNotBlank(requestBody)
+                        ? ApiAccessLogFilter.sanitizeJson(requestBody, sanitizeKeys)
+                        : ApiAccessLogFilter.sanitizeMap(queryString, sanitizeKeys));
             }
             // 计时
             StopWatch stopWatch = new StopWatch();

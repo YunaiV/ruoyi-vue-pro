@@ -112,15 +112,40 @@ public class MemberUserServiceImpl implements MemberUserService {
         memberUserMapper.insert(user);
 
         // 发送 MQ 消息：用户创建
+        sendUserCreateMessageAfterCommit(user.getId());
+        return user;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public MemberUserDO createUserForRegister(String mobile, String nickname, String password,
+                                              String registerIp, Integer terminal) {
+        validateMobileUnique(null, mobile);
+
+        MemberUserDO user = new MemberUserDO();
+        user.setMobile(mobile);
+        user.setStatus(CommonStatusEnum.ENABLE.getStatus());
+        user.setPassword(encodePassword(password));
+        user.setRegisterIp(registerIp).setRegisterTerminal(terminal);
+        user.setNickname(nickname);
+        if (StrUtil.isEmpty(nickname)) {
+            user.setNickname("用户" + RandomUtil.randomNumbers(6));
+        }
+        memberUserMapper.insert(user);
+
+        sendUserCreateMessageAfterCommit(user.getId());
+        return user;
+    }
+
+    private void sendUserCreateMessageAfterCommit(Long userId) {
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
 
             @Override
             public void afterCommit() {
-                memberUserProducer.sendUserCreateMessage(user.getId());
+                memberUserProducer.sendUserCreateMessage(userId);
             }
 
         });
-        return user;
     }
 
     @Override

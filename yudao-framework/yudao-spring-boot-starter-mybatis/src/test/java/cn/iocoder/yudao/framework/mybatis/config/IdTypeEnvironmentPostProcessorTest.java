@@ -167,6 +167,7 @@ public class IdTypeEnvironmentPostProcessorTest {
         assertEquals(DbType.DM, JdbcUtils.getDbType("jdbc:dm://127.0.0.1:5236?schema=RUOYI_VUE_PRO"));
         assertEquals(DbType.VASTBASE, JdbcUtils.getDbType("jdbc:vastbase://127.0.0.1:5432/ruoyi-vue-pro"));
         assertEquals(DbType.OSCAR, JdbcUtils.getDbType("jdbc:oscar://127.0.0.1:2003/OSRDB"));
+        // PolarDB：MyBatis Plus 识别为 OTHER，不按 PostgreSQL 处理
         assertEquals(DbType.OTHER, JdbcUtils.getDbType("jdbc:polardb://127.0.0.1:1521/ruoyi-vue-pro"));
     }
 

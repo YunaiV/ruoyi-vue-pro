@@ -7,6 +7,8 @@ import cn.iocoder.yudao.module.system.controller.admin.mail.vo.account.MailAccou
 import cn.iocoder.yudao.module.system.dal.dataobject.mail.MailAccountDO;
 import cn.iocoder.yudao.module.system.dal.mysql.mail.MailAccountMapper;
 import jakarta.annotation.Resource;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -70,6 +72,35 @@ public class MailAccountServiceImplTest extends BaseDbUnitTest {
         // 校验是否更新正确
         MailAccountDO mailAccount = mailAccountMapper.selectById(reqVO.getId()); // 获取最新的
         assertPojoEquals(reqVO, mailAccount);
+    }
+
+    @Test
+    public void testUpdateMailAccount_timeout() {
+        // 准备参数：新增读取超时为 10000 毫秒的账号
+        MailAccountSaveReqVO reqVO = randomPojo(MailAccountSaveReqVO.class, o -> o.setMail(randomEmail())
+                .setTimeout(10000)).setId(null);
+        Long id = mailAccountService.createMailAccount(reqVO);
+        assertEquals(10000, mailAccountService.getMailAccount(id).getTimeout());
+
+        // 调用：改回 0，表示不限制
+        mailAccountService.updateMailAccount(reqVO.setId(id).setTimeout(0));
+        // 断言
+        assertEquals(0, mailAccountService.getMailAccount(id).getTimeout());
+    }
+
+    @Test
+    public void testMailAccountSaveReqVO_timeoutConstraints() {
+        // 准备参数
+        Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+        MailAccountSaveReqVO reqVO = randomPojo(MailAccountSaveReqVO.class, o -> o.setMail(randomEmail()));
+
+        // 断言：0 与 65535 为有效边界
+        assertTrue(validator.validateProperty(reqVO.setTimeout(0), "timeout").isEmpty());
+        assertTrue(validator.validateProperty(reqVO.setTimeout(65535), "timeout").isEmpty());
+        // 断言：为空、小于 0、大于 65535 均不通过
+        assertFalse(validator.validateProperty(reqVO.setTimeout(null), "timeout").isEmpty());
+        assertFalse(validator.validateProperty(reqVO.setTimeout(-1), "timeout").isEmpty());
+        assertFalse(validator.validateProperty(reqVO.setTimeout(65536), "timeout").isEmpty());
     }
 
     @Test

@@ -23,7 +23,7 @@ import lombok.*;
 public class ImSensitiveWordDO extends BaseDO {
 
     /**
-     * 编号
+     * 敏感词编号
      */
     @TableId
     private Long id;
@@ -33,7 +33,7 @@ public class ImSensitiveWordDO extends BaseDO {
     private String word;
     /**
      * 状态
-     * <p>
+     *
      * 枚举 {@link CommonStatusEnum}
      */
     private Integer status;
