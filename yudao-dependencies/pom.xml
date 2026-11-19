@@ -20,7 +20,7 @@
         <spring.framework.version>5.3.39</spring.framework.version>
         <spring.security.version>5.8.16</spring.security.version>
         <spring.boot.version>2.7.18</spring.boot.version>
-        <kotlin.version>1.9.25</kotlin.version>
+        <kotlin.version>2.1.21</kotlin.version>
         <!-- Web 相关 -->
         <springdoc.version>1.8.0</springdoc.version>
         <knife4j.version>4.5.0</knife4j.version>
@@ -28,7 +28,7 @@
         <!-- DB 相关 -->
         <druid.version>1.2.28</druid.version>
         <mybatis.version>3.5.19</mybatis.version>
-        <mybatis-plus.version>3.5.17</mybatis-plus.version>
+        <mybatis-plus.version>3.5.18.1</mybatis-plus.version>
         <mybatis-plus-join.version>1.5.9</mybatis-plus-join.version>
         <easy-es.version>3.0.2</easy-es.version>
         <elasticsearch-client.version>7.17.28</elasticsearch-client.version>
@@ -46,18 +46,18 @@
         <!-- 服务保障相关 -->
         <lock4j.version>2.2.7</lock4j.version>
         <!-- 监控相关 -->
-        <skywalking.version>9.7.0</skywalking.version>
-        <spring-boot-admin.version>2.7.15</spring-boot-admin.version>
-        <opentelemetry.version>1.67.0</opentelemetry.version>
+        <skywalking.version>9.8.0</skywalking.version>
+        <spring-boot-admin.version>2.7.16</spring-boot-admin.version>
+        <opentelemetry.version>1.68.0</opentelemetry.version>
         <!-- Test 测试相关 -->
         <podam.version>7.2.11.RELEASE</podam.version> <!-- Spring Boot 2.X 最多使用 7.2.11 版本 -->
-        <jedis-mock.version>1.1.20</jedis-mock.version>
+        <jedis-mock.version>1.1.21</jedis-mock.version>
         <mockito-inline.version>4.11.0</mockito-inline.version>
         <!-- Bpm 工作流相关 -->
         <flowable.version>6.8.0</flowable.version> <!-- 不要升级 6.8.1：退回有 bug https://github.com/flowable/flowable-engine/issues/3944 -->
         <!-- 工具类相关 -->
         <anji-plus-captcha.version>2.0.0</anji-plus-captcha.version>
-        <jsoup.version>1.23.2</jsoup.version>
+        <jsoup.version>1.24.1</jsoup.version>
         <sensitive-word.version>0.29.5</sensitive-word.version>
         <pinyin4j.version>2.5.1</pinyin4j.version>
         <lombok.version>1.18.48</lombok.version>
@@ -67,33 +67,34 @@
         <aviator.version>5.4.4</aviator.version>
         <velocity.version>2.4</velocity.version> <!-- JDK8 不能从 2.4 升级到 2.4.1，会报包不存在！！！！ -->
         <fastjson2.version>2.0.66</fastjson2.version>
-        <guava.version>33.7.2-jre</guava.version>
+        <guava.version>33.8.0-jre</guava.version>
         <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
         <commons-net.version>3.13.0</commons-net.version>
-        <commons-lang3.version>3.21.0</commons-lang3.version>
+        <commons-lang3.version>3.22.0</commons-lang3.version>
         <jsch.version>2.28.8</jsch.version>
-        <tika-core.version>2.9.3</tika-core.version> <!-- JDK8 不能从 2.9.3 升级到 3.X，会报 JDK8 不支持 -->
+        <tika-core.version>2.9.4</tika-core.version> <!-- JDK8 不能从 2.9.3 升级到 3.X，会报 JDK8 不支持 -->
         <pdfbox.version>3.0.8</pdfbox.version>
         <ip2region.version>2.7.0</ip2region.version>
         <bizlog-sdk.version>3.0.6</bizlog-sdk.version>
-        <netty.version>4.2.19.Final</netty.version>
+        <netty.version>4.2.21.Final</netty.version>
         <mqtt.version>1.2.5</mqtt.version>
-        <vertx.version>4.5.26</vertx.version>
-        <okhttp.version>4.12.0</okhttp.version>
+        <vertx.version>4.5.36</vertx.version>
+        <okhttp.version>5.5.1</okhttp.version>
+        <okio.version>3.18.1</okio.version>
         <californium.version>3.14.0</californium.version>
         <j2mod.version>3.4.0</j2mod.version>
         <httpclient5.version>5.5.1</httpclient5.version> <!-- WxJava 4.8.x 需要 HttpClient5 5.4+，Spring Boot 2.7 默认 5.1.4 不兼容；JDK8 兼容不能升级到 5.5.2+ -->
         <httpcore5.version>5.3.6</httpcore5.version> <!-- 配套 httpclient5 5.5.1，Spring Boot 2.7 默认 5.1.5 不兼容 -->
         <rhino.version>1.7.15.1</rhino.version>
         <!-- 三方云服务相关 -->
-        <awssdk.version>2.57.3</awssdk.version>
+        <awssdk.version>2.59.4</awssdk.version>
         <justauth.version>1.16.7</justauth.version>
         <justauth-starter.version>1.4.0</justauth-starter.version>
         <jimureport.version>2.3.4</jimureport.version> <!-- JimuBI 2.3.2 依赖此版本中的 JimuAiConfigBean，升级到 2.5.4 会导致启动失败 -->
         <jimubi.version>2.3.2</jimubi.version>
         <ureport2.version>2.0.1</ureport2.version>
-        <weixin-java.version>4.8.6-20261010.094603</weixin-java.version>
-        <alipay-sdk-java.version>4.40.1044.ALL</alipay-sdk-java.version>
+        <weixin-java.version>4.8.6-20261108.214338</weixin-java.version>
+        <alipay-sdk-java.version>4.40.1067.ALL</alipay-sdk-java.version>
         <!-- 专属于 JDK8 安全漏洞升级 -->
         <logback.version>1.2.13</logback.version> <!-- 无法使用 1.3.X 版本，启动会报错 -->
     </properties>
@@ -133,6 +134,20 @@
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-bom</artifactId>
                 <version>${kotlin.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp-bom</artifactId>
+                <version>${okhttp.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.squareup.okio</groupId>
+                <artifactId>okio-bom</artifactId>
+                <version>${okio.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -687,19 +702,6 @@
                 <groupId>org.eclipse.paho</groupId>
                 <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
                 <version>${mqtt.version}</version>
-            </dependency>
-
-            <!-- OkHttp -->
-            <dependency>
-                <groupId>com.squareup.okhttp3</groupId>
-                <artifactId>okhttp</artifactId>
-                <version>${okhttp.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.squareup.okhttp3</groupId>
-                <artifactId>mockwebserver</artifactId>
-                <version>${okhttp.version}</version>
-                <scope>test</scope>
             </dependency>
 
             <!-- CoAP - Eclipse Californium -->
