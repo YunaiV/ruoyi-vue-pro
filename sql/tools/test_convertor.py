@@ -3853,6 +3853,31 @@ ROW_FORMAT = Dynamic;
                 self.assertRegex(out, r"CREATE INDEX \S+ ON demo_opt1 \(name, price\)")
 
 
+class PostgreSQLJsonConvertorTest(unittest.TestCase):
+
+    def test_json_columns_use_text_without_changing_nullability(self):
+        sql = """
+CREATE TABLE `fms_subject` (
+  `id` bigint NOT NULL,
+  `auxiliary_type_ids` json NOT NULL,
+  `currency_ids` json NULL,
+  PRIMARY KEY (`id`)
+);
+INSERT INTO `fms_subject` (`id`, `auxiliary_type_ids`, `currency_ids`) VALUES (1, '[10,20]', NULL);
+"""
+        with tempfile.TemporaryDirectory() as directory:
+            path = os.path.join(directory, "fms.sql")
+            with open(path, "w", encoding="utf-8") as file:
+                file.write(sql)
+            for convertor in (PostgreSQLConvertor, KingbaseConvertor, OpengaussConvertor, HighGoConvertor):
+                with self.subTest(convertor=convertor.__name__):
+                    out, err = convert(convertor(path))
+                    self.assertNotIn("无法正常解析", err)
+                    self.assertRegex(out, r'"?auxiliary_type_ids"? text NOT NULL')
+                    self.assertRegex(out, r'"?currency_ids"? text NULL')
+                    self.assertIn("VALUES (1, '[10,20]', NULL)", out)
+
+
 class ConvertorOfficialDumpTest(unittest.TestCase):
 
     def test_ruoyi_vue_pro(self):

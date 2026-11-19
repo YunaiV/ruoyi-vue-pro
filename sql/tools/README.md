@@ -305,6 +305,16 @@ python3 convertor.py postgres
 
 确认无误后，可以利用 IDEA 进行格式化。当然，也可以直接导入到数据库中。
 
+PostgreSQL、人大金仓、OpenGauss 和瀚高的转换脚本将 MySQL 的 `JSON` 列映射为 `text`，以兼容 MyBatis 用字符串读写 JSON。如果旧脚本已经生成了 `jsonb` 列，请备份后按实际表结构迁移。以 FMS 会计科目为例：
+
+```sql
+ALTER TABLE fms_subject
+    ALTER COLUMN auxiliary_type_ids TYPE text USING auxiliary_type_ids::text,
+    ALTER COLUMN currency_ids TYPE text USING currency_ids::text;
+```
+
+自定义的 JSONB 索引、约束和默认值应在迁移前单独核对。
+
 ### 2.3 OceanBase MySQL 模式
 
 OceanBase MySQL 模式保留原始 MySQL SQL，不经过其它数据库的字段类型和索引转换。更新 MySQL 脚本后，可通过以下命令同步生成：
