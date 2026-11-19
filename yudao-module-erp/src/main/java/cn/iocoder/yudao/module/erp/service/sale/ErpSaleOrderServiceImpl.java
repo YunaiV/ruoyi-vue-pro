@@ -205,7 +205,7 @@ public class ErpSaleOrderServiceImpl implements ErpSaleOrderService {
         // 1. 更新每个销售订单项
         orderItems.forEach(item -> {
             BigDecimal outCount = outCountMap.getOrDefault(item.getId(), BigDecimal.ZERO);
-            if (item.getOutCount().equals(outCount)) {
+            if (item.getOutCount().compareTo(outCount) == 0) {
                 return;
             }
             if (outCount.compareTo(item.getCount()) > 0) {
@@ -225,7 +225,7 @@ public class ErpSaleOrderServiceImpl implements ErpSaleOrderService {
         // 1. 更新每个销售订单项
         orderItems.forEach(item -> {
             BigDecimal returnCount = returnCountMap.getOrDefault(item.getId(), BigDecimal.ZERO);
-            if (item.getReturnCount().equals(returnCount)) {
+            if (item.getReturnCount().compareTo(returnCount) == 0) {
                 return;
             }
             if (returnCount.compareTo(item.getOutCount()) > 0) {

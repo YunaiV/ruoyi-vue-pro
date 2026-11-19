@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,8 +32,8 @@ public class GoViewDataController {
     @Resource
     private GoViewDataService goViewDataService;
 
-    @RequestMapping("/get-by-sql")
-    @Operation(summary = "使用 SQL 查询数据")
+    @PostMapping("/get-by-sql")
+    @Operation(summary = "使用 SQL 查询数据", description = "只允许单条只读 SELECT；可读取的表、列与租户范围，仍取决于本接口的菜单权限与数据库账号的权限")
     @PreAuthorize("@ss.hasPermission('report:go-view-data:get-by-sql')")
     public CommonResult<GoViewDataRespVO> getDataBySQL(@Valid @RequestBody GoViewDataGetBySqlReqVO reqVO) {
         return success(goViewDataService.getDataBySQL(reqVO.getSql()));

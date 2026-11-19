@@ -1052,12 +1052,17 @@ public class HrmPerformanceAssessmentProcessServiceImpl
     private HrmEmployeeDO resolveReviewer(
             HrmEmployeeDO employee, Integer raterType, Integer raterLevel,
             Long raterEmployeeId) {
-        // 1. 解析员工本人或指定员工
+        // 1.1 解析员工本人或指定员工
         if (Objects.equals(raterType, HrmPerformanceRaterTypeEnum.SELF.getType())) {
             return employee;
         }
         if (Objects.equals(raterType, HrmPerformanceRaterTypeEnum.SPECIFIED.getType())) {
             return employeeService.getEmployee(raterEmployeeId);
+        }
+        // 1.2 历史配置未经过请求校验时，拒绝非法层级，避免错误分配给本人或产生空指针
+        if (raterLevel != null && (raterLevel < HrmPerformanceRaterTypeEnum.MIN_LEVEL
+                || raterLevel > HrmPerformanceRaterTypeEnum.MAX_LEVEL)) {
+            throw exception(PERFORMANCE_PROCESS_CONFIG_INVALID);
         }
 
         // 2. 按层级解析员工直属上级

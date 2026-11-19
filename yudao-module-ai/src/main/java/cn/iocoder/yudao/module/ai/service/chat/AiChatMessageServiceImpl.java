@@ -44,6 +44,7 @@ import cn.iocoder.yudao.module.ai.service.requestlog.dto.AiRequestLogCreateReqDT
 import cn.iocoder.yudao.module.ai.service.skill.AiSkillService;
 import cn.iocoder.yudao.module.ai.tool.skill.AiSkillToolCallback;
 import cn.iocoder.yudao.module.ai.util.AiChatUtils;
+import cn.iocoder.yudao.module.ai.util.AiDocumentUtils;
 import cn.iocoder.yudao.module.ai.util.AiReasoningUtils;
 import cn.iocoder.yudao.module.ai.util.FileTypeUtils;
 import com.google.common.collect.Maps;
@@ -648,7 +649,7 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
                     byte[] bytes = HttpUtil.downloadBytes(attachmentUrl);
                     content = Base64.encode(bytes);
                 } else {
-                    content = knowledgeDocumentService.readUrl(attachmentUrl);
+                    content = AiDocumentUtils.readUrl(attachmentUrl);
                 }
                 if (StrUtil.isNotEmpty(content)) {
                     attachmentContents.put(name, content);

@@ -21,6 +21,15 @@ public enum HrmPerformanceRaterTypeEnum implements ArrayValuable<Integer> {
     SPECIFIED(3, "指定评分人"),
     SELF(4, "被考核人");
 
+    /**
+     * 上级、部门负责人支持的最小层级
+     */
+    public static final int MIN_LEVEL = 1;
+    /**
+     * 上级、部门负责人支持的最大层级，与绩效计划保存校验保持一致
+     */
+    public static final int MAX_LEVEL = 10;
+
     public static final Integer[] ARRAYS = Arrays.stream(values())
             .map(HrmPerformanceRaterTypeEnum::getType).toArray(Integer[]::new);
 

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.system.service.tenant;
 
+import cn.hutool.core.util.ReflectUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.tenant.config.TenantProperties;
@@ -369,6 +370,24 @@ public class TenantServiceImplTest extends BaseDbUnitTest {
         // 调用
         Long count = tenantService.getTenantCountByPackageId(1L);
         assertEquals(1, count);
+    }
+
+    @Test
+    public void testHandleTenant_missingProperties_skipsHandlers() {
+        // 准备参数
+        TenantInfoHandler infoHandler = mock(TenantInfoHandler.class);
+        TenantMenuHandler menuHandler = mock(TenantMenuHandler.class);
+        // mock 关闭多租户后，可选的配置属性未注入
+        ReflectUtil.setFieldValue(tenantService, "tenantProperties", null);
+        try {
+            // 调用
+            tenantService.handleTenantInfo(infoHandler);
+            tenantService.handleTenantMenu(menuHandler);
+            // 断言
+            verifyNoInteractions(infoHandler, menuHandler);
+        } finally {
+            ReflectUtil.setFieldValue(tenantService, "tenantProperties", tenantProperties);
+        }
     }
 
     @Test

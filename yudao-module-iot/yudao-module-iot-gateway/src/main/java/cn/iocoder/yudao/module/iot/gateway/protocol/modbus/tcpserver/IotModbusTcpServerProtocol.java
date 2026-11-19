@@ -256,6 +256,9 @@ public class IotModbusTcpServerProtocol implements IotProtocol {
         try {
             netServer.listen().toCompletionStage().toCompletableFuture().get();
             log.info("[startTcpServer][TCP Server 启动成功, port={}]", properties.getPort());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("[startTcpServer][TCP Server 启动被中断]", e);
         } catch (Exception e) {
             throw new RuntimeException("[startTcpServer][TCP Server 启动失败]", e);
         }

@@ -104,6 +104,26 @@ public class IotUdpSessionManagerTest extends BaseMockitoUnitTest {
         assertFailed(future, DEVICE_OFFLINE_OR_WRITE_FAILED);
     }
 
+    @Test
+    public void testSendToDevice_interrupted() {
+        // mock 方法：会话存在，send 一直未回调
+        registerSession();
+
+        // 调用：等待发送结果时被中断
+        boolean success;
+        Thread.currentThread().interrupt();
+        try {
+            success = sessionManager.sendToDevice(DEVICE_ID, DATA, socket);
+            // 断言：恢复中断标记
+            assertTrue(Thread.currentThread().isInterrupted());
+        } finally {
+            Thread.interrupted();
+        }
+        // 断言：按发送失败返回
+        assertFalse(success);
+        verify(socket).send(any(Buffer.class), eq(ADDRESS.getPort()), eq(ADDRESS.getHostString()), any());
+    }
+
     private void registerSession() {
         sessionManager.registerSession(DEVICE_ID, new IotUdpSessionManager.SessionInfo()
                 .setDeviceId(DEVICE_ID).setProductKey("pk").setDeviceName("dn").setAddress(ADDRESS));

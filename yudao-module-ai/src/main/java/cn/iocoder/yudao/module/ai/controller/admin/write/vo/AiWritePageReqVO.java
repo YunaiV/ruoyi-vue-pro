@@ -21,7 +21,7 @@ public class AiWritePageReqVO extends PageParam {
     @Schema(description = "写作类型", example = "1")
     private Integer type;
 
-    @Schema(description = "平台", example = "TongYi")
+    @Schema(description = "平台", example = "ALIBABA")
     private String platform;
 
     @Schema(description = "创建时间")

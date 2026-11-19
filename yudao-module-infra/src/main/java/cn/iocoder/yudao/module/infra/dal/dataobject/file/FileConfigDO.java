@@ -19,6 +19,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.*;
 
 import java.lang.reflect.Field;
+import java.util.Map;
 
 /**
  * 文件配置表
@@ -86,8 +87,15 @@ public class FileConfigDO extends BaseDO {
             }
 
             // 兼容老版本的包路径
-            String className = JsonUtils.parseObject(json, "@class", String.class);
-            className = StrUtil.subAfter(className, ".", true);
+            Map<String, Object> values = JsonUtils.parseObjectQuietly(json, new TypeReference<Map<String, Object>>() {});
+            Object type = values != null ? values.get("@class") : null;
+            if (!(type instanceof String)) {
+                throw new IllegalArgumentException("缺少 FileClientConfig 类型");
+            }
+            String className = StrUtil.subAfter((String) type, ".", true);
+            if (StrUtil.isEmpty(className)) {
+                throw new IllegalArgumentException("缺少 FileClientConfig 类型");
+            }
             switch (className) {
                 case "DBFileClientConfig":
                     return JsonUtils.parseObject2(json, DBFileClientConfig.class);
@@ -100,7 +108,7 @@ public class FileConfigDO extends BaseDO {
                 case "S3FileClientConfig":
                     return JsonUtils.parseObject2(json, S3FileClientConfig.class);
                 default:
-                    throw new IllegalArgumentException("未知的 FileClientConfig 类型：" + json);
+                    throw new IllegalArgumentException("未知的 FileClientConfig 类型");
             }
         }
 

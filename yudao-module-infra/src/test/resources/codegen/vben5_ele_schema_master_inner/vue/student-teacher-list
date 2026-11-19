@@ -19,7 +19,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
   gridOptions: {
   columns: useStudentTeacherGridColumns(),
   pagerConfig: {
-    nabled: false,
+    enabled: false,
   },
   toolbarConfig: {
     enabled: false,
@@ -31,6 +31,12 @@ const [Grid, gridApi] = useVbenVxeGrid({
   },
   } as VxeTableGridOptions<InfraStudentApi.StudentTeacher>,
 });
+
+/** 刷新表格 */
+async function handleRefresh() {
+  const data = await getStudentTeacherByStudentId(props.studentId!);
+  await gridApi.grid.loadData(data ? [data] : []);
+}
 
 /** 监听主表的关联字段的变化，加载对应的子表数据 */
 watch(

@@ -90,7 +90,8 @@ public class ImStatisticsManagerController {
         Map<String, List<Long>> series = new LinkedHashMap<>();
         series.put("private", alignSeries(dates, privateMap));
         series.put("group", alignSeries(dates, groupMap));
-        return success(new ImStatisticsManagerTrendRespVO().setDates(dates).setSeries(series));
+        return success(new ImStatisticsManagerTrendRespVO()
+                .setDates(convertList(dates, date -> date.toLocalDate().toString())).setSeries(series));
     }
 
     @GetMapping("/user-trend")
@@ -108,7 +109,8 @@ public class ImStatisticsManagerController {
         Map<String, List<Long>> series = new LinkedHashMap<>();
         series.put("register", alignSeries(dates, registerMap));
         series.put("active", alignSeries(dates, activeMap));
-        return success(new ImStatisticsManagerTrendRespVO().setDates(dates).setSeries(series));
+        return success(new ImStatisticsManagerTrendRespVO()
+                .setDates(convertList(dates, date -> date.toLocalDate().toString())).setSeries(series));
     }
 
     @GetMapping("/message-type-distribution")

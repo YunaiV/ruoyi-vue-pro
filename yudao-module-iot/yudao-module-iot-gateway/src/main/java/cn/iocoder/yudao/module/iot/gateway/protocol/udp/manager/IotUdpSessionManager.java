@@ -133,6 +133,10 @@ public class IotUdpSessionManager {
             });
             // 同步等待结果，超时 5 秒
             return future.get(5, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.warn("[sendToDevice][等待发送结果被中断，设备 ID: {}]", deviceId);
+            return false;
         } catch (Exception e) {
             log.error("[sendToDevice][发送消息异常，设备 ID: {}]", deviceId, e);
             return false;

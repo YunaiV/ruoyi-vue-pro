@@ -4,6 +4,7 @@ import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
 import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClient;
 import cn.iocoder.yudao.module.infra.framework.file.core.client.s3.S3FileClientConfig;
@@ -108,6 +109,38 @@ public class S3FileClientTest {
         assertTrue(historyResult.contains("response-content-disposition=attachment"));
         assertFalse(historyResult.contains("X-Amz-Signature=old"));
         assertFalse(StrUtil.containsIgnoreCase(putResult, "content-disposition"));
+    }
+
+    @Test
+    public void testPresignGetUrl_privateAccess_customDomainSignedUrl() {
+        // 准备参数：阿里云 OSS 配置自定义域名，预签名地址使用服务商的域名
+        S3FileClientConfig config = new S3FileClientConfig();
+        config.setAccessKey("access-key");
+        config.setAccessSecret("access-secret");
+        config.setBucket("test-bucket");
+        config.setDomain("https://custom.example.com");
+        config.setEndpoint("oss-cn-beijing.aliyuncs.com");
+        config.setEnablePathStyleAccess(false);
+        config.setEnablePublicAccess(false);
+        S3FileClient client = new S3FileClient(0L, config);
+        client.init();
+        // 上传时返回的预签名地址（库里保存的地址）
+        String uploaded = client.presignGetUrl("ai/ppt/中文 100%+幻灯片.png", 300);
+        String uploadedSvg = client.presignGetUrl("ai/ppt/图标.svg", 300);
+
+        // 调用：已签发的预签名地址再次签名（带上 fragment）
+        String result = client.presignGetUrl(uploaded + "#page", null);
+        String svgResult = client.presignGetUrl(uploadedSvg, null);
+
+        // 断言：对象名不变，不会把整个服务商地址当作对象名
+        assertTrue(uploaded.startsWith("https://test-bucket.oss-cn-beijing.aliyuncs.com/ai/ppt/%E4%B8%AD%E6%96%87%20100%25"), uploaded);
+        assertEquals(HttpUtils.removeUrlPathQueryAndFragment(uploaded), HttpUtils.removeUrlPathQueryAndFragment(result));
+        assertEquals(1, StrUtil.count(result, "X-Amz-Signature="));
+        assertFalse(result.contains("#page"));
+        // 断言：SVG 重新签名后仍按附件下载，签名参数不重复
+        assertTrue(svgResult.startsWith("https://test-bucket.oss-cn-beijing.aliyuncs.com/ai/ppt/%E5%9B%BE%E6%A0%87.svg?"), svgResult);
+        assertEquals(1, StrUtil.count(svgResult, "response-content-disposition=attachment"));
+        assertEquals(1, StrUtil.count(svgResult, "X-Amz-Signature="));
     }
 
     @Test

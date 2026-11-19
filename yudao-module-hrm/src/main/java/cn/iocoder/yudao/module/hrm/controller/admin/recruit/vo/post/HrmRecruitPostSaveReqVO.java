@@ -114,12 +114,11 @@ public class HrmRecruitPostSaveReqVO {
     @AssertTrue(message = "薪资范围不正确")
     @JsonIgnore
     public boolean isSalaryRangeValid() {
-        boolean hasNegotiableValue = SALARY_NEGOTIABLE_VALUE.equals(getMinSalary())
-                || SALARY_NEGOTIABLE_VALUE.equals(getMaxSalary()) || SALARY_NEGOTIABLE_UNIT_VALUE.equals(getSalaryUnit());
-        if (hasNegotiableValue) {
-            return SALARY_NEGOTIABLE_VALUE.equals(getMinSalary())
-                    && SALARY_NEGOTIABLE_VALUE.equals(getMaxSalary())
-                    && SALARY_NEGOTIABLE_UNIT_VALUE.equals(getSalaryUnit());
+        boolean minNegotiable = getMinSalary() != null && getMinSalary().compareTo(SALARY_NEGOTIABLE_VALUE) == 0;
+        boolean maxNegotiable = getMaxSalary() != null && getMaxSalary().compareTo(SALARY_NEGOTIABLE_VALUE) == 0;
+        boolean unitNegotiable = SALARY_NEGOTIABLE_UNIT_VALUE.equals(getSalaryUnit());
+        if (minNegotiable || maxNegotiable || unitNegotiable) {
+            return minNegotiable && maxNegotiable && unitNegotiable;
         }
         if ((getMinSalary() != null && getMinSalary().signum() < 0)
                 || (getMaxSalary() != null && getMaxSalary().signum() < 0)) {

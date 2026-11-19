@@ -22,7 +22,7 @@ import reactor.core.publisher.Flux;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
-@Tag(name = "管理后台 - AI 写作")
+@Tag(name = "管理后台 - AI 写作翻译")
 @RestController
 @RequestMapping("/ai/write")
 public class AiWriteController {
