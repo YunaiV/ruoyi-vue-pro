@@ -34,4 +34,13 @@ public class JmReportConfiguration {
         return new JmOnlDragExternalServiceImpl();
     }
 
+    /**
+     * 积木内置 AI 依赖的 Spring AI 1.x 不可用时，把它的 AI 助手替换为未配置状态，避免启动失败
+     */
+    @Bean
+    public static JmReportAiAssistantRegistryPostProcessor jmReportAiAssistantRegistryPostProcessor() {
+        return new JmReportAiAssistantRegistryPostProcessor(
+                JmReportAiAssistantRegistryPostProcessor.isJimuAiAvailable(JmReportConfiguration.class.getClassLoader()));
+    }
+
 }
