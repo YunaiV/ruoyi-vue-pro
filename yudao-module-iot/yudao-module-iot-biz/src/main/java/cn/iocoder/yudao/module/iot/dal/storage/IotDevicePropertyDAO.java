@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * IoT 设备【属性】历史数据的存储 DAO 接口
  *
- * 由 yudao.iot.storage.type 选择 TDengine、IoTDB 其中一个实现。
+ * 由 yudao.iot.storage.type 选择 TDengine、IoTDB、QuestDB 其中一个实现。
  * 厂商相关的字段映射、DDL、字段差异、缺表判断等，都在实现类中处理。
  *
  * @author 芋道源码
