@@ -19,6 +19,7 @@ import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.*;
  * 属性标识符（identifier）统一归一化为小写下划线的“中立字段名”，各存储后端在此基础上映射物理列名：
  * 1. TDengine：直接使用中立字段名
  * 2. IoTDB：使用 p_ + 中立字段名，避免与 time 等内置列冲突
+ * 3. QuestDB：使用 p_ + 中立字段名；DATE 属性使用 d_ + 中立字段名
  *
  * @author 芋道源码
  */
