@@ -15,6 +15,7 @@ import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceRespDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigRespDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusPointRespDTO;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
+import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import cn.iocoder.yudao.module.iot.core.enums.modbus.IotModbusFrameFormatEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.topic.IotDeviceIdentity;
@@ -227,9 +228,9 @@ public class IotModbusTcpServerUpstreamHandler {
                 .setFrameFormat(frameFormat)
                 .setChannel(channel);
         connectionManager.registerConnection(socket, connectionInfo);
-        // 3.2 发送上线消息
+        // 3.2 发送上线消息：离线暂存已启用时，消息总线不可用不阻断认证、轮询
         IotDeviceMessage onlineMessage = IotDeviceMessage.buildStateUpdateOnline();
-        messageService.sendDeviceMessage(onlineMessage, deviceInfo.getProductKey(), deviceInfo.getDeviceName(), serverId);
+        messageService.sendDeviceStateMessage(onlineMessage, deviceInfo.getProductKey(), deviceInfo.getDeviceName(), serverId);
         // 3.3 发送成功响应
         sendCustomResponse(socket, frame, frameFormat, METHOD_AUTH,
                 GlobalErrorCodeConstants.SUCCESS.getCode(), "success");
@@ -330,8 +331,9 @@ public class IotModbusTcpServerUpstreamHandler {
         IotDeviceMessage message = IotDeviceMessage.requestOf(
                 IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod(), params);
 
-        // 3. 发送到消息总线
-        messageService.sendDeviceMessage(message, info.getProductKey(), info.getDeviceName(), serverId);
+        // 3. 发送到消息总线：轮询由网关发起，没有设备确认；离线暂存失败时只记日志
+        messageService.sendDeviceMessage(message, info.getProductKey(), info.getDeviceName(), serverId,
+                IotProtocolTypeEnum.MODBUS_TCP_SERVER);
         log.debug("[handlePollingResult][设备={}, 属性={}, 原始值={}, 转换值={}]",
                 info.getDeviceId(), request.getIdentifier(), rawValues, convertedValue);
     }

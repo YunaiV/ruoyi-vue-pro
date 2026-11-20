@@ -329,10 +329,10 @@ public class IotUdpUpstreamHandler {
             }
             // 2.2 更新会话地址（如有变化）
             sessionManager.updateSessionAddress(device.getId(), senderAddress);
-            // 2.3 将 body 设置为实际的 params，发送消息到消息总线
+            // 2.3 将 body 设置为实际的 params，发送消息到消息总线（失败、含离线暂存失败时，回到 event loop 应答错误）
             message.setParams(params);
             deviceMessageService.sendDeviceMessage(message, device.getProductKey(),
-                    device.getDeviceName(), serverId);
+                    device.getDeviceName(), serverId, IotProtocolTypeEnum.UDP);
             log.debug("[handleBusinessRequest][业务消息处理成功，设备 ID: {}，方法: {}，来源: {}]",
                     device.getId(), message.getMethod(), addressKey);
             return null;
@@ -458,13 +458,13 @@ public class IotUdpUpstreamHandler {
     }
 
     /**
-     * 发送设备上线消息
+     * 发送设备上线消息：离线暂存已启用时，消息总线不可用不阻断认证
      *
      * @param device 设备信息
      */
     private void sendOnlineMessage(IotDeviceRespDTO device) {
         IotDeviceMessage onlineMessage = IotDeviceMessage.buildStateUpdateOnline();
-        deviceMessageService.sendDeviceMessage(onlineMessage, device.getProductKey(),
+        deviceMessageService.sendDeviceStateMessage(onlineMessage, device.getProductKey(),
                 device.getDeviceName(), serverId);
     }
 

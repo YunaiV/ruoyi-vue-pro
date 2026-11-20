@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.mq.redis.core.job.RedisStreamMessageCleanupJob
 import cn.iocoder.yudao.framework.mq.redis.core.stream.AbstractRedisStreamMessage;
 import cn.iocoder.yudao.framework.mq.redis.core.stream.AbstractRedisStreamMessageListener;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
+import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageSubscriber;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.kafka.IotKafkaMessageBus;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.local.IotLocalMessageBus;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.rabbitmq.IotRabbitMQMessageBus;
@@ -31,9 +32,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.kafka.core.KafkaTemplate;
 
+import java.util.AbstractList;
 import java.util.List;
-
-import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
 /**
  * IoT 消息总线自动配置
@@ -137,15 +137,33 @@ public class IotMessageBusAutoConfiguration {
                     RedisStreamMessageCleanupJob.IOT_CLEANUP_LOCK_KEY);
         }
 
+        /**
+         * 获得任务使用的监听器列表：订阅者的视图，任务每次执行时按当前的订阅者生成
+         * <p>
+         * 订阅者在各自的 @PostConstruct 中注册，可能晚于任务创建，所以不能在创建任务时取快照
+         */
         private List<AbstractRedisStreamMessageListener<?>> getListeners(IotRedisMessageBus messageBus) {
-            return convertList(messageBus.getSubscribers(), subscriber ->
-                    new AbstractRedisStreamMessageListener<>(subscriber.getTopic(), subscriber.getGroup()) {
+            return new AbstractList<AbstractRedisStreamMessageListener<?>>() {
+
+                @Override
+                public AbstractRedisStreamMessageListener<?> get(int index) {
+                    IotMessageSubscriber<?> subscriber = messageBus.getSubscribers().get(index);
+                    return new AbstractRedisStreamMessageListener<AbstractRedisStreamMessage>(
+                            subscriber.getTopic(), subscriber.getGroup()) {
 
                         @Override
                         public void onMessage(AbstractRedisStreamMessage message) {
                             throw new UnsupportedOperationException("不应该调用！！！");
                         }
-                    });
+                    };
+                }
+
+                @Override
+                public int size() {
+                    return messageBus.getSubscribers().size();
+                }
+
+            };
         }
 
     }
@@ -164,9 +182,10 @@ public class IotMessageBusAutoConfiguration {
         }
 
         @Bean
-        public IotRabbitMQMessageBus iotRabbitMQMessageBus(RabbitTemplate rabbitTemplate, RabbitAdmin rabbitAdmin) {
+        public IotRabbitMQMessageBus iotRabbitMQMessageBus(RabbitTemplate rabbitTemplate, RabbitAdmin rabbitAdmin,
+                                                           IotMessageBusProperties properties) {
             log.info("[iotRabbitMQMessageBus][创建 IoT RabbitMQ 消息总线]");
-            return new IotRabbitMQMessageBus(rabbitTemplate, rabbitAdmin);
+            return new IotRabbitMQMessageBus(rabbitTemplate, rabbitAdmin, properties.getConfirmTimeout());
         }
 
     }

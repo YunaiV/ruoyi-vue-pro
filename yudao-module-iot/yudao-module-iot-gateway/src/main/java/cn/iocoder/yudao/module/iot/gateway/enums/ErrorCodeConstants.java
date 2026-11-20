@@ -31,4 +31,8 @@ public interface ErrorCodeConstants {
     ErrorCode MODBUS_RESPONSE_INVALID = new ErrorCode(1_051_003_114, "Modbus 响应不合法");
     ErrorCode MODBUS_DISCONNECTED = new ErrorCode(1_051_003_115, "Modbus 连接已断开");
 
+    // ========== 离线暂存 1-051-004-000 ============
+    ErrorCode DEVICE_MESSAGE_SPOOL_REJECTED = new ErrorCode(1_051_004_000, "消息总线不可用，且离线暂存失败：{}");
+    ErrorCode DEVICE_MESSAGE_REJECTED = new ErrorCode(1_051_004_001, "消息被消息总线拒绝（例如说超过大小限制），重试也不会成功");
+
 }

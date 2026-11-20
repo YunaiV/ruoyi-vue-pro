@@ -37,6 +37,14 @@ public class IotLocalMessageBus implements IotMessageBus {
         applicationContext.publishEvent(new IotLocalMessage(topic, message));
     }
 
+    /**
+     * 进程内发布：没有 broker，返回时订阅者已同步处理完成（订阅者的异常只记日志），与 {@link #post} 相同
+     */
+    @Override
+    public void postConfirmed(String topic, Object message) {
+        post(topic, message);
+    }
+
     @Override
     public void register(IotMessageSubscriber<?> subscriber) {
         String topic = subscriber.getTopic();

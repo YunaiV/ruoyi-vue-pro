@@ -107,11 +107,11 @@ public class IotMqttAuthHandler extends IotMqttAbstractHandler {
     }
 
     /**
-     * 发送设备上线消息
+     * 发送设备上线消息：离线暂存已启用时，消息总线不可用不阻断连接
      */
     private void sendOnlineMessage(IotDeviceRespDTO device) {
         IotDeviceMessage onlineMessage = IotDeviceMessage.buildStateUpdateOnline();
-        deviceMessageService.sendDeviceMessage(onlineMessage, device.getProductKey(),
+        deviceMessageService.sendDeviceStateMessage(onlineMessage, device.getProductKey(),
                 device.getDeviceName(), serverId);
         log.info("[sendOnlineMessage][设备上线，设备 ID: {}，设备名称: {}]", device.getId(), device.getDeviceName());
     }
