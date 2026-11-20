@@ -205,6 +205,27 @@ public class BpmnModelUtils {
     }
 
     /**
+     * 给用户任务添加退回后的审批方式
+     *
+     * @param returnApproveMode 退回后的审批方式，参见 {@link BpmReturnApproveModeEnum}
+     * @param userTask          用户任务
+     */
+    public static void addReturnApproveMode(Integer returnApproveMode, UserTask userTask) {
+        addExtensionElement(userTask, USER_TASK_RETURN_APPROVE_MODE, returnApproveMode);
+    }
+
+    /**
+     * 解析用户任务退回后的审批方式
+     *
+     * @param userTask 用户任务
+     * @return 退回后的审批方式；未配置时（例如说，历史版本的流程），默认为重新依次审批
+     */
+    public static BpmReturnApproveModeEnum parseReturnApproveMode(FlowElement userTask) {
+        Integer mode = NumberUtils.parseInt(parseExtensionElement(userTask, USER_TASK_RETURN_APPROVE_MODE));
+        return Optional.ofNullable(BpmReturnApproveModeEnum.typeOf(mode)).orElse(BpmReturnApproveModeEnum.RESTART);
+    }
+
+    /**
      * 给节点添加用户任务的审批人与发起人相同时，处理类型枚举
      *
      * @see BpmUserTaskAssignStartUserHandlerTypeEnum

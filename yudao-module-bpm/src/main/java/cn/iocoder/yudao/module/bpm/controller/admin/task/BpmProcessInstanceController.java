@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
+import cn.iocoder.yudao.framework.security.core.service.SecurityFrameworkService;
 import cn.iocoder.yudao.module.bpm.controller.admin.base.user.UserSimpleBaseVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.*;
 import cn.iocoder.yudao.module.bpm.convert.task.BpmProcessInstanceConvert;
@@ -36,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.FORBIDDEN;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
@@ -56,6 +58,9 @@ public class BpmProcessInstanceController {
     private BpmProcessDefinitionService processDefinitionService;
     @Resource
     private BpmCategoryService categoryService;
+
+    @Resource
+    private SecurityFrameworkService securityFrameworkService;
 
     @Resource
     private AdminUserApi adminUserApi;
@@ -173,9 +178,10 @@ public class BpmProcessInstanceController {
     @GetMapping("/get-approval-detail")
     @Operation(summary = "获得审批详情")
     @Parameter(name = "id", description = "流程实例的编号", required = true)
-    @PreAuthorize("@ss.hasPermission('bpm:process-instance:query')")
+    @PreAuthorize("@ss.hasAnyPermissions('bpm:process-instance:query', 'bpm:task:query')")
     @SuppressWarnings("unchecked")
     public CommonResult<BpmApprovalDetailRespVO> getApprovalDetail(@Valid BpmApprovalDetailReqVO reqVO) {
+        validateApprovalDetailReadable(reqVO.getProcessInstanceId(), reqVO.getTaskId());
         if (StrUtil.isNotEmpty(reqVO.getProcessVariablesStr())) {
             reqVO.setProcessVariables(JsonUtils.parseObject(reqVO.getProcessVariablesStr(), Map.class));
         }
@@ -196,10 +202,30 @@ public class BpmProcessInstanceController {
     @GetMapping("/get-bpmn-model-view")
     @Operation(summary = "获取流程实例的 BPMN 模型视图", description = "在【流程详细】界面中，进行调用")
     @Parameter(name = "id", description = "流程实例的编号", required = true)
-    @PreAuthorize("@ss.hasPermission('bpm:process-instance:query')")
+    @PreAuthorize("@ss.hasAnyPermissions('bpm:process-instance:query', 'bpm:task:query')")
     public CommonResult<BpmProcessInstanceBpmnModelViewRespVO> getProcessInstanceBpmnModelView(
             @RequestParam(value = "id") String id) {
+        validateApprovalDetailReadable(id, null);
         return success(processInstanceService.getProcessInstanceBpmnModelView(id));
+    }
+
+    /**
+     * 校验是否可以读取流程实例的审批详情（包括流程图）
+     * <p>
+     * 拥有【流程实例查询】权限时，可以读取；否则，仅拥有【任务查询】权限时，只有当前用户是该流程实例的修改人（退回修改中），
+     * 才可以读取，用于【待我修改】的修改、重新提交，不放宽其它流程实例的读取
+     *
+     * @param processInstanceId 流程实例编号
+     * @param taskId            任务编号，可以为空
+     */
+    private void validateApprovalDetailReadable(String processInstanceId, String taskId) {
+        if (securityFrameworkService.hasPermission("bpm:process-instance:query")) {
+            return;
+        }
+        if (StrUtil.isEmpty(processInstanceId)
+                || taskService.getRevisionTask(getLoginUserId(), processInstanceId, taskId) == null) {
+            throw exception(FORBIDDEN);
+        }
     }
 
     @GetMapping("/get-print-data")

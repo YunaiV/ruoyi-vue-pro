@@ -5237,6 +5237,10 @@ INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_t
 GO
 INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (1634, 6, N'电器', N'7', N'oa_supply_category', 0, N'primary', N'', NULL, N'1', N'2026-09-18 00:59:24', N'1', N'2026-09-18 00:59:24', N'0')
 GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3026, 9, N'待修改', N'8', N'bpm_task_status', 0, N'warning', N'', N'', N'1', N'2026-11-20 10:00:00', N'1', N'2026-11-20 10:00:00', N'0')
+GO
+INSERT INTO system_dict_data (id, sort, label, value, dict_type, status, color_type, css_class, remark, creator, create_time, updater, update_time, deleted) VALUES (3027, 10, N'重新提交', N'10', N'bpm_comment_type', 0, N'primary', N'', N'流程评论类型 - 重新提交', N'1', N'2026-11-20 10:00:00', N'1', N'2026-11-20 10:00:00', N'0')
+GO
 SET IDENTITY_INSERT system_dict_data OFF
 GO
 COMMIT

@@ -2606,6 +2606,8 @@ INSERT INTO `system_dict_data` (`id`, `sort`, `label`, `value`, `dict_type`, `st
 INSERT INTO `system_dict_data` (`id`, `sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (3023, 5, '小红书', '5', 'ai_write_type', 0, '', '', '', '1', '2026-11-13 00:00:00', '1', '2026-11-13 00:00:00', b'0');
 INSERT INTO `system_dict_data` (`id`, `sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (3024, 6, '润色 / 改写', '6', 'ai_write_type', 0, '', '', '', '1', '2026-11-13 00:00:00', '1', '2026-11-13 00:00:00', b'0');
 INSERT INTO `system_dict_data` (`id`, `sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (3025, 7, '文本翻译', '7', 'ai_write_type', 0, '', '', '', '1', '2026-11-13 00:00:00', '1', '2026-11-13 00:00:00', b'0');
+INSERT INTO `system_dict_data` (`id`, `sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (3026, 9, '待修改', '8', 'bpm_task_status', 0, 'warning', '', '', '1', '2026-11-20 10:00:00', '1', '2026-11-20 10:00:00', b'0');
+INSERT INTO `system_dict_data` (`id`, `sort`, `label`, `value`, `dict_type`, `status`, `color_type`, `css_class`, `remark`, `creator`, `create_time`, `updater`, `update_time`, `deleted`) VALUES (3027, 10, '重新提交', '10', 'bpm_comment_type', 0, 'primary', '', '流程评论类型 - 重新提交', '1', '2026-11-20 10:00:00', '1', '2026-11-20 10:00:00', b'0');
 COMMIT;
 
 -- ----------------------------

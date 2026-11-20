@@ -100,6 +100,26 @@ public class BpmnVariableConstants {
      * @see org.flowable.task.api.Task#getTaskLocalVariables()
      */
     public static final String TASK_VARIABLE_REASON = "TASK_REASON";
+
+    /**
+     * 任务的变量 - 退回修改的修改人编号
+     *
+     * 退回后【从当前节点审批】时，任务处于退回修改中（WAIT_REVISION），由该用户修改表单后重新提交
+     */
+    public static final String TASK_VARIABLE_REVISION_ASSIGNEE = "TASK_REVISION_ASSIGNEE";
+    /**
+     * 任务的变量 - 退回修改的目标节点编号
+     *
+     * 修改人按该节点的表单字段权限修改表单
+     */
+    public static final String TASK_VARIABLE_REVISION_TARGET_NODE = "TASK_REVISION_TARGET_NODE";
+    /**
+     * 任务的变量 - 退回修改的批次编号
+     *
+     * 每次退回修改时重新生成，重新提交后保留：重新提交、审批人审批时，需要与前端详情中的批次一致，避免过期的页面提交
+     */
+    public static final String TASK_VARIABLE_REVISION_ID = "TASK_REVISION_ID";
+
     /**
      * 任务变量 - 签名图片 URL
      */

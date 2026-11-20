@@ -15,6 +15,7 @@ import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelFormTypeEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.SneakyThrows;
+import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.el.ExpressionManager;
@@ -28,6 +29,7 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.TaskInfo;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -35,6 +37,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 
@@ -112,6 +115,28 @@ public class FlowableUtils {
      */
     public static String formatExecutionCollectionElementVariable(String activityId) {
         return activityId + "_assignee";
+    }
+
+    /**
+     * 判断是否为工作流的保留变量：它们由工作流维护，修改后会影响流程的状态、审批人、退回等逻辑
+     * <p>
+     * 1. {@link BpmnVariableConstants} 的流程实例、任务变量：PROCESS_、TASK_、RETURN_FLAG_ 前缀，以及 NEED_SIMULATE_TASK_IDS
+     * 2. Flowable 内置的变量：_FLOWABLE_ 前缀，例如说 {@link BpmnVariableConstants#PROCESS_INSTANCE_SKIP_EXPRESSION_ENABLED}
+     * 3. 多实例的审批人变量：{节点编号}_assignees、{节点编号}_assignee，见 {@link #formatExecutionCollectionVariable(String)}
+     *
+     * @param name      变量名
+     * @param bpmnModel 流程模型
+     * @return 是否
+     */
+    public static boolean isReservedVariable(String name, BpmnModel bpmnModel) {
+        if (StrUtil.startWithAny(name, "PROCESS_", "TASK_", "_FLOWABLE_",
+                StrUtil.removeSuffix(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_RETURN_FLAG, "%s"))
+                || BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_NEED_SIMULATE_TASK_IDS.equals(name)) {
+            return true;
+        }
+        return Stream.of(formatExecutionCollectionVariable(""), formatExecutionCollectionElementVariable(""))
+                .anyMatch(suffix -> name.endsWith(suffix) && bpmnModel != null
+                        && bpmnModel.getFlowElement(StrUtil.removeSuffix(name, suffix)) != null);
     }
 
     // ========== ProcessInstance 相关的工具方法 ==========
@@ -320,6 +345,70 @@ public class FlowableUtils {
         }
     }
 
+    /**
+     * 递归解析表单的字段规则，与 yudao-ui-admin-vue3 的 parseFormFields 一致：组件有 field 即为字段，并继续解析 children
+     * <p>
+     * 子表单（表格表单、子表单）的子字段在 props 中，属于子表单的值，不是流程变量，所以不解析，见 {@link #getSubFormFieldRules(JsonNode)}
+     *
+     * @param rule       组件的生成规则
+     * @param fieldRules 字段规则，key 为字段名
+     */
+    public static void parseFormFieldRules(JsonNode rule, Map<String, JsonNode> fieldRules) {
+        if (rule == null || !rule.isObject()) {
+            return;
+        }
+        String field = JsonUtils.getText(rule, "field");
+        if (StrUtil.isNotBlank(field)) {
+            fieldRules.put(field, rule);
+        }
+        JsonNode children = rule.get("children");
+        if (children != null && children.isArray()) {
+            children.forEach(child -> parseFormFieldRules(child, fieldRules));
+        }
+    }
+
+    /**
+     * 获得子表单的子字段规则，与 yudao-ui-admin-vue3 的 parseSubFormFields 一致：表格表单在 props.columns[].rule，子表单在 props.rule
+     *
+     * @param rule 组件的生成规则
+     * @return 子字段规则；不是子表单时，返回 null
+     */
+    public static List<JsonNode> getSubFormFieldRules(JsonNode rule) {
+        String type = JsonUtils.getText(rule, "type");
+        JsonNode props = rule.get("props");
+        List<JsonNode> subFieldRules = new ArrayList<>();
+        if ("tableForm".equals(type)) {
+            if (props != null && props.get("columns") != null) {
+                props.get("columns").forEach(column -> collectFieldRules(column.get("rule"), subFieldRules));
+            }
+            return subFieldRules;
+        }
+        if ("group".equals(type)) {
+            collectFieldRules(props != null ? props.get("rule") : null, subFieldRules);
+            return subFieldRules;
+        }
+        return null;
+    }
+
+    /**
+     * 收集组件规则中的字段：递归布局组件，不进入字段组件内部
+     */
+    private static void collectFieldRules(JsonNode rules, List<JsonNode> fieldRules) {
+        if (rules == null || !rules.isArray()) {
+            return;
+        }
+        rules.forEach(rule -> {
+            if (!rule.isObject()) {
+                return;
+            }
+            if (StrUtil.isNotBlank(JsonUtils.getText(rule, "field"))) {
+                fieldRules.add(rule);
+            } else {
+                collectFieldRules(rule.get("children"), fieldRules);
+            }
+        });
+    }
+
     // ========== Task 相关的工具方法 ==========
 
     /**
@@ -377,6 +466,9 @@ public class FlowableUtils {
         taskLocalVariables.remove(BpmnVariableConstants.TASK_VARIABLE_REASON);
         taskLocalVariables.remove(BpmnVariableConstants.TASK_DELEGATE_RETURN_USERS);
         taskLocalVariables.remove(BpmnVariableConstants.TASK_SIGN_WAIT_ASSIGNEE);
+        taskLocalVariables.remove(BpmnVariableConstants.TASK_VARIABLE_REVISION_ASSIGNEE);
+        taskLocalVariables.remove(BpmnVariableConstants.TASK_VARIABLE_REVISION_TARGET_NODE);
+        taskLocalVariables.remove(BpmnVariableConstants.TASK_VARIABLE_REVISION_ID);
         return taskLocalVariables;
     }
 

@@ -247,7 +247,7 @@ public class BpmProcessInstanceQueryFlowableTest extends BaseFlowableUnitTest {
         assertEquals(Map.of("a", "1", "b", "3", "c", "1"), respVO.getFormFieldsPermission());
     }
 
-    @Test // 流程已结束：已办使用办理节点的权限，发起人使用发起人节点的权限，均降级为只读；其他人不返回权限
+    @Test // 流程已结束：已办使用办理节点的权限，发起人使用发起人节点的权限，参与者使用自己审批通过的节点的权限，均降级为只读；其他人不返回权限
     public void testGetApprovalDetail_formFieldsPermission_processEnd() {
         // 准备参数：用户 2 审批通过 task1，流程结束
         String processInstanceId = startFormPermissionProcessInstance();
@@ -264,10 +264,13 @@ public class BpmProcessInstanceQueryFlowableTest extends BaseFlowableUnitTest {
         BpmApprovalDetailRespVO startUserRespVO = processInstanceService.getApprovalDetail(1L,
                 new BpmApprovalDetailReqVO().setProcessInstanceId(processInstanceId));
         assertEquals(Map.of("a", "1", "b", "3", "c", "1"), startUserRespVO.getFormFieldsPermission());
-        // 调用 + 断言：用户 2 不传 taskId，既不是发起人也没有待办
+        // 调用 + 断言：用户 2 不传 taskId，既不是发起人也没有待办：使用自己审批通过的 task1 的权限
         BpmApprovalDetailRespVO otherRespVO = processInstanceService.getApprovalDetail(2L,
                 new BpmApprovalDetailReqVO().setProcessInstanceId(processInstanceId));
-        assertNull(otherRespVO.getFormFieldsPermission());
+        assertEquals(Map.of("a", "1", "b", "1", "c", "3"), otherRespVO.getFormFieldsPermission());
+        // 调用 + 断言：没有参与的用户 3 不传 taskId，不返回权限
+        assertNull(processInstanceService.getApprovalDetail(3L,
+                new BpmApprovalDetailReqVO().setProcessInstanceId(processInstanceId)).getFormFieldsPermission());
     }
 
     @Test // 传递其它流程实例的已办 taskId：忽略该任务

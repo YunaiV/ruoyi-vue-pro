@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="http://www.yudao.iocoder.cn/bpm">
+    <!-- 退回修改：发起人 -> task1（或签） -> task2（会签）；task2 退回后【从当前节点审批】，驳回时退回到 task1 -->
+    <!-- 表单字段权限：1 只读、2 可编辑、3 隐藏；task1 未配置的字段，默认只读 -->
+    <process id="revisionApprove" name="退回修改审批" isExecutable="true">
+        <startEvent id="start"/>
+        <sequenceFlow id="flow-start" sourceRef="start" targetRef="StartUserNode"/>
+        <userTask id="StartUserNode" name="发起人">
+            <extensionElements>
+                <flowable:candidateStrategy>36</flowable:candidateStrategy>
+                <flowable:fieldsPermission field="amount" permission="2"/>
+                <flowable:fieldsPermission field="remark" permission="1"/>
+                <flowable:fieldsPermission field="items" permission="2"/>
+                <flowable:fieldsPermission field="items.price" permission="1"/>
+                <!-- 子表单（group）配置 props.field：每行只保存 tag 的值，note 不保存 -->
+                <flowable:fieldsPermission field="tags" permission="2"/>
+                <flowable:fieldsPermission field="tags.tag" permission="1"/>
+                <flowable:fieldsPermission field="tags.note" permission="1"/>
+                <!-- 与工作流保留变量同名的字段，即使可编辑，也不允许修改 -->
+                <flowable:fieldsPermission field="PROCESS_STATUS" permission="2"/>
+                <flowable:fieldsPermission field="NEED_SIMULATE_TASK_IDS" permission="2"/>
+                <flowable:fieldsPermission field="task1_assignees" permission="2"/>
+            </extensionElements>
+        </userTask>
+        <sequenceFlow id="flow-start-user" sourceRef="StartUserNode" targetRef="task1"/>
+        <userTask id="task1" name="一级审批">
+            <extensionElements>
+                <flowable:candidateStrategy>30</flowable:candidateStrategy>
+                <flowable:approveMethod>3</flowable:approveMethod>
+                <flowable:fieldsPermission field="amount" permission="2"/>
+                <flowable:fieldsPermission field="remark" permission="3"/>
+                <!-- 配置 props.field 的子表单可编辑，子字段继承可编辑 -->
+                <flowable:fieldsPermission field="tags" permission="2"/>
+            </extensionElements>
+            <multiInstanceLoopCharacteristics isSequential="false" flowable:collection="${coll_userList}">
+                <completionCondition>${ nrOfCompletedInstances > 0 }</completionCondition>
+            </multiInstanceLoopCharacteristics>
+        </userTask>
+        <sequenceFlow id="flow-task1" sourceRef="task1" targetRef="task2"/>
+        <userTask id="task2" name="二级审批">
+            <extensionElements>
+                <flowable:candidateStrategy>30</flowable:candidateStrategy>
+                <flowable:rejectHandlerType>2</flowable:rejectHandlerType>
+                <flowable:rejectReturnTaskId>task1</flowable:rejectReturnTaskId>
+                <flowable:returnApproveMode>2</flowable:returnApproveMode>
+                <flowable:approveMethod>2</flowable:approveMethod>
+            </extensionElements>
+            <!-- 只有一个审批人时，支持【从当前节点审批】；多个审批人时，仍【重新依次审批】 -->
+            <multiInstanceLoopCharacteristics isSequential="false" flowable:collection="${coll_userList}">
+                <completionCondition>${ nrOfCompletedInstances/nrOfInstances >= 1.00}</completionCondition>
+            </multiInstanceLoopCharacteristics>
+        </userTask>
+        <sequenceFlow id="flow-task2" sourceRef="task2" targetRef="end"/>
+        <endEvent id="end"/>
+    </process>
+</definitions>

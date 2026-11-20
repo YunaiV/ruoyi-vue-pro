@@ -59,6 +59,11 @@ public interface BpmnModelConstants {
     String USER_TASK_REJECT_RETURN_TASK_ID = "rejectReturnTaskId";
 
     /**
+     * BPMN ExtensionElement 的扩展属性，用于标记节点退回后的审批方式。
+     */
+    String USER_TASK_RETURN_APPROVE_MODE = "returnApproveMode";
+
+    /**
      * BPMN UserTask 的扩展属性，用于标记用户任务的审批类型
      */
     String USER_TASK_APPROVE_TYPE = "approveType";

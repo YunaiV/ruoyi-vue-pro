@@ -448,6 +448,8 @@ public class SimpleModelUtils {
             processMultiInstanceLoopCharacteristics(node.getApproveMethod(), node.getApproveRatio(), userTask);
             // 添加任务被拒绝的处理元素
             addTaskRejectElements(node.getRejectHandler(), userTask);
+            // 添加退回到当前节点后的审批方式
+            addReturnApproveMode(node.getReturnApproveMode(), userTask);
             // 添加用户任务的审批人与发起人相同时的处理元素
             addAssignStartUserHandlerType(node.getAssignStartUserHandlerType(), userTask);
             // 添加用户任务的空处理元素

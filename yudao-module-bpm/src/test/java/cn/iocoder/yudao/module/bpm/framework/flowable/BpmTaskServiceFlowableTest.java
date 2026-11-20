@@ -1,13 +1,18 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable;
 
+import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.bpm.api.event.BpmProcessInstanceStatusEvent;
 import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelMetaInfoVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmApprovalDetailReqVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmApprovalDetailRespVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceCancelReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstanceCreateReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionInfoDO;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmAutoApproveTypeEnum;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelFormTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskApproveTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskTimeoutHandlerTypeEnum;
@@ -47,7 +52,11 @@ import org.springframework.test.context.event.ApplicationEvents;
 import org.springframework.test.context.event.RecordApplicationEvents;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -328,6 +337,396 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         // 调用，并断言异常：task2 位于 task1 之后，不能退回
         assertServiceException(() -> bpmTaskService.returnTask(1L, new BpmTaskReturnReqVO().setId(task1.getId())
                 .setTargetTaskDefinitionKey("task2").setReason("退回")), TASK_RETURN_FAIL_SOURCE_TARGET_ERROR);
+    }
+
+    // ========== 退回修改相关（退回后【从当前节点审批】，见 revision-approve.bpmn20.xml） ==========
+
+    @Test
+    public void testReturnTask_resumeSource_resubmitByStartUser() {
+        // 准备参数：task2 待用户 3 审批
+        String processInstanceId = startRevisionProcessInstance(BpmModelFormTypeEnum.NORMAL);
+        String taskId = getRunningTask(processInstanceId).getId();
+
+        // 调用：用户 3 退回到发起人节点
+        bpmTaskService.returnTask(3L, new BpmTaskReturnReqVO().setId(taskId)
+                .setTargetTaskDefinitionKey(BpmnModelConstants.START_USER_NODE_ID).setReason("请补充明细"));
+        // 断言：任务不跳转，标记为退回修改中，修改人为发起人
+        assertEquals(taskId, getRunningTask(processInstanceId).getId());
+        assertTaskStatus(taskId, BpmTaskStatusEnum.WAIT_REVISION.getStatus(), "请补充明细");
+        verify(commentService).createComment(eq(taskId), eq(processInstanceId),
+                eq(BpmCommentTypeEnum.RETURN), eq("请补充明细"));
+        // 断言：不在审批人的待办中，只在发起人的【待我修改】中
+        assertEquals(0, bpmTaskService.getTaskTodoPage(3L, new BpmTaskPageReqVO()).getTotal());
+        assertNull(bpmTaskService.getTodoTask(3L, taskId, processInstanceId));
+        assertEquals(List.of(taskId), getRevisionTaskIds(1L));
+        assertEquals(List.of(), getRevisionTaskIds(3L));
+        // 断言：超出范围的分页，没有数据，但总数仍然正确
+        BpmTaskPageReqVO pageReqVO = new BpmTaskPageReqVO();
+        pageReqVO.setPageNo(2);
+        PageResult<Task> emptyPage = bpmTaskService.getRevisionTaskPage(1L, pageReqVO);
+        assertEquals(1L, emptyPage.getTotal());
+        assertEquals(List.of(), emptyPage.getList());
+        // 断言：审批详情中，修改人使用退回目标节点（发起人节点）的表单权限，与工作流保留变量同名的字段降级为只读；
+        // 审批人既没有待办，也不能修改
+        BpmApprovalDetailRespVO detail = processInstanceService.getApprovalDetail(1L,
+                new BpmApprovalDetailReqVO().setProcessInstanceId(processInstanceId).setTaskId(taskId));
+        assertEquals(taskId, detail.getRevisionTaskId());
+        String revisionId = detail.getRevisionId();
+        assertEquals(getRevisionId(taskId), revisionId);
+        assertNull(detail.getTodoTask());
+        assertEquals(Map.of("amount", "2", "remark", "1", "items", "2", "items.price", "1",
+                "tags", "2", "tags.tag", "1", "tags.note", "1", "PROCESS_STATUS", "1",
+                "NEED_SIMULATE_TASK_IDS", "1", "task1_assignees", "1"), detail.getFormFieldsPermission());
+        BpmApprovalDetailRespVO approverDetail = processInstanceService.getApprovalDetail(3L,
+                new BpmApprovalDetailReqVO().setProcessInstanceId(processInstanceId).setTaskId(taskId));
+        assertNull(approverDetail.getRevisionTaskId());
+        assertNull(approverDetail.getTodoTask());
+
+        // 调用，并断言异常：修改期间，审批人不能审批；只有修改人可以重新提交
+        assertServiceException(() -> bpmTaskService.approveTask(3L, new BpmTaskApproveReqVO().setId(taskId)
+                .setReason("同意")), TASK_WAIT_REVISION);
+        assertServiceException(() -> bpmTaskService.resubmitTask(3L, new BpmTaskResubmitReqVO().setTaskId(taskId)),
+                TASK_RESUBMIT_NOT_ALLOWED);
+        assertServiceException(() -> bpmTaskService.resubmitTask(2L, new BpmTaskResubmitReqVO().setTaskId(taskId)),
+                TASK_RESUBMIT_NOT_ALLOWED);
+        // 调用，并断言：其它租户下，同一用户编号既查询不到，也不能重新提交
+        assertEquals(0L, TenantUtils.execute(2L, () ->
+                bpmTaskService.getRevisionTaskPage(1L, new BpmTaskPageReqVO()).getTotal()));
+        TenantUtils.execute(2L, () -> assertServiceException(() -> bpmTaskService.resubmitTask(1L,
+                new BpmTaskResubmitReqVO().setTaskId(taskId)), TASK_RESUBMIT_NOT_ALLOWED));
+
+        // 调用：发起人修改后，重新提交
+        bpmTaskService.resubmitTask(1L, new BpmTaskResubmitReqVO().setTaskId(taskId).setRevisionId(revisionId)
+                .setVariables(Map.of("amount", 200)));
+        // 断言：表单变量更新；任务恢复为审批中，回到审批人的待办
+        assertEquals(200, runtimeService.getVariable(processInstanceId, "amount"));
+        Task resumedTask = bpmTaskService.getTask(taskId);
+        assertEquals(BpmTaskStatusEnum.RUNNING.getStatus(), FlowableUtils.getTaskStatus(resumedTask));
+        assertFalse(resumedTask.getTaskLocalVariables().containsKey(BpmnVariableConstants.TASK_VARIABLE_REVISION_ASSIGNEE));
+        verify(commentService).createComment(eq(taskId), eq(processInstanceId), eq(BpmCommentTypeEnum.RESUBMIT));
+        assertEquals(List.of(taskId), bpmTaskService.getTaskTodoPage(3L, new BpmTaskPageReqVO()).getList()
+                .stream().map(Task::getId).toList());
+        assertEquals(List.of(), getRevisionTaskIds(1L));
+        // 调用，并断言异常：不能重复提交
+        assertServiceException(() -> bpmTaskService.resubmitTask(1L, new BpmTaskResubmitReqVO().setTaskId(taskId)),
+                TASK_RESUBMIT_NOT_ALLOWED);
+
+        // 调用：审批人继续审批，使用待办中的批次
+        BpmTaskRespVO todoTask = bpmTaskService.getTodoTask(3L, taskId, processInstanceId);
+        assertEquals(revisionId, todoTask.getRevisionId());
+        bpmTaskService.approveTask(3L, new BpmTaskApproveReqVO().setId(taskId).setReason("同意")
+                .setRevisionId(todoTask.getRevisionId()));
+        // 断言：流程结束
+        assertNull(processInstanceService.getProcessInstance(processInstanceId));
+    }
+
+    @Test
+    public void testResubmitTask_fieldNotWritable() {
+        // 准备参数：用户 3 将 task2 退回到发起人节点
+        String processInstanceId = startRevisionProcessInstance(BpmModelFormTypeEnum.NORMAL);
+        String taskId = getRunningTask(processInstanceId).getId();
+        bpmTaskService.returnTask(3L, new BpmTaskReturnReqVO().setId(taskId)
+                .setTargetTaskDefinitionKey(BpmnModelConstants.START_USER_NODE_ID).setReason("请修改"));
+
+        // 调用，并断言异常：只读字段，以及不是表单字段的变量、子表单的子字段，不能修改
+        assertResubmitFieldNotWritable(taskId, "remark", "已修改", "remark");
+        assertResubmitFieldNotWritable(taskId, "notExists", 1, "notExists");
+        assertResubmitFieldNotWritable(taskId, "price", 99, "price");
+        assertResubmitFieldNotWritable(taskId, "items.price", 99, "items.price");
+        // 调用，并断言异常：与工作流保留变量同名的表单字段，即使配置为可编辑，也不能修改
+        assertResubmitFieldNotWritable(taskId, BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_STATUS,
+                BpmProcessInstanceStatusEnum.APPROVE.getStatus(), BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_STATUS);
+        assertResubmitFieldNotWritable(taskId, BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_NEED_SIMULATE_TASK_IDS,
+                Set.of("task2"), BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_NEED_SIMULATE_TASK_IDS);
+        assertResubmitFieldNotWritable(taskId, "task1_assignees", List.of(5L), "task1_assignees");
+        // 调用，并断言异常：子表单中，已有行的只读子字段不能修改，新增行的只读子字段不能填写
+        assertResubmitFieldNotWritable(taskId, "items", List.of(Map.of("name", "a", "price", 99)), "items.price");
+        assertResubmitFieldNotWritable(taskId, "items", List.of(Map.of("name", "a", "price", 10),
+                Map.of("name", "b", "price", 99)), "items.price");
+        // 调用，并断言异常：子表单的值，与组件生成的格式不一致：未知的子字段、行不是对象、不是数组
+        assertResubmitFieldNotWritable(taskId, "items", List.of(Map.of("name", "a", "price", 10, "unknown", 1)), "items");
+        assertResubmitFieldNotWritable(taskId, "items", List.of("a"), "items");
+        assertResubmitFieldNotWritable(taskId, "items", Map.of("name", "a"), "items");
+        assertResubmitFieldNotWritable(taskId, "items", null, "items");
+        // 调用，并断言异常：子表单配置 props.field 时，每行是 tag 的值，只读的 tag 同样不能修改，也不能是包含 tag 的对象
+        assertResubmitFieldNotWritable(taskId, "tags", List.of("a", "y"), "tags.tag");
+        assertResubmitFieldNotWritable(taskId, "tags", List.of(Map.of("tag", "a")), "tags");
+        // 断言：校验不通过时，不修改变量，任务仍等待修改
+        assertEquals(BpmTaskStatusEnum.WAIT_REVISION.getStatus(), getTaskStatus(taskId));
+        assertEquals("备注", runtimeService.getVariable(processInstanceId, "remark"));
+        assertEquals(BpmProcessInstanceStatusEnum.RUNNING.getStatus(), runtimeService.getVariable(processInstanceId,
+                BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_STATUS));
+
+        // 调用：修改可编辑的字段；子表单中，修改可编辑的子字段，删除行、新增行
+        // 其中，只读的 price 序列化为 10.0、键的顺序不同，与修改前的 10 一致；tags 新增行为空、或者 props.defaultValue
+        Map<String, Object> itemB = new LinkedHashMap<>();
+        itemB.put("price", 10.0);
+        itemB.put("name", "b");
+        List<Map<String, Object>> items = List.of(itemB, Map.of("name", "c"));
+        List<String> tags = Arrays.asList("a", null, "x");
+        bpmTaskService.resubmitTask(1L, new BpmTaskResubmitReqVO().setTaskId(taskId).setRevisionId(getRevisionId(taskId))
+                .setVariables(Map.of("amount", 200, "items", items, "tags", tags)));
+        // 断言
+        assertEquals(200, runtimeService.getVariable(processInstanceId, "amount"));
+        assertEquals(items, runtimeService.getVariable(processInstanceId, "items"));
+        assertEquals(tags, runtimeService.getVariable(processInstanceId, "tags"));
+        assertEquals(BpmTaskStatusEnum.RUNNING.getStatus(), getTaskStatus(taskId));
+    }
+
+    @Test
+    public void testRejectTask_resumeSource_resubmitByApprovedAssignee() {
+        // 准备参数：task1 或签，用户 2 审批通过、用户 4 的任务被取消；task2 待用户 3 审批
+        String processInstanceId = startRevisionProcessInstance(BpmModelFormTypeEnum.NORMAL);
+        String taskId = getRunningTask(processInstanceId).getId();
+
+        // 调用：用户 3 审批不通过，按配置驳回到 task1
+        bpmTaskService.rejectTask(3L, new BpmTaskRejectReqVO().setId(taskId).setReason("金额有误")
+                .setAttachments(List.of("https://www.iocoder.cn/files/c.pdf")));
+        // 断言：任务不标记为不通过，由 task1 审批通过的用户 2 修改，而不是被取消的用户 4；附件仍保存到任务上
+        assertTaskStatus(taskId, BpmTaskStatusEnum.WAIT_REVISION.getStatus(), "金额有误");
+        assertEquals(List.of("c.pdf"), bpmTaskService.getAttachments(processInstanceId, Set.of(taskId),
+                BpmAttachmentTypeEnum.TASK_ATTACHMENT).stream().map(Attachment::getName).toList());
+        assertEquals(taskId, getRunningTask(processInstanceId).getId());
+        assertEquals(List.of(taskId), getRevisionTaskIds(2L));
+        assertEquals(List.of(), getRevisionTaskIds(4L));
+        // 调用，并断言异常：task1 隐藏、未配置权限（默认只读）的字段，不能修改
+        String revisionId = getRevisionId(taskId);
+        assertServiceException(() -> bpmTaskService.resubmitTask(2L, new BpmTaskResubmitReqVO().setTaskId(taskId)
+                .setRevisionId(revisionId).setVariables(Map.of("remark", "已修改"))), TASK_RESUBMIT_FIELD_NOT_WRITABLE, "remark");
+        assertServiceException(() -> bpmTaskService.resubmitTask(2L, new BpmTaskResubmitReqVO().setTaskId(taskId)
+                .setRevisionId(revisionId).setVariables(Map.of("items", List.of()))), TASK_RESUBMIT_FIELD_NOT_WRITABLE, "items");
+        // 调用，并断言异常：配置 props.field 的子表单可编辑时，也不能是包含 tag 的对象
+        assertServiceException(() -> bpmTaskService.resubmitTask(2L, new BpmTaskResubmitReqVO().setTaskId(taskId)
+                .setRevisionId(revisionId).setVariables(Map.of("tags", List.of(Map.of("tag", "c"))))), TASK_RESUBMIT_FIELD_NOT_WRITABLE, "tags");
+        // 调用，并断言异常：tag 是普通输入框，每行的值不能是对象、数组
+        assertServiceException(() -> bpmTaskService.resubmitTask(2L, new BpmTaskResubmitReqVO().setTaskId(taskId)
+                .setRevisionId(revisionId).setVariables(Map.of("tags", List.of(Map.of("note", "c"))))), TASK_RESUBMIT_FIELD_NOT_WRITABLE, "tags");
+        assertServiceException(() -> bpmTaskService.resubmitTask(2L, new BpmTaskResubmitReqVO().setTaskId(taskId)
+                .setRevisionId(revisionId).setVariables(Map.of("tags", List.of(List.of("c"))))), TASK_RESUBMIT_FIELD_NOT_WRITABLE, "tags");
+
+        // 调用：用户 2 修改后，重新提交
+        bpmTaskService.resubmitTask(2L, new BpmTaskResubmitReqVO().setTaskId(taskId).setRevisionId(revisionId)
+                .setVariables(Map.of("amount", 300)));
+        // 断言：不重新经过 task1，回到 task2 审批
+        assertEquals(300, runtimeService.getVariable(processInstanceId, "amount"));
+        assertEquals(taskId, getRunningTask(processInstanceId).getId());
+        bpmTaskService.approveTask(3L, new BpmTaskApproveReqVO().setId(taskId).setReason("同意").setRevisionId(revisionId));
+        assertNull(processInstanceService.getProcessInstance(processInstanceId));
+    }
+
+    @Test
+    public void testRejectTask_resumeSource_customFormFallback() {
+        // 准备参数：业务表单，修改人无法在流程详情中修改表单
+        String processInstanceId = startRevisionProcessInstance(BpmModelFormTypeEnum.CUSTOM);
+        String taskId = getRunningTask(processInstanceId).getId();
+
+        // 调用：用户 3 审批不通过
+        bpmTaskService.rejectTask(3L, new BpmTaskRejectReqVO().setId(taskId).setReason("不同意"));
+        // 断言：与【重新依次审批】一致，task2 标记为退回，流程回到 task1，重新生成用户 2、用户 4 的或签任务
+        assertTaskStatus(taskId, BpmTaskStatusEnum.RETURN.getStatus(), "不同意");
+        assertEquals(List.of("2", "4"), bpmTaskService.getRunningTaskListByProcessInstanceId(processInstanceId, null, "task1")
+                .stream().map(Task::getAssignee).sorted().toList());
+        assertEquals(List.of(), getRevisionTaskIds(2L));
+    }
+
+    @Test
+    public void testReturnTask_resumeSource_delegatedTask() {
+        // 准备参数：用户 3 将 task2 委派给用户 5
+        String processInstanceId = startRevisionProcessInstance(BpmModelFormTypeEnum.NORMAL);
+        String taskId = getRunningTask(processInstanceId).getId();
+        bpmTaskService.delegateTask(3L, new BpmTaskDelegateReqVO().setId(taskId)
+                .setDelegateUserId(5L).setReason("请帮忙审批"));
+
+        // 调用：委派中（PENDING），被委派人退回到发起人节点，发起人重新提交
+        bpmTaskService.returnTask(5L, new BpmTaskReturnReqVO().setId(taskId)
+                .setTargetTaskDefinitionKey(BpmnModelConstants.START_USER_NODE_ID).setReason("请修改"));
+        assertEquals(BpmTaskStatusEnum.WAIT_REVISION.getStatus(), getTaskStatus(taskId));
+        String revisionId = getRevisionId(taskId);
+        bpmTaskService.resubmitTask(1L, new BpmTaskResubmitReqVO().setTaskId(taskId).setRevisionId(revisionId));
+        // 断言：仍由被委派人审批
+        Task delegatedTask = bpmTaskService.getTask(taskId);
+        assertEquals("5", delegatedTask.getAssignee());
+        assertEquals(DelegationState.PENDING, delegatedTask.getDelegationState());
+        assertEquals(BpmTaskStatusEnum.RUNNING.getStatus(), FlowableUtils.getTaskStatus(delegatedTask));
+
+        // 调用：被委派人审批，归还给用户 3
+        bpmTaskService.approveTask(5L, new BpmTaskApproveReqVO().setId(taskId).setReason("已处理").setRevisionId(revisionId));
+        Task resolvedTask = bpmTaskService.getTask(taskId);
+        assertEquals("3", resolvedTask.getAssignee());
+        assertEquals(DelegationState.RESOLVED, resolvedTask.getDelegationState());
+
+        // 调用：委派已归还（RESOLVED），用户 3 驳回到 task1
+        bpmTaskService.rejectTask(3L, new BpmTaskRejectReqVO().setId(taskId).setReason("金额有误").setRevisionId(revisionId));
+        // 断言：同样退回修改，由 task1 的用户 2 修改；重新提交后，用户 3 审批通过，流程结束
+        assertEquals(BpmTaskStatusEnum.WAIT_REVISION.getStatus(), getTaskStatus(taskId));
+        String revisionId2 = getRevisionId(taskId);
+        bpmTaskService.resubmitTask(2L, new BpmTaskResubmitReqVO().setTaskId(taskId).setRevisionId(revisionId2));
+        bpmTaskService.approveTask(3L, new BpmTaskApproveReqVO().setId(taskId).setReason("同意").setRevisionId(revisionId2));
+        assertNull(processInstanceService.getProcessInstance(processInstanceId));
+    }
+
+    @Test
+    public void testProcessTaskTimeout_waitRevision() {
+        // 准备参数：用户 3 将 task2 退回到发起人节点
+        String processInstanceId = startRevisionProcessInstance(BpmModelFormTypeEnum.NORMAL);
+        String taskId = getRunningTask(processInstanceId).getId();
+        bpmTaskService.returnTask(3L, new BpmTaskReturnReqVO().setId(taskId)
+                .setTargetTaskDefinitionKey(BpmnModelConstants.START_USER_NODE_ID).setReason("请修改"));
+
+        // 调用：超时提醒
+        bpmTaskService.processTaskTimeout(processInstanceId, "task2", BpmUserTaskTimeoutHandlerTypeEnum.REMINDER.getType());
+        // 断言：等待修改期间，审批人不能处理，所以不提醒
+        verify(messageService, never()).sendMessageWhenTaskTimeout(any());
+        assertEquals(BpmTaskStatusEnum.WAIT_REVISION.getStatus(), getTaskStatus(taskId));
+
+        // 调用：超时自动通过
+        bpmTaskService.processTaskTimeout(processInstanceId, "task2", BpmUserTaskTimeoutHandlerTypeEnum.APPROVE.getType());
+        // 断言：先结束退回修改，再自动通过，流程结束；修改人不能再重新提交
+        assertTaskStatus(taskId, BpmTaskStatusEnum.APPROVE.getStatus(), BpmReasonEnum.TIMEOUT_APPROVE.getReason());
+        assertFalse(bpmTaskService.getHistoricTask(taskId).getTaskLocalVariables()
+                .containsKey(BpmnVariableConstants.TASK_VARIABLE_REVISION_ASSIGNEE));
+        assertNull(processInstanceService.getProcessInstance(processInstanceId));
+        assertEquals(List.of(), getRevisionTaskIds(1L));
+        assertServiceException(() -> bpmTaskService.resubmitTask(1L, new BpmTaskResubmitReqVO().setTaskId(taskId)),
+                TASK_RESUBMIT_NOT_ALLOWED);
+    }
+
+    @Test
+    public void testProcessTaskTimeout_waitRevisionReject() {
+        // 准备参数：用户 3 将 task2 退回到发起人节点
+        String processInstanceId = startRevisionProcessInstance(BpmModelFormTypeEnum.NORMAL);
+        String taskId = getRunningTask(processInstanceId).getId();
+        bpmTaskService.returnTask(3L, new BpmTaskReturnReqVO().setId(taskId)
+                .setTargetTaskDefinitionKey(BpmnModelConstants.START_USER_NODE_ID).setReason("请修改"));
+
+        // 调用：超时自动拒绝
+        bpmTaskService.processTaskTimeout(processInstanceId, "task2", BpmUserTaskTimeoutHandlerTypeEnum.REJECT.getType());
+        // 断言：结束退回修改后，按常规的驳回处理：task2 标记为退回，流程回到驳回节点 task1，不再等待修改
+        assertTaskStatus(taskId, BpmTaskStatusEnum.RETURN.getStatus(), BpmReasonEnum.REJECT_TASK.getReason());
+        assertFalse(bpmTaskService.getHistoricTask(taskId).getTaskLocalVariables()
+                .containsKey(BpmnVariableConstants.TASK_VARIABLE_REVISION_ASSIGNEE));
+        assertEquals(List.of("2", "4"), bpmTaskService.getRunningTaskListByProcessInstanceId(processInstanceId, null, "task1")
+                .stream().map(Task::getAssignee).sorted().toList());
+        assertEquals(List.of(), getRevisionTaskIds(1L));
+        assertEquals(List.of(), getRevisionTaskIds(2L));
+    }
+
+    @Test
+    public void testResubmitAndApprove_expiredRevision() {
+        // 准备参数：从未退回修改的任务，没有批次
+        String processInstanceId = startRevisionProcessInstance(BpmModelFormTypeEnum.NORMAL);
+        String taskId = getRunningTask(processInstanceId).getId();
+        assertNull(bpmTaskService.getTodoTask(3L, taskId, processInstanceId).getRevisionId());
+        // 准备参数：第一次退回修改，发起人重新提交；重新提交后保留批次，审批人的待办返回该批次
+        bpmTaskService.returnTask(3L, new BpmTaskReturnReqVO().setId(taskId)
+                .setTargetTaskDefinitionKey(BpmnModelConstants.START_USER_NODE_ID).setReason("第一次修改"));
+        String revisionId1 = getRevisionId(taskId);
+        assertNotNull(revisionId1);
+        bpmTaskService.resubmitTask(1L, new BpmTaskResubmitReqVO().setTaskId(taskId).setRevisionId(revisionId1)
+                .setVariables(Map.of("amount", 200)));
+        assertEquals(revisionId1, bpmTaskService.getTodoTask(3L, taskId, processInstanceId).getRevisionId());
+
+        // 调用，并断言异常：审批人使用退回修改前的页面（没有批次）审批，不能覆盖修改后的表单
+        assertServiceException(() -> bpmTaskService.approveTask(3L, new BpmTaskApproveReqVO().setId(taskId)
+                .setReason("同意").setVariables(Map.of("amount", 100))), TASK_REVISION_EXPIRED);
+        assertServiceException(() -> bpmTaskService.rejectTask(3L, new BpmTaskRejectReqVO().setId(taskId)
+                .setReason("不同意")), TASK_REVISION_EXPIRED);
+        assertEquals(200, runtimeService.getVariable(processInstanceId, "amount"));
+
+        // 准备参数：第二次退回修改，生成新的批次
+        bpmTaskService.returnTask(3L, new BpmTaskReturnReqVO().setId(taskId)
+                .setTargetTaskDefinitionKey(BpmnModelConstants.START_USER_NODE_ID).setReason("第二次修改"));
+        String revisionId2 = getRevisionId(taskId);
+        assertNotEquals(revisionId1, revisionId2);
+        // 调用，并断言异常：第一次退回修改的页面，不能提交到第二次
+        assertServiceException(() -> bpmTaskService.resubmitTask(1L, new BpmTaskResubmitReqVO().setTaskId(taskId)
+                .setRevisionId(revisionId1).setVariables(Map.of("amount", 300))), TASK_REVISION_EXPIRED);
+        assertEquals(200, runtimeService.getVariable(processInstanceId, "amount"));
+        assertEquals(BpmTaskStatusEnum.WAIT_REVISION.getStatus(), getTaskStatus(taskId));
+        // 调用：使用第二次的批次，重新提交
+        bpmTaskService.resubmitTask(1L, new BpmTaskResubmitReqVO().setTaskId(taskId).setRevisionId(revisionId2)
+                .setVariables(Map.of("amount", 300)));
+        // 调用，并断言异常：审批人使用第一次的页面审批
+        assertServiceException(() -> bpmTaskService.approveTask(3L, new BpmTaskApproveReqVO().setId(taskId)
+                .setReason("同意").setRevisionId(revisionId1)), TASK_REVISION_EXPIRED);
+
+        // 调用：审批人使用第二次的批次审批
+        bpmTaskService.approveTask(3L, new BpmTaskApproveReqVO().setId(taskId).setReason("同意").setRevisionId(revisionId2));
+        // 断言：流程结束，表单为第二次修改的值
+        assertNull(processInstanceService.getProcessInstance(processInstanceId));
+        assertEquals(300, getHistoricProcessVariable(processInstanceId, "amount"));
+    }
+
+    @Test
+    public void testRejectTask_resumeSource_multiInstanceFallback() {
+        // 准备参数：task2 会签，用户 3 已经审批通过，用户 5 待审批
+        String processInstanceId = startRevisionProcessInstance(BpmModelFormTypeEnum.NORMAL,
+                new LinkedHashSet<>(List.of(2L, 4L)), new LinkedHashSet<>(List.of(3L, 5L)));
+        Map<String, Task> task2Map = bpmTaskService.getRunningTaskListByProcessInstanceId(processInstanceId, null, "task2")
+                .stream().collect(Collectors.toMap(Task::getAssignee, Function.identity()));
+        assertEquals(Set.of("3", "5"), task2Map.keySet());
+        bpmTaskService.approveTask(3L, new BpmTaskApproveReqVO().setId(task2Map.get("3").getId()).setReason("同意"));
+        String taskId = task2Map.get("5").getId();
+
+        // 调用：用户 5 审批不通过
+        bpmTaskService.rejectTask(5L, new BpmTaskRejectReqVO().setId(taskId).setReason("金额有误"));
+        // 断言：多人审批的节点，不退回修改，与【重新依次审批】一致：task2 标记为退回，流程回到 task1，重新生成或签任务
+        assertTaskStatus(taskId, BpmTaskStatusEnum.RETURN.getStatus(), "金额有误");
+        assertEquals(List.of("2", "4"), bpmTaskService.getRunningTaskListByProcessInstanceId(processInstanceId, null, "task1")
+                .stream().map(Task::getAssignee).sorted().toList());
+        assertEquals(List.of(), getRevisionTaskIds(2L));
+    }
+
+    @Test
+    public void testReturnTask_resumeSource_targetWithoutAssigneeFallback() {
+        // 准备参数：task1 配置为【自动通过】，没有处理人
+        mockUserTaskExtensionElement("task1", BpmnModelConstants.USER_TASK_APPROVE_TYPE,
+                BpmUserTaskApproveTypeEnum.AUTO_APPROVE.getType());
+        String processInstanceId = startRevisionProcessInstance(BpmModelFormTypeEnum.NORMAL, Set.of(), Set.of(3L));
+        HistoricTaskInstance task1 = getHistoricTask(processInstanceId, "task1");
+        assertTaskStatus(task1.getId(), BpmTaskStatusEnum.APPROVE.getStatus(),
+                BpmReasonEnum.APPROVE_TYPE_AUTO_APPROVE.getReason());
+        assertNull(task1.getAssignee());
+        String taskId = getRunningTask(processInstanceId).getId();
+
+        // 调用：用户 3 退回到 task1
+        bpmTaskService.returnTask(3L, new BpmTaskReturnReqVO().setId(taskId)
+                .setTargetTaskDefinitionKey("task1").setReason("请修改"));
+        // 断言：目标节点没有修改人，与【重新依次审批】一致：task2 标记为退回，流程跳转，不进入退回修改
+        assertTaskStatus(taskId, BpmTaskStatusEnum.RETURN.getStatus(), "请修改");
+        assertNull(bpmTaskService.getTask(taskId));
+        assertFalse(bpmTaskService.getHistoricTask(taskId).getTaskLocalVariables()
+                .containsKey(BpmnVariableConstants.TASK_VARIABLE_REVISION_ASSIGNEE));
+    }
+
+    @Test
+    public void testGetApprovalDetail_revisionWithoutTaskIdAndExpiredLink() {
+        // 准备参数：用户 3 驳回到 task1，由用户 2 修改
+        String processInstanceId = startRevisionProcessInstance(BpmModelFormTypeEnum.NORMAL);
+        String taskId = getRunningTask(processInstanceId).getId();
+        bpmTaskService.rejectTask(3L, new BpmTaskRejectReqVO().setId(taskId).setReason("金额有误"));
+
+        // 调用：不传 taskId，例如说从【我的流程】进入
+        BpmApprovalDetailRespVO detail = processInstanceService.getApprovalDetail(2L,
+                new BpmApprovalDetailReqVO().setProcessInstanceId(processInstanceId));
+        // 断言：找到用户 2 在该流程实例中待修改的任务，使用 task1 的表单权限
+        assertEquals(taskId, detail.getRevisionTaskId());
+        assertEquals(getRevisionId(taskId), detail.getRevisionId());
+        assertEquals(Map.of("amount", "2", "remark", "3", "tags", "2"), detail.getFormFieldsPermission());
+
+        // 调用：重新提交后，使用过期的修改链接（taskId 是审批人的任务）
+        bpmTaskService.resubmitTask(2L, new BpmTaskResubmitReqVO().setTaskId(taskId).setRevisionId(detail.getRevisionId())
+                .setVariables(Map.of("amount", 300)));
+        BpmApprovalDetailRespVO expiredDetail = processInstanceService.getApprovalDetail(2L,
+                new BpmApprovalDetailReqVO().setProcessInstanceId(processInstanceId).setTaskId(taskId));
+        // 断言：不能再修改，使用用户 2 办理过的 task1 的表单权限：可编辑降级为只读，隐藏的字段仍然隐藏
+        assertNull(expiredDetail.getRevisionTaskId());
+        assertNull(expiredDetail.getRevisionId());
+        assertNull(expiredDetail.getTodoTask());
+        assertEquals(Map.of("amount", "1", "remark", "3", "tags", "1"), expiredDetail.getFormFieldsPermission());
+        // 调用 + 断言：不传 taskId（不是发起人），同样使用用户 2 审批通过的 task1 的表单权限，隐藏的字段仍然隐藏
+        assertEquals(Map.of("amount", "1", "remark", "3", "tags", "1"), processInstanceService.getApprovalDetail(2L,
+                new BpmApprovalDetailReqVO().setProcessInstanceId(processInstanceId)).getFormFieldsPermission());
     }
 
     @Test
@@ -1210,6 +1609,84 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
 
     private void deploy(String resource) {
         extraDeploymentIds.add(repositoryService.createDeployment().addClasspathResource(resource).deploy().getId());
+    }
+
+    /**
+     * 发起 revision-approve.bpmn20.xml 流程，并由用户 2 审批通过 task1，流转到 task2
+     *
+     * <p>审批人：发起人节点为用户 1，task1 或签为用户 2、用户 4，task2 为用户 3。
+     * 表单：金额 amount、备注 remark、子表单 items（名称 name、价格 price）、配置 props.field 的子表单 tags（默认值 x），
+     * 以及与工作流保留变量同名的字段</p>
+     *
+     * @param formType 表单类型
+     * @return 流程实例编号
+     */
+    private String startRevisionProcessInstance(BpmModelFormTypeEnum formType) {
+        return startRevisionProcessInstance(formType, new LinkedHashSet<>(List.of(2L, 4L)), Set.of(3L));
+    }
+
+    /**
+     * 发起 revision-approve.bpmn20.xml 流程，见 {@link #startRevisionProcessInstance(BpmModelFormTypeEnum)}
+     *
+     * @param formType     表单类型
+     * @param task1UserIds task1 的审批人。包含用户 2 时，由用户 2 审批通过 task1
+     * @param task2UserIds task2 的审批人
+     * @return 流程实例编号
+     */
+    private String startRevisionProcessInstance(BpmModelFormTypeEnum formType, Set<Long> task1UserIds, Set<Long> task2UserIds) {
+        deploy("bpmn/revision-approve.bpmn20.xml");
+        when(taskCandidateInvoker.calculateUsersByTask(any())).thenAnswer(invocation ->
+                switch (((DelegateExecution) invocation.getArgument(0)).getCurrentActivityId()) {
+                    case "task1" -> task1UserIds;
+                    case "task2" -> task2UserIds;
+                    default -> Set.of(1L);
+                });
+        doAnswer(invocation -> new BpmProcessDefinitionInfoDO().setProcessDefinitionId(invocation.getArgument(0))
+                .setModelType(BpmModelTypeEnum.BPMN.getType()).setFormType(formType.getType())
+                .setFormFields(List.of("{\"type\":\"input\",\"field\":\"amount\",\"title\":\"金额\"}",
+                        "{\"type\":\"input\",\"field\":\"remark\",\"title\":\"备注\"}",
+                        "{\"type\":\"group\",\"field\":\"items\",\"title\":\"明细\",\"props\":{\"rule\":["
+                                + "{\"type\":\"input\",\"field\":\"name\",\"title\":\"名称\"},"
+                                + "{\"type\":\"inputNumber\",\"field\":\"price\",\"title\":\"价格\"}]}}",
+                        "{\"type\":\"group\",\"field\":\"tags\",\"title\":\"标签\",\"props\":{\"field\":\"tag\",\"defaultValue\":\"x\",\"rule\":["
+                                + "{\"type\":\"input\",\"field\":\"tag\",\"title\":\"标签\"},"
+                                + "{\"type\":\"input\",\"field\":\"note\",\"title\":\"说明\"}]}}",
+                        "{\"type\":\"input\",\"field\":\"PROCESS_STATUS\",\"title\":\"状态\"}",
+                        "{\"type\":\"input\",\"field\":\"NEED_SIMULATE_TASK_IDS\",\"title\":\"预测节点\"}",
+                        "{\"type\":\"input\",\"field\":\"task1_assignees\",\"title\":\"审批人\"}")))
+                .when(processDefinitionService).getProcessDefinitionInfo(anyString());
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("amount", 100);
+        variables.put("remark", "备注");
+        variables.put("items", List.of(Map.of("name", "a", "price", 10), Map.of("name", "z", "price", 20)));
+        variables.put("tags", List.of("a", "b"));
+        String processInstanceId = processInstanceService.createProcessInstance(1L, new BpmProcessInstanceCreateReqDTO()
+                .setProcessDefinitionKey("revisionApprove").setBusinessKey("business-1").setVariables(variables));
+        // 用户 2 审批通过 task1，用户 4 的或签任务被取消
+        if (task1UserIds.contains(2L)) {
+            Task task1 = bpmTaskService.getRunningTaskListByProcessInstanceId(processInstanceId, null, "task1").stream()
+                    .filter(task -> "2".equals(task.getAssignee())).findFirst().orElseThrow();
+            bpmTaskService.approveTask(2L, new BpmTaskApproveReqVO().setId(task1.getId()).setReason("同意"));
+        }
+        return processInstanceId;
+    }
+
+    private List<String> getRevisionTaskIds(Long userId) {
+        return bpmTaskService.getRevisionTaskPage(userId, new BpmTaskPageReqVO()).getList().stream()
+                .map(Task::getId).toList();
+    }
+
+    /**
+     * 获得任务当前的退回修改批次，即审批详情、待办任务返回给前端的 revisionId
+     */
+    private String getRevisionId(String taskId) {
+        return (String) flowableTaskService.getVariableLocal(taskId, BpmnVariableConstants.TASK_VARIABLE_REVISION_ID);
+    }
+
+    private void assertResubmitFieldNotWritable(String taskId, String field, Object value, String errorField) {
+        assertServiceException(() -> bpmTaskService.resubmitTask(1L, new BpmTaskResubmitReqVO().setTaskId(taskId)
+                .setRevisionId(getRevisionId(taskId)).setVariables(Collections.singletonMap(field, value))), // 允许 value 为 null
+                TASK_RESUBMIT_FIELD_NOT_WRITABLE, errorField);
     }
 
     private ProcessInstance getChildProcessInstance(String parentId) {

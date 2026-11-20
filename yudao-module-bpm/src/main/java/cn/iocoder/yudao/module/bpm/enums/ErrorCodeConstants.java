@@ -69,6 +69,10 @@ public interface ErrorCodeConstants {
     ErrorCode TASK_SIGN_DELETE_FAIL_NOT_SELF = new ErrorCode(1_009_005_021, "任务减签失败，原因：你不是该任务的加签人");
     ErrorCode TASK_OPERATE_FAIL_APPROVING = new ErrorCode(1_009_005_022, "操作失败，原因：该任务已审批通过，等待加签任务审批完成");
     ErrorCode TASK_SIGN_CREATE_TYPE_NOT_EXISTS = new ErrorCode(1_009_005_023, "任务加签失败，加签类型({})不存在");
+    ErrorCode TASK_WAIT_REVISION = new ErrorCode(1_009_005_024, "操作失败，原因：该任务已退回，等待修改人修改后重新提交");
+    ErrorCode TASK_RESUBMIT_NOT_ALLOWED = new ErrorCode(1_009_005_025, "重新提交失败，原因：修改已失效或你不是该任务的修改人，请刷新后重试");
+    ErrorCode TASK_RESUBMIT_FIELD_NOT_WRITABLE = new ErrorCode(1_009_005_026, "重新提交失败，原因：表单字段({})不允许修改");
+    ErrorCode TASK_REVISION_EXPIRED = new ErrorCode(1_009_005_027, "操作失败，原因：该任务的退回修改已变化，请刷新后重试");
 
     // ========== 动态表单模块 1-009-010-000 ==========
     ErrorCode FORM_NOT_EXISTS = new ErrorCode(1_009_010_000, "动态表单不存在");

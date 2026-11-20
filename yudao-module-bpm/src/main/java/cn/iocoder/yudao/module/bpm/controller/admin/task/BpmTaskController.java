@@ -9,6 +9,8 @@ import cn.iocoder.yudao.module.bpm.convert.task.BpmTaskConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionInfoDO;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmAttachmentTypeEnum;
+import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskStatusEnum;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmFormService;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmProcessDefinitionService;
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
@@ -184,6 +186,40 @@ public class BpmTaskController {
     @PreAuthorize("@ss.hasPermission('bpm:task:update')")
     public CommonResult<Boolean> returnTask(@Valid @RequestBody BpmTaskReturnReqVO reqVO) {
         taskService.returnTask(getLoginUserId(), reqVO);
+        return success(true);
+    }
+
+    @GetMapping("revision-page")
+    @Operation(summary = "获取退回修改中的任务分页", description = "用于【待办任务】的【待我修改】，当前用户是修改人")
+    @PreAuthorize("@ss.hasPermission('bpm:task:query')")
+    public CommonResult<PageResult<BpmTaskRespVO>> getRevisionTaskPage(@Valid BpmTaskPageReqVO pageVO) {
+        PageResult<Task> pageResult = taskService.getRevisionTaskPage(getLoginUserId(), pageVO);
+        if (CollUtil.isEmpty(pageResult.getList())) {
+            return success(PageResult.empty(pageResult.getTotal()));
+        }
+
+        // 拼接数据
+        Map<String, ProcessInstance> processInstanceMap = processInstanceService.getProcessInstanceMap(
+                convertSet(pageResult.getList(), Task::getProcessInstanceId));
+        Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
+                convertSet(processInstanceMap.values(), instance -> Long.valueOf(instance.getStartUserId())));
+        Map<String, BpmProcessDefinitionInfoDO> processDefinitionInfoMap = processDefinitionService.getProcessDefinitionInfoMap(
+                convertSet(pageResult.getList(), Task::getProcessDefinitionId));
+        PageResult<BpmTaskRespVO> result = BpmTaskConvert.INSTANCE.buildTodoTaskPage(
+                pageResult, processInstanceMap, userMap, processDefinitionInfoMap);
+        // 补充退回意见
+        Map<String, Task> taskMap = convertMap(pageResult.getList(), Task::getId);
+        result.getList().forEach(task -> task.setStatus(BpmTaskStatusEnum.WAIT_REVISION.getStatus())
+                .setReason(FlowableUtils.getTaskReason(taskMap.get(task.getId()))));
+        return success(result);
+    }
+
+    @PutMapping("/resubmit")
+    @Operation(summary = "退回修改后重新提交", description = "用于【流程详情】的【重新提交】按钮，当前用户是修改人")
+    // 两个入口：【待我修改】（任务权限）、【我的流程】（流程实例查询权限）；是否为当前修改人、批次，由 Service 校验
+    @PreAuthorize("@ss.hasAnyPermissions('bpm:task:update', 'bpm:process-instance:query')")
+    public CommonResult<Boolean> resubmit(@Valid @RequestBody BpmTaskResubmitReqVO reqVO) {
+        taskService.resubmitTask(getLoginUserId(), reqVO);
         return success(true);
     }
 

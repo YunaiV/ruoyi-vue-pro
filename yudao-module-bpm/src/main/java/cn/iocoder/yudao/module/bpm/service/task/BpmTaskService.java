@@ -259,6 +259,33 @@ public interface BpmTaskService {
     void returnTask(Long userId, BpmTaskReturnReqVO reqVO);
 
     /**
+     * 获得指定用户的退回修改中（WAIT_REVISION）的任务
+     *
+     * @param userId            用户编号，即修改人
+     * @param processInstanceId 流程实例编号；为空时，不限制流程实例
+     * @param taskId            任务编号；为空时，返回该流程实例中，该用户首个待修改的任务
+     * @return 任务，包含任务变量；不是该用户在当前租户下待修改的任务时，返回 null
+     */
+    Task getRevisionTask(Long userId, String processInstanceId, String taskId);
+
+    /**
+     * 获得指定用户的退回修改中（WAIT_REVISION）的任务分页
+     *
+     * @param userId 用户编号，即修改人
+     * @param pageVO 分页请求
+     * @return 任务分页，包含任务变量
+     */
+    PageResult<Task> getRevisionTaskPage(Long userId, BpmTaskPageReqVO pageVO);
+
+    /**
+     * 退回修改后重新提交：修改人修改表单后，任务恢复为审批中，由原审批人继续审批
+     *
+     * @param userId 用户编号，即修改人
+     * @param reqVO  重新提交请求
+     */
+    void resubmitTask(Long userId, @Valid BpmTaskResubmitReqVO reqVO);
+
+    /**
      * 将指定任务委派给其他人处理，等接收人处理后再回到原审批人手中审批
      *
      * @param userId 用户编号

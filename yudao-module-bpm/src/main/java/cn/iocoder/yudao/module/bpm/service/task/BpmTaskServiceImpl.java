@@ -10,6 +10,7 @@ import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
@@ -36,6 +37,8 @@ import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.NullNode;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -121,6 +124,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         TaskQuery taskQuery = taskService.createTaskQuery()
                 .taskAssignee(String.valueOf(userId)) // 分配给自己
                 .active()
+                // 排除退回修改中的任务：等待修改人重新提交，审批人暂时不能处理。在查询条件中排除，保证分页准确
+                .taskVariableValueNotEquals(BpmnVariableConstants.TASK_VARIABLE_STATUS, BpmTaskStatusEnum.WAIT_REVISION.getStatus())
                 .includeProcessVariables()
                 .taskTenantId(FlowableUtils.getTenantId())
                 .orderByTaskCreateTime().desc(); // 创建时间倒序
@@ -175,7 +180,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         }
 
         return BpmTaskConvert.INSTANCE.buildTodoTask(todoTask, childrenTasks, buttonsSetting, taskForm)
-                .setNodeType(nodeType).setSignEnable(signEnable).setReasonRequire(reasonRequire);
+                .setNodeType(nodeType).setSignEnable(signEnable).setReasonRequire(reasonRequire)
+                .setRevisionId((String) todoTask.getTaskLocalVariables().get(BpmnVariableConstants.TASK_VARIABLE_REVISION_ID));
     }
 
     /**
@@ -199,6 +205,10 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             return null;
         }
         if (!isAssignUserTask(userId, task) && !isAddSignUserTask(userId, task)) {
+            return null;
+        }
+        // 退回修改中的任务，审批人暂时不能处理，所以不是待办
+        if (isWaitRevisionTask(task)) {
             return null;
         }
         return task;
@@ -226,9 +236,58 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
         // 2. 查询我的首个任务
         return CollUtil.findOne(tasks, task -> {
+            if (isWaitRevisionTask(task)) { // 退回修改中的任务，不是待办
+                return false;
+            }
             return isAssignUserTask(userId, task) // 当前用户为审批人
                     || isAddSignUserTask(userId, task); // 当前用户为加签人（为了减签）
         });
+    }
+
+    @Override
+    public Task getRevisionTask(Long userId, String processInstanceId, String taskId) {
+        if (StrUtil.isAllEmpty(processInstanceId, taskId)) {
+            return null;
+        }
+        TaskQuery taskQuery = buildRevisionTaskQuery(userId);
+        if (StrUtil.isNotEmpty(processInstanceId)) {
+            taskQuery.processInstanceId(processInstanceId);
+        }
+        // 传递 taskId 时，只查询该任务，避免误用该流程实例中的其它任务
+        if (StrUtil.isNotEmpty(taskId)) {
+            taskQuery.taskId(taskId);
+        }
+        return CollUtil.getFirst(taskQuery.orderByTaskCreateTime().asc().orderByTaskId().asc().list());
+    }
+
+    @Override
+    public PageResult<Task> getRevisionTaskPage(Long userId, BpmTaskPageReqVO pageVO) {
+        TaskQuery taskQuery = buildRevisionTaskQuery(userId)
+                .orderByTaskCreateTime().desc() // 创建时间倒序
+                .orderByTaskId().desc(); // 创建时间相同时，按编号排序，保证分页稳定
+        long count = taskQuery.count();
+        if (count == 0) {
+            return PageResult.empty();
+        }
+        List<Task> tasks = taskQuery.listPage(PageUtils.getStart(pageVO), pageVO.getPageSize());
+        return new PageResult<>(tasks, count);
+    }
+
+    /**
+     * 构建指定用户的退回修改中（WAIT_REVISION）的任务查询
+     * <p>
+     * 修改人记录在任务变量中，而不是 assignee（仍然是审批人），所以按任务变量查询，并限定当前租户
+     *
+     * @param userId 用户编号，即修改人
+     * @return 任务查询
+     */
+    private TaskQuery buildRevisionTaskQuery(Long userId) {
+        return taskService.createTaskQuery()
+                .taskTenantId(FlowableUtils.getTenantId())
+                .active()
+                .taskVariableValueEquals(BpmnVariableConstants.TASK_VARIABLE_REVISION_ASSIGNEE, String.valueOf(userId))
+                .taskVariableValueEquals(BpmnVariableConstants.TASK_VARIABLE_STATUS, BpmTaskStatusEnum.WAIT_REVISION.getStatus())
+                .includeTaskLocalVariables();
     }
 
     @Override
@@ -341,6 +400,11 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 例如说：【向后加签】的父任务已经审批通过，需要等待加签出来的子任务审批完成后自动完成。此时，不能重复审批、拒绝、继续加签等
         if (BpmTaskStatusEnum.APPROVING.getStatus().equals(status)) {
             throw exception(TASK_OPERATE_FAIL_APPROVING);
+        }
+        // 为什么退回修改中（WAIT_REVISION）时，不允许操作？
+        // 例如说：节点配置【从当前节点审批】时，退回后任务不跳转，需要等待修改人重新提交后，才能继续审批、退回、委派、加签等
+        if (BpmTaskStatusEnum.WAIT_REVISION.getStatus().equals(status)) {
+            throw exception(TASK_WAIT_REVISION);
         }
         return task;
     }
@@ -602,6 +666,31 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 && isSignTaskUser(userId, task);
     }
 
+    /**
+     * 判断任务是否退回修改中（WAIT_REVISION）：等待修改人重新提交，审批人暂时不能处理
+     *
+     * @param task 任务，需要包含任务变量
+     * @return 是否
+     */
+    private static boolean isWaitRevisionTask(TaskInfo task) {
+        return BpmTaskStatusEnum.WAIT_REVISION.getStatus().equals(FlowableUtils.getTaskStatus(task));
+    }
+
+    /**
+     * 校验退回修改的批次：任务退回修改过时，前端传递的批次需要与任务当前的一致，避免过期的页面（修改前的表单、上一次退回的修改）提交
+     * <p>
+     * 从未退回修改的任务没有批次，无需校验
+     *
+     * @param task       任务，需要包含任务变量
+     * @param revisionId 前端传递的批次编号
+     */
+    private static void validateRevisionId(TaskInfo task, String revisionId) {
+        Object currentRevisionId = task.getTaskLocalVariables().get(BpmnVariableConstants.TASK_VARIABLE_REVISION_ID);
+        if (currentRevisionId != null && ObjectUtil.notEqual(currentRevisionId, revisionId)) {
+            throw exception(TASK_REVISION_EXPIRED);
+        }
+    }
+
     // ========== Update 写入相关方法 ==========
 
     /**
@@ -612,15 +701,29 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
     @DataPermission(enable = false)
     public void approveTaskInternal(Long userId, BpmTaskApproveReqVO reqVO) {
-        approveTask(userId, reqVO);
+        approveTask(userId, reqVO, false);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     @DataPermission(enable = false) // 关闭数据权限，避免查询不到用户数据。相关案例：https://gitee.com/zhijiantianya/yudao-cloud/issues/ID1UYA
     public void approveTask(Long userId, @Valid BpmTaskApproveReqVO reqVO) {
+        approveTask(userId, reqVO, true);
+    }
+
+    /**
+     * 审批通过
+     *
+     * @param userId 用户编号
+     * @param reqVO  通过请求
+     * @param manual 是否为用户的人工操作：需要校验退回修改的批次。系统自动通过（超时、审批人为空、自动审批）时为 false
+     */
+    private void approveTask(Long userId, BpmTaskApproveReqVO reqVO, boolean manual) {
         // 1.1 校验任务存在
         Task task = validateTask(userId, reqVO.getId());
+        if (manual) {
+            validateRevisionId(task, reqVO.getRevisionId());
+        }
         // 1.2 校验流程实例存在
         ProcessInstance instance = processInstanceService.getProcessInstance(task.getProcessInstanceId());
         if (instance == null) {
@@ -959,31 +1062,65 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
     @DataPermission(enable = false)
     public void rejectTaskInternal(Long userId, BpmTaskRejectReqVO reqVO) {
-        rejectTask(userId, reqVO);
+        rejectTask(userId, reqVO, false);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     @DataPermission(enable = false) // 关闭数据权限，避免查询不到用户数据。相关案例：https://gitee.com/zhijiantianya/yudao-cloud/issues/ID1UYA
     public void rejectTask(Long userId, @Valid BpmTaskRejectReqVO reqVO) {
+        rejectTask(userId, reqVO, true);
+    }
+
+    /**
+     * 审批不通过
+     *
+     * @param userId 用户编号
+     * @param reqVO  不通过请求
+     * @param manual 是否为用户的人工操作：需要校验退回修改的批次，并允许退回修改（【从当前节点审批】）。
+     *               系统自动不通过（超时、审批人为空、自动审批）时为 false，按常规的退回处理：
+     *               否则任务等待修改、重新提交后，仍然没有人处理，或者再次超时又进入等待修改
+     */
+    private void rejectTask(Long userId, BpmTaskRejectReqVO reqVO, boolean manual) {
         // 1.1 校验任务存在
         Task task = validateTask(userId, reqVO.getId());
+        if (manual) {
+            validateRevisionId(task, reqVO.getRevisionId());
+        }
         // 1.2 校验流程实例存在
         ProcessInstance instance = processInstanceService.getProcessInstance(task.getProcessInstanceId());
         if (instance == null) {
             throw exception(PROCESS_INSTANCE_NOT_EXISTS);
         }
 
-        // 2.1 更新流程任务为不通过
-        updateTaskStatusAndReason(task.getId(), BpmTaskStatusEnum.REJECT.getStatus(), reqVO.getReason());
-        // 2.2 添加流程评论
-        commentService.createComment(task.getId(), task.getProcessInstanceId(), BpmCommentTypeEnum.REJECT,
-                reqVO.getReason());
-        // 2.3 添加附件
+        // 1.3 获得驳回的处理策略
+        BpmnModel bpmnModel = modelService.getBpmnModelByDefinitionId(task.getProcessDefinitionId());
+        FlowElement userTaskElement = BpmnModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
+        BpmUserTaskRejectHandlerTypeEnum userTaskRejectHandlerType = BpmnModelUtils.parseRejectHandlerType(userTaskElement);
+
+        // 2.1 添加附件
         if (CollUtil.isNotEmpty(reqVO.getAttachments())) {
             reqVO.getAttachments().forEach(attachment -> taskService.createAttachment(BpmAttachmentTypeEnum.TASK_ATTACHMENT.getType(),
                     task.getId(), task.getProcessInstanceId(), FileUtil.getName(URLUtil.getPath(attachment)), null, attachment));
         }
+        // 特殊：驳回到指定的任务节点，并且【从当前节点审批】时，直接退回修改：任务不标记为不通过，等待修改人重新提交后继续审批
+        // 不满足退回修改的条件（例如说：多人审批的节点、目标节点没有修改人）时，按下面的常规驳回处理，即【重新依次审批】
+        if (manual && userTaskRejectHandlerType == BpmUserTaskRejectHandlerTypeEnum.RETURN_USER_TASK
+                && BpmnModelUtils.parseReturnApproveMode(userTaskElement) == BpmReturnApproveModeEnum.RESUME_SOURCE) {
+            FlowElement targetElement = validateTargetTaskCanReturn(bpmnModel, task.getTaskDefinitionKey(),
+                    BpmnModelUtils.parseReturnTaskId(userTaskElement));
+            String revisionAssignee = getRevisionAssignee(task, userTaskElement, targetElement);
+            if (revisionAssignee != null) {
+                returnTaskToRevision(task, targetElement, revisionAssignee, reqVO.getReason());
+                return;
+            }
+        }
+
+        // 2.2 更新流程任务为不通过
+        updateTaskStatusAndReason(task.getId(), BpmTaskStatusEnum.REJECT.getStatus(), reqVO.getReason());
+        // 2.3 添加流程评论
+        commentService.createComment(task.getId(), task.getProcessInstanceId(), BpmCommentTypeEnum.REJECT,
+                reqVO.getReason());
 
         // 2.4 如果当前任务时被加签的，则加它的根任务也标记成未通过
         // 疑问：为什么要标记未通过呢？
@@ -997,15 +1134,13 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         }
 
         // 3. 根据不同的 RejectHandler 处理策略
-        BpmnModel bpmnModel = modelService.getBpmnModelByDefinitionId(task.getProcessDefinitionId());
-        FlowElement userTaskElement = BpmnModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey());
         // 3.1 情况一：驳回到指定的任务节点
-        BpmUserTaskRejectHandlerTypeEnum userTaskRejectHandlerType = BpmnModelUtils.parseRejectHandlerType(userTaskElement);
         if (userTaskRejectHandlerType == BpmUserTaskRejectHandlerTypeEnum.RETURN_USER_TASK) {
             String returnTaskId = BpmnModelUtils.parseReturnTaskId(userTaskElement);
             Assert.notNull(returnTaskId, "退回的节点不能为空");
+            // 不再退回修改：需要退回修改时，已经在上面处理；这里任务已标记为不通过，按常规的退回处理
             returnTask(userId, new BpmTaskReturnReqVO().setId(task.getId())
-                    .setTargetTaskDefinitionKey(returnTaskId).setReason(reqVO.getReason()));
+                    .setTargetTaskDefinitionKey(returnTaskId).setReason(reqVO.getReason()), false);
             return;
         }
 
@@ -1086,6 +1221,17 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     @Transactional(rollbackFor = Exception.class)
     @DataPermission(enable = false) // 关闭数据权限，避免查询不到用户数据。相关案例：https://gitee.com/zhijiantianya/yudao-cloud/issues/ID1UYA
     public void returnTask(Long userId, BpmTaskReturnReqVO reqVO) {
+        returnTask(userId, reqVO, true);
+    }
+
+    /**
+     * 退回任务
+     *
+     * @param userId          用户编号
+     * @param reqVO           退回请求
+     * @param revisionEnabled 是否允许退回修改（【从当前节点审批】），见 {@link #rejectTask(Long, BpmTaskRejectReqVO, boolean)}
+     */
+    private void returnTask(Long userId, BpmTaskReturnReqVO reqVO, boolean revisionEnabled) {
         // 1.1 当前任务 task
         Task task = validateTask(userId, reqVO.getId());
         if (task.isSuspended()) {
@@ -1097,8 +1243,292 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         FlowElement targetElement = validateTargetTaskCanReturn(bpmnModel, task.getTaskDefinitionKey(),
                 reqVO.getTargetTaskDefinitionKey());
 
-        // 2. 调用 Flowable 框架的退回逻辑
+        // 2.1 情况一：【从当前节点审批】，任务不跳转，等待修改人修改后，由当前审批人继续审批
+        if (revisionEnabled) {
+            String revisionAssignee = getRevisionAssignee(task,
+                    BpmnModelUtils.getFlowElementById(bpmnModel, task.getTaskDefinitionKey()), targetElement);
+            if (revisionAssignee != null) {
+                returnTaskToRevision(task, targetElement, revisionAssignee, reqVO.getReason());
+                return;
+            }
+        }
+        // 2.2 情况二：【重新依次审批】，调用 Flowable 框架的退回逻辑。包括不满足【从当前节点审批】条件的情况
         returnTask(userId, bpmnModel, task, targetElement, reqVO);
+    }
+
+    /**
+     * 获得任务退回时，【从当前节点审批】的修改人。人工驳回、退回共用该判断
+     * <p>
+     * 以下情况，不支持【从当前节点审批】，返回 null，按【重新依次审批】处理：
+     * 1. 节点未配置【从当前节点审批】，或者不是流程表单：修改人需要在流程详情中修改流程表单
+     * 2. 加签的子任务（parentTaskId 非空）、加签中的父任务（scopeType 非空），与原退回逻辑一致
+     * 3. 多人审批的节点（会签、或签、依次审批的实例数大于 1）：其它审批人的任务可能已经完成或者仍在审批，无法只回到当前任务
+     * 4. 目标节点没有有效的修改人，例如说：目标节点自动通过、审批人为空时自动通过
+     * 补充说明：被委派中的任务支持，重新提交后仍由被委派人审批，再归还委派人
+     *
+     * @param task          当前任务
+     * @param sourceElement 当前任务的节点
+     * @param targetElement 退回的目标节点
+     * @return 修改人编号；不支持时，返回 null
+     */
+    private String getRevisionAssignee(Task task, FlowElement sourceElement, FlowElement targetElement) {
+        // 1.1 节点配置、加签
+        if (BpmnModelUtils.parseReturnApproveMode(sourceElement) != BpmReturnApproveModeEnum.RESUME_SOURCE
+                || task.getParentTaskId() != null || task.getScopeType() != null) {
+            return null;
+        }
+        // 1.2 流程表单
+        BpmProcessDefinitionInfoDO processDefinitionInfo = bpmProcessDefinitionService.getProcessDefinitionInfo(
+                task.getProcessDefinitionId());
+        if (processDefinitionInfo == null
+                || ObjectUtil.notEqual(BpmModelFormTypeEnum.NORMAL.getType(), processDefinitionInfo.getFormType())) {
+            return null;
+        }
+        // 1.3 多人审批的节点：按多实例的实例数（nrOfInstances，记录在多实例的根 execution 上）判断
+        if (sourceElement instanceof Activity activity && activity.getLoopCharacteristics() != null) {
+            Integer nrOfInstances = runtimeService.getVariable(task.getExecutionId(), "nrOfInstances", Integer.class);
+            if (nrOfInstances != null && nrOfInstances > 1) {
+                return null;
+            }
+        }
+
+        // 2. 修改人：目标节点最近一次审批通过的处理人。目标节点是发起人节点时，就是流程发起人
+        // 为什么只取审批通过的任务？或签时其它人的任务被取消，任务被退回、撤回时也会结束，它们的处理人都没有提交过表单
+        // 为什么排除加签的子任务？它们和父任务共用节点，但表单由父任务的处理人提交
+        // 为什么排除没有处理人的任务？目标节点自动通过时，没有人提交过表单
+        List<HistoricTaskInstance> approvedTasks = historyService.createHistoricTaskInstanceQuery()
+                .processInstanceId(task.getProcessInstanceId())
+                .taskDefinitionKey(targetElement.getId())
+                .taskVariableValueEquals(BpmnVariableConstants.TASK_VARIABLE_STATUS, BpmTaskStatusEnum.APPROVE.getStatus())
+                .finished()
+                .orderByHistoricTaskInstanceEndTime().desc().list();
+        HistoricTaskInstance approvedTask = findFirst(approvedTasks,
+                item -> item.getParentTaskId() == null && StrUtil.isNotBlank(item.getAssignee()));
+        return approvedTask != null ? approvedTask.getAssignee() : null;
+    }
+
+    /**
+     * 退回修改：任务不跳转，标记为退回修改中（WAIT_REVISION），由目标节点的处理人修改表单后重新提交
+     *
+     * @param task             当前任务
+     * @param targetElement    退回的目标节点
+     * @param revisionAssignee 修改人编号，见 {@link #getRevisionAssignee(Task, FlowElement, FlowElement)}
+     * @param reason           退回意见
+     */
+    private void returnTaskToRevision(Task task, FlowElement targetElement, String revisionAssignee, String reason) {
+        if (task.isSuspended()) {
+            throw exception(TASK_IS_PENDING);
+        }
+        // 1. 记录修改人、目标节点，并生成新的批次：之前批次的页面，不能再重新提交、审批
+        taskService.setVariableLocal(task.getId(), BpmnVariableConstants.TASK_VARIABLE_REVISION_ASSIGNEE, revisionAssignee);
+        taskService.setVariableLocal(task.getId(), BpmnVariableConstants.TASK_VARIABLE_REVISION_TARGET_NODE, targetElement.getId());
+        taskService.setVariableLocal(task.getId(), BpmnVariableConstants.TASK_VARIABLE_REVISION_ID, IdUtil.fastSimpleUUID());
+        // 2. 更新 task 状态 + 原因
+        updateTaskStatusAndReason(task.getId(), BpmTaskStatusEnum.WAIT_REVISION.getStatus(), reason);
+        // 3. 添加评论
+        commentService.createComment(task.getId(), task.getProcessInstanceId(), BpmCommentTypeEnum.RETURN, reason);
+    }
+
+    /**
+     * 结束任务的退回修改：恢复为审批中（RUNNING），由当前审批人继续审批
+     * <p>
+     * 保留批次编号：审批人需要传递该批次审批，避免使用修改前的页面审批
+     *
+     * @param taskId 任务编号
+     */
+    private void resumeRevisionTask(String taskId) {
+        taskService.removeVariablesLocal(taskId, List.of(BpmnVariableConstants.TASK_VARIABLE_REASON,
+                BpmnVariableConstants.TASK_VARIABLE_REVISION_ASSIGNEE, BpmnVariableConstants.TASK_VARIABLE_REVISION_TARGET_NODE));
+        updateTaskStatus(taskId, BpmTaskStatusEnum.RUNNING.getStatus());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    @DataPermission(enable = false) // 关闭数据权限，避免查询不到用户数据。相关案例：https://gitee.com/zhijiantianya/yudao-cloud/issues/ID1UYA
+    public void resubmitTask(Long userId, BpmTaskResubmitReqVO reqVO) {
+        // 1.1 校验是该用户待修改的任务，并且是当前批次：避免上一次退回修改的页面，提交到之后的退回修改
+        Task task = getRevisionTask(userId, null, reqVO.getTaskId());
+        if (task == null) {
+            throw exception(TASK_RESUBMIT_NOT_ALLOWED);
+        }
+        if (ObjectUtil.notEqual(task.getTaskLocalVariables().get(BpmnVariableConstants.TASK_VARIABLE_REVISION_ID),
+                reqVO.getRevisionId())) {
+            throw exception(TASK_REVISION_EXPIRED);
+        }
+        // 1.2 校验流程实例存在
+        ProcessInstance instance = processInstanceService.getProcessInstance(task.getProcessInstanceId());
+        if (instance == null) {
+            throw exception(PROCESS_INSTANCE_NOT_EXISTS);
+        }
+        // 1.3 校验修改的表单字段：按退回目标节点的表单字段权限
+        BpmnModel bpmnModel = modelService.getBpmnModelByDefinitionId(task.getProcessDefinitionId());
+        String targetNode = (String) task.getTaskLocalVariables().get(BpmnVariableConstants.TASK_VARIABLE_REVISION_TARGET_NODE);
+        Map<String, Object> variables = MapUtil.emptyIfNull(reqVO.getVariables());
+        validateRevisionVariables(variables, bpmProcessDefinitionService.getProcessDefinitionInfo(task.getProcessDefinitionId()),
+                bpmnModel, BpmnModelUtils.parseFormFieldsPermission(bpmnModel, targetNode), instance.getProcessVariables());
+
+        // 2. 更新流程变量
+        if (CollUtil.isNotEmpty(variables)) {
+            runtimeService.setVariables(task.getProcessInstanceId(), variables);
+        }
+        // 3. 恢复任务为审批中，并添加评论
+        resumeRevisionTask(task.getId());
+        commentService.createComment(task.getId(), task.getProcessInstanceId(), BpmCommentTypeEnum.RESUBMIT);
+    }
+
+    /**
+     * 校验退回修改后，重新提交的表单变量。和 yudao-ui-admin-vue3 流程详情的表单字段权限保持一致：
+     * <p>
+     * 1. 不能修改工作流的保留变量，即使表单中配置了同名的字段，见 {@link FlowableUtils#isReservedVariable}
+     * 2. 只能修改流程表单的字段，不能修改流程变量、子表单内部的子字段等其它变量
+     * 3. 只能修改退回目标节点【可编辑】的字段。未配置权限的字段，前端默认只读，所以也不能修改
+     * 4. 子表单（表格表单、子表单）的值，格式与组件生成的一致，并且【只读】、【隐藏】的子字段不能修改，见 {@link #validateRevisionSubFormValue}
+     *
+     * @param variables             修改的表单变量
+     * @param processDefinitionInfo 流程定义信息
+     * @param bpmnModel             流程模型
+     * @param fieldsPermission      退回目标节点的表单字段权限
+     * @param processVariables      修改前的流程变量
+     */
+    private void validateRevisionVariables(Map<String, Object> variables, BpmProcessDefinitionInfoDO processDefinitionInfo,
+                                           BpmnModel bpmnModel, Map<String, String> fieldsPermission,
+                                           Map<String, Object> processVariables) {
+        if (CollUtil.isEmpty(variables)) {
+            return;
+        }
+        Map<String, JsonNode> fieldRules = new HashMap<>();
+        if (processDefinitionInfo != null && BpmModelFormTypeEnum.NORMAL.getType().equals(processDefinitionInfo.getFormType())) {
+            CollUtil.emptyIfNull(processDefinitionInfo.getFormFields()).forEach(fieldStr ->
+                    FlowableUtils.parseFormFieldRules(JsonUtils.parseTree(fieldStr), fieldRules));
+        }
+        variables.forEach((field, value) -> {
+            JsonNode fieldRule = fieldRules.get(field);
+            if (FlowableUtils.isReservedVariable(field, bpmnModel) || fieldRule == null
+                    || !isWritePermission(MapUtil.getStr(fieldsPermission, field))) {
+                throw exception(TASK_RESUBMIT_FIELD_NOT_WRITABLE, field);
+            }
+            validateRevisionSubFormValue(field, fieldRule, value, processVariables.get(field), fieldsPermission);
+        });
+    }
+
+    /**
+     * 比较 JSON 值：数字按数值比较，忽略序列化的差异（例如说 10 和 10.0，Integer 和 Long）
+     * <p>
+     * 补充说明：对象按键比较，本身就忽略键的顺序，见 {@link com.fasterxml.jackson.databind.node.ObjectNode#equals(Comparator, JsonNode)}
+     */
+    private static final Comparator<JsonNode> JSON_VALUE_COMPARATOR = (o1, o2) -> {
+        if (o1.isNumber() && o2.isNumber()) {
+            return o1.decimalValue().compareTo(o2.decimalValue());
+        }
+        return o1.equals(o2) ? 0 : 1;
+    };
+
+    /**
+     * 校验子表单（表格表单、子表单）的值
+     * <p>
+     * 1. 值的格式，和 form-create 组件生成的一致，否则不能修改：
+     *    1.1 表格表单（tableForm）、子表单（group）：每一行是【子字段 - 值】的对象，不能包含未知的子字段
+     *    1.2 配置 props.field 的子表单（group）：每一行是该子字段的值，其它子字段不会保存
+     * 2. 【只读】、【隐藏】的子字段，不能修改。子字段的权限，和 yudao-ui-admin-vue3 的 getSubFieldPermission 一致：
+     *    未单独配置时，继承子表单的权限（这里一定是【可编辑】）。
+     *    因为可以新增、删除行，所以按行匹配：每一行的【只读】、【隐藏】子字段，与修改前的某一行一致（已有的行），或者为空、默认值（新增的行）
+     *
+     * @param field            子表单字段
+     * @param fieldRule        子表单的规则
+     * @param value            修改后的值
+     * @param oldValue         修改前的值
+     * @param fieldsPermission 表单字段权限
+     */
+    private static void validateRevisionSubFormValue(String field, JsonNode fieldRule, Object value, Object oldValue,
+                                                     Map<String, String> fieldsPermission) {
+        List<JsonNode> subFieldRules = FlowableUtils.getSubFormFieldRules(fieldRule);
+        if (subFieldRules == null) {
+            return;
+        }
+        // 1. 校验值的格式：必须是数组，不能为 null
+        // 1.1 表格表单、子表单：每一行是对象，不能包含未知的子字段
+        // 1.2 配置 props.field 的子表单：每一行是该子字段的值，不能是包含该子字段的对象（组件会拆包，不是组件生成的格式）；
+        //     该子字段是普通输入框（input）时，值只能是简单值，不能是对象、数组
+        String rowField = StrUtil.emptyToNull(fieldRule.path("props").path("field").asText());
+        Set<String> subFields = convertSet(subFieldRules, subFieldRule -> JsonUtils.getText(subFieldRule, "field"));
+        boolean inputRowField = rowField != null && anyMatch(subFieldRules, subFieldRule ->
+                rowField.equals(JsonUtils.getText(subFieldRule, "field")) && "input".equals(JsonUtils.getText(subFieldRule, "type")));
+        if (!(value instanceof List<?> rows) || anyMatch(rows, row -> rowField == null
+                ? !(row instanceof Map<?, ?> rowMap) || !subFields.containsAll(rowMap.keySet())
+                : (row instanceof Map<?, ?> wrapper && wrapper.containsKey(rowField))
+                        || (inputRowField && (row instanceof Map || row instanceof Collection)))) {
+            throw exception(TASK_RESUBMIT_FIELD_NOT_WRITABLE, field);
+        }
+
+        // 2. 获得不能修改的子字段，以及新增行时它们的默认值：子字段规则的 value，或者子表单（group）的 props.defaultValue
+        // 为什么配置 props.field 时，默认值是整个 props.defaultValue？和 group 组件一致，新增行时，该行的值就是 props.defaultValue
+        JsonNode rowDefaultValue = fieldRule.path("props").path("defaultValue");
+        Map<String, List<JsonNode>> readonlySubFields = new LinkedHashMap<>();
+        subFieldRules.forEach(subFieldRule -> {
+            String subField = JsonUtils.getText(subFieldRule, "field");
+            String permission = MapUtil.getStr(fieldsPermission, field + StrUtil.DOT + subField);
+            if (permission == null || isWritePermission(permission)
+                    || (rowField != null && ObjectUtil.notEqual(rowField, subField))) {
+                return;
+            }
+            JsonNode defaultValue = rowField != null ? rowDefaultValue : rowDefaultValue.get(subField);
+            readonlySubFields.put(subField, filterList(Arrays.asList(subFieldRule.get("value"), defaultValue),
+                    item -> item != null && !item.isMissingNode()));
+        });
+        if (readonlySubFields.isEmpty()) {
+            return;
+        }
+
+        // 3. 逐行校验
+        List<Map<String, Object>> oldReadonlyRows = oldValue instanceof List<?> oldRows
+                ? convertList(oldRows, oldRow -> getReadonlySubFieldValues(oldRow, rowField, readonlySubFields.keySet()))
+                : new ArrayList<>();
+        for (Object row : rows) {
+            Map<String, Object> readonlyValues = getReadonlySubFieldValues(row, rowField, readonlySubFields.keySet());
+            // 3.1 情况一：已有的行，不能修改的子字段与修改前一致。匹配后移除，避免多行匹配同一行
+            int oldIndex = CollUtil.indexOf(oldReadonlyRows, oldRow -> isSameJsonValue(oldRow, readonlyValues));
+            if (oldIndex >= 0) {
+                oldReadonlyRows.remove(oldIndex);
+                continue;
+            }
+            // 3.2 情况二：新增的行，不能修改的子字段为空、或者默认值
+            readonlySubFields.forEach((subField, defaultValues) -> {
+                Object subValue = readonlyValues.get(subField);
+                if (ObjectUtil.isNotEmpty(subValue)
+                        && !anyMatch(defaultValues, defaultValue -> isSameJsonValue(defaultValue, subValue))) {
+                    throw exception(TASK_RESUBMIT_FIELD_NOT_WRITABLE, field + StrUtil.DOT + subField);
+                }
+            });
+        }
+    }
+
+    /**
+     * 获得子表单一行中，不能修改的子字段的值
+     *
+     * @param row       子表单的一行
+     * @param rowField  子表单（group）的 props.field。非空时，和 form-create 的 group 组件一致，一行是该子字段的值
+     * @param subFields 不能修改的子字段
+     * @return 【子字段 - 值】；行的格式不正确时，子字段的值为 null
+     */
+    private static Map<String, Object> getReadonlySubFieldValues(Object row, String rowField, Collection<String> subFields) {
+        Map<?, ?> rowMap = rowField != null ? Collections.singletonMap(rowField, row)
+                : row instanceof Map<?, ?> map ? map : Collections.emptyMap();
+        Map<String, Object> values = new HashMap<>();
+        subFields.forEach(subField -> values.put(subField, rowMap.get(subField)));
+        return values;
+    }
+
+    /**
+     * 判断两个值，转换成 JSON 后是否一致，见 {@link #JSON_VALUE_COMPARATOR}
+     */
+    private static boolean isSameJsonValue(Object value1, Object value2) {
+        JsonNode node1 = ObjectUtil.defaultIfNull(JsonUtils.convertObject(value1, JsonNode.class), NullNode.getInstance());
+        JsonNode node2 = ObjectUtil.defaultIfNull(JsonUtils.convertObject(value2, JsonNode.class), NullNode.getInstance());
+        return node1.equals(JSON_VALUE_COMPARATOR, node2);
+    }
+
+    private static boolean isWritePermission(String permission) {
+        return String.valueOf(BpmFieldPermissionEnum.WRITE.getPermission()).equals(permission);
     }
 
     /**
@@ -1874,25 +2304,33 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         }
 
         taskList.forEach(task -> FlowableUtils.execute(task.getTenantId(), () -> {
-            // 情况一：自动提醒
+            // 情况一：自动提醒。退回修改中的任务，审批人暂时不能处理，所以不提醒
             if (Objects.equals(handlerType, BpmUserTaskTimeoutHandlerTypeEnum.REMINDER.getType())) {
+                if (isWaitRevisionTask(task)) {
+                    return;
+                }
                 messageService.sendMessageWhenTaskTimeout(new BpmMessageSendWhenTaskTimeoutReqDTO()
                         .setProcessInstanceId(processInstanceId).setProcessInstanceName(processInstance.getName())
                         .setTaskId(task.getId()).setTaskName(task.getName()).setAssigneeUserId(Long.parseLong(task.getAssignee())));
                 return;
             }
 
+            // 特殊：退回修改中的任务，自动同意、拒绝前，先结束退回修改，按节点的超时配置处理。修改人尚未重新提交的修改，不再生效
+            if (isWaitRevisionTask(task) && ObjectUtils.equalsAny(handlerType,
+                    BpmUserTaskTimeoutHandlerTypeEnum.APPROVE.getType(), BpmUserTaskTimeoutHandlerTypeEnum.REJECT.getType())) {
+                resumeRevisionTask(task.getId());
+            }
             // 情况二：自动同意
             if (Objects.equals(handlerType, BpmUserTaskTimeoutHandlerTypeEnum.APPROVE.getType())) {
                 approveTask(Long.parseLong(task.getAssignee()),
-                        new BpmTaskApproveReqVO().setId(task.getId()).setReason(BpmReasonEnum.TIMEOUT_APPROVE.getReason()));
+                        new BpmTaskApproveReqVO().setId(task.getId()).setReason(BpmReasonEnum.TIMEOUT_APPROVE.getReason()), false);
                 return;
             }
 
-            // 情况三：自动拒绝
+            // 情况三：自动拒绝。按常规的不通过处理，配置驳回到指定节点时直接退回，不进入退回修改，避免超时任务反复等待修改
             if (Objects.equals(handlerType, BpmUserTaskTimeoutHandlerTypeEnum.REJECT.getType())) {
                 rejectTask(Long.parseLong(task.getAssignee()),
-                        new BpmTaskRejectReqVO().setId(task.getId()).setReason(BpmReasonEnum.REJECT_TASK.getReason()));
+                        new BpmTaskRejectReqVO().setId(task.getId()).setReason(BpmReasonEnum.REJECT_TASK.getReason()), false);
             }
         }));
     }

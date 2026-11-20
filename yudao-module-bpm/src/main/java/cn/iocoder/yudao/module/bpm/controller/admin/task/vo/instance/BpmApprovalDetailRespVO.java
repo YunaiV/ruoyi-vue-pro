@@ -28,6 +28,12 @@ public class BpmApprovalDetailRespVO {
     @Schema(description = "待办任务")
     private BpmTaskRespVO todoTask;
 
+    @Schema(description = "退回修改中的任务编号", example = "1024") // 当前用户是修改人时返回，前端展示【重新提交】按钮
+    private String revisionTaskId;
+
+    @Schema(description = "退回修改的批次编号", example = "a1b2c3") // 与 revisionTaskId 一起返回，【重新提交】时传递
+    private String revisionId;
+
     /**
      * 所属流程定义信息
      */
@@ -97,6 +103,18 @@ public class BpmApprovalDetailRespVO {
 
         @Schema(description = "任务分配人", example = "2048")
         private UserSimpleBaseVO assigneeUser;
+
+        @Schema(description = "退回修改的目标节点编号")
+        private String revisionTargetNode;
+
+        @Schema(description = "退回修改的目标节点名称")
+        private String revisionTargetNodeName;
+
+        @JsonIgnore
+        private Long revisionAssignee;
+
+        @Schema(description = "退回修改的处理人")
+        private UserSimpleBaseVO revisionAssigneeUser;
 
         @Schema(description = "任务状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
         private Integer status;  // 参见 BpmTaskStatusEnum 枚举

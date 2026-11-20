@@ -21,4 +21,7 @@ public class BpmTaskRejectReqVO {
     @Schema(description = "附件", example = "[https://test.yudao.iocoder.cn/20260609/test.txt]")
     private List<String> attachments;
 
+    @Schema(description = "退回修改的批次编号，来自待办任务。任务退回修改过时必须传递", example = "a1b2c3")
+    private String revisionId;
+
 }
