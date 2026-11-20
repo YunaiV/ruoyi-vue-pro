@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.iot.controller.admin.statistics.vo.IotStatisticsD
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import cn.iocoder.yudao.module.iot.core.enums.device.IotDeviceStateEnum;
+import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageRejectedException;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.mq.producer.IotDeviceMessageProducer;
 import cn.iocoder.yudao.module.iot.core.topic.IotDeviceIdentity;
@@ -511,7 +512,7 @@ public class IotDeviceMessageServiceImplTest extends BaseMockitoUnitTest {
 
     @Test
     public void testHandleUpstreamDeviceMessage_packKeepReportTime() {
-        // 准备参数：网关的批量上报，包含一个子设备
+        // 准备参数：网关的批量上报，包含一个空的子设备（跳过）、一个子设备
         IotDeviceDO gateway = buildDevice();
         LocalDateTime reportTime = LocalDateTime.of(2026, 10, 29, 10, 0, 0);
         HashMap<String, Object> subDevice = new HashMap<>();
@@ -519,7 +520,7 @@ public class IotDeviceMessageServiceImplTest extends BaseMockitoUnitTest {
         subDevice.put("properties", Collections.singletonMap("humidity", 60));
         HashMap<String, Object> params = new HashMap<>();
         params.put("properties", Collections.singletonMap("temperature", 25));
-        params.put("subDevices", Collections.singletonList(subDevice));
+        params.put("subDevices", Arrays.asList(null, subDevice));
         IotDeviceMessage message = buildMessage(IotDeviceMessageMethodEnum.PROPERTY_PACK_POST.getMethod());
         message.setReportTime(reportTime).setParams(params);
         // mock 方法
@@ -536,6 +537,131 @@ public class IotDeviceMessageServiceImplTest extends BaseMockitoUnitTest {
         verify(deviceMessageProducer, times(2)).sendDeviceMessage(captor.capture());
         assertEquals(Arrays.asList(2L, 5L), convertList(captor.getAllValues(), IotDeviceMessage::getDeviceId));
         captor.getAllValues().forEach(subMessage -> assertEquals(reportTime, subMessage.getReportTime()));
+    }
+
+    @Test
+    public void testHandleUpstreamDeviceMessage_spooledNoReply() {
+        // 准备参数：补传的属性上报，网关接收时刻在 1 小时前
+        IotDeviceDO device = buildDevice();
+        long spoolTime = System.currentTimeMillis() - 3600 * 1000L;
+        IotDeviceMessage message = buildMessage(IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod())
+                .setRequestId("req-1").setServerId("server-1").setSpoolTime(spoolTime);
+
+        try (MockedStatic<SpringUtil> springUtilMock = mockStatic(SpringUtil.class)) {
+            springUtilMock.when(() -> SpringUtil.getBean(IotDeviceMessageServiceImpl.class)).thenReturn(service);
+            // 调用
+            service.handleUpstreamDeviceMessage(message, device);
+        }
+        // 断言：保存属性，日志时间为网关接收时刻，不回复
+        verify(devicePropertyService).saveDeviceProperty(same(device), same(message));
+        ArgumentCaptor<IotDeviceMessageDO> captor = ArgumentCaptor.forClass(IotDeviceMessageDO.class);
+        verify(deviceMessageDAO).insert(captor.capture());
+        assertEquals(spoolTime, captor.getValue().getTs());
+        verify(deviceMessageProducer, never()).sendDeviceMessageToGateway(any(), any());
+    }
+
+    @Test
+    public void testHandleUpstreamDeviceMessage_spooledPack() {
+        // 准备参数：补传的批量上报，网关自身 1 个属性 + 1 个事件，1 个子设备的属性
+        IotDeviceDO gateway = buildDevice();
+        long spoolTime = System.currentTimeMillis() - 3600 * 1000L;
+        HashMap<String, Object> subDevice = new HashMap<>();
+        subDevice.put("identity", new IotDeviceIdentity("sub-pk", "sub-dn"));
+        subDevice.put("properties", Collections.singletonMap("humidity", 60));
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("properties", Collections.singletonMap("temperature", 25));
+        params.put("events", Collections.singletonMap("alarm", Collections.singletonMap("value", 1)));
+        params.put("subDevices", Collections.singletonList(subDevice));
+        IotDeviceMessage message = buildMessage(IotDeviceMessageMethodEnum.PROPERTY_PACK_POST.getMethod());
+        message.setReportTime(LocalDateTimeUtil.of(spoolTime)).setSpoolTime(spoolTime).setParams(params);
+        // mock 方法：第一次处理时，子设备的消息发送失败（例如 Redis 临时不可用）
+        when(deviceService.getDeviceFromCache(eq("sub-pk"), eq("sub-dn")))
+                .thenReturn(IotDeviceDO.builder().id(5L).productId(6L).build());
+        doNothing().doNothing().doThrow(new IllegalStateException("redis down")).doNothing()
+                .when(deviceMessageProducer).sendDeviceMessageConfirmed(any());
+
+        // 调用：第一次失败，抛出（整个 pack 等待重投）；第二次（重投）成功
+        assertThrows(IllegalStateException.class, () -> service.handleUpstreamDeviceMessage(message, gateway));
+        try (MockedStatic<SpringUtil> springUtilMock = mockStatic(SpringUtil.class)) {
+            springUtilMock.when(() -> SpringUtil.getBean(IotDeviceMessageServiceImpl.class)).thenReturn(service);
+            service.handleUpstreamDeviceMessage(message, gateway);
+        }
+
+        // 断言：拆出的消息等待 broker 确认，沿用 spoolTime；重投时编号与第一次相同
+        ArgumentCaptor<IotDeviceMessage> captor = ArgumentCaptor.forClass(IotDeviceMessage.class);
+        verify(deviceMessageProducer, times(6)).sendDeviceMessageConfirmed(captor.capture());
+        verify(deviceMessageProducer, never()).sendDeviceMessage(any());
+        List<IotDeviceMessage> sent = captor.getAllValues();
+        sent.forEach(subMessage -> assertEquals(spoolTime, subMessage.getSpoolTime()));
+        assertEquals(convertList(sent.subList(0, 3), IotDeviceMessage::getId),
+                convertList(sent.subList(3, 6), IotDeviceMessage::getId));
+        assertEquals(3, sent.stream().limit(3).map(IotDeviceMessage::getId).distinct().count());
+        // 断言：补传的消息不回复
+        verify(deviceMessageProducer, never()).sendDeviceMessageToGateway(any(), any());
+    }
+
+    @Test
+    public void testHandleUpstreamDeviceMessage_spooledPackRejectedSkipped() {
+        // 准备参数：补传的批量上报，网关自身 1 个属性 + 1 个事件，1 个子设备的属性
+        IotDeviceDO gateway = buildDevice();
+        long spoolTime = System.currentTimeMillis() - 3600 * 1000L;
+        HashMap<String, Object> subDevice = new HashMap<>();
+        subDevice.put("identity", new IotDeviceIdentity("sub-pk", "sub-dn"));
+        subDevice.put("properties", Collections.singletonMap("humidity", 60));
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("properties", Collections.singletonMap("temperature", 25));
+        params.put("events", Collections.singletonMap("alarm", Collections.singletonMap("value", 1)));
+        params.put("subDevices", Collections.singletonList(subDevice));
+        IotDeviceMessage message = buildMessage(IotDeviceMessageMethodEnum.PROPERTY_PACK_POST.getMethod());
+        message.setReportTime(LocalDateTimeUtil.of(spoolTime)).setSpoolTime(spoolTime).setParams(params);
+        // mock 方法：第一条拆出的消息被消息总线永久拒绝（例如说超过大小限制），之后成功
+        when(deviceService.getDeviceFromCache(eq("sub-pk"), eq("sub-dn")))
+                .thenReturn(IotDeviceDO.builder().id(5L).productId(6L).build());
+        doThrow(new IotMessageRejectedException("too large", null)).doNothing()
+                .when(deviceMessageProducer).sendDeviceMessageConfirmed(any());
+
+        // 调用：不抛出，pack 确认
+        try (MockedStatic<SpringUtil> springUtilMock = mockStatic(SpringUtil.class)) {
+            springUtilMock.when(() -> SpringUtil.getBean(IotDeviceMessageServiceImpl.class)).thenReturn(service);
+            service.handleUpstreamDeviceMessage(message, gateway);
+        }
+
+        // 断言：被拒绝的跳过，后面的消息（含子设备）照常确认发送
+        ArgumentCaptor<IotDeviceMessage> captor = ArgumentCaptor.forClass(IotDeviceMessage.class);
+        verify(deviceMessageProducer, times(3)).sendDeviceMessageConfirmed(captor.capture());
+        assertEquals(Arrays.asList(2L, 2L, 5L), convertList(captor.getAllValues(), IotDeviceMessage::getDeviceId));
+        verify(deviceMessageProducer, never()).sendDeviceMessage(any());
+    }
+
+    @Test
+    public void testHandleUpstreamDeviceMessage_spooledPackDuplicateSubDevice() {
+        // 准备参数：补传的批量上报，同一子设备出现 2 次（数据相同）
+        IotDeviceDO gateway = buildDevice();
+        long spoolTime = System.currentTimeMillis() - 3600 * 1000L;
+        HashMap<String, Object> subDevice = new HashMap<>();
+        subDevice.put("identity", new IotDeviceIdentity("sub-pk", "sub-dn"));
+        subDevice.put("properties", Collections.singletonMap("humidity", 60));
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("subDevices", Arrays.asList(subDevice, subDevice));
+        IotDeviceMessage message = buildMessage(IotDeviceMessageMethodEnum.PROPERTY_PACK_POST.getMethod());
+        message.setReportTime(LocalDateTimeUtil.of(spoolTime)).setSpoolTime(spoolTime).setParams(params);
+        // mock 方法
+        when(deviceService.getDeviceFromCache(eq("sub-pk"), eq("sub-dn")))
+                .thenReturn(IotDeviceDO.builder().id(5L).productId(6L).build());
+
+        // 调用：处理 2 次（模拟重投）
+        try (MockedStatic<SpringUtil> springUtilMock = mockStatic(SpringUtil.class)) {
+            springUtilMock.when(() -> SpringUtil.getBean(IotDeviceMessageServiceImpl.class)).thenReturn(service);
+            service.handleUpstreamDeviceMessage(message, gateway);
+            service.handleUpstreamDeviceMessage(message, gateway);
+        }
+
+        // 断言：按序号派生编号，同一子设备的 2 条消息编号不同；重投时编号与第一次相同
+        ArgumentCaptor<IotDeviceMessage> captor = ArgumentCaptor.forClass(IotDeviceMessage.class);
+        verify(deviceMessageProducer, times(4)).sendDeviceMessageConfirmed(captor.capture());
+        List<String> ids = convertList(captor.getAllValues(), IotDeviceMessage::getId);
+        assertNotEquals(ids.get(0), ids.get(1));
+        assertEquals(ids.subList(0, 2), ids.subList(2, 4));
     }
 
     private void assertRawPayloadInvalid(IotDeviceMessage message) {

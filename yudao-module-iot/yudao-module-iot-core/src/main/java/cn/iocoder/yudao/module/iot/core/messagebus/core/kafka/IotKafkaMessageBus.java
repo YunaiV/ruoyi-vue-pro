@@ -1,14 +1,19 @@
 package cn.iocoder.yudao.module.iot.core.messagebus.core.kafka;
 
+import cn.hutool.core.exceptions.ExceptionUtil;
+import cn.hutool.core.util.ObjUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.TypeUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
+import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageRejectedException;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageSubscriber;
 import jakarta.annotation.PreDestroy;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.errors.RecordTooLargeException;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.boot.kafka.autoconfigure.KafkaProperties;
@@ -43,9 +48,18 @@ public class IotKafkaMessageBus implements IotMessageBus {
 
     private final List<ConcurrentMessageListenerContainer<String, String>> containers = new ArrayList<>();
 
+    /**
+     * 生产者的 acks 是否需要 broker 确认：acks=0 时不等待 broker，{@link #postConfirmed} 无法确认
+     */
+    private final boolean brokerAcks;
+
     public IotKafkaMessageBus(KafkaProperties kafkaProperties) {
         this.kafkaProperties = kafkaProperties;
-        this.kafkaTemplate = new KafkaTemplate<>(new DefaultKafkaProducerFactory<>(buildProducerProperties(kafkaProperties)));
+        Map<String, Object> producerProperties = buildProducerProperties(kafkaProperties);
+        this.kafkaTemplate = new KafkaTemplate<>(new DefaultKafkaProducerFactory<>(producerProperties));
+        // 未配置时使用 kafka-clients 的默认值（3.x 为 all）
+        Object acks = producerProperties.get(ProducerConfig.ACKS_CONFIG);
+        this.brokerAcks = acks == null || ObjUtil.notEqual("0", StrUtil.trim(acks.toString()));
     }
 
     @Override
@@ -59,6 +73,33 @@ public class IotKafkaMessageBus implements IotMessageBus {
             throw new IllegalStateException(String.format("发送 Kafka 消息失败，topic(%s) message(%s)", topic, message), e);
         } catch (ExecutionException e) {
             throw new IllegalStateException(String.format("发送 Kafka 消息失败，topic(%s) message(%s)", topic, message), e);
+        }
+    }
+
+    /**
+     * 确认发送：{@link #post} 等待 send 的结果，acks 不为 0 时即 broker 已确认；
+     * 失败等待时间由生产者的 max.block.ms、delivery.timeout.ms 限定（沿用用户配置）
+     * <p>
+     * 消息超过大小限制（RecordTooLargeException：客户端的 max.request.size，或 broker 的 message.max.bytes）时，
+     * 重试也不会成功，抛出 {@link IotMessageRejectedException}；其它失败（含超时）按未确认抛出
+     */
+    @Override
+    public void postConfirmed(String topic, Object message) {
+        validateConfirmable();
+        try {
+            post(topic, message);
+        } catch (RuntimeException e) {
+            if (ExceptionUtil.isCausedBy(e, RecordTooLargeException.class)) {
+                throw new IotMessageRejectedException(String.format("Kafka 消息超过大小限制，topic(%s)", topic), e);
+            }
+            throw e;
+        }
+    }
+
+    @Override
+    public void validateConfirmable() {
+        if (!brokerAcks) {
+            throw new IllegalStateException("Kafka 生产者的 acks=0，broker 不会确认，无法确认发送；请配置 spring.kafka.producer.acks 为 1 或 all");
         }
     }
 

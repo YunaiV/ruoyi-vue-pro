@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.mq.consumer.device;
 
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.iocoder.yudao.framework.tenant.core.util.TenantUtils;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
@@ -71,7 +72,13 @@ public class IotDeviceMessageSubscriber implements IotMessageSubscriber<IotDevic
                 return;
             }
             // 特殊：离线消息不算活跃，也不改变连接的 server，避免旧连接的离线把路由改回旧节点
-            if (!IotDeviceMessageUtils.isStateOffline(message)) {
+            boolean spooled = IotDeviceMessageUtils.isSpooled(message);
+            if (spooled) {
+                // 特殊：补传的消息（网关离线暂存），按网关接收时刻只增不减地更新最后时间：很旧的消息不会让设备显得刚刚活跃，
+                // 清积压期间刚收到的消息仍然保持活跃；不改路由，也不强制上线（在线状态由之后的实时消息恢复）
+                devicePropertyService.updateDeviceReportTimeIfLaterAsync(device.getId(),
+                        LocalDateTimeUtil.of(IotDeviceMessageUtils.getSpoolTimeNotAfterNow(message)));
+            } else if (!IotDeviceMessageUtils.isStateOffline(message)) {
                 devicePropertyService.updateDeviceReportTimeAsync(device.getId(), LocalDateTime.now());
                 // 1.2 更新设备的连接 server：早于当前上线时间的旧消息，不改路由
                 if (device.getOnlineTime() == null || message.getReportTime() == null
@@ -81,7 +88,9 @@ public class IotDeviceMessageSubscriber implements IotMessageSubscriber<IotDevic
             }
 
             // 2. 未上线的设备，强制上线
-            forceDeviceOnline(message, device);
+            if (!spooled) {
+                forceDeviceOnline(message, device);
+            }
 
             // 3. 核心：处理消息
             deviceMessageService.handleUpstreamDeviceMessage(message, device);

@@ -131,7 +131,7 @@ public class IotHttpUpstreamHandlerTest extends BaseMockitoUnitTest {
         verify(response, never()).end(any(Buffer.class));
         // 断言：在 worker 上处理
         assertTrue(onWorker.get());
-        verify(deviceMessageService, never()).sendDeviceMessage(any(), any(), any(), any());
+        verify(deviceMessageService, never()).sendDeviceMessage(any(), any(), any(), any(), any());
     }
 
     @Test
@@ -316,7 +316,8 @@ public class IotHttpUpstreamHandlerTest extends BaseMockitoUnitTest {
             onWorker.set(Context.isOnWorkerThread());
             ((IotDeviceMessage) invocation.getArgument(0)).setId("M4");
             return null;
-        }).when(deviceMessageService).sendDeviceMessage(any(), eq(PRODUCT_KEY), eq(DEVICE_NAME), eq(SERVER_ID));
+        }).when(deviceMessageService).sendDeviceMessage(any(), eq(PRODUCT_KEY), eq(DEVICE_NAME), eq(SERVER_ID),
+                eq(IotProtocolTypeEnum.HTTP));
 
         // 调用
         handleOnEventLoop(handler);
@@ -340,7 +341,7 @@ public class IotHttpUpstreamHandlerTest extends BaseMockitoUnitTest {
         mockStandardPostRequest();
         // mock 方法：设备不存在
         doThrow(invalidParamException("设备不存在")).when(deviceMessageService)
-                .sendDeviceMessage(any(), any(), any(), any());
+                .sendDeviceMessage(any(), any(), any(), any(), any());
 
         // 调用
         handleOnEventLoop(handler);
@@ -358,7 +359,7 @@ public class IotHttpUpstreamHandlerTest extends BaseMockitoUnitTest {
         mockStandardPostRequest();
         // mock 方法
         doThrow(new IllegalStateException("boom")).when(deviceMessageService)
-                .sendDeviceMessage(any(), any(), any(), any());
+                .sendDeviceMessage(any(), any(), any(), any(), any());
 
         // 调用
         handleOnEventLoop(handler);

@@ -1,8 +1,10 @@
 package cn.iocoder.yudao.module.iot.core.messagebus.core.rocketmq;
 
+import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.util.TypeUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
+import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageRejectedException;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageSubscriber;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
@@ -11,8 +13,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;
 import org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;
+import org.apache.rocketmq.client.exception.MQBrokerException;
+import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.client.producer.SendResult;
+import org.apache.rocketmq.client.producer.SendStatus;
 import org.apache.rocketmq.common.message.MessageExt;
+import org.apache.rocketmq.remoting.protocol.ResponseCode;
 import org.apache.rocketmq.spring.autoconfigure.RocketMQProperties;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 
@@ -58,6 +64,45 @@ public class IotRocketMQMessageBus implements IotMessageBus {
         // TODO @芋艿：需要 orderly！
         SendResult result = rocketMQTemplate.syncSend(topic, JsonUtils.toJsonString(message));
         log.info("[post][topic({}) 发送消息({}) result({})]", topic, message, result);
+    }
+
+    /**
+     * 确认发送：syncSend 失败时抛出异常；返回非 SEND_OK（刷盘、同步从节点超时等）时，也视为未确认
+     * <p>
+     * 失败等待时间由生产者的 send-message-timeout、retry-times-when-send-failed 限定（沿用用户配置）
+     * <p>
+     * 消息不合法（MESSAGE_ILLEGAL）时，重试也不会成功，抛出 {@link IotMessageRejectedException}：
+     * 1. 客户端发送前校验（MQClientException）：消息体超过 max-message-size 等
+     * 2. broker 返回（MQBrokerException）：消息体超过 broker 的 maxMessageSize、属性超限（PROPERTIES_SIZE_EXCEEDED）等
+     * <p>
+     * 其它失败（系统繁忙、超时、无路由、broker 不可用等）按未确认抛出
+     */
+    @Override
+    public void postConfirmed(String topic, Object message) {
+        SendResult result;
+        try {
+            result = rocketMQTemplate.syncSend(topic, JsonUtils.toJsonString(message));
+        } catch (RuntimeException e) {
+            if (isMessageIllegal(e)) {
+                throw new IotMessageRejectedException(String.format("RocketMQ 消息不合法，topic(%s)", topic), e);
+            }
+            throw e;
+        }
+        if (result == null || result.getSendStatus() != SendStatus.SEND_OK) {
+            throw new IllegalStateException(String.format("RocketMQ 发送未确认，topic(%s) result(%s)", topic, result));
+        }
+    }
+
+    /**
+     * 是否消息不合法（MESSAGE_ILLEGAL）：RocketMQTemplate 把客户端、broker 的异常包装在原因链中
+     */
+    private static boolean isMessageIllegal(Throwable e) {
+        Throwable clientCause = ExceptionUtil.getCausedBy(e, MQClientException.class);
+        if (clientCause != null && ((MQClientException) clientCause).getResponseCode() == ResponseCode.MESSAGE_ILLEGAL) {
+            return true;
+        }
+        Throwable brokerCause = ExceptionUtil.getCausedBy(e, MQBrokerException.class);
+        return brokerCause != null && ((MQBrokerException) brokerCause).getResponseCode() == ResponseCode.MESSAGE_ILLEGAL;
     }
 
     @Override
