@@ -80,6 +80,8 @@ spring:
 #          password: taosdata
 #          druid:
 #            validation-query: SELECT SERVER_STATUS() # TDengine 数据源的有效性检查 SQL
+#            pool-prepared-statements: false # 避免回收 STMT2 语句时调用 clearParameters()，参见 https://t.zsxq.com/9cIK0
+#            max-pool-prepared-statement-per-connection-size: 0 # 覆盖全局语句缓存数量，避免重新开启缓存
 #        iotdb: # IoT 数据库（需要 IoT 物联网，且 yudao.iot.storage.type 为 iotdb 再开启噢！）
 #          lazy: true # 开启懒加载，保证启动速度
 #          type: com.zaxxer.hikari.HikariDataSource # IoTDB 不使用 Druid 连接池
