@@ -104,6 +104,15 @@ public class IotDeviceMessage {
      */
     private String raw;
 
+    // ========== 离线暂存（spool）相关字段 ==========
+
+    /**
+     * 网关接收时刻（毫秒时间戳），与 {@link #reportTime} 是同一次取样；非空表示该消息经网关的离线暂存（SQLite）补传
+     *
+     * 只由网关可信赋值：设备、数据解析脚本带上的一律清空；批量上报（pack）拆出的子消息，沿用 pack 的值
+     */
+    private Long spoolTime;
+
     // ========== 基础方法：只传递"serialize（序列化）相关字段" ==========
 
     public static IotDeviceMessage requestOf(String method) {

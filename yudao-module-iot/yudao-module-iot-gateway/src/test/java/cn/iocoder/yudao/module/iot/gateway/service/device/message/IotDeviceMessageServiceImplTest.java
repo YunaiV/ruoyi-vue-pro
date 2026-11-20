@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.gateway.service.device.message;
 
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.exception.ErrorCode;
@@ -18,6 +19,7 @@ import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties;
 import cn.iocoder.yudao.module.iot.gateway.serialize.IotMessageSerializerManager;
 import cn.iocoder.yudao.module.iot.gateway.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.dto.IotDownstreamEncodeRespDTO;
+import cn.iocoder.yudao.module.iot.gateway.service.device.spool.IotDeviceMessageSpoolService;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -75,6 +77,8 @@ public class IotDeviceMessageServiceImplTest extends BaseMockitoUnitTest {
     private IotMessageSerializerManager messageSerializerManager;
     @Mock
     private IotScriptExecutor scriptExecutor;
+    @Mock
+    private IotDeviceMessageSpoolService deviceMessageSpoolService;
 
     private final IotGatewayProperties gatewayProperties = new IotGatewayProperties();
     private final IotDeviceRespDTO device = new IotDeviceRespDTO().setId(DEVICE_ID).setTenantId(TENANT_ID)
@@ -457,6 +461,26 @@ public class IotDeviceMessageServiceImplTest extends BaseMockitoUnitTest {
     }
 
     @Test
+    public void testSendDeviceMessage_spool() {
+        // 准备参数：设备试图伪造 spoolTime
+        IotDeviceMessage message = IotDeviceMessage.requestOf("thing.property.post", Collections.singletonMap("t", 1))
+                .setSpoolTime(1L);
+        // mock 方法
+        mockDevice();
+        when(deviceMessageSpoolService.isSpoolableMessage(same(message), eq(IotProtocolTypeEnum.MQTT))).thenReturn(true);
+
+        // 调用
+        deviceMessageService.sendDeviceMessage(message, PRODUCT_KEY, DEVICE_NAME, SERVER_ID, IotProtocolTypeEnum.MQTT);
+
+        // 断言：交给离线暂存，不直接发送；spoolTime 被清空，暂存的接收时刻与 reportTime 是同一次取样
+        ArgumentCaptor<Long> spoolTimeCaptor = ArgumentCaptor.forClass(Long.class);
+        verify(deviceMessageSpoolService).sendSpoolableMessage(same(message), spoolTimeCaptor.capture());
+        verifyNoInteractions(deviceMessageProducer);
+        assertNull(message.getSpoolTime());
+        assertEquals(LocalDateTimeUtil.toEpochMilli(message.getReportTime()), spoolTimeCaptor.getValue());
+    }
+
+    @Test
     public void testSendDeviceMessage_keepRequestId() {
         // 准备参数
         IotDeviceMessage message = IotDeviceMessage.requestOf("req-1", "thing.property.post",
@@ -495,6 +519,63 @@ public class IotDeviceMessageServiceImplTest extends BaseMockitoUnitTest {
         assertServiceException(() -> deviceMessageService.sendDeviceMessage(message, PRODUCT_KEY, DEVICE_NAME, SERVER_ID),
                 DEVICE_NOT_EXISTS, PRODUCT_KEY, DEVICE_NAME);
         verifyNoInteractions(deviceMessageProducer);
+    }
+
+    // ========== sendDeviceStateMessage ==========
+
+    @Test
+    public void testSendDeviceStateMessage_busFailureSpoolEnabled() {
+        // 准备参数
+        IotDeviceMessage message = buildStateMessage();
+        // mock 方法：离线暂存已启用；消息总线不可用（RPC 认证仍正常）
+        mockDevice();
+        when(deviceMessageSpoolService.isEnabled()).thenReturn(true);
+        doThrow(new IllegalStateException("redis down")).when(deviceMessageProducer).sendDeviceMessage(any());
+
+        // 调用：不抛出，不阻断调用方（例如说设备认证）
+        deviceMessageService.sendDeviceStateMessage(message, PRODUCT_KEY, DEVICE_NAME, SERVER_ID);
+
+        // 断言：直接发送，不走离线暂存
+        assertSame(message, captureSentMessage());
+        assertDeviceIdentity(message);
+        verify(deviceMessageSpoolService, never()).sendSpoolableMessage(any(), anyLong());
+    }
+
+    @Test
+    public void testSendDeviceStateMessage_busFailureSpoolDisabled() {
+        // mock 方法：离线暂存未启用；消息总线不可用
+        mockDevice();
+        when(deviceMessageSpoolService.isEnabled()).thenReturn(false);
+        doThrow(new IllegalStateException("redis down")).when(deviceMessageProducer).sendDeviceMessage(any());
+
+        // 调用，并断言异常：与原来一致，失败照常抛出
+        IllegalStateException ex = assertThrows(IllegalStateException.class, () -> deviceMessageService
+                .sendDeviceStateMessage(buildStateMessage(), PRODUCT_KEY, DEVICE_NAME, SERVER_ID));
+        assertEquals("redis down", ex.getMessage());
+    }
+
+    @Test
+    public void testSendDeviceStateMessage_deviceNotExists() {
+        // 调用，并断言异常：设备不存在照常抛出
+        assertServiceException(() -> deviceMessageService.sendDeviceStateMessage(buildStateMessage(),
+                PRODUCT_KEY, DEVICE_NAME, SERVER_ID), DEVICE_NOT_EXISTS, PRODUCT_KEY, DEVICE_NAME);
+        verifyNoInteractions(deviceMessageProducer);
+    }
+
+    @Test
+    public void testSendDeviceStateMessage_notStateMessage() {
+        // 准备参数：属性上报
+        IotDeviceMessage message = IotDeviceMessage.requestOf("thing.property.post", Collections.singletonMap("t", 1));
+
+        // 调用，并断言异常：只接受状态消息，其它消息的发送失败不能吞掉
+        assertThrows(IllegalArgumentException.class, () -> deviceMessageService.sendDeviceStateMessage(message,
+                PRODUCT_KEY, DEVICE_NAME, SERVER_ID));
+        verifyNoInteractions(deviceService, deviceMessageProducer);
+    }
+
+    private static IotDeviceMessage buildStateMessage() {
+        return IotDeviceMessage.requestOf(IotDeviceMessageMethodEnum.STATE_UPDATE.getMethod(),
+                Collections.singletonMap("state", 1));
     }
 
     // ========== encodeDownstreamCommand ==========

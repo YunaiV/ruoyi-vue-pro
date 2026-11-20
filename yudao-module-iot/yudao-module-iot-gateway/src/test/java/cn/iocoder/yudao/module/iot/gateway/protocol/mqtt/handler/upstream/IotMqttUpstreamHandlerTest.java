@@ -27,6 +27,8 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.iot.gateway.enums.ErrorCodeConstants.DEVICE_MESSAGE_REJECTED;
+import static cn.iocoder.yudao.module.iot.gateway.enums.ErrorCodeConstants.DEVICE_MESSAGE_SPOOL_REJECTED;
 import static cn.iocoder.yudao.module.iot.gateway.enums.ErrorCodeConstants.SCRIPT_TIMEOUT;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.AdditionalMatchers.aryEq;
@@ -157,8 +159,59 @@ public class IotMqttUpstreamHandlerTest extends BaseMockitoUnitTest {
         await(callOnContext(() -> upstreamHandler.handleBusinessRequest(endpoint, queue, topic, payload)));
 
         // 断言：反序列化后按标准路径发送，不走透传
-        verify(deviceMessageService).sendDeviceMessage(same(message), eq(PRODUCT_KEY), eq(DEVICE_NAME), eq(SERVER_ID));
+        verify(deviceMessageService).sendDeviceMessage(same(message), eq(PRODUCT_KEY), eq(DEVICE_NAME), eq(SERVER_ID),
+                eq(IotProtocolTypeEnum.MQTT));
         verify(deviceMessageService, never()).sendRawMessage(any(), any(), any(), any(), any(), anyLong());
+    }
+
+    @Test
+    public void testHandleBusinessRequest_spoolRejectedNotAck() throws Exception {
+        // 准备参数
+        IotWorkerTaskQueue queue = new IotWorkerTaskQueue(context);
+        String topic = "/sys/pk/dn/thing/property/post";
+        byte[] payload = "{\"method\":\"thing.property.post\"}".getBytes();
+        IotDeviceMessage message = IotDeviceMessage.requestOf("thing.property.post", Collections.singletonMap("t", 1));
+        // mock 方法：标准上报、透传上报，离线暂存都失败
+        when(deviceMessageService.deserializeDeviceMessage(payload, PRODUCT_KEY, DEVICE_NAME)).thenReturn(message);
+        doThrow(exception(DEVICE_MESSAGE_SPOOL_REJECTED, "暂存已满")).when(deviceMessageService)
+                .sendDeviceMessage(any(), any(), any(), any(), any());
+        when(deviceMessageService.sendRawMessage(any(), any(), any(), any(), any(), anyLong()))
+                .thenThrow(exception(DEVICE_MESSAGE_SPOOL_REJECTED, "暂存已满"));
+
+        // 调用
+        Future<Void> standard = callOnContext(() -> upstreamHandler.handleBusinessRequest(endpoint, queue, topic, payload));
+        Future<Void> raw = callOnContext(() -> upstreamHandler.handleBusinessRequest(endpoint, queue, RAW_POST_TOPIC, PAYLOAD));
+
+        // 断言：都失败（不确认），交给调用方断开连接
+        await(standard);
+        await(raw);
+        assertTrue(standard.failed());
+        assertTrue(raw.failed());
+    }
+
+    @Test
+    public void testHandleBusinessRequest_messageRejectedNotAck() throws Exception {
+        // 准备参数
+        IotWorkerTaskQueue queue = new IotWorkerTaskQueue(context);
+        String topic = "/sys/pk/dn/thing/property/post";
+        byte[] payload = "{\"method\":\"thing.property.post\"}".getBytes();
+        IotDeviceMessage message = IotDeviceMessage.requestOf("thing.property.post", Collections.singletonMap("t", 1));
+        // mock 方法：标准上报、透传上报（解码后），直发都被消息总线永久拒绝（例如说超过大小限制）
+        when(deviceMessageService.deserializeDeviceMessage(payload, PRODUCT_KEY, DEVICE_NAME)).thenReturn(message);
+        doThrow(exception(DEVICE_MESSAGE_REJECTED)).when(deviceMessageService)
+                .sendDeviceMessage(any(), any(), any(), any(), any());
+        when(deviceMessageService.sendRawMessage(any(), any(), any(), any(), any(), anyLong()))
+                .thenThrow(exception(DEVICE_MESSAGE_REJECTED));
+
+        // 调用
+        Future<Void> standard = callOnContext(() -> upstreamHandler.handleBusinessRequest(endpoint, queue, topic, payload));
+        Future<Void> raw = callOnContext(() -> upstreamHandler.handleBusinessRequest(endpoint, queue, RAW_POST_TOPIC, PAYLOAD));
+
+        // 断言：都失败（不确认），不能误发成功的 PUBACK / PUBREC
+        await(standard);
+        await(raw);
+        assertTrue(standard.failed());
+        assertTrue(raw.failed());
     }
 
     @Test

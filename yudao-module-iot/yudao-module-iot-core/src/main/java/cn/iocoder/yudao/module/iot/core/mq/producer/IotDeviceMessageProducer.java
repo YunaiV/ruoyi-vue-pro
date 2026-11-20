@@ -25,6 +25,16 @@ public class IotDeviceMessageProducer {
     }
 
     /**
+     * 发送设备消息，并等待 broker 确认已接收：未确认时抛出异常
+     *
+     * @param message 设备消息
+     * @see IotMessageBus#postConfirmed(String, Object)
+     */
+    public void sendDeviceMessageConfirmed(IotDeviceMessage message) {
+        messageBus.postConfirmed(IotDeviceMessage.MESSAGE_BUS_DEVICE_MESSAGE_TOPIC, message);
+    }
+
+    /**
      * 发送网关设备消息
      *
      * @param serverId 网关的 serverId 标识

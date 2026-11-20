@@ -12,6 +12,7 @@ import cn.iocoder.yudao.module.iot.gateway.protocol.udp.IotUdpConfig;
 import cn.iocoder.yudao.module.iot.gateway.protocol.websocket.IotWebSocketConfig;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.util.unit.DataSize;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
@@ -39,6 +40,11 @@ public class IotGatewayProperties {
      */
     @Valid
     private ScriptProperties script = new ScriptProperties();
+    /**
+     * 离线暂存配置
+     */
+    @Valid
+    private SpoolProperties spool = new SpoolProperties();
 
     /**
      * 协议实例列表
@@ -114,6 +120,45 @@ public class IotGatewayProperties {
          */
         @Positive(message = "每个设备最多排队的下行指令数必须大于 0")
         private int maxPendingCommandsPerDevice = 256;
+
+    }
+
+    /**
+     * 离线暂存配置：网关到消息总线不可用时，把各协议的属性、事件、批量上报暂存到本地 SQLite，恢复后按顺序补传
+     * <p>
+     * 支持 Redis、Kafka、RocketMQ、RabbitMQ 消息总线，经 {@link cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus#postConfirmed}
+     * 确认发送；Local 为进程内，没有断网，不生效。确认只到 broker，不保证平台已经处理（入库）
+     */
+    @Data
+    public static class SpoolProperties {
+
+        /**
+         * 是否开启（默认关闭）
+         */
+        private boolean enabled = false;
+        /**
+         * SQLite 文件路径
+         */
+        @NotEmpty(message = "离线暂存文件路径不能为空")
+        private String file = "data/iot-gateway-spool.db";
+        /**
+         * 暂存消息的最大字节数（按消息 JSON 的 UTF-8 字节数累计）：超过时拒绝新消息
+         */
+        @NotNull(message = "离线暂存最大字节数不能为空")
+        private DataSize maxSize = DataSize.ofGigabytes(2);
+        /**
+         * 暂存消息的最长保留时间：超过时删除，不再补传
+         */
+        @NotNull(message = "离线暂存最长保留时间不能为空")
+        private Duration maxAge = Duration.ofDays(7);
+        /**
+         * 每秒最多补传的消息数：降低恢复时的写入峰值
+         * <p>
+         * 注意：Redis 消息总线每小时把 Stream 裁剪到 10000 条，平台的消费积压超过时，未消费的消息会被裁剪；
+         * 限速只能降低这种风险，不能保证避免，需要结合平台的消费能力设置
+         */
+        @Positive(message = "每秒最多补传的消息数必须大于 0")
+        private int drainRate = 200;
 
     }
 

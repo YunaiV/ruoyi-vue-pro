@@ -37,7 +37,7 @@ public abstract class IotCoapAbstractHandler {
     public static final int OPTION_TOKEN = 2088;
 
     /**
-     * handle0 返回这个哨兵：表示响应由子类异步写出（透传上报：worker 处理结果与截止计时只响应一次），基类不再写响应
+     * handle0 返回这个哨兵：表示响应由子类异步写出（上报交给 worker；透传上报的处理结果与截止计时只响应一次），基类不再写响应
      */
     protected static final CommonResult<Object> ASYNC_RESPONSE = new CommonResult<>();
 

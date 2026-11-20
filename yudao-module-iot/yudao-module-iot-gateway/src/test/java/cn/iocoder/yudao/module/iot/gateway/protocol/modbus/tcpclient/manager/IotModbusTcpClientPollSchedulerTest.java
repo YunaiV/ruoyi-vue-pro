@@ -4,6 +4,7 @@ import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigRespDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusPointRespDTO;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
+import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.utils.IotModbusCommonUtils;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpclient.handler.upstream.IotModbusTcpClientUpstreamHandler;
@@ -102,7 +103,8 @@ public class IotModbusTcpClientPollSchedulerTest extends BaseMockitoUnitTest {
                 onWorker.compareAndSet(true, Context.isOnWorkerThread());
                 delivered.countDown();
                 return null;
-            }).when(messageService).sendDeviceMessage(any(IotDeviceMessage.class), eq(PRODUCT_KEY), eq(DEVICE_NAME), eq(SERVER_ID));
+            }).when(messageService).sendDeviceMessage(any(IotDeviceMessage.class), eq(PRODUCT_KEY), eq(DEVICE_NAME), eq(SERVER_ID),
+                    eq(IotProtocolTypeEnum.MODBUS_TCP_CLIENT));
 
             try {
                 // 调用：第一次轮询，发送阻塞在 worker 上
@@ -116,14 +118,15 @@ public class IotModbusTcpClientPollSchedulerTest extends BaseMockitoUnitTest {
                 // 断言：context 没有被发送阻塞，哨兵及时执行；第二条上报排在第一条之后，还没有发送
                 assertTrue(sentinel.get(TIMEOUT_SECONDS, TimeUnit.SECONDS));
                 verify(connection, timeout(TimeUnit.SECONDS.toMillis(TIMEOUT_SECONDS)).times(2)).executeBlocking(any());
-                verify(messageService, times(1)).sendDeviceMessage(any(), any(), any(), any());
+                verify(messageService, times(1)).sendDeviceMessage(any(), any(), any(), any(), any());
             } finally {
                 release.countDown();
             }
             // 断言：放行后两条上报按读取顺序各投递一次，都在 worker 上发送
             assertTrue(delivered.await(TIMEOUT_SECONDS, TimeUnit.SECONDS));
             ArgumentCaptor<IotDeviceMessage> captor = ArgumentCaptor.forClass(IotDeviceMessage.class);
-            verify(messageService, times(2)).sendDeviceMessage(captor.capture(), eq(PRODUCT_KEY), eq(DEVICE_NAME), eq(SERVER_ID));
+            verify(messageService, times(2)).sendDeviceMessage(captor.capture(), eq(PRODUCT_KEY), eq(DEVICE_NAME), eq(SERVER_ID),
+                    eq(IotProtocolTypeEnum.MODBUS_TCP_CLIENT));
             assertTrue(onWorker.get());
             List<IotDeviceMessage> messages = captor.getAllValues();
             assertEquals(IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod(), messages.get(0).getMethod());
