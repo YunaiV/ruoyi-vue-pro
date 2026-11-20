@@ -54,6 +54,11 @@
             <artifactId>rocketmq-spring-boot-starter</artifactId>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
+            <optional>true</optional>
+        </dependency>
 
         <!-- Vert.x 相关 -->
         <dependency>
@@ -77,6 +82,16 @@
         <dependency>
             <groupId>org.eclipse.californium</groupId>
             <artifactId>californium-core</artifactId>
+        </dependency>
+
+        <!-- 离线暂存相关 -->
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
         </dependency>
 
         <!-- 测试相关 -->
@@ -104,6 +119,8 @@
                         <configuration>
                             <!-- 可执行 jar 使用 exec 分类，主 artifact 保留为普通可依赖 jar -->
                             <classifier>exec</classifier>
+                            <!-- 打入 optional 的消息队列依赖（Kafka、RocketMQ、RabbitMQ）：Spring Boot 4 默认不打入，独立运行时按 message-bus.type 选用 -->
+                            <includeOptional>true</includeOptional>
                         </configuration>
                     </execution>
                 </executions>
