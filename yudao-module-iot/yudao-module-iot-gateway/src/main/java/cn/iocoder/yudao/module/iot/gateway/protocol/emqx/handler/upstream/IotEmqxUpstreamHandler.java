@@ -98,8 +98,8 @@ public class IotEmqxUpstreamHandler {
         // 1.2 标准化回复消息的 method（MQTT 协议中，设备回复消息的 method 会携带 _reply 后缀）
         IotMqttTopicUtils.normalizeReplyMethod(message);
 
-        // 2. 发送消息到队列
-        deviceMessageService.sendDeviceMessage(message, productKey, deviceName, serverId);
+        // 2. 发送消息到队列：订阅 EMQX 的客户端收到即自动确认，离线暂存失败时只能记日志（与原来发送失败一致）
+        deviceMessageService.sendDeviceMessage(message, productKey, deviceName, serverId, IotProtocolTypeEnum.EMQX);
     }
 
     /**

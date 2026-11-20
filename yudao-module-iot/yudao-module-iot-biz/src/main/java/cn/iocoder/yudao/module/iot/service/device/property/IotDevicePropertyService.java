@@ -79,6 +79,14 @@ public interface IotDevicePropertyService {
     void updateDeviceReportTimeAsync(Long id, LocalDateTime reportTime);
 
     /**
+     * 更新设备上报时间：只增不减，早于已记录的时间时不更新（补传的消息使用）
+     *
+     * @param id 设备编号
+     * @param reportTime 上报时间
+     */
+    void updateDeviceReportTimeIfLaterAsync(Long id, LocalDateTime reportTime);
+
+    /**
      * 更新设备关联的网关服务 serverId
      *
      * @param id 设备编号

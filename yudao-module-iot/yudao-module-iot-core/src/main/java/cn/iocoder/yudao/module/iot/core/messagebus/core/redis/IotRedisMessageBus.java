@@ -13,8 +13,8 @@ import org.springframework.data.redis.stream.StreamMessageListenerContainer;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static cn.iocoder.yudao.framework.mq.redis.config.YudaoRedisMQConsumerAutoConfiguration.buildConsumerName;
 import static cn.iocoder.yudao.framework.mq.redis.config.YudaoRedisMQConsumerAutoConfiguration.checkRedisVersion;
@@ -31,8 +31,11 @@ public class IotRedisMessageBus implements IotMessageBus {
 
     private final StreamMessageListenerContainer<String, ObjectRecord<String, String>> redisStreamMessageListenerContainer;
 
+    /**
+     * 订阅者：使用 CopyOnWriteArrayList，Redis pending 重投、清理任务执行时并发读取
+     */
     @Getter
-    private final List<IotMessageSubscriber<?>> subscribers = new ArrayList<>();
+    private final List<IotMessageSubscriber<?>> subscribers = new CopyOnWriteArrayList<>();
 
     public IotRedisMessageBus(RedisTemplate<String, ?> redisTemplate) {
         this.redisTemplate = redisTemplate;
@@ -63,6 +66,17 @@ public class IotRedisMessageBus implements IotMessageBus {
         redisTemplate.opsForStream().add(StreamRecords.newRecord()
                 .ofObject(JsonUtils.toJsonString(message)) // 设置内容
                 .withStreamKey(topic)); // 设置 stream key
+    }
+
+    @Override
+    public void postConfirmed(String topic, Object message) {
+        // XADD 同步返回记录编号：返回编号即已写入 Redis（持久化取决于 Redis 的 AOF/RDB 配置）
+        RecordId recordId = redisTemplate.opsForStream().add(StreamRecords.newRecord()
+                .ofObject(JsonUtils.toJsonString(message))
+                .withStreamKey(topic));
+        if (recordId == null) {
+            throw new IllegalStateException(String.format("Redis XADD 未返回记录编号，topic(%s)", topic));
+        }
     }
 
     @Override

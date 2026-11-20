@@ -10,10 +10,27 @@ spring:
     port: 6379 # Redis 服务器端口
     database: 0 # Redis 数据库索引
     # password: # Redis 密码，如果有的话
-    timeout: 30000ms # 连接超时时间
+    timeout: 5000ms # 命令超时时间：Redis 不可用时，离线暂存的直发最多等待该时间后写入暂存（需大于消费 Stream 的阻塞读取时间 2 秒）
+    connect-timeout: 5000ms # 连接超时时间
   # Kafka 配置项，对应 KafkaProperties 配置类
   kafka:
     bootstrap-servers: 127.0.0.1:9092 # 指定 Kafka Broker 地址，可以设置多个，以逗号分隔
+    producer:
+      properties:
+        max.block.ms: 5000 # 等待元数据、发送缓冲区的最长时间：Kafka 不可用时，发送最多阻塞该时间
+        request.timeout.ms: 5000 # 单次请求等待 broker 响应的超时时间
+        delivery.timeout.ms: 10000 # 发送（含重试）的总超时时间：超时按未确认处理，离线暂存保留（可能重复，不会丢失）；需不小于 linger.ms + request.timeout.ms
+  # RabbitMQ 配置项，对应 RabbitProperties 配置类
+  rabbitmq:
+    host: 127.0.0.1 # RabbitMQ 服务的地址
+    port: 5672 # RabbitMQ 服务的端口
+    username: guest # RabbitMQ 服务的账号
+    password: guest # RabbitMQ 服务的密码
+    connection-timeout: 5s # 连接超时时间：RabbitMQ 不可用时，发送最多等待该时间建立连接
+    publisher-confirm-type: correlated # 开启 publisher confirm：离线暂存的确认发送需要
+    publisher-returns: true # 开启 return：离线暂存的确认发送需要，判断消息是否无法路由
+    template:
+      mandatory: false # 普通发送保持不开启 mandatory（publisher-returns 开启时默认为 true）；确认发送使用独立的 RabbitTemplate
 
 --- #################### 消息队列相关 ####################
 
@@ -31,6 +48,7 @@ yudao:
     # 消息总线配置
     message-bus:
       type: redis # 消息总线的类型
+      confirm-timeout: 5s # 确认发送等待 broker 确认的超时时间（RabbitMQ 的 publisher confirm）：超时按未确认处理，离线暂存保留
 
     # 网关配置
     gateway:
@@ -43,6 +61,13 @@ yudao:
       token:
         secret: yudaoIotGatewayTokenSecret123456789 # Token 密钥，至少32位
         expiration: 7d
+      # 离线暂存配置：消息总线不可用时，各协议的属性、事件、批量上报暂存到本地 SQLite，恢复后补传
+      spool:
+        enabled: false # 是否开启：支持 Redis、Kafka、RocketMQ、RabbitMQ 消息总线（RabbitMQ 需开启上面的 publisher confirm、return）；Local 为进程内，不生效
+        file: data/iot-gateway-spool.db # SQLite 文件路径
+        max-size: 2GB # 暂存消息的最大字节数，超过时拒绝新消息
+        max-age: 7d # 暂存消息的最长保留时间，超过时删除
+        drain-rate: 200 # 每秒最多补传的消息数
 
       # 协议实例列表
       protocols:

@@ -261,10 +261,10 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
             return;
         }
 
-        // 2. 发送消息到消息总线（worker）：成功不应答（与原来一致）；失败回到 event loop 应答错误
+        // 2. 发送消息到消息总线（worker）：成功不应答（与原来一致）；失败（含离线暂存失败）回到 event loop 应答错误
         queue.submit(() -> {
             deviceMessageService.sendDeviceMessage(message, connectionInfo.getProductKey(),
-                    connectionInfo.getDeviceName(), serverId);
+                    connectionInfo.getDeviceName(), serverId, IotProtocolTypeEnum.TCP);
             return null;
         }).onComplete(ar -> {
             if (ar.succeeded()) {
@@ -357,13 +357,13 @@ public class IotTcpUpstreamHandler implements Handler<NetSocket> {
     }
 
     /**
-     * 发送设备上线消息
+     * 发送设备上线消息：离线暂存已启用时，消息总线不可用不阻断认证
      *
      * @param device 设备信息
      */
     private void sendOnlineMessage(IotDeviceRespDTO device) {
         IotDeviceMessage onlineMessage = IotDeviceMessage.buildStateUpdateOnline();
-        deviceMessageService.sendDeviceMessage(onlineMessage, device.getProductKey(),
+        deviceMessageService.sendDeviceStateMessage(onlineMessage, device.getProductKey(),
                 device.getDeviceName(), serverId);
     }
 
