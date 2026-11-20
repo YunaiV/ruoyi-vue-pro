@@ -55,17 +55,21 @@ public class SmsCodeServiceImpl implements SmsCodeService {
     }
 
     private String createSmsCode(String mobile, Integer scene, String ip) {
-        // 校验是否可以发送验证码，不用筛选场景
+        // 校验发送间隔：按手机号 + 场景，避免刚发过登录验证码时挡住注册、找回密码等其它场景
         SmsCodeDO lastSmsCode = smsCodeMapper.selectLastByMobile(mobile, null, null);
-        if (lastSmsCode != null) {
-            if (LocalDateTimeUtil.between(lastSmsCode.getCreateTime(), LocalDateTime.now()).toMillis()
-                    < smsCodeProperties.getSendFrequency().toMillis()) { // 发送过于频繁
-                throw exception(SMS_CODE_SEND_TOO_FAST);
-            }
-            if (isToday(lastSmsCode.getCreateTime()) && // 必须是今天，才能计算超过当天的上限
-                    lastSmsCode.getTodayIndex() >= smsCodeProperties.getSendMaximumQuantityPerDay()) { // 超过当天发送的上限。
-                throw exception(SMS_CODE_EXCEED_SEND_MAXIMUM_QUANTITY_PER_DAY);
-            }
+        SmsCodeDO lastSceneSmsCode = lastSmsCode;
+        if (lastSmsCode != null && ObjUtil.notEqual(lastSmsCode.getScene(), scene)) { // 最后一条是其它场景，才需要单独查询本场景
+            lastSceneSmsCode = smsCodeMapper.selectLastByMobile(mobile, null, scene);
+        }
+        if (lastSceneSmsCode != null
+                && LocalDateTimeUtil.between(lastSceneSmsCode.getCreateTime(), LocalDateTime.now()).toMillis()
+                        < smsCodeProperties.getSendFrequency().toMillis()) { // 发送过于频繁
+            throw exception(SMS_CODE_SEND_TOO_FAST);
+        }
+        // 校验当天发送上限：按手机号计数，不区分场景，避免切换场景绕过
+        if (lastSmsCode != null && isToday(lastSmsCode.getCreateTime()) // 必须是今天，才能计算超过当天的上限
+                && lastSmsCode.getTodayIndex() >= smsCodeProperties.getSendMaximumQuantityPerDay()) { // 超过当天发送的上限。
+            throw exception(SMS_CODE_EXCEED_SEND_MAXIMUM_QUANTITY_PER_DAY);
         }
         // 校验 IP 跨手机号的发送数量，手机号校验通过后才占用额度：先占当日额度，再占当前小时额度
         LocalDateTime now = LocalDateTime.now();
