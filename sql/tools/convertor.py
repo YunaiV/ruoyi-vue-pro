@@ -1661,7 +1661,8 @@ class PostgreSQLConvertor(Convertor):
         if type == "date":
             return "date"
         if type == "json":
-            return "jsonb"
+            # JSON 字段由 MyBatis TypeHandler 以 JDBC 字符串读写；查询时再按需转换为 jsonb，参见 https://t.zsxq.com/MUMCK
+            return "text"
         if type == "time":
             return "time"
         if type == "timestamp":
@@ -2524,7 +2525,7 @@ class KingbaseConvertor(PostgreSQLConvertor):
             type = col["type"].lower()
             full_type = self.translate_type(type, col["size"])
             nullable = "NULL" if col["nullable"] else "NOT NULL"
-            if full_type == "text":
+            if full_type == "text" and type != "json":
                 nullable = "NULL"
             default_value = self.translate_default(type, col["default"])
             # TRUE、FALSE 等按列类型转换，见 convert_literal
