@@ -5,6 +5,8 @@ import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.List;
+
 /**
  * 文件 API 实现类
  *
@@ -25,6 +27,11 @@ public class FileApiImpl implements FileApi {
     @Override
     public String presignGetUrl(String url, Integer expirationSeconds) {
         return fileService.presignGetUrl(url, expirationSeconds);
+    }
+
+    @Override
+    public List<String> presignGetUrlList(List<String> urls, Integer expirationSeconds) {
+        return fileService.presignGetUrlList(urls, expirationSeconds);
     }
 
 }

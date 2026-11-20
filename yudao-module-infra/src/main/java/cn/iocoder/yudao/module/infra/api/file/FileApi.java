@@ -1,6 +1,9 @@
 package cn.iocoder.yudao.module.infra.api.file;
 
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+
+import java.util.List;
 
 /**
  * 文件 API 接口
@@ -51,6 +54,17 @@ public interface FileApi {
      */
     String presignGetUrl(@NotEmpty(message = "URL 不能为空") String url,
                          Integer expirationSeconds);
+
+    /**
+     * 批量生成文件预签名地址，用于读取
+     *
+     * @param urls 完整的文件访问地址列表
+     * @param expirationSeconds 访问有效期，单位秒
+     * @return 按输入顺序返回的文件预签名地址列表
+     */
+    List<String> presignGetUrlList(
+            @NotNull(message = "URL 列表不能为空") List<@NotEmpty(message = "URL 不能为空") String> urls,
+            Integer expirationSeconds);
 
     /**
      * 生成文件预签名地址，用于读取

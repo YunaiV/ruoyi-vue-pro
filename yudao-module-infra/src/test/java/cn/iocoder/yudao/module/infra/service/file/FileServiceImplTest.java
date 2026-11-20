@@ -30,6 +30,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
@@ -446,6 +447,25 @@ public class FileServiceImplTest extends BaseDbUnitTest {
             // 校验调用
             verifyNoInteractions(fileConfigService);
         }
+    }
+
+    @Test
+    public void testPresignGetUrlList() {
+        // 准备参数
+        String first = "https://example.com/docs/a,b.jpg";
+        String second = "https://example.com/docs/c.png";
+        List<String> urls = List.of(first, second, first);
+        // mock 方法
+        FileClient client = mock(FileClient.class);
+        when(fileConfigService.getMasterFileClient()).thenReturn(client);
+        when(client.presignGetUrl(first, 300)).thenReturn("signed-first");
+        when(client.presignGetUrl(second, 300)).thenReturn("signed-second");
+
+        // 调用
+        List<String> result = fileService.presignGetUrlList(urls, 300);
+        // 断言
+        assertEquals(List.of("signed-first", "signed-second", "signed-first"), result);
+        verify(fileConfigService).getMasterFileClient();
     }
 
     @Test

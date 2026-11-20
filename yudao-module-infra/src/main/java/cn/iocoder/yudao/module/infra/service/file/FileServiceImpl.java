@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.infra.service.file;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.Assert;
@@ -28,12 +29,14 @@ import org.springframework.stereotype.Service;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
 import static cn.hutool.core.date.DatePattern.PURE_DATE_PATTERN;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.module.infra.enums.ErrorCodeConstants.*;
 
 /**
@@ -284,6 +287,15 @@ public class FileServiceImpl implements FileService {
     public String presignGetUrl(String url, Integer expirationSeconds) {
         FileClient fileClient = fileConfigService.getMasterFileClient();
         return fileClient.presignGetUrl(url, expirationSeconds);
+    }
+
+    @Override
+    public List<String> presignGetUrlList(List<String> urls, Integer expirationSeconds) {
+        if (CollUtil.isEmpty(urls)) {
+            return Collections.emptyList();
+        }
+        FileClient fileClient = fileConfigService.getMasterFileClient();
+        return convertList(urls, url -> fileClient.presignGetUrl(url, expirationSeconds));
     }
 
     @Override
