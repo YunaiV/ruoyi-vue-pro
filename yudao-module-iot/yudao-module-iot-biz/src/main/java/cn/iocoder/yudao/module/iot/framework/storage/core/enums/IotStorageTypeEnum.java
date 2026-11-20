@@ -13,7 +13,8 @@ import lombok.Getter;
 public enum IotStorageTypeEnum {
 
     TDENGINE("tdengine", "tdengine"),
-    IOTDB("iotdb", "iotdb");
+    IOTDB("iotdb", "iotdb"),
+    QUESTDB("questdb", "questdb");
 
     /**
      * 类型，对应 yudao.iot.storage.type 配置项
