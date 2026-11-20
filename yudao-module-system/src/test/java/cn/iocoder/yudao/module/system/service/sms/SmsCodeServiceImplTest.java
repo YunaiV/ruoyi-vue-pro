@@ -159,9 +159,10 @@ public class SmsCodeServiceImplTest extends BaseDbAndRedisUnitTest {
 
     @Test
     public void sendSmsCode_tooFast() {
-        // mock 数据
-        SmsCodeDO smsCodeDO = randomPojo(SmsCodeDO.class,
-                o -> o.setMobile("15601691300").setTodayIndex(1).setUsed(false));
+        // mock 数据：同一场景刚发送过
+        SmsCodeDO smsCodeDO = randomPojo(SmsCodeDO.class, o -> o.setMobile("15601691300")
+                .setScene(SmsSceneEnum.MEMBER_LOGIN.getScene()).setTodayIndex(1).setUsed(false)
+                .setCreateTime(LocalDateTime.now()));
         smsCodeMapper.insert(smsCodeDO);
         // 准备参数
         SmsCodeSendReqDTO reqDTO = randomPojo(SmsCodeSendReqDTO.class, o -> {
@@ -190,6 +191,40 @@ public class SmsCodeServiceImplTest extends BaseDbAndRedisUnitTest {
         // 调用，并断言异常
         assertServiceException(() -> smsCodeService.sendSmsCode(reqDTO),
                 SMS_CODE_EXCEED_SEND_MAXIMUM_QUANTITY_PER_DAY);
+    }
+
+    @Test
+    public void sendSmsCode_sendFrequencyByScene() {
+        // 调用：登录、注册场景连续发送，互不限制发送间隔
+        smsCodeService.sendSmsCode(buildSendReqDTO("15601691300", SmsSceneEnum.MEMBER_LOGIN, "10.0.0.1"));
+        smsCodeService.sendSmsCode(buildSendReqDTO("15601691300", SmsSceneEnum.MEMBER_REGISTER, "10.0.0.1"));
+        // 调用，并断言异常：中间插入注册场景后，登录场景仍按其最后一条限制发送间隔
+        assertServiceException(() -> smsCodeService.sendSmsCode(
+                buildSendReqDTO("15601691300", SmsSceneEnum.MEMBER_LOGIN, "10.0.0.1")), SMS_CODE_SEND_TOO_FAST);
+        // 断言：当天序号按手机号跨场景累加，被拒绝的请求不落库、不发送
+        assertEquals(2L, smsCodeMapper.selectCount());
+        SmsCodeDO lastSmsCode = smsCodeMapper.selectLastByMobile("15601691300", null, null);
+        assertEquals(SmsSceneEnum.MEMBER_REGISTER.getScene(), lastSmsCode.getScene());
+        assertEquals(2, lastSmsCode.getTodayIndex());
+        verify(smsSendService, times(2)).sendSingleSms(any(), isNull(), isNull(), any(), any());
+    }
+
+    @Test
+    public void sendSmsCode_exceedDayAcrossScene() {
+        // mock 数据：注册场景刚发送过，且手机号当天已达上限
+        smsCodeMapper.insert(randomPojo(SmsCodeDO.class, o -> o.setId(null).setMobile("15601691300")
+                .setScene(SmsSceneEnum.MEMBER_REGISTER.getScene()).setTodayIndex(10).setUsed(false)
+                .setCreateTime(LocalDateTime.now())));
+
+        // 调用，并断言异常：换成登录场景不受发送间隔限制，但仍受手机号当天上限限制
+        assertServiceException(() -> smsCodeService.sendSmsCode(
+                        buildSendReqDTO("15601691300", SmsSceneEnum.MEMBER_LOGIN, "10.0.0.1")),
+                SMS_CODE_EXCEED_SEND_MAXIMUM_QUANTITY_PER_DAY);
+        // 断言：不落库、不发送，也不占用 IP 额度
+        assertEquals(1L, smsCodeMapper.selectCount());
+        verify(smsSendService, never()).sendSingleSms(any(), any(), any(), any(), any());
+        assertFalse(stringRedisTemplate.hasKey(buildSendIpDayKey("10.0.0.1")));
+        assertFalse(stringRedisTemplate.hasKey(buildSendIpHourKey("10.0.0.1")));
     }
 
     @Test
@@ -394,9 +429,9 @@ public class SmsCodeServiceImplTest extends BaseDbAndRedisUnitTest {
         // mock 方法：每个 IP 每日、每小时最多发送 1 条
         when(smsCodeProperties.getSendMaximumQuantityPerIpPerDay()).thenReturn(1);
         when(smsCodeProperties.getSendMaximumQuantityPerIpPerHour()).thenReturn(1);
-        // mock 数据：手机号刚发送过
+        // mock 数据：手机号同一场景刚发送过
         smsCodeMapper.insert(randomPojo(SmsCodeDO.class, o -> o.setId(null).setMobile("15601691301")
-                .setTodayIndex(1).setCreateTime(LocalDateTime.now())));
+                .setScene(SmsSceneEnum.MEMBER_LOGIN.getScene()).setTodayIndex(1).setCreateTime(LocalDateTime.now())));
 
         // 调用，并断言异常：手机号维度拒绝
         assertServiceException(() -> smsCodeService.sendSmsCode(buildSendReqDTO("15601691301", "10.0.0.1")),
@@ -497,8 +532,11 @@ public class SmsCodeServiceImplTest extends BaseDbAndRedisUnitTest {
     }
 
     private SmsCodeSendReqDTO buildSendReqDTO(String mobile, String ip) {
-        return new SmsCodeSendReqDTO().setMobile(mobile)
-                .setScene(SmsSceneEnum.MEMBER_LOGIN.getScene()).setCreateIp(ip);
+        return buildSendReqDTO(mobile, SmsSceneEnum.MEMBER_LOGIN, ip);
+    }
+
+    private SmsCodeSendReqDTO buildSendReqDTO(String mobile, SmsSceneEnum scene, String ip) {
+        return new SmsCodeSendReqDTO().setMobile(mobile).setScene(scene.getScene()).setCreateIp(ip);
     }
 
     private String buildSendIpDayKey(String ip) {
