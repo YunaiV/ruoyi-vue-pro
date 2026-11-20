@@ -18,6 +18,9 @@ import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.module.iot.dal.iotdb.IotDeviceMessageIoTDBCodec.*;
@@ -25,7 +28,8 @@ import static cn.iocoder.yudao.module.iot.dal.iotdb.IotDeviceMessageIoTDBCodec.*
 /**
  * 基于 IoTDB（表模型）的 {@link IotDeviceMessageDAO} 实现类
  *
- * 一张全局表 device_message，身份为 (device_id, time)，编解码见 {@link IotDeviceMessageIoTDBCodec}
+ * 一张全局表 device_message，身份为 (device_id, time)，编解码见 {@link IotDeviceMessageIoTDBCodec}；
+ * 写入时同一设备的同一毫秒顺延，见 {@link #allocateTs(Long, long)}
  *
  * @author 芋道源码
  */
@@ -53,10 +57,21 @@ public class IotDeviceMessageIoTDBDAO implements IotDeviceMessageDAO {
             .put("raw", "STRING")
             .build();
 
+    /**
+     * 每个设备记录的已写入物理时间的区间数（连续的毫秒合并为一个区间，不按行数计算）
+     */
+    private static final int USED_RANGES_MAX_SIZE = 1000;
+
     @Resource
     private IotDeviceMessageIoTDBMapper deviceMessageMapper;
     @Resource
     private IoTDBSystemMapper systemMapper;
+
+    /**
+     * 各设备已写入的物理时间：起始 -> 结束（含），区间之间不重叠、不相邻，见 {@link #allocateTs(Long, long)}
+     */
+    private final Cache<Long, TreeMap<Long, Long>> usedRanges = CacheBuilder.newBuilder()
+            .expireAfterAccess(1, TimeUnit.MINUTES).build();
 
     @Override
     public void initialize() {
@@ -142,7 +157,60 @@ public class IotDeviceMessageIoTDBDAO implements IotDeviceMessageDAO {
 
     @Override
     public void insert(IotDeviceMessageDO message) {
-        deviceMessageMapper.insert(encode(message));
+        IotDeviceMessageIoTDBRow row = encode(message);
+        // 物理时间 time 是身份的一部分：同一设备的同一毫秒已写入时顺延，避免后写的整行覆盖先写的
+        row.setTs(allocateTs(message.getDeviceId(), message.getTs()));
+        deviceMessageMapper.insert(row);
+    }
+
+    /**
+     * 分配写入的物理时间：该设备最近已写入过这一毫秒时，顺延到下一个未使用的毫秒；否则使用原时间
+     * <p>
+     * 例如说，同一 pack 拆出的多条消息（相同的 ts）依次写入 ts、ts + 1、ts + 2；同一毫秒的实时消息同理；
+     * 补传的历史消息与实时消息交错写入时，各自按原时间分配，互不覆盖。
+     * 顺延只改变物理时间（分页排序、按时间统计），原始上报时间仍以 report_time 为准
+     * <p>
+     * 已写入的时间按连续区间记录：同一 pack 再多的消息也只占一个区间，不会挤掉自己已写入的时间
+     * <p>
+     * 只在本进程内有效（多个实例同时写入同一设备的同一毫秒，仍可能覆盖）；每个设备最多记录
+     * {@link #USED_RANGES_MAX_SIZE} 个区间，超过时移除时间最早的（不含本次写入的），1 分钟未写入的设备自动移除
+     *
+     * @param deviceId 设备编号
+     * @param ts       期望的时间
+     * @return 实际写入的时间
+     */
+    long allocateTs(Long deviceId, long ts) {
+        long[] allocated = {ts};
+        // compute 对同一设备串行执行：区间只在这里读写
+        usedRanges.asMap().compute(deviceId, (key, ranges) -> {
+            if (ranges == null) {
+                ranges = new TreeMap<>();
+            }
+            // 1. 落在已写入的区间内：顺延到区间结束 + 1（区间之间不相邻，所以一定未写入）
+            Map.Entry<Long, Long> floor = ranges.floorEntry(ts);
+            if (floor != null && floor.getValue() >= ts) {
+                allocated[0] = floor.getValue() + 1;
+            }
+            // 2. 记录：与前、后相邻的区间合并
+            long start = allocated[0];
+            long end = allocated[0];
+            Map.Entry<Long, Long> lower = ranges.floorEntry(start - 1);
+            if (lower != null && lower.getValue() == start - 1) {
+                start = lower.getKey();
+            }
+            Long higherEnd = ranges.remove(end + 1);
+            if (higherEnd != null) {
+                end = higherEnd;
+            }
+            ranges.put(start, end);
+            // 3. 超过上限：移除时间最早的区间，不移除本次写入的
+            if (ranges.size() > USED_RANGES_MAX_SIZE) {
+                Long firstKey = ranges.firstKey();
+                ranges.remove(firstKey != start ? firstKey : ranges.higherKey(firstKey));
+            }
+            return ranges;
+        });
+        return allocated[0];
     }
 
     @Override

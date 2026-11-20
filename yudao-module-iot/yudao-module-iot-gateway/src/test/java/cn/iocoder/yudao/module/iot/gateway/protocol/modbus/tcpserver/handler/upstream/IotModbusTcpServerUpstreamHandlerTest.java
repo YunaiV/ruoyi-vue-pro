@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.iot.core.biz.IotDeviceCommonApi;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigRespDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusPointRespDTO;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
+import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import cn.iocoder.yudao.module.iot.core.enums.modbus.IotModbusFrameFormatEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.manager.IotModbusTx;
@@ -30,10 +31,10 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
@@ -128,7 +129,8 @@ public class IotModbusTcpServerUpstreamHandlerTest extends BaseMockitoUnitTest {
             }
             delivered.countDown();
             return null;
-        }).when(messageService).sendDeviceMessage(any(IotDeviceMessage.class), eq(PRODUCT_KEY), eq(DEVICE_NAME), eq(SERVER_ID));
+        }).when(messageService).sendDeviceMessage(any(IotDeviceMessage.class), eq(PRODUCT_KEY), eq(DEVICE_NAME), eq(SERVER_ID),
+                eq(IotProtocolTypeEnum.MODBUS_TCP_SERVER));
 
         IotModbusFrame rawResponse = buildReadResponseFrame(4, 0x0001);
         try {
@@ -150,7 +152,8 @@ public class IotModbusTcpServerUpstreamHandlerTest extends BaseMockitoUnitTest {
         // 断言：放行后属性上报只投递一次，在 worker 上发送
         assertTrue(delivered.await(TIMEOUT_SECONDS, TimeUnit.SECONDS));
         ArgumentCaptor<IotDeviceMessage> captor = ArgumentCaptor.forClass(IotDeviceMessage.class);
-        verify(messageService, times(1)).sendDeviceMessage(captor.capture(), eq(PRODUCT_KEY), eq(DEVICE_NAME), eq(SERVER_ID));
+        verify(messageService, times(1)).sendDeviceMessage(captor.capture(), eq(PRODUCT_KEY), eq(DEVICE_NAME), eq(SERVER_ID),
+                eq(IotProtocolTypeEnum.MODBUS_TCP_SERVER));
         assertTrue(onWorker.get());
         assertEquals(IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod(), captor.getValue().getMethod());
         assertEquals(Collections.singletonMap("temperature", IotModbusCommonUtils.convertToPropertyValue(new int[]{0x00FA}, point)),
@@ -164,7 +167,7 @@ public class IotModbusTcpServerUpstreamHandlerTest extends BaseMockitoUnitTest {
         IotWorkerTaskQueue queue = new IotWorkerTaskQueue(owner);
         CountDownLatch entered = new CountDownLatch(1);
         CountDownLatch release = new CountDownLatch(1);
-        // mock 方法：事务通道的 worker 队列；点位配置；第一条（属性上报）阻塞直到放行
+        // mock 方法：事务通道的 worker 队列；点位配置；属性上报（带协议，走离线暂存）阻塞直到放行
         when(channel.getUpstreamQueue()).thenReturn(queue);
         when(configCacheService.getConfig(DEVICE_ID)).thenReturn(buildConfig(buildPoint()));
         doAnswer(invocation -> {
@@ -173,8 +176,8 @@ public class IotModbusTcpServerUpstreamHandlerTest extends BaseMockitoUnitTest {
                 throw new IllegalStateException("等待放行超时");
             }
             return null;
-        }).doNothing().when(messageService).sendDeviceMessage(any(IotDeviceMessage.class),
-                eq(PRODUCT_KEY), eq(DEVICE_NAME), eq(SERVER_ID));
+        }).when(messageService).sendDeviceMessage(any(IotDeviceMessage.class),
+                eq(PRODUCT_KEY), eq(DEVICE_NAME), eq(SERVER_ID), eq(IotProtocolTypeEnum.MODBUS_TCP_SERVER));
 
         Future<Void> offline;
         try {
@@ -190,20 +193,25 @@ public class IotModbusTcpServerUpstreamHandlerTest extends BaseMockitoUnitTest {
 
             // 断言：下线消息排在被阻塞的属性上报之后，还没有发送；之后本连接不再接收新任务
             assertFalse(offline.isComplete());
-            verify(messageService, times(1)).sendDeviceMessage(any(), any(), any(), any());
+            verify(messageService, times(1)).sendDeviceMessage(any(), any(), any(), any(), any());
+            verify(messageService, never()).sendDeviceMessage(any(), any(), any(), any());
             assertTrue(callOnOwner(() -> queue.submit(() -> null)).failed());
         } finally {
             release.countDown();
         }
-        // 断言：放行后先发属性上报，再发下线消息，各一次
+        // 断言：放行后先发属性上报（带协议），再发下线消息（不带协议，不走离线暂存），各一次
         await(offline);
         assertTrue(offline.succeeded());
-        ArgumentCaptor<IotDeviceMessage> captor = ArgumentCaptor.forClass(IotDeviceMessage.class);
-        verify(messageService, times(2)).sendDeviceMessage(captor.capture(), eq(PRODUCT_KEY), eq(DEVICE_NAME), eq(SERVER_ID));
-        List<IotDeviceMessage> messages = captor.getAllValues();
-        assertEquals(IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod(), messages.get(0).getMethod());
-        assertEquals(IotDeviceMessage.buildStateOffline().getMethod(), messages.get(1).getMethod());
-        assertEquals(IotDeviceMessage.buildStateOffline().getParams(), messages.get(1).getParams());
+        ArgumentCaptor<IotDeviceMessage> propertyCaptor = ArgumentCaptor.forClass(IotDeviceMessage.class);
+        ArgumentCaptor<IotDeviceMessage> offlineCaptor = ArgumentCaptor.forClass(IotDeviceMessage.class);
+        InOrder inOrder = inOrder(messageService);
+        inOrder.verify(messageService).sendDeviceMessage(propertyCaptor.capture(), eq(PRODUCT_KEY), eq(DEVICE_NAME),
+                eq(SERVER_ID), eq(IotProtocolTypeEnum.MODBUS_TCP_SERVER));
+        inOrder.verify(messageService).sendDeviceMessage(offlineCaptor.capture(), eq(PRODUCT_KEY), eq(DEVICE_NAME),
+                eq(SERVER_ID));
+        assertEquals(IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod(), propertyCaptor.getValue().getMethod());
+        assertEquals(IotDeviceMessage.buildStateOffline().getMethod(), offlineCaptor.getValue().getMethod());
+        assertEquals(IotDeviceMessage.buildStateOffline().getParams(), offlineCaptor.getValue().getParams());
     }
 
     @Test
