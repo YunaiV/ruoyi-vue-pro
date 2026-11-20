@@ -16,7 +16,8 @@ public enum AiWebSearchPlatformEnum {
 
     DEEPSEEK("DeepSeek"), // 搜索 + 网页读取，默认
     BOCHA("博查"), // 搜索 + 网页读取
-    BAIDU("百度"); // 只有搜索，使用千帆的 API Key
+    BAIDU("百度"), // 只有搜索，使用千帆的 API Key
+    PARALLEL("Parallel"); // 搜索 + 网页读取，匿名访问 MCP，无需 API Key
 
     /**
      * 名字

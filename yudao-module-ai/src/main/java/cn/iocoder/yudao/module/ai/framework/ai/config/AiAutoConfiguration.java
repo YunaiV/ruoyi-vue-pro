@@ -24,6 +24,7 @@ import cn.iocoder.yudao.module.ai.framework.ai.core.webserch.AiWebSearchClient;
 import cn.iocoder.yudao.module.ai.framework.ai.core.webserch.baidu.AiBaiduWebSearchClient;
 import cn.iocoder.yudao.module.ai.framework.ai.core.webserch.bocha.AiBoChaWebSearchClient;
 import cn.iocoder.yudao.module.ai.framework.ai.core.webserch.deepseek.AiDeepSeekWebSearchClient;
+import cn.iocoder.yudao.module.ai.framework.ai.core.webserch.parallel.AiParallelWebSearchClient;
 import cn.iocoder.yudao.module.ai.tool.function.DirectoryListToolFunction;
 import cn.iocoder.yudao.module.ai.tool.function.UserProfileQueryToolFunction;
 import cn.iocoder.yudao.module.ai.tool.function.WeatherQueryToolFunction;
@@ -500,6 +501,8 @@ public class AiAutoConfiguration {
                 return new AiBoChaWebSearchClient(properties.getApiKey());
             case BAIDU:
                 return new AiBaiduWebSearchClient(properties.getApiKey());
+            case PARALLEL:
+                return new AiParallelWebSearchClient();
             default:
                 return new AiDeepSeekWebSearchClient(properties.getApiKey());
         }
