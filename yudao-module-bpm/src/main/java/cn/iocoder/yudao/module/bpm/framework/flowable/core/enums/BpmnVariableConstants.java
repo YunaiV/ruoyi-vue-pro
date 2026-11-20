@@ -105,4 +105,17 @@ public class BpmnVariableConstants {
      */
     public static final String TASK_SIGN_PIC_URL = "TASK_SIGN_PIC_URL";
 
+    /**
+     * 任务变量 - 委派的归还顺序
+     *
+     * 逗号分隔的用户编号，最后一个是当前被委派人的直接委派人。多次委派时，审批后逐层归还
+     */
+    public static final String TASK_DELEGATE_RETURN_USERS = "TASK_DELEGATE_RETURN_USERS";
+    /**
+     * 任务变量 - 加签等待中的审批人
+     *
+     * 被委派的任务向前加签时，owner 需要保留给委派归还使用，所以等待恢复审批的用户记录在这里
+     */
+    public static final String TASK_SIGN_WAIT_ASSIGNEE = "TASK_SIGN_WAIT_ASSIGNEE";
+
 }

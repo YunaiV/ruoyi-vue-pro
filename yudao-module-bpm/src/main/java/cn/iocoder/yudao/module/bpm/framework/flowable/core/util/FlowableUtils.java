@@ -375,6 +375,8 @@ public class FlowableUtils {
     public static Map<String, Object> filterTaskFormVariable(Map<String, Object> taskLocalVariables) {
         taskLocalVariables.remove(BpmnVariableConstants.TASK_VARIABLE_STATUS);
         taskLocalVariables.remove(BpmnVariableConstants.TASK_VARIABLE_REASON);
+        taskLocalVariables.remove(BpmnVariableConstants.TASK_DELEGATE_RETURN_USERS);
+        taskLocalVariables.remove(BpmnVariableConstants.TASK_SIGN_WAIT_ASSIGNEE);
         return taskLocalVariables;
     }
 

@@ -14,7 +14,6 @@ import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
-import cn.iocoder.yudao.framework.web.core.util.WebFrameworkUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelMetaInfoVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.convert.task.BpmTaskConvert;
@@ -41,6 +40,7 @@ import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.bpmn.model.*;
+import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.RuntimeService;
@@ -328,15 +328,17 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 && ObjectUtil.notEqual(userId, NumberUtils.parseLong(task.getAssignee()))) {
             throw exception(TASK_OPERATE_FAIL_ASSIGN_NOT_SELF);
         }
-        // 为什么 assignee 为空、owner 非空时，不允许操作？
-        // 例如说：【加签】等待中（WAIT）的任务（向前加签的父任务、向后加签的子任务），只有 owner 没有 assignee，
+        // 为什么等待中（WAIT），或者 assignee 为空、owner 非空时，不允许操作？
+        // 例如说：【加签】等待中（WAIT）的任务（向前加签的父任务、向后加签的子任务），没有 assignee，
         // 需要等待其它任务审批后，才能恢复 assignee 继续审批。此时，任何人都不能直接审批、拒绝它
-        if (StrUtil.isBlank(task.getAssignee()) && StrUtil.isNotBlank(task.getOwner())) {
+        // 补充说明：被委派的任务向前加签时，等待人记录在任务变量中，owner 仍是委派人，所以需要按 WAIT 状态判断
+        Integer status = (Integer) task.getTaskLocalVariables().get(BpmnVariableConstants.TASK_VARIABLE_STATUS);
+        if (BpmTaskStatusEnum.WAIT.getStatus().equals(status)
+                || (StrUtil.isBlank(task.getAssignee()) && StrUtil.isNotBlank(task.getOwner()))) {
             throw exception(TASK_OPERATE_FAIL_ASSIGN_NOT_SELF);
         }
         // 为什么审批通过中（APPROVING）时，不允许操作？
         // 例如说：【向后加签】的父任务已经审批通过，需要等待加签出来的子任务审批完成后自动完成。此时，不能重复审批、拒绝、继续加签等
-        Integer status = (Integer) task.getTaskLocalVariables().get(BpmnVariableConstants.TASK_VARIABLE_STATUS);
         if (BpmTaskStatusEnum.APPROVING.getStatus().equals(status)) {
             throw exception(TASK_OPERATE_FAIL_APPROVING);
         }
@@ -562,15 +564,30 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     }
 
     /**
-     * 判断指定用户，是否是当前任务的拥有人
+     * 获得【加签】场景下，任务的拥有人：即等待中（WAIT）恢复审批的用户
+     * <p>
+     * 1. 被委派的任务向前加签时，等待人记录在 {@link BpmnVariableConstants#TASK_SIGN_WAIT_ASSIGNEE} 任务变量中，
+     *    此时 owner 是委派人（仅用于归还），由等待人替代 owner
+     * 2. 其它情况，沿用 owner。例如说：先向后加签、再委派的任务，owner 就是实际的加签人
+     *
+     * @param task 任务，需要包含任务变量
+     * @return 用户编号
+     */
+    private String getSignTaskOwner(Task task) {
+        String waitAssignee = (String) task.getTaskLocalVariables().get(BpmnVariableConstants.TASK_SIGN_WAIT_ASSIGNEE);
+        return StrUtil.isNotBlank(waitAssignee) ? waitAssignee : task.getOwner();
+    }
+
+    /**
+     * 判断指定用户，是否是当前任务的审批人，或者加签等待中的拥有人
      *
      * @param userId 用户编号
      * @param task   任务
      * @return 是否
      */
-    private boolean isOwnerUserTask(Long userId, Task task) {
-        Long assignee = NumberUtil.parseLong(task.getOwner(), null);
-        return ObjectUtil.equal(userId, assignee);
+    private boolean isSignTaskUser(Long userId, Task task) {
+        return isAssignUserTask(userId, task)
+                || ObjectUtil.equal(userId, NumberUtil.parseLong(getSignTaskOwner(task), null));
     }
 
     /**
@@ -581,8 +598,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
      * @return 是否
      */
     private boolean isAddSignUserTask(Long userId, Task task) {
-        return (isAssignUserTask(userId, task) || isOwnerUserTask(userId, task))
-                && BpmTaskSignTypeEnum.of(task.getScopeType()) != null;
+        return BpmTaskSignTypeEnum.of(task.getScopeType()) != null
+                && isSignTaskUser(userId, task);
     }
 
     // ========== Update 写入相关方法 ==========
@@ -621,15 +638,16 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             throw exception(TASK_REASON_REQUIRE);
         }
 
-        // 情况一：被委派的任务，不调用 complete 去完成任务
-        if (DelegationState.PENDING.equals(task.getDelegationState())) {
-            approveDelegateTask(reqVO, task);
+        // 情况一：审批有【后】加签的任务。如果它是被委派的任务，等加签任务都完成后，再归还委派人
+        // 补充说明：如果加签任务已经都被减签（例如说：并发减签），则按照情况二、情况三继续审批，覆盖父任务的状态
+        if (BpmTaskSignTypeEnum.AFTER.getType().equals(task.getScopeType())
+                && approveAfterSignTask(task, reqVO)) {
             return;
         }
 
-        // 情况二：审批有【后】加签的任务
-        if (BpmTaskSignTypeEnum.AFTER.getType().equals(task.getScopeType())) {
-            approveAfterSignTask(task, reqVO);
+        // 情况二：被委派的任务，不调用 complete 去完成任务，而是归还给直接委派人
+        if (DelegationState.PENDING.equals(task.getDelegationState())) {
+            approveDelegateTask(task, reqVO.getReason());
             return;
         }
 
@@ -673,12 +691,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             runtimeService.setVariable(task.getProcessInstanceId(), BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_NEED_SIMULATE_TASK_IDS, needSimulateTaskIdsByReturn);
         }
 
-        // 6. 清理退回设置的不自动通过的变量。仅在该标记存在时才删除，避免每次完成任务都产生无谓的 DB delete
-        String returnFlagKey = String.format(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_RETURN_FLAG, task.getTaskDefinitionKey());
-        if (runtimeService.hasVariable(task.getProcessInstanceId(), returnFlagKey)) {
-            log.info("[approveTask][taskId({}) 清理退回标记变量({})]", task.getId(), returnFlagKey);
-            runtimeService.removeVariable(task.getProcessInstanceId(), returnFlagKey);
-        }
+        // 6. 清理退回设置的不自动通过的变量
+        clearReturnFlagIfNodeTask(task);
 
         // 7. 调用 BPM complete 去完成任务
         Map<String,Object> taskVariables = MapUtil.emptyIfNull(reqVO.getVariables()); // task local variables. 一般用于任务内嵌流程表单
@@ -686,6 +700,27 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
         // 【加签专属】处理加签任务
         handleParentTaskIfSign(task.getParentTaskId());
+    }
+
+    /**
+     * 完成流程节点的任务时，清理退回设置的不自动通过的变量
+     * <p>
+     * 加签的子任务和父任务共用节点 key，子任务完成时节点并未完成，需要保留标记，
+     * 避免父任务（例如说：归还委派人）重新分配时，被误判为非退回，从而自动审批通过
+     * <p>
+     * 仅在该标记存在时才删除，避免每次完成任务都产生无谓的 DB delete
+     *
+     * @param task 即将完成的任务
+     */
+    private void clearReturnFlagIfNodeTask(Task task) {
+        if (task.getParentTaskId() != null) {
+            return;
+        }
+        String returnFlagKey = String.format(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_RETURN_FLAG, task.getTaskDefinitionKey());
+        if (runtimeService.hasVariable(task.getProcessInstanceId(), returnFlagKey)) {
+            log.info("[clearReturnFlagIfNodeTask][taskId({}) 清理退回标记变量({})]", task.getId(), returnFlagKey);
+            runtimeService.removeVariable(task.getProcessInstanceId(), returnFlagKey);
+        }
     }
 
     /**
@@ -773,14 +808,27 @@ public class BpmTaskServiceImpl implements BpmTaskService {
      *
      * @param task  当前任务
      * @param reqVO 前端请求参数
+     * @return 是否已按后加签处理。没有加签任务时返回 false，由调用方继续按委派、普通任务审批
      */
-    private void approveAfterSignTask(Task task, BpmTaskApproveReqVO reqVO) {
-        // 更新父 task 状态 + 原因
+    private boolean approveAfterSignTask(Task task, BpmTaskApproveReqVO reqVO) {
+        // 1. 更新父 task 状态 + 原因
+        // 注意：保持先更新父任务、再查询子任务的顺序，避免先读取子任务后，漏掉并发新加签的任务
         updateTaskStatusAndReason(task.getId(), BpmTaskStatusEnum.APPROVING.getStatus(), reqVO.getReason());
-
-        // 2. 激活子任务
         List<Task> childrenTaskList = getTaskListByParentTaskId(task.getId());
+        if (CollUtil.isEmpty(childrenTaskList)) {
+            return false;
+        }
+
+        // 2. 被委派的任务，记录被委派人的审批意见。因为加签任务不通过时，父任务的原因会被覆盖，需要通过评论保留
+        if (DelegationState.PENDING.equals(task.getDelegationState())) {
+            commentService.createComment(task.getId(), task.getProcessInstanceId(), BpmCommentTypeEnum.APPROVE,
+                    reqVO.getReason());
+        }
+
+        // 3. 激活子任务
+        // 如果子任务在查询后被删除（并发减签），Flowable 会因为任务不存在抛出异常，整体回滚
         childrenTaskList.forEach(childrenTask -> resolveWaitTask(childrenTask.getId()));
+        return true;
     }
 
     /**
@@ -812,7 +860,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         parentTaskImpl.setScopeType(null);
         taskService.saveTask(parentTaskImpl);
 
-        // 3.1 情况一：处理向【向前】加签，owner 重新赋值给父任务的 assignee，这样它就可以被审批
+        // 3.1 情况一：处理向【向前】加签，恢复父任务的 assignee，这样它就可以被审批
         if (signType == BpmTaskSignTypeEnum.BEFORE) {
             resolveWaitTask(parentTaskId);
             // 3.2 情况二：处理向【向后】加签
@@ -823,8 +871,15 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             if (ObjectUtil.notEqual(status, BpmTaskStatusEnum.APPROVING.getStatus())) {
                 return;
             }
+            // 3.2.1 被委派的任务，归还给直接委派人，由委派人继续审批
+            if (DelegationState.PENDING.equals(parentTask.getDelegationState())) {
+                approveDelegateTask(parentTask, (String) parentTask.getTaskLocalVariables()
+                        .get(BpmnVariableConstants.TASK_VARIABLE_REASON));
+                return;
+            }
             // 3.2.2 完成自己（因为它已经没有子任务，所以也可以完成）
             updateTaskStatus(parentTaskId, BpmTaskStatusEnum.APPROVE.getStatus());
+            clearReturnFlagIfNodeTask(parentTask);
             taskService.complete(parentTaskId);
         }
 
@@ -833,24 +888,67 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     }
 
     /**
-     * 审批被委派的任务
+     * 审批被委派的任务：归还给直接委派人
+     * <p>
+     * 多次委派时（A 委派 B，B 再委派 C），逐层归还（C 归还 B，B 再归还 A），期间任务一直处于委派中，不推进节点
      *
-     * @param reqVO 前端请求参数，包含当前任务ID，审批意见等
-     * @param task  当前被审批的任务
+     * @param task   当前被审批的任务，需要包含任务变量
+     * @param reason 审批意见
      */
-    private void approveDelegateTask(BpmTaskApproveReqVO reqVO, Task task) {
-        // 1. 添加审批意见
-        AdminUserRespDTO currentUser = adminUserApi.getUser(WebFrameworkUtils.getLoginUserId());
-        AdminUserRespDTO ownerUser = adminUserApi.getUser(NumberUtils.parseLong(task.getOwner())); // 发起委托的用户
-        Assert.notNull(ownerUser, "委派任务找不到原审批人，需要检查数据");
-        commentService.createComment(reqVO.getId(), task.getProcessInstanceId(), BpmCommentTypeEnum.DELEGATE_END,
-                currentUser.getNickname(), ownerUser.getNickname(), reqVO.getReason());
+    private void approveDelegateTask(Task task, String reason) {
+        // 1. 获得归还人：直接委派人。历史数据没有记录归还顺序时，归还给 owner
+        List<String> returnUserIds = getDelegateReturnUserIds(task);
+        String returnUserId = returnUserIds.isEmpty() ? task.getOwner() : returnUserIds.remove(returnUserIds.size() - 1);
+        Long assigneeUserId = NumberUtils.parseLong(task.getAssignee());
+        AdminUserRespDTO assigneeUser = adminUserApi.getUser(assigneeUserId);
+        AdminUserRespDTO returnUser = adminUserApi.getUser(NumberUtils.parseLong(returnUserId));
+        Assert.notNull(returnUser, "委派任务找不到归还人，需要检查数据");
 
-        // 2.1 调用 resolveTask 完成任务。
-        // 底层调用 TaskHelper.changeTaskAssignee(task, task.getOwner())：将 owner 设置为 assignee
-        taskService.resolveTask(task.getId());
-        // 2.2 更新 task 状态 + 原因
-        updateTaskStatusAndReason(task.getId(), BpmTaskStatusEnum.RUNNING.getStatus(), reqVO.getReason());
+        // 2. 添加审批意见
+        // 为什么使用被委派人作为评论人？向后加签的任务都完成、或者被减签时，会触发归还，此时操作人不是被委派人
+        // 所以临时切换 Flowable 认证用户为被委派人，写完后恢复为当前请求的认证用户
+        String previousAuthenticatedUserId = Authentication.getAuthenticatedUserId();
+        FlowableUtils.setAuthenticatedUserId(assigneeUserId);
+        try {
+            commentService.createComment(task.getId(), task.getProcessInstanceId(), BpmCommentTypeEnum.DELEGATE_END,
+                    assigneeUser.getNickname(), returnUser.getNickname(), reason);
+        } finally {
+            Authentication.setAuthenticatedUserId(previousAuthenticatedUserId);
+        }
+
+        // 3.1 更新 task 状态 + 原因
+        updateTaskStatusAndReason(task.getId(), BpmTaskStatusEnum.RUNNING.getStatus(), reason);
+        // 3.2 情况一：多次委派，归还给上一层委派人，任务仍然处于委派中
+        if (CollUtil.isNotEmpty(returnUserIds)) {
+            taskService.setVariableLocal(task.getId(), BpmnVariableConstants.TASK_DELEGATE_RETURN_USERS,
+                    String.join(StrUtil.COMMA, returnUserIds));
+            taskService.setAssignee(task.getId(), returnUserId);
+            return;
+        }
+        // 3.3 情况二：归还给最初的委派人，结束委派
+        taskService.removeVariableLocal(task.getId(), BpmnVariableConstants.TASK_DELEGATE_RETURN_USERS);
+        if (StrUtil.equals(task.getOwner(), returnUserId)) {
+            // 调用 resolveTask 完成委派。底层调用 TaskHelper.changeTaskAssignee(task, task.getOwner())：将 owner 设置为 assignee
+            taskService.resolveTask(task.getId());
+            return;
+        }
+        // 转办后再委派时，直接委派人是转办的接收人，而 owner 需要保留为最初的审批人，所以不能调用 resolveTask
+        // 注意：需要重新查询任务，因为上面更新了任务变量，旧的任务实体会因为版本号不一致而保存失败
+        TaskEntityImpl taskEntity = (TaskEntityImpl) validateTaskExists(task.getId());
+        taskEntity.setDelegationState(DelegationState.RESOLVED);
+        taskService.saveTask(taskEntity);
+        taskService.setAssignee(task.getId(), returnUserId);
+    }
+
+    /**
+     * 获得委派的归还顺序
+     *
+     * @param task 任务，需要包含任务变量
+     * @return 用户编号数组（可修改），最后一个是直接委派人
+     */
+    private List<String> getDelegateReturnUserIds(Task task) {
+        String returnUserIds = (String) task.getTaskLocalVariables().get(BpmnVariableConstants.TASK_DELEGATE_RETURN_USERS);
+        return new ArrayList<>(StrUtil.splitTrim(returnUserIds, StrUtil.C_COMMA));
     }
 
     /**
@@ -939,27 +1037,48 @@ public class BpmTaskServiceImpl implements BpmTaskService {
     }
 
     /**
-     * 保存【加签】等待中的任务：设置 owner、置空 assignee，并更新状态为 WAIT
+     * 保存【加签】等待中的任务：记录等待人、置空 assignee，并更新状态为 WAIT
      * <p>
      * 适用于向前加签的父任务、向后加签的子任务，它们需要等待其它任务审批后，再通过 {@link #resolveWaitTask(String)} 恢复审批
+     * <p>
+     * 特殊：被委派的任务，owner 需要保留给委派归还使用，所以等待人记录到 {@link BpmnVariableConstants#TASK_SIGN_WAIT_ASSIGNEE} 任务变量
      *
      * @param task  任务
-     * @param owner 拥有人，恢复审批时成为 assignee
+     * @param owner 等待恢复审批的用户编号
      */
     private void saveWaitTask(TaskEntityImpl task, String owner) {
-        task.setOwner(owner);
+        // 1. 普通任务用 owner 记录等待人，委派任务保留 owner 供后续归还
+        boolean delegated = DelegationState.PENDING.equals(task.getDelegationState());
+        if (!delegated) {
+            task.setOwner(owner);
+        }
+        // 2. 清空 assignee 并先保存任务，暂停当前审批人的操作
         task.setAssignee(null);
         taskService.saveTask(task);
+
+        // 3. 委派任务单独保存等待人，最后将任务设为 WAIT
+        // 更新局部变量会改变任务版本号，必须在保存任务实体之后执行，避免乐观锁冲突
+        if (delegated) {
+            taskService.setVariableLocal(task.getId(), BpmnVariableConstants.TASK_SIGN_WAIT_ASSIGNEE, owner);
+        }
         updateTaskStatus(task.getId(), BpmTaskStatusEnum.WAIT.getStatus());
     }
 
     /**
-     * 恢复【加签】等待中的任务：将 owner 重新赋值给 assignee，并更新状态为 RUNNING，这样它就可以被审批
+     * 恢复【加签】等待中的任务：将等待人（owner）重新赋值给 assignee，并更新状态为 RUNNING，这样它就可以被审批
      *
      * @param id 任务编号
      */
     private void resolveWaitTask(String id) {
-        taskService.resolveTask(id);
+        // 情况一：被委派的任务，恢复为记录的等待人，并保持委派中，审批后继续归还委派人
+        String waitAssignee = (String) taskService.getVariableLocal(id, BpmnVariableConstants.TASK_SIGN_WAIT_ASSIGNEE);
+        if (StrUtil.isNotBlank(waitAssignee)) {
+            taskService.removeVariableLocal(id, BpmnVariableConstants.TASK_SIGN_WAIT_ASSIGNEE);
+            taskService.setAssignee(id, waitAssignee);
+        // 情况二：普通的任务，调用 resolveTask 将 owner 重新赋值给 assignee
+        } else {
+            taskService.resolveTask(id);
+        }
         updateTaskStatus(id, BpmTaskStatusEnum.RUNNING.getStatus());
     }
 
@@ -1120,7 +1239,16 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         if (StrUtil.isEmpty(task.getOwner())) {
             taskService.setOwner(taskId, task.getAssignee());
         }
-        // 3.2 执行委派，将任务委派给 delegateUser
+        // 3.2 记录归还顺序：追加当前审批人为直接委派人，审批后逐层归还
+        List<String> returnUserIds = getDelegateReturnUserIds(task);
+        if (returnUserIds.isEmpty() && DelegationState.PENDING.equals(task.getDelegationState())
+                && StrUtil.isNotBlank(task.getOwner())) {
+            returnUserIds.add(task.getOwner()); // 兼容历史数据：委派中、但没有记录归还顺序的任务，最初的委派人是 owner
+        }
+        returnUserIds.add(StrUtil.blankToDefault(task.getAssignee(), String.valueOf(userId)));
+        taskService.setVariableLocal(taskId, BpmnVariableConstants.TASK_DELEGATE_RETURN_USERS,
+                String.join(StrUtil.COMMA, returnUserIds));
+        // 3.3 执行委派，将任务委派给 delegateUser
         taskService.delegateTask(taskId, reqVO.getDelegateUserId().toString());
         // 补充说明：委托不单独设置状态。如果需要，可通过 Task 的 DelegationState 字段，判断是否为 DelegationState.PENDING 委托中
     }
@@ -1212,7 +1340,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         // 2.2 记录加签方式，完成任务时需要用到判断
         taskEntity.setScopeType(reqVO.getType());
         // 2.3 保存当前任务修改后的值
-        // 向前加签，设置 owner，置空 assignee，状态为 WAIT。等子任务都完成后，再调用 resolveWaitTask 重新将 owner 设置为 assignee
+        // 向前加签，设置 owner（被委派的任务记录等待人），置空 assignee，状态为 WAIT。等子任务都完成后，再调用 resolveWaitTask 恢复 assignee
         // 原因是：不能和向前加签的子任务一起审批，需要等前面的子任务都完成才能审批
         if (BpmTaskSignTypeEnum.BEFORE.getType().equals(reqVO.getType())) {
             saveWaitTask(taskEntity, taskEntity.getAssignee());
@@ -1255,9 +1383,10 @@ public class BpmTaskServiceImpl implements BpmTaskService {
 
         // 同一个 key 的任务，审批人不重复
         List<Task> taskList = taskService.createTaskQuery().processInstanceId(taskEntity.getProcessInstanceId())
-                .taskDefinitionKey(taskEntity.getTaskDefinitionKey()).list();
+                .taskDefinitionKey(taskEntity.getTaskDefinitionKey()).includeTaskLocalVariables().list();
         List<Long> currentAssigneeList = convertListByFlatMap(taskList, task -> // 需要考虑 owner 的情况，因为向后加签时，它暂时没 assignee 而是 owner
-                Stream.of(NumberUtils.parseLong(task.getAssignee()), NumberUtils.parseLong(task.getOwner())));
+                Stream.of(NumberUtils.parseLong(task.getAssignee()), NumberUtils.parseLong(task.getOwner()),
+                        NumberUtils.parseLong(getSignTaskOwner(task)))); // 被委派的任务向前加签时，等待人记录在任务变量中
         if (CollUtil.containsAny(currentAssigneeList, reqVO.getUserIds())) {
             List<AdminUserRespDTO> userList = adminUserApi.getUserList(CollUtil.intersection(currentAssigneeList, reqVO.getUserIds()));
             throw exception(TASK_SIGN_CREATE_USER_REPEAT, String.join(",", convertList(userList, AdminUserRespDTO::getNickname)));
@@ -1317,8 +1446,9 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         if (StrUtil.isNotBlank(task.getAssignee())) {
             cancelUser = adminUserApi.getUser(NumberUtils.parseLong(task.getAssignee()));
         }
-        if (cancelUser == null && StrUtil.isNotBlank(task.getOwner())) {
-            cancelUser = adminUserApi.getUser(NumberUtils.parseLong(task.getOwner()));
+        String signTaskOwner = getSignTaskOwner(task);
+        if (cancelUser == null && StrUtil.isNotBlank(signTaskOwner)) {
+            cancelUser = adminUserApi.getUser(NumberUtils.parseLong(signTaskOwner));
         }
         Assert.notNull(cancelUser, "任务中没有所有者和审批人，数据错误");
 
@@ -1446,7 +1576,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         }
         Task task = parentTask;
         for (int i = 0; i < Short.MAX_VALUE && task != null; i++) {
-            if (isAssignUserTask(userId, task) || isOwnerUserTask(userId, task)) {
+            if (isSignTaskUser(userId, task)) {
                 return true;
             }
             if (task.getParentTaskId() == null) {

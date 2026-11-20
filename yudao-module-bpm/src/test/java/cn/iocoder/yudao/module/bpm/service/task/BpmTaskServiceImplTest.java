@@ -170,6 +170,19 @@ public class BpmTaskServiceImplTest extends BaseMockitoUnitTest {
     }
 
     @Test
+    public void testValidateTask_waitWithoutOwner() {
+        // 准备参数：被委派的任务向前加签后等待中，没有 assignee，等待人记录在任务变量中
+        BpmTaskServiceImpl spyService = spy(taskService);
+        doReturn(task).when(spyService).validateTaskExists("task-1");
+        when(task.getTaskLocalVariables()).thenReturn(Map.of(BpmnVariableConstants.TASK_VARIABLE_STATUS,
+                BpmTaskStatusEnum.WAIT.getStatus()));
+
+        // 调用，并断言异常：即使 owner 为空，也不允许操作
+        assertServiceException(() -> spyService.validateTask(1L, "task-1"), TASK_OPERATE_FAIL_ASSIGN_NOT_SELF);
+        assertServiceException(() -> spyService.validateTask(null, "task-1"), TASK_OPERATE_FAIL_ASSIGN_NOT_SELF);
+    }
+
+    @Test
     public void testValidateTask_approving() {
         // 准备参数：向后加签的父任务，已审批通过，等待加签任务审批
         BpmTaskServiceImpl spyService = spy(taskService);

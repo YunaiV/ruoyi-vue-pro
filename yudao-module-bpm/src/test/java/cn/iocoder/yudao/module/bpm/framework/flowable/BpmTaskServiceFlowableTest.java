@@ -375,12 +375,62 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         verify(commentService).createComment(eq(task1.getId()), eq(processInstanceId),
                 eq(BpmCommentTypeEnum.DELEGATE_START), eq("用户2"), eq("用户3"), eq("转给用户 3"));
 
-        // 调用：用户 3 审批，任务归还给用户 1
-        bpmTaskService.approveTask(3L, new BpmTaskApproveReqVO().setId(task1.getId()).setReason("已处理"));
-        // 断言
-        assertEquals("1", bpmTaskService.getTask(task1.getId()).getAssignee());
+        // 调用：用户 3 审批，任务先归还给直接委派人用户 2
+        bpmTaskService.approveTask(3L, new BpmTaskApproveReqVO().setId(task1.getId()).setReason("用户 3 已处理"));
+        // 断言：仍处于委派中，节点没有推进
+        Task returnedTask = bpmTaskService.getTask(task1.getId());
+        assertEquals("2", returnedTask.getAssignee());
+        assertEquals("1", returnedTask.getOwner());
+        assertEquals(DelegationState.PENDING, returnedTask.getDelegationState());
         verify(commentService).createComment(eq(task1.getId()), eq(processInstanceId),
-                eq(BpmCommentTypeEnum.DELEGATE_END), any(), eq("用户1"), eq("已处理"));
+                eq(BpmCommentTypeEnum.DELEGATE_END), eq("用户3"), eq("用户2"), eq("用户 3 已处理"));
+
+        // 调用：用户 2 审批，任务再归还给用户 1
+        bpmTaskService.approveTask(2L, new BpmTaskApproveReqVO().setId(task1.getId()).setReason("用户 2 已处理"));
+        // 断言：委派结束，节点仍未推进
+        Task resolvedTask = bpmTaskService.getTask(task1.getId());
+        assertEquals("1", resolvedTask.getAssignee());
+        assertEquals(DelegationState.RESOLVED, resolvedTask.getDelegationState());
+        assertFalse(resolvedTask.getTaskLocalVariables().containsKey(BpmnVariableConstants.TASK_DELEGATE_RETURN_USERS));
+        verify(commentService).createComment(eq(task1.getId()), eq(processInstanceId),
+                eq(BpmCommentTypeEnum.DELEGATE_END), eq("用户2"), eq("用户1"), eq("用户 2 已处理"));
+
+        // 调用：用户 1 审批，节点完成
+        bpmTaskService.approveTask(1L, new BpmTaskApproveReqVO().setId(task1.getId()).setReason("同意"));
+        // 断言
+        assertEquals("task2", getRunningTask(processInstanceId).getTaskDefinitionKey());
+    }
+
+    @Test
+    public void testDelegateTask_legacyWithoutReturnUsers() {
+        // 准备参数：历史数据，委派时没有记录归还顺序
+        String processInstanceId = startProcessInstance();
+        String taskId = getRunningTask(processInstanceId).getId();
+        flowableTaskService.delegateTask(taskId, "2");
+
+        // 调用：用户 2 审批
+        bpmTaskService.approveTask(2L, new BpmTaskApproveReqVO().setId(taskId).setReason("已处理"));
+        // 断言：沿用 owner 归还给用户 1
+        Task resolvedTask = bpmTaskService.getTask(taskId);
+        assertEquals("1", resolvedTask.getAssignee());
+        assertEquals(DelegationState.RESOLVED, resolvedTask.getDelegationState());
+    }
+
+    @Test
+    public void testDelegateTask_afterTransfer() {
+        // 准备参数：用户 1 转办给用户 2，用户 2 再委派给用户 3
+        String processInstanceId = startProcessInstance();
+        String taskId = getRunningTask(processInstanceId).getId();
+        bpmTaskService.transferTask(1L, new BpmTaskTransferReqVO().setId(taskId).setAssigneeUserId(2L).setReason("转办"));
+        bpmTaskService.delegateTask(2L, new BpmTaskDelegateReqVO().setId(taskId).setDelegateUserId(3L).setReason("委派"));
+
+        // 调用：用户 3 审批
+        bpmTaskService.approveTask(3L, new BpmTaskApproveReqVO().setId(taskId).setReason("已处理"));
+        // 断言：归还给直接委派人用户 2，owner 仍为最初的审批人用户 1
+        Task resolvedTask = bpmTaskService.getTask(taskId);
+        assertEquals("2", resolvedTask.getAssignee());
+        assertEquals("1", resolvedTask.getOwner());
+        assertEquals(DelegationState.RESOLVED, resolvedTask.getDelegationState());
     }
 
     @Test
