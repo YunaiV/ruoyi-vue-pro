@@ -75,6 +75,16 @@ spring:
 #          hikari:
 #            maximum-pool-size: 8
 #            connection-test-query: SELECT 1 # IoTDB 数据源的有效性检查 SQL
+#        questdb: # IoT 数据库（需要 IoT 物联网，且 yudao.iot.storage.type 为 questdb 再开启噢！）
+#          lazy: true # 开启懒加载，保证启动速度
+#          type: com.zaxxer.hikari.HikariDataSource # QuestDB 不使用 Druid 连接池，避免 SQL 解析
+#          url: jdbc:postgresql://127.0.0.1:8812/qdb?sslmode=disable # PGWire；库名会被忽略，每个环境使用独立实例
+#          driver-class-name: org.postgresql.Driver
+#          username: admin # 对应 QuestDB server.conf 的 pg.user
+#          password: quest # 对应 pg.password，必须改掉默认值
+#          hikari:
+#            maximum-pool-size: 4
+#            connection-test-query: SELECT 1 # QuestDB 数据源的有效性检查 SQL
 
   # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
   data:

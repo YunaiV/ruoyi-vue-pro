@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.iocoder.yudao.module.iot.dal.questdb.IotDeviceMessageQuestDBMapper">
+
+    <!--
+        一张全局表 device_message：
+        1. ts：Service 写入日志时的毫秒 ts，存为微秒；读出时转回毫秒
+        2. 身份为 (ts, device_id, id)，与 TDengine 一致：DEDUP UPSERT KEYS 保证相同身份只保留后写的一行
+        3. upstream、reply：BOOLEAN 不能为 NULL，由 DAO 校验非空
+        4. code：LONG，避免 INT 以 Integer.MIN_VALUE 表示 NULL；绑定时也要转为 Long，按 int4 绑定的 Integer.MIN_VALUE 会被当成 NULL
+        5. 可空字段的绑定都写明 jdbcType，避免 null 按 OTHER 绑定
+    -->
+
+    <update id="createTable">
+        CREATE TABLE IF NOT EXISTS device_message (
+            ts TIMESTAMP,
+            device_id LONG,
+            id VARCHAR,
+            report_time LONG,
+            tenant_id LONG,
+            server_id VARCHAR,
+            upstream BOOLEAN,
+            reply BOOLEAN,
+            identifier VARCHAR,
+            request_id VARCHAR,
+            method VARCHAR,
+            params VARCHAR,
+            data VARCHAR,
+            code LONG,
+            msg VARCHAR,
+            raw VARCHAR
+        ) TIMESTAMP(ts) PARTITION BY MONTH WAL DEDUP UPSERT KEYS(ts, device_id, id)
+    </update>
+
+    <select id="selectColumnList" resultType="java.util.Map">
+        SELECT "column", type, designated, upsertKey
+        FROM table_columns('device_message')
+    </select>
+
+    <select id="selectTable" resultType="java.util.Map">
+        SELECT designatedTimestamp, walEnabled, dedup
+        FROM tables()
+        WHERE table_name = 'device_message'
+    </select>
+
+    <select id="selectCreateTable" resultType="String">
+        SHOW CREATE TABLE device_message
+    </select>
+
+    <insert id="insert">
+        INSERT INTO device_message (
+            ts, device_id, id, report_time, tenant_id,
+            server_id, upstream, reply, identifier, request_id,
+            method, params, data, code, msg,
+            raw
+        )
+        VALUES (
+            CAST(#{ts,jdbcType=BIGINT} AS TIMESTAMP), #{message.deviceId,jdbcType=BIGINT}, #{message.id,jdbcType=VARCHAR},
+            #{message.reportTime,jdbcType=BIGINT}, #{message.tenantId,jdbcType=BIGINT},
+            #{message.serverId,jdbcType=VARCHAR}, #{message.upstream,jdbcType=BOOLEAN}, #{message.reply,jdbcType=BOOLEAN},
+            #{message.identifier,jdbcType=VARCHAR}, #{message.requestId,jdbcType=VARCHAR},
+            #{message.method,jdbcType=VARCHAR}, #{params,jdbcType=VARCHAR}, #{data,jdbcType=VARCHAR},
+            #{code,jdbcType=BIGINT}, #{message.msg,jdbcType=VARCHAR},
+            #{message.raw,jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <!-- 毫秒 ts 使用 ts_ms 别名：别名为 ts 时，与 ORDER BY 引用的 ts 列重名，QuestDB 报 Duplicate column -->
+    <resultMap id="messageResultMap" type="cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceMessageDO" autoMapping="true">
+        <result property="ts" column="ts_ms" />
+    </resultMap>
+
+    <sql id="selectColumns">
+        SELECT CAST(ts AS LONG) / 1000 AS ts_ms, device_id, id, report_time, tenant_id,
+               server_id, upstream, reply, identifier, request_id,
+               method, params, data, code, msg,
+               raw
+        FROM device_message
+    </sql>
+
+    <sql id="pageWhere">
+        WHERE device_id = #{reqVO.deviceId,jdbcType=BIGINT}
+        <if test="reqVO.method != null and reqVO.method != ''">
+            AND method = #{reqVO.method,jdbcType=VARCHAR}
+        </if>
+        <if test="reqVO.upstream != null">
+            AND upstream = #{reqVO.upstream,jdbcType=BOOLEAN}
+        </if>
+        <if test="reqVO.reply != null">
+            AND reply = #{reqVO.reply,jdbcType=BOOLEAN}
+        </if>
+        <if test="reqVO.identifier != null and reqVO.identifier != ''">
+            AND identifier = #{reqVO.identifier,jdbcType=VARCHAR}
+        </if>
+        <!-- 是否有原始帧：按 raw 列是否为空过滤 -->
+        <if test="reqVO.raw != null and reqVO.raw">
+            AND raw IS NOT NULL
+        </if>
+        <if test="reqVO.raw != null and !reqVO.raw">
+            AND raw IS NULL
+        </if>
+    </sql>
+
+    <select id="selectCount" resultType="Long">
+        SELECT count()
+        FROM device_message
+        <include refid="pageWhere" />
+    </select>
+
+    <select id="selectList" resultMap="messageResultMap">
+        <include refid="selectColumns" />
+        <include refid="pageWhere" />
+        ORDER BY ts DESC, id DESC
+        <if test="lo != null">
+            LIMIT #{lo,jdbcType=BIGINT}, #{hi,jdbcType=BIGINT}
+        </if>
+    </select>
+
+    <select id="selectListByRequestIdsAndReply" resultMap="messageResultMap">
+        <include refid="selectColumns" />
+        WHERE device_id = #{deviceId,jdbcType=BIGINT}
+          AND reply = #{reply,jdbcType=BOOLEAN}
+          AND request_id IN
+        <foreach collection="requestIds" item="requestId" open="(" close=")" separator=",">
+            #{requestId,jdbcType=VARCHAR}
+        </foreach>
+        ORDER BY ts DESC, id DESC
+    </select>
+
+    <select id="selectCountByCreateTime" resultType="Long">
+        SELECT count()
+        FROM device_message
+        <where>
+            <if test="createTime != null">
+                AND ts &gt;= CAST(#{createTime,jdbcType=BIGINT} AS TIMESTAMP)
+            </if>
+        </where>
+    </select>
+
+    <!-- 按 epoch 整点分桶，与 TDengine 的 TIMETRUNCATE、IoTDB 的 date_bin 一致 -->
+    <select id="selectCountGroupByHour" resultType="java.util.Map">
+        SELECT
+            CAST(timestamp_floor('h', ts) AS LONG) / 1000 AS "time",
+            SUM(CASE WHEN upstream THEN 1 ELSE 0 END) AS upstream_count,
+            SUM(CASE WHEN upstream THEN 0 ELSE 1 END) AS downstream_count
+        FROM device_message
+        <where>
+            <if test="startTime != null">
+                AND ts &gt;= CAST(#{startTime,jdbcType=BIGINT} AS TIMESTAMP)
+            </if>
+            <if test="endTime != null">
+                AND ts &lt;= CAST(#{endTime,jdbcType=BIGINT} AS TIMESTAMP)
+            </if>
+        </where>
+        GROUP BY 1
+        ORDER BY 1
+    </select>
+
+</mapper>

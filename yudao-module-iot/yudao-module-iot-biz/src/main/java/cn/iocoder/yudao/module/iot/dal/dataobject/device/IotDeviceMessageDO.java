@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 /**
  * IoT 设备消息数据 DO
  *
- * 支持 TDengine、IoTDB 存储，由 yudao.iot.storage.type 选择
+ * 支持 TDengine、IoTDB、QuestDB 存储，由 yudao.iot.storage.type 选择
  *
  * @author alwayssuper
  */
