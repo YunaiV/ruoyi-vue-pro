@@ -7,6 +7,7 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.crypto.digest.DigestUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -19,6 +20,7 @@ import cn.iocoder.yudao.module.iot.controller.admin.statistics.vo.IotStatisticsD
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import cn.iocoder.yudao.module.iot.core.enums.device.IotDeviceStateEnum;
+import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageRejectedException;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.mq.producer.IotDeviceMessageProducer;
 import cn.iocoder.yudao.module.iot.core.topic.IotDeviceIdentity;
@@ -115,7 +117,9 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
             messageDO.setId(IotDeviceMessageUtils.generateMessageId());
         }
         if (messageDO.getTs() == null) {
-            messageDO.setTs(System.currentTimeMillis());
+            // 补传的消息（网关离线暂存），以网关接收时刻作为日志时间
+            messageDO.setTs(IotDeviceMessageUtils.isSpooled(message)
+                    ? IotDeviceMessageUtils.getSpoolTimeNotAfterNow(message) : System.currentTimeMillis());
         }
         try {
             deviceMessageDAO.insert(messageDO);
@@ -258,9 +262,11 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
 
         // 3. 回复消息。前提：非 _reply 消息、非禁用回复的消息
         //    另外：带原始帧（raw）的是网关透传解析出的消息，不自动回复；设备经标准路径上报的 raw 由网关清空，不能伪造
+        //    补传的消息（网关离线暂存）：网关暂存时已确认设备，回复已经过期，不回复
         if (IotDeviceMessageUtils.isReplyMessage(message)
                 || IotDeviceMessageMethodEnum.isReplyDisabled(message.getMethod())
                 || message.getRaw() != null
+                || IotDeviceMessageUtils.isSpooled(message)
                 || StrUtil.isEmpty(message.getServerId())) {
             return;
         }
@@ -442,6 +448,10 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
      * 处理批量上报消息
      * <p>
      * 将 pack 消息拆分成多条标准消息，发送到 MQ 让规则引擎处理
+     * <p>
+     * 补传的 pack（网关离线暂存）：拆出的消息沿用 pack 的 spoolTime，编号由 pack 编号稳定派生，等待 broker 确认；
+     * 发送失败时抛出，整个 pack 不确认，等待消息总线有限次重投（Redis 的 pending 重投任务、Kafka 容器的错误重试、
+     * RocketMQ 的消费重试、RabbitMQ 仅确认发送失败时重新入队一次），重投时已发送的消息会以相同编号再发送一次
      *
      * @param packMessage   批量消息
      * @param gatewayDevice 网关设备
@@ -458,26 +468,36 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
         // 2. 处理网关设备（自身）的数据
         // 特殊：拆分出的消息沿用 pack 的上报时间，避免迟到的 pack 变成“新”的消息（例如说，强制上线用的是它的时间）
         LocalDateTime reportTime = packMessage.getReportTime() != null ? packMessage.getReportTime() : LocalDateTime.now();
-        sendDevicePackData(gatewayDevice, packMessage.getServerId(), params.getProperties(), params.getEvents(), reportTime);
+        sendDevicePackData(packMessage, -1, gatewayDevice, packMessage.getServerId(), params.getProperties(),
+                params.getEvents(), reportTime);
 
-        // 3. 处理子设备的数据
+        // 3. 处理子设备的数据：序号参与补传消息的编号派生，同一子设备在 pack 中出现多次时编号也不同
         if (CollUtil.isEmpty(params.getSubDevices())) {
             return;
         }
-        for (IotDevicePropertyPackPostReqDTO.SubDeviceData subDeviceData : params.getSubDevices()) {
+        for (int i = 0; i < params.getSubDevices().size(); i++) {
+            IotDevicePropertyPackPostReqDTO.SubDeviceData subDeviceData = params.getSubDevices().get(i);
+            if (subDeviceData == null || subDeviceData.getIdentity() == null) {
+                log.warn("[handlePackMessage][消息({}) 的子设备为空或缺少身份标识，跳过]", packMessage.getId());
+                continue;
+            }
+            IotDeviceIdentity identity = subDeviceData.getIdentity();
             try {
-                IotDeviceIdentity identity = subDeviceData.getIdentity();
                 IotDeviceDO subDevice = deviceService.getDeviceFromCache(identity.getProductKey(), identity.getDeviceName());
                 if (subDevice == null) {
                     log.warn("[handlePackMessage][子设备({}/{}) 不存在]", identity.getProductKey(), identity.getDeviceName());
                     continue;
                 }
                 // 特殊：子设备不需要指定 serverId，因为子设备实际可能连接在不同的 gateway-server 上，导致 serverId 不同
-                sendDevicePackData(subDevice, null, subDeviceData.getProperties(), subDeviceData.getEvents(),
-                        reportTime);
+                sendDevicePackData(packMessage, i, subDevice, null, subDeviceData.getProperties(),
+                        subDeviceData.getEvents(), reportTime);
             } catch (Exception ex) {
-                log.error("[handlePackMessage][子设备({}/{}) 数据处理失败]", subDeviceData.getIdentity().getProductKey(),
-                        subDeviceData.getIdentity().getDeviceName(), ex);
+                // 补传的 pack：抛出，整个 pack 等待重投，避免子设备的数据丢失
+                if (IotDeviceMessageUtils.isSpooled(packMessage)) {
+                    throw ex;
+                }
+                log.error("[handlePackMessage][子设备({}/{}) 数据处理失败]", identity.getProductKey(),
+                        identity.getDeviceName(), ex);
             }
         }
     }
@@ -485,24 +505,29 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
     /**
      * 发送设备 pack 数据到 MQ（属性 + 事件）
      *
+     * @param packMessage 批量消息
+     * @param index      数据在 pack 中的序号：网关自身为 -1，子设备为 subDevices 的下标
      * @param device     设备
      * @param serverId   服务标识
      * @param properties 属性数据
      * @param events     事件数据
      * @param reportTime 上报时间，沿用 pack 消息的上报时间
      */
-    private void sendDevicePackData(IotDeviceDO device, String serverId,
+    private void sendDevicePackData(IotDeviceMessage packMessage, int index, IotDeviceDO device, String serverId,
                                     Map<String, Object> properties,
                                     Map<String, IotDevicePropertyPackPostReqDTO.EventValue> events,
                                     LocalDateTime reportTime) {
         // 1. 发送属性消息
         if (MapUtil.isNotEmpty(properties)) {
+            // 1.1 构建属性消息
             IotDeviceMessage propertyMsg = IotDeviceMessage.requestOf(
                     device.getId(), device.getTenantId(), serverId,
                     IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod(),
                     IotDevicePropertyPostReqDTO.of(properties));
             propertyMsg.setReportTime(reportTime);
-            deviceMessageProducer.sendDeviceMessage(propertyMsg);
+            inheritPackSpool(packMessage, propertyMsg, index, device, "property");
+            // 1.2 发送到 MQ
+            sendPackSubMessage(packMessage, propertyMsg);
         }
 
         // 2. 发送事件消息
@@ -513,14 +538,57 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
                 if (eventValue == null) {
                     continue;
                 }
+                // 2.1 构建事件消息
                 IotDeviceMessage eventMsg = IotDeviceMessage.requestOf(
                         device.getId(), device.getTenantId(), serverId,
                         IotDeviceMessageMethodEnum.EVENT_POST.getMethod(),
                         IotDeviceEventPostReqDTO.of(eventId, eventValue.getValue(), eventValue.getTime()));
                 eventMsg.setReportTime(reportTime);
-                deviceMessageProducer.sendDeviceMessage(eventMsg);
+                inheritPackSpool(packMessage, eventMsg, index, device, "event:" + eventId);
+                // 2.2 发送到 MQ
+                sendPackSubMessage(packMessage, eventMsg);
             }
         }
+    }
+
+    /**
+     * 发送 pack 拆出的消息：补传的 pack 等待 broker 确认（未确认时抛出，整个 pack 等待重投）；实时的 pack 与原来一致
+     * <p>
+     * 补传的 pack 拆出的消息被消息总线永久拒绝（例如说超过大小限制）时，重投也不会成功：记日志并跳过这条，不影响后面的消息
+     *
+     * @param packMessage 批量消息
+     * @param message     拆出的消息
+     */
+    private void sendPackSubMessage(IotDeviceMessage packMessage, IotDeviceMessage message) {
+        if (IotDeviceMessageUtils.isSpooled(packMessage)) {
+            try {
+                deviceMessageProducer.sendDeviceMessageConfirmed(message);
+            } catch (IotMessageRejectedException ex) {
+                log.error("[sendPackSubMessage][补传的 pack({}) 拆出的消息({}) 被消息总线拒绝，重投也不会成功，跳过：{}]",
+                        packMessage.getId(), message.getId(), ex.getMessage());
+            }
+            return;
+        }
+        deviceMessageProducer.sendDeviceMessage(message);
+    }
+
+    /**
+     * 补传的 pack 拆出的消息：沿用 pack 的 spoolTime；编号由「pack 编号:序号:设备编号:类型」稳定派生，
+     * 重投时编号不变（下游不按编号去重）。实时的 pack 不处理，拆出的消息仍然使用随机编号
+     *
+     * @param packMessage 批量消息
+     * @param message     拆出的消息
+     * @param index       数据在 pack 中的序号：网关自身为 -1，子设备为 subDevices 的下标
+     * @param device      设备
+     * @param type        类型：property；事件为 event:{标识符}，标识符放在最后，避免与分隔符混淆
+     */
+    private static void inheritPackSpool(IotDeviceMessage packMessage, IotDeviceMessage message, int index,
+                                         IotDeviceDO device, String type) {
+        if (!IotDeviceMessageUtils.isSpooled(packMessage)) {
+            return;
+        }
+        message.setId(DigestUtil.md5Hex(packMessage.getId() + ":" + index + ":" + device.getId() + ":" + type))
+                .setSpoolTime(packMessage.getSpoolTime());
     }
 
     // ========= 设备消息查询 ==========

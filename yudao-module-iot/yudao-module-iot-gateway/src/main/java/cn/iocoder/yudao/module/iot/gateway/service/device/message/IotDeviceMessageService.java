@@ -65,8 +65,39 @@ public interface IotDeviceMessageService {
      * @param deviceName 设备名称
      * @param serverId   设备连接的 serverId
      */
+    default void sendDeviceMessage(IotDeviceMessage message,
+                                   String productKey, String deviceName, String serverId) {
+        sendDeviceMessage(message, productKey, deviceName, serverId, null);
+    }
+
+    /**
+     * 发送消息：指定协议时，属性上报、事件上报、批量上报可以走离线暂存（协议入口传入协议）
+     * <p>
+     * 离线暂存失败时，抛出 {@link cn.iocoder.yudao.module.iot.gateway.enums.ErrorCodeConstants#DEVICE_MESSAGE_SPOOL_REJECTED}，
+     * 调用方不能确认设备；消息被消息总线永久拒绝（例如说超过大小限制）时，抛出
+     * {@link cn.iocoder.yudao.module.iot.gateway.enums.ErrorCodeConstants#DEVICE_MESSAGE_REJECTED}，不暂存
+     *
+     * @param message    消息
+     * @param productKey 产品 Key
+     * @param deviceName 设备名称
+     * @param serverId   设备连接的 serverId
+     * @param protocol   协议；为空时不走离线暂存
+     */
     void sendDeviceMessage(IotDeviceMessage message,
-                           String productKey, String deviceName, String serverId);
+                           String productKey, String deviceName, String serverId, IotProtocolTypeEnum protocol);
+
+    /**
+     * 发送设备状态消息（thing.state.update）：设备不存在等校验失败照常抛出；
+     * 离线暂存已启用时，发送消息总线失败只记日志，不抛出；未启用时与 {@link #sendDeviceMessage} 一致，照常抛出
+     * <p>
+     * 用于认证成功后的上线：离线暂存已启用、消息总线不可用时，不阻断设备接入。状态消息不走离线暂存
+     *
+     * @param message    状态消息
+     * @param productKey 产品 Key
+     * @param deviceName 设备名称
+     * @param serverId   设备连接的 serverId
+     */
+    void sendDeviceStateMessage(IotDeviceMessage message, String productKey, String deviceName, String serverId);
 
     // DONE @AI：deadlineNanos 是不是收敛掉到 service 里？已收进来：协议只传入收到的时刻（入队之前取得），
     //  截止 = 收到时刻 + gateway.script.deadline，由本方法计算；协议不再读取截止配置
@@ -89,7 +120,8 @@ public interface IotDeviceMessageService {
      * @param receivedNanos 协议收到透传上报的时刻（System.nanoTime）：在交给 worker 排队之前取得，排队的时间也计入截止
      * @return 投递的消息编号
      * @throws cn.iocoder.yudao.framework.common.exception.ServiceException 载荷长度不合法（不投递）；
-     *         已启用但内容为空、脚本失败、超时、繁忙、输出不合法、超过截止（都不投递）
+     *         已启用但内容为空、脚本失败、超时、繁忙、输出不合法、超过截止（都不投递）；
+     *         解析出的属性上报、事件上报、批量上报，离线暂存失败（{@code DEVICE_MESSAGE_SPOOL_REJECTED}）
      */
     String sendRawMessage(byte[] payload, String productKey, String deviceName, String serverId,
                           IotProtocolTypeEnum protocol, long receivedNanos);

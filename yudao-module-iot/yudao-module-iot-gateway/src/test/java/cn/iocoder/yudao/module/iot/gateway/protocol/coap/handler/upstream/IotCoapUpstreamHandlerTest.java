@@ -45,6 +45,7 @@ import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeC
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.UNAUTHORIZED;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.invalidParamException;
+import static cn.iocoder.yudao.module.iot.gateway.enums.ErrorCodeConstants.DEVICE_MESSAGE_REJECTED;
 import static cn.iocoder.yudao.module.iot.gateway.enums.ErrorCodeConstants.SCRIPT_TIMEOUT;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.AdditionalMatchers.aryEq;
@@ -124,7 +125,7 @@ public class IotCoapUpstreamHandlerTest extends BaseMockitoUnitTest {
         assertEquals(1, data.size());
         verify(exchange, times(1)).respond(any(CoAP.ResponseCode.class), anyString(), anyInt());
         verify(exchange, never()).respond(any(CoAP.ResponseCode.class), any(byte[].class), anyInt());
-        verify(deviceMessageService, never()).sendDeviceMessage(any(), any(), any(), any());
+        verify(deviceMessageService, never()).sendDeviceMessage(any(), any(), any(), any(), any());
     }
 
     @Test
@@ -208,7 +209,7 @@ public class IotCoapUpstreamHandlerTest extends BaseMockitoUnitTest {
 
             // 放行：等透传 worker 处理完，迟到的结果丢弃，不再响应
             release.countDown();
-            ThreadPoolExecutor rawExecutor = getRawExecutor(deadlineHandler);
+            ThreadPoolExecutor rawExecutor = getWorkerExecutor(deadlineHandler);
             rawExecutor.shutdown();
             assertTrue(rawExecutor.awaitTermination(5, TimeUnit.SECONDS));
             owner.submit(() -> null).get(5, TimeUnit.SECONDS);
@@ -229,7 +230,7 @@ public class IotCoapUpstreamHandlerTest extends BaseMockitoUnitTest {
         gatewayProperties.getScript().setDeadline(Duration.ofMillis(100));
         IotCoapUpstreamHandler deadlineHandler = new IotCoapUpstreamHandler(SERVER_ID);
         mockRawPostRequest(CoAP.Type.NON);
-        ThreadPoolExecutor rawExecutor = getRawExecutor(deadlineHandler);
+        ThreadPoolExecutor rawExecutor = getWorkerExecutor(deadlineHandler);
         rawExecutor.setCorePoolSize(1);
         rawExecutor.setMaximumPoolSize(1);
         CountDownLatch blocked = new CountDownLatch(1);
@@ -272,7 +273,7 @@ public class IotCoapUpstreamHandlerTest extends BaseMockitoUnitTest {
             assertTrue(receivedCaptor.getValue() >= beginNanos);
             assertTrue(receivedCaptor.getValue() <= queuedNanos);
             assertTrue(nowAtCall.get(0) >= receivedCaptor.getValue() + TimeUnit.MILLISECONDS.toNanos(100));
-            verify(deviceMessageService, never()).sendDeviceMessage(any(), any(), any(), any());
+            verify(deviceMessageService, never()).sendDeviceMessage(any(), any(), any(), any(), any());
             verify(exchange, times(1)).respond(any(CoAP.ResponseCode.class), anyString(), anyInt());
         } finally {
             release.countDown();
@@ -284,7 +285,7 @@ public class IotCoapUpstreamHandlerTest extends BaseMockitoUnitTest {
     public void testHandle_rawPostRejected() {
         // 准备参数：透传 worker 拒绝（已关闭）
         mockRawPostRequest(CoAP.Type.NON);
-        getRawExecutor(handler).shutdown();
+        getWorkerExecutor(handler).shutdown();
 
         // 调用
         handler.handle(exchange);
@@ -329,13 +330,16 @@ public class IotCoapUpstreamHandlerTest extends BaseMockitoUnitTest {
         // 准备参数：raw/post 路径，但 content-format 不是 42：走 JSON 分支，交给标准路径（由它拒绝透传方法）
         mockRequest(RAW_POST_PATH, "{\"method\":\"thing.raw.post\"}".getBytes(StandardCharsets.UTF_8));
         when(options.getContentFormat()).thenReturn(MediaTypeRegistry.APPLICATION_JSON);
+        mockRequestType(CoAP.Type.NON);
 
         // 调用
         handler.handle(exchange);
 
         // 断言：不走透传
+        assertEquals(0, captureResponse().get("code"));
         verify(deviceMessageService, never()).sendRawMessage(any(), any(), any(), any(), any(), anyLong());
-        verify(deviceMessageService).sendDeviceMessage(any(), eq(PRODUCT_KEY), eq(DEVICE_NAME), eq(SERVER_ID));
+        verify(deviceMessageService).sendDeviceMessage(any(), eq(PRODUCT_KEY), eq(DEVICE_NAME), eq(SERVER_ID),
+                eq(IotProtocolTypeEnum.COAP));
         verify(exchange, never()).accept();
     }
 
@@ -343,22 +347,91 @@ public class IotCoapUpstreamHandlerTest extends BaseMockitoUnitTest {
 
     @Test
     public void testHandle_propertyPost() {
-        // 准备参数：JSON 属性上报
-        mockRequest(PROPERTY_POST_PATH, "{\"method\":\"thing.property.post\",\"params\":{\"t\":25}}"
+        // 准备参数：JSON 属性上报（CON）
+        mockRequest(PROPERTY_POST_PATH, "{\"id\":\"M3\",\"method\":\"thing.property.post\",\"params\":{\"t\":25}}"
                 .getBytes(StandardCharsets.UTF_8));
+        mockRequestType(CoAP.Type.CON);
 
         // 调用
         handler.handle(exchange);
 
-        // 断言：同步响应成功；按路径的设备身份交给标准路径，不走透传
-        assertEquals(0, captureResponse().get("code"));
+        // 断言：CON 先回空 ACK，再（在 worker 上）发送，最后以分离响应返回成功；按路径的设备身份交给标准路径，不走透传
+        Map<String, Object> json = captureResponse();
+        assertEquals(0, json.get("code"));
+        assertEquals("M3", ((Map<?, ?>) json.get("data")).get("messageId"));
         ArgumentCaptor<IotDeviceMessage> messageCaptor = ArgumentCaptor.forClass(IotDeviceMessage.class);
-        verify(deviceMessageService).sendDeviceMessage(messageCaptor.capture(), eq(PRODUCT_KEY), eq(DEVICE_NAME),
-                eq(SERVER_ID));
+        InOrder inOrder = inOrder(exchange, deviceMessageService);
+        inOrder.verify(exchange).accept();
+        inOrder.verify(deviceMessageService).sendDeviceMessage(messageCaptor.capture(), eq(PRODUCT_KEY),
+                eq(DEVICE_NAME), eq(SERVER_ID), eq(IotProtocolTypeEnum.COAP));
+        inOrder.verify(exchange).respond(any(CoAP.ResponseCode.class), anyString(), anyInt());
         assertEquals("thing.property.post", messageCaptor.getValue().getMethod());
         assertEquals(25, ((Map<?, ?>) messageCaptor.getValue().getParams()).get("t"));
         verify(deviceMessageService, never()).sendRawMessage(any(), any(), any(), any(), any(), anyLong());
-        verify(exchange, never()).accept();
+    }
+
+    @Test
+    public void testHandle_propertyPostNotBlocking() throws Exception {
+        // 准备参数
+        mockRequest(PROPERTY_POST_PATH, "{\"method\":\"thing.property.post\",\"params\":{}}"
+                .getBytes(StandardCharsets.UTF_8));
+        mockRequestType(CoAP.Type.NON);
+        // mock 方法：发送阻塞（消息总线、离线暂存），直到放行
+        CountDownLatch entered = new CountDownLatch(1);
+        CountDownLatch release = new CountDownLatch(1);
+        doAnswer(invocation -> {
+            entered.countDown();
+            assertTrue(release.await(10, TimeUnit.SECONDS));
+            return null;
+        }).when(deviceMessageService).sendDeviceMessage(any(), any(), any(), any(), any());
+
+        try {
+            // 调用：处理入口立即返回，不等待阻塞中的发送
+            handler.handle(exchange);
+            assertTrue(entered.await(5, TimeUnit.SECONDS));
+            verify(exchange, never()).respond(any(CoAP.ResponseCode.class), anyString(), anyInt());
+
+            // 放行后响应一次成功
+            release.countDown();
+            assertEquals(0, captureResponse().get("code"));
+        } finally {
+            release.countDown();
+        }
+    }
+
+    @Test
+    public void testHandle_propertyPostServiceException() {
+        // 准备参数
+        mockRequest(PROPERTY_POST_PATH, "{\"method\":\"thing.property.post\",\"params\":{}}"
+                .getBytes(StandardCharsets.UTF_8));
+        mockRequestType(CoAP.Type.NON);
+        // mock 方法：消息被消息总线拒绝
+        doThrow(exception(DEVICE_MESSAGE_REJECTED)).when(deviceMessageService)
+                .sendDeviceMessage(any(), any(), any(), any(), any());
+
+        // 调用
+        handler.handle(exchange);
+
+        // 断言：与原来的同步响应一致，返回错误码
+        Map<String, Object> json = captureResponse();
+        assertEquals(DEVICE_MESSAGE_REJECTED.getCode(), json.get("code"));
+        assertEquals(DEVICE_MESSAGE_REJECTED.getMsg(), json.get("msg"));
+    }
+
+    @Test
+    public void testHandle_propertyPostRejected() {
+        // 准备参数：worker 拒绝（已关闭）
+        mockRequest(PROPERTY_POST_PATH, "{\"method\":\"thing.property.post\",\"params\":{}}"
+                .getBytes(StandardCharsets.UTF_8));
+        mockRequestType(CoAP.Type.NON);
+        getWorkerExecutor(handler).shutdown();
+
+        // 调用
+        handler.handle(exchange);
+
+        // 断言：立即响应一次 429，不调用发送
+        assertEquals(TOO_MANY_REQUESTS.getCode(), captureResponse().get("code"));
+        verify(deviceMessageService, never()).sendDeviceMessage(any(), any(), any(), any(), any());
     }
 
     @Test
@@ -371,7 +444,7 @@ public class IotCoapUpstreamHandlerTest extends BaseMockitoUnitTest {
 
         // 断言：400，不投递
         assertEquals(BAD_REQUEST.getCode(), captureResponse().get("code"));
-        verify(deviceMessageService, never()).sendDeviceMessage(any(), any(), any(), any());
+        verify(deviceMessageService, never()).sendDeviceMessage(any(), any(), any(), any(), any());
     }
 
     @Test
@@ -385,7 +458,7 @@ public class IotCoapUpstreamHandlerTest extends BaseMockitoUnitTest {
 
         // 断言：400，不投递
         assertEquals(BAD_REQUEST.getCode(), captureResponse().get("code"));
-        verify(deviceMessageService, never()).sendDeviceMessage(any(), any(), any(), any());
+        verify(deviceMessageService, never()).sendDeviceMessage(any(), any(), any(), any(), any());
     }
 
     @Test
@@ -437,6 +510,11 @@ public class IotCoapUpstreamHandlerTest extends BaseMockitoUnitTest {
         // 请求：thing/raw/post、content-format 42
         mockRequest(RAW_POST_PATH, PAYLOAD);
         when(options.getContentFormat()).thenReturn(MediaTypeRegistry.APPLICATION_OCTET_STREAM);
+        mockRequestType(type);
+    }
+
+    private void mockRequestType(CoAP.Type type) {
+        // 请求：CON 或 NON
         when(exchange.advanced()).thenReturn(advancedExchange);
         when(advancedExchange.getRequest()).thenReturn(new Request(CoAP.Code.POST, type));
     }
@@ -469,10 +547,10 @@ public class IotCoapUpstreamHandlerTest extends BaseMockitoUnitTest {
     }
 
     /**
-     * 获取处理器的透传 worker
+     * 获取处理器的 worker（标准、透传共用）
      */
-    private static ThreadPoolExecutor getRawExecutor(IotCoapUpstreamHandler handler) {
-        return (ThreadPoolExecutor) ReflectUtil.getFieldValue(handler, "rawExecutor");
+    private static ThreadPoolExecutor getWorkerExecutor(IotCoapUpstreamHandler handler) {
+        return (ThreadPoolExecutor) ReflectUtil.getFieldValue(handler, "workerExecutor");
     }
 
 }

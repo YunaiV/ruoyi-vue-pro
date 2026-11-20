@@ -294,7 +294,7 @@ public class IotMqttProtocol implements IotProtocol {
         String topic = message.topicName();
         byte[] payload = message.payload().getBytes();
         upstreamHandler.handleBusinessRequest(endpoint, queue, topic, payload).onComplete(ar -> {
-            if (ar.failed()) { // 队列已满或已关闭：不确认，断开连接，由设备重连后重发
+            if (ar.failed()) { // 队列已满或已关闭、离线暂存失败、被消息总线永久拒绝：不确认，断开连接
                 log.error("[processMessage][消息处理失败，断开连接，客户端 ID: {}，地址: {}，错误: {}]",
                         clientId, connectionManager.getEndpointAddress(endpoint), ar.cause().getMessage());
                 endpoint.close();
