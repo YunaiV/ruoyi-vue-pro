@@ -55,20 +55,21 @@ public class SmsCodeServiceImpl implements SmsCodeService {
     }
 
     private String createSmsCode(String mobile, Integer scene, String ip) {
-        // 发送间隔按手机号 + 场景：登录刚发过，不应挡住改密 / 找回密码。
-        SmsCodeDO lastSameScene = smsCodeMapper.selectLastByMobile(mobile, null, scene);
-        if (lastSameScene != null
-                && LocalDateTimeUtil.between(lastSameScene.getCreateTime(), LocalDateTime.now()).toMillis()
+        // 校验发送间隔：按手机号 + 场景，避免刚发过登录验证码时挡住注册、找回密码等其它场景
+        SmsCodeDO lastSmsCode = smsCodeMapper.selectLastByMobile(mobile, null, null);
+        SmsCodeDO lastSceneSmsCode = lastSmsCode;
+        if (lastSmsCode != null && ObjUtil.notEqual(lastSmsCode.getScene(), scene)) { // 最后一条是其它场景，才需要单独查询本场景
+            lastSceneSmsCode = smsCodeMapper.selectLastByMobile(mobile, null, scene);
+        }
+        if (lastSceneSmsCode != null
+                && LocalDateTimeUtil.between(lastSceneSmsCode.getCreateTime(), LocalDateTime.now()).toMillis()
                         < smsCodeProperties.getSendFrequency().toMillis()) { // 发送过于频繁
             throw exception(SMS_CODE_SEND_TOO_FAST);
         }
-        // 每日上限仍按手机号全局计数，避免换场景绕过。
-        SmsCodeDO lastAnyScene = smsCodeMapper.selectLastByMobile(mobile, null, null);
-        if (lastAnyScene != null) {
-            if (isToday(lastAnyScene.getCreateTime()) && // 必须是今天，才能计算超过当天的上限
-                    lastAnyScene.getTodayIndex() >= smsCodeProperties.getSendMaximumQuantityPerDay()) { // 超过当天发送的上限。
-                throw exception(SMS_CODE_EXCEED_SEND_MAXIMUM_QUANTITY_PER_DAY);
-            }
+        // 校验当天发送上限：按手机号计数，不区分场景，避免切换场景绕过
+        if (lastSmsCode != null && isToday(lastSmsCode.getCreateTime()) // 必须是今天，才能计算超过当天的上限
+                && lastSmsCode.getTodayIndex() >= smsCodeProperties.getSendMaximumQuantityPerDay()) { // 超过当天发送的上限。
+            throw exception(SMS_CODE_EXCEED_SEND_MAXIMUM_QUANTITY_PER_DAY);
         }
         // 校验 IP 跨手机号的发送数量，手机号校验通过后才占用额度：先占当日额度，再占当前小时额度
         LocalDateTime now = LocalDateTime.now();
@@ -85,7 +86,7 @@ public class SmsCodeServiceImpl implements SmsCodeService {
         String code = String.format("%0" + smsCodeProperties.getEndCode().toString().length() + "d",
                 randomInt(smsCodeProperties.getBeginCode(), smsCodeProperties.getEndCode() + 1));
         SmsCodeDO newSmsCode = SmsCodeDO.builder().mobile(mobile).code(code).scene(scene)
-                .todayIndex(lastAnyScene != null && isToday(lastAnyScene.getCreateTime()) ? lastAnyScene.getTodayIndex() + 1 : 1)
+                .todayIndex(lastSmsCode != null && isToday(lastSmsCode.getCreateTime()) ? lastSmsCode.getTodayIndex() + 1 : 1)
                 .createIp(ip).used(false).build();
         smsCodeMapper.insert(newSmsCode);
         return code;
