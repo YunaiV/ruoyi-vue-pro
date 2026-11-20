@@ -28,6 +28,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Supplier;
 
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.BAD_REQUEST;
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.INTERNAL_SERVER_ERROR;
@@ -50,13 +51,13 @@ import static cn.iocoder.yudao.module.iot.gateway.enums.ErrorCodeConstants.SCRIP
 public class IotCoapUpstreamHandler extends IotCoapAbstractHandler {
 
     /**
-     * 透传 worker 的线程数：阻塞在 IO 上，取 CPU 核数的 2 倍
+     * worker 的线程数：阻塞在 IO 上，取 CPU 核数的 2 倍
      */
-    private static final int RAW_WORKER_THREADS = Runtime.getRuntime().availableProcessors() * 2;
+    private static final int WORKER_THREADS = Runtime.getRuntime().availableProcessors() * 2;
     /**
-     * 透传上报最多排队的请求数：超过时立即响应 429
+     * 上报最多排队的请求数（标准、透传共用）：超过时立即响应 429
      */
-    private static final int RAW_MAX_PENDING = 1024;
+    private static final int WORKER_MAX_PENDING = 1024;
 
     private final String serverId;
 
@@ -71,11 +72,12 @@ public class IotCoapUpstreamHandler extends IotCoapAbstractHandler {
     private final ScheduledExecutorService deadlineTimer = Executors.newSingleThreadScheduledExecutor(
             new NamedThreadFactory("iot-coap-raw-deadline-", true));
     /**
-     * 透传上报的 worker（有界）：解析与发送会阻塞，不能占着 Californium 处理请求的线程（Exchange 的响应排在它之后）
+     * 上报的 worker（有界，标准、透传共用）：解析、发送消息总线、写入离线暂存会阻塞，
+     * 不能占着 Californium 处理请求的线程（Exchange 的响应排在它之后）
      */
-    private final ThreadPoolExecutor rawExecutor = new ThreadPoolExecutor(RAW_WORKER_THREADS, RAW_WORKER_THREADS,
-            60, TimeUnit.SECONDS, new LinkedBlockingQueue<>(RAW_MAX_PENDING),
-            new NamedThreadFactory("iot-coap-raw-", true));
+    private final ThreadPoolExecutor workerExecutor = new ThreadPoolExecutor(WORKER_THREADS, WORKER_THREADS,
+            60, TimeUnit.SECONDS, new LinkedBlockingQueue<>(WORKER_MAX_PENDING),
+            new NamedThreadFactory("iot-coap-worker-", true));
 
     private final IotDeviceMessageService deviceMessageService;
 
@@ -83,7 +85,7 @@ public class IotCoapUpstreamHandler extends IotCoapAbstractHandler {
         this.serverId = serverId;
         this.deadline = SpringUtil.getBean(IotGatewayProperties.class).getScript().getDeadline();
         this.deviceMessageService = SpringUtil.getBean(IotDeviceMessageService.class);
-        this.rawExecutor.allowCoreThreadTimeOut(true);
+        this.workerExecutor.allowCoreThreadTimeOut(true);
     }
 
     @Override
@@ -98,16 +100,39 @@ public class IotCoapUpstreamHandler extends IotCoapAbstractHandler {
         if (isRawPost(exchange, method)) {
             return handleRawPost(exchange, productKey, deviceName);
         }
-        // 1.3 解析消息
+        // 1.3 解析消息：不合法时由基类同步响应
         IotDeviceMessage message = deserializeRequest(exchange, IotDeviceMessage.class);
         Assert.notNull(message, "请求参数不能为空");
         Assert.equals(method, message.getMethod(), "method 不匹配");
 
-        // 2. 发送消息
-        deviceMessageService.sendDeviceMessage(message, productKey, deviceName, serverId);
+        // 2. 发送消息：会阻塞（发送消息总线、写入离线暂存），交给 worker 处理，以分离响应返回
+        return handleStandardPost(exchange, message, productKey, deviceName);
+    }
 
-        // 3. 返回结果
-        return CommonResult.success(MapUtil.of("messageId", message.getId()));
+    /**
+     * 标准上报：发送交给 worker，不阻塞 Californium 处理请求的线程；结果（含失败）与原来的同步响应一致，没有截止计时
+     */
+    private CommonResult<Object> handleStandardPost(CoapExchange exchange, IotDeviceMessage message,
+                                                    String productKey, String deviceName) {
+        // 1. CON 请求：先回空 ACK，避免处理期间设备重传；之后的响应作为分离响应发送
+        if (exchange.advanced().getRequest().isConfirmable()) {
+            exchange.accept();
+        }
+
+        // 2. 交给 worker：队列已满时立即响应
+        AtomicBoolean responded = new AtomicBoolean();
+        try {
+            workerExecutor.execute(() -> writeAsyncResponse(exchange, responded,
+                    invoke(productKey, deviceName, () -> {
+                        deviceMessageService.sendDeviceMessage(message, productKey, deviceName, serverId,
+                                IotProtocolTypeEnum.COAP);
+                        return message.getId();
+                    })));
+        } catch (RejectedExecutionException e) {
+            log.warn("[handleStandardPost][productKey({}) deviceName({}) 上报积压，拒绝处理]", productKey, deviceName);
+            writeAsyncResponse(exchange, responded, CommonResult.error(TOO_MANY_REQUESTS));
+        }
+        return ASYNC_RESPONSE;
     }
 
     /**
@@ -124,7 +149,7 @@ public class IotCoapUpstreamHandler extends IotCoapAbstractHandler {
      * 透传上报：身份来自前置认证（token 与路径一致），与 JSON 分支相同
      * <p>
      * Californium 在 Exchange 的串行执行器上处理请求，其它线程写的响应要排在本次处理之后才发出；
-     * 所以这里不阻塞：解析与发送交给透传 worker，立即返回。截止计时归协议：到期先返回超时（101），
+     * 所以这里不阻塞：解析与发送交给 worker，立即返回。截止计时归协议：到期先返回超时（101），
      * 之后完成的结果丢弃，只响应一次。已开始的投递无法撤销；其它情况由 service 的截止检查决定是否投递，超时响应不等待它
      */
     private CommonResult<Object> handleRawPost(CoapExchange exchange, String productKey, String deviceName) {
@@ -136,66 +161,66 @@ public class IotCoapUpstreamHandler extends IotCoapAbstractHandler {
         // 2. 应答计时：在计时器线程上到期响应；截止时间从收到（交给 worker 之前）开始计算
         AtomicBoolean responded = new AtomicBoolean();
         long receivedNanos = System.nanoTime();
-        ScheduledFuture<?> timer = deadlineTimer.schedule(() -> writeRawResponse(exchange, responded,
+        ScheduledFuture<?> timer = deadlineTimer.schedule(() -> writeAsyncResponse(exchange, responded,
                 CommonResult.error(SCRIPT_TIMEOUT)), deadline.toNanos(), TimeUnit.NANOSECONDS);
 
-        // 3. 交给透传 worker：按产品的数据解析脚本 decode 后发送；队列已满时立即响应
+        // 3. 交给 worker：按产品的数据解析脚本 decode 后发送；队列已满时立即响应
         byte[] payload = exchange.getRequestPayload();
         try {
-            rawExecutor.execute(() -> {
+            workerExecutor.execute(() -> {
                 // 排队期间已到截止时，由 service 的截止分支处理：不执行脚本、不投递，只记错误日志；
                 // 超时响应已由计时器写出，这里的结果被门闩丢弃
-                CommonResult<Object> result = sendRawMessage(payload, productKey, deviceName, receivedNanos);
+                CommonResult<Object> result = invoke(productKey, deviceName, () -> deviceMessageService.sendRawMessage(
+                        payload, productKey, deviceName, serverId, IotProtocolTypeEnum.COAP, receivedNanos));
                 timer.cancel(false);
-                writeRawResponse(exchange, responded, result);
+                writeAsyncResponse(exchange, responded, result);
             });
         } catch (RejectedExecutionException e) {
             log.warn("[handleRawPost][productKey({}) deviceName({}) 透传上报积压，拒绝处理]", productKey, deviceName);
             timer.cancel(false);
-            writeRawResponse(exchange, responded, CommonResult.error(TOO_MANY_REQUESTS));
+            writeAsyncResponse(exchange, responded, CommonResult.error(TOO_MANY_REQUESTS));
         }
         return ASYNC_RESPONSE;
     }
 
     /**
-     * 发送透传上报（透传 worker 上执行）：结果（含失败）转为响应，与基类的异常处理一致
+     * 发送上报（worker 上执行）：结果（含失败）转为响应，与基类的异常处理一致
+     *
+     * @param sender 发送，返回消息编号
      */
-    private CommonResult<Object> sendRawMessage(byte[] payload, String productKey, String deviceName,
-                                                long receivedNanos) {
+    private CommonResult<Object> invoke(String productKey, String deviceName, Supplier<String> sender) {
         try {
-            String messageId = deviceMessageService.sendRawMessage(payload, productKey, deviceName, serverId,
-                    IotProtocolTypeEnum.COAP, receivedNanos);
-            return CommonResult.success(MapUtil.of("messageId", messageId));
+            return CommonResult.success(MapUtil.of("messageId", sender.get()));
         } catch (ServiceException e) {
             return CommonResult.error(e.getCode(), e.getMessage());
         } catch (IllegalArgumentException e) {
             return CommonResult.error(BAD_REQUEST.getCode(), e.getMessage());
         } catch (Exception e) {
-            log.error("[sendRawMessage][productKey({}) deviceName({}) 处理异常]", productKey, deviceName, e);
+            log.error("[invoke][productKey({}) deviceName({}) 处理异常]", productKey, deviceName, e);
             return CommonResult.error(INTERNAL_SERVER_ERROR);
         }
     }
 
     /**
-     * 写透传上报的响应：截止计时器与处理线程竞争，只有第一个响应，迟到的结果丢弃
+     * 写异步的响应：只响应一次（透传上报的截止计时器与处理线程竞争），迟到的结果丢弃
      */
-    private void writeRawResponse(CoapExchange exchange, AtomicBoolean responded, CommonResult<Object> result) {
+    private void writeAsyncResponse(CoapExchange exchange, AtomicBoolean responded, CommonResult<Object> result) {
         if (!responded.compareAndSet(false, true)) {
-            log.warn("[writeRawResponse][已响应（超时），丢弃结果({})]", result.getCode());
+            log.warn("[writeAsyncResponse][已响应（超时），丢弃结果({})]", result.getCode());
             return;
         }
         try {
             writeResponse(exchange, result);
         } catch (Exception e) {
-            log.error("[writeRawResponse][写响应异常]", e);
+            log.error("[writeAsyncResponse][写响应异常]", e);
         }
     }
 
     /**
-     * 停止：关闭透传 worker（排队中的不再执行）与截止计时器
+     * 停止：关闭 worker（排队中的不再执行）与截止计时器
      */
     public void stop() {
-        rawExecutor.shutdownNow();
+        workerExecutor.shutdownNow();
         deadlineTimer.shutdownNow();
     }
 
