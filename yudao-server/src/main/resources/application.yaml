@@ -142,6 +142,12 @@ spring:
     # Kafka Consumer Listener 监听器配置
     listener:
       missing-topics-fatal: false # 消费监听接口监听的主题不存在时，默认会报错。所以通过设置为 false ，解决报错
+  # RabbitMQ 配置项，对应 RabbitProperties 配置类（服务地址见 application-{profile}.yaml）
+  rabbitmq:
+    publisher-confirm-type: correlated # 开启 publisher confirm：IoT 消息总线为 rabbitmq 时，补传 pack 拆出的消息需要确认发送
+    publisher-returns: true # 开启 return：同上，判断消息是否无法路由
+    template:
+      mandatory: false # 普通发送保持不开启 mandatory（publisher-returns 开启时默认为 true）；确认发送使用独立的 RabbitTemplate
 
 --- #################### AI 相关配置 ####################
 

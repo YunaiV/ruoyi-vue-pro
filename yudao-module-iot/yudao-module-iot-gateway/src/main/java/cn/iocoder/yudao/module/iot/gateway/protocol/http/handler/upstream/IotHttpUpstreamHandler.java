@@ -71,7 +71,7 @@ public class IotHttpUpstreamHandler extends IotHttpAbstractHandler {
 
         // 2. 发送消息：获取设备、发送总线会阻塞，交给 worker 执行，完成后在 event loop 上响应（与原来一样等发送完成）
         context.vertx().executeBlocking(() -> {
-            deviceMessageService.sendDeviceMessage(message, productKey, deviceName, serverId);
+            deviceMessageService.sendDeviceMessage(message, productKey, deviceName, serverId, IotProtocolTypeEnum.HTTP);
             return message.getId();
         }, false).onComplete(ar -> writeAsyncResponse(context, buildResult(context, ar)));
         return ASYNC_RESPONSE;

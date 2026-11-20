@@ -86,6 +86,28 @@ public class IotDeviceMessageUtils {
                 && StrUtil.equals(getIdentifier(message), String.valueOf(IotDeviceStateEnum.OFFLINE.getState()));
     }
 
+    // ========== 离线暂存（spool）相关 ==========
+
+    /**
+     * 是否是补传的消息：经网关的离线暂存补传
+     *
+     * @param message 消息
+     * @return 是否
+     */
+    public static boolean isSpooled(IotDeviceMessage message) {
+        return message.getSpoolTime() != null;
+    }
+
+    /**
+     * 获得补传消息的历史时间：网关接收时刻，不晚于当前时间（避免网关时钟偏快，写入未来的时间）
+     *
+     * @param message 补传的消息
+     * @return 毫秒时间戳
+     */
+    public static long getSpoolTimeNotAfterNow(IotDeviceMessage message) {
+        return Math.min(message.getSpoolTime(), System.currentTimeMillis());
+    }
+
     // ========== 透传（raw）相关 ==========
 
     /**

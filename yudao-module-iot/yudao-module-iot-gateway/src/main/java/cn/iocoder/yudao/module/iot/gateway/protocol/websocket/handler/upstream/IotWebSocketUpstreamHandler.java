@@ -235,10 +235,10 @@ public class IotWebSocketUpstreamHandler implements Handler<ServerWebSocket> {
             return;
         }
 
-        // 2. 发送消息到消息总线（worker）：成功不应答（与原来一致）；失败回到 event loop 应答错误
+        // 2. 发送消息到消息总线（worker）：成功不应答（与原来一致）；失败（含离线暂存失败）回到 event loop 应答错误
         queue.submit(() -> {
             deviceMessageService.sendDeviceMessage(message, connectionInfo.getProductKey(),
-                    connectionInfo.getDeviceName(), serverId);
+                    connectionInfo.getDeviceName(), serverId, IotProtocolTypeEnum.WEBSOCKET);
             return null;
         }).onComplete(ar -> {
             if (ar.succeeded()) {

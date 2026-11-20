@@ -263,6 +263,33 @@ public class IotDevicePropertyServiceImplTest extends BaseMockitoUnitTest {
         assertTrue(tsCaptor.getValue() >= before && tsCaptor.getValue() <= after);
     }
 
+    @Test
+    public void testSaveDeviceProperty_spooled() {
+        // 准备参数：补传的消息，网关接收时刻在 1 小时前，并带有历史定位
+        IotDeviceDO device = buildDevice();
+        IotThingModelDO thingModel = buildThingModel("Temperature", IotDataSpecsDataTypeEnum.INT.getDataType());
+        Map<String, Object> params = new HashMap<>();
+        params.put("Temperature", 36);
+        params.put("GeoLocation", MapUtil.of("Longitude", 120));
+        long spoolTime = System.currentTimeMillis() - 3600 * 1000L;
+        IotDeviceMessage message = buildMessage(params).setReportTime(LocalDateTimeUtil.of(spoolTime))
+                .setSpoolTime(spoolTime);
+
+        // mock 方法
+        when(thingModelService.getThingModelListByProductIdFromCache(device.getProductId()))
+                .thenReturn(singletonList(thingModel));
+        when(thingModelService.convertThingModelPropertyValue(thingModel, 36)).thenReturn(36);
+
+        // 调用
+        service.saveDeviceProperty(device, message);
+
+        // 断言：历史时间为网关接收时刻；最新值只覆盖更早的值；不更新当前定位
+        verify(devicePropertyDAO).insert(eq(device), eq(MapUtil.of("Temperature", 36)), eq(spoolTime), eq(spoolTime));
+        verify(deviceDataRedisDAO).putAllIfLater(eq(device.getId()), any());
+        verify(deviceDataRedisDAO, never()).putAll(anyLong(), any());
+        verify(deviceService, never()).updateDeviceLocation(any(), any(), any());
+    }
+
     // ========== getHistoryDevicePropertyList ==========
 
     @Test

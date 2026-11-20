@@ -13,6 +13,9 @@ import io.vertx.core.Future;
 import io.vertx.mqtt.MqttEndpoint;
 import lombok.extern.slf4j.Slf4j;
 
+import static cn.iocoder.yudao.module.iot.gateway.enums.ErrorCodeConstants.DEVICE_MESSAGE_REJECTED;
+import static cn.iocoder.yudao.module.iot.gateway.enums.ErrorCodeConstants.DEVICE_MESSAGE_SPOOL_REJECTED;
+
 /**
  * IoT 网关 MQTT 上行消息处理器：处理业务消息（属性上报、事件上报等）
  *
@@ -34,7 +37,7 @@ public class IotMqttUpstreamHandler extends IotMqttAbstractHandler {
      * 处理业务消息
      * <p>
      * 在 event loop 上校验主题与身份；反序列化、透传解析、发送消息会阻塞，交给本连接的 worker 队列按顺序执行。
-     * 处理失败、校验不通过只记录日志（与原来一致，照常确认）；只有队列已满或已关闭时返回失败的 Future
+     * 处理失败、校验不通过只记录日志（与原来一致，照常确认）；队列已满或已关闭、离线暂存失败时返回失败的 Future（不确认）
      *
      * @param endpoint MQTT 连接端点
      * @param queue    本连接的 worker 队列
@@ -85,6 +88,12 @@ public class IotMqttUpstreamHandler extends IotMqttAbstractHandler {
                     handleStandardRequest(clientId, topic, productKey, deviceName, payload);
                 }
             } catch (Exception e) {
+                // 离线暂存失败、被消息总线永久拒绝：消息没有进入消息总线，也没有暂存，不能确认，交给调用方断开连接
+                if (isNotAcknowledged(e)) {
+                    log.error("[handleBusinessRequest][消息未进入消息总线，不确认，客户端 ID: {}，主题: {}，错误: {}]",
+                            clientId, topic, e.getMessage());
+                    throw e;
+                }
                 log.error("[handleBusinessRequest][消息处理异常，客户端 ID: {}，主题: {}，错误: {}]",
                         clientId, topic, e.getMessage(), e);
             }
@@ -114,7 +123,7 @@ public class IotMqttUpstreamHandler extends IotMqttAbstractHandler {
         IotMqttTopicUtils.normalizeReplyMethod(message);
 
         // 2. 处理业务消息
-        deviceMessageService.sendDeviceMessage(message, productKey, deviceName, serverId);
+        deviceMessageService.sendDeviceMessage(message, productKey, deviceName, serverId, IotProtocolTypeEnum.MQTT);
         log.debug("[handleStandardRequest][消息处理成功，客户端 ID: {}，主题: {}]", clientId, topic);
     }
 
@@ -128,9 +137,24 @@ public class IotMqttUpstreamHandler extends IotMqttAbstractHandler {
             deviceMessageService.sendRawMessage(payload, productKey, deviceName, serverId, IotProtocolTypeEnum.MQTT,
                     receivedNanos);
         } catch (ServiceException e) {
+            // 离线暂存失败、被消息总线永久拒绝：交给外层，不确认
+            if (isNotAcknowledged(e)) {
+                throw e;
+            }
             log.warn("[handleRawRequest][透传上报处理失败，productKey: {}，deviceName: {}，数据长度: {} 字节，错误: {}]",
                     productKey, deviceName, payload.length, e.getMessage());
         }
+    }
+
+    /**
+     * 是否不能确认（PUBACK / PUBREC）：离线暂存失败、被消息总线永久拒绝（例如说超过大小限制），消息都没有进入消息总线
+     */
+    private static boolean isNotAcknowledged(Exception e) {
+        if (!(e instanceof ServiceException)) {
+            return false;
+        }
+        Integer code = ((ServiceException) e).getCode();
+        return DEVICE_MESSAGE_SPOOL_REJECTED.getCode().equals(code) || DEVICE_MESSAGE_REJECTED.getCode().equals(code);
     }
 
 }
