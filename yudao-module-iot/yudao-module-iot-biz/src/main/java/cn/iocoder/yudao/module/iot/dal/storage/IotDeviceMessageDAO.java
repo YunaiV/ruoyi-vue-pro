@@ -11,14 +11,15 @@ import java.util.*;
 /**
  * IoT 设备【消息】日志的存储 DAO 接口
  *
- * 由 yudao.iot.storage.type 选择 TDengine、IoTDB 其中一个实现。各实现的消息身份不同：
+ * 由 yudao.iot.storage.type 选择 TDengine、IoTDB、QuestDB 其中一个实现。各实现的消息身份不同：
  * 1. TDengine：(deviceId, ts, id)，按 ts DESC, id DESC 排序。同一设备、同一毫秒、不同 id 的消息都会保留
  * 2. IoTDB：(deviceId, ts)，id 为普通字段，按 ts DESC 排序。同一设备、同一毫秒再次写入时，后写的整行替换先写的，即使 id 不同。
  *    原因：id 作为 TAG 时，每个设备下每出现一个新的消息 id，就产生一个 IoTDB 元数据设备，元数据随消息量无限增长
+ * 3. QuestDB：(deviceId, ts, id)，与 TDengine 一致，由 DEDUP UPSERT KEYS 保证；按 ts DESC, id DESC 排序
  *
  * 重复写入时：
- * 1. 相同 (deviceId, ts, id)：两者都只保留一行。IoTDB 由编码保证整行替换（null 字段也会清空旧值）；TDengine 沿用原有写入语义
- * 2. 重投、重发等重新获取 ts 的写入，按各自的物理键判断：TDengine 为 (deviceId, ts, id)，与已有行都不同时新增，否则覆盖该行；
+ * 1. 相同 (deviceId, ts, id)：都只保留一行。IoTDB 由编码保证整行替换（null 字段也会清空旧值）；QuestDB 由 DEDUP 整行替换；TDengine 沿用原有写入语义
+ * 2. 重投、重发等重新获取 ts 的写入，按各自的物理键判断：TDengine、QuestDB 为 (deviceId, ts, id)，与已有行都不同时新增，否则覆盖该行；
  *    IoTDB 为 (deviceId, ts)，该设备该毫秒没有行时新增，已有行时覆盖该行（可能是另一条消息）
  *
  * @author 芋道源码
