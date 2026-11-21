@@ -5,7 +5,6 @@ import cn.iocoder.yudao.module.iot.core.biz.dto.IotOpcUaDeviceConfigListReqDTO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceOpcUaConfigDO;
 import jakarta.validation.Valid;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -45,12 +44,5 @@ public interface IotDeviceOpcUaConfigService {
      * @return OPC UA 连接配置列表
      */
     List<IotDeviceOpcUaConfigDO> getDeviceOpcUaConfigList(IotOpcUaDeviceConfigListReqDTO listReqDTO);
-
-    /**
-     * 按设备编号逻辑删除 OPC UA 连接配置（删除设备时级联调用）
-     *
-     * @param deviceIds 设备编号集合
-     */
-    void deleteDeviceOpcUaConfigListByDeviceIds(Collection<Long> deviceIds);
 
 }

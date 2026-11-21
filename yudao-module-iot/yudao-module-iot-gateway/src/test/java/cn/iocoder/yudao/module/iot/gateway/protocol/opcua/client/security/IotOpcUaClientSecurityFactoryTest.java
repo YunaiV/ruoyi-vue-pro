@@ -19,11 +19,13 @@ import org.eclipse.milo.opcua.stack.core.types.enumerated.MessageSecurityMode;
 import org.eclipse.milo.opcua.stack.core.types.enumerated.UserTokenType;
 import org.eclipse.milo.opcua.stack.core.types.structured.EndpointDescription;
 import org.eclipse.milo.opcua.stack.core.types.structured.UserTokenPolicy;
+import org.eclipse.milo.opcua.stack.core.util.CertificateUtil;
 import org.eclipse.milo.opcua.stack.core.util.SelfSignedCertificateBuilder;
 import org.eclipse.milo.opcua.stack.core.util.SelfSignedCertificateGenerator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.nio.file.Files;
@@ -359,6 +361,46 @@ public class IotOpcUaClientSecurityFactoryTest {
         assertEquals(leaf, reloaded.getCertificateChain()[0]);
         assertEquals(intermediate, reloaded.getCertificateChain()[1]);
         assertEquals("urn:test:leaf", reloaded.getApplicationUri());
+    }
+
+    @Test
+    public void testInitialize_customAliasAndApplicationName() throws Exception {
+        IotOpcUaClientConfig config = new IotOpcUaClientConfig();
+        config.setPkiDir(pkiDir.toString());
+        config.setKeystorePassword("p1");
+        config.setKeystoreAlias("gateway-1");
+        config.setApplicationName("Gateway 1");
+        // 首次生成：证书放在配置的别名下，CN 为配置的应用名称；应用 URI 与证书 SAN 一致
+        IotOpcUaClientSecurityFactory factory = new IotOpcUaClientSecurityFactory(config);
+        factory.initialize();
+        factory.close();
+        Path keystoreFile = pkiDir.resolve("own").resolve("client.pfx");
+        KeyStore keyStore = KeyStore.getInstance("PKCS12");
+        try (InputStream in = Files.newInputStream(keystoreFile)) {
+            keyStore.load(in, "p1".toCharArray());
+        }
+        assertTrue(keyStore.isKeyEntry("gateway-1"));
+        X509Certificate cert = factory.getCertificateChain()[0];
+        assertTrue(cert.getSubjectX500Principal().getName().contains("CN=Gateway 1"));
+        assertEquals(CertificateUtil.getSanUri(cert).orElseThrow(), factory.getApplicationUri());
+        assertTrue(factory.getApplicationUri().startsWith("urn:yudao:iot:gateway:opc-ua-client:"));
+
+        // 修改别名：不重新生成、不覆盖原有证书，启动失败
+        byte[] keystoreBytes = Files.readAllBytes(keystoreFile);
+        config.setKeystoreAlias("gateway-2");
+        ServiceException exception = assertThrows(ServiceException.class,
+                () -> new IotOpcUaClientSecurityFactory(config).initialize());
+        assertTrue(exception.getMessage().contains("gateway-2"));
+        assertArrayEquals(keystoreBytes, Files.readAllBytes(keystoreFile));
+
+        // 修改应用名称：照常加载原有证书，证书、应用 URI 不变
+        config.setKeystoreAlias("gateway-1");
+        config.setApplicationName("Gateway 1 renamed");
+        IotOpcUaClientSecurityFactory reloaded = new IotOpcUaClientSecurityFactory(config);
+        reloaded.initialize();
+        reloaded.close();
+        assertEquals(cert, reloaded.getCertificateChain()[0]);
+        assertEquals(factory.getApplicationUri(), reloaded.getApplicationUri());
     }
 
     @Test

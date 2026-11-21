@@ -226,6 +226,8 @@ yudao:
             tenant-ids: []                  # 租户白名单（可选）：非空时只采集这些租户的设备
             pki-dir: data/opc-ua/pki        # PKI 目录：own/client.pfx、trusted/certs、issuer/certs、rejected
             keystore-password: ${IOT_OPC_UA_KEYSTORE_PASSWORD:}  # 客户端 keystore 口令（必填，建议通过环境变量注入）
+            keystore-alias: yudao-opc-ua-client # keystore 中客户端证书的别名（放入 CA 签发的证书时，私钥和证书链放在该别名下）
+            application-name: Yudao IoT Gateway OPC UA Client # 应用名称（会话 ApplicationName、新生成证书的 CN；多网关时便于服务端区分）
             security-none-allowed: false    # 是否允许 None 安全策略（只用于开发联调，且只能匿名）
             endpoint-host-rewrite: false    # 服务端返回的端点主机、端口与配置不一致时，是否改写为配置的
             max-nodes-per-read: 100         # 每次 Read 的最大节点数（与服务端 OperationLimits 取较小值）

@@ -70,26 +70,31 @@ import static cn.iocoder.yudao.module.iot.gateway.enums.ErrorCodeConstants.OPC_U
 import static cn.iocoder.yudao.module.iot.gateway.enums.ErrorCodeConstants.OPC_UA_SECURITY_INIT_FAILED;
 import static org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.Unsigned.uint;
 
-// TODO @AI：有没一些库，可以简化这块代码，类似 hutool 里，或者其它的；
 /**
  * IoT OPC UA 客户端安全工厂：客户端证书、信任列表、设备配置校验、端点选择和创建 {@link OpcUaClient}
  * <p>
- * 1. 客户端证书：pkiDir/own/client.pfx（PKCS12），不存在时生成自签名证书（文件权限仅属主可读写）；
+ * 1. 客户端证书：pkiDir/own/client.pfx（PKCS12，条目别名为 keystore-alias），不存在时生成自签名证书（文件权限仅属主可读写）；
  *    读取失败时协议启动失败，不回退匿名；运维放入的 CA 签发证书保留完整证书链；
  * 2. 信任列表：pkiDir/trusted、pkiDir/issuer，未信任的服务端证书放进 pkiDir/rejected，人工移入 trusted/certs 后生效；
- * 3. 端点选择严格匹配安全策略 URI、安全模式和 TCP 传输；主机、端口与配置不一致时默认拒绝
+ * 3. 端点选择严格匹配安全策略 URI、安全模式和 TCP 传输；主机、端口与配置不一致时默认拒绝；
+ * 4. 已复用 Milo 的 FileBasedTrustListManager、DefaultClientCertificateValidator、SelfSignedCertificateBuilder、
+ *    CertificateUtil、EndpointUtil、DiscoveryClient；keystore 的加载与 0600 权限、证书链校验、端点严格选择是安全约束，
+ *    Hutool 没有等价实现，Milo 的 KeyStoreCertificateStore 面向服务端证书组（按证书类型命名别名），不能直接替换
  *
  * @author 芋道源码
  */
 @Slf4j
 public class IotOpcUaClientSecurityFactory {
 
+    /**
+     * keystore 类型：固定 PKCS12（JDK 9+ 默认类型，JKS 已不推荐）
+     */
     private static final String KEYSTORE_TYPE = "PKCS12";
-    // TODO @AI：你看看哪些，应该写到配置文件里
-    private static final String KEYSTORE_ALIAS = "yudao-opc-ua-client";
-    // TODO @AI：你看看哪些，应该写到配置文件里
-    private static final String APPLICATION_NAME = "Yudao IoT Gateway OPC UA Client";
-    // TODO @AI：你看看哪些，应该写到配置文件里
+    /**
+     * 产品 URI：OPC UA 规范中标识软件产品，与网关实例无关，固定不开放配置
+     * <p>
+     * 应用 URI 不单独配置：自签名证书为 PRODUCT_URI:主机名，运维放入的证书取 SAN 中的 URI（两者必须一致，否则服务端拒绝）
+     */
     private static final String PRODUCT_URI = "urn:yudao:iot:gateway:opc-ua-client";
     /**
      * keystore 文件权限：只有属主可读写
@@ -159,28 +164,27 @@ public class IotOpcUaClientSecurityFactory {
 
     private void loadOrCreateKeyStore(Path file) throws Exception {
         char[] password = config.getKeystorePassword().toCharArray();
+        String alias = config.getKeystoreAlias();
         KeyStore keyStore = KeyStore.getInstance(KEYSTORE_TYPE);
         // 1. 已存在：读取失败直接抛出（不覆盖、不回退匿名）
         if (Files.exists(file)) {
             try (InputStream in = Files.newInputStream(file)) {
                 keyStore.load(in, password);
             }
-            Key key = keyStore.getKey(KEYSTORE_ALIAS, password);
+            Key key = keyStore.getKey(alias, password);
             if (!(key instanceof PrivateKey privateKey)) {
-                throw new IllegalStateException("keystore 中没有私钥: " + KEYSTORE_ALIAS);
+                // 不重新生成：别名与 keystore 不一致时启动失败，由运维核对 keystore-alias
+                throw new IllegalStateException("keystore 中没有别名为 " + alias + " 的私钥，请核对 keystore-alias");
             }
             // 证书链：叶子证书在前，保留中间 CA，握手时一并发送给服务端
-            Certificate[] chain = keyStore.getCertificateChain(KEYSTORE_ALIAS);
+            Certificate[] chain = keyStore.getCertificateChain(alias);
             if (chain == null || chain.length == 0 || !(chain[0] instanceof X509Certificate)) {
-                throw new IllegalStateException("keystore 中没有客户端证书: " + KEYSTORE_ALIAS);
+                throw new IllegalStateException("keystore 中没有客户端证书: " + alias);
             }
-            X509Certificate[] certificates = new X509Certificate[chain.length];
-            for (int i = 0; i < chain.length; i++) {
-                if (!(chain[i] instanceof X509Certificate x509)) {
-                    throw new IllegalStateException("客户端证书链中有非 X.509 证书: " + KEYSTORE_ALIAS);
-                }
-                certificates[i] = x509;
+            if (!Arrays.stream(chain).allMatch(X509Certificate.class::isInstance)) {
+                throw new IllegalStateException("客户端证书链中有非 X.509 证书: " + alias);
             }
+            X509Certificate[] certificates = Arrays.copyOf(chain, chain.length, X509Certificate[].class);
             X509Certificate cert = certificates[0];
             this.keyPair = new KeyPair(cert.getPublicKey(), privateKey);
             this.certificate = cert;
@@ -196,11 +200,11 @@ public class IotOpcUaClientSecurityFactory {
         String uri = PRODUCT_URI + ":" + hostname;
         KeyPair newKeyPair = SelfSignedCertificateGenerator.generateRsaKeyPair(2048);
         X509Certificate cert = new SelfSignedCertificateBuilder(newKeyPair)
-                .setCommonName(APPLICATION_NAME).setOrganization("yudao")
+                .setCommonName(config.getApplicationName()).setOrganization("yudao")
                 .setApplicationUri(uri).addDnsName(hostname)
                 .build();
         keyStore.load(null, password);
-        keyStore.setKeyEntry(KEYSTORE_ALIAS, newKeyPair.getPrivate(), password, new X509Certificate[]{cert});
+        keyStore.setKeyEntry(alias, newKeyPair.getPrivate(), password, new X509Certificate[]{cert});
         Files.createDirectories(file.getParent());
         createOwnerOnlyFile(file);
         try (OutputStream out = Files.newOutputStream(file, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING)) {
@@ -348,7 +352,7 @@ public class IotOpcUaClientSecurityFactory {
 
         // 3. 创建客户端
         OpcUaClientConfig clientConfig = OpcUaClientConfig.builder()
-                .setApplicationName(LocalizedText.english(APPLICATION_NAME))
+                .setApplicationName(LocalizedText.english(config.getApplicationName()))
                 .setApplicationUri(applicationUri)
                 .setProductUri(PRODUCT_URI)
                 .setKeyPair(keyPair)

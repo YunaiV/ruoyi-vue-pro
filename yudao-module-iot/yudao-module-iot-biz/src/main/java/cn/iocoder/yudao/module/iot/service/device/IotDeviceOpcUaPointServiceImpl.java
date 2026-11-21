@@ -151,9 +151,4 @@ public class IotDeviceOpcUaPointServiceImpl implements IotDeviceOpcUaPointServic
         return result;
     }
 
-    @Override
-    public void deleteDeviceOpcUaPointListByDeviceIds(Collection<Long> deviceIds) {
-        opcUaPointMapper.deleteByDeviceIds(deviceIds);
-    }
-
 }

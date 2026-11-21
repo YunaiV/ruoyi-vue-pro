@@ -41,8 +41,4 @@ public interface IotDeviceOpcUaPointMapper extends BaseMapperX<IotDeviceOpcUaPoi
                 .orderByAsc(IotDeviceOpcUaPointDO::getId));
     }
 
-    default void deleteByDeviceIds(Collection<Long> deviceIds) {
-        deleteBatch(IotDeviceOpcUaPointDO::getDeviceId, deviceIds);
-    }
-
 }
