@@ -4,6 +4,7 @@ package cn.iocoder.yudao.module.bpm.service.oa;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.module.bpm.controller.admin.oa.vo.BpmOALeaveCreateReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.oa.vo.BpmOALeavePageReqVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.oa.vo.BpmOALeaveUpdateReqVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.oa.BpmOALeaveDO;
 
 import jakarta.validation.Valid;
@@ -24,6 +25,13 @@ public interface BpmOALeaveService {
      * @return 编号
      */
     Long createLeave(Long userId, @Valid BpmOALeaveCreateReqVO createReqVO);
+
+    /**
+     * 更新请假申请：只能在审批中修改，只保存请假申请和流程变量；审批结果由之后的【通过】处理
+     *
+     * @param updateReqVO 修改信息
+     */
+    void updateLeave(@Valid BpmOALeaveUpdateReqVO updateReqVO);
 
     /**
      * 更新请假申请的状态

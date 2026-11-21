@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.oa.vo.BpmOALeaveCreateReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.oa.vo.BpmOALeavePageReqVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.oa.vo.BpmOALeaveUpdateReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.oa.vo.BpmOALeaveRespVO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.oa.BpmOALeaveDO;
 import cn.iocoder.yudao.module.bpm.service.oa.BpmOALeaveService;
@@ -40,6 +41,14 @@ public class BpmOALeaveController {
     @Operation(summary = "创建请求申请")
     public CommonResult<Long> createLeave(@Valid @RequestBody BpmOALeaveCreateReqVO createReqVO) {
         return success(leaveService.createLeave(getLoginUserId(), createReqVO));
+    }
+
+    @PutMapping("/update")
+    @PreAuthorize("@ss.hasPermission('bpm:oa-leave:create')")
+    @Operation(summary = "更新请假申请", description = "只能在审批中修改，审批结果由之后的【通过】处理")
+    public CommonResult<Boolean> updateLeave(@Valid @RequestBody BpmOALeaveUpdateReqVO updateReqVO) {
+        leaveService.updateLeave(updateReqVO);
+        return success(true);
     }
 
     @GetMapping("/get")
