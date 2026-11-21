@@ -5,7 +5,6 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.Tika;
 import org.apache.tika.io.LookaheadInputStream;
@@ -39,9 +38,8 @@ public class FileTypeUtils {
      * @param data 文件内容
      * @return mineType 无法识别时会返回“application/octet-stream”
      */
-    @SneakyThrows
     public static String getMineType(byte[] data) {
-        return TIKA.detect(data);
+        return detectContent(data, null);
     }
 
     /**
@@ -51,7 +49,7 @@ public class FileTypeUtils {
      * @return mineType 无法识别时会返回“application/octet-stream”
      */
     public static String getMineType(String name) {
-        return TIKA.detect(name);
+        return detectByName(name);
     }
 
     /**
@@ -62,7 +60,7 @@ public class FileTypeUtils {
      * @return mineType 无法识别时会返回“application/octet-stream”
      */
     public static String getMineType(byte[] data, String name) {
-        return TIKA.detect(data, name);
+        return detectContent(data, name);
     }
 
     /**
@@ -72,12 +70,43 @@ public class FileTypeUtils {
      * @param name 文件名
      * @return mineType 无法识别时会返回“application/octet-stream”
      */
-    @SneakyThrows
     public static String getMineType(InputStream data, String name) {
         Assert.isTrue(data.markSupported(), "文件流必须支持 mark / reset");
         // 关闭 LookaheadInputStream 时，会将 data 重置到读取前的位置
         try (InputStream head = new LookaheadInputStream(data, DETECT_LIMIT)) {
-            return TIKA.detect(head, name);
+            return detectContent(IoUtil.readBytes(head, DETECT_LIMIT), name);
+        } catch (IOException ex) {
+            log.warn("[getMineType][读取文件头失败，改用文件名({})]", name, ex);
+            return detectByName(name);
+        }
+    }
+
+    /**
+     * 内容识别失败时退回文件名。
+     * Tika 4 的 Detector 接口与 classpath 上的 {@code org.gagravarr.tika.OggDetector} 不兼容时，
+     * 会抛出 AbstractMethodError，把正常文件下载打成 500。
+     */
+    private static String detectContent(byte[] data, String name) {
+        try {
+            return name == null ? TIKA.detect(data) : TIKA.detect(data, name);
+        } catch (Throwable ex) {
+            log.warn("[getMineType][内容识别失败，改用文件名({})]", name, ex);
+            return detectByName(name);
+        }
+    }
+
+    /**
+     * 只按扩展名识别。不能再调用 {@link Tika#detect(String)}，那条路径仍会加载全部 SPI Detector。
+     */
+    private static String detectByName(String name) {
+        if (StrUtil.isBlank(name)) {
+            return "application/octet-stream";
+        }
+        try {
+            return MimeTypes.getDefaultMimeTypes().getMimeType(name).getName();
+        } catch (Throwable ex) {
+            log.warn("[getMineType][按文件名识别失败({})]", name, ex);
+            return "application/octet-stream";
         }
     }
 
