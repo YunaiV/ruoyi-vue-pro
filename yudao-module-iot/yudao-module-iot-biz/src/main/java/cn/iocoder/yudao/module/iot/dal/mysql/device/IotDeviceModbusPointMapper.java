@@ -54,8 +54,7 @@ public interface IotDeviceModbusPointMapper extends BaseMapperX<IotDeviceModbusP
     default void updateForSave(IotDeviceModbusPointDO updateObj) {
         update(updateObj, new LambdaUpdateWrapper<IotDeviceModbusPointDO>()
                 .eq(IotDeviceModbusPointDO::getId, updateObj.getId())
-                // DONE @AI："jdbcType=INTEGER" 放到父类里，？我记得有个类似的；（父类 BaseMapperX 已有 JDBC_TYPE_VARCHAR，bit_index 是整数列不能复用，已在旁边补 JDBC_TYPE_INTEGER）
-                .set(updateObj.getBitIndex() == null, IotDeviceModbusPointDO::getBitIndex, null, JDBC_TYPE_INTEGER));
+                .set(updateObj.getBitIndex() == null, IotDeviceModbusPointDO::getBitIndex, null, BaseMapperX.JDBC_TYPE_INTEGER));
     }
 
 }
