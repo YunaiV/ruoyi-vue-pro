@@ -41,6 +41,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static org.junit.jupiter.api.Assertions.*;
@@ -197,6 +198,53 @@ public class BpmMultiInstanceFlowableTest extends BaseFlowableUnitTest {
         // 调用 + 断言：全部审批通过后，流程审批通过
         newTasks.forEach(this::approveTask);
         assertProcessInstanceStatus(processInstanceId, BpmProcessInstanceStatusEnum.APPROVE.getStatus());
+    }
+
+    @Test // Gitee ID259K：流程实例上存在同名的审批人变量（老版本使用 setVariable 写入），修改审批人后退回重新进入会签节点
+    public void testRejectTask_ratioReturn_processLevelAssignees() {
+        // 准备参数：会签节点由用户 1、用户 2 审批
+        Set<Long> ratioUserIds = new LinkedHashSet<>(List.of(1L, 2L));
+        AtomicInteger ratioCalculateCount = new AtomicInteger();
+        when(taskCandidateInvoker.calculateUsersByTask(any())).thenAnswer(invocation -> {
+            if (!"multiReturn-task".equals(((DelegateExecution) invocation.getArgument(0)).getCurrentActivityId())) {
+                return Set.of(1L);
+            }
+            ratioCalculateCount.incrementAndGet();
+            return new LinkedHashSet<>(ratioUserIds);
+        });
+        String processInstanceId = startProcessInstance("multiReturn", null);
+        approveTask(getRunningTask(processInstanceId));
+        List<Task> tasks = getRunningTasks(processInstanceId);
+        assertEquals(List.of("1", "2"), convertList(tasks, Task::getAssignee));
+        // 准备参数：模拟老版本，审批人集合保存在流程实例上；之后，会签节点的审批人修改为用户 1、用户 3
+        String collectionVariable = FlowableUtils.formatExecutionCollectionVariable("multiReturn-task");
+        runtimeService.setVariable(processInstanceId, collectionVariable, new LinkedHashSet<>(List.of(1L, 2L)));
+        ratioUserIds.remove(2L);
+        ratioUserIds.add(3L);
+
+        // 调用：用户 2 审批不通过，退回到发起审批节点后，再次审批通过
+        taskService.rejectTask(2L, new BpmTaskRejectReqVO().setId(tasks.get(1).getId()).setReason("退回修改"));
+        approveTask(getRunningTask(processInstanceId));
+        // 断言：重新计算审批人，不使用流程实例上的旧集合；流程实例上的变量保持不变
+        assertEquals(List.of("1", "3"), convertList(getRunningTasks(processInstanceId), Task::getAssignee));
+        assertEquals(2, ratioCalculateCount.get());
+        assertEquals(Set.of(1L, 2L), runtimeService.getVariable(processInstanceId, collectionVariable));
+        // 调用 + 断言：全部审批通过后，流程审批通过。每个实例完成时，复用本次进入节点计算的审批人，不重复计算
+        getRunningTasks(processInstanceId).forEach(this::approveTask);
+        assertEquals(2, ratioCalculateCount.get());
+        assertProcessInstanceStatus(processInstanceId, BpmProcessInstanceStatusEnum.APPROVE.getStatus());
+    }
+
+    @Test // 发起时传入与审批人变量同名的流程变量（例如说，表单字段），并行、依次审批都不使用它
+    public void testStartProcessInstance_processLevelAssignees() {
+        // 调用 + 断言：会签
+        String ratioProcessInstanceId = startProcessInstance("multiRatio", new HashMap<>(Map.of(
+                FlowableUtils.formatExecutionCollectionVariable("multiRatio-task"), new LinkedHashSet<>(List.of(9L)))));
+        assertEquals(List.of("1", "2"), convertList(getRunningTasks(ratioProcessInstanceId), Task::getAssignee));
+        // 调用 + 断言：依次审批
+        String sequentialProcessInstanceId = startProcessInstance("multiSequential", new HashMap<>(Map.of(
+                FlowableUtils.formatExecutionCollectionVariable("multiSequential-task"), new LinkedHashSet<>(List.of(9L)))));
+        assertEquals("1", getRunningTask(sequentialProcessInstanceId).getAssignee());
     }
 
     @Test

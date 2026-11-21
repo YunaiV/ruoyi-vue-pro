@@ -63,6 +63,7 @@ public class BpmSimpleModelNodeVO {
     private List<Map<String, String>> fieldsPermission;
 
     @Schema(description = "操作按钮设置", example = "[]")
+    @Valid // 补充说明：子节点 childNode 等未级联校验，保存时由 BpmModelServiceImpl 遍历所有节点的按钮校验
     private List<OperationButtonSetting> buttonsSetting;  // 用于审批节点
 
     @Schema(description = "是否需要签名", example = "false")
@@ -213,6 +214,9 @@ public class BpmSimpleModelNodeVO {
 
         @Schema(description = "最大提醒次数", example = "1")
         private Integer maxRemindCount;
+
+        @Schema(description = "超时自动跳转的目标节点 Id。执行动作是自动跳转时，必填", example = "Activity_2")
+        private String jumpNodeId;
     }
 
     @Schema(description = "空处理策略")
@@ -234,8 +238,14 @@ public class BpmSimpleModelNodeVO {
     @Valid
     public static class OperationButtonSetting {
 
-        // TODO @jason：是不是按钮的标识？id 会和数据库的 id 自增有点模糊，key 标识会更合理一点点哈。
-        @Schema(description = "按钮 Id", example = "1")
+        /**
+         * 按钮类型编号，不是数据库的自增编号
+         * <p>
+         * 取值与前端的 OperationButtonType 枚举一致，见 {@link BpmOperationButtonTypeEnum}。
+         * 已经持久化在 SIMPLE 模型的 JSON、流程图的 buttonsSetting 扩展元素中，所以保持属性名不变
+         */
+        @Schema(description = "按钮类型编号", example = "1")
+        @InEnum(BpmOperationButtonTypeEnum.class)
         private Integer id;
 
         @Schema(description = "显示名称", example = "审批")

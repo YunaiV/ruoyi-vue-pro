@@ -18,13 +18,42 @@ import java.util.Arrays;
 @AllArgsConstructor
 public enum BpmTaskStatusEnum implements ArrayValuable<Integer> {
 
+    /**
+     * 使用场景：
+     * 1. 节点因为跳过表达式等原因未执行，审批详情中展示为跳过（不会记录到任务上）
+     * 2. 审批超时【自动跳转】到其它节点时，当前节点未处理的任务，会被标记为跳过
+     */
     SKIP(-2, "跳过"),
+    /**
+     * 使用场景：
+     * 1. 审批详情中，预测的未来节点尚未执行，展示为未开始（不会记录到任务上）
+     */
     NOT_START(-1, "未开始"),
+    /**
+     * 使用场景：
+     * 1. 任务创建后，等待审批人处理
+     */
     RUNNING(1, "审批中"),
+    /**
+     * 使用场景：
+     * 1. 审批人审批通过，或者系统自动通过（例如说，审批超时自动同意）
+     */
     APPROVE(2, "审批通过"),
+    /**
+     * 使用场景：
+     * 1. 审批人审批不通过，或者系统自动不通过（例如说，审批超时自动拒绝）
+     */
     REJECT(3, "审批不通过"),
+    /**
+     * 使用场景：
+     * 1. 流程实例被取消，或者多人审批已经满足条件等，无需审批的任务被系统取消
+     */
     CANCEL(4, "已取消"),
 
+    /**
+     * 使用场景：
+     * 1. 任务被退回到之前的节点，当前节点的任务结束
+     */
     RETURN(5, "已退回"),
 
     /**
@@ -79,7 +108,7 @@ public enum BpmTaskStatusEnum implements ArrayValuable<Integer> {
     public static boolean isEndStatus(Integer status) {
         return ObjectUtils.equalsAny(status,
                 APPROVE.getStatus(), REJECT.getStatus(), CANCEL.getStatus(),
-                RETURN.getStatus(), APPROVING.getStatus());
+                RETURN.getStatus(), APPROVING.getStatus(), SKIP.getStatus());
     }
 
     public static boolean isCancelStatus(Integer status) {

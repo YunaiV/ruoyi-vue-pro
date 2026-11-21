@@ -4,7 +4,9 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.*;
+import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO.ConditionGroups;
 import cn.iocoder.yudao.module.bpm.enums.definition.*;
@@ -22,6 +24,8 @@ import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.delegate.TaskListener;
 
 import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.*;
@@ -208,8 +212,6 @@ public class SimpleModelUtils {
         BpmSimpleModelNodeTypeEnum nodeType = BpmSimpleModelNodeTypeEnum.valueOf(node.getType());
         BpmSimpleModelNodeVO childNode = node.getChildNode();
         List<BpmSimpleModelNodeVO> conditionNodes = node.getConditionNodes();
-        // TODO @芋艿 路由分支没有conditionNodes 这里注释会影响吗？@jason：一起帮忙瞅瞅！
-//        Assert.notEmpty(conditionNodes, "分支节点的条件节点不能为空");
         // 分支终点节点 ID
         String branchEndNodeId = null;
         if (nodeType == BpmSimpleModelNodeTypeEnum.CONDITION_BRANCH_NODE
@@ -277,8 +279,8 @@ public class SimpleModelUtils {
                                                       String conditionExpression) {
         Assert.notEmpty(sourceId, "sourceId 不能为空");
         Assert.notEmpty(targetId, "targetId 不能为空");
-        // TODO @jason：如果 sequenceFlowId 不存在的时候，是不是要生成一个默认的 sequenceFlowId？ @芋艿： 貌似不需要,Flowable 会默认生成；TODO @jason：建议还是搞一个，主要是后续好排查问题。
-        // TODO @jason：如果 name 不存在的时候，是不是要生成一个默认的 name？ @芋艿： 不需要生成默认的吧？ 这个会在流程图展示的， 一般用户填写的。不好生成默认的吧；TODO @jason：建议还是搞一个，主要是后续好排查问题。
+        // sequenceFlowId 为空时，由 BpmnAutoLayout 自动生成；条件分支的连线，使用条件节点的编号、名称
+        // sequenceFlowName 为空时，不生成默认值：普通连线没有业务名称，名称会展示在流程图上
         SequenceFlow sequenceFlow = new SequenceFlow(sourceId, targetId);
         if (StrUtil.isNotEmpty(sequenceFlowId)) {
             sequenceFlow.setId(sequenceFlowId);
@@ -341,7 +343,8 @@ public class SimpleModelUtils {
             EndEvent endEvent = new EndEvent();
             endEvent.setId(node.getId());
             endEvent.setName(node.getName());
-            // TODO @芋艿 + jason：要不要加一个终止定义？
+            // 补充说明：使用普通的结束事件，不加终止定义。并行、包容分支都会先汇聚，再到达唯一的结束节点；
+            // 审批不通过、取消等提前结束的场景，通过 BpmTaskService#moveTaskToEnd 处理，流程未结束时会删除流程实例
             return endEvent;
         }
 
@@ -369,7 +372,8 @@ public class SimpleModelUtils {
             // 添加操作按钮配置属性元素
             addButtonsSetting(node.getButtonsSetting(), userTask);
             // 使用自动通过策略
-            // TODO @芋艿 复用了SKIP， 是否需要新加一个策略；TODO @芋艿：【回复】是不是应该类似飞书，搞个草稿状态。待定；还有一种策略，不标记自动通过，而是首次发起后，第一个节点，自动通过；
+            // 补充说明：发起人节点的自动通过，由 BpmTaskServiceImpl#processTaskAssigned 按节点编号处理：首次发起时自动通过，
+            // 退回到发起人节点时（存在退回标记）不自动通过，等待发起人重新提交。所以复用 SKIP 即可，不需要新增策略；草稿状态暂不支持
             addAssignStartUserHandlerType(BpmUserTaskAssignStartUserHandlerTypeEnum.SKIP.getType(), userTask);
             return userTask;
         }
@@ -422,8 +426,12 @@ public class SimpleModelUtils {
             BoundaryEvent boundaryEvent = buildTimeoutBoundaryEvent(userTask, BpmBoundaryEventTypeEnum.USER_TASK_TIMEOUT.getType(),
                     timeoutHandler.getTimeDuration(), timeCycle, null);
 
-            // 2 添加超时执行动作元素
+            // 2.1 添加超时执行动作元素
             addExtensionElement(boundaryEvent, USER_TASK_TIMEOUT_HANDLER_TYPE, timeoutHandler.getType());
+            // 2.2 自动跳转时，添加跳转的目标节点
+            if (Objects.equals(BpmUserTaskTimeoutHandlerTypeEnum.AUTO_JUMP.getType(), timeoutHandler.getType())) {
+                addExtensionElement(boundaryEvent, USER_TASK_TIMEOUT_JUMP_NODE_ID, timeoutHandler.getJumpNodeId());
+            }
             return boundaryEvent;
         }
 
@@ -578,7 +586,7 @@ public class SimpleModelUtils {
         public ExclusiveGateway convert(BpmSimpleModelNodeVO node) {
             ExclusiveGateway exclusiveGateway = new ExclusiveGateway();
             exclusiveGateway.setId(node.getId());
-            // TODO @jason：setName
+            // 补充说明：网关（包括下面并行、包容分支的网关）不设置名称。审批详情按 SIMPLE 节点、用户任务等活动展示，不使用网关的名称
 
             // 设置默认的序列流（条件）
             BpmSimpleModelNodeVO defaultSeqFlow = CollUtil.findOne(node.getConditionNodes(),
@@ -607,12 +615,10 @@ public class SimpleModelUtils {
 
             InclusiveGateway inclusiveGateway = new InclusiveGateway();
             inclusiveGateway.setId(node.getId());
-            // TODO @jason：setName
 
             // 合并网关 由程序创建，前端不需要传入
             InclusiveGateway joinParallelGateway = new InclusiveGateway();
             joinParallelGateway.setId(buildGatewayJoinId(node.getId()));
-            // TODO @jason：setName
             return CollUtil.newArrayList(inclusiveGateway, joinParallelGateway);
         }
 
@@ -634,12 +640,10 @@ public class SimpleModelUtils {
                     item -> BooleanUtil.isTrue(item.getConditionSetting().getDefaultFlow()));
             Assert.notNull(defaultSeqFlow, "包容分支节点({})的默认序列流不能为空", node.getId());
             inclusiveGateway.setDefaultFlow(defaultSeqFlow.getId());
-            // TODO @jason：setName
 
             // 并行聚合网关由程序创建，前端不需要传入
             InclusiveGateway joinInclusiveGateway = new InclusiveGateway();
             joinInclusiveGateway.setId(buildGatewayJoinId(node.getId()));
-            // TODO @jason：setName
             return CollUtil.newArrayList(inclusiveGateway, joinInclusiveGateway);
         }
 
@@ -946,6 +950,117 @@ public class SimpleModelUtils {
         return boundaryEvent;
     }
 
+    // ========== SIMPLE 审批超时自动跳转相关的方法 ==========
+
+    /**
+     * 判断审批节点的审批超时【自动跳转】是否有效
+     * <p>
+     * 当前节点、目标节点都需要满足 {@link #isTimeoutJumpNode(BpmSimpleModelNodeVO, boolean)}，并且不能跳转到当前节点。
+     * 另外，目标节点的审批人不能是【审批人自选】、【发起人自选】：跨分支跳转时，没有经过正常的审批、发起环节选择审批人，
+     * 目标节点会因为找不到审批人而创建任务失败
+     *
+     * @param rootNode   SIMPLE 模型的根节点
+     * @param nodeId     当前节点 Id
+     * @param jumpNodeId 跳转的目标节点 Id
+     * @return 是否有效
+     */
+    public static boolean isValidTimeoutJump(BpmSimpleModelNodeVO rootNode, String nodeId, String jumpNodeId) {
+        if (StrUtil.isEmpty(nodeId) || StrUtil.isEmpty(jumpNodeId) || nodeId.equals(jumpNodeId)) {
+            return false;
+        }
+        Map<String, BpmSimpleModelNodeVO> jumpNodes = new HashMap<>();
+        traverseNodeWithConcurrent(rootNode, false, (node, concurrent) -> {
+            if (isTimeoutJumpNode(node, concurrent)) {
+                jumpNodes.put(node.getId(), node);
+            }
+        });
+        BpmSimpleModelNodeVO jumpNode = jumpNodes.get(jumpNodeId);
+        return jumpNodes.containsKey(nodeId) && jumpNode != null
+                && !ObjectUtils.equalsAny(jumpNode.getCandidateStrategy(),
+                BpmTaskCandidateStrategyEnum.APPROVE_USER_SELECT.getStrategy(),
+                BpmTaskCandidateStrategyEnum.START_USER_SELECT.getStrategy());
+    }
+
+    /**
+     * 获得审批超时【自动跳转】配置无效的第一个节点，见 {@link #isValidTimeoutJump(BpmSimpleModelNodeVO, String, String)}
+     *
+     * @param rootNode SIMPLE 模型的根节点
+     * @return 配置无效的节点；全部有效时，返回 null
+     */
+    public static BpmSimpleModelNodeVO findInvalidTimeoutJumpNode(BpmSimpleModelNodeVO rootNode) {
+        return CollUtil.findOne(getTimeoutJumpNodes(rootNode), node ->
+                !isValidTimeoutJump(rootNode, node.getId(), node.getTimeoutHandler().getJumpNodeId()));
+    }
+
+    /**
+     * 获得开启审批超时【自动跳转】的节点们
+     *
+     * @param rootNode SIMPLE 模型的根节点
+     * @return 节点们，按照模型的结构顺序
+     */
+    public static List<BpmSimpleModelNodeVO> getTimeoutJumpNodes(BpmSimpleModelNodeVO rootNode) {
+        List<BpmSimpleModelNodeVO> timeoutJumpNodes = new ArrayList<>();
+        traverseNodeWithConcurrent(rootNode, false, (node, concurrent) -> {
+            BpmSimpleModelNodeVO.TimeoutHandler timeoutHandler = node.getTimeoutHandler();
+            if (timeoutHandler != null && BooleanUtil.isTrue(timeoutHandler.getEnable())
+                    && Objects.equals(BpmUserTaskTimeoutHandlerTypeEnum.AUTO_JUMP.getType(), timeoutHandler.getType())) {
+                timeoutJumpNodes.add(node);
+            }
+        });
+        return timeoutJumpNodes;
+    }
+
+    /**
+     * 判断节点能否作为审批超时【自动跳转】的当前节点、目标节点：
+     * <p>
+     * 1. 只能是人工审批的审批节点：发起人、办理、抄送、延迟器、子流程等其它节点不支持
+     * 2. 不能位于并行分支、包容分支内：分支内可能有多个任务同时进行，跳转后，其它分支的任务会挂起，或者在聚合时重复执行后续节点
+     * <p>
+     * 补充说明：条件分支、路由分支同时只会执行其中一条分支，所以支持跨分支跳转；子流程是独立的流程实例，它的节点不在当前模型中
+     *
+     * @param node       节点
+     * @param concurrent 是否位于并行分支、包容分支内
+     * @return 是否
+     */
+    private static boolean isTimeoutJumpNode(BpmSimpleModelNodeVO node, boolean concurrent) {
+        return !concurrent && BpmSimpleModelNodeTypeEnum.APPROVE_NODE.getType().equals(node.getType())
+                && BpmUserTaskApproveTypeEnum.USER.getType().equals(node.getApproveType());
+    }
+
+    /**
+     * 遍历所有节点（不包括条件节点自身）
+     *
+     * @param rootNode SIMPLE 模型的根节点
+     * @param consumer 节点的处理
+     */
+    public static void traverseNode(BpmSimpleModelNodeVO rootNode, Consumer<BpmSimpleModelNodeVO> consumer) {
+        traverseNodeWithConcurrent(rootNode, false, (node, concurrent) -> consumer.accept(node));
+    }
+
+    /**
+     * 遍历所有节点（不包括条件节点自身），并标记节点是否位于并行分支、包容分支内
+     *
+     * @param node       当前节点
+     * @param concurrent 当前节点是否位于并行分支、包容分支内
+     * @param consumer   节点的处理
+     */
+    private static void traverseNodeWithConcurrent(BpmSimpleModelNodeVO node, boolean concurrent,
+                                                   BiConsumer<BpmSimpleModelNodeVO, Boolean> consumer) {
+        if (!isValidNode(node)) {
+            return;
+        }
+        consumer.accept(node, concurrent);
+        // 分支节点：遍历每个分支。并行分支、包容分支的分支内，可能同时执行
+        if (BpmSimpleModelNodeTypeEnum.isBranchNode(node.getType()) && CollUtil.isNotEmpty(node.getConditionNodes())) {
+            boolean branchConcurrent = concurrent || ObjectUtils.equalsAny(node.getType(),
+                    BpmSimpleModelNodeTypeEnum.PARALLEL_BRANCH_NODE.getType(),
+                    BpmSimpleModelNodeTypeEnum.INCLUSIVE_BRANCH_NODE.getType());
+            node.getConditionNodes().forEach(item -> traverseNodeWithConcurrent(item.getChildNode(), branchConcurrent, consumer));
+        }
+        // 子节点：分支节点的子节点，在分支聚合之后执行，与分支节点自身一致
+        traverseNodeWithConcurrent(node.getChildNode(), concurrent, consumer);
+    }
+
     // ========== SIMPLE 流程预测相关的方法 ==========
 
     public static List<BpmSimpleModelNodeVO> simulateProcess(BpmSimpleModelNodeVO rootNode, Map<String, Object> variables) {
@@ -1017,6 +1132,63 @@ public class SimpleModelUtils {
 
         // 遍历子节点
         simulateNextNode(currentNode.getChildNode(), variables, resultNodes);
+    }
+
+    /**
+     * 预测指定节点们之后的节点：用于审批超时【自动跳转】过的流程实例
+     * <p>
+     * 为什么不使用 {@link #simulateProcess(BpmSimpleModelNodeVO, Map)} 从头预测？跨条件分支跳转后，流程实例不再按流程变量选择的分支执行，
+     * 从头预测会展示已经绕过的节点，并漏掉跳转目标之后的节点。所以，改成从当前进行中的节点开始，沿着后继预测：
+     * 当前节点所在链路的后续节点，再加上外层每个分支节点聚合之后的节点。后续节点中的分支，仍然按流程变量预测
+     *
+     * @param rootNode  SIMPLE 模型的根节点
+     * @param nodeIds   当前进行中的节点 Id 们
+     * @param variables 流程变量
+     * @return 之后的节点（不包括 nodeIds 自身，已经去重）；nodeIds 都不在模型中时，返回空列表
+     */
+    public static List<BpmSimpleModelNodeVO> simulateProcessAfterNodes(BpmSimpleModelNodeVO rootNode, Collection<String> nodeIds,
+                                                                       Map<String, Object> variables) {
+        // 1. 合并每个进行中节点之后的节点
+        Set<String> resultNodeIds = new HashSet<>();
+        for (String nodeId : nodeIds) {
+            List<BpmSimpleModelNodeVO> nodes = new ArrayList<>();
+            simulateAfterNode(rootNode, nodeId, variables, nodes);
+            nodes.forEach(node -> resultNodeIds.add(node.getId()));
+        }
+        nodeIds.forEach(resultNodeIds::remove);
+        // 2. 按照模型的结构顺序排序：分支内的节点，在分支聚合之后的节点之前。
+        // 原因是：多个分支同时进行时，按进行中节点逐个合并，会使先合并分支的聚合后节点，排在后合并分支的节点之前
+        List<BpmSimpleModelNodeVO> resultNodes = new ArrayList<>(resultNodeIds.size());
+        traverseNodeWithConcurrent(rootNode, false, (node, concurrent) -> {
+            if (resultNodeIds.contains(node.getId())) {
+                resultNodes.add(node);
+            }
+        });
+        return resultNodes;
+    }
+
+    /**
+     * 在 node 开始的链路中查找 nodeId 节点，找到时，预测它之后的节点
+     *
+     * @return 是否找到
+     */
+    private static boolean simulateAfterNode(BpmSimpleModelNodeVO node, String nodeId, Map<String, Object> variables,
+                                             List<BpmSimpleModelNodeVO> resultNodes) {
+        for (BpmSimpleModelNodeVO currentNode = node; isValidNode(currentNode); currentNode = currentNode.getChildNode()) {
+            // 情况一：就是该节点，预测它的子节点
+            if (nodeId.equals(currentNode.getId())) {
+                simulateNextNode(currentNode.getChildNode(), variables, resultNodes);
+                return true;
+            }
+            // 情况二：位于分支内，先预测分支内的后续节点，再预测分支聚合之后的子节点
+            if (CollUtil.isNotEmpty(currentNode.getConditionNodes())
+                    && CollectionUtils.anyMatch(currentNode.getConditionNodes(), conditionNode ->
+                    simulateAfterNode(conditionNode.getChildNode(), nodeId, variables, resultNodes))) {
+                simulateNextNode(currentNode.getChildNode(), variables, resultNodes);
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

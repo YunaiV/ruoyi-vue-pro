@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-// TODO @jason：需要考虑，如果某个节点的配置不正确，需要有提示；具体怎么实现，可以讨论下；
 @Schema(description = "管理后台 - 仿钉钉流程设计模型的新增/修改 Request VO")
 @Data
 public class BpmSimpleModelUpdateReqVO {

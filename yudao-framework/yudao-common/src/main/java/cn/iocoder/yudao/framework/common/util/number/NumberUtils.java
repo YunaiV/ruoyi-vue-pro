@@ -143,4 +143,24 @@ public class NumberUtils {
                 .doubleValue();
     }
 
+    /**
+     * 获得整数类型 [minValue, maxValue] 范围内的边界：超出范围时，钳制到范围内
+     *
+     * 例如说，int 类型下边界 >= 3000000000 时，没有满足的值，返回 null；上边界 <= 3000000000 时，钳制为 <= Integer.MAX_VALUE
+     *
+     * @param value    边界值，需已取整（下边界向上取整、上边界向下取整）
+     * @param lower    是否为下边界（>=），否则为上边界（<=）
+     * @param minValue 类型的最小值，需 minValue <= maxValue
+     * @param maxValue 类型的最大值
+     * @return 边界；下边界大于 maxValue、上边界小于 minValue 时，该类型没有满足的值，返回 null
+     */
+    public static Long getIntegerBound(BigDecimal value, boolean lower, long minValue, long maxValue) {
+        BigDecimal min = BigDecimal.valueOf(minValue);
+        BigDecimal max = BigDecimal.valueOf(maxValue);
+        if (lower ? NumberUtil.isGreater(value, max) : NumberUtil.isLess(value, min)) {
+            return null;
+        }
+        return value.max(min).min(max).longValue();
+    }
+
 }

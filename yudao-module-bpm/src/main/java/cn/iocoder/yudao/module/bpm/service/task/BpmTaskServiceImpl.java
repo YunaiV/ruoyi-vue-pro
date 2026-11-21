@@ -16,6 +16,7 @@ import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.common.util.object.PageUtils;
 import cn.iocoder.yudao.framework.datapermission.core.annotation.DataPermission;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelMetaInfoVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.*;
 import cn.iocoder.yudao.module.bpm.convert.task.BpmTaskConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
@@ -27,6 +28,7 @@ import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableCon
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmHttpRequestUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.SimpleModelUtils;
 import cn.iocoder.yudao.module.bpm.service.comment.BpmCommentService;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmFormService;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmModelService;
@@ -139,8 +141,9 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             taskQuery.processDefinitionKey(pageVO.getProcessDefinitionKey());
         }
         if (ArrayUtil.isNotEmpty(pageVO.getCreateTime())) {
-            taskQuery.taskCreatedAfter(DateUtils.of(pageVO.getCreateTime()[0]));
-            taskQuery.taskCreatedBefore(DateUtils.of(pageVO.getCreateTime()[1]));
+            // 包含区间两端：taskCreatedAfter、taskCreatedBefore 不包含边界，所以前后各扩展 1 毫秒
+            taskQuery.taskCreatedAfter(new Date(DateUtils.of(pageVO.getCreateTime()[0]).getTime() - 1));
+            taskQuery.taskCreatedBefore(new Date(DateUtils.of(pageVO.getCreateTime()[1]).getTime() + 1));
         }
         long count = taskQuery.count();
         if (count == 0) {
@@ -1624,7 +1627,8 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         endTaskList.forEach(item -> {
             FlowElement element = getFlowElementById(bpmnModel, item.getTaskDefinitionKey());
             // 如果已结束的任务在回退目标节点之后生成，且串行可达，则加到需要预测节点中
-            // TODO 串行可达的方法需要和判断可回退节点 validateTargetTaskCanReturn 分开吗？ 并行网关可能会有问题。
+            // 补充说明：与 validateTargetTaskCanReturn 使用相同的串行可达判断，保证“可以退回到的节点”与“退回后会再次执行的节点”一致。
+            // 跨过并行网关的任务（例如说，其它并行分支上的任务）不会因为本次退回而再次执行，所以不需要预测
             if (item.getCreateTime().compareTo(targetTask.getCreateTime()) > 0
                     && BpmnModelUtils.isSequentialReachable(element, targetElement, null)) {
                 taskDefinitionKeys.add(item.getTaskDefinitionKey());
@@ -1735,7 +1739,7 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                 .changeState();
 
         // 3. 特殊：如果跳转到 EndEvent 流程还未结束， 执行 deleteProcessInstance 方法
-        // TODO 芋艿：目前发现并行分支情况下，会存在这个情况，后续看看有没更好的方案；
+        // 例如说：并行分支下，已经到达汇聚网关、等待其它分支的执行不是任务，不在上面的 activityIds 中，跳转后仍然保留，流程不会结束
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstanceId).list();
         if (CollUtil.isNotEmpty(executions)) {
             log.warn("[moveTaskToEnd][执行跳转到 EndEvent 后, 流程实例未结束，强制执行 deleteProcessInstance 方法]");
@@ -1923,10 +1927,10 @@ public class BpmTaskServiceImpl implements BpmTaskService {
         if (CollUtil.isEmpty(nextUserTaskKeys)) {
             throw exception(TASK_WITHDRAW_FAIL_NEXT_TASK_NOT_ALLOW);
         }
-        // TODO @芋艿：是否选择升级flowable版本解决taskCreatedAfter、taskCreatedBefore问题，升级7.1.0可以；包括 todo 和 done 那边的查询哇？？？ 是的！
+        // 补充说明：taskCreatedAfter 不包含边界，而下一个节点的任务可能与当前任务的结束时间相同（同一毫秒内创建），所以提前 1 毫秒
         long nextUserTaskFinishedCount = historyService.createHistoricTaskInstanceQuery()
                 .processInstanceId(processInstance.getProcessInstanceId()).taskDefinitionKeys(nextUserTaskKeys)
-                .taskCreatedAfter(taskInstance.getEndTime()).finished().count();
+                .taskCreatedAfter(new Date(taskInstance.getEndTime().getTime() - 1)).finished().count();
         if (nextUserTaskFinishedCount > 0) {
             throw exception(TASK_WITHDRAW_FAIL_NEXT_TASK_NOT_ALLOW);
         }
@@ -2283,11 +2287,19 @@ public class BpmTaskServiceImpl implements BpmTaskService {
             log.error("[processTaskTimeout][processInstanceId({}) 没有找到流程实例]", processInstanceId);
             return;
         }
+        // 情况四：自动跳转。跳转的是整个节点，需要包括未认领、加签中的任务，所以不使用下面按审批人过滤后的任务，在 jumpTaskWhenTimeout 中校验
+        if (Objects.equals(handlerType, BpmUserTaskTimeoutHandlerTypeEnum.AUTO_JUMP.getType())) {
+            FlowableUtils.execute(processInstance.getTenantId(), () -> jumpTaskWhenTimeout(processInstance, taskDefineKey));
+            return;
+        }
+
         // 过滤【向后加签】审批通过中（APPROVING）的父任务：它已经审批通过，等待加签任务审批后自动完成，无需超时处理
         List<Task> taskList = filterList(getRunningTaskListByProcessInstanceId(processInstanceId, true, taskDefineKey),
                 task -> ObjectUtil.notEqual(task.getTaskLocalVariables().get(BpmnVariableConstants.TASK_VARIABLE_STATUS),
                         BpmTaskStatusEnum.APPROVING.getStatus()));
-        // TODO 优化：未来需要考虑加签的情况
+        // 加签说明：加签子任务与父任务的 taskDefinitionKey 相同，有审批人时一起处理；没有审批人的任务不处理，
+        // 即向前加签等待中的父任务、向后加签等待父任务审批的子任务。它们在本次自动同意后才分配审批人，由审批人继续审批
+        // （例如说：向前加签的子任务都自动同意后，父任务恢复给原审批人）
         if (CollUtil.isEmpty(taskList)) {
             log.error("[processTaskTimeout][processInstanceId({}) 定义Key({}) 没有找到任务]", processInstanceId, taskDefineKey);
             return;
@@ -2323,6 +2335,74 @@ public class BpmTaskServiceImpl implements BpmTaskService {
                         new BpmTaskRejectReqVO().setId(task.getId()).setReason(BpmReasonEnum.REJECT_TASK.getReason()), false);
             }
         }));
+    }
+
+    /**
+     * 审批超时，自动跳转到配置的审批节点
+     * <p>
+     * 1. 当前节点未处理的任务（包括加签、退回修改中的任务），标记为跳过，并记录跳转的原因
+     * 2. 使用 Flowable 的 ChangeActivityState，在原流程实例中跳转：结束当前节点的执行（包括多实例、超时定时器），在目标节点创建任务。
+     *    流程变量、审批历史保持不变
+     * <p>
+     * 跳转范围见 {@link SimpleModelUtils#isValidTimeoutJump}，保存模型时已经校验。不满足时（例如说：不是 SIMPLE 设计器的流程、存在其它节点的任务），
+     * 只记录日志，任务保持审批中，避免跳转后其它任务挂起、或者重复处理
+     *
+     * @param processInstance 流程实例
+     * @param taskDefineKey   超时的任务节点
+     */
+    private void jumpTaskWhenTimeout(ProcessInstance processInstance, String taskDefineKey) {
+        // 1.1 获得跳转的目标节点
+        BpmnModel bpmnModel = modelService.getBpmnModelByDefinitionId(processInstance.getProcessDefinitionId());
+        FlowElement sourceElement = BpmnModelUtils.getFlowElementById(bpmnModel, taskDefineKey);
+        String jumpNodeId = BpmnModelUtils.parseTimeoutJumpNodeId(sourceElement);
+        FlowElement targetElement = BpmnModelUtils.getFlowElementById(bpmnModel, jumpNodeId);
+        // 1.2 校验跳转范围：仅支持 SIMPLE 设计器，与保存模型时的校验一致
+        BpmProcessDefinitionInfoDO processDefinitionInfo = bpmProcessDefinitionService.getProcessDefinitionInfo(
+                processInstance.getProcessDefinitionId());
+        if (targetElement == null || processDefinitionInfo == null
+                || ObjectUtil.notEqual(BpmModelTypeEnum.SIMPLE.getType(), processDefinitionInfo.getModelType())
+                || !SimpleModelUtils.isValidTimeoutJump(JsonUtils.parseObject(processDefinitionInfo.getSimpleModel(),
+                BpmSimpleModelNodeVO.class), taskDefineKey, jumpNodeId)) {
+            log.error("[jumpTaskWhenTimeout][processInstanceId({}) 节点({}) 跳转的节点({})无效，不进行跳转]",
+                    processInstance.getId(), taskDefineKey, jumpNodeId);
+            return;
+        }
+        // 1.3 校验当前节点有未处理的任务（包括未认领、加签中的任务）：例如说，定时器到期前，任务刚好审批完成
+        List<Task> taskList = getRunningTaskListByProcessInstanceId(processInstance.getId(), null, null);
+        if (!anyMatch(taskList, task -> ObjectUtil.equal(taskDefineKey, task.getTaskDefinitionKey())
+                && !BpmTaskStatusEnum.isEndStatus(FlowableUtils.getTaskStatus(task)))) {
+            log.error("[jumpTaskWhenTimeout][processInstanceId({}) 节点({}) 没有未处理的任务，不进行跳转]",
+                    processInstance.getId(), taskDefineKey);
+            return;
+        }
+        // 1.4 校验没有其它节点的任务：例如说，同时进行的其它分支，跳转后它们的任务会挂起，或者在聚合时重复执行后续节点
+        if (anyMatch(taskList, task -> ObjectUtil.notEqual(taskDefineKey, task.getTaskDefinitionKey()))) {
+            log.error("[jumpTaskWhenTimeout][processInstanceId({}) 节点({}) 存在其它节点的任务，不进行跳转]",
+                    processInstance.getId(), taskDefineKey);
+            return;
+        }
+
+        // 2. 当前节点未处理的任务，标记为跳过。已经结束的任务（例如说：向后加签的审批通过中的任务）保持不变，与 moveTaskToEnd 一致
+        String reason = BpmReasonEnum.TIMEOUT_JUMP.format(targetElement.getName());
+        taskList.forEach(task -> {
+            if (BpmTaskStatusEnum.isEndStatus(FlowableUtils.getTaskStatus(task))) {
+                return;
+            }
+            // 退回修改中的任务，先结束退回修改。修改人尚未重新提交的修改，不再生效
+            if (isWaitRevisionTask(task)) {
+                resumeRevisionTask(task.getId());
+            }
+            updateTaskStatusAndReason(task.getId(), BpmTaskStatusEnum.SKIP.getStatus(), reason);
+        });
+
+        // 3. 跳转到目标节点
+        // 目标节点按正常到达处理：不设置退回标记 RETURN_FLAG，所以审批人与发起人相同等策略照常生效，与手工退回不同。
+        // 同时，标记流程实例发生过跳转，审批详情改为从当前进行中的节点开始预测，见 BpmProcessInstanceServiceImpl#getSimulateApproveNodeList
+        runtimeService.createChangeActivityStateBuilder()
+                .processInstanceId(processInstance.getId())
+                .moveActivityIdsToSingleActivityId(Collections.singletonList(taskDefineKey), jumpNodeId)
+                .processVariable(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_TIMEOUT_JUMPED, Boolean.TRUE)
+                .changeState();
     }
 
     @Override
