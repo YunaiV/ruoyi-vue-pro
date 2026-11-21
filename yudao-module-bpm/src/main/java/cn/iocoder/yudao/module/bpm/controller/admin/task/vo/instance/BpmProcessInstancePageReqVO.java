@@ -39,7 +39,9 @@ public class BpmProcessInstancePageReqVO extends PageParam {
     @Schema(description = "发起用户编号", example = "1024")
     private Long startUserId; // 注意，只有在【流程实例】菜单，才使用该参数
 
-    @Schema(description = "动态表单字段查询 JSON Str", example = "{}")
+    @Schema(description = "动态表单字段查询 JSON Str。值为标量时全等匹配；{op, value} 时，op 为 like（模糊，%、_ 为通配符）、"
+            + "numberRange（数字范围 [最小值, 最大值]）、dateRange（日期区间 [yyyy-MM-dd, yyyy-MM-dd]），范围两端均包含",
+            example = "{\"reason\": {\"op\": \"like\", \"value\": \"差旅\"}, \"amount\": {\"op\": \"numberRange\", \"value\": [0, 100]}}")
     private String formFieldsParams; // SpringMVC 在 get 请求下，无法方便的定义 Map 类型的参数，所以通过 String 接收后，逻辑里面转换
 
 }

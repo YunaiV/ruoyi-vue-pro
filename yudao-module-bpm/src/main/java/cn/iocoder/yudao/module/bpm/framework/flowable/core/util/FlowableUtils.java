@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Callable;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -354,16 +355,26 @@ public class FlowableUtils {
      * @param fieldRules 字段规则，key 为字段名
      */
     public static void parseFormFieldRules(JsonNode rule, Map<String, JsonNode> fieldRules) {
+        parseFormFieldRules(rule, fieldRules::put);
+    }
+
+    /**
+     * 递归解析表单的字段规则，解析方式与 {@link #parseFormFieldRules(JsonNode, Map)} 相同，按组件顺序回调每个字段
+     *
+     * @param rule     组件的生成规则
+     * @param consumer 字段回调，参数为字段名、组件规则
+     */
+    public static void parseFormFieldRules(JsonNode rule, BiConsumer<String, JsonNode> consumer) {
         if (rule == null || !rule.isObject()) {
             return;
         }
         String field = JsonUtils.getText(rule, "field");
         if (StrUtil.isNotBlank(field)) {
-            fieldRules.put(field, rule);
+            consumer.accept(field, rule);
         }
         JsonNode children = rule.get("children");
         if (children != null && children.isArray()) {
-            children.forEach(child -> parseFormFieldRules(child, fieldRules));
+            children.forEach(child -> parseFormFieldRules(child, consumer));
         }
     }
 

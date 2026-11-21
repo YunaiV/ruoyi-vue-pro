@@ -7,6 +7,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class NumberUtilsTest {
 
@@ -71,6 +72,21 @@ class NumberUtilsTest {
         assertEquals(2147483649L, NumberUtils.getPlainStringLength(new BigDecimal(BigInteger.ONE, Integer.MIN_VALUE)));
         assertEquals(2147483649L, NumberUtils.getPlainStringLength(new BigDecimal(BigInteger.ONE, Integer.MAX_VALUE)));
         assertEquals(2147483650L, NumberUtils.getPlainStringLength(new BigDecimal(BigInteger.ONE.negate(), Integer.MAX_VALUE)));
+    }
+
+    @Test
+    void testGetIntegerBound() {
+        long min = Integer.MIN_VALUE;
+        long max = Integer.MAX_VALUE;
+        // 等于极值：原样返回
+        assertEquals(max, NumberUtils.getIntegerBound(BigDecimal.valueOf(max), true, min, max));
+        assertEquals(min, NumberUtils.getIntegerBound(BigDecimal.valueOf(min), false, min, max));
+        // 越界但仍可钳制：下边界小于最小值、上边界大于最大值
+        assertEquals(min, NumberUtils.getIntegerBound(new BigDecimal("-3000000000"), true, min, max));
+        assertEquals(max, NumberUtils.getIntegerBound(new BigDecimal("3000000000"), false, min, max));
+        // 越界无可匹配值：下边界大于最大值、上边界小于最小值
+        assertNull(NumberUtils.getIntegerBound(new BigDecimal("3000000000"), true, min, max));
+        assertNull(NumberUtils.getIntegerBound(new BigDecimal("-3000000000"), false, min, max));
     }
 
 }

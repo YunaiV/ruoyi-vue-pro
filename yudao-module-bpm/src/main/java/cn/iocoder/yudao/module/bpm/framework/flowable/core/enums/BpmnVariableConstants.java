@@ -61,6 +61,13 @@ public class BpmnVariableConstants {
     public static final String PROCESS_INSTANCE_VARIABLE_NEED_SIMULATE_TASK_IDS = "NEED_SIMULATE_TASK_IDS";
 
     /**
+     * 流程实例的变量 - 用于审批超时【自动跳转】，标记流程实例发生过跳转，变量值类型为 Boolean
+     *
+     * 目的是：跨分支、往回跳转后，流程实例不再按流程变量从头执行，审批详情改为从当前进行中的节点开始预测
+     */
+    public static final String PROCESS_INSTANCE_VARIABLE_TIMEOUT_JUMPED = "PROCESS_TIMEOUT_JUMPED";
+
+    /**
      * 流程实例的变量 - 是否跳过表达式
      *
      * @see ProcessInstance#getProcessVariables()

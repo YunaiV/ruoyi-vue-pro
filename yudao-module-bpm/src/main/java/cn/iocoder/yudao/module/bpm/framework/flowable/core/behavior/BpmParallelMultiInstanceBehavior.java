@@ -1,6 +1,7 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmChildProcessMultiInstanceSourceTypeEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCandidateInvoker;
@@ -62,9 +63,13 @@ public class BpmParallelMultiInstanceBehavior extends ParallelMultiInstanceBehav
     protected int resolveNrOfInstances(DelegateExecution execution) {
         // 情况一：UserTask 节点
         if (execution.getCurrentFlowElement() instanceof UserTask) {
-            // 获取任务的所有处理人
+            // 获取任务的所有处理人：从多实例的根 execution 读取本地变量。该方法在进入节点（根 execution）、
+            // 每个实例完成（子 execution，见 ParallelMultiInstanceBehavior#leave）时都会调用，后者复用根 execution 已经计算的结果
+            // 不使用 execution.getVariable 原因：它会继承读取流程实例上的同名变量（例如说，老版本使用 setVariable 写入的、
+            // 发起时表单传入的），导致退回后重新进入该节点时，不会重新计算审批人
+            DelegateExecution multiInstanceRootExecution = ObjUtil.defaultIfNull(getMultiInstanceRootExecution(execution), execution);
             @SuppressWarnings("unchecked")
-            Set<Long> assigneeUserIds = (Set<Long>) execution.getVariable(super.collectionVariable, Set.class);
+            Set<Long> assigneeUserIds = (Set<Long>) multiInstanceRootExecution.getVariableLocal(super.collectionVariable, Set.class);
             if (assigneeUserIds == null) {
                 assigneeUserIds = taskCandidateInvoker.calculateUsersByTask(execution);
                 if (CollUtil.isEmpty(assigneeUserIds)) {
@@ -73,7 +78,7 @@ public class BpmParallelMultiInstanceBehavior extends ParallelMultiInstanceBehav
                     // 用途：1）审批人为空时；2）审批类型为自动通过、自动拒绝时
                     assigneeUserIds = SetUtils.asSet((Long) null);
                 }
-                execution.setVariableLocal(super.collectionVariable, assigneeUserIds);
+                multiInstanceRootExecution.setVariableLocal(super.collectionVariable, assigneeUserIds);
             }
             return assigneeUserIds.size();
         }

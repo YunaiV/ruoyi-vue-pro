@@ -5,6 +5,8 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
+import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
+import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.common.util.validation.ValidationUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelMetaInfoVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.BpmModelSaveReqVO;
@@ -12,8 +14,12 @@ import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.B
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelUpdateReqVO;
 import cn.iocoder.yudao.module.bpm.convert.definition.BpmModelConvert;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmFormDO;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmBoundaryEventTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelFormTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelTypeEnum;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeTypeEnum;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskApproveTypeEnum;
+import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskTimeoutHandlerTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmReasonEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCandidateInvoker;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
@@ -23,6 +29,7 @@ import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.SimpleModelUtils
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceCopyService;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import jakarta.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.bpmn.model.*;
 import org.flowable.common.engine.impl.db.SuspensionState;
@@ -45,6 +52,9 @@ import java.util.*;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.*;
+import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.BOUNDARY_EVENT_TYPE;
+import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.USER_TASK_TIMEOUT_HANDLER_TYPE;
+import static cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants.USER_TASK_TIMEOUT_JUMP_NODE_ID;
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils.parseCandidateStrategy;
 
 /**
@@ -77,6 +87,8 @@ public class BpmModelServiceImpl implements BpmModelService {
     private TaskService taskService;
     @Resource
     private BpmProcessInstanceCopyService processInstanceCopyService;
+    @Resource
+    private Validator validator;
 
     @Override
     public List<Model> getModelList(String name) {
@@ -175,6 +187,12 @@ public class BpmModelServiceImpl implements BpmModelService {
      * @param saveReqVO 保存信息
      */
     private void saveModel(Model model, BpmModelSaveReqVO saveReqVO) {
+        // 0. 校验 SIMPLE 模型
+        if (ObjUtil.equals(BpmModelTypeEnum.SIMPLE.getType(), saveReqVO.getType())) {
+            validateSimpleModel(saveReqVO.getSimpleModel());
+            validateSimpleModelButtons(saveReqVO.getSimpleModel());
+        }
+
         // 1. 保存模型的基础信息
         repositoryService.saveModel(model);
 
@@ -260,8 +278,13 @@ public class BpmModelServiceImpl implements BpmModelService {
         BpmFormDO form = validateFormConfig(metaInfo);
         // 1.4 校验任务分配规则已配置
         taskCandidateInvoker.validateBpmnConfig(bpmnBytes);
-        // 1.5 获取仿钉钉流程设计器模型数据
+        // 1.5 获取仿钉钉流程设计器模型数据，并校验：保存后，跳转的目标节点可能被修改（例如说，导入的模型）
         String simpleJson = getModelSimpleJson(model.getId());
+        if (BpmModelTypeEnum.SIMPLE.getType().equals(metaInfo.getType())) {
+            BpmSimpleModelNodeVO simpleModel = JsonUtils.parseObject(simpleJson, BpmSimpleModelNodeVO.class);
+            validateSimpleModel(simpleModel);
+            validateSimpleModelTimeoutJumpMatch(BpmnModelUtils.getBpmnModel(bpmnBytes), simpleModel);
+        }
 
         // 2.1 创建流程定义
         String definitionId = processDefinitionService.createProcessDefinition(model, metaInfo, bpmnBytes, simpleJson,
@@ -293,7 +316,14 @@ public class BpmModelServiceImpl implements BpmModelService {
                 throw exception(MODEL_DEPLOY_FAIL_BPMN_USER_TASK_NAME_NOT_EXISTS, userTask.getId());
             }
         });
-        // 3. 校验第一个用户任务节点的规则类型是否为“审批人自选”，BPMN 设计器，校验第一个用户任务节点，SIMPLE 设计器，第一个节点固定为发起人所以校验第二个用户任务节点
+        // 3. 校验超时执行动作【自动跳转】：仅 SIMPLE 设计器支持，跳转的目标节点由 SIMPLE 模型配置并校验
+        if (BpmModelTypeEnum.BPMN.getType().equals(type)) {
+            BoundaryEvent timeoutJumpEvent = CollUtil.getFirst(getTimeoutJumpBoundaryEvents(bpmnModel));
+            if (timeoutJumpEvent != null) {
+                throw exception(MODEL_DEPLOY_FAIL_TIMEOUT_JUMP_NOT_SIMPLE, getAttachedToName(timeoutJumpEvent));
+            }
+        }
+        // 4. 校验第一个用户任务节点的规则类型是否为“审批人自选”，BPMN 设计器，校验第一个用户任务节点，SIMPLE 设计器，第一个节点固定为发起人所以校验第二个用户任务节点
         UserTask firUserTask = CollUtil.get(userTasks, BpmModelTypeEnum.BPMN.getType().equals(type) ? 0 : 1);
         if (firUserTask == null) {
             return;
@@ -376,6 +406,8 @@ public class BpmModelServiceImpl implements BpmModelService {
     public void updateSimpleModel(Long userId, BpmSimpleModelUpdateReqVO reqVO) {
         // 1. 校验流程模型存在
         Model model = validateModelManager(reqVO.getId(), userId);
+        validateSimpleModel(reqVO.getSimpleModel());
+        validateSimpleModelButtons(reqVO.getSimpleModel());
 
         // 2.1 JSON 转换成 bpmnModel
         BpmnModel bpmnModel = SimpleModelUtils.buildBpmnModel(model.getKey(), model.getName(), reqVO.getSimpleModel());
@@ -383,6 +415,109 @@ public class BpmModelServiceImpl implements BpmModelService {
         updateModelBpmnXml(model.getId(), BpmnModelUtils.getBpmnXml(bpmnModel));
         // 2.3 保存 JSON 数据
         updateModelSimpleJson(model.getId(), reqVO.getSimpleModel());
+    }
+
+    /**
+     * 校验 SIMPLE 模型的审批超时【自动跳转】，与实际部署的流程图一致
+     * <p>
+     * 为什么需要校验？流程图可以单独修改（例如说，/update-bpmn 接口），只校验 SIMPLE 模型时，流程图中可能多出、缺少、或者替换了跳转的目标节点。
+     * 所以，比较两者中【开启自动跳转的节点 - 跳转的目标节点】是否一致，并校验流程图中两个节点实际存在、可以跳转，不比较流程图的其它内容
+     *
+     * @param bpmnModel   实际部署的流程图
+     * @param simpleModel SIMPLE 模型
+     */
+    private void validateSimpleModelTimeoutJumpMatch(BpmnModel bpmnModel, BpmSimpleModelNodeVO simpleModel) {
+        // 1. SIMPLE 模型中，开启自动跳转的节点
+        Map<String, BpmSimpleModelNodeVO> simpleNodes = simpleModel == null ? Collections.emptyMap()
+                : convertMap(SimpleModelUtils.getTimeoutJumpNodes(simpleModel), BpmSimpleModelNodeVO::getId);
+        // 2.1 流程图中，自动跳转的边界事件：节点在 SIMPLE 模型中不存在、同一节点有多个、或者跳转的目标节点不同时，都不一致
+        Set<String> bpmnNodeIds = new HashSet<>();
+        for (BoundaryEvent boundaryEvent : getTimeoutJumpBoundaryEvents(bpmnModel)) {
+            String nodeId = boundaryEvent.getAttachedToRefId();
+            String jumpNodeId = BpmnModelUtils.parseBoundaryEventExtensionElement(boundaryEvent, USER_TASK_TIMEOUT_JUMP_NODE_ID);
+            BpmSimpleModelNodeVO simpleNode = simpleNodes.get(nodeId);
+            if (simpleNode == null || !bpmnNodeIds.add(nodeId)
+                    || ObjUtil.notEqual(simpleNode.getTimeoutHandler().getJumpNodeId(), jumpNodeId)) {
+                throw exception(MODEL_DEPLOY_FAIL_TIMEOUT_JUMP_NOT_MATCH, getAttachedToName(boundaryEvent));
+            }
+            // 2.2 流程图中，当前节点、目标节点需要是人工审批的用户任务，目标节点的审批人不能是自选：
+            // 流程图中节点编号一致，但节点被删除、或者修改为其它节点时，运行时无法正确跳转。与运行时一样，按节点编号获取
+            FlowElement targetElement = BpmnModelUtils.getFlowElementById(bpmnModel, jumpNodeId);
+            if (!isTimeoutJumpUserTask(BpmnModelUtils.getFlowElementById(bpmnModel, nodeId))
+                    || !isTimeoutJumpUserTask(targetElement)
+                    || ObjectUtils.equalsAny(parseCandidateStrategy(targetElement),
+                    BpmTaskCandidateStrategyEnum.APPROVE_USER_SELECT.getStrategy(),
+                    BpmTaskCandidateStrategyEnum.START_USER_SELECT.getStrategy())) {
+                throw exception(MODEL_DEPLOY_FAIL_TIMEOUT_JUMP_NOT_MATCH, getAttachedToName(boundaryEvent));
+            }
+        }
+        // 3. SIMPLE 模型中开启自动跳转，但是流程图中缺少
+        simpleNodes.values().forEach(simpleNode -> {
+            if (!bpmnNodeIds.contains(simpleNode.getId())) {
+                throw exception(MODEL_DEPLOY_FAIL_TIMEOUT_JUMP_NOT_MATCH, simpleNode.getName());
+            }
+        });
+    }
+
+    /**
+     * 获得流程图中，超时执行动作为【自动跳转】的用户任务超时边界事件，包括嵌入式子流程中的
+     */
+    private static List<BoundaryEvent> getTimeoutJumpBoundaryEvents(BpmnModel bpmnModel) {
+        return bpmnModel.getProcesses().stream()
+                .flatMap(process -> process.findFlowElementsOfType(BoundaryEvent.class, true).stream())
+                .filter(boundaryEvent -> ObjUtil.equal(BpmBoundaryEventTypeEnum.USER_TASK_TIMEOUT.getType(),
+                        NumberUtils.parseInt(BpmnModelUtils.parseBoundaryEventExtensionElement(boundaryEvent, BOUNDARY_EVENT_TYPE)))
+                        && ObjUtil.equal(BpmUserTaskTimeoutHandlerTypeEnum.AUTO_JUMP.getType(), NumberUtils.parseInt(
+                        BpmnModelUtils.parseBoundaryEventExtensionElement(boundaryEvent, USER_TASK_TIMEOUT_HANDLER_TYPE))))
+                .toList();
+    }
+
+    /**
+     * 判断流程图中的节点，是否为人工审批的用户任务，可以作为审批超时【自动跳转】的当前节点、目标节点
+     * <p>
+     * 特殊：办理节点也是人工审批的用户任务，通过节点类型区分，所以需要是审批节点
+     */
+    private static boolean isTimeoutJumpUserTask(FlowElement element) {
+        return element instanceof UserTask
+                && ObjUtil.equal(BpmUserTaskApproveTypeEnum.USER.getType(), BpmnModelUtils.parseApproveType(element))
+                && ObjUtil.equal(BpmSimpleModelNodeTypeEnum.APPROVE_NODE.getType(), BpmnModelUtils.parseNodeType(element));
+    }
+
+    private static String getAttachedToName(BoundaryEvent boundaryEvent) {
+        return boundaryEvent.getAttachedToRef() != null && StrUtil.isNotEmpty(boundaryEvent.getAttachedToRef().getName())
+                ? boundaryEvent.getAttachedToRef().getName() : boundaryEvent.getAttachedToRefId();
+    }
+
+    /**
+     * 校验 SIMPLE 模型的配置
+     * <p>
+     * 目前只校验审批超时【自动跳转】的目标节点，范围见 {@link SimpleModelUtils#isValidTimeoutJump}
+     *
+     * @param simpleModel SIMPLE 模型
+     */
+    private void validateSimpleModel(BpmSimpleModelNodeVO simpleModel) {
+        if (simpleModel == null) {
+            return;
+        }
+        BpmSimpleModelNodeVO invalidNode = SimpleModelUtils.findInvalidTimeoutJumpNode(simpleModel);
+        if (invalidNode != null) {
+            throw exception(MODEL_SAVE_FAIL_TIMEOUT_JUMP_NODE_INVALID, invalidNode.getName());
+        }
+    }
+
+    /**
+     * 校验 SIMPLE 模型所有节点的操作按钮，例如说按钮类型编号
+     * <p>
+     * 为什么需要遍历？请求参数只级联校验到根节点的按钮，子节点（childNode、conditionNodes）未级联校验，避免一并校验节点的其它约束。
+     * 所以，遍历所有节点，只按 {@link BpmSimpleModelNodeVO.OperationButtonSetting} 自身的约束校验
+     *
+     * @param simpleModel SIMPLE 模型
+     */
+    private void validateSimpleModelButtons(BpmSimpleModelNodeVO simpleModel) {
+        List<BpmSimpleModelNodeVO.OperationButtonSetting> buttons = new ArrayList<>();
+        SimpleModelUtils.traverseNode(simpleModel, node -> CollUtil.emptyIfNull(node.getButtonsSetting())
+                .stream().filter(Objects::nonNull).forEach(buttons::add));
+        buttons.forEach(button -> ValidationUtils.validate(validator, button));
     }
 
     /**

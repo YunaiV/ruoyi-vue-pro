@@ -123,7 +123,7 @@ public class BpmnModelUtils {
     public static Integer parseCandidateStrategy(FlowElement userTask) {
         Integer candidateStrategy = NumberUtils.parseInt(userTask.getAttributeValue(
                 BpmnModelConstants.NAMESPACE, BpmnModelConstants.USER_TASK_CANDIDATE_STRATEGY));
-        // TODO @芋艿 尝试从 ExtensionElement 取. 后续相关扩展是否都可以 存 extensionElement。 如表单权限。 按钮权限
+        // 兼容两种存储：老版本 BPMN 设计器存储在 flowable:candidateStrategy 属性中；SIMPLE 设计器、新版本 BPMN 设计器存储在扩展元素中（与表单权限、按钮设置一致）
         if (candidateStrategy == null) {
             ExtensionElement element = CollUtil.getFirst(userTask.getExtensionElements().get(BpmnModelConstants.USER_TASK_CANDIDATE_STRATEGY));
             candidateStrategy = element != null ? NumberUtils.parseInt(element.getElementText()) : null;
@@ -384,6 +384,26 @@ public class BpmnModelUtils {
         }
         ExtensionElement extensionElement = CollUtil.getFirst(boundaryEvent.getExtensionElements().get(customElement));
         return Optional.ofNullable(extensionElement).map(ExtensionElement::getElementText).orElse(null);
+    }
+
+    /**
+     * 解析用户任务审批超时【自动跳转】的目标节点，记录在用户任务的超时边界事件上
+     * <p>
+     * 同一个用户任务，可能有多个超时边界事件（例如说，流程图中同时有【自动提醒】、【自动跳转】），只读取执行动作为【自动跳转】的
+     *
+     * @param userTask 用户任务
+     * @return 目标节点 Id；未配置时，返回 null
+     */
+    public static String parseTimeoutJumpNodeId(FlowElement userTask) {
+        if (!(userTask instanceof Activity activity)) {
+            return null;
+        }
+        BoundaryEvent boundaryEvent = CollUtil.findOne(activity.getBoundaryEvents(), event -> ObjUtil.equal(
+                BpmBoundaryEventTypeEnum.USER_TASK_TIMEOUT.getType(),
+                NumberUtils.parseInt(parseBoundaryEventExtensionElement(event, BOUNDARY_EVENT_TYPE)))
+                && ObjUtil.equal(BpmUserTaskTimeoutHandlerTypeEnum.AUTO_JUMP.getType(),
+                NumberUtils.parseInt(parseBoundaryEventExtensionElement(event, USER_TASK_TIMEOUT_HANDLER_TYPE))));
+        return parseBoundaryEventExtensionElement(boundaryEvent, USER_TASK_TIMEOUT_JUMP_NODE_ID);
     }
 
     public static void addSignEnable(Boolean signEnable, FlowElement userTask) {
@@ -744,7 +764,9 @@ public class BpmnModelUtils {
             if (target.getId().equals(sourceFlowElement.getId())) {
                return true;
             }
-            // 如果目标节点为并行网关，跳过这个循环 (TODO 疑问：这个判断作用是防止回退到并行网关分支上的节点吗？）
+            // 遇到并行网关，不再向前查找：即不允许跨过 BPMN 并行网关（分支、汇聚）退回。
+            // 原因：退回只移动当前分支的执行，其它分支的执行仍然保留，会导致汇聚网关一直等待、或者后续节点重复执行
+            // 补充说明：SIMPLE 设计器的并行分支、包容分支使用的是包容网关，不受该限制
             if (sourceFlowElement instanceof ParallelGateway) {
                 continue;
             }
@@ -848,6 +870,44 @@ public class BpmnModelUtils {
         simulateNextFlowElements(startEvent, variables, resultElements, visitElements);
 
         // 将 EndEvent 放在末尾。原因是，DFS 遍历，可能 EndEvent 在 resultElements 中
+        List<FlowElement> endEvents = CollUtil.removeWithAddIf(resultElements,
+                flowElement -> flowElement instanceof EndEvent);
+        resultElements.addAll(endEvents);
+        return resultElements;
+    }
+
+    /**
+     * 模拟从指定节点之后的流程执行，获得接下来会执行的节点们；指定节点自身不包括在内
+     * <p>
+     * 用于退回、审批超时【自动跳转】后的预测：从进行中的节点开始，而不是从 StartEvent 开始。原因是：
+     * 1. 进行中的节点已经通过上游的网关，之后修改的流程变量（表单），从头预测可能走其它分支，展示错误的分支、漏掉实际的后续节点
+     * 2. 退回后，进行中的节点之后的节点会再次执行，即使历史中执行过，也需要预测
+     *
+     * @param bpmnModel  流程模型
+     * @param elementIds 指定节点的编号们，例如说进行中的节点
+     * @param variables  流程变量
+     * @return 节点们，按照遍历的顺序去重，EndEvent 放在末尾。指定节点在流程模型中都不存在时，返回 null
+     */
+    public static List<FlowElement> simulateProcessAfterElements(BpmnModel bpmnModel, Collection<String> elementIds,
+                                                                 Map<String, Object> variables) {
+        // 指定节点标记为已经遍历，避免循环回到它们
+        List<FlowNode> flowNodes = new ArrayList<>();
+        Set<FlowElement> visitElements = new HashSet<>();
+        elementIds.forEach(elementId -> {
+            if (getFlowElementById(bpmnModel, elementId) instanceof FlowNode flowNode
+                    && visitElements.add(flowNode)) {
+                flowNodes.add(flowNode);
+            }
+        });
+        if (flowNodes.isEmpty()) {
+            return null;
+        }
+
+        // 从指定节点的出口开始遍历
+        List<FlowElement> resultElements = new ArrayList<>();
+        flowNodes.forEach(flowNode -> flowNode.getOutgoingFlows().forEach(flow -> simulateNextFlowElements(
+                flow.getTargetFlowElement(), variables, resultElements, visitElements)));
+        // 将 EndEvent 放在末尾，与 simulateProcess 一致
         List<FlowElement> endEvents = CollUtil.removeWithAddIf(resultElements,
                 flowElement -> flowElement instanceof EndEvent);
         resultElements.addAll(endEvents);

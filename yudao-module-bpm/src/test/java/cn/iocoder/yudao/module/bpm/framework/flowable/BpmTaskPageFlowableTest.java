@@ -30,7 +30,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 /**
- * {@link BpmTaskServiceImpl} 的【已办任务】、【任务管理】分页的 Flowable 集成测试，覆盖创建时间的筛选
+ * {@link BpmTaskServiceImpl} 的【待办任务】、【已办任务】、【任务管理】分页的 Flowable 集成测试，覆盖创建时间的筛选
  *
  * <p>通过 Flowable 的时钟，控制任务的创建时间、审批时间；审批人使用独立的用户，避免其它测试的数据干扰。</p>
  * <p>测试代码兼容 JDK 8，与 JDK 8 分支仅 Resource 注解的包名不同。</p>
@@ -96,6 +96,23 @@ public class BpmTaskPageFlowableTest extends BaseFlowableUnitTest {
     }
 
     @Test
+    public void testGetTaskTodoPage_createTime() {
+        // 准备参数：待办任务，按时间从旧到新创建
+        createTodoTask("todoOlder", START.minusNanos(1_000_000)); // 区间外较旧：早 1 毫秒
+        createTodoTask("todoStart", START); // 恰好开始
+        createTodoTask("todoEnd", END); // 恰好结束
+        createTodoTask("todoNewer", END.plusNanos(1_000_000)); // 区间外较新：晚 1 毫秒
+
+        // 调用
+        PageResult<Task> pageResult = taskService.getTaskTodoPage(USER_ID,
+                buildPageReqVO(1, 10, new LocalDateTime[]{START, END}));
+        // 断言：包含区间两端，按创建时间倒序
+        assertEquals(2, pageResult.getTotal().longValue());
+        assertEquals(Arrays.asList(taskIds.get("todoEnd"), taskIds.get("todoStart")),
+                convertList(pageResult.getList(), Task::getId));
+    }
+
+    @Test
     public void testGetTaskDonePage_noCreateTime() {
         // 调用 + 断言：不筛选创建时间时，保持原有行为，返回全部
         assertPage(taskService.getTaskDonePage(USER_ID, buildPageReqVO(1, 10, null)), 7,
@@ -119,13 +136,18 @@ public class BpmTaskPageFlowableTest extends BaseFlowableUnitTest {
     }
 
     private void createApprovedTask(String key, LocalDateTime time) {
+        Task task = createTodoTask(key, time);
+        taskService.approveTask(USER_ID, new BpmTaskApproveReqVO().setId(task.getId()).setReason("同意"));
+    }
+
+    private Task createTodoTask(String key, LocalDateTime time) {
         processEngineConfiguration.getClock().setCurrentTime(DateUtils.of(time));
         String processInstanceId = processInstanceService.createProcessInstance(1L,
                 new BpmProcessInstanceCreateReqDTO().setProcessDefinitionKey("simpleApprove"));
         Task task = flowableTaskService.createTaskQuery().processInstanceId(processInstanceId).singleResult();
         assertEquals(String.valueOf(USER_ID), task.getAssignee());
-        taskService.approveTask(USER_ID, new BpmTaskApproveReqVO().setId(task.getId()).setReason("同意"));
         taskIds.put(key, task.getId());
+        return task;
     }
 
     private static BpmTaskPageReqVO buildPageReqVO(int pageNo, int pageSize, LocalDateTime[] createTime) {

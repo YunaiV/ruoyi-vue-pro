@@ -241,8 +241,9 @@ public class BpmProcessInstanceController {
         AdminUserRespDTO startUser = adminUserApi.getUser(Long.valueOf(historicProcessInstance.getStartUserId()));
         DeptRespDTO dept = deptApi.getDept(startUser.getDeptId());
         List<HistoricTaskInstance> tasks = taskService.getFinishedTaskListByProcessInstanceIdWithoutCancel(processInstanceId);
+        // 处理人：优先 assignee；向前加签后被跳过等场景，assignee 为空，使用 owner
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
-                convertSet(tasks, item -> Long.valueOf(item.getAssignee())));
+                convertSet(tasks, item -> NumberUtils.parseLong(StrUtil.blankToDefault(item.getAssignee(), item.getOwner()))));
         return success(BpmProcessInstanceConvert.INSTANCE.buildProcessInstancePrintData(historicProcessInstance,
                 processDefinitionService.getProcessDefinitionInfo(historicProcessInstance.getProcessDefinitionId()),
                 tasks, userMap,

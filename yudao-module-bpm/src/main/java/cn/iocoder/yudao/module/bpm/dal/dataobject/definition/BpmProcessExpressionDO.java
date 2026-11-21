@@ -33,7 +33,7 @@ public class BpmProcessExpressionDO extends BaseDO {
     /**
      * 表达式状态
      *
-     * 枚举 {@link TODO common_status 对应的类}
+     * 枚举 {@link cn.iocoder.yudao.framework.common.enums.CommonStatusEnum}
      */
     private Integer status;
     /**

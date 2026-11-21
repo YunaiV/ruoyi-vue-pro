@@ -34,6 +34,7 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.ManagementService;
+import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
@@ -54,6 +55,7 @@ import org.springframework.test.context.event.RecordApplicationEvents;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -87,6 +89,8 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
     private TaskService flowableTaskService;
     @Resource
     private ManagementService managementService;
+    @Resource
+    private ProcessEngineConfiguration processEngineConfiguration;
 
     @Resource
     private BpmTaskServiceImpl bpmTaskService;
@@ -1101,6 +1105,32 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
     }
 
     @Test
+    public void testWithdrawTask_nextTaskApprovedInSameMillisecond() {
+        // 准备参数：固定 Flowable 时钟，使 task1 的结束时间、task2 的创建时间相同
+        processEngineConfiguration.getClock().setCurrentTime(new Date());
+        try {
+            // 用户 2 审批通过 task1，流转到 task2 会签（用户 3、用户 5）
+            String processInstanceId = startRevisionProcessInstance(BpmModelFormTypeEnum.NORMAL,
+                    Set.of(2L), new LinkedHashSet<>(List.of(3L, 5L)));
+            doAnswer(invocation -> new BpmProcessDefinitionInfoDO().setProcessDefinitionId(invocation.getArgument(0))
+                    .setModelType(BpmModelTypeEnum.BPMN.getType()).setAllowWithdrawTask(true))
+                    .when(processDefinitionService).getProcessDefinitionInfo(anyString());
+            HistoricTaskInstance task1 = getHistoricTask(processInstanceId, "task1");
+            // 用户 3 审批通过 task2，用户 5 的任务仍在审批中
+            Task task2 = bpmTaskService.getRunningTaskListByProcessInstanceId(processInstanceId, null, "task2").stream()
+                    .filter(task -> "3".equals(task.getAssignee())).findFirst().orElseThrow();
+            bpmTaskService.approveTask(3L, new BpmTaskApproveReqVO().setId(task2.getId()).setReason("同意"));
+            assertEquals(task1.getEndTime().getTime(), bpmTaskService.getHistoricTask(task2.getId()).getCreateTime().getTime());
+
+            // 调用，并断言异常：下一个节点已经有人审批，不允许撤回
+            assertServiceException(() -> bpmTaskService.withdrawTask(2L, task1.getId()),
+                    TASK_WITHDRAW_FAIL_NEXT_TASK_NOT_ALLOW);
+        } finally {
+            processEngineConfiguration.getClock().reset();
+        }
+    }
+
+    @Test
     public void testMoveTaskToEnd_success() {
         // 准备参数
         String processInstanceId = startProcessInstance();
@@ -1143,6 +1173,27 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         // 断言
         assertTaskStatus(task1.getId(), BpmTaskStatusEnum.APPROVE.getStatus(), BpmReasonEnum.TIMEOUT_APPROVE.getReason());
         assertEquals("task2", getRunningTask(processInstanceId).getTaskDefinitionKey());
+    }
+
+    @Test
+    public void testProcessTaskTimeout_approveWithBeforeSignTask() {
+        // 准备参数：task1 向前加签给用户 2，父任务等待中（没有审批人）
+        String processInstanceId = startProcessInstance();
+        Task task1 = getRunningTask(processInstanceId);
+        bpmTaskService.createSignTask(1L, new BpmTaskSignCreateReqVO().setId(task1.getId())
+                .setType(BpmTaskSignTypeEnum.BEFORE.getType()).setUserIds(Set.of(2L)).setReason("加签"));
+        Task childTask = bpmTaskService.getTaskListByParentTaskId(task1.getId()).get(0);
+
+        // 调用：task1 超时自动通过
+        bpmTaskService.processTaskTimeout(processInstanceId, "task1",
+                BpmUserTaskTimeoutHandlerTypeEnum.APPROVE.getType());
+        // 断言：加签子任务自动通过，父任务恢复给用户 1 继续审批，流程仍停留在 task1
+        assertTaskStatus(childTask.getId(), BpmTaskStatusEnum.APPROVE.getStatus(), BpmReasonEnum.TIMEOUT_APPROVE.getReason());
+        Task parentTask = getRunningTask(processInstanceId);
+        assertEquals(task1.getId(), parentTask.getId());
+        assertEquals("1", parentTask.getAssignee());
+        assertEquals(BpmTaskStatusEnum.RUNNING.getStatus(),
+                parentTask.getTaskLocalVariables().get(BpmnVariableConstants.TASK_VARIABLE_STATUS));
     }
 
     @Test
@@ -1502,6 +1553,21 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         assertNull(processInstanceService.getProcessInstance(processInstanceId));
         assertEquals(BpmProcessInstanceStatusEnum.REJECT.getStatus(), getHistoricProcessVariable(processInstanceId,
                 BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_STATUS));
+    }
+
+    @Test
+    public void testTimerFired_userTaskTimeoutAutoJumpNotSimple() {
+        // 准备参数：BPMN 设计器的流程，超时处理方式改为【自动跳转】，没有经过 SIMPLE 模型保存的校验
+        deploy("bpmn/timeout-approve.bpmn20.xml");
+        mockBoundaryEventTimeoutHandlerType("task1-timeout", BpmUserTaskTimeoutHandlerTypeEnum.AUTO_JUMP);
+        String processInstanceId = startProcessInstance("timeoutApprove");
+        Task task1 = getRunningTask(processInstanceId);
+
+        // 调用
+        executeTimerJob(processInstanceId);
+        // 断言：自动跳转仅支持 SIMPLE 设计器，不进行跳转，任务保持审批中
+        assertEquals(task1.getId(), getRunningTask(processInstanceId).getId());
+        assertEquals(BpmTaskStatusEnum.RUNNING.getStatus(), getTaskStatus(task1.getId()));
     }
 
     @Test

@@ -26,6 +26,7 @@ public enum BpmReasonEnum {
     CANCEL_BY_SYSTEM("系统自动取消"), // 场景：非常多，比如说：1）多任务审批已经满足条件，无需审批该任务；2）流程实例被取消，无需审批该任务；等等
     TIMEOUT_APPROVE("审批超时，系统自动通过"),
     TIMEOUT_REJECT("审批超时，系统自动不通过"),
+    TIMEOUT_JUMP("审批超时，系统自动跳转到【{}】"),
     ASSIGN_START_USER_APPROVE("审批人与提交人为同一人时，自动通过"),
     ASSIGN_START_USER_APPROVE_WHEN_SKIP("审批人与提交人为同一人时，自动通过"),
     ASSIGN_START_USER_APPROVE_WHEN_SKIP_START_USER_NODE("发起人节点首次自动通过"), // 目前仅“子流程”使用

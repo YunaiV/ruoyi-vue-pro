@@ -26,6 +26,10 @@ public interface ErrorCodeConstants {
     ErrorCode MODEL_UPDATE_FAIL_NOT_MANAGER = new ErrorCode(1_009_002_007, "操作流程失败，原因：你不是该流程({})的管理员");
     ErrorCode MODEL_DEPLOY_FAIL_FIRST_USER_TASK_CANDIDATE_STRATEGY_ERROR = new ErrorCode(1_009_002_008, "部署流程失败，原因：首个任务({})的审批人不能是【审批人自选】");
     ErrorCode MODEL_IMPORT_FAIL_INVALID = new ErrorCode(1_009_002_009, "导入流程失败，流程模型文件为空或 JSON 格式不正确");
+    ErrorCode MODEL_SAVE_FAIL_TIMEOUT_JUMP_NODE_INVALID = new ErrorCode(1_009_002_010, "保存流程失败，原因：审批节点({})的超时自动跳转节点无效，" +
+            "只能跳转到其它人工审批的审批节点（审批人不能是自选），并且两者都不能位于并行分支、包容分支内");
+    ErrorCode MODEL_DEPLOY_FAIL_TIMEOUT_JUMP_NOT_SIMPLE = new ErrorCode(1_009_002_011, "部署流程失败，原因：审批节点({})的超时执行动作【自动跳转】仅支持仿钉钉设计器");
+    ErrorCode MODEL_DEPLOY_FAIL_TIMEOUT_JUMP_NOT_MATCH = new ErrorCode(1_009_002_012, "部署流程失败，原因：审批节点({})的超时自动跳转配置与流程图不一致，请在仿钉钉设计器中重新保存");
 
     // ========== 流程定义 1-009-003-000 ==========
     ErrorCode PROCESS_DEFINITION_KEY_NOT_MATCH = new ErrorCode(1_009_003_000, "流程定义的标识期望是({})，当前是({})，请修改 BPMN 流程图");

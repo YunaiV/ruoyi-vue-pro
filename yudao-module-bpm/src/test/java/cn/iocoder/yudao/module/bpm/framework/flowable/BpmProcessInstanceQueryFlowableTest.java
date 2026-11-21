@@ -1,6 +1,8 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable;
 
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.bpm.api.task.dto.BpmProcessInstanceCreateReqDTO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmApprovalDetailReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmApprovalDetailRespVO;
@@ -9,12 +11,14 @@ import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessI
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmProcessInstancePageReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskApproveReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskRejectReqVO;
+import cn.iocoder.yudao.module.bpm.controller.admin.task.vo.task.BpmTaskReturnReqVO;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceStatusEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskStatusEnum;
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceServiceImpl;
 import cn.iocoder.yudao.module.bpm.service.task.BpmTaskServiceImpl;
 import jakarta.annotation.Resource;
+import org.flowable.engine.HistoryService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
@@ -30,7 +34,9 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.BAD_REQUEST;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.filterList;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.PROCESS_DEFINITION_NOT_EXISTS;
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.PROCESS_INSTANCE_NOT_EXISTS;
@@ -53,6 +59,8 @@ public class BpmProcessInstanceQueryFlowableTest extends BaseFlowableUnitTest {
     private RepositoryService repositoryService;
     @Resource
     private RuntimeService runtimeService;
+    @Resource
+    private HistoryService historyService;
     @Resource
     private TaskService flowableTaskService;
 
@@ -172,6 +180,56 @@ public class BpmProcessInstanceQueryFlowableTest extends BaseFlowableUnitTest {
         assertTrue(childNode.getTasks().isEmpty());
         // 断言：用户 1 在主流程中没有待办
         assertNull(respVO.getTodoTask());
+    }
+
+    @Test
+    public void testGetApprovalDetail_returnTwiceThenPreviousBranch() {
+        // 准备参数：A -> 排他网关 -> 金额大于 100：B -> B2；否则：C；最后汇聚到 D
+        String processInstanceId = startReturnBranchProcessInstance();
+        // 第一次：金额 200，经过 A、B、B2 到达 D，D 退回到 A
+        approveRunningTask(processInstanceId, "A", Map.of("amount", 200));
+        approveRunningTask(processInstanceId, "B", null);
+        approveRunningTask(processInstanceId, "B2", null);
+        returnRunningTask(processInstanceId, "D", "A");
+        // 第二次：金额 50，经过 A、C 到达 D，D 再次退回到 A
+        approveRunningTask(processInstanceId, "A", Map.of("amount", 50));
+        approveRunningTask(processInstanceId, "C", null);
+        returnRunningTask(processInstanceId, "D", "A");
+        // 第三次：金额 200，A 审批通过后，B 进行中。此时，退回记录的预测节点只有 D、C，不包括 B2
+        approveRunningTask(processInstanceId, "A", Map.of("amount", 200));
+
+        // 调用
+        BpmApprovalDetailRespVO respVO = processInstanceService.getApprovalDetail(1L,
+                new BpmApprovalDetailReqVO().setProcessInstanceId(processInstanceId));
+        // 断言：B 进行中；B 之后的 B2、D、结束节点都需要预测，即使 B2 在第一次执行过
+        List<ActivityNode> nodes = respVO.getActivityNodes();
+        assertEquals(List.of("B"), convertList(filterList(nodes,
+                node -> BpmTaskStatusEnum.RUNNING.getStatus().equals(node.getStatus())), ActivityNode::getId));
+        assertEquals(List.of("B2", "D", "end"), convertList(filterList(nodes,
+                node -> BpmTaskStatusEnum.NOT_START.getStatus().equals(node.getStatus())), ActivityNode::getId));
+    }
+
+    @Test
+    public void testGetApprovalDetail_returnThenVariableChangedAfterGateway() {
+        // 准备参数：金额 200，经过 A、B、B2 到达 D，D 退回到 A；A 再次审批通过后，B 进行中
+        String processInstanceId = startReturnBranchProcessInstance();
+        approveRunningTask(processInstanceId, "A", Map.of("amount", 200));
+        approveRunningTask(processInstanceId, "B", null);
+        approveRunningTask(processInstanceId, "B2", null);
+        returnRunningTask(processInstanceId, "D", "A");
+        approveRunningTask(processInstanceId, "A", Map.of("amount", 200));
+        // 准备参数：通过网关后，金额修改为 50（例如说，修改表单）。从头预测会走 C 分支
+        runtimeService.setVariable(processInstanceId, "amount", 50);
+
+        // 调用
+        BpmApprovalDetailRespVO respVO = processInstanceService.getApprovalDetail(1L,
+                new BpmApprovalDetailReqVO().setProcessInstanceId(processInstanceId));
+        // 断言：从进行中的 B 开始预测：B2、D、结束节点，不展示没有走的 C 分支
+        List<ActivityNode> nodes = respVO.getActivityNodes();
+        assertEquals(List.of("B"), convertList(filterList(nodes,
+                node -> BpmTaskStatusEnum.RUNNING.getStatus().equals(node.getStatus())), ActivityNode::getId));
+        assertEquals(List.of("B2", "D", "end"), convertList(filterList(nodes,
+                node -> BpmTaskStatusEnum.NOT_START.getStatus().equals(node.getStatus())), ActivityNode::getId));
     }
 
     @Test
@@ -395,6 +453,58 @@ public class BpmProcessInstanceQueryFlowableTest extends BaseFlowableUnitTest {
         assertTrue(pageResult.getList().isEmpty());
     }
 
+    @Test // 表单字段：数字范围、日期区间、模糊查询，以及原有的全等匹配。表单变量通过 JSON 反序列化，与前端发起流程时一致
+    public void testGetProcessInstancePage_formFieldsParams() {
+        // 准备参数：amount 混合 integer、long、double 类型；applyDate 混合 date、datetime（含毫秒）格式；day 为其它数字字段
+        String id1 = startProcessInstance(1L, parseVariables("{\"amount\": 0, \"applyDate\": \"2026-01-01\", \"reason\": \"差旅 100%\"}"));
+        String id2 = startProcessInstance(1L, parseVariables("{\"amount\": 10, \"applyDate\": \"2026-01-15 09:30:00\", \"reason\": \"差旅_北京\"}"));
+        String id3 = startProcessInstance(1L, parseVariables("{\"amount\": 10.5, \"applyDate\": \"2026-01-31 23:59:59.999\", \"reason\": \"采购\"}"));
+        String id4 = startProcessInstance(1L, parseVariables("{\"amount\": 3000000000, \"day\": 5, \"applyDate\": \"2026-02-01 00:00:00\", \"reason\": \"差旅\"}"));
+        String id5 = startProcessInstance(1L, parseVariables("{\"amount\": 100.0, \"day\": 5, \"applyDate\": \"2025-12-31 23:59:59\", \"reason\": \"其它\"}"));
+        String id6 = startProcessInstance(1L, parseVariables("{\"day\": 5}"));
+        // 断言：Flowable 存储的变量类型
+        assertEquals(List.of("integer", "integer", "double", "long", "double"), convertList(List.of(id1, id2, id3, id4, id5),
+                id -> historyService.createHistoricVariableInstanceQuery().processInstanceId(id).variableName("amount")
+                        .singleResult().getVariableTypeName()));
+
+        // 调用 + 断言：数字范围，两端包含（包括 0），整数、小数、Long 均匹配；不匹配其它字段（day）
+        assertEquals(Set.of(id1, id2, id3), getPageIds("{\"amount\": {\"op\": \"numberRange\", \"value\": [0, 10.5]}}"));
+        assertEquals(Set.of(id3, id4, id5), getPageIds("{\"amount\": {\"op\": \"numberRange\", \"value\": [10.2, null]}}"));
+        assertEquals(Set.of(id1), getPageIds("{\"amount\": {\"op\": \"numberRange\", \"value\": [null, 0]}}"));
+        PageResult<HistoricProcessInstance> pageResult = getPage("{\"amount\": {\"op\": \"numberRange\", \"value\": [0.5, 9.9]}}", 1, 10);
+        assertEquals(0, pageResult.getTotal());
+        assertTrue(pageResult.getList().isEmpty());
+        // 调用 + 断言：日期区间，包含开始日期的 00:00:00、结束日期的 23:59:59.999，不包含结束日期下一天的 00:00:00
+        assertEquals(Set.of(id1, id2, id3), getPageIds("{\"applyDate\": {\"op\": \"dateRange\", \"value\": [\"2026-01-01\", \"2026-01-31\"]}}"));
+        assertEquals(Set.of(id4), getPageIds("{\"applyDate\": {\"op\": \"dateRange\", \"value\": [\"2026-02-01\", null]}}"));
+        // 调用 + 断言：模糊匹配，_ 作为 LIKE 通配符匹配任意一个字符
+        assertEquals(Set.of(id1, id2, id4), getPageIds("{\"reason\": {\"op\": \"like\", \"value\": \"差旅\"}}"));
+        assertEquals(Set.of(id1, id2), getPageIds("{\"reason\": {\"op\": \"like\", \"value\": \"差旅_\"}}"));
+        // 调用 + 断言：组合条件，并分页：总数一致，跨页不重复，超出范围时为空页
+        String combined = "{\"amount\": {\"op\": \"numberRange\", \"value\": [0, 100]},"
+                + " \"applyDate\": {\"op\": \"dateRange\", \"value\": [\"2026-01-01\", \"2026-01-31\"]},"
+                + " \"reason\": {\"op\": \"like\", \"value\": \"差旅\"}}";
+        PageResult<HistoricProcessInstance> page1 = getPage(combined, 1, 1);
+        PageResult<HistoricProcessInstance> page2 = getPage(combined, 2, 1);
+        PageResult<HistoricProcessInstance> page3 = getPage(combined, 3, 1);
+        assertEquals(List.of(2L, 2L, 2L), List.of(page1.getTotal(), page2.getTotal(), page3.getTotal()));
+        assertEquals(1, page1.getList().size());
+        assertEquals(1, page2.getList().size());
+        assertEquals(Set.of(id1, id2), Set.of(page1.getList().get(0).getId(), page2.getList().get(0).getId()));
+        assertTrue(page3.getList().isEmpty());
+        // 调用 + 断言：原有的标量全等匹配
+        assertEquals(Set.of(id3), getPageIds("{\"reason\": \"采购\", \"amount\": 10.5}"));
+        assertEquals(Set.of(id2), getPageIds("{\"amount\": 10}"));
+        // 调用 + 断言：空条件，不进行筛选
+        assertEquals(Set.of(id1, id2, id3, id4, id5, id6), getPageIds("{\"amount\": {\"op\": \"numberRange\", \"value\": [null, null]},"
+                + " \"applyDate\": {\"op\": \"dateRange\", \"value\": null}, \"reason\": {\"op\": \"like\", \"value\": \"\"}, \"day\": null}"));
+        // 调用 + 断言：不支持的查询方式、日期格式
+        assertEquals(BAD_REQUEST.getCode(), assertThrows(ServiceException.class,
+                () -> getPage("{\"amount\": {\"op\": \"gt\", \"value\": 1}}", 1, 10)).getCode());
+        assertEquals(BAD_REQUEST.getCode(), assertThrows(ServiceException.class,
+                () -> getPage("{\"applyDate\": {\"op\": \"dateRange\", \"value\": [\"2026-01-01 00:00:00\", null]}}", 1, 10)).getCode());
+    }
+
     // ========== getNextApprovalNodes ==========
 
     @Test
@@ -456,6 +566,74 @@ public class BpmProcessInstanceQueryFlowableTest extends BaseFlowableUnitTest {
     private void approveRunningTask(String processInstanceId) {
         Task task = getRunningTask(processInstanceId);
         taskService.approveTask(1L, new BpmTaskApproveReqVO().setId(task.getId()).setReason("同意"));
+    }
+
+    /**
+     * 发起退回分支流程：A -> 排他网关 -> 金额大于 100：B -> B2；否则：C；最后汇聚到 D。发起时金额为 200
+     */
+    private String startReturnBranchProcessInstance() {
+        String bpmnXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+                + "<definitions xmlns=\"http://www.omg.org/spec/BPMN/20100524/MODEL\" xmlns:flowable=\"http://flowable.org/bpmn\""
+                + " targetNamespace=\"http://www.yudao.iocoder.cn/bpm\">"
+                + "<process id=\"returnBranch\" name=\"退回分支\" isExecutable=\"true\">"
+                + "<startEvent id=\"start\"/>"
+                + "<sequenceFlow id=\"flow-start\" sourceRef=\"start\" targetRef=\"A\"/>"
+                + buildUserTaskXml("A") + "<sequenceFlow id=\"flow-a\" sourceRef=\"A\" targetRef=\"gateway\"/>"
+                + "<exclusiveGateway id=\"gateway\" default=\"flow-c\"/>"
+                + "<sequenceFlow id=\"flow-b\" sourceRef=\"gateway\" targetRef=\"B\">"
+                + "<conditionExpression xsi:type=\"tFormalExpression\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
+                + "<![CDATA[${amount > 100}]]></conditionExpression></sequenceFlow>"
+                + "<sequenceFlow id=\"flow-c\" sourceRef=\"gateway\" targetRef=\"C\"/>"
+                + buildUserTaskXml("B") + "<sequenceFlow id=\"flow-b-b2\" sourceRef=\"B\" targetRef=\"B2\"/>"
+                + buildUserTaskXml("B2") + "<sequenceFlow id=\"flow-b2-d\" sourceRef=\"B2\" targetRef=\"D\"/>"
+                + buildUserTaskXml("C") + "<sequenceFlow id=\"flow-c-d\" sourceRef=\"C\" targetRef=\"D\"/>"
+                + buildUserTaskXml("D") + "<sequenceFlow id=\"flow-d\" sourceRef=\"D\" targetRef=\"end\"/>"
+                + "<endEvent id=\"end\"/>"
+                + "</process></definitions>";
+        deploymentIds.add(repositoryService.createDeployment().addString("return-branch.bpmn20.xml", bpmnXml)
+                .deploy().getId());
+        return processInstanceService.createProcessInstance(1L, new BpmProcessInstanceCreateReqDTO()
+                .setProcessDefinitionKey("returnBranch").setVariables(new HashMap<>(Map.of("amount", 200))));
+    }
+
+    private void approveRunningTask(String processInstanceId, String taskDefinitionKey, Map<String, Object> variables) {
+        Task task = getRunningTask(processInstanceId);
+        assertEquals(taskDefinitionKey, task.getTaskDefinitionKey());
+        taskService.approveTask(1L, new BpmTaskApproveReqVO().setId(task.getId()).setReason("同意").setVariables(variables));
+    }
+
+    private void returnRunningTask(String processInstanceId, String taskDefinitionKey, String targetTaskDefinitionKey) {
+        Task task = getRunningTask(processInstanceId);
+        assertEquals(taskDefinitionKey, task.getTaskDefinitionKey());
+        taskService.returnTask(1L, new BpmTaskReturnReqVO().setId(task.getId())
+                .setTargetTaskDefinitionKey(targetTaskDefinitionKey).setReason("退回"));
+    }
+
+    private static String buildUserTaskXml(String id) {
+        return "<userTask id=\"" + id + "\" name=\"审批 " + id + "\"><extensionElements>"
+                + "<flowable:candidateStrategy>30</flowable:candidateStrategy></extensionElements></userTask>";
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Map<String, Object> parseVariables(String json) {
+        return JsonUtils.parseObject(json, Map.class);
+    }
+
+    private PageResult<HistoricProcessInstance> getPage(String formFieldsParams, int pageNo, int pageSize) {
+        BpmProcessInstancePageReqVO reqVO = new BpmProcessInstancePageReqVO();
+        reqVO.setProcessDefinitionKey("twoStepApprove").setFormFieldsParams(formFieldsParams);
+        reqVO.setPageNo(pageNo);
+        reqVO.setPageSize(pageSize);
+        return processInstanceService.getProcessInstancePage(null, reqVO);
+    }
+
+    /**
+     * 查询第一页的流程实例编号，并断言总数与列表一致
+     */
+    private Set<String> getPageIds(String formFieldsParams) {
+        PageResult<HistoricProcessInstance> pageResult = getPage(formFieldsParams, 1, 10);
+        assertEquals(pageResult.getList().size(), pageResult.getTotal());
+        return new HashSet<>(convertList(pageResult.getList(), HistoricProcessInstance::getId));
     }
 
     private static void assertPageIds(List<String> expected, PageResult<HistoricProcessInstance> pageResult) {

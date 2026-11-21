@@ -327,8 +327,11 @@ public interface BpmProcessInstanceConvert {
             approveTask.setName(item.getName());
             approveTask.setId(item.getId());
             approveTask.setSignPicUrl((String) taskLocalVariables.get(BpmnVariableConstants.TASK_SIGN_PIC_URL));
+            // 处理人：优先 assignee；向前加签后被跳过等场景，assignee 为空，使用 owner。用户不存在时，展示为空
+            AdminUserRespDTO assigneeUser = userMap.get(NumberUtils.parseLong(
+                    StrUtil.blankToDefault(item.getAssignee(), item.getOwner())));
             approveTask.setDescription(StrUtil.format("{} / {} / {} / {} / {}",
-                    userMap.get(Long.valueOf(item.getAssignee())).getNickname(),
+                    assigneeUser != null ? assigneeUser.getNickname() : "",
                     item.getName(),
                     DateUtil.formatDateTime(item.getEndTime()),
                     BpmTaskStatusEnum.valueOf((Integer) taskLocalVariables.get(BpmnVariableConstants.TASK_VARIABLE_STATUS)).getName(),

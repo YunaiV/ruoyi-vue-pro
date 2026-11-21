@@ -3,7 +3,9 @@ package cn.iocoder.yudao.module.bpm.service.task;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.*;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
@@ -28,6 +30,7 @@ import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelFormTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmSimpleModelNodeTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmAttachmentTypeEnum;
+import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceFormFieldQueryTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceStatusEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmReasonEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskStatusEnum;
@@ -70,9 +73,15 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.validation.annotation.Validated;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.*;
+import java.util.function.BiFunction;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.invalidParamException;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.*;
 import static cn.iocoder.yudao.module.bpm.controller.admin.task.vo.instance.BpmApprovalDetailRespVO.ActivityNode;
 import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.*;
@@ -353,9 +362,14 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
 
         // 3.2 获取由于退回操作，需要预测的节点。从流程变量中获取，回退操作会设置这些变量
         Set<String> needSimulateTaskDefKeysByReturn = new HashSet<>();
+        // 是否从进行中的节点开始预测：实际发生过手工退回（会设置需要预测的节点的变量，即使之后被审批移除为空）、审批超时【自动跳转】。
+        // 从流程实例本身读取，不使用前端传递的流程变量，避免预览时误用
+        boolean simulateAfterRunningNodes = false;
         if (StrUtil.isNotEmpty(reqVO.getProcessInstanceId())) {
             Object needSimulateTaskIds = runtimeService.getVariable(reqVO.getProcessInstanceId(), BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_NEED_SIMULATE_TASK_IDS);
             needSimulateTaskDefKeysByReturn.addAll(Convert.toSet(String.class, needSimulateTaskIds));
+            simulateAfterRunningNodes = needSimulateTaskIds != null || BooleanUtil.isTrue(Convert.toBool(runtimeService.getVariable(
+                    reqVO.getProcessInstanceId(), BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_TIMEOUT_JUMPED)));
         }
         // 移除运行中的节点，运行中的节点无需预测
         if (CollUtil.isNotEmpty(runActivityNodes)) {
@@ -365,7 +379,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         // 3.3 预测未运行节点的审批信息
         List<ActivityNode> simulateActivityNodes = getSimulateApproveNodeList(startUserId, bpmnModel,
                 processDefinitionInfo,
-                processVariables, activities, needSimulateTaskDefKeysByReturn);
+                processVariables, activities, needSimulateTaskDefKeysByReturn, simulateAfterRunningNodes);
 
         // 4. 拼接最终数据
         return buildApprovalDetail(loginUserId, reqVO, bpmnModel, processDefinition, processDefinitionInfo, historicProcessInstance,
@@ -468,13 +482,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         // 表单字段查询
         Map<String, Object> formFieldsParams = JsonUtils.parseObject(pageReqVO.getFormFieldsParams(), Map.class);
         if (CollUtil.isNotEmpty(formFieldsParams)) {
-            formFieldsParams.forEach((key, value) -> {
-                if (StrUtil.isEmpty(String.valueOf(value))) {
-                    return;
-                }
-                // TODO @lesan：应支持多种类型的查询方式，目前只有字符串全等
-                processInstanceQuery.variableValueEquals(key, value);
-            });
+            formFieldsParams.forEach((key, value) -> buildFormFieldQuery(processInstanceQuery, key, value));
         }
 
         // 2.1 查询数量
@@ -486,6 +494,138 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         List<HistoricProcessInstance> processInstanceList = processInstanceQuery.listPage(PageUtils.getStart(pageReqVO),
                 pageReqVO.getPageSize());
         return new PageResult<>(processInstanceList, processInstanceCount);
+    }
+
+    /**
+     * 构建表单字段的查询条件，均通过 Flowable 的流程变量条件，在数据库中查询
+     * <p>
+     * 1. 值为标量时，按全等匹配
+     * 2. 值为 {op, value} 时，按 op 查询，见 {@link BpmProcessInstanceFormFieldQueryTypeEnum}。范围的两端均包含，其中一端为空时只限制另一端
+     * 补充说明：值、范围的两端都为空时，不进行筛选
+     *
+     * @param query 流程实例查询
+     * @param key   表单字段
+     * @param value 查询值
+     */
+    @SuppressWarnings("unchecked")
+    private static void buildFormFieldQuery(HistoricProcessInstanceQuery query, String key, Object value) {
+        // 情况一：全等匹配
+        if (!(value instanceof Map)) {
+            if (value != null && StrUtil.isNotEmpty(String.valueOf(value))) {
+                query.variableValueEquals(key, value);
+            }
+            return;
+        }
+        Map<String, Object> condition = (Map<String, Object>) value;
+        Object op = condition.get("op");
+        Object conditionValue = condition.get("value");
+        BpmProcessInstanceFormFieldQueryTypeEnum queryType = BpmProcessInstanceFormFieldQueryTypeEnum.of(Convert.toStr(op));
+        if (queryType == null) {
+            throw invalidParamException("表单字段({}) 的查询方式({}) 不支持", key, op);
+        }
+        // 情况二：模糊匹配，只匹配字符串类型的变量
+        // 注意：查询值中的 %、_ 作为 LIKE 通配符，不进行转义（与流程名称的模糊查询一致）
+        if (queryType == BpmProcessInstanceFormFieldQueryTypeEnum.LIKE) {
+            if (conditionValue != null && !(conditionValue instanceof String)) {
+                throw invalidParamException("表单字段({}) 的模糊查询值必须是字符串", key);
+            }
+            if (StrUtil.isNotEmpty((String) conditionValue)) {
+                query.variableValueLike(key, "%" + conditionValue + "%");
+            }
+            return;
+        }
+        // 数字范围、日期区间：参数形状均为 [开始, 结束]
+        List<?> range = parseFormFieldRange(key, conditionValue);
+        if (range == null) {
+            return;
+        }
+        // 情况三：数字范围
+        if (queryType == BpmProcessInstanceFormFieldQueryTypeEnum.NUMBER_RANGE) {
+            for (int i = 0; i < range.size(); i++) {
+                Object number = range.get(i);
+                if (number == null) {
+                    continue;
+                }
+                if (!(number instanceof Number)) {
+                    throw invalidParamException("表单字段({}) 的数字范围必须是数字", key);
+                }
+                addFormFieldNumberBound(query, key, new BigDecimal(number.toString()), i == 0);
+            }
+            return;
+        }
+        // 情况四：日期区间。日期组件（date、datetime 类型）的值，存储为 yyyy-MM-dd、yyyy-MM-dd HH:mm:ss（可能带毫秒）格式的字符串，
+        // 按字符串比较即为时间顺序；上界使用 < 结束日期的下一天，从而包含结束日期当天的所有日期时间（包括毫秒），并排除下一天的零点
+        LocalDate startDate = parseFormFieldDate(key, range.get(0));
+        LocalDate endDate = parseFormFieldDate(key, range.get(1));
+        if (startDate != null) {
+            query.variableValueGreaterThanOrEqual(key, startDate.toString());
+        }
+        if (endDate != null) {
+            query.variableValueLessThan(key, endDate.plusDays(1).toString());
+        }
+    }
+
+    /**
+     * 解析表单字段的范围查询值：必须是 [开始, 结束]；为空时，返回 null，表示不进行筛选
+     */
+    private static List<?> parseFormFieldRange(String key, Object value) {
+        if (value == null) {
+            return null;
+        }
+        if (!(value instanceof List<?> range) || range.size() != 2) {
+            throw invalidParamException("表单字段({}) 的范围查询值必须是 [开始, 结束]", key);
+        }
+        return range;
+    }
+
+    /**
+     * 添加表单字段的数字边界条件
+     * <p>
+     * 表单的数字，经 JSON 反序列化后为 Integer、Long、Double，Flowable 分别存储为 integer、long、double 类型的变量，
+     * 并且只比较相同类型的变量。所以，通过 or 匹配任一类型；每个流程实例的同一字段只有一个变量，所以上、下边界的 or 组合后，即为该变量在范围内
+     *
+     * @param query 流程实例查询
+     * @param key   表单字段
+     * @param value 边界值
+     * @param lower 是否为下边界
+     */
+    private static void addFormFieldNumberBound(HistoricProcessInstanceQuery query, String key,
+                                                BigDecimal value, boolean lower) {
+        // 1. 下边界使用 >=，上边界使用 <=，两端均包含
+        BiFunction<String, Object, HistoricProcessInstanceQuery> condition = lower
+                ? query::variableValueGreaterThanOrEqual : query::variableValueLessThanOrEqual;
+        // 2. 整数类型的边界：小数向范围内取整，例如说 >= 1.5 即 >= 2，<= 1.5 即 <= 1
+        BigDecimal integerValue = value.setScale(0, lower ? RoundingMode.CEILING : RoundingMode.FLOOR);
+        query.or();
+        // 2.1 integer 类型：超出 int 范围时钳制到极值；该类型没有满足的值时，不添加条件
+        Long intBound = NumberUtils.getIntegerBound(integerValue, lower, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        if (intBound != null) {
+            condition.apply(key, intBound.intValue());
+        }
+        // 2.2 long 类型：同上
+        Long longBound = NumberUtils.getIntegerBound(integerValue, lower, Long.MIN_VALUE, Long.MAX_VALUE);
+        if (longBound != null) {
+            condition.apply(key, longBound);
+        }
+        // 3. double 类型：使用原始边界值，不取整
+        condition.apply(key, value.doubleValue());
+        query.endOr();
+    }
+
+    /**
+     * 解析表单字段的日期区间：只支持 yyyy-MM-dd 格式；为空时，返回 null
+     */
+    private static LocalDate parseFormFieldDate(String key, Object date) {
+        if (StrUtil.isBlankIfStr(date)) {
+            return null;
+        }
+        if (date instanceof String dateStr) {
+            try {
+                return LocalDateTimeUtil.parseDate(dateStr, DatePattern.NORM_DATE_PATTERN);
+            } catch (DateTimeParseException ignored) {
+            }
+        }
+        throw invalidParamException("表单字段({}) 的日期({}) 必须是 yyyy-MM-dd 格式", key, date);
     }
 
     /**
@@ -662,7 +802,7 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
             for (HistoricActivityInstance activity : taskActivities) {
                 HistoricTaskInstance task = taskMap.get(activity.getTaskId());
                 // 特殊情况：子流程节点 ChildProcess 仅存在于 activity 中，并且没有自身的 task，需要跳过执行
-                // TODO @芋艿：后续看看怎么优化！
+                // 补充说明：此时只展示节点本身，并在下面设置子流程实例编号（processInstanceId），子流程的任务通过它查看
                 if (task == null) {
                     continue;
                 }
@@ -711,21 +851,36 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
                                                           BpmProcessDefinitionInfoDO processDefinitionInfo,
                                                           Map<String, Object> processVariables,
                                                           List<HistoricActivityInstance> activities,
-                                                          Set<String> needSimulateTaskDefKeysByReturn) {
-        // TODO @芋艿：【可优化】在驳回场景下，未来的预测准确性不高。原因是，驳回后，HistoricActivityInstance
-        // 包括了历史的操作，不是只有 startEvent 到当前节点的记录
+                                                          Set<String> needSimulateTaskDefKeysByReturn,
+                                                          boolean simulateAfterRunningNodes) {
         Set<String> runActivityIds = convertSet(activities, HistoricActivityInstance::getActivityId);
         // 情况一：BPMN 设计器
         if (Objects.equals(BpmModelTypeEnum.BPMN.getType(), processDefinitionInfo.getModelType())) {
-            List<FlowElement> flowElements = BpmnModelUtils.simulateProcess(bpmnModel, processVariables);
+            // 特殊：手工退回、审批超时【自动跳转】过的流程实例，从进行中的节点开始预测，见 BpmnModelUtils#simulateProcessAfterElements
+            // 原因：HistoricActivityInstance 包括了历史的操作，进行中的节点之后的节点即使执行过（例如说，多次退回后，走了之前的分支），
+            // 也会再次执行，需要预测；退回时记录的节点，只包括最近一次退回目标之后执行过的节点，不够
+            List<FlowElement> afterElements = simulateAfterRunningNodes ? BpmnModelUtils.simulateProcessAfterElements(bpmnModel,
+                    convertList(filterList(activities, activity -> activity.getEndTime() == null),
+                            HistoricActivityInstance::getActivityId), processVariables) : null;
+            // 正常情况（或者进行中的节点在流程模型中都不存在时），从 StartEvent 开始预测
+            List<FlowElement> flowElements = afterElements != null ? afterElements
+                    : BpmnModelUtils.simulateProcess(bpmnModel, processVariables);
+            // 从进行中的节点开始预测时，预测的节点都会再次执行，即使历史中执行过，也需要预测
+            Set<String> needSimulateTaskDefKeys = afterElements != null ? convertSet(afterElements, FlowElement::getId)
+                    : needSimulateTaskDefKeysByReturn;
             return convertList(flowElements, flowElement -> buildNotRunApproveNodeForBpmn(
                     startUserId, bpmnModel, flowElements,
-                    processDefinitionInfo, processVariables, flowElement, runActivityIds, needSimulateTaskDefKeysByReturn));
+                    processDefinitionInfo, processVariables, flowElement, runActivityIds, needSimulateTaskDefKeys));
         }
         // 情况二：SIMPLE 设计器
         if (Objects.equals(BpmModelTypeEnum.SIMPLE.getType(), processDefinitionInfo.getModelType())) {
             BpmSimpleModelNodeVO simpleModel = JsonUtils.parseObject(processDefinitionInfo.getSimpleModel(),
                     BpmSimpleModelNodeVO.class);
+            // 特殊：手工退回、审批超时【自动跳转】过的流程实例，不再按流程变量从头执行，从当前进行中的节点开始预测
+            if (simulateAfterRunningNodes) {
+                return getSimulateApproveNodeListAfterRunningNodes(startUserId, bpmnModel, processDefinitionInfo,
+                        processVariables, activities, simpleModel);
+            }
             List<BpmSimpleModelNodeVO> simpleNodes = SimpleModelUtils.simulateProcess(simpleModel, processVariables);
             return convertList(simpleNodes, simpleNode -> buildNotRunApproveNodeForSimple(
                     startUserId, bpmnModel,
@@ -734,14 +889,45 @@ public class BpmProcessInstanceServiceImpl implements BpmProcessInstanceService 
         throw new IllegalArgumentException("未知设计器类型：" + processDefinitionInfo.getModelType());
     }
 
+    /**
+     * 获得手工退回、审批超时【自动跳转】过的 SIMPLE 流程实例，【预测（未来）】的活动节点们
+     * <p>
+     * 跨条件分支跳转后，流程实例不再按流程变量从头执行：从头预测会展示已经绕过的节点，漏掉跳转目标之后的节点；
+     * 退回、往回跳过已经执行的节点（包括并行分支）时，它们会因为执行过而不展示。所以，只按实际进行中的节点预测它们之后的节点，
+     * 见 {@link SimpleModelUtils#simulateProcessAfterNodes}。这些节点都会再次执行，所以即使执行过，也需要展示
+     * <p>
+     * 进行中的节点都不在模型中时（例如说，数据异常），无法可靠预测，不展示未来的节点，避免展示错误的分支
+     */
+    private List<ActivityNode> getSimulateApproveNodeListAfterRunningNodes(Long startUserId, BpmnModel bpmnModel,
+                                                                          BpmProcessDefinitionInfoDO processDefinitionInfo,
+                                                                          Map<String, Object> processVariables,
+                                                                          List<HistoricActivityInstance> activities,
+                                                                          BpmSimpleModelNodeVO simpleModel) {
+        // 1. 获得进行中（未结束）的节点
+        Set<String> runningActivityIds = convertSet(filterList(activities, activity -> activity.getEndTime() == null),
+                HistoricActivityInstance::getActivityId);
+        // 2. 从进行中的节点开始，预测之后的节点；无法预测时，不展示未来的节点
+        List<BpmSimpleModelNodeVO> simpleNodes = SimpleModelUtils.simulateProcessAfterNodes(simpleModel,
+                runningActivityIds, processVariables);
+        if (CollUtil.isEmpty(simpleNodes)) {
+            log.warn("[getSimulateApproveNodeListAfterRunningNodes][定义({}) 进行中的节点({}) 无法预测，不展示未来的节点]",
+                    processDefinitionInfo.getProcessDefinitionId(), runningActivityIds);
+            return Collections.emptyList();
+        }
+        // 3. 构建预测的活动节点：预测的节点都会再次执行，所以作为需要预测的节点，即使执行过，也展示
+        Set<String> needSimulateTaskDefKeys = convertSet(simpleNodes, BpmSimpleModelNodeVO::getId);
+        return convertList(simpleNodes, simpleNode -> buildNotRunApproveNodeForSimple(
+                startUserId, bpmnModel, processDefinitionInfo, processVariables, simpleNode,
+                runningActivityIds, needSimulateTaskDefKeys));
+    }
+
     private ActivityNode buildNotRunApproveNodeForSimple(Long startUserId, BpmnModel bpmnModel,
                                                          BpmProcessDefinitionInfoDO processDefinitionInfo, Map<String, Object> processVariables,
                                                          BpmSimpleModelNodeVO node, Set<String> runActivityIds,
                                                          Set<String> needSimulateTaskDefKeysByReturn) {
-        // TODO @芋艿：【可优化】在驳回场景下，未来的预测准确性不高。原因是，驳回后，HistoricActivityInstance
-        // 包括了历史的操作，不是只有 startEvent 到当前节点的记录
+        // 已经执行过的节点，不需要预测。特殊：需要预测的节点（例如说，从进行中的节点开始预测时，之后的节点会再次执行），即使执行过，也需要预测
         if (runActivityIds.contains(node.getId())
-                && !needSimulateTaskDefKeysByReturn.contains(node.getId())) { // 特殊：回退操作时候，会记录需要预测的节点到流程变量中。即使在历史操作中，也需要预测
+                && !needSimulateTaskDefKeysByReturn.contains(node.getId())) {
             return null;
         }
         Integer status = BpmTaskStatusEnum.NOT_START.getStatus();
