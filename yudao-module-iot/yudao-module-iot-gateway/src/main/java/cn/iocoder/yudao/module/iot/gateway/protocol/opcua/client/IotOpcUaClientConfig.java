@@ -117,6 +117,28 @@ public class IotOpcUaClientConfig {
     @Min(value = 3, message = "订阅 Lifetime 次数不能小于 3")
     private Integer subscriptionLifetimeCount = 30;
 
+    // ========== 属性写入 ==========
+
+    /**
+     * 属性写入超时（毫秒）：从收到 thing.property.set 开始计算，包含在会话队列中的排队、读取节点属性和写入；
+     * 超过时回复超时，排队中尚未发出的写入不再执行
+     */
+    @NotNull(message = "属性写入超时不能为空")
+    @Min(value = 100, message = "属性写入超时不能小于 100 毫秒")
+    private Integer writeTimeout = 10000;
+    /**
+     * 每个设备排队中（含执行中）的属性写入消息上限：超过时直接回复排队已满
+     */
+    @NotNull(message = "每个设备排队的写入数不能为空")
+    @Min(value = 1, message = "每个设备排队的写入数不能小于 1")
+    private Integer maxPendingWritesPerDevice = 16;
+    /**
+     * 每次 Write 的最大节点数：与服务端 OperationLimits.MaxNodesPerWrite 取较小值；服务端缺失或为 0 时使用本值
+     */
+    @NotNull(message = "每次写入的最大节点数不能为空")
+    @Min(value = 1, message = "每次写入的最大节点数不能小于 1")
+    private Integer maxNodesPerWrite = 100;
+
     // ========== 凭据 ==========
 
     /**

@@ -116,7 +116,28 @@ public class IotModbusTcpClientUtils {
                                         Integer slaveId,
                                         IotModbusPointRespDTO point,
                                         int[] values) {
+        return write(connection, slaveId, point, values, null);
+    }
+
+    /**
+     * 写入 Modbus 数据：在有序队列里轮到本任务、发出请求之前，先执行 beforeExecute 核对（例如点位配置是否已变化）
+     *
+     * @param connection    Modbus 连接
+     * @param slaveId       从站地址
+     * @param point         点位配置
+     * @param values        要写入的值
+     * @param beforeExecute 发出请求之前的核对（可为 null）：抛出异常时不写入，Future 以该异常失败
+     * @return 是否成功
+     */
+    public static Future<Boolean> write(IotModbusTcpClientConnectionManager.ModbusConnection connection,
+                                        Integer slaveId,
+                                        IotModbusPointRespDTO point,
+                                        int[] values,
+                                        Runnable beforeExecute) {
         return connection.executeBlocking(tcpConnection -> {
+            if (beforeExecute != null) {
+                beforeExecute.run();
+            }
             try {
                 // 1. 创建请求
                 ModbusRequest request = createWriteRequest(point.getFunctionCode(),
@@ -156,7 +177,27 @@ public class IotModbusTcpClientUtils {
      */
     public static Future<Boolean> writeBit(IotModbusTcpClientConnectionManager.ModbusConnection connection,
                                            Integer slaveId, IotModbusPointRespDTO point, boolean bitValue) {
+        return writeBit(connection, slaveId, point, bitValue, null);
+    }
+
+    /**
+     * 写入保持寄存器中的一位：在有序队列里轮到本任务、读取寄存器之前，先执行 beforeExecute 核对（例如点位配置是否已变化）
+     *
+     * @param connection    Modbus 连接
+     * @param slaveId       从站地址
+     * @param point         位点位（{@link IotModbusCommonUtils#isBitPoint} 为 true）
+     * @param bitValue      要写入的位值
+     * @param beforeExecute 读取之前的核对（可为 null）：抛出异常时不读写，Future 以该异常失败
+     * @return 是否成功
+     * @see #writeBit(IotModbusTcpClientConnectionManager.ModbusConnection, Integer, IotModbusPointRespDTO, boolean)
+     */
+    public static Future<Boolean> writeBit(IotModbusTcpClientConnectionManager.ModbusConnection connection,
+                                           Integer slaveId, IotModbusPointRespDTO point, boolean bitValue,
+                                           Runnable beforeExecute) {
         return connection.executeBlocking(tcpConnection -> {
+            if (beforeExecute != null) {
+                beforeExecute.run();
+            }
             try {
                 // 1. 读取当前寄存器值（与标准读一样使用 j2mod 默认重试：只影响拿到快照的时间，不拉长读写之间的窗口）
                 ReadMultipleRegistersRequest readRequest = new ReadMultipleRegistersRequest(point.getRegisterAddress(), 1);

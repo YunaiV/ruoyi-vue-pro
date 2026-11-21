@@ -236,6 +236,9 @@ yudao:
             max-monitored-items-per-call: 100 # 每次创建、删除 MonitoredItem 的最大数量
             subscription-keep-alive-count: 10
             subscription-lifetime-count: 30
+            write-timeout: 10000            # 属性写入超时（毫秒），含排队、读取节点属性和写入
+            max-pending-writes-per-device: 16 # 每个设备排队中的属性写入消息上限
+            max-nodes-per-write: 100        # 每次 Write 的最大节点数（与服务端 OperationLimits 取较小值）
             credentials: {}                 # 用户名凭据，示例：
             #  plc-reader:                    # 凭据别名（设备配置的 credentialAlias）
             #    username: reader

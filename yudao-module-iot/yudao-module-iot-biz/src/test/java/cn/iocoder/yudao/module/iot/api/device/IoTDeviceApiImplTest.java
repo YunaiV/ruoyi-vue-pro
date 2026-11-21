@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceRespDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotGatewayServerAliveReqDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotOpcUaDeviceConfigListReqDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotOpcUaDeviceConfigRespDTO;
+import cn.iocoder.yudao.module.iot.core.biz.dto.IotOpcUaPointRespDTO;
 import cn.iocoder.yudao.module.iot.core.enums.opcua.IotOpcUaAuthTypeEnum;
 import cn.iocoder.yudao.module.iot.core.enums.opcua.IotOpcUaCollectModeEnum;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
@@ -16,6 +17,8 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceOpcUaConfigDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceOpcUaPointDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.model.ThingModelProperty;
+import cn.iocoder.yudao.module.iot.enums.thingmodel.IotThingModelAccessModeEnum;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceModbusConfigService;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceModbusPointService;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceOpcUaConfigService;
@@ -36,6 +39,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -257,13 +261,16 @@ public class IoTDeviceApiImplTest extends BaseMockitoUnitTest {
         when(productService.getProductMap(any())).thenReturn(productMap);
         // mock 数据：设备 1 的点位：正常、重复（同一物模型属性）、物模型已删除、物模型属于其它产品
         Map<Long, List<IotDeviceOpcUaPointDO>> pointMap = new LinkedHashMap<>();
-        pointMap.put(1L, Arrays.asList(newOpcUaPoint(101L, 1L, 1001L, "nsu=urn:plc;s=Temp"),
+        IotDeviceOpcUaPointDO writablePoint = newOpcUaPoint(101L, 1L, 1001L, "nsu=urn:plc;s=Temp");
+        writablePoint.setWritable(true);
+        pointMap.put(1L, Arrays.asList(writablePoint,
                 newOpcUaPoint(102L, 1L, 1001L, "ns=2;s=Temp"),
                 newOpcUaPoint(103L, 1L, 1002L, "ns=2;s=Deleted"),
                 newOpcUaPoint(104L, 1L, 3001L, "ns=2;s=Other")));
         when(opcUaPointService.getEnabledDeviceOpcUaPointMapByDeviceIds(any())).thenReturn(pointMap);
         Map<Long, IotThingModelDO> thingModelMap = new LinkedHashMap<>();
-        thingModelMap.put(1001L, IotThingModelDO.builder().id(1001L).productId(100L).identifier("temperature").build());
+        thingModelMap.put(1001L, IotThingModelDO.builder().id(1001L).productId(100L).identifier("temperature")
+                .property(newProperty(IotThingModelAccessModeEnum.READ_WRITE.getMode())).build());
         thingModelMap.put(3001L, IotThingModelDO.builder().id(3001L).productId(300L).identifier("other").build());
         when(opcUaPointService.getPropertyThingModelMap(any())).thenReturn(thingModelMap);
 
@@ -285,10 +292,42 @@ public class IoTDeviceApiImplTest extends BaseMockitoUnitTest {
         assertEquals(101L, config1.getPoints().get(0).getId());
         assertEquals("temperature", config1.getPoints().get(0).getIdentifier());
         assertEquals("nsu=urn:plc;s=Temp", config1.getPoints().get(0).getNodeId());
+        assertTrue(config1.getPoints().get(0).getWritable());
         // 断言：没有点位的设备也返回（维护会话与上下线）
         IotOpcUaDeviceConfigRespDTO config2 = list.get(1);
         assertEquals(2L, config2.getDeviceId());
         assertTrue(config2.getPoints().isEmpty());
+    }
+
+    @Test
+    public void testGetOpcUaDeviceConfigList_writableReadOnlyThingModel() {
+        // 准备参数
+        IotOpcUaDeviceConfigListReqDTO reqDTO = new IotOpcUaDeviceConfigListReqDTO();
+        // mock 数据：设备 1 的两个点位都开启了可写；speed 的物模型属性后来改为只读，mode 的物模型属性缺少定义
+        when(opcUaConfigService.getDeviceOpcUaConfigList(same(reqDTO))).thenReturn(
+                Collections.singletonList(newOpcUaConfig(11L, 1L, AUTH_ANONYMOUS, "")));
+        when(deviceService.getDeviceMap(any())).thenReturn(Collections.singletonMap(1L, newDevice(1L, 100L)));
+        when(productService.getProductMap(any())).thenReturn(
+                Collections.singletonMap(100L, IotProductDO.builder().id(100L).protocolType("opc_ua_client").build()));
+        IotDeviceOpcUaPointDO speedPoint = newOpcUaPoint(101L, 1L, 1001L, "ns=2;s=Speed");
+        speedPoint.setWritable(true);
+        IotDeviceOpcUaPointDO modePoint = newOpcUaPoint(102L, 1L, 1002L, "ns=2;s=Mode");
+        modePoint.setWritable(true);
+        when(opcUaPointService.getEnabledDeviceOpcUaPointMapByDeviceIds(any())).thenReturn(
+                Collections.singletonMap(1L, Arrays.asList(speedPoint, modePoint)));
+        Map<Long, IotThingModelDO> thingModelMap = new LinkedHashMap<>();
+        thingModelMap.put(1001L, IotThingModelDO.builder().id(1001L).productId(100L).identifier("speed")
+                .property(newProperty(IotThingModelAccessModeEnum.READ_ONLY.getMode())).build());
+        thingModelMap.put(1002L, IotThingModelDO.builder().id(1002L).productId(100L).identifier("mode").build());
+        when(opcUaPointService.getPropertyThingModelMap(any())).thenReturn(thingModelMap);
+
+        // 调用
+        CommonResult<List<IotOpcUaDeviceConfigRespDTO>> result = deviceApi.getOpcUaDeviceConfigList(reqDTO);
+        // 断言：下发给网关的可写与物模型当前的读写模式取交集，点位上残留的 true 不下发
+        List<IotOpcUaPointRespDTO> points = result.getData().get(0).getPoints();
+        assertEquals(2, points.size());
+        assertFalse(points.get(0).getWritable());
+        assertFalse(points.get(1).getWritable());
     }
 
     @Test
@@ -309,6 +348,12 @@ public class IoTDeviceApiImplTest extends BaseMockitoUnitTest {
                 .endpointUrl("opc.tcp://192.168.1.10:4840/server").securityPolicy("Basic256Sha256")
                 .securityMode("SignAndEncrypt").authType(authType).credentialAlias(credentialAlias)
                 .timeout(5000).retryInterval(10000).status(0).build();
+    }
+
+    private static ThingModelProperty newProperty(String accessMode) {
+        ThingModelProperty property = new ThingModelProperty();
+        property.setAccessMode(accessMode);
+        return property;
     }
 
     private static IotDeviceOpcUaPointDO newOpcUaPoint(Long id, Long deviceId, Long thingModelId, String nodeId) {

@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpserver.manager;
 
+import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 import cn.iocoder.yudao.module.iot.core.enums.modbus.IotModbusFrameFormatEnum;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.manager.IotModbusTx;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.utils.IotModbusCommonUtils;
@@ -28,14 +29,14 @@ import static cn.iocoder.yudao.module.iot.gateway.enums.ErrorCodeConstants.*;
 /**
  * IoT Modbus TCP Server 单个连接的事务通道
  * <p>
- * 认证注册时捕获这条连接的 socket 和 owner（event loop Context）：标准轮询、标准写、透传的登记、发送、匹配、清理都用这一个连接身份，
+ * 认证注册时捕获这条连接的 socket 和 owner（event loop Context）：标准轮询、属性设置写入、透传的登记、发送、匹配、清理都用这一个连接身份，
  * 不会在 A 连接上登记、从 B 连接发出。
  * <ul>
- *     <li>标准轮询、标准写：只通过 {@link #allocateTransactionId()} 取事务号、{@link #send} 写出，其余保持原逻辑：
- *     不排队、不受透传名额限制，超时只由清理定时器移除、不断开连接，标准写不等待回显；</li>
- *     <li>透传：排队 + 在途不超过 {@link #MAX_RAW_OUTSTANDING}；TCP 帧格式可以多个同时在途，
- *     RTU 帧格式同一时刻只有 1 个透传在途（轮询、标准写不受此限制）；实际发送时才登记待响应请求，
- *     排队过期、在途超时、写失败、连接关闭都只进入一次终态，同时释放名额和待响应请求。</li>
+ *     <li>标准轮询：只通过 {@link #allocateTransactionId()} 取事务号、{@link #send} 写出，其余保持原逻辑：
+ *     不排队、不受透传名额限制，超时只由清理定时器移除、不断开连接；</li>
+ *     <li>事务（透传，以及属性设置的写入）：排队 + 在途不超过 {@link #MAX_RAW_OUTSTANDING}；TCP 帧格式可以多个同时在途，
+ *     RTU 帧格式同一时刻只有 1 个事务在途（轮询不受此限制）；实际发送时才登记待响应请求，
+ *     收到响应、排队过期、在途超时、写失败、连接关闭都只进入一次终态，同时释放名额和待响应请求。</li>
  * </ul>
  * 透传状态（queue / sent / closed）只在 owner 上读写，不加锁：submitRaw / onCleanup / onClose 可能来自总线消费线程、
  * 清理定时器、配置刷新定时器、stop 线程，一律先 runOnContext 切回 owner；onRawResponse（RecordParser 回调）、写出回调本来就在 owner 上
@@ -129,8 +130,7 @@ public class IotModbusTcpServerTransactionChannel {
     /**
      * 分配事务号：RTU 帧格式返回 null
      * <p>
-     * 复用协议共享的计数器（16 位），跳过本连接仍有待响应请求（轮询、在途透传）占用的编号。
-     * 标准写不登记待响应请求，它的编号不受保护：计数器回绕时，仍在路上的写回显可能与新编号相同
+     * 复用协议共享的计数器（16 位），跳过本连接仍有待响应请求（轮询、在途事务）占用的编号
      *
      * @return 事务号
      */
@@ -235,6 +235,12 @@ public class IotModbusTcpServerTransactionChannel {
             // 1. 排队超过截止时间：不再发送
             if (tx.isExpired()) {
                 tx.fail(MODBUS_TIMEOUT);
+                continue;
+            }
+            // 1.2 发送之前的核对（例如属性设置写入时点位已禁用、删除或地址、类型变化）：不通过时不再发送
+            ErrorCode beforeSendFailure = tx.checkBeforeSend();
+            if (beforeSendFailure != null) {
+                tx.fail(beforeSendFailure);
                 continue;
             }
             // 2.1 分配事务号、封装帧

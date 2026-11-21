@@ -174,7 +174,7 @@ public class IotModbusTcpServerProtocol implements IotProtocol {
             // 3. 启动下行消息订阅
             IotMessageBus messageBus = SpringUtil.getBean(IotMessageBus.class);
             IotModbusTcpServerDownstreamHandler downstreamHandler = new IotModbusTcpServerDownstreamHandler(
-                    connectionManager, configCacheService, frameEncoder);
+                    connectionManager, configCacheService);
             this.downstreamSubscriber = new IotModbusTcpServerDownstreamSubscriber(
                     this, downstreamHandler, connectionManager, messageBus);
             downstreamSubscriber.start();

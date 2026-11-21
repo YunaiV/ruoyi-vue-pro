@@ -40,6 +40,9 @@ public class IotDeviceOpcUaPointRespVO {
     @Schema(description = "采集间隔（毫秒）", requiredMode = Schema.RequiredMode.REQUIRED, example = "5000")
     private Integer collectInterval;
 
+    @Schema(description = "是否可写", requiredMode = Schema.RequiredMode.REQUIRED, example = "false")
+    private Boolean writable;
+
     @Schema(description = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
     private Integer status;
 

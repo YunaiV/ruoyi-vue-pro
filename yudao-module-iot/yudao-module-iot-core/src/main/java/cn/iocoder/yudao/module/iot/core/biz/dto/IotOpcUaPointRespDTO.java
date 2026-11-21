@@ -36,5 +36,9 @@ public class IotOpcUaPointRespDTO {
      * 采集间隔，单位：毫秒（轮询周期，或订阅的发布、采样间隔）
      */
     private Integer collectInterval;
+    /**
+     * 是否可写：为 true 时才允许 thing.property.set 写入该点位的 Value 属性
+     */
+    private Boolean writable;
 
 }

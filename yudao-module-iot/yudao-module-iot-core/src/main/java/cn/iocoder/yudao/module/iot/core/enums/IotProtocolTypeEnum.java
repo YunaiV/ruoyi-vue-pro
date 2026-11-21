@@ -57,7 +57,7 @@ public enum IotProtocolTypeEnum implements ArrayValuable<String> {
     }
 
     /**
-     * @return 是否是 OPC UA 协议：一期只读采集，不支持属性设置、服务调用和透传下发
+     * @return 是否是 OPC UA 协议：采集属性，下行只支持属性设置（不支持服务调用和透传下发）
      */
     public boolean isOpcUa() {
         return this == OPC_UA_CLIENT;

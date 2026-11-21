@@ -5,7 +5,10 @@ import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import cn.iocoder.yudao.module.iot.core.enums.IotSerializeTypeEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.script.dto.IotScriptSource;
+import cn.iocoder.yudao.module.iot.core.topic.property.IotDevicePropertySetResultDTO;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.dto.IotDownstreamEncodeRespDTO;
+
+import java.util.Map;
 
 /**
  * IoT 设备消息 Service 接口
@@ -163,5 +166,21 @@ public interface IotDeviceMessageService {
      * @param serverId    所属协议实例的 serverId
      */
     void sendRawReply(IotDeviceMessage request, IotScriptSource source, byte[] payload, ErrorCode deviceError, String serverId);
+
+    /**
+     * 回复属性设置（thing.property.set）的标准路径结果：逐项回复每个属性的结果
+     * <ul>
+     *     <li>failure 非空：整条消息失败（例如参数不合法），data 为空；</li>
+     *     <li>否则：data 为 results（属性标识符 → 结果）；全部成功时 code 为成功，有失败时为 PROPERTY_SET_FAILED。</li>
+     * </ul>
+     * 会阻塞（加载设备、发送总线）：只能在 worker 线程调用
+     *
+     * @param request  原请求
+     * @param results  每个属性的结果；failure 非空时为 null
+     * @param failure  整条消息的失败；逐项回复时为 null
+     * @param serverId 所属协议实例的 serverId
+     */
+    void sendPropertySetReply(IotDeviceMessage request, Map<String, IotDevicePropertySetResultDTO> results,
+                              ErrorCode failure, String serverId);
 
 }

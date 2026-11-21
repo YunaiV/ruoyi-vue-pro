@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusPointRespDTO;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.enums.modbus.IotModbusFrameFormatEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
+import cn.iocoder.yudao.module.iot.core.topic.property.IotDevicePropertySetResultDTO;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.common.manager.IotModbusTx;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpserver.codec.IotModbusFrame;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpserver.codec.IotModbusFrameEncoder;
@@ -28,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -206,25 +208,85 @@ public class IotModbusTcpServerTransactionChannelTest {
     }
 
     @Test
-    public void testWriteProperty_logOnSocketWriteWithoutWaitingResponse() throws Exception {
+    public void testWriteProperty_waitDeviceEcho() throws Exception {
         // 准备参数
         IotModbusTcpServerTransactionChannel channel = createChannel(IotModbusFrameFormatEnum.MODBUS_TCP,
                 new AtomicInteger(), REQUEST_TIMEOUT);
         IotModbusTcpServerConnectionManager connectionManager = createConnectionManager(channel,
                 IotModbusFrameFormatEnum.MODBUS_TCP);
         IotModbusTcpServerDownstreamHandler downstreamHandler = new IotModbusTcpServerDownstreamHandler(
-                connectionManager, mockConfigCacheService(), new IotModbusFrameEncoder(65));
+                connectionManager, mockConfigCacheService());
         IotDeviceMessage message = IotDeviceMessage.requestOf(IotDeviceMessageMethodEnum.PROPERTY_SET.getMethod(),
                 MapUtil.of("temperature", 220));
         message.setDeviceId(DEVICE_ID);
 
         // 调用
-        downstreamHandler.handle(message);
+        Future<Map<String, IotDevicePropertySetResultDTO>> future = downstreamHandler.handle(message);
+        awaitOwner();
 
-        // 断言：写出 FC06 请求（socket 写出成功即记成功）；不登记待响应请求，不等待设备回显
+        // 断言：作为事务写出 FC06 请求，登记待响应请求；设备回显之前不返回结果
         List<Buffer> writes = captureWrites(1);
         assertArrayEquals(HexUtil.decodeHex("06000000DC"), writes.get(0).getBytes(7, 12));
+        assertEquals(1, pendingRequestManager.added.size());
+        assertFalse(future.isComplete());
+        // 调用：设备回显写请求
+        int transactionId = pendingRequestManager.added.get(0).getTransactionId();
+        receive(channel, IotModbusFrameFormatEnum.MODBUS_TCP, new IotModbusFrame().setSlaveId(SLAVE_ID)
+                .setFunctionCode(6).setPdu(HexUtil.decodeHex("000000DC")).setTransactionId(transactionId));
+        // 断言：属性写入成功
+        Map<String, IotDevicePropertySetResultDTO> results = future.toCompletionStage().toCompletableFuture()
+                .get(5, TimeUnit.SECONDS);
+        assertTrue(results.get("temperature").succeeded());
+    }
+
+    @Test
+    public void testWriteProperty_pointChangedBeforeSend() throws Exception {
+        // 准备参数：构造 PDU 时点位地址为 0；排队期间配置刷新，地址变为 1
+        IotModbusTcpServerTransactionChannel channel = createChannel(IotModbusFrameFormatEnum.MODBUS_TCP,
+                new AtomicInteger(), REQUEST_TIMEOUT);
+        IotModbusTcpServerConfigCacheService configCacheService = mockConfigCacheService();
+        when(configCacheService.getCachedConfig(DEVICE_ID)).thenReturn(buildConfig(1));
+        IotModbusTcpServerDownstreamHandler downstreamHandler = new IotModbusTcpServerDownstreamHandler(
+                createConnectionManager(channel, IotModbusFrameFormatEnum.MODBUS_TCP), configCacheService);
+        IotDeviceMessage message = IotDeviceMessage.requestOf(IotDeviceMessageMethodEnum.PROPERTY_SET.getMethod(),
+                MapUtil.of("temperature", 220));
+        message.setDeviceId(DEVICE_ID);
+
+        // 调用
+        Future<Map<String, IotDevicePropertySetResultDTO>> future = downstreamHandler.handle(message);
+        awaitOwner();
+
+        // 断言：发送前核对不通过，不写出旧地址，结果为点位已变化
+        verify(socket, never()).write(any(Buffer.class));
         assertTrue(pendingRequestManager.added.isEmpty());
+        Map<String, IotDevicePropertySetResultDTO> results = future.toCompletionStage().toCompletableFuture()
+                .get(5, TimeUnit.SECONDS);
+        assertEquals(PROPERTY_SET_POINT_CHANGED.getCode(), results.get("temperature").getCode());
+    }
+
+    @Test
+    public void testWriteProperty_timeout() throws Exception {
+        // 准备参数：请求超时 1ms
+        IotModbusTcpServerTransactionChannel channel = createChannel(IotModbusFrameFormatEnum.MODBUS_TCP,
+                new AtomicInteger(), 1);
+        IotModbusTcpServerDownstreamHandler downstreamHandler = new IotModbusTcpServerDownstreamHandler(
+                createConnectionManager(channel, IotModbusFrameFormatEnum.MODBUS_TCP), mockConfigCacheService());
+        IotDeviceMessage message = IotDeviceMessage.requestOf(IotDeviceMessageMethodEnum.PROPERTY_SET.getMethod(),
+                MapUtil.of("temperature", 220));
+        message.setDeviceId(DEVICE_ID);
+
+        // 调用：写出后设备不响应，清理超时
+        Future<Map<String, IotDevicePropertySetResultDTO>> future = downstreamHandler.handle(message);
+        awaitOwner();
+        Thread.sleep(5);
+        channel.onCleanup();
+        awaitOwner();
+
+        // 断言：属性写入失败（超时）
+        Map<String, IotDevicePropertySetResultDTO> results = future.toCompletionStage().toCompletableFuture()
+                .get(5, TimeUnit.SECONDS);
+        assertFalse(results.get("temperature").succeeded());
+        assertEquals(MODBUS_TIMEOUT.getCode(), results.get("temperature").getCode());
     }
 
     // ========== 透传：响应关联 ==========
@@ -438,19 +500,25 @@ public class IotModbusTcpServerTransactionChannelTest {
      * 设备配置：一个 FC03 读 1 个寄存器的点位（INT16，可写，单值用 FC06）
      */
     private static IotModbusTcpServerConfigCacheService mockConfigCacheService() {
+        IotModbusDeviceConfigRespDTO config = buildConfig(0);
+        IotModbusTcpServerConfigCacheService configCacheService = mock(IotModbusTcpServerConfigCacheService.class);
+        when(configCacheService.getConfig(DEVICE_ID)).thenReturn(config);
+        when(configCacheService.getCachedConfig(DEVICE_ID)).thenReturn(config);
+        return configCacheService;
+    }
+
+    private static IotModbusDeviceConfigRespDTO buildConfig(int registerAddress) {
         IotModbusPointRespDTO point = new IotModbusPointRespDTO();
         point.setId(POINT_ID);
         point.setIdentifier("temperature");
         point.setFunctionCode(3);
-        point.setRegisterAddress(0);
+        point.setRegisterAddress(registerAddress);
         point.setRegisterCount(1);
         point.setRawDataType("INT16");
         IotModbusDeviceConfigRespDTO config = new IotModbusDeviceConfigRespDTO();
         config.setDeviceId(DEVICE_ID);
         config.setPoints(Collections.singletonList(point));
-        IotModbusTcpServerConfigCacheService configCacheService = mock(IotModbusTcpServerConfigCacheService.class);
-        when(configCacheService.getConfig(DEVICE_ID)).thenReturn(config);
-        return configCacheService;
+        return config;
     }
 
     private static IotModbusTx newTx(IotModbusTcpServerTransactionChannel channel, TxResult result) {
