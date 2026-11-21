@@ -4,7 +4,9 @@ import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.http.HttpUtils;
+import com.google.common.annotations.VisibleForTesting;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.Tika;
 import org.apache.tika.io.LookaheadInputStream;
@@ -70,44 +72,46 @@ public class FileTypeUtils {
      * @param name 文件名
      * @return mineType 无法识别时会返回“application/octet-stream”
      */
+    @SneakyThrows
     public static String getMineType(InputStream data, String name) {
         Assert.isTrue(data.markSupported(), "文件流必须支持 mark / reset");
         // 关闭 LookaheadInputStream 时，会将 data 重置到读取前的位置
-        try (InputStream head = new LookaheadInputStream(data, DETECT_LIMIT)) {
-            return detectContent(IoUtil.readBytes(head, DETECT_LIMIT), name);
-        } catch (IOException ex) {
-            log.warn("[getMineType][读取文件头失败，改用文件名({})]", name, ex);
-            return detectByName(name);
+        // 注意：读取、重置失败时直接抛出，不能按文件名兜底，否则后续输出的内容会缺失头部
+        byte[] head;
+        try (InputStream lookahead = new LookaheadInputStream(data, DETECT_LIMIT)) {
+            head = lookahead.readNBytes(DETECT_LIMIT);
         }
+        return detectContent(head, name);
     }
 
-    /**
-     * 内容识别失败时退回文件名。
-     * Tika 4 的 Detector 接口与 classpath 上的 {@code org.gagravarr.tika.OggDetector} 不兼容时，
-     * 会抛出 AbstractMethodError，把正常文件下载打成 500。
-     */
     private static String detectContent(byte[] data, String name) {
+        return detectContent(TIKA, data, name);
+    }
+
+    /**
+     * 按内容和文件名识别，失败时只按文件名识别
+     *
+     * 例如说：Tika 4 的 Detector 接口与 classpath 上旧的 {@code org.gagravarr.tika.OggDetector} 不兼容，
+     * 识别时抛出 AbstractMethodError（LinkageError），会把正常的文件上传、下载打成 500
+     */
+    @VisibleForTesting
+    static String detectContent(Tika tika, byte[] data, String name) {
         try {
-            return name == null ? TIKA.detect(data) : TIKA.detect(data, name);
-        } catch (Throwable ex) {
-            log.warn("[getMineType][内容识别失败，改用文件名({})]", name, ex);
+            return name == null ? tika.detect(data) : tika.detect(data, name);
+        } catch (Exception | LinkageError ex) {
+            log.warn("[detectContent][按内容识别文件({})类型失败，改为按文件名识别]", name, ex);
             return detectByName(name);
         }
     }
 
     /**
-     * 只按扩展名识别。不能再调用 {@link Tika#detect(String)}，那条路径仍会加载全部 SPI Detector。
+     * 只按扩展名识别，不能调用 {@link Tika#detect(String)}：该方法同样会调用全部 SPI Detector
      */
     private static String detectByName(String name) {
         if (StrUtil.isBlank(name)) {
-            return "application/octet-stream";
+            return MimeTypes.OCTET_STREAM;
         }
-        try {
-            return MimeTypes.getDefaultMimeTypes().getMimeType(name).getName();
-        } catch (Throwable ex) {
-            log.warn("[getMineType][按文件名识别失败({})]", name, ex);
-            return "application/octet-stream";
-        }
+        return MimeTypes.getDefaultMimeTypes().getMimeType(name).getName();
     }
 
     /**
