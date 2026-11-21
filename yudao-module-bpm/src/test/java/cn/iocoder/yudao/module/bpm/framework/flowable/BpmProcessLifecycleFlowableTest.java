@@ -7,12 +7,12 @@ import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmProcessInstanceStatusEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmReasonEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskStatusEnum;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.listener.BpmCallActivityListener;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.listener.BpmTaskEventListener;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceQueryServiceImpl;
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceUpdateServiceImpl;
 import cn.iocoder.yudao.module.bpm.service.task.BpmTaskUpdateServiceImpl;
-import cn.iocoder.yudao.module.bpm.service.task.listener.BpmCallActivityListener;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import jakarta.annotation.Resource;
@@ -27,6 +27,9 @@ import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.AnnotatedGenericBeanDefinition;
+import org.springframework.beans.factory.support.SimpleBeanDefinitionRegistry;
+import org.springframework.context.annotation.AnnotationBeanNameGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -243,6 +246,14 @@ public class BpmProcessLifecycleFlowableTest extends BaseFlowableUnitTest {
                 .processInstanceId(processInstanceId).includeProcessVariables().singleResult();
         assertNotNull(processInstance.getEndTime());
         assertEquals(status, FlowableUtils.getProcessInstanceStatus(processInstance));
+    }
+
+    @Test
+    public void testCallActivity_delegateExpressionBeanName() {
+        // 断言：BPMN 中的 DELEGATE_EXPRESSION，与组件扫描的默认 Bean 名称一致，不受包路径影响
+        String beanName = AnnotationBeanNameGenerator.INSTANCE.generateBeanName(
+                new AnnotatedGenericBeanDefinition(BpmCallActivityListener.class), new SimpleBeanDefinitionRegistry());
+        assertEquals("${" + beanName + "}", BpmCallActivityListener.DELEGATE_EXPRESSION);
     }
 
 }

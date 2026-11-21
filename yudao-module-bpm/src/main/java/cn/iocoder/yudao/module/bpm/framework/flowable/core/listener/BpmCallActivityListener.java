@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.bpm.service.task.listener;
+package cn.iocoder.yudao.module.bpm.framework.flowable.core.listener;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
@@ -22,11 +22,10 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-// TODO @AI：这个是不是抽到 framework 层面，而不是在 service 里？
 /**
  * BPM 子流程监听器：设置流程的发起人
  *
- * @author Lesan
+ * @author 芋道源码
  */
 @Component
 @Slf4j

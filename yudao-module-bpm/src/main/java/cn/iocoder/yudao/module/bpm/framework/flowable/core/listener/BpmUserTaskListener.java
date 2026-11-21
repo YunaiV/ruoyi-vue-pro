@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.bpm.service.task.listener;
+package cn.iocoder.yudao.module.bpm.framework.flowable.core.listener;
 
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmHttpRequestParamTypeEnum;
@@ -19,11 +19,10 @@ import java.util.List;
 
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils.parseListenerConfig;
 
-// TODO @AI：这个是不是抽到 framework 层面，而不是在 service 里？
 /**
  * BPM 用户任务通用监听器
  *
- * @author Lesan
+ * @author 芋道源码
  */
 @Component
 @Slf4j

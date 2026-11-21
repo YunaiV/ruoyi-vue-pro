@@ -1,8 +1,8 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.listener;
 
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmTriggerTypeEnum;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.trigger.BpmTrigger;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
-import cn.iocoder.yudao.module.bpm.service.task.trigger.BpmTrigger;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;

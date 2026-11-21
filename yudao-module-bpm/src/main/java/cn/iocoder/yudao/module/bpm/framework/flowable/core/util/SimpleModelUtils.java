@@ -12,10 +12,10 @@ import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.B
 import cn.iocoder.yudao.module.bpm.enums.definition.*;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.listener.BpmCallActivityListener;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.listener.BpmCopyTaskDelegate;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.listener.BpmTriggerTaskDelegate;
-import cn.iocoder.yudao.module.bpm.service.task.listener.BpmCallActivityListener;
-import cn.iocoder.yudao.module.bpm.service.task.listener.BpmUserTaskListener;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.listener.BpmUserTaskListener;
 import org.flowable.bpmn.BpmnAutoLayout;
 import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.model.*;
