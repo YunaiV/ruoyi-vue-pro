@@ -52,6 +52,18 @@ public class IotOpcUaClientConfig {
      */
     private String keystorePassword;
     /**
+     * 客户端 keystore 中证书条目的别名：自动生成证书时使用；运维放入 CA 签发的证书时，私钥和证书链要放在该别名下
+     */
+    @NotEmpty(message = "keystore 别名不能为空")
+    private String keystoreAlias = "yudao-opc-ua-client";
+    /**
+     * 应用名称：会话中的 ApplicationName、自动生成的自签名证书 CN；多个网关连接同一服务端时，便于在服务端区分
+     * <p>
+     * 修改后只影响新生成的证书，已有证书的 CN 不变；应用 URI 始终取客户端证书 SAN 中的 URI
+     */
+    @NotEmpty(message = "应用名称不能为空")
+    private String applicationName = "Yudao IoT Gateway OPC UA Client";
+    /**
      * 是否允许 None 安全策略：默认禁止，只作为显式的开发联调开关，并且只能配合匿名身份
      */
     @NotNull(message = "是否允许 None 安全策略不能为空")

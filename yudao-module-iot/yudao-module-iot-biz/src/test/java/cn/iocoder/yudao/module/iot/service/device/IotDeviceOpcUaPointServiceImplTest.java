@@ -29,7 +29,6 @@ import java.util.Map;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEquals;
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.*;
-import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -215,15 +214,16 @@ public class IotDeviceOpcUaPointServiceImplTest extends BaseDbUnitTest {
 
     @Test
     public void testGetEnabledDeviceOpcUaPointMapByDeviceIds() {
-        // 准备数据：启用、禁用、已删除（按设备批量删除）
+        // 准备数据：启用、禁用、已删除
         Long enabledId = opcUaPointService.createDeviceOpcUaPoint(newSaveReqVO());
         mockThingModel(105L, PRODUCT_ID, IotThingModelTypeEnum.PROPERTY.getType());
         opcUaPointService.createDeviceOpcUaPoint(newSaveReqVO().setThingModelId(105L)
                 .setStatus(CommonStatusEnum.DISABLE.getStatus()));
-        opcUaPointMapper.insert(IotDeviceOpcUaPointDO.builder().deviceId(2L).thingModelId(106L)
+        IotDeviceOpcUaPointDO deleted = IotDeviceOpcUaPointDO.builder().deviceId(2L).thingModelId(106L)
                 .nodeId("i=1").collectMode(COLLECT_POLL).collectInterval(1000)
-                .status(CommonStatusEnum.ENABLE.getStatus()).build());
-        opcUaPointService.deleteDeviceOpcUaPointListByDeviceIds(singletonList(2L));
+                .status(CommonStatusEnum.ENABLE.getStatus()).build();
+        opcUaPointMapper.insert(deleted);
+        opcUaPointMapper.deleteById(deleted.getId());
 
         // 调用
         Map<Long, List<IotDeviceOpcUaPointDO>> result = opcUaPointService.getEnabledDeviceOpcUaPointMapByDeviceIds(

@@ -26,7 +26,6 @@ import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertPojoEq
 import static cn.iocoder.yudao.framework.test.core.util.AssertUtils.assertServiceException;
 import static cn.iocoder.yudao.framework.test.core.util.RandomUtils.randomLongId;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.*;
-import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -139,7 +138,7 @@ public class IotDeviceOpcUaConfigServiceImplTest extends BaseDbUnitTest {
         opcUaConfigMapper.insert(newConfigDO(2L, CommonStatusEnum.DISABLE.getStatus()));
         IotDeviceOpcUaConfigDO deleted = newConfigDO(3L, CommonStatusEnum.ENABLE.getStatus());
         opcUaConfigMapper.insert(deleted);
-        opcUaConfigService.deleteDeviceOpcUaConfigListByDeviceIds(singletonList(3L));
+        opcUaConfigMapper.deleteById(deleted.getId());
 
         // 调用
         List<IotDeviceOpcUaConfigDO> list = opcUaConfigService.getDeviceOpcUaConfigList(

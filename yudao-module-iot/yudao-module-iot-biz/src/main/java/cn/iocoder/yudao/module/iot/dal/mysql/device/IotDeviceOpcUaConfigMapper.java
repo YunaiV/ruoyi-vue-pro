@@ -6,7 +6,6 @@ import cn.iocoder.yudao.module.iot.core.biz.dto.IotOpcUaDeviceConfigListReqDTO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceOpcUaConfigDO;
 import org.apache.ibatis.annotations.Mapper;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -28,10 +27,6 @@ public interface IotDeviceOpcUaConfigMapper extends BaseMapperX<IotDeviceOpcUaCo
                 .eqIfPresent(IotDeviceOpcUaConfigDO::getStatus, reqDTO.getStatus())
                 .inIfPresent(IotDeviceOpcUaConfigDO::getDeviceId, reqDTO.getDeviceIds())
                 .orderByAsc(IotDeviceOpcUaConfigDO::getId));
-    }
-
-    default void deleteByDeviceIds(Collection<Long> deviceIds) {
-        deleteBatch(IotDeviceOpcUaConfigDO::getDeviceId, deviceIds);
     }
 
 }

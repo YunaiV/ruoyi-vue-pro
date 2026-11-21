@@ -16,7 +16,6 @@ import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.Collection;
 import java.util.List;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -78,11 +77,6 @@ public class IotDeviceOpcUaConfigServiceImpl implements IotDeviceOpcUaConfigServ
     @Override
     public List<IotDeviceOpcUaConfigDO> getDeviceOpcUaConfigList(IotOpcUaDeviceConfigListReqDTO listReqDTO) {
         return opcUaConfigMapper.selectList(listReqDTO);
-    }
-
-    @Override
-    public void deleteDeviceOpcUaConfigListByDeviceIds(Collection<Long> deviceIds) {
-        opcUaConfigMapper.deleteByDeviceIds(deviceIds);
     }
 
 }

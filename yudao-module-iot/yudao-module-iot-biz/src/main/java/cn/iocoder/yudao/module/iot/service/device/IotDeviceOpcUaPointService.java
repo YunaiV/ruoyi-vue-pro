@@ -72,11 +72,4 @@ public interface IotDeviceOpcUaPointService {
      */
     Map<Long, IotThingModelDO> getPropertyThingModelMap(Collection<Long> productIds);
 
-    /**
-     * 按设备编号逻辑删除 OPC UA 点位配置（删除设备时级联调用）
-     *
-     * @param deviceIds 设备编号集合
-     */
-    void deleteDeviceOpcUaPointListByDeviceIds(Collection<Long> deviceIds);
-
 }
