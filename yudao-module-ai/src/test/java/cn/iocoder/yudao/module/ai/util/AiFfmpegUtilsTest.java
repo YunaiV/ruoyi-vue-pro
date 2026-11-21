@@ -102,6 +102,19 @@ public class AiFfmpegUtilsTest {
     }
 
     @Test
+    public void testBuildFilterComplex_windowsWatermarkPath() {
+        List<AiFfmpegUtils.Clip> clips = Collections.singletonList(new AiFfmpegUtils.Clip(null, 5, true));
+
+        String filter = AiFfmpegUtils.buildFilterComplex(clips, 720, 1280, AiDramaTransitionTypeEnum.NONE,
+                0.5, false, null, "C:\\Windows\\Fonts\\msyh.ttc",
+                "C:\\Users\\yudao\\AppData\\Local\\Temp\\ai-drama-compose\\1\\watermark.txt");
+
+        // Windows 路径：盘符的 : 需要转义，否则 FFmpeg 会在 : 处截断 drawtext 参数
+        assertTrue(filter.contains("drawtext=textfile='C\\:/Users/yudao/AppData/Local/Temp/ai-drama-compose/1/watermark.txt'"
+                + ":fontfile='C\\:/Windows/Fonts/msyh.ttc':fontsize="));
+    }
+
+    @Test
     public void testBuildFilterComplex_transitionTooLong() {
         List<AiFfmpegUtils.Clip> clips = Arrays.asList(
                 new AiFfmpegUtils.Clip(null, 5, true), new AiFfmpegUtils.Clip(null, 1, true));
