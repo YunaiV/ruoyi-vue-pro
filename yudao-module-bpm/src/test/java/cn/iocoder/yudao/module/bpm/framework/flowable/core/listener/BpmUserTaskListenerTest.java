@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.bpm.service.task.listener;
+package cn.iocoder.yudao.module.bpm.framework.flowable.core.listener;
 
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
@@ -13,6 +13,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
+import org.springframework.beans.factory.annotation.AnnotatedGenericBeanDefinition;
+import org.springframework.beans.factory.support.SimpleBeanDefinitionRegistry;
+import org.springframework.context.annotation.AnnotationBeanNameGenerator;
 
 import java.util.List;
 
@@ -69,6 +72,14 @@ public class BpmUserTaskListenerTest extends BaseMockitoUnitTest {
             assertEquals(List.of("process-instance-1", "1", "task1", "task-1"),
                     convertList(body, BpmSimpleModelNodeVO.HttpRequestParam::getValue));
         }
+    }
+
+    @Test
+    public void testDelegateExpression_beanName() {
+        // 断言：BPMN 中的 DELEGATE_EXPRESSION，与组件扫描的默认 Bean 名称一致，不受包路径影响
+        String beanName = AnnotationBeanNameGenerator.INSTANCE.generateBeanName(
+                new AnnotatedGenericBeanDefinition(BpmUserTaskListener.class), new SimpleBeanDefinitionRegistry());
+        assertEquals("${" + beanName + "}", BpmUserTaskListener.DELEGATE_EXPRESSION);
     }
 
 }

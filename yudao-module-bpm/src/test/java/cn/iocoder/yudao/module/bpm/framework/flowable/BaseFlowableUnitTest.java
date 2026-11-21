@@ -6,6 +6,7 @@ import cn.iocoder.yudao.module.bpm.dal.redis.BpmProcessIdRedisDAO;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmModelTypeEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.config.BpmFlowableConfiguration;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCandidateInvoker;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.listener.BpmCallActivityListener;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.listener.BpmProcessInstanceEventListener;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.listener.BpmTaskEventListener;
 import cn.iocoder.yudao.module.bpm.service.comment.BpmCommentService;
@@ -18,7 +19,6 @@ import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceQueryServiceIm
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceUpdateServiceImpl;
 import cn.iocoder.yudao.module.bpm.service.task.BpmTaskQueryServiceImpl;
 import cn.iocoder.yudao.module.bpm.service.task.BpmTaskUpdateServiceImpl;
-import cn.iocoder.yudao.module.bpm.service.task.listener.BpmCallActivityListener;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;

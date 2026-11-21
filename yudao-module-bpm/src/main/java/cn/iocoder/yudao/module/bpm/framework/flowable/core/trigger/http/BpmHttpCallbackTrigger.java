@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.bpm.service.task.trigger.http;
+package cn.iocoder.yudao.module.bpm.framework.flowable.core.trigger.http;
 
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
@@ -15,11 +15,10 @@ import org.springframework.web.client.RestTemplate;
 import java.util.ArrayList;
 import java.util.List;
 
-// TODO @AI：这个是不是抽到 framework 层面，而不是在 service 里？
 /**
  * BPM HTTP 回调触发器
  *
- * @author jason
+ * @author 芋道源码
  */
 @Component
 @Slf4j

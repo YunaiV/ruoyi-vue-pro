@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.bpm.service.task.trigger.http;
+package cn.iocoder.yudao.module.bpm.framework.flowable.core.trigger.http;
 
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;

@@ -1,4 +1,4 @@
-package cn.iocoder.yudao.module.bpm.service.task.trigger.http;
+package cn.iocoder.yudao.module.bpm.framework.flowable.core.trigger.http;
 
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO.TriggerSetting.HttpRequestTriggerSetting;
@@ -11,11 +11,10 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-// TODO @AI：这个是不是抽到 framework 层面，而不是在 service 里？
 /**
  * BPM 发送同步 HTTP 请求触发器
  *
- * @author jason
+ * @author 芋道源码
  */
 @Component
 @Slf4j

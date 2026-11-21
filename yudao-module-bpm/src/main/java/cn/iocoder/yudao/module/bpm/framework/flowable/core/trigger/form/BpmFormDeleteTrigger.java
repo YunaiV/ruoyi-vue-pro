@@ -1,31 +1,32 @@
-package cn.iocoder.yudao.module.bpm.service.task.trigger.form;
+package cn.iocoder.yudao.module.bpm.framework.flowable.core.trigger.form;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
-import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO.TriggerSetting.FormTriggerSetting;
+import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmTriggerTypeEnum;
+import cn.iocoder.yudao.module.bpm.framework.flowable.core.trigger.BpmTrigger;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.SimpleModelUtils;
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceQueryService;
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceUpdateService;
-import cn.iocoder.yudao.module.bpm.service.task.trigger.BpmTrigger;
 import com.fasterxml.jackson.core.type.TypeReference;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-// TODO @AI：这个是不是抽到 framework 层面，而不是在 service 里？
 /**
- * BPM 更新流程表单触发器
+ * BPM 删除流程表单数据触发器
  *
- * @author jason
+ * @author 芋道源码
  */
 @Component
 @Slf4j
-public class BpmFormUpdateTrigger implements BpmTrigger {
+public class BpmFormDeleteTrigger implements BpmTrigger {
 
     @Resource
     private BpmProcessInstanceQueryService processInstanceQueryService;
@@ -34,37 +35,42 @@ public class BpmFormUpdateTrigger implements BpmTrigger {
 
     @Override
     public BpmTriggerTypeEnum getType() {
-        return BpmTriggerTypeEnum.FORM_UPDATE;
+        return BpmTriggerTypeEnum.FORM_DELETE;
     }
 
     @Override
     public void execute(String processInstanceId, String param) {
-        // 1. 解析更新流程表单配置
-        List<FormTriggerSetting> settings = JsonUtils.parseObject(param, new TypeReference<>() {});
+        // 1. 解析删除流程表单数据配置
+        List<BpmSimpleModelNodeVO.TriggerSetting.FormTriggerSetting> settings = JsonUtils.parseObject(param, new TypeReference<>() {});
         if (CollUtil.isEmpty(settings)) {
-            log.error("[execute][流程({}) 更新流程表单触发器配置为空]", processInstanceId);
+            log.error("[execute][流程({}) 删除流程表单数据触发器配置为空]", processInstanceId);
             return;
         }
 
         // 2. 获取流程变量
         Map<String, Object> processVariables = processInstanceQueryService.getProcessInstance(processInstanceId).getProcessVariables();
 
-        // 3. 更新流程变量
-        for (FormTriggerSetting setting : settings) {
-            if (CollUtil.isEmpty(setting.getUpdateFormFields())) {
-                continue;
+        // 3.1 获取需要删除的表单字段
+        Set<String> deleteFields = new HashSet<>();
+        settings.forEach(setting -> {
+            if (CollUtil.isEmpty(setting.getDeleteFields())) {
+                return;
             }
             // 配置了条件，判断条件是否满足
-            boolean isFormUpdateNeeded = true;
+            boolean isFieldDeletedNeeded = true;
             if (setting.getConditionType() != null) {
                 String conditionExpression = SimpleModelUtils.buildConditionExpression(
                         setting.getConditionType(), setting.getConditionExpression(), setting.getConditionGroups());
-                isFormUpdateNeeded = BpmnModelUtils.evalConditionExpress(processVariables, conditionExpression);
+                isFieldDeletedNeeded = BpmnModelUtils.evalConditionExpress(processVariables, conditionExpression);
             }
-            // 更新流程表单
-            if (isFormUpdateNeeded) {
-                processInstanceUpdateService.updateProcessInstanceVariables(processInstanceId, setting.getUpdateFormFields());
+            if (isFieldDeletedNeeded) {
+                deleteFields.addAll(setting.getDeleteFields());
             }
+        });
+
+        // 3.2 删除流程变量
+        if (CollUtil.isNotEmpty(deleteFields)) {
+            processInstanceUpdateService.removeProcessInstanceVariables(processInstanceId, deleteFields);
         }
     }
 }
