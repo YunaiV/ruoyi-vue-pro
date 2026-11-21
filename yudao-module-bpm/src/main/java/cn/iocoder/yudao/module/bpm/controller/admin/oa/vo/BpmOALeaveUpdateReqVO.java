@@ -1,0 +1,46 @@
+package cn.iocoder.yudao.module.bpm.controller.admin.oa.vo;
+
+import cn.hutool.core.util.StrUtil;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDateTime;
+
+import static cn.iocoder.yudao.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
+
+@Schema(description = "管理后台 - 请假申请更新 Request VO")
+@Data
+public class BpmOALeaveUpdateReqVO {
+
+    @Schema(description = "请假表单主键", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
+    @NotNull(message = "请假表单主键不能为空")
+    private Long id;
+
+    @Schema(description = "请假类型-参见 bpm_oa_type 枚举", example = "1")
+    private Integer type;
+
+    @Schema(description = "原因", example = "阅读芋道源码")
+    private String reason;
+
+    @Schema(description = "请假的开始时间")
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    private LocalDateTime startTime;
+
+    @Schema(description = "请假的结束时间")
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
+    private LocalDateTime endTime;
+
+    @AssertTrue(message = "请假原因不能为空")
+    public boolean isReasonValid() {
+        return reason == null || StrUtil.isNotBlank(reason);
+    }
+
+    @AssertTrue(message = "结束时间，需要在开始时间之后")
+    public boolean isEndTimeValid() {
+        return startTime == null || endTime == null || !endTime.isBefore(startTime);
+    }
+
+}

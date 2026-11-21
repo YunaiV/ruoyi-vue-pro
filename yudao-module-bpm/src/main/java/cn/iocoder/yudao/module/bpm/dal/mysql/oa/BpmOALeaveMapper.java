@@ -5,6 +5,7 @@ import cn.iocoder.yudao.module.bpm.dal.dataobject.oa.BpmOALeaveDO;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.mybatis.core.mapper.BaseMapperX;
 import cn.iocoder.yudao.framework.mybatis.core.query.LambdaQueryWrapperX;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
@@ -24,6 +25,12 @@ public interface BpmOALeaveMapper extends BaseMapperX<BpmOALeaveDO> {
                 .likeIfPresent(BpmOALeaveDO::getReason, reqVO.getReason())
                 .betweenIfPresent(BpmOALeaveDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(BpmOALeaveDO::getId));
+    }
+
+    default int updateByIdAndStatus(Long id, Integer whereStatus, BpmOALeaveDO updateObj) {
+        return update(updateObj, new LambdaUpdateWrapper<BpmOALeaveDO>()
+                .eq(BpmOALeaveDO::getId, id)
+                .eq(BpmOALeaveDO::getStatus, whereStatus));
     }
 
 }

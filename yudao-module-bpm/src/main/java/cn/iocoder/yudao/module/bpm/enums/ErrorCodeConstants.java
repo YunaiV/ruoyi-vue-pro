@@ -13,6 +13,7 @@ public interface ErrorCodeConstants {
 
     // ========== OA 流程模块 1-009-001-000 ==========
     ErrorCode OA_LEAVE_NOT_EXISTS = new ErrorCode(1_009_001_001, "请假申请不存在");
+    ErrorCode OA_LEAVE_UPDATE_NOT_ALLOWED = new ErrorCode(1_009_001_002, "请假申请不能修改，原因：不在审批中");
 
     // ========== 流程模型 1-009-002-000 ==========
     ErrorCode MODEL_KEY_EXISTS = new ErrorCode(1_009_002_000, "已经存在流程标识为【{}】的流程");

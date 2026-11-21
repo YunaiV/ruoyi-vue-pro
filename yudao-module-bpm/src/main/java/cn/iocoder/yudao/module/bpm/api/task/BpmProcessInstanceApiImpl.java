@@ -8,6 +8,8 @@ import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.Map;
+
 /**
  * Flowable 流程实例 Api 实现类
  *
@@ -30,6 +32,11 @@ public class BpmProcessInstanceApiImpl implements BpmProcessInstanceApi {
     public void cancelProcessInstanceByStartUser(Long userId, String processInstanceId, String reason) {
         processInstanceUpdateService.cancelProcessInstanceByStartUser(userId,
                 new BpmProcessInstanceCancelReqVO().setId(processInstanceId).setReason(reason));
+    }
+
+    @Override
+    public void updateProcessInstanceVariables(String processInstanceId, Map<String, Object> variables) {
+        processInstanceUpdateService.updateProcessInstanceVariables(processInstanceId, variables);
     }
 
 }
