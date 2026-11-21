@@ -86,6 +86,12 @@ public class IotDeviceServiceImpl implements IotDeviceService {
     @Resource
     @Lazy // 延迟加载，解决循环依赖
     private IotDeviceShadowService deviceShadowService;
+    @Resource
+    @Lazy // 延迟加载，解决循环依赖
+    private IotDeviceOpcUaConfigService opcUaConfigService;
+    @Resource
+    @Lazy // 延迟加载，解决循环依赖
+    private IotDeviceOpcUaPointService opcUaPointService;
 
     private IotDeviceServiceImpl getSelf() {
         return SpringUtil.getBean(getClass());
@@ -215,8 +221,12 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         // 2. 删除设备
         deviceMapper.deleteById(id);
 
-        // 3. 级联删除影子
+        // 3.1 级联删除影子
         deviceShadowService.deleteByDeviceId(id);
+        // 3.2 级联删除 OPC UA 配置和点位
+        // TODO @AI：是不是可以不删除噢？如果 modbus 也没删除？最好一起做；要不把 modubs 删除也搞了！
+        opcUaConfigService.deleteDeviceOpcUaConfigListByDeviceIds(singletonList(id));
+        opcUaPointService.deleteDeviceOpcUaPointListByDeviceIds(singletonList(id));
 
         // 4. 清空对应缓存（事务提交后生效）
         deleteDeviceCache(device);
@@ -244,8 +254,13 @@ public class IotDeviceServiceImpl implements IotDeviceService {
         // 2. 删除设备
         deviceMapper.deleteByIds(ids);
 
-        // 3. 级联删除影子
+        // 3.1 级联删除影子
         ids.forEach(deviceShadowService::deleteByDeviceId);
+        // 3.2 级联删除 OPC UA 配置和点位
+        opcUaConfigService.deleteDeviceOpcUaConfigListByDeviceIds(ids);
+        opcUaPointService.deleteDeviceOpcUaPointListByDeviceIds(ids);
+        // TODO @芋艿：Modbus 是否也级联删除配置和点位？目前 Modbus 不级联，网关配置接口按设备是否存在过滤，残留记录不影响采集；
+        //  补级联需要给 Modbus 配置、点位 Service 增加按设备批量删除，属于 Modbus 的行为变化，OPC UA 一期不改
 
         // 4. 清空对应缓存（事务提交后生效）
         deleteDeviceCache(devices);

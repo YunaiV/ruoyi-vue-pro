@@ -14,6 +14,7 @@ import cn.iocoder.yudao.module.iot.gateway.protocol.http.IotHttpProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpclient.IotModbusTcpClientProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpserver.IotModbusTcpServerProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.IotMqttProtocol;
+import cn.iocoder.yudao.module.iot.gateway.protocol.opcua.client.IotOpcUaClientProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.IotTcpProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.udp.IotUdpProtocol;
 import cn.iocoder.yudao.module.iot.gateway.protocol.websocket.IotWebSocketProtocol;
@@ -252,6 +253,8 @@ public class IotProtocolManager implements SmartLifecycle {
                 return createModbusTcpClientProtocol(config);
             case MODBUS_TCP_SERVER:
                 return createModbusTcpServerProtocol(config);
+            case OPC_UA_CLIENT:
+                return createOpcUaClientProtocol(config);
             default:
                 throw new IllegalArgumentException(String.format(
                         "[createProtocol][协议实例 %s 的协议类型 %s 暂不支持]", config.getId(), protocolType));
@@ -346,6 +349,16 @@ public class IotProtocolManager implements SmartLifecycle {
      */
     private IotModbusTcpServerProtocol createModbusTcpServerProtocol(IotGatewayProperties.ProtocolProperties config) {
         return new IotModbusTcpServerProtocol(config);
+    }
+
+    /**
+     * 创建 OPC UA Client 协议实例
+     *
+     * @param config 协议实例配置
+     * @return OPC UA Client 协议实例
+     */
+    private IotOpcUaClientProtocol createOpcUaClientProtocol(IotGatewayProperties.ProtocolProperties config) {
+        return new IotOpcUaClientProtocol(config);
     }
 
 }

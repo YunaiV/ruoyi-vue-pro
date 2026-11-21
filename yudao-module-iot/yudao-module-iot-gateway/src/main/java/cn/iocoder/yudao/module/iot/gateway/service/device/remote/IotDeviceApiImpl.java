@@ -9,6 +9,8 @@ import cn.iocoder.yudao.module.iot.core.biz.dto.IotDeviceRespDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotGatewayServerAliveReqDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigListReqDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotModbusDeviceConfigRespDTO;
+import cn.iocoder.yudao.module.iot.core.biz.dto.IotOpcUaDeviceConfigListReqDTO;
+import cn.iocoder.yudao.module.iot.core.biz.dto.IotOpcUaDeviceConfigRespDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotSubDeviceRegisterFullReqDTO;
 import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterReqDTO;
 import cn.iocoder.yudao.module.iot.core.topic.auth.IotDeviceRegisterRespDTO;
@@ -90,6 +92,11 @@ public class IotDeviceApiImpl implements IotDeviceCommonApi {
     @Override
     public CommonResult<List<IotModbusDeviceConfigRespDTO>> getModbusDeviceConfigList(IotModbusDeviceConfigListReqDTO listReqDTO) {
         return doPost("/rpc-api/iot/modbus/config-list", listReqDTO, new ParameterizedTypeReference<>() { });
+    }
+
+    @Override
+    public CommonResult<List<IotOpcUaDeviceConfigRespDTO>> getOpcUaDeviceConfigList(IotOpcUaDeviceConfigListReqDTO listReqDTO) {
+        return doPost("/rpc-api/iot/opc-ua/config-list", listReqDTO, new ParameterizedTypeReference<>() { });
     }
 
     @Override
