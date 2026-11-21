@@ -9,6 +9,7 @@ import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties.ProtocolProperties;
 import cn.iocoder.yudao.module.iot.gateway.protocol.IotProtocol;
+import cn.iocoder.yudao.module.iot.gateway.protocol.opcua.client.handler.downstream.IotOpcUaClientDownstreamHandler;
 import cn.iocoder.yudao.module.iot.gateway.protocol.opcua.client.handler.downstream.IotOpcUaClientDownstreamSubscriber;
 import cn.iocoder.yudao.module.iot.gateway.protocol.opcua.client.handler.upstream.IotOpcUaClientUpstreamHandler;
 import cn.iocoder.yudao.module.iot.gateway.protocol.opcua.client.manager.IotOpcUaClientConfigCacheService;
@@ -30,10 +31,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
- * IoT 网关 OPC UA Client 协议：连接 OPC UA 服务端，Read 轮询或 MonitoredItem 订阅采集设备属性（只读）
+ * IoT 网关 OPC UA Client 协议：连接 OPC UA 服务端，Read 轮询或 MonitoredItem 订阅采集设备属性；
+ * 下行只支持属性设置（写节点的 Value 属性）
  * <p>
- * 所有状态（会话、设备绑定、轮询、订阅、上下线）只在一个 Vert.x context 上修改；
- * 阻塞操作（拉取配置、创建客户端、订阅操作、发送消息）提交到该 context 的有序 worker 队列
+ * 所有状态（会话、设备绑定、轮询、订阅、上下线、写入排队）只在一个 Vert.x context 上修改；
+ * 阻塞操作（拉取配置、创建客户端、订阅操作、属性写入、发送消息）提交到该 context 的有序 worker 队列
  *
  * @author 芋道源码
  */
@@ -89,6 +91,11 @@ public class IotOpcUaClientProtocol implements IotProtocol {
      * 下行消息订阅者
      */
     private IotOpcUaClientDownstreamSubscriber downstreamSubscriber;
+    /**
+     * 下行属性写入处理器
+     */
+    @Getter
+    private final IotOpcUaClientDownstreamHandler downstreamHandler;
 
     private final IotOpcUaClientConfigCacheService configCacheService;
     private final IotOpcUaClientSecurityFactory securityFactory;
@@ -128,6 +135,8 @@ public class IotOpcUaClientProtocol implements IotProtocol {
                 opcUaClientConfig, upstreamHandler);
         this.sessionManager = new IotOpcUaClientSessionManager(vertx, context, opcUaClientConfig, securityFactory,
                 stateTracker, pollScheduler, subscriptionManager);
+        this.downstreamHandler = new IotOpcUaClientDownstreamHandler(vertx, context, opcUaClientConfig, sessionManager,
+                messageService, serverId);
     }
 
     @Override
@@ -160,9 +169,9 @@ public class IotOpcUaClientProtocol implements IotProtocol {
             });
             log.info("[start][IoT OPC UA Client 协议 {} 启动成功，serverId={}]", getId(), serverId);
 
-            // 3. 启动下行消息订阅者（只读：下行指令只记日志）
+            // 3. 启动下行消息订阅者（只处理属性设置）
             if (messageBus != null) {
-                this.downstreamSubscriber = new IotOpcUaClientDownstreamSubscriber(this, messageBus);
+                this.downstreamSubscriber = new IotOpcUaClientDownstreamSubscriber(this, downstreamHandler, messageBus);
                 this.downstreamSubscriber.start();
             }
         } catch (Exception e) {

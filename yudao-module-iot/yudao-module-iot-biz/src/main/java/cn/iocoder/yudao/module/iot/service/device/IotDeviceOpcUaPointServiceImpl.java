@@ -14,6 +14,7 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceOpcUaPointDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
 import cn.iocoder.yudao.module.iot.dal.mysql.device.IotDeviceOpcUaPointMapper;
+import cn.iocoder.yudao.module.iot.enums.thingmodel.IotThingModelAccessModeEnum;
 import cn.iocoder.yudao.module.iot.enums.thingmodel.IotThingModelTypeEnum;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import cn.iocoder.yudao.module.iot.service.thingmodel.IotThingModelService;
@@ -103,6 +104,12 @@ public class IotDeviceOpcUaPointServiceImpl implements IotDeviceOpcUaPointServic
         if (ObjUtil.notEqual(thingModel.getProductId(), device.getProductId())
                 || ObjUtil.notEqual(thingModel.getType(), IotThingModelTypeEnum.PROPERTY.getType())) {
             throw exception(DEVICE_OPC_UA_POINT_THING_MODEL_INVALID);
+        }
+        // 2.2 校验可写：默认不可写；可写时物模型属性需要为读写
+        reqVO.setWritable(Boolean.TRUE.equals(reqVO.getWritable()));
+        if (reqVO.getWritable() && (thingModel.getProperty() == null || ObjUtil.notEqual(
+                IotThingModelAccessModeEnum.READ_WRITE.getMode(), thingModel.getProperty().getAccessMode()))) {
+            throw exception(DEVICE_OPC_UA_POINT_WRITABLE_INVALID);
         }
         // 3. 校验 NodeId 语法（命名空间、标识由网关在会话激活后解析）
         reqVO.setNodeId(reqVO.getNodeId().trim());

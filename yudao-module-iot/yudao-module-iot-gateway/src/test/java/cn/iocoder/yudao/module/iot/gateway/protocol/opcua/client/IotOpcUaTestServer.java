@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.iot.gateway.protocol.opcua.client;
 
 import org.eclipse.milo.opcua.sdk.core.AccessLevel;
 import org.eclipse.milo.opcua.sdk.core.Reference;
+import org.eclipse.milo.opcua.sdk.core.ValueRanks;
 import org.eclipse.milo.opcua.sdk.server.EndpointConfig;
 import org.eclipse.milo.opcua.sdk.server.ManagedNamespaceWithLifecycle;
 import org.eclipse.milo.opcua.sdk.server.OpcUaServer;
@@ -14,9 +15,13 @@ import org.eclipse.milo.opcua.sdk.server.items.DataItem;
 import org.eclipse.milo.opcua.sdk.server.items.MonitoredItem;
 import org.eclipse.milo.opcua.sdk.server.nodes.UaFolderNode;
 import org.eclipse.milo.opcua.sdk.server.nodes.UaVariableNode;
+import org.eclipse.milo.opcua.sdk.server.nodes.filters.AttributeFilter;
+import org.eclipse.milo.opcua.sdk.server.nodes.filters.AttributeFilterContext;
 import org.eclipse.milo.opcua.sdk.server.util.SubscriptionModel;
+import org.eclipse.milo.opcua.stack.core.AttributeId;
 import org.eclipse.milo.opcua.stack.core.NodeIds;
 import org.eclipse.milo.opcua.stack.core.StatusCodes;
+import org.eclipse.milo.opcua.stack.core.UaException;
 import org.eclipse.milo.opcua.stack.core.security.*;
 import org.eclipse.milo.opcua.stack.core.transport.TransportProfile;
 import org.eclipse.milo.opcua.stack.core.types.builtin.*;
@@ -52,7 +57,12 @@ import static org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.Unsigned.
  *     <li>{@code /yudao-plain-token}：Basic256Sha256/SignAndEncrypt，用户名 token 的 policy 实际为 None（用于校验口令不能明文发送）。</li>
  * </ul>
  * 节点：命名空间 {@link #NAMESPACE_URI} 下的 {@code s=Temperature}（Double）、{@code s=Counter}（Int32）、{@code s=Name}（String）、
- * {@code s=Flag}（Boolean）、{@code s=Array}（Int32[]）、{@code s=Big}（UInt64）、{@code s=Bad}（Bad 状态）、{@code i=1001}（Int32）
+ * {@code s=Flag}（Boolean）、{@code s=Array}（Int32[]）、{@code s=Big}（UInt64）、{@code s=Bad}（Bad 状态）、{@code i=1001}（Int32），
+ * 都是只读、DataType 为 BaseDataType；
+ * <p>
+ * 可写节点（DataType 为具体类型）：{@code s=W.Int16}、{@code s=W.UInt32}、{@code s=W.Double}、{@code s=W.String}、{@code s=W.Flag}、
+ * {@code s=W.Time}（UtcTime）、{@code s=W.Array}（Int32[]），{@code s=W.UserDenied}（AccessLevel 可写、UserAccessLevel 只读），
+ * {@code s=W.Reject}（可写，但服务端拒绝写入：返回 Bad_OutOfRange）
  *
  * @author 芋道源码
  */
@@ -73,6 +83,10 @@ public class IotOpcUaTestServer {
      * 节点值：重启后保留，模拟设备的现场值
      */
     private final Map<String, DataValue> values = new ConcurrentHashMap<>();
+    /**
+     * 可写节点：名字 → 定义（按插入顺序创建）
+     */
+    private final Map<String, WritableNode> writableNodes = new LinkedHashMap<>();
     /**
      * 服务端 OperationLimits.MaxMonitoredItemsPerCall：为 null 时使用 Milo 默认值；下次启动（重启）后生效
      */
@@ -108,6 +122,15 @@ public class IotOpcUaTestServer {
         values.put("Big", new DataValue(new Variant(ulong("18446744073709551615"))));
         values.put("Bad", new DataValue(new StatusCode(StatusCodes.Bad_SensorFailure)));
         values.put("1001", new DataValue(new Variant(42)));
+        writableNodes.put("W.Int16", new WritableNode(NodeIds.Int16, (short) 0));
+        writableNodes.put("W.UInt32", new WritableNode(NodeIds.UInt32, uint(0)));
+        writableNodes.put("W.Double", new WritableNode(NodeIds.Double, 0D));
+        writableNodes.put("W.String", new WritableNode(NodeIds.String, ""));
+        writableNodes.put("W.Flag", new WritableNode(NodeIds.Boolean, false));
+        writableNodes.put("W.Time", new WritableNode(NodeIds.UtcTime, DateTime.MIN_DATE_TIME));
+        writableNodes.put("W.Array", new WritableNode(NodeIds.Int32, new Integer[]{0}));
+        writableNodes.put("W.UserDenied", new WritableNode(NodeIds.Int32, 0));
+        writableNodes.put("W.Reject", new WritableNode(NodeIds.Int32, 0));
     }
 
     public synchronized void start() throws Exception {
@@ -257,6 +280,33 @@ public class IotOpcUaTestServer {
     }
 
     /**
+     * 读取节点的当前值（包括客户端写入的值）
+     *
+     * @param name 节点名
+     * @return 值；节点不存在时返回 null
+     */
+    public Object getValue(String name) {
+        TestNamespace current = namespace;
+        UaVariableNode node = current != null ? current.nodes.get(name) : null;
+        return node != null ? node.getValue().getValue().getValue() : null;
+    }
+
+    /**
+     * 可写节点的定义
+     */
+    private static class WritableNode {
+
+        private final NodeId dataType;
+        private final Object initialValue;
+
+        WritableNode(NodeId dataType, Object initialValue) {
+            this.dataType = dataType;
+            this.initialValue = initialValue;
+        }
+
+    }
+
+    /**
      * 测试命名空间：每个值一个变量节点，挂在 Objects/YudaoTest 下
      */
     private class TestNamespace extends ManagedNamespaceWithLifecycle {
@@ -290,6 +340,38 @@ public class IotOpcUaTestServer {
                         .setTypeDefinition(NodeIds.BaseDataVariableType)
                         .build();
                 node.setValue(entry.getValue());
+                getNodeManager().addNode(node);
+                folder.addOrganizes(node);
+                nodes.put(name, node);
+            }
+            for (Map.Entry<String, WritableNode> entry : writableNodes.entrySet()) {
+                String name = entry.getKey();
+                WritableNode definition = entry.getValue();
+                boolean array = definition.initialValue.getClass().isArray();
+                UaVariableNode node = new UaVariableNode.UaVariableNodeBuilder(getNodeContext())
+                        .setNodeId(newNodeId(name))
+                        .setAccessLevel(AccessLevel.READ_WRITE)
+                        .setUserAccessLevel("W.UserDenied".equals(name) ? AccessLevel.READ_ONLY : AccessLevel.READ_WRITE)
+                        .setBrowseName(newQualifiedName(name))
+                        .setDisplayName(LocalizedText.english(name))
+                        .setDataType(definition.dataType)
+                        .setValueRank(array ? ValueRanks.OneDimension : ValueRanks.Scalar)
+                        .setTypeDefinition(NodeIds.BaseDataVariableType)
+                        .build();
+                node.setValue(new DataValue(new Variant(definition.initialValue)));
+                if ("W.Reject".equals(name)) {
+                    // 模拟设备拒绝：值超出现场允许的范围
+                    node.getFilterChain().addLast(new AttributeFilter() {
+                        @Override
+                        public void writeAttribute(AttributeFilterContext ctx, AttributeId attributeId, Object value)
+                                throws UaException {
+                            if (attributeId == AttributeId.Value) {
+                                throw new UaException(StatusCodes.Bad_OutOfRange);
+                            }
+                            ctx.writeAttribute(attributeId, value);
+                        }
+                    });
+                }
                 getNodeManager().addNode(node);
                 folder.addOrganizes(node);
                 nodes.put(name, node);

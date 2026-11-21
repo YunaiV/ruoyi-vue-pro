@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * IoT OPC UA 会话：租户、端点、安全策略、模式、认证方式、凭据别名、超时时间、重试间隔都相同的设备共用一个 {@link OpcUaClient} 长连接
@@ -78,6 +79,18 @@ public class IotOpcUaClientSession {
      */
     private volatile long generation;
     /**
+     * 连接代数：Milo 回调会话激活 / 失效时，在 Milo 的线程上立即加一（不等切回 context）
+     * <p>
+     * {@link #generation}、{@link #active} 要等回调切回 context 才更新；物理断开、重连（Milo 复用同一个 {@link OpcUaClient}）
+     * 与切回 context 之间，写入以它判断底层会话是否已经变化
+     */
+    private final AtomicLong connectionEpoch = new AtomicLong();
+    /**
+     * 本次激活对应的连接代数：在 context 上处理会话激活时记录（取自激活回调当时的 {@link #connectionEpoch}）；
+     * 与 {@link #connectionEpoch} 不相等表示底层会话在本次激活之后已失效或重新激活
+     */
+    private volatile long activeConnectionEpoch = -1;
+    /**
      * 本次激活读取的命名空间数组（nsu= 写法的 NodeId 据此解析）
      */
     private String[] namespaces;
@@ -91,6 +104,10 @@ public class IotOpcUaClientSession {
      * 读取完成前为 null，不同步订阅（分批由 Milo 的 OpcUaSubscription 按该值执行）
      */
     private Integer maxMonitoredItemsPerCall;
+    /**
+     * 本次激活每次 Write 的最大节点数：min(本地配置, 服务端 OperationLimits)；读取完成前为 null，不写入
+     */
+    private Integer maxNodesPerWrite;
 
     /**
      * 本代已告警过的 key：同一问题每代只告警一次，避免每次轮询都刷日志

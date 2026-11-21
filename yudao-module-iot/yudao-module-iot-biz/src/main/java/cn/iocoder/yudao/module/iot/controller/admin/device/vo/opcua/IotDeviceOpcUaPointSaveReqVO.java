@@ -43,6 +43,9 @@ public class IotDeviceOpcUaPointSaveReqVO {
     @Max(value = 86400000, message = "采集间隔不能大于 86400000 毫秒")
     private Integer collectInterval;
 
+    @Schema(description = "是否可写（默认 false；物模型属性需要为读写）", example = "false")
+    private Boolean writable;
+
     @Schema(description = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "0")
     @NotNull(message = "状态不能为空")
     @InEnum(CommonStatusEnum.class)

@@ -2,12 +2,14 @@ package cn.iocoder.yudao.module.iot.gateway.protocol;
 
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.exception.ErrorCode;
+import cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.script.dto.IotScriptSource;
+import cn.iocoder.yudao.module.iot.core.topic.property.IotDevicePropertySetResultDTO;
 import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.dto.IotDownstreamEncodeRespDTO;
@@ -25,18 +27,21 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
 
-import static cn.iocoder.yudao.module.iot.gateway.enums.ErrorCodeConstants.MODBUS_EXCEPTION;
+import static cn.iocoder.yudao.module.iot.gateway.enums.ErrorCodeConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.AdditionalMatchers.aryEq;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.*;
 
 /**
@@ -547,6 +552,61 @@ public class AbstractIotProtocolDownstreamSubscriberTest extends BaseMockitoUnit
                 eq(SERVER_ID));
     }
 
+    // ========== replyPropertySetResult ==========
+
+    @Test
+    public void testReplyPropertySetResult() {
+        // 准备参数：每个属性的结果
+        IotDeviceMessage request = buildPropertySet();
+        Map<String, IotDevicePropertySetResultDTO> results = new LinkedHashMap<>();
+        results.put("power", IotDevicePropertySetResultDTO.success());
+        results.put("speed", IotDevicePropertySetResultDTO.failure(PROPERTY_SET_POINT_NOT_EXISTS));
+        // mock 方法
+        when(protocol.getServerId()).thenReturn(SERVER_ID);
+        mockDeviceMessageService();
+        mockExecuteBlocking();
+
+        // 调用
+        subscriber.replyPropertySet(request, Future.succeededFuture(results));
+
+        // 断言：切到协议的 worker 回复给 biz，带每个属性的结果
+        verify(vertx).executeBlocking(any(Callable.class), eq(false));
+        verify(deviceMessageService).sendPropertySetReply(same(request), same(results), isNull(), eq(SERVER_ID));
+    }
+
+    @Test
+    public void testReplyPropertySetResult_failure() {
+        // 准备参数
+        IotDeviceMessage request = buildPropertySet();
+        // mock 方法
+        when(protocol.getServerId()).thenReturn(SERVER_ID);
+        mockDeviceMessageService();
+        mockExecuteBlocking();
+
+        // 调用：整条消息失败（业务异常、其它异常）
+        subscriber.replyPropertySet(request, Future.failedFuture(
+                ServiceExceptionUtil.exception(PROPERTY_SET_PARAMS_INVALID, "params 需要是非空的属性 Map")));
+        subscriber.replyPropertySet(request, Future.failedFuture(new IllegalStateException("closed")));
+
+        // 断言：业务异常保留错误码和消息；其它异常转为写入失败
+        ArgumentCaptor<ErrorCode> captor = ArgumentCaptor.forClass(ErrorCode.class);
+        verify(deviceMessageService, times(2)).sendPropertySetReply(same(request), isNull(), captor.capture(),
+                eq(SERVER_ID));
+        assertEquals(PROPERTY_SET_PARAMS_INVALID.getCode(), captor.getAllValues().get(0).getCode());
+        assertEquals("属性设置参数不合法：params 需要是非空的属性 Map", captor.getAllValues().get(0).getMsg());
+        assertSame(DEVICE_OFFLINE_OR_WRITE_FAILED, captor.getAllValues().get(1));
+    }
+
+    @Test
+    public void testReplyPropertySetResult_null() {
+        // 调用：不是属性设置，不回复
+        subscriber.replyPropertySet(buildPropertySet(), null);
+
+        // 断言
+        verify(protocol, never()).getVertx();
+        springUtilMockedStatic.verifyNoInteractions();
+    }
+
     // ========== 辅助方法 ==========
 
     private void mockScriptProperties() {
@@ -631,6 +691,10 @@ public class AbstractIotProtocolDownstreamSubscriberTest extends BaseMockitoUnit
 
         void reply(IotDeviceMessage request, IotScriptSource source, byte[] payload, ErrorCode deviceError) {
             replyRawResult(request, source, payload, deviceError);
+        }
+
+        void replyPropertySet(IotDeviceMessage request, Future<Map<String, IotDevicePropertySetResultDTO>> result) {
+            replyPropertySetResult(request, result);
         }
 
     }

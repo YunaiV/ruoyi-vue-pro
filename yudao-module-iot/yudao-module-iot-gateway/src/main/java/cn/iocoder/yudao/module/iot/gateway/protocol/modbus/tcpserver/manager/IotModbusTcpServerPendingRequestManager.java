@@ -137,8 +137,8 @@ public class IotModbusTcpServerPendingRequestManager {
      * 按 FIFO 匹配（slaveId + functionCode + registerCount）
      * <p>
      * 这是原有的 RTU 匹配逻辑，透传请求只是加入同一个 FIFO，有原有的限制：
-     * RTU 帧没有事务号，同 unit、同功能码、同数量的迟到响应（例如到期清理后才到的轮询响应），
-     * 或者同功能码的标准写（不登记待响应请求）的回显 / 异常响应，都可能被配给排在前面的另一个请求
+     * RTU 帧没有事务号，同 unit、同功能码、同数量的迟到响应（例如到期清理后才到的轮询、事务响应），
+     * 都可能被配给排在前面的另一个请求
      */
     private PendingRequest matchByFifo(Deque<PendingRequest> queue, IotModbusTcpServerTransactionChannel channel,
                                        int slaveId, int functionCode, int responseRegisterCount) {

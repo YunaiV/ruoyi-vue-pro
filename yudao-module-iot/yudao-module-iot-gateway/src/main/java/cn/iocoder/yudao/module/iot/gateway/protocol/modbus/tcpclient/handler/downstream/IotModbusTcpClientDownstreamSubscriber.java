@@ -49,7 +49,8 @@ public class IotModbusTcpClientDownstreamSubscriber extends AbstractIotProtocolD
 
     @Override
     protected void handleMessage(IotDeviceMessage message) {
-        downstreamHandler.handle(message);
+        // 属性设置：写入完成后逐项回复（其它消息返回 null，不回复）
+        replyPropertySetResult(message, downstreamHandler.handle(message));
     }
 
     /**

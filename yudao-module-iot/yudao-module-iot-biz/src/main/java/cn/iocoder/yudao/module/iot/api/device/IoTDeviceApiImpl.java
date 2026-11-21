@@ -19,6 +19,7 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceOpcUaConfigDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceOpcUaPointDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
+import cn.iocoder.yudao.module.iot.enums.thingmodel.IotThingModelAccessModeEnum;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceModbusConfigService;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceModbusPointService;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceOpcUaConfigService;
@@ -195,7 +196,13 @@ public class IoTDeviceApiImpl implements IotDeviceCommonApi {
                         || !thingModelIds.add(point.getThingModelId())) {
                     continue;
                 }
-                points.add(BeanUtils.toBean(point, IotOpcUaPointRespDTO.class, o -> o.setIdentifier(thingModel.getIdentifier())));
+                // 可写：点位开启可写，且物模型属性当前仍是读写（物模型改为只读后，不下发点位上残留的 writable=true）
+                boolean writable = Boolean.TRUE.equals(point.getWritable()) && thingModel.getProperty() != null
+                        && ObjUtil.equal(IotThingModelAccessModeEnum.READ_WRITE.getMode(), thingModel.getProperty().getAccessMode());
+                points.add(BeanUtils.toBean(point, IotOpcUaPointRespDTO.class, o -> {
+                    o.setIdentifier(thingModel.getIdentifier());
+                    o.setWritable(writable);
+                }));
             }
             // 3.3 点位为空也返回：会话与上下线照常维护，没有点位时不采集
             result.add(BeanUtils.toBean(config, IotOpcUaDeviceConfigRespDTO.class, o ->

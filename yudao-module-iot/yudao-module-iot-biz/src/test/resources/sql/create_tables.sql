@@ -281,6 +281,7 @@ CREATE TABLE IF NOT EXISTS "iot_device_opc_ua_point" (
     "node_id" varchar(512) NOT NULL DEFAULT '',
     "collect_mode" tinyint NOT NULL,
     "collect_interval" int NOT NULL DEFAULT '1000',
+    "writable" bit NOT NULL DEFAULT FALSE,
     "status" tinyint NOT NULL DEFAULT '0',
     "creator" varchar(64) DEFAULT '',
     "create_time" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,

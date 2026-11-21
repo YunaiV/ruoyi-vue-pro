@@ -55,6 +55,8 @@ public interface ErrorCodeConstants {
     ErrorCode DEVICE_MESSAGE_RAW_PAYLOAD_INVALID = new ErrorCode(1_050_003_400, "透传载荷不合法：{}");
     ErrorCode DEVICE_MESSAGE_RAW_PROTOCOL_NOT_SUPPORTED = new ErrorCode(1_050_003_401, "协议({}) 不支持透传下发");
     ErrorCode DEVICE_MESSAGE_RAW_METHOD_RESERVED = new ErrorCode(1_050_003_402, "透传上报只能由网关创建");
+    ErrorCode DEVICE_MESSAGE_PROPERTY_SET_PARAMS_INVALID = new ErrorCode(1_050_003_410, "属性设置参数需要是非空的属性 Map（属性标识符 → 属性值）");
+    ErrorCode DEVICE_MESSAGE_PROPERTY_NOT_WRITABLE = new ErrorCode(1_050_003_411, "属性({}) 不存在或不可写（物模型读写类型需要为读写）");
 
     // ========== 产品分类 1-050-004-000 ==========
     ErrorCode PRODUCT_CATEGORY_NOT_EXISTS = new ErrorCode(1_050_004_000, "产品分类不存在");
@@ -133,7 +135,8 @@ public interface ErrorCodeConstants {
     ErrorCode DEVICE_OPC_UA_CONFIG_NOT_EXISTS = new ErrorCode(1_050_015_000, "设备 OPC UA 连接配置不存在");
     ErrorCode DEVICE_OPC_UA_CONFIG_PROTOCOL_INVALID = new ErrorCode(1_050_015_001, "产品协议不是 OPC UA Client，不能配置 OPC UA 连接和点位");
     ErrorCode DEVICE_OPC_UA_DOWNSTREAM_NOT_SUPPORTED = new ErrorCode(1_050_015_100,
-            "OPC UA 设备只支持读取采集，不支持下行消息（属性设置、服务调用、透传、配置推送、OTA 等）");
+            "OPC UA 设备只支持属性设置下发，不支持服务调用、透传、配置推送、OTA 等下行消息");
+    ErrorCode DEVICE_OPC_UA_POINT_NOT_WRITABLE = new ErrorCode(1_050_015_101, "属性({}) 没有启用且可写的 OPC UA 点位");
 
     // ========== 设备 OPC UA 点位 1-050-016-000 ==========
     ErrorCode DEVICE_OPC_UA_POINT_NOT_EXISTS = new ErrorCode(1_050_016_000, "设备 OPC UA 点位配置不存在");
@@ -141,5 +144,6 @@ public interface ErrorCodeConstants {
     ErrorCode DEVICE_OPC_UA_POINT_THING_MODEL_INVALID = new ErrorCode(1_050_016_002, "物模型不是该设备所属产品的属性");
     ErrorCode DEVICE_OPC_UA_POINT_NODE_ID_INVALID = new ErrorCode(1_050_016_003, "NodeId 格式不正确：{}");
     ErrorCode DEVICE_OPC_UA_POINT_DEVICE_MISMATCH = new ErrorCode(1_050_016_004, "点位不属于该设备，不能修改");
+    ErrorCode DEVICE_OPC_UA_POINT_WRITABLE_INVALID = new ErrorCode(1_050_016_005, "物模型属性为只读，点位不能设为可写");
 
 }

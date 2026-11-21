@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.gateway.protocol.opcua.client;
 
+import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.module.iot.core.biz.IotDeviceCommonApi;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotOpcUaDeviceConfigRespDTO;
@@ -8,11 +9,13 @@ import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.enums.opcua.IotOpcUaAuthTypeEnum;
 import cn.iocoder.yudao.module.iot.core.enums.opcua.IotOpcUaCollectModeEnum;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
+import cn.iocoder.yudao.module.iot.core.topic.property.IotDevicePropertySetResultDTO;
 import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties;
 import cn.iocoder.yudao.module.iot.gateway.protocol.opcua.client.manager.IotOpcUaClientSession;
 import cn.iocoder.yudao.module.iot.gateway.protocol.opcua.client.security.IotOpcUaClientSecurityFactory;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.eclipse.milo.opcua.stack.core.types.builtin.DateTime;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -25,25 +28,32 @@ import java.nio.file.Path;
 import java.security.KeyStore;
 import java.security.Security;
 import java.security.cert.X509Certificate;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
+import static cn.iocoder.yudao.module.iot.gateway.enums.ErrorCodeConstants.*;
 import static org.awaitility.Awaitility.await;
+import static org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.Unsigned.uint;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.*;
 
 /**
  * {@link IotOpcUaClientProtocol} 的模拟验收测试：进程内 Milo Server
  * <p>
  * 覆盖 Read 轮询（分批、合并、拆分）、MonitoredItem 订阅、断线重连、Session 恢复、订阅重建、
- * 命名空间顺序变化后的 NodeId 解析、安全策略（None 默认拒绝、用户名 SignAndEncrypt、明文令牌拒绝、未信任证书拒绝、主机不一致拒绝）
+ * 命名空间顺序变化后的 NodeId 解析、安全策略（None 默认拒绝、用户名 SignAndEncrypt、明文令牌拒绝、未信任证书拒绝、主机不一致拒绝）、
+ * 属性写入（按节点实际 DataType 转换、访问级别、服务端 StatusCode、会话失效）
  *
  * @author 芋道源码
  */
@@ -66,6 +76,10 @@ public class IotOpcUaClientProtocolIntegrationTest {
     private IotOpcUaClientProtocol protocol;
     private final List<IotDeviceMessage> sentMessages = new CopyOnWriteArrayList<>();
     private final List<String> sentDeviceNames = new CopyOnWriteArrayList<>();
+    /**
+     * 属性设置的回复：请求 requestId → 每个属性的结果
+     */
+    private final Map<String, Map<String, IotDevicePropertySetResultDTO>> propertySetReplies = new ConcurrentHashMap<>();
     private volatile List<IotOpcUaDeviceConfigRespDTO> deviceConfigs = new ArrayList<>();
     private IotDeviceCommonApi deviceApi;
 
@@ -419,6 +433,101 @@ public class IotOpcUaClientProtocolIntegrationTest {
         await().atMost(20, TimeUnit.SECONDS).until(() -> hasPropertyValue("dev1", "temperature", 25.5D));
     }
 
+    // ========== 属性写入 ==========
+
+    @Test
+    public void testPropertySet_writeAndReply() throws Exception {
+        // 准备参数：可写的具体类型节点、只读节点、用户无写权限节点、数组节点、服务端拒绝的节点、未开启可写的点位
+        IotOpcUaClientConfig config = newConfig();
+        trustEachOther(config, true);
+        deviceConfigs = Collections.singletonList(newDevice(1L, server.getEndpointUrl(), "Basic256Sha256",
+                "SignAndEncrypt", AUTH_ANONYMOUS, Arrays.asList(
+                        newWritablePoint(11L, "int16", NSU + "s=W.Int16"),
+                        newWritablePoint(12L, "uint32", NSU + "s=W.UInt32"),
+                        newWritablePoint(13L, "double", NSU + "s=W.Double"),
+                        newWritablePoint(14L, "string", NSU + "s=W.String"),
+                        newWritablePoint(15L, "flag", NSU + "s=W.Flag"),
+                        newWritablePoint(16L, "time", NSU + "s=W.Time"),
+                        newWritablePoint(17L, "overflow", NSU + "s=W.Int16"),
+                        newWritablePoint(18L, "readOnly", NSU + "s=Counter"),
+                        newWritablePoint(19L, "userDenied", NSU + "s=W.UserDenied"),
+                        newWritablePoint(20L, "array", NSU + "s=W.Array"),
+                        newWritablePoint(21L, "rejected", NSU + "s=W.Reject"),
+                        newPoint(22L, "notWritable", NSU + "s=W.Double", COLLECT_POLL, 1000),
+                        newWritablePoint(23L, "missing", "nsu=urn:not-exists;s=X"))));
+        startProtocol(config);
+        awaitState("dev1", true);
+        Map<String, Object> params = new LinkedHashMap<>();
+        params.put("int16", -1234);
+        params.put("uint32", 4294967295L);
+        params.put("double", "12.5");
+        params.put("string", "on");
+        params.put("flag", true);
+        params.put("time", 1700000000000L);
+        params.put("overflow", 40000);
+        params.put("readOnly", 1);
+        params.put("userDenied", 1);
+        params.put("array", 1);
+        params.put("rejected", 1);
+        params.put("notWritable", 1.5D);
+        params.put("missing", 1);
+        params.put("unknown", 1);
+
+        // 调用
+        Map<String, IotDevicePropertySetResultDTO> results = propertySet("w1", params);
+
+        // 断言：结果按参数顺序，每个属性一个结果
+        assertEquals(new ArrayList<>(params.keySet()), new ArrayList<>(results.keySet()));
+        // 断言：按节点实际的 DataType 写入；成功带回服务端的 Good 状态码
+        for (String identifier : Arrays.asList("int16", "uint32", "double", "string", "flag", "time")) {
+            assertTrue(results.get(identifier).succeeded(), identifier + " " + results.get(identifier));
+            assertEquals("0x00000000", results.get(identifier).getStatusCode());
+        }
+        assertEquals((short) -1234, server.getValue("W.Int16"));
+        assertEquals(uint(4294967295L), server.getValue("W.UInt32"));
+        assertEquals(12.5D, server.getValue("W.Double"));
+        assertEquals("on", server.getValue("W.String"));
+        assertEquals(true, server.getValue("W.Flag"));
+        assertEquals(new DateTime(Instant.ofEpochMilli(1700000000000L)), server.getValue("W.Time"));
+        // 断言：超出 Int16 范围不截断；只读、用户无写权限带回对应的 Bad 状态码；数组不支持
+        assertResult(results.get("overflow"), PROPERTY_SET_VALUE_INVALID, null);
+        assertResult(results.get("readOnly"), OPC_UA_WRITE_NODE_NOT_WRITABLE, "0x803B0000");
+        assertResult(results.get("userDenied"), OPC_UA_WRITE_NODE_NOT_WRITABLE, "0x801F0000");
+        assertResult(results.get("array"), OPC_UA_WRITE_DATA_TYPE_NOT_SUPPORTED, null);
+        assertEquals(0, server.getValue("W.UserDenied"));
+        // 断言：服务端拒绝写入：StatusCode 原样带回
+        assertResult(results.get("rejected"), OPC_UA_WRITE_STATUS_BAD, "0x803C0000");
+        assertTrue(results.get("rejected").getMsg().contains("Bad_OutOfRange"), results.get("rejected").getMsg());
+        // 断言：未开启可写、NodeId 无法解析、没有点位
+        assertResult(results.get("notWritable"), PROPERTY_SET_POINT_NOT_WRITABLE, null);
+        assertResult(results.get("missing"), OPC_UA_WRITE_NODE_ID_UNRESOLVED, null);
+        assertResult(results.get("unknown"), PROPERTY_SET_POINT_NOT_EXISTS, null);
+    }
+
+    @Test
+    public void testPropertySet_sessionInactive() throws Exception {
+        // 准备参数
+        IotOpcUaClientConfig config = newConfig();
+        trustEachOther(config, true);
+        deviceConfigs = Collections.singletonList(newDevice(1L, server.getEndpointUrl(), "Basic256Sha256",
+                "SignAndEncrypt", AUTH_ANONYMOUS, Collections.singletonList(
+                        newWritablePoint(11L, "int16", NSU + "s=W.Int16"))));
+        startProtocol(config);
+        awaitState("dev1", true);
+
+        // 调用：服务端停止，会话失效后写入
+        server.stop();
+        awaitState("dev1", false);
+        Map<String, IotDevicePropertySetResultDTO> results = propertySet("w2", Collections.singletonMap("int16", 1));
+
+        // 断言：会话未激活，直接失败
+        assertResult(results.get("int16"), OPC_UA_WRITE_SESSION_INACTIVE, null);
+        // 调用：设备不属于本网关
+        Map<String, IotDevicePropertySetResultDTO> notConfigured = propertySet("w3", Collections.singletonMap("int16", 1),
+                99L);
+        assertResult(notConfigured.get("int16"), PROPERTY_SET_DEVICE_NOT_CONFIGURED, null);
+    }
+
     // ========== 工具方法 ==========
 
     private IotOpcUaClientConfig newConfig() {
@@ -460,6 +569,7 @@ public class IotOpcUaClientProtocolIntegrationTest {
     private void startProtocol(IotOpcUaClientConfig config) {
         sentMessages.clear();
         sentDeviceNames.clear();
+        propertySetReplies.clear();
         deviceApi = mock(IotDeviceCommonApi.class);
         when(deviceApi.getOpcUaDeviceConfigList(any())).thenAnswer(invocation -> CommonResult.success(deviceConfigs));
         IotDeviceMessageService messageService = mock(IotDeviceMessageService.class);
@@ -473,6 +583,12 @@ public class IotOpcUaClientProtocolIntegrationTest {
             sentDeviceNames.add(invocation.getArgument(2));
             return null;
         }).when(messageService).sendDeviceMessage(any(), any(), any(), any());
+        doAnswer(invocation -> {
+            IotDeviceMessage request = invocation.getArgument(0);
+            Map<String, IotDevicePropertySetResultDTO> results = invocation.getArgument(1);
+            propertySetReplies.put(request.getRequestId(), new LinkedHashMap<>(results));
+            return null;
+        }).when(messageService).sendPropertySetReply(any(), any(), isNull(), any());
         IotGatewayProperties.ProtocolProperties properties = new IotGatewayProperties.ProtocolProperties();
         properties.setId("opc-ua-client-test");
         properties.setProtocol("opc_ua_client");
@@ -510,6 +626,38 @@ public class IotOpcUaClientProtocolIntegrationTest {
         point.setCollectMode(collectMode);
         point.setCollectInterval(collectInterval);
         return point;
+    }
+
+    private static IotOpcUaPointRespDTO newWritablePoint(Long id, String identifier, String nodeId) {
+        IotOpcUaPointRespDTO point = newPoint(id, identifier, nodeId, COLLECT_POLL, 1000);
+        point.setWritable(true);
+        return point;
+    }
+
+    private Map<String, IotDevicePropertySetResultDTO> propertySet(String requestId, Map<String, Object> params) {
+        return propertySet(requestId, params, 1L);
+    }
+
+    /**
+     * 下发属性设置，等待回复
+     */
+    private Map<String, IotDevicePropertySetResultDTO> propertySet(String requestId, Map<String, Object> params,
+                                                                   Long deviceId) {
+        IotDeviceMessage message = IotDeviceMessage.requestOf(requestId,
+                IotDeviceMessageMethodEnum.PROPERTY_SET.getMethod(), params);
+        message.setDeviceId(deviceId);
+        protocol.getDownstreamHandler().handle(message);
+        await().atMost(20, TimeUnit.SECONDS).until(() -> propertySetReplies.containsKey(requestId));
+        return propertySetReplies.get(requestId);
+    }
+
+    private static void assertResult(IotDevicePropertySetResultDTO result, ErrorCode errorCode, String statusCode) {
+        assertNotNull(result);
+        assertFalse(result.succeeded(), String.valueOf(result));
+        assertEquals(errorCode.getCode(), result.getCode(), String.valueOf(result));
+        if (statusCode != null) {
+            assertEquals(statusCode, result.getStatusCode());
+        }
     }
 
     private void awaitState(String deviceName, boolean online) {

@@ -8,10 +8,12 @@ import io.vertx.core.Context;
 import io.vertx.core.Vertx;
 import org.eclipse.milo.opcua.sdk.client.OpcUaClient;
 import org.eclipse.milo.opcua.sdk.client.OperationLimits;
+import org.eclipse.milo.opcua.sdk.client.SessionActivityListener;
 import org.eclipse.milo.opcua.stack.core.NamespaceTable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 
 import java.util.Arrays;
@@ -69,7 +71,7 @@ public class IotOpcUaClientSessionManagerTest {
     @Test
     public void testHandleSessionActive_afterOperationLimits() throws Exception {
         // mock 方法：创建客户端成功，连接不完成（由测试触发会话激活）；OperationLimits 读取阻塞，直到放行；
-        // 服务端上限低于本地配置（MaxNodesPerRead 10 < 100，MaxMonitoredItemsPerCall 2 < 100）
+        // 服务端上限低于本地配置（MaxNodesPerRead 10 < 100，MaxMonitoredItemsPerCall 2 < 100，MaxNodesPerWrite 5 < 100）
         OpcUaClient client = mock(OpcUaClient.class, RETURNS_DEEP_STUBS);
         when(client.connectAsync()).thenReturn(new CompletableFuture<>());
         when(client.getNamespaceTable()).thenReturn(new NamespaceTable());
@@ -77,6 +79,7 @@ public class IotOpcUaClientSessionManagerTest {
         OperationLimits limits = mock(OperationLimits.class);
         when(limits.maxNodesPerRead()).thenReturn(Optional.of(uint(10)));
         when(limits.maxMonitoredItemsPerCall()).thenReturn(Optional.of(uint(2)));
+        when(limits.maxNodesPerWrite()).thenReturn(Optional.of(uint(5)));
         when(client.readOperationLimits()).thenAnswer(invocation -> {
             assertTrue(operationLimitsLatch.await(10, TimeUnit.SECONDS));
             return limits;
@@ -94,7 +97,7 @@ public class IotOpcUaClientSessionManagerTest {
 
         // 调用：会话激活；OperationLimits 读取完成前，又挂入一个设备
         callOnContext(() -> {
-            sessionManager.handleSessionActive(session, client);
+            sessionManager.handleSessionActive(session, client, session.getConnectionEpoch().incrementAndGet());
             sessionManager.applyConfigs(Arrays.asList(device1, device2), Collections.emptySet());
             return null;
         });
@@ -102,6 +105,7 @@ public class IotOpcUaClientSessionManagerTest {
         assertTrue(callOnContext(session::isActive));
         assertNull(callOnContext(session::getMaxNodesPerRead));
         assertNull(callOnContext(session::getMaxMonitoredItemsPerCall));
+        assertNull(callOnContext(session::getMaxNodesPerWrite));
         verify(subscriptionManager, never()).onSessionActive(any(), anyBoolean());
         verify(stateTracker, never()).online(any());
 
@@ -114,16 +118,34 @@ public class IotOpcUaClientSessionManagerTest {
         });
         assertEquals(10, callOnContext(session::getMaxNodesPerRead));
         assertEquals(2, callOnContext(session::getMaxMonitoredItemsPerCall));
+        assertEquals(5, callOnContext(session::getMaxNodesPerWrite));
         InOrder inOrder = inOrder(subscriptionManager, stateTracker);
         inOrder.verify(subscriptionManager).onSessionActive(eq(session), eq(false));
         inOrder.verify(stateTracker, times(2)).online(any());
 
-        // 调用：会话失效（断线）后，上限清空，等下次激活重新读取
-        callOnContext(() -> {
-            sessionManager.handleSessionInactive(session, client);
-            return null;
+        assertEquals(session.getConnectionEpoch().get(), session.getActiveConnectionEpoch());
+
+        // 调用：底层断线，Milo 在自己的线程上回调 onSessionInactive；此时 context 被占用，还没处理失效
+        ArgumentCaptor<SessionActivityListener> listenerCaptor = ArgumentCaptor.forClass(SessionActivityListener.class);
+        verify(client).addSessionActivityListener(listenerCaptor.capture());
+        CountDownLatch contextLatch = new CountDownLatch(1);
+        context.runOnContext(v -> {
+            try {
+                contextLatch.await(10, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
         });
+        listenerCaptor.getValue().onSessionInactive(null);
+        // 断言：连接代数立即变化（写入据此阻断），而 active / generation 要等切回 context 才更新
+        assertNotEquals(session.getConnectionEpoch().get(), session.getActiveConnectionEpoch());
+        assertTrue(session.isActive());
+
+        // 调用：context 处理失效后，上限清空，等下次激活重新读取
+        contextLatch.countDown();
+        await().atMost(5, TimeUnit.SECONDS).until(() -> !session.isActive());
         assertNull(callOnContext(session::getMaxMonitoredItemsPerCall));
+        assertNull(callOnContext(session::getMaxNodesPerWrite));
     }
 
     @Test

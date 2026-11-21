@@ -133,6 +133,16 @@ public class IotModbusTcpServerConfigCacheService {
     }
 
     /**
+     * 只从本地缓存获取设备配置（不访问远程，可以在 owner 上调用）
+     *
+     * @param deviceId 设备编号
+     * @return 设备配置；未缓存时返回 null
+     */
+    public IotModbusDeviceConfigRespDTO getCachedConfig(Long deviceId) {
+        return configCache.get(deviceId);
+    }
+
+    /**
      * 移除设备配置缓存（设备断连时调用）
      */
     public void removeConfig(Long deviceId) {

@@ -200,7 +200,35 @@ public class IotModbusTcpClientConnectionManager {
         // 首次注册，发送上线消息
         if (previous == null) {
             sendOnlineMessage(config);
+            return;
         }
+        // 已注册但从站号变化：更新为新的从站号（之后的轮询、写入使用新从站号；排队中的旧写入由 isCurrentTarget 阻断）
+        if (ObjUtil.notEqual(previous, config.getSlaveId())) {
+            log.info("[addDeviceAndOnline][设备 {} 从站号变更: {} -> {}]", config.getDeviceId(), previous, config.getSlaveId());
+            connection.updateSlaveId(config.getDeviceId(), config.getSlaveId());
+        }
+    }
+
+    /**
+     * 设备当前的写入目标是否仍是指定的连接 + 从站号（属性设置写入排队后、执行前核对）
+     * <p>
+     * 1. 设备仍映射到该连接对象（IP / 端口变更时会换连接），且连接未失效；
+     * 2. 连接的 IP:端口与设备当前配置一致（配置缓存先于连接刷新：刷新期间也会判为不一致）；
+     * 3. 设备当前配置、连接中登记的从站号都与写入时使用的一致
+     *
+     * @param config     设备当前配置（配置缓存）；为 null 表示设备已删除或禁用
+     * @param connection 写入时使用的连接
+     * @param slaveId    写入时使用的从站号
+     * @return 是否一致
+     */
+    public boolean isCurrentTarget(IotModbusDeviceConfigRespDTO config, ModbusConnection connection, Integer slaveId) {
+        if (config == null || connection == null || connection.isRetired()) {
+            return false;
+        }
+        return getConnection(config.getDeviceId()) == connection
+                && ObjUtil.equal(connection.getConnectionKey(), buildConnectionKey(config.getIp(), config.getPort()))
+                && ObjUtil.equal(config.getSlaveId(), slaveId)
+                && ObjUtil.equal(connection.getSlaveId(config.getDeviceId()), slaveId);
     }
 
     /**
@@ -331,6 +359,10 @@ public class IotModbusTcpClientConnectionManager {
 
         public Integer addDevice(Long deviceId, Integer slaveId) {
             return deviceSlaveMap.putIfAbsent(deviceId, slaveId);
+        }
+
+        public void updateSlaveId(Long deviceId, Integer slaveId) {
+            deviceSlaveMap.put(deviceId, slaveId);
         }
 
         public void removeDevice(Long deviceId) {

@@ -238,11 +238,14 @@ public class IotOpcUaClientSessionManager {
 
                 @Override
                 public void onSessionActive(UaSession uaSession) {
-                    context.runOnContext(v -> handleSessionActive(session, client));
+                    // 连接代数在 Milo 的线程上立即加一：切回 context 之前，旧激活期间提交的写入即可感知
+                    long connectionEpoch = session.getConnectionEpoch().incrementAndGet();
+                    context.runOnContext(v -> handleSessionActive(session, client, connectionEpoch));
                 }
 
                 @Override
                 public void onSessionInactive(UaSession uaSession) {
+                    session.getConnectionEpoch().incrementAndGet();
                     context.runOnContext(v -> handleSessionInactive(session, client));
                 }
 
@@ -272,13 +275,18 @@ public class IotOpcUaClientSessionManager {
 
     /**
      * 会话激活：Milo 在激活前已刷新命名空间表；转移失败的 Subscription 已被重置
+     *
+     * @param session         会话
+     * @param client          回调所属的客户端
+     * @param connectionEpoch 激活回调时的连接代数：之后底层会话再失效 / 激活时会变化，写入据此阻断
      */
-    void handleSessionActive(IotOpcUaClientSession session, OpcUaClient client) {
+    void handleSessionActive(IotOpcUaClientSession session, OpcUaClient client, long connectionEpoch) {
         if (session.isClosed() || session.getClient() != client) {
             return;
         }
-        // 1. 新的一代
+        // 1. 新的一代；记录本次激活对应的连接代数
         session.nextGeneration();
+        session.setActiveConnectionEpoch(connectionEpoch);
         long generation = session.getGeneration();
         // 2. 命名空间表：变化时重新解析所有 NodeId，并重建订阅
         String[] namespaces = client.getNamespaceTable().toArray();
@@ -301,6 +309,7 @@ public class IotOpcUaClientSessionManager {
         // 3. OperationLimits：读取完成前不轮询、不同步订阅、不上线；读取失败时使用本地配置
         session.setMaxNodesPerRead(null);
         session.setMaxMonitoredItemsPerCall(null);
+        session.setMaxNodesPerWrite(null);
         session.getServiceQueue().submit(client::readOperationLimits).onComplete(ar -> {
             if (session.getGeneration() != generation) {
                 return;
@@ -315,6 +324,8 @@ public class IotOpcUaClientSessionManager {
                     limits != null ? limits.maxNodesPerRead() : Optional.empty()));
             session.setMaxMonitoredItemsPerCall(minLimit(config.getMaxMonitoredItemsPerCall(),
                     limits != null ? limits.maxMonitoredItemsPerCall() : Optional.empty()));
+            session.setMaxNodesPerWrite(minLimit(config.getMaxNodesPerWrite(),
+                    limits != null ? limits.maxNodesPerWrite() : Optional.empty()));
             // 4. 订阅：按本次的 MaxMonitoredItemsPerCall 转移或重建（与一期激活顺序一致：OperationLimits 之后）
             subscriptionManager.onSessionActive(session, namespaceChanged);
             // 5. 设备上线：OperationLimits 读取完成（成功或回退本地配置）后
@@ -340,6 +351,7 @@ public class IotOpcUaClientSessionManager {
         session.nextGeneration();
         session.setMaxNodesPerRead(null);
         session.setMaxMonitoredItemsPerCall(null);
+        session.setMaxNodesPerWrite(null);
         log.warn("[handleSessionInactive][会话 {} 已失效，等待 Milo 重连]", session.getKey());
         session.getDevices().values().forEach(binding -> stateTracker.offline(binding.getConfig()));
     }
@@ -402,6 +414,17 @@ public class IotOpcUaClientSessionManager {
         pollScheduler.stopAll();
         deviceSessionKeys.clear();
         return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+    }
+
+    /**
+     * 获取设备所在的会话（属性写入使用）
+     *
+     * @param deviceId 设备 ID
+     * @return 会话；设备未绑定（没有配置、配置被拒绝或已删除）时返回 null
+     */
+    public IotOpcUaClientSession getDeviceSession(Long deviceId) {
+        String key = deviceSessionKeys.get(deviceId);
+        return key != null ? sessions.get(key) : null;
     }
 
     /**

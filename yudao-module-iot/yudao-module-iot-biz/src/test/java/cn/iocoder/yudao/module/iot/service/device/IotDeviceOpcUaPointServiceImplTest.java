@@ -12,7 +12,9 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceOpcUaPointDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.model.ThingModelProperty;
 import cn.iocoder.yudao.module.iot.dal.mysql.device.IotDeviceOpcUaPointMapper;
+import cn.iocoder.yudao.module.iot.enums.thingmodel.IotThingModelAccessModeEnum;
 import cn.iocoder.yudao.module.iot.enums.thingmodel.IotThingModelTypeEnum;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import cn.iocoder.yudao.module.iot.service.thingmodel.IotThingModelService;
@@ -97,6 +99,28 @@ public class IotDeviceOpcUaPointServiceImplTest extends BaseDbUnitTest {
         mockThingModel(102L, PRODUCT_ID, IotThingModelTypeEnum.SERVICE.getType());
         assertServiceException(() -> opcUaPointService.createDeviceOpcUaPoint(newSaveReqVO().setThingModelId(102L)),
                 DEVICE_OPC_UA_POINT_THING_MODEL_INVALID);
+    }
+
+    @Test
+    public void testCreateDeviceOpcUaPoint_writable() {
+        // 默认不可写：未传 writable 时保存为 false
+        Long id = opcUaPointService.createDeviceOpcUaPoint(newSaveReqVO().setWritable(null));
+        assertFalse(opcUaPointMapper.selectById(id).getWritable());
+
+        // 物模型属性为读写：可以设为可写
+        mockThingModel(107L, PRODUCT_ID, IotThingModelTypeEnum.PROPERTY.getType(), IotThingModelAccessModeEnum.READ_WRITE);
+        Long writableId = opcUaPointService.createDeviceOpcUaPoint(newSaveReqVO().setThingModelId(107L).setWritable(true));
+        assertTrue(opcUaPointMapper.selectById(writableId).getWritable());
+
+        // 物模型属性为只读、没有属性定义：不能设为可写（新增、修改都校验）
+        mockThingModel(108L, PRODUCT_ID, IotThingModelTypeEnum.PROPERTY.getType(), IotThingModelAccessModeEnum.READ_ONLY);
+        assertServiceException(() -> opcUaPointService.createDeviceOpcUaPoint(newSaveReqVO().setThingModelId(108L)
+                .setWritable(true)), DEVICE_OPC_UA_POINT_WRITABLE_INVALID);
+        assertServiceException(() -> opcUaPointService.updateDeviceOpcUaPoint(newSaveReqVO().setId(id)
+                .setWritable(true)), DEVICE_OPC_UA_POINT_WRITABLE_INVALID);
+        assertFalse(opcUaPointMapper.selectById(id).getWritable());
+        // 只读属性不设可写，可以正常保存
+        opcUaPointService.createDeviceOpcUaPoint(newSaveReqVO().setThingModelId(108L).setWritable(false));
     }
 
     @Test
@@ -240,6 +264,14 @@ public class IotDeviceOpcUaPointServiceImplTest extends BaseDbUnitTest {
     private void mockThingModel(Long id, Long productId, Integer type) {
         when(thingModelService.getThingModel(eq(id))).thenReturn(IotThingModelDO.builder().id(id)
                 .productId(productId).type(type).identifier("p" + id).name("属性" + id).build());
+    }
+
+    private void mockThingModel(Long id, Long productId, Integer type, IotThingModelAccessModeEnum accessMode) {
+        ThingModelProperty property = new ThingModelProperty();
+        property.setIdentifier("p" + id);
+        property.setAccessMode(accessMode.getMode());
+        when(thingModelService.getThingModel(eq(id))).thenReturn(IotThingModelDO.builder().id(id)
+                .productId(productId).type(type).identifier("p" + id).name("属性" + id).property(property).build());
     }
 
     private static IotDeviceOpcUaPointSaveReqVO newSaveReqVO() {

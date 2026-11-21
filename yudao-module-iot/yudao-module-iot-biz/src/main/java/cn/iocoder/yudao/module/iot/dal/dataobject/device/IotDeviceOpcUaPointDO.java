@@ -58,6 +58,10 @@ public class IotDeviceOpcUaPointDO extends TenantBaseDO {
      */
     private Integer collectInterval;
     /**
+     * 是否可写：默认 false；为 true 时才允许 thing.property.set 写入该节点的 Value 属性（物模型属性还需要为读写）
+     */
+    private Boolean writable;
+    /**
      * 状态
      *
      * 枚举 {@link cn.iocoder.yudao.framework.common.enums.CommonStatusEnum}
