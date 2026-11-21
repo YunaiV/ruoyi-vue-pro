@@ -43,8 +43,8 @@ export namespace InfraStudentApi {
     avatar?: string; // 头像
     video?: string; // 附件
     memo?: string; // 备注
-        studentcontacts?: StudentContact[]
-        studentteacher?: StudentTeacher
+        studentContacts?: Partial<StudentContact>[] // 提交时：新增的学生联系人还没有编号
+        studentTeacher?: Partial<StudentTeacher> // 提交时：新增的学生班主任还没有编号
   }
 }
 

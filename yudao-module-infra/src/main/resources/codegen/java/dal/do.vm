@@ -11,6 +11,9 @@ import java.time.LocalDateTime;
 #end
 #end
 import com.baomidou.mybatisplus.annotation.*;
+#if ($codegenHelper.hasCollection($columns))## 集合字段：JSON 数组存储
+import ${JacksonTypeHandlerClassName};
+#end
 import ${BaseDOClassName};
 ## 处理 Excel 导出 + Schema 注解（仅 DO 模式）
 #if ($voType == 20)
@@ -23,6 +26,9 @@ import org.apache.fesod.sheet.annotation.*;
         #break
     #end
 #end
+#foreach ($converterClassName in $codegenHelper.getExcelConverterClassNames($columns, "all"))## 集合字段的 Excel 转换器
+import ${converterClassName};
+#end
 #end
 
 /**
@@ -30,7 +36,11 @@ import org.apache.fesod.sheet.annotation.*;
  *
  * @author ${table.author}
  */
+#if ($codegenHelper.hasCollection($columns))## 集合字段：开启 autoResultMap，查询结果才会使用 typeHandler
+@TableName(value = "${table.tableName.toLowerCase()}", autoResultMap = true)
+#else
 @TableName("${table.tableName.toLowerCase()}")
+#end
 @KeySequence("${table.tableName.toLowerCase()}_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -66,7 +76,12 @@ public class ${table.className}DO extends BaseDO {
 ## 1. 处理 Swagger 注解
     @Schema(description = "${column.columnComment}"#if (!${column.nullable}), requiredMode = Schema.RequiredMode.REQUIRED#end#if ("$!column.example" != ""), example = "${column.example}"#end)
 ## 2. 处理 Excel 导出
-#if ("$!column.dictType" != "")##处理枚举值
+#if ($codegenHelper.isCollection($column))## 集合字段
+    @ExcelProperty(value = "${column.columnComment}", converter = ${codegenHelper.getExcelConverter($column)}.class)
+#if ("$!column.dictType" != "")
+    @DictFormat("${column.dictType}") // TODO 代码优化：建议设置到对应的 DictTypeConstants 枚举类中
+#end
+#elseif ("$!column.dictType" != "")##处理枚举值
     @ExcelProperty(value = "${column.columnComment}", converter = DictConvert.class)
     @DictFormat("${column.dictType}") // TODO 代码优化：建议设置到对应的 DictTypeConstants 枚举类中
 #else
@@ -74,7 +89,10 @@ public class ${table.className}DO extends BaseDO {
 #end
 #end
 ## 3. 处理字段定义
-    private ${column.javaType} ${column.javaField};
+#if ($codegenHelper.isCollection($column))## 集合字段：JSON 数组存储
+    @TableField(typeHandler = JacksonTypeHandler.class)
+#end
+    private ${codegenHelper.getJavaType($column)} ${column.javaField};
 #end
 #end
 

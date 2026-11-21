@@ -150,28 +150,16 @@ export function useGridColumns(): VxeTableGridOptions<InfraStudentApi.Student>['
       field: 'id',
       title: '编号',
       minWidth: 120,
-      cellRender: {
-        name: 'CellDict',
-        props: { type: DICT_TYPE.$dictType.toUpperCase() },
-      },
     },
     {
       field: 'name',
       title: '名字',
       minWidth: 120,
-      cellRender: {
-        name: 'CellDict',
-        props: { type: DICT_TYPE.$dictType.toUpperCase() },
-      },
     },
     {
       field: 'description',
       title: '简介',
       minWidth: 120,
-      cellRender: {
-        name: 'CellDict',
-        props: { type: DICT_TYPE.$dictType.toUpperCase() },
-      },
     },
     {
       field: 'birthday',
@@ -201,28 +189,16 @@ export function useGridColumns(): VxeTableGridOptions<InfraStudentApi.Student>['
       field: 'avatar',
       title: '头像',
       minWidth: 120,
-      cellRender: {
-        name: 'CellDict',
-        props: { type: DICT_TYPE.$dictType.toUpperCase() },
-      },
     },
     {
       field: 'video',
       title: '附件',
       minWidth: 120,
-      cellRender: {
-        name: 'CellDict',
-        props: { type: DICT_TYPE.$dictType.toUpperCase() },
-      },
     },
     {
       field: 'memo',
       title: '备注',
       minWidth: 120,
-      cellRender: {
-        name: 'CellDict',
-        props: { type: DICT_TYPE.$dictType.toUpperCase() },
-      },
     },
     {
       field: 'createTime',

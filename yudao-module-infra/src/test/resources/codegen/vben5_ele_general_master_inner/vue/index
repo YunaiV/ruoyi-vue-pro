@@ -1,17 +1,16 @@
 <script lang="ts" setup>
 import type { StudentApi } from '#/api/infra/demo';
 
-import { ref, h, reactive, onMounted, nextTick } from 'vue';
+import { ref, h, reactive, onMounted } from 'vue';
 
-import { Page, useVbenModal } from '@vben/common-ui';
+import { ContentWrap, Page, useVbenModal } from '@vben/common-ui';
 import { DICT_TYPE } from '@vben/constants';
 import { getDictOptions } from '@vben/hooks';
 import { useTableToolbar, VbenVxeTableToolbar } from '@vben/plugins/vxe-table';
 import { cloneDeep, downloadFileFromBlobPart, formatDateTime } from '@vben/utils';
 import { ElButton, ElMessage, ElLoading, ElTabs, ElTabPane, ElPagination, ElForm, ElFormItem, ElDatePicker, ElSelect, ElOption, ElInput } from 'element-plus';
 import StudentForm from './modules/form.vue';
-import { Download, Plus, RefreshCw, Search, Trash2 } from '@vben/icons';
-import { ContentWrap } from '#/components/content-wrap';
+import { Download, Plus, Trash2 } from '@vben/icons';
 import { VxeColumn, VxeTable } from '#/adapter/vxe-table';
 
     import StudentContactList from './modules/student-contact-list.vue'
@@ -147,6 +146,12 @@ try {
 
 /** 初始化 */
 const { hiddenSearchBar, tableToolbarRef, tableRef } = useTableToolbar();
+function setTableToolbarRef(el: any) {
+  tableToolbarRef.value = el;
+}
+function setTableRef(el: any) {
+  tableRef.value = el;
+}
 onMounted(() => {
   getList();
 });
@@ -205,7 +210,7 @@ onMounted(() => {
                       >
                             <ElOption
                                 v-for="dict in getDictOptions(DICT_TYPE.INFRA_BOOLEAN_STRING, 'boolean')"
-                                :key="dict.value"
+                                :key="String(dict.value)"
                                 :value="dict.value"
                                 :label="dict.label"
                             />
@@ -235,7 +240,7 @@ onMounted(() => {
     <ContentWrap title="学生">
       <template #extra>
         <VbenVxeTableToolbar
-            ref="tableToolbarRef"
+            :ref="setTableToolbarRef"
             v-model:hidden-search="hiddenSearchBar"
         >
           <ElButton
@@ -270,7 +275,7 @@ onMounted(() => {
         </VbenVxeTableToolbar>
       </template>
       <VxeTable
-          ref="tableRef"
+          :ref="setTableRef"
           :data="list"
           show-overflow
           :loading="loading"

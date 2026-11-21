@@ -7,7 +7,7 @@ import { DICT_TYPE } from '@vben/constants';
 import { getDictOptions } from '@vben/hooks';
 import { Tinymce as RichTextarea } from '#/components/tinymce';
 import { ImageUpload, FileUpload } from "#/components/upload";
-import { ElMessage, ElTabs, ElTabPane, ElForm, ElFormItem, ElInput, ElSelect, ElOption, ElRadioGroup, ElRadio, ElCheckboxGroup, ElCheckbox, ElDatePicker, ElTreeSelect } from 'element-plus';
+import { ElMessage, ElTabs, ElTabPane, ElForm, ElFormItem, ElInput, ElSelect, ElOption, ElRadioGroup, ElRadio, ElDatePicker } from 'element-plus';
   import StudentContactForm from './student-contact-form.vue'
   import StudentTeacherForm from './student-teacher-form.vue'
 
@@ -103,7 +103,7 @@ const [Modal, modalApi] = useVbenModal({
       return;
     }
     // 加载数据
-    let data = modalApi.getData<StudentApi.Student>();
+    let data = modalApi.getData() as StudentApi.Student;
     if (!data) {
       return;
     }
@@ -156,7 +156,7 @@ const [Modal, modalApi] = useVbenModal({
               <ElRadioGroup v-model="formData.enabled">
                   <ElRadio
                           v-for="dict in getDictOptions(DICT_TYPE.INFRA_BOOLEAN_STRING, 'boolean')"
-                          :key="dict.value"
+                          :key="String(dict.value)"
                           :value="dict.value"
                   >
                     {{ dict.label }}

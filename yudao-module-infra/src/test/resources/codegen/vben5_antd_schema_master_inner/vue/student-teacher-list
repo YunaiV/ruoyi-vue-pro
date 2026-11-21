@@ -2,11 +2,8 @@
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
 import type { InfraStudentApi } from '#/api/infra/demo';
 
-import { confirm, useVbenModal } from '@vben/common-ui';
-import { message } from 'ant-design-vue';
-import { ref, computed, nextTick,watch } from 'vue';
-import { $t } from '#/locales';
-import { ACTION_ICON, TableAction, useVbenVxeGrid } from '#/adapter/vxe-table';
+import { nextTick, watch } from 'vue';
+import { useVbenVxeGrid } from '#/adapter/vxe-table';
 
 import { getStudentTeacherByStudentId } from '#/api/infra/demo';
 import { useStudentTeacherGridColumns } from '../data';

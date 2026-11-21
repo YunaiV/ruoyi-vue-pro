@@ -1,12 +1,13 @@
 <script lang="ts" setup>
+   import type { VxeTableGridOptions } from '#/adapter/vxe-table';
   import type { InfraStudentApi } from '#/api/infra/demo';
 
-  import { computed, ref, h, onMounted, watch, nextTick } from 'vue';
+  import { h, watch, nextTick } from 'vue';
 
   import { $t } from '#/locales';
 
  import { Plus } from "@vben/icons";
-import { Button, Checkbox, CheckboxGroup, DatePicker, Input, message, RadioGroup, Select, Tabs, Textarea } from 'ant-design-vue';
+import { Button, DatePicker, Input, message, RadioGroup, Select, Textarea } from 'ant-design-vue';
 import { ImageUpload, FileUpload } from "#/components/upload";
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { useStudentContactGridEditColumns } from '../data';
@@ -32,7 +33,7 @@ gridOptions: {
   toolbarConfig: {
     enabled: false,
   },
-},
+} as VxeTableGridOptions<InfraStudentApi.StudentContact>,
 });
 
 /** 添加学生联系人 */
@@ -46,7 +47,7 @@ const handleDelete =  async (row: InfraStudentApi.StudentContact) => {
 }
 
 /** 获取当前子表数据，新增行不提交表格生成的临时编号 */
-function getData(): InfraStudentApi.StudentContact[] {
+function getData(): Partial<InfraStudentApi.StudentContact>[] {
   const { fullData } = gridApi.grid.getTableData();
   const inserted = new Set(gridApi.grid.getInsertRecords());
   return fullData.map((row) =>
@@ -181,7 +182,7 @@ watch(
           size="small"
           type="link"
           danger
-          @click="handleDelete(row)"
+          @click="handleDelete(row as InfraStudentApi.StudentContact)"
           v-access:code="['infra:student:delete']"
       >
         {{ $t('ui.actionTitle.delete') }}

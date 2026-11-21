@@ -64,21 +64,9 @@
           @selection-change="handleRowCheckboxChange"
       >
         <el-table-column type="selection" width="55" />
-            <el-table-column label="编号" align="center" prop="id">
-        <template v-slot="scope">
-          <dict-tag :type="DICT_TYPE.$dictType.toUpperCase()" :value="scope.row.id" />
-        </template>
-      </el-table-column>
-      <el-table-column label="名字" align="center" prop="name">
-        <template v-slot="scope">
-          <dict-tag :type="DICT_TYPE.$dictType.toUpperCase()" :value="scope.row.name" />
-        </template>
-      </el-table-column>
-      <el-table-column label="简介" align="center" prop="description">
-        <template v-slot="scope">
-          <dict-tag :type="DICT_TYPE.$dictType.toUpperCase()" :value="scope.row.description" />
-        </template>
-      </el-table-column>
+            <el-table-column label="编号" align="center" prop="id" />
+      <el-table-column label="名字" align="center" prop="name" />
+      <el-table-column label="简介" align="center" prop="description" />
       <el-table-column label="出生日期" align="center" prop="birthday" width="180">
         <template v-slot="scope">
           <span>{{ parseTime(scope.row.birthday) }}</span>
@@ -94,21 +82,9 @@
           <dict-tag :type="DICT_TYPE.INFRA_BOOLEAN_STRING" :value="scope.row.enabled" />
         </template>
       </el-table-column>
-      <el-table-column label="头像" align="center" prop="avatar">
-        <template v-slot="scope">
-          <dict-tag :type="DICT_TYPE.$dictType.toUpperCase()" :value="scope.row.avatar" />
-        </template>
-      </el-table-column>
-      <el-table-column label="附件" align="center" prop="video">
-        <template v-slot="scope">
-          <dict-tag :type="DICT_TYPE.$dictType.toUpperCase()" :value="scope.row.video" />
-        </template>
-      </el-table-column>
-      <el-table-column label="备注" align="center" prop="memo">
-        <template v-slot="scope">
-          <dict-tag :type="DICT_TYPE.$dictType.toUpperCase()" :value="scope.row.memo" />
-        </template>
-      </el-table-column>
+      <el-table-column label="头像" align="center" prop="avatar" />
+      <el-table-column label="附件" align="center" prop="video" />
+      <el-table-column label="备注" align="center" prop="memo" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template v-slot="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>

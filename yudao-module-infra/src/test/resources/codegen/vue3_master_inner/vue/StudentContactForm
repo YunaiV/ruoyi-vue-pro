@@ -55,7 +55,7 @@
             <el-radio-group v-model="row.enabled">
                 <el-radio
                   v-for="dict in getBoolDictOptions(DICT_TYPE.INFRA_BOOLEAN_STRING)"
-                  :key="dict.value"
+                  :key="String(dict.value)"
                   :value="dict.value"
                 >
                   {{ dict.label }}
@@ -98,14 +98,15 @@
 </template>
 <script setup lang="ts">
 import { getIntDictOptions, getBoolDictOptions, DICT_TYPE } from '@/utils/dict'
+import type { FormRules } from 'element-plus'
 import { StudentApi } from '@/api/infra/demo'
 
 const props = defineProps<{
-  studentId: number // 学生编号（主表的关联字段）
+  studentId?: number // 学生编号（主表的关联字段）
 }>()
 const formLoading = ref(false) // 表单的加载中
 const formData = ref<any[]>([])
-const formRules = reactive({
+const formRules = reactive<FormRules>({
   studentId: [{ required: true, message: '学生编号不能为空', trigger: 'blur' }],
   name: [{ required: true, message: '名字不能为空', trigger: 'blur' }],
   description: [{ required: true, message: '简介不能为空', trigger: 'blur' }],

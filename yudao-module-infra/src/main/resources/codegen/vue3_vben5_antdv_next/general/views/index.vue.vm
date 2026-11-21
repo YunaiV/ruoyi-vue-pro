@@ -1,8 +1,15 @@
 #set ($rangePickerEnable = false)
+#set ($datePickerEnable = false)## 搜索：日期的非范围查询
+#set ($formatDateTimeEnable = false)## 列表：日期时间字段
 #set ($selectOptionEnable = false)
 #foreach ($column in $columns)
   #if ($column.listOperation && $column.htmlType == "datetime" && $column.listOperationCondition == "BETWEEN")
     #set ($rangePickerEnable = true)
+  #elseif ($column.listOperation && $column.htmlType == "datetime")
+    #set ($datePickerEnable = true)
+  #end
+  #if ($column.listOperationResult && $column.javaType == "LocalDateTime")
+    #set ($formatDateTimeEnable = true)
   #end
   #if ($column.listOperation && ($column.htmlType == "select" || $column.htmlType == "radio" || $column.htmlType == "checkbox"))
     #set ($selectOptionEnable = true)
@@ -11,16 +18,16 @@
 <script lang="ts" setup>
 import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${table.businessName}';
 
-import { ref, h, reactive, onMounted, nextTick } from 'vue';
+import { ref, h, reactive, onMounted } from 'vue';
 
 import { Page, useVbenModal } from '@vben/common-ui';
 import { DICT_TYPE } from '@vben/constants';
 import { getDictOptions } from '@vben/hooks';
 import { useTableToolbar, VbenVxeTableToolbar } from '@vben/plugins/vxe-table';
-import { cloneDeep, downloadFileFromBlobPart, formatDateTime, isEmpty } from '@vben/utils';
-import { Button, Card, DatePicker, Form, FormItem, Input, message, Pagination#if ($rangePickerEnable), DateRangePicker as RangePicker#end, Select#if ($selectOptionEnable), SelectOption#end#if ( $table.templateType == 11 || $table.templateType == 12 ), TabPane, Tabs#end } from 'antdv-next';
+import { cloneDeep, downloadFileFromBlobPart,#if ($formatDateTimeEnable) formatDateTime,#end isEmpty } from '@vben/utils';
+import { Button, Card,#if ($datePickerEnable) DatePicker,#end Form, FormItem, Input, message#if ($table.templateType != 2), Pagination#end#if ($rangePickerEnable), DateRangePicker as RangePicker#end, Select#if ($selectOptionEnable), SelectOption#end#if ( $table.templateType == 11 || $table.templateType == 12 ), TabPane, Tabs#end } from 'antdv-next';
 import ${simpleClassName}Form from './modules/form.vue';
-import { Download, Plus, RefreshCw, Search, Trash2 } from '@vben/icons';
+import { Download, Plus#if ($table.templateType != 2 && $deleteBatchEnable), Trash2#end } from '@vben/icons';
 import { DictTag } from '#/components/dict-tag';
 import { VxeColumn, VxeTable } from '#/adapter/vxe-table';
 #if ($rangePickerEnable)
@@ -38,7 +45,6 @@ import { getRangePickerDefaultProps } from '#/utils/rangePickerProps';
 
 import { $t } from '#/locales';
 #if (${table.templateType} == 2)## 树表接口
-import { handleTree } from '@vben/utils'
 import { get${simpleClassName}List, delete${simpleClassName}, export${simpleClassName} } from '#/api/${table.moduleName}/${table.businessName}';
 #else## 标准表接口
 import { get${simpleClassName}Page, delete${simpleClassName},#if ($deleteBatchEnable) delete${simpleClassName}List,#end export${simpleClassName} } from '#/api/${table.moduleName}/${table.businessName}';
@@ -233,6 +239,12 @@ function handleExpand() {
 
 /** 初始化 */
 const { hiddenSearchBar, tableToolbarRef, tableRef } = useTableToolbar();
+function setTableToolbarRef(el: any) {
+  tableToolbarRef.value = el;
+}
+function setTableRef(el: any) {
+  tableRef.value = el;
+}
 onMounted(() => {
   getList();
 });
@@ -258,7 +270,9 @@ onMounted(() => {
                   #set ($javaField = $column.javaField)
                   #set ($javaType = $column.javaType)
                   #set ($comment = $column.columnComment)
-                  #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
+                  #if ($codegenHelper.isLongCollection($column))## Long 集合：使用字符串的字典值，避免超过 JS 安全整数后精度丢失
+                      #set ($dictMethod = "string")
+                  #elseif ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
                       #set ($dictMethod = "number")
                   #elseif ($javaType == "String")
                       #set ($dictMethod = "string")
@@ -286,7 +300,7 @@ onMounted(() => {
                           #if ("" != $dictType)## 设置了 dictType 数据字典的情况
                             <SelectOption
                                 v-for="dict in getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod')"
-                                :key="dict.value"
+                                :key="#if ($column.javaType == 'Boolean')String(dict.value)#{else}dict.value#end"
                                 :value="dict.value"
                             >
                               {{ dict.label }}
@@ -332,7 +346,7 @@ onMounted(() => {
     <Card title="${table.classComment}">
       <template #extra>
         <VbenVxeTableToolbar
-            ref="tableToolbarRef"
+            :ref="setTableToolbarRef"
             v-model:hidden-search="hiddenSearchBar"
         >
         #if (${table.templateType} == 2)
@@ -385,7 +399,7 @@ onMounted(() => {
         </VbenVxeTableToolbar>
       </template>
       <VxeTable
-          ref="tableRef"
+          :ref="setTableRef"
           :data="list"
         #if ( $table.templateType == 2 )
           :tree-config="{
@@ -449,7 +463,11 @@ onMounted(() => {
                   #elseif($column.dictType && "" != $column.dictType)## 数据字典
                     <VxeColumn field="${javaField}" title="${comment}" align="center">
                       <template #default="{row}">
+                        #if ($codegenHelper.isCollection($column))## 集合字段：逐个展示字典标签
+                        <dict-tag v-for="item in row.${javaField} || []" :key="item" :type="DICT_TYPE.$dictType.toUpperCase()" :value="item" />
+                        #else
                         <dict-tag :type="DICT_TYPE.$dictType.toUpperCase()" :value="row.${javaField}" />
+                        #end
                       </template>
                     </VxeColumn>
                   #elseif ($table.templateType == 2 && $javaField == $treeNameColumn.javaField)

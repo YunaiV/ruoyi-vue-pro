@@ -1,1 +1,2 @@
+#set ($dateTsType = "string | Dayjs")## 日期字段的类型：antd、antdv-next 的 DatePicker 值为 Dayjs
 #parse("codegen/vue3_vben5_ele/schema/api/api.ts.vm")

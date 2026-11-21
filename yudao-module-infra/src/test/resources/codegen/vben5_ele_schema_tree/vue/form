@@ -59,7 +59,7 @@ const [Modal, modalApi] = useVbenModal({
       return;
     }
     // 加载数据
-    const data = modalApi.getData<InfraCategoryApi.Category>();
+    const data = modalApi.getData() as InfraCategoryApi.Category;
     if (!data || !data.id) {
       // 设置上级
       await formApi.setValues(data);

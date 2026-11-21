@@ -1,18 +1,15 @@
 <script lang="ts" setup>
   import type { StudentApi } from '#/api/infra/demo';
-  import type { VxeTableInstance } from '#/adapter/vxe-table';
 
-  import { reactive,ref, h, nextTick,watch,onMounted } from 'vue';
+  import { ref, nextTick, watch } from 'vue';
 
   import { DICT_TYPE } from '@vben/constants';
-  import { getDictOptions } from '@vben/hooks';
 import { formatDateTime } from '@vben/utils';
 
   import { DictTag } from '#/components/dict-tag';
-  import { getRangePickerDefaultProps } from '#/utils';
   import { VxeColumn, VxeTable } from '#/adapter/vxe-table';
-  import { ContentWrap } from '#/components/content-wrap';
 
+    import { ContentWrap } from '@vben/common-ui';
 
   import { getStudentTeacherByStudentId } from '#/api/infra/demo';
 

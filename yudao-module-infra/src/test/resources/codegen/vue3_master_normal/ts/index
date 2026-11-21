@@ -40,8 +40,8 @@ export interface Student {
           avatar?: string; // 头像
           video?: string; // 附件
           memo?: string; // 备注
-            studentcontacts?: StudentContact[]
-          studentteacher?: StudentTeacher
+            studentContacts?: StudentContact[]
+          studentTeacher?: StudentTeacher
 }
 
 // 学生 API

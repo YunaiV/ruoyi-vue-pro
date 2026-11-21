@@ -203,6 +203,9 @@
           this.formLoading = true;
           try {
             const res = await ${simpleClassName}Api.get${simpleClassName}(id);
+            #foreach ($column in $codegenHelper.getCollectionFormColumns($columns))
+            res.data.${column.javaField} = res.data.${column.javaField} || []; // 多选字段：历史数据可能为 null
+            #end
             this.formData = res.data;
             this.title = "修改${table.classComment}";
           } finally {

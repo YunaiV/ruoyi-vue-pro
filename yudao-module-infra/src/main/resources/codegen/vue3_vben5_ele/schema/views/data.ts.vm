@@ -4,13 +4,40 @@ import type { VxeTableGridOptions } from '#/adapter/vxe-table';
 import type { ${apiName} } from '#/api/${table.moduleName}/${table.businessName}';
 
 import { DICT_TYPE } from '@vben/constants';
+## 特殊：集合字段的字典标签展示，需要使用 getDictLabel
+#set ($collectionDictLabelEnable = $codegenHelper.hasCollectionDictListResult($columns))
+#if (($table.templateType == 11 || $table.templateType == 12) && $codegenHelper.hasSubCollectionDictListResult($subColumnsList))
+#set ($collectionDictLabelEnable = true)
+#end
+#if ($collectionDictLabelEnable)
+import { getDictLabel, getDictOptions } from '@vben/hooks';
+#else
 import { getDictOptions } from '@vben/hooks';
+#end
 #if(${table.templateType} == 2)## 树表需要导入这些
 import { get${simpleClassName}List } from '#/api/${table.moduleName}/${table.businessName}';
 import { handleTree } from '@vben/utils';
 #end
+## 特殊：日期的范围查询，才需要使用 getRangePickerDefaultProps
+#set ($rangePickerEnable = false)
+#foreach ($column in $columns)
+#if ($column.listOperation && $column.htmlType == "datetime")
+#set ($rangePickerEnable = true)
+#end
+#end
+#if ($table.templateType == 11)
+#foreach ($rangeSubColumns in $subColumnsList)
+#foreach ($column in $rangeSubColumns)
+#if ($column.listOperation && $column.htmlType == "datetime")
+#set ($rangePickerEnable = true)
+#end
+#end
+#end
+#end
+#if ($rangePickerEnable)
 
 import { getRangePickerDefaultProps } from '#/utils';
+#end
 
 /** 新增/修改的表单 */
 export function useFormSchema(): VbenFormSchema[] {
@@ -31,7 +58,7 @@ export function useFormSchema(): VbenFormSchema[] {
       componentProps: {
         clearable: true,
         api: async () => {
-          const data = await get${simpleClassName}List({});
+          const data: Partial<${apiName}.${simpleClassName}>[] = await get${simpleClassName}List({}); // 顶级节点只有编号、名称，所以使用 Partial
           data.unshift({
             id: 0,
             ${treeNameColumn.javaField}: '顶级${table.classComment}',
@@ -55,7 +82,9 @@ export function useFormSchema(): VbenFormSchema[] {
   #set ($javaType = $column.javaType)
   #set ($javaField = $column.javaField)
   #set ($comment = $column.columnComment)
-  #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
+  #if ($codegenHelper.isLongCollection($column))## Long 集合：使用字符串的字典值，避免超过 JS 安全整数后精度丢失
+    #set ($dictMethod = "string")
+  #elseif ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
     #set ($dictMethod = "number")
   #elseif ($javaType == "String")
     #set ($dictMethod = "string")
@@ -91,6 +120,9 @@ export function useFormSchema(): VbenFormSchema[] {
       },
   #elseif($column.htmlType == "checkbox")## 多选框
       component: 'CheckboxGroup',
+      #if ($codegenHelper.isCollection($column))## 集合字段：默认空数组
+      defaultValue: [],
+      #end
       componentProps: {
         #if ("" != $dictType)## 有数据字典
         options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod'),
@@ -161,7 +193,9 @@ export function useGridFormSchema(): VbenFormSchema[] {
   #set ($javaType = $column.javaType)
   #set ($javaField = $column.javaField)
   #set ($comment = $column.columnComment)
-  #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
+  #if ($codegenHelper.isLongCollection($column))## Long 集合：使用字符串的字典值，避免超过 JS 安全整数后精度丢失
+    #set ($dictMethod = "string")
+  #elseif ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
     #set ($dictMethod = "number")
   #elseif ($javaType == "String")
     #set ($dictMethod = "string")
@@ -177,7 +211,7 @@ export function useGridFormSchema(): VbenFormSchema[] {
         clearable: true,
         placeholder: '请输入${comment}',
       },
-  #elseif ($column.htmlType == "select" || $column.htmlType == "radio")
+  #elseif ($column.htmlType == "select" || $column.htmlType == "radio" || $codegenHelper.isCollection($column))## 集合字段：单选一个元素，查询包含该元素的记录
       component: 'Select',
       componentProps: {
         clearable: true,
@@ -221,6 +255,11 @@ export function useGridColumns(): VxeTableGridOptions<${apiName}.${simpleClassNa
       minWidth: 120,
   #if ($column.javaType == "LocalDateTime")## 时间类型
       formatter: 'formatDateTime',
+  #elseif("" != $dictType && $codegenHelper.isCollection($column))## 数据字典（集合字段）：逐个转换为字典标签
+      formatter: ({ cellValue }) =>
+        (cellValue ?? [])
+          .map((value: number | string) => getDictLabel(DICT_TYPE.$dictType.toUpperCase(), value))
+          .join('、'),
   #elseif("" != $dictType)## 数据字典
       cellRender: {
         name: 'CellDict',
@@ -271,7 +310,9 @@ export function use${subSimpleClassName}FormSchema(): VbenFormSchema[] {
                     #set ($javaType = $column.javaType)
                     #set ($javaField = $column.javaField)
                     #set ($comment = $column.columnComment)
-                    #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
+                    #if ($codegenHelper.isLongCollection($column))## Long 集合：使用字符串的字典值，避免超过 JS 安全整数后精度丢失
+                        #set ($dictMethod = "string")
+                    #elseif ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
                         #set ($dictMethod = "number")
                     #elseif ($javaType == "String")
                         #set ($dictMethod = "string")
@@ -309,6 +350,9 @@ export function use${subSimpleClassName}FormSchema(): VbenFormSchema[] {
                                 },
                             #elseif($column.htmlType == "checkbox")## 多选框
                                 component: 'CheckboxGroup',
+                                #if ($codegenHelper.isCollection($column))## 集合字段：默认空数组
+                                defaultValue: [],
+                                #end
                                 componentProps: {
                                     #if ("" != $dictType)## 有数据字典
                                         options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod'),
@@ -365,7 +409,9 @@ export function use${subSimpleClassName}GridFormSchema(): VbenFormSchema[] {
                 #set ($javaType = $column.javaType)
                 #set ($javaField = $column.javaField)
                 #set ($comment = $column.columnComment)
-                #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
+                #if ($codegenHelper.isLongCollection($column))## Long 集合：使用字符串的字典值，避免超过 JS 安全整数后精度丢失
+                    #set ($dictMethod = "string")
+                #elseif ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
                     #set ($dictMethod = "number")
                 #elseif ($javaType == "String")
                     #set ($dictMethod = "string")
@@ -381,7 +427,7 @@ export function use${subSimpleClassName}GridFormSchema(): VbenFormSchema[] {
                             clearable: true,
                             placeholder: '请输入${comment}',
                         },
-                    #elseif ($column.htmlType == "select" || $column.htmlType == "radio")
+                    #elseif ($column.htmlType == "select" || $column.htmlType == "radio" || $codegenHelper.isCollection($column))## 集合字段：单选一个元素，查询包含该元素的记录
                         component: 'Select',
                         componentProps: {
                             clearable: true,
@@ -422,6 +468,11 @@ export function use${subSimpleClassName}GridColumns(): VxeTableGridOptions<${api
                     minWidth: 120,
                     #if ($column.javaType == "LocalDateTime")## 时间类型
                         formatter: 'formatDateTime',
+                    #elseif("" != $dictType && $codegenHelper.isCollection($column))## 数据字典（集合字段）：逐个转换为字典标签
+                        formatter: ({ cellValue }) =>
+                          (cellValue ?? [])
+                            .map((value: number | string) => getDictLabel(DICT_TYPE.$dictType.toUpperCase(), value))
+                            .join('、'),
                     #elseif("" != $dictType)## 数据字典
                         cellRender: {
                             name: 'CellDict',
@@ -447,12 +498,14 @@ export function use${subSimpleClassName}GridColumns(): VxeTableGridOptions<${api
         return [
             #foreach($column in $subColumns)
                 #if ($column.createOperation || $column.updateOperation)
-                    #if (!$column.primaryKey && $column.listOperationResult && $column.id != $subJoinColumn.id) ## 特殊：忽略主子表的 join 字段，不用填写
+                    #if (!$column.primaryKey && $column.id != $subJoinColumn.id) ## 特殊：忽略主子表的 join 字段，不用填写；编辑列跟随新增、修改操作，与表格的编辑插槽一致
                         #set ($dictType = $column.dictType)
                         #set ($javaType = $column.javaType)
                         #set ($javaField = $column.javaField)
                         #set ($comment = $column.columnComment)
-                        #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
+                        #if ($codegenHelper.isLongCollection($column))## Long 集合：使用字符串的字典值，避免超过 JS 安全整数后精度丢失
+                            #set ($dictMethod = "string")
+                        #elseif ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
                             #set ($dictMethod = "number")
                         #elseif ($javaType == "String")
                             #set ($dictMethod = "string")
@@ -507,7 +560,9 @@ export function use${subSimpleClassName}GridColumns(): VxeTableGridOptions<${api
                         #set ($javaType = $column.javaType)
                         #set ($javaField = $column.javaField)
                         #set ($comment = $column.columnComment)
-                        #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
+                        #if ($codegenHelper.isLongCollection($column))## Long 集合：使用字符串的字典值，避免超过 JS 安全整数后精度丢失
+                            #set ($dictMethod = "string")
+                        #elseif ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
                             #set ($dictMethod = "number")
                         #elseif ($javaType == "String")
                             #set ($dictMethod = "string")
@@ -545,6 +600,9 @@ export function use${subSimpleClassName}GridColumns(): VxeTableGridOptions<${api
                                     },
                                 #elseif($column.htmlType == "checkbox")## 多选框
                                     component: 'CheckboxGroup',
+                                    #if ($codegenHelper.isCollection($column))## 集合字段：默认空数组
+                                    defaultValue: [],
+                                    #end
                                     componentProps: {
                                         #if ("" != $dictType)## 有数据字典
                                             options: getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod'),
@@ -608,6 +666,11 @@ export function use${subSimpleClassName}GridColumns(): VxeTableGridOptions<${api
                         minWidth: 120,
                         #if ($column.javaType == "LocalDateTime")## 时间类型
                             formatter: 'formatDateTime',
+                        #elseif("" != $dictType && $codegenHelper.isCollection($column))## 数据字典（集合字段）：逐个转换为字典标签
+                            formatter: ({ cellValue }) =>
+                              (cellValue ?? [])
+                                .map((value: number | string) => getDictLabel(DICT_TYPE.$dictType.toUpperCase(), value))
+                                .join('、'),
                         #elseif("" != $dictType)## 数据字典
                             cellRender: {
                                 name: 'CellDict',

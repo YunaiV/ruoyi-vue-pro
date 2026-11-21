@@ -297,6 +297,13 @@
             const that = this;
             #if ( $subTable.subJoinMany )
             ${simpleClassName}Api.get${subSimpleClassName}ListBy${SubJoinColumnName}(val).then(function (res){
+            #if ($codegenHelper.hasCollectionFormColumn($subColumns))
+              (res.data || []).forEach(function (row) {
+            #foreach ($column in $codegenHelper.getCollectionFormColumns($subColumns))
+                row.${column.javaField} = row.${column.javaField} || []; // 多选字段：历史数据可能为 null
+            #end
+              });
+            #end
               that.formData = res.data;
             })
             #else
@@ -305,6 +312,9 @@
               if (!data) {
                 return
               }
+            #foreach ($column in $codegenHelper.getCollectionFormColumns($subColumns))
+              data.${column.javaField} = data.${column.javaField} || []; // 多选字段：历史数据可能为 null
+            #end
               that.formData = data;
             })
             #end

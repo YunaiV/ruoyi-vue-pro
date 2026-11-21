@@ -20,7 +20,9 @@ export interface ${subSimpleClassName} {
 #if ($column.primaryKey || $column.createOperation || $column.updateOperation || $column.listOperationResult)
 #set ($javaType = $column.javaType.toLowerCase())
 #set ($optional = $column.nullable || $column.primaryKey || ($table.templateType != 11 && $column.id == $subJoinColumn.id))
-#if(${javaType} == "long" || ${javaType} == "integer" || ${javaType} == "short" || ${javaType} == "float" || ${javaType} == "double" || ${javaType} == "bigdecimal" || ${javaType} == "byte")
+#if ($codegenHelper.isCollection($column))## 集合字段
+  ${column.javaField}#if($optional)?#end: ${codegenHelper.getCollectionTsType($column)}
+#elseif(${javaType} == "long" || ${javaType} == "integer" || ${javaType} == "short" || ${javaType} == "float" || ${javaType} == "double" || ${javaType} == "bigdecimal" || ${javaType} == "byte")
   ${column.javaField}#if($optional)?#end: number
 #elseif(${javaType} == "date" || ${javaType} == "localdate" || ${javaType} == "localdatetime")
   ${column.javaField}#if($optional)?#end: number
@@ -40,7 +42,9 @@ export interface ${simpleClassName} {
 #if ($column.primaryKey || $column.createOperation || $column.updateOperation || $column.listOperationResult)
 #set ($javaType = $column.javaType.toLowerCase())
 #set ($optional = $column.nullable || $column.primaryKey)
-#if(${javaType} == "long" || ${javaType} == "integer" || ${javaType} == "short" || ${javaType} == "float" || ${javaType} == "double" || ${javaType} == "bigdecimal" || ${javaType} == "byte")
+#if ($codegenHelper.isCollection($column))## 集合字段
+  ${column.javaField}#if($optional)?#end: ${codegenHelper.getCollectionTsType($column)}
+#elseif(${javaType} == "long" || ${javaType} == "integer" || ${javaType} == "short" || ${javaType} == "float" || ${javaType} == "double" || ${javaType} == "bigdecimal" || ${javaType} == "byte")
   ${column.javaField}#if($optional)?#end: number
 #elseif(${javaType} == "date" || ${javaType} == "localdate" || ${javaType} == "localdatetime")
   ${column.javaField}#if($optional)?#end: number

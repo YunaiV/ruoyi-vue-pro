@@ -108,7 +108,7 @@
 <script setup lang="ts">
 import { getIntDictOptions, getStrDictOptions, getBoolDictOptions, DICT_TYPE } from '@/utils/dict'
 import { dateFormatter } from '@/utils/formatTime'
-#if ($deleteBatchEnable)
+#if ($table.templateType == 11 && $deleteBatchEnable)
 import { isEmpty } from '@/utils/is'
 #end
 import { ${simpleClassName}Api, ${subSimpleClassName} } from '@/api/${table.moduleName}/${table.businessName}'
@@ -124,7 +124,7 @@ const props = defineProps<{
   ${subJoinColumn.javaField}?: number // ${subJoinColumn.columnComment}（主表的关联字段）
 }>()
 const loading = ref(false) // 列表的加载中
-const list = ref([]) // 列表的数据
+const list = ref<${subSimpleClassName}[]>([]) // 列表的数据
 #if ($table.templateType == 11)
 const total = ref(0) // 列表的总页数
 const queryParams = reactive({

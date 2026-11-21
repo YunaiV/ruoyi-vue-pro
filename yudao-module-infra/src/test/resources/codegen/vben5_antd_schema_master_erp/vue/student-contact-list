@@ -5,8 +5,8 @@ import type { InfraStudentApi } from '#/api/infra/demo';
  import StudentContactForm from './student-contact-form.vue'
 import { confirm, useVbenModal } from '@vben/common-ui';
 import { message } from 'ant-design-vue';
-import { ref, computed, nextTick,watch } from 'vue';
-import { $t } from '#/locales';
+import { ref, nextTick, watch } from 'vue';
+ import { $t } from '#/locales';
 import { ACTION_ICON, TableAction, useVbenVxeGrid } from '#/adapter/vxe-table';
 
  import { deleteStudentContact, deleteStudentContactList, getStudentContactPage } from '#/api/infra/demo';

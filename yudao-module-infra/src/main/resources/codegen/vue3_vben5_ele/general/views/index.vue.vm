@@ -1,17 +1,26 @@
+#set ($datePickerEnable = false)## 搜索：日期查询（范围、非范围都使用 ElDatePicker）
+#set ($formatDateTimeEnable = false)## 列表：日期时间字段
+#foreach ($column in $columns)
+  #if ($column.listOperation && $column.htmlType == "datetime")
+    #set ($datePickerEnable = true)
+  #end
+  #if ($column.listOperationResult && $column.javaType == "LocalDateTime")
+    #set ($formatDateTimeEnable = true)
+  #end
+#end
 <script lang="ts" setup>
 import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${table.businessName}';
 
-import { ref, h, reactive, onMounted, nextTick } from 'vue';
+import { ref, h, reactive, onMounted } from 'vue';
 
-import { Page, useVbenModal } from '@vben/common-ui';
+import { ContentWrap, Page, useVbenModal } from '@vben/common-ui';
 import { DICT_TYPE } from '@vben/constants';
 import { getDictOptions } from '@vben/hooks';
 import { useTableToolbar, VbenVxeTableToolbar } from '@vben/plugins/vxe-table';
-import { cloneDeep, downloadFileFromBlobPart, formatDateTime } from '@vben/utils';
-import { ElButton, ElMessage, ElLoading, ElTabs, ElTabPane, ElPagination, ElForm, ElFormItem, ElDatePicker, ElSelect, ElOption, ElInput } from 'element-plus';
+import { cloneDeep, downloadFileFromBlobPart#if ($formatDateTimeEnable), formatDateTime#end } from '@vben/utils';
+import { ElButton, ElMessage, ElLoading,#if ($table.templateType == 11 || $table.templateType == 12) ElTabs, ElTabPane,#end#if ($table.templateType != 2) ElPagination,#end ElForm, ElFormItem,#if ($datePickerEnable) ElDatePicker,#end ElSelect, ElOption, ElInput } from 'element-plus';
 import ${simpleClassName}Form from './modules/form.vue';
-import { Download, Plus, RefreshCw, Search, Trash2 } from '@vben/icons';
-import { ContentWrap } from '#/components/content-wrap';
+import { Download, Plus#if ($table.templateType != 2 && $deleteBatchEnable), Trash2#end } from '@vben/icons';
 import { VxeColumn, VxeTable } from '#/adapter/vxe-table';
 
 ## 特殊：主子表专属逻辑
@@ -25,7 +34,7 @@ import { VxeColumn, VxeTable } from '#/adapter/vxe-table';
 
 import { $t } from '#/locales';
 #if (${table.templateType} == 2)## 树表接口
-import { handleTree,isEmpty } from '@vben/utils'
+import { isEmpty } from '@vben/utils';
 import { get${simpleClassName}List, delete${simpleClassName}, export${simpleClassName} } from '#/api/${table.moduleName}/${table.businessName}';
 #else## 标准表接口
 import { isEmpty } from '@vben/utils';
@@ -219,6 +228,12 @@ function handleExpand() {
 
 /** 初始化 */
 const { hiddenSearchBar, tableToolbarRef, tableRef } = useTableToolbar();
+function setTableToolbarRef(el: any) {
+  tableToolbarRef.value = el;
+}
+function setTableRef(el: any) {
+  tableRef.value = el;
+}
 onMounted(() => {
   getList();
 });
@@ -244,7 +259,9 @@ onMounted(() => {
                   #set ($javaField = $column.javaField)
                   #set ($javaType = $column.javaType)
                   #set ($comment = $column.columnComment)
-                  #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
+                  #if ($codegenHelper.isLongCollection($column))## Long 集合：使用字符串的字典值，避免超过 JS 安全整数后精度丢失
+                      #set ($dictMethod = "string")
+                  #elseif ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
                       #set ($dictMethod = "number")
                   #elseif ($javaType == "String")
                       #set ($dictMethod = "string")
@@ -272,7 +289,7 @@ onMounted(() => {
                           #if ("" != $dictType)## 设置了 dictType 数据字典的情况
                             <ElOption
                                 v-for="dict in getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod')"
-                                :key="dict.value"
+                                :key="#if ($column.javaType == 'Boolean')String(dict.value)#{else}dict.value#end"
                                 :value="dict.value"
                                 :label="dict.label"
                             />
@@ -321,7 +338,7 @@ onMounted(() => {
     <ContentWrap title="${table.classComment}">
       <template #extra>
         <VbenVxeTableToolbar
-            ref="tableToolbarRef"
+            :ref="setTableToolbarRef"
             v-model:hidden-search="hiddenSearchBar"
         >
         #if (${table.templateType} == 2)
@@ -373,7 +390,7 @@ onMounted(() => {
         </VbenVxeTableToolbar>
       </template>
       <VxeTable
-          ref="tableRef"
+          :ref="setTableRef"
           :data="list"
         #if ( $table.templateType == 2 )
           :tree-config="{
@@ -437,7 +454,11 @@ onMounted(() => {
                   #elseif($column.dictType && "" != $column.dictType)## 数据字典
                     <VxeColumn field="${javaField}" title="${comment}" align="center">
                       <template #default="{row}">
+                        #if ($codegenHelper.isCollection($column))## 集合字段：逐个展示字典标签
+                        <dict-tag v-for="item in row.${javaField} || []" :key="item" :type="DICT_TYPE.$dictType.toUpperCase()" :value="item" />
+                        #else
                         <dict-tag :type="DICT_TYPE.$dictType.toUpperCase()" :value="row.${javaField}" />
+                        #end
                       </template>
                     </VxeColumn>
                   #elseif ($table.templateType == 2 && $javaField == $treeNameColumn.javaField)

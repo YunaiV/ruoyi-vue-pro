@@ -63,7 +63,7 @@
         return;
       }
       // 加载数据
-      let data = modalApi.getData<${apiName}.${subSimpleClassName}>();
+      let data = modalApi.getData() as ${apiName}.${subSimpleClassName};
       if (!data) {
         return;
       }
@@ -75,6 +75,13 @@
           modalApi.unlock();
         }
       }
+#foreach ($column in $codegenHelper.getCollectionFormColumns($subColumns))
+#if ($codegenHelper.isLongCollection($column))## Long 集合：转换为字符串，与字符串的字典值一致，避免精度丢失
+      data.${column.javaField} = (data.${column.javaField} ?? []).map(String); // 多选字段：历史数据可能为 null
+#else
+      data.${column.javaField} ??= []; // 多选字段：历史数据可能为 null
+#end
+#end
       // 设置到 values
       formData.value = data;
       await formApi.setValues(formData.value);

@@ -21,6 +21,7 @@ import {
 
  import { VxeColumn, VxeTable } from '#/adapter/vxe-table';
 import { getStudentContactListByStudentId } from '#/api/infra/demo';
+import { ImageUpload, FileUpload } from "#/components/upload";
 import { $t } from '#/locales';
 
 const props = defineProps<{
@@ -40,7 +41,7 @@ async function onDelete(row: StudentApi.StudentContact) {
 }
 
 /** 获取当前子表数据，新增行不提交表格生成的临时编号 */
-function getData(): StudentApi.StudentContact[] {
+function getData(): Partial<StudentApi.StudentContact>[] {
   const table = tableRef.value;
   if (!table) {
     return [];
@@ -177,7 +178,7 @@ watch(
                     <ElRadioGroup v-model="row.enabled">
                           <ElRadio
                               v-for="dict in getDictOptions(DICT_TYPE.INFRA_BOOLEAN_STRING, 'boolean')"
-                              :key="dict.value"
+                              :key="String(dict.value)"
                               :value="dict.value"
                           >
                             {{ dict.label }}

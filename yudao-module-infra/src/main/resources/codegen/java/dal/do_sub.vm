@@ -13,6 +13,9 @@ import java.time.LocalDateTime;
 #end
 #end
 import com.baomidou.mybatisplus.annotation.*;
+#if ($codegenHelper.hasCollection($subColumns))## 集合字段：JSON 数组存储
+import ${JacksonTypeHandlerClassName};
+#end
 import ${BaseDOClassName};
 ## 处理 Schema 注解（仅 DO 模式）
 #if ($voType == 20)
@@ -31,7 +34,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
  *
  * @author ${subTable.author}
  */
+#if ($codegenHelper.hasCollection($subColumns))## 集合字段：开启 autoResultMap，查询结果才会使用 typeHandler
+@TableName(value = "${subTable.tableName.toLowerCase()}", autoResultMap = true)
+#else
 @TableName("${subTable.tableName.toLowerCase()}")
+#end
 @KeySequence("${subTable.tableName.toLowerCase()}_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -62,7 +69,10 @@ public class ${subTable.className}DO extends BaseDO {
     @Schema(description = "${column.columnComment}"#if (!${column.nullable}), requiredMode = Schema.RequiredMode.REQUIRED#end#if ("$!column.example" != ""), example = "${column.example}"#end)
 #end
 ## 2. 处理字段定义
-    private ${column.javaType} ${column.javaField};
+#if ($codegenHelper.isCollection($column))## 集合字段：JSON 数组存储
+    @TableField(typeHandler = JacksonTypeHandler.class)
+#end
+    private ${codegenHelper.getJavaType($column)} ${column.javaField};
 #end
 #end
 

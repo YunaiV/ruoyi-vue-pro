@@ -1,12 +1,13 @@
 <script lang="ts" setup>
+   import type { VxeTableGridOptions } from '#/adapter/vxe-table';
   import type { InfraStudentApi } from '#/api/infra/demo';
 
-  import { computed, ref, h, onMounted,watch,nextTick } from 'vue';
+  import { watch, nextTick } from 'vue';
 
   import { $t } from '#/locales';
 
  import { Plus } from "@vben/icons";
-import { ElButton, ElCheckbox, ElCheckboxGroup, ElDatePicker, ElInput, ElMessage, ElOption, ElRadio, ElRadioGroup, ElSelect, ElTabPane, ElTabs } from 'element-plus';
+import { ElButton, ElDatePicker, ElInput, ElMessage, ElOption, ElRadio, ElRadioGroup, ElSelect } from 'element-plus';
 import { ImageUpload, FileUpload } from "#/components/upload";
 import { ACTION_ICON, TableAction, useVbenVxeGrid } from '#/adapter/vxe-table';
 import { useStudentContactGridEditColumns } from '../data';
@@ -32,7 +33,7 @@ gridOptions: {
   toolbarConfig: {
     enabled: false,
   },
-},
+} as VxeTableGridOptions<InfraStudentApi.StudentContact>,
 });
 
 /** 添加学生联系人 */
@@ -46,7 +47,7 @@ const onDelete =  async (row: InfraStudentApi.StudentContact) => {
 }
 
 /** 获取当前子表数据，新增行不提交表格生成的临时编号 */
-function getData(): InfraStudentApi.StudentContact[] {
+function getData(): Partial<InfraStudentApi.StudentContact>[] {
   const { fullData } = gridApi.grid.getTableData();
   const inserted = new Set(gridApi.grid.getInsertRecords());
   return fullData.map((row) =>
@@ -186,7 +187,7 @@ watch(
             type: 'danger', link: true,
             icon: ACTION_ICON.DELETE,
             auth: ['infra:student:delete'],
-            onClick: onDelete.bind(null, row),
+            onClick: onDelete.bind(null, row as InfraStudentApi.StudentContact),
           },
         ]"
       />

@@ -5,6 +5,13 @@ import java.util.*;
 import ${PageResultClassName};
 import ${QueryWrapperClassName};
 import ${BaseMapperClassName};
+#if ($codegenHelper.hasCollectionListCondition($columns))## 集合字段的查询条件
+import cn.hutool.core.util.ObjectUtil;
+import ${JsonUtilsClassName};
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
+import java.util.function.Consumer;
+#end
 import ${basePackage}.module.${table.moduleName}.dal.dataobject.${table.businessName}.${table.className}DO;
 import org.apache.ibatis.annotations.Mapper;
 import ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePackage}.${table.businessName}.vo.*;
@@ -14,6 +21,14 @@ import ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePack
 #foreach ($column in $columns)
 #if (${column.listOperation})
 #set ($JavaField = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})##首字母大写
+#if ($codegenHelper.isCollection($column))##情况零，集合字段：!= 为空或不包含该元素，其它为包含该元素
+#if (${column.listOperationCondition} == "!=")
+                .and(ObjectUtil.isNotEmpty(reqVO.get${JavaField}()), w -> w.isNull(${table.className}DO::get${JavaField})
+                        .or().not(jsonArrayContains(${table.className}DO::get${JavaField}, reqVO.get${JavaField}())))
+#else
+                .and(ObjectUtil.isNotEmpty(reqVO.get${JavaField}()), jsonArrayContains(${table.className}DO::get${JavaField}, reqVO.get${JavaField}()))
+#end
+#else
 #if (${column.listOperationCondition} == "=")##情况一，= 的时候
                 .eqIfPresent(${table.className}DO::get${JavaField}, reqVO.get${JavaField}())
 #end
@@ -37,6 +52,7 @@ import ${basePackage}.module.${table.moduleName}.controller.${sceneEnum.basePack
 #end
 #if (${column.listOperationCondition} == "BETWEEN")##情况八，Between 的时候
                 .betweenIfPresent(${table.className}DO::get${JavaField}, reqVO.get${JavaField}())
+#end
 #end
 #end
 #end
@@ -76,6 +92,22 @@ public interface ${table.className}Mapper extends BaseMapperX<${table.className}
 
     default Long selectCountBy${TreeParentJavaField}(${treeParentColumn.javaType} ${treeParentColumn.javaField}) {
         return selectCount(${table.className}DO::get${TreeParentJavaField}, ${treeParentColumn.javaField});
+    }
+
+#end
+## 特殊：集合字段的查询条件
+#if ($codegenHelper.hasCollectionListCondition($columns))
+    /**
+     * 构建集合字段“包含该元素”的查询条件
+     *
+     * 集合字段通过 JacksonTypeHandler 存储为 JSON 数组字符串，例如说 ["a","b"]、[1,2]，所以按照元素的边界匹配
+     */
+    private static Consumer<LambdaQueryWrapper<${table.className}DO>> jsonArrayContains(SFunction<${table.className}DO, ?> column, Object value) {
+        String json = JsonUtils.toJsonString(value);
+        return w -> w.eq(column, "[" + json + "]")
+                .or().likeRight(column, "[" + json + ",")
+                .or().like(column, "," + json + ",")
+                .or().likeLeft(column, "," + json + "]");
     }
 
 #end

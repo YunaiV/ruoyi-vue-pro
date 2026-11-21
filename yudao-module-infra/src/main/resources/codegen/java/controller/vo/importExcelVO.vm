@@ -12,6 +12,13 @@ import ${DictConvertClassName};
 #break
 #end
 #end
+## 处理集合字段：List 的引入、Excel 转换器的引入
+#if ($codegenHelper.hasCollection($columns))
+import java.util.List;
+#end
+#foreach ($converterClassName in $codegenHelper.getExcelConverterClassNames($columns, "import"))
+import ${converterClassName};
+#end
 
 /**
  * ${table.classComment} Excel 导入 VO
@@ -25,13 +32,18 @@ public class ${sceneEnum.prefixClass}${table.className}ImportExcelVO {
 ## 逐个处理字段
 #foreach ($column in $columns)
 #if (${column.createOperation})
+#if ($codegenHelper.isCollection($column))## 集合字段：设置数据字典时，使用 MultiDictConvert 双向转换
+    @ExcelProperty(value = "${column.columnComment}", converter = ${codegenHelper.getExcelConverter($column)}.class)
 #if ("$!column.dictType" != "")
+    @DictFormat("${column.dictType}") // TODO 代码优化：建议设置到对应的 DictTypeConstants 枚举类中
+#end
+#elseif ("$!column.dictType" != "")
     @ExcelProperty(value = "${column.columnComment}", converter = DictConvert.class)
     @DictFormat("${column.dictType}") // TODO 代码优化：建议设置到对应的 DictTypeConstants 枚举类中
 #else
     @ExcelProperty("${column.columnComment}")
 #end
-    private ${column.javaType} ${column.javaField};
+    private ${codegenHelper.getJavaType($column)} ${column.javaField};
 
 #end
 #end

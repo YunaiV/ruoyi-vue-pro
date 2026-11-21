@@ -20,6 +20,8 @@
         </wd-cell>
     #elseif ($column.javaType == "LocalDateTime")
         <wd-cell title="${comment}" :value="formatDateTime(formData?.${javaField}) || '-'" />
+    #elseif ($codegenHelper.isCollection($column))## 多选字段（无字典）：数组拼接展示
+        <wd-cell title="${comment}" :value="formData?.${javaField}?.join('、') || '-'" />
     #else
         <wd-cell title="${comment}" :value="formData?.${javaField} ?? '-'" />
     #end

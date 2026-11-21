@@ -9,7 +9,7 @@ import { DICT_TYPE } from '@vben/constants';
 import { getDictOptions } from '@vben/hooks';
 import { Tinymce as RichTextarea } from '#/components/tinymce';
 import { ImageUpload, FileUpload } from "#/components/upload";
-import { message, Tabs, Form, Input, Textarea, Select, RadioGroup, Radio, CheckboxGroup, Checkbox, DatePicker, TreeSelect } from 'ant-design-vue';
+import { message, Form, Input, Textarea, Select, RadioGroup, Radio, DatePicker } from 'ant-design-vue';
 
 import { $t } from '#/locales';
 import { getStudent, createStudent, updateStudent } from '#/api/infra/demo';
@@ -86,7 +86,7 @@ const [Modal, modalApi] = useVbenModal({
       return;
     }
     // 加载数据
-    let data = modalApi.getData<StudentApi.Student>();
+    let data = modalApi.getData() as StudentApi.Student;
     if (!data) {
       return;
     }
@@ -140,7 +140,7 @@ const [Modal, modalApi] = useVbenModal({
               <RadioGroup v-model:value="formData.enabled">
                   <Radio
                           v-for="dict in getDictOptions(DICT_TYPE.INFRA_BOOLEAN_STRING, 'boolean')"
-                          :key="dict.value"
+                          :key="String(dict.value)"
                           :value="dict.value"
                   >
                     {{ dict.label }}

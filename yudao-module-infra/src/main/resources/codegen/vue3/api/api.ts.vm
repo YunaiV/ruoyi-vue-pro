@@ -11,7 +11,9 @@ import type { Dayjs } from 'dayjs';
 export interface ${subSimpleClassName} {
   #foreach ($column in $subColumns)
     #if ($column.createOperation || $column.updateOperation)
-      #if(${column.javaType.toLowerCase()} == "long" || ${column.javaType.toLowerCase()} == "integer" || ${column.javaType.toLowerCase()} == "short" || ${column.javaType.toLowerCase()} == "double" || ${column.javaType.toLowerCase()} == "bigdecimal")
+      #if ($codegenHelper.isCollection($column))## 集合字段
+          ${column.javaField}#if($column.updateOperation && !$column.primaryKey && !$column.nullable)?#end: ${codegenHelper.getCollectionTsType($column)}; // ${column.columnComment}
+      #elseif(${column.javaType.toLowerCase()} == "long" || ${column.javaType.toLowerCase()} == "integer" || ${column.javaType.toLowerCase()} == "short" || ${column.javaType.toLowerCase()} == "double" || ${column.javaType.toLowerCase()} == "bigdecimal")
           ${column.javaField}#if($column.updateOperation && !$column.primaryKey && !$column.nullable)?#end: number; // ${column.columnComment}
       #elseif(${column.javaType.toLowerCase()} == "date" || ${column.javaType.toLowerCase()} == "localdate" || ${column.javaType.toLowerCase()} == "localdatetime")
           ${column.javaField}#if($column.updateOperation && !$column.primaryKey && !$column.nullable)?#end: string | Dayjs; // ${column.columnComment}
@@ -27,7 +29,9 @@ export interface ${subSimpleClassName} {
 export interface ${simpleClassName} {
   #foreach ($column in $columns)
     #if ($column.createOperation || $column.updateOperation)
-      #if(${column.javaType.toLowerCase()} == "long" || ${column.javaType.toLowerCase()} == "integer" || ${column.javaType.toLowerCase()} == "short" || ${column.javaType.toLowerCase()} == "double" || ${column.javaType.toLowerCase()} == "bigdecimal")
+      #if ($codegenHelper.isCollection($column))## 集合字段
+          ${column.javaField}#if($column.updateOperation && !$column.primaryKey && !$column.nullable)?#end: ${codegenHelper.getCollectionTsType($column)}; // ${column.columnComment}
+      #elseif(${column.javaType.toLowerCase()} == "long" || ${column.javaType.toLowerCase()} == "integer" || ${column.javaType.toLowerCase()} == "short" || ${column.javaType.toLowerCase()} == "double" || ${column.javaType.toLowerCase()} == "bigdecimal")
           ${column.javaField}#if($column.updateOperation && !$column.primaryKey && !$column.nullable)?#end: number; // ${column.columnComment}
       #elseif(${column.javaType.toLowerCase()} == "date" || ${column.javaType.toLowerCase()} == "localdate" || ${column.javaType.toLowerCase()} == "localdatetime")
           ${column.javaField}#if($column.updateOperation && !$column.primaryKey && !$column.nullable)?#end: string | Dayjs; // ${column.columnComment}
@@ -45,9 +49,9 @@ export interface ${simpleClassName} {
       #set ($index = $foreach.count - 1)
       #set ($subSimpleClassName = $subSimpleClassNames.get($index))
       #if ( $subTable.subJoinMany )
-          ${subSimpleClassName.toLowerCase()}s?: ${subSimpleClassName}[]
+          ${subClassNameVars.get($index)}s?: ${subSimpleClassName}[]
       #else
-          ${subSimpleClassName.toLowerCase()}?: ${subSimpleClassName}
+          ${subClassNameVars.get($index)}?: ${subSimpleClassName}
       #end
     #end
   #end

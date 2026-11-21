@@ -71,6 +71,11 @@
               <text class="mr-8rpx text-[#999]">${comment}：</text>
               <text class="line-clamp-1">{{ formatDateTime(item.${javaField}) || '-' }}</text>
             </view>
+    #elseif ($codegenHelper.isCollection($column))## 多选字段（无字典）：数组拼接展示
+            <view class="mb-12rpx flex items-center text-28rpx text-[#666]">
+              <text class="mr-8rpx text-[#999]">${comment}：</text>
+              <text class="line-clamp-1">{{ item.${javaField}?.join('、') || '-' }}</text>
+            </view>
     #else
             <view class="mb-12rpx flex items-center text-28rpx text-[#666]">
               <text class="mr-8rpx text-[#999]">${comment}：</text>

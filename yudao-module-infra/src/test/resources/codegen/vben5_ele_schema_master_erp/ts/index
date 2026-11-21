@@ -1,5 +1,4 @@
 import type { PageParam, PageResult } from '@vben/request';
-import type { Dayjs } from 'dayjs';
 
 import { requestClient } from '#/api/request';
 
@@ -10,7 +9,7 @@ export namespace InfraStudentApi {
             studentId?: number; // 学生编号
             name?: string; // 名字
             description?: string; // 简介
-            birthday?: string | Dayjs; // 出生日期
+            birthday?: Date | string; // 出生日期
             sex?: number; // 性别
             enabled?: boolean; // 是否有效
             avatar?: string; // 头像
@@ -24,7 +23,7 @@ export namespace InfraStudentApi {
             studentId?: number; // 学生编号
             name?: string; // 名字
             description?: string; // 简介
-            birthday?: string | Dayjs; // 出生日期
+            birthday?: Date | string; // 出生日期
             sex?: number; // 性别
             enabled?: boolean; // 是否有效
             avatar?: string; // 头像
@@ -37,7 +36,7 @@ export namespace InfraStudentApi {
     id: number; // 编号
     name?: string; // 名字
     description?: string; // 简介
-    birthday?: string | Dayjs; // 出生日期
+    birthday?: Date | string; // 出生日期
     sex?: number; // 性别
     enabled?: boolean; // 是否有效
     avatar?: string; // 头像

@@ -17,6 +17,8 @@
 #end
 #set ($hasDict = 0)
 #set ($hasBoolDict = 0)
+#set ($hasIntCollectionDict = 0)
+#set ($hasStrCollectionDict = 0)
 #set ($hasDate = 0)
 #set ($hasDateTime = 0)
 #foreach ($column in $subColumns)
@@ -25,6 +27,14 @@
 #set ($hasDict = 1)
 #if ($column.javaType == "Boolean")
 #set ($hasBoolDict = 1)
+#end
+#end
+#if ($codegenHelper.isCollection($column) && $column.dictType && "" != $column.dictType)
+#set ($hasDict = 1)
+#if ($column.javaType == "String" || $column.javaType == "Long")## Long 集合：使用字符串的字典值，避免超过 JS 安全整数后精度丢失
+#set ($hasStrCollectionDict = 1)
+#else
+#set ($hasIntCollectionDict = 1)
 #end
 #end
 #if (${column.javaType.toLowerCase()} == "date" || ${column.javaType.toLowerCase()} == "localdate")
@@ -62,6 +72,25 @@
 #end
           placeholder="请选择${column.columnComment}"
         />
+## 多选（集合字段）→ checkbox-group，JSON 数组存储
+#elseif ($codegenHelper.isCollection($column))
+        <wd-form-item title="${column.columnComment}" title-width="180rpx" prop="${column.javaField}">
+          <wd-checkbox-group v-model="formData.${column.javaField}">
+#if ("$!column.dictType" != "")
+#set ($collectionDictMethod = "getIntDictOptions")
+#if ($column.javaType == "String" || $column.javaType == "Long")## Long 集合：使用字符串的字典值，避免超过 JS 安全整数后精度丢失
+#set ($collectionDictMethod = "getStrDictOptions")
+#end
+            <wd-checkbox
+              v-for="dict in ${collectionDictMethod}(DICT_TYPE.${column.dictType.toUpperCase()})"
+              :key="dict.value"
+              :name="dict.value"
+            >
+              {{ dict.label }}
+            </wd-checkbox>
+#end
+          </wd-checkbox-group>
+        </wd-form-item>
 #elseif ($javaType == "date" || $javaType == "localdate" || $javaType == "localdatetime")
 #set ($pickerType = "date")
 #if ($javaType == "localdatetime")
@@ -143,8 +172,20 @@ import { computed, onMounted, ref } from 'vue'
 import { useToast } from '@wot-ui/ui/components/wd-toast'
 import { create${subSimpleClassName}, get${subSimpleClassName}, update${subSimpleClassName} } from '@/api/${table.moduleName}/${table.businessName}'
 import { delay, navigateBackPlus } from '@/utils'
+#if ($hasBoolDict == 1 || $hasIntCollectionDict == 1 || $hasStrCollectionDict == 1)
+#set ($dictImportNames = "")
 #if ($hasBoolDict == 1)
-import { getBoolDictOptions } from '@/hooks/useDict'
+#set ($dictImportNames = "${dictImportNames}getBoolDictOptions, ")
+#end
+#if ($hasIntCollectionDict == 1)
+#set ($dictImportNames = "${dictImportNames}getIntDictOptions, ")
+#end
+#if ($hasStrCollectionDict == 1)
+#set ($dictImportNames = "${dictImportNames}getStrDictOptions, ")
+#end
+#set ($dictImportNames = $dictImportNames.trim())
+#set ($dictImportNames = $dictImportNames.substring(0, $dictImportNames.length() - 1))
+import { $dictImportNames } from '@/hooks/useDict'
 #end
 #if ($hasDict == 1)
 import { DICT_TYPE } from '@/utils/constants'
@@ -183,7 +224,9 @@ const formData = ref<Partial<${subSimpleClassName}>>({
   ${column.javaField}: props.${column.javaField},
 #elseif ($column.createOperation || $column.updateOperation)
 #set ($javaType = $column.javaType.toLowerCase())
-#if((($column.htmlType == "select" || $column.htmlType == "radio") && $column.dictType && "" != $column.dictType) || $javaType == "date" || $javaType == "localdate" || $javaType == "localdatetime")
+#if($codegenHelper.isCollection($column))
+  ${column.javaField}: [],
+#elseif((($column.htmlType == "select" || $column.htmlType == "radio") && $column.dictType && "" != $column.dictType) || $javaType == "date" || $javaType == "localdate" || $javaType == "localdatetime")
   ${column.javaField}: undefined,
 #else
   ${column.javaField}:#if($column.nullable) undefined#elseif($javaType == "long" || $javaType == "integer" || $javaType == "short" || $javaType == "float" || $javaType == "double" || $javaType == "bigdecimal" || $javaType == "byte") 0#elseif($javaType == "boolean") false#else ''#end,
@@ -215,6 +258,13 @@ function handleBack() {
 async function getDetail() {
   if (props.id) {
     formData.value = await get${subSimpleClassName}(props.id)
+#foreach ($column in $codegenHelper.getCollectionFormColumns($subColumns))
+#if ($codegenHelper.isLongCollection($column))## Long 集合：转换为字符串，与字符串的字典值一致，避免精度丢失
+    formData.value.${column.javaField} = (formData.value.${column.javaField} ?? []).map(String) // 多选字段：历史数据可能为 null
+#else
+    formData.value.${column.javaField} ??= [] // 多选字段：历史数据可能为 null
+#end
+#end
   }
 }
 

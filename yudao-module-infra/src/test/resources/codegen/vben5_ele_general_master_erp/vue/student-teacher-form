@@ -9,7 +9,7 @@
   import { getDictOptions } from '@vben/hooks';
   import { Tinymce as RichTextarea } from '#/components/tinymce';
   import { ImageUpload, FileUpload } from "#/components/upload";
-  import { ElMessage, ElTabs, ElTabPane, ElForm, ElFormItem, ElInput, ElSelect, ElOption, ElRadioGroup, ElRadio, ElCheckboxGroup, ElCheckbox, ElDatePicker, ElTreeSelect } from 'element-plus';
+  import { ElMessage, ElForm, ElFormItem, ElInput, ElSelect, ElOption, ElRadioGroup, ElRadio, ElDatePicker } from 'element-plus';
 
   import { $t } from '#/locales';
 
@@ -70,7 +70,7 @@
       }
 
       // 加载数据
-      let data = modalApi.getData<StudentApi.StudentTeacher>();
+      let data = modalApi.getData() as StudentApi.StudentTeacher;
       if (!data) {
         return;
       }
@@ -141,7 +141,7 @@
               <ElRadioGroup v-model="formData.enabled">
                   <ElRadio
                           v-for="dict in getDictOptions(DICT_TYPE.INFRA_BOOLEAN_STRING, 'boolean')"
-                          :key="dict.value"
+                          :key="String(dict.value)"
                           :value="dict.value"
                   >
                     {{ dict.label }}

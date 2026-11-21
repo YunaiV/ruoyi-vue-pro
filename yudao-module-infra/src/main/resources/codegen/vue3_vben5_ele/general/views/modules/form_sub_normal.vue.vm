@@ -4,6 +4,12 @@
 #set ($subSimpleClassName = $subSimpleClassNames.get($subIndex))
 #set ($subClassNameVar = $subClassNameVars.get($subIndex))
 #set ($SubJoinColumnName = $subJoinColumn.javaField.substring(0,1).toUpperCase() + ${subJoinColumn.javaField.substring(1)})##首字母大写
+#if ($subTable.subJoinMany)## 一对多：表格内编辑，不渲染 join 字段；一对一：表单渲染全部字段
+#set ($subFormColumns = $codegenHelper.excludeColumn($subColumns, $subJoinColumn))
+#else
+#set ($subFormColumns = $subColumns)
+#end
+#set ($hasRequiredColumn = $codegenHelper.hasFormRequiredColumn($codegenHelper.excludeColumn($subColumns, $subJoinColumn)))## 是否有必填字段（排除 join 字段）
 <script lang="ts" setup>
 #if ($subTable.subJoinMany)
 import type { VxeTableInstance } from '#/adapter/vxe-table';
@@ -18,18 +24,15 @@ import { ref, watch } from 'vue';
 import { nextTick, reactive, ref, watch } from 'vue';
 #end
 
+#if ($codegenHelper.hasFormDict($subFormColumns))
 import { DICT_TYPE } from '@vben/constants';
 import { getDictOptions } from '@vben/hooks';
+#end
 #if ($subTable.subJoinMany)
 import { Plus } from '@vben/icons';
 #end
 
-#set ($hasCheckbox = false)
-#foreach ($column in $subColumns)
-#if (($column.createOperation || $column.updateOperation) && $column.id != $subJoinColumn.id && $column.htmlType == "checkbox")
-#set ($hasCheckbox = true)
-#end
-#end
+## 表单组件按需导入：一对多的文本域、富文本均使用 ElInput；一对一的富文本使用 RichTextarea
 import {
 #if ($subTable.subJoinMany)
   ElButton,
@@ -37,29 +40,50 @@ import {
   ElForm,
   ElFormItem,
 #end
-#if ($hasCheckbox)
+#if ($codegenHelper.hasFormHtmlType($subFormColumns, "checkbox"))
   ElCheckbox,
   ElCheckboxGroup,
 #end
+#if ($codegenHelper.hasFormHtmlType($subFormColumns, "datetime"))
   ElDatePicker,
+#end
+#if ($codegenHelper.hasFormHtmlType($subFormColumns, "input") || $codegenHelper.hasFormHtmlType($subFormColumns, "textarea") || ($subTable.subJoinMany && $codegenHelper.hasFormHtmlType($subFormColumns, "editor")))
   ElInput,
-#if ($subTable.subJoinMany)
+#end
+#if ($subTable.subJoinMany && $hasRequiredColumn)
   ElMessage,
 #end
+#if ($codegenHelper.hasFormHtmlType($subFormColumns, "select"))
   ElOption,
+#end
+#if ($codegenHelper.hasFormHtmlType($subFormColumns, "radio"))
   ElRadio,
   ElRadioGroup,
+#end
+#if ($codegenHelper.hasFormHtmlType($subFormColumns, "select"))
   ElSelect,
+#end
 } from 'element-plus';
 
 #if ($subTable.subJoinMany) ## 一对多
 import { VxeColumn, VxeTable } from '#/adapter/vxe-table';
 import { get${subSimpleClassName}ListBy${SubJoinColumnName} } from '#/api/${table.moduleName}/${table.businessName}';
 #else
+#if ($codegenHelper.hasFormHtmlType($subFormColumns, "editor"))
 import { Tinymce as RichTextarea } from '#/components/tinymce';
+#end
 import { get${subSimpleClassName}By${SubJoinColumnName} } from '#/api/${table.moduleName}/${table.businessName}';
 #end
+#if ($codegenHelper.hasFormHtmlType($subFormColumns, "imageUpload") && $codegenHelper.hasFormHtmlType($subFormColumns, "fileUpload"))
+import { ImageUpload, FileUpload } from "#/components/upload";
+#elseif ($codegenHelper.hasFormHtmlType($subFormColumns, "imageUpload"))
+import { ImageUpload } from "#/components/upload";
+#elseif ($codegenHelper.hasFormHtmlType($subFormColumns, "fileUpload"))
+import { FileUpload } from "#/components/upload";
+#end
+#if ($subTable.subJoinMany)
 import { $t } from '#/locales';
+#end
 
 const props = defineProps<{
    ${subJoinColumn.javaField}?: number // ${subJoinColumn.columnComment}（主表的关联字段）
@@ -79,7 +103,7 @@ async function onDelete(row: ${simpleClassName}Api.${subSimpleClassName}) {
 }
 
 /** 获取当前子表数据，新增行不提交表格生成的临时编号 */
-function getData(): ${simpleClassName}Api.${subSimpleClassName}[] {
+function getData(): Partial<${simpleClassName}Api.${subSimpleClassName}>[] {
   const table = tableRef.value;
   if (!table) {
     return [];
@@ -91,12 +115,6 @@ function getData(): ${simpleClassName}Api.${subSimpleClassName}[] {
   );
 }
 
-#set ($hasRequiredColumn = false)
-#foreach ($column in $subColumns)
-#if (($column.createOperation || $column.updateOperation) && !$column.nullable && !$column.primaryKey && $column.id != $subJoinColumn.id)
-#set ($hasRequiredColumn = true)
-#end
-#end
 /** 校验子表必填字段 */
 function validate(): boolean {
 #if ($hasRequiredColumn)
@@ -130,6 +148,18 @@ watch(
         return;
       }
       list.value = await get${subSimpleClassName}ListBy${SubJoinColumnName}(props.${subJoinColumn.javaField}!);
+#if ($codegenHelper.hasCollectionFormColumn($subColumns))
+      // 多选字段：历史数据可能为 null，归一化为空数组
+      list.value.forEach((row) => {
+#foreach ($column in $codegenHelper.getCollectionFormColumns($subColumns))
+#if ($codegenHelper.isLongCollection($column))## Long 集合：转换为字符串，与字符串的字典值一致，避免精度丢失
+        row.${column.javaField} = (row.${column.javaField} ?? []).map(String);
+#else
+        row.${column.javaField} ??= [];
+#end
+#end
+      });
+#end
     },
     { immediate: true },
 );
@@ -150,7 +180,11 @@ const rules = reactive<FormRules>({
     #foreach ($column in $subColumns)
         #if (($column.createOperation || $column.updateOperation) && !$column.nullable && !${column.primaryKey})## 创建或者更新操作 && 要求非空 && 非主键
             #set($comment=$column.columnComment)
+                #if ($codegenHelper.isCollection($column))## 集合字段：使用 array 类型校验，避免空数组通过必填校验
+                $column.javaField: [{ required: true, type: 'array', message: '${comment}不能为空', trigger: 'change' }],
+                #else
                 $column.javaField: [{ required: true, message: '${comment}不能为空', trigger: #if($column.htmlType == 'select')'change'#else'blur'#end }],
+                #end
         #end
     #end
 });
@@ -180,6 +214,17 @@ watch(
       }
       await nextTick();
       formData.value = await get${subSimpleClassName}By${SubJoinColumnName}(props.${subJoinColumn.javaField}!);
+#if ($codegenHelper.hasCollectionFormColumn($subColumns))
+      if (formData.value) {
+#foreach ($column in $codegenHelper.getCollectionFormColumns($subColumns))
+#if ($codegenHelper.isLongCollection($column))## Long 集合：转换为字符串，与字符串的字典值一致，避免精度丢失
+        formData.value.${column.javaField} = (formData.value.${column.javaField} ?? []).map(String); // 多选字段：历史数据可能为 null
+#else
+        formData.value.${column.javaField} ??= []; // 多选字段：历史数据可能为 null
+#end
+#end
+      }
+#end
     },
     { immediate: true },
 );
@@ -195,7 +240,9 @@ watch(
               #set ($dictType = $column.dictType)
               #set ($javaField = $column.javaField)
               #set ($javaType = $column.javaType)
-              #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
+              #if ($codegenHelper.isLongCollection($column))## Long 集合：使用字符串的字典值，避免超过 JS 安全整数后精度丢失
+                  #set ($dictMethod = "string")
+              #elseif ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
                   #set ($dictMethod = "number")
               #elseif ($javaType == "String")
                   #set ($dictMethod = "string")
@@ -228,7 +275,7 @@ watch(
                         #if ("" != $dictType)## 有数据字典
                           <ElOption
                               v-for="dict in getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod')"
-                              :key="dict.value"
+                              :key="#if ($column.javaType == 'Boolean')String(dict.value)#{else}dict.value#end"
                               :value="dict.value"
                               :label="dict.label"
                           />
@@ -245,7 +292,7 @@ watch(
                         #if ("" != $dictType)## 有数据字典
                           <ElCheckbox
                               v-for="dict in getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod')"
-                              :key="dict.value"
+                              :key="#if ($column.javaType == 'Boolean')String(dict.value)#{else}dict.value#end"
                               :value="dict.value"
                           >
                             {{ dict.label }}
@@ -263,7 +310,7 @@ watch(
                         #if ("" != $dictType)## 有数据字典
                           <ElRadio
                               v-for="dict in getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod')"
-                              :key="dict.value"
+                              :key="#if ($column.javaType == 'Boolean')String(dict.value)#{else}dict.value#end"
                               :value="dict.value"
                           >
                             {{ dict.label }}
@@ -328,7 +375,9 @@ watch(
               #set ($javaField = $column.javaField)
               #set ($javaType = $column.javaType)
               #set ($comment = $column.columnComment)
-              #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
+              #if ($codegenHelper.isLongCollection($column))## Long 集合：使用字符串的字典值，避免超过 JS 安全整数后精度丢失
+                  #set ($dictMethod = "string")
+              #elseif ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
                   #set ($dictMethod = "number")
               #elseif ($javaType == "String")
                   #set ($dictMethod = "string")
@@ -357,7 +406,7 @@ watch(
                       #if ("" != $dictType)## 有数据字典
                         <ElOption
                             v-for="dict in getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod')"
-                            :key="dict.value"
+                            :key="#if ($column.javaType == 'Boolean')String(dict.value)#{else}dict.value#end"
                             :value="dict.value"
                             :label="dict.label"
                         />
@@ -372,7 +421,7 @@ watch(
                       #if ("" != $dictType)## 有数据字典
                         <ElCheckbox
                             v-for="dict in getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod')"
-                            :key="dict.value"
+                            :key="#if ($column.javaType == 'Boolean')String(dict.value)#{else}dict.value#end"
                             :value="dict.value"
                         >
                           {{ dict.label }}
@@ -388,7 +437,7 @@ watch(
                       #if ("" != $dictType)## 有数据字典
                         <ElRadio
                             v-for="dict in getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod')"
-                            :key="dict.value"
+                            :key="#if ($column.javaType == 'Boolean')String(dict.value)#{else}dict.value#end"
                             :value="dict.value"
                         >
                           {{ dict.label }}

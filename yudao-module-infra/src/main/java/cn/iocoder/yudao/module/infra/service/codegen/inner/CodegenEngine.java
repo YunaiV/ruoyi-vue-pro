@@ -17,6 +17,7 @@ import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.CollectionUtils;
 import cn.iocoder.yudao.framework.common.util.date.DateUtils;
 import cn.iocoder.yudao.framework.common.util.date.LocalDateTimeUtils;
+import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.framework.common.util.object.ObjectUtils;
 import cn.iocoder.yudao.framework.common.util.string.StrUtils;
@@ -34,6 +35,7 @@ import cn.iocoder.yudao.module.infra.enums.codegen.CodegenTemplateTypeEnum;
 import cn.iocoder.yudao.module.infra.enums.codegen.CodegenVOTypeEnum;
 import cn.iocoder.yudao.module.infra.framework.codegen.config.CodegenProperties;
 import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Maps;
@@ -372,6 +374,10 @@ public class CodegenEngine {
         globalBindingMap.put("OperateTypeEnumClassName", OperateTypeEnum.class.getName());
         globalBindingMap.put("BeanUtils", BeanUtils.class.getName());
         globalBindingMap.put("CollectionUtilsClassName", CollectionUtils.class.getName());
+        // 模板 Helper：集合（多选）字段等通用逻辑
+        globalBindingMap.put("codegenHelper", new CodegenHelper());
+        globalBindingMap.put("JacksonTypeHandlerClassName", JacksonTypeHandler.class.getName());
+        globalBindingMap.put("JsonUtilsClassName", JsonUtils.class.getName());
     }
 
     /**

@@ -24,7 +24,9 @@
         #set ($AttrName = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
         #set ($comment = $column.columnComment)
         #set ($dictMethod = "getDictOptions")## 计算使用哪个 dict 字典方法
-        #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
+        #if ($codegenHelper.isLongCollection($column))## Long 集合：使用字符串的字典值，避免超过 JS 安全整数后精度丢失
+            #set ($dictMethod = "getStrDictOptions")
+        #elseif ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
             #set ($dictMethod = "getIntDictOptions")
         #elseif ($javaType == "String")
             #set ($dictMethod = "getStrDictOptions")
@@ -72,7 +74,7 @@
               #if ("" != $dictType)## 有数据字典
                 <el-option
                   v-for="dict in $dictMethod(DICT_TYPE.$dictType.toUpperCase())"
-                  :key="dict.value"
+                  :key="#if ($column.javaType == 'Boolean')String(dict.value)#{else}dict.value#end"
                   :label="dict.label"
                   :value="dict.value"
                 />
@@ -91,7 +93,7 @@
               #if ("" != $dictType)## 有数据字典
                 <el-checkbox
                   v-for="dict in $dictMethod(DICT_TYPE.$dictType.toUpperCase())"
-                  :key="dict.value"
+                  :key="#if ($column.javaType == 'Boolean')String(dict.value)#{else}dict.value#end"
                   :label="dict.label"
                   :value="dict.value"
                 />
@@ -110,7 +112,7 @@
               #if ("" != $dictType)## 有数据字典
                 <el-radio
                   v-for="dict in $dictMethod(DICT_TYPE.$dictType.toUpperCase())"
-                  :key="dict.value"
+                  :key="#if ($column.javaType == 'Boolean')String(dict.value)#{else}dict.value#end"
                   :value="dict.value"
                 >
                   {{ dict.label }}
@@ -172,7 +174,9 @@
       #set ($AttrName = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
       #set ($comment = $column.columnComment)
       #set ($dictMethod = "getDictOptions")## 计算使用哪个 dict 字典方法
-      #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
+      #if ($codegenHelper.isLongCollection($column))## Long 集合：使用字符串的字典值，避免超过 JS 安全整数后精度丢失
+        #set ($dictMethod = "getStrDictOptions")
+      #elseif ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
         #set ($dictMethod = "getIntDictOptions")
       #elseif ($javaType == "String")
           #set ($dictMethod = "getStrDictOptions")
@@ -202,7 +206,7 @@
               #if ("" != $dictType)## 有数据字典
         <el-option
           v-for="dict in $dictMethod(DICT_TYPE.$dictType.toUpperCase())"
-          :key="dict.value"
+          :key="#if ($column.javaType == 'Boolean')String(dict.value)#{else}dict.value#end"
           :label="dict.label"
           :value="dict.value"
         />
@@ -217,7 +221,7 @@
               #if ("" != $dictType)## 有数据字典
         <el-checkbox
           v-for="dict in $dictMethod(DICT_TYPE.$dictType.toUpperCase())"
-          :key="dict.value"
+          :key="#if ($column.javaType == 'Boolean')String(dict.value)#{else}dict.value#end"
           :label="dict.label"
           :value="dict.value"
         />
@@ -232,7 +236,7 @@
               #if ("" != $dictType)## 有数据字典
         <el-radio
           v-for="dict in $dictMethod(DICT_TYPE.$dictType.toUpperCase())"
-          :key="dict.value"
+          :key="#if ($column.javaType == 'Boolean')String(dict.value)#{else}dict.value#end"
           :value="dict.value"
           >
           {{ dict.label }}
@@ -263,18 +267,23 @@
 </template>
 <script setup lang="ts">
 import { getIntDictOptions, getStrDictOptions, getBoolDictOptions, DICT_TYPE } from '@/utils/dict'
+import type { FormRules } from 'element-plus'
 import { ${simpleClassName}Api } from '@/api/${table.moduleName}/${table.businessName}'
 
 const props = defineProps<{
-  ${subJoinColumn.javaField}: number // ${subJoinColumn.columnComment}（主表的关联字段）
+  ${subJoinColumn.javaField}?: number // ${subJoinColumn.columnComment}（主表的关联字段）
 }>()
 const formLoading = ref(false) // 表单的加载中
 const formData = ref<any#if ( $subTable.subJoinMany )[]#end>(#if ( $subTable.subJoinMany )[]#else{}#end)
-const formRules = reactive({
+const formRules = reactive<FormRules>({
 #foreach ($column in $subColumns)
     #if (($column.createOperation || $column.updateOperation) && !$column.nullable && !${column.primaryKey})## 创建或者更新操作 && 要求非空 && 非主键
         #set($comment=$column.columnComment)
+        #if ($codegenHelper.isCollection($column))## 集合字段：使用 array 类型校验，避免空数组通过必填校验
+  $column.javaField: [{ required: true, type: 'array', message: '${comment}不能为空', trigger: 'change' }],
+        #else
   $column.javaField: [{ required: true, message: '${comment}不能为空', trigger: #if($column.htmlType == 'select')'change'#else'blur'#end }],
+        #end
     #end
 #end
 })
@@ -308,12 +317,31 @@ watch(
       formLoading.value = true
 #if ( $subTable.subJoinMany )
       formData.value = await ${simpleClassName}Api.get${subSimpleClassName}ListBy${SubJoinColumnName}(val)
+#if ($codegenHelper.hasCollectionFormColumn($subColumns))
+      // 多选字段：历史数据可能为 null，归一化为空数组
+      formData.value.forEach((row) => {
+  #foreach ($column in $codegenHelper.getCollectionFormColumns($subColumns))
+#if ($codegenHelper.isLongCollection($column))## Long 集合：转换为字符串，与字符串的字典值一致，避免精度丢失
+        row.${column.javaField} = (row.${column.javaField} ?? []).map(String)
+#else
+        row.${column.javaField} = row.${column.javaField} ?? []
+#end
+  #end
+      })
+#end
 #else
       const data = await ${simpleClassName}Api.get${subSimpleClassName}By${SubJoinColumnName}(val)
       if (!data) {
         return
       }
       formData.value = data
+#foreach ($column in $codegenHelper.getCollectionFormColumns($subColumns))
+#if ($codegenHelper.isLongCollection($column))## Long 集合：转换为字符串，与字符串的字典值一致，避免精度丢失
+      formData.value.${column.javaField} = (formData.value.${column.javaField} ?? []).map(String) // 多选字段：历史数据可能为 null
+#else
+      formData.value.${column.javaField} = formData.value.${column.javaField} ?? [] // 多选字段：历史数据可能为 null
+#end
+#end
 #end
     } finally {
       formLoading.value = false

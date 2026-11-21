@@ -1,8 +1,7 @@
 <script lang="ts" setup>
 import type { StudentApi } from '#/api/infra/demo';
-import type { VxeTableInstance } from '#/adapter/vxe-table';
 
-import { reactive, ref, h, nextTick, watch, onMounted } from 'vue';
+ import { reactive, ref, h, nextTick, watch, onMounted } from 'vue';
 
 import { DICT_TYPE } from '@vben/constants';
 import { getDictOptions } from '@vben/hooks';
@@ -15,14 +14,12 @@ import { formatDateTime } from '@vben/utils';
  import { useVbenModal } from '@vben/common-ui';
 import { useTableToolbar, VbenVxeTableToolbar } from '@vben/plugins/vxe-table';
 import StudentContactForm from './student-contact-form.vue'
-import { Tinymce as RichTextarea } from '#/components/tinymce';
-import { ImageUpload, FileUpload } from "#/components/upload";
-import { message, Button, Card, Tabs, Pagination, Form, Input, Textarea, Select, RadioGroup, Radio, CheckboxGroup, Checkbox, RangePicker, DatePicker, TreeSelect } from 'ant-design-vue';
+import { message, Button, Card, Pagination, Form, Input, Select, RangePicker, DatePicker } from 'ant-design-vue';
 import { Plus, Trash2 } from '@vben/icons';
 import { $t } from '#/locales';
 
  import { deleteStudentContact, deleteStudentContactList, getStudentContactPage } from '#/api/infra/demo';
-import { isEmpty, cloneDeep } from '@vben/utils';
+import { cloneDeep, isEmpty } from '@vben/utils';
 
 const props = defineProps<{
   studentId?: number // 学生编号（主表的关联字段）
@@ -96,7 +93,6 @@ const queryParams = reactive({
   pageSize: 10,
             name: undefined,
             birthday: undefined,
-            birthday: undefined,
             sex: undefined,
             enabled: undefined,
             createTime: undefined,
@@ -151,6 +147,12 @@ watch(
 
  /** 初始化 */
 const { hiddenSearchBar, tableToolbarRef, tableRef } = useTableToolbar();
+function setTableToolbarRef(el: any) {
+  tableToolbarRef.value = el;
+}
+function setTableRef(el: any) {
+  tableRef.value = el;
+}
 onMounted(() => {
   getList();
 });
@@ -209,7 +211,7 @@ onMounted(() => {
                           >
                                 <Select.Option
                                     v-for="dict in getDictOptions(DICT_TYPE.INFRA_BOOLEAN_STRING, 'boolean')"
-                                    :key="dict.value"
+                                    :key="String(dict.value)"
                                     :value="dict.value"
                                 >
                                   {{ dict.label }}
@@ -236,7 +238,7 @@ onMounted(() => {
         <Card title="学生">
           <template #extra>
             <VbenVxeTableToolbar
-                ref="tableToolbarRef"
+                :ref="setTableToolbarRef"
                 v-model:hidden-search="hiddenSearchBar"
             >
               <Button
@@ -262,7 +264,7 @@ onMounted(() => {
             </VbenVxeTableToolbar>
           </template>
           <VxeTable
-              ref="tableRef"
+              :ref="setTableRef"
               :data="list"
               show-overflow
               :loading="loading"

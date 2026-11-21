@@ -62,7 +62,7 @@
       }
 
       // 加载数据
-      let data = modalApi.getData<InfraStudentApi.StudentTeacher>();
+      let data = modalApi.getData() as InfraStudentApi.StudentTeacher;
       if (!data) {
         return;
       }

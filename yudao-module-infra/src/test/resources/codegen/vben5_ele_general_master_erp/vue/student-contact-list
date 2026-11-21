@@ -1,24 +1,19 @@
 <script lang="ts" setup>
   import type { StudentApi } from '#/api/infra/demo';
-  import type { VxeTableInstance } from '#/adapter/vxe-table';
 
-  import { reactive,ref, h, nextTick,watch,onMounted } from 'vue';
+   import { reactive, ref, h, nextTick, watch, onMounted } from 'vue';
 
   import { DICT_TYPE } from '@vben/constants';
   import { getDictOptions } from '@vben/hooks';
 import { formatDateTime } from '@vben/utils';
 
   import { DictTag } from '#/components/dict-tag';
-  import { getRangePickerDefaultProps } from '#/utils';
   import { VxeColumn, VxeTable } from '#/adapter/vxe-table';
-  import { ContentWrap } from '#/components/content-wrap';
 
-     import { useVbenModal } from '@vben/common-ui';
+     import { ContentWrap, useVbenModal } from '@vben/common-ui';
     import { useTableToolbar, VbenVxeTableToolbar } from '@vben/plugins/vxe-table';
     import StudentContactForm from './student-contact-form.vue'
-    import { Tinymce as RichTextarea } from '#/components/tinymce';
-    import { ImageUpload, FileUpload } from "#/components/upload";
-    import { ElMessage, ElLoading, ElButton, ElTabs, ElTabPane, ElPagination, ElForm, ElFormItem, ElDatePicker, ElSelect, ElOption, ElInput } from 'element-plus';
+    import { ElMessage, ElLoading, ElButton, ElPagination, ElForm, ElFormItem, ElDatePicker, ElSelect, ElOption, ElInput } from 'element-plus';
     import { Plus, Trash2 } from '@vben/icons';
     import { $t } from '#/locales';
 
@@ -95,7 +90,6 @@ function handleRowCheckboxChange({
       pageSize: 10,
                       name: undefined,
                       birthday: undefined,
-                      birthday: undefined,
                       sex: undefined,
                       enabled: undefined,
                       createTime: undefined,
@@ -150,6 +144,12 @@ watch(
 
  /** 初始化 */
 const { hiddenSearchBar, tableToolbarRef, tableRef } = useTableToolbar();
+function setTableToolbarRef(el: any) {
+  tableToolbarRef.value = el;
+}
+function setTableRef(el: any) {
+  tableRef.value = el;
+}
 onMounted(() => {
   getList();
 });
@@ -207,7 +207,7 @@ onMounted(() => {
                           >
                                 <ElOption
                                     v-for="dict in getDictOptions(DICT_TYPE.INFRA_BOOLEAN_STRING, 'boolean')"
-                                    :key="dict.value"
+                                    :key="String(dict.value)"
                                     :value="dict.value"
                                     :label="dict.label"
                                 />
@@ -237,7 +237,7 @@ onMounted(() => {
         <ContentWrap title="学生">
           <template #extra>
             <VbenVxeTableToolbar
-                ref="tableToolbarRef"
+                :ref="setTableToolbarRef"
                 v-model:hidden-search="hiddenSearchBar"
             >
               <ElButton
@@ -262,7 +262,7 @@ onMounted(() => {
             </VbenVxeTableToolbar>
           </template>
           <VxeTable
-              ref="tableRef"
+              :ref="setTableRef"
               :data="list"
               show-overflow
               :loading="loading"

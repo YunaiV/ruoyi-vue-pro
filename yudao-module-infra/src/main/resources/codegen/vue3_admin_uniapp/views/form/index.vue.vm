@@ -18,7 +18,9 @@
 #set ($javaType = $column.javaType)
 #set ($comment = $column.columnComment)
 #set ($dictMethod = "getDictOptions")
-#if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
+#if ($codegenHelper.isLongCollection($column))## Long 集合：使用字符串的字典值，避免超过 JS 安全整数后精度丢失
+#set ($dictMethod = "getStrDictOptions")
+#elseif ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
 #set ($dictMethod = "getIntDictOptions")
 #elseif ($javaType == "String")
 #set ($dictMethod = "getStrDictOptions")
@@ -64,6 +66,21 @@
                 {{ dict.label }}
               </wd-radio>
             </wd-radio-group>
+          </wd-form-item>
+## 多选（集合字段）→ checkbox-group，JSON 数组存储
+#elseif ($codegenHelper.isCollection($column))
+          <wd-form-item title="${comment}" title-width="180rpx" prop="${javaField}">
+            <wd-checkbox-group v-model="formData.${javaField}">
+#if ("$!dictType" != "")
+              <wd-checkbox
+                v-for="dict in $dictMethod(DICT_TYPE.${dictType.toUpperCase()})"
+                :key="dict.value"
+                :name="dict.value"
+              >
+                {{ dict.label }}
+              </wd-checkbox>
+#end
+            </wd-checkbox-group>
           </wd-form-item>
 ## 数字类型（无字典）
 #elseif (${javaType.toLowerCase()} == "long" || ${javaType.toLowerCase()} == "integer" || ${javaType.toLowerCase()} == "short" || ${javaType.toLowerCase()} == "float" || ${javaType.toLowerCase()} == "double" || ${javaType.toLowerCase()} == "bigdecimal" || ${javaType.toLowerCase()} == "byte")
@@ -194,7 +211,9 @@
 #if (($column.createOperation || $column.updateOperation) && !$column.primaryKey && $column.id != $subJoinColumn.id)
 #set ($javaType = $column.javaType.toLowerCase())
 #set ($dictMethod = "getDictOptions")
-#if ($column.javaType == "Integer" || $column.javaType == "Long" || $column.javaType == "Byte" || $column.javaType == "Short")
+#if ($codegenHelper.isLongCollection($column))## Long 集合：使用字符串的字典值，避免超过 JS 安全整数后精度丢失
+#set ($dictMethod = "getStrDictOptions")
+#elseif ($column.javaType == "Integer" || $column.javaType == "Long" || $column.javaType == "Byte" || $column.javaType == "Short")
 #set ($dictMethod = "getIntDictOptions")
 #elseif ($column.javaType == "String")
 #set ($dictMethod = "getStrDictOptions")
@@ -227,6 +246,21 @@
                 {{ dict.label }}
               </wd-radio>
             </wd-radio-group>
+          </wd-form-item>
+## 多选（集合字段）→ checkbox-group，JSON 数组存储
+#elseif ($codegenHelper.isCollection($column))
+          <wd-form-item title="${column.columnComment}" title-width="180rpx">
+            <wd-checkbox-group v-model="item.${column.javaField}">
+#if ("$!column.dictType" != "")
+              <wd-checkbox
+                v-for="dict in $dictMethod(DICT_TYPE.${column.dictType.toUpperCase()})"
+                :key="dict.value"
+                :name="dict.value"
+              >
+                {{ dict.label }}
+              </wd-checkbox>
+#end
+            </wd-checkbox-group>
           </wd-form-item>
 #elseif ($javaType == "boolean")
           <wd-form-item title="${column.columnComment}" title-width="180rpx" center>
@@ -307,7 +341,9 @@
 #if (($column.createOperation || $column.updateOperation) && !$column.primaryKey && $column.id != $subJoinColumn.id)
 #set ($javaType = $column.javaType.toLowerCase())
 #set ($dictMethod = "getDictOptions")
-#if ($column.javaType == "Integer" || $column.javaType == "Long" || $column.javaType == "Byte" || $column.javaType == "Short")
+#if ($codegenHelper.isLongCollection($column))## Long 集合：使用字符串的字典值，避免超过 JS 安全整数后精度丢失
+#set ($dictMethod = "getStrDictOptions")
+#elseif ($column.javaType == "Integer" || $column.javaType == "Long" || $column.javaType == "Byte" || $column.javaType == "Short")
 #set ($dictMethod = "getIntDictOptions")
 #elseif ($column.javaType == "String")
 #set ($dictMethod = "getStrDictOptions")
@@ -340,6 +376,21 @@
                 {{ dict.label }}
               </wd-radio>
             </wd-radio-group>
+          </wd-form-item>
+## 多选（集合字段）→ checkbox-group，JSON 数组存储
+#elseif ($codegenHelper.isCollection($column))
+          <wd-form-item title="${column.columnComment}" title-width="180rpx">
+            <wd-checkbox-group v-model="${subClassNameVar}.${column.javaField}">
+#if ("$!column.dictType" != "")
+              <wd-checkbox
+                v-for="dict in $dictMethod(DICT_TYPE.${column.dictType.toUpperCase()})"
+                :key="dict.value"
+                :name="dict.value"
+              >
+                {{ dict.label }}
+              </wd-checkbox>
+#end
+            </wd-checkbox-group>
           </wd-form-item>
 #elseif ($javaType == "boolean")
           <wd-form-item title="${column.columnComment}" title-width="180rpx" center>
@@ -463,6 +514,15 @@ import type { FormInstance } from '@wot-ui/ui/components/wd-form/types'
 #end
 #end
 #if (($column.createOperation || $column.updateOperation) && !$column.primaryKey
+      && $codegenHelper.isCollection($column) && $column.dictType && "" != $column.dictType)
+#set ($hasDict = 1)
+#if ($column.javaType == "String" || $column.javaType == "Long")## Long 集合：使用字符串的字典值，避免超过 JS 安全整数后精度丢失
+#set ($hasGetStrDictOptions = 1)
+#else
+#set ($hasGetIntDictOptions = 1)
+#end
+#end
+#if (($column.createOperation || $column.updateOperation) && !$column.primaryKey
       && (${column.javaType.toLowerCase()} == "date" || ${column.javaType.toLowerCase()} == "localdate"))
 #set ($hasDate = 1)
 #end
@@ -486,6 +546,15 @@ import type { FormInstance } from '@wot-ui/ui/components/wd-form/types'
 #set ($hasGetBoolDictOptions = 1)
 #elseif ($column.htmlType == "radio")
 #set ($hasGetDictOptions = 1)
+#end
+#end
+#if (($column.createOperation || $column.updateOperation) && !$column.primaryKey
+      && $codegenHelper.isCollection($column) && $column.dictType && "" != $column.dictType)
+#set ($hasDict = 1)
+#if ($column.javaType == "String" || $column.javaType == "Long")## Long 集合：使用字符串的字典值，避免超过 JS 安全整数后精度丢失
+#set ($hasGetStrDictOptions = 1)
+#else
+#set ($hasGetIntDictOptions = 1)
 #end
 #end
 #if (($column.createOperation || $column.updateOperation) && !$column.primaryKey
@@ -599,6 +668,8 @@ const formData = ref<Partial<${simpleClassName}>>({
   ${column.javaField}: undefined,
 #elseif($table.templateType == 2 && $column.id == $treeParentColumn.id)
   ${column.javaField}: props.${column.javaField} ?? 0,
+#elseif($codegenHelper.isCollection($column))
+  ${column.javaField}: [],
 #elseif(($column.htmlType == "select" || $column.htmlType == "radio") && $column.dictType && "" != $column.dictType)
   ${column.javaField}: undefined,
 #elseif(${javaType} == "long" || ${javaType} == "integer" || ${javaType} == "short" || ${javaType} == "float" || ${javaType} == "double" || ${javaType} == "bigdecimal" || ${javaType} == "byte")
@@ -670,7 +741,9 @@ function add${subClassNameVar.substring(0,1).toUpperCase()}${subClassNameVar.sub
 #foreach ($column in $subColumns)
 #if (($column.createOperation || $column.updateOperation) && !$column.primaryKey && $column.id != $subJoinColumn.id)
 #set ($javaType = $column.javaType.toLowerCase())
-#if((($column.htmlType == "select" || $column.htmlType == "radio") && $column.dictType && "" != $column.dictType) || $javaType == "date" || $javaType == "localdate" || $javaType == "localdatetime")
+#if($codegenHelper.isCollection($column))
+    ${column.javaField}: [],
+#elseif((($column.htmlType == "select" || $column.htmlType == "radio") && $column.dictType && "" != $column.dictType) || $javaType == "date" || $javaType == "localdate" || $javaType == "localdatetime")
     ${column.javaField}: undefined,
 #else
     ${column.javaField}:#if($column.nullable) undefined#elseif($javaType == "long" || $javaType == "integer" || $javaType == "short" || $javaType == "float" || $javaType == "double" || $javaType == "bigdecimal" || $javaType == "byte") 0#elseif($javaType == "boolean") false#else ''#end,
@@ -692,7 +765,9 @@ function add${subClassNameVar.substring(0,1).toUpperCase()}${subClassNameVar.sub
 #foreach ($column in $subColumns)
 #if (($column.createOperation || $column.updateOperation) && !$column.primaryKey && $column.id != $subJoinColumn.id)
 #set ($javaType = $column.javaType.toLowerCase())
-#if((($column.htmlType == "select" || $column.htmlType == "radio") && $column.dictType && "" != $column.dictType) || $javaType == "date" || $javaType == "localdate" || $javaType == "localdatetime")
+#if($codegenHelper.isCollection($column))
+    ${column.javaField}: [],
+#elseif((($column.htmlType == "select" || $column.htmlType == "radio") && $column.dictType && "" != $column.dictType) || $javaType == "date" || $javaType == "localdate" || $javaType == "localdatetime")
     ${column.javaField}: undefined,
 #else
     ${column.javaField}:#if($column.nullable) undefined#elseif($javaType == "long" || $javaType == "integer" || $javaType == "short" || $javaType == "float" || $javaType == "double" || $javaType == "bigdecimal" || $javaType == "byte") 0#elseif($javaType == "boolean") false#else ''#end,
@@ -706,7 +781,11 @@ function add${subClassNameVar.substring(0,1).toUpperCase()}${subClassNameVar.sub
 #end
 /** 校验主子表数据 */
 function isEmptySubValue(value: unknown) {
+#if ($codegenHelper.hasSubCollectionFormColumn($subColumnsList))## 集合字段：空数组视为未填写
+  return value === undefined || value === null || value === '' || (Array.isArray(value) && value.length === 0)
+#else
   return value === undefined || value === null || value === ''
+#end
 }
 
 function validateSubTables() {
@@ -774,17 +853,54 @@ async function getDetail() {
 #end
   ])
   formData.value = data
+#foreach ($column in $codegenHelper.getCollectionFormColumns($columns))
+#if ($codegenHelper.isLongCollection($column))## Long 集合：转换为字符串，与字符串的字典值一致，避免精度丢失
+  formData.value.${column.javaField} = (formData.value.${column.javaField} ?? []).map(String) // 多选字段：历史数据可能为 null
+#else
+  formData.value.${column.javaField} ??= [] // 多选字段：历史数据可能为 null
+#end
+#end
 #foreach ($subTable in $subTables)
 #set ($index = $foreach.count - 1)
 #set ($subClassNameVar = $subClassNameVars.get($index))
+#set ($subColumns = $subColumnsList.get($index))
 #if ($subTable.subJoinMany)
   ${subClassNameVar}s.value = ${subClassNameVar}Data || []
+#if ($codegenHelper.hasCollectionFormColumn($subColumns))
+  ${subClassNameVar}s.value.forEach((item) => {
+#foreach ($column in $codegenHelper.getCollectionFormColumns($subColumns))
+#if ($codegenHelper.isLongCollection($column))## Long 集合：转换为字符串，与字符串的字典值一致，避免精度丢失
+    item.${column.javaField} = (item.${column.javaField} ?? []).map(String) // 多选字段：历史数据可能为 null
+#else
+    item.${column.javaField} ??= [] // 多选字段：历史数据可能为 null
+#end
+#end
+  })
+#end
 #else
   ${subClassNameVar}.value = ${subClassNameVar}Data || null
+#if ($codegenHelper.hasCollectionFormColumn($subColumns))
+  if (${subClassNameVar}.value) {
+#foreach ($column in $codegenHelper.getCollectionFormColumns($subColumns))
+#if ($codegenHelper.isLongCollection($column))## Long 集合：转换为字符串，与字符串的字典值一致，避免精度丢失
+    ${subClassNameVar}.value.${column.javaField} = (${subClassNameVar}.value.${column.javaField} ?? []).map(String) // 多选字段：历史数据可能为 null
+#else
+    ${subClassNameVar}.value.${column.javaField} ??= [] // 多选字段：历史数据可能为 null
+#end
+#end
+  }
+#end
 #end
 #end
 #else
   formData.value = await get${simpleClassName}(props.id)
+#foreach ($column in $codegenHelper.getCollectionFormColumns($columns))
+#if ($codegenHelper.isLongCollection($column))## Long 集合：转换为字符串，与字符串的字典值一致，避免精度丢失
+  formData.value.${column.javaField} = (formData.value.${column.javaField} ?? []).map(String) // 多选字段：历史数据可能为 null
+#else
+  formData.value.${column.javaField} ??= [] // 多选字段：历史数据可能为 null
+#end
+#end
 #end
 }
 

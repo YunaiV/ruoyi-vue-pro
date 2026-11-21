@@ -18,7 +18,9 @@
         #set ($AttrName = $column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
         #set ($comment = $column.columnComment)
         #set ($dictMethod = "getDictOptions")## 计算使用哪个 dict 字典方法
-        #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
+        #if ($codegenHelper.isLongCollection($column))## Long 集合：使用字符串的字典值，避免超过 JS 安全整数后精度丢失
+            #set ($dictMethod = "getStrDictOptions")
+        #elseif ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
             #set ($dictMethod = "getIntDictOptions")
         #elseif ($javaType == "String")
             #set ($dictMethod = "getStrDictOptions")
@@ -48,7 +50,7 @@
                 #if ("" != $dictType)## 有数据字典
           <el-option
             v-for="dict in $dictMethod(DICT_TYPE.$dictType.toUpperCase())"
-            :key="dict.value"
+            :key="#if ($column.javaType == 'Boolean')String(dict.value)#{else}dict.value#end"
             :label="dict.label"
             :value="dict.value"
           />
@@ -63,7 +65,7 @@
                 #if ("" != $dictType)## 有数据字典
           <el-checkbox
             v-for="dict in $dictMethod(DICT_TYPE.$dictType.toUpperCase())"
-            :key="dict.value"
+            :key="#if ($column.javaType == 'Boolean')String(dict.value)#{else}dict.value#end"
             :label="dict.label"
             :value="dict.value"
           />
@@ -78,7 +80,7 @@
                 #if ("" != $dictType)## 有数据字典
           <el-radio
             v-for="dict in $dictMethod(DICT_TYPE.$dictType.toUpperCase())"
-            :key="dict.value"
+            :key="#if ($column.javaType == 'Boolean')String(dict.value)#{else}dict.value#end"
             :value="dict.value"
           >
             {{ dict.label }}
@@ -125,8 +127,12 @@ const formType = ref('') // 表单的类型：create - 新增；update - 修改
 const formData = ref({
 #foreach ($column in $subColumns)
     #if ($column.createOperation || $column.updateOperation)
-      #if ($column.htmlType == "checkbox")
+      #if ($codegenHelper.isLongCollection($column))## Long 集合：元素使用字符串，需要声明类型，避免推断为 never[]
+  $column.javaField: [] as string[],
+      #elseif ($column.htmlType == "checkbox")
   $column.javaField: [],
+      #elseif ($column.htmlType == "fileUpload")## UploadFile 的 modelValue 不允许 undefined，使用空字符串
+  $column.javaField: '',
       #else
   $column.javaField: undefined,
       #end
@@ -137,7 +143,11 @@ const formRules = reactive({
 #foreach ($column in $subColumns)
     #if (($column.createOperation || $column.updateOperation) && !$column.nullable && !${column.primaryKey})## 创建或者更新操作 && 要求非空 && 非主键
         #set($comment=$column.columnComment)
+        #if ($codegenHelper.isCollection($column))## 集合字段：使用 array 类型校验，避免空数组通过必填校验
+  $column.javaField: [{ required: true, type: 'array', message: '${comment}不能为空', trigger: 'change' }],
+        #else
   $column.javaField: [{ required: true, message: '${comment}不能为空', trigger: #if($column.htmlType == 'select')'change'#else'blur'#end }],
+        #end
     #end
 #end
 })
@@ -155,6 +165,13 @@ const open = async (type: string, id?: number, ${subJoinColumn.javaField}?: numb
     formLoading.value = true
     try {
       formData.value = await ${simpleClassName}Api.get${subSimpleClassName}(id)
+#foreach ($column in $codegenHelper.getCollectionFormColumns($subColumns))
+#if ($codegenHelper.isLongCollection($column))## Long 集合：转换为字符串，与字符串的字典值一致，避免精度丢失
+      formData.value.${column.javaField} = (formData.value.${column.javaField} ?? []).map(String) // 多选字段：历史数据可能为 null
+#else
+      formData.value.${column.javaField} = formData.value.${column.javaField} ?? [] // 多选字段：历史数据可能为 null
+#end
+#end
     } finally {
       formLoading.value = false
     }
@@ -193,6 +210,8 @@ const resetForm = () => {
   #if ($column.createOperation || $column.updateOperation)
       #if ($column.htmlType == "checkbox")
     $column.javaField: [],
+      #elseif ($column.htmlType == "fileUpload")## UploadFile 的 modelValue 不允许 undefined，使用空字符串
+    $column.javaField: '',
       #else
     $column.javaField: undefined,
       #end

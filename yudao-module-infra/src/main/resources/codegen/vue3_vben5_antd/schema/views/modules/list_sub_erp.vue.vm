@@ -12,17 +12,23 @@ import type { ${apiName} } from '#/api/${table.moduleName}/${table.businessName}
 
 #if ($table.templateType == 11) ## erp
 import ${subSimpleClassName}Form from './${subSimpleClassName_strikeCase}-form.vue'
-#end
-import { confirm, useVbenModal } from '@vben/common-ui';
+import {#if ($deleteBatchEnable) confirm,#end useVbenModal } from '@vben/common-ui';
 import { message } from 'ant-design-vue';
-import { ref, computed, nextTick,watch } from 'vue';
+#end
+import {#if ($table.templateType == 11 && $deleteBatchEnable) ref,#end nextTick, watch } from 'vue';
+#if ($table.templateType == 11) ## erp
 import { $t } from '#/locales';
 import { ACTION_ICON, TableAction, useVbenVxeGrid } from '#/adapter/vxe-table';
+#else
+import { useVbenVxeGrid } from '#/adapter/vxe-table';
+#end
 
 #if ($table.templateType == 11) ## erp
 import { delete${subSimpleClassName},#if ($deleteBatchEnable) delete${subSimpleClassName}List,#end get${subSimpleClassName}Page } from '#/api/${table.moduleName}/${table.businessName}';
 import { use${subSimpleClassName}GridFormSchema, use${subSimpleClassName}GridColumns } from '../data';
+#if ($deleteBatchEnable)
 import { isEmpty } from '@vben/utils';
+#end
 #else
 #if ($subTable.subJoinMany) ## 一对多
 import { get${subSimpleClassName}ListBy${SubJoinColumnName} } from '#/api/${table.moduleName}/${table.businessName}';

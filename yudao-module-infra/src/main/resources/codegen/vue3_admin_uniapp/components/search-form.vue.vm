@@ -21,7 +21,9 @@
     #set ($listOperationCondition = $column.listOperationCondition)
     #set ($comment = $column.columnComment)
     #set ($dictMethod = "getDictOptions")
-    #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
+    #if ($codegenHelper.isLongCollection($column))## Long 集合：使用字符串的字典值，避免超过 JS 安全整数后精度丢失
+      #set ($dictMethod = "getStrDictOptions")
+    #elseif ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
       #set ($dictMethod = "getIntDictOptions")
     #elseif ($javaType == "String")
       #set ($dictMethod = "getStrDictOptions")
@@ -41,7 +43,7 @@
       </view>
     #elseif ($column.htmlType == "datetime" && $listOperationCondition == "BETWEEN")
       <yd-search-date-range v-model="formData.${javaField}" label="${comment}" />
-    #elseif (($column.htmlType == "select" || $column.htmlType == "radio") && $dictType && "" != $dictType)
+    #elseif (($column.htmlType == "select" || $column.htmlType == "radio" || $codegenHelper.isCollection($column)) && $dictType && "" != $dictType)## 集合（多选）字段按单个元素搜索
       <yd-search-picker
         v-model="formData.${javaField}"
         label="${comment}"
@@ -84,8 +86,10 @@
 #foreach($column in $columns)
   #if ($column.listOperation && $column.dictType && "" != $column.dictType)
     #set ($hasDict = 1)
-    #if ($column.htmlType == "select" || $column.htmlType == "radio")
-      #if ($column.javaType == "Integer" || $column.javaType == "Long" || $column.javaType == "Byte" || $column.javaType == "Short")
+    #if ($column.htmlType == "select" || $column.htmlType == "radio" || $codegenHelper.isCollection($column))
+      #if ($codegenHelper.isLongCollection($column))## Long 集合：使用字符串的字典值，避免超过 JS 安全整数后精度丢失
+        #set ($hasGetStrDictOptions = 1)
+      #elseif ($column.javaType == "Integer" || $column.javaType == "Long" || $column.javaType == "Byte" || $column.javaType == "Short")
         #set ($hasGetIntDictOptions = 1)
       #elseif ($column.javaType == "String")
         #set ($hasGetStrDictOptions = 1)

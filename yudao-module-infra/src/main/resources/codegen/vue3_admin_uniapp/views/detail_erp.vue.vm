@@ -14,6 +14,9 @@
         </wd-cell>
 #elseif ($column.javaType == "LocalDateTime")
         <wd-cell title="${column.columnComment}" :value="formatDateTime(formData?.${column.javaField}) || '-'" />
+## 多选字段（无字典）：数组拼接展示
+#elseif ($codegenHelper.isCollection($column))
+        <wd-cell title="${column.columnComment}" :value="formData?.${column.javaField}?.join('、') || '-'" />
 #else
         <wd-cell title="${column.columnComment}" :value="formData?.${column.javaField} ?? '-'" />
 #end
@@ -67,7 +70,13 @@
 #foreach ($column in $subColumns)
 #if ($column.listOperationResult && !$column.primaryKey)
             <view class="mb-8rpx text-28rpx text-[#666]">
+#if ($codegenHelper.isCollection($column) && $column.dictType && "" != $column.dictType)## 多选字段（字典）：展示字典标签，与主表一致
+              ${column.columnComment}：<dict-tag :type="DICT_TYPE.${column.dictType.toUpperCase()}" :value="item.${column.javaField}" />
+#elseif ($codegenHelper.isCollection($column))## 多选字段（无字典）：数组拼接展示
+              ${column.columnComment}：{{ item.${column.javaField}?.join('、') || '-' }}
+#else
               ${column.columnComment}：{{ item.${column.javaField} ?? '-' }}
+#end
             </view>
 #end
 #end
@@ -115,6 +124,9 @@
 #if ($column.javaType == "LocalDateTime")
 #set ($hasDateTime = 1)
 #end
+#end
+#if ($codegenHelper.hasSubCollectionDictListResult($subColumnsList))## 子表的多选字段（字典）使用 dict-tag 展示
+#set ($hasDict = 1)
 #end
 import type {
   ${simpleClassName},

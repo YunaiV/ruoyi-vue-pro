@@ -87,6 +87,9 @@ public abstract class CodegenEngineAbstractTest extends BaseMockitoUnitTest {
             if (column.getListOperationResult() == null) {
                 column.setListOperationResult(false);
             }
+            if (column.getDictType() == null) {
+                column.setDictType(""); // 与 infra_codegen_column 表 dict_type 字段的默认值一致
+            }
         });
         return list;
     }

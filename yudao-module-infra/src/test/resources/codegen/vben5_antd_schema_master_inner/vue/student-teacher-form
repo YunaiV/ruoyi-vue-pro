@@ -1,9 +1,6 @@
 <script lang="ts" setup>
-  import type { InfraStudentApi } from '#/api/infra/demo';
 
-  import { computed, ref, h, onMounted, watch, nextTick } from 'vue';
-
-  import { $t } from '#/locales';
+  import { watch, nextTick } from 'vue';
 
 import { useVbenForm } from '#/adapter/form';
 import { useStudentTeacherFormSchema } from '../data';

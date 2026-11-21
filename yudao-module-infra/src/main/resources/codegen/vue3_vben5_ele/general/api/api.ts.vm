@@ -1,5 +1,6 @@
+#if ( $table.templateType != 2 )## 树表没有分页接口
 import type { PageParam, PageResult } from '@vben/request';
-import type { Dayjs } from 'dayjs';
+#end
 
 import { requestClient } from '#/api/request';
 #set ($baseURL = "/${table.moduleName}/${simpleClassName_strikeCase}")
@@ -14,10 +15,12 @@ export namespace ${simpleClassName}Api {
     export interface ${subSimpleClassName} {
       #foreach ($column in $subColumns)
         #if ($column.createOperation || $column.updateOperation)
-          #if(${column.javaType.toLowerCase()} == "long" || ${column.javaType.toLowerCase()} == "integer" || ${column.javaType.toLowerCase()} == "short" || ${column.javaType.toLowerCase()} == "double" || ${column.javaType.toLowerCase()} == "bigdecimal")
+          #if ($codegenHelper.isCollection($column))## 集合字段
+              ${column.javaField}#if($column.updateOperation && !$column.primaryKey && !$column.nullable)?#end: ${codegenHelper.getCollectionTsType($column)}; // ${column.columnComment}
+          #elseif(${column.javaType.toLowerCase()} == "long" || ${column.javaType.toLowerCase()} == "integer" || ${column.javaType.toLowerCase()} == "short" || ${column.javaType.toLowerCase()} == "double" || ${column.javaType.toLowerCase()} == "bigdecimal")
               ${column.javaField}#if($column.updateOperation && !$column.primaryKey && !$column.nullable)?#end: number; // ${column.columnComment}
           #elseif(${column.javaType.toLowerCase()} == "date" || ${column.javaType.toLowerCase()} == "localdate" || ${column.javaType.toLowerCase()} == "localdatetime")
-              ${column.javaField}#if($column.updateOperation && !$column.primaryKey && !$column.nullable)?#end: string | Dayjs; // ${column.columnComment}
+              ${column.javaField}#if($column.updateOperation && !$column.primaryKey && !$column.nullable)?#end: Date | string; // ${column.columnComment}
           #else
               ${column.javaField}#if($column.updateOperation && !$column.primaryKey && !$column.nullable)?#end: ${column.javaType.toLowerCase()}; // ${column.columnComment}
           #end
@@ -30,10 +33,12 @@ export namespace ${simpleClassName}Api {
   export interface ${simpleClassName} {
     #foreach ($column in $columns)
       #if ($column.createOperation || $column.updateOperation)
-        #if(${column.javaType.toLowerCase()} == "long" || ${column.javaType.toLowerCase()} == "integer" || ${column.javaType.toLowerCase()} == "short" || ${column.javaType.toLowerCase()} == "double" || ${column.javaType.toLowerCase()} == "bigdecimal")
+        #if ($codegenHelper.isCollection($column))## 集合字段
+            ${column.javaField}#if($column.updateOperation && !$column.primaryKey && !$column.nullable)?#end: ${codegenHelper.getCollectionTsType($column)}; // ${column.columnComment}
+        #elseif(${column.javaType.toLowerCase()} == "long" || ${column.javaType.toLowerCase()} == "integer" || ${column.javaType.toLowerCase()} == "short" || ${column.javaType.toLowerCase()} == "double" || ${column.javaType.toLowerCase()} == "bigdecimal")
             ${column.javaField}#if($column.updateOperation && !$column.primaryKey && !$column.nullable)?#end: number; // ${column.columnComment}
         #elseif(${column.javaType.toLowerCase()} == "date" || ${column.javaType.toLowerCase()} == "localdate" || ${column.javaType.toLowerCase()} == "localdatetime")
-            ${column.javaField}#if($column.updateOperation && !$column.primaryKey && !$column.nullable)?#end: string | Dayjs; // ${column.columnComment}
+            ${column.javaField}#if($column.updateOperation && !$column.primaryKey && !$column.nullable)?#end: Date | string; // ${column.columnComment}
         #else
             ${column.javaField}#if($column.updateOperation && !$column.primaryKey && !$column.nullable)?#end: ${column.javaType.toLowerCase()}; // ${column.columnComment}
         #end
@@ -48,9 +53,9 @@ export namespace ${simpleClassName}Api {
         #set ($index = $foreach.count - 1)
         #set ($subSimpleClassName = $subSimpleClassNames.get($index))
         #if ( $subTable.subJoinMany )
-            ${subSimpleClassName.toLowerCase()}s?: ${subSimpleClassName}[]
+            ${subClassNameVars.get($index)}s?: Partial<${subSimpleClassName}>[] // 提交时：新增的${subTable.classComment}还没有编号
         #else
-            ${subSimpleClassName.toLowerCase()}?: ${subSimpleClassName}
+            ${subClassNameVars.get($index)}?: Partial<${subSimpleClassName}> // 提交时：新增的${subTable.classComment}还没有编号
         #end
       #end
     #end

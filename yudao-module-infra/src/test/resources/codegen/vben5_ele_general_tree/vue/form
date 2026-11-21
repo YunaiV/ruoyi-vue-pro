@@ -3,10 +3,7 @@ import type { CategoryApi } from '#/api/infra/demo';
 import type { FormRules } from 'element-plus';
 
 import { useVbenModal } from '@vben/common-ui';
-import { getDictOptions } from '@vben/hooks';
-import { Tinymce as RichTextarea } from '#/components/tinymce';
-import { ImageUpload, FileUpload } from "#/components/upload";
-import { ElMessage, ElTabs, ElTabPane, ElForm, ElFormItem, ElInput, ElSelect, ElOption, ElRadioGroup, ElRadio, ElCheckboxGroup, ElCheckbox, ElDatePicker, ElTreeSelect } from 'element-plus';
+import { ElMessage, ElForm, ElFormItem, ElInput, ElTreeSelect } from 'element-plus';
 import { getCategoryList } from '#/api/infra/demo';
 import { handleTree } from '@vben/utils'
 
@@ -47,7 +44,7 @@ const resetForm = () => {
 /** 获得分类树 */
 const getCategoryTree = async () => {
   categoryTree.value = []
-  const data = await getCategoryList({});
+  const data: Partial<CategoryApi.Category>[] = await getCategoryList({}); // 顶级节点只有编号、名称，所以使用 Partial
   data.unshift({
     id: 0,
     name: '顶级分类',
@@ -77,7 +74,7 @@ const [Modal, modalApi] = useVbenModal({
       return;
     }
     // 加载数据
-    let data = modalApi.getData<CategoryApi.Category>();
+    let data = modalApi.getData() as CategoryApi.Category;
     if (!data) {
       return;
     }
@@ -114,9 +111,9 @@ const [Modal, modalApi] = useVbenModal({
                       :data="categoryTree"
                       :props="{
             label: 'name',
-            value: 'id',
             children: 'children',
           }"
+                      node-key="id"
                       check-strictly
                       default-expand-all
                       placeholder="请选择父编号"

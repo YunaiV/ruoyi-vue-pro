@@ -154,6 +154,9 @@
           this.formLoading = true;
           try {
             const res = await ${simpleClassName}Api.get${subSimpleClassName}(id);
+            #foreach ($column in $codegenHelper.getCollectionFormColumns($subColumns))
+            res.data.${column.javaField} = res.data.${column.javaField} || []; // 多选字段：历史数据可能为 null
+            #end
             this.formData = res.data;
             this.dialogTitle = "修改${subTable.classComment}";
           } finally {

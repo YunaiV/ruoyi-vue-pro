@@ -1,22 +1,20 @@
 <script lang="ts" setup>
 import type { CategoryApi } from '#/api/infra/demo';
 
-import { ref, h, reactive, onMounted, nextTick } from 'vue';
+import { ref, h, reactive, onMounted } from 'vue';
 
 import { Page, useVbenModal } from '@vben/common-ui';
 import { getDictOptions } from '@vben/hooks';
 import { useTableToolbar, VbenVxeTableToolbar } from '@vben/plugins/vxe-table';
-import { cloneDeep, downloadFileFromBlobPart, formatDateTime, isEmpty } from '@vben/utils';
-import { Button, Card, message, Tabs, Pagination, Form, RangePicker, DatePicker, Select, Input } from 'ant-design-vue';
+import { cloneDeep, downloadFileFromBlobPart, isEmpty } from '@vben/utils';
+import { Button, Card, message, Form, Select, Input } from 'ant-design-vue';
 import CategoryForm from './modules/form.vue';
-import { Download, Plus, RefreshCw, Search, Trash2 } from '@vben/icons';
+import { Download, Plus } from '@vben/icons';
 import { DictTag } from '#/components/dict-tag';
 import { VxeColumn, VxeTable } from '#/adapter/vxe-table';
-import { getRangePickerDefaultProps } from '#/utils/rangePickerProps';
 
 
 import { $t } from '#/locales';
-import { handleTree } from '@vben/utils'
 import { getCategoryList, deleteCategory, exportCategory } from '#/api/infra/demo';
 
 
@@ -109,6 +107,12 @@ function handleExpand() {
 
 /** 初始化 */
 const { hiddenSearchBar, tableToolbarRef, tableRef } = useTableToolbar();
+function setTableToolbarRef(el: any) {
+  tableToolbarRef.value = el;
+}
+function setTableRef(el: any) {
+  tableRef.value = el;
+}
 onMounted(() => {
   getList();
 });
@@ -147,7 +151,7 @@ onMounted(() => {
     <Card title="分类">
       <template #extra>
         <VbenVxeTableToolbar
-            ref="tableToolbarRef"
+            :ref="setTableToolbarRef"
             v-model:hidden-search="hiddenSearchBar"
         >
           <Button @click="handleExpand" class="mr-2">
@@ -175,7 +179,7 @@ onMounted(() => {
         </VbenVxeTableToolbar>
       </template>
       <VxeTable
-          ref="tableRef"
+          :ref="setTableRef"
           :data="list"
           :tree-config="{
           parentField: 'parentId',

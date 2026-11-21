@@ -9,11 +9,21 @@ import type { ${simpleClassName}Api } from '#/api/${table.moduleName}/${table.bu
 import { computed, ref } from 'vue';
 
 import { useVbenModal } from '@vben/common-ui';
+#if ($codegenHelper.hasFormDict($subColumns))
 import { DICT_TYPE } from '@vben/constants';
 import { getDictOptions } from '@vben/hooks';
+#end
+#if ($codegenHelper.hasFormHtmlType($subColumns, "editor"))
 import { Tinymce as RichTextarea } from '#/components/tinymce';
+#end
+#if ($codegenHelper.hasFormHtmlType($subColumns, "imageUpload") && $codegenHelper.hasFormHtmlType($subColumns, "fileUpload"))
 import { ImageUpload, FileUpload } from "#/components/upload";
-import { message, Tabs, Form, Input, Textarea, Select, RadioGroup, Radio, CheckboxGroup, Checkbox, DatePicker, TreeSelect } from 'ant-design-vue';
+#elseif ($codegenHelper.hasFormHtmlType($subColumns, "imageUpload"))
+import { ImageUpload } from "#/components/upload";
+#elseif ($codegenHelper.hasFormHtmlType($subColumns, "fileUpload"))
+import { FileUpload } from "#/components/upload";
+#end
+import { message, Form#if ($codegenHelper.hasFormHtmlType($subColumns, "input")), Input#end#if ($codegenHelper.hasFormHtmlType($subColumns, "textarea")), Textarea#end#if ($codegenHelper.hasFormHtmlType($subColumns, "select")), Select#end#if ($codegenHelper.hasFormHtmlType($subColumns, "radio")), RadioGroup, Radio#end#if ($codegenHelper.hasFormHtmlType($subColumns, "checkbox")), CheckboxGroup, Checkbox#end#if ($codegenHelper.hasFormHtmlType($subColumns, "datetime")), DatePicker#end } from 'ant-design-vue';
 
 import { $t } from '#/locales';
 
@@ -42,7 +52,11 @@ const rules: Record<string, Rule[]> = {
   #foreach ($column in $subColumns)
     #if (($column.createOperation || $column.updateOperation) && !$column.nullable && !${column.primaryKey})## 创建或者更新操作 && 要求非空 && 非主键
       #set($comment=$column.columnComment)
+        #if ($codegenHelper.isCollection($column))## 集合字段：使用 array 类型校验，避免空数组通过必填校验
+        $column.javaField: [{ required: true, type: 'array', message: '${comment}不能为空', trigger: 'change' }],
+        #else
         $column.javaField: [{ required: true, message: '${comment}不能为空', trigger: #if($column.htmlType == 'select')'change'#else'blur'#end }],
+        #end
     #end
   #end
 };
@@ -73,7 +87,7 @@ const [Modal, modalApi] = useVbenModal({
     }
 
     // 加载数据
-    let data = modalApi.getData<${simpleClassName}Api.${subSimpleClassName}>();
+    let data = modalApi.getData() as ${simpleClassName}Api.${subSimpleClassName};
     if (!data) {
       return;
     }
@@ -87,6 +101,13 @@ const [Modal, modalApi] = useVbenModal({
     }
     // 设置到 values
     formData.value = data;
+#foreach ($column in $codegenHelper.getCollectionFormColumns($subColumns))
+#if ($codegenHelper.isLongCollection($column))## Long 集合：转换为字符串，与字符串的字典值一致，避免精度丢失
+    formData.value.${column.javaField} = (formData.value.${column.javaField} ?? []).map(String); // 多选字段：历史数据可能为 null
+#else
+    formData.value.${column.javaField} ??= []; // 多选字段：历史数据可能为 null
+#end
+#end
   },
 });
 
@@ -122,7 +143,9 @@ function resetForm(){
           #set ($javaField = $column.javaField)
           #set ($javaType = $column.javaType)
           #set ($comment = $column.columnComment)
-          #if ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
+          #if ($codegenHelper.isLongCollection($column))## Long 集合：使用字符串的字典值，避免超过 JS 安全整数后精度丢失
+            #set ($dictMethod = "string")
+          #elseif ($javaType == "Integer" || $javaType == "Long" || $javaType == "Byte" || $javaType == "Short")
             #set ($dictMethod = "number")
           #elseif ($javaType == "String")
             #set ($dictMethod = "string")
@@ -151,7 +174,7 @@ function resetForm(){
                 #if ("" != $dictType)## 有数据字典
                   <Select.Option
                           v-for="dict in getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod')"
-                          :key="dict.value"
+                          :key="#if ($column.javaType == 'Boolean')String(dict.value)#{else}dict.value#end"
                           :value="dict.value"
                   >
                     {{ dict.label }}
@@ -167,7 +190,7 @@ function resetForm(){
                 #if ("" != $dictType)## 有数据字典
                   <Checkbox
                           v-for="dict in getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod')"
-                          :key="dict.value"
+                          :key="#if ($column.javaType == 'Boolean')String(dict.value)#{else}dict.value#end"
                           :value="dict.value"
                   >
                     {{ dict.label }}
@@ -183,7 +206,7 @@ function resetForm(){
                 #if ("" != $dictType)## 有数据字典
                   <Radio
                           v-for="dict in getDictOptions(DICT_TYPE.$dictType.toUpperCase(), '$dictMethod')"
-                          :key="dict.value"
+                          :key="#if ($column.javaType == 'Boolean')String(dict.value)#{else}dict.value#end"
                           :value="dict.value"
                   >
                     {{ dict.label }}

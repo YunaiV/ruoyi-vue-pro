@@ -4,18 +4,36 @@
 #set ($subSimpleClassName = $subSimpleClassNames.get($subIndex))
 #set ($subClassNameVar = $subClassNameVars.get($subIndex))
 #set ($SubJoinColumnName = $subJoinColumn.javaField.substring(0,1).toUpperCase() + ${subJoinColumn.javaField.substring(1)})##首字母大写
+#if ($subTable.subJoinMany)## 一对多：表格内编辑，不渲染 join 字段；一对一：表单渲染全部字段
+#set ($subFormColumns = $codegenHelper.excludeColumn($subColumns, $subJoinColumn))
+#else
+#set ($subFormColumns = $subColumns)
+#end
 #set ($apiName = "${table.moduleName.substring(0,1).toUpperCase()}${table.moduleName.substring(1)}${simpleClassName}Api")
+#set ($hasRequiredColumn = $codegenHelper.hasFormRequiredColumn($codegenHelper.excludeColumn($subColumns, $subJoinColumn)))## 是否有必填字段（排除 join 字段）
 <script lang="ts" setup>
+#if ($subTable.subJoinMany) ## 一对多
+  import type { VxeTableGridOptions } from '#/adapter/vxe-table';
   import type { ${apiName} } from '#/api/${table.moduleName}/${table.businessName}';
 
-  import { computed, ref, h, onMounted, watch, nextTick } from 'vue';
+  import { h, watch, nextTick } from 'vue';
 
   import { $t } from '#/locales';
+#else
+
+  import { watch, nextTick } from 'vue';
+#end
 
 #if ($subTable.subJoinMany) ## 一对多
 import { Plus } from "@vben/icons";
-import { Button, Checkbox, CheckboxGroup, DatePicker, Input, message, RadioGroup, Select, Tabs, Textarea } from 'ant-design-vue';
+import { Button#if ($codegenHelper.hasFormHtmlType($subFormColumns, "checkbox")), CheckboxGroup#end#if ($codegenHelper.hasFormHtmlType($subFormColumns, "datetime")), DatePicker#end#if ($codegenHelper.hasFormHtmlType($subFormColumns, "input")), Input#end#if ($hasRequiredColumn), message#end#if ($codegenHelper.hasFormHtmlType($subFormColumns, "radio")), RadioGroup#end#if ($codegenHelper.hasFormHtmlType($subFormColumns, "select")), Select#end#if ($codegenHelper.hasFormHtmlType($subFormColumns, "textarea") || $codegenHelper.hasFormHtmlType($subFormColumns, "editor")), Textarea#end } from 'ant-design-vue';
+#if ($codegenHelper.hasFormHtmlType($subFormColumns, "imageUpload") && $codegenHelper.hasFormHtmlType($subFormColumns, "fileUpload"))
 import { ImageUpload, FileUpload } from "#/components/upload";
+#elseif ($codegenHelper.hasFormHtmlType($subFormColumns, "imageUpload"))
+import { ImageUpload } from "#/components/upload";
+#elseif ($codegenHelper.hasFormHtmlType($subFormColumns, "fileUpload"))
+import { FileUpload } from "#/components/upload";
+#end
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { use${subSimpleClassName}GridEditColumns } from '../data';
 import { get${subSimpleClassName}ListBy${SubJoinColumnName} } from '#/api/${table.moduleName}/${table.businessName}';
@@ -46,7 +64,7 @@ gridOptions: {
   toolbarConfig: {
     enabled: false,
   },
-},
+} as VxeTableGridOptions<${apiName}.${subSimpleClassName}>,
 });
 
 /** 添加${subTable.classComment} */
@@ -60,7 +78,7 @@ const handleDelete =  async (row: ${apiName}.${subSimpleClassName}) => {
 }
 
 /** 获取当前子表数据，新增行不提交表格生成的临时编号 */
-function getData(): ${apiName}.${subSimpleClassName}[] {
+function getData(): Partial<${apiName}.${subSimpleClassName}>[] {
   const { fullData } = gridApi.grid.getTableData();
   const inserted = new Set(gridApi.grid.getInsertRecords());
   return fullData.map((row) =>
@@ -68,12 +86,6 @@ function getData(): ${apiName}.${subSimpleClassName}[] {
   );
 }
 
-#set ($hasRequiredColumn = false)
-#foreach ($column in $subColumns)
-#if (($column.createOperation || $column.updateOperation) && !$column.nullable && !$column.primaryKey && $column.id != $subJoinColumn.id)
-#set ($hasRequiredColumn = true)
-#end
-#end
 /** 校验子表必填字段 */
 function validate(): boolean {
 #if ($hasRequiredColumn)
@@ -107,7 +119,22 @@ watch(
         await gridApi.grid.loadData([]);
         return;
       }
+#if ($codegenHelper.hasCollectionFormColumn($subColumns))
+      const list = await get${subSimpleClassName}ListBy${SubJoinColumnName}(props.${subJoinColumn.javaField}!);
+      // 多选字段：历史数据可能为 null，归一化为空数组
+      list.forEach((row) => {
+#foreach ($column in $codegenHelper.getCollectionFormColumns($subColumns))
+#if ($codegenHelper.isLongCollection($column))## Long 集合：转换为字符串，与字符串的字典值一致，避免精度丢失
+        row.${column.javaField} = (row.${column.javaField} ?? []).map(String);
+#else
+        row.${column.javaField} ??= [];
+#end
+#end
+      });
+      await gridApi.grid.loadData(list);
+#else
       await gridApi.grid.loadData(await get${subSimpleClassName}ListBy${SubJoinColumnName}(props.${subJoinColumn.javaField}!));
+#end
     },
     { immediate: true },
 );
@@ -143,7 +170,21 @@ watch(
       if (!val) {
         return;
       }
+#if ($codegenHelper.hasCollectionFormColumn($subColumns))
+      const data = await get${subSimpleClassName}By${SubJoinColumnName}(props.${subJoinColumn.javaField}!);
+      if (data) {
+#foreach ($column in $codegenHelper.getCollectionFormColumns($subColumns))
+#if ($codegenHelper.isLongCollection($column))## Long 集合：转换为字符串，与字符串的字典值一致，避免精度丢失
+        data.${column.javaField} = (data.${column.javaField} ?? []).map(String); // 多选字段：历史数据可能为 null
+#else
+        data.${column.javaField} ??= []; // 多选字段：历史数据可能为 null
+#end
+#end
+      }
+      await formApi.setValues(data);
+#else
       await formApi.setValues(await get${subSimpleClassName}By${SubJoinColumnName}(props.${subJoinColumn.javaField}!));
+#end
     },
     { immediate: true },
 );
@@ -206,7 +247,7 @@ watch(
           size="small"
           type="link"
           danger
-          @click="handleDelete(row)"
+          @click="handleDelete(row as ${apiName}.${subSimpleClassName})"
           v-access:code="['${subTable.moduleName}:${simpleClassName_strikeCase}:delete']"
       >
         {{ $t('ui.actionTitle.delete') }}
