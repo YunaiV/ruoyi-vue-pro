@@ -322,9 +322,10 @@ public class AiFfmpegUtils {
 
         // 5. 水印：右下角
         if (StrUtil.isNotBlank(watermarkFile)) {
-            String font = StrUtil.isNotBlank(fontFile) ? ":fontfile='" + fontFile + "'" : "";
+            String font = StrUtil.isNotBlank(fontFile) ? ":fontfile='" + escapeFilterPath(fontFile) + "'" : "";
             filters.add(StrUtil.format("[{}]drawtext=textfile='{}'{}:fontsize=h/28:fontcolor=white@0.85:"
-                    + "shadowcolor=black@0.6:shadowx=2:shadowy=2:x=w-tw-32:y=h-th-32[vw]", video, watermarkFile, font));
+                    + "shadowcolor=black@0.6:shadowx=2:shadowy=2:x=w-tw-32:y=h-th-32[vw]", video,
+                    escapeFilterPath(watermarkFile), font));
             video = "vw";
         }
         filters.add(StrUtil.format("[{}]null[vout]", video));
@@ -427,6 +428,15 @@ public class AiFfmpegUtils {
     @VisibleForTesting
     static String formatSeconds(double seconds) {
         return new DecimalFormat("0.###", DecimalFormatSymbols.getInstance(Locale.ROOT)).format(seconds);
+    }
+
+    /**
+     * 转义滤镜参数中的文件路径：FFmpeg 去掉单引号后按 : 切分滤镜参数，Windows 路径的盘符（例如 C:\）会把参数截断，
+     * 所以 : 转义为 \:；\ 换成 /，避免被当作转义符
+     */
+    @VisibleForTesting
+    static String escapeFilterPath(String path) {
+        return path.replace('\\', '/').replace(":", "\\:");
     }
 
     /**
