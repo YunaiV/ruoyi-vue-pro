@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.bpm.service.comment;
 
 import cn.iocoder.yudao.module.bpm.controller.admin.comment.vo.BpmCommentCreateReqVO;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmCommentTypeEnum;
-import cn.iocoder.yudao.module.bpm.service.task.BpmTaskService;
+import cn.iocoder.yudao.module.bpm.service.task.BpmTaskQueryService;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.flowable.engine.TaskService;
@@ -26,7 +26,7 @@ public class BpmCommentServiceImpl implements BpmCommentService {
     private TaskService taskService;
     @Resource
     @Lazy // 延迟加载，避免循环依赖
-    private BpmTaskService bpmTaskService;
+    private BpmTaskQueryService taskQueryService;
 
     @Override
     public List<Comment> getCommentListByProcessInstanceId(String processInstanceId) {
@@ -36,7 +36,7 @@ public class BpmCommentServiceImpl implements BpmCommentService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void createComment(@Valid BpmCommentCreateReqVO reqVO) {
-        Task task = bpmTaskService.validateTaskExists(reqVO.getTaskId());
+        Task task = taskQueryService.validateTaskExists(reqVO.getTaskId());
         createComment(task.getId(), task.getProcessInstanceId(), BpmCommentTypeEnum.COMMENT, reqVO.getMessage());
     }
 

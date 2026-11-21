@@ -9,7 +9,7 @@ import cn.iocoder.yudao.module.bpm.controller.admin.base.user.UserSimpleBaseVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.comment.vo.BpmCommentCreateReqVO;
 import cn.iocoder.yudao.module.bpm.controller.admin.comment.vo.BpmCommentRespVO;
 import cn.iocoder.yudao.module.bpm.service.comment.BpmCommentService;
-import cn.iocoder.yudao.module.bpm.service.task.BpmTaskService;
+import cn.iocoder.yudao.module.bpm.service.task.BpmTaskQueryService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,7 +40,7 @@ public class BpmCommentController {
     @Resource
     private BpmCommentService commentService;
     @Resource
-    private BpmTaskService taskService;
+    private BpmTaskQueryService taskQueryService;
 
     @Resource
     private AdminUserApi adminUserApi;
@@ -58,7 +58,7 @@ public class BpmCommentController {
         }
 
         // 拼接 VO
-        Map<String, HistoricTaskInstance> taskMap = taskService.getHistoricTaskMap(
+        Map<String, HistoricTaskInstance> taskMap = taskQueryService.getHistoricTaskMap(
                 convertSet(commentList, Comment::getTaskId));
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
                 convertSet(commentList, comment -> NumberUtils.parseLong(comment.getUserId())));

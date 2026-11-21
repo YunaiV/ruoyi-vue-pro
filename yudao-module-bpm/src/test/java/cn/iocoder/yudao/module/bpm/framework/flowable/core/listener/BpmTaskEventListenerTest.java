@@ -6,7 +6,8 @@ import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskTimeoutHandlerTyp
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmModelService;
-import cn.iocoder.yudao.module.bpm.service.task.BpmTaskService;
+import cn.iocoder.yudao.module.bpm.service.task.BpmTaskQueryService;
+import cn.iocoder.yudao.module.bpm.service.task.BpmTaskUpdateService;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.Process;
@@ -31,7 +32,9 @@ public class BpmTaskEventListenerTest extends BaseMockitoUnitTest {
     @Mock
     private BpmModelService modelService;
     @Mock
-    private BpmTaskService taskService;
+    private BpmTaskQueryService taskQueryService;
+    @Mock
+    private BpmTaskUpdateService taskUpdateService;
 
     @Test
     public void testTimerFired_elementIdFromJobHandlerConfiguration() {
@@ -60,7 +63,7 @@ public class BpmTaskEventListenerTest extends BaseMockitoUnitTest {
         taskEventListener.timerFired(event);
 
         // 断言：使用解析出的 activityId 查找边界事件，并触发用户任务超时处理
-        verify(taskService).processTaskTimeout("process-instance-1", "task",
+        verify(taskUpdateService).processTaskTimeout("process-instance-1", "task",
                 BpmUserTaskTimeoutHandlerTypeEnum.REMINDER.getType());
     }
 

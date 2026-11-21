@@ -9,8 +9,9 @@ import cn.iocoder.yudao.module.bpm.enums.task.BpmReasonEnum;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmTaskStatusEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.listener.BpmTaskEventListener;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
-import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceServiceImpl;
-import cn.iocoder.yudao.module.bpm.service.task.BpmTaskServiceImpl;
+import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceQueryServiceImpl;
+import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceUpdateServiceImpl;
+import cn.iocoder.yudao.module.bpm.service.task.BpmTaskUpdateServiceImpl;
 import cn.iocoder.yudao.module.bpm.service.task.listener.BpmCallActivityListener;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
@@ -39,9 +40,9 @@ import static org.mockito.Mockito.*;
 /**
  * 任务创建、分配事件后自动处理，以及子流程发起的 Flowable 集成测试
  *
- * <p>补充 {@link BpmTaskServiceFlowableTest} 未覆盖的 {@link BpmTaskServiceImpl#processTaskCreated}、
- * {@link BpmTaskServiceImpl#processTaskAssigned} 分支，以及 {@link BpmCallActivityListener}、
- * {@link BpmProcessInstanceServiceImpl#processProcessInstanceCreated} 在真实事务提交后的回调。
+ * <p>补充 {@link BpmTaskServiceFlowableTest} 未覆盖的 {@link BpmTaskUpdateServiceImpl#processTaskCreated}、
+ * {@link BpmTaskUpdateServiceImpl#processTaskAssigned} 分支，以及 {@link BpmCallActivityListener}、
+ * {@link BpmProcessInstanceUpdateServiceImpl#processProcessInstanceCreated} 在真实事务提交后的回调。
  * 事件均由 {@link BpmTaskEventListener} 等真实监听器触发。</p>
  *
  * @author HUIHUI
@@ -58,7 +59,9 @@ public class BpmProcessLifecycleFlowableTest extends BaseFlowableUnitTest {
     private TaskService flowableTaskService;
 
     @Resource
-    private BpmProcessInstanceServiceImpl processInstanceService;
+    private BpmProcessInstanceQueryServiceImpl processInstanceQueryService;
+    @Resource
+    private BpmProcessInstanceUpdateServiceImpl processInstanceUpdateService;
 
     private final List<String> deploymentIds = new ArrayList<>();
 
@@ -193,13 +196,13 @@ public class BpmProcessLifecycleFlowableTest extends BaseFlowableUnitTest {
         // 调用：用户 2 发起主流程
         String processInstanceId = startProcessInstance("childParent", 2L);
         // 断言：主流程标题在发起时生成
-        assertEquals("主流程-用户2", processInstanceService.getProcessInstance(processInstanceId).getName());
+        assertEquals("主流程-用户2", processInstanceQueryService.getProcessInstance(processInstanceId).getName());
         // 断言：子流程发起人同主流程（BpmCallActivityListener），标题在 PROCESS_CREATED 事务提交后生成
         ProcessInstance child = runtimeService.createProcessInstanceQuery()
                 .superProcessInstanceId(processInstanceId).singleResult();
         assertNotNull(child);
         assertEquals("2", child.getStartUserId());
-        assertEquals("子流程-用户2", processInstanceService.getProcessInstance(child.getId()).getName());
+        assertEquals("子流程-用户2", processInstanceQueryService.getProcessInstance(child.getId()).getName());
         Task childTask = getRunningTask(child.getId());
         assertEquals("task", childTask.getTaskDefinitionKey());
         assertEquals("子流程审批", childTask.getName());
@@ -212,7 +215,7 @@ public class BpmProcessLifecycleFlowableTest extends BaseFlowableUnitTest {
     }
 
     private String startProcessInstance(String processDefinitionKey, Long userId) {
-        return processInstanceService.createProcessInstance(userId, new BpmProcessInstanceCreateReqDTO()
+        return processInstanceUpdateService.createProcessInstance(userId, new BpmProcessInstanceCreateReqDTO()
                 .setProcessDefinitionKey(processDefinitionKey).setBusinessKey("business-1"));
     }
 

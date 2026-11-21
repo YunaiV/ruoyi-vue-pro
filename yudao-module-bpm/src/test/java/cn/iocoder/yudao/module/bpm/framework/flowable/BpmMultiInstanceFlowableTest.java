@@ -18,8 +18,10 @@ import cn.iocoder.yudao.module.bpm.framework.flowable.core.behavior.BpmSequentia
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.SimpleModelUtils;
-import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceServiceImpl;
-import cn.iocoder.yudao.module.bpm.service.task.BpmTaskServiceImpl;
+import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceQueryServiceImpl;
+import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceUpdateServiceImpl;
+import cn.iocoder.yudao.module.bpm.service.task.BpmTaskQueryServiceImpl;
+import cn.iocoder.yudao.module.bpm.service.task.BpmTaskUpdateServiceImpl;
 import jakarta.annotation.Resource;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.HistoryService;
@@ -52,7 +54,7 @@ import static org.mockito.Mockito.when;
  * 多实例（会签、或签、依次审批、子流程多实例）的 Flowable 集成测试
  *
  * <p>覆盖 {@link BpmParallelMultiInstanceBehavior}、{@link BpmSequentialMultiInstanceBehavior} 在真实引擎中的实例创建、
- * 审批人分配，以及 {@link BpmTaskServiceImpl} 审批后完成条件的流转。</p>
+ * 审批人分配，以及 {@link BpmTaskUpdateServiceImpl} 审批后完成条件的流转。</p>
  *
  * @author HUIHUI
  */
@@ -66,9 +68,13 @@ public class BpmMultiInstanceFlowableTest extends BaseFlowableUnitTest {
     private HistoryService historyService;
 
     @Resource
-    private BpmTaskServiceImpl taskService;
+    private BpmTaskQueryServiceImpl taskQueryService;
     @Resource
-    private BpmProcessInstanceServiceImpl processInstanceService;
+    private BpmTaskUpdateServiceImpl taskUpdateService;
+    @Resource
+    private BpmProcessInstanceQueryServiceImpl processInstanceQueryService;
+    @Resource
+    private BpmProcessInstanceUpdateServiceImpl processInstanceUpdateService;
 
     private final List<String> deploymentIds = new ArrayList<>();
 
@@ -112,7 +118,7 @@ public class BpmMultiInstanceFlowableTest extends BaseFlowableUnitTest {
         List<Task> tasks = getRunningTasks(processInstanceId);
 
         // 调用：用户 1 审批不通过
-        taskService.rejectTask(1L, new BpmTaskRejectReqVO().setId(tasks.get(0).getId()).setReason("不同意"));
+        taskUpdateService.rejectTask(1L, new BpmTaskRejectReqVO().setId(tasks.get(0).getId()).setReason("不同意"));
         // 断言：或签一人不通过即可，用户 2 的任务被取消，流程不通过
         assertTaskStatus(tasks.get(0).getId(), BpmTaskStatusEnum.REJECT.getStatus(), "不同意");
         assertTaskStatus(tasks.get(1).getId(), BpmTaskStatusEnum.CANCEL.getStatus(),
@@ -163,7 +169,7 @@ public class BpmMultiInstanceFlowableTest extends BaseFlowableUnitTest {
         approveTask(tasks.get(0));
 
         // 调用：用户 2 审批不通过
-        taskService.rejectTask(2L, new BpmTaskRejectReqVO().setId(tasks.get(1).getId()).setReason("不同意"));
+        taskUpdateService.rejectTask(2L, new BpmTaskRejectReqVO().setId(tasks.get(1).getId()).setReason("不同意"));
         // 断言：会签任一人不通过，流程不通过
         assertTaskStatus(tasks.get(0).getId(), BpmTaskStatusEnum.APPROVE.getStatus(), "同意");
         assertTaskStatus(tasks.get(1).getId(), BpmTaskStatusEnum.REJECT.getStatus(), "不同意");
@@ -182,7 +188,7 @@ public class BpmMultiInstanceFlowableTest extends BaseFlowableUnitTest {
         assertEquals(List.of("1", "2"), convertList(tasks, Task::getAssignee));
 
         // 调用：用户 2 审批不通过，按配置退回到发起审批节点
-        taskService.rejectTask(2L, new BpmTaskRejectReqVO().setId(tasks.get(1).getId()).setReason("退回修改"));
+        taskUpdateService.rejectTask(2L, new BpmTaskRejectReqVO().setId(tasks.get(1).getId()).setReason("退回修改"));
         // 断言：用户 2 的任务标记为退回，用户 1 的会签任务被取消，流程回到发起审批节点
         assertTaskStatus(tasks.get(1).getId(), BpmTaskStatusEnum.RETURN.getStatus(), "退回修改");
         assertTaskStatus(tasks.get(0).getId(), BpmTaskStatusEnum.CANCEL.getStatus(),
@@ -223,7 +229,7 @@ public class BpmMultiInstanceFlowableTest extends BaseFlowableUnitTest {
         ratioUserIds.add(3L);
 
         // 调用：用户 2 审批不通过，退回到发起审批节点后，再次审批通过
-        taskService.rejectTask(2L, new BpmTaskRejectReqVO().setId(tasks.get(1).getId()).setReason("退回修改"));
+        taskUpdateService.rejectTask(2L, new BpmTaskRejectReqVO().setId(tasks.get(1).getId()).setReason("退回修改"));
         approveTask(getRunningTask(processInstanceId));
         // 断言：重新计算审批人，不使用流程实例上的旧集合；流程实例上的变量保持不变
         assertEquals(List.of("1", "3"), convertList(getRunningTasks(processInstanceId), Task::getAssignee));
@@ -346,7 +352,7 @@ public class BpmMultiInstanceFlowableTest extends BaseFlowableUnitTest {
     // ========== 私有方法 ==========
 
     private String startProcessInstance(String processDefinitionKey, Map<String, Object> variables) {
-        return processInstanceService.createProcessInstance(1L, new BpmProcessInstanceCreateReqDTO()
+        return processInstanceUpdateService.createProcessInstance(1L, new BpmProcessInstanceCreateReqDTO()
                 .setProcessDefinitionKey(processDefinitionKey).setVariables(variables));
     }
 
@@ -356,7 +362,7 @@ public class BpmMultiInstanceFlowableTest extends BaseFlowableUnitTest {
 
     private List<Task> getRunningTasks(String processInstanceId) {
         // 按审批人排序，便于断言
-        return taskService.getRunningTaskListByProcessInstanceId(processInstanceId, null, null).stream()
+        return taskQueryService.getRunningTaskListByProcessInstanceId(processInstanceId, null, null).stream()
                 .sorted(Comparator.comparing(Task::getAssignee)).toList();
     }
 
@@ -367,18 +373,18 @@ public class BpmMultiInstanceFlowableTest extends BaseFlowableUnitTest {
     }
 
     private void approveTask(Task task) {
-        taskService.approveTask(Long.valueOf(task.getAssignee()), new BpmTaskApproveReqVO().setId(task.getId())
+        taskUpdateService.approveTask(Long.valueOf(task.getAssignee()), new BpmTaskApproveReqVO().setId(task.getId())
                 .setReason("同意"));
     }
 
     private void assertTaskStatus(String taskId, Integer status, String reason) {
-        HistoricTaskInstance task = taskService.getHistoricTask(taskId);
+        HistoricTaskInstance task = taskQueryService.getHistoricTask(taskId);
         assertEquals(status, FlowableUtils.getTaskStatus(task));
         assertEquals(reason, FlowableUtils.getTaskReason(task));
     }
 
     private void assertProcessInstanceStatus(String processInstanceId, Integer status) {
-        HistoricProcessInstance processInstance = processInstanceService.getHistoricProcessInstance(processInstanceId);
+        HistoricProcessInstance processInstance = processInstanceQueryService.getHistoricProcessInstance(processInstanceId);
         assertNotNull(processInstance.getEndTime());
         assertEquals(status, FlowableUtils.getProcessInstanceStatus(processInstance));
     }

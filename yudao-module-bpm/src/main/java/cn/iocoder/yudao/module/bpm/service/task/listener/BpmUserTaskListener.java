@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.bpm.service.task.listener;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmHttpRequestParamTypeEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmHttpRequestUtils;
-import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
+import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceQueryService;
 import jakarta.annotation.Resource;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +19,7 @@ import java.util.List;
 
 import static cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils.parseListenerConfig;
 
-// TODO @芋艿：可能会想换个包地址
+// TODO @AI：这个是不是抽到 framework 层面，而不是在 service 里？
 /**
  * BPM 用户任务通用监听器
  *
@@ -33,7 +33,7 @@ public class BpmUserTaskListener implements TaskListener {
     public static final String DELEGATE_EXPRESSION = "${bpmUserTaskListener}";
 
     @Resource
-    private BpmProcessInstanceService processInstanceService;
+    private BpmProcessInstanceQueryService processInstanceQueryService;
 
     @Setter
     private Expression listenerConfig;
@@ -41,7 +41,7 @@ public class BpmUserTaskListener implements TaskListener {
     @Override
     public void notify(DelegateTask delegateTask) {
         // 1. 获取所需基础信息
-        ProcessInstance processInstance = processInstanceService.getProcessInstance(delegateTask.getProcessInstanceId());
+        ProcessInstance processInstance = processInstanceQueryService.getProcessInstance(delegateTask.getProcessInstanceId());
         BpmSimpleModelNodeVO.ListenerHandler listenerHandler = parseListenerConfig(listenerConfig);
 
         // 2. 发起请求

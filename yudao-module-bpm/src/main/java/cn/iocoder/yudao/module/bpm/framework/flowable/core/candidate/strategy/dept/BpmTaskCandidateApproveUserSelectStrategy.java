@@ -5,7 +5,7 @@ import cn.hutool.core.lang.Assert;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.strategy.user.BpmTaskCandidateUserStrategy;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
-import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
+import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceQueryService;
 import com.google.common.collect.Sets;
 import jakarta.annotation.Resource;
 import org.flowable.bpmn.model.BpmnModel;
@@ -29,7 +29,7 @@ public class BpmTaskCandidateApproveUserSelectStrategy extends AbstractBpmTaskCa
 
     @Resource
     @Lazy // 延迟加载，避免循环依赖
-    private BpmProcessInstanceService processInstanceService;
+    private BpmProcessInstanceQueryService processInstanceQueryService;
 
     @Override
     public BpmTaskCandidateStrategyEnum getStrategy() {
@@ -46,7 +46,7 @@ public class BpmTaskCandidateApproveUserSelectStrategy extends AbstractBpmTaskCa
 
     @Override
     public LinkedHashSet<Long> calculateUsersByTask(DelegateExecution execution, String param) {
-        ProcessInstance processInstance = processInstanceService.getProcessInstance(execution.getProcessInstanceId());
+        ProcessInstance processInstance = processInstanceQueryService.getProcessInstance(execution.getProcessInstanceId());
         Assert.notNull(processInstance, "流程实例({})不能为空", execution.getProcessInstanceId());
         Map<String, List<Long>> approveUserSelectAssignees = FlowableUtils.getApproveUserSelectAssignees(processInstance);
         Assert.notNull(approveUserSelectAssignees, "流程实例({}) 的下一个执行节点审批人不能为空",

@@ -14,7 +14,7 @@ import cn.iocoder.yudao.module.bpm.dal.dataobject.task.BpmProcessInstanceCopyDO;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmProcessDefinitionService;
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceCopyService;
-import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
+import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceQueryService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -44,7 +44,7 @@ public class BpmProcessInstanceCopyController {
     @Resource
     private BpmProcessInstanceCopyService processInstanceCopyService;
     @Resource
-    private BpmProcessInstanceService processInstanceService;
+    private BpmProcessInstanceQueryService processInstanceQueryService;
     @Resource
     private BpmProcessDefinitionService processDefinitionService;
 
@@ -63,7 +63,7 @@ public class BpmProcessInstanceCopyController {
         }
 
         // 拼接返回
-        Map<String, HistoricProcessInstance> processInstanceMap = processInstanceService.getHistoricProcessInstanceMap(
+        Map<String, HistoricProcessInstance> processInstanceMap = processInstanceQueryService.getHistoricProcessInstanceMap(
                 convertSet(pageResult.getList(), BpmProcessInstanceCopyDO::getProcessInstanceId));
 
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(convertListByFlatMap(pageResult.getList(),

@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.strategy.d
 
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants;
-import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
+import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceQueryService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -32,7 +32,7 @@ public class BpmTaskCandidateStartUserDeptLeaderMultiStrategyTest extends BaseMo
     private BpmTaskCandidateStartUserDeptLeaderMultiStrategy strategy;
 
     @Mock
-    private BpmProcessInstanceService processInstanceService;
+    private BpmProcessInstanceQueryService processInstanceQueryService;
     @Mock
     private AdminUserApi adminUserApi;
     @Mock
@@ -47,7 +47,7 @@ public class BpmTaskCandidateStartUserDeptLeaderMultiStrategyTest extends BaseMo
         Long processVariableStartUserId = 2L;
         ProcessInstance processInstance = mock(ProcessInstance.class);
         DelegateExecution execution = mock(DelegateExecution.class);
-        when(processInstanceService.getProcessInstance(eq(execution.getProcessInstanceId()))).thenReturn(processInstance);
+        when(processInstanceQueryService.getProcessInstance(eq(execution.getProcessInstanceId()))).thenReturn(processInstance);
         when(processInstance.getStartUserId()).thenReturn(startUserId.toString());
         Map<String, Object> processVariables = new HashMap<>();
         processVariables.put(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_START_USER_ID, processVariableStartUserId);

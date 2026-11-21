@@ -24,7 +24,6 @@ import cn.iocoder.yudao.module.bpm.service.message.dto.BpmMessageSendWhenProcess
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import org.flowable.common.engine.impl.identity.Authentication;
-import org.flowable.engine.HistoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
@@ -51,23 +50,23 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 /**
- * {@link BpmProcessInstanceServiceImpl} 的单元测试
+ * {@link BpmProcessInstanceUpdateServiceImpl} 的单元测试
  *
  * @author HUIHUI
  */
-public class BpmProcessInstanceServiceImplTest extends BaseMockitoUnitTest {
+public class BpmProcessInstanceUpdateServiceImplTest extends BaseMockitoUnitTest {
 
     @InjectMocks
-    private BpmProcessInstanceServiceImpl processInstanceService;
+    private BpmProcessInstanceUpdateServiceImpl processInstanceService;
 
     @Mock
     private RuntimeService runtimeService;
     @Mock
-    private HistoryService historyService;
-    @Mock
     private BpmProcessDefinitionService processDefinitionService;
     @Mock
-    private BpmTaskService taskService;
+    private BpmProcessInstanceQueryService processInstanceQueryService;
+    @Mock
+    private BpmTaskUpdateService taskUpdateService;
     @Mock
     private BpmMessageService messageService;
     @Mock
@@ -86,7 +85,7 @@ public class BpmProcessInstanceServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testCreateProcessInstance_success() {
         // 准备参数：动态表单必填字段已填写，开启流程编号规则、标题设置，并配置发起人自选审批人
-        BpmProcessInstanceServiceImpl spyService = spy(processInstanceService);
+        BpmProcessInstanceUpdateServiceImpl spyService = spy(processInstanceService);
         BpmModelMetaInfoVO.ProcessIdRule processIdRule = new BpmModelMetaInfoVO.ProcessIdRule().setEnable(true)
                 .setPrefix("QJ");
         mockCreateProcessInstance(buildProcessDefinitionInfo()
@@ -96,7 +95,7 @@ public class BpmProcessInstanceServiceImplTest extends BaseMockitoUnitTest {
                 .setTitleSetting(new BpmModelMetaInfoVO.TitleSetting().setEnable(true)
                         .setTitle("{" + BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_START_USER_ID + "}的"
                                 + "{" + BpmnVariableConstants.PROCESS_DEFINITION_NAME + "}，请假{day}天")));
-        mockApprovalDetail(spyService, buildActivityNode("task1", "一级审批", BpmTaskCandidateStrategyEnum.USER),
+        mockApprovalDetail(buildActivityNode("task1", "一级审批", BpmTaskCandidateStrategyEnum.USER),
                 buildActivityNode("task2", "二级审批", BpmTaskCandidateStrategyEnum.START_USER_SELECT));
         when(adminUserApi.getUserMap(List.of(2L))).thenReturn(Map.of(2L, new AdminUserRespDTO().setId(2L)));
         when(adminUserApi.getUser(1L)).thenReturn(new AdminUserRespDTO().setId(1L).setNickname("张三"));
@@ -128,14 +127,14 @@ public class BpmProcessInstanceServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testCreateProcessInstance_dto() {
         // 准备参数：未开启流程编号规则、标题设置
-        BpmProcessInstanceServiceImpl spyService = spy(processInstanceService);
+        BpmProcessInstanceUpdateServiceImpl spyService = spy(processInstanceService);
         when(processDefinitionService.getActiveProcessDefinition("leave")).thenReturn(processDefinition);
         when(processDefinition.getId()).thenReturn("definition-1");
         when(processDefinition.getName()).thenReturn("请假");
         BpmProcessDefinitionInfoDO processDefinitionInfo = buildProcessDefinitionInfo();
         when(processDefinitionService.getProcessDefinitionInfo("definition-1")).thenReturn(processDefinitionInfo);
         when(processDefinitionService.canUserStartProcessDefinition(processDefinitionInfo, 1L)).thenReturn(true);
-        mockApprovalDetail(spyService);
+        mockApprovalDetail();
         ProcessInstanceBuilder processInstanceBuilder = mockProcessInstanceBuilder();
         // 发起时，需要设置 Flowable 的认证用户，作为流程发起人
         List<String> authenticatedUserIds = new ArrayList<>();
@@ -254,10 +253,9 @@ public class BpmProcessInstanceServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testCreateProcessInstance_startUserSelectAssigneesNotConfig() {
         // 准备参数：预测到发起人自选节点，但未选择审批人
-        BpmProcessInstanceServiceImpl spyService = spy(processInstanceService);
+        BpmProcessInstanceUpdateServiceImpl spyService = spy(processInstanceService);
         mockCreateProcessInstance(buildProcessDefinitionInfo());
-        mockApprovalDetail(spyService,
-                buildActivityNode("task2", "二级审批", BpmTaskCandidateStrategyEnum.START_USER_SELECT));
+        mockApprovalDetail(buildActivityNode("task2", "二级审批", BpmTaskCandidateStrategyEnum.START_USER_SELECT));
 
         // 调用，并断言异常
         assertServiceException(() -> spyService.createProcessInstance(1L,
@@ -269,10 +267,9 @@ public class BpmProcessInstanceServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testCreateProcessInstance_startUserSelectAssigneesNotExists() {
         // 准备参数：选择的审批人不存在
-        BpmProcessInstanceServiceImpl spyService = spy(processInstanceService);
+        BpmProcessInstanceUpdateServiceImpl spyService = spy(processInstanceService);
         mockCreateProcessInstance(buildProcessDefinitionInfo());
-        mockApprovalDetail(spyService,
-                buildActivityNode("task2", "二级审批", BpmTaskCandidateStrategyEnum.START_USER_SELECT));
+        mockApprovalDetail(buildActivityNode("task2", "二级审批", BpmTaskCandidateStrategyEnum.START_USER_SELECT));
         when(adminUserApi.getUserMap(List.of(2L))).thenReturn(Map.of());
 
         // 调用，并断言异常
@@ -287,8 +284,8 @@ public class BpmProcessInstanceServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testCancelProcessInstanceByAdmin_notExists() {
         // 准备参数
-        BpmProcessInstanceServiceImpl spyService = spy(processInstanceService);
-        doReturn(null).when(spyService).getProcessInstance("process-instance-1");
+        BpmProcessInstanceUpdateServiceImpl spyService = spy(processInstanceService);
+        when(processInstanceQueryService.getProcessInstance("process-instance-1")).thenReturn(null);
 
         // 调用，并断言异常
         assertServiceException(() -> spyService.cancelProcessInstanceByAdmin(1L, buildCancelReq()),
@@ -298,8 +295,8 @@ public class BpmProcessInstanceServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testCancelProcessInstanceByStartUser_notExists() {
         // 准备参数
-        BpmProcessInstanceServiceImpl spyService = spy(processInstanceService);
-        doReturn(null).when(spyService).getProcessInstance("process-instance-1");
+        BpmProcessInstanceUpdateServiceImpl spyService = spy(processInstanceService);
+        when(processInstanceQueryService.getProcessInstance("process-instance-1")).thenReturn(null);
         BpmProcessInstanceCancelReqVO reqVO = buildCancelReq();
 
         // 调用，并断言异常
@@ -310,8 +307,8 @@ public class BpmProcessInstanceServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testCancelProcessInstanceByStartUser_notAllow() {
         // 准备参数
-        BpmProcessInstanceServiceImpl spyService = spy(processInstanceService);
-        doReturn(processInstance).when(spyService).getProcessInstance("process-instance-1");
+        BpmProcessInstanceUpdateServiceImpl spyService = spy(processInstanceService);
+        when(processInstanceQueryService.getProcessInstance("process-instance-1")).thenReturn(processInstance);
         when(processInstance.getStartUserId()).thenReturn("1");
         when(processInstance.getProcessDefinitionId()).thenReturn("definition-1");
         when(processDefinitionService.getProcessDefinitionInfo("definition-1"))
@@ -362,8 +359,8 @@ public class BpmProcessInstanceServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testProcessProcessInstanceCompleted_childRejectRolledBack() {
         // 准备参数
-        BpmProcessInstanceServiceImpl spyService = spy(processInstanceService);
-        ProcessInstance parentProcessInstance = mockChildRejectProcessInstance(spyService);
+        BpmProcessInstanceUpdateServiceImpl spyService = spy(processInstanceService);
+        ProcessInstance parentProcessInstance = mockChildRejectProcessInstance();
 
         // 调用：事务回滚
         executeWithSynchronization(() -> spyService.processProcessInstanceCompleted(processInstance),
@@ -371,7 +368,7 @@ public class BpmProcessInstanceServiceImplTest extends BaseMockitoUnitTest {
         // 断言：回滚时，不结束父流程
         verify(spyService).updateProcessInstanceReject(parentProcessInstance,
                 BpmReasonEnum.REJECT_CHILD_PROCESS.getReason());
-        verifyNoInteractions(taskService);
+        verifyNoInteractions(taskUpdateService);
     }
 
     @Test
@@ -455,10 +452,9 @@ public class BpmProcessInstanceServiceImplTest extends BaseMockitoUnitTest {
     /**
      * 模拟发起流程时的审批节点预测结果
      */
-    private void mockApprovalDetail(BpmProcessInstanceServiceImpl spyService,
-                                    BpmApprovalDetailRespVO.ActivityNode... activityNodes) {
-        doReturn(new BpmApprovalDetailRespVO().setActivityNodes(new ArrayList<>(List.of(activityNodes))))
-                .when(spyService).getApprovalDetail(eq(1L), any());
+    private void mockApprovalDetail(BpmApprovalDetailRespVO.ActivityNode... activityNodes) {
+        when(processInstanceQueryService.getApprovalDetail(eq(1L), any()))
+                .thenReturn(new BpmApprovalDetailRespVO().setActivityNodes(new ArrayList<>(List.of(activityNodes))));
     }
 
     private ProcessInstanceBuilder mockProcessInstanceBuilder() {
@@ -489,7 +485,7 @@ public class BpmProcessInstanceServiceImplTest extends BaseMockitoUnitTest {
         lenient().when(processInstance.getBusinessKey()).thenReturn("business-1");
     }
 
-    private ProcessInstance mockChildRejectProcessInstance(BpmProcessInstanceServiceImpl spyService) {
+    private ProcessInstance mockChildRejectProcessInstance() {
         mockCompletedProcessInstance(BpmProcessInstanceStatusEnum.REJECT.getStatus(), "不同意");
         when(processInstance.getSuperExecutionId()).thenReturn("super-execution-1");
         ExecutionQuery executionQuery = mock(ExecutionQuery.class, RETURNS_SELF);
@@ -500,7 +496,7 @@ public class BpmProcessInstanceServiceImplTest extends BaseMockitoUnitTest {
         ProcessInstance parentProcessInstance = mock(ProcessInstance.class);
         lenient().when(parentProcessInstance.getId()).thenReturn("parent-process-instance-1");
         when(parentProcessInstance.getProcessInstanceId()).thenReturn("parent-process-instance-1");
-        doReturn(parentProcessInstance).when(spyService).getProcessInstance("parent-process-instance-1");
+        when(processInstanceQueryService.getProcessInstance("parent-process-instance-1")).thenReturn(parentProcessInstance);
         return parentProcessInstance;
     }
 

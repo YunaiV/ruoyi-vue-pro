@@ -2,7 +2,7 @@ package cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.expression
 
 import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
-import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
+import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceQueryService;
 import jakarta.annotation.Resource;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -20,7 +20,7 @@ import java.util.Set;
 public class BpmTaskAssignStartUserExpression {
 
     @Resource
-    private BpmProcessInstanceService processInstanceService;
+    private BpmProcessInstanceQueryService processInstanceQueryService;
 
     /**
      * 计算审批的候选人
@@ -29,7 +29,7 @@ public class BpmTaskAssignStartUserExpression {
      * @return 发起人
      */
     public Set<Long> calculateUsers(ExecutionEntityImpl execution) {
-        ProcessInstance processInstance = processInstanceService.getProcessInstance(execution.getProcessInstanceId());
+        ProcessInstance processInstance = processInstanceQueryService.getProcessInstance(execution.getProcessInstanceId());
         Long startUserId = NumberUtils.parseLong(processInstance.getStartUserId());
         return SetUtils.asSet(startUserId);
     }

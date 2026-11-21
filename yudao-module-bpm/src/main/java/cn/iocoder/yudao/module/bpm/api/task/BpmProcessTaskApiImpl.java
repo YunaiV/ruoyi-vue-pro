@@ -1,6 +1,6 @@
 package cn.iocoder.yudao.module.bpm.api.task;
 
-import cn.iocoder.yudao.module.bpm.service.task.BpmTaskService;
+import cn.iocoder.yudao.module.bpm.service.task.BpmTaskUpdateService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -15,11 +15,11 @@ import org.springframework.validation.annotation.Validated;
 public class BpmProcessTaskApiImpl implements BpmProcessTaskApi {
 
     @Resource
-    private BpmTaskService bpmTaskService;
+    private BpmTaskUpdateService taskUpdateService;
 
     @Override
     public void triggerTask(String processInstanceId, String taskDefineKey) {
-        bpmTaskService.triggerTask(processInstanceId, taskDefineKey);
+        taskUpdateService.triggerTask(processInstanceId, taskDefineKey);
     }
 
 }

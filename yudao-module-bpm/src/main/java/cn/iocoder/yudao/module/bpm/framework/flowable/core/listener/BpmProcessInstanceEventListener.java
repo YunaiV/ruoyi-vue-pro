@@ -1,7 +1,8 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.listener;
 
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
-import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
+import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceQueryService;
+import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceUpdateService;
 import com.google.common.collect.ImmutableSet;
 import jakarta.annotation.Resource;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEntityEvent;
@@ -30,7 +31,10 @@ public class BpmProcessInstanceEventListener extends AbstractFlowableEngineEvent
 
     @Resource
     @Lazy // 延迟加载，避免循环依赖
-    private BpmProcessInstanceService processInstanceService;
+    private BpmProcessInstanceQueryService processInstanceQueryService;
+    @Resource
+    @Lazy // 延迟加载，避免循环依赖
+    private BpmProcessInstanceUpdateService processInstanceUpdateService;
 
     public BpmProcessInstanceEventListener(){
         super(PROCESS_INSTANCE_EVENTS);
@@ -40,23 +44,23 @@ public class BpmProcessInstanceEventListener extends AbstractFlowableEngineEvent
     protected void processCreated(FlowableEngineEntityEvent event) {
         ProcessInstance processInstance = (ProcessInstance) event.getEntity();
         FlowableUtils.execute(processInstance.getTenantId(),
-                () -> processInstanceService.processProcessInstanceCreated(processInstance));
+                () -> processInstanceUpdateService.processProcessInstanceCreated(processInstance));
     }
 
     @Override
     protected void processCompleted(FlowableEngineEntityEvent event) {
         ProcessInstance processInstance = (ProcessInstance) event.getEntity();
         FlowableUtils.execute(processInstance.getTenantId(),
-                () -> processInstanceService.processProcessInstanceCompleted(processInstance));
+                () -> processInstanceUpdateService.processProcessInstanceCompleted(processInstance));
     }
 
     @Override
     protected void processCancelled(FlowableCancelledEvent event) {
         // 特殊情况：当跳转到 EndEvent 流程实例未结束, 会执行 deleteProcessInstance 方法
-        ProcessInstance processInstance = processInstanceService.getProcessInstance(event.getProcessInstanceId());
+        ProcessInstance processInstance = processInstanceQueryService.getProcessInstance(event.getProcessInstanceId());
         if (processInstance != null) {
             FlowableUtils.execute(processInstance.getTenantId(),
-                    () -> processInstanceService.processProcessInstanceCompleted(processInstance));
+                    () -> processInstanceUpdateService.processProcessInstanceCompleted(processInstance));
         }
     }
 

@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.expression;
 
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
-import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
+import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceQueryService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -31,7 +31,7 @@ public class BpmTaskAssignLeaderExpressionTest extends BaseMockitoUnitTest {
     @Mock
     private DeptApi deptApi;
     @Mock
-    private BpmProcessInstanceService processInstanceService;
+    private BpmProcessInstanceQueryService processInstanceQueryService;
 
     @Test
     public void testCalculateUsers_noDept() {
@@ -96,7 +96,7 @@ public class BpmTaskAssignLeaderExpressionTest extends BaseMockitoUnitTest {
         // mock 返回 startUserId
         ExecutionEntityImpl processInstance = new ExecutionEntityImpl();
         processInstance.setStartUserId(String.valueOf(startUserId));
-        when(processInstanceService.getProcessInstance(eq(execution.getProcessInstanceId())))
+        when(processInstanceQueryService.getProcessInstance(eq(execution.getProcessInstanceId())))
                 .thenReturn(processInstance);
         return execution;
     }

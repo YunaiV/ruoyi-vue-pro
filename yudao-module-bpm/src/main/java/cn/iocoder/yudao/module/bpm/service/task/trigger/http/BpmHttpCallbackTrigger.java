@@ -5,7 +5,7 @@ import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.B
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmHttpRequestParamTypeEnum;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmTriggerTypeEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmHttpRequestUtils;
-import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
+import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceQueryService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -15,6 +15,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.ArrayList;
 import java.util.List;
 
+// TODO @AI：这个是不是抽到 framework 层面，而不是在 service 里？
 /**
  * BPM HTTP 回调触发器
  *
@@ -25,7 +26,7 @@ import java.util.List;
 public class BpmHttpCallbackTrigger extends BpmAbstractHttpRequestTrigger {
 
     @Resource
-    private BpmProcessInstanceService processInstanceService;
+    private BpmProcessInstanceQueryService processInstanceQueryService;
 
     @Override
     public BpmTriggerTypeEnum getType() {
@@ -43,7 +44,7 @@ public class BpmHttpCallbackTrigger extends BpmAbstractHttpRequestTrigger {
         }
 
         // 2. 发起请求
-        ProcessInstance processInstance = processInstanceService.getProcessInstance(processInstanceId);
+        ProcessInstance processInstance = processInstanceQueryService.getProcessInstance(processInstanceId);
         List<BpmSimpleModelNodeVO.HttpRequestParam> body = setting.getBody() == null
                 ? new ArrayList<>() : new ArrayList<>(setting.getBody());
         body.add(new BpmSimpleModelNodeVO.HttpRequestParam()

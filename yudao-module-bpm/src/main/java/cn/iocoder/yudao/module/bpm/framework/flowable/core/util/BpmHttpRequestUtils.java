@@ -11,7 +11,8 @@ import cn.iocoder.yudao.module.bpm.api.event.BpmProcessInstanceStatusEvent;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmHttpRequestParamTypeEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.config.BpmHttpRequestProperties;
-import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
+import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceQueryService;
+import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceUpdateService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -49,7 +50,7 @@ public class BpmHttpRequestUtils {
                                              List<KeyValue<String, String>> response) {
         // 0. 校验请求地址的域名 / IP 黑白名单（默认关闭）
         validateHttpRequestUrl(url);
-        BpmProcessInstanceService processInstanceService = SpringUtils.getBean(BpmProcessInstanceService.class);
+        BpmProcessInstanceUpdateService processInstanceUpdateService = SpringUtils.getBean(BpmProcessInstanceUpdateService.class);
 
         // 1.1 设置请求头
         MultiValueMap<String, String> headers = buildHttpHeaders(processInstance, headerParams);
@@ -81,7 +82,7 @@ public class BpmHttpRequestUtils {
         Map<String, Object> updateVariables = getNeedUpdatedVariablesFromResponse(respResult.getData(), response);
         // 3.4 更新流程变量
         if (CollUtil.isNotEmpty(updateVariables)) {
-            processInstanceService.updateProcessInstanceVariables(processInstance.getId(), updateVariables);
+            processInstanceUpdateService.updateProcessInstanceVariables(processInstance.getId(), updateVariables);
         }
     }
 
@@ -93,8 +94,8 @@ public class BpmHttpRequestUtils {
         if (TenantContextHolder.getTenantId() != null) {
             headers.add(HEADER_TENANT_ID, String.valueOf(TenantContextHolder.getTenantId()));
         } else {
-            BpmProcessInstanceService processInstanceService = SpringUtils.getBean(BpmProcessInstanceService.class);
-            ProcessInstance processInstance = processInstanceService.getProcessInstance(event.getId());
+            BpmProcessInstanceQueryService processInstanceQueryService = SpringUtils.getBean(BpmProcessInstanceQueryService.class);
+            ProcessInstance processInstance = processInstanceQueryService.getProcessInstance(event.getId());
             if (processInstance != null) {
                 headers.add(HEADER_TENANT_ID, processInstance.getTenantId());
             }

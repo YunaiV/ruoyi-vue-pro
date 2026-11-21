@@ -38,8 +38,10 @@ import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.SimpleModelUtils;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmModelServiceImpl;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmProcessDefinitionServiceImpl;
-import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceServiceImpl;
-import cn.iocoder.yudao.module.bpm.service.task.BpmTaskServiceImpl;
+import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceQueryServiceImpl;
+import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceUpdateServiceImpl;
+import cn.iocoder.yudao.module.bpm.service.task.BpmTaskQueryServiceImpl;
+import cn.iocoder.yudao.module.bpm.service.task.BpmTaskUpdateServiceImpl;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import jakarta.annotation.Resource;
 import jakarta.validation.ConstraintViolationException;
@@ -129,9 +131,13 @@ public class BpmModelDeployFlowableTest extends BaseFlowableUnitTest {
     private BpmProcessDefinitionInfoMapper processDefinitionMapper;
 
     @Resource
-    private BpmTaskServiceImpl taskService;
+    private BpmTaskQueryServiceImpl taskQueryService;
     @Resource
-    private BpmProcessInstanceServiceImpl processInstanceService;
+    private BpmTaskUpdateServiceImpl taskUpdateService;
+    @Resource
+    private BpmProcessInstanceQueryServiceImpl processInstanceQueryService;
+    @Resource
+    private BpmProcessInstanceUpdateServiceImpl processInstanceUpdateService;
 
     private final BpmProcessDefinitionServiceImpl processDefinitionServiceImpl = new BpmProcessDefinitionServiceImpl();
     private final BpmModelServiceImpl modelServiceImpl = new BpmModelServiceImpl();
@@ -328,11 +334,11 @@ public class BpmModelDeployFlowableTest extends BaseFlowableUnitTest {
         approveB1.setApproveMethod(BpmUserTaskApproveMethodEnum.RATIO.getMethod()).setApproveRatio(100);
         String modelId = modelServiceImpl.createModel(buildModelSaveReqVO(approveA));
         modelServiceImpl.deployModel(1L, modelId);
-        String processInstanceId = processInstanceService.createProcessInstance(1L, new BpmProcessInstanceCreateReqDTO()
+        String processInstanceId = processInstanceUpdateService.createProcessInstance(1L, new BpmProcessInstanceCreateReqDTO()
                 .setProcessDefinitionKey(MODEL_KEY).setBusinessKey("business-1")
                 .setVariables(new HashMap<>(Map.of("amount", 200))));
         approveTask(getRunningTask(processInstanceId)); // 审批 A
-        List<Task> tasksB1 = taskService.getRunningTaskListByProcessInstanceId(processInstanceId, null, "approve-b1");
+        List<Task> tasksB1 = taskQueryService.getRunningTaskListByProcessInstanceId(processInstanceId, null, "approve-b1");
         assertEquals(2, tasksB1.size());
 
         // 调用：B1 的超时定时器到期
@@ -386,9 +392,9 @@ public class BpmModelDeployFlowableTest extends BaseFlowableUnitTest {
         String processInstanceId = deployAndStartTimeoutJumpModel("approve-b1", "approve-b2", 200);
         approveTask(getRunningTask(processInstanceId)); // 审批 A
         Task taskB1 = getRunningTask(processInstanceId);
-        taskService.createSignTask(1L, new BpmTaskSignCreateReqVO().setId(taskB1.getId())
+        taskUpdateService.createSignTask(1L, new BpmTaskSignCreateReqVO().setId(taskB1.getId())
                 .setType(BpmTaskSignTypeEnum.BEFORE.getType()).setUserIds(Set.of(2L)).setReason("加签"));
-        Task childTask = taskService.getTaskListByParentTaskId(taskB1.getId()).get(0);
+        Task childTask = taskQueryService.getTaskListByParentTaskId(taskB1.getId()).get(0);
 
         // 调用：B1 的超时定时器到期
         executeTimerJob(processInstanceId);
@@ -396,12 +402,12 @@ public class BpmModelDeployFlowableTest extends BaseFlowableUnitTest {
         String reason = BpmReasonEnum.TIMEOUT_JUMP.format("审批 B2");
         assertTaskStatus(taskB1.getId(), BpmTaskStatusEnum.SKIP.getStatus(), reason);
         assertTaskStatus(childTask.getId(), BpmTaskStatusEnum.SKIP.getStatus(), reason);
-        assertNull(taskService.getTask(childTask.getId()));
+        assertNull(taskQueryService.getTask(childTask.getId()));
         assertEquals("approve-b2", getRunningTask(processInstanceId).getTaskDefinitionKey());
 
         // 断言：打印数据中，被跳过的向前加签父任务（assignee 为空）使用 owner 展示处理人；处理人不存在时，展示为空
-        HistoricProcessInstance processInstance = processInstanceService.getHistoricProcessInstance(processInstanceId);
-        List<HistoricTaskInstance> finishedTasks = taskService.getFinishedTaskListByProcessInstanceIdWithoutCancel(processInstanceId);
+        HistoricProcessInstance processInstance = processInstanceQueryService.getHistoricProcessInstance(processInstanceId);
+        List<HistoricTaskInstance> finishedTasks = taskQueryService.getFinishedTaskListByProcessInstanceIdWithoutCancel(processInstanceId);
         HistoricTaskInstance parentTask = finishedTasks.stream().filter(task -> task.getId().equals(taskB1.getId()))
                 .findFirst().orElseThrow();
         assertNull(parentTask.getAssignee());
@@ -591,7 +597,7 @@ public class BpmModelDeployFlowableTest extends BaseFlowableUnitTest {
                 repositoryService.getBpmnModel(getActiveProcessDefinition().getId()), "approve-b1");
         assertEquals(List.of("reminder-b1", jumpEventId), userTaskB1.getBoundaryEvents().stream().map(BoundaryEvent::getId).toList());
         // 准备参数：金额 200，审批 A 后到达 B1
-        String processInstanceId = processInstanceService.createProcessInstance(1L, new BpmProcessInstanceCreateReqDTO()
+        String processInstanceId = processInstanceUpdateService.createProcessInstance(1L, new BpmProcessInstanceCreateReqDTO()
                 .setProcessDefinitionKey(MODEL_KEY).setBusinessKey("business-1")
                 .setVariables(new HashMap<>(Map.of("amount", 200))));
         approveTask(getRunningTask(processInstanceId)); // 审批 A
@@ -624,7 +630,7 @@ public class BpmModelDeployFlowableTest extends BaseFlowableUnitTest {
         assertEquals("approve-d", taskD.getTaskDefinitionKey());
 
         // 调用：D 手工退回到 A
-        taskService.returnTask(1L, new BpmTaskReturnReqVO().setId(taskD.getId())
+        taskUpdateService.returnTask(1L, new BpmTaskReturnReqVO().setId(taskD.getId())
                 .setTargetTaskDefinitionKey("approve-a").setReason("退回"));
         // 断言：实际移动到 A，记录了需要预测的节点
         assertEquals("approve-a", getRunningTask(processInstanceId).getTaskDefinitionKey());
@@ -908,7 +914,7 @@ public class BpmModelDeployFlowableTest extends BaseFlowableUnitTest {
     }
 
     private BpmApprovalDetailRespVO getApprovalDetail(String processInstanceId) {
-        return processInstanceService.getApprovalDetail(1L,
+        return processInstanceQueryService.getApprovalDetail(1L,
                 new BpmApprovalDetailReqVO().setProcessInstanceId(processInstanceId));
     }
 
@@ -949,7 +955,7 @@ public class BpmModelDeployFlowableTest extends BaseFlowableUnitTest {
     private String deployAndStartTimeoutJumpModel(String timeoutNodeId, String jumpNodeId, int amount) {
         String modelId = modelServiceImpl.createModel(buildModelSaveReqVO(buildTimeoutJumpNodes(timeoutNodeId, jumpNodeId)));
         modelServiceImpl.deployModel(1L, modelId);
-        return processInstanceService.createProcessInstance(1L, new BpmProcessInstanceCreateReqDTO()
+        return processInstanceUpdateService.createProcessInstance(1L, new BpmProcessInstanceCreateReqDTO()
                 .setProcessDefinitionKey(MODEL_KEY).setBusinessKey("business-1")
                 .setVariables(new HashMap<>(Map.of("amount", amount))));
     }
@@ -974,7 +980,7 @@ public class BpmModelDeployFlowableTest extends BaseFlowableUnitTest {
     }
 
     private void assertTaskStatus(String taskId, Integer status, String reason) {
-        HistoricTaskInstance task = taskService.getHistoricTask(taskId);
+        HistoricTaskInstance task = taskQueryService.getHistoricTask(taskId);
         assertEquals(status, FlowableUtils.getTaskStatus(task));
         assertEquals(reason, task.getTaskLocalVariables().get(BpmnVariableConstants.TASK_VARIABLE_REASON));
     }
@@ -986,7 +992,7 @@ public class BpmModelDeployFlowableTest extends BaseFlowableUnitTest {
     }
 
     private String startProcessInstance() {
-        return processInstanceService.createProcessInstance(1L, new BpmProcessInstanceCreateReqDTO()
+        return processInstanceUpdateService.createProcessInstance(1L, new BpmProcessInstanceCreateReqDTO()
                 .setProcessDefinitionKey(MODEL_KEY).setBusinessKey("business-1"));
     }
 
@@ -1000,19 +1006,19 @@ public class BpmModelDeployFlowableTest extends BaseFlowableUnitTest {
     }
 
     private Task getRunningTask(String processInstanceId) {
-        List<Task> tasks = taskService.getRunningTaskListByProcessInstanceId(processInstanceId, null, null);
+        List<Task> tasks = taskQueryService.getRunningTaskListByProcessInstanceId(processInstanceId, null, null);
         assertEquals(1, tasks.size());
         return tasks.get(0);
     }
 
     private void approveTask(Task task) {
-        taskService.approveTask(Long.valueOf(task.getAssignee()), new BpmTaskApproveReqVO().setId(task.getId())
+        taskUpdateService.approveTask(Long.valueOf(task.getAssignee()), new BpmTaskApproveReqVO().setId(task.getId())
                 .setReason("同意"));
     }
 
     private void assertProcessInstanceStatus(String processInstanceId, Integer status) {
         assertEquals(status, FlowableUtils.getProcessInstanceStatus(
-                processInstanceService.getHistoricProcessInstance(processInstanceId)));
+                processInstanceQueryService.getHistoricProcessInstance(processInstanceId)));
     }
 
 }

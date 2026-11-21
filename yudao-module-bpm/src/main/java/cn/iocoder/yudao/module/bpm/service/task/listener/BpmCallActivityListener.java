@@ -10,7 +10,7 @@ import cn.iocoder.yudao.module.bpm.enums.definition.BpmChildProcessStartUserEmpt
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmChildProcessStartUserTypeEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmProcessDefinitionService;
-import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
+import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceQueryService;
 import jakarta.annotation.Resource;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+// TODO @AI：这个是不是抽到 framework 层面，而不是在 service 里？
 /**
  * BPM 子流程监听器：设置流程的发起人
  *
@@ -40,7 +41,7 @@ public class BpmCallActivityListener implements ExecutionListener {
     private BpmProcessDefinitionService processDefinitionService;
 
     @Resource
-    private BpmProcessInstanceService processInstanceService;
+    private BpmProcessInstanceQueryService processInstanceQueryService;
 
     @Override
     public void notify(DelegateExecution execution) {
@@ -48,7 +49,7 @@ public class BpmCallActivityListener implements ExecutionListener {
         Assert.notNull(expressionText, "监听器扩展字段({})不能为空", expressionText);
         BpmSimpleModelNodeVO.ChildProcessSetting.StartUserSetting startUserSetting = JsonUtils.parseObject(
                 expressionText, BpmSimpleModelNodeVO.ChildProcessSetting.StartUserSetting.class);
-        ProcessInstance processInstance = processInstanceService.getProcessInstance(execution.getRootProcessInstanceId());
+        ProcessInstance processInstance = processInstanceQueryService.getProcessInstance(execution.getRootProcessInstanceId());
 
         // 1. 当发起人来源为主流程发起人时，并兜底 startUserSetting 为空时
         if (startUserSetting == null

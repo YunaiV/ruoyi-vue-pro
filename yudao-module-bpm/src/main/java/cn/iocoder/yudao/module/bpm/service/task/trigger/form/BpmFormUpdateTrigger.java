@@ -6,7 +6,8 @@ import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.B
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmTriggerTypeEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.SimpleModelUtils;
-import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
+import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceQueryService;
+import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceUpdateService;
 import cn.iocoder.yudao.module.bpm.service.task.trigger.BpmTrigger;
 import com.fasterxml.jackson.core.type.TypeReference;
 import jakarta.annotation.Resource;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Map;
 
+// TODO @AI：这个是不是抽到 framework 层面，而不是在 service 里？
 /**
  * BPM 更新流程表单触发器
  *
@@ -26,7 +28,9 @@ import java.util.Map;
 public class BpmFormUpdateTrigger implements BpmTrigger {
 
     @Resource
-    private BpmProcessInstanceService processInstanceService;
+    private BpmProcessInstanceQueryService processInstanceQueryService;
+    @Resource
+    private BpmProcessInstanceUpdateService processInstanceUpdateService;
 
     @Override
     public BpmTriggerTypeEnum getType() {
@@ -43,7 +47,7 @@ public class BpmFormUpdateTrigger implements BpmTrigger {
         }
 
         // 2. 获取流程变量
-        Map<String, Object> processVariables = processInstanceService.getProcessInstance(processInstanceId).getProcessVariables();
+        Map<String, Object> processVariables = processInstanceQueryService.getProcessInstance(processInstanceId).getProcessVariables();
 
         // 3. 更新流程变量
         for (FormTriggerSetting setting : settings) {
@@ -59,7 +63,7 @@ public class BpmFormUpdateTrigger implements BpmTrigger {
             }
             // 更新流程表单
             if (isFormUpdateNeeded) {
-                processInstanceService.updateProcessInstanceVariables(processInstanceId, setting.getUpdateFormFields());
+                processInstanceUpdateService.updateProcessInstanceVariables(processInstanceId, setting.getUpdateFormFields());
             }
         }
     }
