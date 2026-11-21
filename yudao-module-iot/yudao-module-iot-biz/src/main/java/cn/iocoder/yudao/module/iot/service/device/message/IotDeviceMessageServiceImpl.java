@@ -63,6 +63,7 @@ import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.DEVICE_DOWNST
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.DEVICE_MESSAGE_RAW_METHOD_RESERVED;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.DEVICE_MESSAGE_RAW_PAYLOAD_INVALID;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.DEVICE_MESSAGE_RAW_PROTOCOL_NOT_SUPPORTED;
+import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.DEVICE_OPC_UA_DOWNSTREAM_NOT_SUPPORTED;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.PRODUCT_NOT_EXISTS;
 
 /**
@@ -168,6 +169,8 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
         }
 
         // 2.2 情况二：发送下行消息
+        // OPC UA 一期只读：回复以外的下行消息都不下发
+        validateOpcUaDownstreamNotSupported(message, device);
         // 如果是下行消息，需要校验 serverId 存在
         // TODO 芋艿：【设计】下行消息需要区分 PUSH 和 PULL 模型
         // 1. PUSH 模型：适用于 MQTT 等长连接协议。通过 serverId 将消息路由到指定网关，实时推送。
@@ -205,13 +208,14 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
             return null;
         }
 
-        // 2. 校验产品协议：HTTP、CoAP 没有长连接，不支持透传下发
+        // 2. 校验产品协议：HTTP、CoAP 没有长连接，不支持透传下发；OPC UA 一期只读，也不支持
         IotProductDO product = productService.getProductFromCache(device.getProductId());
         if (product == null) {
             throw exception(PRODUCT_NOT_EXISTS);
         }
         IotProtocolTypeEnum protocol = IotProtocolTypeEnum.of(product.getProtocolType());
-        if (protocol == IotProtocolTypeEnum.HTTP || protocol == IotProtocolTypeEnum.COAP) {
+        if (protocol == IotProtocolTypeEnum.HTTP || protocol == IotProtocolTypeEnum.COAP
+                || protocol == IotProtocolTypeEnum.OPC_UA_CLIENT) {
             throw exception(DEVICE_MESSAGE_RAW_PROTOCOL_NOT_SUPPORTED, product.getProtocolType());
         }
 
@@ -222,6 +226,27 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
             return payload;
         } catch (IllegalArgumentException e) {
             throw exception(DEVICE_MESSAGE_RAW_PAYLOAD_INVALID, e.getMessage());
+        }
+    }
+
+    /**
+     * 校验 OPC UA 设备的下行消息：一期只读采集，回复以外的下行消息（属性设置、服务调用、配置推送、OTA 等）都不下发
+     * <p>
+     * 产品不存在时无法判断协议，同样拒绝，避免绕过只读限制
+     *
+     * @param message 消息（下行）
+     * @param device  设备信息
+     */
+    private void validateOpcUaDownstreamNotSupported(IotDeviceMessage message, IotDeviceDO device) {
+        if (IotDeviceMessageUtils.isReplyMessage(message)) {
+            return;
+        }
+        IotProductDO product = productService.getProductFromCache(device.getProductId());
+        if (product == null) {
+            throw exception(PRODUCT_NOT_EXISTS);
+        }
+        if (IotProtocolTypeEnum.OPC_UA_CLIENT.getType().equals(product.getProtocolType())) {
+            throw exception(DEVICE_OPC_UA_DOWNSTREAM_NOT_SUPPORTED);
         }
     }
 

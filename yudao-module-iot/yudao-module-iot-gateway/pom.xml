@@ -64,6 +64,12 @@
             <artifactId>j2mod</artifactId>
         </dependency>
 
+        <!-- OPC UA 相关 - Eclipse Milo -->
+        <dependency>
+            <groupId>org.eclipse.milo</groupId>
+            <artifactId>milo-sdk-client</artifactId>
+        </dependency>
+
         <!-- CoAP 相关 - Eclipse Californium -->
         <dependency>
             <groupId>org.eclipse.californium</groupId>
@@ -85,6 +91,11 @@
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-test</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.milo</groupId>
+            <artifactId>milo-sdk-server</artifactId>
+            <scope>test</scope> <!-- OPC UA 模拟验收：进程内 Milo Server -->
         </dependency>
     </dependencies>
 

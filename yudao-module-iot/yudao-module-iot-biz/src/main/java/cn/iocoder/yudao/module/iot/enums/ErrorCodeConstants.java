@@ -129,4 +129,17 @@ public interface ErrorCodeConstants {
     // ========== IoT 告警记录 1-050-014-000 ==========
     ErrorCode ALERT_RECORD_NOT_EXISTS = new ErrorCode(1_050_014_000, "IoT 告警记录不存在");
 
+    // ========== 设备 OPC UA 配置 1-050-015-000 ==========
+    ErrorCode DEVICE_OPC_UA_CONFIG_NOT_EXISTS = new ErrorCode(1_050_015_000, "设备 OPC UA 连接配置不存在");
+    ErrorCode DEVICE_OPC_UA_CONFIG_PROTOCOL_INVALID = new ErrorCode(1_050_015_001, "产品协议不是 OPC UA Client，不能配置 OPC UA 连接和点位");
+    ErrorCode DEVICE_OPC_UA_DOWNSTREAM_NOT_SUPPORTED = new ErrorCode(1_050_015_100,
+            "OPC UA 设备只支持读取采集，不支持下行消息（属性设置、服务调用、透传、配置推送、OTA 等）");
+
+    // ========== 设备 OPC UA 点位 1-050-016-000 ==========
+    ErrorCode DEVICE_OPC_UA_POINT_NOT_EXISTS = new ErrorCode(1_050_016_000, "设备 OPC UA 点位配置不存在");
+    ErrorCode DEVICE_OPC_UA_POINT_EXISTS = new ErrorCode(1_050_016_001, "该物模型属性已配置 OPC UA 点位");
+    ErrorCode DEVICE_OPC_UA_POINT_THING_MODEL_INVALID = new ErrorCode(1_050_016_002, "物模型不是该设备所属产品的属性");
+    ErrorCode DEVICE_OPC_UA_POINT_NODE_ID_INVALID = new ErrorCode(1_050_016_003, "NodeId 格式不正确：{}");
+    ErrorCode DEVICE_OPC_UA_POINT_DEVICE_MISMATCH = new ErrorCode(1_050_016_004, "点位不属于该设备，不能修改");
+
 }

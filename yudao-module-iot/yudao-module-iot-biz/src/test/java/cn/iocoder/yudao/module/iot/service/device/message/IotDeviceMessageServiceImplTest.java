@@ -146,6 +146,7 @@ public class IotDeviceMessageServiceImplTest extends BaseMockitoUnitTest {
         // 准备：下行消息（SERVICE_INVOKE）；devicePropertyService 也查不到 serverId
         IotDeviceDO device = buildDevice();
         IotDeviceMessage message = buildMessage(IotDeviceMessageMethodEnum.SERVICE_INVOKE.getMethod());
+        when(productService.getProductFromCache(3L)).thenReturn(IotProductDO.builder().id(3L).protocolType("mqtt").build());
         when(devicePropertyService.getDeviceServerId(device.getId())).thenReturn(null);
 
         // 调用 & 断言：抛 DEVICE_DOWNSTREAM_FAILED_SERVER_ID_NULL
@@ -288,6 +289,61 @@ public class IotDeviceMessageServiceImplTest extends BaseMockitoUnitTest {
     }
 
     @Test
+    public void testSendDeviceMessage_rawPushOpcUaNotSupported() {
+        // 准备参数
+        IotDeviceMessage message = buildRawPush("AQID");
+        // mock 方法：OPC UA 产品（一期只读）
+        when(productService.getProductFromCache(3L)).thenReturn(IotProductDO.builder().id(3L).protocolType("opc_ua_client").build());
+
+        // 调用，并断言异常
+        assertServiceException(() -> service.sendDeviceMessage(message, buildDevice(), null),
+                DEVICE_MESSAGE_RAW_PROTOCOL_NOT_SUPPORTED, "opc_ua_client");
+        verifyNoInteractions(deviceMessageProducer);
+    }
+
+    @Test
+    public void testSendDeviceMessage_opcUaDownstreamNotSupported() {
+        // mock 方法：OPC UA 产品（一期只读）
+        when(productService.getProductFromCache(3L)).thenReturn(IotProductDO.builder().id(3L).protocolType("opc_ua_client").build());
+
+        // 调用，并断言异常：回复以外的下行消息（属性设置、服务调用、配置推送、OTA、拓扑变更）都不下发
+        for (IotDeviceMessageMethodEnum method : new IotDeviceMessageMethodEnum[]{
+                IotDeviceMessageMethodEnum.PROPERTY_SET, IotDeviceMessageMethodEnum.SERVICE_INVOKE,
+                IotDeviceMessageMethodEnum.CONFIG_PUSH, IotDeviceMessageMethodEnum.OTA_UPGRADE,
+                IotDeviceMessageMethodEnum.TOPO_CHANGE}) {
+            assertServiceException(() -> service.sendDeviceMessage(buildMessage(method.getMethod()), buildDevice(), null),
+                    DEVICE_OPC_UA_DOWNSTREAM_NOT_SUPPORTED);
+        }
+        verifyNoInteractions(deviceMessageProducer);
+        verify(devicePropertyService, never()).getDeviceServerId(any());
+    }
+
+    @Test
+    public void testSendDeviceMessage_downstreamProductNotExists() {
+        // mock 方法：产品缓存为空（无法判断协议）
+
+        // 调用，并断言异常：不能绕过 OPC UA 只读校验
+        assertServiceException(() -> service.sendDeviceMessage(buildMessage(IotDeviceMessageMethodEnum.CONFIG_PUSH.getMethod()),
+                buildDevice(), null), PRODUCT_NOT_EXISTS);
+        verifyNoInteractions(deviceMessageProducer);
+    }
+
+    @Test
+    public void testSendDeviceMessage_opcUaReplyAllowed() {
+        // 准备参数：属性上报的回复（下行）
+        IotDeviceMessage message = buildMessage(IotDeviceMessageMethodEnum.PROPERTY_POST.getMethod()).setCode(0);
+
+        try (MockedStatic<SpringUtil> springUtilMock = mockStatic(SpringUtil.class)) {
+            springUtilMock.when(() -> SpringUtil.getBean(IotDeviceMessageServiceImpl.class)).thenReturn(service);
+            // 调用：回复不查产品协议，直接下发
+            service.sendDeviceMessage(message, buildDevice(), "server-1");
+        }
+        // 断言
+        verify(deviceMessageProducer).sendDeviceMessageToGateway(eq("server-1"), same(message));
+        verifyNoInteractions(productService);
+    }
+
+    @Test
     public void testSendDeviceMessage_rawPushPayloadInvalid() {
         // mock 方法：TCP 产品
         when(productService.getProductFromCache(3L)).thenReturn(IotProductDO.builder().id(3L).protocolType("tcp").build());
@@ -357,6 +413,7 @@ public class IotDeviceMessageServiceImplTest extends BaseMockitoUnitTest {
         IotDeviceMessage message = buildMessage(IotDeviceMessageMethodEnum.PROPERTY_SET.getMethod())
                 .setParams(params).setRaw("AQID");
         // mock 方法：设备已连接网关
+        when(productService.getProductFromCache(3L)).thenReturn(IotProductDO.builder().id(3L).protocolType("tcp").build());
         when(devicePropertyService.getDeviceServerId(2L)).thenReturn("server-1");
 
         try (MockedStatic<SpringUtil> springUtilMock = mockStatic(SpringUtil.class)) {
@@ -369,7 +426,9 @@ public class IotDeviceMessageServiceImplTest extends BaseMockitoUnitTest {
         verify(deviceMessageProducer).sendDeviceMessageToGateway(eq("server-1"), messageCaptor.capture());
         assertNull(messageCaptor.getValue().getRaw());
         assertSame(params, messageCaptor.getValue().getParams());
-        verifyNoInteractions(productService);
+        // 只查询产品协议（OPC UA 只读校验），不走透传路径
+        verify(productService).getProductFromCache(3L);
+        verifyNoMoreInteractions(productService);
     }
 
     @Test

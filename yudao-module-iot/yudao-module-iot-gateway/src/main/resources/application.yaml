@@ -213,6 +213,33 @@ yudao:
             min-request-interval: 1000      # 同一设备的最小轮询请求间隔（毫秒，小于等于 0 表示不限制）
             request-timeout: 5000           # Pending Request 超时时间（毫秒）
             request-cleanup-interval: 10000 # Pending Request 清理间隔（毫秒）
+        # ====================================
+        # 针对引入的 OPC UA Client 组件的配置（只读采集；单网关长连接，只部署一个启用该协议的网关实例）
+        # ====================================
+        - id: opc-ua-client-1
+          enabled: false
+          protocol: opc_ua_client
+          port: 4841                        # 只用于生成 serverId，不监听端口
+          opc-ua-client:
+            config-refresh-interval: 30     # 配置刷新间隔（秒）
+            state-retry-interval: 30        # 上下线消息发送失败后的重试间隔（秒）
+            tenant-ids: []                  # 租户白名单（可选）：非空时只采集这些租户的设备
+            pki-dir: data/opc-ua/pki        # PKI 目录：own/client.pfx、trusted/certs、issuer/certs、rejected
+            keystore-password: ${IOT_OPC_UA_KEYSTORE_PASSWORD:}  # 客户端 keystore 口令（必填，建议通过环境变量注入）
+            security-none-allowed: false    # 是否允许 None 安全策略（只用于开发联调，且只能匿名）
+            endpoint-host-rewrite: false    # 服务端返回的端点主机、端口与配置不一致时，是否改写为配置的
+            max-nodes-per-read: 100         # 每次 Read 的最大节点数（与服务端 OperationLimits 取较小值）
+            max-points-per-message: 100     # 每条属性上报消息的最大点位数
+            max-message-bytes: 262144       # 每条属性上报消息的最大字节数
+            max-monitored-items-per-call: 100 # 每次创建、删除 MonitoredItem 的最大数量
+            subscription-keep-alive-count: 10
+            subscription-lifetime-count: 30
+            credentials: {}                 # 用户名凭据，示例：
+            #  plc-reader:                    # 凭据别名（设备配置的 credentialAlias）
+            #    username: reader
+            #    password: ${IOT_OPC_UA_PLC_READER_PASSWORD:}
+            #    tenant-ids: [1]              # 允许使用的租户
+            #    endpoints: ["opc.tcp://192.168.1.10:4840"] # 允许使用的端点
 
 --- #################### 日志相关配置 ####################
 
@@ -235,6 +262,7 @@ logging:
     cn.iocoder.yudao.module.iot.gateway.protocol.coap: DEBUG
     cn.iocoder.yudao.module.iot.gateway.protocol.websocket: DEBUG
     cn.iocoder.yudao.module.iot.gateway.protocol.modbus: DEBUG
+    cn.iocoder.yudao.module.iot.gateway.protocol.opcua: DEBUG
     # 根日志级别
     root: INFO
 

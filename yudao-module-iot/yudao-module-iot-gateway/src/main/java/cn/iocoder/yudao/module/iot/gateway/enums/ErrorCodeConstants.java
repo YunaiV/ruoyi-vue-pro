@@ -35,4 +35,10 @@ public interface ErrorCodeConstants {
     ErrorCode DEVICE_MESSAGE_SPOOL_REJECTED = new ErrorCode(1_051_004_000, "消息总线不可用，且离线暂存失败：{}");
     ErrorCode DEVICE_MESSAGE_REJECTED = new ErrorCode(1_051_004_001, "消息被消息总线拒绝（例如说超过大小限制），重试也不会成功");
 
+    // ========== OPC UA Client 1-051-005-000 ============
+    ErrorCode OPC_UA_DOWNSTREAM_NOT_SUPPORTED = new ErrorCode(1_051_005_000, "OPC UA 只支持读取采集，不支持下行指令");
+    ErrorCode OPC_UA_DEVICE_CONFIG_REJECTED = new ErrorCode(1_051_005_001, "OPC UA 设备配置不可用：{}");
+    ErrorCode OPC_UA_ENDPOINT_REJECTED = new ErrorCode(1_051_005_002, "OPC UA 端点不可用：{}");
+    ErrorCode OPC_UA_SECURITY_INIT_FAILED = new ErrorCode(1_051_005_003, "OPC UA 客户端证书初始化失败：{}");
+
 }

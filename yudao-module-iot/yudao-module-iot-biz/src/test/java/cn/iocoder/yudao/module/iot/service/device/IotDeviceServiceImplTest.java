@@ -107,6 +107,10 @@ public class IotDeviceServiceImplTest extends BaseDbUnitTest {
     private IotDeviceMessageDAO deviceMessageDAO;
     @MockitoBean
     private IotDeviceMessageProducer deviceMessageProducer;
+    @MockitoBean
+    private IotDeviceOpcUaConfigService opcUaConfigService;
+    @MockitoBean
+    private IotDeviceOpcUaPointService opcUaPointService;
 
     /**
      * 与线上一致：缓存的写入、清理，在事务提交后才生效
@@ -140,6 +144,8 @@ public class IotDeviceServiceImplTest extends BaseDbUnitTest {
         // 断言
         assertNull(deviceMapper.selectById(id));
         verify(deviceShadowService).deleteByDeviceId(id);
+        verify(opcUaConfigService).deleteDeviceOpcUaConfigListByDeviceIds(singletonList(id));
+        verify(opcUaPointService).deleteDeviceOpcUaPointListByDeviceIds(singletonList(id));
     }
 
     @Test
