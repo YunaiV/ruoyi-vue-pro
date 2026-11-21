@@ -32,9 +32,7 @@ import org.flowable.bpmn.model.UserTask;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
-import org.flowable.engine.impl.persistence.entity.AttachmentEntityImpl;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Attachment;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
@@ -63,14 +61,14 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 /**
- * {@link BpmTaskServiceImpl} 的单元测试
+ * {@link BpmTaskUpdateServiceImpl} 的单元测试
  *
  * @author HUIHUI
  */
-public class BpmTaskServiceImplTest extends BaseMockitoUnitTest {
+public class BpmTaskUpdateServiceImplTest extends BaseMockitoUnitTest {
 
     @InjectMocks
-    private BpmTaskServiceImpl taskService;
+    private BpmTaskUpdateServiceImpl taskService;
 
     @Mock
     private TaskService flowableTaskService;
@@ -81,7 +79,11 @@ public class BpmTaskServiceImplTest extends BaseMockitoUnitTest {
     @Mock
     private RuntimeService runtimeService;
     @Mock
-    private BpmProcessInstanceService processInstanceService;
+    private BpmTaskQueryService taskQueryService;
+    @Mock
+    private BpmProcessInstanceQueryService processInstanceQueryService;
+    @Mock
+    private BpmProcessInstanceUpdateService processInstanceUpdateService;
     @Mock
     private BpmProcessDefinitionService processDefinitionService;
     @Mock
@@ -103,7 +105,7 @@ public class BpmTaskServiceImplTest extends BaseMockitoUnitTest {
      * 自身代理对象，用于验证 getSelf() 发起的自动审批、自动拒绝、转办
      */
     @Mock
-    private BpmTaskServiceImpl selfService;
+    private BpmTaskUpdateServiceImpl selfService;
 
     private MockedStatic<SpringUtil> springUtilMockedStatic;
 
@@ -118,136 +120,13 @@ public class BpmTaskServiceImplTest extends BaseMockitoUnitTest {
         springUtilMockedStatic.close();
     }
 
-    @Test
-    public void testValidateTask_success() {
-        // 准备参数：通过 spy 绕过 Flowable 查询，只验证负责人校验
-        BpmTaskServiceImpl spyService = spy(taskService);
-        doReturn(task).when(spyService).validateTaskExists("task-1");
-        when(task.getAssignee()).thenReturn("1");
-
-        // 调用
-        Task result = spyService.validateTask(1L, "task-1");
-        // 断言
-        assertSame(task, result);
-    }
-
-    @Test
-    public void testValidateTask_assigneeNotSelf() {
-        // 准备参数
-        BpmTaskServiceImpl spyService = spy(taskService);
-        doReturn(task).when(spyService).validateTaskExists("task-1");
-        when(task.getAssignee()).thenReturn("2");
-
-        // 调用，并断言异常
-        assertServiceException(() -> spyService.validateTask(1L, "task-1"), TASK_OPERATE_FAIL_ASSIGN_NOT_SELF);
-    }
-
-    @Test
-    public void testValidateTask_noAssignee_success() {
-        // 准备参数
-        BpmTaskServiceImpl spyService = spy(taskService);
-        doReturn(task).when(spyService).validateTaskExists("task-1");
-        when(task.getAssignee()).thenReturn(null);
-
-        // 调用
-        Task result = spyService.validateTask(null, "task-1");
-        // 断言
-        assertSame(task, result);
-    }
-
-    @Test
-    public void testValidateTask_ownerOnly() {
-        // 准备参数：加签等待中的任务，只有 owner 没有 assignee
-        BpmTaskServiceImpl spyService = spy(taskService);
-        doReturn(task).when(spyService).validateTaskExists("task-1");
-        when(task.getAssignee()).thenReturn(null);
-        when(task.getOwner()).thenReturn("1");
-
-        // 调用，并断言异常：owner 自己、其它用户、无 userId 都不允许操作
-        assertServiceException(() -> spyService.validateTask(1L, "task-1"), TASK_OPERATE_FAIL_ASSIGN_NOT_SELF);
-        assertServiceException(() -> spyService.validateTask(2L, "task-1"), TASK_OPERATE_FAIL_ASSIGN_NOT_SELF);
-        assertServiceException(() -> spyService.validateTask(null, "task-1"), TASK_OPERATE_FAIL_ASSIGN_NOT_SELF);
-    }
-
-    @Test
-    public void testValidateTask_waitWithoutOwner() {
-        // 准备参数：被委派的任务向前加签后等待中，没有 assignee，等待人记录在任务变量中
-        BpmTaskServiceImpl spyService = spy(taskService);
-        doReturn(task).when(spyService).validateTaskExists("task-1");
-        when(task.getTaskLocalVariables()).thenReturn(Map.of(BpmnVariableConstants.TASK_VARIABLE_STATUS,
-                BpmTaskStatusEnum.WAIT.getStatus()));
-
-        // 调用，并断言异常：即使 owner 为空，也不允许操作
-        assertServiceException(() -> spyService.validateTask(1L, "task-1"), TASK_OPERATE_FAIL_ASSIGN_NOT_SELF);
-        assertServiceException(() -> spyService.validateTask(null, "task-1"), TASK_OPERATE_FAIL_ASSIGN_NOT_SELF);
-    }
-
-    @Test
-    public void testValidateTask_approving() {
-        // 准备参数：向后加签的父任务，已审批通过，等待加签任务审批
-        BpmTaskServiceImpl spyService = spy(taskService);
-        doReturn(task).when(spyService).validateTaskExists("task-1");
-        when(task.getAssignee()).thenReturn("1");
-        when(task.getTaskLocalVariables()).thenReturn(Map.of(BpmnVariableConstants.TASK_VARIABLE_STATUS,
-                BpmTaskStatusEnum.APPROVING.getStatus()));
-
-        // 调用，并断言异常
-        assertServiceException(() -> spyService.validateTask(1L, "task-1"), TASK_OPERATE_FAIL_APPROVING);
-    }
-
-    @Test
-    public void testValidateTaskExists_notExists() {
-        // 准备参数
-        BpmTaskServiceImpl spyService = spy(taskService);
-        doReturn(null).when(spyService).getTask("task-1");
-
-        // 调用，并断言异常
-        assertServiceException(() -> spyService.validateTaskExists("task-1"), TASK_NOT_EXISTS);
-    }
-
-    // ========== Query 查询相关方法 ==========
-
-    @Test
-    public void testGetAllChildrenTaskListByParentTaskId_success() {
-        // 准备参数：parent -> child1 -> child2；other 属于其它父任务
-        TaskEntityImpl parent = buildTaskEntity("parent", null);
-        TaskEntityImpl child1 = buildTaskEntity("child1", "parent");
-        TaskEntityImpl child2 = buildTaskEntity("child2", "child1");
-        TaskEntityImpl other = buildTaskEntity("other", "unknown");
-
-        // 调用
-        List<TaskEntityImpl> result = taskService.getAllChildrenTaskListByParentTaskId("parent",
-                List.of(parent, child1, child2, other));
-        // 断言
-        assertEquals(List.of("child1", "child2"), result.stream().map(TaskEntityImpl::getId).toList());
-        assertTrue(taskService.getAllChildrenTaskListByParentTaskId("parent", List.of(parent)).isEmpty());
-        assertTrue(taskService.getAllChildrenTaskListByParentTaskId("parent", List.<Task>of()).isEmpty());
-    }
-
-    @Test
-    public void testGetAttachments_filter() {
-        // 准备参数
-        Attachment attachment1 = buildAttachment("task-1", BpmAttachmentTypeEnum.TASK_ATTACHMENT.getType());
-        Attachment attachment2 = buildAttachment("task-2", BpmAttachmentTypeEnum.TASK_ATTACHMENT.getType());
-        Attachment attachment3 = buildAttachment("task-1", "other");
-        when(flowableTaskService.getProcessInstanceAttachments("process-instance-1"))
-                .thenReturn(List.of(attachment1, attachment2, attachment3));
-
-        // 调用
-        List<Attachment> result = taskService.getAttachments("process-instance-1", Set.of("task-1"),
-                BpmAttachmentTypeEnum.TASK_ATTACHMENT);
-        // 断言
-        assertEquals(List.of(attachment1), result);
-        assertEquals(3, taskService.getAttachments("process-instance-1", null, null).size());
-    }
-
     // ========== Update 写入相关方法 ==========
 
     @Test
     public void testApproveTask_processInstanceNotExists() {
         // 准备参数
-        BpmTaskServiceImpl spyService = spy(taskService);
-        doReturn(task).when(spyService).validateTask(1L, "task-1");
+        BpmTaskUpdateServiceImpl spyService = spy(taskService);
+        doReturn(task).when(taskQueryService).validateTask(1L, "task-1");
         when(task.getProcessInstanceId()).thenReturn("process-instance-1");
 
         // 调用，并断言异常
@@ -258,7 +137,7 @@ public class BpmTaskServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testApproveTask_signatureNotExists() {
         // 准备参数
-        BpmTaskServiceImpl spyService = spy(taskService);
+        BpmTaskUpdateServiceImpl spyService = spy(taskService);
         mockApproveTask(spyService, BpmnModelConstants.SIGN_ENABLE);
 
         // 调用，并断言异常
@@ -269,7 +148,7 @@ public class BpmTaskServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testApproveTask_reasonRequire() {
         // 准备参数
-        BpmTaskServiceImpl spyService = spy(taskService);
+        BpmTaskUpdateServiceImpl spyService = spy(taskService);
         mockApproveTask(spyService, BpmnModelConstants.REASON_REQUIRE);
 
         // 调用，并断言异常
@@ -280,7 +159,7 @@ public class BpmTaskServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testApproveTask_success() {
         // 准备参数：task1 开启签名，下一个节点 task2 为审批人自选；task1 曾被退回过
-        BpmTaskServiceImpl spyService = spy(taskService);
+        BpmTaskUpdateServiceImpl spyService = spy(taskService);
         BpmnModel bpmnModel = mockApproveTaskSuccess(spyService, BpmTaskCandidateStrategyEnum.APPROVE_USER_SELECT,
                 Map.of("reason", "事假"));
         BpmnModelUtils.addExtensionElement(bpmnModel.getFlowElement("task1"), BpmnModelConstants.SIGN_ENABLE, "true");
@@ -322,7 +201,7 @@ public class BpmTaskServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testApproveTask_approveUserSelectNotConfig() {
         // 准备参数：下一个节点 task2 为审批人自选，但未选择审批人
-        BpmTaskServiceImpl spyService = spy(taskService);
+        BpmTaskUpdateServiceImpl spyService = spy(taskService);
         mockApproveTaskSuccess(spyService, BpmTaskCandidateStrategyEnum.APPROVE_USER_SELECT, Map.of());
 
         // 调用，并断言异常
@@ -334,7 +213,7 @@ public class BpmTaskServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testApproveTask_startUserSelectNotConfig() {
         // 准备参数：下一个节点 task2 为发起人自选，但发起时、审批时都未选择审批人
-        BpmTaskServiceImpl spyService = spy(taskService);
+        BpmTaskUpdateServiceImpl spyService = spy(taskService);
         mockApproveTaskSuccess(spyService, BpmTaskCandidateStrategyEnum.START_USER_SELECT, Map.of());
 
         // 调用，并断言异常
@@ -345,7 +224,7 @@ public class BpmTaskServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testApproveTask_startUserSelectAlreadyConfig() {
         // 准备参数：下一个节点 task2 为发起人自选，发起时已经选择审批人
-        BpmTaskServiceImpl spyService = spy(taskService);
+        BpmTaskUpdateServiceImpl spyService = spy(taskService);
         Map<String, List<Long>> startUserSelectAssignees = Map.of("task2", List.of(2L));
         mockApproveTaskSuccess(spyService, BpmTaskCandidateStrategyEnum.START_USER_SELECT, Map.of(
                 BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_START_USER_SELECT_ASSIGNEES, startUserSelectAssignees));
@@ -363,8 +242,8 @@ public class BpmTaskServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testMoveTaskToEnd_noRunningTask() {
         // 准备参数
-        BpmTaskServiceImpl spyService = spy(taskService);
-        doReturn(List.of()).when(spyService).getRunningTaskListByProcessInstanceId("process-instance-1", null, null);
+        BpmTaskUpdateServiceImpl spyService = spy(taskService);
+        doReturn(List.of()).when(taskQueryService).getRunningTaskListByProcessInstanceId("process-instance-1", null, null);
 
         // 调用
         spyService.moveTaskToEnd("process-instance-1", "结束流程");
@@ -375,8 +254,8 @@ public class BpmTaskServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testRejectTask_processInstanceNotExists() {
         // 准备参数
-        BpmTaskServiceImpl spyService = spy(taskService);
-        doReturn(task).when(spyService).validateTask(1L, "task-1");
+        BpmTaskUpdateServiceImpl spyService = spy(taskService);
+        doReturn(task).when(taskQueryService).validateTask(1L, "task-1");
         when(task.getProcessInstanceId()).thenReturn("process-instance-1");
 
         // 调用，并断言异常
@@ -387,8 +266,8 @@ public class BpmTaskServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testReturnTask_pending() {
         // 准备参数
-        BpmTaskServiceImpl spyService = spy(taskService);
-        doReturn(task).when(spyService).validateTask(1L, "task-1");
+        BpmTaskUpdateServiceImpl spyService = spy(taskService);
+        doReturn(task).when(taskQueryService).validateTask(1L, "task-1");
         when(task.isSuspended()).thenReturn(true);
 
         // 调用，并断言异常
@@ -399,8 +278,8 @@ public class BpmTaskServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testDelegateTask_userNotExists() {
         // 准备参数
-        BpmTaskServiceImpl spyService = spy(taskService);
-        doReturn(task).when(spyService).validateTask(1L, "task-1");
+        BpmTaskUpdateServiceImpl spyService = spy(taskService);
+        doReturn(task).when(taskQueryService).validateTask(1L, "task-1");
         when(task.getAssignee()).thenReturn("1");
 
         // 调用，并断言异常
@@ -411,8 +290,8 @@ public class BpmTaskServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testDelegateTask_emptyAssignee_userNotExists() {
         // 准备参数：自动审批或审批人为空时，任务可能没有 assignee
-        BpmTaskServiceImpl spyService = spy(taskService);
-        doReturn(task).when(spyService).validateTask(1L, "task-1");
+        BpmTaskUpdateServiceImpl spyService = spy(taskService);
+        doReturn(task).when(taskQueryService).validateTask(1L, "task-1");
         when(task.getAssignee()).thenReturn(null);
 
         // 调用，并断言：不应因 assignee 为空触发空指针
@@ -423,8 +302,8 @@ public class BpmTaskServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testTransferTask_userRepeat() {
         // 准备参数
-        BpmTaskServiceImpl spyService = spy(taskService);
-        doReturn(task).when(spyService).validateTask(1L, "task-1");
+        BpmTaskUpdateServiceImpl spyService = spy(taskService);
+        doReturn(task).when(taskQueryService).validateTask(1L, "task-1");
         when(task.getAssignee()).thenReturn("1");
 
         // 调用，并断言异常
@@ -435,8 +314,8 @@ public class BpmTaskServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testTransferTask_userNotExists() {
         // 准备参数
-        BpmTaskServiceImpl spyService = spy(taskService);
-        doReturn(task).when(spyService).validateTask(1L, "task-1");
+        BpmTaskUpdateServiceImpl spyService = spy(taskService);
+        doReturn(task).when(taskQueryService).validateTask(1L, "task-1");
         when(task.getAssignee()).thenReturn("1");
 
         // 调用，并断言异常
@@ -447,8 +326,8 @@ public class BpmTaskServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testTransferTask_alreadyHasOwner() {
         // 准备参数
-        BpmTaskServiceImpl spyService = spy(taskService);
-        doReturn(task).when(spyService).validateTask(1L, "task-1");
+        BpmTaskUpdateServiceImpl spyService = spy(taskService);
+        doReturn(task).when(taskQueryService).validateTask(1L, "task-1");
         when(task.getAssignee()).thenReturn("1");
         when(task.getOwner()).thenReturn("3");
         when(task.getProcessInstanceId()).thenReturn("process-instance-1");
@@ -467,11 +346,11 @@ public class BpmTaskServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testCreateSignTask_userNotExists() {
         // 准备参数
-        BpmTaskServiceImpl spyService = spy(taskService);
+        BpmTaskUpdateServiceImpl spyService = spy(taskService);
         TaskEntityImpl taskEntity = buildTaskEntity("task-1", null);
         taskEntity.setProcessInstanceId("process-instance-1");
         taskEntity.setTaskDefinitionKey("task1");
-        doReturn(taskEntity).when(spyService).validateTask(1L, "task-1");
+        doReturn(taskEntity).when(taskQueryService).validateTask(1L, "task-1");
         TaskQuery taskQuery = mock(TaskQuery.class, RETURNS_SELF);
         when(flowableTaskService.createTaskQuery()).thenReturn(taskQuery);
         when(taskQuery.list()).thenReturn(List.of());
@@ -493,10 +372,10 @@ public class BpmTaskServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testDeleteSignTask_parentNotExists() {
         // 准备参数
-        BpmTaskServiceImpl spyService = spy(taskService);
-        doReturn(task).when(spyService).validateTaskExists("task-1");
+        BpmTaskUpdateServiceImpl spyService = spy(taskService);
+        doReturn(task).when(taskQueryService).validateTaskExists("task-1");
         when(task.getParentTaskId()).thenReturn("parent-1");
-        doReturn(null).when(spyService).getTask("parent-1");
+        doReturn(null).when(taskQueryService).getTask("parent-1");
 
         // 调用，并断言异常
         assertServiceException(() -> spyService.deleteSignTask(1L, new BpmTaskSignDeleteReqVO().setId("task-1")
@@ -506,10 +385,10 @@ public class BpmTaskServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testDeleteSignTask_parentNotSign() {
         // 准备参数
-        BpmTaskServiceImpl spyService = spy(taskService);
-        doReturn(task).when(spyService).validateTaskExists("task-1");
+        BpmTaskUpdateServiceImpl spyService = spy(taskService);
+        doReturn(task).when(taskQueryService).validateTaskExists("task-1");
         when(task.getParentTaskId()).thenReturn("parent-1");
-        doReturn(buildTaskEntity("parent-1", null)).when(spyService).getTask("parent-1");
+        doReturn(buildTaskEntity("parent-1", null)).when(taskQueryService).getTask("parent-1");
 
         // 调用，并断言异常
         assertServiceException(() -> spyService.deleteSignTask(1L, new BpmTaskSignDeleteReqVO().setId("task-1")
@@ -543,7 +422,7 @@ public class BpmTaskServiceImplTest extends BaseMockitoUnitTest {
         HistoricTaskInstance historicTask = mockWithdrawHistoricTask("task2");
         when(historicTask.getProcessInstanceId()).thenReturn("process-instance-1");
         when(historicTask.getProcessDefinitionId()).thenReturn("definition-1");
-        when(processInstanceService.getProcessInstance("process-instance-1")).thenReturn(processInstance);
+        when(processInstanceQueryService.getProcessInstance("process-instance-1")).thenReturn(processInstance);
         when(processInstance.getProcessDefinitionId()).thenReturn("definition-1");
         when(processDefinitionService.getProcessDefinitionInfo("definition-1"))
                 .thenReturn(new BpmProcessDefinitionInfoDO().setAllowWithdrawTask(true));
@@ -565,7 +444,7 @@ public class BpmTaskServiceImplTest extends BaseMockitoUnitTest {
         taskService.processTaskCreated(task);
         // 断言
         verify(flowableTaskService, never()).setVariableLocal(any(), any(), any());
-        verifyNoInteractions(processInstanceService);
+        verifyNoInteractions(processInstanceQueryService, processInstanceUpdateService);
     }
 
     @Test
@@ -585,7 +464,7 @@ public class BpmTaskServiceImplTest extends BaseMockitoUnitTest {
     public void testProcessTaskCreated_processDefinitionNotExists() {
         // 准备参数
         mockTask("1");
-        when(processInstanceService.getProcessInstance("process-instance-1")).thenReturn(processInstance);
+        when(processInstanceQueryService.getProcessInstance("process-instance-1")).thenReturn(processInstance);
         when(processInstance.getProcessDefinitionId()).thenReturn("definition-1");
 
         // 调用
@@ -645,10 +524,10 @@ public class BpmTaskServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testProcessTaskCreated_unknownStatusTaskNotExists() {
         // 准备参数：事务状态未知，且任务已经不存在（例如说，已被自动审批）
-        BpmTaskServiceImpl spyService = spy(taskService);
+        BpmTaskUpdateServiceImpl spyService = spy(taskService);
         mockProcessTaskCreated("1", Map.of(BpmnModelConstants.USER_TASK_APPROVE_TYPE,
                 BpmUserTaskApproveTypeEnum.AUTO_APPROVE.getType()));
-        doReturn(null).when(spyService).getTask("task-1");
+        doReturn(null).when(taskQueryService).getTask("task-1");
 
         // 调用
         executeWithSynchronization(() -> spyService.processTaskCreated(task),
@@ -660,10 +539,10 @@ public class BpmTaskServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testProcessTaskCreated_unknownStatusTaskExists() {
         // 准备参数：事务状态未知，但任务仍然存在
-        BpmTaskServiceImpl spyService = spy(taskService);
+        BpmTaskUpdateServiceImpl spyService = spy(taskService);
         mockProcessTaskCreated("1", Map.of(BpmnModelConstants.USER_TASK_APPROVE_TYPE,
                 BpmUserTaskApproveTypeEnum.AUTO_APPROVE.getType()));
-        doReturn(task).when(spyService).getTask("task-1");
+        doReturn(task).when(taskQueryService).getTask("task-1");
 
         // 调用
         executeWithSynchronization(() -> spyService.processTaskCreated(task),
@@ -675,8 +554,8 @@ public class BpmTaskServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testProcessTaskCanceled_notExists() {
         // 准备参数
-        BpmTaskServiceImpl spyService = spy(taskService);
-        doReturn(null).when(spyService).getTask("task-1");
+        BpmTaskUpdateServiceImpl spyService = spy(taskService);
+        doReturn(null).when(taskQueryService).getTask("task-1");
 
         // 调用
         spyService.processTaskCanceled("task-1");
@@ -687,8 +566,8 @@ public class BpmTaskServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testProcessTaskCanceled_endStatus() {
         // 准备参数
-        BpmTaskServiceImpl spyService = spy(taskService);
-        doReturn(task).when(spyService).getTask("task-1");
+        BpmTaskUpdateServiceImpl spyService = spy(taskService);
+        doReturn(task).when(taskQueryService).getTask("task-1");
         when(task.getTaskLocalVariables()).thenReturn(Map.of(BpmnVariableConstants.TASK_VARIABLE_STATUS,
                 BpmTaskStatusEnum.APPROVE.getStatus()));
 
@@ -701,8 +580,8 @@ public class BpmTaskServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testProcessTaskCanceled_success() {
         // 准备参数
-        BpmTaskServiceImpl spyService = spy(taskService);
-        doReturn(task).when(spyService).getTask("task-1");
+        BpmTaskUpdateServiceImpl spyService = spy(taskService);
+        doReturn(task).when(taskQueryService).getTask("task-1");
         when(task.getTaskLocalVariables()).thenReturn(Map.of(BpmnVariableConstants.TASK_VARIABLE_STATUS,
                 BpmTaskStatusEnum.RUNNING.getStatus()));
 
@@ -724,7 +603,7 @@ public class BpmTaskServiceImplTest extends BaseMockitoUnitTest {
         executeWithSynchronization(() -> taskService.processTaskAssigned(task),
                 TransactionSynchronization.STATUS_COMMITTED);
         // 断言
-        verifyNoInteractions(processInstanceService, messageService, selfService);
+        verifyNoInteractions(processInstanceQueryService, processInstanceUpdateService, messageService, selfService);
     }
 
     @Test
@@ -733,21 +612,21 @@ public class BpmTaskServiceImplTest extends BaseMockitoUnitTest {
         executeWithSynchronization(() -> taskService.processTaskAssigned(task),
                 TransactionSynchronization.STATUS_ROLLED_BACK);
         // 断言
-        verifyNoInteractions(task, processInstanceService, messageService, selfService);
+        verifyNoInteractions(task, processInstanceQueryService, processInstanceUpdateService, messageService, selfService);
     }
 
     @Test
     public void testProcessTaskAssigned_unknownStatusTaskNotExists() {
         // 准备参数：事务状态未知，且任务已经不存在
-        BpmTaskServiceImpl spyService = spy(taskService);
+        BpmTaskUpdateServiceImpl spyService = spy(taskService);
         when(task.getId()).thenReturn("task-1");
-        doReturn(null).when(spyService).getTask("task-1");
+        doReturn(null).when(taskQueryService).getTask("task-1");
 
         // 调用
         executeWithSynchronization(() -> spyService.processTaskAssigned(task),
                 TransactionSynchronization.STATUS_UNKNOWN);
         // 断言
-        verifyNoInteractions(processInstanceService, messageService, selfService);
+        verifyNoInteractions(processInstanceQueryService, processInstanceUpdateService, messageService, selfService);
     }
 
     @Test
@@ -800,7 +679,7 @@ public class BpmTaskServiceImplTest extends BaseMockitoUnitTest {
     public void testProcessTaskCompleted_noTriggerSetting() {
         // 准备参数
         when(task.getProcessInstanceId()).thenReturn("process-instance-1");
-        when(processInstanceService.getProcessInstance("process-instance-1")).thenReturn(processInstance);
+        when(processInstanceQueryService.getProcessInstance("process-instance-1")).thenReturn(processInstance);
         when(processInstance.getProcessDefinitionId()).thenReturn("definition-1");
         when(processDefinitionService.getProcessDefinitionInfo("definition-1"))
                 .thenReturn(new BpmProcessDefinitionInfoDO());
@@ -815,7 +694,7 @@ public class BpmTaskServiceImplTest extends BaseMockitoUnitTest {
     public void testProcessTaskCompleted_taskAfterTrigger() {
         // 准备参数：配置任务后置通知
         when(task.getProcessInstanceId()).thenReturn("process-instance-1");
-        when(processInstanceService.getProcessInstance("process-instance-1")).thenReturn(processInstance);
+        when(processInstanceQueryService.getProcessInstance("process-instance-1")).thenReturn(processInstance);
         when(processInstance.getProcessDefinitionId()).thenReturn("definition-1");
         BpmModelMetaInfoVO.HttpRequestSetting setting = new BpmModelMetaInfoVO.HttpRequestSetting()
                 .setUrl("http://127.0.0.1/task-after");
@@ -843,9 +722,9 @@ public class BpmTaskServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testProcessTaskTimeout_taskNotExists() {
         // 准备参数
-        BpmTaskServiceImpl spyService = spy(taskService);
-        when(processInstanceService.getProcessInstance("process-instance-1")).thenReturn(processInstance);
-        doReturn(List.of()).when(spyService).getRunningTaskListByProcessInstanceId("process-instance-1", true, "task1");
+        BpmTaskUpdateServiceImpl spyService = spy(taskService);
+        when(processInstanceQueryService.getProcessInstance("process-instance-1")).thenReturn(processInstance);
+        doReturn(List.of()).when(taskQueryService).getRunningTaskListByProcessInstanceId("process-instance-1", true, "task1");
 
         // 调用
         spyService.processTaskTimeout("process-instance-1", "task1",
@@ -861,13 +740,6 @@ public class BpmTaskServiceImplTest extends BaseMockitoUnitTest {
         taskEntity.setId(id);
         taskEntity.setParentTaskId(parentTaskId);
         return taskEntity;
-    }
-
-    private static Attachment buildAttachment(String taskId, String type) {
-        AttachmentEntityImpl attachment = new AttachmentEntityImpl();
-        attachment.setTaskId(taskId);
-        attachment.setType(type);
-        return attachment;
     }
 
     /**
@@ -892,12 +764,12 @@ public class BpmTaskServiceImplTest extends BaseMockitoUnitTest {
         return bpmnModel;
     }
 
-    private void mockApproveTask(BpmTaskServiceImpl spyService, String extensionName) {
-        doReturn(task).when(spyService).validateTask(1L, "task-1");
+    private void mockApproveTask(BpmTaskUpdateServiceImpl spyService, String extensionName) {
+        doReturn(task).when(taskQueryService).validateTask(1L, "task-1");
         when(task.getProcessInstanceId()).thenReturn("process-instance-1");
         when(task.getProcessDefinitionId()).thenReturn("definition-1");
         when(task.getTaskDefinitionKey()).thenReturn("task1");
-        when(processInstanceService.getProcessInstance("process-instance-1")).thenReturn(processInstance);
+        when(processInstanceQueryService.getProcessInstance("process-instance-1")).thenReturn(processInstance);
         BpmnModel bpmnModel = buildTwoStepBpmnModel();
         BpmnModelUtils.addExtensionElement(bpmnModel.getFlowElement("task1"), extensionName, "true");
         when(modelService.getBpmnModelByDefinitionId("definition-1")).thenReturn(bpmnModel);
@@ -906,14 +778,14 @@ public class BpmTaskServiceImplTest extends BaseMockitoUnitTest {
     /**
      * 模拟审批 task1：下一个节点 task2 使用指定的审批人策略
      */
-    private BpmnModel mockApproveTaskSuccess(BpmTaskServiceImpl spyService, BpmTaskCandidateStrategyEnum task2Strategy,
+    private BpmnModel mockApproveTaskSuccess(BpmTaskUpdateServiceImpl spyService, BpmTaskCandidateStrategyEnum task2Strategy,
                                              Map<String, Object> processVariables) {
-        doReturn(task).when(spyService).validateTask(1L, "task-1");
+        doReturn(task).when(taskQueryService).validateTask(1L, "task-1");
         when(task.getId()).thenReturn("task-1");
         when(task.getProcessInstanceId()).thenReturn("process-instance-1");
         when(task.getProcessDefinitionId()).thenReturn("definition-1");
         when(task.getTaskDefinitionKey()).thenReturn("task1");
-        when(processInstanceService.getProcessInstance("process-instance-1")).thenReturn(processInstance);
+        when(processInstanceQueryService.getProcessInstance("process-instance-1")).thenReturn(processInstance);
         when(processInstance.getProcessVariables()).thenReturn(processVariables);
         BpmnModel bpmnModel = buildTwoStepBpmnModel();
         FlowElement task2 = bpmnModel.getFlowElement("task2");
@@ -960,7 +832,7 @@ public class BpmTaskServiceImplTest extends BaseMockitoUnitTest {
                                         BpmProcessDefinitionInfoDO processDefinitionInfo) {
         mockTask(assignee);
         when(task.getTaskDefinitionKey()).thenReturn("task1");
-        when(processInstanceService.getProcessInstance("process-instance-1")).thenReturn(processInstance);
+        when(processInstanceQueryService.getProcessInstance("process-instance-1")).thenReturn(processInstance);
         when(processInstance.getProcessDefinitionId()).thenReturn("definition-1");
         when(processDefinitionService.getProcessDefinitionInfo("definition-1")).thenReturn(processDefinitionInfo);
         when(modelService.getBpmnModelByDefinitionId("definition-1")).thenReturn(buildBpmnModel("task1", extensions));
@@ -972,7 +844,7 @@ public class BpmTaskServiceImplTest extends BaseMockitoUnitTest {
         when(task.getProcessInstanceId()).thenReturn("process-instance-1");
         when(task.getProcessDefinitionId()).thenReturn("definition-1");
         lenient().when(task.getTaskDefinitionKey()).thenReturn(taskDefinitionKey);
-        when(processInstanceService.getProcessInstance("process-instance-1")).thenReturn(processInstance);
+        when(processInstanceQueryService.getProcessInstance("process-instance-1")).thenReturn(processInstance);
         lenient().when(processInstance.getProcessDefinitionId()).thenReturn("definition-1");
         when(processDefinitionService.getProcessDefinitionInfo("definition-1"))
                 .thenReturn(new BpmProcessDefinitionInfoDO().setAutoApprovalType(autoApprovalType));

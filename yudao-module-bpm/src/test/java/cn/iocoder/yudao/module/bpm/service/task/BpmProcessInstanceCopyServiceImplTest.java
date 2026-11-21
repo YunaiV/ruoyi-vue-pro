@@ -35,9 +35,9 @@ public class BpmProcessInstanceCopyServiceImplTest extends BaseMockitoUnitTest {
     @Mock
     private BpmProcessInstanceCopyMapper copyMapper;
     @Mock
-    private BpmTaskService taskService;
+    private BpmTaskQueryService taskQueryService;
     @Mock
-    private BpmProcessInstanceService processInstanceService;
+    private BpmProcessInstanceQueryService processInstanceQueryService;
     @Mock
     private BpmProcessDefinitionService processDefinitionService;
     @Mock
@@ -50,7 +50,7 @@ public class BpmProcessInstanceCopyServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testCreateProcessInstanceCopy_task_success() {
         // 准备参数
-        when(taskService.getTask("task-1")).thenReturn(task);
+        when(taskQueryService.getTask("task-1")).thenReturn(task);
         when(task.getProcessInstanceId()).thenReturn("process-instance-1");
         when(task.getTaskDefinitionKey()).thenReturn("approve");
         when(task.getName()).thenReturn("审批");
@@ -70,7 +70,7 @@ public class BpmProcessInstanceCopyServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testCreateProcessInstanceCopy_taskNotExists() {
         // 准备参数
-        when(taskService.getTask("task-1")).thenReturn(null);
+        when(taskQueryService.getTask("task-1")).thenReturn(null);
 
         // 调用，并断言异常
         assertServiceException(() -> copyService.createProcessInstanceCopy(List.of(2L), "请知悉", "task-1"),
@@ -80,7 +80,7 @@ public class BpmProcessInstanceCopyServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testCreateProcessInstanceCopy_processInstanceNotExists() {
         // 准备参数
-        when(processInstanceService.getProcessInstance("process-instance-1")).thenReturn(null);
+        when(processInstanceQueryService.getProcessInstance("process-instance-1")).thenReturn(null);
 
         // 调用，并断言异常
         assertServiceException(() -> copyService.createProcessInstanceCopy(List.of(2L), "请知悉",
@@ -90,7 +90,7 @@ public class BpmProcessInstanceCopyServiceImplTest extends BaseMockitoUnitTest {
     @Test
     public void testCreateProcessInstanceCopy_processDefinitionNotExists() {
         // 准备参数
-        when(processInstanceService.getProcessInstance("process-instance-1")).thenReturn(processInstance);
+        when(processInstanceQueryService.getProcessInstance("process-instance-1")).thenReturn(processInstance);
         when(processInstance.getProcessDefinitionId()).thenReturn("definition-1");
         when(processDefinitionService.getProcessDefinition("definition-1")).thenReturn(null);
 
@@ -100,7 +100,7 @@ public class BpmProcessInstanceCopyServiceImplTest extends BaseMockitoUnitTest {
     }
 
     private void prepareProcessInstance() {
-        when(processInstanceService.getProcessInstance("process-instance-1")).thenReturn(processInstance);
+        when(processInstanceQueryService.getProcessInstance("process-instance-1")).thenReturn(processInstance);
         when(processInstance.getStartUserId()).thenReturn("1");
         when(processInstance.getName()).thenReturn("请假申请");
         when(processInstance.getProcessDefinitionId()).thenReturn("definition-1");

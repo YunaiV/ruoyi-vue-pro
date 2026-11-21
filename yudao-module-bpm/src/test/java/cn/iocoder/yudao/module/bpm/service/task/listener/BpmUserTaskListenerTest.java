@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmHttpRequestUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
-import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
+import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceQueryService;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.service.delegate.DelegateTask;
@@ -32,7 +32,7 @@ public class BpmUserTaskListenerTest extends BaseMockitoUnitTest {
     private BpmUserTaskListener userTaskListener;
 
     @Mock
-    private BpmProcessInstanceService processInstanceService;
+    private BpmProcessInstanceQueryService processInstanceQueryService;
     @Mock
     private Expression listenerConfig;
 
@@ -41,7 +41,7 @@ public class BpmUserTaskListenerTest extends BaseMockitoUnitTest {
     public void testNotify_bodyNull() {
         // mock 方法：监听器未配置 body
         ProcessInstance processInstance = mock(ProcessInstance.class);
-        when(processInstanceService.getProcessInstance("process-instance-1")).thenReturn(processInstance);
+        when(processInstanceQueryService.getProcessInstance("process-instance-1")).thenReturn(processInstance);
         BpmSimpleModelNodeVO.ListenerHandler listenerHandler = new BpmSimpleModelNodeVO.ListenerHandler()
                 .setPath("http://127.0.0.1/listener");
         // 准备参数

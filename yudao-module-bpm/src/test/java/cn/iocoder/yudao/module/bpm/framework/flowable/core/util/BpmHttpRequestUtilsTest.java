@@ -5,7 +5,8 @@ import cn.iocoder.yudao.framework.tenant.core.context.TenantContextHolder;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.bpm.api.event.BpmProcessInstanceStatusEvent;
 import cn.iocoder.yudao.module.bpm.framework.flowable.config.BpmHttpRequestProperties;
-import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
+import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceQueryService;
+import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceUpdateService;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -33,7 +34,9 @@ import static org.mockito.Mockito.*;
 public class BpmHttpRequestUtilsTest extends BaseMockitoUnitTest {
 
     @Mock
-    private BpmProcessInstanceService processInstanceService;
+    private BpmProcessInstanceQueryService processInstanceQueryService;
+    @Mock
+    private BpmProcessInstanceUpdateService processInstanceUpdateService;
     @Mock
     private ProcessInstance processInstance;
     @Mock
@@ -49,13 +52,13 @@ public class BpmHttpRequestUtilsTest extends BaseMockitoUnitTest {
         // 准备参数：事务完成后的回调可能已经没有租户上下文，但流程实例仍带有租户编号
         BpmProcessInstanceStatusEvent event = new BpmProcessInstanceStatusEvent(this);
         event.setId("process-instance");
-        when(processInstanceService.getProcessInstance("process-instance")).thenReturn(processInstance);
+        when(processInstanceQueryService.getProcessInstance("process-instance")).thenReturn(processInstance);
         when(processInstance.getTenantId()).thenReturn("tenant-1");
         when(restTemplate.exchange(anyString(), any(), any(), eq(String.class))).thenReturn(ResponseEntity.ok("{}"));
 
         try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
-            springUtilMockedStatic.when(() -> SpringUtil.getBean(BpmProcessInstanceService.class))
-                    .thenReturn(processInstanceService);
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(BpmProcessInstanceQueryService.class))
+                    .thenReturn(processInstanceQueryService);
             springUtilMockedStatic.when(() -> SpringUtil.getBean(RestTemplate.class)).thenReturn(restTemplate);
 
             // 调用
@@ -146,8 +149,8 @@ public class BpmHttpRequestUtilsTest extends BaseMockitoUnitTest {
         when(restTemplate.exchange(anyString(), any(), any(), eq(String.class))).thenReturn(ResponseEntity.ok("{}"));
         try (MockedStatic<SpringUtil> springUtilMockedStatic = mockStatic(SpringUtil.class)) {
             springUtilMockedStatic.when(() -> SpringUtil.getBean(BpmHttpRequestProperties.class)).thenReturn(properties);
-            springUtilMockedStatic.when(() -> SpringUtil.getBean(BpmProcessInstanceService.class))
-                    .thenReturn(processInstanceService);
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(BpmProcessInstanceUpdateService.class))
+                    .thenReturn(processInstanceUpdateService);
             springUtilMockedStatic.when(() -> SpringUtil.getBean(RestTemplate.class)).thenReturn(restTemplate);
 
             for (String url : urls) {

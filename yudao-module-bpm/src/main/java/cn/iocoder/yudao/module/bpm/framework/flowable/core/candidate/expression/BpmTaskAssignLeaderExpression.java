@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.expression;
 
 import cn.iocoder.yudao.framework.common.util.number.NumberUtils;
-import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
+import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceQueryService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -33,7 +33,7 @@ public class BpmTaskAssignLeaderExpression {
     private DeptApi deptApi;
 
     @Resource
-    private BpmProcessInstanceService processInstanceService;
+    private BpmProcessInstanceQueryService processInstanceQueryService;
 
     /**
      * 计算审批的候选人
@@ -45,7 +45,7 @@ public class BpmTaskAssignLeaderExpression {
     public Set<Long> calculateUsers(DelegateExecution execution, int level) {
         Assert.isTrue(level > 0, "level 必须大于 0");
         // 获得发起人
-        ProcessInstance processInstance = processInstanceService.getProcessInstance(execution.getProcessInstanceId());
+        ProcessInstance processInstance = processInstanceQueryService.getProcessInstance(execution.getProcessInstanceId());
         Long startUserId = NumberUtils.parseLong(processInstance.getStartUserId());
         // 获得对应 leve 的部门
         DeptRespDTO dept = null;

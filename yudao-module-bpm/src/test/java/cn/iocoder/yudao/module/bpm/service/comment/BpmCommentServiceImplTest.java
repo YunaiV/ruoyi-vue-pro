@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.bpm.service.comment;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.bpm.controller.admin.comment.vo.BpmCommentCreateReqVO;
 import cn.iocoder.yudao.module.bpm.enums.task.BpmCommentTypeEnum;
-import cn.iocoder.yudao.module.bpm.service.task.BpmTaskService;
+import cn.iocoder.yudao.module.bpm.service.task.BpmTaskQueryService;
 import org.flowable.engine.TaskService;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
@@ -27,7 +27,7 @@ public class BpmCommentServiceImplTest extends BaseMockitoUnitTest {
     @Mock
     private TaskService taskService;
     @Mock
-    private BpmTaskService bpmTaskService;
+    private BpmTaskQueryService taskQueryService;
     @Mock
     private Task task;
 
@@ -47,7 +47,7 @@ public class BpmCommentServiceImplTest extends BaseMockitoUnitTest {
         // 准备参数
         BpmCommentCreateReqVO reqVO = new BpmCommentCreateReqVO()
                 .setTaskId("task-1").setMessage("请补充附件");
-        when(bpmTaskService.validateTaskExists(reqVO.getTaskId())).thenReturn(task);
+        when(taskQueryService.validateTaskExists(reqVO.getTaskId())).thenReturn(task);
         when(task.getId()).thenReturn(reqVO.getTaskId());
         when(task.getProcessInstanceId()).thenReturn("process-instance-1");
 

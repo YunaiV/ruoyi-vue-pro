@@ -14,8 +14,9 @@ import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmCategoryDO;
 import cn.iocoder.yudao.module.bpm.dal.dataobject.definition.BpmProcessDefinitionInfoDO;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmCategoryService;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmProcessDefinitionService;
-import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
-import cn.iocoder.yudao.module.bpm.service.task.BpmTaskService;
+import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceQueryService;
+import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceUpdateService;
+import cn.iocoder.yudao.module.bpm.service.task.BpmTaskQueryService;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.dept.dto.DeptRespDTO;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -51,9 +52,11 @@ import static cn.iocoder.yudao.module.bpm.enums.ErrorCodeConstants.PROCESS_INSTA
 public class BpmProcessInstanceController {
 
     @Resource
-    private BpmProcessInstanceService processInstanceService;
+    private BpmProcessInstanceQueryService processInstanceQueryService;
     @Resource
-    private BpmTaskService taskService;
+    private BpmProcessInstanceUpdateService processInstanceUpdateService;
+    @Resource
+    private BpmTaskQueryService taskQueryService;
     @Resource
     private BpmProcessDefinitionService processDefinitionService;
     @Resource
@@ -72,14 +75,14 @@ public class BpmProcessInstanceController {
     @PreAuthorize("@ss.hasPermission('bpm:process-instance:query')")
     public CommonResult<PageResult<BpmProcessInstanceRespVO>> getProcessInstanceMyPage(
             @Valid BpmProcessInstancePageReqVO pageReqVO) {
-        PageResult<HistoricProcessInstance> pageResult = processInstanceService.getProcessInstancePage(
+        PageResult<HistoricProcessInstance> pageResult = processInstanceQueryService.getProcessInstancePage(
                 getLoginUserId(), pageReqVO);
         if (CollUtil.isEmpty(pageResult.getList())) {
             return success(PageResult.empty(pageResult.getTotal()));
         }
 
         // 拼接返回
-        Map<String, List<Task>> taskMap = taskService.getTaskMapByProcessInstanceIds(
+        Map<String, List<Task>> taskMap = taskQueryService.getTaskMapByProcessInstanceIds(
                 convertList(pageResult.getList(), HistoricProcessInstance::getId));
         Map<String, ProcessDefinition> processDefinitionMap = processDefinitionService.getProcessDefinitionMap(
                 convertSet(pageResult.getList(), HistoricProcessInstance::getProcessDefinitionId));
@@ -102,14 +105,14 @@ public class BpmProcessInstanceController {
     @PreAuthorize("@ss.hasPermission('bpm:process-instance:manager-query')")
     public CommonResult<PageResult<BpmProcessInstanceRespVO>> getProcessInstanceManagerPage(
             @Valid BpmProcessInstancePageReqVO pageReqVO) {
-        PageResult<HistoricProcessInstance> pageResult = processInstanceService.getProcessInstancePage(
+        PageResult<HistoricProcessInstance> pageResult = processInstanceQueryService.getProcessInstancePage(
                 null, pageReqVO);
         if (CollUtil.isEmpty(pageResult.getList())) {
             return success(PageResult.empty(pageResult.getTotal()));
         }
 
         // 拼接返回
-        Map<String, List<Task>> taskMap = taskService.getTaskMapByProcessInstanceIds(
+        Map<String, List<Task>> taskMap = taskQueryService.getTaskMapByProcessInstanceIds(
                 convertList(pageResult.getList(), HistoricProcessInstance::getId));
         Map<String, ProcessDefinition> processDefinitionMap = processDefinitionService.getProcessDefinitionMap(
                 convertSet(pageResult.getList(), HistoricProcessInstance::getProcessDefinitionId));
@@ -130,7 +133,7 @@ public class BpmProcessInstanceController {
     @Operation(summary = "新建流程实例")
     @PreAuthorize("@ss.hasPermission('bpm:process-instance:query')")
     public CommonResult<String> createProcessInstance(@Valid @RequestBody BpmProcessInstanceCreateReqVO createReqVO) {
-        return success(processInstanceService.createProcessInstance(getLoginUserId(), createReqVO));
+        return success(processInstanceUpdateService.createProcessInstance(getLoginUserId(), createReqVO));
     }
 
     @GetMapping("/get")
@@ -138,7 +141,7 @@ public class BpmProcessInstanceController {
     @Parameter(name = "id", description = "流程实例的编号", required = true)
     @PreAuthorize("@ss.hasPermission('bpm:process-instance:query')")
     public CommonResult<BpmProcessInstanceRespVO> getProcessInstance(@RequestParam("id") String id) {
-        HistoricProcessInstance processInstance = processInstanceService.getHistoricProcessInstance(id);
+        HistoricProcessInstance processInstance = processInstanceQueryService.getHistoricProcessInstance(id);
         if (processInstance == null) {
             return success(null);
         }
@@ -162,7 +165,7 @@ public class BpmProcessInstanceController {
     @PreAuthorize("@ss.hasPermission('bpm:process-instance:cancel')")
     public CommonResult<Boolean> cancelProcessInstanceByStartUser(
             @Valid @RequestBody BpmProcessInstanceCancelReqVO cancelReqVO) {
-        processInstanceService.cancelProcessInstanceByStartUser(getLoginUserId(), cancelReqVO);
+        processInstanceUpdateService.cancelProcessInstanceByStartUser(getLoginUserId(), cancelReqVO);
         return success(true);
     }
 
@@ -171,7 +174,7 @@ public class BpmProcessInstanceController {
     @PreAuthorize("@ss.hasPermission('bpm:process-instance:cancel-by-admin')")
     public CommonResult<Boolean> cancelProcessInstanceByManager(
             @Valid @RequestBody BpmProcessInstanceCancelReqVO cancelReqVO) {
-        processInstanceService.cancelProcessInstanceByAdmin(getLoginUserId(), cancelReqVO);
+        processInstanceUpdateService.cancelProcessInstanceByAdmin(getLoginUserId(), cancelReqVO);
         return success(true);
     }
 
@@ -185,7 +188,7 @@ public class BpmProcessInstanceController {
         if (StrUtil.isNotEmpty(reqVO.getProcessVariablesStr())) {
             reqVO.setProcessVariables(JsonUtils.parseObject(reqVO.getProcessVariablesStr(), Map.class));
         }
-        return success(processInstanceService.getApprovalDetail(getLoginUserId(), reqVO));
+        return success(processInstanceQueryService.getApprovalDetail(getLoginUserId(), reqVO));
     }
 
     @GetMapping("/get-next-approval-nodes")
@@ -196,7 +199,7 @@ public class BpmProcessInstanceController {
         if (StrUtil.isNotEmpty(reqVO.getProcessVariablesStr())) {
             reqVO.setProcessVariables(JsonUtils.parseObject(reqVO.getProcessVariablesStr(), Map.class));
         }
-        return success(processInstanceService.getNextApprovalNodes(getLoginUserId(), reqVO));
+        return success(processInstanceQueryService.getNextApprovalNodes(getLoginUserId(), reqVO));
     }
 
     @GetMapping("/get-bpmn-model-view")
@@ -206,7 +209,7 @@ public class BpmProcessInstanceController {
     public CommonResult<BpmProcessInstanceBpmnModelViewRespVO> getProcessInstanceBpmnModelView(
             @RequestParam(value = "id") String id) {
         validateApprovalDetailReadable(id, null);
-        return success(processInstanceService.getProcessInstanceBpmnModelView(id));
+        return success(processInstanceQueryService.getProcessInstanceBpmnModelView(id));
     }
 
     /**
@@ -223,7 +226,7 @@ public class BpmProcessInstanceController {
             return;
         }
         if (StrUtil.isEmpty(processInstanceId)
-                || taskService.getRevisionTask(getLoginUserId(), processInstanceId, taskId) == null) {
+                || taskQueryService.getRevisionTask(getLoginUserId(), processInstanceId, taskId) == null) {
             throw exception(FORBIDDEN);
         }
     }
@@ -234,13 +237,13 @@ public class BpmProcessInstanceController {
     @PreAuthorize("@ss.hasPermission('bpm:process-instance:query')")
     public CommonResult<BpmProcessPrintDataRespVO> getProcessInstancePrintData(
             @RequestParam("processInstanceId") String processInstanceId) {
-        HistoricProcessInstance historicProcessInstance = processInstanceService.getHistoricProcessInstance(processInstanceId);
+        HistoricProcessInstance historicProcessInstance = processInstanceQueryService.getHistoricProcessInstance(processInstanceId);
         if (historicProcessInstance == null) {
             throw exception(PROCESS_INSTANCE_NOT_EXISTS);
         }
         AdminUserRespDTO startUser = adminUserApi.getUser(Long.valueOf(historicProcessInstance.getStartUserId()));
         DeptRespDTO dept = deptApi.getDept(startUser.getDeptId());
-        List<HistoricTaskInstance> tasks = taskService.getFinishedTaskListByProcessInstanceIdWithoutCancel(processInstanceId);
+        List<HistoricTaskInstance> tasks = taskQueryService.getFinishedTaskListByProcessInstanceIdWithoutCancel(processInstanceId);
         // 处理人：优先 assignee；向前加签后被跳过等场景，assignee 为空，使用 owner
         Map<Long, AdminUserRespDTO> userMap = adminUserApi.getUserMap(
                 convertSet(tasks, item -> NumberUtils.parseLong(StrUtil.blankToDefault(item.getAssignee(), item.getOwner()))));

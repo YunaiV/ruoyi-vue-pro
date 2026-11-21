@@ -4,7 +4,7 @@ import cn.iocoder.yudao.framework.common.util.json.JsonUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
 import cn.iocoder.yudao.module.bpm.controller.admin.definition.vo.model.simple.BpmSimpleModelNodeVO;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmHttpRequestUtils;
-import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
+import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceQueryService;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -29,14 +29,14 @@ public class BpmHttpCallbackTriggerTest extends BaseMockitoUnitTest {
     private BpmHttpCallbackTrigger httpCallbackTrigger;
 
     @Mock
-    private BpmProcessInstanceService processInstanceService;
+    private BpmProcessInstanceQueryService processInstanceQueryService;
 
     @Test
     @SuppressWarnings("unchecked")
     public void testExecute_bodyNull() {
         // mock 方法
         ProcessInstance processInstance = mock(ProcessInstance.class);
-        when(processInstanceService.getProcessInstance("process-instance-1")).thenReturn(processInstance);
+        when(processInstanceQueryService.getProcessInstance("process-instance-1")).thenReturn(processInstance);
         // 准备参数：回调配置未配置 body
         BpmSimpleModelNodeVO.TriggerSetting.HttpRequestTriggerSetting setting =
                 new BpmSimpleModelNodeVO.TriggerSetting.HttpRequestTriggerSetting();

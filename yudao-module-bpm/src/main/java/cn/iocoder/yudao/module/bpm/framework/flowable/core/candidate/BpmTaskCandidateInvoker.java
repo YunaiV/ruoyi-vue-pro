@@ -13,7 +13,7 @@ import cn.iocoder.yudao.module.bpm.enums.definition.BpmUserTaskAssignStartUserHa
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
-import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
+import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceQueryService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import com.google.common.annotations.VisibleForTesting;
@@ -117,7 +117,7 @@ public class BpmTaskCandidateInvoker {
             }
 
             // 3. 移除发起人的用户
-            ProcessInstance processInstance = SpringUtil.getBean(BpmProcessInstanceService.class)
+            ProcessInstance processInstance = SpringUtil.getBean(BpmProcessInstanceQueryService.class)
                     .getProcessInstance(execution.getProcessInstanceId());
             Assert.notNull(processInstance, "流程实例({}) 不存在", execution.getProcessInstanceId());
             removeStartUserIfSkip(userIds, flowElement, Long.valueOf(processInstance.getStartUserId()));

@@ -1,7 +1,7 @@
 package cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.strategy.user;
 
 import cn.iocoder.yudao.framework.test.core.ut.BaseMockitoUnitTest;
-import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
+import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceQueryService;
 import org.assertj.core.util.Sets;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -22,7 +22,7 @@ public class BpmTaskCandidateStartUserStrategyTest extends BaseMockitoUnitTest {
     private BpmTaskCandidateStartUserStrategy strategy;
 
     @Mock
-    private BpmProcessInstanceService processInstanceService;
+    private BpmProcessInstanceQueryService processInstanceQueryService;
 
     @Test
     public void testCalculateUsersByTask() {
@@ -32,7 +32,7 @@ public class BpmTaskCandidateStartUserStrategyTest extends BaseMockitoUnitTest {
         Long startUserId = 1L;
         ProcessInstance processInstance = mock(ProcessInstance.class);
         DelegateExecution execution = mock(DelegateExecution.class);
-        when(processInstanceService.getProcessInstance(eq(execution.getProcessInstanceId()))).thenReturn(processInstance);
+        when(processInstanceQueryService.getProcessInstance(eq(execution.getProcessInstanceId()))).thenReturn(processInstance);
         when(processInstance.getStartUserId()).thenReturn(startUserId.toString());
 
         // 调用

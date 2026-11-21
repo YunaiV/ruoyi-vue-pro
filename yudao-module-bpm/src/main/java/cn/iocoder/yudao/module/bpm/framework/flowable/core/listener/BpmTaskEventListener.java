@@ -10,7 +10,8 @@ import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConsta
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmModelService;
-import cn.iocoder.yudao.module.bpm.service.task.BpmTaskService;
+import cn.iocoder.yudao.module.bpm.service.task.BpmTaskQueryService;
+import cn.iocoder.yudao.module.bpm.service.task.BpmTaskUpdateService;
 import com.google.common.collect.ImmutableSet;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +45,10 @@ public class BpmTaskEventListener extends AbstractFlowableEngineEventListener {
     private BpmModelService modelService;
     @Resource
     @Lazy // 解决循环依赖
-    private BpmTaskService taskService;
+    private BpmTaskQueryService taskQueryService;
+    @Resource
+    @Lazy // 解决循环依赖
+    private BpmTaskUpdateService taskUpdateService;
 
     public static final Set<FlowableEngineEventType> TASK_EVENTS = ImmutableSet.<FlowableEngineEventType>builder()
             .add(FlowableEngineEventType.TASK_CREATED)
@@ -61,24 +65,24 @@ public class BpmTaskEventListener extends AbstractFlowableEngineEventListener {
     @Override
     protected void taskCreated(FlowableEngineEntityEvent event) {
         Task entity = (Task) event.getEntity();
-        FlowableUtils.execute(entity.getTenantId(), () -> taskService.processTaskCreated(entity));
+        FlowableUtils.execute(entity.getTenantId(), () -> taskUpdateService.processTaskCreated(entity));
     }
 
     @Override
     protected void taskAssigned(FlowableEngineEntityEvent event) {
         Task entity = (Task) event.getEntity();
-        FlowableUtils.execute(entity.getTenantId(), () -> taskService.processTaskAssigned(entity));
+        FlowableUtils.execute(entity.getTenantId(), () -> taskUpdateService.processTaskAssigned(entity));
     }
 
     @Override
     protected void taskCompleted(FlowableEngineEntityEvent event) {
         Task entity = (Task) event.getEntity();
-        FlowableUtils.execute(entity.getTenantId(), () -> taskService.processTaskCompleted(entity));
+        FlowableUtils.execute(entity.getTenantId(), () -> taskUpdateService.processTaskCompleted(entity));
     }
 
     @Override
     protected void activityCancelled(FlowableActivityCancelledEvent event) {
-        List<HistoricActivityInstance> activityList = taskService.getHistoricActivityListByExecutionId(event.getExecutionId());
+        List<HistoricActivityInstance> activityList = taskQueryService.getHistoricActivityListByExecutionId(event.getExecutionId());
         if (CollUtil.isEmpty(activityList)) {
             log.error("[activityCancelled][使用 executionId({}) 查找不到对应的活动实例]", event.getExecutionId());
             return;
@@ -88,7 +92,7 @@ public class BpmTaskEventListener extends AbstractFlowableEngineEventListener {
             if (StrUtil.isEmpty(activity.getTaskId())) {
                 return;
             }
-            taskService.processTaskCanceled(activity.getTaskId());
+            taskUpdateService.processTaskCanceled(activity.getTaskId());
         });
     }
 
@@ -132,15 +136,15 @@ public class BpmTaskEventListener extends AbstractFlowableEngineEventListener {
             String timeoutHandlerType = BpmnModelUtils.parseBoundaryEventExtensionElement(boundaryEvent,
                     BpmnModelConstants.USER_TASK_TIMEOUT_HANDLER_TYPE);
             String taskKey = boundaryEvent.getAttachedToRefId();
-            taskService.processTaskTimeout(event.getProcessInstanceId(), taskKey, NumberUtils.parseInt(timeoutHandlerType));
+            taskUpdateService.processTaskTimeout(event.getProcessInstanceId(), taskKey, NumberUtils.parseInt(timeoutHandlerType));
             // 2.2 延迟器超时处理
         } else if (ObjectUtil.equal(bpmTimerBoundaryEventType, BpmBoundaryEventTypeEnum.DELAY_TIMER_TIMEOUT)) {
             String taskKey = boundaryEvent.getAttachedToRefId();
-            taskService.triggerTask(event.getProcessInstanceId(), taskKey);
+            taskUpdateService.triggerTask(event.getProcessInstanceId(), taskKey);
             // 2.3 子流程超时处理
         } else if (ObjectUtil.equal(bpmTimerBoundaryEventType, BpmBoundaryEventTypeEnum.CHILD_PROCESS_TIMEOUT)) {
             String taskKey = boundaryEvent.getAttachedToRefId();
-            taskService.processChildProcessTimeout(event.getProcessInstanceId(), taskKey);
+            taskUpdateService.processChildProcessTimeout(event.getProcessInstanceId(), taskKey);
         }
     }
 

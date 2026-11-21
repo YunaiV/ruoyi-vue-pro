@@ -11,7 +11,7 @@ import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.strategy.us
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConstants;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
-import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
+import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceQueryService;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
 import cn.iocoder.yudao.module.system.api.user.dto.AdminUserRespDTO;
 import org.flowable.bpmn.model.BpmnModel;
@@ -50,7 +50,7 @@ public class BpmTaskCandidateInvokerTest extends BaseMockitoUnitTest {
     @Mock
     private AdminUserApi adminUserApi;
     @Mock
-    private BpmProcessInstanceService processInstanceService;
+    private BpmProcessInstanceQueryService processInstanceQueryService;
 
     @Spy
     private BpmTaskCandidateStrategy userStrategy;
@@ -96,10 +96,10 @@ public class BpmTaskCandidateInvokerTest extends BaseMockitoUnitTest {
                     .put(user2.getId(), user2).build();
             when(adminUserApi.getUserMap(eq(asSet(1L, 2L)))).thenReturn(userMap);
             // mock 移除发起人的用户
-            springUtilMockedStatic.when(() -> SpringUtil.getBean(BpmProcessInstanceService.class))
-                    .thenReturn(processInstanceService);
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(BpmProcessInstanceQueryService.class))
+                    .thenReturn(processInstanceQueryService);
             ProcessInstance processInstance = mock(ProcessInstance.class);
-            when(processInstanceService.getProcessInstance(eq(processInstanceId))).thenReturn(processInstance);
+            when(processInstanceQueryService.getProcessInstance(eq(processInstanceId))).thenReturn(processInstance);
             when(processInstance.getStartUserId()).thenReturn("1");
             mockFlowElementExtensionElement(userTask, BpmnModelConstants.USER_TASK_ASSIGN_START_USER_HANDLER_TYPE,
                     String.valueOf(BpmUserTaskAssignStartUserHandlerTypeEnum.SKIP.getType()));
@@ -141,10 +141,10 @@ public class BpmTaskCandidateInvokerTest extends BaseMockitoUnitTest {
             when(emptyStrategy.calculateUsersByTask(same(execution), same(param)))
                     .thenReturn(Sets.newSet(2L));
             // mock 移除发起人的用户
-            springUtilMockedStatic.when(() -> SpringUtil.getBean(BpmProcessInstanceService.class))
-                    .thenReturn(processInstanceService);
+            springUtilMockedStatic.when(() -> SpringUtil.getBean(BpmProcessInstanceQueryService.class))
+                    .thenReturn(processInstanceQueryService);
             ProcessInstance processInstance = mock(ProcessInstance.class);
-            when(processInstanceService.getProcessInstance(eq(processInstanceId))).thenReturn(processInstance);
+            when(processInstanceQueryService.getProcessInstance(eq(processInstanceId))).thenReturn(processInstance);
             when(processInstance.getStartUserId()).thenReturn("1");
 
             // 调用

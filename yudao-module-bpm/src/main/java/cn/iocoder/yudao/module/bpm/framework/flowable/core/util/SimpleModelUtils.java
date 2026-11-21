@@ -344,7 +344,7 @@ public class SimpleModelUtils {
             endEvent.setId(node.getId());
             endEvent.setName(node.getName());
             // 补充说明：使用普通的结束事件，不加终止定义。并行、包容分支都会先汇聚，再到达唯一的结束节点；
-            // 审批不通过、取消等提前结束的场景，通过 BpmTaskService#moveTaskToEnd 处理，流程未结束时会删除流程实例
+            // 审批不通过、取消等提前结束的场景，通过 BpmTaskUpdateService#moveTaskToEnd 处理，流程未结束时会删除流程实例
             return endEvent;
         }
 
@@ -372,7 +372,7 @@ public class SimpleModelUtils {
             // 添加操作按钮配置属性元素
             addButtonsSetting(node.getButtonsSetting(), userTask);
             // 使用自动通过策略
-            // 补充说明：发起人节点的自动通过，由 BpmTaskServiceImpl#processTaskAssigned 按节点编号处理：首次发起时自动通过，
+            // 补充说明：发起人节点的自动通过，由 BpmTaskUpdateServiceImpl#processTaskAssigned 按节点编号处理：首次发起时自动通过，
             // 退回到发起人节点时（存在退回标记）不自动通过，等待发起人重新提交。所以复用 SKIP 即可，不需要新增策略；草稿状态暂不支持
             addAssignStartUserHandlerType(BpmUserTaskAssignStartUserHandlerTypeEnum.SKIP.getType(), userTask);
             return userTask;

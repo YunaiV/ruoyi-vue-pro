@@ -2,7 +2,8 @@ package cn.iocoder.yudao.module.bpm.service.task.trigger;
 
 import cn.iocoder.yudao.module.bpm.enums.definition.BpmTriggerTypeEnum;
 
-// TODO @芋艿：可能会想换个包地址
+// TODO @芋艿：可能会想换个包地址（这个类 先留着）
+// TODO @AI：这个是不是抽到 framework 层面，而不是在 service 里？
 /**
  * BPM 触发器接口
  * <p>

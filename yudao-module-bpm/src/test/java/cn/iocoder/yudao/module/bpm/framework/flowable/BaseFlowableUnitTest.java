@@ -14,8 +14,10 @@ import cn.iocoder.yudao.module.bpm.service.definition.BpmModelService;
 import cn.iocoder.yudao.module.bpm.service.definition.BpmProcessDefinitionService;
 import cn.iocoder.yudao.module.bpm.service.message.BpmMessageService;
 import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceCopyService;
-import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceServiceImpl;
-import cn.iocoder.yudao.module.bpm.service.task.BpmTaskServiceImpl;
+import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceQueryServiceImpl;
+import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceUpdateServiceImpl;
+import cn.iocoder.yudao.module.bpm.service.task.BpmTaskQueryServiceImpl;
+import cn.iocoder.yudao.module.bpm.service.task.BpmTaskUpdateServiceImpl;
 import cn.iocoder.yudao.module.bpm.service.task.listener.BpmCallActivityListener;
 import cn.iocoder.yudao.module.system.api.dept.DeptApi;
 import cn.iocoder.yudao.module.system.api.user.AdminUserApi;
@@ -47,7 +49,7 @@ import static org.mockito.Mockito.*;
  * 依赖 Flowable 引擎的单元测试
  *
  * <p>使用 H2 数据源，Flowable 表由测试环境的 Flowable 自动配置创建；需要业务表的测试自行导入对应 SQL。</p>
- * <p>加载真实的 {@link BpmTaskServiceImpl}、{@link BpmProcessInstanceServiceImpl} 及 Flowable 事件监听器，
+ * <p>加载真实的 {@link BpmTaskQueryServiceImpl}、{@link BpmTaskUpdateServiceImpl}、{@link BpmProcessInstanceQueryServiceImpl}、{@link BpmProcessInstanceUpdateServiceImpl} 及 Flowable 事件监听器，
  * 保证事务代理、getSelf() 自调用、任务/流程实例状态回调与生产一致；其它模块、DB 相关的 Service 统一 Mock。</p>
  * <p>注意：Mock 统一声明在基类，保证子类共享同一个 Spring 上下文（同一个 Flowable 引擎），子类不要再额外声明 {@link MockitoBean}。</p>
  *
@@ -85,7 +87,7 @@ public abstract class BaseFlowableUnitTest {
     protected DeptApi deptApi;
 
     @Import({BaseDbUnitTest.Application.class, BpmFlowableConfiguration.class,
-            BpmTaskServiceImpl.class, BpmProcessInstanceServiceImpl.class,
+            BpmTaskQueryServiceImpl.class, BpmTaskUpdateServiceImpl.class, BpmProcessInstanceQueryServiceImpl.class, BpmProcessInstanceUpdateServiceImpl.class,
             BpmTaskEventListener.class, BpmProcessInstanceEventListener.class})
     @ImportAutoConfiguration({ProcessEngineAutoConfiguration.class, ProcessEngineServicesAutoConfiguration.class,
             TransactionAutoConfiguration.class})

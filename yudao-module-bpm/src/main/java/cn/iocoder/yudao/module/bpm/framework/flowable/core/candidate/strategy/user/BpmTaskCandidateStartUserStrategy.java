@@ -3,7 +3,7 @@ package cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.strategy.u
 import cn.iocoder.yudao.framework.common.util.collection.SetUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.candidate.BpmTaskCandidateStrategy;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmTaskCandidateStrategyEnum;
-import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceService;
+import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceQueryService;
 import jakarta.annotation.Resource;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.delegate.DelegateExecution;
@@ -26,7 +26,7 @@ public class BpmTaskCandidateStartUserStrategy implements BpmTaskCandidateStrate
 
     @Resource
     @Lazy // 延迟加载，避免循环依赖
-    private BpmProcessInstanceService processInstanceService;
+    private BpmProcessInstanceQueryService processInstanceQueryService;
 
     @Override
     public BpmTaskCandidateStrategyEnum getStrategy() {
@@ -44,7 +44,7 @@ public class BpmTaskCandidateStartUserStrategy implements BpmTaskCandidateStrate
 
     @Override
     public Set<Long> calculateUsersByTask(DelegateExecution execution, String param) {
-        ProcessInstance processInstance = processInstanceService.getProcessInstance(execution.getProcessInstanceId());
+        ProcessInstance processInstance = processInstanceQueryService.getProcessInstance(execution.getProcessInstanceId());
         return SetUtils.asSet(Long.valueOf(processInstance.getStartUserId()));
     }
 

@@ -37,18 +37,18 @@ public class BpmProcessInstanceCopyServiceImpl implements BpmProcessInstanceCopy
 
     @Resource
     @Lazy // 延迟加载，避免循环依赖
-    private BpmTaskService taskService;
+    private BpmTaskQueryService taskQueryService;
 
     @Resource
     @Lazy // 延迟加载，避免循环依赖
-    private BpmProcessInstanceService processInstanceService;
+    private BpmProcessInstanceQueryService processInstanceQueryService;
     @Resource
     @Lazy // 延迟加载，避免循环依赖
     private BpmProcessDefinitionService processDefinitionService;
 
     @Override
     public void createProcessInstanceCopy(Collection<Long> userIds, String reason, String taskId) {
-        Task task = taskService.getTask(taskId);
+        Task task = taskQueryService.getTask(taskId);
         if (ObjectUtil.isNull(task)) {
             throw exception(ErrorCodeConstants.TASK_NOT_EXISTS);
         }
@@ -61,7 +61,7 @@ public class BpmProcessInstanceCopyServiceImpl implements BpmProcessInstanceCopy
     public void createProcessInstanceCopy(Collection<Long> userIds, String reason, String processInstanceId,
                                           String activityId, String activityName, String taskId) {
         // 1.1 校验流程实例存在
-        ProcessInstance processInstance = processInstanceService.getProcessInstance(processInstanceId);
+        ProcessInstance processInstance = processInstanceQueryService.getProcessInstance(processInstanceId);
         if (processInstance == null) {
             throw exception(ErrorCodeConstants.PROCESS_INSTANCE_NOT_EXISTS);
         }

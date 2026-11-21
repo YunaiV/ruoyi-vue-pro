@@ -26,8 +26,10 @@ import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnModelConsta
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.enums.BpmnVariableConstants;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.BpmnModelUtils;
 import cn.iocoder.yudao.module.bpm.framework.flowable.core.util.FlowableUtils;
-import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceServiceImpl;
-import cn.iocoder.yudao.module.bpm.service.task.BpmTaskServiceImpl;
+import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceQueryServiceImpl;
+import cn.iocoder.yudao.module.bpm.service.task.BpmProcessInstanceUpdateServiceImpl;
+import cn.iocoder.yudao.module.bpm.service.task.BpmTaskQueryServiceImpl;
+import cn.iocoder.yudao.module.bpm.service.task.BpmTaskUpdateServiceImpl;
 import jakarta.annotation.Resource;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
@@ -72,7 +74,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 /**
- * {@link BpmTaskServiceImpl}、{@link BpmProcessInstanceServiceImpl} 的 Flowable 集成测试
+ * {@link BpmTaskQueryServiceImpl}、{@link BpmTaskUpdateServiceImpl}、{@link BpmProcessInstanceQueryServiceImpl}、{@link BpmProcessInstanceUpdateServiceImpl} 的 Flowable 集成测试
  *
  * @author HUIHUI
  */
@@ -93,9 +95,13 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
     private ProcessEngineConfiguration processEngineConfiguration;
 
     @Resource
-    private BpmTaskServiceImpl bpmTaskService;
+    private BpmTaskQueryServiceImpl taskQueryService;
     @Resource
-    private BpmProcessInstanceServiceImpl processInstanceService;
+    private BpmTaskUpdateServiceImpl taskUpdateService;
+    @Resource
+    private BpmProcessInstanceQueryServiceImpl processInstanceQueryService;
+    @Resource
+    private BpmProcessInstanceUpdateServiceImpl processInstanceUpdateService;
 
     @Resource
     private ApplicationEvents applicationEvents;
@@ -136,10 +142,10 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
                 .activityId("wait").singleResult());
 
         // 调用
-        bpmTaskService.triggerTask(processInstanceId, "wait");
+        taskUpdateService.triggerTask(processInstanceId, "wait");
         // 断言：触发等待节点后，流程结束
-        assertNull(processInstanceService.getProcessInstance(processInstanceId));
-        assertNotNull(processInstanceService.getHistoricProcessInstance(processInstanceId).getEndTime());
+        assertNull(processInstanceQueryService.getProcessInstance(processInstanceId));
+        assertNotNull(processInstanceQueryService.getHistoricProcessInstance(processInstanceId).getEndTime());
     }
 
     @Test
@@ -148,7 +154,7 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         String processInstanceId = startProcessInstance();
 
         // 调用：触发不存在的等待节点
-        bpmTaskService.triggerTask(processInstanceId, "notExists");
+        taskUpdateService.triggerTask(processInstanceId, "notExists");
         // 断言：流程实例不受影响
         assertEquals("task1", getRunningTask(processInstanceId).getTaskDefinitionKey());
     }
@@ -161,7 +167,7 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         assertEquals("1", task1.getAssignee());
 
         // 调用：审批 task1
-        bpmTaskService.approveTask(1L, new BpmTaskApproveReqVO().setId(task1.getId()).setReason("同意"));
+        taskUpdateService.approveTask(1L, new BpmTaskApproveReqVO().setId(task1.getId()).setReason("同意"));
         // 断言：task1 审批通过，流程流转到 task2
         assertTaskStatus(task1.getId(), BpmTaskStatusEnum.APPROVE.getStatus(), "同意");
         verify(commentService).createComment(eq(task1.getId()), eq(processInstanceId),
@@ -170,11 +176,11 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         assertEquals("task2", task2.getTaskDefinitionKey());
 
         // 调用：审批 task2
-        bpmTaskService.approveTask(1L, new BpmTaskApproveReqVO().setId(task2.getId()).setReason("同意"));
+        taskUpdateService.approveTask(1L, new BpmTaskApproveReqVO().setId(task2.getId()).setReason("同意"));
         // 断言：流程实例结束
-        assertNull(processInstanceService.getProcessInstance(processInstanceId));
-        assertNotNull(processInstanceService.getHistoricProcessInstance(processInstanceId).getEndTime());
-        List<HistoricTaskInstance> tasks = bpmTaskService.getTaskListByProcessInstanceId(processInstanceId, true);
+        assertNull(processInstanceQueryService.getProcessInstance(processInstanceId));
+        assertNotNull(processInstanceQueryService.getHistoricProcessInstance(processInstanceId).getEndTime());
+        List<HistoricTaskInstance> tasks = taskQueryService.getTaskListByProcessInstanceId(processInstanceId, true);
         assertEquals(List.of("task1", "task2"), tasks.stream().map(HistoricTaskInstance::getTaskDefinitionKey).toList());
     }
 
@@ -190,18 +196,18 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         Task task1 = getRunningTask(processInstanceId);
 
         // 调用
-        bpmTaskService.approveTask(1L, new BpmTaskApproveReqVO().setId(task1.getId()).setReason("同意")
+        taskUpdateService.approveTask(1L, new BpmTaskApproveReqVO().setId(task1.getId()).setReason("同意")
                 .setSignPicUrl("https://www.iocoder.cn/sign.png")
                 .setAttachments(List.of("https://www.iocoder.cn/files/a.pdf"))
                 .setVariables(Map.of("day", 3)));
         // 断言：签名、表单变量保存到任务上，表单变量同步到流程实例
-        HistoricTaskInstance historicTask = bpmTaskService.getHistoricTask(task1.getId());
+        HistoricTaskInstance historicTask = taskQueryService.getHistoricTask(task1.getId());
         assertEquals("https://www.iocoder.cn/sign.png",
                 historicTask.getTaskLocalVariables().get(BpmnVariableConstants.TASK_SIGN_PIC_URL));
         assertEquals(3, historicTask.getTaskLocalVariables().get("day"));
         assertEquals(3, runtimeService.getVariable(processInstanceId, "day"));
         // 断言：附件
-        List<Attachment> attachments = bpmTaskService.getAttachments(processInstanceId, Set.of(task1.getId()),
+        List<Attachment> attachments = taskQueryService.getAttachments(processInstanceId, Set.of(task1.getId()),
                 BpmAttachmentTypeEnum.TASK_ATTACHMENT);
         assertEquals(1, attachments.size());
         assertEquals("a.pdf", attachments.get(0).getName());
@@ -216,7 +222,7 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         Task task1 = getRunningTask(processInstanceId);
 
         // 调用，并断言异常
-        assertServiceException(() -> bpmTaskService.approveTask(2L,
+        assertServiceException(() -> taskUpdateService.approveTask(2L,
                 new BpmTaskApproveReqVO().setId(task1.getId()).setReason("同意")), TASK_OPERATE_FAIL_ASSIGN_NOT_SELF);
     }
 
@@ -227,15 +233,15 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         Task task1 = getRunningTask(processInstanceId);
 
         // 调用：task1 未配置驳回策略，默认结束流程
-        bpmTaskService.rejectTask(1L, new BpmTaskRejectReqVO().setId(task1.getId()).setReason("不同意")
+        taskUpdateService.rejectTask(1L, new BpmTaskRejectReqVO().setId(task1.getId()).setReason("不同意")
                 .setAttachments(List.of("https://www.iocoder.cn/files/b.pdf")));
         // 断言：任务不通过，附件保存到任务上
         assertTaskStatus(task1.getId(), BpmTaskStatusEnum.REJECT.getStatus(), "不同意");
-        List<Attachment> attachments = bpmTaskService.getAttachments(processInstanceId, Set.of(task1.getId()),
+        List<Attachment> attachments = taskQueryService.getAttachments(processInstanceId, Set.of(task1.getId()),
                 BpmAttachmentTypeEnum.TASK_ATTACHMENT);
         assertEquals(List.of("b.pdf"), attachments.stream().map(Attachment::getName).toList());
         // 断言：流程实例不通过并结束
-        assertNull(processInstanceService.getProcessInstance(processInstanceId));
+        assertNull(processInstanceQueryService.getProcessInstance(processInstanceId));
         assertEquals(BpmProcessInstanceStatusEnum.REJECT.getStatus(), getHistoricProcessVariable(processInstanceId,
                 BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_STATUS));
         assertEquals("审批不通过任务，原因：不同意", getHistoricProcessVariable(processInstanceId,
@@ -250,7 +256,7 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         Task task2 = getRunningTask(processInstanceId);
 
         // 调用：task2 配置驳回到 task1
-        bpmTaskService.rejectTask(1L, new BpmTaskRejectReqVO().setId(task2.getId()).setReason("退回修改"));
+        taskUpdateService.rejectTask(1L, new BpmTaskRejectReqVO().setId(task2.getId()).setReason("退回修改"));
         // 断言：task2 被标记为退回，流程回到 task1
         assertTaskStatus(task2.getId(), BpmTaskStatusEnum.RETURN.getStatus(), "退回修改");
         Task task1 = getRunningTask(processInstanceId);
@@ -261,7 +267,7 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
                 BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_NEED_SIMULATE_TASK_IDS));
 
         // 调用：再次审批 task1
-        bpmTaskService.approveTask(1L, new BpmTaskApproveReqVO().setId(task1.getId()).setReason("已修改"));
+        taskUpdateService.approveTask(1L, new BpmTaskApproveReqVO().setId(task1.getId()).setReason("已修改"));
         // 断言：退回标记被清理，流程再次流转到 task2
         assertFalse(runtimeService.hasVariable(processInstanceId,
                 String.format(BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_RETURN_FLAG, "task1")));
@@ -273,19 +279,19 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         // 准备参数：task1 向前加签给用户 2
         String processInstanceId = startProcessInstance();
         Task task1 = getRunningTask(processInstanceId);
-        bpmTaskService.createSignTask(1L, new BpmTaskSignCreateReqVO().setId(task1.getId())
+        taskUpdateService.createSignTask(1L, new BpmTaskSignCreateReqVO().setId(task1.getId())
                 .setType(BpmTaskSignTypeEnum.BEFORE.getType()).setUserIds(Set.of(2L)).setReason("加签"));
-        Task childTask = bpmTaskService.getTaskListByParentTaskId(task1.getId()).get(0);
+        Task childTask = taskQueryService.getTaskListByParentTaskId(task1.getId()).get(0);
 
         // 调用：用户 2 审批不通过加签任务
-        bpmTaskService.rejectTask(2L, new BpmTaskRejectReqVO().setId(childTask.getId()).setReason("不同意"));
+        taskUpdateService.rejectTask(2L, new BpmTaskRejectReqVO().setId(childTask.getId()).setReason("不同意"));
         // 断言：加签任务、根任务都标记为不通过，流程实例不通过并结束
         assertTaskStatus(childTask.getId(), BpmTaskStatusEnum.REJECT.getStatus(), "不同意");
         assertTaskStatus(task1.getId(), BpmTaskStatusEnum.REJECT.getStatus(),
                 BpmCommentTypeEnum.REJECT.formatComment("加签任务不通过"));
         verify(commentService).createComment(eq(task1.getId()), eq(processInstanceId),
                 eq(BpmCommentTypeEnum.REJECT), eq("加签任务不通过"));
-        assertNull(processInstanceService.getProcessInstance(processInstanceId));
+        assertNull(processInstanceQueryService.getProcessInstance(processInstanceId));
         assertEquals(BpmProcessInstanceStatusEnum.REJECT.getStatus(), getHistoricProcessVariable(processInstanceId,
                 BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_STATUS));
     }
@@ -294,12 +300,12 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
     public void testGetUserTaskListByReturn_success() {
         // 准备参数
         String processInstanceId = startProcessInstance();
-        assertTrue(bpmTaskService.getUserTaskListByReturn(getRunningTask(processInstanceId).getId()).isEmpty());
+        assertTrue(taskQueryService.getUserTaskListByReturn(getRunningTask(processInstanceId).getId()).isEmpty());
         approveRunningTask(processInstanceId);
         Task task2 = getRunningTask(processInstanceId);
 
         // 调用
-        List<UserTask> userTasks = bpmTaskService.getUserTaskListByReturn(task2.getId());
+        List<UserTask> userTasks = taskQueryService.getUserTaskListByReturn(task2.getId());
         // 断言
         assertEquals(List.of("task1"), userTasks.stream().map(UserTask::getId).toList());
     }
@@ -312,7 +318,7 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         Task task2 = getRunningTask(processInstanceId);
 
         // 调用
-        bpmTaskService.returnTask(1L, new BpmTaskReturnReqVO().setId(task2.getId())
+        taskUpdateService.returnTask(1L, new BpmTaskReturnReqVO().setId(task2.getId())
                 .setTargetTaskDefinitionKey("task1").setReason("退回"));
         // 断言
         assertTaskStatus(task2.getId(), BpmTaskStatusEnum.RETURN.getStatus(), "退回");
@@ -328,7 +334,7 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         Task task1 = getRunningTask(processInstanceId);
 
         // 调用，并断言异常
-        assertServiceException(() -> bpmTaskService.returnTask(1L, new BpmTaskReturnReqVO().setId(task1.getId())
+        assertServiceException(() -> taskUpdateService.returnTask(1L, new BpmTaskReturnReqVO().setId(task1.getId())
                 .setTargetTaskDefinitionKey("notExists").setReason("退回")), TASK_TARGET_NODE_NOT_EXISTS);
     }
 
@@ -339,7 +345,7 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         Task task1 = getRunningTask(processInstanceId);
 
         // 调用，并断言异常：task2 位于 task1 之后，不能退回
-        assertServiceException(() -> bpmTaskService.returnTask(1L, new BpmTaskReturnReqVO().setId(task1.getId())
+        assertServiceException(() -> taskUpdateService.returnTask(1L, new BpmTaskReturnReqVO().setId(task1.getId())
                 .setTargetTaskDefinitionKey("task2").setReason("退回")), TASK_RETURN_FAIL_SOURCE_TARGET_ERROR);
     }
 
@@ -352,7 +358,7 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         String taskId = getRunningTask(processInstanceId).getId();
 
         // 调用：用户 3 退回到发起人节点
-        bpmTaskService.returnTask(3L, new BpmTaskReturnReqVO().setId(taskId)
+        taskUpdateService.returnTask(3L, new BpmTaskReturnReqVO().setId(taskId)
                 .setTargetTaskDefinitionKey(BpmnModelConstants.START_USER_NODE_ID).setReason("请补充明细"));
         // 断言：任务不跳转，标记为退回修改中，修改人为发起人
         assertEquals(taskId, getRunningTask(processInstanceId).getId());
@@ -360,19 +366,19 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         verify(commentService).createComment(eq(taskId), eq(processInstanceId),
                 eq(BpmCommentTypeEnum.RETURN), eq("请补充明细"));
         // 断言：不在审批人的待办中，只在发起人的【待我修改】中
-        assertEquals(0, bpmTaskService.getTaskTodoPage(3L, new BpmTaskPageReqVO()).getTotal());
-        assertNull(bpmTaskService.getTodoTask(3L, taskId, processInstanceId));
+        assertEquals(0, taskQueryService.getTaskTodoPage(3L, new BpmTaskPageReqVO()).getTotal());
+        assertNull(taskQueryService.getTodoTask(3L, taskId, processInstanceId));
         assertEquals(List.of(taskId), getRevisionTaskIds(1L));
         assertEquals(List.of(), getRevisionTaskIds(3L));
         // 断言：超出范围的分页，没有数据，但总数仍然正确
         BpmTaskPageReqVO pageReqVO = new BpmTaskPageReqVO();
         pageReqVO.setPageNo(2);
-        PageResult<Task> emptyPage = bpmTaskService.getRevisionTaskPage(1L, pageReqVO);
+        PageResult<Task> emptyPage = taskQueryService.getRevisionTaskPage(1L, pageReqVO);
         assertEquals(1L, emptyPage.getTotal());
         assertEquals(List.of(), emptyPage.getList());
         // 断言：审批详情中，修改人使用退回目标节点（发起人节点）的表单权限，与工作流保留变量同名的字段降级为只读；
         // 审批人既没有待办，也不能修改
-        BpmApprovalDetailRespVO detail = processInstanceService.getApprovalDetail(1L,
+        BpmApprovalDetailRespVO detail = processInstanceQueryService.getApprovalDetail(1L,
                 new BpmApprovalDetailReqVO().setProcessInstanceId(processInstanceId).setTaskId(taskId));
         assertEquals(taskId, detail.getRevisionTaskId());
         String revisionId = detail.getRevisionId();
@@ -381,47 +387,47 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         assertEquals(Map.of("amount", "2", "remark", "1", "items", "2", "items.price", "1",
                 "tags", "2", "tags.tag", "1", "tags.note", "1", "PROCESS_STATUS", "1",
                 "NEED_SIMULATE_TASK_IDS", "1", "task1_assignees", "1"), detail.getFormFieldsPermission());
-        BpmApprovalDetailRespVO approverDetail = processInstanceService.getApprovalDetail(3L,
+        BpmApprovalDetailRespVO approverDetail = processInstanceQueryService.getApprovalDetail(3L,
                 new BpmApprovalDetailReqVO().setProcessInstanceId(processInstanceId).setTaskId(taskId));
         assertNull(approverDetail.getRevisionTaskId());
         assertNull(approverDetail.getTodoTask());
 
         // 调用，并断言异常：修改期间，审批人不能审批；只有修改人可以重新提交
-        assertServiceException(() -> bpmTaskService.approveTask(3L, new BpmTaskApproveReqVO().setId(taskId)
+        assertServiceException(() -> taskUpdateService.approveTask(3L, new BpmTaskApproveReqVO().setId(taskId)
                 .setReason("同意")), TASK_WAIT_REVISION);
-        assertServiceException(() -> bpmTaskService.resubmitTask(3L, new BpmTaskResubmitReqVO().setTaskId(taskId)),
+        assertServiceException(() -> taskUpdateService.resubmitTask(3L, new BpmTaskResubmitReqVO().setTaskId(taskId)),
                 TASK_RESUBMIT_NOT_ALLOWED);
-        assertServiceException(() -> bpmTaskService.resubmitTask(2L, new BpmTaskResubmitReqVO().setTaskId(taskId)),
+        assertServiceException(() -> taskUpdateService.resubmitTask(2L, new BpmTaskResubmitReqVO().setTaskId(taskId)),
                 TASK_RESUBMIT_NOT_ALLOWED);
         // 调用，并断言：其它租户下，同一用户编号既查询不到，也不能重新提交
         assertEquals(0L, TenantUtils.execute(2L, () ->
-                bpmTaskService.getRevisionTaskPage(1L, new BpmTaskPageReqVO()).getTotal()));
-        TenantUtils.execute(2L, () -> assertServiceException(() -> bpmTaskService.resubmitTask(1L,
+                taskQueryService.getRevisionTaskPage(1L, new BpmTaskPageReqVO()).getTotal()));
+        TenantUtils.execute(2L, () -> assertServiceException(() -> taskUpdateService.resubmitTask(1L,
                 new BpmTaskResubmitReqVO().setTaskId(taskId)), TASK_RESUBMIT_NOT_ALLOWED));
 
         // 调用：发起人修改后，重新提交
-        bpmTaskService.resubmitTask(1L, new BpmTaskResubmitReqVO().setTaskId(taskId).setRevisionId(revisionId)
+        taskUpdateService.resubmitTask(1L, new BpmTaskResubmitReqVO().setTaskId(taskId).setRevisionId(revisionId)
                 .setVariables(Map.of("amount", 200)));
         // 断言：表单变量更新；任务恢复为审批中，回到审批人的待办
         assertEquals(200, runtimeService.getVariable(processInstanceId, "amount"));
-        Task resumedTask = bpmTaskService.getTask(taskId);
+        Task resumedTask = taskQueryService.getTask(taskId);
         assertEquals(BpmTaskStatusEnum.RUNNING.getStatus(), FlowableUtils.getTaskStatus(resumedTask));
         assertFalse(resumedTask.getTaskLocalVariables().containsKey(BpmnVariableConstants.TASK_VARIABLE_REVISION_ASSIGNEE));
         verify(commentService).createComment(eq(taskId), eq(processInstanceId), eq(BpmCommentTypeEnum.RESUBMIT));
-        assertEquals(List.of(taskId), bpmTaskService.getTaskTodoPage(3L, new BpmTaskPageReqVO()).getList()
+        assertEquals(List.of(taskId), taskQueryService.getTaskTodoPage(3L, new BpmTaskPageReqVO()).getList()
                 .stream().map(Task::getId).toList());
         assertEquals(List.of(), getRevisionTaskIds(1L));
         // 调用，并断言异常：不能重复提交
-        assertServiceException(() -> bpmTaskService.resubmitTask(1L, new BpmTaskResubmitReqVO().setTaskId(taskId)),
+        assertServiceException(() -> taskUpdateService.resubmitTask(1L, new BpmTaskResubmitReqVO().setTaskId(taskId)),
                 TASK_RESUBMIT_NOT_ALLOWED);
 
         // 调用：审批人继续审批，使用待办中的批次
-        BpmTaskRespVO todoTask = bpmTaskService.getTodoTask(3L, taskId, processInstanceId);
+        BpmTaskRespVO todoTask = taskQueryService.getTodoTask(3L, taskId, processInstanceId);
         assertEquals(revisionId, todoTask.getRevisionId());
-        bpmTaskService.approveTask(3L, new BpmTaskApproveReqVO().setId(taskId).setReason("同意")
+        taskUpdateService.approveTask(3L, new BpmTaskApproveReqVO().setId(taskId).setReason("同意")
                 .setRevisionId(todoTask.getRevisionId()));
         // 断言：流程结束
-        assertNull(processInstanceService.getProcessInstance(processInstanceId));
+        assertNull(processInstanceQueryService.getProcessInstance(processInstanceId));
     }
 
     @Test
@@ -429,7 +435,7 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         // 准备参数：用户 3 将 task2 退回到发起人节点
         String processInstanceId = startRevisionProcessInstance(BpmModelFormTypeEnum.NORMAL);
         String taskId = getRunningTask(processInstanceId).getId();
-        bpmTaskService.returnTask(3L, new BpmTaskReturnReqVO().setId(taskId)
+        taskUpdateService.returnTask(3L, new BpmTaskReturnReqVO().setId(taskId)
                 .setTargetTaskDefinitionKey(BpmnModelConstants.START_USER_NODE_ID).setReason("请修改"));
 
         // 调用，并断言异常：只读字段，以及不是表单字段的变量、子表单的子字段，不能修改
@@ -468,7 +474,7 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         itemB.put("name", "b");
         List<Map<String, Object>> items = List.of(itemB, Map.of("name", "c"));
         List<String> tags = Arrays.asList("a", null, "x");
-        bpmTaskService.resubmitTask(1L, new BpmTaskResubmitReqVO().setTaskId(taskId).setRevisionId(getRevisionId(taskId))
+        taskUpdateService.resubmitTask(1L, new BpmTaskResubmitReqVO().setTaskId(taskId).setRevisionId(getRevisionId(taskId))
                 .setVariables(Map.of("amount", 200, "items", items, "tags", tags)));
         // 断言
         assertEquals(200, runtimeService.getVariable(processInstanceId, "amount"));
@@ -484,38 +490,38 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         String taskId = getRunningTask(processInstanceId).getId();
 
         // 调用：用户 3 审批不通过，按配置驳回到 task1
-        bpmTaskService.rejectTask(3L, new BpmTaskRejectReqVO().setId(taskId).setReason("金额有误")
+        taskUpdateService.rejectTask(3L, new BpmTaskRejectReqVO().setId(taskId).setReason("金额有误")
                 .setAttachments(List.of("https://www.iocoder.cn/files/c.pdf")));
         // 断言：任务不标记为不通过，由 task1 审批通过的用户 2 修改，而不是被取消的用户 4；附件仍保存到任务上
         assertTaskStatus(taskId, BpmTaskStatusEnum.WAIT_REVISION.getStatus(), "金额有误");
-        assertEquals(List.of("c.pdf"), bpmTaskService.getAttachments(processInstanceId, Set.of(taskId),
+        assertEquals(List.of("c.pdf"), taskQueryService.getAttachments(processInstanceId, Set.of(taskId),
                 BpmAttachmentTypeEnum.TASK_ATTACHMENT).stream().map(Attachment::getName).toList());
         assertEquals(taskId, getRunningTask(processInstanceId).getId());
         assertEquals(List.of(taskId), getRevisionTaskIds(2L));
         assertEquals(List.of(), getRevisionTaskIds(4L));
         // 调用，并断言异常：task1 隐藏、未配置权限（默认只读）的字段，不能修改
         String revisionId = getRevisionId(taskId);
-        assertServiceException(() -> bpmTaskService.resubmitTask(2L, new BpmTaskResubmitReqVO().setTaskId(taskId)
+        assertServiceException(() -> taskUpdateService.resubmitTask(2L, new BpmTaskResubmitReqVO().setTaskId(taskId)
                 .setRevisionId(revisionId).setVariables(Map.of("remark", "已修改"))), TASK_RESUBMIT_FIELD_NOT_WRITABLE, "remark");
-        assertServiceException(() -> bpmTaskService.resubmitTask(2L, new BpmTaskResubmitReqVO().setTaskId(taskId)
+        assertServiceException(() -> taskUpdateService.resubmitTask(2L, new BpmTaskResubmitReqVO().setTaskId(taskId)
                 .setRevisionId(revisionId).setVariables(Map.of("items", List.of()))), TASK_RESUBMIT_FIELD_NOT_WRITABLE, "items");
         // 调用，并断言异常：配置 props.field 的子表单可编辑时，也不能是包含 tag 的对象
-        assertServiceException(() -> bpmTaskService.resubmitTask(2L, new BpmTaskResubmitReqVO().setTaskId(taskId)
+        assertServiceException(() -> taskUpdateService.resubmitTask(2L, new BpmTaskResubmitReqVO().setTaskId(taskId)
                 .setRevisionId(revisionId).setVariables(Map.of("tags", List.of(Map.of("tag", "c"))))), TASK_RESUBMIT_FIELD_NOT_WRITABLE, "tags");
         // 调用，并断言异常：tag 是普通输入框，每行的值不能是对象、数组
-        assertServiceException(() -> bpmTaskService.resubmitTask(2L, new BpmTaskResubmitReqVO().setTaskId(taskId)
+        assertServiceException(() -> taskUpdateService.resubmitTask(2L, new BpmTaskResubmitReqVO().setTaskId(taskId)
                 .setRevisionId(revisionId).setVariables(Map.of("tags", List.of(Map.of("note", "c"))))), TASK_RESUBMIT_FIELD_NOT_WRITABLE, "tags");
-        assertServiceException(() -> bpmTaskService.resubmitTask(2L, new BpmTaskResubmitReqVO().setTaskId(taskId)
+        assertServiceException(() -> taskUpdateService.resubmitTask(2L, new BpmTaskResubmitReqVO().setTaskId(taskId)
                 .setRevisionId(revisionId).setVariables(Map.of("tags", List.of(List.of("c"))))), TASK_RESUBMIT_FIELD_NOT_WRITABLE, "tags");
 
         // 调用：用户 2 修改后，重新提交
-        bpmTaskService.resubmitTask(2L, new BpmTaskResubmitReqVO().setTaskId(taskId).setRevisionId(revisionId)
+        taskUpdateService.resubmitTask(2L, new BpmTaskResubmitReqVO().setTaskId(taskId).setRevisionId(revisionId)
                 .setVariables(Map.of("amount", 300)));
         // 断言：不重新经过 task1，回到 task2 审批
         assertEquals(300, runtimeService.getVariable(processInstanceId, "amount"));
         assertEquals(taskId, getRunningTask(processInstanceId).getId());
-        bpmTaskService.approveTask(3L, new BpmTaskApproveReqVO().setId(taskId).setReason("同意").setRevisionId(revisionId));
-        assertNull(processInstanceService.getProcessInstance(processInstanceId));
+        taskUpdateService.approveTask(3L, new BpmTaskApproveReqVO().setId(taskId).setReason("同意").setRevisionId(revisionId));
+        assertNull(processInstanceQueryService.getProcessInstance(processInstanceId));
     }
 
     @Test
@@ -525,10 +531,10 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         String taskId = getRunningTask(processInstanceId).getId();
 
         // 调用：用户 3 审批不通过
-        bpmTaskService.rejectTask(3L, new BpmTaskRejectReqVO().setId(taskId).setReason("不同意"));
+        taskUpdateService.rejectTask(3L, new BpmTaskRejectReqVO().setId(taskId).setReason("不同意"));
         // 断言：与【重新依次审批】一致，task2 标记为退回，流程回到 task1，重新生成用户 2、用户 4 的或签任务
         assertTaskStatus(taskId, BpmTaskStatusEnum.RETURN.getStatus(), "不同意");
-        assertEquals(List.of("2", "4"), bpmTaskService.getRunningTaskListByProcessInstanceId(processInstanceId, null, "task1")
+        assertEquals(List.of("2", "4"), taskQueryService.getRunningTaskListByProcessInstanceId(processInstanceId, null, "task1")
                 .stream().map(Task::getAssignee).sorted().toList());
         assertEquals(List.of(), getRevisionTaskIds(2L));
     }
@@ -538,35 +544,35 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         // 准备参数：用户 3 将 task2 委派给用户 5
         String processInstanceId = startRevisionProcessInstance(BpmModelFormTypeEnum.NORMAL);
         String taskId = getRunningTask(processInstanceId).getId();
-        bpmTaskService.delegateTask(3L, new BpmTaskDelegateReqVO().setId(taskId)
+        taskUpdateService.delegateTask(3L, new BpmTaskDelegateReqVO().setId(taskId)
                 .setDelegateUserId(5L).setReason("请帮忙审批"));
 
         // 调用：委派中（PENDING），被委派人退回到发起人节点，发起人重新提交
-        bpmTaskService.returnTask(5L, new BpmTaskReturnReqVO().setId(taskId)
+        taskUpdateService.returnTask(5L, new BpmTaskReturnReqVO().setId(taskId)
                 .setTargetTaskDefinitionKey(BpmnModelConstants.START_USER_NODE_ID).setReason("请修改"));
         assertEquals(BpmTaskStatusEnum.WAIT_REVISION.getStatus(), getTaskStatus(taskId));
         String revisionId = getRevisionId(taskId);
-        bpmTaskService.resubmitTask(1L, new BpmTaskResubmitReqVO().setTaskId(taskId).setRevisionId(revisionId));
+        taskUpdateService.resubmitTask(1L, new BpmTaskResubmitReqVO().setTaskId(taskId).setRevisionId(revisionId));
         // 断言：仍由被委派人审批
-        Task delegatedTask = bpmTaskService.getTask(taskId);
+        Task delegatedTask = taskQueryService.getTask(taskId);
         assertEquals("5", delegatedTask.getAssignee());
         assertEquals(DelegationState.PENDING, delegatedTask.getDelegationState());
         assertEquals(BpmTaskStatusEnum.RUNNING.getStatus(), FlowableUtils.getTaskStatus(delegatedTask));
 
         // 调用：被委派人审批，归还给用户 3
-        bpmTaskService.approveTask(5L, new BpmTaskApproveReqVO().setId(taskId).setReason("已处理").setRevisionId(revisionId));
-        Task resolvedTask = bpmTaskService.getTask(taskId);
+        taskUpdateService.approveTask(5L, new BpmTaskApproveReqVO().setId(taskId).setReason("已处理").setRevisionId(revisionId));
+        Task resolvedTask = taskQueryService.getTask(taskId);
         assertEquals("3", resolvedTask.getAssignee());
         assertEquals(DelegationState.RESOLVED, resolvedTask.getDelegationState());
 
         // 调用：委派已归还（RESOLVED），用户 3 驳回到 task1
-        bpmTaskService.rejectTask(3L, new BpmTaskRejectReqVO().setId(taskId).setReason("金额有误").setRevisionId(revisionId));
+        taskUpdateService.rejectTask(3L, new BpmTaskRejectReqVO().setId(taskId).setReason("金额有误").setRevisionId(revisionId));
         // 断言：同样退回修改，由 task1 的用户 2 修改；重新提交后，用户 3 审批通过，流程结束
         assertEquals(BpmTaskStatusEnum.WAIT_REVISION.getStatus(), getTaskStatus(taskId));
         String revisionId2 = getRevisionId(taskId);
-        bpmTaskService.resubmitTask(2L, new BpmTaskResubmitReqVO().setTaskId(taskId).setRevisionId(revisionId2));
-        bpmTaskService.approveTask(3L, new BpmTaskApproveReqVO().setId(taskId).setReason("同意").setRevisionId(revisionId2));
-        assertNull(processInstanceService.getProcessInstance(processInstanceId));
+        taskUpdateService.resubmitTask(2L, new BpmTaskResubmitReqVO().setTaskId(taskId).setRevisionId(revisionId2));
+        taskUpdateService.approveTask(3L, new BpmTaskApproveReqVO().setId(taskId).setReason("同意").setRevisionId(revisionId2));
+        assertNull(processInstanceQueryService.getProcessInstance(processInstanceId));
     }
 
     @Test
@@ -574,24 +580,24 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         // 准备参数：用户 3 将 task2 退回到发起人节点
         String processInstanceId = startRevisionProcessInstance(BpmModelFormTypeEnum.NORMAL);
         String taskId = getRunningTask(processInstanceId).getId();
-        bpmTaskService.returnTask(3L, new BpmTaskReturnReqVO().setId(taskId)
+        taskUpdateService.returnTask(3L, new BpmTaskReturnReqVO().setId(taskId)
                 .setTargetTaskDefinitionKey(BpmnModelConstants.START_USER_NODE_ID).setReason("请修改"));
 
         // 调用：超时提醒
-        bpmTaskService.processTaskTimeout(processInstanceId, "task2", BpmUserTaskTimeoutHandlerTypeEnum.REMINDER.getType());
+        taskUpdateService.processTaskTimeout(processInstanceId, "task2", BpmUserTaskTimeoutHandlerTypeEnum.REMINDER.getType());
         // 断言：等待修改期间，审批人不能处理，所以不提醒
         verify(messageService, never()).sendMessageWhenTaskTimeout(any());
         assertEquals(BpmTaskStatusEnum.WAIT_REVISION.getStatus(), getTaskStatus(taskId));
 
         // 调用：超时自动通过
-        bpmTaskService.processTaskTimeout(processInstanceId, "task2", BpmUserTaskTimeoutHandlerTypeEnum.APPROVE.getType());
+        taskUpdateService.processTaskTimeout(processInstanceId, "task2", BpmUserTaskTimeoutHandlerTypeEnum.APPROVE.getType());
         // 断言：先结束退回修改，再自动通过，流程结束；修改人不能再重新提交
         assertTaskStatus(taskId, BpmTaskStatusEnum.APPROVE.getStatus(), BpmReasonEnum.TIMEOUT_APPROVE.getReason());
-        assertFalse(bpmTaskService.getHistoricTask(taskId).getTaskLocalVariables()
+        assertFalse(taskQueryService.getHistoricTask(taskId).getTaskLocalVariables()
                 .containsKey(BpmnVariableConstants.TASK_VARIABLE_REVISION_ASSIGNEE));
-        assertNull(processInstanceService.getProcessInstance(processInstanceId));
+        assertNull(processInstanceQueryService.getProcessInstance(processInstanceId));
         assertEquals(List.of(), getRevisionTaskIds(1L));
-        assertServiceException(() -> bpmTaskService.resubmitTask(1L, new BpmTaskResubmitReqVO().setTaskId(taskId)),
+        assertServiceException(() -> taskUpdateService.resubmitTask(1L, new BpmTaskResubmitReqVO().setTaskId(taskId)),
                 TASK_RESUBMIT_NOT_ALLOWED);
     }
 
@@ -600,16 +606,16 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         // 准备参数：用户 3 将 task2 退回到发起人节点
         String processInstanceId = startRevisionProcessInstance(BpmModelFormTypeEnum.NORMAL);
         String taskId = getRunningTask(processInstanceId).getId();
-        bpmTaskService.returnTask(3L, new BpmTaskReturnReqVO().setId(taskId)
+        taskUpdateService.returnTask(3L, new BpmTaskReturnReqVO().setId(taskId)
                 .setTargetTaskDefinitionKey(BpmnModelConstants.START_USER_NODE_ID).setReason("请修改"));
 
         // 调用：超时自动拒绝
-        bpmTaskService.processTaskTimeout(processInstanceId, "task2", BpmUserTaskTimeoutHandlerTypeEnum.REJECT.getType());
+        taskUpdateService.processTaskTimeout(processInstanceId, "task2", BpmUserTaskTimeoutHandlerTypeEnum.REJECT.getType());
         // 断言：结束退回修改后，按常规的驳回处理：task2 标记为退回，流程回到驳回节点 task1，不再等待修改
         assertTaskStatus(taskId, BpmTaskStatusEnum.RETURN.getStatus(), BpmReasonEnum.REJECT_TASK.getReason());
-        assertFalse(bpmTaskService.getHistoricTask(taskId).getTaskLocalVariables()
+        assertFalse(taskQueryService.getHistoricTask(taskId).getTaskLocalVariables()
                 .containsKey(BpmnVariableConstants.TASK_VARIABLE_REVISION_ASSIGNEE));
-        assertEquals(List.of("2", "4"), bpmTaskService.getRunningTaskListByProcessInstanceId(processInstanceId, null, "task1")
+        assertEquals(List.of("2", "4"), taskQueryService.getRunningTaskListByProcessInstanceId(processInstanceId, null, "task1")
                 .stream().map(Task::getAssignee).sorted().toList());
         assertEquals(List.of(), getRevisionTaskIds(1L));
         assertEquals(List.of(), getRevisionTaskIds(2L));
@@ -620,44 +626,44 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         // 准备参数：从未退回修改的任务，没有批次
         String processInstanceId = startRevisionProcessInstance(BpmModelFormTypeEnum.NORMAL);
         String taskId = getRunningTask(processInstanceId).getId();
-        assertNull(bpmTaskService.getTodoTask(3L, taskId, processInstanceId).getRevisionId());
+        assertNull(taskQueryService.getTodoTask(3L, taskId, processInstanceId).getRevisionId());
         // 准备参数：第一次退回修改，发起人重新提交；重新提交后保留批次，审批人的待办返回该批次
-        bpmTaskService.returnTask(3L, new BpmTaskReturnReqVO().setId(taskId)
+        taskUpdateService.returnTask(3L, new BpmTaskReturnReqVO().setId(taskId)
                 .setTargetTaskDefinitionKey(BpmnModelConstants.START_USER_NODE_ID).setReason("第一次修改"));
         String revisionId1 = getRevisionId(taskId);
         assertNotNull(revisionId1);
-        bpmTaskService.resubmitTask(1L, new BpmTaskResubmitReqVO().setTaskId(taskId).setRevisionId(revisionId1)
+        taskUpdateService.resubmitTask(1L, new BpmTaskResubmitReqVO().setTaskId(taskId).setRevisionId(revisionId1)
                 .setVariables(Map.of("amount", 200)));
-        assertEquals(revisionId1, bpmTaskService.getTodoTask(3L, taskId, processInstanceId).getRevisionId());
+        assertEquals(revisionId1, taskQueryService.getTodoTask(3L, taskId, processInstanceId).getRevisionId());
 
         // 调用，并断言异常：审批人使用退回修改前的页面（没有批次）审批，不能覆盖修改后的表单
-        assertServiceException(() -> bpmTaskService.approveTask(3L, new BpmTaskApproveReqVO().setId(taskId)
+        assertServiceException(() -> taskUpdateService.approveTask(3L, new BpmTaskApproveReqVO().setId(taskId)
                 .setReason("同意").setVariables(Map.of("amount", 100))), TASK_REVISION_EXPIRED);
-        assertServiceException(() -> bpmTaskService.rejectTask(3L, new BpmTaskRejectReqVO().setId(taskId)
+        assertServiceException(() -> taskUpdateService.rejectTask(3L, new BpmTaskRejectReqVO().setId(taskId)
                 .setReason("不同意")), TASK_REVISION_EXPIRED);
         assertEquals(200, runtimeService.getVariable(processInstanceId, "amount"));
 
         // 准备参数：第二次退回修改，生成新的批次
-        bpmTaskService.returnTask(3L, new BpmTaskReturnReqVO().setId(taskId)
+        taskUpdateService.returnTask(3L, new BpmTaskReturnReqVO().setId(taskId)
                 .setTargetTaskDefinitionKey(BpmnModelConstants.START_USER_NODE_ID).setReason("第二次修改"));
         String revisionId2 = getRevisionId(taskId);
         assertNotEquals(revisionId1, revisionId2);
         // 调用，并断言异常：第一次退回修改的页面，不能提交到第二次
-        assertServiceException(() -> bpmTaskService.resubmitTask(1L, new BpmTaskResubmitReqVO().setTaskId(taskId)
+        assertServiceException(() -> taskUpdateService.resubmitTask(1L, new BpmTaskResubmitReqVO().setTaskId(taskId)
                 .setRevisionId(revisionId1).setVariables(Map.of("amount", 300))), TASK_REVISION_EXPIRED);
         assertEquals(200, runtimeService.getVariable(processInstanceId, "amount"));
         assertEquals(BpmTaskStatusEnum.WAIT_REVISION.getStatus(), getTaskStatus(taskId));
         // 调用：使用第二次的批次，重新提交
-        bpmTaskService.resubmitTask(1L, new BpmTaskResubmitReqVO().setTaskId(taskId).setRevisionId(revisionId2)
+        taskUpdateService.resubmitTask(1L, new BpmTaskResubmitReqVO().setTaskId(taskId).setRevisionId(revisionId2)
                 .setVariables(Map.of("amount", 300)));
         // 调用，并断言异常：审批人使用第一次的页面审批
-        assertServiceException(() -> bpmTaskService.approveTask(3L, new BpmTaskApproveReqVO().setId(taskId)
+        assertServiceException(() -> taskUpdateService.approveTask(3L, new BpmTaskApproveReqVO().setId(taskId)
                 .setReason("同意").setRevisionId(revisionId1)), TASK_REVISION_EXPIRED);
 
         // 调用：审批人使用第二次的批次审批
-        bpmTaskService.approveTask(3L, new BpmTaskApproveReqVO().setId(taskId).setReason("同意").setRevisionId(revisionId2));
+        taskUpdateService.approveTask(3L, new BpmTaskApproveReqVO().setId(taskId).setReason("同意").setRevisionId(revisionId2));
         // 断言：流程结束，表单为第二次修改的值
-        assertNull(processInstanceService.getProcessInstance(processInstanceId));
+        assertNull(processInstanceQueryService.getProcessInstance(processInstanceId));
         assertEquals(300, getHistoricProcessVariable(processInstanceId, "amount"));
     }
 
@@ -666,17 +672,17 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         // 准备参数：task2 会签，用户 3 已经审批通过，用户 5 待审批
         String processInstanceId = startRevisionProcessInstance(BpmModelFormTypeEnum.NORMAL,
                 new LinkedHashSet<>(List.of(2L, 4L)), new LinkedHashSet<>(List.of(3L, 5L)));
-        Map<String, Task> task2Map = bpmTaskService.getRunningTaskListByProcessInstanceId(processInstanceId, null, "task2")
+        Map<String, Task> task2Map = taskQueryService.getRunningTaskListByProcessInstanceId(processInstanceId, null, "task2")
                 .stream().collect(Collectors.toMap(Task::getAssignee, Function.identity()));
         assertEquals(Set.of("3", "5"), task2Map.keySet());
-        bpmTaskService.approveTask(3L, new BpmTaskApproveReqVO().setId(task2Map.get("3").getId()).setReason("同意"));
+        taskUpdateService.approveTask(3L, new BpmTaskApproveReqVO().setId(task2Map.get("3").getId()).setReason("同意"));
         String taskId = task2Map.get("5").getId();
 
         // 调用：用户 5 审批不通过
-        bpmTaskService.rejectTask(5L, new BpmTaskRejectReqVO().setId(taskId).setReason("金额有误"));
+        taskUpdateService.rejectTask(5L, new BpmTaskRejectReqVO().setId(taskId).setReason("金额有误"));
         // 断言：多人审批的节点，不退回修改，与【重新依次审批】一致：task2 标记为退回，流程回到 task1，重新生成或签任务
         assertTaskStatus(taskId, BpmTaskStatusEnum.RETURN.getStatus(), "金额有误");
-        assertEquals(List.of("2", "4"), bpmTaskService.getRunningTaskListByProcessInstanceId(processInstanceId, null, "task1")
+        assertEquals(List.of("2", "4"), taskQueryService.getRunningTaskListByProcessInstanceId(processInstanceId, null, "task1")
                 .stream().map(Task::getAssignee).sorted().toList());
         assertEquals(List.of(), getRevisionTaskIds(2L));
     }
@@ -694,12 +700,12 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         String taskId = getRunningTask(processInstanceId).getId();
 
         // 调用：用户 3 退回到 task1
-        bpmTaskService.returnTask(3L, new BpmTaskReturnReqVO().setId(taskId)
+        taskUpdateService.returnTask(3L, new BpmTaskReturnReqVO().setId(taskId)
                 .setTargetTaskDefinitionKey("task1").setReason("请修改"));
         // 断言：目标节点没有修改人，与【重新依次审批】一致：task2 标记为退回，流程跳转，不进入退回修改
         assertTaskStatus(taskId, BpmTaskStatusEnum.RETURN.getStatus(), "请修改");
-        assertNull(bpmTaskService.getTask(taskId));
-        assertFalse(bpmTaskService.getHistoricTask(taskId).getTaskLocalVariables()
+        assertNull(taskQueryService.getTask(taskId));
+        assertFalse(taskQueryService.getHistoricTask(taskId).getTaskLocalVariables()
                 .containsKey(BpmnVariableConstants.TASK_VARIABLE_REVISION_ASSIGNEE));
     }
 
@@ -708,10 +714,10 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         // 准备参数：用户 3 驳回到 task1，由用户 2 修改
         String processInstanceId = startRevisionProcessInstance(BpmModelFormTypeEnum.NORMAL);
         String taskId = getRunningTask(processInstanceId).getId();
-        bpmTaskService.rejectTask(3L, new BpmTaskRejectReqVO().setId(taskId).setReason("金额有误"));
+        taskUpdateService.rejectTask(3L, new BpmTaskRejectReqVO().setId(taskId).setReason("金额有误"));
 
         // 调用：不传 taskId，例如说从【我的流程】进入
-        BpmApprovalDetailRespVO detail = processInstanceService.getApprovalDetail(2L,
+        BpmApprovalDetailRespVO detail = processInstanceQueryService.getApprovalDetail(2L,
                 new BpmApprovalDetailReqVO().setProcessInstanceId(processInstanceId));
         // 断言：找到用户 2 在该流程实例中待修改的任务，使用 task1 的表单权限
         assertEquals(taskId, detail.getRevisionTaskId());
@@ -719,9 +725,9 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         assertEquals(Map.of("amount", "2", "remark", "3", "tags", "2"), detail.getFormFieldsPermission());
 
         // 调用：重新提交后，使用过期的修改链接（taskId 是审批人的任务）
-        bpmTaskService.resubmitTask(2L, new BpmTaskResubmitReqVO().setTaskId(taskId).setRevisionId(detail.getRevisionId())
+        taskUpdateService.resubmitTask(2L, new BpmTaskResubmitReqVO().setTaskId(taskId).setRevisionId(detail.getRevisionId())
                 .setVariables(Map.of("amount", 300)));
-        BpmApprovalDetailRespVO expiredDetail = processInstanceService.getApprovalDetail(2L,
+        BpmApprovalDetailRespVO expiredDetail = processInstanceQueryService.getApprovalDetail(2L,
                 new BpmApprovalDetailReqVO().setProcessInstanceId(processInstanceId).setTaskId(taskId));
         // 断言：不能再修改，使用用户 2 办理过的 task1 的表单权限：可编辑降级为只读，隐藏的字段仍然隐藏
         assertNull(expiredDetail.getRevisionTaskId());
@@ -729,7 +735,7 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         assertNull(expiredDetail.getTodoTask());
         assertEquals(Map.of("amount", "1", "remark", "3", "tags", "1"), expiredDetail.getFormFieldsPermission());
         // 调用 + 断言：不传 taskId（不是发起人），同样使用用户 2 审批通过的 task1 的表单权限，隐藏的字段仍然隐藏
-        assertEquals(Map.of("amount", "1", "remark", "3", "tags", "1"), processInstanceService.getApprovalDetail(2L,
+        assertEquals(Map.of("amount", "1", "remark", "3", "tags", "1"), processInstanceQueryService.getApprovalDetail(2L,
                 new BpmApprovalDetailReqVO().setProcessInstanceId(processInstanceId)).getFormFieldsPermission());
     }
 
@@ -740,10 +746,10 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         Task task1 = getRunningTask(processInstanceId);
 
         // 调用：委派给用户 2
-        bpmTaskService.delegateTask(1L, new BpmTaskDelegateReqVO().setId(task1.getId())
+        taskUpdateService.delegateTask(1L, new BpmTaskDelegateReqVO().setId(task1.getId())
                 .setDelegateUserId(2L).setReason("请帮忙审批"));
         // 断言
-        Task delegatedTask = bpmTaskService.getTask(task1.getId());
+        Task delegatedTask = taskQueryService.getTask(task1.getId());
         assertEquals("1", delegatedTask.getOwner());
         assertEquals("2", delegatedTask.getAssignee());
         assertEquals(DelegationState.PENDING, delegatedTask.getDelegationState());
@@ -751,9 +757,9 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
                 eq(BpmCommentTypeEnum.DELEGATE_START), eq("用户1"), eq("用户2"), eq("请帮忙审批"));
 
         // 调用：被委派人审批，任务归还给原审批人
-        bpmTaskService.approveTask(2L, new BpmTaskApproveReqVO().setId(task1.getId()).setReason("已处理"));
+        taskUpdateService.approveTask(2L, new BpmTaskApproveReqVO().setId(task1.getId()).setReason("已处理"));
         // 断言：任务仍在 task1，审批人恢复为用户 1
-        Task resolvedTask = bpmTaskService.getTask(task1.getId());
+        Task resolvedTask = taskQueryService.getTask(task1.getId());
         assertEquals("1", resolvedTask.getAssignee());
         assertEquals(DelegationState.RESOLVED, resolvedTask.getDelegationState());
         assertEquals(BpmTaskStatusEnum.RUNNING.getStatus(),
@@ -765,23 +771,23 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         // 准备参数：用户 1 委派给用户 2
         String processInstanceId = startProcessInstance();
         Task task1 = getRunningTask(processInstanceId);
-        bpmTaskService.delegateTask(1L, new BpmTaskDelegateReqVO().setId(task1.getId())
+        taskUpdateService.delegateTask(1L, new BpmTaskDelegateReqVO().setId(task1.getId())
                 .setDelegateUserId(2L).setReason("请帮忙审批"));
 
         // 调用：用户 2 再委派给用户 3
-        bpmTaskService.delegateTask(2L, new BpmTaskDelegateReqVO().setId(task1.getId())
+        taskUpdateService.delegateTask(2L, new BpmTaskDelegateReqVO().setId(task1.getId())
                 .setDelegateUserId(3L).setReason("转给用户 3"));
         // 断言：owner 仍为最初的审批人
-        Task delegatedTask = bpmTaskService.getTask(task1.getId());
+        Task delegatedTask = taskQueryService.getTask(task1.getId());
         assertEquals("1", delegatedTask.getOwner());
         assertEquals("3", delegatedTask.getAssignee());
         verify(commentService).createComment(eq(task1.getId()), eq(processInstanceId),
                 eq(BpmCommentTypeEnum.DELEGATE_START), eq("用户2"), eq("用户3"), eq("转给用户 3"));
 
         // 调用：用户 3 审批，任务先归还给直接委派人用户 2
-        bpmTaskService.approveTask(3L, new BpmTaskApproveReqVO().setId(task1.getId()).setReason("用户 3 已处理"));
+        taskUpdateService.approveTask(3L, new BpmTaskApproveReqVO().setId(task1.getId()).setReason("用户 3 已处理"));
         // 断言：仍处于委派中，节点没有推进
-        Task returnedTask = bpmTaskService.getTask(task1.getId());
+        Task returnedTask = taskQueryService.getTask(task1.getId());
         assertEquals("2", returnedTask.getAssignee());
         assertEquals("1", returnedTask.getOwner());
         assertEquals(DelegationState.PENDING, returnedTask.getDelegationState());
@@ -789,9 +795,9 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
                 eq(BpmCommentTypeEnum.DELEGATE_END), eq("用户3"), eq("用户2"), eq("用户 3 已处理"));
 
         // 调用：用户 2 审批，任务再归还给用户 1
-        bpmTaskService.approveTask(2L, new BpmTaskApproveReqVO().setId(task1.getId()).setReason("用户 2 已处理"));
+        taskUpdateService.approveTask(2L, new BpmTaskApproveReqVO().setId(task1.getId()).setReason("用户 2 已处理"));
         // 断言：委派结束，节点仍未推进
-        Task resolvedTask = bpmTaskService.getTask(task1.getId());
+        Task resolvedTask = taskQueryService.getTask(task1.getId());
         assertEquals("1", resolvedTask.getAssignee());
         assertEquals(DelegationState.RESOLVED, resolvedTask.getDelegationState());
         assertFalse(resolvedTask.getTaskLocalVariables().containsKey(BpmnVariableConstants.TASK_DELEGATE_RETURN_USERS));
@@ -799,7 +805,7 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
                 eq(BpmCommentTypeEnum.DELEGATE_END), eq("用户2"), eq("用户1"), eq("用户 2 已处理"));
 
         // 调用：用户 1 审批，节点完成
-        bpmTaskService.approveTask(1L, new BpmTaskApproveReqVO().setId(task1.getId()).setReason("同意"));
+        taskUpdateService.approveTask(1L, new BpmTaskApproveReqVO().setId(task1.getId()).setReason("同意"));
         // 断言
         assertEquals("task2", getRunningTask(processInstanceId).getTaskDefinitionKey());
     }
@@ -812,9 +818,9 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         flowableTaskService.delegateTask(taskId, "2");
 
         // 调用：用户 2 审批
-        bpmTaskService.approveTask(2L, new BpmTaskApproveReqVO().setId(taskId).setReason("已处理"));
+        taskUpdateService.approveTask(2L, new BpmTaskApproveReqVO().setId(taskId).setReason("已处理"));
         // 断言：沿用 owner 归还给用户 1
-        Task resolvedTask = bpmTaskService.getTask(taskId);
+        Task resolvedTask = taskQueryService.getTask(taskId);
         assertEquals("1", resolvedTask.getAssignee());
         assertEquals(DelegationState.RESOLVED, resolvedTask.getDelegationState());
     }
@@ -824,13 +830,13 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         // 准备参数：用户 1 转办给用户 2，用户 2 再委派给用户 3
         String processInstanceId = startProcessInstance();
         String taskId = getRunningTask(processInstanceId).getId();
-        bpmTaskService.transferTask(1L, new BpmTaskTransferReqVO().setId(taskId).setAssigneeUserId(2L).setReason("转办"));
-        bpmTaskService.delegateTask(2L, new BpmTaskDelegateReqVO().setId(taskId).setDelegateUserId(3L).setReason("委派"));
+        taskUpdateService.transferTask(1L, new BpmTaskTransferReqVO().setId(taskId).setAssigneeUserId(2L).setReason("转办"));
+        taskUpdateService.delegateTask(2L, new BpmTaskDelegateReqVO().setId(taskId).setDelegateUserId(3L).setReason("委派"));
 
         // 调用：用户 3 审批
-        bpmTaskService.approveTask(3L, new BpmTaskApproveReqVO().setId(taskId).setReason("已处理"));
+        taskUpdateService.approveTask(3L, new BpmTaskApproveReqVO().setId(taskId).setReason("已处理"));
         // 断言：归还给直接委派人用户 2，owner 仍为最初的审批人用户 1
-        Task resolvedTask = bpmTaskService.getTask(taskId);
+        Task resolvedTask = taskQueryService.getTask(taskId);
         assertEquals("2", resolvedTask.getAssignee());
         assertEquals("1", resolvedTask.getOwner());
         assertEquals(DelegationState.RESOLVED, resolvedTask.getDelegationState());
@@ -843,7 +849,7 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         Task task1 = getRunningTask(processInstanceId);
 
         // 调用，并断言异常
-        assertServiceException(() -> bpmTaskService.delegateTask(1L, new BpmTaskDelegateReqVO().setId(task1.getId())
+        assertServiceException(() -> taskUpdateService.delegateTask(1L, new BpmTaskDelegateReqVO().setId(task1.getId())
                 .setDelegateUserId(1L).setReason("委派")), TASK_DELEGATE_FAIL_USER_REPEAT);
     }
 
@@ -854,10 +860,10 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         Task task1 = getRunningTask(processInstanceId);
 
         // 调用
-        bpmTaskService.transferTask(1L, new BpmTaskTransferReqVO().setId(task1.getId())
+        taskUpdateService.transferTask(1L, new BpmTaskTransferReqVO().setId(task1.getId())
                 .setAssigneeUserId(2L).setReason("转办"));
         // 断言
-        Task transferredTask = bpmTaskService.getTask(task1.getId());
+        Task transferredTask = taskQueryService.getTask(task1.getId());
         assertEquals("1", transferredTask.getOwner());
         assertEquals("2", transferredTask.getAssignee());
         assertNull(transferredTask.getDelegationState());
@@ -874,15 +880,15 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         assertNull(task1.getAssignee());
 
         // 调用：转办给用户 2
-        bpmTaskService.transferTask(1L, new BpmTaskTransferReqVO().setId(task1.getId())
+        taskUpdateService.transferTask(1L, new BpmTaskTransferReqVO().setId(task1.getId())
                 .setAssigneeUserId(2L).setReason("转办"));
         // 断言：用户 2 成为审批人
-        Task transferredTask = bpmTaskService.getTask(task1.getId());
+        Task transferredTask = taskQueryService.getTask(task1.getId());
         assertEquals("2", transferredTask.getAssignee());
         assertNull(transferredTask.getOwner());
         // 调用 + 断言：用户 2 审批通过，流程流转到 task2
         when(taskCandidateInvoker.calculateUsersByTask(any())).thenReturn(Set.of(1L));
-        bpmTaskService.approveTask(2L, new BpmTaskApproveReqVO().setId(task1.getId()).setReason("同意"));
+        taskUpdateService.approveTask(2L, new BpmTaskApproveReqVO().setId(task1.getId()).setReason("同意"));
         assertEquals("task2", getRunningTask(processInstanceId).getTaskDefinitionKey());
     }
 
@@ -893,30 +899,30 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         Task task1 = getRunningTask(processInstanceId);
 
         // 调用：向前加签给用户 2
-        bpmTaskService.createSignTask(1L, new BpmTaskSignCreateReqVO().setId(task1.getId())
+        taskUpdateService.createSignTask(1L, new BpmTaskSignCreateReqVO().setId(task1.getId())
                 .setType(BpmTaskSignTypeEnum.BEFORE.getType()).setUserIds(Set.of(2L)).setReason("加签"));
         // 断言：父任务等待子任务审批，子任务分配给用户 2
-        Task parentTask = bpmTaskService.getTask(task1.getId());
+        Task parentTask = taskQueryService.getTask(task1.getId());
         assertNull(parentTask.getAssignee());
         assertEquals("1", parentTask.getOwner());
         assertEquals(BpmTaskSignTypeEnum.BEFORE.getType(), parentTask.getScopeType());
         assertEquals(BpmTaskStatusEnum.WAIT.getStatus(),
                 parentTask.getTaskLocalVariables().get(BpmnVariableConstants.TASK_VARIABLE_STATUS));
-        List<Task> childTasks = bpmTaskService.getTaskListByParentTaskId(task1.getId());
+        List<Task> childTasks = taskQueryService.getTaskListByParentTaskId(task1.getId());
         assertEquals(1, childTasks.size());
         assertEquals("2", childTasks.get(0).getAssignee());
         verify(commentService).createComment(eq(task1.getId()), eq(processInstanceId),
                 eq(BpmCommentTypeEnum.ADD_SIGN), eq("用户1"), eq("向前加签"), eq("用户2"), eq("加签"));
 
         // 调用：用户 2 审批子任务
-        bpmTaskService.approveTask(2L, new BpmTaskApproveReqVO().setId(childTasks.get(0).getId()).setReason("同意"));
+        taskUpdateService.approveTask(2L, new BpmTaskApproveReqVO().setId(childTasks.get(0).getId()).setReason("同意"));
         // 断言：父任务恢复给用户 1 审批
-        Task resolvedTask = bpmTaskService.getTask(task1.getId());
+        Task resolvedTask = taskQueryService.getTask(task1.getId());
         assertEquals("1", resolvedTask.getAssignee());
         assertNull(resolvedTask.getScopeType());
         assertEquals(BpmTaskStatusEnum.RUNNING.getStatus(),
                 resolvedTask.getTaskLocalVariables().get(BpmnVariableConstants.TASK_VARIABLE_STATUS));
-        assertTrue(bpmTaskService.getTaskListByParentTaskId(task1.getId()).isEmpty());
+        assertTrue(taskQueryService.getTaskListByParentTaskId(task1.getId()).isEmpty());
     }
 
     @Test
@@ -926,23 +932,23 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         Task task1 = getRunningTask(processInstanceId);
 
         // 调用：向后加签给用户 2
-        bpmTaskService.createSignTask(1L, new BpmTaskSignCreateReqVO().setId(task1.getId())
+        taskUpdateService.createSignTask(1L, new BpmTaskSignCreateReqVO().setId(task1.getId())
                 .setType(BpmTaskSignTypeEnum.AFTER.getType()).setUserIds(Set.of(2L)).setReason("加签"));
         // 断言：子任务暂由用户 2 拥有，等待父任务审批
-        Task childTask = bpmTaskService.getTaskListByParentTaskId(task1.getId()).get(0);
+        Task childTask = taskQueryService.getTaskListByParentTaskId(task1.getId()).get(0);
         assertEquals("2", childTask.getOwner());
         assertNull(childTask.getAssignee());
         assertEquals(BpmTaskStatusEnum.WAIT.getStatus(), getTaskStatus(childTask.getId()));
 
         // 调用：用户 1 审批父任务，激活子任务
-        bpmTaskService.approveTask(1L, new BpmTaskApproveReqVO().setId(task1.getId()).setReason("同意"));
+        taskUpdateService.approveTask(1L, new BpmTaskApproveReqVO().setId(task1.getId()).setReason("同意"));
         // 断言：父任务处于审批通过中，子任务分配给用户 2
         assertEquals(BpmTaskStatusEnum.APPROVING.getStatus(), getTaskStatus(task1.getId()));
-        assertEquals("2", bpmTaskService.getTask(childTask.getId()).getAssignee());
+        assertEquals("2", taskQueryService.getTask(childTask.getId()).getAssignee());
         assertEquals(BpmTaskStatusEnum.RUNNING.getStatus(), getTaskStatus(childTask.getId()));
 
         // 调用：用户 2 审批子任务
-        bpmTaskService.approveTask(2L, new BpmTaskApproveReqVO().setId(childTask.getId()).setReason("同意"));
+        taskUpdateService.approveTask(2L, new BpmTaskApproveReqVO().setId(childTask.getId()).setReason("同意"));
         // 断言：父任务自动完成，流程流转到 task2
         assertTaskStatus(task1.getId(), BpmTaskStatusEnum.APPROVE.getStatus(), "同意");
         assertEquals("task2", getRunningTask(processInstanceId).getTaskDefinitionKey());
@@ -953,11 +959,11 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         // 准备参数
         String processInstanceId = startProcessInstance();
         Task task1 = getRunningTask(processInstanceId);
-        bpmTaskService.createSignTask(1L, new BpmTaskSignCreateReqVO().setId(task1.getId())
+        taskUpdateService.createSignTask(1L, new BpmTaskSignCreateReqVO().setId(task1.getId())
                 .setType(BpmTaskSignTypeEnum.AFTER.getType()).setUserIds(Set.of(2L)).setReason("加签"));
 
         // 调用，并断言异常
-        assertServiceException(() -> bpmTaskService.createSignTask(1L, new BpmTaskSignCreateReqVO().setId(task1.getId())
+        assertServiceException(() -> taskUpdateService.createSignTask(1L, new BpmTaskSignCreateReqVO().setId(task1.getId())
                         .setType(BpmTaskSignTypeEnum.BEFORE.getType()).setUserIds(Set.of(3L)).setReason("加签")),
                 TASK_SIGN_CREATE_TYPE_ERROR, "向后加签", "向前加签");
     }
@@ -969,7 +975,7 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         Task task1 = getRunningTask(processInstanceId);
 
         // 调用，并断言异常：用户 1 已经是当前节点的审批人
-        assertServiceException(() -> bpmTaskService.createSignTask(1L, new BpmTaskSignCreateReqVO().setId(task1.getId())
+        assertServiceException(() -> taskUpdateService.createSignTask(1L, new BpmTaskSignCreateReqVO().setId(task1.getId())
                         .setType(BpmTaskSignTypeEnum.BEFORE.getType()).setUserIds(Set.of(1L)).setReason("加签")),
                 TASK_SIGN_CREATE_USER_REPEAT, "用户1");
     }
@@ -979,16 +985,16 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         // 准备参数
         String processInstanceId = startProcessInstance();
         Task task1 = getRunningTask(processInstanceId);
-        bpmTaskService.createSignTask(1L, new BpmTaskSignCreateReqVO().setId(task1.getId())
+        taskUpdateService.createSignTask(1L, new BpmTaskSignCreateReqVO().setId(task1.getId())
                 .setType(BpmTaskSignTypeEnum.BEFORE.getType()).setUserIds(Set.of(2L)).setReason("加签"));
-        Task childTask = bpmTaskService.getTaskListByParentTaskId(task1.getId()).get(0);
+        Task childTask = taskQueryService.getTaskListByParentTaskId(task1.getId()).get(0);
 
         // 调用
-        bpmTaskService.deleteSignTask(1L, new BpmTaskSignDeleteReqVO().setId(childTask.getId()).setReason("减签"));
+        taskUpdateService.deleteSignTask(1L, new BpmTaskSignDeleteReqVO().setId(childTask.getId()).setReason("减签"));
         // 断言：子任务被取消删除，父任务恢复给用户 1 审批
-        assertNull(bpmTaskService.getTask(childTask.getId()));
+        assertNull(taskQueryService.getTask(childTask.getId()));
         assertEquals(BpmTaskStatusEnum.CANCEL.getStatus(), getTaskStatus(childTask.getId()));
-        Task parentTask = bpmTaskService.getTask(task1.getId());
+        Task parentTask = taskQueryService.getTask(task1.getId());
         assertEquals("1", parentTask.getAssignee());
         assertNull(parentTask.getScopeType());
         verify(commentService).createComment(eq(task1.getId()), eq(processInstanceId),
@@ -1000,25 +1006,25 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         // 准备参数：task1 向前加签给用户 2、用户 3
         String processInstanceId = startProcessInstance();
         Task task1 = getRunningTask(processInstanceId);
-        bpmTaskService.createSignTask(1L, new BpmTaskSignCreateReqVO().setId(task1.getId())
+        taskUpdateService.createSignTask(1L, new BpmTaskSignCreateReqVO().setId(task1.getId())
                 .setType(BpmTaskSignTypeEnum.BEFORE.getType()).setUserIds(Set.of(2L, 3L)).setReason("加签"));
-        Map<String, Task> childTasks = bpmTaskService.getTaskListByParentTaskId(task1.getId()).stream()
+        Map<String, Task> childTasks = taskQueryService.getTaskListByParentTaskId(task1.getId()).stream()
                 .collect(Collectors.toMap(Task::getAssignee, Function.identity()));
 
         // 调用：减签用户 2
-        bpmTaskService.deleteSignTask(1L, new BpmTaskSignDeleteReqVO().setId(childTasks.get("2").getId())
+        taskUpdateService.deleteSignTask(1L, new BpmTaskSignDeleteReqVO().setId(childTasks.get("2").getId())
                 .setReason("减签"));
         // 断言：用户 3 的加签任务仍在，父任务继续等待
         assertEquals(BpmTaskStatusEnum.CANCEL.getStatus(), getTaskStatus(childTasks.get("2").getId()));
-        assertEquals(List.of(childTasks.get("3").getId()), bpmTaskService.getTaskListByParentTaskId(task1.getId())
+        assertEquals(List.of(childTasks.get("3").getId()), taskQueryService.getTaskListByParentTaskId(task1.getId())
                 .stream().map(Task::getId).toList());
-        Task parentTask = bpmTaskService.getTask(task1.getId());
+        Task parentTask = taskQueryService.getTask(task1.getId());
         assertNull(parentTask.getAssignee());
         assertEquals(BpmTaskSignTypeEnum.BEFORE.getType(), parentTask.getScopeType());
 
         // 调用 + 断言：用户 3 审批通过后，父任务恢复给用户 1 审批
-        bpmTaskService.approveTask(3L, new BpmTaskApproveReqVO().setId(childTasks.get("3").getId()).setReason("同意"));
-        assertEquals("1", bpmTaskService.getTask(task1.getId()).getAssignee());
+        taskUpdateService.approveTask(3L, new BpmTaskApproveReqVO().setId(childTasks.get("3").getId()).setReason("同意"));
+        assertEquals("1", taskQueryService.getTask(task1.getId()).getAssignee());
     }
 
     @Test
@@ -1026,12 +1032,12 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         // 准备参数：task1 向后加签给用户 2，但 task1 尚未审批
         String processInstanceId = startProcessInstance();
         Task task1 = getRunningTask(processInstanceId);
-        bpmTaskService.createSignTask(1L, new BpmTaskSignCreateReqVO().setId(task1.getId())
+        taskUpdateService.createSignTask(1L, new BpmTaskSignCreateReqVO().setId(task1.getId())
                 .setType(BpmTaskSignTypeEnum.AFTER.getType()).setUserIds(Set.of(2L)).setReason("加签"));
-        Task childTask = bpmTaskService.getTaskListByParentTaskId(task1.getId()).get(0);
+        Task childTask = taskQueryService.getTaskListByParentTaskId(task1.getId()).get(0);
 
         // 调用
-        bpmTaskService.deleteSignTask(1L, new BpmTaskSignDeleteReqVO().setId(childTask.getId()).setReason("减签"));
+        taskUpdateService.deleteSignTask(1L, new BpmTaskSignDeleteReqVO().setId(childTask.getId()).setReason("减签"));
         // 断言：父任务不会因为加签任务被减签而自动完成，仍由用户 1 审批
         Task parentTask = getRunningTask(processInstanceId);
         assertEquals(task1.getId(), parentTask.getId());
@@ -1047,7 +1053,7 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         Task task1 = getRunningTask(processInstanceId);
 
         // 调用，并断言异常
-        assertServiceException(() -> bpmTaskService.deleteSignTask(1L,
+        assertServiceException(() -> taskUpdateService.deleteSignTask(1L,
                 new BpmTaskSignDeleteReqVO().setId(task1.getId()).setReason("减签")), TASK_SIGN_DELETE_NO_PARENT);
     }
 
@@ -1060,7 +1066,7 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         Task task2 = getRunningTask(processInstanceId);
 
         // 调用
-        bpmTaskService.withdrawTask(1L, task1.getId());
+        taskUpdateService.withdrawTask(1L, task1.getId());
         // 断言：task2 被取消，流程回到 task1
         assertTaskStatus(task2.getId(), BpmTaskStatusEnum.CANCEL.getStatus(), "前一任务撤回，系统自动取消");
         verify(commentService).createComment(eq(task2.getId()), eq(processInstanceId),
@@ -1075,7 +1081,7 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         Task task1 = getRunningTask(processInstanceId);
 
         // 调用，并断言异常
-        assertServiceException(() -> bpmTaskService.withdrawTask(1L, task1.getId()), TASK_WITHDRAW_FAIL_TASK_NOT_EXISTS);
+        assertServiceException(() -> taskUpdateService.withdrawTask(1L, task1.getId()), TASK_WITHDRAW_FAIL_TASK_NOT_EXISTS);
     }
 
     @Test
@@ -1087,7 +1093,7 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         approveRunningTask(processInstanceId);
 
         // 调用，并断言异常
-        assertServiceException(() -> bpmTaskService.withdrawTask(1L, task1.getId()),
+        assertServiceException(() -> taskUpdateService.withdrawTask(1L, task1.getId()),
                 TASK_WITHDRAW_FAIL_PROCESS_NOT_RUNNING);
     }
 
@@ -1101,7 +1107,7 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
                 .thenReturn(new BpmProcessDefinitionInfoDO().setAllowWithdrawTask(false));
 
         // 调用，并断言异常
-        assertServiceException(() -> bpmTaskService.withdrawTask(1L, task1.getId()), TASK_WITHDRAW_FAIL_NOT_ALLOW);
+        assertServiceException(() -> taskUpdateService.withdrawTask(1L, task1.getId()), TASK_WITHDRAW_FAIL_NOT_ALLOW);
     }
 
     @Test
@@ -1117,13 +1123,13 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
                     .when(processDefinitionService).getProcessDefinitionInfo(anyString());
             HistoricTaskInstance task1 = getHistoricTask(processInstanceId, "task1");
             // 用户 3 审批通过 task2，用户 5 的任务仍在审批中
-            Task task2 = bpmTaskService.getRunningTaskListByProcessInstanceId(processInstanceId, null, "task2").stream()
+            Task task2 = taskQueryService.getRunningTaskListByProcessInstanceId(processInstanceId, null, "task2").stream()
                     .filter(task -> "3".equals(task.getAssignee())).findFirst().orElseThrow();
-            bpmTaskService.approveTask(3L, new BpmTaskApproveReqVO().setId(task2.getId()).setReason("同意"));
-            assertEquals(task1.getEndTime().getTime(), bpmTaskService.getHistoricTask(task2.getId()).getCreateTime().getTime());
+            taskUpdateService.approveTask(3L, new BpmTaskApproveReqVO().setId(task2.getId()).setReason("同意"));
+            assertEquals(task1.getEndTime().getTime(), taskQueryService.getHistoricTask(task2.getId()).getCreateTime().getTime());
 
             // 调用，并断言异常：下一个节点已经有人审批，不允许撤回
-            assertServiceException(() -> bpmTaskService.withdrawTask(2L, task1.getId()),
+            assertServiceException(() -> taskUpdateService.withdrawTask(2L, task1.getId()),
                     TASK_WITHDRAW_FAIL_NEXT_TASK_NOT_ALLOW);
         } finally {
             processEngineConfiguration.getClock().reset();
@@ -1137,10 +1143,10 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         Task task1 = getRunningTask(processInstanceId);
 
         // 调用
-        bpmTaskService.moveTaskToEnd(processInstanceId, "结束流程");
+        taskUpdateService.moveTaskToEnd(processInstanceId, "结束流程");
         // 断言：运行中的任务被取消，流程实例结束
         assertTaskStatus(task1.getId(), BpmTaskStatusEnum.CANCEL.getStatus(), "系统自动取消");
-        assertNull(processInstanceService.getProcessInstance(processInstanceId));
+        assertNull(processInstanceQueryService.getProcessInstance(processInstanceId));
     }
 
     @Test
@@ -1148,17 +1154,17 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         // 准备参数：task1 向前加签给用户 2，子任务未审批
         String processInstanceId = startProcessInstance();
         Task task1 = getRunningTask(processInstanceId);
-        bpmTaskService.createSignTask(1L, new BpmTaskSignCreateReqVO().setId(task1.getId())
+        taskUpdateService.createSignTask(1L, new BpmTaskSignCreateReqVO().setId(task1.getId())
                 .setType(BpmTaskSignTypeEnum.BEFORE.getType()).setUserIds(Set.of(2L)).setReason("加签"));
-        Task childTask = bpmTaskService.getTaskListByParentTaskId(task1.getId()).get(0);
+        Task childTask = taskQueryService.getTaskListByParentTaskId(task1.getId()).get(0);
 
         // 调用
-        bpmTaskService.moveTaskToEnd(processInstanceId, "结束流程");
+        taskUpdateService.moveTaskToEnd(processInstanceId, "结束流程");
         // 断言：父任务、子任务都被取消，流程实例结束
         assertTaskStatus(task1.getId(), BpmTaskStatusEnum.CANCEL.getStatus(), "系统自动取消");
         assertTaskStatus(childTask.getId(), BpmTaskStatusEnum.CANCEL.getStatus(), "系统自动取消");
-        assertNull(processInstanceService.getProcessInstance(processInstanceId));
-        assertNull(bpmTaskService.getTask(childTask.getId()));
+        assertNull(processInstanceQueryService.getProcessInstance(processInstanceId));
+        assertNull(taskQueryService.getTask(childTask.getId()));
     }
 
     @Test
@@ -1168,7 +1174,7 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         Task task1 = getRunningTask(processInstanceId);
 
         // 调用：task1 超时自动通过
-        bpmTaskService.processTaskTimeout(processInstanceId, "task1",
+        taskUpdateService.processTaskTimeout(processInstanceId, "task1",
                 BpmUserTaskTimeoutHandlerTypeEnum.APPROVE.getType());
         // 断言
         assertTaskStatus(task1.getId(), BpmTaskStatusEnum.APPROVE.getStatus(), BpmReasonEnum.TIMEOUT_APPROVE.getReason());
@@ -1180,12 +1186,12 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         // 准备参数：task1 向前加签给用户 2，父任务等待中（没有审批人）
         String processInstanceId = startProcessInstance();
         Task task1 = getRunningTask(processInstanceId);
-        bpmTaskService.createSignTask(1L, new BpmTaskSignCreateReqVO().setId(task1.getId())
+        taskUpdateService.createSignTask(1L, new BpmTaskSignCreateReqVO().setId(task1.getId())
                 .setType(BpmTaskSignTypeEnum.BEFORE.getType()).setUserIds(Set.of(2L)).setReason("加签"));
-        Task childTask = bpmTaskService.getTaskListByParentTaskId(task1.getId()).get(0);
+        Task childTask = taskQueryService.getTaskListByParentTaskId(task1.getId()).get(0);
 
         // 调用：task1 超时自动通过
-        bpmTaskService.processTaskTimeout(processInstanceId, "task1",
+        taskUpdateService.processTaskTimeout(processInstanceId, "task1",
                 BpmUserTaskTimeoutHandlerTypeEnum.APPROVE.getType());
         // 断言：加签子任务自动通过，父任务恢复给用户 1 继续审批，流程仍停留在 task1
         assertTaskStatus(childTask.getId(), BpmTaskStatusEnum.APPROVE.getStatus(), BpmReasonEnum.TIMEOUT_APPROVE.getReason());
@@ -1203,11 +1209,11 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         Task task1 = getRunningTask(processInstanceId);
 
         // 调用：task1 超时自动拒绝
-        bpmTaskService.processTaskTimeout(processInstanceId, "task1",
+        taskUpdateService.processTaskTimeout(processInstanceId, "task1",
                 BpmUserTaskTimeoutHandlerTypeEnum.REJECT.getType());
         // 断言：任务不通过，流程实例不通过并结束
         assertEquals(BpmTaskStatusEnum.REJECT.getStatus(), getTaskStatus(task1.getId()));
-        assertNull(processInstanceService.getProcessInstance(processInstanceId));
+        assertNull(processInstanceQueryService.getProcessInstance(processInstanceId));
         assertEquals(BpmProcessInstanceStatusEnum.REJECT.getStatus(), getHistoricProcessVariable(processInstanceId,
                 BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_STATUS));
     }
@@ -1228,10 +1234,10 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
 
         // 调用：模拟 FlowableWebFilter 设置发起人
         String processInstanceId = FlowableUtils.executeAuthenticatedUserId(1L,
-                () -> processInstanceService.createProcessInstance(1L, new BpmProcessInstanceCreateReqVO()
+                () -> processInstanceUpdateService.createProcessInstance(1L, new BpmProcessInstanceCreateReqVO()
                         .setProcessDefinitionId(processDefinitionId).setVariables(new HashMap<>(Map.of("day", 3)))));
         // 断言
-        ProcessInstance processInstance = processInstanceService.getProcessInstance(processInstanceId);
+        ProcessInstance processInstance = processInstanceQueryService.getProcessInstance(processInstanceId);
         assertEquals("用户1的两级审批，请假3天", processInstance.getName());
         assertEquals(3, runtimeService.getVariable(processInstanceId, "day"));
         assertEquals(1L, runtimeService.getVariable(processInstanceId,
@@ -1248,10 +1254,10 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         Task task1 = getRunningTask(processInstanceId);
 
         // 调用
-        processInstanceService.cancelProcessInstanceByStartUser(1L, new BpmProcessInstanceCancelReqVO()
+        processInstanceUpdateService.cancelProcessInstanceByStartUser(1L, new BpmProcessInstanceCancelReqVO()
                 .setId(processInstanceId).setReason("不想请了"));
         // 断言：流程实例取消并结束，运行中的任务被取消
-        assertNull(processInstanceService.getProcessInstance(processInstanceId));
+        assertNull(processInstanceQueryService.getProcessInstance(processInstanceId));
         assertEquals(BpmProcessInstanceStatusEnum.CANCEL.getStatus(), getHistoricProcessVariable(processInstanceId,
                 BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_STATUS));
         assertEquals(BpmReasonEnum.CANCEL_PROCESS_INSTANCE_BY_START_USER.format("不想请了"),
@@ -1265,10 +1271,10 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         String processInstanceId = startProcessInstance();
 
         // 调用，并断言异常
-        assertServiceException(() -> processInstanceService.cancelProcessInstanceByStartUser(2L,
+        assertServiceException(() -> processInstanceUpdateService.cancelProcessInstanceByStartUser(2L,
                 new BpmProcessInstanceCancelReqVO().setId(processInstanceId).setReason("取消")),
                 PROCESS_INSTANCE_CANCEL_FAIL_NOT_SELF);
-        assertNotNull(processInstanceService.getProcessInstance(processInstanceId));
+        assertNotNull(processInstanceQueryService.getProcessInstance(processInstanceId));
     }
 
     @Test
@@ -1278,10 +1284,10 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         approveRunningTask(processInstanceId);
 
         // 调用
-        processInstanceService.cancelProcessInstanceByAdmin(100L, new BpmProcessInstanceCancelReqVO()
+        processInstanceUpdateService.cancelProcessInstanceByAdmin(100L, new BpmProcessInstanceCancelReqVO()
                 .setId(processInstanceId).setReason("流程配置错误"));
         // 断言
-        assertNull(processInstanceService.getProcessInstance(processInstanceId));
+        assertNull(processInstanceQueryService.getProcessInstance(processInstanceId));
         assertEquals(BpmProcessInstanceStatusEnum.CANCEL.getStatus(), getHistoricProcessVariable(processInstanceId,
                 BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_STATUS));
         assertEquals(BpmReasonEnum.CANCEL_PROCESS_INSTANCE_BY_ADMIN.format("用户100", "流程配置错误"),
@@ -1294,10 +1300,10 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         String processInstanceId = startProcessInstance();
 
         // 调用 + 断言：更新变量
-        processInstanceService.updateProcessInstanceVariables(processInstanceId, Map.of("day", 5));
+        processInstanceUpdateService.updateProcessInstanceVariables(processInstanceId, Map.of("day", 5));
         assertEquals(5, runtimeService.getVariable(processInstanceId, "day"));
         // 调用 + 断言：删除变量
-        processInstanceService.removeProcessInstanceVariables(processInstanceId, Set.of("day"));
+        processInstanceUpdateService.removeProcessInstanceVariables(processInstanceId, Set.of("day"));
         assertFalse(runtimeService.hasVariable(processInstanceId, "day"));
     }
 
@@ -1308,14 +1314,14 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         Task task1 = getRunningTask(processInstanceId);
 
         // 调用：不传 taskId 时，按流程实例查询首个待办
-        BpmTaskRespVO todoTask = bpmTaskService.getTodoTask(1L, null, processInstanceId);
+        BpmTaskRespVO todoTask = taskQueryService.getTodoTask(1L, null, processInstanceId);
         // 断言
         assertEquals(task1.getId(), todoTask.getId());
         assertEquals("一级审批", todoTask.getName());
         assertFalse(todoTask.getSignEnable());
         assertFalse(todoTask.getReasonRequire());
         // 断言：其他用户没有待办
-        assertNull(bpmTaskService.getTodoTask(2L, task1.getId(), processInstanceId));
+        assertNull(taskQueryService.getTodoTask(2L, task1.getId(), processInstanceId));
     }
 
     @Test
@@ -1328,14 +1334,14 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         pageReqVO.setProcessDefinitionKey("twoStepApprove");
 
         // 调用 + 断言：待办为 task2
-        List<Task> todoTasks = bpmTaskService.getTaskTodoPage(1L, pageReqVO).getList();
+        List<Task> todoTasks = taskQueryService.getTaskTodoPage(1L, pageReqVO).getList();
         assertEquals(List.of("task2"), todoTasks.stream().map(Task::getTaskDefinitionKey).toList());
         // 调用 + 断言：已办为 task1
         pageReqVO.setStatus(BpmTaskStatusEnum.APPROVE.getStatus());
-        List<HistoricTaskInstance> doneTasks = bpmTaskService.getTaskDonePage(1L, pageReqVO).getList();
+        List<HistoricTaskInstance> doneTasks = taskQueryService.getTaskDonePage(1L, pageReqVO).getList();
         assertEquals(List.of("task1"), doneTasks.stream().map(HistoricTaskInstance::getTaskDefinitionKey).toList());
         // 调用 + 断言：其它用户没有待办
-        assertEquals(0, bpmTaskService.getTaskTodoPage(2L, new BpmTaskPageReqVO()).getTotal());
+        assertEquals(0, taskQueryService.getTaskTodoPage(2L, new BpmTaskPageReqVO()).getTotal());
     }
 
     // ========== 状态回调相关（依赖 BpmTaskEventListener、BpmProcessInstanceEventListener） ==========
@@ -1373,7 +1379,7 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         Task task1 = getRunningTask(processInstanceId);
 
         // 调用
-        bpmTaskService.rejectTask(1L, new BpmTaskRejectReqVO().setId(task1.getId()).setReason("不同意"));
+        taskUpdateService.rejectTask(1L, new BpmTaskRejectReqVO().setId(task1.getId()).setReason("不同意"));
         // 断言：流程完成回调发送不通过消息、状态事件，且不会误发通过消息
         verify(messageService).sendMessageWhenProcessInstanceReject(argThat(reqDTO ->
                 processInstanceId.equals(reqDTO.getProcessInstanceId()) && "审批不通过任务，原因：不同意".equals(reqDTO.getReason())));
@@ -1389,7 +1395,7 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         String processInstanceId = startProcessInstance();
 
         // 调用
-        processInstanceService.cancelProcessInstanceByStartUser(1L, new BpmProcessInstanceCancelReqVO()
+        processInstanceUpdateService.cancelProcessInstanceByStartUser(1L, new BpmProcessInstanceCancelReqVO()
                 .setId(processInstanceId).setReason("不想请了"));
         // 断言：取消时只发送状态事件，不发送通过、不通过消息
         BpmProcessInstanceStatusEvent event = getProcessInstanceStatusEvent(processInstanceId);
@@ -1406,10 +1412,10 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         String processInstanceId = startProcessInstance("triggerTask");
 
         // 调用
-        processInstanceService.cancelProcessInstanceByStartUser(1L, new BpmProcessInstanceCancelReqVO()
+        processInstanceUpdateService.cancelProcessInstanceByStartUser(1L, new BpmProcessInstanceCancelReqVO()
                 .setId(processInstanceId).setReason("不想请了"));
         // 断言：流程实例结束，并发送取消的状态事件
-        assertNull(processInstanceService.getProcessInstance(processInstanceId));
+        assertNull(processInstanceQueryService.getProcessInstance(processInstanceId));
         assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstanceId).count());
         assertEquals(BpmProcessInstanceStatusEnum.CANCEL.getStatus(), getHistoricProcessVariable(processInstanceId,
                 BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_STATUS));
@@ -1425,10 +1431,10 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         String processInstanceId = startProcessInstance("delayTimer");
 
         // 调用
-        processInstanceService.cancelProcessInstanceByAdmin(100L, new BpmProcessInstanceCancelReqVO()
+        processInstanceUpdateService.cancelProcessInstanceByAdmin(100L, new BpmProcessInstanceCancelReqVO()
                 .setId(processInstanceId).setReason("流程配置错误"));
         // 断言：流程实例结束，延迟器的定时任务一并删除，不会再推进流程
-        assertNull(processInstanceService.getProcessInstance(processInstanceId));
+        assertNull(processInstanceQueryService.getProcessInstance(processInstanceId));
         assertEquals(0, managementService.createTimerJobQuery().processInstanceId(processInstanceId).count());
         BpmProcessInstanceStatusEvent event = getProcessInstanceStatusEvent(processInstanceId);
         assertEquals(BpmProcessInstanceStatusEnum.CANCEL.getStatus(), event.getStatus());
@@ -1466,7 +1472,7 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         HistoricTaskInstance task1 = getHistoricTask(processInstanceId, "task1");
         assertTaskStatus(task1.getId(), BpmTaskStatusEnum.REJECT.getStatus(),
                 BpmReasonEnum.APPROVE_TYPE_AUTO_REJECT.getReason());
-        assertNull(processInstanceService.getProcessInstance(processInstanceId));
+        assertNull(processInstanceQueryService.getProcessInstance(processInstanceId));
         assertEquals(BpmProcessInstanceStatusEnum.REJECT.getStatus(), getHistoricProcessVariable(processInstanceId,
                 BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_STATUS));
     }
@@ -1482,7 +1488,7 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         // 断言：task2 仍由用户 1 审批，自动通过，流程结束
         HistoricTaskInstance task2 = getHistoricTask(processInstanceId, "task2");
         assertTaskStatus(task2.getId(), BpmTaskStatusEnum.APPROVE.getStatus(), BpmAutoApproveTypeEnum.APPROVE_ALL.getName());
-        assertNull(processInstanceService.getProcessInstance(processInstanceId));
+        assertNull(processInstanceQueryService.getProcessInstance(processInstanceId));
         assertEquals(BpmProcessInstanceStatusEnum.APPROVE.getStatus(), getHistoricProcessVariable(processInstanceId,
                 BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_STATUS));
     }
@@ -1499,7 +1505,7 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         HistoricTaskInstance task2 = getHistoricTask(processInstanceId, "task2");
         assertTaskStatus(task2.getId(), BpmTaskStatusEnum.APPROVE.getStatus(),
                 BpmAutoApproveTypeEnum.APPROVE_SEQUENT.getName());
-        assertNull(processInstanceService.getProcessInstance(processInstanceId));
+        assertNull(processInstanceQueryService.getProcessInstance(processInstanceId));
     }
 
     // ========== 定时器超时相关（依赖 BpmTaskEventListener#timerFired） ==========
@@ -1515,7 +1521,7 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         executeTimerJob(processInstanceId);
         // 断言：task1 超时自动通过，流程结束
         assertTaskStatus(task1.getId(), BpmTaskStatusEnum.APPROVE.getStatus(), BpmReasonEnum.TIMEOUT_APPROVE.getReason());
-        assertNull(processInstanceService.getProcessInstance(processInstanceId));
+        assertNull(processInstanceQueryService.getProcessInstance(processInstanceId));
         assertEquals(BpmProcessInstanceStatusEnum.APPROVE.getStatus(), getHistoricProcessVariable(processInstanceId,
                 BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_STATUS));
     }
@@ -1550,7 +1556,7 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         executeTimerJob(processInstanceId);
         // 断言：task1 超时自动拒绝，流程实例不通过并结束
         assertTaskStatus(task1.getId(), BpmTaskStatusEnum.REJECT.getStatus(), BpmReasonEnum.REJECT_TASK.getReason());
-        assertNull(processInstanceService.getProcessInstance(processInstanceId));
+        assertNull(processInstanceQueryService.getProcessInstance(processInstanceId));
         assertEquals(BpmProcessInstanceStatusEnum.REJECT.getStatus(), getHistoricProcessVariable(processInstanceId,
                 BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_STATUS));
     }
@@ -1581,7 +1587,7 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         // 调用：延迟器到期
         executeTimerJob(processInstanceId);
         // 断言：receiveTask 被触发，流程结束
-        assertNull(processInstanceService.getProcessInstance(processInstanceId));
+        assertNull(processInstanceQueryService.getProcessInstance(processInstanceId));
         assertEquals(BpmProcessInstanceStatusEnum.APPROVE.getStatus(), getHistoricProcessVariable(processInstanceId,
                 BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_STATUS));
     }
@@ -1600,8 +1606,8 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         executeTimerJob(parentId);
         // 断言：子流程被结束、任务被取消，主流程继续流转并结束
         assertTaskStatus(childTask.getId(), BpmTaskStatusEnum.CANCEL.getStatus(), BpmReasonEnum.CANCEL_BY_SYSTEM.getReason());
-        assertNull(processInstanceService.getProcessInstance(child.getId()));
-        assertNull(processInstanceService.getProcessInstance(parentId));
+        assertNull(processInstanceQueryService.getProcessInstance(child.getId()));
+        assertNull(processInstanceQueryService.getProcessInstance(parentId));
         assertEquals(BpmProcessInstanceStatusEnum.APPROVE.getStatus(), getHistoricProcessVariable(parentId,
                 BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_STATUS));
     }
@@ -1615,10 +1621,10 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         Task childTask = getRunningTask(child.getId());
 
         // 调用：子流程审批不通过
-        bpmTaskService.rejectTask(1L, new BpmTaskRejectReqVO().setId(childTask.getId()).setReason("不同意"));
+        taskUpdateService.rejectTask(1L, new BpmTaskRejectReqVO().setId(childTask.getId()).setReason("不同意"));
         // 断言：子流程不通过时，主流程同样标记为不通过并结束
-        assertNull(processInstanceService.getProcessInstance(child.getId()));
-        assertNull(processInstanceService.getProcessInstance(parentId));
+        assertNull(processInstanceQueryService.getProcessInstance(child.getId()));
+        assertNull(processInstanceQueryService.getProcessInstance(parentId));
         assertEquals(BpmProcessInstanceStatusEnum.REJECT.getStatus(), getHistoricProcessVariable(parentId,
                 BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_STATUS));
         assertEquals(BpmReasonEnum.REJECT_TASK.format(BpmReasonEnum.REJECT_CHILD_PROCESS.getReason()),
@@ -1635,11 +1641,11 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         Task childTask = getRunningTask(child.getId());
 
         // 调用：取消主流程
-        processInstanceService.cancelProcessInstanceByStartUser(1L, new BpmProcessInstanceCancelReqVO()
+        processInstanceUpdateService.cancelProcessInstanceByStartUser(1L, new BpmProcessInstanceCancelReqVO()
                 .setId(parentId).setReason("不想请了"));
         // 断言：主流程、子流程都被取消
-        assertNull(processInstanceService.getProcessInstance(parentId));
-        assertNull(processInstanceService.getProcessInstance(child.getId()));
+        assertNull(processInstanceQueryService.getProcessInstance(parentId));
+        assertNull(processInstanceQueryService.getProcessInstance(child.getId()));
         assertEquals(BpmProcessInstanceStatusEnum.CANCEL.getStatus(), getHistoricProcessVariable(parentId,
                 BpmnVariableConstants.PROCESS_INSTANCE_VARIABLE_STATUS));
         assertEquals(BpmProcessInstanceStatusEnum.CANCEL.getStatus(), getHistoricProcessVariable(child.getId(),
@@ -1657,7 +1663,7 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         ProcessInstance child = getChildProcessInstance(parentId);
 
         // 调用，并断言异常：子流程不允许单独取消
-        assertServiceException(() -> processInstanceService.cancelProcessInstanceByStartUser(1L,
+        assertServiceException(() -> processInstanceUpdateService.cancelProcessInstanceByStartUser(1L,
                 new BpmProcessInstanceCancelReqVO().setId(child.getId()).setReason("取消")),
                 PROCESS_INSTANCE_CANCEL_CHILD_FAIL_NOT_ALLOW);
     }
@@ -1669,7 +1675,7 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
     }
 
     private String startProcessInstance(String processDefinitionKey) {
-        return processInstanceService.createProcessInstance(1L, new BpmProcessInstanceCreateReqDTO()
+        return processInstanceUpdateService.createProcessInstance(1L, new BpmProcessInstanceCreateReqDTO()
                 .setProcessDefinitionKey(processDefinitionKey).setBusinessKey("business-1"));
     }
 
@@ -1726,19 +1732,19 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
         variables.put("remark", "备注");
         variables.put("items", List.of(Map.of("name", "a", "price", 10), Map.of("name", "z", "price", 20)));
         variables.put("tags", List.of("a", "b"));
-        String processInstanceId = processInstanceService.createProcessInstance(1L, new BpmProcessInstanceCreateReqDTO()
+        String processInstanceId = processInstanceUpdateService.createProcessInstance(1L, new BpmProcessInstanceCreateReqDTO()
                 .setProcessDefinitionKey("revisionApprove").setBusinessKey("business-1").setVariables(variables));
         // 用户 2 审批通过 task1，用户 4 的或签任务被取消
         if (task1UserIds.contains(2L)) {
-            Task task1 = bpmTaskService.getRunningTaskListByProcessInstanceId(processInstanceId, null, "task1").stream()
+            Task task1 = taskQueryService.getRunningTaskListByProcessInstanceId(processInstanceId, null, "task1").stream()
                     .filter(task -> "2".equals(task.getAssignee())).findFirst().orElseThrow();
-            bpmTaskService.approveTask(2L, new BpmTaskApproveReqVO().setId(task1.getId()).setReason("同意"));
+            taskUpdateService.approveTask(2L, new BpmTaskApproveReqVO().setId(task1.getId()).setReason("同意"));
         }
         return processInstanceId;
     }
 
     private List<String> getRevisionTaskIds(Long userId) {
-        return bpmTaskService.getRevisionTaskPage(userId, new BpmTaskPageReqVO()).getList().stream()
+        return taskQueryService.getRevisionTaskPage(userId, new BpmTaskPageReqVO()).getList().stream()
                 .map(Task::getId).toList();
     }
 
@@ -1750,7 +1756,7 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
     }
 
     private void assertResubmitFieldNotWritable(String taskId, String field, Object value, String errorField) {
-        assertServiceException(() -> bpmTaskService.resubmitTask(1L, new BpmTaskResubmitReqVO().setTaskId(taskId)
+        assertServiceException(() -> taskUpdateService.resubmitTask(1L, new BpmTaskResubmitReqVO().setTaskId(taskId)
                 .setRevisionId(getRevisionId(taskId)).setVariables(Collections.singletonMap(field, value))), // 允许 value 为 null
                 TASK_RESUBMIT_FIELD_NOT_WRITABLE, errorField);
     }
@@ -1822,29 +1828,29 @@ public class BpmTaskServiceFlowableTest extends BaseFlowableUnitTest {
     }
 
     private Task getRunningTask(String processInstanceId) {
-        List<Task> tasks = bpmTaskService.getRunningTaskListByProcessInstanceId(processInstanceId, null, null);
+        List<Task> tasks = taskQueryService.getRunningTaskListByProcessInstanceId(processInstanceId, null, null);
         assertEquals(1, tasks.size());
         return tasks.get(0);
     }
 
     private void approveRunningTask(String processInstanceId) {
         Task task = getRunningTask(processInstanceId);
-        bpmTaskService.approveTask(1L, new BpmTaskApproveReqVO().setId(task.getId()).setReason("同意"));
+        taskUpdateService.approveTask(1L, new BpmTaskApproveReqVO().setId(task.getId()).setReason("同意"));
     }
 
     private Integer getTaskStatus(String taskId) {
-        return (Integer) bpmTaskService.getHistoricTask(taskId).getTaskLocalVariables()
+        return (Integer) taskQueryService.getHistoricTask(taskId).getTaskLocalVariables()
                 .get(BpmnVariableConstants.TASK_VARIABLE_STATUS);
     }
 
     private void assertTaskStatus(String taskId, Integer status, String reason) {
-        HistoricTaskInstance task = bpmTaskService.getHistoricTask(taskId);
+        HistoricTaskInstance task = taskQueryService.getHistoricTask(taskId);
         assertEquals(status, task.getTaskLocalVariables().get(BpmnVariableConstants.TASK_VARIABLE_STATUS));
         assertEquals(reason, task.getTaskLocalVariables().get(BpmnVariableConstants.TASK_VARIABLE_REASON));
     }
 
     private Object getHistoricProcessVariable(String processInstanceId, String name) {
-        return processInstanceService.getHistoricProcessInstance(processInstanceId).getProcessVariables().get(name);
+        return processInstanceQueryService.getHistoricProcessInstance(processInstanceId).getProcessVariables().get(name);
     }
 
 }
