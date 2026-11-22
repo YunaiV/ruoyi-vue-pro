@@ -1,12 +1,18 @@
 package cn.iocoder.yudao.module.infra.framework.file.core.utils;
 
 import cn.hutool.core.io.resource.ResourceUtil;
+import org.apache.tika.Tika;
+import org.apache.tika.detect.CompositeDetector;
+import org.apache.tika.detect.Detector;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.mime.MediaType;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.FilterInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -64,6 +70,82 @@ public class FileTypeUtilsTest {
         };
 
         assertThrows(IllegalArgumentException.class, () -> FileTypeUtils.getMineType(input, "a.txt"));
+    }
+
+    @Test
+    public void testGetMineType_streamResetFailedThrows() {
+        // 准备参数：重置失败的流
+        InputStream input = new BufferedInputStream(new ByteArrayInputStream("test".getBytes(StandardCharsets.UTF_8))) {
+
+            @Override
+            public synchronized void reset() throws IOException {
+                throw new IOException("reset failed");
+            }
+
+        };
+
+        // 调用，并断言：直接抛出，不按文件名兜底，避免后续输出缺失头部的内容
+        assertThrows(IOException.class, () -> FileTypeUtils.getMineType(input, "a.txt"));
+    }
+
+    @Test
+    public void testGetMineType_streamReadFailedThrows() {
+        // 准备参数：读取文件头失败的流
+        InputStream input = new InputStream() {
+
+            @Override
+            public int read() throws IOException {
+                throw new IOException("read failed");
+            }
+
+            @Override
+            public boolean markSupported() {
+                return true;
+            }
+
+            @Override
+            public void mark(int readlimit) {
+            }
+
+            @Override
+            public void reset() {
+            }
+
+        };
+
+        // 调用，并断言：直接抛出，不按文件名兜底
+        assertThrows(IOException.class, () -> FileTypeUtils.getMineType(input, "a.txt"));
+    }
+
+    @Test
+    public void testDetectContent_incompatibleDetectorFallbackName() {
+        // 准备参数：与 Tika 默认相同，组合全部 Detector，其中一个与 Tika 4 接口不兼容
+        Tika tika = new Tika(new CompositeDetector(new IncompatibleDetector()));
+        byte[] image = ResourceUtil.readBytes("file/erweima.jpg");
+        assertThrows(AbstractMethodError.class, () -> tika.detect(image, "二维码.jpg"));
+
+        // 调用，并断言：不抛出，按扩展名识别；扩展名不区分大小写
+        assertEquals("image/jpeg", FileTypeUtils.detectContent(tika, image, "二维码.jpg"));
+        assertEquals("application/pdf", FileTypeUtils.detectContent(tika, image, "2026/11/REPORT.PDF"));
+        assertEquals("application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                FileTypeUtils.detectContent(tika, image, "合同.docx"));
+        // 调用，并断言：没有文件名、没有扩展名、扩展名未知时，返回 application/octet-stream
+        assertEquals("application/octet-stream", FileTypeUtils.detectContent(tika, image, null));
+        assertEquals("application/octet-stream", FileTypeUtils.detectContent(tika, image, ""));
+        assertEquals("application/octet-stream", FileTypeUtils.detectContent(tika, image, " "));
+        assertEquals("application/octet-stream", FileTypeUtils.detectContent(tika, image, "附件"));
+        assertEquals("application/octet-stream", FileTypeUtils.detectContent(tika, image, "a.unknown-ext"));
+    }
+
+    @Test
+    public void testGetMineType_name() {
+        // 只按扩展名识别，不调用 Tika 的 Detector
+        assertEquals("image/png", FileTypeUtils.getMineType("头像.PNG"));
+        assertEquals("image/svg+xml", FileTypeUtils.getMineType("2026/11/图标.svg"));
+        assertEquals("video/mp4", FileTypeUtils.getMineType("演示.mp4"));
+        assertEquals("application/octet-stream", FileTypeUtils.getMineType("附件"));
+        assertEquals("application/octet-stream", FileTypeUtils.getMineType((String) null));
+        assertEquals("application/octet-stream", FileTypeUtils.getMineType(""));
     }
 
     @Test
@@ -264,6 +346,22 @@ public class FileTypeUtilsTest {
         assertFalse(FileTypeUtils.isScriptable("application/pdf"));
         assertFalse(FileTypeUtils.isScriptable("application/vnd.openxmlformats-officedocument.wordprocessingml.document"));
         assertFalse(FileTypeUtils.isScriptable(null));
+    }
+
+    /**
+     * 模拟旧的 {@code org.gagravarr.tika.OggDetector}：检测器调用时抛出 AbstractMethodError，
+     * 验证文件类型识别失败后按文件名兜底。
+     */
+    private static class IncompatibleDetector implements Detector {
+
+        @Override
+        public MediaType detect(InputStream input, Metadata metadata) {
+            throw new AbstractMethodError("Receiver class org.gagravarr.tika.OggDetector does not define or inherit "
+                    + "an implementation of the resolved method 'abstract org.apache.tika.mime.MediaType "
+                    + "detect(org.apache.tika.io.TikaInputStream, org.apache.tika.metadata.Metadata, "
+                    + "org.apache.tika.parser.ParseContext)' of interface org.apache.tika.detect.Detector.");
+        }
+
     }
 
 }

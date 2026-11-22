@@ -90,7 +90,7 @@ public class AiFfmpegUtils {
                 HttpUtil.downloadFile(request.getMusicTracks().get(i).getUrl(), file);
                 musicFiles.add(file);
             }
-            // 1.4 水印文本写入文件：drawtext 通过 textfile 读取，避免转义
+            // 1.4 水印文本写入文件：drawtext 通过 textfile 读取，并关闭 expansion，避免转义
             File watermark = null;
             if (StrUtil.isNotBlank(request.getWatermarkText())) {
                 watermark = new File(dir, "watermark.txt");
@@ -320,11 +320,12 @@ public class AiFfmpegUtils {
             audio = "amusic";
         }
 
-        // 5. 水印：右下角
+        // 5. 水印：右下角。expansion=none：水印按原文绘制，避免 % 被当作表达式（例如 100% 会导致合成失败）
         if (StrUtil.isNotBlank(watermarkFile)) {
-            String font = StrUtil.isNotBlank(fontFile) ? ":fontfile='" + fontFile + "'" : "";
-            filters.add(StrUtil.format("[{}]drawtext=textfile='{}'{}:fontsize=h/28:fontcolor=white@0.85:"
-                    + "shadowcolor=black@0.6:shadowx=2:shadowy=2:x=w-tw-32:y=h-th-32[vw]", video, watermarkFile, font));
+            String font = StrUtil.isNotBlank(fontFile) ? ":fontfile=" + escapeFilterPath(fontFile) : "";
+            filters.add(StrUtil.format("[{}]drawtext=textfile={}:expansion=none{}:fontsize=h/28:fontcolor=white@0.85:"
+                    + "shadowcolor=black@0.6:shadowx=2:shadowy=2:x=w-tw-32:y=h-th-32[vw]", video,
+                    escapeFilterPath(watermarkFile), font));
             video = "vw";
         }
         filters.add(StrUtil.format("[{}]null[vout]", video));
@@ -427,6 +428,21 @@ public class AiFfmpegUtils {
     @VisibleForTesting
     static String formatSeconds(double seconds) {
         return new DecimalFormat("0.###", DecimalFormatSymbols.getInstance(Locale.ROOT)).format(seconds);
+    }
+
+    /**
+     * 转义滤镜参数中的文件路径，返回带单引号的参数值
+     *
+     * FFmpeg 解析两层：先按滤镜图去掉单引号，再按 : 切分滤镜参数并处理 \ 转义。
+     * Windows 路径的盘符（例如 C:\）会把参数截断，路径中的 \、' 也会被吃掉。参见 https://ffmpeg.org/ffmpeg-filters.html#Notes-on-filtergraph-escaping
+     *
+     * 1. 参数层：\、'、: 前加 \，路径原样传给 FFmpeg，Windows、Linux 都不需要替换分隔符
+     * 2. 滤镜图层：整体加单引号；内部的 ' 需先闭合引号，写为 '\''
+     */
+    @VisibleForTesting
+    static String escapeFilterPath(String path) {
+        String value = path.replace("\\", "\\\\").replace("'", "\\'").replace(":", "\\:");
+        return "'" + value.replace("'", "'\\''") + "'";
     }
 
     /**

@@ -58,8 +58,8 @@ public class AiFfmpegUtilsTest {
         // 旁白：输入下标为镜头数量
         assertTrue(filter.contains("[3:a]aformat="));
         assertTrue(filter.contains("[ax2][nar]amix=inputs=2:duration=first"));
-        // 水印
-        assertTrue(filter.contains("[vx2]drawtext=textfile='/tmp/watermark.txt':fontfile='/fonts/cjk.ttc'"));
+        // 水印：按原文绘制，不展开 %
+        assertTrue(filter.contains("[vx2]drawtext=textfile='/tmp/watermark.txt':expansion=none:fontfile='/fonts/cjk.ttc'"));
         assertTrue(filter.endsWith("[vw]null[vout];[am]anull[aout]"));
     }
 
@@ -99,6 +99,34 @@ public class AiFfmpegUtilsTest {
         assertEquals(2, ranges.size());
         assertArrayEquals(new double[]{0, 5}, ranges.get(0), 0.001);
         assertArrayEquals(new double[]{8, 14}, ranges.get(1), 0.001);
+    }
+
+    @Test
+    public void testBuildFilterComplex_windowsWatermarkPath() {
+        List<AiFfmpegUtils.Clip> clips = Collections.singletonList(new AiFfmpegUtils.Clip(null, 5, true));
+
+        String filter = AiFfmpegUtils.buildFilterComplex(clips, 720, 1280, AiDramaTransitionTypeEnum.NONE,
+                0.5, false, null, "C:\\Windows\\Fonts\\msyh.ttc",
+                "C:\\Users\\yudao\\AppData\\Local\\Temp\\ai-drama-compose\\1\\watermark.txt");
+
+        // Windows 路径：盘符的 : 需要转义，否则 FFmpeg 会在 : 处截断 drawtext 参数；\ 转义后原样保留
+        assertTrue(filter.contains("drawtext=textfile='C\\:\\\\Users\\\\yudao\\\\AppData\\\\Local\\\\Temp"
+                + "\\\\ai-drama-compose\\\\1\\\\watermark.txt':expansion=none"
+                + ":fontfile='C\\:\\\\Windows\\\\Fonts\\\\msyh.ttc':fontsize="));
+    }
+
+    @Test
+    public void testEscapeFilterPath() {
+        // Linux 普通路径：只加单引号
+        assertEquals("'/tmp/ai-drama-compose/1/watermark.txt'",
+                AiFfmpegUtils.escapeFilterPath("/tmp/ai-drama-compose/1/watermark.txt"));
+        // Windows 路径：盘符的 : 转义为 \:，\ 转义为 \\，不替换为 /
+        assertEquals("'C\\:\\\\Windows\\\\Fonts\\\\msyh.ttc'", AiFfmpegUtils.escapeFilterPath("C:\\Windows\\Fonts\\msyh.ttc"));
+        // Linux 文件名可以包含 \，不能当作分隔符替换
+        assertEquals("'/data/a\\\\b/watermark.txt'", AiFfmpegUtils.escapeFilterPath("/data/a\\b/watermark.txt"));
+        // 单引号：参数层转义为 \'，滤镜图层再把其中的 ' 写为 '\''（闭合引号、转义、重新打开）
+        assertEquals("'C\\:\\\\Users\\\\O\\'\\''Brien\\\\watermark.txt'",
+                AiFfmpegUtils.escapeFilterPath("C:\\Users\\O'Brien\\watermark.txt"));
     }
 
     @Test
