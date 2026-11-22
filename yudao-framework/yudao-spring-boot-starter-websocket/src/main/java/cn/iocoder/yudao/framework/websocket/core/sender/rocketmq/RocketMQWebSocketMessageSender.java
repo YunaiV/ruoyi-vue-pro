@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.framework.websocket.core.sender.rocketmq;
 
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.websocket.core.sender.WebSocketPushMessage;
 import cn.iocoder.yudao.framework.websocket.core.sender.AbstractWebSocketMessageSender;
 import cn.iocoder.yudao.framework.websocket.core.sender.WebSocketMessageSender;
 import cn.iocoder.yudao.framework.websocket.core.session.WebSocketSessionManager;
@@ -26,35 +28,14 @@ public class RocketMQWebSocketMessageSender extends AbstractWebSocketMessageSend
         this.topic = topic;
     }
 
-    @Override
-    public void send(Integer userType, Long userId, String messageType, String messageContent) {
-        sendRocketMQMessage(null, userId, userType, messageType, messageContent);
-    }
-
-    @Override
-    public void send(Integer userType, String messageType, String messageContent) {
-        sendRocketMQMessage(null, null, userType, messageType, messageContent);
-    }
-
-    @Override
-    public void send(String sessionId, String messageType, String messageContent) {
-        sendRocketMQMessage(sessionId, null, null, messageType, messageContent);
-    }
-
     /**
      * 通过 RocketMQ 广播消息
      *
-     * @param sessionId Session 编号
-     * @param userId 用户编号
-     * @param userType 用户类型
-     * @param messageType 消息类型
-     * @param messageContent 消息内容
+     * @param message 消息
      */
-    private void sendRocketMQMessage(String sessionId, Long userId, Integer userType,
-                                     String messageType, String messageContent) {
-        RocketMQWebSocketMessage mqMessage = new RocketMQWebSocketMessage()
-                .setSessionId(sessionId).setUserId(userId).setUserType(userType)
-                .setMessageType(messageType).setMessageContent(messageContent);
+    @Override
+    protected void doPublish(WebSocketPushMessage message) {
+        RocketMQWebSocketMessage mqMessage = BeanUtils.toBean(message, RocketMQWebSocketMessage.class);
         rocketMQTemplate.syncSend(topic, mqMessage);
     }
 

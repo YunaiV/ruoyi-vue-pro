@@ -77,6 +77,9 @@ public class WebSocketSessionManagerImpl implements WebSocketSessionManager {
             return;
         }
         CopyOnWriteArrayList<WebSocketSession> sessions = userSessionsMap.get(user.getId());
+        if (sessions == null) { // 重复移除时，可能已经被移除，保证幂等
+            return;
+        }
         sessions.removeIf(session0 -> session0.getId().equals(session.getId()));
         if (CollUtil.isEmpty(sessions)) {
             userSessionsMap.remove(user.getId(), sessions);

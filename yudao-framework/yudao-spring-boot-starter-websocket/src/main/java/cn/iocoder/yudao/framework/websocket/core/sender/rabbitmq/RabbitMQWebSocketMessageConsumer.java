@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.framework.websocket.core.sender.rabbitmq;
 
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.websocket.core.sender.WebSocketPushMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.core.ExchangeTypes;
 import org.springframework.amqp.rabbit.annotation.*;
@@ -31,9 +33,7 @@ public class RabbitMQWebSocketMessageConsumer {
 
     @RabbitHandler
     public void onMessage(RabbitMQWebSocketMessage message) {
-        rabbitMQWebSocketMessageSender.send(message.getSessionId(),
-                message.getUserType(), message.getUserId(),
-                message.getMessageType(), message.getMessageContent());
+        rabbitMQWebSocketMessageSender.send(BeanUtils.toBean(message, WebSocketPushMessage.class));
     }
 
 }
