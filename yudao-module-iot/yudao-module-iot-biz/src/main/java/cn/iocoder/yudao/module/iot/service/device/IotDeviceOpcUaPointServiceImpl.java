@@ -111,8 +111,7 @@ public class IotDeviceOpcUaPointServiceImpl implements IotDeviceOpcUaPointServic
                 IotThingModelAccessModeEnum.READ_WRITE.getMode(), thingModel.getProperty().getAccessMode()))) {
             throw exception(DEVICE_OPC_UA_POINT_WRITABLE_INVALID);
         }
-        // 3. 校验 NodeId 语法（命名空间、标识由网关在会话激活后解析）
-        reqVO.setNodeId(reqVO.getNodeId().trim());
+        // 3. 校验 NodeId 语法，不允许首尾空白（命名空间、标识由网关在会话激活后解析）
         if (!IotOpcUaUtils.isValidNodeId(reqVO.getNodeId())) {
             throw exception(DEVICE_OPC_UA_POINT_NODE_ID_INVALID, reqVO.getNodeId());
         }

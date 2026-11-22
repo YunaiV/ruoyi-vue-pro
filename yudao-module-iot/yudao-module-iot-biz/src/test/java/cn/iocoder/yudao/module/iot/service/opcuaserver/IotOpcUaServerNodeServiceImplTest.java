@@ -67,8 +67,8 @@ public class IotOpcUaServerNodeServiceImplTest extends BaseDbUnitTest {
 
     @Test
     public void testCreateOpcUaServerNode_success() {
-        // 调用：浏览名称去掉首尾空白
-        Long id = opcUaServerNodeService.createOpcUaServerNode(newSaveReqVO(1001L, " temperature "));
+        // 调用
+        Long id = opcUaServerNodeService.createOpcUaServerNode(newSaveReqVO(1001L, "temperature"));
         // 断言
         IotOpcUaServerNodeDO node = opcUaServerNodeMapper.selectById(id);
         assertEquals("temperature", node.getBrowseName());

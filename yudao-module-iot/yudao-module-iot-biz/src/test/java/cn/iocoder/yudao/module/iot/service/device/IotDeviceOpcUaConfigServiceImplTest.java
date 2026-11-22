@@ -54,9 +54,8 @@ public class IotDeviceOpcUaConfigServiceImplTest extends BaseDbUnitTest {
 
     @Test
     public void testSaveDeviceOpcUaConfig_createAndUpdate() {
-        // 准备参数：端点去掉首尾空白
+        // 准备参数
         IotDeviceOpcUaConfigSaveReqVO reqVO = newSaveReqVO();
-        reqVO.setEndpointUrl(" opc.tcp://192.168.1.10:4840/server ");
         mockDevice(reqVO.getDeviceId(), IotProtocolTypeEnum.OPC_UA_CLIENT.getType());
 
         // 调用：新增
@@ -93,7 +92,8 @@ public class IotDeviceOpcUaConfigServiceImplTest extends BaseDbUnitTest {
     public void testSaveDeviceOpcUaConfig_endpointInvalid() {
         for (String endpointUrl : Arrays.asList("http://192.168.1.10:4840", "opc.tcp://192.168.1.10",
                 "opc.tcp://user:pass@192.168.1.10:4840", "opc.tcp://192.168.1.10:70000", "not a url", " ",
-                "opc.tcp://192.168.1.10:4840/server?x=1", "opc.tcp://192.168.1.10:4840/server#a")) {
+                "opc.tcp://192.168.1.10:4840/server?x=1", "opc.tcp://192.168.1.10:4840/server#a",
+                " opc.tcp://192.168.1.10:4840/server ")) { // 首尾空白：拒绝，不自动去掉
             IotDeviceOpcUaConfigSaveReqVO reqVO = newSaveReqVO().setEndpointUrl(endpointUrl);
 
             // 调用，并断言异常：参数校验不通过，不进入业务校验

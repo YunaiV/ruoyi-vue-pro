@@ -99,8 +99,7 @@ public class IotOpcUaServerNodeServiceImpl implements IotOpcUaServerNodeService 
                 || ObjUtil.notEqual(thingModel.getType(), IotThingModelTypeEnum.PROPERTY.getType())) {
             throw exception(OPC_UA_SERVER_NODE_THING_MODEL_INVALID);
         }
-        // 3.1 校验同一配置下浏览名称唯一（NodeId 由浏览名称生成）
-        reqVO.setBrowseName(reqVO.getBrowseName().trim());
+        // 3.1 校验同一配置下浏览名称唯一（NodeId 由浏览名称生成；格式由 IotOpcUaServerNodeSaveReqVO 校验，不含空白）
         IotOpcUaServerNodeDO node = opcUaServerNodeMapper.selectByConfigIdAndBrowseName(
                 reqVO.getConfigId(), reqVO.getBrowseName());
         if (node != null && ObjUtil.notEqual(node.getId(), excludeId)) {
