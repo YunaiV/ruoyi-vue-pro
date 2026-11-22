@@ -1,1 +1,2 @@
 cn.iocoder.yudao.framework.websocket.config.YudaoWebSocketAutoConfiguration
+cn.iocoder.yudao.framework.sse.config.YudaoSseAutoConfiguration

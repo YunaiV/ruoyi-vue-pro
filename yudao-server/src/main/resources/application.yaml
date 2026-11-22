@@ -313,6 +313,7 @@ yudao:
     enable: true # websocket的开关
     path: /infra/ws # 路径
     sender-type: local # 消息发送的类型，可选值为 local、redis、rocketmq、kafka、rabbitmq
+    # 下面 sender-rocketmq、sender-rabbitmq、sender-kafka 为 WebSocket 消息广播的 MQ 配置
     sender-rocketmq:
       topic: ${spring.application.name}-websocket # 消息发送的 RocketMQ Topic
       consumer-group: ${spring.application.name}-websocket-consumer # 消息发送的 RocketMQ Consumer Group
@@ -322,6 +323,25 @@ yudao:
     sender-kafka:
       topic: ${spring.application.name}-websocket # 消息发送的 Kafka Topic
       consumer-group: ${spring.application.name}-websocket-consumer # 消息发送的 Kafka Consumer Group
+  sse: # SSE 与 WebSocket 相互独立：开关、路径、sender-type、MQ 配置、心跳与超时均独立配置
+    enable: false # SSE 的开关，默认关闭
+    path: /infra/sse # 路径，提供 {path}/connect、{path}/close 两个接口
+    sender-type: local # 消息发送的类型，可选值为 local、redis、rocketmq、kafka、rabbitmq；redis 复用 spring.data.redis 配置
+    heartbeat-interval: 25s # 心跳间隔，需小于代理（例如说 Nginx）的空闲超时
+    emitter-timeout: 30m # 连接超时时间，到期后客户端按 retry 自动重连
+    retry-interval: 5s # 客户端断线后的重连间隔，通过 retry 字段下发
+    send-timeout: 3s # 单次发送等待连接锁的超时时间
+    max-send-failures: 3 # 连续发送失败多少次后断开连接
+    # 下面 sender-rocketmq、sender-rabbitmq、sender-kafka 为 SSE 消息广播的 MQ 配置；默认 topic、exchange 与 WebSocket 不同
+    sender-rocketmq:
+      topic: ${spring.application.name}-sse # 消息发送的 RocketMQ Topic
+      consumer-group: ${spring.application.name}-sse-consumer # 消息发送的 RocketMQ Consumer Group
+    sender-rabbitmq:
+      exchange: ${spring.application.name}-sse-exchange # 消息发送的 RabbitMQ Exchange
+      queue: ${spring.application.name}-sse-queue # 消息发送的 RabbitMQ Queue
+    sender-kafka:
+      topic: ${spring.application.name}-sse # 消息发送的 Kafka Topic
+      consumer-group: ${spring.application.name}-sse-consumer # 消息发送的 Kafka Consumer Group
   swagger:
     title: 芋道快速开发平台
     description: 提供管理后台、用户 App 的所有功能

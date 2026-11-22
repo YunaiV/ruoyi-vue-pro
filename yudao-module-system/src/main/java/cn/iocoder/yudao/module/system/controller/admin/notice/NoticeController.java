@@ -5,6 +5,7 @@ import cn.iocoder.yudao.framework.common.enums.UserTypeEnum;
 import cn.iocoder.yudao.framework.common.pojo.CommonResult;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.module.infra.api.sse.SseSenderApi;
 import cn.iocoder.yudao.module.infra.api.websocket.WebSocketSenderApi;
 import cn.iocoder.yudao.module.system.controller.admin.notice.vo.NoticePageReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.notice.vo.NoticeRespVO;
@@ -13,6 +14,7 @@ import cn.iocoder.yudao.module.system.dal.dataobject.notice.NoticeDO;
 import cn.iocoder.yudao.module.system.service.notice.NoticeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
@@ -22,6 +24,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.BAD_REQUEST;
+import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception0;
 import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 
 @Tag(name = "管理后台 - 通知公告")
@@ -30,11 +34,16 @@ import static cn.iocoder.yudao.framework.common.pojo.CommonResult.success;
 @Validated
 public class NoticeController {
 
+    private static final String TRANSPORT_WEBSOCKET = "WEBSOCKET";
+    private static final String TRANSPORT_SSE = "SSE";
+
     @Resource
     private NoticeService noticeService;
 
     @Resource
     private WebSocketSenderApi webSocketSenderApi;
+    @Resource
+    private SseSenderApi sseSenderApi;
 
     @PostMapping("/create")
     @Operation(summary = "创建通知公告")
@@ -88,14 +97,24 @@ public class NoticeController {
     }
 
     @PostMapping("/push")
-    @Operation(summary = "推送通知公告", description = "只发送给 websocket 连接在线的用户")
-    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @Operation(summary = "推送通知公告", description = "按指定的 WebSocket 或 SSE 连接方式，发送给在线的用户")
+    @Parameters({
+            @Parameter(name = "id", description = "编号", required = true, example = "1024"),
+            @Parameter(name = "transport", description = "推送方式，可选 WEBSOCKET、SSE；为空时使用 WEBSOCKET（兼容旧版本）", example = "SSE")
+    })
     @PreAuthorize("@ss.hasPermission('system:notice:update')")
-    public CommonResult<Boolean> push(@RequestParam("id") Long id) {
+    public CommonResult<Boolean> push(@RequestParam("id") Long id,
+                                      @RequestParam(value = "transport", defaultValue = TRANSPORT_WEBSOCKET) String transport) {
         NoticeDO notice = noticeService.getNotice(id);
         Assert.notNull(notice, "公告不能为空");
-        // 通过 websocket 推送给在线的用户
-        webSocketSenderApi.sendObject(UserTypeEnum.ADMIN.getValue(), "notice-push", notice);
+        // 通过 SSE 或 WebSocket 推送给在线的用户
+        if (TRANSPORT_SSE.equals(transport)) {
+            sseSenderApi.sendObject(UserTypeEnum.ADMIN.getValue(), "notice-push", notice);
+        } else if (TRANSPORT_WEBSOCKET.equals(transport)) {
+            webSocketSenderApi.sendObject(UserTypeEnum.ADMIN.getValue(), "notice-push", notice);
+        } else {
+            throw exception0(BAD_REQUEST.getCode(), "推送方式必须是 WEBSOCKET 或 SSE");
+        }
         return success(true);
     }
 

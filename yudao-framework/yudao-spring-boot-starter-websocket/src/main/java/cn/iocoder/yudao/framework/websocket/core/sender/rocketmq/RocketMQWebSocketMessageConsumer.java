@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.framework.websocket.core.sender.rocketmq;
 
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.websocket.core.sender.WebSocketPushMessage;
 import lombok.RequiredArgsConstructor;
 import org.apache.rocketmq.spring.annotation.MessageModel;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
@@ -22,9 +24,7 @@ public class RocketMQWebSocketMessageConsumer implements RocketMQListener<Rocket
 
     @Override
     public void onMessage(RocketMQWebSocketMessage message) {
-        rocketMQWebSocketMessageSender.send(message.getSessionId(),
-                message.getUserType(), message.getUserId(),
-                message.getMessageType(), message.getMessageContent());
+        rocketMQWebSocketMessageSender.send(BeanUtils.toBean(message, WebSocketPushMessage.class));
     }
 
 }

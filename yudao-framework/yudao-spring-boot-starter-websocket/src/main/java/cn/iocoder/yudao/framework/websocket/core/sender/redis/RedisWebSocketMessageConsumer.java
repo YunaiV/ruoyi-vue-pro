@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.framework.websocket.core.sender.redis;
 
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.websocket.core.sender.WebSocketPushMessage;
 import cn.iocoder.yudao.framework.mq.redis.core.pubsub.AbstractRedisChannelMessageListener;
 import lombok.RequiredArgsConstructor;
 
@@ -15,9 +17,7 @@ public class RedisWebSocketMessageConsumer extends AbstractRedisChannelMessageLi
 
     @Override
     public void onMessage(RedisWebSocketMessage message) {
-        redisWebSocketMessageSender.send(message.getSessionId(),
-                message.getUserType(), message.getUserId(),
-                message.getMessageType(), message.getMessageContent());
+        redisWebSocketMessageSender.send(BeanUtils.toBean(message, WebSocketPushMessage.class));
     }
 
 }

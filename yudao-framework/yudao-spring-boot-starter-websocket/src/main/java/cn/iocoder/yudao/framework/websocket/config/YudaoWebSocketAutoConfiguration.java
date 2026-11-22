@@ -21,13 +21,14 @@ import cn.iocoder.yudao.framework.websocket.core.session.WebSocketSessionManager
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.util.Assert;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
@@ -84,9 +85,9 @@ public class YudaoWebSocketAutoConfiguration {
 
     // ==================== Sender 相关 ====================
 
-    @Configuration
-    @ConditionalOnProperty(prefix = "yudao.websocket", name = "sender-type", havingValue = "local")
-    public class LocalWebSocketMessageSenderConfiguration {
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnProperty(prefix = "yudao.websocket", name = "sender-type", havingValue = "local", matchIfMissing = true)
+    public static class LocalWebSocketMessageSenderConfiguration {
 
         @Bean
         public LocalWebSocketMessageSender localWebSocketMessageSender(WebSocketSessionManager sessionManager) {
@@ -95,9 +96,9 @@ public class YudaoWebSocketAutoConfiguration {
 
     }
 
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnProperty(prefix = "yudao.websocket", name = "sender-type", havingValue = "redis")
-    public class RedisWebSocketMessageSenderConfiguration {
+    public static class RedisWebSocketMessageSenderConfiguration {
 
         @Bean
         public RedisWebSocketMessageSender redisWebSocketMessageSender(WebSocketSessionManager sessionManager,
@@ -113,14 +114,16 @@ public class YudaoWebSocketAutoConfiguration {
 
     }
 
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnProperty(prefix = "yudao.websocket", name = "sender-type", havingValue = "rocketmq")
-    public class RocketMQWebSocketMessageSenderConfiguration {
+    public static class RocketMQWebSocketMessageSenderConfiguration {
 
         @Bean
         public RocketMQWebSocketMessageSender rocketMQWebSocketMessageSender(
                 WebSocketSessionManager sessionManager, RocketMQTemplate rocketMQTemplate,
-                @Value("${yudao.websocket.sender-rocketmq.topic}") String topic) {
+                WebSocketProperties webSocketProperties) {
+            String topic = webSocketProperties.getSenderRocketmq().getTopic();
+            Assert.hasText(topic, "yudao.websocket.sender-rocketmq.topic 不能为空");
             return new RocketMQWebSocketMessageSender(sessionManager, rocketMQTemplate, topic);
         }
 
@@ -132,14 +135,14 @@ public class YudaoWebSocketAutoConfiguration {
 
     }
 
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnProperty(prefix = "yudao.websocket", name = "sender-type", havingValue = "rabbitmq")
-    public class RabbitMQWebSocketMessageSenderConfiguration {
+    public static class RabbitMQWebSocketMessageSenderConfiguration {
 
         @Bean
         public RabbitMQWebSocketMessageSender rabbitMQWebSocketMessageSender(
                 WebSocketSessionManager sessionManager, RabbitTemplate rabbitTemplate,
-                TopicExchange websocketTopicExchange) {
+                @Qualifier("websocketTopicExchange") TopicExchange websocketTopicExchange) {
             return new RabbitMQWebSocketMessageSender(sessionManager, rabbitTemplate, websocketTopicExchange);
         }
 
@@ -153,7 +156,9 @@ public class YudaoWebSocketAutoConfiguration {
          * 创建 Topic Exchange
          */
         @Bean
-        public TopicExchange websocketTopicExchange(@Value("${yudao.websocket.sender-rabbitmq.exchange}") String exchange) {
+        public TopicExchange websocketTopicExchange(WebSocketProperties webSocketProperties) {
+            String exchange = webSocketProperties.getSenderRabbitmq().getExchange();
+            Assert.hasText(exchange, "yudao.websocket.sender-rabbitmq.exchange 不能为空");
             return new TopicExchange(exchange,
                     true,  // durable: 是否持久化
                     false);  // exclusive: 是否排它
@@ -161,14 +166,16 @@ public class YudaoWebSocketAutoConfiguration {
 
     }
 
-    @Configuration
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnProperty(prefix = "yudao.websocket", name = "sender-type", havingValue = "kafka")
-    public class KafkaWebSocketMessageSenderConfiguration {
+    public static class KafkaWebSocketMessageSenderConfiguration {
 
         @Bean
         public KafkaWebSocketMessageSender kafkaWebSocketMessageSender(
                 WebSocketSessionManager sessionManager, KafkaTemplate<Object, Object> kafkaTemplate,
-                @Value("${yudao.websocket.sender-kafka.topic}") String topic) {
+                WebSocketProperties webSocketProperties) {
+            String topic = webSocketProperties.getSenderKafka().getTopic();
+            Assert.hasText(topic, "yudao.websocket.sender-kafka.topic 不能为空");
             return new KafkaWebSocketMessageSender(sessionManager, kafkaTemplate, topic);
         }
 
