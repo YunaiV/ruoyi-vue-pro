@@ -1,5 +1,6 @@
 package cn.iocoder.yudao.module.iot.controller.admin.device.vo.opcua;
 
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
@@ -73,7 +74,7 @@ public class IotDeviceOpcUaConfigSaveReqVO {
             return true;
         }
         try {
-            URI uri = new URI(StrUtil.trim(endpointUrl));
+            URI uri = new URI(endpointUrl);
             return StrUtil.equalsIgnoreCase("opc.tcp", uri.getScheme()) && StrUtil.isNotEmpty(uri.getHost())
                     && uri.getPort() > 0 && uri.getPort() <= 65535 && uri.getUserInfo() == null
                     && uri.getRawQuery() == null && uri.getRawFragment() == null;
@@ -91,9 +92,8 @@ public class IotDeviceOpcUaConfigSaveReqVO {
         if (securityPolicy == null || securityMode == null) {
             return true;
         }
-        // TODO @AI：notequals any 简化下判断；
-        return !IotOpcUaSecurityPolicyEnum.NONE.getPolicy().equals(securityPolicy)
-                && IotOpcUaSecurityModeEnum.SIGN_AND_ENCRYPT.getMode().equals(securityMode);
+        return ObjUtil.notEqual(IotOpcUaSecurityPolicyEnum.NONE.getPolicy(), securityPolicy)
+                && ObjUtil.equal(IotOpcUaSecurityModeEnum.SIGN_AND_ENCRYPT.getMode(), securityMode);
     }
 
     @AssertTrue(message = "OPC UA Client 只支持用户名认证，并且必须填写凭据别名")

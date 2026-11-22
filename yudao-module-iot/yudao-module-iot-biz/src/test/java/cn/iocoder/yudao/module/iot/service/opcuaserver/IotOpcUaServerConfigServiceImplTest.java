@@ -35,8 +35,8 @@ public class IotOpcUaServerConfigServiceImplTest extends BaseDbUnitTest {
 
     @Test
     public void testCreateOpcUaServerConfig_success() {
-        // 准备参数：凭据别名去掉首尾空白
-        IotOpcUaServerConfigSaveReqVO reqVO = newSaveReqVO(" scada-a ");
+        // 准备参数
+        IotOpcUaServerConfigSaveReqVO reqVO = newSaveReqVO("scada-a");
 
         // 调用
         Long id = opcUaServerConfigService.createOpcUaServerConfig(reqVO);

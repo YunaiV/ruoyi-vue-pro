@@ -74,8 +74,8 @@ public class IotDeviceOpcUaPointServiceImplTest extends BaseDbUnitTest {
 
     @Test
     public void testCreateDeviceOpcUaPoint_success() {
-        // 准备参数：NodeId 去掉首尾空白后保存
-        IotDeviceOpcUaPointSaveReqVO reqVO = newSaveReqVO().setNodeId("  nsu=urn:plc;s=Line1.Temperature ");
+        // 准备参数
+        IotDeviceOpcUaPointSaveReqVO reqVO = newSaveReqVO().setNodeId("nsu=urn:plc;s=Line1.Temperature");
 
         // 调用
         Long id = opcUaPointService.createDeviceOpcUaPoint(reqVO);
@@ -127,6 +127,9 @@ public class IotDeviceOpcUaPointServiceImplTest extends BaseDbUnitTest {
     public void testCreateDeviceOpcUaPoint_nodeIdInvalid() {
         assertServiceException(() -> opcUaPointService.createDeviceOpcUaPoint(newSaveReqVO().setNodeId("ns=70000;i=1")),
                 DEVICE_OPC_UA_POINT_NODE_ID_INVALID, "ns=70000;i=1");
+        // 首尾空白：拒绝，不自动去掉
+        assertServiceException(() -> opcUaPointService.createDeviceOpcUaPoint(newSaveReqVO().setNodeId(" ns=2;i=1 ")),
+                DEVICE_OPC_UA_POINT_NODE_ID_INVALID, " ns=2;i=1 ");
     }
 
     @Test

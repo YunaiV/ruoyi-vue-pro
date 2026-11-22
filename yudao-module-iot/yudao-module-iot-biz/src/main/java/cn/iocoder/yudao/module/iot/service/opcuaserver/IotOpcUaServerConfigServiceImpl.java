@@ -35,8 +35,7 @@ public class IotOpcUaServerConfigServiceImpl implements IotOpcUaServerConfigServ
 
     @Override
     public Long createOpcUaServerConfig(IotOpcUaServerConfigSaveReqVO createReqVO) {
-        // 1. 校验凭据别名全局唯一
-        createReqVO.setCredentialAlias(createReqVO.getCredentialAlias().trim());
+        // 1. 校验凭据别名全局唯一（格式由 IotOpcUaServerConfigSaveReqVO 校验，不含空白）
         validateCredentialAliasUnique(null, createReqVO.getCredentialAlias());
 
         // 2. 插入
@@ -49,7 +48,6 @@ public class IotOpcUaServerConfigServiceImpl implements IotOpcUaServerConfigServ
     public void updateOpcUaServerConfig(IotOpcUaServerConfigSaveReqVO updateReqVO) {
         // 1. 校验存在、凭据别名全局唯一
         validateOpcUaServerConfigExists(updateReqVO.getId());
-        updateReqVO.setCredentialAlias(updateReqVO.getCredentialAlias().trim());
         validateCredentialAliasUnique(updateReqVO.getId(), updateReqVO.getCredentialAlias());
 
         // 2. 更新
