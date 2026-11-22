@@ -1,5 +1,7 @@
 package cn.iocoder.yudao.framework.websocket.core.sender.kafka;
 
+import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
+import cn.iocoder.yudao.framework.websocket.core.sender.WebSocketPushMessage;
 import cn.iocoder.yudao.framework.websocket.core.sender.AbstractWebSocketMessageSender;
 import cn.iocoder.yudao.framework.websocket.core.sender.WebSocketMessageSender;
 import cn.iocoder.yudao.framework.websocket.core.session.WebSocketSessionManager;
@@ -28,42 +30,21 @@ public class KafkaWebSocketMessageSender extends AbstractWebSocketMessageSender 
         this.topic = topic;
     }
 
-    @Override
-    public void send(Integer userType, Long userId, String messageType, String messageContent) {
-        sendKafkaMessage(null, userId, userType, messageType, messageContent);
-    }
-
-    @Override
-    public void send(Integer userType, String messageType, String messageContent) {
-        sendKafkaMessage(null, null, userType, messageType, messageContent);
-    }
-
-    @Override
-    public void send(String sessionId, String messageType, String messageContent) {
-        sendKafkaMessage(sessionId, null, null, messageType, messageContent);
-    }
-
     /**
      * 通过 Kafka 广播消息
      *
-     * @param sessionId Session 编号
-     * @param userId 用户编号
-     * @param userType 用户类型
-     * @param messageType 消息类型
-     * @param messageContent 消息内容
+     * @param message 消息
      */
-    private void sendKafkaMessage(String sessionId, Long userId, Integer userType,
-                                  String messageType, String messageContent) {
-        KafkaWebSocketMessage mqMessage = new KafkaWebSocketMessage()
-                .setSessionId(sessionId).setUserId(userId).setUserType(userType)
-                .setMessageType(messageType).setMessageContent(messageContent);
+    @Override
+    protected void doPublish(WebSocketPushMessage message) {
+        KafkaWebSocketMessage mqMessage = BeanUtils.toBean(message, KafkaWebSocketMessage.class);
         try {
             kafkaTemplate.send(topic, mqMessage).get();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            log.warn("[sendKafkaMessage][等待 Kafka 发送结果时被中断]", e);
+            log.warn("[doPublish][等待 Kafka 发送结果时被中断]", e);
         } catch (ExecutionException e) {
-            log.error("[sendKafkaMessage][发送消息({}) 到 Kafka 失败]", mqMessage, e);
+            log.error("[doPublish][发送消息({}) 到 Kafka 失败]", mqMessage, e);
         }
     }
 

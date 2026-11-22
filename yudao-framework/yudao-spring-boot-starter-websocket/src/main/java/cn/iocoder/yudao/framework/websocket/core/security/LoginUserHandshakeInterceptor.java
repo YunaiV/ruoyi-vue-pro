@@ -6,6 +6,7 @@ import cn.iocoder.yudao.framework.security.core.util.SecurityFrameworkUtils;
 import cn.iocoder.yudao.framework.websocket.core.util.WebSocketFrameworkUtils;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.server.HandshakeInterceptor;
@@ -18,6 +19,7 @@ import java.util.Map;
  * 流程如下：
  * 1. 前端连接 websocket 时，会通过拼接 ?token={token} 到 ws:// 连接后，这样它可以被 {@link TokenAuthenticationFilter} 所认证通过
  * 2. {@link LoginUserHandshakeInterceptor} 负责把 {@link LoginUser} 添加到 {@link WebSocketSession} 中
+ * 3. 可选拼接 &clientId={clientId}，同一客户端重连时替换旧连接
  *
  * @author 芋道源码
  */
@@ -31,6 +33,7 @@ public class LoginUserHandshakeInterceptor implements HandshakeInterceptor {
             return false;
         }
         WebSocketFrameworkUtils.setLoginUser(loginUser, attributes);
+        WebSocketFrameworkUtils.setClientId(getClientId(request), attributes);
         return true;
     }
 
@@ -38,6 +41,15 @@ public class LoginUserHandshakeInterceptor implements HandshakeInterceptor {
     public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response,
                                WebSocketHandler wsHandler, Exception exception) {
         // do nothing
+    }
+
+    private static String getClientId(ServerHttpRequest request) {
+        if (!(request instanceof ServletServerHttpRequest)) {
+            return null;
+        }
+        ServletServerHttpRequest servletRequest = (ServletServerHttpRequest) request;
+        String clientId = servletRequest.getServletRequest().getParameter(WebSocketFrameworkUtils.PARAMETER_CLIENT_ID);
+        return WebSocketFrameworkUtils.isValidClientId(clientId) ? clientId : null;
     }
 
 }
