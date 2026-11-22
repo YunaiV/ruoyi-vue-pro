@@ -17,6 +17,8 @@ import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceModbusConfigDO
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceModbusPointDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceOpcUaConfigDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceOpcUaPointDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.opcuaserver.IotOpcUaServerConfigDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.opcuaserver.IotOpcUaServerNodeDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
 import cn.iocoder.yudao.module.iot.enums.thingmodel.IotThingModelAccessModeEnum;
@@ -26,6 +28,8 @@ import cn.iocoder.yudao.module.iot.service.device.IotDeviceOpcUaConfigService;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceOpcUaPointService;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.service.device.property.IotDevicePropertyService;
+import cn.iocoder.yudao.module.iot.service.opcuaserver.IotOpcUaServerConfigService;
+import cn.iocoder.yudao.module.iot.service.opcuaserver.IotOpcUaServerNodeService;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import jakarta.annotation.Resource;
 import jakarta.annotation.security.PermitAll;
@@ -76,6 +80,12 @@ public class IoTDeviceApiImpl implements IotDeviceCommonApi {
     @Resource
     @Lazy // 延迟加载，解决循环依赖
     private IotDeviceOpcUaPointService opcUaPointService;
+    @Resource
+    @Lazy // 延迟加载，解决循环依赖
+    private IotOpcUaServerConfigService opcUaServerConfigService;
+    @Resource
+    @Lazy // 延迟加载，解决循环依赖
+    private IotOpcUaServerNodeService opcUaServerNodeService;
 
     @Override
     @PostMapping(RpcConstants.RPC_API_PREFIX + "/iot/device/auth")
@@ -208,6 +218,55 @@ public class IoTDeviceApiImpl implements IotDeviceCommonApi {
             result.add(BeanUtils.toBean(config, IotOpcUaDeviceConfigRespDTO.class, o ->
                     o.setTenantId(device.getTenantId()).setProductKey(device.getProductKey())
                             .setDeviceName(device.getDeviceName()).setPoints(points)));
+        }
+        return success(result);
+    }
+
+    @Override
+    @PostMapping(RpcConstants.RPC_API_PREFIX + "/iot/opc-ua-server/config-list")
+    @PermitAll
+    @TenantIgnore
+    public CommonResult<List<IotOpcUaServerConfigRespDTO>> getOpcUaServerConfigList() {
+        // 1. 获取全部租户启用的配置（网关按配置编号隔离会话可见的节点，按凭据的 tenant-ids 校验配置的租户）
+        List<IotOpcUaServerConfigDO> configList = opcUaServerConfigService.getEnabledOpcUaServerConfigList();
+        if (CollUtil.isEmpty(configList)) {
+            return success(new ArrayList<>());
+        }
+
+        // 2. 获取启用的节点，以及节点关联的设备、物模型属性
+        Map<Long, List<IotOpcUaServerNodeDO>> nodeMap = opcUaServerNodeService.getEnabledOpcUaServerNodeMapByConfigIds(
+                convertSet(configList, IotOpcUaServerConfigDO::getId));
+        Set<Long> deviceIds = new HashSet<>();
+        nodeMap.values().forEach(nodes -> deviceIds.addAll(convertSet(nodes, IotOpcUaServerNodeDO::getDeviceId)));
+        Map<Long, IotDeviceDO> deviceMap = CollUtil.isEmpty(deviceIds) ? Collections.emptyMap()
+                : deviceService.getDeviceMap(deviceIds);
+        Map<Long, IotThingModelDO> thingModelMap = opcUaServerNodeService.getPropertyThingModelMap(
+                convertSet(deviceMap.values(), IotDeviceDO::getProductId));
+
+        // 3. 组装返回结果：不含口令，只有凭据别名；同一凭据别名万一有多条配置，只返回编号最小的一条
+        List<IotOpcUaServerConfigRespDTO> result = new ArrayList<>(configList.size());
+        Set<String> returnedAliases = new HashSet<>();
+        for (IotOpcUaServerConfigDO config : configList) {
+            if (!returnedAliases.add(config.getCredentialAlias())) {
+                continue;
+            }
+            // 节点：设备、物模型属性必须与配置同租户，且物模型仍是设备所属产品的属性；浏览名称重复时只保留编号最小的一个
+            List<IotOpcUaServerNodeRespDTO> nodes = new ArrayList<>();
+            Set<String> browseNames = new HashSet<>();
+            for (IotOpcUaServerNodeDO node : nodeMap.getOrDefault(config.getId(), Collections.emptyList())) {
+                IotDeviceDO device = deviceMap.get(node.getDeviceId());
+                IotThingModelDO thingModel = thingModelMap.get(node.getThingModelId());
+                if (device == null || ObjUtil.notEqual(device.getTenantId(), config.getTenantId())
+                        || thingModel == null || ObjUtil.notEqual(thingModel.getProductId(), device.getProductId())
+                        || !browseNames.add(node.getBrowseName())) {
+                    continue;
+                }
+                nodes.add(BeanUtils.toBean(node, IotOpcUaServerNodeRespDTO.class, o -> o
+                        .setProductKey(device.getProductKey()).setDeviceName(device.getDeviceName())
+                        .setIdentifier(thingModel.getIdentifier())
+                        .setDataType(thingModel.getProperty() != null ? thingModel.getProperty().getDataType() : null)));
+            }
+            result.add(BeanUtils.toBean(config, IotOpcUaServerConfigRespDTO.class, o -> o.setNodes(nodes)));
         }
         return success(result);
     }

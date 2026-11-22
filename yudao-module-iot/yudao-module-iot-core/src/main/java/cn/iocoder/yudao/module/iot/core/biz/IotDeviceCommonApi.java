@@ -64,6 +64,14 @@ public interface IotDeviceCommonApi {
      */
     CommonResult<List<IotOpcUaDeviceConfigRespDTO>> getOpcUaDeviceConfigList(IotOpcUaDeviceConfigListReqDTO listReqDTO);
 
+    // TODO @AI：“（全部租户启用的配置及其启用的节点；口令不入库，网关按凭据别名读取本地配置）”；这里的全部租户，应该不用提吧；
+    /**
+     * 获取 OPC UA Server 配置列表（全部租户启用的配置及其启用的节点；口令不入库，网关按凭据别名读取本地配置）
+     *
+     * @return OPC UA Server 配置列表
+     */
+    CommonResult<List<IotOpcUaServerConfigRespDTO>> getOpcUaServerConfigList();
+
     /**
      * 续期网关协议实例的存活标记
      *

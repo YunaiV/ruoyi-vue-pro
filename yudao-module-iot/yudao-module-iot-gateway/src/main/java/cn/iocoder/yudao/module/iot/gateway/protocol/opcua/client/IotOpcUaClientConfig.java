@@ -21,11 +21,6 @@ import java.util.Map;
 public class IotOpcUaClientConfig {
 
     /**
-     * 租户白名单（可选）：非空时，只采集这些租户的设备
-     */
-    private List<Long> tenantIds = new ArrayList<>();
-
-    /**
      * 配置刷新间隔（秒）
      */
     @NotNull(message = "配置刷新间隔不能为空")
@@ -63,11 +58,6 @@ public class IotOpcUaClientConfig {
      */
     @NotEmpty(message = "应用名称不能为空")
     private String applicationName = "Yudao IoT Gateway OPC UA Client";
-    /**
-     * 是否允许 None 安全策略：默认禁止，只作为显式的开发联调开关，并且只能配合匿名身份
-     */
-    @NotNull(message = "是否允许 None 安全策略不能为空")
-    private Boolean securityNoneAllowed = false;
     /**
      * 服务端返回的端点主机、端口与配置不一致时，是否改写为配置的主机、端口（默认报错）
      */

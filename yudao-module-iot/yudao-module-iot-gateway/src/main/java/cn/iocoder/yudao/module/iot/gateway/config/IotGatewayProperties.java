@@ -8,6 +8,7 @@ import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpclient.IotModbusTc
 import cn.iocoder.yudao.module.iot.gateway.protocol.modbus.tcpserver.IotModbusTcpServerConfig;
 import cn.iocoder.yudao.module.iot.gateway.protocol.mqtt.IotMqttConfig;
 import cn.iocoder.yudao.module.iot.gateway.protocol.opcua.client.IotOpcUaClientConfig;
+import cn.iocoder.yudao.module.iot.gateway.protocol.opcua.server.IotOpcUaServerConfig;
 import cn.iocoder.yudao.module.iot.gateway.protocol.tcp.IotTcpConfig;
 import cn.iocoder.yudao.module.iot.gateway.protocol.udp.IotUdpConfig;
 import cn.iocoder.yudao.module.iot.gateway.protocol.websocket.IotWebSocketConfig;
@@ -272,6 +273,12 @@ public class IotGatewayProperties {
          */
         @Valid
         private IotOpcUaClientConfig opcUaClient;
+
+        /**
+         * OPC UA Server 协议配置
+         */
+        @Valid
+        private IotOpcUaServerConfig opcUaServer;
 
     }
 

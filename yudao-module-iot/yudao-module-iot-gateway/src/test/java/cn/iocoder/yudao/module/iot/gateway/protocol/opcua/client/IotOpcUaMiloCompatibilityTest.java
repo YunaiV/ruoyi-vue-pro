@@ -9,7 +9,7 @@ import java.net.ServerSocket;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Milo 1.1.8 与芋道 BOM（Netty 4.2、BouncyCastle 1.87）的依赖闸门
+ * 芋道 Milo（yudao-milo 1.2.0-RC3-preview-20261123）与芋道 BOM（Netty 4.2、BouncyCastle 1.87）的依赖闸门
  * <p>
  * 安全通道、Read、Subscription 在芋道 BOM 依赖版本下的同进程兼容性，由 {@link IotOpcUaClientProtocolIntegrationTest} 覆盖
  *

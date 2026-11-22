@@ -64,10 +64,14 @@
             <artifactId>j2mod</artifactId>
         </dependency>
 
-        <!-- OPC UA 相关 - Eclipse Milo -->
+        <!-- OPC UA 相关 - 芋道 Milo -->
         <dependency>
-            <groupId>org.eclipse.milo</groupId>
-            <artifactId>milo-sdk-client</artifactId>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-milo-sdk-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-milo-sdk-server</artifactId> <!-- OPC UA Server：北向只读数据服务，默认关闭 -->
         </dependency>
 
         <!-- CoAP 相关 - Eclipse Californium -->
@@ -91,11 +95,6 @@
             <groupId>cn.iocoder.boot</groupId>
             <artifactId>yudao-spring-boot-starter-test</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.milo</groupId>
-            <artifactId>milo-sdk-server</artifactId>
-            <scope>test</scope> <!-- OPC UA 模拟验收：进程内 Milo Server -->
         </dependency>
     </dependencies>
 

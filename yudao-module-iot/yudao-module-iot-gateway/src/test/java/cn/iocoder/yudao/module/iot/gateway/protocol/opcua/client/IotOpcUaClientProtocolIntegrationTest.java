@@ -52,7 +52,8 @@ import static org.mockito.Mockito.*;
  * {@link IotOpcUaClientProtocol} 的模拟验收测试：进程内 Milo Server
  * <p>
  * 覆盖 Read 轮询（分批、合并、拆分）、MonitoredItem 订阅、断线重连、Session 恢复、订阅重建、
- * 命名空间顺序变化后的 NodeId 解析、安全策略（None 默认拒绝、用户名 SignAndEncrypt、明文令牌拒绝、未信任证书拒绝、主机不一致拒绝）、
+ * 命名空间顺序变化后的 NodeId 解析、安全策略（只支持用户名认证：匿名与 None 拒绝、用户名 SignAndEncrypt、明文令牌拒绝、
+ * 未信任证书拒绝、主机不一致拒绝）、
  * 属性写入（按节点实际 DataType 转换、访问级别、服务端 StatusCode、会话失效）
  *
  * @author 芋道源码
@@ -120,7 +121,7 @@ public class IotOpcUaClientProtocolIntegrationTest {
         config.setMaxPointsPerMessage(4);
         trustEachOther(config, true);
         IotOpcUaDeviceConfigRespDTO pollDevice = newDevice(1L, server.getEndpointUrl(), "Basic256Sha256",
-                "SignAndEncrypt", AUTH_ANONYMOUS, Arrays.asList(
+                "SignAndEncrypt", AUTH_USERNAME, Arrays.asList(
                         newPoint(11L, "temperature", NSU + "s=Temperature", COLLECT_POLL, 200),
                         newPoint(12L, "counter", NSU + "s=Counter", COLLECT_POLL, 200),
                         newPoint(13L, "name", NSU + "s=Name", COLLECT_POLL, 200),
@@ -131,7 +132,7 @@ public class IotOpcUaClientProtocolIntegrationTest {
                         newPoint(18L, "numeric", "ns=" + server.getNamespaceIndex() + ";i=1001", COLLECT_POLL, 200),
                         newPoint(19L, "missing", "nsu=urn:not-exists;s=X", COLLECT_POLL, 200)));
         IotOpcUaDeviceConfigRespDTO subscribeDevice = newDevice(2L, server.getEndpointUrl(), "Basic256Sha256",
-                "SignAndEncrypt", AUTH_ANONYMOUS, Collections.singletonList(
+                "SignAndEncrypt", AUTH_USERNAME, Collections.singletonList(
                         newPoint(21L, "temperature", NSU + "s=Temperature", COLLECT_SUBSCRIBE, 100)));
         deviceConfigs = Arrays.asList(pollDevice, subscribeDevice);
 
@@ -168,14 +169,14 @@ public class IotOpcUaClientProtocolIntegrationTest {
         IotOpcUaClientConfig config = newConfig();
         trustEachOther(config, true);
         deviceConfigs = Collections.singletonList(newDevice(1L, server.getEndpointUrl(), "Basic256Sha256",
-                "SignAndEncrypt", AUTH_ANONYMOUS, Collections.singletonList(
+                "SignAndEncrypt", AUTH_USERNAME, Collections.singletonList(
                         newPoint(11L, "temperature", NSU + "s=Temperature", COLLECT_SUBSCRIBE, 100))));
         startProtocol(config);
         await().atMost(20, TimeUnit.SECONDS).until(() -> hasPropertyValue("dev1", "temperature", 25.5D));
 
         // 调用：点位改为订阅 Counter（下一次配置刷新生效）
         deviceConfigs = Collections.singletonList(newDevice(1L, server.getEndpointUrl(), "Basic256Sha256",
-                "SignAndEncrypt", AUTH_ANONYMOUS, Collections.singletonList(
+                "SignAndEncrypt", AUTH_USERNAME, Collections.singletonList(
                         newPoint(12L, "counter", NSU + "s=Counter", COLLECT_SUBSCRIBE, 100))));
         await().atMost(20, TimeUnit.SECONDS).until(() -> hasPropertyValue("dev1", "counter", 1));
         int before = getPropertyMessages("dev1").size();
@@ -197,7 +198,7 @@ public class IotOpcUaClientProtocolIntegrationTest {
         config.setSubscriptionLifetimeCount(9);
         trustEachOther(config, true);
         deviceConfigs = Collections.singletonList(newDevice(1L, server.getEndpointUrl(), "Basic256Sha256",
-                "SignAndEncrypt", AUTH_ANONYMOUS, Collections.singletonList(
+                "SignAndEncrypt", AUTH_USERNAME, Collections.singletonList(
                         newPoint(12L, "counter", NSU + "s=Counter", COLLECT_SUBSCRIBE, 100))));
         startProtocol(config);
         await().atMost(20, TimeUnit.SECONDS).until(() -> hasPropertyValue("dev1", "counter", 1));
@@ -227,7 +228,7 @@ public class IotOpcUaClientProtocolIntegrationTest {
         IotOpcUaClientConfig config = newConfig();
         trustEachOther(config, true);
         deviceConfigs = Collections.singletonList(newDevice(1L, server.getEndpointUrl(), "Basic256Sha256",
-                "SignAndEncrypt", AUTH_ANONYMOUS, Arrays.asList(
+                "SignAndEncrypt", AUTH_USERNAME, Arrays.asList(
                         newPoint(11L, "temperature", NSU + "s=Temperature", COLLECT_SUBSCRIBE, 100),
                         newPoint(12L, "counter", NSU + "s=Counter", COLLECT_SUBSCRIBE, 100),
                         newPoint(13L, "name", NSU + "s=Name", COLLECT_SUBSCRIBE, 100),
@@ -256,7 +257,7 @@ public class IotOpcUaClientProtocolIntegrationTest {
         IotOpcUaClientConfig config = newConfig();
         trustEachOther(config, true);
         deviceConfigs = Collections.singletonList(newDevice(1L, server.getEndpointUrl(), "Basic256Sha256",
-                "SignAndEncrypt", AUTH_ANONYMOUS, Arrays.asList(
+                "SignAndEncrypt", AUTH_USERNAME, Arrays.asList(
                         newPoint(11L, "temperature", NSU + "s=Temperature", COLLECT_POLL, 200),
                         newPoint(12L, "counter", NSU + "s=Counter", COLLECT_SUBSCRIBE, 100))));
         startProtocol(config);
@@ -288,7 +289,7 @@ public class IotOpcUaClientProtocolIntegrationTest {
         IotOpcUaClientConfig config = newConfig();
         trustEachOther(config, true);
         deviceConfigs = Collections.singletonList(newDevice(1L, server.getEndpointUrl(), "Basic256Sha256",
-                "SignAndEncrypt", AUTH_ANONYMOUS, Collections.singletonList(
+                "SignAndEncrypt", AUTH_USERNAME, Collections.singletonList(
                         newPoint(11L, "temperature", NSU + "s=Temperature", COLLECT_POLL, 200))));
         startProtocol(config);
         awaitState("dev1", true);
@@ -304,36 +305,28 @@ public class IotOpcUaClientProtocolIntegrationTest {
     // ========== 安全策略 ==========
 
     @Test
-    public void testSecurityNone_rejectedByDefault() throws Exception {
-        // 准备参数
+    public void testAnonymousAndSecurityNone_rejected() throws Exception {
+        // 准备参数：只支持用户名认证。测试服务端本身允许匿名登录，用来证明是网关拒绝的：
+        // 1）匿名 + SignAndEncrypt（即使带了有效的凭据别名）；2）用户名 + None
         IotOpcUaClientConfig config = newConfig();
         trustEachOther(config, true);
-        deviceConfigs = Collections.singletonList(newDevice(1L, server.getEndpointUrl(), "None", "None",
-                AUTH_ANONYMOUS, Collections.singletonList(newPoint(11L, "numeric", NSU + "i=1001", COLLECT_POLL, 200))));
+        IotOpcUaDeviceConfigRespDTO anonymous = newDevice(1L, server.getEndpointUrl(), "Basic256Sha256",
+                "SignAndEncrypt", AUTH_ANONYMOUS, Collections.singletonList(
+                        newPoint(11L, "temperature", NSU + "s=Temperature", COLLECT_POLL, 200)));
+        IotOpcUaDeviceConfigRespDTO none = newDevice(2L, server.getEndpointUrl(), "None", "None",
+                AUTH_USERNAME, Collections.singletonList(newPoint(21L, "numeric", NSU + "i=1001", COLLECT_POLL, 200)));
+        deviceConfigs = Arrays.asList(anonymous, none);
 
         // 调用
         startProtocol(config);
 
-        // 断言：配置被拒绝，不建立会话，不上报
+        // 断言：配置被拒绝，不建立会话，不上线、不上报
         verify(deviceApi, timeout(10000).atLeast(2)).getOpcUaDeviceConfigList(any());
         assertTrue(protocol.getSessionManager().getSessions().isEmpty());
         assertTrue(getPropertyMessages("dev1").isEmpty());
-    }
-
-    @Test
-    public void testSecurityNone_allowed() throws Exception {
-        // 准备参数：显式开启 None（开发联调）
-        IotOpcUaClientConfig config = newConfig();
-        config.setSecurityNoneAllowed(true);
-        trustEachOther(config, true);
-        deviceConfigs = Collections.singletonList(newDevice(1L, server.getEndpointUrl(), "None", "None",
-                AUTH_ANONYMOUS, Collections.singletonList(newPoint(11L, "numeric", NSU + "i=1001", COLLECT_POLL, 200))));
-
-        // 调用
-        startProtocol(config);
-
-        // 断言
-        await().atMost(20, TimeUnit.SECONDS).until(() -> hasPropertyValue("dev1", "numeric", 42));
+        assertTrue(getPropertyMessages("dev2").isEmpty());
+        assertFalse(hasState("dev1", true));
+        assertFalse(hasState("dev2", true));
     }
 
     @Test
@@ -393,7 +386,7 @@ public class IotOpcUaClientProtocolIntegrationTest {
         IotOpcUaClientConfig config = newConfig();
         trustEachOther(config, false);
         deviceConfigs = Collections.singletonList(newDevice(1L, server.getEndpointUrl(), "Basic256Sha256",
-                "SignAndEncrypt", AUTH_ANONYMOUS, Collections.singletonList(
+                "SignAndEncrypt", AUTH_USERNAME, Collections.singletonList(
                         newPoint(11L, "temperature", NSU + "s=Temperature", COLLECT_POLL, 200))));
 
         // 调用
@@ -418,7 +411,7 @@ public class IotOpcUaClientProtocolIntegrationTest {
         IotOpcUaClientConfig config = newConfig();
         trustEachOther(config, true);
         deviceConfigs = Collections.singletonList(newDevice(1L, endpointUrl, "Basic256Sha256",
-                "SignAndEncrypt", AUTH_ANONYMOUS, Collections.singletonList(
+                "SignAndEncrypt", AUTH_USERNAME, Collections.singletonList(
                         newPoint(11L, "temperature", NSU + "s=Temperature", COLLECT_POLL, 200))));
 
         // 调用：默认拒绝
@@ -441,7 +434,7 @@ public class IotOpcUaClientProtocolIntegrationTest {
         IotOpcUaClientConfig config = newConfig();
         trustEachOther(config, true);
         deviceConfigs = Collections.singletonList(newDevice(1L, server.getEndpointUrl(), "Basic256Sha256",
-                "SignAndEncrypt", AUTH_ANONYMOUS, Arrays.asList(
+                "SignAndEncrypt", AUTH_USERNAME, Arrays.asList(
                         newWritablePoint(11L, "int16", NSU + "s=W.Int16"),
                         newWritablePoint(12L, "uint32", NSU + "s=W.UInt32"),
                         newWritablePoint(13L, "double", NSU + "s=W.Double"),
@@ -510,7 +503,7 @@ public class IotOpcUaClientProtocolIntegrationTest {
         IotOpcUaClientConfig config = newConfig();
         trustEachOther(config, true);
         deviceConfigs = Collections.singletonList(newDevice(1L, server.getEndpointUrl(), "Basic256Sha256",
-                "SignAndEncrypt", AUTH_ANONYMOUS, Collections.singletonList(
+                "SignAndEncrypt", AUTH_USERNAME, Collections.singletonList(
                         newWritablePoint(11L, "int16", NSU + "s=W.Int16"))));
         startProtocol(config);
         awaitState("dev1", true);
@@ -530,12 +523,17 @@ public class IotOpcUaClientProtocolIntegrationTest {
 
     // ========== 工具方法 ==========
 
+    /**
+     * 网关配置：默认带凭据 reader（只支持用户名认证），允许租户 1、测试服务端的端点（含 localhost 写法、明文令牌端点）
+     */
     private IotOpcUaClientConfig newConfig() {
         IotOpcUaClientConfig config = new IotOpcUaClientConfig();
         config.setPkiDir(pkiDir.toString());
         config.setKeystorePassword(KEYSTORE_PASSWORD);
         config.setConfigRefreshInterval(1);
         config.setStateRetryInterval(1);
+        config.getCredentials().put("reader", newCredential(server.getEndpointUrl(),
+                server.getEndpointUrl().replace("127.0.0.1", "localhost"), server.getPlainTokenEndpointUrl()));
         return config;
     }
 
@@ -610,7 +608,7 @@ public class IotOpcUaClientProtocolIntegrationTest {
         device.setSecurityPolicy(securityPolicy);
         device.setSecurityMode(securityMode);
         device.setAuthType(authType);
-        device.setCredentialAlias("");
+        device.setCredentialAlias("reader");
         device.setTimeout(3000);
         device.setRetryInterval(1000);
         device.setPoints(points);

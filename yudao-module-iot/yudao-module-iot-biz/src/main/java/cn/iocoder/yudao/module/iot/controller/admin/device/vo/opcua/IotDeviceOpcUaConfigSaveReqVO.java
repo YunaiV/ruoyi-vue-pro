@@ -39,12 +39,12 @@ public class IotDeviceOpcUaConfigSaveReqVO {
     @InEnum(IotOpcUaSecurityModeEnum.class)
     private String securityMode;
 
-    @Schema(description = "认证方式", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "认证方式（只支持用户名认证）", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     @NotNull(message = "认证方式不能为空")
     @InEnum(IotOpcUaAuthTypeEnum.class)
     private Integer authType;
 
-    @Schema(description = "凭据别名（用户名认证时必填，对应网关本地配置的 credentials）", example = "kep-reader")
+    @Schema(description = "凭据别名（必填，对应网关本地配置的 credentials）", requiredMode = Schema.RequiredMode.REQUIRED, example = "kep-reader")
     @Size(max = 64, message = "凭据别名长度不能超过 64 个字符")
     @Pattern(regexp = "^[A-Za-z0-9_.-]*$", message = "凭据别名只能包含字母、数字、下划线、点和中划线")
     private String credentialAlias;
@@ -83,24 +83,26 @@ public class IotDeviceOpcUaConfigSaveReqVO {
     }
 
     /**
-     * None 允许保存（便于开发联调），网关默认拒绝，只有显式开启开关才放行
+     * 只支持用户名认证，口令不能明文传输：安全策略不能是 None，安全模式只能是 SignAndEncrypt
      */
-    @AssertTrue(message = "安全策略和安全模式不匹配：None 策略只能配合 None 模式，其它策略只能配合 Sign 或 SignAndEncrypt 模式")
+    @AssertTrue(message = "安全策略不能为 None，安全模式只能为 SignAndEncrypt（用户名认证的口令必须加密传输）")
     @JsonIgnore
     public boolean isSecurityValid() {
         if (securityPolicy == null || securityMode == null) {
             return true;
         }
-        return IotOpcUaSecurityPolicyEnum.NONE.getPolicy().equals(securityPolicy)
-                == IotOpcUaSecurityModeEnum.NONE.getMode().equals(securityMode);
+        // TODO @AI：notequals any 简化下判断；
+        return !IotOpcUaSecurityPolicyEnum.NONE.getPolicy().equals(securityPolicy)
+                && IotOpcUaSecurityModeEnum.SIGN_AND_ENCRYPT.getMode().equals(securityMode);
     }
 
-    @AssertTrue(message = "用户名认证只能使用 SignAndEncrypt 模式，并且必须填写凭据别名")
+    @AssertTrue(message = "OPC UA Client 只支持用户名认证，并且必须填写凭据别名")
     @JsonIgnore
     public boolean isAuthValid() {
-        return !IotOpcUaAuthTypeEnum.USERNAME.getType().equals(authType)
-                || (IotOpcUaSecurityModeEnum.SIGN_AND_ENCRYPT.getMode().equals(securityMode)
-                && StrUtil.isNotBlank(credentialAlias));
+        if (authType == null) {
+            return true;
+        }
+        return IotOpcUaAuthTypeEnum.USERNAME.getType().equals(authType) && StrUtil.isNotBlank(credentialAlias);
     }
 
 }

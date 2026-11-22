@@ -27,7 +27,11 @@ public enum IotProtocolTypeEnum implements ArrayValuable<String> {
     COAP("coap", false),
     MODBUS_TCP_CLIENT("modbus_tcp_client", true),
     MODBUS_TCP_SERVER("modbus_tcp_server", true),
-    OPC_UA_CLIENT("opc_ua_client", true);
+    OPC_UA_CLIENT("opc_ua_client", true),
+    /**
+     * OPC UA Server：网关把设备属性以只读节点暴露给上位机，属于北向数据服务，不作为产品的设备接入协议
+     */
+    OPC_UA_SERVER("opc_ua_server", false);
 
     public static final String[] ARRAYS = Arrays.stream(values()).map(IotProtocolTypeEnum::getType).toArray(String[]::new);
 

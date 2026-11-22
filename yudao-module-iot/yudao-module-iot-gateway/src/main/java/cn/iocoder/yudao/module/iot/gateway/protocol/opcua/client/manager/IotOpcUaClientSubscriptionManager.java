@@ -24,6 +24,7 @@ import org.eclipse.milo.opcua.stack.core.types.enumerated.DeadbandType;
 import org.eclipse.milo.opcua.stack.core.types.structured.DataChangeFilter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -334,7 +335,7 @@ public class IotOpcUaClientSubscriptionManager {
     static List<String> synchronize(OpcUaSubscription subscription) throws MonitoredItemSynchronizationException {
         try {
             subscription.synchronizeMonitoredItems();
-            return List.of();
+            return Collections.emptyList();
         } catch (MonitoredItemSynchronizationException e) {
             boolean serviceFailed = Stream.of(e.getCreateResults(), e.getModifyResults(), e.getDeleteResults())
                     .flatMap(List::stream)
@@ -353,8 +354,13 @@ public class IotOpcUaClientSubscriptionManager {
 
     private static String describe(MonitoredItemServiceOperationResult result) {
         Object userObject = result.monitoredItem().getUserObject().orElse(null);
-        String target = userObject instanceof ItemBinding item ? item.deviceId + "/" + item.identifier
-                + "(" + item.nodeId.toParseableString() + ")" : String.valueOf(result.monitoredItem().getReadValueId().getNodeId());
+        String target;
+        if (userObject instanceof ItemBinding) {
+            ItemBinding item = (ItemBinding) userObject;
+            target = item.deviceId + "/" + item.identifier + "(" + item.nodeId.toParseableString() + ")";
+        } else {
+            target = String.valueOf(result.monitoredItem().getReadValueId().getNodeId());
+        }
         return target + " " + result.operationResult().orElse(null);
     }
 
@@ -438,7 +444,11 @@ public class IotOpcUaClientSubscriptionManager {
         Map<Long, Map<String, Object>> deviceProperties = new LinkedHashMap<>();
         for (int i = 0; i < items.size() && i < values.size(); i++) {
             Object userObject = items.get(i).getUserObject().orElse(null);
-            if (!(userObject instanceof ItemBinding item) || !item.active) {
+            if (!(userObject instanceof ItemBinding)) {
+                continue;
+            }
+            ItemBinding item = (ItemBinding) userObject;
+            if (!item.active) {
                 continue;
             }
             DeviceBinding binding = session.getDevices().get(item.deviceId);
@@ -469,7 +479,7 @@ public class IotOpcUaClientSubscriptionManager {
     }
 
     private static boolean isSubscriptionGone(OpcUaSubscription subscription) {
-        return subscription == null || subscription.getSubscriptionId().isEmpty();
+        return subscription == null || !subscription.getSubscriptionId().isPresent();
     }
 
     private static void deactivateAll(SubscriptionGroup group) {
