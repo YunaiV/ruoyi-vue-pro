@@ -4,10 +4,8 @@ import cn.hutool.core.io.resource.ResourceUtil;
 import org.apache.tika.Tika;
 import org.apache.tika.detect.CompositeDetector;
 import org.apache.tika.detect.Detector;
-import org.apache.tika.io.TikaInputStream;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.mime.MediaType;
-import org.apache.tika.parser.ParseContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletResponse;
 
@@ -351,13 +349,13 @@ public class FileTypeUtilsTest {
     }
 
     /**
-     * 模拟旧的 {@code org.gagravarr.tika.OggDetector}：按 Tika 2.x 接口编译，只实现了 detect(InputStream, Metadata)，
-     * Tika 4 调用 detect(TikaInputStream, Metadata, ParseContext) 时，JVM 抛出 AbstractMethodError
+     * 模拟旧的 {@code org.gagravarr.tika.OggDetector}：检测器调用时抛出 AbstractMethodError，
+     * 验证文件类型识别失败后按文件名兜底。
      */
     private static class IncompatibleDetector implements Detector {
 
         @Override
-        public MediaType detect(TikaInputStream input, Metadata metadata, ParseContext parseContext) {
+        public MediaType detect(InputStream input, Metadata metadata) {
             throw new AbstractMethodError("Receiver class org.gagravarr.tika.OggDetector does not define or inherit "
                     + "an implementation of the resolved method 'abstract org.apache.tika.mime.MediaType "
                     + "detect(org.apache.tika.io.TikaInputStream, org.apache.tika.metadata.Metadata, "
