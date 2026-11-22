@@ -41,7 +41,7 @@ import static org.mockito.Mockito.*;
  */
 public class IotOpcUaClientSessionManagerTest {
 
-    private static final Integer AUTH_ANONYMOUS = IotOpcUaAuthTypeEnum.ANONYMOUS.getType();
+    private static final Integer AUTH_USERNAME = IotOpcUaAuthTypeEnum.USERNAME.getType();
 
     private static final String ENDPOINT = "opc.tcp://192.168.1.10:4840/server";
 
@@ -185,8 +185,8 @@ public class IotOpcUaClientSessionManagerTest {
         device.setEndpointUrl(ENDPOINT);
         device.setSecurityPolicy("Basic256Sha256");
         device.setSecurityMode("SignAndEncrypt");
-        device.setAuthType(AUTH_ANONYMOUS);
-        device.setCredentialAlias("");
+        device.setAuthType(AUTH_USERNAME);
+        device.setCredentialAlias("reader");
         device.setTimeout(3000);
         device.setRetryInterval(retryInterval);
         device.setPoints(Collections.emptyList());

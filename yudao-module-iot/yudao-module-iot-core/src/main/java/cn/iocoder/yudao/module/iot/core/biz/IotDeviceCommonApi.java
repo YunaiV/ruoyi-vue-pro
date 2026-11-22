@@ -65,6 +65,13 @@ public interface IotDeviceCommonApi {
     CommonResult<List<IotOpcUaDeviceConfigRespDTO>> getOpcUaDeviceConfigList(IotOpcUaDeviceConfigListReqDTO listReqDTO);
 
     /**
+     * 获取 OPC UA Server 配置列表（启用的配置及其启用的节点；口令不入库，网关按凭据别名读取本地配置）
+     *
+     * @return OPC UA Server 配置列表
+     */
+    CommonResult<List<IotOpcUaServerConfigRespDTO>> getOpcUaServerConfigList();
+
+    /**
      * 续期网关协议实例的存活标记
      *
      * @param reqDTO 各协议实例的启动时间

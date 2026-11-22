@@ -10,11 +10,14 @@ import cn.iocoder.yudao.module.iot.core.biz.dto.IotGatewayServerAliveReqDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotOpcUaDeviceConfigListReqDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotOpcUaDeviceConfigRespDTO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotOpcUaPointRespDTO;
+import cn.iocoder.yudao.module.iot.core.biz.dto.IotOpcUaServerConfigRespDTO;
 import cn.iocoder.yudao.module.iot.core.enums.opcua.IotOpcUaAuthTypeEnum;
 import cn.iocoder.yudao.module.iot.core.enums.opcua.IotOpcUaCollectModeEnum;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceOpcUaConfigDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceOpcUaPointDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.opcuaserver.IotOpcUaServerConfigDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.opcuaserver.IotOpcUaServerNodeDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.model.ThingModelProperty;
@@ -25,6 +28,8 @@ import cn.iocoder.yudao.module.iot.service.device.IotDeviceOpcUaConfigService;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceOpcUaPointService;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.service.device.property.IotDevicePropertyService;
+import cn.iocoder.yudao.module.iot.service.opcuaserver.IotOpcUaServerConfigService;
+import cn.iocoder.yudao.module.iot.service.opcuaserver.IotOpcUaServerNodeService;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import jakarta.validation.Validation;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,6 +49,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static cn.iocoder.yudao.framework.common.util.collection.SetUtils.asSet;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -59,7 +65,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 public class IoTDeviceApiImplTest extends BaseMockitoUnitTest {
 
-    private static final Integer AUTH_ANONYMOUS = IotOpcUaAuthTypeEnum.ANONYMOUS.getType();
     private static final Integer AUTH_USERNAME = IotOpcUaAuthTypeEnum.USERNAME.getType();
     private static final Integer COLLECT_SUBSCRIBE = IotOpcUaCollectModeEnum.SUBSCRIBE.getMode();
 
@@ -82,6 +87,10 @@ public class IoTDeviceApiImplTest extends BaseMockitoUnitTest {
     private IotDeviceOpcUaConfigService opcUaConfigService;
     @Mock
     private IotDeviceOpcUaPointService opcUaPointService;
+    @Mock
+    private IotOpcUaServerConfigService opcUaServerConfigService;
+    @Mock
+    private IotOpcUaServerNodeService opcUaServerNodeService;
 
     /**
      * 方法校验代理：参数约束继承不合法时，代理上的任何方法调用都会抛 ConstraintDeclarationException（HV000151）
@@ -245,9 +254,9 @@ public class IoTDeviceApiImplTest extends BaseMockitoUnitTest {
         // mock 数据：设备 1（OPC UA，有点位）、设备 2（OPC UA，没有点位）、设备 3（Modbus）、设备 4（产品不存在）
         //   设备 1 有两条配置（并发写入前的历史数据），只返回编号最小的一条
         when(opcUaConfigService.getDeviceOpcUaConfigList(same(reqDTO))).thenReturn(Arrays.asList(
-                newOpcUaConfig(11L, 1L, AUTH_USERNAME, "plc-reader"), newOpcUaConfig(12L, 1L, AUTH_ANONYMOUS, ""),
-                newOpcUaConfig(21L, 2L, AUTH_ANONYMOUS, ""), newOpcUaConfig(31L, 3L, AUTH_ANONYMOUS, ""),
-                newOpcUaConfig(41L, 4L, AUTH_ANONYMOUS, ""), newOpcUaConfig(51L, 5L, AUTH_ANONYMOUS, "")));
+                newOpcUaConfig(11L, 1L, AUTH_USERNAME, "plc-reader"), newOpcUaConfig(12L, 1L, AUTH_USERNAME, "plc-other"),
+                newOpcUaConfig(21L, 2L, AUTH_USERNAME, "plc-reader"), newOpcUaConfig(31L, 3L, AUTH_USERNAME, "plc-reader"),
+                newOpcUaConfig(41L, 4L, AUTH_USERNAME, "plc-reader"), newOpcUaConfig(51L, 5L, AUTH_USERNAME, "plc-reader")));
         Map<Long, IotDeviceDO> deviceMap = new LinkedHashMap<>();
         deviceMap.put(1L, newDevice(1L, 100L));
         deviceMap.put(2L, newDevice(2L, 100L));
@@ -305,7 +314,7 @@ public class IoTDeviceApiImplTest extends BaseMockitoUnitTest {
         IotOpcUaDeviceConfigListReqDTO reqDTO = new IotOpcUaDeviceConfigListReqDTO();
         // mock 数据：设备 1 的两个点位都开启了可写；speed 的物模型属性后来改为只读，mode 的物模型属性缺少定义
         when(opcUaConfigService.getDeviceOpcUaConfigList(same(reqDTO))).thenReturn(
-                Collections.singletonList(newOpcUaConfig(11L, 1L, AUTH_ANONYMOUS, "")));
+                Collections.singletonList(newOpcUaConfig(11L, 1L, AUTH_USERNAME, "plc-reader")));
         when(deviceService.getDeviceMap(any())).thenReturn(Collections.singletonMap(1L, newDevice(1L, 100L)));
         when(productService.getProductMap(any())).thenReturn(
                 Collections.singletonMap(100L, IotProductDO.builder().id(100L).protocolType("opc_ua_client").build()));
@@ -341,6 +350,77 @@ public class IoTDeviceApiImplTest extends BaseMockitoUnitTest {
         assertTrue(result.isSuccess());
         assertTrue(result.getData().isEmpty());
         verifyNoInteractions(deviceService, opcUaPointService);
+    }
+
+    @Test
+    public void testGetOpcUaServerConfigList() {
+        // mock 数据：配置 1（租户 1）、配置 2（与配置 1 凭据别名重复）、配置 3（租户 2，节点引用了租户 1 的设备）
+        when(opcUaServerConfigService.getEnabledOpcUaServerConfigList()).thenReturn(Arrays.asList(
+                newOpcUaServerConfig(1L, 1L, "scada-a"), newOpcUaServerConfig(2L, 1L, "scada-a"),
+                newOpcUaServerConfig(3L, 2L, "scada-b")));
+        Map<Long, List<IotOpcUaServerNodeDO>> nodeMap = new LinkedHashMap<>();
+        nodeMap.put(1L, Arrays.asList(newOpcUaServerNode(11L, 1L, 1L, 1001L, "temperature"),
+                newOpcUaServerNode(12L, 1L, 1L, 1001L, "temperature"), // 浏览名称重复
+                newOpcUaServerNode(13L, 1L, 1L, 3001L, "other"), // 物模型属于其它产品
+                newOpcUaServerNode(14L, 1L, 9L, 1001L, "deleted"))); // 设备已删除
+        nodeMap.put(3L, Collections.singletonList(newOpcUaServerNode(31L, 3L, 1L, 1001L, "cross-tenant")));
+        when(opcUaServerNodeService.getEnabledOpcUaServerNodeMapByConfigIds(eq(asSet(1L, 2L, 3L)))).thenReturn(nodeMap);
+        when(deviceService.getDeviceMap(eq(asSet(1L, 9L)))).thenReturn(Collections.singletonMap(1L, newDevice(1L, 100L)));
+        Map<Long, IotThingModelDO> thingModelMap = new LinkedHashMap<>();
+        ThingModelProperty property = newProperty(IotThingModelAccessModeEnum.READ_ONLY.getMode());
+        property.setDataType("float");
+        thingModelMap.put(1001L, IotThingModelDO.builder().id(1001L).productId(100L).identifier("temperature")
+                .property(property).build());
+        thingModelMap.put(3001L, IotThingModelDO.builder().id(3001L).productId(300L).identifier("other").build());
+        when(opcUaServerNodeService.getPropertyThingModelMap(any())).thenReturn(thingModelMap);
+
+        // 调用
+        CommonResult<List<IotOpcUaServerConfigRespDTO>> result = deviceApi.getOpcUaServerConfigList();
+        // 断言：凭据别名重复的配置只返回编号最小的一条
+        assertTrue(result.isSuccess());
+        List<IotOpcUaServerConfigRespDTO> list = result.getData();
+        assertEquals(2, list.size());
+        IotOpcUaServerConfigRespDTO config1 = list.get(0);
+        assertEquals(1L, config1.getId());
+        assertEquals(1L, config1.getTenantId());
+        assertEquals("scada-a", config1.getCredentialAlias()); // 只返回凭据别名，不含口令
+        assertEquals(2, config1.getMaxSessions());
+        // 断言：节点只保留设备存在、物模型属于本产品、浏览名称不重复的
+        assertEquals(1, config1.getNodes().size());
+        assertEquals(11L, config1.getNodes().get(0).getId());
+        assertEquals("pk-1", config1.getNodes().get(0).getProductKey());
+        assertEquals("dn-1", config1.getNodes().get(0).getDeviceName());
+        assertEquals("temperature", config1.getNodes().get(0).getIdentifier());
+        assertEquals("float", config1.getNodes().get(0).getDataType());
+        // 断言：租户隔离，配置 3（租户 2）不能暴露租户 1 的设备
+        assertEquals(3L, list.get(1).getId());
+        assertTrue(list.get(1).getNodes().isEmpty());
+    }
+
+    @Test
+    public void testGetOpcUaServerConfigList_empty() {
+        // mock 方法：没有配置
+        when(opcUaServerConfigService.getEnabledOpcUaServerConfigList()).thenReturn(Collections.emptyList());
+
+        // 调用，并断言
+        CommonResult<List<IotOpcUaServerConfigRespDTO>> result = deviceApi.getOpcUaServerConfigList();
+        assertTrue(result.isSuccess());
+        assertTrue(result.getData().isEmpty());
+        verifyNoInteractions(deviceService, opcUaServerNodeService);
+    }
+
+    private static IotOpcUaServerConfigDO newOpcUaServerConfig(Long id, Long tenantId, String credentialAlias) {
+        IotOpcUaServerConfigDO config = IotOpcUaServerConfigDO.builder().id(id).name("config-" + id)
+                .credentialAlias(credentialAlias).maxSessions(2).maxSubscriptionsPerSession(5)
+                .maxMonitoredItemsPerSession(1000).status(0).build();
+        config.setTenantId(tenantId);
+        return config;
+    }
+
+    private static IotOpcUaServerNodeDO newOpcUaServerNode(Long id, Long configId, Long deviceId, Long thingModelId,
+                                                           String browseName) {
+        return IotOpcUaServerNodeDO.builder().id(id).configId(configId).deviceId(deviceId).thingModelId(thingModelId)
+                .browseName(browseName).status(0).build();
     }
 
     private static IotDeviceOpcUaConfigDO newOpcUaConfig(Long id, Long deviceId, Integer authType, String credentialAlias) {

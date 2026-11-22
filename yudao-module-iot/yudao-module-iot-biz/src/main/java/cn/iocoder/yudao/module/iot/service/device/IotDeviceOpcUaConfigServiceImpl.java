@@ -1,12 +1,10 @@
 package cn.iocoder.yudao.module.iot.service.device;
 
 import cn.hutool.core.util.ObjUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.util.object.BeanUtils;
 import cn.iocoder.yudao.module.iot.controller.admin.device.vo.opcua.IotDeviceOpcUaConfigSaveReqVO;
 import cn.iocoder.yudao.module.iot.core.biz.dto.IotOpcUaDeviceConfigListReqDTO;
 import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
-import cn.iocoder.yudao.module.iot.core.enums.opcua.IotOpcUaAuthTypeEnum;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceOpcUaConfigDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
@@ -46,12 +44,8 @@ public class IotDeviceOpcUaConfigServiceImpl implements IotDeviceOpcUaConfigServ
         if (product == null || ObjUtil.notEqual(IotProtocolTypeEnum.OPC_UA_CLIENT.getType(), product.getProtocolType())) {
             throw exception(DEVICE_OPC_UA_CONFIG_PROTOCOL_INVALID);
         }
-        // 1.2 端点去掉首尾空白后保存（网关按端点地址匹配凭据）；匿名认证时清空凭据别名
-        //     端点格式、安全策略与模式、认证方式的校验，见 IotDeviceOpcUaConfigSaveReqVO
-        saveReqVO.setEndpointUrl(StrUtil.trim(saveReqVO.getEndpointUrl()));
-        if (IotOpcUaAuthTypeEnum.ANONYMOUS.getType().equals(saveReqVO.getAuthType())) {
-            saveReqVO.setCredentialAlias("");
-        }
+        // 1.2 端点格式（不允许首尾空白，网关按端点地址完全匹配凭据）、安全策略与模式、认证方式（只支持用户名认证）的校验，
+        //     见 IotDeviceOpcUaConfigSaveReqVO
 
         // 2. 每台设备只有一份未删除的配置（应用层唯一，与 Modbus 一致不加锁）：已有则更新，没有则新增
         //    并发保存产生的重复记录不会导致报错：查询取编号最小的一条，网关配置接口按设备去重

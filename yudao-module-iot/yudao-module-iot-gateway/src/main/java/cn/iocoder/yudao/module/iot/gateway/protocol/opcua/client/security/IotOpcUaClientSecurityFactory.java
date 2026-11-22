@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.eclipse.milo.opcua.sdk.client.OpcUaClient;
 import org.eclipse.milo.opcua.sdk.client.OpcUaClientConfig;
-import org.eclipse.milo.opcua.sdk.client.identity.AnonymousProvider;
 import org.eclipse.milo.opcua.sdk.client.identity.IdentityProvider;
 import org.eclipse.milo.opcua.sdk.client.identity.UsernameProvider;
 import org.eclipse.milo.opcua.sdk.client.DiscoveryClient;
@@ -172,10 +171,11 @@ public class IotOpcUaClientSecurityFactory {
                 keyStore.load(in, password);
             }
             Key key = keyStore.getKey(alias, password);
-            if (!(key instanceof PrivateKey privateKey)) {
+            if (!(key instanceof PrivateKey)) {
                 // 不重新生成：别名与 keystore 不一致时启动失败，由运维核对 keystore-alias
                 throw new IllegalStateException("keystore 中没有别名为 " + alias + " 的私钥，请核对 keystore-alias");
             }
+            PrivateKey privateKey = (PrivateKey) key;
             // 证书链：叶子证书在前，保留中间 CA，握手时一并发送给服务端
             Certificate[] chain = keyStore.getCertificateChain(alias);
             if (chain == null || chain.length == 0 || !(chain[0] instanceof X509Certificate)) {
@@ -263,54 +263,40 @@ public class IotOpcUaClientSecurityFactory {
      * @return 不能使用的原因；可以使用时返回 null
      */
     public String validateDevice(IotOpcUaDeviceConfigRespDTO device) {
-        // 1. 租户白名单
-        if (CollUtil.isNotEmpty(config.getTenantIds()) && !config.getTenantIds().contains(device.getTenantId())) {
-            return "租户 " + device.getTenantId() + " 不在网关的 tenant-ids 中";
-        }
-        // 2. 端点地址
+        // 1. 端点地址
         if (parseEndpoint(device.getEndpointUrl()) == null) {
             return "端点地址不正确: " + device.getEndpointUrl();
         }
-        // 3. 安全策略、模式
+        // 2. 认证方式：只支持用户名认证，匿名一律拒绝（包括历史保存的匿名配置）
         IotOpcUaSecurityPolicyEnum policy = IotOpcUaSecurityPolicyEnum.of(device.getSecurityPolicy());
         IotOpcUaSecurityModeEnum mode = IotOpcUaSecurityModeEnum.of(device.getSecurityMode());
         IotOpcUaAuthTypeEnum authType = IotOpcUaAuthTypeEnum.of(device.getAuthType());
         if (policy == null || mode == null || authType == null) {
             return "安全策略、安全模式或认证方式不支持";
         }
-        boolean none = policy == IotOpcUaSecurityPolicyEnum.NONE;
-        if (none != (mode == IotOpcUaSecurityModeEnum.NONE)) {
-            return "安全策略 None 必须与安全模式 None 搭配";
+        if (authType != IotOpcUaAuthTypeEnum.USERNAME) {
+            return "OPC UA Client 只支持用户名认证，不支持" + authType.getName() + "认证";
         }
-        if (none) {
-            if (!Boolean.TRUE.equals(config.getSecurityNoneAllowed())) {
-                return "网关未开启 security-none-allowed，不允许 None 安全策略";
-            }
-            if (authType != IotOpcUaAuthTypeEnum.ANONYMOUS) {
-                return "None 安全策略只能使用匿名身份";
-            }
+        // 3. 安全策略、模式：口令不能明文传输，必须是非 None 安全策略 + SignAndEncrypt
+        if (policy == IotOpcUaSecurityPolicyEnum.NONE || mode != IotOpcUaSecurityModeEnum.SIGN_AND_ENCRYPT) {
+            return "用户名认证必须使用非 None 安全策略和 SignAndEncrypt 安全模式";
         }
-        // 4. 用户名认证：SignAndEncrypt + 网关本地凭据（租户、端点都必须命中）
-        if (authType == IotOpcUaAuthTypeEnum.USERNAME) {
-            if (mode != IotOpcUaSecurityModeEnum.SIGN_AND_ENCRYPT) {
-                return "用户名认证必须使用 SignAndEncrypt 安全模式";
-            }
-            IotOpcUaClientConfig.Credential credential = config.getCredentials() != null
-                    ? config.getCredentials().get(device.getCredentialAlias()) : null;
-            // 空白用户名、口令按未配置处理（与管理后台对凭据别名的非空校验一致）
-            if (credential == null || StrUtil.isBlank(credential.getUsername())) {
-                return "网关未配置凭据别名 " + device.getCredentialAlias();
-            }
-            if (StrUtil.isBlank(credential.getPassword())) {
-                // 例如环境变量未设置时，${IOT_OPC_UA_XXX_PASSWORD:} 解析为空字符串
-                return "凭据别名 " + device.getCredentialAlias() + " 的口令为空";
-            }
-            if (CollUtil.isEmpty(credential.getTenantIds()) || !credential.getTenantIds().contains(device.getTenantId())) {
-                return "凭据别名 " + device.getCredentialAlias() + " 不允许租户 " + device.getTenantId() + " 使用";
-            }
-            if (CollUtil.isEmpty(credential.getEndpoints()) || !credential.getEndpoints().contains(device.getEndpointUrl())) {
-                return "凭据别名 " + device.getCredentialAlias() + " 不允许端点 " + device.getEndpointUrl() + " 使用";
-            }
+        // 4. 网关本地凭据：凭据的 tenant-ids、endpoints 都必须命中
+        IotOpcUaClientConfig.Credential credential = config.getCredentials() != null
+                ? config.getCredentials().get(device.getCredentialAlias()) : null;
+        // 空白用户名、口令按未配置处理（与管理后台对凭据别名的非空校验一致）
+        if (credential == null || StrUtil.isBlank(credential.getUsername())) {
+            return "网关未配置凭据别名 " + device.getCredentialAlias();
+        }
+        if (StrUtil.isBlank(credential.getPassword())) {
+            // 例如环境变量未设置时，${IOT_OPC_UA_XXX_PASSWORD:} 解析为空字符串
+            return "凭据别名 " + device.getCredentialAlias() + " 的口令为空";
+        }
+        if (CollUtil.isEmpty(credential.getTenantIds()) || !credential.getTenantIds().contains(device.getTenantId())) {
+            return "凭据别名 " + device.getCredentialAlias() + " 不允许租户 " + device.getTenantId() + " 使用";
+        }
+        if (CollUtil.isEmpty(credential.getEndpoints()) || !credential.getEndpoints().contains(device.getEndpointUrl())) {
+            return "凭据别名 " + device.getCredentialAlias() + " 不允许端点 " + device.getEndpointUrl() + " 使用";
         }
         return null;
     }
@@ -387,7 +373,7 @@ public class IotOpcUaClientSecurityFactory {
      * 严格选择端点
      * <ol>
      *     <li>安全策略 URI、安全模式与配置完全一致，传输为 opc.tcp 二进制（未返回传输协议 URI 时，端点地址必须是 opc.tcp://）；</li>
-     *     <li>匿名：端点提供 Anonymous 令牌；用户名：端点提供 UserName 令牌，且令牌的生效安全策略不是 None；</li>
+     *     <li>端点提供 UserName 令牌，且令牌的生效安全策略不是 None（只支持用户名认证）；</li>
      *     <li>配置了非根路径时只选择路径一致的端点，没有则拒绝（凭据按端点授权，不能换到其它路径）；
      *         配置为根路径时优先选择根路径的端点，没有再从其它路径中选择；</li>
      *     <li>优先选择主机、端口与配置一致的端点（服务端可能同时返回主机名、IP 等多个地址）；
@@ -401,7 +387,6 @@ public class IotOpcUaClientSecurityFactory {
     public EndpointDescription selectEndpoint(List<EndpointDescription> endpoints, IotOpcUaDeviceConfigRespDTO device) {
         IotOpcUaSecurityPolicyEnum policy = IotOpcUaSecurityPolicyEnum.of(device.getSecurityPolicy());
         MessageSecurityMode mode = MessageSecurityMode.valueOf(IotOpcUaSecurityModeEnum.of(device.getSecurityMode()).getMode());
-        boolean username = IotOpcUaAuthTypeEnum.USERNAME.getType().equals(device.getAuthType());
         URI configured = parseEndpoint(device.getEndpointUrl());
         if (configured == null) {
             throw exception(OPC_UA_ENDPOINT_REJECTED, "端点地址不正确: " + device.getEndpointUrl());
@@ -421,9 +406,9 @@ public class IotOpcUaClientSecurityFactory {
         if (!samePath.isEmpty() || !"/".equals(configuredPath)) {
             candidates = samePath;
         }
-        // 1.3 身份令牌
+        // 1.3 身份令牌：安全的 UserName 令牌
         candidates = candidates.stream()
-                .filter(e -> username ? selectUsernameTokenPolicy(e).isPresent() : hasAnonymousToken(e))
+                .filter(e -> selectUsernameTokenPolicy(e).isPresent())
                 .collect(Collectors.toList());
         if (candidates.isEmpty()) {
             throw exception(OPC_UA_ENDPOINT_REJECTED, String.format("服务端没有 %s / %s / %s 的端点",
@@ -471,10 +456,6 @@ public class IotOpcUaClientSecurityFactory {
         return StrUtil.removeSuffix(path, "/");
     }
 
-    private static boolean hasAnonymousToken(EndpointDescription endpoint) {
-        return getTokenPolicies(endpoint).anyMatch(p -> p.getTokenType() == UserTokenType.Anonymous);
-    }
-
     /**
      * 选择 UserName 令牌策略：令牌的生效安全策略（令牌未指定时取端点的）必须是已知的非 None 策略，口令不会明文传输
      */
@@ -510,8 +491,9 @@ public class IotOpcUaClientSecurityFactory {
     }
 
     private IdentityProvider buildIdentityProvider(IotOpcUaDeviceConfigRespDTO device) {
+        // 只支持用户名认证：validateDevice 已拒绝匿名，这里兜底，不回退匿名
         if (!IotOpcUaAuthTypeEnum.USERNAME.getType().equals(device.getAuthType())) {
-            return AnonymousProvider.INSTANCE;
+            throw new IllegalStateException("OPC UA Client 只支持用户名认证");
         }
         IotOpcUaClientConfig.Credential credential = config.getCredentials().get(device.getCredentialAlias());
         String password = credential.getPassword();

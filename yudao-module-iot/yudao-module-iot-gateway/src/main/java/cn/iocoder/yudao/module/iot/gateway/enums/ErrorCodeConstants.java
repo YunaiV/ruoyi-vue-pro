@@ -63,4 +63,7 @@ public interface ErrorCodeConstants {
     ErrorCode OPC_UA_WRITE_FAILED = new ErrorCode(1_051_005_109, "OPC UA 写入失败：{}");
     ErrorCode OPC_UA_WRITE_CONFIG_EXPIRED = new ErrorCode(1_051_005_110, "设备配置已变化（解绑、会话或点位变更），未写入");
 
+    // ========== OPC UA Server 1-051-006-000 ==========
+    ErrorCode OPC_UA_SERVER_SECURITY_INIT_FAILED = new ErrorCode(1_051_006_000, "OPC UA Server 证书初始化失败：{}");
+
 }

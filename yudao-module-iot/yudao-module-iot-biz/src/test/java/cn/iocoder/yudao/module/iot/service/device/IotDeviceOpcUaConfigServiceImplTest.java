@@ -54,10 +54,8 @@ public class IotDeviceOpcUaConfigServiceImplTest extends BaseDbUnitTest {
 
     @Test
     public void testSaveDeviceOpcUaConfig_createAndUpdate() {
-        // 准备参数：匿名时凭据别名被清空；端点去掉首尾空白
+        // 准备参数
         IotDeviceOpcUaConfigSaveReqVO reqVO = newSaveReqVO();
-        reqVO.setEndpointUrl(" opc.tcp://192.168.1.10:4840/server ");
-        reqVO.setCredentialAlias("ignored");
         mockDevice(reqVO.getDeviceId(), IotProtocolTypeEnum.OPC_UA_CLIENT.getType());
 
         // 调用：新增
@@ -66,17 +64,18 @@ public class IotDeviceOpcUaConfigServiceImplTest extends BaseDbUnitTest {
         IotDeviceOpcUaConfigDO config = opcUaConfigMapper.selectByDeviceId(reqVO.getDeviceId());
         assertPojoEquals(reqVO, config, "id");
         assertEquals("opc.tcp://192.168.1.10:4840/server", config.getEndpointUrl());
-        assertEquals("", config.getCredentialAlias());
+        assertEquals(AUTH_USERNAME, config.getAuthType());
+        assertEquals("plc-reader", config.getCredentialAlias());
 
         // 调用：再次保存为更新（每台设备一份配置）
         IotDeviceOpcUaConfigSaveReqVO updateReqVO = newSaveReqVO().setDeviceId(reqVO.getDeviceId())
-                .setAuthType(AUTH_USERNAME).setCredentialAlias("plc-reader").setTimeout(8000);
+                .setCredentialAlias("plc-writer").setTimeout(8000);
         opcUaConfigService.saveDeviceOpcUaConfig(updateReqVO);
         // 断言
         List<IotDeviceOpcUaConfigDO> list = opcUaConfigMapper.selectList();
         assertEquals(1, list.size());
         assertEquals(config.getId(), list.get(0).getId());
-        assertEquals("plc-reader", list.get(0).getCredentialAlias());
+        assertEquals("plc-writer", list.get(0).getCredentialAlias());
         assertEquals(8000, list.get(0).getTimeout());
     }
 
@@ -93,7 +92,8 @@ public class IotDeviceOpcUaConfigServiceImplTest extends BaseDbUnitTest {
     public void testSaveDeviceOpcUaConfig_endpointInvalid() {
         for (String endpointUrl : Arrays.asList("http://192.168.1.10:4840", "opc.tcp://192.168.1.10",
                 "opc.tcp://user:pass@192.168.1.10:4840", "opc.tcp://192.168.1.10:70000", "not a url", " ",
-                "opc.tcp://192.168.1.10:4840/server?x=1", "opc.tcp://192.168.1.10:4840/server#a")) {
+                "opc.tcp://192.168.1.10:4840/server?x=1", "opc.tcp://192.168.1.10:4840/server#a",
+                " opc.tcp://192.168.1.10:4840/server ")) { // 首尾空白：拒绝，不自动去掉
             IotDeviceOpcUaConfigSaveReqVO reqVO = newSaveReqVO().setEndpointUrl(endpointUrl);
 
             // 调用，并断言异常：参数校验不通过，不进入业务校验
@@ -105,28 +105,24 @@ public class IotDeviceOpcUaConfigServiceImplTest extends BaseDbUnitTest {
 
     @Test
     public void testSaveDeviceOpcUaConfig_securityInvalid() {
-        // None 策略只能配合 None 模式；其它策略不能配合 None 模式
-        assertThrows(ConstraintViolationException.class, () -> opcUaConfigService.saveDeviceOpcUaConfig(
-                newSaveReqVO().setSecurityPolicy("None").setSecurityMode("Sign")));
-        assertThrows(ConstraintViolationException.class, () -> opcUaConfigService.saveDeviceOpcUaConfig(
-                newSaveReqVO().setSecurityMode("None")));
+        // 只支持用户名认证，口令必须加密传输：None 策略、None / Sign 模式都不允许保存
+        for (String[] security : new String[][]{{"None", "None"}, {"None", "Sign"}, {"None", "SignAndEncrypt"},
+                {"Basic256Sha256", "None"}, {"Basic256Sha256", "Sign"}}) {
+            assertThrows(ConstraintViolationException.class, () -> opcUaConfigService.saveDeviceOpcUaConfig(
+                    newSaveReqVO().setSecurityPolicy(security[0]).setSecurityMode(security[1])),
+                    security[0] + "/" + security[1]);
+        }
         verifyNoInteractions(deviceService);
-
-        // None 策略配合 None 模式：允许保存（网关默认拒绝，显式开启开关才放行）
-        IotDeviceOpcUaConfigSaveReqVO reqVO = newSaveReqVO().setSecurityPolicy("None").setSecurityMode("None");
-        mockDevice(reqVO.getDeviceId(), IotProtocolTypeEnum.OPC_UA_CLIENT.getType());
-        opcUaConfigService.saveDeviceOpcUaConfig(reqVO);
-        assertEquals("None", opcUaConfigMapper.selectByDeviceId(reqVO.getDeviceId()).getSecurityPolicy());
     }
 
     @Test
     public void testSaveDeviceOpcUaConfig_authInvalid() {
-        // 用户名认证：必须 SignAndEncrypt
+        // 只支持用户名认证：匿名不允许保存
         assertThrows(ConstraintViolationException.class, () -> opcUaConfigService.saveDeviceOpcUaConfig(
-                newSaveReqVO().setSecurityMode("Sign").setAuthType(AUTH_USERNAME).setCredentialAlias("plc-reader")));
+                newSaveReqVO().setAuthType(AUTH_ANONYMOUS).setCredentialAlias("")));
         // 用户名认证：必须填写凭据别名
         assertThrows(ConstraintViolationException.class, () -> opcUaConfigService.saveDeviceOpcUaConfig(
-                newSaveReqVO().setAuthType(AUTH_USERNAME).setCredentialAlias(" ")));
+                newSaveReqVO().setCredentialAlias(" ")));
         verifyNoInteractions(deviceService);
     }
 
@@ -182,7 +178,7 @@ public class IotDeviceOpcUaConfigServiceImplTest extends BaseDbUnitTest {
         return new IotDeviceOpcUaConfigSaveReqVO().setDeviceId(randomLongId())
                 .setEndpointUrl("opc.tcp://192.168.1.10:4840/server")
                 .setSecurityPolicy("Basic256Sha256").setSecurityMode("SignAndEncrypt")
-                .setAuthType(AUTH_ANONYMOUS).setCredentialAlias("")
+                .setAuthType(AUTH_USERNAME).setCredentialAlias("plc-reader")
                 .setTimeout(5000).setRetryInterval(10000).setStatus(CommonStatusEnum.ENABLE.getStatus());
     }
 
@@ -190,7 +186,7 @@ public class IotDeviceOpcUaConfigServiceImplTest extends BaseDbUnitTest {
         return IotDeviceOpcUaConfigDO.builder().deviceId(deviceId)
                 .endpointUrl("opc.tcp://192.168.1.10:4840/server")
                 .securityPolicy("Basic256Sha256").securityMode("SignAndEncrypt")
-                .authType(AUTH_ANONYMOUS).credentialAlias("")
+                .authType(AUTH_USERNAME).credentialAlias("plc-reader")
                 .timeout(5000).retryInterval(10000).status(status).build();
     }
 

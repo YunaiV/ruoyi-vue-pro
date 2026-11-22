@@ -146,4 +146,16 @@ public interface ErrorCodeConstants {
     ErrorCode DEVICE_OPC_UA_POINT_DEVICE_MISMATCH = new ErrorCode(1_050_016_004, "点位不属于该设备，不能修改");
     ErrorCode DEVICE_OPC_UA_POINT_WRITABLE_INVALID = new ErrorCode(1_050_016_005, "物模型属性为只读，点位不能设为可写");
 
+    // ========== OPC UA Server 配置 1-050-017-000 ==========
+    ErrorCode OPC_UA_SERVER_CONFIG_NOT_EXISTS = new ErrorCode(1_050_017_000, "OPC UA Server 配置不存在");
+    ErrorCode OPC_UA_SERVER_CONFIG_CREDENTIAL_ALIAS_EXISTS = new ErrorCode(1_050_017_001, "凭据别名已被其它 OPC UA Server 配置使用");
+    ErrorCode OPC_UA_SERVER_CONFIG_HAS_NODES = new ErrorCode(1_050_017_002, "OPC UA Server 配置下还有节点，不能删除");
+
+    // ========== OPC UA Server 节点 1-050-018-000 ==========
+    ErrorCode OPC_UA_SERVER_NODE_NOT_EXISTS = new ErrorCode(1_050_018_000, "OPC UA Server 节点不存在");
+    ErrorCode OPC_UA_SERVER_NODE_BROWSE_NAME_EXISTS = new ErrorCode(1_050_018_001, "该配置下已存在相同浏览名称的节点");
+    ErrorCode OPC_UA_SERVER_NODE_EXISTS = new ErrorCode(1_050_018_002, "该设备属性已在此配置下暴露为节点");
+    ErrorCode OPC_UA_SERVER_NODE_THING_MODEL_INVALID = new ErrorCode(1_050_018_003, "物模型不是该设备所属产品的属性");
+    ErrorCode OPC_UA_SERVER_NODE_CONFIG_MISMATCH = new ErrorCode(1_050_018_004, "节点不属于该配置，不能修改");
+
 }

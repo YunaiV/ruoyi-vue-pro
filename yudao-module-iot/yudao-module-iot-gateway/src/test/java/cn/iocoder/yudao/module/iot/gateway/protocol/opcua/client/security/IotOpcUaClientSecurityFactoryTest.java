@@ -70,24 +70,31 @@ public class IotOpcUaClientSecurityFactoryTest {
     // ========== validateDevice ==========
 
     @Test
-    public void testValidateDevice_anonymousSignAndEncrypt() {
-        IotOpcUaClientSecurityFactory factory = new IotOpcUaClientSecurityFactory(new IotOpcUaClientConfig());
-        assertNull(factory.validateDevice(newDevice("Basic256Sha256", "SignAndEncrypt", AUTH_ANONYMOUS, "")));
-        assertNull(factory.validateDevice(newDevice("Aes256_Sha256_RsaPss", "Sign", AUTH_ANONYMOUS, "")));
+    public void testValidateDevice_anonymousRejected() {
+        IotOpcUaClientSecurityFactory factory = new IotOpcUaClientSecurityFactory(newUsernameConfig());
+        // 只支持用户名认证：匿名一律拒绝，不论安全策略、模式
+        for (String[] security : new String[][]{{"Basic256Sha256", "SignAndEncrypt"},
+                {"Aes256_Sha256_RsaPss", "Sign"}, {"None", "None"}}) {
+            String reason = factory.validateDevice(newDevice(security[0], security[1], AUTH_ANONYMOUS, ""));
+            assertNotNull(reason, security[0] + "/" + security[1]);
+            assertTrue(reason.contains("只支持用户名认证"), reason);
+        }
+        // 历史数据中的匿名设备即使带了已配置的凭据别名，也拒绝
+        assertNotNull(factory.validateDevice(newDevice("Basic256Sha256", "SignAndEncrypt", AUTH_ANONYMOUS, "reader")));
     }
 
     @Test
-    public void testValidateDevice_none() {
-        IotOpcUaClientConfig config = new IotOpcUaClientConfig();
-        IotOpcUaClientSecurityFactory factory = new IotOpcUaClientSecurityFactory(config);
-        // 默认拒绝 None
-        assertNotNull(factory.validateDevice(newDevice("None", "None", AUTH_ANONYMOUS, "")));
-        // 开启后只允许匿名；策略与模式必须同为 None
-        config.setSecurityNoneAllowed(true);
-        assertNull(factory.validateDevice(newDevice("None", "None", AUTH_ANONYMOUS, "")));
-        assertNotNull(factory.validateDevice(newDevice("None", "None", AUTH_USERNAME, "reader")));
-        assertNotNull(factory.validateDevice(newDevice("None", "Sign", AUTH_ANONYMOUS, "")));
-        assertNotNull(factory.validateDevice(newDevice("Basic256Sha256", "None", AUTH_ANONYMOUS, "")));
+    public void testValidateDevice_securityRejected() {
+        IotOpcUaClientSecurityFactory factory = new IotOpcUaClientSecurityFactory(newUsernameConfig());
+        // 用户名认证的口令不能明文传输：None 策略、None / Sign 模式都拒绝
+        for (String[] security : new String[][]{{"None", "None"}, {"None", "SignAndEncrypt"},
+                {"Basic256Sha256", "Sign"}, {"Basic256Sha256", "None"}}) {
+            assertNotNull(factory.validateDevice(newDevice(security[0], security[1], AUTH_USERNAME, "reader")),
+                    security[0] + "/" + security[1]);
+        }
+        // 未知的安全策略、认证方式
+        assertNotNull(factory.validateDevice(newDevice("Unknown", "SignAndEncrypt", AUTH_USERNAME, "reader")));
+        assertNotNull(factory.validateDevice(newDevice("Basic256Sha256", "SignAndEncrypt", 99, "reader")));
     }
 
     @Test
@@ -111,17 +118,25 @@ public class IotOpcUaClientSecurityFactoryTest {
         IotOpcUaDeviceConfigRespDTO otherEndpoint = newDevice("Basic256Sha256", "SignAndEncrypt", AUTH_USERNAME, "reader");
         otherEndpoint.setEndpointUrl("opc.tcp://192.168.1.11:4840/server");
         assertNotNull(factory.validateDevice(otherEndpoint));
+        // 凭据没有配置允许的租户时拒绝
+        credential.setTenantIds(Collections.<Long>emptyList());
+        assertNotNull(factory.validateDevice(newDevice("Basic256Sha256", "SignAndEncrypt", AUTH_USERNAME, "reader")));
     }
 
     @Test
-    public void testValidateDevice_tenantWhitelistAndEndpoint() {
-        IotOpcUaClientConfig config = new IotOpcUaClientConfig();
-        config.setTenantIds(Collections.singletonList(2L));
+    public void testValidateDevice_anyTenantAndEndpoint() {
+        IotOpcUaClientConfig config = newUsernameConfig();
+        config.getCredentials().get("reader").setTenantIds(Arrays.asList(1L, 2L));
         IotOpcUaClientSecurityFactory factory = new IotOpcUaClientSecurityFactory(config);
-        assertNotNull(factory.validateDevice(newDevice("Basic256Sha256", "SignAndEncrypt", AUTH_ANONYMOUS, "")));
+        // 网关不绑定租户：只受凭据级 tenant-ids 限制，凭据允许的租户都可以使用
+        IotOpcUaDeviceConfigRespDTO otherTenant = newDevice("Basic256Sha256", "SignAndEncrypt", AUTH_USERNAME, "reader");
+        otherTenant.setTenantId(2L);
+        assertNull(factory.validateDevice(otherTenant));
+        otherTenant.setTenantId(3L);
+        assertNotNull(factory.validateDevice(otherTenant));
 
-        config.setTenantIds(Collections.emptyList());
-        IotOpcUaDeviceConfigRespDTO device = newDevice("Basic256Sha256", "SignAndEncrypt", AUTH_ANONYMOUS, "");
+        // 端点地址不正确
+        IotOpcUaDeviceConfigRespDTO device = newDevice("Basic256Sha256", "SignAndEncrypt", AUTH_USERNAME, "reader");
         device.setEndpointUrl("http://192.168.1.10:4840");
         assertNotNull(factory.validateDevice(device));
         device.setEndpointUrl("opc.tcp://user@192.168.1.10:4840");
@@ -171,11 +186,11 @@ public class IotOpcUaClientSecurityFactoryTest {
 
     @Test
     public void testBuildSessionKey() {
-        IotOpcUaDeviceConfigRespDTO device = newDevice("Basic256Sha256", "SignAndEncrypt", AUTH_ANONYMOUS, "");
+        IotOpcUaDeviceConfigRespDTO device = newDevice("Basic256Sha256", "SignAndEncrypt", AUTH_USERNAME, "reader");
         device.setTimeout(5000);
         String key = IotOpcUaClientSecurityFactory.buildSessionKey(device);
         // 同一租户、端点、安全配置、超时时间：同一会话
-        IotOpcUaDeviceConfigRespDTO same = newDevice("Basic256Sha256", "SignAndEncrypt", AUTH_ANONYMOUS, "");
+        IotOpcUaDeviceConfigRespDTO same = newDevice("Basic256Sha256", "SignAndEncrypt", AUTH_USERNAME, "reader");
         same.setDeviceId(2L);
         same.setTimeout(5000);
         assertEquals(key, IotOpcUaClientSecurityFactory.buildSessionKey(same));
@@ -197,16 +212,28 @@ public class IotOpcUaClientSecurityFactoryTest {
     public void testSelectEndpoint_strictPolicyAndMode() {
         IotOpcUaClientSecurityFactory factory = new IotOpcUaClientSecurityFactory(new IotOpcUaClientConfig());
         List<EndpointDescription> endpoints = Arrays.asList(
-                newEndpoint(ENDPOINT, SecurityPolicy.Basic256Sha256, MessageSecurityMode.Sign, ANONYMOUS),
-                newEndpoint(ENDPOINT, SecurityPolicy.Basic256Sha256, MessageSecurityMode.SignAndEncrypt, ANONYMOUS));
+                newEndpoint(ENDPOINT, SecurityPolicy.Basic256Sha256, MessageSecurityMode.Sign, USERNAME_SECURE),
+                newEndpoint(ENDPOINT, SecurityPolicy.Basic256Sha256, MessageSecurityMode.SignAndEncrypt, USERNAME_SECURE));
 
         EndpointDescription endpoint = factory.selectEndpoint(endpoints,
-                newDevice("Basic256Sha256", "SignAndEncrypt", AUTH_ANONYMOUS, ""));
+                newDevice("Basic256Sha256", "SignAndEncrypt", AUTH_USERNAME, "reader"));
 
         assertEquals(MessageSecurityMode.SignAndEncrypt, endpoint.getSecurityMode());
         // 服务端没有该策略：拒绝（不降级）
         ServiceException exception = assertThrows(ServiceException.class, () -> factory.selectEndpoint(endpoints,
-                newDevice("Aes128_Sha256_RsaOaep", "SignAndEncrypt", AUTH_ANONYMOUS, "")));
+                newDevice("Aes128_Sha256_RsaOaep", "SignAndEncrypt", AUTH_USERNAME, "reader")));
+        assertEquals(OPC_UA_ENDPOINT_REJECTED.getCode(), exception.getCode());
+    }
+
+    @Test
+    public void testSelectEndpoint_anonymousTokenOnly() {
+        IotOpcUaClientSecurityFactory factory = new IotOpcUaClientSecurityFactory(new IotOpcUaClientConfig());
+        IotOpcUaDeviceConfigRespDTO device = newDevice("Basic256Sha256", "SignAndEncrypt", AUTH_USERNAME, "reader");
+        // 端点只提供 Anonymous 令牌：拒绝，不回退匿名
+        List<EndpointDescription> anonymousOnly = Collections.singletonList(newEndpoint(ENDPOINT,
+                SecurityPolicy.Basic256Sha256, MessageSecurityMode.SignAndEncrypt, ANONYMOUS));
+        ServiceException exception = assertThrows(ServiceException.class,
+                () -> factory.selectEndpoint(anonymousOnly, device));
         assertEquals(OPC_UA_ENDPOINT_REJECTED.getCode(), exception.getCode());
     }
 
@@ -229,14 +256,14 @@ public class IotOpcUaClientSecurityFactoryTest {
     @Test
     public void testSelectEndpoint_emptyTransportProfile() {
         IotOpcUaClientSecurityFactory factory = new IotOpcUaClientSecurityFactory(new IotOpcUaClientConfig());
-        IotOpcUaDeviceConfigRespDTO device = newDevice("Basic256Sha256", "SignAndEncrypt", AUTH_ANONYMOUS, "");
+        IotOpcUaDeviceConfigRespDTO device = newDevice("Basic256Sha256", "SignAndEncrypt", AUTH_USERNAME, "reader");
         EndpointDescription https = newEndpoint("https://192.168.1.10:4840/server", SecurityPolicy.Basic256Sha256,
-                MessageSecurityMode.SignAndEncrypt, (String) null, ANONYMOUS);
+                MessageSecurityMode.SignAndEncrypt, (String) null, USERNAME_SECURE);
         EndpointDescription tcp = newEndpoint(ENDPOINT, SecurityPolicy.Basic256Sha256,
-                MessageSecurityMode.SignAndEncrypt, "", ANONYMOUS);
+                MessageSecurityMode.SignAndEncrypt, "", USERNAME_SECURE);
         EndpointDescription websocket = newEndpoint(ENDPOINT, SecurityPolicy.Basic256Sha256,
                 MessageSecurityMode.SignAndEncrypt, "http://opcfoundation.org/UA-Profile/Transport/wss-uasc-uabinary",
-                ANONYMOUS);
+                USERNAME_SECURE);
 
         // 未返回传输协议 URI：兼容 opc.tcp:// 端点
         assertSame(tcp, factory.selectEndpoint(Arrays.asList(https, tcp), device));
@@ -270,8 +297,8 @@ public class IotOpcUaClientSecurityFactoryTest {
         IotOpcUaClientConfig config = new IotOpcUaClientConfig();
         IotOpcUaClientSecurityFactory factory = new IotOpcUaClientSecurityFactory(config);
         List<EndpointDescription> endpoints = Collections.singletonList(newEndpoint("opc.tcp://plc-host:4840/server",
-                SecurityPolicy.Basic256Sha256, MessageSecurityMode.SignAndEncrypt, ANONYMOUS));
-        IotOpcUaDeviceConfigRespDTO device = newDevice("Basic256Sha256", "SignAndEncrypt", AUTH_ANONYMOUS, "");
+                SecurityPolicy.Basic256Sha256, MessageSecurityMode.SignAndEncrypt, USERNAME_SECURE));
+        IotOpcUaDeviceConfigRespDTO device = newDevice("Basic256Sha256", "SignAndEncrypt", AUTH_USERNAME, "reader");
 
         // 默认拒绝
         assertThrows(ServiceException.class, () -> factory.selectEndpoint(endpoints, device));
@@ -285,17 +312,17 @@ public class IotOpcUaClientSecurityFactoryTest {
         IotOpcUaClientSecurityFactory factory = new IotOpcUaClientSecurityFactory(new IotOpcUaClientConfig());
         // 配置的路径 /server 没有该策略的端点，只有 /other 有：拒绝，不换到其它路径
         List<EndpointDescription> otherPathOnly = Arrays.asList(
-                newEndpoint(ENDPOINT, SecurityPolicy.Basic256Sha256, MessageSecurityMode.Sign, ANONYMOUS),
+                newEndpoint(ENDPOINT, SecurityPolicy.Basic256Sha256, MessageSecurityMode.Sign, USERNAME_SECURE),
                 newEndpoint("opc.tcp://192.168.1.10:4840/other", SecurityPolicy.Basic256Sha256,
-                        MessageSecurityMode.SignAndEncrypt, ANONYMOUS));
-        IotOpcUaDeviceConfigRespDTO device = newDevice("Basic256Sha256", "SignAndEncrypt", AUTH_ANONYMOUS, "");
+                        MessageSecurityMode.SignAndEncrypt, USERNAME_SECURE));
+        IotOpcUaDeviceConfigRespDTO device = newDevice("Basic256Sha256", "SignAndEncrypt", AUTH_USERNAME, "reader");
         ServiceException exception = assertThrows(ServiceException.class, () -> factory.selectEndpoint(otherPathOnly, device));
         assertEquals(OPC_UA_ENDPOINT_REJECTED.getCode(), exception.getCode());
 
         // 末尾的 / 不影响路径匹配
         device.setEndpointUrl(ENDPOINT + "/");
         List<EndpointDescription> samePath = Collections.singletonList(newEndpoint(ENDPOINT, SecurityPolicy.Basic256Sha256,
-                MessageSecurityMode.SignAndEncrypt, ANONYMOUS));
+                MessageSecurityMode.SignAndEncrypt, USERNAME_SECURE));
         assertEquals(ENDPOINT, factory.selectEndpoint(samePath, device).getEndpointUrl());
 
         // 根路径：优先根路径的端点；没有时可以选择其它路径
@@ -303,9 +330,9 @@ public class IotOpcUaClientSecurityFactoryTest {
         assertEquals("opc.tcp://192.168.1.10:4840/other", factory.selectEndpoint(otherPathOnly, device).getEndpointUrl());
         List<EndpointDescription> withRoot = Arrays.asList(
                 newEndpoint("opc.tcp://192.168.1.10:4840/other", SecurityPolicy.Basic256Sha256,
-                        MessageSecurityMode.SignAndEncrypt, ANONYMOUS),
+                        MessageSecurityMode.SignAndEncrypt, USERNAME_SECURE),
                 newEndpoint("opc.tcp://192.168.1.10:4840/", SecurityPolicy.Basic256Sha256,
-                        MessageSecurityMode.SignAndEncrypt, ANONYMOUS));
+                        MessageSecurityMode.SignAndEncrypt, USERNAME_SECURE));
         assertEquals("opc.tcp://192.168.1.10:4840/", factory.selectEndpoint(withRoot, device).getEndpointUrl());
     }
 
@@ -315,11 +342,11 @@ public class IotOpcUaClientSecurityFactoryTest {
         // 服务端同时返回主机名、IP 两个地址：选择与配置一致的，不需要开启改写
         List<EndpointDescription> endpoints = Arrays.asList(
                 newEndpoint("opc.tcp://plc-host:4840/server", SecurityPolicy.Basic256Sha256,
-                        MessageSecurityMode.SignAndEncrypt, ANONYMOUS),
-                newEndpoint(ENDPOINT, SecurityPolicy.Basic256Sha256, MessageSecurityMode.SignAndEncrypt, ANONYMOUS));
+                        MessageSecurityMode.SignAndEncrypt, USERNAME_SECURE),
+                newEndpoint(ENDPOINT, SecurityPolicy.Basic256Sha256, MessageSecurityMode.SignAndEncrypt, USERNAME_SECURE));
 
         EndpointDescription endpoint = factory.selectEndpoint(endpoints,
-                newDevice("Basic256Sha256", "SignAndEncrypt", AUTH_ANONYMOUS, ""));
+                newDevice("Basic256Sha256", "SignAndEncrypt", AUTH_USERNAME, "reader"));
 
         assertEquals(ENDPOINT, endpoint.getEndpointUrl());
     }
@@ -440,6 +467,20 @@ public class IotOpcUaClientSecurityFactoryTest {
                 new GeneralNames(new GeneralName(GeneralName.uniformResourceIdentifier, applicationUri)));
         ContentSigner signer = new JcaContentSignerBuilder("SHA256withRSA").build(issuerKeyPair.getPrivate());
         return new JcaX509CertificateConverter().getCertificate(builder.build(signer));
+    }
+
+    /**
+     * 配置凭据 reader：允许租户 1、端点 {@link #ENDPOINT}
+     */
+    private static IotOpcUaClientConfig newUsernameConfig() {
+        IotOpcUaClientConfig config = new IotOpcUaClientConfig();
+        IotOpcUaClientConfig.Credential credential = new IotOpcUaClientConfig.Credential();
+        credential.setUsername("reader");
+        credential.setPassword("secret");
+        credential.setTenantIds(Collections.singletonList(1L));
+        credential.setEndpoints(Collections.singletonList(ENDPOINT));
+        config.getCredentials().put("reader", credential);
+        return config;
     }
 
     private static IotOpcUaDeviceConfigRespDTO newDevice(String policy, String mode, Integer authType, String alias) {

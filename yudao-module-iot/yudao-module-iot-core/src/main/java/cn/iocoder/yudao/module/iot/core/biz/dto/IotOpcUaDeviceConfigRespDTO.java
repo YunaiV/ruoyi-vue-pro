@@ -22,7 +22,7 @@ public class IotOpcUaDeviceConfigRespDTO {
      */
     private Long deviceId;
     /**
-     * 租户编号（网关按它校验租户白名单、凭据别名的租户）
+     * 租户编号（网关按它校验凭据别名允许的租户，并作为会话 key 的一部分，不同租户的设备不共用会话）
      */
     private Long tenantId;
     /**
