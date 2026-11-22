@@ -82,7 +82,7 @@
         <okio.version>3.18.1</okio.version>
         <californium.version>3.14.0</californium.version>
         <j2mod.version>3.4.0</j2mod.version>
-        <milo.version>1.1.8</milo.version>
+        <yudao-milo.version>1.2.0-RC3-preview-20261123</yudao-milo.version>
         <rhino.version>1.9.2</rhino.version>
         <!-- 三方云服务相关 -->
         <awssdk.version>2.59.4</awssdk.version>
@@ -720,16 +720,13 @@
                 <version>${j2mod.version}</version>
             </dependency>
 
-            <!-- OPC UA 相关 - Eclipse Milo（1.x 需要 JDK 17+） -->
+            <!-- OPC UA 相关 - 芋道 Milo（JDK 17/25 使用 yudao-milo-bom；JDK 8 分支使用 yudao-milo-jdk8-bom 及 -jdk8 版本） -->
             <dependency>
-                <groupId>org.eclipse.milo</groupId>
-                <artifactId>milo-sdk-client</artifactId>
-                <version>${milo.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.milo</groupId>
-                <artifactId>milo-sdk-server</artifactId>
-                <version>${milo.version}</version>
+                <groupId>cn.iocoder.boot</groupId>
+                <artifactId>yudao-milo-bom</artifactId>
+                <version>${yudao-milo.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
 
             <!-- JS 脚本引擎 -->
