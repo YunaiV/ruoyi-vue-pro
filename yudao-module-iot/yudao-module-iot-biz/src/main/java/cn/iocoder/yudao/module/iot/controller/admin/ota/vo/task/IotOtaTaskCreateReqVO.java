@@ -1,8 +1,12 @@
 package cn.iocoder.yudao.module.iot.controller.admin.ota.vo.task;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.iot.enums.ota.IotOtaTaskDeviceScopeEnum;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -29,9 +33,14 @@ public class IotOtaTaskCreateReqVO {
     @InEnum(value = IotOtaTaskDeviceScopeEnum.class)
     private Integer deviceScope;
 
-    @Schema(description = "选中的设备编号数组", requiredMode = Schema.RequiredMode.REQUIRED, example = "1,2,3")
+    @Schema(description = "选中的设备编号数组（升级范围为指定设备时必填）", example = "1,2,3")
     private List<Long> deviceIds;
 
-    // TODO @li：如果 deviceScope 等于 2 时，deviceIds 校验非空；
+    @AssertTrue(message = "升级范围为指定设备时，选中的设备不能为空")
+    @JsonIgnore
+    public boolean isDeviceIdsValid() {
+        return ObjUtil.notEqual(IotOtaTaskDeviceScopeEnum.SELECT.getScope(), deviceScope)
+                || CollUtil.isNotEmpty(deviceIds);
+    }
 
 }

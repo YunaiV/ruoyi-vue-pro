@@ -14,79 +14,71 @@ Authorization: Bearer {{token}}
   }
 }
 
-### 请求 /iot/device/downstream 接口（服务调用）=> 成功 TODO 芋艿：未更新为最新
-POST {{baseUrl}}/iot/device/downstream
+### 请求 /iot/device/message/send 接口（属性设置：params 为可写属性的标识符与值）=> 成功
+POST {{baseUrl}}/iot/device/message/send
 Content-Type: application/json
 tenant-id: {{adminTenantId}}
 Authorization: Bearer {{token}}
 
 {
-  "id": 25,
-  "type": "service",
-  "identifier": "temperature",
-  "data": {
-    "xx": "yy"
+  "deviceId": 25,
+  "method": "thing.property.set",
+  "params": {
+    "width": 1
   }
 }
 
-### 请求 /iot/device/downstream 接口（属性设置）=> 成功 TODO 芋艿：未更新为最新
-POST {{baseUrl}}/iot/device/downstream
+### 请求 /iot/device/message/send 接口（服务调用）=> 成功
+POST {{baseUrl}}/iot/device/message/send
 Content-Type: application/json
 tenant-id: {{adminTenantId}}
 Authorization: Bearer {{token}}
 
 {
-  "id": 25,
-  "type": "property",
-  "identifier": "set",
-  "data": {
-    "xx": "yy"
+  "deviceId": 25,
+  "method": "thing.service.invoke",
+  "params": {
+    "identifier": "temperature",
+    "inputParams": {
+      "xx": "yy"
+    }
   }
 }
 
-### 请求 /iot/device/downstream 接口（属性获取）=> 成功 TODO 芋艿：未更新为最新
-POST {{baseUrl}}/iot/device/downstream
+### 请求 /iot/device/message/send 接口（配置推送）=> 成功
+POST {{baseUrl}}/iot/device/message/send
 Content-Type: application/json
 tenant-id: {{adminTenantId}}
 Authorization: Bearer {{token}}
 
 {
-  "id": 25,
-  "type": "property",
-  "identifier": "get",
-  "data": ["xx", "yy"]
-}
-
-### 请求 /iot/device/downstream 接口（配置设置）=> 成功 TODO 芋艿：未更新为最新
-POST {{baseUrl}}/iot/device/downstream
-Content-Type: application/json
-tenant-id: {{adminTenantId}}
-Authorization: Bearer {{token}}
-
-{
-  "id": 25,
-  "type": "config",
-  "identifier": "set"
-}
-
-### 请求 /iot/device/downstream 接口（OTA 升级）=> 成功 TODO 芋艿：未更新为最新
-POST {{baseUrl}}/iot/device/downstream
-Content-Type: application/json
-tenant-id: {{adminTenantId}}
-Authorization: Bearer {{token}}
-
-{
-  "id": 25,
-  "type": "ota",
-  "identifier": "upgrade",
-  "data": {
-    "firmwareId": 1,
-    "version": "1.0.0",
+  "deviceId": 25,
+  "method": "thing.config.push",
+  "params": {
+    "configId": "1",
+    "configSize": 1024,
     "signMethod": "MD5",
-    "fileSign": "d41d8cd98f00b204e9800998ecf8427e",
-    "fileSize": 1024,
+    "sign": "d41d8cd98f00b204e9800998ecf8427e",
+    "url": "http://example.com/config.json",
+    "getType": "file"
+  }
+}
+
+### 请求 /iot/device/message/send 接口（OTA 固件信息推送）=> 成功
+POST {{baseUrl}}/iot/device/message/send
+Content-Type: application/json
+tenant-id: {{adminTenantId}}
+Authorization: Bearer {{token}}
+
+{
+  "deviceId": 25,
+  "method": "thing.ota.upgrade",
+  "params": {
+    "version": "1.0.0",
     "fileUrl": "http://example.com/firmware.bin",
-    "information": "{\"desc\":\"升级到最新版本\"}"
+    "fileSize": 1024,
+    "fileDigestAlgorithm": "MD5",
+    "fileDigestValue": "d41d8cd98f00b204e9800998ecf8427e"
   }
 }
 
