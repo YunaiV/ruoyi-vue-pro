@@ -2,6 +2,7 @@ package cn.iocoder.yudao.module.iot.gateway.service.device.message;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.iocoder.yudao.framework.common.exception.ErrorCode;
 import cn.iocoder.yudao.framework.common.exception.ServiceException;
@@ -17,6 +18,7 @@ import cn.iocoder.yudao.module.iot.core.script.IotScriptUtils;
 import cn.iocoder.yudao.module.iot.core.script.dto.IotScriptResult;
 import cn.iocoder.yudao.module.iot.core.script.dto.IotScriptSource;
 import cn.iocoder.yudao.module.iot.core.script.rhino.IotRhinoScriptExecutor;
+import cn.iocoder.yudao.module.iot.core.topic.property.IotDevicePropertySetResultDTO;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties;
 import cn.iocoder.yudao.module.iot.gateway.serialize.IotMessageSerializer;
@@ -30,6 +32,8 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
+
+import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.enums.GlobalErrorCodeConstants.SUCCESS;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -385,6 +389,36 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
             return;
         }
         reply.setRaw(IotDeviceMessageUtils.encodeRaw(payload));
+        sendDeviceMessage(reply, device, serverId, null);
+    }
+
+    // ========== 属性设置回复 ==========
+
+    @Override
+    public void sendPropertySetReply(IotDeviceMessage request, Map<String, IotDevicePropertySetResultDTO> results,
+                                     ErrorCode failure, String serverId) {
+        IotDeviceRespDTO device = deviceService.getDeviceFromCache(request.getDeviceId());
+        if (device == null) {
+            log.warn("[sendPropertySetReply][设备({}) 不存在]", request.getDeviceId());
+            return;
+        }
+        // 1.1 整条消息失败：没有逐项结果；逐项回复却没有任何结果时，同样按整条失败回复，避免误回成功
+        if (failure == null && MapUtil.isEmpty(results)) {
+            log.warn("[sendPropertySetReply][设备({}) 属性设置({}) 没有结果]", request.getDeviceId(), request.getRequestId());
+            failure = DEVICE_OFFLINE_OR_WRITE_FAILED;
+        }
+        IotDeviceMessage reply;
+        if (failure != null) {
+            reply = IotDeviceMessage.replyOf(request.getRequestId(), request.getMethod(), null,
+                    failure.getCode(), failure.getMsg());
+        } else {
+            // 1.2 逐项回复：全部成功时为成功，有失败（含缺失的结果）时整体为 PROPERTY_SET_FAILED
+            long failedCount = results.values().stream().filter(result -> result == null || !result.succeeded()).count();
+            Integer code = failedCount > 0 ? PROPERTY_SET_FAILED.getCode() : null;
+            String msg = failedCount > 0 ? StrUtil.format(PROPERTY_SET_FAILED.getMsg(), results.size(), failedCount) : null;
+            reply = IotDeviceMessage.replyOf(request.getRequestId(), request.getMethod(), results, code, msg);
+        }
+        // 2. 发送
         sendDeviceMessage(reply, device, serverId, null);
     }
 

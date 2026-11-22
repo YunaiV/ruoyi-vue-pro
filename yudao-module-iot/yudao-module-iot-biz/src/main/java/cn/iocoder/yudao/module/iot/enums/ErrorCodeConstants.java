@@ -55,6 +55,8 @@ public interface ErrorCodeConstants {
     ErrorCode DEVICE_MESSAGE_RAW_PAYLOAD_INVALID = new ErrorCode(1_050_003_400, "透传载荷不合法：{}");
     ErrorCode DEVICE_MESSAGE_RAW_PROTOCOL_NOT_SUPPORTED = new ErrorCode(1_050_003_401, "协议({}) 不支持透传下发");
     ErrorCode DEVICE_MESSAGE_RAW_METHOD_RESERVED = new ErrorCode(1_050_003_402, "透传上报只能由网关创建");
+    ErrorCode DEVICE_MESSAGE_PROPERTY_SET_PARAMS_INVALID = new ErrorCode(1_050_003_410, "属性设置参数需要是非空的属性 Map（属性标识符 → 属性值）");
+    ErrorCode DEVICE_MESSAGE_PROPERTY_NOT_WRITABLE = new ErrorCode(1_050_003_411, "属性({}) 不存在或不可写（物模型读写类型需要为读写）");
 
     // ========== 产品分类 1-050-004-000 ==========
     ErrorCode PRODUCT_CATEGORY_NOT_EXISTS = new ErrorCode(1_050_004_000, "产品分类不存在");
@@ -134,5 +136,32 @@ public interface ErrorCodeConstants {
 
     // ========== IoT 告警记录 1-050-014-000 ==========
     ErrorCode ALERT_RECORD_NOT_EXISTS = new ErrorCode(1_050_014_000, "IoT 告警记录不存在");
+
+    // ========== 设备 OPC UA 配置 1-050-015-000 ==========
+    ErrorCode DEVICE_OPC_UA_CONFIG_NOT_EXISTS = new ErrorCode(1_050_015_000, "设备 OPC UA 连接配置不存在");
+    ErrorCode DEVICE_OPC_UA_CONFIG_PROTOCOL_INVALID = new ErrorCode(1_050_015_001, "产品协议不是 OPC UA Client，不能配置 OPC UA 连接和点位");
+    ErrorCode DEVICE_OPC_UA_DOWNSTREAM_NOT_SUPPORTED = new ErrorCode(1_050_015_100,
+            "OPC UA 设备只支持属性设置下发，不支持服务调用、透传、配置推送、OTA 等下行消息");
+    ErrorCode DEVICE_OPC_UA_POINT_NOT_WRITABLE = new ErrorCode(1_050_015_101, "属性({}) 没有启用且可写的 OPC UA 点位");
+
+    // ========== 设备 OPC UA 点位 1-050-016-000 ==========
+    ErrorCode DEVICE_OPC_UA_POINT_NOT_EXISTS = new ErrorCode(1_050_016_000, "设备 OPC UA 点位配置不存在");
+    ErrorCode DEVICE_OPC_UA_POINT_EXISTS = new ErrorCode(1_050_016_001, "该物模型属性已配置 OPC UA 点位");
+    ErrorCode DEVICE_OPC_UA_POINT_THING_MODEL_INVALID = new ErrorCode(1_050_016_002, "物模型不是该设备所属产品的属性");
+    ErrorCode DEVICE_OPC_UA_POINT_NODE_ID_INVALID = new ErrorCode(1_050_016_003, "NodeId 格式不正确：{}");
+    ErrorCode DEVICE_OPC_UA_POINT_DEVICE_MISMATCH = new ErrorCode(1_050_016_004, "点位不属于该设备，不能修改");
+    ErrorCode DEVICE_OPC_UA_POINT_WRITABLE_INVALID = new ErrorCode(1_050_016_005, "物模型属性为只读，点位不能设为可写");
+
+    // ========== OPC UA Server 配置 1-050-017-000 ==========
+    ErrorCode OPC_UA_SERVER_CONFIG_NOT_EXISTS = new ErrorCode(1_050_017_000, "OPC UA Server 配置不存在");
+    ErrorCode OPC_UA_SERVER_CONFIG_CREDENTIAL_ALIAS_EXISTS = new ErrorCode(1_050_017_001, "凭据别名已被其它 OPC UA Server 配置使用");
+    ErrorCode OPC_UA_SERVER_CONFIG_HAS_NODES = new ErrorCode(1_050_017_002, "OPC UA Server 配置下还有节点，不能删除");
+
+    // ========== OPC UA Server 节点 1-050-018-000 ==========
+    ErrorCode OPC_UA_SERVER_NODE_NOT_EXISTS = new ErrorCode(1_050_018_000, "OPC UA Server 节点不存在");
+    ErrorCode OPC_UA_SERVER_NODE_BROWSE_NAME_EXISTS = new ErrorCode(1_050_018_001, "该配置下已存在相同浏览名称的节点");
+    ErrorCode OPC_UA_SERVER_NODE_EXISTS = new ErrorCode(1_050_018_002, "该设备属性已在此配置下暴露为节点");
+    ErrorCode OPC_UA_SERVER_NODE_THING_MODEL_INVALID = new ErrorCode(1_050_018_003, "物模型不是该设备所属产品的属性");
+    ErrorCode OPC_UA_SERVER_NODE_CONFIG_MISMATCH = new ErrorCode(1_050_018_004, "节点不属于该配置，不能修改");
 
 }

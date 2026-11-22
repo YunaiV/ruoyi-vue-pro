@@ -1,13 +1,16 @@
 package cn.iocoder.yudao.module.iot.controller.admin.product.vo.product;
 
+import cn.hutool.core.util.ObjUtil;
 import cn.iocoder.yudao.framework.common.validation.InEnum;
 import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import cn.iocoder.yudao.module.iot.core.enums.IotSerializeTypeEnum;
 import cn.iocoder.yudao.module.iot.enums.product.IotNetTypeEnum;
 import cn.iocoder.yudao.module.iot.enums.product.IotProductDeviceTypeEnum;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -60,5 +63,14 @@ public class IotProductSaveReqVO {
     @Schema(description = "是否开启动态注册", example = "false")
     @NotNull(message = "是否开启动态注册不能为空")
     private Boolean registerEnabled;
+
+    /**
+     * OPC UA Server 是网关的北向数据服务，不是设备接入协议，产品不能选择
+     */
+    @AssertTrue(message = "协议类型不能是 OPC UA Server")
+    @JsonIgnore
+    public boolean isProtocolTypeValid() {
+        return ObjUtil.notEqual(IotProtocolTypeEnum.OPC_UA_SERVER.getType(), protocolType);
+    }
 
 }

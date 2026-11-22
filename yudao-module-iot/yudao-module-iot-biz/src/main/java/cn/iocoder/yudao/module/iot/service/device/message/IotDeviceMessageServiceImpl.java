@@ -30,9 +30,14 @@ import cn.iocoder.yudao.module.iot.core.topic.property.IotDevicePropertyPostReqD
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceMessageDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.device.IotDeviceOpcUaPointDO;
 import cn.iocoder.yudao.module.iot.dal.dataobject.product.IotProductDO;
+import cn.iocoder.yudao.module.iot.dal.dataobject.thingmodel.IotThingModelDO;
 import cn.iocoder.yudao.module.iot.dal.storage.IotDeviceMessageDAO;
 import cn.iocoder.yudao.module.iot.enums.product.IotProductDeviceTypeEnum;
+import cn.iocoder.yudao.module.iot.enums.thingmodel.IotThingModelAccessModeEnum;
+import cn.iocoder.yudao.module.iot.enums.thingmodel.IotThingModelTypeEnum;
+import cn.iocoder.yudao.module.iot.service.device.IotDeviceOpcUaPointService;
 import cn.iocoder.yudao.module.iot.service.device.IotDeviceService;
 import cn.iocoder.yudao.module.iot.service.device.property.IotDevicePropertyService;
 import cn.iocoder.yudao.module.iot.service.device.shadow.IotDeviceShadowService;
@@ -40,6 +45,7 @@ import cn.iocoder.yudao.module.iot.service.ota.IotOtaTaskRecordService;
 import cn.iocoder.yudao.module.iot.service.product.IotProductService;
 import cn.iocoder.yudao.module.iot.service.rule.data.IotDataRuleService;
 import cn.iocoder.yudao.module.iot.service.rule.scene.IotSceneRuleService;
+import cn.iocoder.yudao.module.iot.service.thingmodel.IotThingModelService;
 import com.google.common.base.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
@@ -53,16 +59,25 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Resource;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.invalidParamException;
 import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertList;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertMap;
+import static cn.iocoder.yudao.framework.common.util.collection.CollectionUtils.convertSet;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.DEVICE_DOWNSTREAM_FAILED_SERVER_ID_NULL;
+import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.DEVICE_MESSAGE_PROPERTY_NOT_WRITABLE;
+import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.DEVICE_MESSAGE_PROPERTY_SET_PARAMS_INVALID;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.DEVICE_MESSAGE_RAW_METHOD_RESERVED;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.DEVICE_MESSAGE_RAW_PAYLOAD_INVALID;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.DEVICE_MESSAGE_RAW_PROTOCOL_NOT_SUPPORTED;
+import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.DEVICE_OPC_UA_DOWNSTREAM_NOT_SUPPORTED;
+import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.DEVICE_OPC_UA_POINT_NOT_WRITABLE;
 import static cn.iocoder.yudao.module.iot.enums.ErrorCodeConstants.PRODUCT_NOT_EXISTS;
 
 /**
@@ -94,6 +109,12 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
     @Resource
     @Lazy // 延迟加载，避免循环依赖
     private IotDataRuleService dataRuleService;
+    @Resource
+    @Lazy // 延迟加载，避免循环依赖
+    private IotThingModelService thingModelService;
+    @Resource
+    @Lazy // 延迟加载，避免循环依赖
+    private IotDeviceOpcUaPointService opcUaPointService;
 
     @Resource
     private IotDeviceMessageDAO deviceMessageDAO;
@@ -168,6 +189,8 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
         }
 
         // 2.2 情况二：发送下行消息
+        // 校验协议的下行能力：OPC UA 只支持属性设置；OPC UA、Modbus 的属性设置校验物模型属性可写
+        validateDownstreamMessage(message, device);
         // 如果是下行消息，需要校验 serverId 存在
         // TODO 芋艿：【设计】下行消息需要区分 PUSH 和 PULL 模型
         // 1. PUSH 模型：适用于 MQTT 等长连接协议。通过 serverId 将消息路由到指定网关，实时推送。
@@ -205,13 +228,14 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
             return null;
         }
 
-        // 2. 校验产品协议：HTTP、CoAP 没有长连接，不支持透传下发
+        // 2. 校验产品协议：HTTP、CoAP 没有长连接，不支持透传下发；OPC UA 只支持属性设置，也不支持
         IotProductDO product = productService.getProductFromCache(device.getProductId());
         if (product == null) {
             throw exception(PRODUCT_NOT_EXISTS);
         }
         IotProtocolTypeEnum protocol = IotProtocolTypeEnum.of(product.getProtocolType());
-        if (protocol == IotProtocolTypeEnum.HTTP || protocol == IotProtocolTypeEnum.COAP) {
+        if (protocol == IotProtocolTypeEnum.HTTP || protocol == IotProtocolTypeEnum.COAP
+                || protocol == IotProtocolTypeEnum.OPC_UA_CLIENT) {
             throw exception(DEVICE_MESSAGE_RAW_PROTOCOL_NOT_SUPPORTED, product.getProtocolType());
         }
 
@@ -223,6 +247,82 @@ public class IotDeviceMessageServiceImpl implements IotDeviceMessageService {
         } catch (IllegalArgumentException e) {
             throw exception(DEVICE_MESSAGE_RAW_PAYLOAD_INVALID, e.getMessage());
         }
+    }
+
+    /**
+     * 校验下行消息（回复以外）：
+     * <ul>
+     *     <li>OPC UA：只支持属性设置；服务调用、配置推送、OTA、拓扑变更等都不下发；</li>
+     *     <li>OPC UA、Modbus 的属性设置：参数为非空的属性 Map，每个属性都是物模型中的读写属性；
+     *         OPC UA 还要求属性有启用且可写的点位（点位默认不可写）。</li>
+     * </ul>
+     * 产品不存在时无法判断协议，同样拒绝，避免绕过校验
+     *
+     * @param message 消息（下行）
+     * @param device  设备信息
+     */
+    private void validateDownstreamMessage(IotDeviceMessage message, IotDeviceDO device) {
+        if (IotDeviceMessageUtils.isReplyMessage(message)) {
+            return;
+        }
+        IotProductDO product = productService.getProductFromCache(device.getProductId());
+        if (product == null) {
+            throw exception(PRODUCT_NOT_EXISTS);
+        }
+        // 1. OPC UA 只支持属性设置
+        IotProtocolTypeEnum protocol = IotProtocolTypeEnum.of(product.getProtocolType());
+        boolean propertySet = IotDeviceMessageMethodEnum.PROPERTY_SET.getMethod().equals(message.getMethod());
+        if (protocol == IotProtocolTypeEnum.OPC_UA_CLIENT && !propertySet) {
+            throw exception(DEVICE_OPC_UA_DOWNSTREAM_NOT_SUPPORTED);
+        }
+        if (!propertySet || protocol == null || !(protocol.isOpcUa() || protocol.isModbus())) {
+            return;
+        }
+        // 2. 属性设置：物模型属性可写
+        Map<String, IotThingModelDO> thingModels = validatePropertySetWritable(message, device);
+        // 3. OPC UA：属性有启用且可写的点位
+        if (protocol.isOpcUa()) {
+            List<IotDeviceOpcUaPointDO> points = opcUaPointService.getEnabledDeviceOpcUaPointMapByDeviceIds(
+                    Collections.singleton(device.getId())).getOrDefault(device.getId(), Collections.emptyList());
+            Set<Long> writableThingModelIds = convertSet(points, IotDeviceOpcUaPointDO::getThingModelId,
+                    point -> Boolean.TRUE.equals(point.getWritable()));
+            for (String identifier : thingModels.keySet()) {
+                if (!writableThingModelIds.contains(thingModels.get(identifier).getId())) {
+                    throw exception(DEVICE_OPC_UA_POINT_NOT_WRITABLE, identifier);
+                }
+            }
+        }
+    }
+
+    /**
+     * 校验属性设置的参数：非空的属性 Map，每个属性都是物模型中的读写属性
+     *
+     * @param message 属性设置消息
+     * @param device  设备信息
+     * @return 请求的属性：属性标识符 → 物模型
+     */
+    private Map<String, IotThingModelDO> validatePropertySetWritable(IotDeviceMessage message, IotDeviceDO device) {
+        // 1. 校验参数：属性标识符 → 属性值，不能为空
+        if (!(message.getParams() instanceof Map) || MapUtil.isEmpty((Map<?, ?>) message.getParams())) {
+            throw exception(DEVICE_MESSAGE_PROPERTY_SET_PARAMS_INVALID);
+        }
+        // 2. 获取产品的属性物模型：属性标识符 → 物模型
+        Map<String, IotThingModelDO> propertyThingModels = convertMap(CollUtil.filterNew(
+                        thingModelService.getThingModelListByProductIdFromCache(device.getProductId()),
+                        thingModel -> IotThingModelTypeEnum.PROPERTY.getType().equals(thingModel.getType())),
+                IotThingModelDO::getIdentifier);
+        // 3. 逐个校验请求的属性：必须是物模型中的属性，且读写类型为读写（只读、不存在、非属性都拒绝整条消息）
+        Map<String, IotThingModelDO> result = new LinkedHashMap<>();
+        for (Object key : ((Map<?, ?>) message.getParams()).keySet()) {
+            String identifier = String.valueOf(key);
+            IotThingModelDO thingModel = propertyThingModels.get(identifier);
+            if (thingModel == null || thingModel.getProperty() == null || ObjUtil.notEqual(
+                    IotThingModelAccessModeEnum.READ_WRITE.getMode(), thingModel.getProperty().getAccessMode())) {
+                throw exception(DEVICE_MESSAGE_PROPERTY_NOT_WRITABLE, identifier);
+            }
+            result.put(identifier, thingModel);
+        }
+        return result;
     }
 
     /**

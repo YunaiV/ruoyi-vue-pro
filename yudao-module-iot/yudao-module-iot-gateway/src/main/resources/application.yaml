@@ -212,6 +212,61 @@ yudao:
             min-request-interval: 1000      # 同一设备的最小轮询请求间隔（毫秒，小于等于 0 表示不限制）
             request-timeout: 5000           # Pending Request 超时时间（毫秒）
             request-cleanup-interval: 10000 # Pending Request 清理间隔（毫秒）
+        # ====================================
+        # 针对引入的 OPC UA Client 组件的配置（只读采集；单网关长连接，只部署一个启用该协议的网关实例）
+        # ====================================
+        - id: opc-ua-client-1
+          enabled: false
+          protocol: opc_ua_client
+          port: 4841                        # 只用于生成 serverId，不监听端口
+          opc-ua-client:
+            config-refresh-interval: 30     # 配置刷新间隔（秒）
+            state-retry-interval: 30        # 上下线消息发送失败后的重试间隔（秒）
+            pki-dir: data/opc-ua/pki        # PKI 目录：own/client.pfx、trusted/certs、issuer/certs、rejected
+            keystore-password: ${IOT_OPC_UA_KEYSTORE_PASSWORD:}  # 客户端 keystore 口令（必填，建议通过环境变量注入）
+            keystore-alias: yudao-opc-ua-client # keystore 中客户端证书的别名（放入 CA 签发的证书时，私钥和证书链放在该别名下）
+            application-name: Yudao IoT Gateway OPC UA Client # 应用名称（会话 ApplicationName、新生成证书的 CN；多网关时便于服务端区分）
+            endpoint-host-rewrite: false    # 服务端返回的端点主机、端口与配置不一致时，是否改写为配置的
+            max-nodes-per-read: 100         # 每次 Read 的最大节点数（与服务端 OperationLimits 取较小值）
+            max-points-per-message: 100     # 每条属性上报消息的最大点位数
+            max-message-bytes: 262144       # 每条属性上报消息的最大字节数
+            max-monitored-items-per-call: 100 # 每次创建、删除 MonitoredItem 的最大数量
+            subscription-keep-alive-count: 10
+            subscription-lifetime-count: 30
+            write-timeout: 10000            # 属性写入超时（毫秒），含排队、读取节点属性和写入
+            max-pending-writes-per-device: 16 # 每个设备排队中的属性写入消息上限
+            max-nodes-per-write: 100        # 每次 Write 的最大节点数（与服务端 OperationLimits 取较小值）
+            credentials: {}                 # 用户名凭据（只支持用户名认证，设备必须引用这里的凭据别名），示例：
+            #  plc-reader:                    # 凭据别名（设备配置的 credentialAlias）
+            #    username: reader
+            #    password: ${IOT_OPC_UA_PLC_READER_PASSWORD:}
+            #    tenant-ids: [1]              # 允许使用的租户
+            #    endpoints: ["opc.tcp://192.168.1.10:4840"] # 允许使用的端点
+        # ====================================
+        # 针对引入的 OPC UA Server 组件的配置（北向只读数据服务：节点只读、写入拒绝；单网关部署，默认关闭）
+        # ====================================
+        - id: opc-ua-server-1
+          enabled: false
+          protocol: opc_ua_server
+          port: 4840                        # 监听端口
+          opc-ua-server:
+            config-refresh-interval: 30     # 配置刷新间隔（秒）
+            bind-address: 0.0.0.0           # 监听地址
+            hostname: localhost             # 端点主机名（上位机可访问的地址，也写入自签名证书 SAN）
+            path: /yudao-iot                # 端点路径；发现端点为 <path>/discovery
+            pki-dir: data/opc-ua-server/pki # PKI 目录：own/server.pfx、trusted/certs、issuer/certs、rejected
+            keystore-password: ${IOT_OPC_UA_SERVER_KEYSTORE_PASSWORD:} # 服务端 keystore 口令（必填，建议通过环境变量注入）
+            keystore-alias: yudao-opc-ua-server
+            application-name: Yudao IoT Gateway OPC UA Server
+            security-none-allowed: false    # 是否允许 None 安全策略的会话（只用于开发联调；仍然只允许用户名登录）
+            max-sessions: 20                # 网关最大会话数（每个配置的会话数另受配置的最大会话数限制）
+            max-subscriptions-per-session: 5      # 每个会话的最大订阅数上限
+            max-monitored-items-per-session: 1000 # 每个会话的最大 MonitoredItem 数上限
+            credentials: {}                 # 用户名凭据，示例：
+            #  scada-a:                       # 凭据别名（OPC UA Server 配置的 credentialAlias）
+            #    username: scada
+            #    password: ${IOT_OPC_UA_SERVER_SCADA_A_PASSWORD:}
+            #    tenant-ids: [1]              # 允许使用的租户
 
 --- #################### 日志相关配置 ####################
 
@@ -234,6 +289,7 @@ logging:
     cn.iocoder.yudao.module.iot.gateway.protocol.coap: DEBUG
     cn.iocoder.yudao.module.iot.gateway.protocol.websocket: DEBUG
     cn.iocoder.yudao.module.iot.gateway.protocol.modbus: DEBUG
+    cn.iocoder.yudao.module.iot.gateway.protocol.opcua: DEBUG
     # 根日志级别
     root: INFO
 

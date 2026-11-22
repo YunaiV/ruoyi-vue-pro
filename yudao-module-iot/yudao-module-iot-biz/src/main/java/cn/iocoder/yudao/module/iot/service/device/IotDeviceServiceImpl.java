@@ -241,10 +241,9 @@ public class IotDeviceServiceImpl implements IotDeviceService {
             }
         }
 
-        // 2. 删除设备
+        // 2.1 删除设备
         deviceMapper.deleteByIds(ids);
-
-        // 3. 级联删除影子
+        // 2.2 级联删除影子
         ids.forEach(deviceShadowService::deleteByDeviceId);
 
         // 4. 清空对应缓存（事务提交后生效）

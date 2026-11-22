@@ -83,6 +83,7 @@
         <okio.version>3.18.1</okio.version>
         <californium.version>3.14.0</californium.version>
         <j2mod.version>3.4.0</j2mod.version>
+        <yudao-milo.version>1.2.0-RC3-preview-20261123-jdk8</yudao-milo.version>
         <httpclient5.version>5.5.1</httpclient5.version> <!-- WxJava 4.8.x 需要 HttpClient5 5.4+，Spring Boot 2.7 默认 5.1.4 不兼容；JDK8 兼容不能升级到 5.5.2+ -->
         <httpcore5.version>5.3.6</httpcore5.version> <!-- 配套 httpclient5 5.5.1，Spring Boot 2.7 默认 5.1.5 不兼容 -->
         <rhino.version>1.7.15.1</rhino.version>
@@ -760,6 +761,15 @@
                 <groupId>com.ghgande</groupId>
                 <artifactId>j2mod</artifactId>
                 <version>${j2mod.version}</version>
+            </dependency>
+
+            <!-- OPC UA 相关 - 芋道 Milo（JDK 8 分支使用 yudao-milo-jdk8-bom 及 -jdk8 版本） -->
+            <dependency>
+                <groupId>cn.iocoder.boot</groupId>
+                <artifactId>yudao-milo-jdk8-bom</artifactId>
+                <version>${yudao-milo.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
 
             <!-- WxJava 4.8.x 需要 HttpClient5 5.4+，覆盖 Spring Boot 2.7 默认的 5.1.4；JDK8 兼容不能升级到 5.5.2+ -->

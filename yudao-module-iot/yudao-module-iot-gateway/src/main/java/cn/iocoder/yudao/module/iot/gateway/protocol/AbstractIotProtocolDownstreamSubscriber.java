@@ -3,12 +3,14 @@ package cn.iocoder.yudao.module.iot.gateway.protocol;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.iocoder.yudao.framework.common.exception.ErrorCode;
+import cn.iocoder.yudao.framework.common.exception.ServiceException;
 import cn.iocoder.yudao.module.iot.core.enums.IotDeviceMessageMethodEnum;
 import cn.iocoder.yudao.module.iot.core.enums.IotProtocolTypeEnum;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageBus;
 import cn.iocoder.yudao.module.iot.core.messagebus.core.IotMessageSubscriber;
 import cn.iocoder.yudao.module.iot.core.mq.message.IotDeviceMessage;
 import cn.iocoder.yudao.module.iot.core.script.dto.IotScriptSource;
+import cn.iocoder.yudao.module.iot.core.topic.property.IotDevicePropertySetResultDTO;
 import cn.iocoder.yudao.module.iot.core.util.IotDeviceMessageUtils;
 import cn.iocoder.yudao.module.iot.gateway.config.IotGatewayProperties;
 import cn.iocoder.yudao.module.iot.gateway.service.device.message.IotDeviceMessageService;
@@ -24,6 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static cn.iocoder.yudao.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static cn.iocoder.yudao.module.iot.gateway.enums.ErrorCodeConstants.DEVICE_OFFLINE_OR_WRITE_FAILED;
 import static cn.iocoder.yudao.module.iot.gateway.enums.ErrorCodeConstants.RAW_NOT_SUPPORTED;
 
 /**
@@ -316,6 +319,34 @@ public abstract class AbstractIotProtocolDownstreamSubscriber implements IotMess
             SpringUtil.getBean(IotDeviceMessageService.class).sendRawReply(request, source, payload, deviceError, serverId);
             return null;
         }, false).onFailure(e -> log.error("[replyRawResult][下行({}) 回复失败]", request.getRequestId(), e));
+    }
+
+
+    /**
+     * 回复属性设置（标准路径，非透传）的结果：结果完成后切到协议的 worker，交给设备消息 Service 逐项回复给 biz
+     * <p>
+     * 与透传不同，网关判定的失败（不在线、超时、值不合法等）也作为该属性的结果回复，biz 能看到每个属性是否设置成功
+     *
+     * @param request 原请求（thing.property.set）
+     * @param result  每个属性的结果；失败 = 整条消息失败（ServiceException 的错误码，例如参数不合法）；为 null 时不回复
+     */
+    protected final void replyPropertySetResult(IotDeviceMessage request,
+                                                Future<Map<String, IotDevicePropertySetResultDTO>> result) {
+        if (result == null) {
+            return;
+        }
+        String serverId = getServerId();
+        result.onComplete(ar -> protocol.getVertx().executeBlocking(() -> {
+            ErrorCode failure = null;
+            if (ar.failed()) {
+                failure = ar.cause() instanceof ServiceException
+                        ? new ErrorCode(((ServiceException) ar.cause()).getCode(), ar.cause().getMessage())
+                        : DEVICE_OFFLINE_OR_WRITE_FAILED;
+            }
+            SpringUtil.getBean(IotDeviceMessageService.class).sendPropertySetReply(request,
+                    ar.succeeded() ? ar.result() : null, failure, serverId);
+            return null;
+        }, false).onFailure(e -> log.error("[replyPropertySetResult][下行({}) 回复失败]", request.getRequestId(), e)));
     }
 
 }

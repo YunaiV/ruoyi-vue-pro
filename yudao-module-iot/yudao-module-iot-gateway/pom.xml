@@ -64,6 +64,16 @@
             <artifactId>j2mod</artifactId>
         </dependency>
 
+        <!-- OPC UA 相关 - 芋道 Milo -->
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-milo-jdk8-sdk-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cn.iocoder.boot</groupId>
+            <artifactId>yudao-milo-jdk8-sdk-server</artifactId> <!-- OPC UA Server：北向只读数据服务，默认关闭 -->
+        </dependency>
+
         <!-- CoAP 相关 - Eclipse Californium -->
         <dependency>
             <groupId>org.eclipse.californium</groupId>
