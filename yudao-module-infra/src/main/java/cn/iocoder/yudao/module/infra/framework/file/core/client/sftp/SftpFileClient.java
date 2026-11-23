@@ -14,7 +14,6 @@ import com.jcraft.jsch.SftpException;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -149,7 +148,8 @@ public class SftpFileClient extends AbstractFileClient<SftpFileClientConfig> {
     }
 
     private String getFilePath(String path) {
-        return config.getBasePath() + File.separator + path;
+        // 远程路径固定使用 /，不随服务端操作系统变化（Windows 的 \ 会被 JSch 当作转义符）
+        return config.getBasePath() + StrUtil.SLASH + path;
     }
 
     private synchronized void reconnectIfTimeout() {

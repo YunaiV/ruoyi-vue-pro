@@ -122,6 +122,26 @@ public class SftpFileClientTest {
     }
 
     @Test
+    public void testUpload_nestedPath() {
+        // 准备参数：默认会生成「日期目录/文件名」这种带子目录的 path
+        Sftp sftp = mock(Sftp.class);
+        SftpFileClient client = buildMockClient(sftp);
+        byte[] content = "synthetic-upload-content".getBytes(StandardCharsets.UTF_8);
+        // mock 上传方法
+        when(sftp.upload(eq("/upload/20260101/"), eq("test.txt"), any(InputStream.class))).thenReturn(true);
+
+        // 调用
+        String result = client.upload(content, "20260101/test.txt", "text/plain");
+
+        // 断言：远程路径只能使用 /，与服务端运行的操作系统无关
+        assertEquals("http://localhost/admin-api/infra/file/0/get/20260101/test.txt", result);
+        verify(sftp).reconnectIfTimeout();
+        verify(sftp).mkDirs("/upload/20260101/");
+        verify(sftp).upload(eq("/upload/20260101/"), eq("test.txt"), any(InputStream.class));
+        verifyNoMoreInteractions(sftp);
+    }
+
+    @Test
     public void testUpload_failure() {
         // 准备参数
         Sftp sftp = mock(Sftp.class);
