@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.InputStream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -47,11 +46,12 @@ public class SftpFileClientStreamTest {
         // 准备参数：独立通道返回文件流
         ChannelSftp channel = mock(ChannelSftp.class);
         when(streamSftp.getClient()).thenReturn(channel);
-        when(channel.get("/upload" + File.separator + "docs/a.txt")).thenReturn(new ByteArrayInputStream(new byte[]{1, 2}));
+        when(channel.get("/upload/docs/a.txt")).thenReturn(new ByteArrayInputStream(new byte[]{1, 2}));
 
         // 调用
         try (InputStream input = client.getStream("docs/a.txt")) {
-            assertArrayEquals(new byte[]{1, 2}, cn.hutool.core.io.IoUtil.readBytes(input));
+            // 读取时不关闭流：关闭由 try-with-resources 负责，才能断言关闭前未断开独立通道
+            assertArrayEquals(new byte[]{1, 2}, cn.hutool.core.io.IoUtil.readBytes(input, false));
             verify(streamSftp, never()).close();
         }
 
@@ -77,7 +77,7 @@ public class SftpFileClientStreamTest {
     public void testUpload_streamOnDedicatedChannel() {
         // 准备参数
         InputStream content = new ByteArrayInputStream(new byte[]{1, 2, 3});
-        String dir = "/upload" + File.separator + "docs/";
+        String dir = "/upload/docs/";
 
         // 调用
         String url = client.upload(content, 3, "docs/a.txt", "text/plain");
