@@ -83,7 +83,8 @@ public class S3FileClientStreamTest {
         // 调用
         try (InputStream input = fileClient.getStream("docs/a.txt")) {
             assertSame(response, input);
-            assertArrayEquals(new byte[]{1, 2}, cn.hutool.core.io.IoUtil.readBytes(input));
+            // 读取时不关闭流：关闭由 try-with-resources 负责，否则 content.close() 会变成两次
+            assertArrayEquals(new byte[]{1, 2}, cn.hutool.core.io.IoUtil.readBytes(input, false));
         }
 
         // 断言：调用方关闭时释放 SDK 响应流

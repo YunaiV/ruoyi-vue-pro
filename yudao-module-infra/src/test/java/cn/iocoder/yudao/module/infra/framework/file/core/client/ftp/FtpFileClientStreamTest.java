@@ -52,7 +52,8 @@ public class FtpFileClientStreamTest {
 
         // 调用
         try (InputStream input = client.getStream("docs/a.txt")) {
-            assertArrayEquals(new byte[]{1, 2}, cn.hutool.core.io.IoUtil.readBytes(input));
+            // 读取时不关闭流：关闭由 try-with-resources 负责，才能断言关闭前未释放独立连接
+            assertArrayEquals(new byte[]{1, 2}, cn.hutool.core.io.IoUtil.readBytes(input, false));
             verify(streamFtp, never()).close();
         }
 
