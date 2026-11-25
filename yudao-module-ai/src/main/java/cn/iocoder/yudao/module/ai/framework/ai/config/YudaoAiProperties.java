@@ -153,9 +153,9 @@ public class YudaoAiProperties {
         private boolean enable;
 
         /**
-         * 平台，默认 DeepSeek
+         * 平台；未指定时，有搜索密钥用 DeepSeek，否则用 Parallel
          */
-        private AiWebSearchPlatformEnum platform = AiWebSearchPlatformEnum.DEEPSEEK;
+        private AiWebSearchPlatformEnum platform;
 
         private String apiKey;
 

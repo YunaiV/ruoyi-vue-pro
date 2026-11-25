@@ -21,6 +21,7 @@ import cn.iocoder.yudao.module.ai.framework.ai.core.model.yiyan.YiYanChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.model.zhipu.ZhiPuChatModel;
 import cn.iocoder.yudao.module.ai.framework.ai.core.reasoning.AiRequestBodyPatcher;
 import cn.iocoder.yudao.module.ai.framework.ai.core.webserch.AiWebSearchClient;
+import cn.iocoder.yudao.module.ai.framework.ai.core.webserch.AiWebSearchPlatformEnum;
 import cn.iocoder.yudao.module.ai.framework.ai.core.webserch.baidu.AiBaiduWebSearchClient;
 import cn.iocoder.yudao.module.ai.framework.ai.core.webserch.bocha.AiBoChaWebSearchClient;
 import cn.iocoder.yudao.module.ai.framework.ai.core.webserch.deepseek.AiDeepSeekWebSearchClient;
@@ -496,7 +497,14 @@ public class AiAutoConfiguration {
     @ConditionalOnProperty(value = "yudao.ai.web-search.enable", havingValue = "true")
     public AiWebSearchClient webSearchClient(YudaoAiProperties yudaoAiProperties) {
         YudaoAiProperties.WebSearch properties = yudaoAiProperties.getWebSearch();
-        switch (properties.getPlatform()) {
+        AiWebSearchPlatformEnum platform = properties.getPlatform();
+        if (platform == null) {
+            // 兼容旧配置中的示例密钥；已配置真实密钥时继续使用 DeepSeek
+            String apiKey = StrUtil.trim(properties.getApiKey());
+            platform = StrUtil.isBlank(apiKey) || "sk-xxxx".equals(apiKey)
+                    ? AiWebSearchPlatformEnum.PARALLEL : AiWebSearchPlatformEnum.DEEPSEEK;
+        }
+        switch (platform) {
             case BOCHA:
                 return new AiBoChaWebSearchClient(properties.getApiKey());
             case BAIDU:

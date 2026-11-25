@@ -344,6 +344,10 @@
 
 演示地址：<https://doc.iocoder.cn/ai-preview/>
 
+启用 AI 模块并配置对话模型后，打开对话中的「联网搜索」再发送消息，才会将本条消息发给搜索平台。
+未配置搜索平台和密钥时，默认使用 Parallel MCP 的匿名额度。有搜索密钥但未指定平台时使用 DeepSeek。
+可在 `yudao.ai.web-search.platform` 中指定 `deepseek`、`bocha`、`baidu` 或 `parallel`，也可用 `yudao.ai.web-search.enable: false` 关闭联网搜索。
+
 ![功能图](/.image/common/ai-feature.png)
 
 ![功能图](/.image/common/ai-preview.gif)
