@@ -45,15 +45,14 @@ import java.util.concurrent.atomic.AtomicReference;
  * 3. 只实现上述 Streamable HTTP 请求，每个请求都有超时；超时或收到结果后取消请求，由 WebClient 关闭连接，
  *    不使用 MCP SDK 的客户端：其关闭会话超时后，不会关闭仍在读取的连接
  *
- * @see <a href="https://docs.parallel.ai/integrations/mcp/search-mcp">Parallel Search MCP</a>
- * @see <a href="https://github.com/parallel-web/search-mcp">parallel-web/search-mcp</a>
+ * @see <a href="https://docs.parallel.ai/integrations/mcp/quickstart">Parallel MCP</a>
  *
  * @author 芋道源码
  */
 @Slf4j
 public class AiParallelWebSearchClient implements AiWebSearchClient {
 
-    private static final String BASE_URL = "https://search.parallel.ai";
+    private static final String BASE_URL = "https://mcp.parallel.ai";
     private static final String ENDPOINT = "/mcp";
 
     /**
