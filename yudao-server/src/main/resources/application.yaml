@@ -291,8 +291,8 @@ yudao:
         notify-url: http://java.nat300.top/admin-api/ai/image/midjourney/notify
     web-search:
       enable: true
-      platform: deepseek # 联网搜索平台：deepseek（默认）、bocha、baidu
-      api-key: ${WEB_SEARCH_API_KEY:sk-xxxx} # 对应平台的 API Key：DeepSeek、博查、百度千帆
+      platform: deepseek # 联网搜索平台：deepseek（默认）、bocha、baidu、parallel（匿名访问 mcp.parallel.ai，无需 API Key）、keenable（未配置 API Key 时匿名访问 api.keenable.ai，有使用限额）
+      api-key: ${WEB_SEARCH_API_KEY:sk-xxxx} # 对应平台的 API Key：DeepSeek、博查、百度千帆；Keenable 可选
 
 --- #################### 芋道相关配置 ####################
 
